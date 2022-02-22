@@ -27,10 +27,10 @@ import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.Monitor;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.MutationType;
 import denoptimga.DENOPTIMGraphOperations;
-import denoptimga.Monitor;
 
 /**
  * Tool to test genetic operators

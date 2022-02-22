@@ -19,8 +19,6 @@
 
 package denoptim.fragspace;
 
-import static denoptimga.DENOPTIMGraphOperations.extractPattern;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,16 +37,15 @@ import denoptim.files.UndetectedFileFormatException;
 import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.GraphPattern;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphUtils;
-import denoptimga.GraphPattern;
 
 /**
  * Class defining the fragment space
@@ -1330,7 +1327,7 @@ public class FragmentSpace
         List<DENOPTIMGraph> subgraphs = null;
         try
         {   
-            subgraphs = extractPattern(graph,GraphPattern.RING);
+            subgraphs = graph.extractPattern(GraphPattern.RING);
         } catch (DENOPTIMException e1)
         {
             DENOPTIMLogger.appLogger.log(Level.WARNING, "Failed to extract "

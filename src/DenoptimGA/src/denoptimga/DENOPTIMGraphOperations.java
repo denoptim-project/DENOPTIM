@@ -45,9 +45,12 @@ import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.GraphPattern;
 import denoptim.graph.SymmetricSet;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.Monitor;
 import denoptim.rings.ChainLink;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.RingClosureParameters;
@@ -1086,141 +1089,6 @@ public class DENOPTIMGraphOperations
         }
 
         return res;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Extracts subgraphs from the graph parameter that match the provided
-     * pattern.
-     * @param graph graph to extract pattern from.
-     * @param pattern to match against.
-     * @return The subgraphs matching the provided pattern.
-     * @throws DENOPTIMException 
-     */
-    
-    public static List<DENOPTIMGraph> extractPattern(DENOPTIMGraph graph,
-            GraphPattern pattern) throws DENOPTIMException {
-        if (pattern != GraphPattern.RING) {
-            throw new IllegalArgumentException("Graph pattern " + pattern +
-                    " not supported.");
-        }
-
-        List<Set<DENOPTIMVertex>> disjointMultiCycleVertices = graph
-                .getRings()
-                .stream()
-                .map(DENOPTIMRing::getVertices)
-                .map(HashSet::new)
-                .collect(Collectors.toList());
-
-        GenUtils.unionOfIntersectingSets(disjointMultiCycleVertices);
-
-        List<DENOPTIMGraph> subgraphs = new ArrayList<>();
-        for (Set<DENOPTIMVertex> fusedRing : disjointMultiCycleVertices) {
-            subgraphs.add(extractSubgraph(graph, fusedRing));
-        }
-        
-        for (DENOPTIMGraph g : subgraphs) {
-            g.storeCurrentVertexIDs();
-            g.renumberGraphVertices();
-            reorderVertexList(g);
-        }
-
-        return subgraphs;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns the subgraph in the graph defined on the a set of vertices.
-     * The graph is cloned before the subgraph is extracted.
-     * @param graph To extract subgraph from.
-     * @param definedOn Set of vertices in the graph that the subgraph is
-     *                  defined on.
-     * @return Subgraph of graph defined on set of vertices.
-     */
-    private static DENOPTIMGraph extractSubgraph(DENOPTIMGraph graph,
-            Set<DENOPTIMVertex> definedOn) {
-        DENOPTIMGraph subgraph = graph.clone();
-
-        Set<DENOPTIMVertex> complement = subgraph
-                .getVertexList()
-                .stream()
-                .filter(u -> definedOn
-                        .stream()
-                        .allMatch(v -> v.getVertexId() != u.getVertexId())
-                ).collect(Collectors.toSet());
-
-        for (DENOPTIMVertex v : complement) {
-            subgraph.removeVertex(v);
-        }
-        return subgraph;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Sets the vertex at the lowest level as the scaffold, changes the  
-     * directions of edges so that the scaffold is the source, and changes 
-     * the levels of the graph's other vertices to be consistent with the new
-     * scaffold.
-     * @param g Graph to fix.
-     */
-    private static void reorderVertexList(DENOPTIMGraph g) 
-    {
-        DENOPTIMVertex newScaffold = g.getSourceVertex();
-        if (newScaffold == null) {
-            return;
-        }
-        DENOPTIMGraph.setScaffold(newScaffold);
-        fixEdgeDirections(g);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Flips edges in the graph so that the scaffold is the only source vertex.
-     * @param graph to fix edges of.
-     */
-    private static void fixEdgeDirections(DENOPTIMGraph graph) {
-        DENOPTIMVertex src = graph.getSourceVertex();
-        fixEdgeDirections(src, new HashSet<>());
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Recursive utility method for fixEdgeDirections(DENOPTIMGraph graph).
-     * @param v current vertex
-     */
-    private static void fixEdgeDirections(DENOPTIMVertex v,
-                                          Set<Integer> visited) {
-        visited.add(v.getVertexId());
-        int visitedVertexEncounters = 0;
-        for (int i = 0; i < v.getNumberOfAPs(); i++) {
-            DENOPTIMAttachmentPoint ap = v.getAP(i);
-            DENOPTIMEdge edge = ap.getEdgeUser();
-            if (edge != null) {
-                int srcVertex = edge.getSrcVertex();
-                boolean srcIsVisited =
-                        srcVertex != v.getVertexId() && visited.contains(srcVertex);
-
-                visitedVertexEncounters += srcIsVisited ? 1 : 0;
-                if (visitedVertexEncounters >= 2) {
-                    throw new IllegalArgumentException("Invalid graph. Contains a" +
-                            " cycle.");
-                }
-
-                boolean edgeIsWrongWay = edge.getTrgVertex() == v.getVertexId()
-                        && !srcIsVisited;
-                if (edgeIsWrongWay) {
-                    edge.flipEdge();
-                }
-                if (!srcIsVisited) {
-                    fixEdgeDirections(edge.getTrgAP().getOwner(), visited);
-                }
-            }
-        }
     }
 
 //------------------------------------------------------------------------------

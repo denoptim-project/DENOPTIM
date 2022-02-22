@@ -37,7 +37,9 @@ import org.apache.commons.lang3.time.StopWatch;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.graph.Candidate;
+import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.Monitor;
 import denoptim.task.FitnessTask;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
@@ -383,7 +385,8 @@ public class EvolutionaryAlgorithm
             return;
         }
         
-        Monitor mnt = new Monitor("MonitorGen",0);
+        Monitor mnt = new Monitor("MonitorGen",0,GAParameters.getMonitorFile(),
+                GAParameters.getMonitorDumpStep(), GAParameters.dumpMonitor);
         
         // Loop creation of candidates until we have created enough new valid 
         // candidates or we have reached the max number of attempts.
@@ -546,7 +549,8 @@ public class EvolutionaryAlgorithm
         
         int i=0;
         ArrayList<Task> syncronisedTasks = new ArrayList<>();
-        Monitor mnt = new Monitor("MonitorGen",genId);
+        Monitor mnt = new Monitor("MonitorGen",genId,GAParameters.getMonitorFile(),
+                GAParameters.getMonitorDumpStep(), GAParameters.dumpMonitor);
         try
         {
             while (i < GAParameters.getPopulationSize() *

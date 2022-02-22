@@ -1,4 +1,4 @@
-package denoptimga;
+package denoptim.graph;
 
 public enum GraphPattern {
     RING

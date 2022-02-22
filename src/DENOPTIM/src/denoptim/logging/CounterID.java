@@ -1,4 +1,4 @@
-package denoptimga;
+package denoptim.logging;
 
 /**
  * Identifier of a counter. A printable description is given by method

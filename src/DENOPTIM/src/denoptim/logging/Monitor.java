@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptimga;
+package denoptim.logging;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,7 +24,6 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
 
 /**
  * A collection of counters user to count actions taken by the evolutionary 
@@ -44,6 +43,22 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
      * A name that allows humans to understand what this is a monitor of.
      */
     public String name = "noname";
+    
+    /**
+     * Pathname to a file where to dump data
+     */
+    private String monitorFile = "unset.eamonitor";
+    
+    /**
+     * Number of steps (i.e., attempts to make new candidates) after which we 
+     * dump data to file, if required.
+     */
+    private int dumpStep = 50;
+    
+    /**
+     * Flag requesting to dump the monitor data on file
+     */
+    private boolean dumpData = false;
     
     /**
      * A generation number
@@ -77,12 +92,17 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
      * Creates a named monitor that is marked with the given generation number
      * @param identifier the string identifying this monitor.
      * @param genId the generation number.
+     * @param monitorFile the pathname of the file where to print monitor dumps.
      */
-    public Monitor(String identifier, int genId)
+    public Monitor(String identifier, int genId, String monitorFile, 
+            int dumpStep, boolean dumpData)
     {
         this();
         name = identifier;
         generationId = genId;
+        this.monitorFile = monitorFile;
+        this.dumpStep = dumpStep;
+        this.dumpData = dumpData;
     }
     
 //------------------------------------------------------------------------------
@@ -96,8 +116,7 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
             if (cid == CounterID.NEWCANDIDATEATTEMPTS)
             {
                 dumpsId++;
-                if (dumpsId >= GAParameters.getMonitorDumpStep()
-                        && GAParameters.dumpMonitor)
+                if (dumpData && dumpsId >= dumpStep)
                 {
                     dumpsId = 0;
                     dump = getMonitorDataLine("DUMP");
@@ -150,23 +169,21 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
 
     public void printHeader() throws DENOPTIMException
     {
-        DenoptimIO.writeData(GAParameters.getMonitorFile(),
-                getMonitorDataHeader(),true);
+        DenoptimIO.writeData(monitorFile, getMonitorDataHeader(), true);
     }
     
 //------------------------------------------------------------------------------
 
     public void printSummary() throws DENOPTIMException
     {
-        DenoptimIO.writeData(GAParameters.getMonitorFile(),
-                getMonitorDataLine("SUMMARY"),true);
+        DenoptimIO.writeData(monitorFile, getMonitorDataLine("SUMMARY"), true);
     }
     
 //------------------------------------------------------------------------------
 
     public void printSnapshot(String snapshot) throws DENOPTIMException
     {
-        DenoptimIO.writeData(GAParameters.getMonitorFile(),snapshot,true);
+        DenoptimIO.writeData(monitorFile, snapshot, true);
     }
 
 //------------------------------------------------------------------------------

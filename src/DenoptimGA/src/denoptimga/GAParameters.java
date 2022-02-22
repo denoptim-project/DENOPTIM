@@ -38,6 +38,7 @@ import denoptim.files.FileFormat;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.Monitor;
 import denoptim.logging.Version;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.MutationType;
@@ -296,7 +297,7 @@ public class GAParameters
 
     /**
      * Monitor dumps step. The EA {@link Monitor} will dump data to file every 
-     * this number is number of new attempts to generate candidate. 
+     * this number of new attempts to generate candidate. 
      */
     protected static int monitorDumpStep = 50;
     

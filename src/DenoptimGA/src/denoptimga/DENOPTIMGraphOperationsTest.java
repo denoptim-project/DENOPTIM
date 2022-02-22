@@ -38,6 +38,7 @@ import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
+import denoptim.graph.GraphPattern;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -70,8 +71,7 @@ public class DENOPTIMGraphOperationsTest {
     {
         DENOPTIMGraph g = getThreeCycle();
 
-        List<DENOPTIMGraph> subgraphs = DENOPTIMGraphOperations
-                .extractPattern(g, GraphPattern.RING);
+        List<DENOPTIMGraph> subgraphs = g.extractPattern(GraphPattern.RING);
 
         assertEquals(1, subgraphs.size());
         DENOPTIMGraph actual = subgraphs.get(0);
@@ -93,8 +93,7 @@ public class DENOPTIMGraphOperationsTest {
     {
         DENOPTIMGraph g = getThreeCycle();
         g.removeRing(g.getRings().get(0));
-        List<DENOPTIMGraph> subgraphs =
-                DENOPTIMGraphOperations.extractPattern(g, GraphPattern.RING);
+        List<DENOPTIMGraph> subgraphs = g.extractPattern(GraphPattern.RING);
 
         assertEquals(0, subgraphs.size());
     }
@@ -106,8 +105,7 @@ public class DENOPTIMGraphOperationsTest {
     {
         ExtractPatternCase testCase = getFusedRings();
 
-        List<DENOPTIMGraph> subgraphs = DENOPTIMGraphOperations
-                .extractPattern(testCase.g, GraphPattern.RING);
+        List<DENOPTIMGraph> subgraphs = testCase.g.extractPattern(GraphPattern.RING);
 
         assertTrue(testCase.matchesExpected(subgraphs));
     }

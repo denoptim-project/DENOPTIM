@@ -22,6 +22,7 @@ import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.logging.Monitor;
 import denoptim.graph.EmptyVertex;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
