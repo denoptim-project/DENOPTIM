@@ -19,8 +19,8 @@
 package checkpointreader;
 
 import denoptim.files.FileUtils;
-import fragspaceexplorer.FSECheckPoint;
-import fragspaceexplorer.FSEUtils;
+import denoptim.fragspaceexplorer.FSECheckPoint;
+import denoptim.fragspaceexplorer.FSEUtils;
 
 
 /**

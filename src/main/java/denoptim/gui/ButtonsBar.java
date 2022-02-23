@@ -1,4 +1,4 @@
-package gui;
+package denoptim.gui;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;

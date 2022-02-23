@@ -1,4 +1,4 @@
-package gui;
+package denoptim.gui;
 
 import java.util.ArrayList;
 import java.util.Map;

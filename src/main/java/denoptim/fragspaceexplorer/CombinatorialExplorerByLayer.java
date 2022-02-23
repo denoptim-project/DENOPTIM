@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fragspaceexplorer;
+package denoptim.fragspaceexplorer;
 
 import java.io.File;
 import java.util.ArrayList;

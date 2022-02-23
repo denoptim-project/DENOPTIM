@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptimcg;
+package denoptim.denoptimcg;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

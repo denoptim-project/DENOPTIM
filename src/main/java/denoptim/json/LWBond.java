@@ -1,8 +1,5 @@
 package denoptim.json;
 
-import javax.vecmath.Point3d;
-
-import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IBond;
 
 /**

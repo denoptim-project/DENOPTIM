@@ -1,4 +1,4 @@
-package denoptimga;
+package denoptim.denoptimga;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import denoptim.denoptimga.EAUtils.CandidateSource;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
@@ -22,11 +23,9 @@ import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.logging.Monitor;
 import denoptim.graph.EmptyVertex;
-import denoptim.utils.MutationType;
+import denoptim.logging.Monitor;
 import denoptim.utils.RandomUtils;
-import denoptimga.EAUtils.CandidateSource;
 
 /**
  * Unit test

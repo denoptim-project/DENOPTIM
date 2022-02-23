@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptimcg;
+package denoptim.denoptimcg;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +53,6 @@ import denoptim.rings.RingClosingAttractor;
 import denoptim.rings.RingClosure;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DummyAtomHandler;
-import denoptim.utils.GraphConversionTool;
 import denoptim.utils.ObjectPair;
 
 /**

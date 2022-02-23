@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.denoptimga.DENOPTIMGraphOperations;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
@@ -30,7 +31,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.MutationType;
-import denoptimga.DENOPTIMGraphOperations;
 
 /**
  * Tool to test genetic operators

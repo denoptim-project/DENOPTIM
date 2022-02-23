@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fitnessrunner;
+package denoptim.fitnessrunner;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,14 +33,13 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.denoptimga.DenoptimGA;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspaceexplorer.FragSpaceExplorer;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.task.FitnessTask;
-import denoptimga.DenoptimGA;
-import fragspaceexplorer.FragSpaceExplorer;
 
 
 /**

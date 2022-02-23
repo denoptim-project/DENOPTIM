@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fitnessrunner;
+package denoptim.fitnessrunner;
 
 import java.io.BufferedReader;
 import java.io.File;

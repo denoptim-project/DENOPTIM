@@ -17,19 +17,16 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptimga;
+package denoptim.denoptimga;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -42,10 +39,8 @@ import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.graph.GraphPattern;
 import denoptim.graph.SymmetricSet;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
@@ -54,7 +49,6 @@ import denoptim.logging.Monitor;
 import denoptim.rings.ChainLink;
 import denoptim.rings.ClosableChain;
 import denoptim.rings.RingClosureParameters;
-import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;

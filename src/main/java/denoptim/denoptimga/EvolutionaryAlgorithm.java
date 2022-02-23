@@ -16,10 +16,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptimga;
+package denoptim.denoptimga;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,6 +33,7 @@ import java.util.logging.Level;
 
 import org.apache.commons.lang3.time.StopWatch;
 
+import denoptim.denoptimga.EAUtils.CandidateSource;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.graph.Candidate;
@@ -44,7 +44,6 @@ import denoptim.task.FitnessTask;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
 import denoptim.utils.SizeControlledSet;
-import denoptimga.EAUtils.CandidateSource;
 
 /**
  * DENOPTIM's evolutionary algorithm. 

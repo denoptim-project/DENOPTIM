@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fitnessrunner;
+package denoptim.fitnessrunner;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 

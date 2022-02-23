@@ -20,7 +20,7 @@
 package denoptim.task;
 
 import denoptim.exception.DENOPTIMException;
-import fitnessrunner.FitnessRunner;
+import denoptim.fitnessrunner.FitnessRunner;
 
 /**
  * Task that runs the fitness provider main method from within

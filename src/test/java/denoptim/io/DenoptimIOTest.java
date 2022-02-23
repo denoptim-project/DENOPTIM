@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -47,12 +46,10 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.CandidateLW;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMFragmentTest;
 import denoptim.graph.DENOPTIMGraph;
@@ -60,6 +57,7 @@ import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMTemplateTest;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.SymmetricSet;
 

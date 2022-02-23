@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package gui;
+package denoptim.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

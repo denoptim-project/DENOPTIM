@@ -32,11 +32,9 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.DENOPTIMMoleculeUtils;

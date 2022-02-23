@@ -25,10 +25,7 @@ import java.io.IOException;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.io.DenoptimIO;
 import denoptim.rings.RingClosureParameters;
-import denoptim.utils.MutationType;
-import denoptim.utils.RandomUtils;
 
 
 /**

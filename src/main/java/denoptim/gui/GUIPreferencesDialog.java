@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package gui;
+package denoptim.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -41,7 +41,7 @@ import javax.swing.table.DefaultTableModel;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
-import gui.GUIPreferences.SMITo3DEngine;
+import denoptim.gui.GUIPreferences.SMITo3DEngine;
 
 public class GUIPreferencesDialog extends GUIModalDialog
 {

@@ -21,13 +21,8 @@ package isomorphism;
 import java.io.File;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.utils.GenUtils;
-import denoptim.utils.GraphConversionTool;
-import denoptim.utils.MutationType;
-import denoptimga.DENOPTIMGraphOperations;
+import denoptim.io.DenoptimIO;
 
 /**
  * Tool to test perform isomorphism analysis on DENOPTIMGreaphs.

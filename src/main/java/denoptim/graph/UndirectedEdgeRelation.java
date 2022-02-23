@@ -18,7 +18,6 @@
 
 package denoptim.graph;
 
-import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.utils.GenUtils;
 

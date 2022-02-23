@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package gui;
+package denoptim.gui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -40,12 +40,12 @@ import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.EmptyVertex;
+import denoptim.gui.GraphViewerPanel.JVertex;
+import denoptim.gui.GraphViewerPanel.JVertexType;
+import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
-import gui.GraphViewerPanel.JVertex;
-import gui.GraphViewerPanel.JVertexType;
-import gui.GraphViewerPanel.LabelType;
 
 
 /**

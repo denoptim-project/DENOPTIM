@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package gui;
+package denoptim.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -61,7 +61,6 @@ import org.openscience.cdk.interfaces.IBond;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileAndFormat;
-import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;

@@ -20,7 +20,7 @@
 package denoptim.task;
 
 import denoptim.exception.DENOPTIMException;
-import fragspaceexplorer.FragSpaceExplorer;
+import denoptim.fragspaceexplorer.FragSpaceExplorer;
 
 /**
  * Task that runs a DENOPTIM experiment with the fragment space explorer. 

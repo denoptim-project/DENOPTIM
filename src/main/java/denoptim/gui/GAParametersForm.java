@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package gui;
+package denoptim.gui;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -60,8 +60,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 
-import denoptimga.EAUtils;
-import denoptimga.GAParameters;
+import denoptim.denoptimga.EAUtils;
+import denoptim.denoptimga.GAParameters;
 
 
 /**

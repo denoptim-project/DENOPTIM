@@ -1,4 +1,4 @@
-package gui;
+package denoptim.gui;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import denoptim.gui.GraphViewerPanel.JEdge;
+import denoptim.gui.GraphViewerPanel.JVertex;
+import denoptim.gui.GraphViewerPanel.LabelType;
 import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
 import edu.uci.ics.jung.graph.Graph;
-import gui.GraphViewerPanel.JEdge;
-import gui.GraphViewerPanel.JVertex;
-import gui.GraphViewerPanel.LabelType;
 
 /**
  * This class collects information on how a graph was displayed in a JUNG

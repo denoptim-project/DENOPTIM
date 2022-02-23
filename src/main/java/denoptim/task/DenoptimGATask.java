@@ -19,8 +19,8 @@
 
 package denoptim.task;
 
+import denoptim.denoptimga.DenoptimGA;
 import denoptim.exception.DENOPTIMException;
-import denoptimga.DenoptimGA;
 
 /**
  * Task that runs a DENOPTIM experiment with the genetic algorithm. This class

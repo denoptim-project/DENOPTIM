@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptimcg;
+package denoptim.denoptimcg;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,11 +25,9 @@ import java.util.ArrayList;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.io.DenoptimIO;
-import denoptim.utils.GraphConversionTool;
 
 /**
  *

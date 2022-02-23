@@ -16,13 +16,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fitnessrunner;
+package denoptim.fitnessrunner;
 
 import java.util.logging.Level;
 
+import denoptim.denoptimga.DenoptimGA;
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
-import denoptimga.DenoptimGA;
 
 
 /**

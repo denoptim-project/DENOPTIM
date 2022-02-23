@@ -14,7 +14,6 @@ import denoptim.graph.APTreeMap.APMapSerializer;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.DENOPTIMEdgeSerializer;
-import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMGraph.DENOPTIMGraphDeserializer;
 import denoptim.graph.DENOPTIMGraph.DENOPTIMGraphSerializer;

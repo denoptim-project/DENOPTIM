@@ -1,31 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/classes" path="src/DENOPTIM/src">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/FitnessRunner/src"/>
 	<classpathentry kind="src" path="src/misc/StringConverter/src"/>
+	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/misc/RDKITFragmenter/src"/>
 	<classpathentry kind="src" path="src/misc/SerConverter/src"/>
 	<classpathentry kind="src" path="src/misc/CheckpointReader/src"/>
 	<classpathentry kind="src" path="src/misc/PrepareFitnessOutput/src"/>
 	<classpathentry kind="src" path="src/misc/PrepareMOPAC/src"/>
 	<classpathentry kind="src" path="src/misc/TestOperator/src"/>
-	<classpathentry kind="src" path="src/DenoptimCG/src"/>
-	<classpathentry kind="src" path="src/DenoptimGA/src"/>
-	<classpathentry kind="src" path="src/DenoptimRND/src"/>
-	<classpathentry kind="src" path="src/FragSpaceExplorer/src"/>
-	<classpathentry kind="src" path="src/GUI/src"/>
-	<classpathentry kind="src" path="src/UpdateUID/src"/>
 	<classpathentry kind="src" path="src/misc/GraphListsHandler/src"/>
 	<classpathentry kind="src" path="src/misc/GraphEditor/src"/>
 	<classpathentry kind="src" path="src/misc/Isomorphism/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
+			<attribute name="module" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>

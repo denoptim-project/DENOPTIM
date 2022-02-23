@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package gui;
+package denoptim.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -63,15 +63,15 @@ import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
+import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
-import gui.GraphViewerPanel.LabelType;
 
 
 /**

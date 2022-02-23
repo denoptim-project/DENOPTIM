@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import org.apache.commons.io.FilenameUtils;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -38,7 +37,6 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.DENOPTIMGraphEdit;
-import denoptim.utils.GraphConversionTool;
 
 
 /**

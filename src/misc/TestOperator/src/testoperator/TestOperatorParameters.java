@@ -22,13 +22,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import denoptim.denoptimga.GAParameters;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
-import denoptimga.GAParameters;
 
 
 /**

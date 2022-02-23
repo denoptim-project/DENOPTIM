@@ -1,4 +1,4 @@
-package gui;
+package denoptim.gui;
 
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
@@ -8,10 +8,10 @@ import java.util.concurrent.ExecutionException;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 
+import denoptim.gui.GraphViewerPanel.JVertex;
 import edu.uci.ics.jung.algorithms.layout.SpringLayout2;
 import edu.uci.ics.jung.algorithms.layout.util.RandomLocationTransformer;
 import edu.uci.ics.jung.graph.Graph;
-import gui.GraphViewerPanel.JVertex;
 
 /**
  * This layout extends the SpringLayout to change its behaviour. The

@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptimga;
+package denoptim.denoptimga;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -28,7 +28,6 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.SizeControlledSet;
 
 /**
  *

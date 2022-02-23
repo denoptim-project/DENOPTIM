@@ -328,7 +328,7 @@ public class FitnessParameters
      * expression using descriptors (i.e., values
      * that will eventually be calculated by IDescriptor implementations) 
      * and variables (i.e., values that are derived from descriptors according 
-     * to customisable expressions that aims at cutomise the parameters used
+     * to customizable expressions that aims at customize the parameters used
      * to calculated the descriptor value, or make the descriptor atom/bond
      * specific). Since
      * the value obtained from the calculation of each single descriptor can be 

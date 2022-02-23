@@ -19,10 +19,7 @@ package denoptim.graph;
  */
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-
-import javax.vecmath.Point3d;
 
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
