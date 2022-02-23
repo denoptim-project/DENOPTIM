@@ -164,7 +164,7 @@ public class FSEUtils
             
             DENOPTIMGraph c = g.clone();
             
-            storeGraphOfLevel(c,level,0,new ArrayList());
+            storeGraphOfLevel(c,level,0,new ArrayList<Integer>());
         }
     }
 

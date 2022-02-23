@@ -399,7 +399,8 @@ public class PathSubGraph
             // Non-empty if there exists a path
             if (path.iterator().hasNext()) {
                 List<DENOPTIMAttachmentPoint> extendedPath =
-                        new ArrayList(Arrays.asList(fromAP, adjAP));
+                        new ArrayList<DENOPTIMAttachmentPoint>(Arrays.asList(
+                                fromAP, adjAP));
                 path.iterator().forEachRemaining(extendedPath::add);
                 return extendedPath;
             }

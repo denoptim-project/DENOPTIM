@@ -129,7 +129,7 @@ public class DescriptorUtils
             {
                 URL url = roots.nextElement();
                 File root = new File(url.getPath());
-                for (File f : Files.fileTreeTraverser().breadthFirstTraversal(
+                for (File f : Files.fileTraverser().breadthFirst(
                         root))
                 {
                     if (!f.isDirectory() && f.getPath().contains(
