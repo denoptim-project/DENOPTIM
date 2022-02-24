@@ -34,14 +34,12 @@ import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
 
-import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.fingerprint.IBitFingerprint;
 import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.fingerprint.ShortestPathFingerprinter;
 import org.openscience.cdk.fingerprint.SubstructureFingerprinter;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
@@ -88,7 +86,6 @@ public class FitnessParameters
      */
     private static String fitnessExpression = "";
     
-    
     /**
      * List of custom variable definitions read from input. 
      * These lines are the definition of atom/bond specific 
@@ -105,8 +102,8 @@ public class FitnessParameters
     private static List<Variable> variables = new ArrayList<Variable>();
     
     /**
-     * The list of descriptors needed to calculate the fitness with internal 
-     * fitness provider.
+     * The list of descriptors needed to calculate the variables that are
+     * used to calculate the fitness with the internal fitness provider.
      */
     private static List<DescriptorForFitness> descriptors = 
             new ArrayList<DescriptorForFitness>();
@@ -132,12 +129,7 @@ public class FitnessParameters
      * a molecular entity. See 
      */
     private static boolean checkPreFitnessUID = true;
-    
-    /**
-     * Utility for constructing CDK objects
-     */
-    private static IChemObjectBuilder cdkBuilder = 
-            DefaultChemObjectBuilder.getInstance();
+
     
     //TODO-V3 should all this stuff be static? Check!
     
@@ -349,73 +341,16 @@ public class FitnessParameters
 	        throws DENOPTIMException
 	{
 		// Parse expression of the fitness to get the names of all ingredients
+	    
         Set<String> variableAndFunctionNames = new HashSet<String>();
 	    ExpressionFactory expFactory = new ExpressionFactoryImpl();
 	    
-	    /**
-	     * A context that does not map neither variables (i.e., strings that can
-	     * be converted into values) nor functions (strings that need to be 
-	     * translated into methods and fed with variables to be translated into 
-	     * values), but 
-	     * that collects the names of either variables and functions without
-	     * distinguishing their nature.
-	     */
-	    ELContext nameCollectingContext = new ELContext() {
-	        /**
-	         * A dummy function mapper that maps nothing
-	         */
-	        private javax.el.FunctionMapper fm = new javax.el.FunctionMapper() {
-	            @Override
-	            public Method resolveFunction(String p, String n) {
-	                return null;
-	            }
-	        };
-
-	        /**
-	         * Rather than mapping a variable it adds it to an external list
-	         * of variables.
-	         */
-	        private VariableMapper vm = new VariableMapper() {
-	            @Override
-	            public ValueExpression resolveVariable(String variable) {
-	                variableAndFunctionNames.add(variable);
-	                return null;
-	            }
-
-	            @Override
-	            public ValueExpression setVariable(String variable, 
-	                    ValueExpression expression) {
-                            return null;
-                }
-	        };
-	        
-	        private ELResolver resolver = new SimpleResolver();
-
-            @Override
-            public ELResolver getELResolver()
-            {
-                return resolver;
-            }
-
-            @Override
-            public javax.el.FunctionMapper getFunctionMapper()
-            {
-                return fm;
-            }
-
-            @Override
-            public VariableMapper getVariableMapper()
-            {
-                return vm;
-            }
-        };
-            
         // Here we read the fitness expression to identify all ingredients that 
         // are needed to calculate the fitness value. At this stage, we cannot
         // know whether a string refers to a variable of a descriptor name.
         // Either are collected in variableAndFunctionNames
-	    expFactory.createValueExpression(nameCollectingContext, 
-	            fitnessExpression, Double.class);
+	    NameCollectingContext ncc = new NameCollectingContext(variableAndFunctionNames);
+	    expFactory.createValueExpression(ncc, fitnessExpression, Double.class);
 		
 		// Make all variables (mostly empty of info, for now)
 	    // Since at this stage we cannot distinguish between variables and
@@ -431,87 +366,14 @@ public class FitnessParameters
 		    variables.add(v);
 		}
 		
-		/**
-		 * A context that allows the expression evaluation to find methods 
-		 * in the implementations of {@link FitnessParameter}. 
-		 * Currently, such methods are 
-         * {@link FitnessParameters#atomSpecific} and  
-         * {@link FitnessParameters#parametrized}.
-		 * This does nothing to and does not map variables.
-		 */
-		ELContext functionDefiningContext = new ELContext() {
-            /**
-             * Maps a function name to a method in the {@link FitnessParameter}
-             * implementation.
-             */
-            private javax.el.FunctionMapper fm = new javax.el.FunctionMapper() {
-                @Override
-                /**
-                 * This map allows ExpressionEvaluator to find the methods 
-                 * implemented here in {@link FitnessParameter} class and that 
-                 * are used to parse the expression string that defines the 
-                 * function to be used to calculate a specific variable value.
-                 * Currently, such methods are 
-                 * {@link FitnessParameters#atomSpecific} and  
-                 * {@link FitnessParameters#parametrized}.
-                 */
-                public Method resolveFunction(String nameSpace, String methodName) {
-                    try {
-                        //TODO make the methods part of a private inner class
-                        return FitnessParameters.class.getMethod(methodName, 
-                                String.class, String.class, String.class);
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (SecurityException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-            };
-
-            /**
-             * Dummy variable mapper that does nothing; maps nothing.
-             */
-            private VariableMapper vm = new VariableMapper() {
-                @Override
-                public ValueExpression resolveVariable(String variable) {
-                    return null;
-                }
-
-                @Override
-                public ValueExpression setVariable(String variable, 
-                        ValueExpression expression) {
-                            return null;
-                }
-            };
-            
-            private ELResolver resolver = new SimpleResolver();
-
-            @Override
-            public ELResolver getELResolver()
-            {
-                return resolver;
-            }
-
-            @Override
-            public javax.el.FunctionMapper getFunctionMapper()
-            {
-                return fm;
-            }
-
-            @Override
-            public VariableMapper getVariableMapper()
-            {
-                return vm;
-            }
-        };
+		FunctionDefiningContext fdc = new FunctionDefiningContext();
 		
 		// Now, we parse the expression defining variables, i.e., any custom 
 		// parameterized and/or atom-/bond-specific descriptor.
 		for (String variableDefinition : customVarDescExpressions)
 		{
 		    //NB: this identifies which method should be used to parse
-		    ValueExpression ve  = expFactory.createValueExpression(functionDefiningContext, 
+		    ValueExpression ve  = expFactory.createValueExpression(fdc, 
 			        variableDefinition, Double.class);
 		    // This does the actual parsing by calling executing the 
 		    // function, i.e., the method identified above, that parses the
@@ -519,7 +381,7 @@ public class FitnessParameters
 		    // which atom-/bond-specific descriptor to calculate, which SMARTS 
 		    // to use to identify the atoms/bonds on which to calculate the 
 		    // descriptor, etc...)
-		    ve.getValue(functionDefiningContext);
+		    ve.getValue(fdc);
 		    // NB: the parsing alters the collection of variables stored
 		    // in the "variables" field.
 		}
@@ -698,6 +560,163 @@ public class FitnessParameters
 		    }
         }
 	}
+	
+//------------------------------------------------------------------------------
+	
+	/**
+     * A context that allows the expression evaluation to find methods 
+     * in the implementations of {@link FitnessParameter}. 
+     * Currently, such methods are 
+     * {@link FitnessParameters#atomSpecific} and  
+     * {@link FitnessParameters#parametrized}.
+     * This does nothing to and does not map variables.
+     */
+	
+    private static class FunctionDefiningContext extends ELContext
+    {
+        /**
+         * Maps a function name to a method in the {@link FitnessParameter}
+         * implementation.
+         */
+        private javax.el.FunctionMapper fm = new javax.el.FunctionMapper() {
+            @Override
+            /**
+             * This map allows ExpressionEvaluator to find the methods 
+             * implemented here in {@link FitnessParameter} class and that 
+             * are used to parse the expression string that defines the 
+             * function to be used to calculate a specific variable value.
+             * Currently, such methods are 
+             * {@link FitnessParameters#atomSpecific} and  
+             * {@link FitnessParameters#parametrized}.
+             */
+            public Method resolveFunction(String nameSpace, String methodName) {
+                try {
+                    //TODO make the methods part of a private inner class
+                    return FitnessParameters.class.getMethod(methodName, 
+                            String.class, String.class, String.class);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+
+        /**
+         * Dummy variable mapper that does nothing; maps nothing.
+         */
+        private VariableMapper vm = new VariableMapper() {
+            @Override
+            public ValueExpression resolveVariable(String variable) {
+                return null;
+            }
+
+            @Override
+            public ValueExpression setVariable(String variable, 
+                    ValueExpression expression) {
+                        return null;
+            }
+        };
+        
+        private ELResolver resolver = new SimpleResolver();
+
+        @Override
+        public ELResolver getELResolver()
+        {
+            return resolver;
+        }
+
+        @Override
+        public javax.el.FunctionMapper getFunctionMapper()
+        {
+            return fm;
+        }
+
+        @Override
+        public VariableMapper getVariableMapper()
+        {
+            return vm;
+        }
+    }
+	
+//------------------------------------------------------------------------------
+	
+    /**
+     * A context that does not map neither variables (i.e., strings that can
+     * be converted into values) nor functions (strings that need to be 
+     * translated into methods and fed with variables to be translated into 
+     * values), but 
+     * that collects the names of either variables and functions without
+     * distinguishing their nature.
+     */
+    private static class NameCollectingContext extends ELContext
+    {
+        /**
+         * Reference to the list of variable names
+         */
+        private Set<String> variableAndFunctionNames;
+        
+        /**
+         * A dummy function mapper that maps nothing
+         */
+        private javax.el.FunctionMapper fm = new javax.el.FunctionMapper() {
+            @Override
+            public Method resolveFunction(String p, String n) {
+                return null;
+            }
+        };
+
+        /**
+         * Rather than mapping a variable it adds it to an external list
+         * of variables.
+         */
+        private VariableMapper vm = new VariableMapper() {
+            @Override
+            public ValueExpression resolveVariable(String variable) {
+                variableAndFunctionNames.add(variable);
+                return null;
+            }
+
+            @Override
+            public ValueExpression setVariable(String variable, 
+                    ValueExpression expression) {
+                        return null;
+            }
+        };
+        
+        /**
+         * Default resolver that undesrtands the syntax of expression language.
+         */
+        private ELResolver resolver = new SimpleResolver();
+        
+        /**
+         * constructor that tells where to collect the list of variables.
+         * @param variableAndFunctionNames
+         */
+        public NameCollectingContext(Set<String> variableAndFunctionNames)
+        {
+            this.variableAndFunctionNames = variableAndFunctionNames;
+        }
+
+        @Override
+        public ELResolver getELResolver()
+        {
+            return resolver;
+        }
+
+        @Override
+        public javax.el.FunctionMapper getFunctionMapper()
+        {
+            return fm;
+        }
+
+        @Override
+        public VariableMapper getVariableMapper()
+        {
+            return vm;
+        }
+    }
 	
 //------------------------------------------------------------------------------
     
