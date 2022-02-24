@@ -22,12 +22,20 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.el.ELContext;
+import javax.el.ELResolver;
+import javax.el.ExpressionFactory;
+import javax.el.MethodExpression;
+import javax.el.StandardELContext;
+import javax.el.ValueExpression;
+import javax.el.VariableMapper;
 import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.FunctionMapper;
 import javax.servlet.jsp.el.VariableResolver;
@@ -44,6 +52,9 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.qsar.IDescriptor;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
+import de.odysseus.el.ExpressionFactoryImpl;
+import de.odysseus.el.util.SimpleContext;
+import de.odysseus.el.util.SimpleResolver;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.fitness.descriptors.TanimotoMolSimilarity;
@@ -96,7 +107,7 @@ public class FitnessParameters
     
     /**
      * List of variables used in the calculation of the fitness. 
-     * For instance, atom/bond specific descriptors, and customly parametrised 
+     * For instance, atom/bond specific descriptors, and custom parameterized 
      * descriptors.
      */
     private static List<Variable> variables = new ArrayList<Variable>();
@@ -325,12 +336,14 @@ public class FitnessParameters
 
     /**
      * This method parser the strings defining the fitness as a mathematical
-     * expression using descriptors (i.e., values
+     * expression using <code>descriptors</code> (i.e., values
      * that will eventually be calculated by IDescriptor implementations) 
-     * and variables (i.e., values that are derived from descriptors according 
+     * and <code>variables</code> 
+     * (i.e., values that are derived from descriptors according 
      * to customizable expressions that aims at customize the parameters used
      * to calculated the descriptor value, or make the descriptor atom/bond
-     * specific). Since
+     * specific)
+     * Since
      * the value obtained from the calculation of each single descriptor can be 
      * used for multiple purposes (i.e., as a proper descriptor and as a 
      * component used to calculate the value of a variable) we collect the
@@ -343,32 +356,81 @@ public class FitnessParameters
 	private static void parseFitnessExpressionToDefineDescriptors() 
 	        throws DENOPTIMException
 	{
-		// Parse expression of the fitness to get the names of all variables
-		ExpressionEvaluatorImpl extractor = new ExpressionEvaluatorImpl();
-		Set<String> variableNames = new HashSet<String>();
-        VariableResolver collectAll = new VariableResolver() {
-			@Override
-			public Double resolveVariable(String varName) throws ELException {
-				variableNames.add(varName);
-				return 1.0;
-			}
-		};
+		// Parse expression of the fitness to get the names of all ingredients
+        Set<String> variableAndFunctionNames = new HashSet<String>();
+	    ExpressionFactory expFactory = new ExpressionFactoryImpl();
+	    
+	    /**
+	     * A context that does not map neither variables (i.e., strings that can
+	     * be converted into values) nor functions (strings that need to be 
+	     * translated into methods and fed with variables to be translated into 
+	     * values), but 
+	     * that collects the names of either variables and functions without
+	     * distinguishing their nature.
+	     */
+	    ELContext nameCollectingContext = new ELContext() {
+	        /**
+	         * A dummy function mapper that maps nothing
+	         */
+	        private javax.el.FunctionMapper fm = new javax.el.FunctionMapper() {
+	            @Override
+	            public Method resolveFunction(String p, String n) {
+	                return null;
+	            }
+	        };
+
+	        /**
+	         * Rather than mapping a variable it adds it to an external list
+	         * of variables.
+	         */
+	        private VariableMapper vm = new VariableMapper() {
+	            @Override
+	            public ValueExpression resolveVariable(String variable) {
+	                variableAndFunctionNames.add(variable);
+	                return null;
+	            }
+
+	            @Override
+	            public ValueExpression setVariable(String variable, 
+	                    ValueExpression expression) {
+                            return null;
+                }
+	        };
+	        
+	        private ELResolver resolver = new SimpleResolver();
+
+            @Override
+            public ELResolver getELResolver()
+            {
+                return resolver;
+            }
+
+            @Override
+            public javax.el.FunctionMapper getFunctionMapper()
+            {
+                return fm;
+            }
+
+            @Override
+            public VariableMapper getVariableMapper()
+            {
+                return vm;
+            }
+        };
+            
+        // Here we read the fitness expression to identify all ingredients that 
+        // are needed to calculate the fitness value. At this stage, we cannot
+        // know whether a string refers to a variable of a descriptor name.
+        // Either are collected in variableAndFunctionNames
+	    expFactory.createValueExpression(nameCollectingContext, 
+	            fitnessExpression, Double.class);
 		
-		// Here we read the fitness expression to identify all components that 
-		// are needed to calculate the fitness value. At this stage, we cannot
-		// know whether a string refers to a variable of a descriptor name.
-		try {
-			//NB: this is not really an evaluation because the variableResolver
-			// parse the data the get from the  
-			// ExpressionEvaluator
-			extractor.evaluate(fitnessExpression, Double.class, collectAll, 
-					null);
-		} catch (ELException e) {
-			throw new DENOPTIMException("ERROR: unable to parse fitness "
-					+ "expression.",e);
-		}
-		// Make all Variables (mostly empty of info, for now)
-		for (String varName : variableNames)
+		// Make all variables (mostly empty of info, for now)
+	    // Since at this stage we cannot distinguish between variables and
+	    // descriptors, all ingredients are treated as variables. Later,
+	    // when parsing the definition of functions, these pseudo-variables
+	    // will be replaced by definitions of functions.
+		for (String varName : variableAndFunctionNames)
 		{
 		    Variable v = new Variable(varName);
 		    //WARNING: we first write the varName as descName, and then we 
@@ -377,57 +439,101 @@ public class FitnessParameters
 		    variables.add(v);
 		}
 		
-		// Dummy variable resolver. This is needed to fulfil the requirements of 
-		// extractor, but it does nothing.
-		//TODO try to use null
-        VariableResolver dummyResolver = new VariableResolver() {
-            @Override
-            public Double resolveVariable(String varName) throws ELException {
-                return 1.0;
-            }
-        };
-        /**
-         * This map allows ExpressionEvaluator to find the methods 
-         * implemented here in FitnessParameter class and that are used to 
-         * parse the expression string.
-         * Currently, such methods are 
+		/**
+		 * A context that allows the expression evaluation to find methods 
+		 * in the implementations of {@link FitnessParameter}. 
+		 * Currently, such methods are 
          * {@link FitnessParameters#atomSpecific} and  
          * {@link FitnessParameters#parametrized}.
-         */
-        FunctionMapper funcsMap = new FunctionMapper() {
-            @Override
-            public Method resolveFunction(String nameSpace, String methodName) {
-                try {
-                    //TODO make the methods part of a private inner class
-                    return FitnessParameters.class.getMethod(methodName, 
-                            String.class, String.class, String.class);
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (SecurityException e) {
-                    e.printStackTrace();
+		 * This does nothing to and does not map variables.
+		 */
+		ELContext functionDefiningContext = new ELContext() {
+            /**
+             * Maps a function name to a method in the {@link FitnessParameter}
+             * implementation.
+             */
+            private javax.el.FunctionMapper fm = new javax.el.FunctionMapper() {
+                @Override
+                /**
+                 * This map allows ExpressionEvaluator to find the methods 
+                 * implemented here in {@link FitnessParameter} class and that 
+                 * are used to parse the expression string that defines the 
+                 * function to be used to calculate a specific variable value.
+                 * Currently, such methods are 
+                 * {@link FitnessParameters#atomSpecific} and  
+                 * {@link FitnessParameters#parametrized}.
+                 */
+                public Method resolveFunction(String nameSpace, String methodName) {
+                    try {
+                        //TODO make the methods part of a private inner class
+                        return FitnessParameters.class.getMethod(methodName, 
+                                String.class, String.class, String.class);
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (SecurityException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
                 }
-                return null;
+            };
+
+            /**
+             * Dummy variable mapper that does nothing; maps nothing.
+             */
+            private VariableMapper vm = new VariableMapper() {
+                @Override
+                public ValueExpression resolveVariable(String variable) {
+                    return null;
+                }
+
+                @Override
+                public ValueExpression setVariable(String variable, 
+                        ValueExpression expression) {
+                            return null;
+                }
+            };
+            
+            private ELResolver resolver = new SimpleResolver();
+
+            @Override
+            public ELResolver getELResolver()
+            {
+                return resolver;
+            }
+
+            @Override
+            public javax.el.FunctionMapper getFunctionMapper()
+            {
+                return fm;
+            }
+
+            @Override
+            public VariableMapper getVariableMapper()
+            {
+                return vm;
             }
         };
-		// Now, we read the specifics of variables, i.e., any custom 
-		// parametrised and/or atom/bond specific descriptor.
-		try {
-			//NB: this is not really an evaluation because the variableResolver
-			// and function map only parse the data they get from the 
-			// ExpressionEvaluator.
-			for (String variableDefinition : customVarDescExpressions)
-			{
-			    //NB: 'funcsMap' tells the extractor how to deal with the data
-			    // fed into functions 'atomSpecific' and 'parametrized'
-				extractor.evaluate(variableDefinition, Double.class, 
-				        dummyResolver, funcsMap);
-			}
-		} catch (ELException e) {
-			throw new DENOPTIMException("ERROR: unable to parse fitness "
-					+ "expression.",e);
+		
+		// Now, we parse the expression defining variables, i.e., any custom 
+		// parameterized and/or atom-/bond-specific descriptor.
+		for (String variableDefinition : customVarDescExpressions)
+		{
+		    //NB: this identifies which method should be used to parse
+		    ValueExpression ve  = expFactory.createValueExpression(functionDefiningContext, 
+			        variableDefinition, Double.class);
+		    // This does the actual parsing by calling executing the 
+		    // function, i.e., the method identified above, that parses the
+		    // expression to identify the specifics of the variable (e.g.,
+		    // which atom-/bond-specific descriptor to calculate, which SMARTS 
+		    // to use to identify the atoms/bonds on which to calculate the 
+		    // descriptor, etc...)
+		    ve.getValue(functionDefiningContext);
+		    // NB: the parsing alters the collection of variables stored
+		    // in the "variables" field.
 		}
 		
-		// Also the descriptors that are simply called by name are transformed 
+		//TODO-gg should this be removed?
+	    // Also the descriptors that are simply called by name are transformed 
 		// into variables
 		/*
 		for (String s : descriptorsGeneratingVariables)
@@ -458,7 +564,7 @@ public class FitnessParameters
 		        new HashMap<String,DescriptorForFitness>();
 		
 		// Now we create the list of descriptors, each with either standard or 
-		// customised configuration, that will be fed to the fitness provider
+		// customized configuration, that will be fed to the fitness provider
 		// descriptor engine. This list goes into the field 'descriptors'.
 		for (int i=0; i<variables.size(); i++)
         {   
@@ -467,7 +573,7 @@ public class FitnessParameters
 		    String descName = v.getDescriptorName();
 
 		    // 'raw' means that it has not yet been configured, so it can be 
-		    // used to draft both standard and customised descriptors instances
+		    // used to draft both standard and customized descriptors instances
             DescriptorForFitness rawDff = rawDescriptors.stream()
                     .filter(d -> descName.equals(d.getShortName()))
                     .findAny()
@@ -496,7 +602,7 @@ public class FitnessParameters
     		        standardDescriptors.put(rawDff.getShortName(),dff);
 		        }
 		    } else {
-		        // This variable requires a customised descriptor configuration
+		        // This variable requires a customized descriptor configuration
 		        // So, here a brand new descriptor is made and configured
                 DescriptorForFitness dff = rawDff.makeCopy();
                 dff.addDependentVariable(v);

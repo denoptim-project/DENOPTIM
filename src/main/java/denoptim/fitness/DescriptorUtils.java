@@ -50,7 +50,7 @@ public class DescriptorUtils
             String jarFileWildQuery)
     {
         String pkgPath = packageName.replaceAll("\\.", FS);
-        String jarPathName  = "";
+        List<String> jarPathNames = new ArrayList<String>();
         String classPath = System.getProperty("java.class.path");
         String[] jarsAndDirs = classPath.split(File.pathSeparator);
         for (int i = 0; i < jarsAndDirs.length; i++)
@@ -67,57 +67,27 @@ public class DescriptorUtils
                 Enumeration<JarEntry> enumeration = jarFile.entries();
                 while (enumeration.hasMoreElements()) {
                     JarEntry jarEntry = enumeration.nextElement();
+                    
                     if (jarEntry.toString().contains(pkgPath))
                     {
-                        jarPathName = pathName;
+                        jarPathNames.add(pathName);
                         break;
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            
-            if (jarPathName.equals("") && jarFileWildQuery!=null 
-                    && !jarFileWildQuery.equals(""))
-            {
-                File parentFolder = new File(System.getProperty("user.dir"));
-                if (pathName.endsWith("DenoptimGA.jar") 
-                        || pathName.endsWith("FragSpaceExplorer.jar")
-                        || pathName.endsWith("GUI.jar")
-                        || pathName.endsWith("FitnessRunner.jar"))
-                {
-                    File myClassPath = new File(pathName);
-                    if (pathName.contains(FS))
-                    {
-                        parentFolder = new File(myClassPath.getParent());
-                    }
-                }
-                
-                FileFilter fileFilter = new WildcardFileFilter(jarFileWildQuery);
-                File[] cands = parentFolder.listFiles(fileFilter);
-                if (cands.length == 1)
-                {
-                    jarPathName = cands[0].getAbsolutePath();
-                }
-                
-                File libFolder = new File(parentFolder.getAbsolutePath() 
-                        + FS + "lib");
-                if (libFolder.exists())
-                {
-                    cands = libFolder.listFiles(fileFilter);
-                    if (cands.length == 1)
-                    {
-                        jarPathName = cands[0].getAbsolutePath();
-                    }
-                }
-            }
         }
         
         List<String> classNames = new ArrayList<String>();
-        if (!jarPathName.equals(""))
+        if (jarPathNames.size()>0)
         {
-            classNames = DescriptorEngine.getDescriptorClassNameByPackage(
-                    packageName, new String[]{jarPathName});
+            for (String jarPathName : jarPathNames)
+            {
+                classNames.addAll(DescriptorEngine
+                        .getDescriptorClassNameByPackage(packageName, 
+                                new String[]{jarPathName}));
+            }
         }
         
         ClassLoader cl = new ClassLoader() {};
@@ -129,8 +99,7 @@ public class DescriptorUtils
             {
                 URL url = roots.nextElement();
                 File root = new File(url.getPath());
-                for (File f : Files.fileTraverser().breadthFirst(
-                        root))
+                for (File f : Files.fileTraverser().breadthFirst(root))
                 {
                     if (!f.isDirectory() && f.getPath().contains(
                             pkgPath.replaceAll(FS,File.separator)))
