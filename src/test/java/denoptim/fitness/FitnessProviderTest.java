@@ -226,12 +226,12 @@ public class FitnessProviderTest
         String[] lines = new String[] {
                 "FP-Equation=${taniSym + taniBis + 0.02 * Zagreb - aHyb_1 +"
                 + " aHyb_2}",
-                "FP-DescriptorSpecs=${atomSpecific('aHyb_1','aHyb','[$([C])]')}",
-                "FP-DescriptorSpecs=${atomSpecific('aHyb_2','aHyb','[$([O])]')}",
-                "FP-DescriptorSpecs=${parametrized('taniSym',"
+                "FP-DescriptorSpecs=${Variable.atomSpecific('aHyb_1','aHyb','[$([C])]')}",
+                "FP-DescriptorSpecs=${Variable.atomSpecific('aHyb_2','aHyb','[$([O])]')}",
+                "FP-DescriptorSpecs=${Variable.parametrized('taniSym',"
                     + "'TanimotoSimilarity','PubchemFingerprinter, " 
                     + "FILE:" + fileName + "')}",
-                "FP-DescriptorSpecs=${parametrized('taniBis',"
+                "FP-DescriptorSpecs=${Variable.parametrized('taniBis',"
                     + "'TanimotoSimilarity','GraphOnlyFingerprinter, "
                     + "FILE:" + fileName + "')}"};
         for (int i=0; i<lines.length; i++)

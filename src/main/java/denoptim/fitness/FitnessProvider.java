@@ -6,10 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import javax.servlet.jsp.el.ELException;
-import javax.servlet.jsp.el.VariableResolver;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ELResolver;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.FunctionMapper;
+import jakarta.el.ValueExpression;
+import jakarta.el.VariableMapper;
 
-import org.apache.commons.el.ExpressionEvaluatorImpl;
 import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
@@ -345,26 +349,109 @@ public class FitnessProvider
             }
         }
         if (debug) System.out.println("VARIABLES: "+valuesMap);
-        
+    
+
         // Calculate the fitness from the expression and descriptor values
-		ExpressionEvaluatorImpl evaluator = new ExpressionEvaluatorImpl();
-		VariableResolver resolver = new VariableResolver() {
-			@Override
-			public Double resolveVariable(String varName) throws ELException {
-				Double value = null;
-				if (!valuesMap.containsKey(varName))
-				{
-					throw new ELException("Variable '" + varName 
-							+ "' cannot be resolved");
-				} else {
-					value = valuesMap.get(varName);
-				}
-				return value;
-			}
-		};
-		
-		double fitness = (double) evaluator.evaluate(expression, Double.class, 
-				resolver, null);
+        ExpressionFactory expFactory = ExpressionFactory.newInstance();
+        ELContext ncc = new ELContext() {
+            
+            VariableMapper vm = new VariableMapper() {
+
+                @Override
+                public ValueExpression resolveVariable(String varName)
+                {
+                    ValueExpression ve = new ValueExpression() {
+
+                        @Override
+                        public Object getValue(ELContext context)
+                        {
+                            Double value = null;
+                            if (!valuesMap.containsKey(varName))
+                            {
+                                throw new ELException("Variable '" + varName 
+                                        + "' cannot be resolved");
+                            } else {
+                                value = valuesMap.get(varName);
+                            }
+                            return value;
+                        }
+
+                        @Override
+                        public void setValue(ELContext context, Object value)
+                        {}
+
+                        @Override
+                        public boolean isReadOnly(ELContext context)
+                        {
+                            return true;
+                        }
+
+                        @Override
+                        public Class<?> getType(ELContext context)
+                        {
+                            return Double.class;
+                        }
+
+                        @Override
+                        public Class<?> getExpectedType()
+                        {
+                            return Double.class;
+                        }
+
+                        @Override
+                        public String getExpressionString()
+                        {
+                            return null;
+                        }
+
+                        @Override
+                        public boolean equals(Object obj)
+                        {
+                            return false;
+                        }
+
+                        @Override
+                        public int hashCode()
+                        {
+                            return 0;
+                        }
+
+                        @Override
+                        public boolean isLiteralText()
+                        {
+                            return false;
+                        }
+                    };
+                    return ve;
+                }
+
+                @Override
+                public ValueExpression setVariable(String variable,
+                        ValueExpression expression)
+                {
+                    return null;
+                }};
+
+            @Override
+            public ELResolver getELResolver()
+            {
+                return null;
+            }
+
+            @Override
+            public FunctionMapper getFunctionMapper()
+            {
+                return null;
+            }
+
+            @Override
+            public VariableMapper getVariableMapper()
+            {
+                return vm;
+            }};
+        ValueExpression ve = expFactory.createValueExpression(ncc, expression, 
+                Double.class);
+        double fitness = (double) ve.getValue(ncc);
 		
 		iac.setProperty(DENOPTIMConstants.FITNESSTAG,fitness);
 		return fitness;

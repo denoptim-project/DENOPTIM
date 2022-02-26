@@ -1,6 +1,7 @@
 package denoptim.fitness;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.openscience.cdk.qsar.IDescriptor;
 
@@ -50,9 +51,62 @@ public class Variable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Constructs a named variable.
+     * @param varName
+     */
     public Variable(String varName)
     {
         this.varName = varName;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns an atom specific variable, i.e., a variable the value of which
+     * needs to be obtained from the calculation of the given descriptor
+     * on a specific atom that is defined by the given
+     * SMARTS string.
+     * @param varName the name of the variable
+     * @param descName the name of the descriptor as defined in any 
+     * implementation of {@link IDescriptor}.
+     * @param smartsIdentifier the SMARTS that identifies the atom/s to consider
+     * for the calculation of the descriptor and thus the value.
+     * @return the variable instance.
+     */
+    
+    public static Variable atomSpecific(String varName, String descName, 
+            String smartsIdentifier)
+    {
+        ArrayList<String> smarts = new ArrayList<String>(Arrays.asList(
+                smartsIdentifier.split("\\s+")));
+        Variable v = new Variable(varName);
+        v.setDescriptorName(descName);
+        v.setSMARTS(smarts);
+        return v;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns an parameterized variable, i.e., a variable the value of which
+     * needs to be obtained from the calculation of the given descriptor
+     * according to the given parameters.
+     * @param varName the name of the variable
+     * @param descName the name of the descriptor as defined in any 
+     * implementation of {@link IDescriptor}.
+     * @param paramsStr string defining all the parameters for the calculation 
+     * of the descriptor.
+     * @return the variable instance.
+     */
+    
+    public static Variable parametrized(String varName, String descName, 
+            String paramsStr)
+    {
+        Variable v = new Variable(varName);
+        v.setDescriptorName(descName);
+        v.setDescriptorParameters(paramsStr.split(", +"));
+        return v;
     }
  
 //------------------------------------------------------------------------------

@@ -40,12 +40,12 @@ import org.openscience.cdk.smiles.SmilesParser;
 import denoptim.io.DenoptimIO;
 
 /**
- * Unit test for fitness parameters' handler
+ * Unit test for parser of fitness-defining expressions.
  * 
  * @author Marco Foscato
  */
 
-public class FitnessParametersTest
+public class FitnessExpressionParserTest
 {
 	
     private SmilesParser sp;
@@ -74,12 +74,12 @@ public class FitnessParametersTest
         String[] lines = new String[] {
                 "FP-Equation=${taniSym + taniBis + 3.3 * Zagreb - aHyb_1 + "
                 + "aHyb_2}",
-                "FP-DescriptorSpecs=${atomSpecific('aHyb_1','aHyb','[$([C])]')}",
-                "FP-DescriptorSpecs=${atomSpecific('aHyb_2','aHyb','[$([N])]')}",
-                "FP-DescriptorSpecs=${parametrized('taniSym',"
+                "FP-DescriptorSpecs=${Variable.atomSpecific('aHyb_1','aHyb','[$([C])]')}",
+                "FP-DescriptorSpecs=${Variable.atomSpecific('aHyb_2','aHyb','[$([N])]')}",
+                "FP-DescriptorSpecs=${Variable.parametrized('taniSym',"
                     + "'TanimotoSimilarity','PubchemFingerprinter, "
                     + "FILE:" + fileName + "')}",
-                "FP-DescriptorSpecs=${parametrized('taniBis',"
+                "FP-DescriptorSpecs=${Variable.parametrized('taniBis',"
                     + "'TanimotoSimilarity','Fingerprinter, "
                     + "FILE:" + fileName + "')}"};
         for (int i=0; i<lines.length; i++)
@@ -87,9 +87,12 @@ public class FitnessParametersTest
             String line = lines[i];
             FitnessParameters.interpretKeyword(line);
         }
-        FitnessParameters.processParameters();
         
-        assertEquals(4,FitnessParameters.getDescriptors().size(),
+        FitnessParameters.processParameters();
+        List<DescriptorForFitness> descriptors = 
+                FitnessParameters.getDescriptors();
+        
+        assertEquals(4,descriptors.size(),
                 "Number of descriptor implementation");
         
         Map<String,Integer> counts = new HashMap<String,Integer>();
@@ -110,17 +113,6 @@ public class FitnessParametersTest
                     "Number of " + expectedNames[i] + " implementations");
         }
 
-        Map<String,List<String>> expectedVarNames = new HashMap<String,List<String>>();
-        expectedVarNames.put("aHyb", new ArrayList<>(Arrays.asList(
-                "aHyb_1","aHyb_2")));
-        expectedVarNames.put("TanimotoSimilarity", new ArrayList<>(
-                Arrays.asList("taniSym")));
-        expectedVarNames.put("TanimotoSimilarity", new ArrayList<>(
-                Arrays.asList("taniBis")));
-        expectedVarNames.put("Zagreb", new ArrayList<>(Arrays.asList("Zagreb")));
-        List<DescriptorForFitness> descriptors = 
-                FitnessParameters.getDescriptors();
-        assertEquals(4,descriptors.size(), "Number of descriptors for fitness");
         boolean foundA = false;
         boolean foundB = false;
         for (int i=0; i<descriptors.size(); i++)
@@ -143,8 +135,8 @@ public class FitnessParametersTest
                         if ("aHyb_2".equals(actual.getName()))
                             foundTwo = true;
                     }
-                    assertTrue(foundOne, "Found fitst variable");
-                    assertTrue(foundTwo, "Found second variable");
+                    assertTrue(foundOne, "Found first variable aHyb");
+                    assertTrue(foundTwo, "Found second variable aHyb");
                     break;
                     
                 case "Zagreb":
@@ -167,6 +159,8 @@ public class FitnessParametersTest
                     fail("Unexpected descriptor name "+descName);
             }
         }
+        assertTrue(foundA, "Tanimoto-variable A");
+        assertTrue(foundB, "Tanimoto-variable B");
         
         // Cleanup static fields
         FitnessParameters.resetParameters();

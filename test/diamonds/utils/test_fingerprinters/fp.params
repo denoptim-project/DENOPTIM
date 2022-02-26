@@ -5,9 +5,9 @@ FR-OUTPUT=output.sdf
 FP-NO3DTREEMODEL
 
 #FP-Equation=${taniToGoal}
-#FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','ShortestPathFingerprinter, FILE:goal.sdf')}
+#FP-DescriptorSpecs=${Variable.parametrized('taniToGoal','TanimotoSimilarity','ShortestPathFingerprinter, FILE:goal.sdf')}
 
 FP-Equation=${taniToSubStructs}
-FP-DescriptorSpecs=${parametrized('taniToSubStructs','TanimotoSimilarityBySubstructure','FILE:smarts, FILE:goal.sdf')}
+FP-DescriptorSpecs=${Variable.parametrized('taniToSubStructs','TanimotoSimilarityBySubstructure','FILE:smarts, FILE:goal.sdf')}
 
-#FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:goal.sdf')}
+#FP-DescriptorSpecs=${Variable.parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:goal.sdf')}

@@ -6,5 +6,5 @@ FR-Output=t25_out.sdf
 
 # Fitness Provider - parameters
 FP-Equation=${taniToGoal}
-FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:goal.sdf')}
+FP-DescriptorSpecs=${Variable.parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:goal.sdf')}
 FP-No3dTreeModel

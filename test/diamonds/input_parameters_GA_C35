@@ -42,4 +42,4 @@ RC-EvaluationClosabilityMode=Ring_size
 
 # Fitness Provider - parameters
 FP-Equation=${taniToGoal*taniToGoal*taniToGoal}
-FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
+FP-DescriptorSpecs=${Variable.parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
