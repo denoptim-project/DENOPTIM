@@ -153,6 +153,33 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M3</version>
       </plugin>
+        <!-- Maven Assembly Plugin -->
+	  <plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-assembly-plugin</artifactId>
+          <configuration>
+		    <!-- get all project dependencies -->
+		    <descriptorRefs>
+		        <descriptorRef>jar-with-dependencies</descriptorRef>
+		    </descriptorRefs>
+		    <!-- MainClass in mainfest make a executable jar -->
+		    <archive>
+		      <manifest>
+	            <mainClass>denoptim.gui.GUI</mainClass>
+		      </manifest>
+		    </archive>
+	      </configuration>
+	      <executions>
+		    <execution>
+		      <id>make-assembly</id>
+                <!-- bind to the packaging phase -->
+		        <phase>package</phase>
+		        <goals>
+		            <goal>single</goal>
+		        </goals>
+	          </execution>
+	        </executions>
+        </plugin>
     </plugins>
   </build>
 </project>
