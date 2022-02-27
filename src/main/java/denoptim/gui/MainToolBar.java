@@ -536,13 +536,13 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 //-----------------------------------------------------------------------------
 
 	/**
-	 * Process a file that has a recognised file format and loads a suitable 
+	 * Process a file that has a recognized file format and loads a suitable 
 	 * GUI card to visualize the file content.
 	 * @param file the file to open
 	 * @param fileFormat the DENOPTIM format of the file
 	 */
 	
-	private void openFile(File file, FileFormat fileFormat) 
+	void openFile(File file, FileFormat fileFormat) 
 	{
 		switch (fileFormat)
 		{

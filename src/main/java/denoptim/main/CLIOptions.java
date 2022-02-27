@@ -15,22 +15,22 @@ public class CLIOptions extends Options
     /**
      * Option requesting the printing of the help message.
      */
-    protected static Option help;
+    public static Option help;
     
     /**
      * Option specifying the input file
      */
-    protected static Option input;
+    public static Option input;
     
     /**
      * Option requesting only the printing of the version.
      */
-    protected static Option version;
+    public static Option version;
     
     /**
      * Option controlling the type of run.
      */
-    protected static Option run;
+    public static Option run;
     
     /**
      * The only, static instance of this class

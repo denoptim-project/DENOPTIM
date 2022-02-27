@@ -1,6 +1,8 @@
 package denoptim.main;
 
 
+import org.apache.commons.cli.CommandLine;
+
 import denoptim.main.Main.RunType;
 
 /**
@@ -31,27 +33,27 @@ public class Behavior
     protected RunType runType = null;
     
     /**
-     * The arguments
+     * The parsed command line arguments.
      */
-    protected String[] params = null;
+    protected CommandLine cmd = null;
     
 //------------------------------------------------------------------------------
 
     /**
      * Creates a behavior
      * @param runType the type of run.
-     * @param params the arguments for the run.
+     * @param cmd the command line arguments for the run.
      * @param exitStatus any non-zero corresponds to an error.
      * @param errorMsg the error message, if any.
      */
-    public Behavior(RunType runType, String[] params, int exitStatus, 
+    public Behavior(RunType runType, CommandLine cmd, int exitStatus, 
             String helpMsg, String errorMsg)
     {
         this.helpMsg = helpMsg;
         this.errorMsg = errorMsg;
         this.exitStatus = exitStatus;
         this.runType = runType;
-        this.params = params;
+        this.cmd = cmd;
     }
     
 //------------------------------------------------------------------------------
@@ -61,9 +63,9 @@ public class Behavior
      * @param runType the type of run.
      * @param params the arguments for the run.
      */
-    public Behavior(RunType runType, String[] params)
+    public Behavior(RunType runType, CommandLine cmd)
     {
-        this(runType, params, 0, null, null);
+        this(runType, cmd, 0, null, null);
     }
     
 //------------------------------------------------------------------------------

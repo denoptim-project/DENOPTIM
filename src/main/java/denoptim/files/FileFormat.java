@@ -7,7 +7,7 @@ import java.util.Set;
 import denoptim.constants.DENOPTIMConstants;
 
 /**
- * File formats identified by DENOOTIM.
+ * File formats identified by DENOPTIM.
  *
  */
 public enum FileFormat {
@@ -16,7 +16,8 @@ public enum FileFormat {
     GRAPHJSON, GRAPHSDF, VRTXJSON, VRTXSDF,
     FSE_RUN, GA_RUN,
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP,
-    TXT, GRAPHTXT;
+    TXT, GRAPHTXT,
+    UNRECOGNIZED;
         
     private String extension = "";
     

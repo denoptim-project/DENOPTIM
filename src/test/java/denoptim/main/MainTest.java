@@ -56,7 +56,8 @@ public class MainTest
                 "-"+CLIOptions.input.getOpt(), inputPathName});
         assertEquals(0, b.exitStatus, "Exit status");
         assertEquals(RunType.GA, b.runType, "Type of run");
-        assertEquals(inputPathName, b.params[3], "Parameter");
+        assertEquals(inputPathName, b.cmd.getOptionValue(CLIOptions.input), 
+                "Parameter");
 
         b = Main.defineProgramBehavior(new String[] {
                 "-"+CLIOptions.run.getOpt(), "gA", 
@@ -70,7 +71,8 @@ public class MainTest
                 "-"+CLIOptions.run.getOpt(), "FSE"});
         assertEquals(0, b.exitStatus, "Exit status");
         assertEquals(RunType.FSE, b.runType, "Type of run");
-        assertEquals(inputPathName, b.params[1], "Parameter");
+        assertEquals(inputPathName, b.cmd.getOptionValue(CLIOptions.input), 
+                "Parameter");
         
         //
         // Testing the request for a specific type of run (wrong request)

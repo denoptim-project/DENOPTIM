@@ -31,8 +31,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
@@ -43,6 +45,9 @@ import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
  * The home panel contains shortcuts buttons to perform the most common tasks.
@@ -86,9 +91,9 @@ public class HomePanel extends GUICardPanel
 		
 		try
 		{
-			show_image.setIcon(new ImageIcon(new ImageIcon(
-					this.getClass().getClass().getResource(
-					"/images/DENOPTIM_extended_logo.png")).getImage()));
+		    URL url =  ClassLoader.getSystemResource(
+		            "images/DENOPTIM_extended_logo.png");
+			show_image.setIcon(new ImageIcon(new ImageIcon(url).getImage()));
 		} catch (Throwable t)
 		{
 			// Problems loading resources

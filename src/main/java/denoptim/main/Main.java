@@ -1,5 +1,7 @@
 package denoptim.main;
 
+import java.awt.EventQueue;
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -10,8 +12,10 @@ import org.apache.commons.cli.ParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.denoptimga.DenoptimGA;
+import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fragspaceexplorer.FragSpaceExplorer;
+import denoptim.gui.GUI;
 import denoptim.logging.Version;
 
 /**
@@ -71,18 +75,62 @@ public class Main
             System.exit(0);
         }
         
-        // And now, we actually launch one of the main programs
-        
-        //TODO-gg
+        // Now we deal with actual program runs
+        switch (behavior.runType)
+        {
+            case GA:
+                break;
+                
+            case FSE:
+                break;
+                
+            case GUI:
+                ensureFileIsReadable(behavior.cmd);
+                EventQueue.invokeLater(new GUI(behavior.cmd));
+                break;
+                
+            default:
+                reportError("You requested a run of type '" + behavior.runType 
+                        + "', but I found no such implementation. "
+                        + "Please, report this to the authors.", 1);
+                break;
+        }
+    }
 
-        System.exit(0);
+//------------------------------------------------------------------------------
+    
+    /**
+     * Use this method to avoid launching a GUI in the attempt to open a file 
+     * with unrecognized format.
+     * @param cmd the command line containing the option 
+     * {@link CLIOptions#input}.
+     */
+    private static void ensureFileIsReadable(CommandLine cmd)
+    {
+        if (!cmd.hasOption(CLIOptions.input))
+            return;
+        
+        String pathname = cmd.getOptionValue(CLIOptions.input);
+        FileFormat format = FileFormat.UNRECOGNIZED;
+        try {
+            format = FileUtils.detectFileFormat(new File(pathname));
+        } catch (Throwable t) {
+            // Ignore: if anything goes wrong well still get UNRECOGNIZED which
+            // triggers the error.
+        }
+        if (FileFormat.UNRECOGNIZED.equals(format))
+        {
+            reportError("Could not open file '" + pathname + "' because its "
+                    + "format is not recognized.", 1);
+        }
     }
 
 //------------------------------------------------------------------------------
     
     /**
      * Does the processing of the application arguments and decides what the
-     * program should do.
+     * program should do. Note that this method already checks if the pathname
+     * given for the {@link CLIOptions#input} option is valid.
      * @param args the arguments to process
      * @return the behavior of the program as inferred from the given arguments.
      */
@@ -127,7 +175,7 @@ public class Main
                     result = new Behavior(null, null, 1, null, errMsg);
                     break;
                 }
-                result = new Behavior(RunType.GUI, args, 0, null, null);
+                result = new Behavior(RunType.GUI, cmd, 0, null, null);
                 break;
                 
             default:
@@ -170,22 +218,22 @@ public class Main
                         switch (rt)
                         {
                             case GA:
-                                result = new Behavior(RunType.GA, args);
+                                result = new Behavior(RunType.GA, cmd);
                                 break;
                                 
                             case FSE:
-                                result = new Behavior(RunType.FSE, args);
+                                result = new Behavior(RunType.FSE, cmd);
                                 break;
                                 
                             case GUI:
-                                result = new Behavior(RunType.GUI, args);
+                                result = new Behavior(RunType.GUI, cmd);
                                 break;
                         }
                     }
                 } else {
                     if (cmd.hasOption(CLIOptions.input))
                     {
-                        result = new Behavior(RunType.GUI, args);
+                        result = new Behavior(RunType.GUI, cmd);
                     } else {
                         String helpMsg = getHelpString();
                         String errMsg = "No meaningful command line option. "
@@ -213,7 +261,17 @@ public class Main
         formatter.printHelp(pw, 80, "denoptim", DENOPTIMConstants.EOL, 
                 CLIOptions.getInstance(), 
                 formatter.getLeftPadding(), formatter.getDescPadding(), 
-                "", true);
+                DENOPTIMConstants.EOL +
+                "Run without arguments to launch the graphical user "
+                + "interface (GUI) without opening any specific file. "
+                + "Alternatively, to open the file/folder named <filename> in "
+                + "the GUI the two following commands are equivalent: "
+                + DENOPTIMConstants.EOL
+                + "  denoptim -" + CLIOptions.run.getOpt() 
+                + " GUI -f <filename>"
+                + DENOPTIMConstants.EOL
+                + "  denoptim <filename> -" + CLIOptions.run.getOpt() + " GUI",
+                true);
         pw.flush();
         return out.toString();
     }
