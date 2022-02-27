@@ -20,6 +20,8 @@ package denoptim.logging;
 
 import java.util.Properties;
 
+import denoptim.constants.DENOPTIMConstants;
+
 /**
  *  Version numbers used here are broken into 3 parts: major, minor, and 
  *  update, and are written as V<major>.<minor>.<update> (e.g. V0.1.1).  
@@ -41,22 +43,27 @@ public class Version
     public static final String DATE = "Nov 30, 2020";
     public static final String MINIMUMJAVAVERSION = "1.8";
     
+    //NB: Remember the version has to be consistent with the pom.xml file
+    
     /** The major version number. */
-    public static final int MAJOR = 2;
+    public static final int MAJOR = 3;
 
     /** The minor version number. */
-    public static final int MINOR = 2;
+    public static final int MINOR = 0;
 
     /** The update letter. */
     public static final int UPDATE = 0;
-
 
     /** String for the current version. */
     public static final String VERSION = "V" + MAJOR + "." + MINOR + "." + UPDATE;
 
 //------------------------------------------------------------------------------    
 
-    public static String message()
+    /**
+     * Builds the header with version, authors, contributors, and
+     * @return
+     */
+    public static String buildDenoptimHeader()
     {
         Properties p = System.getProperties();
         String javaVersion = p.getProperty("java.version");
@@ -67,16 +74,16 @@ public class Version
         if (javaVM != null && javaVMVersion != null)
             javaVersion = javaVersion + "-" + javaVMVersion;
     
-        return 
-            "\n| " + NAME + 
-            "\n| DENovo OPTimization of In/organic Molecules (" + VERSION + ")" +
-            "\n| By " + AUTHORS + 
-            "\n| Contributors: " + CONTRIBUTORS +
-            "\n| Contact: " + CONTACT + 
-            "\n| Date: " + DATE +
-            "\n| Current Java: " + javaVersion +
-            "\n| Required Minimum Java: " + MINIMUMJAVAVERSION +
-            "\n\n";
+        String NL = DENOPTIMConstants.EOL;
+        return NL + "| " + NAME + 
+            NL + "| DENovo OPTimization of In/organic Molecules (" + VERSION + ")" +
+            NL + "| By " + AUTHORS + 
+            NL + "| Contributors: " + CONTRIBUTORS +
+            NL + "| Contact: " + CONTACT + 
+            NL + "| Date: " + DATE +
+            NL + "| Current Java: " + javaVersion +
+            NL + "| Required Minimum Java: " + MINIMUMJAVAVERSION +
+            NL + NL;
     }
     
 //------------------------------------------------------------------------------        

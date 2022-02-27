@@ -714,7 +714,7 @@ public class GAParameters
     {
         String eol = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder(1024);
-        sb.append(Version.message());
+        sb.append(Version.buildDenoptimHeader());
         sb.append("# ").append(DateFormat.getDateTimeInstance(
             DateFormat.LONG, DateFormat.LONG).format(new Date())).append(eol);
 
