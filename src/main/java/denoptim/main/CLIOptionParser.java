@@ -33,20 +33,27 @@ public class CLIOptionParser extends DefaultParser implements CommandLineParser
             return super.parse(options, arguments);
         } else if (arguments.length == 1)
         {
-            editedArguments = new String[2];
-            editedArguments[0] = "-" + CLIOptions.input.getOpt();
-            editedArguments[1] = arguments[0];
-        } else if (arguments.length > 1) {
+            if (arguments[0].startsWith("-"))
+            {
+                return super.parse(options, arguments);
+            } else {
+                editedArguments = new String[2];
+                editedArguments[0] = "-" + CLIOptions.input.getOpt();
+                editedArguments[1] = arguments[0];
+                return super.parse(options, editedArguments);
+            }
+        } else {
             if (!arguments[0].startsWith("-"))
             {
                 editedArguments = new String[arguments.length+1];
                 editedArguments[0] = "-" + CLIOptions.input.getOpt();
                 for (int i=0; i<arguments.length; i++)
                     editedArguments[i+1] = arguments[i];
+
+                return super.parse(options, editedArguments);
             } else {
                 return super.parse(options, arguments);
             }
         }
-        return super.parse(options, editedArguments);
     }
 }

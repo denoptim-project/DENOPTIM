@@ -9,7 +9,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.denoptimga.DenoptimGA;
 import denoptim.files.FileUtils;
+import denoptim.fragspaceexplorer.FragSpaceExplorer;
 import denoptim.logging.Version;
 
 /**
@@ -20,7 +22,30 @@ public class Main
     /**
      * Types of runs that can be requested to the denoptim Main class.
      */
-    public static enum RunType {GA, FSE, GUI};
+    public static enum RunType {
+        /**
+         * Run the genetic algorithm with {@link DenoptimGA}
+         */
+        GA, 
+        /**
+         * Run a combinatorial generation of candidates with 
+         * {@link FragSpaceExplorer}.
+         */
+        FSE, 
+        /**
+         * Launch the graphical user interface {@link denoptim.gui.GUI}
+         */
+        GUI, 
+        /**
+         * Only prints help or version and close program.
+         */
+        DRY;
+
+        public static String getTypeForUser()
+        {
+            return GA + ", " + FSE + ", and " + GUI;
+        }
+        };
     
 //------------------------------------------------------------------------------
     
@@ -32,9 +57,21 @@ public class Main
     
     public static void main(String[] args)
     {
+        // First, we try to understand what the user wants to do.
         Behavior behavior = defineProgramBehavior(args);
+        
+        // In case of inconsistent requests we report the error and stop
         if (behavior.exitStatus!=0)
             reportError(behavior);
+        
+        // Deal with simple requests for information
+        if (RunType.DRY.equals(behavior.runType))
+        {
+            System.out.println(behavior.helpMsg);
+            System.exit(0);
+        }
+        
+        // And now, we actually launch one of the main programs
         
         //TODO-gg
 
@@ -47,7 +84,7 @@ public class Main
      * Does the processing of the application arguments and decides what the
      * program should do.
      * @param args the arguments to process
-     * @return the behavior of the program.
+     * @return the behavior of the program as inferred from the given arguments.
      */
     protected static Behavior defineProgramBehavior(String[] args)
     {   
@@ -67,13 +104,12 @@ public class Main
         if (cmd.hasOption(CLIOptions.help))
         {
             String helpMsg = getHelpString();
-            return new Behavior(null, null, 0, helpMsg, null);
+            return new Behavior(RunType.DRY, null, 0, helpMsg, null);
         }
         
         if (cmd.hasOption(CLIOptions.version))
         {
-            return new Behavior(null, null, 0, Version.buildDenoptimHeader(), 
-                    null);
+            return new Behavior(RunType.DRY, null, 0, Version.VERSION, null);
         } 
         
         Behavior result = null;
@@ -107,8 +143,19 @@ public class Main
                 }
                 if (cmd.hasOption(CLIOptions.run))
                 {
-                    RunType rt = RunType.valueOf(
-                            cmd.getOptionValue(CLIOptions.run).toString());
+                    String rts = cmd.getOptionValue(CLIOptions.run).toString();
+                    RunType rt = null;
+                    try
+                    {
+                        rt = RunType.valueOf(rts.toUpperCase());
+                    } catch (Exception e)
+                    {
+                        String errMsg = "Unacceptable value for "
+                                + CLIOptions.run.getLongOpt() + " option: "
+                                + "'" + rts + "'. Please, modify "
+                                + "your command. ";
+                        return new Behavior(null, null, 1, null, errMsg);
+                    }
                     
                     if (!rt.equals(RunType.GUI) 
                             && !cmd.hasOption(CLIOptions.input))

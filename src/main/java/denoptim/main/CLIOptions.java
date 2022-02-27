@@ -51,16 +51,16 @@ public class CLIOptions extends Options
         this.addOption(input);
         
         run = new Option("r","run",true, "Request a specific type of "
-                + "run. Choose among " + RunType.values() + ". Unless the type "
-                        + "of run is '" + RunType.GUI + "', this option must "
-                        + "be coupled with '-" + input.getOpt() + " <arg>'"
-                        + " to provide a file with the input "
-                        + "parameters.");
+                + "run. Choose among " + RunType.getTypeForUser() 
+                + ". Unless the type "
+                + "of run is '" + RunType.GUI + "', this option must "
+                + "be coupled with '-" + input.getOpt() + " <arg>' "
+                + "to provide the pathname to the file containing input "
+                + "parameters.");
         run.setRequired(false);
         this.addOption(run);
         
-        version = new Option("v","version",false, "Prints the version "
-                + "of denoptim.");
+        version = new Option("v","version",false, "Print denoptim version.");
         version.setRequired(false);
         this.addOption(version);
     }

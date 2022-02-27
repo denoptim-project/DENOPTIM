@@ -42,5 +42,14 @@ public class CLIOptionParserTest
         assertTrue(cmd.hasOption(CLIOptions.run),"Standard other options");
         assertEquals("GA",cmd.getOptionValue(CLIOptions.run),
                 "Value of Standard other option");
+        
+        //Test without need for "input option"
+        args = new String[] {"-"+CLIOptions.version.getOpt()};
+        cmd = parser.parse(CLIOptions.getInstance(), args);
+        assertTrue(cmd.hasOption(CLIOptions.version),"Single arg, no input");
+        
+        args = new String[] {"--"+CLIOptions.help.getLongOpt()};
+        cmd = parser.parse(CLIOptions.getInstance(), args);
+        assertTrue(cmd.hasOption(CLIOptions.help),"Single arg, no input");
     }
 }
