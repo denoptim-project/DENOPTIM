@@ -16,15 +16,18 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package grapheditor;
+package denoptim.grapheditor;
 
+import java.io.File;
 import java.util.logging.Level;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.task.ProgramTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 
 
@@ -34,38 +37,30 @@ import denoptim.threedim.ThreeDimTreeBuilder;
  * @author Marco Foscato
  */
 
-public class GraphEditor
+public class GraphEditor extends ProgramTask
 {
 
 //------------------------------------------------------------------------------
-
+    
     /**
-     * Prints the syntax to execute the main program.
+     * Creates and configures the program task.
+     * @param configFile the file containing the configuration parameters.
+     * @param workDir the file system location from which to run the program.
      */
-
-    public static void printUsage()
+    public GraphEditor(File configFile, File workDir)
     {
-        System.err.println("Usage: java -jar GraphEditor.jar ConfigFile");
-        System.exit(-1);
+        super(configFile,workDir);
     }
+    
+//------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------    
-    /**
-     * @param args the command line arguments
-     */
-
-    public static void main(String[] args)
-    {
-        if (args.length < 1)
-        {
-            printUsage();
-        }
-
-        String configFile = args[0];
-        
+    @Override
+    public void runProgram()
+    {   
         try
         {
-            GraphEdParameters.readParameterFile(configFile);
+            GraphEdParameters.readParameterFile(
+                    configFilePathName.getAbsolutePath());
             GraphEdParameters.checkParameters();
             GraphEdParameters.processParameters();
             GraphEdParameters.printParameters();
@@ -87,6 +82,8 @@ public class GraphEditor
                     System.out.println("Modified graph: ");
                     System.out.println(modGraph.toString());
                 }
+                
+                //TODO: upgrade to I/O with sepcification of format
 
                 switch (GraphEdParameters.getOutFormat())
                 {
@@ -131,13 +128,12 @@ public class GraphEditor
         {
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
             e.printStackTrace(System.err);
-            System.exit(-1);
+            thrownExc = new DENOPTIMException("Error in GraphEditor run", e);
         }
 
         // normal completion
-	DENOPTIMLogger.appLogger.log(Level.SEVERE, 
+        DENOPTIMLogger.appLogger.log(Level.SEVERE, 
 			       "========= GraphEditor run completed =========");
-        System.exit(0);
     }
     
 //-----------------------------------------------------------------------------

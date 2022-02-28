@@ -19,8 +19,10 @@ import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fragspaceexplorer.FragSpaceExplorer;
 import denoptim.geneopsrunner.GeneOpsRunner;
+import denoptim.grapheditor.GraphEditor;
 import denoptim.graphlisthandler.GraphListsHandler;
 import denoptim.gui.GUI;
+import denoptim.isomorphism.Isomorphism;
 import denoptim.logging.Version;
 import denoptim.task.ProgramTask;
 import denoptim.task.StaticTaskManager;
@@ -63,7 +65,24 @@ public class Main
         /**
          * Run a comparison of lists of graphs.
          */
-        CLG;
+        CLG,
+        
+        /**
+         * Run a stand-alone graph editing task
+         */
+        GE,
+        
+        /**
+         * Run a stand-alone test for graph isomorphism
+         */
+        GI;
+        
+        
+        // NB: to define a new run type: 
+        //  1) add the enum alternative above this 
+        //  2) set the value of "description" in the static block below
+        //  3) set the value of "isCLIEnabled" in the static block below
+        //  4) set the value of "programTaskImpl" in the static block below
         
         /**
          * The implementation of {@link ProgramTask} capable of this run type.
@@ -84,13 +103,17 @@ public class Main
             DRY.description = "Dry run";
             FSE.description = "combinatorial Fragment Space Exploration";
             GA.description = "Genetic Algorithm";
+            GE.description = "stand-alone Graph Editing task";
+            GI.description = "stand-alone Graph Isomorphism analysis";
             GO.description = "stand-alone Genetic Operation";
             GUI.description = "Graphycal User Interface";
-            CLG.description = "comparison of graph lists";
+            CLG.description = "Comparison of Lists of Graphs";
             
             DRY.isCLIEnabled = false;
             FSE.isCLIEnabled = true;
             GA.isCLIEnabled = true;
+            GE.isCLIEnabled = true;
+            GI.isCLIEnabled = true;
             GO.isCLIEnabled = true;
             GUI.isCLIEnabled = true;
             CLG.isCLIEnabled = true;
@@ -98,6 +121,8 @@ public class Main
             DRY.programTaskImpl = null;
             FSE.programTaskImpl = FragSpaceExplorer.class;
             GA.programTaskImpl = DenoptimGA.class;
+            GE.programTaskImpl = GraphEditor.class;
+            GI.programTaskImpl = Isomorphism.class;
             GO.programTaskImpl = GeneOpsRunner.class;
             GUI.programTaskImpl = GUI.class;
             CLG.programTaskImpl = GraphListsHandler.class;
@@ -406,14 +431,18 @@ public class Main
                 DENOPTIMConstants.EOL +
                 "Run without arguments to launch the graphical user "
                 + "interface (GUI) without opening any specific file. "
+                + DENOPTIMConstants.EOL
                 + "Alternatively, to open the file/folder named <filename> in "
                 + "the GUI the two following commands are equivalent: "
                 + DENOPTIMConstants.EOL
                 + "  denoptim -" + CLIOptions.run.getOpt() 
-                + " GUI -f <filename>"
+                + " " + RunType.GUI + " -" + CLIOptions.input.getOpt() 
+                + " <filename>"
                 + DENOPTIMConstants.EOL
-                + "  denoptim <filename> -" + CLIOptions.run.getOpt() + " GUI",
-                true);
+                + "  denoptim <filename> -" + CLIOptions.run.getOpt() + " " 
+                + RunType.GUI + DENOPTIMConstants.EOL
+                + "This simplification of the syntax is valid for any -" 
+                + CLIOptions.run.getOpt() + " option.", true);
         pw.flush();
         return out.toString();
     }

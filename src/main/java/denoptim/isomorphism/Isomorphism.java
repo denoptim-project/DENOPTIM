@@ -16,38 +16,43 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package isomorphism;
+package denoptim.isomorphism;
 
 import java.io.File;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
+import denoptim.task.ProgramTask;
 
 /**
- * Tool to test perform isomorphism analysis on DENOPTIMGreaphs.
+ * Tool to perform isomorphism analysis on {@link DENOPTIMGraph}s.
  *
  * @author Marco Foscato
  */
 
-public class Isomorphism
+public class Isomorphism extends ProgramTask
 {
-
-//------------------------------------------------------------------------------    
+    
     /**
-     * @param args the command line arguments
+     * Creates and configures the program task.
+     * @param configFile the file containing the configuration parameters.
+     * @param workDir the file system location from which to run the program.
      */
-    public static void main(String[] args)
+    public Isomorphism(File configFile, File workDir)
     {
-        if (args.length < 1)
-        {
-            System.err.println("Usage: java -jar Isomorphism.jar paramsFile");
-            System.exit(-1);
-        }
+        super(configFile,workDir);
+    }
+    
+//------------------------------------------------------------------------------
 
+    @Override
+    public void runProgram()
+    { 
         try
         {
-            IsomorphismParameters.readParameterFile(args[0]);
+            IsomorphismParameters.readParameterFile(
+                    configFilePathName.getAbsolutePath());
             IsomorphismParameters.checkParameters();
             IsomorphismParameters.processParameters();
             
@@ -58,10 +63,8 @@ public class Isomorphism
         catch (DENOPTIMException de)
         {
             de.printStackTrace(System.err);
-            System.exit(-1);
+            thrownExc = new DENOPTIMException("Error in Isomorphism run", de);
         }
-
-        System.exit(0);
     }
 
 //------------------------------------------------------------------------------
