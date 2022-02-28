@@ -1,4 +1,4 @@
-package graphlistshandler;
+package denoptim.graphlisthandler;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

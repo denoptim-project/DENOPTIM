@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package testoperator;
+package denoptim.geneopsrunner;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -37,7 +37,7 @@ import denoptim.utils.RandomUtils;
  * @author Marco Foscato
  */
 
-public class TestOperatorParameters
+public class GeneOpsRunnerParameters
 {
     /**
      * Flag indicating that at least one parameter has been defined
@@ -145,7 +145,7 @@ public class TestOperatorParameters
 
     public static void readParameterFile(String infile) throws DENOPTIMException
     {
-        String option, line;
+        String line;
         BufferedReader br = null;
         try
         {
@@ -207,7 +207,6 @@ public class TestOperatorParameters
             }
         }
 
-        option = null;
         line = null;
     }
 

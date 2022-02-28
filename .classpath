@@ -12,8 +12,6 @@
 	<classpathentry kind="src" path="src/misc/CheckpointReader/src"/>
 	<classpathentry kind="src" path="src/misc/PrepareFitnessOutput/src"/>
 	<classpathentry kind="src" path="src/misc/PrepareMOPAC/src"/>
-	<classpathentry kind="src" path="src/misc/TestOperator/src"/>
-	<classpathentry kind="src" path="src/misc/GraphListsHandler/src"/>
 	<classpathentry kind="src" path="src/misc/GraphEditor/src"/>
 	<classpathentry kind="src" path="src/misc/Isomorphism/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
@@ -35,7 +33,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" output="target/classes" path="src/main/resources">
+	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>

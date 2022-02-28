@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package testoperator;
+package denoptim.geneopsrunner;
 
 import java.io.File;
 
@@ -29,37 +29,45 @@ import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
+import denoptim.task.ProgramTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.MutationType;
 
 /**
- * Tool to test genetic operators.
+ * Tool to run genetic operations in a stand-alone fashion, i.e., outside of a
+ * genetic algorithm run.
  *
  * @author Marco Foscato
  */
 
-public class TestOperator
+public class GeneOpsRunner extends ProgramTask
 {
 
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------
+  
     /**
-     * @param args the command line arguments
+     * Creates and configures the program task.
+     * @param configFile the file containing the configuration parameters.
+     * @param workDir the file system location from which to run the program.
      */
-    public static void main(String[] args)
+    public GeneOpsRunner(File configFile, File workDir)
     {
-        if (args.length < 1)
-        {
-            System.err.println("Usage: java -jar TestOperator.jar paramsFile");
-            System.exit(-1);
-        }
+        super(configFile,workDir);
+    }
 
+//------------------------------------------------------------------------------    
+
+    @Override
+    public void runProgram()
+    {
         try
         {
-            TestOperatorParameters.readParameterFile(args[0]);
-            TestOperatorParameters.checkParameters();
-            TestOperatorParameters.processParameters();
+            GeneOpsRunnerParameters.readParameterFile(
+                    configFilePathName.getAbsolutePath());
+            GeneOpsRunnerParameters.checkParameters();
+            GeneOpsRunnerParameters.processParameters();
             
-            switch (TestOperatorParameters.operatorToTest)
+            switch (GeneOpsRunnerParameters.operatorToTest)
             {
                 case XOVER:
                     runXOver();
@@ -71,13 +79,11 @@ public class TestOperator
          
             System.out.println("TestOperator run completed");
         }
-        catch (DENOPTIMException de)
+        catch (DENOPTIMException e)
         {
-            de.printStackTrace(System.err);
-            System.exit(-1);
+            e.printStackTrace(System.err);
+            thrownExc = new DENOPTIMException("Error in GeneOpsRunner run.", e);
         }
-
-        System.exit(0);
     }
     
 //------------------------------------------------------------------------------
@@ -88,7 +94,7 @@ public class TestOperator
         try
         {
             graph = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(TestOperatorParameters.inpFileM)).get(0);
+                    new File(GeneOpsRunnerParameters.inpFileM)).get(0);
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -97,12 +103,12 @@ public class TestOperator
         System.out.println("Initial graphs: ");
         System.out.println(graph);
         System.out.println(" ");
-        MutationType mt = TestOperatorParameters.mutationType;
+        MutationType mt = GeneOpsRunnerParameters.mutationType;
         
         if (mt != null)
         {
             DENOPTIMVertex v = null;
-            int[] vidv = TestOperatorParameters.mutationTarget;
+            int[] vidv = GeneOpsRunnerParameters.mutationTarget;
             String str = "";
             if (vidv != null && vidv.length>1)
             {
@@ -130,7 +136,7 @@ public class TestOperator
                     {
                         System.out.println("VertexID '" + vidv[i] +  "' not found "
                                 + "in graph "+innerGraph);
-                        System.exit(-1);
+                        return;
                     }
                 }
                 v = outerVertex;
@@ -143,14 +149,14 @@ public class TestOperator
                 {
                     System.out.println("VertexID '" +vid +  "' not found in graph " 
                             + graph);
-                    System.exit(-1);
+                    return;
                 }
             }
              
-            int apID = TestOperatorParameters.idNewAP;
+            int apID = GeneOpsRunnerParameters.idNewAP;
             if (mt==MutationType.ADDLINK)
             {
-                apID = TestOperatorParameters.idTargetAP;
+                apID = GeneOpsRunnerParameters.idTargetAP;
                 if (apID<0)
                     throw new DENOPTIMException("ID of target AP is negative. "
                             + "For mutation " + mt + " you should specify also "
@@ -160,7 +166,7 @@ public class TestOperator
             
             // NB: last boolean asks to ignore the growth probability
             DENOPTIMGraphOperations.performMutation(v,mt,true,
-                    TestOperatorParameters.idNewVrt, apID, new Monitor());
+                    GeneOpsRunnerParameters.idNewVrt, apID, new Monitor());
 
         } else {
             System.out.println("Attempting mutation a random mutation on a "
@@ -173,7 +179,7 @@ public class TestOperator
         
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(graph, true);
-        DenoptimIO.writeSDFFile(TestOperatorParameters.outFileM, iac, false);
+        DenoptimIO.writeSDFFile(GeneOpsRunnerParameters.outFileM, iac, false);
     }
     
 //------------------------------------------------------------------------------
@@ -185,9 +191,9 @@ public class TestOperator
         try
         {
             male = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(TestOperatorParameters.inpFileM)).get(0);
+                    new File(GeneOpsRunnerParameters.inpFileM)).get(0);
             female = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(TestOperatorParameters.inpFileF)).get(0);
+                    new File(GeneOpsRunnerParameters.inpFileF)).get(0);
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -203,16 +209,16 @@ public class TestOperator
         }
 
         System.out.println("Initial graphs: ");
-        System.out.println("v:"+TestOperatorParameters.mvid
+        System.out.println("v:"+GeneOpsRunnerParameters.mvid
                              +" of MALE: "+male);
         System.out.println(" ");
-        System.out.println("v:"+TestOperatorParameters.fvid
+        System.out.println("v:"+GeneOpsRunnerParameters.fvid
                              +" of FEMALE: "+female);
         System.out.println(" ");
     
         // Remember position of vertex chosen for xover
-        int ivmale = male.indexOfVertexWithID(TestOperatorParameters.mvid);
-        int ivfemale = female.indexOfVertexWithID(TestOperatorParameters.fvid);
+        int ivmale = male.indexOfVertexWithID(GeneOpsRunnerParameters.mvid);
+        int ivfemale = female.indexOfVertexWithID(GeneOpsRunnerParameters.fvid);
         // Ensure uniqueness on vertexID
         male.renumberGraphVertices();
         female.renumberGraphVertices();
@@ -223,10 +229,10 @@ public class TestOperator
     
         // do crossover
         System.out.println("Initial graphs now with unique vertexID: ");
-        System.out.println("v:"+TestOperatorParameters.mvid+" (now:"+newmvid
+        System.out.println("v:"+GeneOpsRunnerParameters.mvid+" (now:"+newmvid
                              +") of MALE: "+male);
         System.out.println(" ");
-        System.out.println("v:"+TestOperatorParameters.fvid+" (now:"+newfvid
+        System.out.println("v:"+GeneOpsRunnerParameters.fvid+" (now:"+newfvid
                              +") of FEMALE: "+female);
         System.out.println(" ");
     
@@ -242,8 +248,8 @@ public class TestOperator
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iacM = t3d.convertGraphTo3DAtomContainer(male,true);
         IAtomContainer iacF = t3d.convertGraphTo3DAtomContainer(female,true);
-        DenoptimIO.writeSDFFile(TestOperatorParameters.outFileM, iacM, false);
-        DenoptimIO.writeSDFFile(TestOperatorParameters.outFileF, iacF, false);
+        DenoptimIO.writeSDFFile(GeneOpsRunnerParameters.outFileM, iacM, false);
+        DenoptimIO.writeSDFFile(GeneOpsRunnerParameters.outFileF, iacF, false);
     }
 
 //------------------------------------------------------------------------------

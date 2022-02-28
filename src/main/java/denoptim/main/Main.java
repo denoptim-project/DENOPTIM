@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.cli.CommandLine;
@@ -15,11 +14,12 @@ import org.apache.commons.cli.ParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.denoptimga.DenoptimGA;
-import denoptim.exception.DENOPTIMException;
 import denoptim.exception.ExceptionUtils;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fragspaceexplorer.FragSpaceExplorer;
+import denoptim.geneopsrunner.GeneOpsRunner;
+import denoptim.graphlisthandler.GraphListsHandler;
 import denoptim.gui.GUI;
 import denoptim.logging.Version;
 import denoptim.task.ProgramTask;
@@ -38,23 +38,115 @@ public class Main
          * Run the genetic algorithm with {@link DenoptimGA}
          */
         GA, 
+        
         /**
          * Run a combinatorial generation of candidates with 
          * {@link FragSpaceExplorer}.
          */
         FSE, 
+        
         /**
          * Launch the graphical user interface {@link denoptim.gui.GUI}
          */
         GUI, 
+        
         /**
          * Only prints help or version and close program.
          */
-        DRY;
+        DRY,
+        
+        /**
+         * Run a stand-alone genetic operation
+         */
+        GO,
+        
+        /**
+         * Run a comparison of lists of graphs.
+         */
+        CLG;
+        
+        /**
+         * The implementation of {@link ProgramTask} capable of this run type.
+         */
+        private Class<?> programTaskImpl;
+        
+        /**
+         * A short description of the run type.
+         */
+        private String description = "";
+        
+        /**
+         * Flag indicating if this run type can be called from CLI.
+         */
+        private boolean isCLIEnabled = true;
+        
+        static {
+            DRY.description = "Dry run";
+            FSE.description = "combinatorial Fragment Space Exploration";
+            GA.description = "Genetic Algorithm";
+            GO.description = "stand-alone Genetic Operation";
+            GUI.description = "Graphycal User Interface";
+            CLG.description = "comparison of graph lists";
+            
+            DRY.isCLIEnabled = false;
+            FSE.isCLIEnabled = true;
+            GA.isCLIEnabled = true;
+            GO.isCLIEnabled = true;
+            GUI.isCLIEnabled = true;
+            CLG.isCLIEnabled = true;
+            
+            DRY.programTaskImpl = null;
+            FSE.programTaskImpl = FragSpaceExplorer.class;
+            GA.programTaskImpl = DenoptimGA.class;
+            GO.programTaskImpl = GeneOpsRunner.class;
+            GUI.programTaskImpl = GUI.class;
+            CLG.programTaskImpl = GraphListsHandler.class;
+        }
 
-        public static String getTypeForUser()
+        /**
+         * Returns the class that implements the program with this type of run.
+         * @return the class that implements the program with this type of run.
+         */
+        public Class<?> getProgramTaskImpl()
         {
-            return GA + ", " + FSE + ", and " + GUI;
+            return programTaskImpl;
+        }
+        
+        /**
+         * Returns a string that contains a textual list (e.g., "A, B, and C")
+         * of the possible types that can be requested by a user.
+         * @return a textual list (e.g., "A, B, and C").
+         */
+        public static String getRunTypesForUser()
+        {
+            String s = "";
+            String separator = DENOPTIMConstants.EOL;
+            String last = ""; //in case the last entry should use " and "
+            for (int i=0; i<RunType.values().length; i++)
+            {
+                RunType rt = RunType.values()[i];
+                if (RunType.DRY.equals(rt))
+                    continue; //This run type should not be visible by the user
+                if (i>0 && i < RunType.values().length-2)
+                    s = s + " '" + rt.toString() + "' for "+rt.description+ ",";
+                else if (i==0)
+                    s = "'" + rt.toString() + "' for "+rt.description+",";
+                else
+                    s = s + last+"'"+rt.toString()+"' for "+rt.description+".";
+                s = s + separator;
+            }
+            return s;
+        }
+
+        /**
+         * Returns <code>true</code> if this run type can be requested from the 
+         * CLI.
+         * @return <code>true</code> if this run type can be requested from the 
+         * CLI.
+         */
+        boolean isCLIEnabled()
+        {
+            return isCLIEnabled;
         }
     };
     
@@ -88,31 +180,20 @@ public class Main
         StaticTaskManager.getInstance();
         
         // Now, we deal with proper program runs
-        //TODO-gg: need to do better then this...
-        File inputFile = new File(behavior.cmd.getOptionValue(CLIOptions.input));
-        File workDir = inputFile.getParentFile();
-        switch (behavior.runType)
+        if (ProgramTask.class.isAssignableFrom(
+                behavior.runType.getProgramTaskImpl()))
         {
-            case GA:
-                runProgramTask(DenoptimGA.class, inputFile, workDir);
-                terminate();
-                break;
-                
-            case FSE:
-                runProgramTask(FragSpaceExplorer.class, inputFile, workDir);
-                terminate();
-                break;
-                
-            case GUI:
-                ensureFileIsReadable(behavior.cmd);
-                EventQueue.invokeLater(new GUI(behavior.cmd));
-                break;
-                
-            default:
-                reportError("You requested a run of type '" + behavior.runType 
-                        + "', but I found no such implementation. "
-                        + "Please, report this to the authors.", 1);
-                break;
+            File inpFile = new File(behavior.cmd.getOptionValue(CLIOptions.input));
+            File wDir = inpFile.getParentFile();
+            runProgramTask(behavior.runType.getProgramTaskImpl(), inpFile, wDir);
+            terminate();
+        } else if (RunType.GUI.equals(behavior.runType)) {
+            ensureFileIsReadable(behavior.cmd);
+            EventQueue.invokeLater(new GUI(behavior.cmd));
+        } else {
+            reportError("You requested a run of type '" + behavior.runType 
+                    + "', but I found no such implementation. "
+                    + "Please, report this to the authors.", 1);
         }
     }
 
@@ -281,20 +362,14 @@ public class Main
                                 + "but was not found. Please, modify "
                                 + "your command. ";
                         result = new Behavior(null, null, 1, null, errMsg);
-                    } else {                    
-                        switch (rt)
+                    } else {
+                        if (rt.isCLIEnabled())
                         {
-                            case GA:
-                                result = new Behavior(RunType.GA, cmd);
-                                break;
-                                
-                            case FSE:
-                                result = new Behavior(RunType.FSE, cmd);
-                                break;
-                                
-                            case GUI:
-                                result = new Behavior(RunType.GUI, cmd);
-                                break;
+                            result = new Behavior(rt, cmd);
+                        } else {
+                            result = new Behavior(null, null, 1, null, 
+                                    "RunType '"+rt+"' is not enabled from CLI. "
+                                    + "Please, contacts the developers.");
                         }
                     }
                 } else {

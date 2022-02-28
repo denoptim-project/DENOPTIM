@@ -3,6 +3,7 @@ package denoptim.main;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.main.Main.RunType;
 
 public class CLIOptions extends Options
@@ -41,7 +42,7 @@ public class CLIOptions extends Options
     
     private CLIOptions() 
     {
-        help = new Option("h","help",false, "Print help message");
+        help = new Option("h","help",false, "Print help message.");
         help.setRequired(false);
         this.addOption(help);
        
@@ -51,8 +52,9 @@ public class CLIOptions extends Options
         this.addOption(input);
         
         run = new Option("r","run",true, "Request a specific type of "
-                + "run. Choose among " + RunType.getTypeForUser() 
-                + ". Unless the type "
+                + "run. Choose among:" + DENOPTIMConstants.EOL
+                + RunType.getRunTypesForUser() 
+                + "Unless the type "
                 + "of run is '" + RunType.GUI + "', this option must "
                 + "be coupled with '-" + input.getOpt() + " <arg>' "
                 + "to provide the pathname to the file containing input "

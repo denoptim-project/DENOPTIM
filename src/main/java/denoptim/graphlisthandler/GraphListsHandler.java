@@ -1,11 +1,14 @@
-package  graphlistshandler;
+package  denoptim.graphlisthandler;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.task.ProgramTask;
 
 
 /**
@@ -14,39 +17,30 @@ import denoptim.logging.DENOPTIMLogger;
  * @author Marco Foscato
  */
 
-public class GraphListsHandler
+public class GraphListsHandler extends ProgramTask
 {
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Prints the syntax to execute
-     */
-
-    public static void printUsage()
-    {
-        System.err.println("Usage: java -jar GraphListsHandler.jar ConfigFile");
-        System.exit(-1);
-    }
 
 //------------------------------------------------------------------------------
     
     /**
-     * @param args the command line arguments
+     * Creates and configures the program task.
+     * @param configFile the file containing the configuration parameters.
+     * @param workDir the file system location from which to run the program.
      */
-
-    public static void main(String[] args)
+    public GraphListsHandler(File configFile, File workDir)
     {
-        if (args.length < 1)
-        {
-            printUsage();
-        }
+        super(configFile,workDir);
+    }
+    
+//------------------------------------------------------------------------------
 
-        String configFile = args[0];
-
+    @Override
+    public void runProgram()
+    {
         try
         {
-            GraphListsHandlerParameters.readParameterFile(configFile);
+            GraphListsHandlerParameters.readParameterFile(
+                    configFilePathName.getAbsolutePath());
             GraphListsHandlerParameters.checkParameters();
             GraphListsHandlerParameters.processParameters();
             GraphListsHandlerParameters.printParameters();
@@ -117,13 +111,13 @@ public class GraphListsHandler
         {
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
             e.printStackTrace(System.err);
-            System.exit(-1);
+            thrownExc = new DENOPTIMException("Error in GraphListHandler run.",
+                    e);
         }
 
         // normal completion
-        DENOPTIMLogger.appLogger.log(Level.SEVERE,
+        DENOPTIMLogger.appLogger.log(Level.INFO,
                    "========= GraphListsHandler run completed =========");
-        System.exit(0);
     }
     
 //------------------------------------------------------------------------------
