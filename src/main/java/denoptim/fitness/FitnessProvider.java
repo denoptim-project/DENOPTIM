@@ -6,14 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import jakarta.el.ELContext;
-import jakarta.el.ELException;
-import jakarta.el.ELResolver;
-import jakarta.el.ExpressionFactory;
-import jakarta.el.FunctionMapper;
-import jakarta.el.ValueExpression;
-import jakarta.el.VariableMapper;
-
 import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
@@ -39,6 +31,13 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ManySMARTSQuery;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ELResolver;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.FunctionMapper;
+import jakarta.el.ValueExpression;
+import jakarta.el.VariableMapper;
 
 /**
  * DENOPTIM's (internal) fitness provider class calculates descriptors for a 

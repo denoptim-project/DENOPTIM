@@ -4,6 +4,9 @@ import java.awt.EventQueue;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -12,11 +15,15 @@ import org.apache.commons.cli.ParseException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.denoptimga.DenoptimGA;
+import denoptim.exception.DENOPTIMException;
+import denoptim.exception.ExceptionUtils;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fragspaceexplorer.FragSpaceExplorer;
 import denoptim.gui.GUI;
 import denoptim.logging.Version;
+import denoptim.task.ProgramTask;
+import denoptim.task.StaticTaskManager;
 
 /**
  * Entry point of any kind of run of the denoptim program.
@@ -49,13 +56,13 @@ public class Main
         {
             return GA + ", " + FSE + ", and " + GUI;
         }
-        };
+    };
     
 //------------------------------------------------------------------------------
     
     /**
      * Launches the appropriate program according to the arguments given. Use
-     * "-h" to get usage instructions.
+     * "-h" to print usage instructions.
      * @param args the list of arguments.
      */
     
@@ -64,7 +71,7 @@ public class Main
         // First, we try to understand what the user wants to do.
         Behavior behavior = defineProgramBehavior(args);
         
-        // In case of inconsistent requests we report the error and stop
+        // In case of inconsistent requests, we report the error and stop
         if (behavior.exitStatus!=0)
             reportError(behavior);
         
@@ -75,13 +82,25 @@ public class Main
             System.exit(0);
         }
         
-        // Now we deal with actual program runs
+        // We instantiate also the task manager, even if it might not be used.
+        // This is to pre-start the tasks and get a more reliable queue status
+        // at any given time after this point.
+        StaticTaskManager.getInstance();
+        
+        // Now, we deal with proper program runs
+        //TODO-gg: need to do better then this...
+        File inputFile = new File(behavior.cmd.getOptionValue(CLIOptions.input));
+        File workDir = inputFile.getParentFile();
         switch (behavior.runType)
         {
             case GA:
+                runProgramTask(DenoptimGA.class, inputFile, workDir);
+                terminate();
                 break;
                 
             case FSE:
+                runProgramTask(FragSpaceExplorer.class, inputFile, workDir);
+                terminate();
                 break;
                 
             case GUI:
@@ -94,6 +113,54 @@ public class Main
                         + "', but I found no such implementation. "
                         + "Please, report this to the authors.", 1);
                 break;
+        }
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Creates a task for the given class
+     * @param taskClass
+     * @param inputFile
+     * @param workDir
+     * @throws SecurityException 
+     * @throws NoSuchMethodException 
+     */
+    private static void runProgramTask(Class<?> taskClass, File inputFile,
+            File workDir)
+    {
+        if (!ProgramTask.class.isAssignableFrom(taskClass))
+        {
+            reportError("Attempt to create a program task for class '" 
+                    + taskClass.getSimpleName() + "', but such class is not a "
+                    + "extension of '" + ProgramTask.class.getSimpleName() 
+                    + "'.", 1);
+        }
+
+        ProgramTask task = null;
+        try
+        {
+            Constructor<?> taskConstructor = taskClass.getConstructor(File.class, 
+                    File.class);
+            task = (ProgramTask) taskConstructor.newInstance(inputFile, 
+                    workDir);
+        } catch (Exception e)
+        {
+            reportError("Could not create a program task for " 
+                    + taskClass.getSimpleName() + DENOPTIMConstants.EOL
+                    + ". Details: " + DENOPTIMConstants.EOL
+                    + ExceptionUtils.getStackTraceAsString(e), 1);
+        }
+        
+        try
+        {
+            StaticTaskManager.submitAndWait(task);
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        } catch (ExecutionException e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -304,6 +371,23 @@ public class Main
         if (behavior.helpMsg!=null)
             System.out.println(behavior.helpMsg);
         reportError(behavior.errorMsg,behavior.exitStatus);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Stops services and halts the Virtual Machine.
+     */
+    private static void terminate()
+    {
+        try {
+            StaticTaskManager.stopAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("StaticTaskManager had problems stopping. "
+                    + "Forcing termination.");
+        }
+        Runtime.getRuntime().halt(0);
     }
     
 //------------------------------------------------------------------------------

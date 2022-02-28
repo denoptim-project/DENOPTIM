@@ -20,7 +20,6 @@ package denoptim.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
@@ -93,7 +92,6 @@ public class GUI implements Runnable
 	public GUI(CommandLine cmd) 
 	{
 	    this.cmd = cmd;
-	    
 		ToolTipManager.sharedInstance().setDismissDelay(6000);
 		ToolTipManager.sharedInstance().setInitialDelay(1000);
 		ToolTipManager.sharedInstance().setReshowDelay(100);
@@ -130,11 +128,6 @@ public class GUI implements Runnable
         menuBar.setRefToMasterGUI(this);
         
         mainPanel.add(new HomePanel(mainPanel));
-        
-        // We instantiate also the task manager, even it it might not be used
-        // This is to pre-start the tasks and get a more reliable queue status
-        // at any given time after this point.
-        StaticTaskManager.getInstance();
         
         // Hack to debug com.apple.laf.AquaLookAndFeel. Such LAF when combined 
         // with "dark mode" (i.e., the system appearance where all windows have 

@@ -167,9 +167,9 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
     
 //------------------------------------------------------------------------------
 
-    public void printHeader() throws DENOPTIMException
+    public void printHeader(String pathName) throws DENOPTIMException
     {
-        DenoptimIO.writeData(monitorFile, getMonitorDataHeader(), true);
+        DenoptimIO.writeData(pathName, getMonitorDataHeader(), true);
     }
     
 //------------------------------------------------------------------------------

@@ -1,7 +1,6 @@
 package denoptim.fitness;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.qsar.DescriptorEngine;
 import org.openscience.cdk.qsar.IDescriptor;

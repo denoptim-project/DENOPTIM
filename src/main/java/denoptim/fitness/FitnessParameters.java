@@ -19,36 +19,11 @@
 package denoptim.fitness;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import jakarta.el.ELContext;
-import jakarta.el.ELResolver;
-import jakarta.el.ExpressionFactory;
-import jakarta.el.FunctionMapper;
-import jakarta.el.ValueExpression;
-import jakarta.el.VariableMapper;
-
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.fingerprint.IBitFingerprint;
-import org.openscience.cdk.fingerprint.IFingerprinter;
-import org.openscience.cdk.fingerprint.ShortestPathFingerprinter;
-import org.openscience.cdk.fingerprint.SubstructureFingerprinter;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.qsar.IDescriptor;
-import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
-import denoptim.fitness.descriptors.TanimotoMolSimilarity;
-import denoptim.fitness.descriptors.TanimotoMolSimilarityBySubstructure;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 
 

@@ -32,33 +32,30 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.TaskUtils;
 
 /**
- * Task that runs any of the main methods in the denoptim project, such as 
- * DenoptimGA and FragSpaceExplorer from within the GUI.
+ * Task structure for any of the main programs in the denoptim project, such as 
+ * genetic algorithm and combinatorial explored of fragment spaces.
  */
 
-public abstract class GUIInvokedMainTask extends Task
+public abstract class ProgramTask extends Task
 {
-	private String configFilePathName = "";
-
-//------------------------------------------------------------------------------
     
-    public GUIInvokedMainTask()
-    {
-    	super(TaskUtils.getUniqueTaskIndex());
-    }
-
-//------------------------------------------------------------------------------
-
-    public void setConfigFile(File configFile)
-    {
-    	setConfigFile(configFile.getAbsolutePath());
-    }
+    /**
+     * File containing configuration parameters for the program task.
+     */
+    protected File configFilePathName;
     
 //------------------------------------------------------------------------------
-
-    public void setConfigFile(String configFilePathName)
+    
+    /**
+     * Creates and configures the program task.
+     * @param configFile the file containing the configuration parameters.
+     * @param workDir the file system location from which to run the program.
+     */
+    public ProgramTask(File configFile, File workDir)
     {
-    	this.configFilePathName = configFilePathName;
+        super(TaskUtils.getUniqueTaskIndex());
+        this.configFilePathName = configFile;
+        this.workDir = workDir;
     }
     
 //------------------------------------------------------------------------------
@@ -73,16 +70,18 @@ public abstract class GUIInvokedMainTask extends Task
     			+ " id="+id+", configFile="
     			+ configFilePathName + ", workSpace=" + workDir + ")");
     	
-    	String[] args = new String[] {configFilePathName, workDir};
-    	
     	try {
-			mainCaller(args);
-	    	System.out.println(implName + " id="+id+" done!");
+			runProgram();
+			// This string is meant for the log of the GUI, i.e., the terminal
+			System.out.println(implName + " id="+id+" done!");
 		} catch (Throwable t) {
         	StringWriter sw = new StringWriter();
         	PrintWriter pw = new PrintWriter(sw);
         	t.printStackTrace(pw);
+        	thrownExc = t;
         	String errFile = workDir + SEP + "ERROR";
+        	//TODO: use logger? Perhaps a dedicated one for the GUI because
+        	// This string is meant for the log of the GUI, i.e., the terminal
         	System.out.println("ERROR reported in "+errFile);
             try {
 				DenoptimIO.writeData(errFile, sw.toString(), false);
@@ -100,7 +99,6 @@ public abstract class GUIInvokedMainTask extends Task
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured.");
 		}
     	
-
     	if (notify)
     	{
     		StaticTaskManager.subtractDoneTask();
@@ -111,7 +109,7 @@ public abstract class GUIInvokedMainTask extends Task
     
 //------------------------------------------------------------------------------ 
 
-    protected abstract void mainCaller(String[] args) throws DENOPTIMException;
+    protected abstract void runProgram() throws DENOPTIMException;
     
 //------------------------------------------------------------------------------
 

@@ -510,15 +510,10 @@ public class GAParameters
     public static void setWorkingDirectory(String pathName)
     {
         dataDir = pathName;
-        monitorFile = pathName + ".eaMonitor";
+        monitorFile = dataDir + ".eaMonitor";
         interfaceDir = pathName + FS + "interface";
         
         logFile = dataDir + ".log";
-        
-        if (monitorFile.equals(""))
-        {
-            monitorFile = dataDir + ".eaMonitor";
-        }
 
         if (uidFileOut.equals(""))
         {
@@ -980,7 +975,7 @@ public class GAParameters
                 break;
             }
         
-            case "GA-GROWTHMULTIPLIER=":
+            case "GA-LEVELGROWTHMULTIPLIER=":
             {
                 if (value.length() > 0)
                 {

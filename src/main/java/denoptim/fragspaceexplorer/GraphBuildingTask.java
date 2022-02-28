@@ -18,6 +18,7 @@
 
 package denoptim.fragspaceexplorer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,7 +107,7 @@ public class GraphBuildingTask extends FitnessTask
         dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
         rootId = molGraph.getGraphId();
         graphId = dGraph.getGraphId();
-        this.workDir = workDir;
+        this.workDir = new File(workDir);
         this.fragsToAdd = fragsToAdd;
         this.level = level;  
         this.verbosity = verbosity;

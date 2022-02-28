@@ -21,11 +21,9 @@ package denoptim.denoptimga;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -821,12 +819,6 @@ public class DENOPTIMGraphOperations
             {
                 DENOPTIMVertex parVrt = molGraph.getVertexWithId(parVrtId);
                 
-                String typ = "single";
-                if (cpOnSymAPs || cpOnSymVrts)
-                {
-                    typ = "symmetric";
-                }
-                
                 for (int si=0; si<symAPs.size(); si++)
                 {
                     int symApId = symAPs.get(si);
@@ -881,7 +873,6 @@ public class DENOPTIMGraphOperations
             for (int i=0; i<addedVertices.size(); i++)
             {
                 int vid = addedVertices.get(i);
-                DENOPTIMVertex fragVertex = molGraph.getVertexWithId(vid);
                 DENOPTIMVertex v = molGraph.getVertexWithId(vid);
                 extendGraph(v, extend, symmetryOnAps);
             }
@@ -1117,13 +1108,6 @@ public class DENOPTIMGraphOperations
 
         //----------------------------------------------------------------------
 
-        public void addIncompatibleCC(ClosableChain icc)
-        {
-            incompatChains.add(icc);
-        }
-
-        //----------------------------------------------------------------------
-
         public ArrayList<ClosableChain> getCompatibleCC()
         {
             return compatChains;
@@ -1162,8 +1146,6 @@ public class DENOPTIMGraphOperations
         // Select candidate fragments respecting the closability conditions
         ArrayList<FragForClosabChains> lstChosenFfCc = 
                                         new ArrayList<FragForClosabChains>();
-        Set<ArrayList<Integer>> candidateFrags = 
-                                              new HashSet<ArrayList<Integer>>();
 
         if (molGraph.getClosableChains().size() == 0)
         {

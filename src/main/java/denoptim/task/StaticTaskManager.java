@@ -3,6 +3,7 @@ package denoptim.task;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -201,6 +202,20 @@ public class StaticTaskManager
     			+ tpe.getPoolSize() + "</li>"
     	    	+ "<li>Queue Size    = " + tpe.getQueue().size()+ "</li></ul>";
     	return s;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Submits a task and waits for completion.
+     * @param task the task to submit.
+     * @throws ExecutionException 
+     * @throws InterruptedException 
+     */
+    public static void submitAndWait(Task task) throws InterruptedException, 
+    ExecutionException
+    {
+        tpe.submit(task).get();
     }
 	
 //------------------------------------------------------------------------------

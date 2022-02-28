@@ -874,8 +874,6 @@ public class EAUtils
         if (parentA == null)
             return null;
         
-        DENOPTIMGraph g1 = parentA.getGraph();
-    
         ArrayList<Candidate> matesCompatibleWithFirst = 
                 population.getXoverPartners(parentA,eligibleParents);
         if (matesCompatibleWithFirst.size() == 0)
@@ -1329,7 +1327,6 @@ public class EAUtils
                     mol, molGraph, RingClosureParameters.getMaxRingClosures());
             if (combsOfRings.size() > 0)
             {
-                int nnn = 0;
                 for (DENOPTIMRing ring : combsOfRings)
                 {
                     // Consider the crowding probability
@@ -1346,7 +1343,6 @@ public class EAUtils
                     if (shot < crowdProbH && shot < crowdProbT)
                     {
                         molGraph.addRing(ring);
-                        nnn++;
                     }
                 }
             }

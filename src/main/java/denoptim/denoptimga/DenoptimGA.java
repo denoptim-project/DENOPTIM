@@ -18,6 +18,7 @@
 
 package denoptim.denoptimga;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
@@ -28,45 +29,40 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.task.ProgramTask;
 
 /**
- *
+ * The genetic algorithms entry point.
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public class DenoptimGA
+public class DenoptimGA extends ProgramTask
 {
 
 //------------------------------------------------------------------------------
-
-    public static void printUsage()
-    {
-        System.err.println("Usage: java -jar DenoptimGA.jar ConfigFile "
-        		+ "[workDir]");
-    }
-
-//------------------------------------------------------------------------------    
     
     /**
-     * @param args the command line arguments
-     * @throws DENOPTIMException in any case of not-normal termination
+     * Creates and configures the program task.
+     * @param configFile the file containing the configuration parameters.
+     * @param workDir the file system location from which to run the program.
      */
-    public static void main(String[] args) throws DENOPTIMException
+    public DenoptimGA(File configFile, File workDir)
     {
-        if (args.length < 1)
-        {
-            printUsage();
-            throw new DENOPTIMException("Cannot run. Need at least one argument"
-            		+ "to run DenoptimGA main method.");
-        }
-        
+        super(configFile,workDir);
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public void runProgram()
+    {   
+        //TODO: get rid of this one parameters are not static anymore.
     	//needed by static parameters, and in case of subsequent runs in the same JVM
     	GAParameters.resetParameters(); 
 
-        String configFile = args[0];
-        if (args.length > 1)
+        if (workDir != null)
         {
-        	GAParameters.setWorkingDirectory(args[1]);
+        	GAParameters.setWorkingDirectory(workDir.getAbsolutePath());
         }
         
         ExecutorService executor = null;
@@ -76,7 +72,7 @@ public class DenoptimGA
         ExternalCmdsListener ecl = null;
         try
         {	
-            GAParameters.readParameterFile(configFile);
+            GAParameters.readParameterFile(configFilePathName.getAbsolutePath());
             GAParameters.checkParameters();
             GAParameters.processParameters();
             GAParameters.printParameters();
@@ -96,22 +92,23 @@ public class DenoptimGA
             {
                 ea.stopRun();
             }
-            
             stopExternalCmdListener(ecl,executor,futureWatchers);
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occurred", t);
-
             t.printStackTrace(System.err);
-            
-            throw new DENOPTIMException("Error in DenoptimGA run.", t);
+            thrownExc = new DENOPTIMException("Error in DenoptimGA run.", t);
         }
 
         stopExternalCmdListener(ecl,executor,futureWatchers);
-        // normal completion: do NOT call System exit(0) as we might be calling
-        // this main from another thread, which would be killed as well.
     }
-
+    
 //------------------------------------------------------------------------------
     
+    /**
+     * Stop the service that waits for instructions from the outside world.
+     * @param ecl
+     * @param executor
+     * @param futureWatchers
+     */
 	private static void stopExternalCmdListener(ExternalCmdsListener ecl,
 	        ExecutorService executor, Future<?> futureWatchers) 
 	{

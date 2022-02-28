@@ -66,7 +66,7 @@ import denoptim.utils.SizeControlledSet;
  * thread seats will remain idle. The situation is repeated a few times until
  * fewer and fewer threads are submitted and the last population member 
  * (or new candidate population member) has been evaluated.</p>
- * <p>This <i>asynchronous</i> parallelisation scheme removes the waiting for 
+ * <p>This <i>asynchronous</i> parallelization scheme removes the waiting for 
  * completion of a batch of threads by keeping always as many active fitness 
  * evaluation threads as the max number of such threads, which is controllable 
  * in the {@link GAParameters}. Even towards the end of a generation, all 
@@ -93,7 +93,7 @@ public class EvolutionaryAlgorithm
 	private SizeControlledSet scs;
 	
 	/**
-	 * Flag signalling this EA was stopped
+	 * Flag signaling this EA was stopped
 	 */
     private boolean stopped = false;
     
@@ -118,23 +118,23 @@ public class EvolutionaryAlgorithm
     
     /*
      * Temporary storage of future results produced by fitness evaluation tasks
-     * submitted to asynchronous parallelisation scheme.
+     * submitted to asynchronous parallelization scheme.
      */
     private List<Future<Object>> futures;
     
     /*
      * Temporary storage of fitness evaluation tasks just submitted to asynchronous 
-     * parallelisation scheme.
+     * Parallelization scheme.
      */
     private ArrayList<FitnessTask> submitted;
     
     /*
-     * Execution service used in asynchronous parallelisation scheme.
+     * Execution service used in asynchronous parallelization scheme.
      */
     private ThreadPoolExecutor tpe;
 
     /*
-     * Issue emerging from a thread submitted by asynchronous parallelisation 
+     * Issue emerging from a thread submitted by asynchronous parallelization 
      * scheme.
      */
     private Throwable ex;
@@ -227,7 +227,7 @@ public class EvolutionaryAlgorithm
             tpe.prestartAllCoreThreads();
         }
         Monitor mnt = new Monitor();
-        mnt.printHeader();
+        mnt.printHeader(GAParameters.getMonitorFile());
         
         // Create initial population of candidates
         EAUtils.createFolderForGeneration(0);
@@ -237,7 +237,8 @@ public class EvolutionaryAlgorithm
             population = EAUtils.importInitialPopulation(scs);
         } catch (Exception e)
         {
-            throw new DENOPTIMException("Unable to import initial population.",e);
+            throw new DENOPTIMException("Unable to import initial population.", 
+                    e);
         }
         initializePopulation(population);
         EAUtils.outputPopulationDetails(population, 
@@ -247,9 +248,9 @@ public class EvolutionaryAlgorithm
         double sdev = EAUtils.getPopulationSD(population);
         if (sdev < GAParameters.minFitnessSD)
         {
-            String msg = "Fitness values have negligible standard deviation (STDDEV="
-                            + String.format("%.6f", sdev) + "). Abbandoning "
-                                    + "evolutionary algorithm.";
+            String msg = "Fitness values have negligible standard deviation "
+                    + "(STDDEV=" + String.format("%.6f", sdev) + "). "
+                    + "Abbandoning evolutionary algorithm.";
             DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
             population.trim(0);
             return;
@@ -548,8 +549,9 @@ public class EvolutionaryAlgorithm
         
         int i=0;
         ArrayList<Task> syncronisedTasks = new ArrayList<>();
-        Monitor mnt = new Monitor("MonitorGen",genId,GAParameters.getMonitorFile(),
-                GAParameters.getMonitorDumpStep(), GAParameters.dumpMonitor);
+        Monitor mnt = new Monitor("MonitorGen", genId, 
+                GAParameters.getMonitorFile(),GAParameters.getMonitorDumpStep(), 
+                GAParameters.dumpMonitor);
         try
         {
             while (i < GAParameters.getPopulationSize() *

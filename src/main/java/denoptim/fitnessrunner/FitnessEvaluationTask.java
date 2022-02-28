@@ -19,6 +19,8 @@
 
 package denoptim.fitnessrunner;
 
+import java.io.File;
+
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
@@ -49,7 +51,7 @@ public class FitnessEvaluationTask extends FitnessTask
             String workDir, String outFileName)
     {
     	super(new Candidate(molGraph));
-        this.workDir = workDir;
+        this.workDir = new File(workDir);
         fitProvMol = iac;
         fitProvOutFile = outFileName;
     }

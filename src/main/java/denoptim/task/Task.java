@@ -73,9 +73,9 @@ public abstract class Task implements Callable<Object>
     protected ProcessHandler processHandler;
     
     /**
-     * Pathname of work directory
+     * The file system location where we want to be placed when doing the work.
      */
-    protected String workDir = "";
+    protected File workDir;
     
     /**
      * Verbosity level
@@ -123,18 +123,7 @@ public abstract class Task implements Callable<Object>
      */
     public void setWorkSpace(File workDir)
     {
-    	setWorkSpace(workDir.getAbsolutePath());
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Sets the pathname of the work space, i.e., the location where the task 
-     * is supposed to use move to or to threat as the result of "pwd" at runtime
-     */
-    public void setWorkSpace(String workDirPathname)
-    {
-    	this.workDir = workDirPathname;
+    	this.workDir = workDir;
     }
     
 //------------------------------------------------------------------------------

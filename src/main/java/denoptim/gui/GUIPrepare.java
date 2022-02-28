@@ -31,13 +31,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
+import denoptim.denoptimga.DenoptimGA;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.task.DenoptimGATask;
-import denoptim.task.FitnessRunnerTask;
-import denoptim.task.FragSpaceExplorerTask;
-import denoptim.task.GUIInvokedMainTask;
+import denoptim.fitnessrunner.FitnessRunner;
+import denoptim.fragspaceexplorer.FragSpaceExplorer;
+import denoptim.task.ProgramTask;
 import denoptim.task.StaticTaskManager;
 
 /**
@@ -153,7 +153,7 @@ public class GUIPrepare extends GUICardPanel
 		//		UIManager.getIcon("Menu.arrowIcon"));
 		// Using the arrowIcon causes problems with adoptopenjdk-1.8
 		// due to casting of the JButton into a JMenuItem. This could be
-		// due to the fact thet the arrow icon is meant for a menu. 
+		// due to the fact that the arrow icon is meant for a menu. 
 		btnRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String msg = "<html><body width='%1s'><p>Running a DENOPTIM "
@@ -182,13 +182,12 @@ public class GUIPrepare extends GUICardPanel
 					case 0:
 						String location = "unknownLocation";
 						try {
-							GUIInvokedMainTask task = buildMainCall();
 							File wrkSpace = prepareWorkSpace();
 							File paramFile = instantiateParametersFile(wrkSpace);
 							if (printAllParamsToFile(paramFile))
 							{
-								task.setConfigFile(paramFile);
-								task.setWorkSpace(wrkSpace);
+	                            ProgramTask task = buildProgramTask(paramFile,
+	                                    wrkSpace);
 								StaticTaskManager.submit(task);
 							} else {
 								throw new DENOPTIMException("Failed to make "
@@ -219,49 +218,6 @@ public class GUIPrepare extends GUICardPanel
 		});
 		commandsPane.add(btnRun);
 		
-		
-		/*
-		//
-		//TODO? Right now it only prints the configuration file in a new folder
-		//But, running the experiments requires a command from the user and 
-		//from outside this JVM. Moreover, that command is platform specific.
-		//
-		JButton btnSubmit = new JButton("Submit...",
-		btnSubmit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-					String location = "unknownLocation";
-					try {
-						File wrkSpace = prepareWorkSpace();
-						File paramFile = instatiateParametersFile(wrkSpace);
-						if (!printAllParamsToFile(paramFile))
-						{
-							throw new DENOPTIMException("Failed to make "
-									+ "parameter file '" + paramFile + "'");
-						}
-						location = wrkSpace.getAbsolutePath();
-					} catch (DENOPTIMException e1) {
-						JOptionPane.showMessageDialog(btnSubmit,
-								"Could not prepare work space. " 
-								+ e1.getMessage()
-								+ ". " + e1.getCause().getMessage(),
-			                    "ERROR",
-			                    JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					
-					// We have only the .params file under the tmp space
-					// Should get copies of all input files and place them under 
-					// the same location.
-
-					JOptionPane.showMessageDialog(btnSubmit,
-							"<html>The experiment is all set up under<br>"
-							+ location+"</html>",
-		                    "Prepared. Now, submit!",
-		                    JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-		commandsPane.add(btnSubmit);
-		*/
 		
 		JButton btnCanc = new JButton("Close Tab");
 		// Adding the icon overrites font size no matter setFont
@@ -350,6 +306,7 @@ public class GUIPrepare extends GUICardPanel
 	
 //------------------------------------------------------------------------------
 	
+    //TODO-gg use RunType
 	private String getAchronimFromClass()
 	{
 		String baseName = "none";
@@ -437,20 +394,24 @@ public class GUIPrepare extends GUICardPanel
 	
 	/**
 	 * The type of main to run is determined by which subclass calls this method
+	 * @param configFile the file containing the configuration parameter for
+	 * the program to run.
+	 * @param workDir the file system location from which to run the program.
 	 * @throws DENOPTIMException 
 	 */
-	private GUIInvokedMainTask buildMainCall() throws DENOPTIMException
+	private ProgramTask buildProgramTask(File configFile, File workDir) 
+	        throws DENOPTIMException
 	{
-		GUIInvokedMainTask task = null;
+		ProgramTask task = null;
 		if (this instanceof GUIPrepareGARun)
 		{
-			task = new DenoptimGATask();
+			task = new DenoptimGA(configFile, workDir);
 		} else if (this instanceof GUIPrepareFSERun)
 		{
-			task = new FragSpaceExplorerTask();
+			task = new FragSpaceExplorer(configFile, workDir);
 		} else if (this instanceof GUIPrepareFitnessRunner)
 		{
-		    task = new FitnessRunnerTask();
+		    task = new FitnessRunner(configFile, workDir);
 		}
 		return task;
 	}

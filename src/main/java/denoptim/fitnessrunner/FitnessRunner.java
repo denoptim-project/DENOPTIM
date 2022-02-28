@@ -18,66 +18,58 @@
 
 package denoptim.fitnessrunner;
 
+import java.io.File;
 import java.util.logging.Level;
 
 import denoptim.denoptimga.DenoptimGA;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspaceexplorer.FragSpaceExplorer;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.task.ProgramTask;
 
 
 /**
- * Stand-alone fitness provider main class. This class implements a main method 
- * that allows to run a fitness evaluation in a stand-alone. The configuration
- * of the fitness provider is given as a DENOPTIM params input file, in all 
- * equal to the parameters file used by {@link DenoptimGA} 
- * and {@link FitnessRunner}.
+ * Stand-alone fitness provider. This class implements a method 
+ * that allows to run a fitness evaluation in a stand-alone fashion. 
+ * The configuration of the fitness provider is given as a DENOPTIM's input 
+ * parameter file, that is in all equal to the parameters file used by 
+ * {@link DenoptimGA} and {@link FragSpaceExplorer}.
  * 
  * @author Marco Foscato
  */
 
-public class FitnessRunner
+public class FitnessRunner  extends ProgramTask
 {
 
+//------------------------------------------------------------------------------ 
+
+    /**
+     * Creates and configures the program task.
+     * @param configFile the file containing the configuration parameters.
+     * @param workDir the file system location from which to run the program.
+     */
+    public FitnessRunner(File configFile, File workDir)
+    {
+        super(configFile, workDir);
+    }
+    
 //------------------------------------------------------------------------------
 
-    /**
-     * Prints the syntax to execute
-     */
-
-    public static void printUsage()
-    {
-        System.err.println("Usage: java -jar FitnessRunner.jar ConfigFile "
-        		+ "[workDir]");
-    }
-
-//------------------------------------------------------------------------------ 
-    
-    /**
-     * @param args the command line arguments
-     * @throws DENOPTIMException 
-     */
-
-    public static void main(String[] args) throws DENOPTIMException
-    {
-        if (args.length < 1)
-        {
-            printUsage();
-            throw new DENOPTIMException("Cannot run FitnessRunner. Need "
-            		+ "at least one argument, i.e., the parameters file.");
-        }
-        
+    @Override
+    public void runProgram()
+    {   
+        //TODO: get rid of this one parameters are not static anymore.
         FRParameters.resetParameters();
         
-        String configFile = args[0];
-        if (args.length > 1)
+        if (workDir != null)
         {
-            FRParameters.workDir = args[1];
+            FRParameters.workDir = workDir.getAbsolutePath();
         }
         
         FPRunner runner = null;
         try
         {
-        	FRParameters.readParameterFile(configFile);
+        	FRParameters.readParameterFile(configFilePathName.getAbsolutePath());
             FRParameters.checkParameters();
             FRParameters.processParameters();
             FRParameters.printParameters();
@@ -93,11 +85,8 @@ public class FitnessRunner
     	    }
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
             t.printStackTrace(System.err);
-            throw new DENOPTIMException("Error in FitnessRunner run.", t);
+            thrownExc = new DENOPTIMException("Error in FitnessRunner run.", t);
         }
-        
-        // normal completion: do NOT call System exit(0) as we might be calling
-        // this main from another thread, which would be killed as well.
     }
     
 //------------------------------------------------------------------------------        

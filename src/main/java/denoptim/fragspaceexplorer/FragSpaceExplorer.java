@@ -18,10 +18,13 @@
 
 package denoptim.fragspaceexplorer;
 
+import java.io.File;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.task.ProgramTask;
 
 
 /**
@@ -40,7 +43,7 @@ import denoptim.logging.DENOPTIMLogger;
  * The exploration of a fragment space generated all combination of building
  * blocks according to the definition of the fragment space. Symmetry may be
  * enforced in the fragment space 
- * (see {@link FragmentSpaceParametersV2.FragmentSpaceParameters}). 
+ * (see {@link FragmentSpaceParameters}). 
  * In such case, if symmetric attachment points are found on a 
  * scaffold/fragment/graph, then the exploration is restricted
  * to such combinations respecting the constitutional symmetry of the APs.
@@ -48,49 +51,39 @@ import denoptim.logging.DENOPTIMLogger;
  * @author Marco Foscato
  */
 
-public class FragSpaceExplorer
+public class FragSpaceExplorer  extends ProgramTask
 {
 
 //------------------------------------------------------------------------------
-
+    
     /**
-     * Prints the syntax to execute
+     * Creates and configures the program task.
+     * @param configFile the file containing the configuration parameters.
+     * @param workDir the file system location from which to run the program.
      */
-
-    public static void printUsage()
+    public FragSpaceExplorer(File configFile, File workDir)
     {
-        System.err.println("Usage: java -jar FragSpaceExplorer.jar ConfigFile "
-        		+ "[workDir]");
+        super(configFile, workDir);
     }
-
-//------------------------------------------------------------------------------    
-    /**
-     * @param args the command line arguments
-     * @throws DENOPTIMException 
-     */
-
-    public static void main(String[] args) throws DENOPTIMException
+  
+//------------------------------------------------------------------------------
+    
+    @Override
+    public void runProgram()
     {
-        if (args.length < 1)
-        {
-            printUsage();
-            throw new DENOPTIMException("Cannot run FragSpaceExplorer. Need "
-            		+ "at least one argument to call FragSpaceExplorer.main");
-        }
-        
+        //TODO: get rid of this one parameters are not static anymore.
         //needed by static parameters, and in case of subsequent runs in the same JVM
     	FSEParameters.resetParameters(); 
 
-        String configFile = args[0];
-        if (args.length > 1)
+        if (workDir != null)
         {
-        	FSEParameters.workDir = args[1];
+            FSEParameters.workDir = workDir.getAbsolutePath();
         }
         
         CombinatorialExplorerByLayer pCombExp = null;
         try
         {
-        	FSEParameters.readParameterFile(configFile);
+        	FSEParameters.readParameterFile(configFilePathName.getAbsolutePath());
             FSEParameters.checkParameters();
             FSEParameters.processParameters();
             FSEParameters.printParameters();
@@ -102,15 +95,13 @@ public class FragSpaceExplorer
         {
     	    if (pCombExp != null)
     	    {
-                    pCombExp.stopRun();
+    	        pCombExp.stopRun();
     	    }
             DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
-            System.exit(-1);
+            thrownExc = new DENOPTIMException("Error in FeagSpaceExporer run", t);
         }
-        
-        // normal completion: do NOT call System exit(0) as we might be calling
-        // this main from another thread, which would be killed as well.
     }
-    
-//------------------------------------------------------------------------------        
+      
+//------------------------------------------------------------------------------  
+
 }

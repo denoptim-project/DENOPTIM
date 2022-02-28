@@ -33,7 +33,7 @@ import denoptim.threedim.ThreeDimTreeBuilder;
 import denoptim.utils.MutationType;
 
 /**
- * Tool to test genetic operators
+ * Tool to test genetic operators.
  *
  * @author Marco Foscato
  */

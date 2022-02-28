@@ -19,6 +19,7 @@
 
 package denoptim.denoptimga;
 
+import java.io.File;
 import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
@@ -48,11 +49,6 @@ public class OffspringEvaluationTask extends FitnessTask
     private volatile Population population;
     private volatile Monitor mnt;
     
-    /**
-     * Tool for generating 3D models assembling 3D building blocks.
-     */
-    private ThreeDimTreeBuilder tb3d;
-    
 //------------------------------------------------------------------------------
     
     public OffspringEvaluationTask(Candidate offspring, String workDir,
@@ -60,7 +56,7 @@ public class OffspringEvaluationTask extends FitnessTask
     {
         super(offspring);
         this.molName = offspring.getName();
-        this.workDir = workDir;
+        this.workDir = new File(workDir);
         this.fitProvMol = offspring.getChemicalRepresentation();
         this.population = popln;
         this.mnt = mnt;
