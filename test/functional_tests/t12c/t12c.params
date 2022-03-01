@@ -12,12 +12,12 @@ FS-ConstrainSymmetry=co:0 1.0
 
 # Use internal fitness provider
 FP-EQUATION=${nHBAcc + 0.2*nAtom + 3*Zagreb}
+FP-CheckUidBeforeFitness
 
 # Genetic Algorithm parameters
 GA-UIDFileIn=OTF_WDIR/knownUID.txt
 GA-InitPoplnFile=OTF_WDIR/initialPop.sdf
 GA-randomSeed=8572368003836
-FP-Interpreter=bash
 GA-Parallelization=synchronous
 GA-numParallelTasks=4
 GA-populationSize=8

@@ -86,17 +86,9 @@ exec > $log
 exec 2>&1
 
 #
-# Create UID from input mol
+# Checking og unique identifier UID has been done prior to submit the task to
+# this external fitness provider
 #
-molUniqueFile=$wrkDir/$molName".uid"
-grep -A1 InChi $inpSDF | tail -n 1 > $molUniqueFile
-$java -jar $pathToJarFiles/UpdateUID.jar -m $molUniqueFile -s $inpSDF -k $UIDFILE
-if grep -q "MOL_ERROR" $inpSDF
-then
-    cat $inpSDF > $outSDF
-    rm  "$molUniqueFile"
-    exit $E_OPTERROR
-fi
 
 #
 # FITNESS: # Cl and F atoms
@@ -104,6 +96,14 @@ fi
 ncl=$(grep -c " Cl " $inpSDF)
 nf=$(grep -c " F " $inpSDF)
 fitness=$((ncl + nf))
+
+#
+# Artifically slowing down the fitness evaluation.
+# Too fast execution interferes with the purpose of this test. The run must 
+# last enough to give DENOPTIM the time to read-in the instructions from the 
+# interface folder and apply those changes.
+#
+sleep 0.1
 
 # These are the candidates that will have an artificially high fitness:
 candIdTo50="M00000027"
@@ -165,7 +165,6 @@ addPropertyToSingleMolSDF "FITNESS" $fitness $outSDF
 #
 # Cleanup
 #
-rm "$molUniqueFile"
 rm "$inpSDF"
 
 #

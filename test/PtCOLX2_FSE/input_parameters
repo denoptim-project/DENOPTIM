@@ -6,6 +6,7 @@
 # Fitness provider
 FP-INTERPRETER=bash
 FP-SOURCE=data/fitness_provider_fromDB.sh
+FP-CheckUidBeforeFitness
 
 # Parameters for the fragment space exploration
 FSE-ROOTGRAPHS=data/root.txt

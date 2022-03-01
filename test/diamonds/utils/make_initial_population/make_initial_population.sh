@@ -2,4 +2,5 @@
 
 rm initial_population.sdf
 
-java -jar ../../../../build/FitnessRunner.jar fitness.params
+denoptimJar=$(find  -name "../../../../target/denoptim*-jar-with-dependencies.jar")
+java -jar  "$denoptimJar" -r FIT -f fitness.params

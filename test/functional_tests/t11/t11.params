@@ -13,6 +13,7 @@ FS-ENFORCESYMMETRY
 GA-randomSeed=8572368003836
 FP-Source=OTF_WDIR/fitness_provider.sh
 FP-Interpreter=bash
+FP-CheckUidBeforeFitness
 GA-Parallelization=asynchronous
 GA-numParallelTasks=OTF_PROCS
 GA-populationSize=5
