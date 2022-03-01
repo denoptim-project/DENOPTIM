@@ -291,7 +291,7 @@ public class Main
      */
     private static void ensureFileIsReadable(CommandLine cmd)
     {
-        if (!cmd.hasOption(CLIOptions.input))
+        if (cmd==null || !cmd.hasOption(CLIOptions.input))
             return;
         
         String pathname = cmd.getOptionValue(CLIOptions.input);
