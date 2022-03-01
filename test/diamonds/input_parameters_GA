@@ -50,7 +50,7 @@ RC-RCCFOLDER=data/rccArchive
 
 # Fitness Provider - parameters
 #FP-Equation=${taniToGoal*taniToGoal}
-#FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
+#FP-DescriptorSpecs=${Variable.parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
 FP-Source=data/fitness_provider_w3D.sh
 FP-Interpreter=bash
 FP-CHECKUIDBEFOREFITNESS

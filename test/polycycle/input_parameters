@@ -60,10 +60,10 @@ RC-MAXNUMBERRINGCLOSURES=3
 
 # Fitness Provider - parameters
 #FP-Equation=${taniPubChem*taniPubChem + taniSP}
-#FP-DescriptorSpecs=${parametrized('taniSP','TanimotoSimilarity','ShortestPathFingerprinter, FILE:RUNDIRTOSET/data/goal.sdf')}
-#FP-DescriptorSpecs=${parametrized('taniPubChem','TanimotoSimilarity','PubchemFingerprinter, FILE:RUNDIRTOSET/data/goal.sdf')}
+#FP-DescriptorSpecs=${Variable.parametrized('taniSP','TanimotoSimilarity','ShortestPathFingerprinter, FILE:RUNDIRTOSET/data/goal.sdf')}
+#FP-DescriptorSpecs=${Variable.parametrized('taniPubChem','TanimotoSimilarity','PubchemFingerprinter, FILE:RUNDIRTOSET/data/goal.sdf')}
 
 FP-Equation=${taniToSubStructs*taniToSubStructs}
-FP-DescriptorSpecs=${parametrized('taniToSubStructs','TanimotoSimilarityBySubstructure','FILE:RUNDIRTOSET/data/substructures.smarts, FILE:RUNDIRTOSET/data/goal.sdf')}
+FP-DescriptorSpecs=${Variable.parametrized('taniToSubStructs','TanimotoSimilarityBySubstructure','FILE:RUNDIRTOSET/data/substructures.smarts, FILE:RUNDIRTOSET/data/goal.sdf')}
 
 FP-CHECKUIDBEFOREFITNESS

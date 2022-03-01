@@ -42,5 +42,5 @@ RC-RCCFOLDER=data/rccArchive
 
 # Fitness Provider - parameters
 FP-Equation=${taniToGoal}
-FP-DescriptorSpecs=${parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
+FP-DescriptorSpecs=${Variable.parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
 FP-CheckUidBeforeFitness

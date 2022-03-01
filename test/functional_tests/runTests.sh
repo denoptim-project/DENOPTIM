@@ -32,19 +32,14 @@ wDir="/tmp/denoptim_test"
 export SHELL="/bin/bash"
 export DENOPTIM_HOME="$(cd ../.. ; pwd)"
 export javaDENOPTIM="java"
-export DENOPTIMJarFiles="$DENOPTIM_HOME/build"
-if [ ! -f "$DENOPTIMJarFiles/DenoptimGA.jar" ]
+export denoptimJar=$(find "$DENOPTIM_HOME/target" -name "denoptim*-jar-with-dependencies.jar")
+
+if [ ! -f "$denoptimJar" ]
 then
-    echo "Cannot find  $DENOPTIMJarFiles/DenoptimGA.jar"
-    echo "Trying under dist folder"
-    if [ ! -f "$DENOPTIMJarFiles/dist/DenoptimGA.jar" ]
-    then
-       echo "ERROR! Cannot find  $DENOPTIMJarFiles/dist/DenoptimGA.jar"
-       exit -1
-    fi
-    export DENOPTIMJarFiles="$DENOPTIM_HOME/build/dist"
+    echo "Cannot find DENOPTIM's jar. Make sure you have built the project by running 'mvn package' and ensuring its successful completion."
+    exit -1
 fi
-echo "Using DENOPTIM from $DENOPTIMJarFiles"
+echo "Using DENOPTIM jar: $denoptimJar"
 
 
 ############################################
@@ -235,7 +230,8 @@ echo "t7 replaced by unit test"
 #
 # t8: conversion of serialized checkpoint file to human readable string
 #
-runTest "t8"
+echo TODO: change t8
+#runTest "t8"
 
 #
 # t9: FragSpaceExplorer with symmetry constraints
@@ -295,7 +291,8 @@ runTest "t16"
 #
 # t17: Evolution based on random seletion of known graphs
 #
-runTest "t17"
+echo TODO: refactor DenoptimRND
+#runTest "t17"
 
 #
 # t18: comparison of graph lists
@@ -306,7 +303,8 @@ runTest "t18"
 # t19: conversion of graph's string representations (with templates and empty
 # vertices)
 #
-runTest "t19"
+echo TODO: remove StringConverter
+#runTest "t19"
 
 #
 # t20: crossover with templates

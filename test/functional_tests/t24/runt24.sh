@@ -18,7 +18,7 @@ done
 totChecks=0
 for i in $(seq 1 4)
 do
-    "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/Isomorphism.jar" "t24-$i.params" > "t24-$i.log" 2>&1 
+    "$javaDENOPTIM" -jar "$denoptimJar" -r GI -f "t24-$i.params" > "t24-$i.log" 2>&1 
     if ! grep -q 'Isomorphism run completed' "t24-$i.log"
     then
         echo " "
@@ -36,7 +36,7 @@ done
 
 for i in $(seq 6 9)
 do
-    "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/Isomorphism.jar" "t24-$i.params" > "t24-$i.log" 2>&1
+    "$javaDENOPTIM" -jar "$denoptimJar" -r GI -f "t24-$i.params" > "t24-$i.log" 2>&1
     if ! grep -q 'Isomorphism run completed' "t24-$i.log"
     then
         echo " "

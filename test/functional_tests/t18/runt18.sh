@@ -19,7 +19,7 @@ done
 exec 6>&1
 exec > "$logFile"
 exec 2>&1
-"$javaDENOPTIM" -jar "$DENOPTIMJarFiles"/GraphListsHandler.jar "$paramFile"
+"$javaDENOPTIM" -jar "$denoptimJar" -r CLG -f "$paramFile"
 exec 1>&6 6>&- 
 
 #Check outcome
