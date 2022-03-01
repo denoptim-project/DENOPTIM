@@ -20,7 +20,15 @@ randomSeeds=(2624 19377 9563 26551 13997 19563 13082 17637 11771 26024 26992 231
 export SHELL="/bin/bash"
 export DENOPTIM_HOME="$(cd ../.. ; pwd)"
 export javaDENOPTIM="java"
-export DENOPTIMJarFiles="$DENOPTIM_HOME/build"
+export denoptimJar=$(find "$DENOPTIM_HOME/target" -name "denoptim*-jar-with-dependencies.jar")
+
+if [ ! -f "$denoptimJar" ]
+then
+    echo "Cannot find DENOPTIM's jar. Make sure you have built the project by running 'mvn package' and ensuring its successful completion."
+    exit -1
+fi
+echo "Using DENOPTIM jar: $denoptimJar"
+
 submitDir="$(pwd)"
 wDir="/tmp/denoptim_polycycle_multirun"
 
@@ -44,19 +52,6 @@ then
     echo "ERROR! Not enough random seeds. Please, edit the script to add more random seeds."
     exit -1
 fi
-
-if [ ! -f "$DENOPTIMJarFiles/DenoptimGA.jar" ]
-then
-    echo "Cannot find $DENOPTIMJarFiles/DenoptimGA.jar"
-    echo "Trying under dist folder"
-    if [ ! -f "$DENOPTIMJarFiles/dist/DenoptimGA.jar" ]
-    then
-       echo "ERROR! Cannot find  $DENOPTIMJarFiles/dist/DenoptimGA.jar"
-       exit -1
-    fi
-    export DENOPTIMJarFiles="$DENOPTIM_HOME/build/dist"
-fi
-echo "Using DENOPTIM from $DENOPTIMJarFiles"
 
 sedSyntax=GNU
 sed --version >/dev/null 2>&1
@@ -121,7 +116,7 @@ do
 
     log="$runDir/run_$i.log"
     echo "Running DenoptimGA... (Use interface to stop it. PWD:$(pwd). Log in $log)"
-    nohup "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/DenoptimGA.jar" GA.params > "$log" 2>&1&
+    nohup "$javaDENOPTIM" -jar "$denoptimJar" -r GA -f GA.params > "$log" 2>&1&
 
     files=$(find "$runDir" -type f -wholename "*/interface/*")
     stopme=1
