@@ -68,7 +68,7 @@ public class FitnessProvider
 //------------------------------------------------------------------------------
 
 	/**
-	 * Constructs an instance that will calculated the fitness according to
+	 * Constructs an instance that will calculate the fitness according to
 	 * the given parameters. Note that the descriptors implementation instances
 	 * are not the same (not same hash) than those that will be used to compute 
 	 * the descriptor values. This to make the descriptor calculations
@@ -92,7 +92,7 @@ public class FitnessProvider
 		// threads will run the exact same instance of the implementation
 		this.descriptors = new ArrayList<DescriptorForFitness>();
 
-		// Make new instances of DFF
+		// Make new instances of DescriptorForFitness
 		ArrayList<String> classnames = new ArrayList<String>();
 		for (int i=0; i<descriptors.size(); i++)
 		{
