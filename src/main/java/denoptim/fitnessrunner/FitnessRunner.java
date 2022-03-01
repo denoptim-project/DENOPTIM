@@ -38,7 +38,7 @@ import denoptim.task.ProgramTask;
  * @author Marco Foscato
  */
 
-public class FitnessRunner  extends ProgramTask
+public class FitnessRunner extends ProgramTask
 {
 
 //------------------------------------------------------------------------------ 

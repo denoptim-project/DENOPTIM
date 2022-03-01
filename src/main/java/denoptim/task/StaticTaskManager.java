@@ -52,12 +52,27 @@ public class StaticTaskManager
 	private static final int queueSize = 10;
 	
 	/**
-	 * Queue indicator for GUI
+	 * Value indicated in the progress bar of the GUI.
 	 */
-	public static final JProgressBar queueStatusBar = new JProgressBar(0, 1);
+	public static int valProgressBar = 1; //On startup the bar is filled.up.
 	
 	/**
-	 * Synchronisation lock for queue progress bar
+     * Queue max indicator for progress bar in GUI.
+     */
+    public static int maxProgressBar = 1;
+
+    /**
+     * Reference to progress bar in GUI. Null when we start.
+     */
+    public static JProgressBar queueStatusBar = null;
+    
+    /**
+     * Property change fired to indicate the need to update progress bar
+     */
+    public static final String PROGRESSBARUPDATE = "UPDATE-PROGRESS-BAR";
+
+	/**
+	 * Synchronisation lock for queue progress bar.
 	 */
 	private static final Object LOCK = new Object();
     
@@ -150,19 +165,24 @@ public class StaticTaskManager
     public static void addTodoTasks(int addedTasksCount)
     {
     	synchronized (LOCK) {
-	    	int max = queueStatusBar.getMaximum();
-	    	int val = queueStatusBar.getValue();
+	    	int max = maxProgressBar;
+	    	int val = valProgressBar;
 	    	if (max==1 && val==1)
 	    	{
 	        	// NB: the progress bar is initialized to max=1/val=1
 	    		// Thus it looks "filled-up", i.e., no pending/running task
-	        	queueStatusBar.setMaximum(addedTasksCount);
-	        	queueStatusBar.setValue(0);
+	    	    maxProgressBar = addedTasksCount;
+	    	    valProgressBar = 0;
 	    	} else {
-		    	queueStatusBar.setMaximum(max+addedTasksCount);
-		    	queueStatusBar.setValue(val);
+	    	    maxProgressBar = max+addedTasksCount;
+		    	valProgressBar = val;
 	    	}
-	    	queueStatusBar.repaint();
+    	}
+    	if (queueStatusBar!=null)
+    	{
+    	    queueStatusBar.setMaximum(maxProgressBar);
+    	    queueStatusBar.setValue(valProgressBar);
+    	    queueStatusBar.repaint();
     	}
     }
 
@@ -177,16 +197,21 @@ public class StaticTaskManager
     public static void subtractDoneTasks(int doneTasksCount)
     {
     	synchronized (LOCK) {
-	    	int max = queueStatusBar.getMaximum();
-	    	int val = queueStatusBar.getValue();
-	    	queueStatusBar.setValue(val+doneTasksCount);
-	    	if (queueStatusBar.getValue() == queueStatusBar.getMaximum())
+	    	int max = maxProgressBar;
+	    	int val = valProgressBar;
+	    	valProgressBar = val+doneTasksCount;
+	    	if (valProgressBar == maxProgressBar)
 	    	{
-	    		queueStatusBar.setMaximum(1);
-	        	queueStatusBar.setValue(1);
+	    	    maxProgressBar = 1;
+	    		valProgressBar = 1;
 	    	}
-	    	queueStatusBar.repaint();
     	}
+        if (queueStatusBar!=null)
+        {
+            queueStatusBar.setMaximum(maxProgressBar);
+            queueStatusBar.setValue(valProgressBar);
+            queueStatusBar.repaint();
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -259,6 +284,18 @@ public class StaticTaskManager
 	{
 		return tpe.getActiveCount() > 0;
 	}
+
+//------------------------------------------------------------------------------
+
+	/**
+	 * Adds a reference to the given progress bar. This to enable the task
+	 * manager to report queue status.
+	 * @param bar
+	 */
+    public static void setLinkToProgressBar(JProgressBar bar)
+    {
+        queueStatusBar = bar;
+    }
 
 //------------------------------------------------------------------------------
     

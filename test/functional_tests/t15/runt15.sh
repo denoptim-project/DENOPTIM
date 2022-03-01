@@ -19,7 +19,7 @@ done
 exec 6>&1
 exec > "$logFile"
 exec 2>&1
-"$javaDENOPTIM" -jar "$DENOPTIMJarFiles"/TestOperator.jar "$paramFile"
+"$javaDENOPTIM" -jar "$denoptimJar" -r GO -f "$paramFile"
 exec 1>&6 6>&- 
 
 #Check outcome
@@ -33,7 +33,7 @@ fi
 exec 6>&1
 exec > "${logFile}_check-1"
 exec 2>&1
-"$javaDENOPTIM" -jar "$DENOPTIMJarFiles"/GraphListsHandler.jar t15-check-1.params
+"$javaDENOPTIM" -jar "$denoptimJar" -r CLG -f t15-check-1.params
 exec 1>&6 6>&-
 
 if ! grep -q "#Matches in list A: 1/1" "${logFile}_check-1"
@@ -52,7 +52,7 @@ fi
 exec 6>&1
 exec > "${logFile}_check-2"
 exec 2>&1
-"$javaDENOPTIM" -jar "$DENOPTIMJarFiles"/GraphListsHandler.jar t15-check-2.params
+"$javaDENOPTIM" -jar "$denoptimJar" -r CLG -f t15-check-2.params
 exec 1>&6 6>&-
 
 if ! grep -q "#Matches in list A: 1/1" "${logFile}_check-2"

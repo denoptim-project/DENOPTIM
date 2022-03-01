@@ -44,6 +44,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.MenuEvent;
@@ -68,7 +69,7 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 	/**
 	 * Version
 	 */
-	private static final long serialVersionUID = -6297787221312734786L;
+	private static final long serialVersionUID = 3L;
 	
 	/**
 	 * Main DENOPTIM menu
@@ -99,6 +100,11 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
      * An indicator to whether a fragment space is loaded or not
      */
     private JTextField fragSpaceIndicator;
+    
+    /**
+     * Progress bar indicating the queue of task to complete.
+     */
+    private JProgressBar queueStatusBar;
 	
 	/**
 	 * List of the active panels in the deck of cards
@@ -404,10 +410,12 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		// From here the items will be added to the RIGHT of the menu bar
 		this.add(Box.createGlue());
 
-        StaticTaskManager.queueStatusBar.setMaximum(1);
-        StaticTaskManager.queueStatusBar.setValue(1);
-        StaticTaskManager.queueStatusBar.setToolTipText("Status of tasks");
-        this.add(StaticTaskManager.queueStatusBar);
+		queueStatusBar = new JProgressBar(0,1);
+		StaticTaskManager.setLinkToProgressBar(queueStatusBar);
+        queueStatusBar.setMaximum(1);
+        queueStatusBar.setValue(1);
+        queueStatusBar.setToolTipText("Status of tasks");
+        this.add(queueStatusBar);
         
 		fragSpaceIndicator = new JTextField("BBSpace");
 		fragSpaceIndicator.setHorizontalAlignment(JTextField.CENTER);

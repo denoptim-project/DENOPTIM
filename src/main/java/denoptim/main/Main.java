@@ -17,6 +17,7 @@ import denoptim.denoptimga.DenoptimGA;
 import denoptim.exception.ExceptionUtils;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.fitnessrunner.FitnessRunner;
 import denoptim.fragspaceexplorer.FragSpaceExplorer;
 import denoptim.geneopsrunner.GeneOpsRunner;
 import denoptim.grapheditor.GraphEditor;
@@ -37,6 +38,11 @@ public class Main
      */
     public static enum RunType {
         /**
+         * Launch the graphical user interface {@link denoptim.gui.GUI}
+         */
+        GUI, 
+        
+        /**
          * Run the genetic algorithm with {@link DenoptimGA}
          */
         GA, 
@@ -48,9 +54,9 @@ public class Main
         FSE, 
         
         /**
-         * Launch the graphical user interface {@link denoptim.gui.GUI}
+         * stand-alone fitness evaluation
          */
-        GUI, 
+        FIT,
         
         /**
          * Only prints help or version and close program.
@@ -63,11 +69,6 @@ public class Main
         GO,
         
         /**
-         * Run a comparison of lists of graphs.
-         */
-        CLG,
-        
-        /**
          * Run a stand-alone graph editing task
          */
         GE,
@@ -75,11 +76,18 @@ public class Main
         /**
          * Run a stand-alone test for graph isomorphism
          */
-        GI;
+        GI,
+        
+        /**
+         * Run a comparison of lists of graphs.
+         */
+        CLG;
+        
         
         
         // NB: to define a new run type: 
-        //  1) add the enum alternative above this 
+        //  1) add the enum alternative. The order is somewhat related to the
+        //     importance (i.e., common use) of a run type.
         //  2) set the value of "description" in the static block below
         //  3) set the value of "isCLIEnabled" in the static block below
         //  4) set the value of "programTaskImpl" in the static block below
@@ -102,6 +110,7 @@ public class Main
         static {
             DRY.description = "Dry run";
             FSE.description = "combinatorial Fragment Space Exploration";
+            FIT.description = "stand-alone FITness evaluation";
             GA.description = "Genetic Algorithm";
             GE.description = "stand-alone Graph Editing task";
             GI.description = "stand-alone Graph Isomorphism analysis";
@@ -111,6 +120,7 @@ public class Main
             
             DRY.isCLIEnabled = false;
             FSE.isCLIEnabled = true;
+            FIT.isCLIEnabled = true;
             GA.isCLIEnabled = true;
             GE.isCLIEnabled = true;
             GI.isCLIEnabled = true;
@@ -120,6 +130,7 @@ public class Main
             
             DRY.programTaskImpl = null;
             FSE.programTaskImpl = FragSpaceExplorer.class;
+            FIT.programTaskImpl = FitnessRunner.class;
             GA.programTaskImpl = DenoptimGA.class;
             GE.programTaskImpl = GraphEditor.class;
             GI.programTaskImpl = Isomorphism.class;

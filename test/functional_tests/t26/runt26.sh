@@ -21,7 +21,7 @@ elSymbols=('C  ' 'N  ' 'P  ' 'H  ' 'ATM' 'O  ' 'Si ' 'F  ' 'S  ')
 totChecks=0
 for i in $(seq 1 $nSubTests)
 do
-    "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/TestOperator.jar" "t26-$i.params" > "t26-$i.log" 2>&1 
+    "$javaDENOPTIM" -jar "$denoptimJar" -r GO -f "t26-$i.params" > "t26-$i.log" 2>&1 
     if ! grep -q 'TestOperator run completed' "t26-$i.log"
     then
         echo " "
