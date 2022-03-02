@@ -26,12 +26,6 @@
 # Settings and Parameters
 ###############################################################################
 
-#Java
-java="$javaDENOPTIM"
-
-#Denoptim home
-pathToDenoptimJars="$DENOPTIMJarFiles"
-
 #Tinker (bin folder)
 pathToTinkerBin="/Users/marco/tools/TinkerLFMM_RCP_2/bin"
 
@@ -256,7 +250,7 @@ echo "CG-RCPSSROTPARAMS=$wrkDir/../../data/submit_RC-PSSROT" >> "$DnCGParFile"
 #echo "=" >> "$DnCGParFile"
 
 #run builder
-"$java" -jar "$pathToDenoptimJars/DenoptimCG.jar" "$DnCGParFile" 
+"$javaDENOPTIM" -jar "$denoptimJar" -r 3D -f "$DnCGParFile" 
 
 # Cleanup files tmp files
 #echo "Removing $wrkDir/${molNum}_cs0.*"
@@ -291,7 +285,7 @@ echo "FR-Input=$FPinp" >> "$FPParFile"
 echo "FR-Output=$FPout" >> "$FPParFile"
 
 #run fitness runner
-"$java" -jar "$pathToDenoptimJars/FitnessRunner.jar" "$FPParFile"
+"$java" -jar "$denoptimJar" -r FIT -f "$FPParFile"
 
 # Check outcome
 if [ ! -f "$FPout" ]; then

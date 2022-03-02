@@ -440,7 +440,7 @@ public class DENOPTIMMoleculeUtils
             // Get InChIGenerator, this is a non-standard inchi
             InChIGenerator gen = factory.getInChIGenerator(
                     fmol,
-                    "AuxNone RecMet SUU"
+                    "AuxNone, RecMet, SUU"
             );
             INCHI_RET ret = gen.getReturnStatus();
             if (ret == INCHI_RET.WARNING)

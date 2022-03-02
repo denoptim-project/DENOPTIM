@@ -86,18 +86,6 @@ log=$wrkDir/$molName"_FProvider.log"
 exec > $log
 exec 2>&1
 
-#
-# Create UID from input mol
-#
-molUniqueFile=$wrkDir/$molName".uid"
-grep -A1 InChi $inpSDF | tail -n 1 > $molUniqueFile
-$java -jar $pathToJarFiles/UpdateUID.jar -m $molUniqueFile -s $inpSDF -k $UIDFILE
-if grep -q "MOL_ERROR" $inpSDF
-then
-    cat $inpSDF > $outSDF
-    rm  "$molUniqueFile"
-    exit $E_OPTERROR
-fi
 
 #
 # FITNESS: # Cl and F atoms
@@ -120,7 +108,6 @@ addPropertyToSingleMolSDF "FITNESS" $fitness $outSDF
 #
 # Cleanup
 #
-rm "$molUniqueFile"
 rm "$inpSDF"
 
 #

@@ -26,19 +26,14 @@ done
 export SHELL="/bin/bash"
 export DENOPTIM_HOME="$(cd ../.. ; pwd)"
 export javaDENOPTIM="java"
-export DENOPTIMJarFiles="$DENOPTIM_HOME/build"
-if [ ! -f "$DENOPTIMJarFiles/FragSpaceExplorer.jar" ]
+export denoptimJar=$(find "$DENOPTIM_HOME/target" -name "denoptim*-jar-with-dependencies.jar")
+
+if [ ! -f "$denoptimJar" ]
 then
-    echo "Cannot find  $DENOPTIMJarFiles/FragSpaceExplorer.jar"
-    echo "Trying under dist folder"
-    if [ ! -f "$DENOPTIMJarFiles/dist/FragSpaceExplorer.jar" ]
-    then
-       echo "ERROR! Cannot find  $DENOPTIMJarFiles/dist/FragSpaceExplorer.jar"
-       exit -1
-    fi
-    export DENOPTIMJarFiles="$DENOPTIM_HOME/build/dist"
+    echo "Cannot find DENOPTIM's jar. Make sure you have built the project by running 'mvn package' and ensuring its successful completion."
+    exit -1
 fi
-echo "Using DENOPTIM from $DENOPTIMJarFiles"
+echo "Using DENOPTIM jar: $denoptimJar"
 
 # Copy to tmp space
 wDir="/tmp/denoptim_PtCO_FSE"
@@ -70,7 +65,7 @@ cd "$wDir"
 echo " "
 echo "Starting FragSpaceExplorer (ctrl+c to kill)"
 echo " "
-java -jar "$DENOPTIMJarFiles/FragSpaceExplorer.jar" input_parameters
+"$javaDENOPTIM" -jar "$denoptimJar" -r FSE -f input_parameters
 
 # Goodbye
 echo "All done. See results under $wDir"
