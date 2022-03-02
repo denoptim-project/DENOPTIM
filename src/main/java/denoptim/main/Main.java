@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 
@@ -125,7 +127,7 @@ public class Main
             GE.isCLIEnabled = true;
             GI.isCLIEnabled = true;
             GO.isCLIEnabled = true;
-            GUI.isCLIEnabled = true;
+            GUI.isCLIEnabled = false;
             CLG.isCLIEnabled = true;
             
             DRY.programTaskImpl = null;
@@ -161,7 +163,7 @@ public class Main
             for (int i=0; i<RunType.values().length; i++)
             {
                 RunType rt = RunType.values()[i];
-                if (RunType.DRY.equals(rt))
+                if (!rt.isCLIEnabled)
                     continue; //This run type should not be visible by the user
                 if (i>0 && i < RunType.values().length-2)
                     s = s + " '" + rt.toString() + "' for "+rt.description+ ",";
@@ -210,6 +212,8 @@ public class Main
             System.exit(0);
         }
         
+        List<String> inputFiles = behavior.cmd.getArgList();
+        
         // We instantiate also the task manager, even if it might not be used.
         // This is to pre-start the tasks and get a more reliable queue status
         // at any given time after this point.
@@ -219,12 +223,18 @@ public class Main
         if (ProgramTask.class.isAssignableFrom(
                 behavior.runType.getProgramTaskImpl()))
         {
-            File inpFile = new File(behavior.cmd.getOptionValue(CLIOptions.input));
+            if (inputFiles.size()>1)
+            {    
+                reportError("Only one input file allowed when requesting run "
+                        + behavior.runType + ". Found " + inputFiles.size()
+                        + " files: " + inputFiles, 1);
+            }
+            File inpFile = new File(inputFiles.get(0));
+            //TODO Check existence of parent
             File wDir = inpFile.getParentFile();
             runProgramTask(behavior.runType.getProgramTaskImpl(), inpFile, wDir);
             terminate();
         } else if (RunType.GUI.equals(behavior.runType)) {
-            ensureFileIsReadable(behavior.cmd);
             EventQueue.invokeLater(new GUI(behavior.cmd));
         } else {
             reportError("You requested a run of type '" + behavior.runType 
@@ -236,7 +246,7 @@ public class Main
 //------------------------------------------------------------------------------
     
     /**
-     * Creates a task for the given class
+     * Creates a task for the given class.
      * @param taskClass
      * @param inputFile
      * @param workDir
@@ -284,29 +294,32 @@ public class Main
 //------------------------------------------------------------------------------
     
     /**
-     * Use this method to avoid launching a GUI in the attempt to open a file 
-     * with unrecognized format.
-     * @param cmd the command line containing the option 
-     * {@link CLIOptions#input}.
+     * Checks the file exists and format is recognized.
+     * @param file file to check.
+     * @param behavior this is where we write error messages.
      */
-    private static void ensureFileIsReadable(CommandLine cmd)
+    private static Behavior ensureFileExistsAndIsReadable(File file, 
+            Behavior behavior)
     {
-        if (cmd==null || !cmd.hasOption(CLIOptions.input))
-            return;
-        
-        String pathname = cmd.getOptionValue(CLIOptions.input);
+        if (!file.exists())
+        {
+            return new Behavior(behavior.runType, behavior.cmd, 1, null,
+                    "File '"+ file.getAbsolutePath() +"' not found.");
+        }
         FileFormat format = FileFormat.UNRECOGNIZED;
         try {
-            format = FileUtils.detectFileFormat(new File(pathname));
+            format = FileUtils.detectFileFormat(file);
         } catch (Throwable t) {
             // Ignore: if anything goes wrong well still get UNRECOGNIZED which
             // triggers the error.
         }
         if (FileFormat.UNRECOGNIZED.equals(format))
         {
-            reportError("Could not open file '" + pathname + "' because its "
-                    + "format is not recognized.", 1);
+            return new Behavior(behavior.runType, behavior.cmd, 1, null,
+                    "Could not open file '" + file.getAbsolutePath() 
+                    + "' because its format is not recognized.");
         }
+        return behavior;
     }
 
 //------------------------------------------------------------------------------
@@ -320,7 +333,7 @@ public class Main
      */
     protected static Behavior defineProgramBehavior(String[] args)
     {   
-        CommandLineParser parser = new CLIOptionParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
         
         try {
@@ -345,82 +358,44 @@ public class Main
         } 
         
         Behavior result = null;
-        switch (args.length)
-        {
-            case 0:
-                result = new Behavior(RunType.GUI, null, 0, null, null);
-                break;
-                
-            case 1:
-                String pathname = args[0];
-                if (!FileUtils.checkExists(pathname))
+        if (cmd.getOptions().length==0)
+            result = new Behavior(RunType.GUI, cmd, 0, null, null);
+        else {
+            if (cmd.hasOption(CLIOptions.run))
+            {
+                String rts = cmd.getOptionValue(CLIOptions.run).toString();
+                RunType rt = null;
+                try
                 {
-                    String errMsg = "File " + pathname + " not found!";
-                    result = new Behavior(null, null, 1, null, errMsg);
-                    break;
+                    rt = RunType.valueOf(rts.toUpperCase());
+                } catch (Exception e)
+                {
+                    String errMsg = "Unacceptable value for "
+                            + CLIOptions.run.getLongOpt() + " option: "
+                            + "'" + rts + "'. Please, modify "
+                            + "your command. ";
+                    return new Behavior(null, null, 1, null, errMsg);
                 }
-                result = new Behavior(RunType.GUI, cmd, 0, null, null);
-                break;
-                
-            default:
-                if (cmd.hasOption(CLIOptions.input))
+            
+                if (rt.isCLIEnabled())
                 {
-                    String pathName = cmd.getOptionValue(CLIOptions.input);
-                    if (!FileUtils.checkExists(pathName))
-                    {
-                        String errMsg = "File '" + pathName + "' not found!";
-                        result = new Behavior(null, null, 1, null, errMsg);
-                        break;
-                    }
-                }
-                if (cmd.hasOption(CLIOptions.run))
-                {
-                    String rts = cmd.getOptionValue(CLIOptions.run).toString();
-                    RunType rt = null;
-                    try
-                    {
-                        rt = RunType.valueOf(rts.toUpperCase());
-                    } catch (Exception e)
-                    {
-                        String errMsg = "Unacceptable value for "
-                                + CLIOptions.run.getLongOpt() + " option: "
-                                + "'" + rts + "'. Please, modify "
-                                + "your command. ";
-                        return new Behavior(null, null, 1, null, errMsg);
-                    }
-                    
-                    if (!rt.equals(RunType.GUI) 
-                            && !cmd.hasOption(CLIOptions.input))
-                    {
-                        String errMsg = "Option '-" 
-                                + CLIOptions.input.getOpt() 
-                                + "' is needed to specify the input, "
-                                + "but was not found. Please, modify "
-                                + "your command. ";
-                        result = new Behavior(null, null, 1, null, errMsg);
-                    } else {
-                        if (rt.isCLIEnabled())
-                        {
-                            result = new Behavior(rt, cmd);
-                        } else {
-                            result = new Behavior(null, null, 1, null, 
-                                    "RunType '"+rt+"' is not enabled from CLI. "
-                                    + "Please, contacts the developers.");
-                        }
-                    }
+                    result = new Behavior(rt, cmd);
                 } else {
-                    if (cmd.hasOption(CLIOptions.input))
-                    {
-                        result = new Behavior(RunType.GUI, cmd);
-                    } else {
-                        String helpMsg = getHelpString();
-                        String errMsg = "No meaningful command line option. "
-                                + "Nothing to do. Exiting.";
-                        result = new Behavior(null, null, 1, helpMsg, errMsg);
-                    }
+                    result = new Behavior(null, null, 1, null, 
+                            "RunType '"+rt+"' is not enabled from CLI. "
+                            + "Please, contacts the developers.");
                 }
-                break;
+            } else {
+                reportError("Command line has no " + CLIOptions.run + " option, "
+                        + "but more than zero options. Please, contact the "
+                        + "developers.", 1);
+            }
         }
+
+        List<String> inputFiles = cmd.getArgList();
+        for (String pathname : inputFiles)
+            result = ensureFileExistsAndIsReadable(new File(pathname), result);
+        
         return result;
     }
     
@@ -441,19 +416,7 @@ public class Main
                 formatter.getLeftPadding(), formatter.getDescPadding(), 
                 DENOPTIMConstants.EOL +
                 "Run without arguments to launch the graphical user "
-                + "interface (GUI) without opening any specific file. "
-                + DENOPTIMConstants.EOL
-                + "Alternatively, to open the file/folder named <filename> in "
-                + "the GUI the two following commands are equivalent: "
-                + DENOPTIMConstants.EOL
-                + "  denoptim -" + CLIOptions.run.getOpt() 
-                + " " + RunType.GUI + " -" + CLIOptions.input.getOpt() 
-                + " <filename>"
-                + DENOPTIMConstants.EOL
-                + "  denoptim <filename> -" + CLIOptions.run.getOpt() + " " 
-                + RunType.GUI + DENOPTIMConstants.EOL
-                + "This simplification of the syntax is valid for any -" 
-                + CLIOptions.run.getOpt() + " option.", true);
+                + "interface (GUI) without opening any file. ", true);
         pw.flush();
         return out.toString();
     }
