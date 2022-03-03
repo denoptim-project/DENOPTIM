@@ -1420,7 +1420,7 @@ public class EAUtils
         res[1] = molsmiles;
 
         // Update the INCHI key representation
-        ObjectPair pr = DENOPTIMMoleculeUtils.getInchiForMolecule(mol);
+        ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
         if (pr.getFirst() == null)
         {
             String msg = "Evaluation of graph: INCHI is null!";
@@ -1780,7 +1780,7 @@ public class EAUtils
         }
 
         // get the smiles/Inchi representation
-        ObjectPair pr = DENOPTIMMoleculeUtils.getInchiForMolecule(mol);
+        ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
         if (pr.getFirst() == null)
         {
             String msg = "Evaluation of graph: INCHI is null!";

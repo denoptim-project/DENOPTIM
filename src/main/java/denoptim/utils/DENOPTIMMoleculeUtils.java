@@ -77,6 +77,8 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import io.github.dan2097.jnainchi.InchiFlag;
+import io.github.dan2097.jnainchi.InchiOptions;
 import net.sf.jniinchi.INCHI_RET;
 
 
@@ -409,14 +411,36 @@ public class DENOPTIMMoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
+     * Generates the InChI key for the given atom container. By default we
+     * produce a non-standard InChI using the flags {@link InchiFlag#AuxNone},
+     * {@link InchiFlag#RecMet}, and {@link InchiFlag#SUU}.
+     * 
+     * @param mol the molecule
+     * @return the InchiKey. <code>null</code> if error
+     * @throws denoptim.exception.DENOPTIMException
+     */
+
+    public static ObjectPair getInChIForMolecule(IAtomContainer mol)
+            throws DENOPTIMException {
+        InchiOptions options = new InchiOptions.InchiOptionsBuilder()
+                .withFlag(InchiFlag.AuxNone)
+                .withFlag(InchiFlag.RecMet)
+                .withFlag(InchiFlag.SUU)
+                .build();
+        return getInChIForMolecule(mol, options);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Generates the INCHI key for the molecule
      * @param mol the molecule
      * @return the InchiKey. <code>null</code> if error
      * @throws denoptim.exception.DENOPTIMException
      */
 
-    public static ObjectPair getInchiForMolecule(IAtomContainer mol)
-            throws DENOPTIMException {
+    public static ObjectPair getInChIForMolecule(IAtomContainer mol, 
+            InchiOptions options) throws DENOPTIMException {
         IAtomContainer fmol = builder.newAtomContainer();
         try 
         { 
@@ -437,11 +461,7 @@ public class DENOPTIMMoleculeUtils
         try
         {
             InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();
-            // Get InChIGenerator, this is a non-standard inchi
-            InChIGenerator gen = factory.getInChIGenerator(
-                    fmol,
-                    "AuxNone, RecMet, SUU"
-            );
+            InChIGenerator gen = factory.getInChIGenerator(fmol, options);
             INCHI_RET ret = gen.getReturnStatus();
             if (ret == INCHI_RET.WARNING)
             {

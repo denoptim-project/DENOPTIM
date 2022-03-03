@@ -394,7 +394,7 @@ public class GraphBuildingTask extends FitnessTask
         
                             // Prepare INCHI                    
                             ObjectPair pr = 
-                                 DENOPTIMMoleculeUtils.getInchiForMolecule(mol);
+                                 DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
                             if (pr.getFirst() == null)
                             {
                                 pr.setFirst("UNDEFINED_INCHI");

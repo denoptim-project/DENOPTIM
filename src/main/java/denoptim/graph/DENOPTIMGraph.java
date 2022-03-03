@@ -3690,7 +3690,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
 
         // get the smiles/Inchi representation
-        ObjectPair pr = DENOPTIMMoleculeUtils.getInchiForMolecule(mol);
+        ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
         if (pr.getFirst() == null)
         {
             String msg = "Evaluation of graph: INCHI is null!";
