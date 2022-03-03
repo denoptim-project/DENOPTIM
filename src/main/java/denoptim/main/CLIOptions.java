@@ -19,11 +19,6 @@ public class CLIOptions extends Options
     public static Option help;
     
     /**
-     * Option specifying the input file
-     */
-    public static Option input;
-    
-    /**
      * Option requesting only the printing of the version.
      */
     public static Option version;
@@ -45,20 +40,10 @@ public class CLIOptions extends Options
         help = new Option("h","help",false, "Print help message.");
         help.setRequired(false);
         this.addOption(help);
-       
-        input = new Option("f","file",true, "Specifies the file to "
-                + "process.");
-        input.setRequired(false);
-        this.addOption(input);
         
         run = new Option("r","run",true, "Request a specific type of "
                 + "run. Choose among:" + DENOPTIMConstants.EOL
-                + RunType.getRunTypesForUser() 
-                + "Unless the type "
-                + "of run is '" + RunType.GUI + "', this option must "
-                + "be coupled with '-" + input.getOpt() + " <arg>' "
-                + "to provide the pathname to the file containing input "
-                + "parameters.");
+                + RunType.getRunTypesForUser());
         run.setRequired(false);
         this.addOption(run);
         

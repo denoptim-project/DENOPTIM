@@ -164,16 +164,21 @@ public class GUI implements Runnable
                 }
             });
             
-            if (cmd!=null && cmd.hasOption(CLIOptions.input))
+            if (cmd!=null && cmd.getArgList().size()>0)
             {
-                File file = new File(cmd.getOptionValue(CLIOptions.input));
-                FileFormat format = FileFormat.UNRECOGNIZED;
-                try {
-                    format = FileUtils.detectFileFormat(file);
-                } catch (Throwable t) {
-                    // We have ensured the format is recognized in the Main
+                for (String arg : cmd.getArgList())
+                {   
+                    File file = new File(arg);
+                    FileFormat format = FileFormat.UNRECOGNIZED;
+                    try
+                    {
+                        format = FileUtils.detectFileFormat(file);
+                    } catch (Throwable t)
+                    {
+                        // We have ensured the format is recognized in the Main
+                    }
+                    menuBar.openFile(file, format);
                 }
-                menuBar.openFile(file, format);
             }
         } catch (Exception e) {
             e.printStackTrace();

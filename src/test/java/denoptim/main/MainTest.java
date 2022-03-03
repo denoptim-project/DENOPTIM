@@ -27,7 +27,9 @@ public class MainTest
     {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory");
         String inputPathName = tempDir.getAbsolutePath() + SEP + "input.par";
-        DenoptimIO.writeData(inputPathName, "data", false);
+        DenoptimIO.writeData(inputPathName, "GA-", false);
+        String inputPathName2 = tempDir.getAbsolutePath() + SEP + "input2.par";
+        DenoptimIO.writeData(inputPathName2, "GA-", false);
 
         //
         // Simplest call (launch GUI)
@@ -52,34 +54,33 @@ public class MainTest
         // Testing the request for a specific type of run
         //
         b = Main.defineProgramBehavior(new String[] {
-                "-"+CLIOptions.run.getOpt(), "GA", 
-                "-"+CLIOptions.input.getOpt(), inputPathName});
+                "-"+CLIOptions.run.getOpt(), "GA", inputPathName});
         assertEquals(0, b.exitStatus, "Exit status");
         assertEquals(RunType.GA, b.runType, "Type of run");
-        assertEquals(inputPathName, b.cmd.getOptionValue(CLIOptions.input), 
-                "Parameter");
+        assertTrue(b.cmd.getArgList().contains(inputPathName),"Input file");
 
         b = Main.defineProgramBehavior(new String[] {
-                "-"+CLIOptions.run.getOpt(), "gA", 
-                "-"+CLIOptions.input.getOpt(), inputPathName});
+                "-"+CLIOptions.run.getOpt(), "gA", inputPathName});
         assertEquals(0, b.exitStatus, "Exit status");
         assertEquals(RunType.GA, b.runType, "Type of run");
         
+        b = Main.defineProgramBehavior(new String[] { 
+                "-"+CLIOptions.run.getOpt(), "GUI"});
+        assertEquals(1, b.exitStatus, "Exit status");
+        assertTrue(b.errorMsg.contains("not enabled from CLI"), "Error Msg");
         
-        b = Main.defineProgramBehavior(new String[] {
-                "-"+CLIOptions.input.getOpt(), inputPathName, 
+        
+        b = Main.defineProgramBehavior(new String[] {inputPathName, 
                 "-"+CLIOptions.run.getOpt(), "FSE"});
         assertEquals(0, b.exitStatus, "Exit status");
         assertEquals(RunType.FSE, b.runType, "Type of run");
-        assertEquals(inputPathName, b.cmd.getOptionValue(CLIOptions.input), 
-                "Parameter");
+        assertTrue(b.cmd.getArgList().contains(inputPathName),"Input file");
         
         //
         // Testing the request for a specific type of run (wrong request)
         //
         b = Main.defineProgramBehavior(new String[] {
-                "-"+CLIOptions.run.getOpt(), "GAG", 
-                "-"+CLIOptions.input.getOpt(), inputPathName});
+                "-"+CLIOptions.run.getOpt(), "GAG", inputPathName});
         assertEquals(1, b.exitStatus, "Exit status");
         assertTrue(b.errorMsg.contains(CLIOptions.run.getLongOpt() + " option"),
                 "Illegal run type");
@@ -87,8 +88,7 @@ public class MainTest
         //
         // Test unrecognized options
         //
-        b = Main.defineProgramBehavior(new String[] {
-                "-"+CLIOptions.input.getOpt(), inputPathName, 
+        b = Main.defineProgramBehavior(new String[] {inputPathName, 
                 "-"+CLIOptions.run.getOpt(), "FSE", "--something"});
         //System.out.println(b.helpMsg);
         //System.out.println(b.errorMsg);
@@ -99,20 +99,23 @@ public class MainTest
         //
         // Test non-existing input file
         //
-        b = Main.defineProgramBehavior(new String[] {
-                "-"+CLIOptions.input.getOpt(), inputPathName+"_missing", 
-                "-"+CLIOptions.run.getOpt(), "GUI"});
-        //System.out.println(b.helpMsg);
-        //System.out.println(b.errorMsg);
+        b = Main.defineProgramBehavior(new String[] {inputPathName+"_missing"});
         assertEquals(1, b.exitStatus, "Exit status");
         assertTrue(b.errorMsg.contains("not found"), "Error Msg");
         
-        b = Main.defineProgramBehavior(new String[] {
-                "-"+CLIOptions.input.getOpt(), inputPathName+"_missing"});
-        //System.out.println(b.helpMsg);
-        //System.out.println(b.errorMsg);
+        b = Main.defineProgramBehavior(new String[] {inputPathName+"_missing"});
         assertEquals(1, b.exitStatus, "Exit status");
         assertTrue(b.errorMsg.contains("not found"), "Error Msg");
         
+        //
+        //Test multiple input files
+        //
+        b = Main.defineProgramBehavior(new String[] {inputPathName,
+                inputPathName2});
+        assertEquals(0, b.exitStatus, "Exit status");
+        assertEquals(RunType.GUI, b.runType, "Type of run");
+        assertTrue(b.cmd.getArgList().contains(inputPathName),"Input file");
+        assertTrue(b.cmd.getArgList().contains(inputPathName2),"Input file");
+
     }
 }
