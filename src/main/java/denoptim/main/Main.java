@@ -93,6 +93,8 @@ public class Main
         //  2) set the value of "description" in the static block below
         //  3) set the value of "isCLIEnabled" in the static block below
         //  4) set the value of "programTaskImpl" in the static block below
+        //  5) consider whether a new parameter file format should be added
+        //     in FileFormats
         
         /**
          * The implementation of {@link ProgramTask} capable of this run type.

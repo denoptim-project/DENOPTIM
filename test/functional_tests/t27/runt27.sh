@@ -29,7 +29,7 @@ done
 exec 6>&1
 exec > "$logFile"
 exec 2>&1
-"$javaDENOPTIM" -jar "$denoptimJar" -r GA -f "$paramFile"
+"$javaDENOPTIM" -jar "$denoptimJar" -r GA "$paramFile"
 exec 1>&6 6>&-
 
 #Check outcome

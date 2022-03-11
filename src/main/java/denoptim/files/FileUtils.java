@@ -536,9 +536,7 @@ public class FileUtils
     public static FileFormat detectKindOfSDFFile(String fileName) 
             throws IOException 
     {
-        FileFormat[] ffs = {FileFormat.VRTXSDF, FileFormat.GRAPHSDF,
-                FileFormat.CANDIDATESDF};
-        return FileUtils.detectKindFile(fileName, ffs);
+        return FileUtils.detectKindFile(fileName, FileFormat.getSDFFormats());
     }
 
 //------------------------------------------------------------------------------
@@ -554,12 +552,7 @@ public class FileUtils
     public static FileFormat detectKindOfParameterFile(String fileName) 
             throws IOException
     {
-    	FileFormat[] ffs = {
-    	        FileFormat.GA_PARAM,
-    	        FileFormat.FSE_PARAM,
-    	        FileFormat.FR_PARAM,
-    	        FileFormat.COMP_MAP};
-    	return FileUtils.detectKindFile(fileName, ffs);
+    	return FileUtils.detectKindFile(fileName, FileFormat.getParameterFormats());
     }
 
 //------------------------------------------------------------------------------
@@ -576,16 +569,16 @@ public class FileUtils
     public static FileFormat detectKindFile(String fileName, FileFormat[] ffs) 
             throws IOException 
     {
-        Map<String,FileFormat> definingMap = 
+        Map<String,FileFormat> regexToMatch = 
                 new HashMap<String,FileFormat>();
-        Map<String,List<FileFormat>> negatingRegex = 
+        Map<String,List<FileFormat>> regexToNotMatch = 
                 new HashMap<String,List<FileFormat>>();
         String endOfSample = null;
         for (FileFormat ff : ffs)
         {
            for (String regex : ff.getDefiningRegex())
            {
-               definingMap.put(regex,ff);
+               regexToMatch.put(regex,ff);
                if (ff.getSampleEndRegex() != null)
                {
                    endOfSample = ff.getSampleEndRegex();
@@ -593,27 +586,33 @@ public class FileUtils
            }
            for (String regex : ff.getNegatingRegex())
            {
-               if (negatingRegex.containsKey(regex))
+               if (regexToNotMatch.containsKey(regex))
                {
-                   negatingRegex.get(regex).add(ff);
+                   regexToNotMatch.get(regex).add(ff);
                } else {
                    List<FileFormat> lst = new ArrayList<FileFormat>();
                    lst.add(ff);
-                   negatingRegex.put(regex, lst);
+                   regexToNotMatch.put(regex, lst);
                }
            }
         }
         
-        FileFormat ff = null;
+        Map<FileFormat,Boolean> foundDefiningRegex = new HashMap<FileFormat,Boolean>();
+        for (FileFormat f : ffs)
+            foundDefiningRegex.put(f, false);
+        
+        Map<FileFormat,Boolean> foundNegatingRegex = new HashMap<FileFormat,Boolean>();
+        for (FileFormat f : ffs)
+            foundNegatingRegex.put(f, false);
+        
         String line;
         BufferedReader br = null;
-        Set<FileFormat> negatedFFs = new HashSet<FileFormat>();
         try
         {
             br = new BufferedReader(new FileReader(fileName));
             lineReadingLoop:
                 while ((line = br.readLine()) != null)
-                {	            	
+                {
                 	if (endOfSample != null && line.matches(endOfSample))
                 	{
                 		break lineReadingLoop;
@@ -624,24 +623,22 @@ public class FileUtils
                         continue;
                     }
                     
-                    for (String key : negatingRegex.keySet())
+                    for (String key : regexToNotMatch.keySet())
                     {
-                        if (line.matches(key))
+                        if (line.toUpperCase().matches(key.toUpperCase()))
                         {
-                            negatedFFs.addAll(negatingRegex.get(key));
-                            if (negatingRegex.get(key).contains(ff))
+                            for (FileFormat ff : regexToNotMatch.get(key))
                             {
-                                ff = null;
+                                foundNegatingRegex.put(ff,true);
                             }
                         }
                     }
                     
-                    for (String keyRoot : definingMap.keySet())
+                    for (String keyRoot : regexToMatch.keySet())
                     {
-                        if (!negatedFFs.contains(definingMap.get(keyRoot))
-                                && line.matches(keyRoot))
+                        if (line.toUpperCase().matches(keyRoot.toUpperCase()))
                         {
-                        	ff = definingMap.get(keyRoot);
+                            foundDefiningRegex.put(regexToMatch.get(keyRoot), true);
                         }
                     }
                 }
@@ -667,7 +664,17 @@ public class FileUtils
             			ioe);
             }
         }
-    	return ff;
+        
+        FileFormat result = null;
+        for (FileFormat ff : ffs)
+        {
+            if (foundDefiningRegex.get(ff) && !foundNegatingRegex.get(ff))
+            {
+                result = ff;
+                break;
+            }
+        }
+    	return result;
     }
 
 //------------------------------------------------------------------------------

@@ -16,7 +16,7 @@ done
 exec 6>&1
 exec > "$logFile"
 exec 2>&1
-"$javaDENOPTIM" -jar "$denoptimJar" -r FIT -f "$paramFile"
+"$javaDENOPTIM" -jar "$denoptimJar" -r FIT "$paramFile"
 exec 1>&6 6>&- 
 
 

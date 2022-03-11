@@ -15,7 +15,10 @@ public enum FileFormat {
     CANDIDATESDF,
     GRAPHJSON, GRAPHSDF, VRTXJSON, VRTXSDF,
     FSE_RUN, GA_RUN,
-    GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP,
+    
+    GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP, GO_PARAM, CLG_PARAM, GE_PARAM, 
+    GI_PARAM,
+    
     TXT, GRAPHTXT,
     UNRECOGNIZED;
         
@@ -25,19 +28,22 @@ public enum FileFormat {
      * Collection of regex that, if matched, suggests assigning the format to a
      * specific FileFormat. Consider a logical <b>OR</b> operator, i.e., any 
      * match will suggest among the set of regex will lead to format 
-     * interpretation.
+     * interpretation. Regex are matches against toUpperCase strings, so they
+     * behave as case-insensitive.
      */
     private Set<String> definingRegex = new HashSet<String>();
     
     /**
      * Collection of regex that, if matched, prevents assigning the format to a
-     * specific FileFormat.
+     * specific FileFormat. Regex are matches against toUpperCase strings, so they
+     * behave as case-insensitive.
      */
     private Set<String> negatingRegex = new HashSet<String>();
     
     /**
      * Regex used to identify the end of the sampled text used to determine the
-     * format of a file.
+     * format of a file. Regex are matches against toUpperCase strings, so they
+     * behave as case-insensitive.
      */
     private String endOfSampleRegex = null;
     
@@ -52,7 +58,8 @@ public enum FileFormat {
         GRAPHSDF.negatingRegex = new HashSet<String>(Arrays.asList(
                 "^> *<" + DENOPTIMConstants.FITNESSTAG + ">.*",
                 "^> *<" + DENOPTIMConstants.MOLERRORTAG + ">.*",
-                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*"
+                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.VERTEXJSONTAG + ">.*"
                 ));
         GRAPHSDF.endOfSampleRegex = "\\$\\$\\$\\$";
         
@@ -81,6 +88,9 @@ public enum FileFormat {
         VRTXSDF.extension = "sdf";
         VRTXSDF.definingRegex = new HashSet<String>(Arrays.asList(
                 "^> *<" + DENOPTIMConstants.APSTAG+">.*"));
+        VRTXJSON.negatingRegex = new HashSet<String>(Arrays.asList(
+                "^> *<" + DENOPTIMConstants.GRAPHJSONTAG + ">.*"
+                ));
         VRTXSDF.endOfSampleRegex = "\\$\\$\\$\\$";
 
         //------------------------------------
@@ -119,6 +129,30 @@ public enum FileFormat {
         
         //------------------------------------
         
+        GO_PARAM.extension = "";
+        GO_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
+                "^TESTGENOPS-.*"));
+        
+        //------------------------------------
+        
+        GE_PARAM.extension = "";
+        GE_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
+                "^GRAPHEDIT-.*"));
+        
+        //------------------------------------
+        
+        CLG_PARAM.extension = "";
+        CLG_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
+                "^GRAPHLISTS-.*"));
+        
+        //------------------------------------
+        
+        GI_PARAM.extension = "";
+        GI_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
+                "^ISOMORPHISM-.*"));
+        
+        //------------------------------------
+        
         TXT.extension = "";
         
         //------------------------------------
@@ -127,7 +161,7 @@ public enum FileFormat {
     }
     
     public enum DataKind {GRAPH, VERTEX, GA_RUN, FSE_RUN, GA_PARAM, FSE_PARAM,
-        FR_PARAM, COMP_MAP}
+        FR_PARAM, GO_PARAM, CLG_PARAM, GE_PARAM, GI_PARAM, COMP_MAP}
     
 //------------------------------------------------------------------------------
 
@@ -193,6 +227,18 @@ public enum FileFormat {
                     case FR_PARAM:
                         ff = FR_PARAM;
                         break;
+                    case GO_PARAM:
+                        ff = GO_PARAM;
+                        break;
+                    case GE_PARAM:
+                        ff = GE_PARAM;
+                        break;
+                    case CLG_PARAM:
+                        ff = CLG_PARAM;
+                        break;
+                    case GI_PARAM:
+                        ff = GI_PARAM;
+                        break;
                     case COMP_MAP:
                         ff = COMP_MAP;
                         break;
@@ -200,6 +246,44 @@ public enum FileFormat {
                 break;
         }
         return ff;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the collection of file formats using SDF syntax.
+     * @return the collection of file formats using SDF syntax.
+     */
+    public static FileFormat[] getSDFFormats()
+    {
+        FileFormat[] a = {
+                // GraphSDF must come before Vertex SDF
+                FileFormat.GRAPHSDF, 
+                FileFormat.VRTXSDF,
+                FileFormat.CANDIDATESDF};
+        return a;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the collection of file formats with input parameters.
+     * @return the collection of file formats with input parameters.
+     */
+    public static FileFormat[] getParameterFormats()
+    {
+        FileFormat[] a = {
+            FileFormat.GO_PARAM,  
+            FileFormat.GE_PARAM,
+            FileFormat.CLG_PARAM,
+            FileFormat.GI_PARAM,
+         // GA must come after others that might use GA parameters, for example 
+         // the setting of the random seed)
+            FileFormat.GA_PARAM,  
+            FileFormat.FSE_PARAM,
+            FileFormat.FR_PARAM,
+            FileFormat.COMP_MAP};
+        return a;
     }
     
 //------------------------------------------------------------------------------
