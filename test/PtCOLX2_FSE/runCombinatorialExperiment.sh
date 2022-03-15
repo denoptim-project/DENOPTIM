@@ -65,7 +65,7 @@ cd "$wDir"
 echo " "
 echo "Starting FragSpaceExplorer (ctrl+c to kill)"
 echo " "
-"$javaDENOPTIM" -jar "$denoptimJar" -r FSE -f input_parameters
+"$javaDENOPTIM" -jar "$denoptimJar" -r FSE input_parameters
 
 # Goodbye
 echo "All done. See results under $wDir"

@@ -116,7 +116,7 @@ do
 
     log="$runDir/run_$i.log"
     echo "Running DenoptimGA... (Use interface to stop it. PWD:$(pwd). Log in $log)"
-    nohup "$javaDENOPTIM" -jar "$denoptimJar" -r GA -f GA.params > "$log" 2>&1&
+    nohup "$javaDENOPTIM" -jar "$denoptimJar" -r GA GA.params > "$log" 2>&1&
 
     files=$(find "$runDir" -type f -wholename "*/interface/*")
     stopme=1
