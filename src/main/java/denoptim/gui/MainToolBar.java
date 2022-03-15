@@ -587,6 +587,12 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
                 mainPanel.add(fragPanel2);
                 fragPanel2.importVerticesFromFile(file);
                 break;  
+                
+	        case CANDIDATESDF:
+                GUIGraphHandler graphPanel3 = new GUIGraphHandler(mainPanel);
+                mainPanel.add(graphPanel3);
+                graphPanel3.importGraphsFromFile(file);
+                break;
 				
 			case GRAPHSDF:
 				GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
