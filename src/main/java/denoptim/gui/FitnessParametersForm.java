@@ -64,6 +64,7 @@ import org.openscience.cdk.qsar.IDescriptor;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.DescriptorForFitness;
 import denoptim.fitness.DescriptorUtils;
+import denoptim.graph.APClass;
 
 /**
  * Form collecting input parameters for a setting-up the fitness provider.
@@ -130,11 +131,11 @@ public class FitnessParametersForm extends ParametersForm
     JLabel lblEq;
     JTextField txtEq;
     
-    String keyMoreEq = "FP-DescriptorSpecs";
-    JPanel lineMoreEq;
-    JLabel lblMoreEq;
-    JTable tabMoreEq;
-    DefaultTableModel tabMoreEqMod;
+    String keyCustomVars = "FP-DescriptorSpecs";
+    JPanel lineCustomVars;
+    JLabel lblCustomvars;
+    JTable tabCustomVars;
+    DefaultTableModel tabCustomVarsMod;
     
     JPanel descDefinitionPane;
     JScrollPane descDefScrollPane;
@@ -654,10 +655,9 @@ public class FitnessParametersForm extends ParametersForm
                 ParametrizedDescriptorDefinition dialog = 
                         new ParametrizedDescriptorDefinition(descNameToTune,
                                 paramsToTune);
-                Object[] res = (Object[]) dialog.showDialog();
-                if (res!=null)
+                if (dialog.result!=null)
                 {
-                    tabMoreEqMod.addRow(res);
+                    tabCustomVarsMod.addRow((Object[]) dialog.result);
                 }
             }
         });
@@ -736,40 +736,38 @@ public class FitnessParametersForm extends ParametersForm
         lineDescsTree.add(splitPaneDescs);
         localBlock4.add(lineDescsTree);
         
-        lblMoreEq = new JLabel("Custom variables definition:");
+        lblCustomvars = new JLabel("Definition of custom variables:");
         JPanel lineMoreEqTitle = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lineMoreEqTitle.add(lblMoreEq);
+        lineMoreEqTitle.add(lblCustomvars);
         localBlock4.add(lineMoreEqTitle);
         
         String toolTipMoreEq = "<html>Define atom/bond specific descriptors.</html>";
-        lineMoreEq = new JPanel();
-        lineMoreEq.setLayout(new BoxLayout(lineMoreEq, BoxLayout.LINE_AXIS));
+        lineCustomVars = new JPanel();
         
-        tabMoreEqMod = new DefaultTableModel();
-        tabMoreEqMod.setColumnCount(2);
+        tabCustomVarsMod = new DefaultTableModel();
+        tabCustomVarsMod.setColumnCount(2);
         String column_names[]= {"<html><b>Variable</b></html>", 
         		"<html><b>Definition</b></html>"};
-        tabMoreEqMod.setColumnIdentifiers(column_names);
-        tabMoreEq = new JTable(tabMoreEqMod);
-        tabMoreEq.setToolTipText(toolTipMoreEq);
-        tabMoreEq.putClientProperty("terminateEditOnFocusLost", true);
-        tabMoreEq.getColumnModel().getColumn(0).setMinWidth(75);
-        tabMoreEq.getColumnModel().getColumn(1).setMinWidth(100);
-        tabMoreEq.setGridColor(Color.LIGHT_GRAY);
-		JTableHeader tabMoreEqHeader = tabMoreEq.getTableHeader();
+        tabCustomVarsMod.setColumnIdentifiers(column_names);
+        tabCustomVars = new JTable(tabCustomVarsMod);
+        tabCustomVars.setToolTipText(toolTipMoreEq);
+        tabCustomVars.putClientProperty("terminateEditOnFocusLost", true);
+        tabCustomVars.getColumnModel().getColumn(0).setMinWidth(75);
+        tabCustomVars.getColumnModel().getColumn(1).setMinWidth(100);
+        tabCustomVars.setGridColor(Color.LIGHT_GRAY);
+		JTableHeader tabMoreEqHeader = tabCustomVars.getTableHeader();
 		tabMoreEqHeader.setPreferredSize(new Dimension(120, 20));
-		JScrollPane tabMoreEqScrollPane = new JScrollPane(tabMoreEq);
+		JScrollPane tabMoreEqScrollPane = new JScrollPane(tabCustomVars);
 		//tabMoreEqScrollPane.setMinimumSize(new Dimension(240,30));
 
-        mapKeyFieldToValueField.put(keyMoreEq.toUpperCase(), 
-        		tabMoreEqMod);
+        mapKeyFieldToValueField.put(keyCustomVars.toUpperCase(), 
+        		tabCustomVarsMod);
         
-
         tabMoreEqScrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
-        lineMoreEq.add(tabMoreEqScrollPane);
 
-        JButton btnAtomSpec = new JButton("Add atom-specific variable");
-        btnAtomSpec.addActionListener(new ActionListener() {
+        JButton btAtomSpecVar = new JButton("Add atom-specific variable");
+        btAtomSpecVar.setToolTipText("Add the defintion of an atom specific variabnle.");
+        btAtomSpecVar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				AtomSpecExpressionDefinition dialog = 
@@ -777,14 +775,86 @@ public class FitnessParametersForm extends ParametersForm
 				Object[] res = (Object[]) dialog.showDialog();
 				if (res!=null)
 				{
-					tabMoreEqMod.addRow(res);
+					tabCustomVarsMod.addRow(res);
 				}
 			}
 		});
-        btnAtomSpec.setAlignmentY(Component.TOP_ALIGNMENT);
         
-        lineMoreEq.add(btnAtomSpec);
-        localBlock4.add(lineMoreEq);
+        btnDDValueParams.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                ParametrizedDescriptorDefinition dialog = 
+                        new ParametrizedDescriptorDefinition(descNameToTune,
+                                paramsToTune);
+                Object[] res = (Object[]) dialog.showDialog();
+                if (res!=null)
+                {
+                    tabCustomVarsMod.addRow(res);
+                }
+            }
+        });
+        
+        /*
+        // Not active because it needs the definition of the descriptor and its parameters
+        JButton btnParametrizedVar = new JButton("Add parametrized descriptor");
+        btnParametrizedVar.setToolTipText("Defines a variable from a parametrized descriptor.");
+        btnParametrizedVar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ParametrizedDescriptorDefinition dialog = 
+                        new ParametrizedDescriptorDefinition(descNameToTune,
+                                paramsToTune);
+                Object[] res = (Object[]) dialog.showDialog();
+                if (res!=null)
+                {
+                    tabCustomVarsMod.addRow(res);
+                }
+            }
+        });
+        */
+        
+        JButton btnRemoveCustomVar = new JButton("Remove selected");
+        btnRemoveCustomVar.setToolTipText("Remove the selected definitions.");
+        btnRemoveCustomVar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabCustomVars.getRowCount() > 0)
+                {
+                    if (tabCustomVars.getSelectedRowCount() > 0)
+                    {
+                        int selectedRowIds[] = tabCustomVars.getSelectedRows();
+                        Arrays.sort(selectedRowIds);
+                        for (int i=(selectedRowIds.length-1); i>-1; i--)
+                        {
+                            tabCustomVarsMod.removeRow(selectedRowIds[i]);
+                        }
+                    }
+                }
+            }
+        });
+        
+        GroupLayout lyoCustomvarPanel = new GroupLayout(lineCustomVars);
+        lineCustomVars.setLayout(lyoCustomvarPanel);
+        lyoCustomvarPanel.setAutoCreateGaps(true);
+        lyoCustomvarPanel.setAutoCreateContainerGaps(true);
+        lyoCustomvarPanel.setHorizontalGroup(
+                lyoCustomvarPanel.createSequentialGroup()
+                    .addComponent(tabMoreEqScrollPane)
+                    .addGroup(lyoCustomvarPanel.createParallelGroup(
+                            GroupLayout.Alignment.CENTER)
+                        .addComponent(btAtomSpecVar)
+                       // .addComponent(btnParametrizedVar)
+                        .addComponent(btnRemoveCustomVar)));
+        lyoCustomvarPanel.setVerticalGroup(
+                lyoCustomvarPanel.createParallelGroup()
+                    .addComponent(tabMoreEqScrollPane)
+                    .addGroup(lyoCustomvarPanel.createSequentialGroup()
+                        .addComponent(btAtomSpecVar)
+                       // .addComponent(btnParametrizedVar)
+                        .addComponent(btnRemoveCustomVar)));
+        
+        localBlock4.add(lineCustomVars);
         
 
         //HEREGOESADVIMPLEMENTATION this is only to facilitate automated insertion of code       
@@ -850,10 +920,10 @@ public class FitnessParametersForm extends ParametersForm
     @Override
     protected void preliminatyTasksUponImportingParams()
     {
-    	int initialRowCount = tabMoreEqMod.getRowCount();
+    	int initialRowCount = tabCustomVarsMod.getRowCount();
     	for (int i=0; i<initialRowCount; i++)
     	{
-    		tabMoreEqMod.removeRow(0);
+    		tabCustomVarsMod.removeRow(0);
     	}
     }
     
@@ -994,7 +1064,7 @@ public class FitnessParametersForm extends ParametersForm
  				break;
  				
  			case "class javax.swing.table.DefaultTableModel":
- 				if (key.toUpperCase().equals(keyMoreEq.toUpperCase())) 
+ 				if (key.toUpperCase().equals(keyCustomVars.toUpperCase())) 
     			{
  					String noHead = value.replace("${atomSpecific('", "");
  					Object[] rowContent = new Object[2];
@@ -1033,10 +1103,10 @@ public class FitnessParametersForm extends ParametersForm
         else
         {
         	sb.append(getStringIfNotEmpty(keyEq,txtEq,"${","}"));
-        	for (int i=0; i<tabMoreEqMod.getRowCount(); i++) 
+        	for (int i=0; i<tabCustomVarsMod.getRowCount(); i++) 
             {
-        		sb.append(keyMoreEq).append("=").append(
-        				tabMoreEqMod.getValueAt(i, 1)).append(NL);
+        		sb.append(keyCustomVars).append("=").append(
+        				tabCustomVarsMod.getValueAt(i, 1)).append(NL);
             }
         }
         if (!rdb3dTrees.isSelected())
@@ -1056,7 +1126,7 @@ public class FitnessParametersForm extends ParametersForm
     {   
         public ParametrizedDescriptorDefinition(String descName, String[] paramNames)
         {
-            super();
+            super(true);
             this.setBounds(150, 150, 500, 200);
             this.setTitle("Define parametrized descriptor variable");
             
@@ -1121,37 +1191,74 @@ public class FitnessParametersForm extends ParametersForm
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (txtVarName.getText().equals("")
-                            && txtDescName.getText().equals(""))
+                            || txtDescName.getText().equals(""))
                     {
                         result = null;
                     } else {
                         String line = "${parametrized('" + txtVarName.getText() 
                                 + "','" + txtDescName.getText() + "','";
-                        //NB: all params are collected into a single string!
+                        // First check that all parameters were given
+                        boolean quit = false;
                         for (int i=0; i<tabSize; i++)
                         {
-                            String s = tabParamsMod.getValueAt(i,0).toString()
-                                    .trim();
-                            if (s.contains(paramNames[i]))
-                            {
-                                s = s.replaceFirst(paramNames[i],"");
-                                s = s.trim();
-                                if (s.startsWith("="))
-                                {
-                                    s = s.replaceFirst("=","");
-                                    s = s.trim();
-                                }
-                            }
-                            line = line + s;
-                            if (i<(tabSize-1))
-                                line = line  + ", ";
+                            if (tabParamsMod.getValueAt(i,0) == null || 
+                                    tabParamsMod.getValueAt(i,0).toString().trim().equals(""))
+                                quit = true;
                         }
-                        line = line + "')}";
-                        result = new Object[] {txtVarName.getText(),line};
+                        
+                        if (!quit)
+                        {
+                            //NB: all params are collected into a single string!
+                            for (int i=0; i<tabSize; i++)
+                            {   
+                                String s = tabParamsMod.getValueAt(i,0).toString()
+                                        .trim();
+                                if (s.contains(paramNames[i]))
+                                {
+                                    s = s.replaceFirst(paramNames[i],"");
+                                    s = s.trim();
+                                    if (s.startsWith("="))
+                                    {
+                                        s = s.replaceFirst("=","");
+                                        s = s.trim();
+                                    }
+                                }
+                                line = line + s;
+                                if (i<(tabSize-1))
+                                    line = line  + ", ";
+                            }
+                            line = line + "')}";
+                            result = new Object[] {txtVarName.getText(),line};
+                        }
                     }
                     close();
                 }
             });
+            this.btnExtra.setText("?");
+            this.btnExtra.setVisible(true);
+            this.btnExtra.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String txt = "<html><body width='%1s'>"
+                        + "Here you can define:<ul>"
+                        + "<li>the name of the variable, i.e., "
+                        + "the string used to represent this variable in the "
+                        + "equation defining the fitness,</li>"
+                        + "<li>the name of the descriptor this variable is "
+                        + "based on, i.e., the unique string identifying the "
+                        + "descriptor in the list of available descriptors,</li>"
+                        + "<li>the list of parameters that customize the "
+                        + "calculation of the descriptor. The values of the "
+                        + "parameters should be given in the order specified in "
+                        + "the description of the descriptor.</li>"
+                        + "</ul></html>";
+                JOptionPane.showMessageDialog(btnExtra, 
+                        String.format(txt, 350),
+                        "Tips",
+                        JOptionPane.PLAIN_MESSAGE);
+                }
+            });
+            
             this.btnCanc.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

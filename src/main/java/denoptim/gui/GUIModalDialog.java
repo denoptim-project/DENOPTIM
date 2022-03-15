@@ -50,7 +50,7 @@ public class GUIModalDialog extends JDialog
 	protected JButton btnCanc;
 	
 	/**
-     * The button that can be used for anything action that does not close the 
+     * The button that can be used for any action that does not close the 
      * dialog.
      */
     protected JButton btnExtra;
