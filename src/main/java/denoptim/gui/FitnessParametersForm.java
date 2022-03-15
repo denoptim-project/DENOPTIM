@@ -319,7 +319,7 @@ public class FitnessParametersForm extends ParametersForm
         		+ "output SDF file with the <code>&lt;FITNESS&gt;</code> or "
         		+ "<code>&lt;MOL_ERROR&gt;</code> tags.</html>";
         lineIntOrExt = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        rdbIntOrExt = new JRadioButton("Use external fitnes provider");
+        rdbIntOrExt = new JRadioButton("Use external fitness provider");
         rdbIntOrExt.setToolTipText(toolTipIntOrExt);
         
         rdbIntOrExt.setSelected(false);
