@@ -1300,6 +1300,8 @@ public class GUIVertexInspector extends GUICardPanel
         if (apClassList.getModel().getSize() == 1)
         {
             apClassList.setSelectedIndex(0);
+        } else {
+            apClassList.setSelectedIndex(apClassLstModel.getSize()-1);
         }
       
         //Make and launch dialog for the user to make the selection
