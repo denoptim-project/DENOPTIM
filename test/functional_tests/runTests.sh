@@ -307,7 +307,7 @@ echo TODO: remove StringConverter
 #runTest "t19"
 
 #
-# t20: crossover with templates
+# t20: crossover with templates (outside templates)
 #
 runTest 't20'
 
