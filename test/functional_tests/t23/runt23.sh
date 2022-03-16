@@ -23,7 +23,7 @@ exec 2>&1
 exec 1>&6 6>&- 
 
 #Check outcome
-if ! grep -q 'TestOperator run completed' "$wrkDir"/t23.log
+if ! grep -q 'Completed GeneOpsRunner' "$wrkDir"/t23.log
 then
     echo " "
     echo "Test 't23' NOT PASSED (symptom: completion msg not found)"

@@ -38,6 +38,26 @@ import denoptim.task.ProgramTask;
  */
 public class DenoptimGA extends ProgramTask
 {
+    /**
+     * The implementation of the evolutionary algorithm we run here.
+     */
+    private EvolutionaryAlgorithm ea = null;
+
+    /**
+     * The service that listens for commands from outside the JVM.
+     */
+    private ExternalCmdsListener ecl = null;
+    
+    /**
+     * Executor of the service that listens for commands.
+     */
+    private ExecutorService executor = null;
+    
+    /**
+     * Pending tasks of the service listening for commands.
+     */
+    private Future<?> futureWatchers = null;
+    
 
 //------------------------------------------------------------------------------
     
@@ -54,7 +74,7 @@ public class DenoptimGA extends ProgramTask
 //------------------------------------------------------------------------------
 
     @Override
-    public void runProgram()
+    public void runProgram() throws Throwable
     {   
         //TODO: get rid of this one parameters are not static anymore.
     	//needed by static parameters, and in case of subsequent runs in the same JVM
@@ -65,40 +85,33 @@ public class DenoptimGA extends ProgramTask
         	GAParameters.setWorkingDirectory(workDir.getAbsolutePath());
         }
         
-        ExecutorService executor = null;
-        Future<?> futureWatchers = null;
+        GAParameters.readParameterFile(configFilePathName.getAbsolutePath());
+        GAParameters.checkParameters();
+        GAParameters.processParameters();
+        GAParameters.printParameters();
         
-        EvolutionaryAlgorithm ea = null;
-        ExternalCmdsListener ecl = null;
-        try
-        {	
-            GAParameters.readParameterFile(configFilePathName.getAbsolutePath());
-            GAParameters.checkParameters();
-            GAParameters.processParameters();
-            GAParameters.printParameters();
-            
-            ecl = new ExternalCmdsListener(
-            		Paths.get(GAParameters.getInterfaceDir()));
-            executor = Executors.newSingleThreadExecutor();
-            futureWatchers = executor.submit(ecl);
-            executor.shutdown();
-            
-            ea = new EvolutionaryAlgorithm(ecl);
-            ea.run();
-        }
-        catch (Throwable t)
-        {
-            if (ea != null)
-            {
-                ea.stopRun();
-            }
-            stopExternalCmdListener(ecl,executor,futureWatchers);
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occurred", t);
-            t.printStackTrace(System.err);
-            thrownExc = new DENOPTIMException("Error in DenoptimGA run.", t);
-        }
+        ecl = new ExternalCmdsListener(
+        		Paths.get(GAParameters.getInterfaceDir()));
+        executor = Executors.newSingleThreadExecutor();
+        futureWatchers = executor.submit(ecl);
+        executor.shutdown();
+        
+        ea = new EvolutionaryAlgorithm(ecl);
+        ea.run();
 
-        stopExternalCmdListener(ecl,executor,futureWatchers);
+        stopExternalCmdListener();
+    }
+
+//------------------------------------------------------------------------------
+
+    protected void handleThrowable()
+    {
+        if (ea != null)
+        {
+            ea.stopRun();
+        }
+        stopExternalCmdListener();
+        super.handleThrowable();
     }
     
 //------------------------------------------------------------------------------
@@ -109,8 +122,7 @@ public class DenoptimGA extends ProgramTask
      * @param executor
      * @param futureWatchers
      */
-	private static void stopExternalCmdListener(ExternalCmdsListener ecl,
-	        ExecutorService executor, Future<?> futureWatchers) 
+	private void stopExternalCmdListener() 
 	{
         if (executor != null)
         {

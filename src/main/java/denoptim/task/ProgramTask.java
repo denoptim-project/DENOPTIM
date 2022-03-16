@@ -33,7 +33,9 @@ import denoptim.utils.TaskUtils;
 
 /**
  * Task structure for any of the main programs in the denoptim project, such as 
- * genetic algorithm and combinatorial explored of fragment spaces.
+ * genetic algorithm and combinatorial explored of fragment spaces. 
+ * Any implementation of this class must define a {@link #runProgram()} method
+ * that runs the actual program implementation.
  */
 
 public abstract class ProgramTask extends Task
@@ -60,6 +62,10 @@ public abstract class ProgramTask extends Task
     
 //------------------------------------------------------------------------------
 
+    /**
+     * This method redirects the callable functionality to an abstract method
+     * to be specified by the implementations of this abstract class.
+     */
     @Override
     public Object call()
     {
@@ -70,35 +76,17 @@ public abstract class ProgramTask extends Task
     			+ " id="+id+", configFile="
     			+ configFilePathName + ", workSpace=" + workDir + ")");
     	
-    	try {
-			runProgram();
-			// This string is meant for the log of the GUI, i.e., the terminal
-			System.out.println(implName + " id="+id+" done!");
-		} catch (Throwable t) {
-        	StringWriter sw = new StringWriter();
-        	PrintWriter pw = new PrintWriter(sw);
-        	t.printStackTrace(pw);
-        	thrownExc = t;
-        	String errFile = workDir + SEP + "ERROR";
-        	//TODO: use logger? Perhaps a dedicated one for the GUI because
-        	// This string is meant for the log of the GUI, i.e., the terminal
-        	System.out.println("ERROR reported in "+errFile);
-            try {
-				DenoptimIO.writeData(errFile, sw.toString(), false);
-	        	System.out.println(implName + " id="+id+" returned an error. "
-	        			+ "See '" + errFile + "'");
-			} catch (DENOPTIMException e) {
-				t.printStackTrace();
-	        	System.out.println(implName + " id="+id+" returned an error. "
-	        			+ "Inspect the log before this line.");
-			}
-            
-            FileUtils.addToRecentFiles(errFile, FileFormat.TXT);
-            
-            // NB: the static logger should have been set by the main we called
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured.");
-		}
-    	
+		try
+        {
+            runProgram();
+            // This string is meant for the log of the GUI, i.e., the terminal
+            System.out.println("Completed " + implName + " id="+id);
+        } catch (Throwable t)
+        {
+            thrownExc = t;
+            handleThrowable();
+        }
+		
     	if (notify)
     	{
     		StaticTaskManager.subtractDoneTask();
@@ -107,9 +95,55 @@ public abstract class ProgramTask extends Task
 		return null;
     }
     
+//------------------------------------------------------------------------------
+    
+    /**
+     * Method to handle any {@link Throwable} originated from the 
+     * {@link #runProgram()} method. This method can be overwritten to alter the
+     * behavior in case of specific needs.
+     */
+    protected void handleThrowable()
+    {
+        printErrorToFile();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Method that can be called to create a text file with the error triggered 
+     * by any {@link Throwable} that can be thrown by the execution of the 
+     * program. The file names "ERROR" will be created in the working directory
+     * specified to this program task.
+     */
+    public void printErrorToFile()
+    {
+        String implName = this.getClass().getSimpleName();
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        thrownExc.printStackTrace(pw);
+        String errFile = workDir + SEP + "ERROR";
+        
+        // This string is meant for the log of the GUI, i.e., the terminal
+        System.out.println("ERROR reported in "+errFile);
+        try {
+            DenoptimIO.writeData(errFile, sw.toString(), false);
+            System.out.println(implName + " id="+id+" returned an error. "
+                    + "See '" + errFile + "'");
+        } catch (DENOPTIMException e) {
+            thrownExc.printStackTrace();
+            System.out.println(implName + " id="+id+" returned an error. "
+                    + "Inspect the log before this line.");
+        }
+        
+        FileUtils.addToRecentFiles(errFile, FileFormat.TXT);
+        
+        // NB: the static logger should have been set by the main we called
+        DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured.");
+    }
+    
 //------------------------------------------------------------------------------ 
 
-    protected abstract void runProgram() throws DENOPTIMException;
+    protected abstract void runProgram() throws Throwable;
     
 //------------------------------------------------------------------------------
 

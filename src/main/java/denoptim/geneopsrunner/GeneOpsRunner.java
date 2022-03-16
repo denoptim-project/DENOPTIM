@@ -58,31 +58,21 @@ public class GeneOpsRunner extends ProgramTask
 //------------------------------------------------------------------------------    
 
     @Override
-    public void runProgram()
+    public void runProgram() throws Throwable
     {
-        try
+        GeneOpsRunnerParameters.readParameterFile(
+                configFilePathName.getAbsolutePath());
+        GeneOpsRunnerParameters.checkParameters();
+        GeneOpsRunnerParameters.processParameters();
+        
+        switch (GeneOpsRunnerParameters.operatorToTest)
         {
-            GeneOpsRunnerParameters.readParameterFile(
-                    configFilePathName.getAbsolutePath());
-            GeneOpsRunnerParameters.checkParameters();
-            GeneOpsRunnerParameters.processParameters();
-            
-            switch (GeneOpsRunnerParameters.operatorToTest)
-            {
-                case XOVER:
-                    runXOver();
-                    break;
-                case MUTATION:
-                    runMutation();
-                    break;
-            }
-         
-            System.out.println("TestOperator run completed");
-        }
-        catch (DENOPTIMException e)
-        {
-            e.printStackTrace(System.err);
-            thrownExc = new DENOPTIMException("Error in GeneOpsRunner run.", e);
+            case XOVER:
+                runXOver();
+                break;
+            case MUTATION:
+                runMutation();
+                break;
         }
     }
     

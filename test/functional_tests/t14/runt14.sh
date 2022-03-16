@@ -68,7 +68,7 @@ then
     exit 1
 fi
 
-if ! grep -q 'TestOperator run completed' "$wrkDir"/t14.log
+if ! grep -q 'Completed GeneOpsRunner' "$wrkDir"/t14.log
 then
     echo " "
     echo "Test 't14' NOT PASSED (symptom: completion msg not found)"

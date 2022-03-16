@@ -40,6 +40,7 @@ import denoptim.task.ProgramTask;
 
 public class FitnessRunner extends ProgramTask
 {
+    private FPRunner runner = null;
 
 //------------------------------------------------------------------------------ 
 
@@ -56,7 +57,7 @@ public class FitnessRunner extends ProgramTask
 //------------------------------------------------------------------------------
 
     @Override
-    public void runProgram()
+    public void runProgram() throws Throwable
     {   
         //TODO: get rid of this one parameters are not static anymore.
         FRParameters.resetParameters();
@@ -66,27 +67,24 @@ public class FitnessRunner extends ProgramTask
             FRParameters.workDir = workDir.getAbsolutePath();
         }
         
-        FPRunner runner = null;
-        try
+    	FRParameters.readParameterFile(configFilePathName.getAbsolutePath());
+        FRParameters.checkParameters();
+        FRParameters.processParameters();
+        FRParameters.printParameters();
+        
+        runner = new FPRunner();
+        runner.run();
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected void handleThrowable()
+    {
+        if (runner != null)
         {
-        	FRParameters.readParameterFile(configFilePathName.getAbsolutePath());
-            FRParameters.checkParameters();
-            FRParameters.processParameters();
-            FRParameters.printParameters();
-            
-            runner = new FPRunner();
-            runner.run();    
+            runner.stopRun();
         }
-        catch (Throwable t)
-        {
-    	    if (runner != null)
-    	    {
-    	        runner.stopRun();
-    	    }
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
-            t.printStackTrace(System.err);
-            thrownExc = new DENOPTIMException("Error in FitnessRunner run.", t);
-        }
+        super.handleThrowable();
     }
     
 //------------------------------------------------------------------------------        

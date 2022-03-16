@@ -47,24 +47,14 @@ public class Isomorphism extends ProgramTask
 //------------------------------------------------------------------------------
 
     @Override
-    public void runProgram()
-    { 
-        try
-        {
-            IsomorphismParameters.readParameterFile(
-                    configFilePathName.getAbsolutePath());
-            IsomorphismParameters.checkParameters();
-            IsomorphismParameters.processParameters();
-            
-            checkIsomorphism();
-            
-            System.out.println("Isomorphism run completed");
-        }
-        catch (DENOPTIMException de)
-        {
-            de.printStackTrace(System.err);
-            thrownExc = new DENOPTIMException("Error in Isomorphism run", de);
-        }
+    public void runProgram() throws Throwable
+    {
+        IsomorphismParameters.readParameterFile(
+                configFilePathName.getAbsolutePath());
+        IsomorphismParameters.checkParameters();
+        IsomorphismParameters.processParameters();
+        
+        checkIsomorphism();
     }
 
 //------------------------------------------------------------------------------
