@@ -177,37 +177,34 @@ public class GeneOpsRunner extends ProgramTask
         DENOPTIMVertex vf = getEmbeddedVertex(GeneOpsRunnerParameters.xoverSrcFemale,
                 female, "crossover");
         
-        int ivmale = male.indexOf(vm);
-        int ivfemale = female.indexOf(vf);
         // Ensure uniqueness on vertexID
         male.renumberGraphVertices();
         female.renumberGraphVertices();
     
         // Get new vid of chosen frags
-        int newmvid = male.getVertexAtPosition(ivmale).getVertexId();
-        int newfvid = female.getVertexAtPosition(ivfemale).getVertexId();
+        int newmvid = vm.getVertexId();
+        int newfvid = vf.getVertexId();
     
         // do crossover
         System.out.println("Initial graphs now with unique vertexID: ");
-        System.out.println("v:"+GeneOpsRunnerParameters.xoverSrcMale+" (now:"+newmvid
-                             +") of MALE: "+male);
+        System.out.println("v:"+GeneOpsRunnerParameters.xoverSrcMale+" (now:"
+                + newmvid + ") of MALE: " + male);
         System.out.println(" ");
-        System.out.println("v:"+GeneOpsRunnerParameters.xoverSrcFemale+" (now:"+newfvid
-                             +") of FEMALE: "+female);
+        System.out.println("v:"+GeneOpsRunnerParameters.xoverSrcFemale+" (now:"
+                + newfvid + ") of FEMALE: " + female);
         System.out.println(" ");
     
-        DENOPTIMGraphOperations.performCrossover(male,newmvid,
-                                                   female,newfvid,true);
+        DENOPTIMGraphOperations.performCrossover(vm, vf, true);
     
         System.out.println("Result of crossover:");
         System.out.println(" ");
-        System.out.println("MALE: "+male);
-        System.out.println("FEMALE: "+female);
+        System.out.println("MALE: " + male);
+        System.out.println("FEMALE: " + female);
         System.out.println(" ");
     
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
-        IAtomContainer iacM = t3d.convertGraphTo3DAtomContainer(male,true);
-        IAtomContainer iacF = t3d.convertGraphTo3DAtomContainer(female,true);
+        IAtomContainer iacM = t3d.convertGraphTo3DAtomContainer(male, true);
+        IAtomContainer iacF = t3d.convertGraphTo3DAtomContainer(female, true);
         DenoptimIO.writeSDFFile(GeneOpsRunnerParameters.outFileM, iacM, false);
         DenoptimIO.writeSDFFile(GeneOpsRunnerParameters.outFileF, iacF, false);
     }
