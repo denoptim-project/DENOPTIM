@@ -141,26 +141,6 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * Substitutes a vertex. Deletes the given vertex from the graph that owns
-     * it, and removes any child vertex (i.e., reachable from the given vertex
-     * by a directed path). Then it tries to extent the graph from the
-     * parent vertex (i.e., the one that was originally holding the given 
-     * vertex). Moreover, additional extension may occur on
-     * any available attachment point of the parent vertex.
-     * @param vertex to mutate (the given vertex).
-     * @return <code>true</code> if substitution is successful
-     * @throws DENOPTIMException
-     */
-
-    protected static boolean substituteFragment(DENOPTIMVertex vertex)
-                                                    throws DENOPTIMException
-    {
-        return substituteBranch(vertex, false, -1, -1);
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
      * Removes a vertex while merging as many of the child branches into the
      * parent vertex.
      * @param vertex the vertex to remove.
@@ -361,7 +341,8 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * Substitutes a vertex. Deletes the given vertex from the graph that owns
+     * Substitutes a vertex and any child branch. 
+     * Deletes the given vertex from the graph that owns
      * it, and removes any child vertex (i.e., reachable from the given vertex
      * by a directed path). Then it tries to extent the graph from the
      * parent vertex (i.e., the one that was originally holding the given 
@@ -379,7 +360,7 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
 
-    protected static boolean substituteBranch(DENOPTIMVertex vertex,
+    protected static boolean rebuildBranch(DENOPTIMVertex vertex,
             boolean force, int chosenVrtxIdx, int chosenApId)
                                                     throws DENOPTIMException
     {
@@ -1580,7 +1561,7 @@ public class DENOPTIMGraphOperations
         switch (mType) 
         {
             case CHANGEBRANCH:
-                done = substituteBranch(vertex, force, chosenVrtxIdx, chosenApId);
+                done = rebuildBranch(vertex, force, chosenVrtxIdx, chosenApId);
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH);

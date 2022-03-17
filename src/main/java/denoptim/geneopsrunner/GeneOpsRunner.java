@@ -153,22 +153,10 @@ public class GeneOpsRunner extends ProgramTask
         {
             e.printStackTrace();
         }
-        
-        for (DENOPTIMVertex v : male.getVertexList()) {
-            System.out.println("Vertex with id: " + v.getVertexId() + "is " +
-                    "class " + v.getClass().getName());
-        }
-        for (DENOPTIMVertex v : female.getVertexList()) {
-            System.out.println("Vertex with id: " + v.getVertexId() + "is " +
-                    "class " + v.getClass().getName());
-        }
 
         System.out.println("Initial graphs: ");
-        System.out.println("v:"+GeneOpsRunnerParameters.xoverSrcMale
-                             +" of MALE: "+male);
-        System.out.println(" ");
-        System.out.println("v:"+GeneOpsRunnerParameters.xoverSrcFemale
-                             +" of FEMALE: "+female);
+        System.out.println("MALE: "+male);
+        System.out.println("FEMALE: "+female);
         System.out.println(" ");
     
         // Remember position of vertex chosen for xover
@@ -186,18 +174,15 @@ public class GeneOpsRunner extends ProgramTask
         int newfvid = vf.getVertexId();
     
         // do crossover
-        System.out.println("Initial graphs now with unique vertexID: ");
-        System.out.println("v:"+GeneOpsRunnerParameters.xoverSrcMale+" (now:"
-                + newmvid + ") of MALE: " + male);
         System.out.println(" ");
-        System.out.println("v:"+GeneOpsRunnerParameters.xoverSrcFemale+" (now:"
-                + newfvid + ") of FEMALE: " + female);
+        System.out.println("Initial graphs now with unique vertexID: ");
+        System.out.println("v: "+ newmvid + " of MALE: " + male);
+        System.out.println("v:" + newfvid + " of FEMALE: " + female);
         System.out.println(" ");
     
         DENOPTIMGraphOperations.performCrossover(vm, vf, true);
     
         System.out.println("Result of crossover:");
-        System.out.println(" ");
         System.out.println("MALE: " + male);
         System.out.println("FEMALE: " + female);
         System.out.println(" ");
