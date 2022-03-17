@@ -241,6 +241,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 e.printStackTrace();
             }
         }
+        c.setProperties(this.copyStringBasedProperties());
         return c;
     }
     

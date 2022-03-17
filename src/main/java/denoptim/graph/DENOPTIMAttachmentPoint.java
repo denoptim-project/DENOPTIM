@@ -1139,6 +1139,8 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
         properties.put(key, property);
     }
 
+//-----------------------------------------------------------------------------
+    
     /**
      * Prepares the two strings that can be used to define 
      * {@link DENOPTIMAttachmentPoint}s in SDF files.

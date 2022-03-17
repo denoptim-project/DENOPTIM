@@ -1155,6 +1155,70 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         
         return !this.containsVertex(vertex);
     }
+        
+//------------------------------------------------------------------------------
+    
+    /**
+     * Replaced the branch starting at the given vertex of this graph with the
+     * given new branch. This method reproduces the 
+     * change of vertex on all symmetric sites.
+     * @param vertex the vertex currently belonging to this graph and to be 
+     * replaced.
+     * @param newBranch the graph that will be used to create the new branch 
+     * replacing the old one. Vertexes of such branch will be cloned to create
+     * the new vertexes to be added to this graph.
+     * @return <code>true</code> if the substitution is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean replaceBranch(DENOPTIMVertex oldBranchSrc, 
+            DENOPTIMGraph newBranch) throws DENOPTIMException
+    {
+        if (!gVertices.contains(oldBranchSrc))
+        {
+            return false;
+        }
+        
+        ArrayList<DENOPTIMVertex> symSites = getSymVertexesForVertex(oldBranchSrc);
+        if (symSites.size() == 0)
+        {
+            symSites.add(oldBranchSrc);
+        }
+        for (DENOPTIMVertex oldLink : symSites)
+        {
+            GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
+            DENOPTIMGraph newBranchCopy = newBranch.clone();
+            
+            if (!replaceSingleBranch(oldLink, newBranchCopy))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Replaced the branch starting at the given vertex of this graph with the
+     * given new branch. This method does not project the 
+     * change of vertex on symmetric sites, and does not alter the symmetric 
+     * sets more than replacing the pointer of the old vertex with the new one.
+     * @param vertex the vertex currently belonging to this graph and to be 
+     * replaced.
+     * @param newBranch the graph that will be used to create the new branch 
+     * replacing the old one. Vertexes of such branch will be cloned to create
+     * the new vertexes to be added to this graph.
+     * @return <code>true</code> if the substitution is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean replaceSingleBranch(DENOPTIMVertex oldBranchSrc, 
+            DENOPTIMGraph newBranch) throws DENOPTIMException
+    {
+        //TODO
+        //TODO 
+        //TODO
+        return true;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -1162,7 +1226,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Replaced a given vertex belonging to this graph with a new vertex 
      * generated specifically for this purpose. This method reproduces the 
      * change of vertex on all symmetric sites.
-     * @param oldLink the vertex currently belonging to this graph and to be 
+     * @param vertex the vertex currently belonging to this graph and to be 
      * replaced.
      * @param bbId the building block Id of the building blocks that will 
      * replace the original vertex.
@@ -1209,7 +1273,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Replaced a given vertex belonging to this graph with another vertex that 
      * does not yet belong to this graph. This method does not project the 
      * change of vertex on symmetric sites, and does not alter the symmetric 
-     * sets. 
+     * sets more than replacing the pointer of the old vertex with the new one.
      * @param oldLink the vertex currently belonging to this graph and to be 
      * replaced.
      * @param newLink the vertex to replace the old one with.
@@ -3952,7 +4016,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                                 Map<Integer,SymmetricSet> newSymSets)
                                         throws DENOPTIMException
     {
-
         // Clone and renumber the subgraph to ensure uniqueness
         DENOPTIMGraph sgClone = subGraph.clone();
         // The clones have the same vertex IDs before renumbering vertices

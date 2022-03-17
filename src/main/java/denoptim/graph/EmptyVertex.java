@@ -276,7 +276,7 @@ public class EmptyVertex extends DENOPTIMVertex
             cLstSymAPs.add(ss.clone());
         }
         c.setSymmetricAPSets(cLstSymAPs);
-
+        c.setProperties(this.copyStringBasedProperties());
         return c;
     }
     

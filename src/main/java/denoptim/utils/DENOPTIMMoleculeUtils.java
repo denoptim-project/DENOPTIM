@@ -202,7 +202,7 @@ public class DENOPTIMMoleculeUtils
      * while adding the ring closing bonds. Does not alter the graph.
      * @param mol the molecular representation to be updated
      * @param graph the corresponding graph representation 
-     * @throws DENOPTIMException if
+     * @throws DENOPTIMException
      */
 
     public static void removeUsedRCA(IAtomContainer mol, DENOPTIMGraph graph)
@@ -709,7 +709,7 @@ public class DENOPTIMMoleculeUtils
      * Constructs a copy of an atom container, i.e., a molecule that reflects 
      * the one given in the input argument
      * in terms of atom count, type, and geometric properties, and bond count 
-     * and type. Other properties are not copyied.
+     * and type. Other properties are not copied.
      * @param mol the container to copy.
      * @return the chemical-copy of the input argument.
      * @throws DENOPTIMException if there are bonds involving more than two atoms.

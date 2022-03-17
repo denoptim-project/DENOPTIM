@@ -145,7 +145,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     private boolean isRCV;
     
     /**
-     * Map of customisable properties
+     * Map of customizable properties
      */
     private Map<Object, Object> properties;
 
@@ -1058,13 +1058,13 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
     
-    public Object getProperty(Object description)
+    public Object getProperty(Object property)
     {
         if (properties == null)
         {
             return null;
         } else {
-            return properties.get(description);
+            return properties.get(property);
         }
     }
     
@@ -1077,6 +1077,34 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             properties = new HashMap<Object, Object>();
         }
         properties.put(key, property);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Copies all the string-based properties.
+     * @return the map of cloned properties.
+     */
+    protected Map<Object, Object> copyStringBasedProperties()
+    {
+        if (properties==null)
+            return null;
+        
+        Map<Object, Object> copy = new HashMap<Object, Object>();
+        for (Object k : properties.keySet())
+        {
+            Object v = properties.get(k);
+            if (k instanceof String && v instanceof String)
+            copy.put(k,v);
+        }
+        return copy;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void setProperties(Map<Object, Object> properties)
+    {
+        this.properties = properties;
     }
     
 //------------------------------------------------------------------------------

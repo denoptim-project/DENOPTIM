@@ -105,7 +105,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 //-----------------------------------------------------------------------------
 
     /**
-     * Constructor from another atom container, which has APs only as 
+     * Constructor from an atom container, which has APs only as 
      * molecular properties. WARNING: other properties of the atom container
      * are not imported!
      * @param vertexId the identifier of the vertex to construct
@@ -495,14 +495,14 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
 
 	    String allAtomsProp = "";    
-	    if (mol.getProperty(DENOPTIMConstants.APSTAG) == null)
+	    if (getProperty(DENOPTIMConstants.APSTAG) == null)
 	    {
 	    	System.out.println("WARNING: no tag " 
 	    			+ DENOPTIMConstants.APSTAG + "found in fragment."
 	    			+ " No AP created.");
 	    	return;
         }
-	    allAtomsProp = mol.getProperty(DENOPTIMConstants.APSTAG).toString();
+	    allAtomsProp = getProperty(DENOPTIMConstants.APSTAG).toString();
 	    projectPropertyToAP(allAtomsProp);
     }
 	    
@@ -645,14 +645,14 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             }
         }
         //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
-        mol.setProperty(DENOPTIMConstants.APSTAG, 
+        setProperty(DENOPTIMConstants.APSTAG, 
                 DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
     }
 
 //-----------------------------------------------------------------------------
 
     /**
-     * Returns a deep copy of this fragments.
+     * Returns a deep copy of this fragments
      * @throws CloneNotSupportedException 
      */
     
@@ -692,6 +692,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         }
         clone.setSymmetricAPSets(cLstSymAPs);
         clone.setAsRCV(this.isRCV());
+        clone.setProperties(this.copyStringBasedProperties());
 		return clone;
     }
 
@@ -707,6 +708,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, getVertexId());
             atm.setProperty(DENOPTIMConstants.ATMPROPORIGINALATMID, atmPos);
         }
+        mol.setProperty(DENOPTIMConstants.APSTAG, 
+                getProperty(DENOPTIMConstants.APSTAG));
         mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         return mol;
     }
@@ -800,46 +803,6 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     public int getConnectedAtomsCount(IAtom atom)
     {
         return mol.getConnectedAtomsCount(atom);
-    }
- 
-//-----------------------------------------------------------------------------
-
-    // The Vertex class has properties and getter/setter for properties.
-    // This looks like an overkill and a creates confusion as to where exactly 
-    // are the properties stored. 
-    // TODO: distinguish between the properties of the vertex and those of the 
-    // atom container.
-    
-    @Override
-    public Object getProperty(Object description)
-    {
-        return mol.getProperty(description);
-    }
-    
-//-----------------------------------------------------------------------------
-    // The Vertex class has properties and getter/setter for properties.
-    // This looks like an overkill and a creates confusion as to where exactly 
-    // are the properties stored. 
-    // TODO: distinguish between the properties of the vertex and those of the 
-    // atom container.
-    
-    @Override
-    public void setProperty(Object description, Object property)
-    {
-        mol.setProperty(description, property);
-    }
-    
-//-----------------------------------------------------------------------------
-    
-    // The Vertex class has properties and getter/setter for properties.
-    // This looks like an overkill and a creates confusion as to where exactly 
-    // are the properties stored. 
-    // TODO: distinguish between the properties of the vertex and those of the 
-    // atom container.
-    
-    public void setProperties(Map<Object, Object> properties)
-    {
-        mol.setProperties(properties);
     }
     
 //------------------------------------------------------------------------------
