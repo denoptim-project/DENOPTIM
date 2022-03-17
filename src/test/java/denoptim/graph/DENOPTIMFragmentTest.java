@@ -192,6 +192,7 @@ public class DENOPTIMFragmentTest
     public void testClone() throws Exception
     {   
         DENOPTIMFragment v = makeFragment();
+        v.setProperty("PROPNAME","PROVALUE");
         
         DENOPTIMVertex c = v.clone();
         
@@ -221,6 +222,7 @@ public class DENOPTIMFragmentTest
         assertEquals(v.getBuildingBlockType(),
                 ((DENOPTIMFragment)c).getBuildingBlockType(), 
                 "Building bloc ktype");
+        assertEquals("PROVALUE",c.getProperty("PROPNAME"));
     }
     
 //------------------------------------------------------------------------------

@@ -113,11 +113,13 @@ public class DENOPTIMTemplateTest
         //TODO-v3 add required APs and check they are cloned properly
         t.setInnerGraph(g);
         t.freezeTemplate();
+        t.setProperty("PROPNAME","PROVALUE");
         
         DENOPTIMTemplate c = t.clone();
         
         assertEquals(t.getFreeAPCount(),c.getFreeAPCount(),
                 "Different #free APs");
+        assertEquals("PROVALUE",c.getProperty("PROPNAME"));
         for (int i=0; i<t.getFreeAPCount(); i++)
         {
             DENOPTIMAttachmentPoint oriAP = t.getAP(i);

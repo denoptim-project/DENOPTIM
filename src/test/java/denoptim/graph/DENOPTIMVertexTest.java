@@ -109,6 +109,7 @@ public class DENOPTIMVertexTest
         v.addAP();
         v.addAP();
         v.addAP();
+        v.setProperty("PROPNAME","PROVALUE");
         
         DENOPTIMVertex c = v.clone();
         
@@ -118,6 +119,7 @@ public class DENOPTIMVertexTest
                 c.getSymmetricAPSets().size(), "Number of SymAPs sets");
         assertEquals(v.isRCV(), c.isRCV(), "RCV flag");
         assertNotEquals(v.hashCode(), c.hashCode(), "Hash code"); 
+        assertEquals("PROVALUE",c.getProperty("PROPNAME"));
         
         
         DENOPTIMFragment v2 = new DENOPTIMFragment();
