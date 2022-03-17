@@ -386,6 +386,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Adds a symmetric set of vertices to this graph.
+     * @param symSet the set to add
+     * @throws DENOPTIMException is the symmetric set being added contains
+     * an id that is already contained in another set already present.
+     */
     public void addSymmetricSetOfVertices(SymmetricSet symSet)
                                                         throws DENOPTIMException
     {
@@ -536,6 +542,36 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMRing r : gRings)
         {
             if (r.contains(v))
+            {
+                rings.add(r);
+            }
+        }
+        return rings;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of rings that include the given list of vertexes in their 
+     * fundamental cycle.
+     * @param vs the collection of vertexes to search for.
+     * @return the list of rings of an empty list.
+     */
+    public ArrayList<DENOPTIMRing> getRingsInvolvingVertex(DENOPTIMVertex[] vs)
+    {
+        ArrayList<DENOPTIMRing> rings = new ArrayList<DENOPTIMRing>();
+        for (DENOPTIMRing r : gRings)
+        {
+            boolean matchesAll = true;
+            for (int i=0; i<vs.length; i++)
+            {
+                if (!r.contains(vs[i]))
+                {
+                    matchesAll = false;
+                    break;
+                }
+            }
+            if (matchesAll)
             {
                 rings.add(r);
             }
@@ -755,7 +791,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Remove a vertex from this graph. This method removes also edges and rings
      * that involve the given vertex. Symmetric sets of vertices are corrected
      * accordingly: they are removed if there is only one remaining vertex in
-     * the set, of purged from the removed vertex.
+     * the set, or purged from the vertex being removed.
      * @param vertex the vertex to remove.
      */
     public void removeVertex(DENOPTIMVertex vertex)
@@ -1155,6 +1191,107 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         
         return !this.containsVertex(vertex);
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Marks the vertexes of this graph with a string that is consistent for all
+     * vertexes that belong to symmetric sets. All vertexes will get a label,
+     * whether they belong to a symmetric set or not. The label is places in the
+     * vertex property {@link DENOPTIMConstants#VRTSYMMSETID}.
+     * Any previous labeling is ignored and overwritten.
+     */
+    protected void reassignSymmetricLabels()
+    {
+        //Remove previous labeling
+        for (DENOPTIMVertex v : gVertices)
+            v.removeProperty(DENOPTIMConstants.VRTSYMMSETID);
+        
+        Iterator<SymmetricSet> ssIter = getSymSetsIterator();
+        int i = 0;
+        while (ssIter.hasNext())
+        {
+            SymmetricSet ss = ssIter.next();
+            String symmLabel = ss.hashCode() + "-" + i;
+            for (Integer vid : ss.getList())
+            {
+                getVertexWithId(vid).setProperty(DENOPTIMConstants.VRTSYMMSETID,
+                        symmLabel);
+            }
+            i++;
+        }
+        for (DENOPTIMVertex v : gVertices)
+        {
+            i++;
+            if (!v.hasProperty(DENOPTIMConstants.VRTSYMMSETID))
+                v.setProperty(DENOPTIMConstants.VRTSYMMSETID, v.hashCode()+"-"+i);
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Looks for any symmetric labels, creates symmetric sets that collect the 
+     * same information, and removes the original symmetric labels.
+     */
+    protected void convertSymmetricLabelsToSymmetricSets()
+    {
+        Map<String,List<DENOPTIMVertex>> collectedLabels = new HashMap<>();
+        for (DENOPTIMVertex v : gVertices)
+        {
+            if (v.hasProperty(DENOPTIMConstants.VRTSYMMSETID))
+            {
+                String label = v.getProperty(
+                        DENOPTIMConstants.VRTSYMMSETID).toString();
+                if (collectedLabels.containsKey(label))
+                {
+                    collectedLabels.get(label).add(v);
+                } else {
+                    List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+                    lst.add(v);
+                    collectedLabels.put(label, lst);
+                }
+                v.removeProperty(DENOPTIMConstants.VRTSYMMSETID);
+            }
+        }
+        
+        for (String label : collectedLabels.keySet())
+        {
+            List<DENOPTIMVertex> symmVertexes = collectedLabels.get(label);
+            
+            if (symmVertexes.size()>1)
+            {
+                SymmetricSet ss = null;
+                for (DENOPTIMVertex v : symmVertexes)
+                {
+                    if (hasSymmetryInvolvingVertex(v))
+                    {
+                        ss = getSymSetForVertex(v);
+                        break;
+                    }
+                }
+                
+                if (ss != null)
+                {
+                    for (DENOPTIMVertex v : symmVertexes)
+                        ss.add(v.getVertexId());
+                    
+                } else {
+                    ss = new SymmetricSet();
+                    for (DENOPTIMVertex v : symmVertexes)
+                        ss.add(v.getVertexId());
+                    try
+                    {
+                        addSymmetricSetOfVertices(ss);
+                    } catch (DENOPTIMException e)
+                    {
+                        //this can never happen because we are testing for
+                        // preliminary existence of an id in the existing sets.
+                    }
+                }
+            }
+        }
+    }
         
 //------------------------------------------------------------------------------
     
@@ -1178,6 +1315,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             return false;
         }
         
+        // Refresh the symmetry set labels so that clones of the branch inherit
+        // the same symmetry set labels.
+        newBranch.reassignSymmetricLabels();
+        
         ArrayList<DENOPTIMVertex> symSites = getSymVertexesForVertex(oldBranchSrc);
         if (symSites.size() == 0)
         {
@@ -1187,11 +1328,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
             DENOPTIMGraph newBranchCopy = newBranch.clone();
-            
+           
+            //TODO-gg
+            /*
             if (!replaceSingleBranch(oldLink, newBranchCopy))
             {
                 return false;
             }
+            */
         }
         return true;
     }
@@ -1202,21 +1346,307 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * Replaced the branch starting at the given vertex of this graph with the
      * given new branch. This method does not project the 
      * change of vertex on symmetric sites, and does not alter the symmetric 
-     * sets more than replacing the pointer of the old vertex with the new one.
+     * sets.
      * @param vertex the vertex currently belonging to this graph and to be 
      * replaced.
-     * @param newBranch the graph that will be used to create the new branch 
-     * replacing the old one. Vertexes of such branch will be cloned to create
-     * the new vertexes to be added to this graph.
+     * @param newBranch the graph that will be attached on this graph. 
+     * No copying or cloning.
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException
      */
     public boolean replaceSingleBranch(DENOPTIMVertex oldBranchSrc, 
-            DENOPTIMGraph newBranch) throws DENOPTIMException
+            DENOPTIMGraph newBranch, 
+            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
+                    throws DENOPTIMException
     {
-        //TODO
-        //TODO 
-        //TODO
+        if (!gVertices.contains(oldBranchSrc) 
+                || gVertices.contains(newBranch.getVertexAtPosition(0)))
+        {
+            return false;
+        }
+        
+        // Identify vertexes in the sub-graph that will be removed
+        ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
+        subGrpVrtxs.add(oldBranchSrc);
+        getChildrenTree(oldBranchSrc, subGrpVrtxs);
+        
+        return replaceSingleSubGraph(subGrpVrtxs, newBranch, apMap);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Replaced the subgraph represented a given collection of vertexes that
+     * belong to this graph with the new branch given as incoming graph. 
+     * This method does not project the 
+     * change of vertex on symmetric sites, and does not alter the symmetric 
+     * sets.
+     * @param subGrpVrtxs the vertexes currently belonging to this graph and to be 
+     * replaced. We assume these collection of vertexes is a connected subgraph,
+     * i.e., all vertexes are reachable by one single vertex via a directed path
+     * that does not involve any other vertex not included in this collections.
+     * @param newSubGraph the graph that will be attached on this graph. 
+     * No copying or cloning: such graph contains the actual vertexes that will 
+     * become part of <i>this</i> graph.
+     * @param apMap mapping of attachment points belonging to any vertex in
+     * <code>subGrpVrtxs</code> to attachment points in <code>newSubGraph</code>.
+     * @return <code>true</code> if the substitution is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean replaceSingleSubGraph(ArrayList<DENOPTIMVertex> subGrpVrtxs, 
+            DENOPTIMGraph newSubGraph, 
+            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
+                    throws DENOPTIMException
+    {
+        if (!gVertices.containsAll(subGrpVrtxs) 
+                || gVertices.contains(newSubGraph.getVertexAtPosition(0)))
+        {
+            return false;
+        }
+        
+        // Identify vertex that will be added
+        ArrayList<DENOPTIMVertex> newVertexes = new ArrayList<DENOPTIMVertex>();
+        newVertexes.addAll(newSubGraph.getVertexList());
+        
+        // Collect APs from the vertexes that will be removed, and that might
+        // be reflected onto the jacket template or used to make links to the 
+        // rest of the graph.
+        List<DENOPTIMAttachmentPoint> interfaceApsOnOldBranch = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMVertex vToDel : subGrpVrtxs)
+        {
+            for (DENOPTIMAttachmentPoint ap : vToDel.getAttachmentPoints())
+            {
+                if (ap.isAvailable())
+                {
+                    // being available, this AP might be reflected onto jacket template
+                    interfaceApsOnOldBranch.add(ap);
+                } else {
+                    DENOPTIMVertex user = ap.getLinkedAP().getOwner();
+                    if (!subGrpVrtxs.contains(user))
+                    {
+                        interfaceApsOnOldBranch.add(ap);
+                    }
+                }
+            }
+        }
+        List<DENOPTIMAttachmentPoint> interfaceApsOnNewBranch = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMVertex v : newSubGraph.getVertexList())
+        {
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            {
+                if (ap.isAvailable())
+                {
+                    // being available, this AP will have to be reflected onto jacket template
+                    interfaceApsOnNewBranch.add(ap);
+                }
+            }
+        }
+        
+        // Keep track of the links that will be broken and re-created,
+        // and also of the relation free APs may have with a possible template
+        // that embeds this graph.
+        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
+            linksToRecreate = new LinkedHashMap<>();
+        LinkedHashMap<DENOPTIMAttachmentPoint,BondType> 
+            linkTypesToRecreate = new LinkedHashMap<>();
+        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
+            inToOutAPForTemplate = new LinkedHashMap<>();
+        List<DENOPTIMAttachmentPoint> oldAPToRemoveFromTmpl = new ArrayList<>();
+        DENOPTIMAttachmentPoint trgAPOnNewLink = null;
+        for (DENOPTIMAttachmentPoint oldAP : interfaceApsOnOldBranch)
+        {
+            if (oldAP.isAvailable())
+            {
+                // NB: if this graph is embedded in a template, free/available 
+                // APs at this level (and from the old link) 
+                // are mapped on the templates' surface
+                if (templateJacket!=null)
+                {
+                    if (!apMap.containsKey(oldAP))
+                    {
+                        // An AP of the old link is going to be removed from the
+                        // template-jacket's list of APs
+                        oldAPToRemoveFromTmpl.add(oldAP);
+                    } else {
+                        inToOutAPForTemplate.put(apMap.get(oldAP),oldAP);
+                    }
+                }
+                continue;
+            }
+            
+            if (!apMap.containsKey(oldAP))
+            {
+                throw new DENOPTIMException("Mismatch in AP map keys.");
+            }
+            DENOPTIMAttachmentPoint newAP = apMap.get(oldAP);
+            linksToRecreate.put(newAP, oldAP.getLinkedAP());
+            linkTypesToRecreate.put(newAP, oldAP.getEdgeUser().getBondType());
+            
+            // This is were we identify the edge/ap to the parent of the oldLink
+            if (!oldAP.isSrcInUser())
+            {
+                trgAPOnNewLink = newAP;
+            }
+        }
+        
+        // Identify rings that are affected by the change of vertexes
+        Map<DENOPTIMRing,List<DENOPTIMVertex>> ringsOverSubGraph = 
+                new HashMap<DENOPTIMRing,List<DENOPTIMVertex>>();
+        for (int iA=0; iA<interfaceApsOnOldBranch.size(); iA++)
+        {
+            DENOPTIMAttachmentPoint apA = interfaceApsOnOldBranch.get(iA);
+        
+            if (apA.isAvailable())
+                continue;
+            
+            for (int iB=(iA+1); iB<interfaceApsOnOldBranch.size(); iB++)
+            {
+                DENOPTIMAttachmentPoint apB = interfaceApsOnOldBranch.get(iB);
+            
+                if (apB.isAvailable())
+                    continue;
+                
+                DENOPTIMVertex vLinkedOnA = apA.getLinkedAP().getOwner();
+                DENOPTIMVertex vLinkedOnB = apB.getLinkedAP().getOwner();
+                for (DENOPTIMRing r : getRingsInvolvingVertex(
+                        new DENOPTIMVertex[] {
+                                apA.getOwner(), vLinkedOnA,
+                                apB.getOwner(), vLinkedOnB}))
+                {
+                    List<DENOPTIMVertex> vPair = new ArrayList<DENOPTIMVertex>();
+                    vPair.add(r.getCloserToHead(vLinkedOnA, vLinkedOnB));
+                    vPair.add(r.getCloserToTail(vLinkedOnA, vLinkedOnB));
+                    ringsOverSubGraph.put(r, vPair);
+                }
+            }
+        }
+        
+        // remove the vertex-to-delete from the rings where they participate
+        for (DENOPTIMRing r : ringsOverSubGraph.keySet())
+        {
+            List<DENOPTIMVertex> vPair = ringsOverSubGraph.get(r);
+            PathSubGraph path = new PathSubGraph(vPair.get(0),vPair.get(1),this);
+            List<DENOPTIMVertex> vertexesInPath = path.getVertecesPath();
+            for (int i=1; i<(vertexesInPath.size()-1); i++)
+            {
+                r.removeVertex(vertexesInPath.get(i));
+            }
+        }
+        
+        // remove edges with old vertex
+        for (DENOPTIMAttachmentPoint oldAP : interfaceApsOnOldBranch)
+        {
+            if (!oldAP.isAvailable())
+                removeEdge(oldAP.getEdgeUser());
+        }
+
+        // remove the vertex from the graph
+        for (DENOPTIMVertex vToDel : subGrpVrtxs)
+        {
+            // WARNING! This removes rings involving these vertexes. 
+            removeVertex(vToDel);
+        }
+        
+        // finally introduce the new vertexes from incoming graph into this graph
+        for (DENOPTIMVertex incomingVrtx : newSubGraph.getVertexList())
+        {
+            addVertex(incomingVrtx);
+        }
+        
+        // import edges from incoming graph 
+        for (DENOPTIMEdge incomingEdge : newSubGraph.getEdgeList())
+        {
+            addEdge(incomingEdge);
+        }
+        
+        // import rings from incoming graph 
+        for (DENOPTIMRing incomingRing : newSubGraph.getRings())
+        {
+            addRing(incomingRing);
+        }
+        
+        // We keep track of the APs on the new link that have been dealt with
+        List<DENOPTIMAttachmentPoint> doneApsOnNew = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        
+        // Connect the incoming subgraph to the rest of the graph
+        if (trgAPOnNewLink != null)
+        {
+            // the incoming graph has a parent vertex, and the edge should be  
+            // directed accordingly
+            DENOPTIMEdge edge = new DENOPTIMEdge(
+                    linksToRecreate.get(trgAPOnNewLink),
+                    trgAPOnNewLink, 
+                    linkTypesToRecreate.get(trgAPOnNewLink));
+            addEdge(edge);
+            doneApsOnNew.add(trgAPOnNewLink);
+        } else {
+            // newLink does NOT have a parent vertex, so all the
+            // edges see newLink as target vertex. Such links are dealt with
+            // in the loop below. So, there is nothing special to do, here.
+        }
+        for (DENOPTIMAttachmentPoint apOnNew : linksToRecreate.keySet())
+        {
+            if (apOnNew == trgAPOnNewLink)
+            {
+                continue; //done just before this loop
+            }
+            DENOPTIMAttachmentPoint trgOnChild = linksToRecreate.get(apOnNew);
+            DENOPTIMEdge edge = new DENOPTIMEdge(apOnNew,trgOnChild, 
+                    linkTypesToRecreate.get(apOnNew));
+            addEdge(edge);
+            doneApsOnNew.add(apOnNew);
+        }
+        
+        // redefine rings that spanned over the removed subgraph
+        for (DENOPTIMRing r : ringsOverSubGraph.keySet())
+        {
+            List<DENOPTIMVertex> vPair = ringsOverSubGraph.get(r);
+            PathSubGraph path = new PathSubGraph(vPair.get(0),vPair.get(1),this);
+            int initialInsertPoint = r.getPositionOf(vPair.get(0));
+            List<DENOPTIMVertex> vertexesInPath = path.getVertecesPath();
+            for (int i=1; i<(vertexesInPath.size()-1); i++)
+            {
+                r.insertVertex(initialInsertPoint+i, vertexesInPath.get(i));
+            }
+        }
+        
+        // update the mapping of this vertexes' APs in the jacket template
+        if (templateJacket != null)
+        {   
+            for (DENOPTIMAttachmentPoint apOnNew : inToOutAPForTemplate.keySet())
+            {
+                templateJacket.updateInnerApID(
+                        inToOutAPForTemplate.get(apOnNew),apOnNew);
+                doneApsOnNew.add(apOnNew);
+            }
+            
+            // Project all remaining APs of new branch on the surface of template
+            for (DENOPTIMAttachmentPoint apOnNew : interfaceApsOnNewBranch)
+            {
+                if (!doneApsOnNew.contains(apOnNew))
+                {
+                    templateJacket.addInnerToOuterAPMapping(apOnNew);
+                }
+            }
+            
+            // Remove all APs that existed only in the old branch
+            for (DENOPTIMAttachmentPoint apOnOld : oldAPToRemoveFromTmpl)
+            {
+                templateJacket.removeProjectionOfInnerAP(apOnOld);
+            }
+        }
+        
+        jGraph = null;
+        
+        for (DENOPTIMVertex vOld : subGrpVrtxs)
+            if (this.containsVertex(vOld))
+                return false;
+        for (DENOPTIMVertex vNew : newVertexes)
+            if (!this.containsVertex(vNew))
+                return false;
         return true;
     }
     
@@ -1239,7 +1669,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
     public boolean replaceVertex(DENOPTIMVertex vertex, int bbId, BBType bbt,
-            LinkedHashMap<Integer, Integer> apMap) throws DENOPTIMException
+            LinkedHashMap<Integer, Integer> apIdMap) throws DENOPTIMException
     {
         if (!gVertices.contains(vertex))
         {
@@ -1251,197 +1681,38 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             symSites.add(vertex);
         }
+        
+        GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
+        DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
+                GraphUtils.getUniqueVertexIndex(), bbId, bbt);
+        DENOPTIMGraph incomingGraph = new DENOPTIMGraph();
+        incomingGraph.addVertex(newLink);
+        incomingGraph.reassignSymmetricLabels();
+        
         for (DENOPTIMVertex oldLink : symSites)
         {
-            GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
-            DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
-                    GraphUtils.getUniqueVertexIndex(), bbId, bbt);
-
-            newLink.setMutationTypes(oldLink.getUnfilteredMutationTypes());
+            DENOPTIMGraph graphAdded = incomingGraph.clone();
+            graphAdded.getVertexAtPosition(0).setMutationTypes(
+                    oldLink.getUnfilteredMutationTypes());
+            graphAdded.renumberGraphVertices();
             
-            if (!replaceSingleVertex(oldLink, newLink, apMap))
+            ArrayList<DENOPTIMVertex> oldVertex = new ArrayList<DENOPTIMVertex>();
+            oldVertex.add(oldLink);
+            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap =
+                    new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+            for (Map.Entry<Integer,Integer> e : apIdMap.entrySet())
+            {
+                apMap.put(oldLink.getAP(e.getKey()), 
+                        graphAdded.getVertexAtPosition(0).getAP(e.getValue()));
+            }
+            
+            if (!replaceSingleSubGraph(oldVertex, graphAdded, apMap))
             {
                 return false;
             }
         }
+        convertSymmetricLabelsToSymmetricSets();
         return true;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Replaced a given vertex belonging to this graph with another vertex that 
-     * does not yet belong to this graph. This method does not project the 
-     * change of vertex on symmetric sites, and does not alter the symmetric 
-     * sets more than replacing the pointer of the old vertex with the new one.
-     * @param oldLink the vertex currently belonging to this graph and to be 
-     * replaced.
-     * @param newLink the vertex to replace the old one with.
-     * @param apMap the mapping of attachment points needed to install the new
-     * vertex in the slot of the old one and recreate the edges to the rest of
-     * the graph.
-     * @return <code>true</code> if the substitution is successful.
-     * @throws DENOPTIMException
-     */
-    public boolean replaceSingleVertex(DENOPTIMVertex oldLink, DENOPTIMVertex newLink,
-            LinkedHashMap<Integer, Integer> apMap) throws DENOPTIMException
-    {
-        if (!gVertices.contains(oldLink) || gVertices.contains(newLink))
-        {
-            return false;
-        }
-        
-        // Keep track of the links that will be broken and re-created,
-        // and also of the relation free APs may have with a possible template
-        // that embeds this graph.
-        LinkedHashMap<Integer,DENOPTIMAttachmentPoint> linksToRecreate = 
-                new LinkedHashMap<Integer,DENOPTIMAttachmentPoint>();
-        LinkedHashMap<Integer,BondType> linkTypesToRecreate = 
-                new LinkedHashMap<Integer,BondType>();
-        LinkedHashMap<Integer,DENOPTIMAttachmentPoint> inToOutAPForTemplate = 
-                new LinkedHashMap<Integer,DENOPTIMAttachmentPoint>();
-        List<DENOPTIMAttachmentPoint> oldAPToRemoveFromTmpl = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        int trgApIdOnNewLink = -1;
-        for (DENOPTIMAttachmentPoint oldAP : oldLink.getAttachmentPoints())
-        {
-            int oldApId = oldAP.getIndexInOwner();
-            if (oldAP.isAvailable())
-            {
-                // NB: if this graph is embedded in a template, free/available 
-                // APs at this level (and from the old link) 
-                // are mapped on the templates' surface
-                if (templateJacket!=null)
-                {
-                    if (!apMap.containsKey(oldApId))
-                    {
-                        // An AP of the old link is going to be removed from the
-                        // template jacket's list of APs
-                        oldAPToRemoveFromTmpl.add(oldAP);
-                    } else {
-                        inToOutAPForTemplate.put(apMap.get(oldApId),oldAP);
-                    }
-                }
-                continue;
-            }
-            
-            if (!apMap.containsKey(oldApId))
-            {
-                throw new DENOPTIMException("Mismatch between AP map keys (" 
-                        + apMap.keySet() +") and AP index "+oldApId);
-            }
-            int newApId = apMap.get(oldApId);
-            linksToRecreate.put(newApId, oldAP.getLinkedAP());
-            linkTypesToRecreate.put(newApId, oldAP.getEdgeUser().getBondType());
-            
-            // This is were we identify the edge/ap to the parent of the oldLink
-            if (!oldAP.isSrcInUser())
-            {
-                trgApIdOnNewLink = newApId;
-            }
-        }
-        
-        oldLink.resetGraphOwner();
-        
-        // update rings
-        if (isVertexInRing(oldLink))
-        {
-            ArrayList<DENOPTIMRing> rToEdit = getRingsInvolvingVertex(oldLink);
-            for (DENOPTIMRing r : rToEdit)
-            {
-                r.replaceVertex(oldLink,newLink);
-            }
-        }
-        
-        // remove edges with old vertex
-        for (DENOPTIMAttachmentPoint oldAP : oldLink.getAttachmentPoints())
-        {
-            if (!oldAP.isAvailable())
-                removeEdge(oldAP.getEdgeUser());
-        }
-
-        // Update pointers in symmetric sets
-        int oldVrtxId = oldLink.getVertexId();
-        int newVrtxId = newLink.getVertexId();
-        for (SymmetricSet ss : symVertices)
-        {
-            if (ss.contains(oldVrtxId))
-            {
-                int idx = ss.indexOf(oldVrtxId);
-                ss.set(idx,newVrtxId);
-            }
-        }
-
-        // remove the vertex from the graph
-        gVertices.remove(oldLink);
-        
-        // finally introduce the new vertex in the graph
-        addVertex(newLink);
-        
-        // We keep track of the APs on the new link that have been dealt with
-        List<DENOPTIMAttachmentPoint> doneApsOnNew = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        
-        // and connect it to the rest of the graph
-        if (trgApIdOnNewLink >= 0)
-        {
-            // newLink has a parent vertex, and the edge should be directed 
-            // accordingly
-            DENOPTIMEdge edge = new DENOPTIMEdge(
-                    linksToRecreate.get(trgApIdOnNewLink),
-                    newLink.getAP(trgApIdOnNewLink), 
-                    linkTypesToRecreate.get(trgApIdOnNewLink));
-            addEdge(edge);
-            doneApsOnNew.add(newLink.getAP(trgApIdOnNewLink));
-        } else {
-            // newLink does NOT have a parent vertex, so all the
-            // edges see newLink as target vertex. Such links are dealt with
-            // in the loop below. So, there is nothing special to do, here.
-        }
-        for (Integer apIdOnNew : linksToRecreate.keySet())
-        {
-            if (apIdOnNew == trgApIdOnNewLink)
-            {
-                continue; //done just before this loop
-            }
-            DENOPTIMAttachmentPoint srcOnNewLink = newLink.getAP(apIdOnNew);
-            DENOPTIMAttachmentPoint trgOnChild = linksToRecreate.get(apIdOnNew);
-            DENOPTIMEdge edge = new DENOPTIMEdge(srcOnNewLink,trgOnChild, 
-                    linkTypesToRecreate.get(apIdOnNew));
-            addEdge(edge);
-            doneApsOnNew.add(srcOnNewLink);
-        }
-        
-        // update the mapping of this vertex's APs in the jacket template
-        if (templateJacket!=null)
-        {   
-            for (Integer apIdOnNew : inToOutAPForTemplate.keySet())
-            {
-                templateJacket.updateInnerApID(
-                        inToOutAPForTemplate.get(apIdOnNew),
-                        newLink.getAP(apIdOnNew));
-                doneApsOnNew.add(newLink.getAP(apIdOnNew));
-            }
-            
-            // Project all remaining APs of new Link on the surface of template
-            for (DENOPTIMAttachmentPoint apOnNew : newLink.getAttachmentPoints())
-            {
-                if (!doneApsOnNew.contains(apOnNew))
-                {
-                    templateJacket.addInnerToOuterAPMapping(apOnNew);
-                }
-            }
-            
-            // Remove all APs that existed only in the old link
-            for (DENOPTIMAttachmentPoint apOnOld : oldAPToRemoveFromTmpl)
-            {
-                templateJacket.removeProjectionOfInnerAP(apOnOld);
-            }
-        }
-        
-        jGraph = null;
-        
-        return !this.containsVertex(oldLink) && this.containsVertex(newLink);
     }
     
 //------------------------------------------------------------------------------
@@ -3027,7 +3298,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     /**
      * Deletes the branch, i.e., the specified vertex and its children.
-     * No handling of symmetry.
+     * Updates symmetry accordingly, but does not remove symmetric branches.
      * @param vid the vertexID of the root of the branch. We'll remove also
      * this vertex.
      * @return <code>true</code> if operation is successful
@@ -3985,6 +4256,49 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         this.addVertex(trgAP.getOwner());
         DENOPTIMEdge edge = new DENOPTIMEdge(srcAP,trgAP, bndTyp);
         addEdge(edge);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Appends a graph onto this graph. The operation is not projected by 
+     * symmetry, and the incoming graph is not cloned/copied.
+     * @param apOnThisGraph where to append to on this growing graph.
+     * @param apOnIncomingGraph where to connect this graph into the incoming one.
+     * @param bndType the bond type of the new edge created.
+     * @throws DENOPTIMException
+     */
+
+    public void appendGraphOnAP(DENOPTIMAttachmentPoint apOnThisGraph,
+            DENOPTIMAttachmentPoint apOnIncomingGraph, BondType bndType)
+                                        throws DENOPTIMException
+    {
+        DENOPTIMGraph incomingGraph = apOnIncomingGraph.getOwner().getGraphOwner();
+        incomingGraph.renumberGraphVertices();
+
+        DENOPTIMEdge edge = new DENOPTIMEdge(apOnThisGraph, apOnIncomingGraph, 
+                bndType);
+        addEdge(edge);
+        
+        //Import vertexes
+        for (DENOPTIMVertex incomingVrtx : incomingGraph.getVertexList())
+        {
+            addVertex(incomingVrtx);
+        }
+        
+        //Import edges
+        for (DENOPTIMEdge incomingEdge : incomingGraph.getEdgeList())
+        {
+            addEdge(incomingEdge);
+        }
+        
+        //Import rings
+        for (DENOPTIMRing incomingRing : incomingGraph.getRings())
+        {
+            addRing(incomingRing);
+        }
+        
+        incomingGraph.cleanup();
     }
 
 //------------------------------------------------------------------------------

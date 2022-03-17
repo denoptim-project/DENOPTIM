@@ -753,7 +753,7 @@ public class PathSubGraph
      * the position of the chord.
      */
 
-    public ArrayList<String> getAllAlternativeChainIDs()
+    public List<String> getAllAlternativeChainIDs()
     {
         return allPossibleChainIDs;
     }

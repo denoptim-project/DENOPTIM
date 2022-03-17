@@ -1058,6 +1058,16 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
     
+    public boolean hasProperty(Object property)
+    {
+        if (properties==null)
+            return false;
+        
+        return properties.containsKey(property);
+    }
+    
+//------------------------------------------------------------------------------
+    
     public Object getProperty(Object property)
     {
         if (properties == null)
@@ -1077,6 +1087,16 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             properties = new HashMap<Object, Object>();
         }
         properties.put(key, property);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public void removeProperty(Object key)
+    {
+        if (properties == null)
+            return;
+        
+        properties.remove(key);
     }
     
 //------------------------------------------------------------------------------

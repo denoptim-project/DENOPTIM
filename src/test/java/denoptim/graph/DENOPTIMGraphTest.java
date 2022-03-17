@@ -5,12 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
@@ -21,12 +25,14 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.DENOPTIMVertex.VertexType;
+import denoptim.io.DenoptimIO;
 import denoptim.utils.MutationType;
 
 
@@ -37,9 +43,6 @@ import denoptim.utils.MutationType;
  */
 
 public class DENOPTIMGraphTest {
-    
-    private final String APRULE = "MyRule";
-    private final String APSUBRULE = "1";
     
     private static APClass APCA, APCB, APCC, APCD;
     private static String a="A", b="B", c="C", d="D";
@@ -556,6 +559,77 @@ public class DENOPTIMGraphTest {
     }
     
 //------------------------------------------------------------------------------
+
+    /**
+     *  Creates a test graph that looks like this:
+     * 
+     *  <pre>
+
+     * 2(A)-v1-1(B)-2(A)-v1(*)-1(B)-2(A)-v1(**)
+     *      | \           |\
+     *      |  |          | 3(B)-2(A)-v1(**)
+     *      |  |
+     *      |  3(B)-2(A)-v1(*)-1(B)-2(A)-v1
+     *      |             |\
+     *      |             | 3(B)-2(A)-v1
+     *      \
+     *       4(C)-2(A)-v1
+     *   </pre>
+     *  
+     *  where only those marked with a star are included in the symmetric sets.
+     */
+    private DENOPTIMGraph makeTestGraphE() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1b);
+        //First layer
+        DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v2b);
+        DENOPTIMVertex v2b_bis = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v2b_bis);
+        DENOPTIMVertex v2b_tris = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v2b_tris);
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(1), v2b.getAP(2)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(3), v2b_bis.getAP(2)));
+        graph.addEdge(new DENOPTIMEdge(v1b.getAP(4), v2b_tris.getAP(2)));
+        //Second layer
+        DENOPTIMVertex v3b_1 = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v3b_1);
+        DENOPTIMVertex v3b_2 = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v3b_2);
+        DENOPTIMVertex v3b_3 = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v3b_3);
+        DENOPTIMVertex v3b_4 = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v3b_4);
+        graph.addEdge(new DENOPTIMEdge(v2b.getAP(1), v3b_1.getAP(2)));
+        graph.addEdge(new DENOPTIMEdge(v2b.getAP(3), v3b_2.getAP(2)));
+        graph.addEdge(new DENOPTIMEdge(v2b_bis.getAP(1), v3b_3.getAP(2)));
+        graph.addEdge(new DENOPTIMEdge(v2b_bis.getAP(3), v3b_4.getAP(2)));
+        
+        ArrayList<Integer> symFirstLayer = new ArrayList<Integer>();
+        symFirstLayer.add(v2b.getVertexId());
+        symFirstLayer.add(v2b_bis.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(symFirstLayer));
+        
+        ArrayList<Integer> symSecondLayer = new ArrayList<Integer>();
+        symSecondLayer.add(v3b_1.getVertexId());
+        symSecondLayer.add(v3b_2.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(symSecondLayer));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
     
     /**
      * Makes a graph with disordered list of vertexes, i.e., the first vertex is
@@ -697,9 +771,17 @@ public class DENOPTIMGraphTest {
         assertEquals(4,numEdgesWith2,"Number of new edges with v2a/b.");
         assertEquals(2,numEdgesWith3,"Number of new edges with v3a/b.");
         
+        //
+        // 
+        //
         DENOPTIMGraph g2 = makeTestGraphB();
         
         DENOPTIMVertex v2 = g2.getVertexAtPosition(2);
+        
+        SymmetricSet origSS = g2.getSymSetForVertex(v2).clone();
+        Set<Integer> oldVertexIds = new HashSet<Integer>();
+        for (DENOPTIMVertex v : g2.getVertexList())
+            oldVertexIds.add(v.getVertexId());
         
         LinkedHashMap<Integer,Integer> apMap2 = 
                 new LinkedHashMap<Integer,Integer>();
@@ -734,6 +816,50 @@ public class DENOPTIMGraphTest {
         }
         assertEquals(4,numVertexesWithGoodBBId2,"Number of new links.");
         assertEquals(4,numEdgesWith1,"Number of new edges with scaffold.");
+        assertEquals(2,g2.getSymmetricSetCount(),"Number of symmetric sets.");
+        boolean found = false;
+        boolean foundOldVertexId = false;
+        Iterator<SymmetricSet> iterSS = g2.getSymSetsIterator();
+        while (iterSS.hasNext())
+        {
+            SymmetricSet ss = iterSS.next();
+            if (ss.size() == origSS.size())
+            {
+                found = true;
+                for (Integer vid : ss.getList())
+                {
+                    if (oldVertexIds.contains(vid))
+                        foundOldVertexId = true;
+                }
+            }
+        }
+        assertTrue(found,"could not find old symmetric set");
+        assertFalse(foundOldVertexId,"found old vertex id in new symmetric set");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testReplaceVertex_inRing() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphD();
+        
+        DENOPTIMVertex v = g.getVertexAtPosition(1);
+        
+        LinkedHashMap<Integer, Integer> apMap = 
+                new LinkedHashMap<Integer,Integer>();
+        apMap.put(0, 0); 
+        apMap.put(1, 1);
+        apMap.put(2, 2);
+        apMap.put(3, 3);
+        apMap.put(4, 4);
+        
+        boolean res = g.replaceVertex(v, 1, BBType.FRAGMENT, apMap);
+        assertTrue(res);
+        
+        DENOPTIMGraph g2 = makeTestGraphD();
+        assertTrue(g.isIsomorphicTo(g2));
     }
     
 //------------------------------------------------------------------------------
@@ -2170,7 +2296,90 @@ public class DENOPTIMGraphTest {
     	            "Inconsistent matches ("+i+")");
 	    }
 	}
+
+//------------------------------------------------------------------------------
 	
-//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testSymmetricSetLabels() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphB();
+        
+        g.reassignSymmetricLabels();
+        
+        Map<Object,Integer> countsPerLabel = new HashMap<Object,Integer>();
+        for (DENOPTIMVertex v : g.getVertexList())
+        {
+            Object label = v.getProperty(DENOPTIMConstants.VRTSYMMSETID);
+            if (countsPerLabel.containsKey(label))
+                countsPerLabel.put(label,countsPerLabel.get(label)+1);
+            else
+                countsPerLabel.put(label,1);
+        }
+        
+        assertEquals(1,countsPerLabel.get(g.getVertexAtPosition(0).getProperty(
+                DENOPTIMConstants.VRTSYMMSETID)));
+        assertEquals(2,countsPerLabel.get(g.getVertexAtPosition(1).getProperty(
+                DENOPTIMConstants.VRTSYMMSETID)));
+        assertEquals(4,countsPerLabel.get(g.getVertexAtPosition(2).getProperty(
+                DENOPTIMConstants.VRTSYMMSETID)));
+        assertEquals(4,countsPerLabel.get(g.getVertexAtPosition(3).getProperty(
+                DENOPTIMConstants.VRTSYMMSETID)));
+        assertEquals(1,countsPerLabel.get(g.getVertexAtPosition(4).getProperty(
+                DENOPTIMConstants.VRTSYMMSETID)));
+        assertEquals(1,countsPerLabel.get(g.getVertexAtPosition(8).getProperty(
+                DENOPTIMConstants.VRTSYMMSETID)));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testConvertSymmetricLabelsToSymmetricSets() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphE();
+        g.getVertexAtPosition(5).setProperty(DENOPTIMConstants.VRTSYMMSETID, 
+                "1234-ABC");
+        g.getVertexAtPosition(6).setProperty(DENOPTIMConstants.VRTSYMMSETID, 
+                "1234-ABC");
+        g.getVertexAtPosition(7).setProperty(DENOPTIMConstants.VRTSYMMSETID, 
+                "1234-ABC");
+        
+        g.convertSymmetricLabelsToSymmetricSets();
+        
+        assertEquals(2,g.getSymmetricSetCount(),"number of sets");
+        boolean foundA = false;
+        boolean foundB = false;
+        Iterator<SymmetricSet> iter = g.getSymSetsIterator();
+        while (iter.hasNext())
+        {
+            SymmetricSet ss = iter.next();
+            if (ss.size() == 2)
+                foundA = true;
+            if (ss.size() == 4)
+                foundB = true;
+        }
+        assertTrue(foundA,"Found 2-membered set");
+        assertTrue(foundB,"Found 4-membered set");
+        
+        DENOPTIMGraph g2 = makeTestGraphE();
+        g2.getVertexAtPosition(6).setProperty(DENOPTIMConstants.VRTSYMMSETID, 
+                "1234-ABC");
+        g2.getVertexAtPosition(7).setProperty(DENOPTIMConstants.VRTSYMMSETID, 
+                "1234-ABC");
+        
+        g2.convertSymmetricLabelsToSymmetricSets();
+        
+        assertEquals(3,g2.getSymmetricSetCount(),"number of sets");
+        Iterator<SymmetricSet> iter2 = g2.getSymSetsIterator();
+        while (iter2.hasNext())
+        {
+            SymmetricSet ss = iter2.next();
+            assertEquals(2,ss.size(),"side of each symmetric sets.");
+        }
+    }
+    
+//------------------------------------------------------------------------------
 	
 }

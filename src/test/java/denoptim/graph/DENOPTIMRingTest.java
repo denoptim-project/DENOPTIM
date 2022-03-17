@@ -55,6 +55,59 @@ public class DENOPTIMRingTest {
         assertEquals(3,r.getDistance(lst.get(0), lst.get(3)));
         assertEquals(3,r.getDistance(lst.get(3), lst.get(0)));
     }
+    
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testGetCloserVertex() throws Exception 
+    {
+        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        for (int i=0; i<10; i++)
+        {
+            EmptyVertex v = new EmptyVertex();
+            v.setBuildingBlockId(i);
+            lst.add(v);
+        }
+        DENOPTIMRing r = new DENOPTIMRing(lst);
+        
+        DENOPTIMVertex v = r.getCloserTo(r.getVertexAtPosition(4),
+                r.getVertexAtPosition(4), r.getVertexAtPosition(4));
+        assertEquals(r.getVertexAtPosition(4), v);
+        
+
+        v = r.getCloserTo(r.getVertexAtPosition(4),
+                r.getVertexAtPosition(8), r.getVertexAtPosition(4));
+        assertEquals(r.getVertexAtPosition(4), v);
+        
+        v = r.getCloserTo(r.getVertexAtPosition(4),
+                r.getVertexAtPosition(8), r.getVertexAtPosition(5));
+        assertEquals(r.getVertexAtPosition(4), v);
+        
+        v = r.getCloserTo(r.getVertexAtPosition(4),
+                r.getVertexAtPosition(8), r.getVertexAtPosition(1));
+        assertEquals(r.getVertexAtPosition(4), v);
+
+        
+        v = r.getCloserTo(r.getVertexAtPosition(4),
+                r.getVertexAtPosition(8), r.getVertexAtPosition(8));
+        assertEquals(r.getVertexAtPosition(8), v);
+        
+        v = r.getCloserTo(r.getVertexAtPosition(4),
+                r.getVertexAtPosition(8), r.getVertexAtPosition(7));
+        assertEquals(r.getVertexAtPosition(8), v);
+        
+        v = r.getCloserTo(r.getVertexAtPosition(4),
+                r.getVertexAtPosition(8), r.getVertexAtPosition(9));
+        assertEquals(r.getVertexAtPosition(8), v);
+        
+
+        v = r.getCloserToTail(r.getVertexAtPosition(4),r.getVertexAtPosition(8));
+        assertEquals(r.getVertexAtPosition(8), v);
+        
+        v = r.getCloserToHead(r.getVertexAtPosition(4),r.getVertexAtPosition(8));
+        assertEquals(r.getVertexAtPosition(4), v);
+    }
 
 //------------------------------------------------------------------------------
 }

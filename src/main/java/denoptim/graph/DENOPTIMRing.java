@@ -259,6 +259,29 @@ public class DENOPTIMRing implements Serializable
         int idx = vertices.indexOf(oldVrtx);
         vertices.set(idx, newVrtx);
     }
+
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Adds a vertex to the ring, in the given position. Shifts the element 
+     * currently at that position (if any) and any subsequent elements to the 
+     * right (adds one to their indices).
+     * @param position the position where the vertex will be found after 
+     * insertion.
+     * @param newLink vertex to add to this ring.
+     * @return <code>true</code> if the vertex is inserted, or 
+     * <code>false</code> if the operation cannot be performed for any reason,
+     * e.g., the vertex is already contained in this ring.
+     */
+    public boolean insertVertex(int position, DENOPTIMVertex newLink)
+    {
+        if (this.contains(newLink) || position>=vertices.size())
+            return false;
+        
+        vertices.add(position,newLink);
+        return true;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -315,7 +338,75 @@ public class DENOPTIMRing implements Serializable
         
         return Math.max(pV1,pV2) - Math.min(pV1, pV2);
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Chooses among the two given vertexes the one that is closer to the 
+     * head vertex.
+     * @param vA first candidate.
+     * @param vB second candidate
+     * @return the vertex closer to the head.
+     */
+    public DENOPTIMVertex getCloserToHead(DENOPTIMVertex vA, DENOPTIMVertex vB)
+    {
+        return getCloserTo(vA, vB, vertices.get(0));
+    }
+    
+//------------------------------------------------------------------------------
 
+    /**
+     * Chooses among the two given vertexes the one that is closer to the 
+     * tail vertex.
+     * @param vA first candidate.
+     * @param vB second candidate
+     * @return the vertex closer to the tail.
+     */
+    public DENOPTIMVertex getCloserToTail(DENOPTIMVertex vA, DENOPTIMVertex vB)
+    {
+        return getCloserTo(vA, vB, vertices.get(vertices.size() - 1));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Chooses among the two given vertexes the one that is closer to the 
+     * target vertex.
+     * @param vA first candidate.
+     * @param vB second candidate.
+     * @param vT the target vertex.
+     * @return the vertex closer to the target vertex.
+     */
+    public DENOPTIMVertex getCloserTo(DENOPTIMVertex vA, DENOPTIMVertex vB,
+            DENOPTIMVertex vT)
+    {
+        int dA = -1, dB = -1;
+        try
+        {
+            dA = getDistance(vA, vT);
+        } catch (DENOPTIMException e)
+        {
+            if (contains(vB))
+                return vB;
+            else
+                return null;
+        }
+        try
+        {
+            dB = getDistance(vB, vT);
+        } catch (DENOPTIMException e)
+        {
+            if (contains(vA))
+                return vA;
+            else
+                return null;
+        }
+        if (dA<=dB)
+            return vA;
+        else
+            return vB;
+    }
+    
 //------------------------------------------------------------------------------
     
     /**
