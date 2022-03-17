@@ -1308,7 +1308,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
     public boolean replaceBranch(DENOPTIMVertex oldBranchSrc, 
-            DENOPTIMGraph newBranch) throws DENOPTIMException
+            DENOPTIMGraph incomingGraph, 
+            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap)
+                    throws DENOPTIMException
     {
         if (!gVertices.contains(oldBranchSrc))
         {
@@ -1317,26 +1319,41 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         
         // Refresh the symmetry set labels so that clones of the branch inherit
         // the same symmetry set labels.
-        newBranch.reassignSymmetricLabels();
+        incomingGraph.reassignSymmetricLabels();
         
         ArrayList<DENOPTIMVertex> symSites = getSymVertexesForVertex(oldBranchSrc);
         if (symSites.size() == 0)
         {
             symSites.add(oldBranchSrc);
         }
+        
+        GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
+        
         for (DENOPTIMVertex oldLink : symSites)
         {
-            GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
-            DENOPTIMGraph newBranchCopy = newBranch.clone();
-           
-            //TODO-gg
-            /*
-            if (!replaceSingleBranch(oldLink, newBranchCopy))
+            DENOPTIMGraph graphToAdd = incomingGraph.clone();
+            graphToAdd.renumberGraphVertices();
+            
+            ArrayList<DENOPTIMVertex> vertexesToRemove = new ArrayList<DENOPTIMVertex>();
+            vertexesToRemove.add(oldLink);
+            getChildrenTree(oldLink, vertexesToRemove);
+            
+            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
+                localApMap = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+            for (Map.Entry<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>  e : apMap.entrySet())
+            {
+                int vrtPosition = incomingGraph.indexOf(e.getValue().getOwner());
+                int apPosition = e.getValue().getIndexInOwner();
+                localApMap.put(oldLink.getAP(e.getKey().getIndexInOwner()),
+                        graphToAdd.getVertexAtPosition(vrtPosition).getAP(apPosition));
+            }
+            
+            if (!replaceSingleSubGraph(vertexesToRemove, graphToAdd, localApMap))
             {
                 return false;
             }
-            */
         }
+        convertSymmetricLabelsToSymmetricSets();
         return true;
     }
     

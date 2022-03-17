@@ -180,7 +180,7 @@ public class GeneOpsRunner extends ProgramTask
         System.out.println("v:" + newfvid + " of FEMALE: " + female);
         System.out.println(" ");
     
-        DENOPTIMGraphOperations.performCrossover(vm, vf, true);
+        DENOPTIMGraphOperations.performCrossover(vm, vf);
     
         System.out.println("Result of crossover:");
         System.out.println("MALE: " + male);

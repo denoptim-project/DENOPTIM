@@ -1266,12 +1266,11 @@ public class DENOPTIMGraphOperations
      * This method does changes the given graphs. 
      * @param mvert the root vertex of the branch of male to exchange.
      * @param fvert the root vertex of the branch of female to exchange.
-     * @return <code>true</code> if a new graph has been successfully produced
      * @throws DENOPTIMException
      */
 
     public static boolean performCrossover(DENOPTIMVertex mvert, 
-            DENOPTIMVertex fvert, boolean debug) throws DENOPTIMException
+            DENOPTIMVertex fvert) throws DENOPTIMException
     {
         DENOPTIMGraph male = mvert.getGraphOwner();
         DENOPTIMGraph female = fvert.getGraphOwner();
@@ -1282,78 +1281,20 @@ public class DENOPTIMGraphOperations
         
         DENOPTIMEdge eM = mvert.getEdgeToParent();
         DENOPTIMEdge eF = fvert.getEdgeToParent();
-        int apidxMP = eM.getSrcAPID(); // ap index of the male parent
         int apidxMC = eM.getTrgAPID(); // ap index of the male
         int apidxFC = eF.getTrgAPID(); // ap index of the female
-        int apidxFP = eF.getSrcAPID(); // ap index of the female parent
-        BondType bndType = eM.getBondType();
 
-        // Identify all verteces symmetric to the ones chosen for xover
-        // Xover is to be projected on each of these
+        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
+        apMapM = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        apMapM.put(eM.getTrgAP(),subG_F.getSourceVertex().getAP(apidxFC));
+        if (!male.replaceBranch(mvert, subG_F, apMapM))
+            return false;
         
-        ArrayList<Integer> symVrtIDs_M = 
-                male.getSymSetForVertexID(mvert.getVertexId()).getList();
-        ArrayList<Integer> symVrtIDs_F = 
-                female.getSymSetForVertexID(fvert.getVertexId()).getList();
-        
-        // MALE: Find all parent verteces and AP indeces where the incoming 
-        // graph will have to be placed
-        ArrayList<DENOPTIMVertex> symParVertM = new ArrayList<DENOPTIMVertex>();
-        ArrayList<Integer> symmParAPidxM = new ArrayList<Integer>();
-        ArrayList<Integer> toRemoveFromM = new ArrayList<Integer>();
-        for (int i=0; i<symVrtIDs_M.size(); i++)
-        {
-            int svid = symVrtIDs_M.get(i);
-            // Store information on where the symmetric vertex is attached
-            DENOPTIMEdge se = male.getEdgeWithParent(svid);
-            DENOPTIMVertex spv = male.getParent(male.getVertexWithId(svid));
-            symParVertM.add(spv);
-            symmParAPidxM.add(se.getSrcAPID());
-            toRemoveFromM.add(svid);
-        }
-        if (symVrtIDs_M.size() == 0)
-        {
-            symParVertM.add(male.getParent(mvert));        
-            symmParAPidxM.add(apidxMP);
-            toRemoveFromM.add(mvert.getVertexId());
-        }
-        for (Integer svid : toRemoveFromM)
-        {
-            male.removeBranchStartingAt(male.getVertexWithId(svid));
-        }
-
-        // FEMALE Find all parent verteces and AP indeces where the incoming
-        // graph will have to be placed
-        ArrayList<DENOPTIMVertex> symParVertF = new ArrayList<DENOPTIMVertex>();
-        ArrayList<Integer> symmParAPidxF = new ArrayList<Integer>();
-        ArrayList<Integer> toRemoveFromF = new ArrayList<Integer>();
-        for (int i=0; i<symVrtIDs_F.size(); i++)
-        {
-            int svid = symVrtIDs_F.get(i);
-            // Store information on where the symmetric vertex is attached
-            DENOPTIMEdge se = female.getEdgeWithParent(svid);
-            DENOPTIMVertex spv = female.getParent(female.getVertexWithId(svid));
-            symParVertF.add(spv);
-            symmParAPidxF.add(se.getSrcAPID());
-            toRemoveFromF.add(svid);
-        }
-        if (symVrtIDs_F.size() == 0)
-        {
-            symParVertF.add(female.getParent(fvert));        
-            symmParAPidxF.add(apidxFP);
-            toRemoveFromF.add(fvert.getVertexId());
-        }
-        for (Integer svid : toRemoveFromF)
-        {
-            female.removeBranchStartingAt(female.getVertexWithId(svid));
-        }
-        
-        // attach the subgraph from M/F onto F/M in all symmetry related APs
-        male.appendGraphOnGraph(symParVertM, symmParAPidxM, subG_F,
-                subG_F.getSourceVertex(), apidxFC, bndType, true);
-        female.appendGraphOnGraph(symParVertF, symmParAPidxF, subG_M,
-                subG_M.getSourceVertex(), apidxMC, bndType, true);
-
+        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
+        apMapF = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        apMapF.put(eF.getTrgAP(),subG_M.getSourceVertex().getAP(apidxMC));
+        if (!female.replaceBranch(fvert, subG_M, apMapF))
+            return false;
         return true;
     }
 

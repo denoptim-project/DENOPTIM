@@ -327,8 +327,7 @@ public class EAUtils
         {
             if (!DENOPTIMGraphOperations.performCrossover(
                     graph1.getVertexAtPosition(vid1),
-                    graph2.getVertexAtPosition(vid2),
-                    false))
+                    graph2.getVertexAtPosition(vid2)))
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
