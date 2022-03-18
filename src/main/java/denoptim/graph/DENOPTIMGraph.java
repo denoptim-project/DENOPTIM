@@ -1491,13 +1491,28 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 // are mapped on the templates' surface
                 if (templateJacket!=null)
                 {
-                    if (!apMap.containsKey(oldAP))
+                    if (oldAP.isAvailableThroughout())
                     {
-                        // An AP of the old link is going to be removed from the
-                        // template-jacket's list of APs
-                        oldAPToRemoveFromTmpl.add(oldAP);
+                        if (!apMap.containsKey(oldAP))
+                        {
+                            // An AP of the old link is going to be removed from the
+                            // template-jacket's list of APs
+                            oldAPToRemoveFromTmpl.add(oldAP);
+                        } else {
+                            // This AP is not used, not even outside of the template
+                            // but for some reason the apMapping wants to keep it
+                            inToOutAPForTemplate.put(apMap.get(oldAP),oldAP);
+                        }
                     } else {
-                        inToOutAPForTemplate.put(apMap.get(oldAP),oldAP);
+                        if (!apMap.containsKey(oldAP))
+                        {
+                            throw new DENOPTIMException("Cannot replace subgraph "
+                                    + "if an AP that has no mapping is in use.");
+                        } else {
+                            // This AP is not used, not even outside of the template
+                            // but for some reason the apMapping wants to keep it
+                            inToOutAPForTemplate.put(apMap.get(oldAP),oldAP);
+                        }
                     }
                 }
                 continue;
@@ -1505,7 +1520,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             
             if (!apMap.containsKey(oldAP))
             {
-                throw new DENOPTIMException("Mismatch in AP map keys.");
+                throw new DENOPTIMException("Cannot replace subgraph if an AP "
+                        + "that has no mapping is in use.");
             }
             DENOPTIMAttachmentPoint newAP = apMap.get(oldAP);
             linksToRecreate.put(newAP, oldAP.getLinkedAP());
@@ -1517,6 +1533,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 trgAPOnNewLink = newAP;
             }
         }
+        
+        //TODO-gg look also for used RCVs?
         
         // Identify rings that are affected by the change of vertexes
         Map<DENOPTIMRing,List<DENOPTIMVertex>> ringsOverSubGraph = 
@@ -2958,7 +2976,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the list of all attachment points contained in this graph
+     * Returns the list of available attachment points contained in this graph
      * @return list of attachment points.
      */
 
@@ -5390,6 +5408,20 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     public DENOPTIMTemplate getTemplateJacket()
     {
         return templateJacket;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the outermost graph object that can be reached from this 
+     * possibly embedded graph.
+     */
+    public DENOPTIMGraph getOutermostGraphOwner()
+    {
+        if (templateJacket == null)
+            return this;
+        else
+            return templateJacket.getGraphOwner().getOutermostGraphOwner();
     }
 
 //------------------------------------------------------------------------------    

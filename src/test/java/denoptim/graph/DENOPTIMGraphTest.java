@@ -522,7 +522,8 @@ public class DENOPTIMGraphTest {
      *  Creates a test graph that looks like this: 
      * 
      *  <pre>
-
+     *        0(A)
+     *       /
      * 2(A)-v1-1(B)-(B)-v2
      *      |\
      *      | 3(B)-(B)-v2
@@ -869,6 +870,134 @@ public class DENOPTIMGraphTest {
 //------------------------------------------------------------------------------
     
     /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+     *        (C)-(C)-v6-(D)--(B)-v7
+     *        /                    |
+     *       /                   chord
+     *      |                      |
+     *      | (B)-(C)-v6-(D)--(B)-v7
+     *      |/
+     *  (A)-v1-(B)
+     *       \
+     *        (A)
+     *   </pre>
+     *   
+     */
+    private DENOPTIMGraph makeTestGraphH() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1a);
+        DENOPTIMVertex v6a_bis = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        graph.addVertex(v6a_bis);
+        DENOPTIMVertex v6a_tris = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        graph.addVertex(v6a_tris);
+        DENOPTIMVertex v7a_bis = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        graph.addVertex(v7a_bis);
+        DENOPTIMVertex v7a_tris = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        graph.addVertex(v7a_tris);
+        
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(3), v6a_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(4), v6a_tris.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a_bis.getAP(1), v7a_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a_tris.getAP(1), v7a_tris.getAP(0)));
+        
+        graph.addRing(v7a_bis, v7a_tris);
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+     *        (A)-(C)-v6-(D)--(B)-v7
+     *        /                    |
+     *       /                   chord
+     *      |                      |
+     *      | (B)-(C)-v6-(D)--(B)-v7
+     *      |/
+     *  template-(A)
+     *   </pre>
+     *   
+     */
+    private DENOPTIMGraph makeTestGraphI() throws Exception
+    {
+        DENOPTIMGraph innerGraph = makeTestGraphH();
+        DENOPTIMTemplate tmpl = new DENOPTIMTemplate(BBType.FRAGMENT);
+        tmpl.setInnerGraph(innerGraph);
+        
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        graph.addVertex(tmpl);
+        DENOPTIMVertex v6 = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        graph.addVertex(v6);
+        DENOPTIMVertex v7 = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        graph.addVertex(v7);
+        DENOPTIMVertex v6a = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        graph.addVertex(v6a);
+        DENOPTIMVertex v7a = DENOPTIMVertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT);
+        graph.addVertex(v7a);
+        
+        graph.addEdge(new DENOPTIMEdge(tmpl.getAP(0), v6.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6.getAP(1), v7.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(tmpl.getAP(1), v6a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a.getAP(1), v7a.getAP(0)));
+        
+        graph.addRing(v7, v7a);
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>              
+     *                     0(A)
+     *                    /
+     *        0(A)--2(A)-v1-1(B)
+     *       /           | \
+     * 2(A)-v1-1(B)       \  3(B)
+     *      |\             4(C)
+     *      | 3(B)
+     *      \
+     *       4(C)
+     *   </pre>
+     *   
+     */
+    private DENOPTIMGraph makeTestGraphJ() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex v1 = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1);
+        DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1b);
+        graph.addEdge(new DENOPTIMEdge(v1.getAP(0), v1b.getAP(2)));
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
      * Makes a graph with disordered list of vertexes, i.e., the first vertex is
      * not the source.
      * <pre>
@@ -1149,6 +1278,56 @@ public class DENOPTIMGraphTest {
         
         DENOPTIMGraph expected = makeTestGraphG();
         assertTrue(g.isIsomorphicTo(expected),"isomforphic to expected");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testReplaceSubGraph_inTemplate() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphI();
+        
+        DENOPTIMGraph innerGraph = ((DENOPTIMTemplate) g.getVertexAtPosition(0))
+                .getInnerGraph();
+        
+        List<DENOPTIMVertex> vrtxsToReplace = new ArrayList<DENOPTIMVertex>();
+        vrtxsToReplace.add(innerGraph.getVertexAtPosition(0));
+        
+        DENOPTIMGraph incomingSubGraph = makeTestGraphJ();
+        
+        LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> apMap = 
+                new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        // first two are those needed within the template
+        apMap.put(vrtxsToReplace.get(0).getAP(3), //B:0
+                incomingSubGraph.getVertexAtPosition(0).getAP(1)); //B:0
+        apMap.put(vrtxsToReplace.get(0).getAP(4), //C:0
+                incomingSubGraph.getVertexAtPosition(1).getAP(4)); //C:0
+        // second two are those projected and used outside template
+        apMap.put(vrtxsToReplace.get(0).getAP(0), //A:0
+                incomingSubGraph.getVertexAtPosition(0).getAP(2)); //A:0
+        apMap.put(vrtxsToReplace.get(0).getAP(1), //B:0
+                incomingSubGraph.getVertexAtPosition(0).getAP(3)); //B:0
+
+        boolean res = innerGraph.replaceSingleSubGraph(vrtxsToReplace, 
+                incomingSubGraph, apMap);
+        assertTrue(res);
+        
+        assertEquals(5,g.getVertexCount(),"Vertex in outer graph");
+        assertEquals(1,g.getRingCount(),"Rings in outer graph");
+        assertEquals(4,g.getAvailableAPs().size(),"Free APs outer graph");
+        DENOPTIMRing r = g.getRings().get(0);
+        assertEquals(4,r.getDistance(r.getHeadVertex(),r.getTailVertex()),
+                "Distance Head-Tail in ring of outer graph");
+        
+        DENOPTIMGraph innerGraphAfter = 
+                ((DENOPTIMTemplate) g.getVertexAtPosition(0)).getInnerGraph();
+        assertEquals(6,innerGraphAfter.getVertexCount(),"Vertex in inner graph");
+        assertEquals(1,innerGraphAfter.getRingCount(),"Rings in inner graph");
+        assertEquals(6,innerGraphAfter.getAvailableAPs().size(),"Free APs inner graph");
+        DENOPTIMRing ri = innerGraphAfter.getRings().get(0);
+        assertEquals(5,ri.getDistance(ri.getHeadVertex(),ri.getTailVertex()),
+                "Distance Head-Tail in ring of inner graph");
     }
     
 //------------------------------------------------------------------------------
@@ -1821,14 +2000,14 @@ public class DENOPTIMGraphTest {
 		graph.addVertex(tmpl);
 
 		assertEquals(1, graph.getMutableSites().size(),
-				"Size of mutation size list in case of frozen template");
+				"Size of mutation list in case of frozen template");
 
 		graph = new DENOPTIMGraph();
 		tmpl = DENOPTIMTemplate.getTestTemplate(ContractLevel.FREE);
 		graph.addVertex(tmpl);
 
 		assertEquals(2, graph.getMutableSites().size(),
-				"Size of mutation size list in case of free template");
+				"Size of mutation list in case of free template");
 		
         assertEquals(0, graph.getMutableSites(new ArrayList<>(
                 Arrays.asList(MutationType.values()))).size(),

@@ -325,13 +325,18 @@ public class EAUtils
         
         try
         {
-            if (!DENOPTIMGraphOperations.performCrossover(
+            //TODO-gg graph1/2 is not necessarily the owner of vid1/2 due to template embedding!!!
+            DENOPTIMGraph[] offspring = DENOPTIMGraphOperations.performCrossover(
                     graph1.getVertexAtPosition(vid1),
-                    graph2.getVertexAtPosition(vid2)))
+                    graph2.getVertexAtPosition(vid2));
+            if (offspring[0]==null || offspring[1]==null)
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
                 return null;
+            } else {
+                graph1 = offspring[0];
+                graph2 = offspring[1];
             }
         } catch (Throwable t) {
             t.printStackTrace();

@@ -1263,18 +1263,25 @@ public class DENOPTIMGraphOperations
 
     /**
      * Performs crossover between two graphs owning the given pair of vertexes. 
-     * This method does changes the given graphs. 
+     * This method does changes the given graphs.
      * @param mvert the root vertex of the branch of male to exchange.
      * @param fvert the root vertex of the branch of female to exchange.
      * @throws DENOPTIMException
+     * //TODO-gg doc
      */
+    
+    //NB: we need to keep 'male§ and 'female' to keep a reference to the graphs
+    // also when exiting this method. Otherwise, the two objects are not 
+    // referenced anymore and get garbage-collected (apparently...).
 
-    public static boolean performCrossover(DENOPTIMVertex mvert, 
+    public static DENOPTIMGraph[] performCrossover(DENOPTIMVertex mvert,
             DENOPTIMVertex fvert) throws DENOPTIMException
     {
+        DENOPTIMGraph[] offspring = new DENOPTIMGraph[2];
+        
         DENOPTIMGraph male = mvert.getGraphOwner();
         DENOPTIMGraph female = fvert.getGraphOwner();
-
+        
         // Prepare subgraphs that will be exchanged
         DENOPTIMGraph subG_M = male.extractSubgraph(mvert);
         DENOPTIMGraph subG_F = female.extractSubgraph(fvert);
@@ -1288,14 +1295,19 @@ public class DENOPTIMGraphOperations
         apMapM = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
         apMapM.put(eM.getTrgAP(),subG_F.getSourceVertex().getAP(apidxFC));
         if (!male.replaceBranch(mvert, subG_F, apMapM))
-            return false;
+            return offspring;
+        offspring[0] = male.getOutermostGraphOwner();
         
         LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
         apMapF = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
         apMapF.put(eF.getTrgAP(),subG_M.getSourceVertex().getAP(apidxMC));
         if (!female.replaceBranch(fvert, subG_M, apMapF))
-            return false;
-        return true;
+            return offspring;
+        offspring[1] = female.getOutermostGraphOwner();
+        
+        //TODO-gg: graphMsg
+        //TODO-gg back to boolean return
+        return offspring;
     }
 
 //------------------------------------------------------------------------------
