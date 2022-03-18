@@ -1248,6 +1248,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             throw new DENOPTIMException("Unable to parse IAtomContainer to "
                     + "create vertex .",e);
         }
+        v.setBuildingBlockType(bbt);
         return v;
     }
     
