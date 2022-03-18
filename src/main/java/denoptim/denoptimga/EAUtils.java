@@ -1177,8 +1177,7 @@ public class EAUtils
         int scafIdx = selectRandomScaffold();
 
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), scafIdx, 
-                DENOPTIMVertex.BBType.SCAFFOLD);
+                GraphUtils.getUniqueVertexIndex(), scafIdx, DENOPTIMVertex.BBType.SCAFFOLD);
         
         // add the scaffold as a vertex
         graph.addVertex(scafVertex);
