@@ -1393,11 +1393,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Replaced the subgraph represented a given collection of vertexes that
-     * belong to this graph with the new branch given as incoming graph. 
+     * Replaced the subgraph represented by a given collection of vertexes that
+     * belong to this graph. 
      * This method does not project the 
      * change of vertex on symmetric sites, and does not alter the symmetric 
-     * sets.
+     * sets. To properly manage symmetry, you should run 
+     * {@link DENOPTIMGraph#reassignSymmetricLabels()} on <code>newSubGraph</code>
+     * prior to calling this method, and, after running this method, call
+     * {@link DENOPTIMGraph#convertSymmetricLabelsToSymmetricSets()} on this
+     * graph.
+     * This strategy reflects the fact that multiple sub-graph replacements can
+     * introduce vertexes that are symmetric throughout these newly inserted
+     * subgraphs, thus a single subgraph replacement cannot know the complete
+     * list of symmetric vertexes. 
+     * Therefore, the handling of the symmetry is left outside of the
+     * subgraph replacement operation.
      * @param subGrpVrtxs the vertexes currently belonging to this graph and to be 
      * replaced. We assume these collection of vertexes is a connected subgraph,
      * i.e., all vertexes are reachable by one single vertex via a directed path
@@ -1410,7 +1420,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException
      */
-    public boolean replaceSingleSubGraph(ArrayList<DENOPTIMVertex> subGrpVrtxs, 
+    public boolean replaceSingleSubGraph(List<DENOPTIMVertex> subGrpVrtxs, 
             DENOPTIMGraph newSubGraph, 
             LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
                     throws DENOPTIMException
@@ -1578,11 +1588,17 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             addEdge(incomingEdge);
         }
         
-        // import rings from incoming graph 
+        // import rings from incoming graph
         for (DENOPTIMRing incomingRing : newSubGraph.getRings())
         {
             addRing(incomingRing);
         }
+        
+        // import symmetric sets from incoming graph? No, this method doesn't do
+        // it because we want to use it in situations where we have to perform 
+        // multiple replaceSubGraph operations and, afterwards, use the 
+        // symmetric labels to create symmetric sets that might span across
+        // more than one of the subgraphs that were added.
         
         // We keep track of the APs on the new link that have been dealt with
         List<DENOPTIMAttachmentPoint> doneApsOnNew = 
