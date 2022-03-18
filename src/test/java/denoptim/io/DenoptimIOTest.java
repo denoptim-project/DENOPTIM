@@ -73,6 +73,7 @@ public class DenoptimIOTest
     private static final BondType BT = BondType.SINGLE;
 
     private final String SEP = System.getProperty("file.separator");
+    private final String NL = System.getProperty("line.separator");
 
     @TempDir
     File tempDir;
@@ -359,7 +360,7 @@ public class DenoptimIOTest
 		}
 		graph.addVertex(v);
 	}
-
+    
 //------------------------------------------------------------------------------
 
     @Test
@@ -373,13 +374,15 @@ public class DenoptimIOTest
         assertThrows(UndetectedFileFormatException.class, 
                 () -> FileUtils.detectFileFormat(ffile));
         
-        DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.APSTAG
-                + ">", false);
+        DenoptimIO.writeData(pathName, 
+                "> <" + DENOPTIMConstants.APSTAG + ">"+ NL
+                + "> <" + DENOPTIMConstants.VERTEXJSONTAG + ">", false);
         assertTrue(FileFormat.VRTXSDF == FileUtils.detectFileFormat(file),
                 "Vertex SDF");
         
-        DenoptimIO.writeData(pathName, "> <" + DENOPTIMConstants.GRAPHTAG 
-                + ">", false);
+        DenoptimIO.writeData(pathName, 
+                "> <" + DENOPTIMConstants.APSTAG + ">"+ NL
+                + "> <" + DENOPTIMConstants.GRAPHJSONTAG + ">", false);
         assertTrue(FileFormat.GRAPHSDF == FileUtils.detectFileFormat(file),
                 "Graph SDF");
         

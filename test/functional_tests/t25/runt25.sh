@@ -21,7 +21,7 @@ exec 1>&6 6>&-
 
 
 #Check outcome
-if ! grep -q 'FitnessRunner run completed' "$wrkDir"/t25.log
+if ! grep -q 'Completed FitnessRunner' "$wrkDir"/t25.log
 then
     echo " "
     echo "Test 't25' NOT PASSED (symptom: completion msg not found)"

@@ -66,7 +66,7 @@ cd "$wDir"
 echo " "
 echo "Starting DenoptimGA (ctrl+c to kill)"
 echo " "
-"$javaDENOPTIM" -jar "$denoptimJar" -r GA -f input_parameters
+"$javaDENOPTIM" -jar "$denoptimJar" -r GA input_parameters
 
 # Goodbye
 echo "All done. See results under $wDir"

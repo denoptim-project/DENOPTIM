@@ -43,12 +43,12 @@ public class GUIFileSaver
 	public static FileAndFormat pickFileForSavingGraphs(Component parent) 
 	{
 		fileChooser.resetChoosableFileFilters();
-		FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter(
-		        "JSON", "json");
-		fileChooser.addChoosableFileFilter(jsonFilter);
 		FileNameExtensionFilter sdfFilter = new FileNameExtensionFilter(
                 "SDF", "sdf");
         fileChooser.addChoosableFileFilter(sdfFilter);
+        FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter(
+                "JSON", "json");
+        fileChooser.addChoosableFileFilter(jsonFilter);
         fileChooser.setAcceptAllFileFilterUsed(false);
         File file;
         if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)
@@ -69,12 +69,12 @@ public class GUIFileSaver
     public static FileAndFormat pickFileForSavingVertexes(Component parent) 
     {
         fileChooser.resetChoosableFileFilters();
-        FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter(
-                "JSON", "json");
-        fileChooser.addChoosableFileFilter(jsonFilter);
         FileNameExtensionFilter sdfFilter = new FileNameExtensionFilter(
                 "SDF", "sdf");
         fileChooser.addChoosableFileFilter(sdfFilter);
+        FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter(
+                "JSON", "json");
+        fileChooser.addChoosableFileFilter(jsonFilter);
         fileChooser.setAcceptAllFileFilterUsed(false);
         File file;
         if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)

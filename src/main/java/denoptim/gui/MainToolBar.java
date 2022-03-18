@@ -517,12 +517,12 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 
         if (FragmentSpace.isDefined())
         {
-            msg = msg + "A space of building block is alredy loaded.";
+            msg = msg + "A space of building block is alredy loaded. ";
             showWarning = true;
         }
         if (showWarning)
         {
-            msg = "Do you want to change the building blocks "
+            msg = msg + "Do you want to change the building blocks "
                     + "space? </html>";
             String[] options = new String[]{"Yes", "No"};
             int res = JOptionPane.showOptionDialog(this,
@@ -587,6 +587,12 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
                 mainPanel.add(fragPanel2);
                 fragPanel2.importVerticesFromFile(file);
                 break;  
+                
+	        case CANDIDATESDF:
+                GUIGraphHandler graphPanel3 = new GUIGraphHandler(mainPanel);
+                mainPanel.add(graphPanel3);
+                graphPanel3.importGraphsFromFile(file);
+                break;
 				
 			case GRAPHSDF:
 				GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);

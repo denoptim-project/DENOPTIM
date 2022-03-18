@@ -45,7 +45,7 @@ then
     exit -1
 fi
 
-grep -q 'GraphEditor run completed' "$wrkDir"/GraphEd.log
+grep -q 'Completed GraphEditor' "$logFile"
 if [[ $? != 0 ]]
 then
     echo " "

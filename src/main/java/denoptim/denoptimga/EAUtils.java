@@ -110,9 +110,6 @@ public class EAUtils
     
     private static final String NL =System.getProperty("line.separator");
     private static final String FSEP = System.getProperty("file.separator");
-   
-    // flag for debugging
-    private static final boolean DEBUG = false;
     
 //------------------------------------------------------------------------------
 
@@ -327,10 +324,9 @@ public class EAUtils
         graph2.renumberGraphVertices();
         
         try
-        {   
-            if (!DENOPTIMGraphOperations.performCrossover(graph1, 
+        {
+            if (!DENOPTIMGraphOperations.performCrossover(
                     graph1.getVertexAtPosition(vid1),
-                    graph2,
                     graph2.getVertexAtPosition(vid2),
                     false))
             {
@@ -1351,12 +1347,6 @@ public class EAUtils
             ArrayList<List<DENOPTIMRing>> allCombsOfRings = 
                             cgh.getPossibleCombinationOfRings(mol, molGraph);
         
-            if (DEBUG)
-            {
-                System.out.println("Got combination of rings: " 
-                                                    + allCombsOfRings.size());
-            }
-
             // Keep closable chains that are relevant for chelate formation
             if (RingClosureParameters.buildChelatesMode())
             {
@@ -1427,13 +1417,6 @@ public class EAUtils
             pr.setFirst("UNDEFINED");
         }
         res[0] = pr.getFirst();
-
-        if (DEBUG)
-        {
-            System.out.println("After setupRings: Graph "+molGraph);
-            System.out.println("Number of rings: "+molGraph.getRingCount());
-            //GenUtils.pause();
-        }
 
         return true;
     }

@@ -55,86 +55,74 @@ public class GraphEditor extends ProgramTask
 //------------------------------------------------------------------------------
 
     @Override
-    public void runProgram()
-    {   
-        try
+    public void runProgram() throws Throwable
+    {
+        GraphEdParameters.readParameterFile(
+                configFilePathName.getAbsolutePath());
+        GraphEdParameters.checkParameters();
+        GraphEdParameters.processParameters();
+        GraphEdParameters.printParameters();
+
+        int i = -1;
+        for (DENOPTIMGraph graph : GraphEdParameters.getInputGraphs())
         {
-            GraphEdParameters.readParameterFile(
-                    configFilePathName.getAbsolutePath());
-            GraphEdParameters.checkParameters();
-            GraphEdParameters.processParameters();
-            GraphEdParameters.printParameters();
-
-            int i = -1;
-            for (DENOPTIMGraph graph : GraphEdParameters.getInputGraphs())
+            i++;
+            DENOPTIMGraph modGraph = graph.editGraph(
+                                     GraphEdParameters.getGraphEditTasks(),
+                                          GraphEdParameters.symmetryFlag(),
+                                         GraphEdParameters.getVerbosity()
+            );
+           
+            if (GraphEdParameters.getVerbosity() > 0)
             {
-                i++;
-                DENOPTIMGraph modGraph = graph.editGraph(
-                                         GraphEdParameters.getGraphEditTasks(),
-                                              GraphEdParameters.symmetryFlag(),
-                                             GraphEdParameters.getVerbosity()
-                );
-               
-                if (GraphEdParameters.getVerbosity() > 0)
+                System.out.println("Original graph: ");
+                System.out.println(graph.toString());
+                System.out.println("Modified graph: ");
+                System.out.println(modGraph.toString());
+            }
+            
+            //TODO: upgrade to I/O with sepcification of format
+
+            switch (GraphEdParameters.getOutFormat())
+            {
+                case (GraphEdParameters.STRINGFORMATLABEL):
                 {
-                    System.out.println("Original graph: ");
-                    System.out.println(graph.toString());
-                    System.out.println("Modified graph: ");
-                    System.out.println(modGraph.toString());
+                    DenoptimIO.writeData(GraphEdParameters.getOutFile(),
+                                                  modGraph.toString(),true);
+                    break;
                 }
-                
-                //TODO: upgrade to I/O with sepcification of format
-
-                switch (GraphEdParameters.getOutFormat())
+                case (GraphEdParameters.SERFORMATLABEL):
                 {
-                    case (GraphEdParameters.STRINGFORMATLABEL):
-                    {
-                        DenoptimIO.writeData(GraphEdParameters.getOutFile(),
-                                                      modGraph.toString(),true);
-                        break;
-                    }
-                    case (GraphEdParameters.SERFORMATLABEL):
-                    {
-                        DenoptimIO.serializeToFile(
-                                                GraphEdParameters.getOutFile(),
-                                                      modGraph.toString(),true);
-                        break;
-                    }
-                    case ("SDF"):
-                    {
+                    DenoptimIO.serializeToFile(
+                                            GraphEdParameters.getOutFile(),
+                                                  modGraph.toString(),true);
+                    break;
+                }
+                case ("SDF"):
+                {
 
-                        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
-                        IAtomContainer newMol = t3d
-                                .convertGraphTo3DAtomContainer(modGraph,true);
-                        if (GraphEdParameters.getInFormat().equals("SDF"))
+                    ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+                    IAtomContainer newMol = t3d
+                            .convertGraphTo3DAtomContainer(modGraph,true);
+                    if (GraphEdParameters.getInFormat().equals("SDF"))
+                    {
+                        IAtomContainer oldMol = 
+                                             GraphEdParameters.getInpMol(i);
+                        if (oldMol.getProperty("cdk:Title") != null)
                         {
-                            IAtomContainer oldMol = 
-                                                 GraphEdParameters.getInpMol(i);
-                            if (oldMol.getProperty("cdk:Title") != null)
-                            {
-                            	String name = oldMol.getProperty(
-                                                        "cdk:Title").toString();
-                            	newMol.setProperty("cdk:Title",name);
-                            }
+                        	String name = oldMol.getProperty(
+                                                    "cdk:Title").toString();
+                        	newMol.setProperty("cdk:Title",name);
                         }
-                        DenoptimIO.writeSDFFile(GraphEdParameters.getOutFile(),
-                                                                   newMol,true);
-                        break;
                     }
+                    DenoptimIO.writeSDFFile(GraphEdParameters.getOutFile(),
+                                                               newMol,true);
+                    break;
                 }
             }
         }
-        catch (Exception e)
-        {
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", e);
-            e.printStackTrace(System.err);
-            thrownExc = new DENOPTIMException("Error in GraphEditor run", e);
-        }
-
-        // normal completion
-        DENOPTIMLogger.appLogger.log(Level.SEVERE, 
-			       "========= GraphEditor run completed =========");
     }
     
 //-----------------------------------------------------------------------------
+    
 }

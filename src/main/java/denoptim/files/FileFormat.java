@@ -88,7 +88,10 @@ public enum FileFormat {
         VRTXSDF.extension = "sdf";
         VRTXSDF.definingRegex = new HashSet<String>(Arrays.asList(
                 "^> *<" + DENOPTIMConstants.APSTAG+">.*"));
-        VRTXJSON.negatingRegex = new HashSet<String>(Arrays.asList(
+        VRTXSDF.negatingRegex = new HashSet<String>(Arrays.asList(
+                "^> *<" + DENOPTIMConstants.FITNESSTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.MOLERRORTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*",
                 "^> *<" + DENOPTIMConstants.GRAPHJSONTAG + ">.*"
                 ));
         VRTXSDF.endOfSampleRegex = "\\$\\$\\$\\$";
@@ -258,9 +261,9 @@ public enum FileFormat {
     {
         FileFormat[] a = {
                 // GraphSDF must come before Vertex SDF
+                FileFormat.CANDIDATESDF,
                 FileFormat.GRAPHSDF, 
-                FileFormat.VRTXSDF,
-                FileFormat.CANDIDATESDF};
+                FileFormat.VRTXSDF};
         return a;
     }
     

@@ -55,9 +55,9 @@ public class GeneOpsRunnerParameters
     protected static long randomSeed = 1234567890L;
     
     /**
-     * Testable Operators
+     * Testable Operators. {@link #XOVER} is an alias for {@link #CROSSOVER}
      */
-    protected enum Operator {MUTATION,XOVER}
+    protected enum Operator {MUTATION,XOVER,CROSSOVER}
     
     /**
      * Chosen operator
@@ -65,7 +65,8 @@ public class GeneOpsRunnerParameters
     protected static Operator operatorToTest = Operator.XOVER;
 
     /**
-     * Target vertex ID for mutation
+     * Target vertex ID for mutation. Multiple values indicate embedding into 
+     * nested graphs.
      */
     protected static int[] mutationTarget;
     
@@ -105,9 +106,10 @@ public class GeneOpsRunnerParameters
     protected static String inpFileF;
 
     /**
-     * Male VertedID (not index) on which perform xover
+     * Male VertedID (not index) on which perform xover. 
+     * Multiple values indicate embedding into nested graphs.
      */
-    protected static int mvid;
+    protected static int[] xoverSrcMale;
 
     /**
      * Male AP index on which perform xover
@@ -115,9 +117,10 @@ public class GeneOpsRunnerParameters
     protected static int mapid;
 
     /**
-     * Female VertexID (not index) on which perform xover
+     * Female VertexID (not index) on which perform xover.
+     * Multiple values indicate embedding into nested graphs.
      */
-    protected static int fvid;
+    protected static int[] xoverSrcFemale;
 
     /**
      * Female AP index on which perform xover
@@ -254,7 +257,7 @@ public class GeneOpsRunnerParameters
         switch (key.toUpperCase())
         {
             case "TESTGENOPS-OP=":
-                operatorToTest = Operator.valueOf(value);
+                operatorToTest = Operator.valueOf(value.toUpperCase());
                 break;
             case "TESTGENOPS-INPFILE=":
                 inpFileM = value;
@@ -263,6 +266,7 @@ public class GeneOpsRunnerParameters
                 outFileM = value;
                 break;
             case "TESTGENOPS-MUTATIONTARGET=":
+            {
                 String[] parts = value.split(",");
                 mutationTarget = new int[parts.length];
                 for (int i=0; i<parts.length; i++)
@@ -270,6 +274,7 @@ public class GeneOpsRunnerParameters
                     mutationTarget[i] = Integer.parseInt(parts[i].trim());
                 }
                 break;
+            }
             case "TESTGENOPS-APIDONTARGETVERTEX=":
                 idTargetAP = Integer.parseInt(value);
                 break;
@@ -292,14 +297,28 @@ public class GeneOpsRunnerParameters
     	        inpFileF = value;
                 break;
             case "TESTGENOPS-VERTEXMALE=":
-                mvid = Integer.parseInt(value);
+            {
+                String[] parts = value.split(",");
+                xoverSrcMale = new int[parts.length];
+                for (int i=0; i<parts.length; i++)
+                {
+                    xoverSrcMale[i] = Integer.parseInt(parts[i].trim());
+                }
                 break;
+            }
             case "TESTGENOPS-APMALE=":
                 mapid = Integer.parseInt(value);
                 break;
             case "TESTGENOPS-VERTEXFEMALE=":
-                fvid = Integer.parseInt(value);
+            {
+                String[] parts = value.split(",");
+                xoverSrcFemale = new int[parts.length];
+                for (int i=0; i<parts.length; i++)
+                {
+                    xoverSrcFemale[i] = Integer.parseInt(parts[i].trim());
+                }
                 break;
+            }
             case "TESTGENOPS-APFEMALE=":
                 fapid = Integer.parseInt(value);
                 break;

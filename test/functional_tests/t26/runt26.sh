@@ -22,7 +22,7 @@ totChecks=0
 for i in $(seq 1 $nSubTests)
 do
     "$javaDENOPTIM" -jar "$denoptimJar" -r GO "t26-$i.params" > "t26-$i.log" 2>&1 
-    if ! grep -q 'TestOperator run completed' "t26-$i.log"
+    if ! grep -q 'Completed GeneOpsRunner' "t26-$i.log"
     then
         echo " "
         echo "Test 't26' NOT PASSED (symptom: completion msg not found - step $i)"

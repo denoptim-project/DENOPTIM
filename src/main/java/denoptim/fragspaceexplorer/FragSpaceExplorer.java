@@ -53,6 +53,7 @@ import denoptim.task.ProgramTask;
 
 public class FragSpaceExplorer  extends ProgramTask
 {
+    private  CombinatorialExplorerByLayer pCombExp = null;
 
 //------------------------------------------------------------------------------
     
@@ -69,7 +70,7 @@ public class FragSpaceExplorer  extends ProgramTask
 //------------------------------------------------------------------------------
     
     @Override
-    public void runProgram()
+    public void runProgram() throws Throwable
     {
         //TODO: get rid of this one parameters are not static anymore.
         //needed by static parameters, and in case of subsequent runs in the same JVM
@@ -80,26 +81,24 @@ public class FragSpaceExplorer  extends ProgramTask
             FSEParameters.workDir = workDir.getAbsolutePath();
         }
         
-        CombinatorialExplorerByLayer pCombExp = null;
-        try
+    	FSEParameters.readParameterFile(configFilePathName.getAbsolutePath());
+        FSEParameters.checkParameters();
+        FSEParameters.processParameters();
+        FSEParameters.printParameters();
+        
+        pCombExp = new CombinatorialExplorerByLayer();
+        pCombExp.runPCE();
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected void handleThrowable()
+    {
+        if (pCombExp != null)
         {
-        	FSEParameters.readParameterFile(configFilePathName.getAbsolutePath());
-            FSEParameters.checkParameters();
-            FSEParameters.processParameters();
-            FSEParameters.printParameters();
-            
-            pCombExp = new CombinatorialExplorerByLayer();
-            pCombExp.runPCE();
+            pCombExp.stopRun();
         }
-        catch (Throwable t)
-        {
-    	    if (pCombExp != null)
-    	    {
-    	        pCombExp.stopRun();
-    	    }
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured", t);
-            thrownExc = new DENOPTIMException("Error in FeagSpaceExporer run", t);
-        }
+        super.handleThrowable();
     }
       
 //------------------------------------------------------------------------------  

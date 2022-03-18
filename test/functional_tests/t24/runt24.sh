@@ -19,7 +19,7 @@ totChecks=0
 for i in $(seq 1 4)
 do
     "$javaDENOPTIM" -jar "$denoptimJar" -r GI "t24-$i.params" > "t24-$i.log" 2>&1 
-    if ! grep -q 'Isomorphism run completed' "t24-$i.log"
+    if ! grep -q 'Completed Isomorphism' "t24-$i.log"
     then
         echo " "
         echo "Test 't24' NOT PASSED (symptom: completion msg not found - step $i)"
@@ -37,7 +37,7 @@ done
 for i in $(seq 6 9)
 do
     "$javaDENOPTIM" -jar "$denoptimJar" -r GI "t24-$i.params" > "t24-$i.log" 2>&1
-    if ! grep -q 'Isomorphism run completed' "t24-$i.log"
+    if ! grep -q 'Completed Isomorphism' "t24-$i.log"
     then
         echo " "
         echo "Test 't24' NOT PASSED (symptom: completion msg not found - step $i)"

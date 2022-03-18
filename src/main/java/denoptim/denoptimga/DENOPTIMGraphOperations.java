@@ -58,9 +58,6 @@ import denoptim.utils.RandomUtils;
 public class DENOPTIMGraphOperations
 {
 
-    // set true to debug
-    private static boolean debug = false;
-
 //------------------------------------------------------------------------------
 
     /**
@@ -565,8 +562,6 @@ public class DENOPTIMGraphOperations
         // check if the fragment has available APs
         if (!curVrtx.hasFreeAP())
         {
-            if (debug)
-                System.err.println("Cannot extend graph that has no free AP!");
             return status;
         }
         
@@ -574,14 +569,6 @@ public class DENOPTIMGraphOperations
         DENOPTIMGraph molGraph = curVrtx.getGraphOwner();
         int lvl = molGraph.getLevel(curVrtx);
         int grphId = molGraph.getGraphId();
-
-        if (debug)
-        {
-            System.err.println("---> Extending Graph " + grphId
-                               + " on vertex " + curVrtId
-                               + " which is in level " + lvl);
-            System.err.println("     Grap: "+ molGraph);
-        }
 
         ArrayList<Integer> addedVertices = new ArrayList<>();
 
@@ -601,21 +588,9 @@ public class DENOPTIMGraphOperations
             toDoAPs.remove(ap);
             int apId = ap.getIndexInOwner();
             
-            if (debug)
-            {
-                System.err.println("Evaluating growth: attempt #" + i 
-                        + " on AP #" + apId + " of "
-                        + "vertex "+ curVrtId 
-                        + " (AP: " + apId + ")");
-            }
-            
             // is it possible to extend on this AP?
             if (!ap.isAvailable())
             {
-                if (debug)
-                {
-                    System.err.println("AP is aready in use.");
-                }
                 continue;
             }
 
@@ -633,25 +608,11 @@ public class DENOPTIMGraphOperations
                 double crowdingProb = EAUtils.getCrowdingProbability(ap);
                 double extendGraphProb = molSizeProb * byLevelProb * crowdingProb;
                 boolean fgrow = RandomUtils.nextBoolean(extendGraphProb);
-                if (debug)
-                {
-                    System.err.println("Growth probability on this AP:" 
-                            + extendGraphProb + " (growth: "+byLevelProb+", "
-                                    + "crowding: "+crowdingProb+")");
-                }
                 if (!fgrow)
                 {
-                    if (debug)
-                    {
-                        System.err.println("Decided not to grow on this AP!");
-                    }
                     if (RingClosureParameters.allowRingClosures() 
                             && RandomUtils.nextBoolean(byLevelProb * crowdingProb))
                     {
-                        if (debug)
-                        {
-                            System.err.println("Decided to close ring, if possible.");
-                        }
                         allowOnlyRingClosure = true;
                     } else {
                         continue;
@@ -683,10 +644,6 @@ public class DENOPTIMGraphOperations
             int fid = chosenFrgAndAp.getVertexMolId();
             if (fid == -1)
             {
-                if (debug)
-                {
-                    System.err.println("No compatible fragment found.");
-                }
                 continue;
             }
             
@@ -699,10 +656,6 @@ public class DENOPTIMGraphOperations
                     incomingVertex.getHeavyAtomsCount()) > 
                         FragmentSpaceParameters.getMaxHeavyAtom())
             {
-                if (debug)
-                {
-                    System.err.println("Graph is growing too large. Skipping AP.");
-                }
                 continue;
             }
 
@@ -715,13 +668,7 @@ public class DENOPTIMGraphOperations
             {
                 symAPs = curVrtx.getSymmetricAPs(apId);
 				if (symAPs != null)
-				{
-                    if (debug)
-                    {
-                        System.err.println("Applying intra-fragment symmetric "
-                                          + "substitution over APs: " + symAPs);
-                    }
-                    
+				{   
                     // Are symmetric APs rooted on same atom?
                     boolean allOnSameSrc = true;
                     for (Integer symApId : symAPs.getList())
@@ -788,11 +735,6 @@ public class DENOPTIMGraphOperations
             if (cpOnSymVrts)
             {
                 symVerts = molGraph.getSymSetForVertexID(curVrtId);
-                if (debug)
-                {
-                    System.err.println("Inheriting symmetry in vertices "
-                                                                    + symVerts);
-                }
             }
             else
             {
@@ -804,10 +746,6 @@ public class DENOPTIMGraphOperations
                     incomingVertex.getHeavyAtomsCount()*symVerts.size()*symAPs.size()) > 
                         FragmentSpaceParameters.getMaxHeavyAtom())
             {
-                if (debug)
-                {
-                    System.err.println("Graph is growing too large. Skipping AP.");
-                }
                 continue;
             }
             
@@ -853,22 +791,8 @@ public class DENOPTIMGraphOperations
             }
         } // end loop over APs
         
-        if (debug)
-        {
-            String filename = "/tmp/"+grphId+"_growth.sdf";
-            System.err.println("Writing growing graph to "+filename);
-            ArrayList<DENOPTIMGraph> lst = new ArrayList<DENOPTIMGraph>();
-            lst.add(molGraph);
-            DenoptimIO.writeGraphsToSDF(new File(filename), lst, true);
-        }
-
         if (extend)
         {
-            if (debug)
-            {
-                System.err.println("New level on graphID: " + grphId);
-            }
-
             // attempt to further extend each of the newly added vertices
             for (int i=0; i<addedVertices.size(); i++)
             {
@@ -1353,93 +1277,27 @@ public class DENOPTIMGraphOperations
 
         return lstChosenFfCc;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Performs crossover between two graphs on a given pair of vertexIDs
-     * @param male the first Graph
-     * @param female the second Graph
-     * @param mvid vertexID of the root vertex of the branch of male to exchange
-     * @param fvid vertexID of the root vertex of the branch of female to
-     * exchange
-     * @par
-     * @return <code>true</code> if a new graph has been successfully produced
-     * @throws DENOPTIMException
-     */
-
-    public static boolean performCrossover(DENOPTIMGraph male, int mvid,
-                        DENOPTIMGraph female, int fvid) throws DENOPTIMException
-    {
-        return performCrossover(male, mvid, female, fvid, false);
-    }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Performs crossover between two graphs on a given pair of vertexIDs
-     * @param male the first Graph
-     * @param female the second Graph
-     * @param mvid vertexID of the root vertex of the branch of male to exchange
-     * @param fvid vertexID of the root vertex of the branch of female to
-     * exchange
-     * @return <code>true</code> if a new graph has been successfully produced
-     * @throws DENOPTIMException
-     */
-
-    public static boolean performCrossover(DENOPTIMGraph male, int mvid,
-                        DENOPTIMGraph female, int fvid, boolean debug)
-                                throws DENOPTIMException
-    {   
-        if(debug)
-        {
-            System.err.println("Crossover on vertices " + mvid + " " + fvid);
-            System.err.println("Male graph:   "+male);
-            System.err.println("Female graph: "+female);
-        }
-
-        // get details about crossover points
-        DENOPTIMVertex mvert = male.getVertexWithId(mvid);
-        DENOPTIMVertex fvert = female.getVertexWithId(fvid);
-        
-        return performCrossover(male, mvert, female, fvert, debug);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Performs crossover between two graphs on a given pair of vertexes. 
+     * Performs crossover between two graphs owning the given pair of vertexes. 
      * This method does changes the given graphs. 
-     * @param male the first Graph
-     * @param female the second Graph
-     * @param mvert the root vertex of the branch of male to exchange
-     * @param fvert the root vertex of the branch of female to
-     * exchange
+     * @param mvert the root vertex of the branch of male to exchange.
+     * @param fvert the root vertex of the branch of female to exchange.
      * @return <code>true</code> if a new graph has been successfully produced
      * @throws DENOPTIMException
      */
 
-    public static boolean performCrossover(DENOPTIMGraph male, 
-            DENOPTIMVertex mvert,DENOPTIMGraph female, DENOPTIMVertex fvert, 
-            boolean debug) throws DENOPTIMException
+    public static boolean performCrossover(DENOPTIMVertex mvert, 
+            DENOPTIMVertex fvert, boolean debug) throws DENOPTIMException
     {
-        if(debug)
-        {
-            System.err.println("Attempt to perform Crossover");
-            System.err.println("Male graph:   "+male);
-            System.err.println("Male XOVER vertex: " + mvert);
-            System.err.println("Female graph: "+female);
-            System.err.println("Female XOVER vertex: " + fvert);
-        }
-        
+        DENOPTIMGraph male = mvert.getGraphOwner();
+        DENOPTIMGraph female = fvert.getGraphOwner();
+
         // Prepare subgraphs that will be exchanged
         DENOPTIMGraph subG_M = male.extractSubgraph(mvert);
         DENOPTIMGraph subG_F = female.extractSubgraph(fvert);
-        if (debug)
-        {
-            System.out.println("DBUG: subGraph from male: "+subG_M);
-            System.out.println("DBUG: subGraph from female: "+subG_F);
-        }
         
         DENOPTIMEdge eM = mvert.getEdgeToParent();
         DENOPTIMEdge eF = fvert.getEdgeToParent();
@@ -1456,12 +1314,6 @@ public class DENOPTIMGraphOperations
                 male.getSymSetForVertexID(mvert.getVertexId()).getList();
         ArrayList<Integer> symVrtIDs_F = 
                 female.getSymSetForVertexID(fvert.getVertexId()).getList();
-        
-        if (debug)
-        {
-            System.out.println("DBUG: MALE sym sites: "+symVrtIDs_M);
-            System.out.println("DBUG: FEMALE sym sites: "+symVrtIDs_F);
-        }
         
         // MALE: Find all parent verteces and AP indeces where the incoming 
         // graph will have to be placed
@@ -1513,25 +1365,6 @@ public class DENOPTIMGraphOperations
         for (Integer svid : toRemoveFromF)
         {
             female.removeBranchStartingAt(female.getVertexWithId(svid));
-        }
-        
-        // extract subgraphs (i.e., branches of graphs that will be exchanged)
-        if (debug)
-        {
-            System.out.println("DBUG: MALE sites for FEMALE subGraph:");
-            for (int i=0; i<symParVertM.size(); i++)
-            {
-                System.out.println("     v:"  + symParVertM.get(i) 
-                    + " ap:"+symmParAPidxM.get(i));
-            }
-            System.out.println("DBUG: FEMALE sites for MALE subGraph:");
-            for (int i=0; i<symParVertF.size(); i++)
-            {
-                System.out.println("     v:"  + symParVertF.get(i) + 
-                                                   " ap:"+symmParAPidxF.get(i));
-            }
-            System.out.println("DBUG: MALE after pruning: "+male);
-            System.out.println("DBUG: FEMALE after pruning: "+female);
         }
         
         // attach the subgraph from M/F onto F/M in all symmetry related APs

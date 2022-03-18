@@ -117,6 +117,7 @@ public class GUIAPClassDefinitionDialog extends GUIModalDialog
 		// Customise the buttons of the modal dialog
 		this.btnDone.setText("OK");
 		this.btnDone.setToolTipText("Confirm the definition of the APClass");
+		this.getRootPane().setDefaultButton(btnDone);
 		for (ActionListener al : this.btnDone.getActionListeners())
 		    this.btnDone.removeActionListener(al);
 		this.btnDone.addActionListener(new ActionListener() {
