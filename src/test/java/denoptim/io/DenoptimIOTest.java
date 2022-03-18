@@ -157,7 +157,7 @@ public class DenoptimIOTest
         File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
         DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
         ArrayList<DENOPTIMVertex> readInVrtxs = 
-                DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
+                DenoptimIO.readVertexes(tmpFile, BBType.UNDEFINED);
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
         assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
