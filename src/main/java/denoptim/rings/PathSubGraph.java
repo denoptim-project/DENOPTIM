@@ -148,14 +148,21 @@ public class PathSubGraph
         this.vA = vA;
         this.vB = vB;
         
-        // Identify the path between vA/vB and spanning tree seed
+        // Identify the path between vA/vB and the seed of the spanning tree
         List<DENOPTIMVertex> vAToSeed = new ArrayList<DENOPTIMVertex>();
         molGraph.getParentTree(vA, vAToSeed);
         vAToSeed.add(0, vA);
         List<DENOPTIMVertex> vBToSeed = new ArrayList<DENOPTIMVertex>();
         molGraph.getParentTree(vB, vBToSeed);
         vBToSeed.add(0, vB);
-
+        
+        if (Collections.disjoint(vAToSeed, vBToSeed))
+        {
+            vertPathVAVB = new ArrayList<DENOPTIMVertex>();
+            edgesPathVAVB = new ArrayList<DENOPTIMEdge>();
+            return;
+        }
+        
         // find XOR plus junction vertex (turning point)
         vertPathVAVB = new ArrayList<DENOPTIMVertex>();
         edgesPathVAVB = new ArrayList<DENOPTIMEdge>();
@@ -322,7 +329,6 @@ public class PathSubGraph
      */
     public static DENOPTIMGraph findPath(DENOPTIMVertex from,
                                          DENOPTIMVertex to) {
-
         DENOPTIMGraph g = new DENOPTIMGraph();
         try {
             if (from == to) {

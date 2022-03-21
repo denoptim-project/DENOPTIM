@@ -325,18 +325,13 @@ public class EAUtils
         
         try
         {
-            //TODO-gg graph1/2 is not necessarily the owner of vid1/2 due to template embedding!!!
-            DENOPTIMGraph[] offspring = DENOPTIMGraphOperations.performCrossover(
+            if (!DENOPTIMGraphOperations.performCrossover(
                     graph1.getVertexAtPosition(vid1),
-                    graph2.getVertexAtPosition(vid2));
-            if (offspring[0]==null || offspring[1]==null)
+                    graph2.getVertexAtPosition(vid2)))
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
                 return null;
-            } else {
-                graph1 = offspring[0];
-                graph2 = offspring[1];
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -353,8 +348,8 @@ public class EAUtils
         
         graph1.setGraphId(GraphUtils.getUniqueGraphIndex());
         graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
-        EAUtils.addCappingGroup(graph1);
-        EAUtils.addCappingGroup(graph2);
+        graph1.addCappingGroups();
+        graph2.addCappingGroups();
         String msg = "Xover: " + molid1 + "|" + gid1 + "|" + vid1 + "="
                     + molid2 + "|" + gid2 + "|" + vid2;
         graph1.setLocalMsg(msg);
@@ -468,8 +463,9 @@ public class EAUtils
         }
         
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
-    
-        EAUtils.addCappingGroup(graph);
+        
+        graph.addCappingGroups();
+        
         Object[] res = null;
         try
         {
@@ -1228,55 +1224,8 @@ public class EAUtils
             return null;
         }
         
-        addCappingGroup(graph);
+        graph.addCappingGroups();
         return graph;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Select a compatible capping group
-     * @param rcnCap
-     * @return the index of capping group
-     */
-
-    protected static int getCappingFragment(APClass rcnCap)
-    {
-        if (rcnCap == null)
-            return -1;
-
-        ArrayList<Integer> reacFrags = getCompatibleCappingFragments(rcnCap);
-
-        int fapidx = -1;
-        if (reacFrags.size() > 0)
-        {
-            fapidx = RandomUtils.randomlyChooseOne(reacFrags);
-        }
-
-        return fapidx;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Retrieve a list of compatible capping groups
-     * @param cmpReac
-     * @return a list of compatible capping groups
-     */
-
-    protected static ArrayList<Integer> getCompatibleCappingFragments(
-            APClass cmpReac)
-    {
-        ArrayList<Integer> lstFragIdx = new ArrayList<>();
-        for (int i=0; i<FragmentSpace.getCappingLibrary().size(); i++)
-        {
-                DENOPTIMVertex mol = FragmentSpace.getCappingLibrary().get(i);
-            ArrayList<APClass> lstRcn = mol.getAllAPClasses();
-            if (lstRcn.contains(cmpReac))
-                lstFragIdx.add(i);
-        }
-
-        return lstFragIdx;
     }
 
 //------------------------------------------------------------------------------
@@ -1423,73 +1372,6 @@ public class EAUtils
         res[0] = pr.getFirst();
 
         return true;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Add a capping group if free connection is available
-     * Addition of Capping groups does not update the symmetry table
-     * for a symmetric graph.
-     * @param molGraph
-     */
-
-    protected static void addCappingGroup(DENOPTIMGraph molGraph)
-                                                    throws DENOPTIMException
-    {
-        if (!FragmentSpace.useAPclassBasedApproach())
-            return;
-
-        ArrayList<DENOPTIMVertex> lstVert = molGraph.getVertexList();
-
-        for (int i=0; i<lstVert.size(); i++)
-        {
-            // check if the vertex has a free valence
-            DENOPTIMVertex curVertex = lstVert.get(i);
-
-            // no capping of a capping group. Since capping groups are expected
-            // to have only one AP, there should never be a capping group with 
-            // a free AP.
-            if (curVertex.getBuildingBlockType() == DENOPTIMVertex.BBType.CAP)
-            {
-                //String msg = "Attempting to cap a capping group. Check your data.";
-                //DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
-                continue;
-            }
-
-            ArrayList<DENOPTIMAttachmentPoint> lstDaps =
-                                            curVertex.getAttachmentPoints();
-
-            for (int j=0; j<lstDaps.size(); j++)
-            {
-                DENOPTIMAttachmentPoint curDap = lstDaps.get(j);
-
-                if (curDap.isAvailable())
-                {
-                    APClass apcCap = FragmentSpace.getAPClassOfCappingVertex(
-                            curDap.getAPClass());
-                    if (apcCap != null)
-                    {
-                        int bbIdCap = getCappingFragment(apcCap);
-
-                        if (bbIdCap != -1)
-                        {
-                            DENOPTIMVertex capVrtx = DENOPTIMVertex.newVertexFromLibrary(
-                                    GraphUtils.getUniqueVertexIndex(), bbIdCap, 
-                                    DENOPTIMVertex.BBType.CAP);
-                            molGraph.appendVertexOnAP(curDap, capVrtx.getAP(0));
-                        }
-                        else
-                        {
-                            String msg = "Capping is required but no proper capping "
-                                            + "fragment found with APCalss " + apcCap;
-                            DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
-                            throw new DENOPTIMException(msg);
-                        }
-                    }
-                }
-            }
-        }
     }
 
 //------------------------------------------------------------------------------

@@ -46,6 +46,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.RandomUtils;
 
 /**
  * Class defining the fragment space
@@ -529,6 +530,53 @@ public class FragmentSpace
                     + bbType + ".");
         }
         return clone;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Select a compatible capping group for the given APClass.
+     * @param rcnCap the class of the attachment point to be capped.
+     * @return the index of capping group
+     */
+
+    public static int getCappingFragment(APClass rcnCap)
+    {
+        if (rcnCap == null)
+            return -1;
+
+        ArrayList<Integer> reacFrags = getCompatibleCappingFragments(rcnCap);
+
+        int fapidx = -1;
+        if (reacFrags.size() > 0)
+        {
+            fapidx = RandomUtils.randomlyChooseOne(reacFrags);
+        }
+
+        return fapidx;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Retrieve a list of compatible capping groups
+     * @param cmpReac
+     * @return a list of compatible capping groups
+     */
+
+    public static ArrayList<Integer> getCompatibleCappingFragments(
+            APClass cmpReac)
+    {
+        ArrayList<Integer> lstFragIdx = new ArrayList<>();
+        for (int i=0; i<FragmentSpace.getCappingLibrary().size(); i++)
+        {
+                DENOPTIMVertex mol = getCappingLibrary().get(i);
+            ArrayList<APClass> lstRcn = mol.getAllAPClasses();
+            if (lstRcn.contains(cmpReac))
+                lstFragIdx.add(i);
+        }
+
+        return lstFragIdx;
     }
 
 //------------------------------------------------------------------------------

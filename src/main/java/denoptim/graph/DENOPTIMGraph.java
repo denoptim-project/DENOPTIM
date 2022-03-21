@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -321,6 +322,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * @param v the vertex for which we want the list of symmetric vertexes.
+     * @return a list that includes v but can be empty.
+     */
     public ArrayList<DENOPTIMVertex> getSymVertexesForVertex(DENOPTIMVertex v)
     {
         ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
@@ -1296,62 +1301,86 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Replaced the branch starting at the given vertex of this graph with the
-     * given new branch. This method reproduces the 
-     * change of vertex on all symmetric sites.
-     * @param vertex the vertex currently belonging to this graph and to be 
-     * replaced.
-     * @param newBranch the graph that will be used to create the new branch 
+     * Replaced the subgraph represented by a given collection of vertexes that
+     * belong to this graph. 
+     * This method reproduces the change of vertex on all symmetric sites, where
+     * a site is identified by a symmetrically identified reflection of the 
+     * subgraph to replace, which are identified using symmetric sets.
+     * @param subGrpVrtxs the vertexes currently belonging to this graph and to  
+     * be replaced. We assume these collection of vertexes is a connected graph,
+     * i.e., all vertexes are reachable by one single vertex via a directed path
+     * that does not involve any other vertex not included in this collections.
+     * @param newSubGraph the graph that will be used to create the new branch 
      * replacing the old one. Vertexes of such branch will be cloned to create
      * the new vertexes to be added to this graph.
+     * @param apMap mapping of attachment points belonging to any vertex in
+     * <code>subGrpVrtxs</code> to attachment points in <code>newSubGraph</code>.
      * @return <code>true</code> if the substitution is successful.
-     * @throws DENOPTIMException
+     * @throws DENOPTIMException is capping groups are the only vertexes in the
+     * subgraph.
      */
-    public boolean replaceBranch(DENOPTIMVertex oldBranchSrc, 
+    public boolean replaceSubGraph(List<DENOPTIMVertex> subGrpVrtxs, 
             DENOPTIMGraph incomingGraph, 
-            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap)
+            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
                     throws DENOPTIMException
     {
-        if (!gVertices.contains(oldBranchSrc))
+        for (DENOPTIMVertex vToRemove : subGrpVrtxs)
         {
-            return false;
+            if (!gVertices.contains(vToRemove))
+            {
+                return false;
+            }
+        }
+        
+        // Capping groups are removed and, if needed, re-added back
+        subGrpVrtxs.stream().filter(v -> v.getBuildingBlockType()==BBType.CAP)
+            .forEach(v -> this.removeVertex(v));
+        subGrpVrtxs.removeIf(v -> v.getBuildingBlockType()==BBType.CAP);
+        if (subGrpVrtxs.size() == 0)
+        {
+            throw new DENOPTIMException("Capping groups cannot be the only "
+                    + "vertex in a subgraph to replase.");   
         }
         
         // Refresh the symmetry set labels so that clones of the branch inherit
         // the same symmetry set labels.
         incomingGraph.reassignSymmetricLabels();
         
-        ArrayList<DENOPTIMVertex> symSites = getSymVertexesForVertex(oldBranchSrc);
-        if (symSites.size() == 0)
-        {
-            symSites.add(oldBranchSrc);
-        }
-        
         GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
         
-        for (DENOPTIMVertex oldLink : symSites)
+        for (List<DENOPTIMVertex> vertexesToRemove : getSymmetricSubGraphs(subGrpVrtxs))
         {
             DENOPTIMGraph graphToAdd = incomingGraph.clone();
             graphToAdd.renumberGraphVertices();
             
-            ArrayList<DENOPTIMVertex> vertexesToRemove = new ArrayList<DENOPTIMVertex>();
-            vertexesToRemove.add(oldLink);
-            getChildrenTree(oldLink, vertexesToRemove);
+            removeCappingGroupsFromChilds(vertexesToRemove);
             
+            List<DENOPTIMVertex> vertexAddedToThis = new ArrayList<>(graphToAdd.gVertices);
+            
+            //TODO-gg: detect multiple mappings and chose one
             LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
                 localApMap = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
             for (Map.Entry<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>  e : apMap.entrySet())
             {
-                int vrtPosition = incomingGraph.indexOf(e.getValue().getOwner());
-                int apPosition = e.getValue().getIndexInOwner();
-                localApMap.put(oldLink.getAP(e.getKey().getIndexInOwner()),
-                        graphToAdd.getVertexAtPosition(vrtPosition).getAP(apPosition));
+                // WARNING! Assumption that subGrpVrtxs and vertexesToRemove
+                // are sorted accordingly to symmetry, which should be the case.
+                int vrtPosOnOld = subGrpVrtxs.indexOf(e.getKey().getOwner());
+                int apPosOnOld = e.getKey().getIndexInOwner();
+                DENOPTIMAttachmentPoint apOnOld = vertexesToRemove.get(
+                        vrtPosOnOld).getAP(apPosOnOld); 
+                
+                int vrtPosOnNew = incomingGraph.indexOf(e.getValue().getOwner());
+                int apPosOnNew = e.getValue().getIndexInOwner();
+                DENOPTIMAttachmentPoint apOnNew = graphToAdd.getVertexAtPosition(
+                        vrtPosOnNew).getAP(apPosOnNew); 
+                localApMap.put(apOnOld,apOnNew);
             }
             
             if (!replaceSingleSubGraph(vertexesToRemove, graphToAdd, localApMap))
             {
                 return false;
             }
+            addCappingGroups(vertexAddedToThis);
         }
         convertSymmetricLabelsToSymmetricSets();
         return true;
@@ -1360,34 +1389,123 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Replaced the branch starting at the given vertex of this graph with the
-     * given new branch. This method does not project the 
-     * change of vertex on symmetric sites, and does not alter the symmetric 
-     * sets.
-     * @param vertex the vertex currently belonging to this graph and to be 
-     * replaced.
-     * @param newBranch the graph that will be attached on this graph. 
-     * No copying or cloning.
-     * @return <code>true</code> if the substitution is successful.
-     * @throws DENOPTIMException
+     * We assume that the subgraph is a continuously connected, directed graph.
+     * By contract, the source of the symmetric subgraph's spanning tree is 
+     * always the first vertex in each returned list. Also, note that symmetry
+     * does not pertain capping groups, so capping groups are not expected to be
+     * among the vertexes in the given list and will not be present in the 
+     * resulting subgraphs.
+     * @param subGrpVrtxs
+     * @return a collection of subgraphs, each represented by a list of vertexes
+     * belonging to it.
+     * @throws DENOPTIMException if capping groups are present in the list.
      */
-    public boolean replaceSingleBranch(DENOPTIMVertex oldBranchSrc, 
-            DENOPTIMGraph newBranch, 
-            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
-                    throws DENOPTIMException
+    public List<List<DENOPTIMVertex>> getSymmetricSubGraphs(
+            List<DENOPTIMVertex> subGrpVrtxs) throws DENOPTIMException
     {
-        if (!gVertices.contains(oldBranchSrc) 
-                || gVertices.contains(newBranch.getVertexAtPosition(0)))
+        if (subGrpVrtxs.stream().anyMatch(v -> v.getBuildingBlockType()==BBType.CAP))
+            throw new DENOPTIMException("Capping groups must not be part of "
+                    + "symmetric subgraphs");
+
+        List<List<DENOPTIMVertex>> symSites = new ArrayList<List<DENOPTIMVertex>>();
+        
+        if (subGrpVrtxs.size()==1)
         {
-            return false;
+            for (DENOPTIMVertex sv : getSymVertexesForVertex(subGrpVrtxs.get(0)))
+            {
+                ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+                lst.add(sv);
+                symSites.add(lst);
+            }
+            if (symSites.size()==0)
+            {
+                symSites.add(subGrpVrtxs);
+            }
+            return symSites;
         }
         
-        // Identify vertexes in the sub-graph that will be removed
-        ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
-        subGrpVrtxs.add(oldBranchSrc);
-        getChildrenTree(oldBranchSrc, subGrpVrtxs);
+        // Identify the (sole) grand parent.
+        List<DENOPTIMVertex> thoseWithoutParent = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : subGrpVrtxs)
+        {
+            if (!subGrpVrtxs.contains(v.getParent()))
+                thoseWithoutParent.add(v);
+        }
+        if (thoseWithoutParent.size()!=1)
+        {
+            throw new DENOPTIMException("SubGraph has more than one grand "
+                    + "parent.");
+        }
+        DENOPTIMVertex sourceOfSubGraph = thoseWithoutParent.get(0);
+        int numSymmetricSubGraphs = getSymVertexesForVertex(sourceOfSubGraph).size();
+        if (numSymmetricSubGraphs==0)
+        {
+            symSites.add(subGrpVrtxs);
+            return symSites;
+        }
         
-        return replaceSingleSubGraph(subGrpVrtxs, newBranch, apMap);
+        // Identify the ends of the subgraph's spanning tree
+        List<DENOPTIMVertex> thoseWithoutChildren = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : subGrpVrtxs)
+        {
+            if (Collections.disjoint(v.getChilddren(),subGrpVrtxs))
+                thoseWithoutChildren.add(v);
+        }
+        
+        // We want to verify that all the ends of the subgraph's spanning tree
+        // have the same number of symmetric partners. This, while collecting
+        // all ends that are outside the subgraph and are symmetric to any of
+        // the ends belonging to the subgraph. The first, in fact, are the ends
+        // of the symmetric subgraphs.
+        Set<DENOPTIMVertex> upperLimits = new HashSet<DENOPTIMVertex>();
+        Set<DENOPTIMVertex> doneBySymmetry = new HashSet<DENOPTIMVertex>();
+        for (DENOPTIMVertex upperLimit : thoseWithoutChildren)
+        {
+            // We need to understand how many symmetric vertexes are already
+            // within the subgraph
+            int numInSubGraphReplicas = 1;
+            
+            if (doneBySymmetry.contains(upperLimit))
+                continue;
+            
+            // These are symmetric vertexes that do belong to the subgraph
+            Set<DENOPTIMVertex> symmSitesOnBranch = new HashSet<DENOPTIMVertex>(
+                    getSymVertexesForVertex(upperLimit));
+            symmSitesOnBranch.retainAll(subGrpVrtxs);
+            if (symmSitesOnBranch.size()>0)
+            {
+                numInSubGraphReplicas = symmSitesOnBranch.size();
+                doneBySymmetry.addAll(symmSitesOnBranch);
+            }
+            
+            List<DENOPTIMVertex> lst = getSymVertexesForVertex(upperLimit);
+            if (lst.size() != numInSubGraphReplicas*numSymmetricSubGraphs)
+            {
+                // The subgraph is not symmetrically reproduced.
+                symSites.add(subGrpVrtxs);
+                return symSites;
+            }
+            upperLimits.addAll(lst);
+        }
+        
+        for (DENOPTIMVertex symSources : getSymVertexesForVertex(sourceOfSubGraph))
+        {
+            List<DENOPTIMVertex> symSubGraph = new ArrayList<DENOPTIMVertex>();
+            // The source of the symmetric subgraph is always the first!
+            symSubGraph.add(symSources);
+            getChildTreeLimited(symSources, symSubGraph, upperLimits);
+            //NB: Capping groups are not supposed to be in the list.
+            symSubGraph.removeIf(v -> v.getBuildingBlockType()==BBType.CAP);
+            if (symSubGraph.size()!=subGrpVrtxs.size())
+            {
+                symSites = new ArrayList<List<DENOPTIMVertex>>();
+                symSites.add(subGrpVrtxs);
+                return symSites;
+            }
+            symSites.add(symSubGraph);
+        }
+
+        return symSites;
     }
     
 //------------------------------------------------------------------------------
@@ -1507,7 +1625,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                         if (!apMap.containsKey(oldAP))
                         {
                             throw new DENOPTIMException("Cannot replace subgraph "
-                                    + "if an AP that has no mapping is in use.");
+                                    + "if a used AP has no mapping.");
                         } else {
                             // This AP is not used, not even outside of the template
                             // but for some reason the apMapping wants to keep it
@@ -1520,8 +1638,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             
             if (!apMap.containsKey(oldAP))
             {
-                throw new DENOPTIMException("Cannot replace subgraph if an AP "
-                        + "that has no mapping is in use.");
+                throw new DENOPTIMException("Cannot replace subgraph if a used "
+                        + "AP has no mapping.");
             }
             DENOPTIMAttachmentPoint newAP = apMap.get(oldAP);
             linksToRecreate.put(newAP, oldAP.getLinkedAP());
@@ -2193,9 +2311,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param children list containing the references to all the children
      */
     public void getChildrenTree(DENOPTIMVertex vertex,
-            ArrayList<DENOPTIMVertex> children) 
+            List<DENOPTIMVertex> children) 
     {
-        ArrayList<DENOPTIMVertex> lst = getChildVertices(vertex);
+        List<DENOPTIMVertex> lst = getChildVertices(vertex);
         if (lst.isEmpty()) 
         {
             return;
@@ -2208,6 +2326,61 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 getChildrenTree(child, children);
             }
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Gets all the children of the current vertex recursively until it 
+     * finds one of the vertexes listed as limit.
+     * This method does not cross template 
+     * boundaries, thus all children belong to the same graph.
+     * @param vertex the vertex whose children are to be located
+     * @param children list containing the references to all the children
+     * @param limits the list of vertexes where exploration should stop.
+     */
+    public void getChildTreeLimited(DENOPTIMVertex vertex,
+            List<DENOPTIMVertex> children, Set<DENOPTIMVertex> limits)
+    {
+        List<DENOPTIMVertex> lst = getChildVertices(vertex);
+        if (lst.isEmpty()) 
+        {
+            return;
+        }
+        for (DENOPTIMVertex child : lst) 
+        {
+            if (!children.contains(child)) 
+            {
+                children.add(child);
+                if (!limits.contains(child))
+                    getChildTreeLimited(child, children, limits);
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Identify the oldest ancestor (i.e., most great grandparent) in the given
+     * collection. In case of two vertexes being at the same level, this returns
+     * the first.
+     * @return the vertex that has the shortest path to the source.
+     */
+    public DENOPTIMVertex getDeepestAmongThese(List<DENOPTIMVertex> list)
+    {
+        DENOPTIMVertex deepest = null;
+        int shortest = Integer.MAX_VALUE;
+        for (DENOPTIMVertex vertex : list)
+        {
+            List<DENOPTIMVertex> parentTree = new ArrayList<DENOPTIMVertex>();
+            getParentTree(vertex, parentTree);
+            if (parentTree.size()<shortest)
+            {
+                shortest = parentTree.size();
+                deepest = vertex;
+            }
+        }
+        return deepest;
     }
     
 //------------------------------------------------------------------------------
@@ -3072,12 +3245,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Remove all capping groups on this graph
+     * Remove capping groups that belong to this graph and are in the given list.
+     * @param lstVerts the list of vertexes to analyze.
      */
 
-    public void removeCappingGroups()
+    public void removeCappingGroups(List<DENOPTIMVertex> lstVerts)
     {
-        ArrayList<DENOPTIMVertex> lstVerts = getVertexList();
         ArrayList<Integer> rvids = new ArrayList<>();
         for (int i=0; i<lstVerts.size(); i++)
         {
@@ -3086,7 +3259,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 continue;
             }
-            // capping groups have fragment type 2
+            
             if (((DENOPTIMFragment) vtx).getBuildingBlockType() == BBType.CAP
                     && !isVertexInRing(vtx))
             {
@@ -3099,6 +3272,112 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             int vid = rvids.get(i);
             removeVertex(getVertexWithId(vid));
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public void removeCappingGroupsFromChilds(List<DENOPTIMVertex> lstVerts)
+    {
+        for (DENOPTIMVertex v : lstVerts)
+        {
+            removeCappingGroups(getChildVertices(v));
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Remove all capping groups on this graph
+     */
+
+    public void removeCappingGroups()
+    {
+        removeCappingGroups(new ArrayList<DENOPTIMVertex>(gVertices));
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Add a capping groups on free unused attachment points.
+     * Addition of Capping groups does not update the symmetry table
+     * for a symmetric graph.
+     */
+
+    public void addCappingGroups() throws DENOPTIMException
+    {
+        if (!FragmentSpace.useAPclassBasedApproach())
+            return;
+        addCappingGroups(new ArrayList<DENOPTIMVertex>(gVertices));
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Add a capping group if free connection is available on any of the given 
+     * vertexes.
+     * Addition of Capping groups does not update the symmetry table
+     * for a symmetric graph.
+     * @param vertexAddedToThis list of vertexes to operate on. They must belong to this
+     * graph.
+     * @throws DENOPTIMException if the addition of capping groups cannot be 
+     * performed.
+     */
+
+    public void addCappingGroups(List<DENOPTIMVertex> vertexAddedToThis)
+                                                    throws DENOPTIMException
+    {
+        if (!FragmentSpace.useAPclassBasedApproach())
+            return;
+
+        for (DENOPTIMVertex curVertex : vertexAddedToThis)
+        {
+            // no capping of a capping group. Since capping groups are expected
+            // to have only one AP, there should never be a capping group with 
+            // a free AP.
+            if (curVertex.getBuildingBlockType() == DENOPTIMVertex.BBType.CAP)
+            {
+                //String msg = "Attempting to cap a capping group. Check your data.";
+                //DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+                continue;
+            }
+
+            for (DENOPTIMAttachmentPoint curDap : curVertex.getAttachmentPoints())
+            {
+                if (curDap.isAvailable())
+                {
+                    APClass apcCap = FragmentSpace.getAPClassOfCappingVertex(
+                            curDap.getAPClass());
+                    if (apcCap != null)
+                    {
+                        int bbIdCap = FragmentSpace.getCappingFragment(apcCap);
+
+                        if (bbIdCap != -1)
+                        {
+                            DENOPTIMVertex capVrtx = 
+                                    DENOPTIMVertex.newVertexFromLibrary(
+                                        GraphUtils.getUniqueVertexIndex(), 
+                                        bbIdCap, 
+                                        DENOPTIMVertex.BBType.CAP);
+                            DENOPTIMGraph molGraph = curDap.getOwner()
+                                    .getGraphOwner();
+                            if (molGraph == null)
+                                throw new DENOPTIMException("Canno add capping "
+                                        + "groups to a vertex that does not "
+                                        + "belong to a graph.");
+                            molGraph.appendVertexOnAP(curDap, capVrtx.getAP(0));
+                        }
+                        else
+                        {
+                            String msg = "Capping is required but no proper "
+                                    + "capping fragment found with APCalss " 
+                                    + apcCap;
+                            DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
+                            throw new DENOPTIMException(msg);
+                        }
+                    }
+                }
+            }
         }
     }
     

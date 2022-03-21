@@ -2849,5 +2849,29 @@ public class DENOPTIMGraphTest {
     }
     
 //------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetSymmetricSubGraphs() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphF();
+        List<DENOPTIMVertex> sg = new ArrayList<DENOPTIMVertex>();
+        sg.add(g.getVertexAtPosition(1));
+        sg.add(g.getVertexAtPosition(3));
+        
+        List<List<DENOPTIMVertex>> symSubGraphs = g.getSymmetricSubGraphs(sg);
+        
+        assertEquals(2,symSubGraphs.size(),"Number of subgraphs");
+        assertEquals(g.getVertexAtPosition(1).getVertexId(),
+                symSubGraphs.get(0).get(0).getVertexId());
+        assertEquals(g.getVertexAtPosition(3).getVertexId(),
+                symSubGraphs.get(0).get(1).getVertexId());
+        assertEquals(g.getVertexAtPosition(2).getVertexId(),
+                symSubGraphs.get(1).get(0).getVertexId());
+        assertEquals(g.getVertexAtPosition(4).getVertexId(),
+                symSubGraphs.get(1).get(1).getVertexId());
+    }
+    
+//------------------------------------------------------------------------------
 	
 }

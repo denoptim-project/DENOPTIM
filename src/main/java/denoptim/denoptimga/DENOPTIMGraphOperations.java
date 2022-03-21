@@ -1249,13 +1249,11 @@ public class DENOPTIMGraphOperations
                                                                 compatChains,
                                                                 incompatChains,
                                                                 eligibleFrgId);
-
                     newChosenCc.addCompatibleCC(cc);
                     lstChosenFfCc.add(newChosenCc);
                 }
             }
         }
-
         return lstChosenFfCc;
     }
     
@@ -1274,11 +1272,9 @@ public class DENOPTIMGraphOperations
     // also when exiting this method. Otherwise, the two objects are not 
     // referenced anymore and get garbage-collected (apparently...).
 
-    public static DENOPTIMGraph[] performCrossover(DENOPTIMVertex mvert,
+    public static boolean performCrossover(DENOPTIMVertex mvert,
             DENOPTIMVertex fvert) throws DENOPTIMException
     {
-        DENOPTIMGraph[] offspring = new DENOPTIMGraph[2];
-        
         DENOPTIMGraph male = mvert.getGraphOwner();
         DENOPTIMGraph female = fvert.getGraphOwner();
         
@@ -1292,22 +1288,28 @@ public class DENOPTIMGraphOperations
         int apidxFC = eF.getTrgAPID(); // ap index of the female
 
         LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
-        apMapM = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+            apMapM = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
         apMapM.put(eM.getTrgAP(),subG_F.getSourceVertex().getAP(apidxFC));
-        if (!male.replaceBranch(mvert, subG_F, apMapM))
-            return offspring;
-        offspring[0] = male.getOutermostGraphOwner();
+        
+        ArrayList<DENOPTIMVertex> vertexesToDelM = new ArrayList<DENOPTIMVertex>();
+        vertexesToDelM.add(mvert);
+        male.getChildrenTree(mvert, vertexesToDelM);
+        
+        if (!male.replaceSubGraph(vertexesToDelM, subG_F, apMapM))
+           return false;
         
         LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
-        apMapF = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+            apMapF = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
         apMapF.put(eF.getTrgAP(),subG_M.getSourceVertex().getAP(apidxMC));
-        if (!female.replaceBranch(fvert, subG_M, apMapF))
-            return offspring;
-        offspring[1] = female.getOutermostGraphOwner();
+        ArrayList<DENOPTIMVertex> vertexesToDelF = new ArrayList<DENOPTIMVertex>();
+        vertexesToDelF.add(fvert);
+        female.getChildrenTree(fvert, vertexesToDelF);
+        if (!female.replaceSubGraph(vertexesToDelF, subG_M, apMapF))
+            return false;
         
         //TODO-gg: graphMsg
-        //TODO-gg back to boolean return
-        return offspring;
+        //TODO-gg back to boolean return, cleanup
+        return true;
     }
 
 //------------------------------------------------------------------------------

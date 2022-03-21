@@ -751,6 +751,10 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns the graph this vertex belongs to or null.
+     * @return the graph this vertex belongs to or null.
+     */
     public DENOPTIMGraph getGraphOwner()
     {
         return owner;
