@@ -34,29 +34,7 @@ public class GraphLinkFinder
      * result reported here is chosen randomly among the possible ones.
      */
     private DENOPTIMVertex chosenNewLink;
-    
-    /**
-     * The mapping of attachment points between the original vertex and the
-     * chosen link. This mapping is reported and integer indexes, where each int
-     * is the result of {@link DENOPTIMVertex#getIndexInOwner()}. 
-     * In case of multiple possible AP mappings, the
-     * result reported here is randomly chosen among the possible ones. This
-     * field is null in case the constructor was asked to work on an
-     * edge rather than a vertex.
-     */
-    //TODO: consider getting rid of this and use only chosenAPMap
-    private LinkedHashMap<Integer,Integer> chosenAPMapInt;
-    
-    /**
-     * The collection of all alternative vertex that can replace the 
-     * original vertex, with the consistent mappings. 
-     * This
-     * field is null in case the constructor was asked to work on an
-     * edge rather than a vertex.
-     */
-    private LinkedHashMap<DENOPTIMVertex,List<LinkedHashMap<Integer,Integer>>> allCompatLinksInt = 
-            new LinkedHashMap<DENOPTIMVertex,List<LinkedHashMap<Integer,Integer>>>();
-    
+
     /**
      * The mapping of attachment points between the original vertex/es and the
      * chosen link. 
@@ -176,168 +154,10 @@ public class GraphLinkFinder
             }
             
             // We map all the compatibilities before choosing a specific mapping
-            LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
-                    new LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
+            APMapFinder apmf = new APMapFinder(originalLink, chosenNewLink, 
+                    screenAll);
             
-            for (DENOPTIMAttachmentPoint oAP : originalLink.getAttachmentPoints())
-            {
-                for (DENOPTIMAttachmentPoint cAP : chosenNewLink.getAttachmentPoints())
-                {  
-                    boolean compatible = false;
-                    if (FragmentSpace.useAPclassBasedApproach())
-                    {
-                        // TODO: if the vertex is a template, we should
-                        // consider the required APs.
-                        
-                        if (oAP.getAPClass().equals(cAP.getAPClass()))
-                            compatible = true;
-                        
-                        if (oAP.isAvailableThroughout())
-                        {
-                            //NB:template's requires AP will have to be considered here as well
-                            compatible = true;
-                        } else {
-                            DENOPTIMAttachmentPoint lAP = 
-                                    oAP.getLinkedAPThroughout();
-                            if (oAP.isSrcInUserThroughout())
-                            {
-                                if (lAP!=null && cAP.getAPClass()
-                                      .isCPMapCompatibleWith(lAP.getAPClass()))
-                                {
-                                    compatible = true;
-                                }
-                            } else {
-                                if (lAP!=null && lAP.getAPClass()
-                                      .isCPMapCompatibleWith(cAP.getAPClass()))
-                                {
-                                    compatible = true;
-                                }
-                            }
-                        }
-                    } else {
-                        compatible = true;
-                    }
-                    if (compatible)
-                    {
-                        if (apCompatilities.containsKey(oAP))
-                        {
-                            apCompatilities.get(oAP).add(cAP);
-                        } else {
-                            List<DENOPTIMAttachmentPoint> lst = 
-                                    new ArrayList<DENOPTIMAttachmentPoint>();
-                            lst.add(cAP);
-                            apCompatilities.put(oAP,lst);
-                        }
-                    }
-                }
-            }
-            // keys is used just to keep the map keys sorted in a separate list
-            // so that the order is randomized only once, then it is retained.
-            List<DENOPTIMAttachmentPoint> keys = 
-                    new ArrayList<DENOPTIMAttachmentPoint>(
-                            apCompatilities.keySet());
-            if (keys.size() < originalLink.getNumberOfAPs())
-            {
-                continue;
-            }
-            
-            // Identify APs in old link that are used: we want a mapping that
-            // includes all of those. This, to be able to change the link without
-            // removing any existing branch.
-            ArrayList<DENOPTIMAttachmentPoint> oldAPsRequiredToHaveAMapping = new
-                    ArrayList<DENOPTIMAttachmentPoint>();
-            for (DENOPTIMAttachmentPoint oldAp : originalLink.getAttachmentPoints())
-            {
-                if (oldAp.isAvailableThroughout())
-                {
-                    apCompatilities.get(oldAp).add(null);
-                } else {
-                    oldAPsRequiredToHaveAMapping.add(oldAp);
-                    if (!keys.contains(oldAp))
-                    {
-                        // In this case we have no hope of finding a mapping 
-                        // that satisfies out needs.
-                        continue;
-                    }
-                }
-            }
-            
-            // Get all possible combinations of compatible AP pairs
-            List<APMapping> apMappings = new ArrayList<APMapping>();
-            int currentKey = 0;
-            APMapping currentMapping = new APMapping();
-            // We try the comprehensive approach, but if that is too demanding
-            // and gets stopped, then we run a a series of simplified attempts
-            // to hit a decent combination with "lucky shots".
-            Boolean stopped = FragmentSpaceUtils.recursiveCombiner(keys, 
-                    currentKey, apCompatilities, currentMapping, apMappings, 
-                    screenAll, maxCombs);
-            
-            // Keep only mappings that allow retaining the (i.e., include all APs of the 
-            // original vertex)
-            List<APMapping> toRemove = new ArrayList<APMapping>();
-            for (APMapping c : apMappings)
-            {
-                if (!c.containsAllKeys(oldAPsRequiredToHaveAMapping))
-                {
-                    toRemove.add(c);
-                }
-            }
-            apMappings.removeAll(toRemove);
-            
-            // If we where interrupted, we try to get a proper mapping again.
-            // This time we ignore all the possibilities and try a more direct 
-            // approach, which, however, cannot account for all possible combs.
-            if (stopped && apMappings.isEmpty())
-            {
-                for (int iTry = 0; iTry < maxCombs; iTry++)
-                {
-                    APMapping apMap = new APMapping();
-                    List<DENOPTIMAttachmentPoint> used = 
-                            new ArrayList<DENOPTIMAttachmentPoint>();
-                    List<DENOPTIMAttachmentPoint> availKeys = 
-                            new ArrayList<DENOPTIMAttachmentPoint>();
-                    availKeys.addAll(oldAPsRequiredToHaveAMapping);
-                    boolean abandon = false;
-                    for (int jj=0; jj<oldAPsRequiredToHaveAMapping.size(); jj++)
-                    {
-                        DENOPTIMAttachmentPoint ap =
-                                RandomUtils.randomlyChooseOne(availKeys);
-                        availKeys.remove(ap);
-                        List<DENOPTIMAttachmentPoint> availPartners = 
-                                new ArrayList<DENOPTIMAttachmentPoint>();
-                        availPartners.addAll(apCompatilities.get(ap));
-                        boolean done = false;
-                        for (int j=0; j<apCompatilities.get(ap).size(); j++)
-                        {
-                            DENOPTIMAttachmentPoint chosenAvail = 
-                                    RandomUtils.randomlyChooseOne(availPartners);
-                            availPartners.remove(chosenAvail);
-                            if (used.contains(chosenAvail))
-                            {
-                                continue;
-                            }
-                            used.add(chosenAvail);
-                            apMap.put(ap,chosenAvail);
-                            done = true;
-                            break;
-                        }
-                        if (!done)
-                        {
-                            abandon = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!abandon)
-                    {
-                        apMappings.add(apMap);
-                        break;
-                    }
-                }
-            }
-            
-            if (apMappings.isEmpty())
+            if (!apmf.foundMapping())
             {
                 this.chosenNewLink = null;
                 continue;
@@ -345,29 +165,11 @@ public class GraphLinkFinder
                 this.foundNewLink = true;
             }
             
-            APMapping chosen = RandomUtils.randomlyChooseOne(apMappings);
-            try
-            {
-                this.chosenAPMapInt = chosen.toIntMappig();
-            } catch (DENOPTIMException e)
-            {
-                throw new IllegalStateException(e);
-            }
+            chosenAPMap = apmf.getChosenAPMapping();
+            
             if (screenAll)
             {
-                List<LinkedHashMap<Integer,Integer>> lst = 
-                        new ArrayList<LinkedHashMap<Integer,Integer>>();
-                for (APMapping apm : apMappings)
-                {
-                    try
-                    {
-                        lst.add(apm.toIntMappig());
-                    } catch (DENOPTIMException e)
-                    {
-                        throw new IllegalStateException(e);
-                    }
-                }
-                allCompatLinksInt.put(chosenNewLink, lst);
+                allCompatLinks.put(chosenNewLink, apmf.getAllAPMappings());
             }
         }
     }
@@ -570,7 +372,7 @@ public class GraphLinkFinder
      * Returns the vertex chosen as alternative. If more than one possibilities
      * exist, then this will return a randomly chosen one. 
      * Consistency between the return value of this method and 
-     * {@link GraphLinkFinder#getChosenAPMappingInt()} is guaranteed.
+     * {@link GraphLinkFinder#getChosenAPMapping()} is guaranteed.
      * @return the chosen alternative or null is none was found.
      */
     public DENOPTIMVertex getChosenAlternativeLink()
@@ -581,45 +383,17 @@ public class GraphLinkFinder
 //------------------------------------------------------------------------------
     
     /**
-     * Returns the AP mapping that allows the vertex chosen as alternative to
-     * be installed in the slot originally occupied by the original vertex.
-     * If more than one possibilities exist, then this will return a randomly 
-     * chosen one. Consistency between the return value of this method and 
-     * {@link GraphLinkFinder#getChosenAlternativeLink()} is guaranteed.
-     * @return the chosen alternative or null is none was found.
-     */
-    public LinkedHashMap<Integer, Integer> getChosenAPMappingInt()
-    {
-        return chosenAPMapInt;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Returns all the AP mapping that were identified for any candidate 
-     * vertex that could 
-     * be installed in the slot originally occupied by the original vertex.
-     * @return map of all AP mappings for each alternative vertex. 
-     */
-    public LinkedHashMap<DENOPTIMVertex, List<LinkedHashMap<Integer, Integer>>> getAllAlternativesFoundInt()
-    {
-        return allCompatLinksInt;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
      * Returns the AP mapping that allows the usage of the vertex chosen either
      * as alternative to be installed in the slot originally occupied by the 
      * original vertex, or to be inserted in between two vertexes. The meaning 
      * of the mapping depends on how this {@link GraphLinkFinder} was 
-     * constructed. In particular, when this instance if constructed from an 
+     * constructed. In particular, when this instance is constructed from an 
      * {@link DENOPTIMVertex}, the syntax of the AP mapping is:
      * <ul>
-     * <li>null (TODO: FIXME by making the constructor store 
-     * (AP reference):(AP reference)
-     * mapping in
-     * addition to the int:int mapping)</li>
+     * <li>keys: the APs of the original vertex from which we seek replacement.
+     * </li>
+     * <li>values: the APs that belong on the new vertex returned by 
+     * {@link GraphLinkFinder#getChosenAlternativeLink()}.</li>
      * </ul>
      * Otherwise, when this instance if constructed from an 
      * {@link DENOPTIMEdge}, the AP mapping's syntax is:

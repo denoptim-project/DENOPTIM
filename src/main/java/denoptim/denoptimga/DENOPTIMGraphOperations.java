@@ -35,8 +35,8 @@ import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.SymmetricSet;
@@ -205,7 +205,7 @@ public class DENOPTIMGraphOperations
         boolean done = graph.replaceVertex(vertex,
                 glf.getChosenAlternativeLink().getBuildingBlockId(),
                 glf.getChosenAlternativeLink().getBuildingBlockType(),
-                glf.getChosenAPMappingInt());
+                glf.getChosenAPMapping().toIntMappig());
         if (!done)
         {
             mnt.increase(
@@ -1275,8 +1275,19 @@ public class DENOPTIMGraphOperations
         DENOPTIMGraph female = fvert.getGraphOwner();
         
         // Prepare subgraphs that will be exchanged
+        // NB: now this takes all the branch rooted at the given vertexes, but
+        // one day it should identify a subgraph from a vertex to set of end 
+        // vertexes. This may include the entire branch or a portion of it.
         DENOPTIMGraph subG_M = male.extractSubgraph(mvert);
         DENOPTIMGraph subG_F = female.extractSubgraph(fvert);
+        // TODO-gg use something like  graph.getChildTreeLimited();
+        
+        // Identify a mapping of APs that is compatible.
+        DENOPTIMTemplate tmplSubGrphM = new DENOPTIMTemplate(BBType.UNDEFINED);
+        tmplSubGrphM.setInnerGraph(subG_M);
+        DENOPTIMTemplate tmplSubGrphF = new DENOPTIMTemplate(BBType.UNDEFINED);
+        tmplSubGrphF.setInnerGraph(subG_F);
+        
         
         DENOPTIMEdge eM = mvert.getEdgeToParent();
         DENOPTIMEdge eF = fvert.getEdgeToParent();
@@ -1290,6 +1301,10 @@ public class DENOPTIMGraphOperations
         ArrayList<DENOPTIMVertex> vertexesToDelM = new ArrayList<DENOPTIMVertex>();
         vertexesToDelM.add(mvert);
         male.getChildrenTree(mvert, vertexesToDelM);
+        
+        //TODO-gg
+        DenoptimIO.writeGraphToSDF(new File("/tmp/m.sdf"), male, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/f.sdf"), female, false);
         
         if (!male.replaceSubGraph(vertexesToDelM, subG_F, apMapM))
            return false;

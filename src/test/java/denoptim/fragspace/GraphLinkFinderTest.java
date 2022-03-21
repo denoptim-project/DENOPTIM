@@ -306,8 +306,8 @@ public class GraphLinkFinderTest
         expected.put(11, 84);
         expected.put(13, 2);
         
-        LinkedHashMap<DENOPTIMVertex, List<LinkedHashMap<Integer, Integer>>> allAltLinks = 
-                glf.getAllAlternativesFoundInt();
+        LinkedHashMap<DENOPTIMVertex, List<APMapping>> allAltLinks = 
+                glf.getAllAlternativesFound();
         Set<DENOPTIMVertex> keys = allAltLinks.keySet();
         for (DENOPTIMVertex k : keys)
         {
