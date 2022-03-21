@@ -37,6 +37,7 @@ import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fitnessrunner.FitnessRunner;
 import denoptim.fragspaceexplorer.FragSpaceExplorer;
+import denoptim.main.Main.RunType;
 import denoptim.task.ProgramTask;
 import denoptim.task.StaticTaskManager;
 
@@ -306,19 +307,18 @@ public class GUIPrepare extends GUICardPanel
 	
 //------------------------------------------------------------------------------
 	
-    //TODO-gg use RunType
-	private String getAchronimFromClass()
+	private RunType getAchronimFromClass()
 	{
-		String baseName = "none";
+	    RunType baseName =null;
 		if (this instanceof GUIPrepareGARun)
 		{
-			baseName = "GA";
+			baseName = RunType.GA;
 		} else if (this instanceof GUIPrepareFSERun)
 		{
-			baseName = "FSE";
+			baseName = RunType.FSE;
 		} else if (this instanceof GUIPrepareFitnessRunner)
         {
-            baseName = "FR";
+            baseName = RunType.FIT;
         }
 		return baseName;
 	}

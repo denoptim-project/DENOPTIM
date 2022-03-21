@@ -1358,6 +1358,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             List<DENOPTIMVertex> vertexAddedToThis = new ArrayList<>(graphToAdd.gVertices);
             
             //TODO-gg: detect multiple mappings and chose one
+            
             LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
                 localApMap = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
             for (Map.Entry<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>  e : apMap.entrySet())
@@ -1651,8 +1652,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 trgAPOnNewLink = newAP;
             }
         }
-        
-        //TODO-gg look also for used RCVs?
         
         // Identify rings that are affected by the change of vertexes
         Map<DENOPTIMRing,List<DENOPTIMVertex>> ringsOverSubGraph = 

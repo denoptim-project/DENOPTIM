@@ -1261,16 +1261,12 @@ public class DENOPTIMGraphOperations
 
     /**
      * Performs crossover between two graphs owning the given pair of vertexes. 
-     * This method does changes the given graphs.
+     * The operation is performed on the graphs that own the given vertexes, 
+     * so the original version of the graph is lost.
      * @param mvert the root vertex of the branch of male to exchange.
      * @param fvert the root vertex of the branch of female to exchange.
      * @throws DENOPTIMException
-     * //TODO-gg doc
      */
-    
-    //NB: we need to keep 'male§ and 'female' to keep a reference to the graphs
-    // also when exiting this method. Otherwise, the two objects are not 
-    // referenced anymore and get garbage-collected (apparently...).
 
     public static boolean performCrossover(DENOPTIMVertex mvert,
             DENOPTIMVertex fvert) throws DENOPTIMException
@@ -1307,8 +1303,6 @@ public class DENOPTIMGraphOperations
         if (!female.replaceSubGraph(vertexesToDelF, subG_M, apMapF))
             return false;
         
-        //TODO-gg: graphMsg
-        //TODO-gg back to boolean return, cleanup
         return true;
     }
 

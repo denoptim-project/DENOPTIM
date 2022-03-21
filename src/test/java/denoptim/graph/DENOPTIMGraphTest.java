@@ -45,8 +45,8 @@ import denoptim.utils.MutationType;
 
 public class DENOPTIMGraphTest {
     
-    private static APClass APCA, APCB, APCC, APCD;
-    private static String a="A", b="B", c="C", d="D";
+    private static APClass APCA, APCB, APCC, APCD, CAPP;
+    private static String a="A", b="B", c="C", d="D", cap="cap";
     
 //------------------------------------------------------------------------------
     
@@ -56,6 +56,7 @@ public class DENOPTIMGraphTest {
         APCB = APClass.make(b, 0);
         APCC = APClass.make(c, 0);
         APCD = APClass.make(d, 99);
+        CAPP = APClass.make(cap, 1);
         
         HashMap<String,BondType> boMap = new HashMap<String,BondType>();
         boMap.put(a,BondType.SINGLE);
@@ -104,6 +105,7 @@ public class DENOPTIMGraphTest {
         
         FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
         FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
+        FragmentSpace.setCappingLibrary(new ArrayList<DENOPTIMVertex>());
         
         EmptyVertex s0 = new EmptyVertex();
         s0.setBuildingBlockType(BBType.SCAFFOLD);
@@ -181,6 +183,13 @@ public class DENOPTIMGraphTest {
         v7.addAP(APCB);
         FragmentSpace.appendVertexToLibrary(v7, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
+        
+
+        EmptyVertex c0 = new EmptyVertex();
+        c0.setBuildingBlockType(BBType.CAP);
+        c0.addAP(CAPP);
+        FragmentSpace.appendVertexToLibrary(c0, BBType.CAP,
+                FragmentSpace.getCappingLibrary());
         
     }
 
@@ -991,6 +1000,87 @@ public class DENOPTIMGraphTest {
                 BBType.FRAGMENT);
         graph.addVertex(v1b);
         graph.addEdge(new DENOPTIMEdge(v1.getAP(0), v1b.getAP(2)));
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+     *        (C)-(C)-v6-(D)--(C)-v1-(capped)
+     *       /
+     *      | (B)-(C)-v6*-(D)--(C)-v1**-(capped)
+     *      |/
+     *  (A)-v1-(B)-(C)-v6*-(D)--(C)-v1**-(capped)
+ 
+     *   </pre>
+     *   where vertexes marked with either * or ** are in symmetric sets, and
+     *   "capped" means all APs have been used by capping groups.
+     */
+    private DENOPTIMGraph makeTestGraphK() throws DENOPTIMException
+    {
+        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DENOPTIMVertex v1a = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1a);
+        DENOPTIMVertex v6a = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        graph.addVertex(v6a);
+        DENOPTIMVertex v6a_bis = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        graph.addVertex(v6a_bis);
+        DENOPTIMVertex v6a_tris = DENOPTIMVertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT);
+        graph.addVertex(v6a_tris);
+
+        DENOPTIMVertex v1a_2 = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1a_2);
+        DENOPTIMVertex v1a_2_bis = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1a_2_bis);
+        DENOPTIMVertex v1a_2_tris = DENOPTIMVertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT);
+        graph.addVertex(v1a_2_tris);
+        
+        List<DENOPTIMVertex> vToCap = new ArrayList<DENOPTIMVertex>();
+        vToCap.add(v1a);
+        vToCap.add(v1a_2);
+        vToCap.add(v1a_2_bis);
+        vToCap.add(v1a_2_tris);
+        for (DENOPTIMVertex v : vToCap)
+        {
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            {
+                if (ap.isAvailable())
+                {
+                    DENOPTIMVertex cap =  DENOPTIMVertex.newVertexFromLibrary(0,
+                            BBType.CAP);
+                    graph.appendVertexOnAP(ap, cap.getAP(0));
+                }
+            }
+        }
+        
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(1), v6a.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(3), v6a_bis.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v1a.getAP(4), v6a_tris.getAP(0)));
+        graph.addEdge(new DENOPTIMEdge(v6a.getAP(1), v1a_2.getAP(1)));
+        graph.addEdge(new DENOPTIMEdge(v6a_bis.getAP(1), v1a_2_bis.getAP(1)));
+        graph.addEdge(new DENOPTIMEdge(v6a_tris.getAP(1), v1a_2_tris.getAP(1)));
+        
+        ArrayList<Integer> symA = new ArrayList<Integer>();
+        symA.add(v6a.getVertexId());
+        symA.add(v6a_bis.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(symA));
+        
+        ArrayList<Integer> symB = new ArrayList<Integer>();
+        symB.add(v1a_2.getVertexId());
+        symB.add(v1a_2_bis.getVertexId());
+        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        
         graph.renumberGraphVertices();
         return graph;
     }
@@ -2870,6 +2960,38 @@ public class DENOPTIMGraphTest {
                 symSubGraphs.get(1).get(0).getVertexId());
         assertEquals(g.getVertexAtPosition(4).getVertexId(),
                 symSubGraphs.get(1).get(1).getVertexId());
+        
+
+        DENOPTIMGraph g2 = makeTestGraphK();
+        List<DENOPTIMVertex> sg2 = new ArrayList<DENOPTIMVertex>();
+        sg2.add(g2.getVertexAtPosition(1));
+        sg2.add(g2.getVertexAtPosition(4));
+        sg2.add(g2.getVertexAtPosition(12));
+        
+        /*
+         * In the second part we check that capping groups are not included.
+         */
+        
+        boolean exceptionWhenCappingIsIncluded = false;
+        try
+        {
+            symSubGraphs = g2.getSymmetricSubGraphs(sg2);
+        } catch (DENOPTIMException e)
+        {
+            if (e.getMessage().contains("Capping groups must not be part of "
+                    + "symmetric subgraphs"))
+                exceptionWhenCappingIsIncluded = true;
+        }
+        assertTrue(exceptionWhenCappingIsIncluded,
+                "Capping groups trigger exception");
+        
+        sg2 = new ArrayList<DENOPTIMVertex>();
+        sg2.add(g2.getVertexAtPosition(1));
+        sg2.add(g2.getVertexAtPosition(4));
+        symSubGraphs = g2.getSymmetricSubGraphs(sg2);
+        assertEquals(2,symSubGraphs.size());
+        assertEquals(2,symSubGraphs.get(0).size());
+        assertEquals(2,symSubGraphs.get(1).size());
     }
     
 //------------------------------------------------------------------------------
