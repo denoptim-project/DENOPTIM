@@ -180,7 +180,7 @@ public class DENOPTIMGraphTest {
         EmptyVertex v7 = new EmptyVertex();
         v7.setBuildingBlockType(BBType.FRAGMENT);
         v7.setAsRCV(true);
-        v7.addAP(APCB);
+        v7.addAP(APClass.make("ATneutral:0", BondType.ANY));
         FragmentSpace.appendVertexToLibrary(v7, BBType.FRAGMENT,
                 FragmentSpace.getFragmentLibrary());
         
@@ -2992,6 +2992,46 @@ public class DENOPTIMGraphTest {
         assertEquals(2,symSubGraphs.size());
         assertEquals(2,symSubGraphs.get(0).size());
         assertEquals(2,symSubGraphs.get(1).size());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetChildrenTree() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphD();
+        
+        List<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+        g.getChildrenTree(g.getVertexAtPosition(1), childTree);
+        assertEquals(6,childTree.size());
+        assertTrue(childTree.contains(g.getVertexAtPosition(2)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(3)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(4)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(5)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(6)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(7)));
+        
+        childTree = new ArrayList<DENOPTIMVertex>();
+        g.getChildrenTree(g.getVertexAtPosition(9), childTree, 1, false);
+        assertEquals(1,childTree.size());
+        assertTrue(childTree.contains(g.getVertexAtPosition(10)));
+        
+        childTree = new ArrayList<DENOPTIMVertex>();
+        g.getChildrenTree(g.getVertexAtPosition(9), childTree, 2, false);
+        assertEquals(4,childTree.size());
+        assertTrue(childTree.contains(g.getVertexAtPosition(10)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(11)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(12)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(13)));
+        
+        childTree = new ArrayList<DENOPTIMVertex>();
+        g.getChildrenTree(g.getVertexAtPosition(1), childTree, Integer.MAX_VALUE,
+                true);
+        assertEquals(3,childTree.size());
+        assertTrue(childTree.contains(g.getVertexAtPosition(2)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(3)));
+        assertTrue(childTree.contains(g.getVertexAtPosition(4)));
     }
     
 //------------------------------------------------------------------------------

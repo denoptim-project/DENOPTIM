@@ -63,6 +63,59 @@ public class APMapFinder
     public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll) 
             throws DENOPTIMException
     {
+        initialize(vA, vB, screenAll, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor that launches the search for a mapping between the
+     * {@link DENOPTIMAttachmentPoint}s on the first vertex to those of the
+     * second. Note that is APs are available throughout any template barrier
+     * we consider only the existence of an AP to be a reason for a compatible 
+     * AP-AP mapping, irrespectively of the {@link APClass}.
+     * @param vA the first vertex. This vertex defined the minimal requirements,
+     * i.e., all {@link DENOPTIMAttachmentPoint}s on this vertex that are used
+     * (also throughout the template barriers) will have
+     * to be mapped into {@link DENOPTIMAttachmentPoint}s on the other vertex 
+     * for the mapping to be successful.
+     * @param vB the second vertex.
+     * @param screenAll use <code>true</code> to NOT stop at the first 
+     * compatible combinations.
+     * @param onlyCompleteMappings use <code>true</code> to collect only mappings 
+     * that include all of the APs on the first vertex.
+     * @throws DENOPTIMException
+     */
+    public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll,
+            boolean onlyCompleteMappings) throws DENOPTIMException
+    {
+        initialize(vA, vB, screenAll, onlyCompleteMappings);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor that launches the search for a mapping between the
+     * {@link DENOPTIMAttachmentPoint}s on the first vertex to those of the
+     * second. Note that is APs are available throughout any template barrier
+     * we consider only the existence of an AP to be a reason for a compatible 
+     * AP-AP mapping, irrespectively of the {@link APClass}.
+     * @param vA the first vertex. This vertex defined the minimal requirements,
+     * i.e., all {@link DENOPTIMAttachmentPoint}s on this vertex that are used
+     * (also throughout the template barriers) will have
+     * to be mapped into {@link DENOPTIMAttachmentPoint}s on the other vertex 
+     * for the mapping to be successful.
+     * @param vB the second vertex.
+     * @param screenAll use <code>true</code> to NOT stop at the first 
+     * compatible combinations.
+     * @param onlyCompleteMappings use <code>true</code> to collect only mappings 
+     * that include all of the APs on the first vertex.
+     * @throws DENOPTIMException
+     */
+    private void initialize(DENOPTIMVertex vA, DENOPTIMVertex vB, 
+            boolean screenAll, boolean onlyCompleteMappings) 
+                    throws DENOPTIMException
+    {
         // We map all the compatibilities before choosing a specific mapping
         LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
             apCompatilities = new LinkedHashMap<DENOPTIMAttachmentPoint,
@@ -137,18 +190,23 @@ public class APMapFinder
         // removing any existing branch.
         ArrayList<DENOPTIMAttachmentPoint> oldAPsRequiredToHaveAMapping = new
                 ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMAttachmentPoint oldAp : vA.getAttachmentPoints())
+        if (onlyCompleteMappings)
         {
-            if (oldAp.isAvailableThroughout())
+            oldAPsRequiredToHaveAMapping.addAll(vA.getAttachmentPoints());
+        } else {
+            for (DENOPTIMAttachmentPoint oldAp : vA.getAttachmentPoints())
             {
-                apCompatilities.get(oldAp).add(null);
-            } else {
-                oldAPsRequiredToHaveAMapping.add(oldAp);
-                if (!keys.contains(oldAp))
+                if (oldAp.isAvailableThroughout())
                 {
-                    // In this case we have no hope of finding a mapping 
-                    // that satisfies out needs.
-                    continue;
+                    apCompatilities.get(oldAp).add(null);
+                } else {
+                    oldAPsRequiredToHaveAMapping.add(oldAp);
+                    if (!keys.contains(oldAp))
+                    {
+                        // In this case we have no hope of finding a mapping 
+                        // that satisfies out needs.
+                        continue;
+                    }
                 }
             }
         }
@@ -226,8 +284,8 @@ public class APMapFinder
                 }
             }
         }
-        
-        chosenAPMap = RandomUtils.randomlyChooseOne(allAPMappings);
+        if (allAPMappings.size() > 0)
+            chosenAPMap = RandomUtils.randomlyChooseOne(allAPMappings);
     }
     
 //------------------------------------------------------------------------------

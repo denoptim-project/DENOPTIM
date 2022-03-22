@@ -75,7 +75,6 @@ public abstract class ProgramTask extends Task
     	System.out.println("Calling " + implName +" ("
     			+ " id="+id+", configFile="
     			+ configFilePathName + ", workSpace=" + workDir + ")");
-    	
 		try
         {
             runProgram();

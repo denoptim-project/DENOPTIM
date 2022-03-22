@@ -61,6 +61,7 @@ import denoptim.rings.CyclicGraphHandler;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
 import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.utils.CrossoverType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
@@ -269,7 +270,8 @@ public class EAUtils
                 femaleGraph = vertxOnFemale.getGraphOwner();
                 femaleCandidate = femaleGraph.getCandidateOwner();
             } else {
-                Candidate[] parents = EAUtils.selectBasedOnFitness(eligibleParents, 2);
+                Candidate[] parents = EAUtils.selectBasedOnFitness(
+                        eligibleParents, 2);
                 if (parents[0] == null || parents[1] == null)
                 {
                     numatt++;
@@ -325,9 +327,10 @@ public class EAUtils
         
         try
         {
+            //TODO-gg enable other crossover types
             if (!DENOPTIMGraphOperations.performCrossover(
                     graph1.getVertexAtPosition(vid1),
-                    graph2.getVertexAtPosition(vid2)))
+                    graph2.getVertexAtPosition(vid2),CrossoverType.BRANCH))
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);

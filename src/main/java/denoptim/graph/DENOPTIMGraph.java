@@ -1348,20 +1348,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         
         GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
         
-        for (List<DENOPTIMVertex> vertexesToRemove : getSymmetricSubGraphs(subGrpVrtxs))
+        for (List<DENOPTIMVertex> vertexesToRemove : getSymmetricSubGraphs(
+                subGrpVrtxs))
         {
             DENOPTIMGraph graphToAdd = incomingGraph.clone();
             graphToAdd.renumberGraphVertices();
             
             removeCappingGroupsFromChilds(vertexesToRemove);
             
-            List<DENOPTIMVertex> vertexAddedToThis = new ArrayList<>(graphToAdd.gVertices);
-            
-            //TODO-gg: detect multiple mappings and chose one
-            
+            List<DENOPTIMVertex> vertexAddedToThis = 
+                    new ArrayList<DENOPTIMVertex>(graphToAdd.gVertices);
             LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
-                localApMap = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
-            for (Map.Entry<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>  e : apMap.entrySet())
+                localApMap = new LinkedHashMap<DENOPTIMAttachmentPoint,
+                DENOPTIMAttachmentPoint>();
+            for (Map.Entry<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>  e 
+                    : apMap.entrySet())
             {
                 // WARNING! Assumption that subGrpVrtxs and vertexesToRemove
                 // are sorted accordingly to symmetry, which should be the case.
@@ -2324,6 +2325,45 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 children.add(child);
                 getChildrenTree(child, children);
             }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets all the children of the current vertex recursively. 
+     * This method does not cross template 
+     * boundaries, thus all children belong to the same graph.
+     * @param vertex the vertex whose children are to be located
+     * @param children list containing the references to all the children
+     * @param numLayers the maximum number of vertex layers after the seen 
+     * vertex that we want to consider before stopping. If this value is 2, we 
+     * will explore three layers: the seed, and two more layers away from it.
+     * @param stopBeforeRCVs set <code>true</code> to make the exploration of
+     * each branch stop before including ring closing vertexes.
+     */
+    public void getChildrenTree(DENOPTIMVertex vertex,
+            List<DENOPTIMVertex> children, int numLayers, boolean stopBeforeRCVs) 
+    {
+        if (numLayers==0)
+        {
+            return;
+        }
+        List<DENOPTIMVertex> lst = getChildVertices(vertex);
+        if (lst.isEmpty()) 
+        {
+            return;
+        }
+        for (DENOPTIMVertex child : lst) 
+        {
+            if (children.contains(child)) 
+                continue;
+            
+            if (stopBeforeRCVs && child.isRCV())
+                continue;
+                
+            children.add(child);
+            getChildrenTree(child, children, numLayers-1, stopBeforeRCVs);
         }
     }
     
@@ -3313,8 +3353,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Add a capping group if free connection is available on any of the given 
-     * vertexes.
+     * Add a capping group on the given vertexes, if needed. The need for such 
+     * groups is manifest when an attachment point that is not used in this
+     * or any embedding lever (i.e., attachment point is 
+     * {@link DENOPTIMAttachmentPoint#isAvailableThroughout()}) has and 
+     * {@link APClass} that demands to be capped.
      * Addition of Capping groups does not update the symmetry table
      * for a symmetric graph.
      * @param vertexAddedToThis list of vertexes to operate on. They must belong to this
@@ -3343,7 +3386,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
             for (DENOPTIMAttachmentPoint curDap : curVertex.getAttachmentPoints())
             {
-                if (curDap.isAvailable())
+                if (curDap.isAvailableThroughout())
                 {
                     APClass apcCap = FragmentSpace.getAPClassOfCappingVertex(
                             curDap.getAPClass());
@@ -3408,12 +3451,38 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * are considered part of
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
-     * @param seed the vertex from which the extraction has to start
+     * @param seed the vertex from which the extraction has to start.
      * @return a new vertex that corresponds to the subgraph of this graph.
      */
 
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed)
             throws DENOPTIMException
+    {
+        return extractSubgraph(seed, Integer.MAX_VALUE, false);
+    }
+    
+  //------------------------------------------------------------------------------
+
+    /**
+     * Creates a new graph that corresponds to the subgraph of this graph 
+     * when exploring the spanning tree from a given seed vertex and visiting
+     * at most a given number of vertex layers, and optionally stopping the
+     * exploration of a branch before including any ring-closing vertex.
+     * Only the seed vertex and all child vertices (and further successors)
+     * are considered part of
+     * the subgraph, which includes also rings and symmetric sets. All
+     * rings that include vertices not belonging to the subgraph are lost.
+     * @param seed the vertex from which the extraction has to start.
+     * @param numLayers the maximum number of vertex layers after the seen 
+     * vertex that we want to consider before stopping. If this value is 2, we 
+     * will explore three layers: the seed, and two more layers away from it.
+     * @param stopBeforeRCVs set <code>true</code> to make the exploration of
+     * each branch stop before including ring closing vertexes.
+     * @return a new vertex that corresponds to the subgraph of this graph.
+     */
+
+    public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, int numLayers, 
+            boolean stopBeforeRCVs) throws DENOPTIMException
     {
         if (!this.gVertices.contains(seed))
         {
@@ -3426,7 +3495,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         
         ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
         subGrpVrtxs.add(seedClone);
-        subGraph.getChildrenTree(seedClone, subGrpVrtxs);
+        subGraph.getChildrenTree(seedClone, subGrpVrtxs, numLayers, stopBeforeRCVs);
         ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex v : subGraph.gVertices)
         {

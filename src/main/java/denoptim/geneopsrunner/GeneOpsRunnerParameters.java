@@ -27,6 +27,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.rings.RingClosureParameters;
+import denoptim.utils.CrossoverType;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
 
@@ -104,6 +105,16 @@ public class GeneOpsRunnerParameters
      * Input File female
      */
     protected static String inpFileF;
+    
+    /**
+     * Type of crossover to perform
+     */
+    protected static CrossoverType xoverType = CrossoverType.BRANCH;
+    
+    /**
+     * Maximum length of the subgraph that is swapped in a crossover operation
+     */
+    protected static int maxSwappableChainLength = Integer.MAX_VALUE;
 
     /**
      * Male VertedID (not index) on which perform xover. 
@@ -308,6 +319,12 @@ public class GeneOpsRunnerParameters
             }
             case "TESTGENOPS-APMALE=":
                 mapid = Integer.parseInt(value);
+                break;
+            case "TESTGENOPS-XOVERTYPE=":
+                xoverType = CrossoverType.valueOf(value);
+                break;
+            case "TESTGENOPS-CROSSOVERTYPE=":
+                xoverType = CrossoverType.valueOf(value);
                 break;
             case "TESTGENOPS-VERTEXFEMALE=":
             {

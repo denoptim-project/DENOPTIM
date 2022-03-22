@@ -346,6 +346,10 @@ runTest "t26"
 #
 runTest "t27"
 
+#
+# t28: test crossover inside templates
+#
+runTest "t28"
 
 echo "All done!"
 exit 0

@@ -179,22 +179,15 @@ public class GeneOpsRunner extends ProgramTask
         System.out.println("v: "+ newmvid + " of MALE: " + male);
         System.out.println("v:" + newfvid + " of FEMALE: " + female);
         System.out.println(" ");
-    
-
-        //TODO
-        DenoptimIO.writeGraphToJSON(new File("/tmp/m.json"), male);
-        DenoptimIO.writeGraphToJSON(new File("/tmp/f.json"), female);
         
-        DENOPTIMGraphOperations.performCrossover(vm, vf);
+        DENOPTIMGraphOperations.performCrossover(vm, vf, 
+                GeneOpsRunnerParameters.xoverType, 
+                GeneOpsRunnerParameters.maxSwappableChainLength);
     
         System.out.println("Result of crossover:");
         System.out.println("MALE: " + male);
         System.out.println("FEMALE: " + female);
         System.out.println(" ");
-        
-        //TODO
-        DenoptimIO.writeGraphToJSON(new File("/tmp/m_xo.json"), male);
-        DenoptimIO.writeGraphToJSON(new File("/tmp/f_xo.json"), female);
     
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iacM = t3d.convertGraphTo3DAtomContainer(male, true);

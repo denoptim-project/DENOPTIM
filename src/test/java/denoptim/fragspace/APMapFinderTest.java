@@ -137,6 +137,14 @@ public class APMapFinderTest
                 .filter(m ->  m.containsKey(vA.getAP(0)))
                 .count());
         
+        //: we can restrict to all mappings that cover all APs on first vertex
+        apmf = new APMapFinder(vA, vB, true, true);
+        
+        assertTrue(apmf.foundMapping());
+        assertEquals(2, apmf.getAllAPMappings().size());
+        
+        // testing for handling of used APs
+        
         EmptyVertex vC = new EmptyVertex();
         vC.setBuildingBlockType(BBType.FRAGMENT);
         vC.addAP(APCA);
