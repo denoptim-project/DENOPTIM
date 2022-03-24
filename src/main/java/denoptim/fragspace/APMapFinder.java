@@ -249,7 +249,12 @@ public class APMapFinder
         int currentKey = 0;
         APMapping currentMapping = new APMapping();
         if (fixedRootAPs!=null)
-            currentMapping = fixedRootAPs;
+        {
+            for (DENOPTIMAttachmentPoint key : fixedRootAPs.keySet())
+            {
+                currentMapping.put(key, fixedRootAPs.get(key));
+            }
+        }
         // We try the comprehensive approach, but if that is too demanding
         // and gets stopped, then we run a series of simplified attempts
         // to hit a decent combination with "lucky shots".

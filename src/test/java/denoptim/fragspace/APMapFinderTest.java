@@ -98,7 +98,39 @@ public class APMapFinderTest
         FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
     }
     
-    //TODO-gg test testAPMapFinder_Constrained
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testAPMapFinder_Constrained() throws Exception
+    {
+        prepare();
+        EmptyVertex vA = new EmptyVertex();
+        vA.setBuildingBlockType(BBType.FRAGMENT);
+        vA.addAP(APCA);
+        vA.addAP(APCA);
+        vA.addAP(APCA);
+        vA.addAP(APCD);
+
+        EmptyVertex vB = new EmptyVertex();
+        vB.setBuildingBlockType(BBType.FRAGMENT);
+        vB.addAP(APCD);
+        vB.addAP(APCD);
+        vB.addAP(APCA);
+        vB.addAP(APCA);
+        vB.addAP(APCA);
+        
+        APMapping constrain = new APMapping();
+        constrain.put(vA.getAP(2), vB.getAP(4));
+        APMapFinder apmf = new APMapFinder(vA, vB, constrain, true, false, false);
+        
+        assertTrue(apmf.foundMapping());
+        assertEquals(21, apmf.getAllAPMappings().size());
+        for (APMapping apm : apmf.getAllAPMappings())
+        {
+            assertTrue(apm.containsKey(vA.getAP(2)));
+            assertEquals(vB.getAP(4), apm.get(vA.getAP(2)));
+        }
+    }
 
 //------------------------------------------------------------------------------
     
@@ -116,7 +148,7 @@ public class APMapFinderTest
         vB.addAP(APCA);
         vB.addAP(APCD);
         
-        // NB: when APs are NOT used the mapping is permissive and is happy
+        // NB: when APs are NOT used, the mapping is permissive and is happy
         // to find "a" AP to map another AP with, irrespectively on the APClass
         
         APMapFinder apmf = new APMapFinder(vA, vB, true);
