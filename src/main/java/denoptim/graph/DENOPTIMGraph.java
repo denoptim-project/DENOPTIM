@@ -2396,6 +2396,42 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
     }
+   
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets all the children of the current vertex recursively until it 
+     * finds one of the vertexes listed as limit.
+     * This method does not cross template 
+     * boundaries, thus all children belong to the same graph.
+     * @param vertex the vertex whose children are to be located
+     * @param children list containing the references to all the children
+     * @param limitsInClone the list of vertexes where exploration should stop.
+     * @param stopBeforeRCVs set <code>true</code> to make the exploration of
+     * each branch stop before including ring closing vertexes.
+     */
+    public void getChildTreeLimited(DENOPTIMVertex vertex,
+            List<DENOPTIMVertex> children, List<DENOPTIMVertex> limitsInClone, 
+            boolean stopBeforeRCVs) 
+    {
+        List<DENOPTIMVertex> lst = getChildVertices(vertex);
+        if (lst.isEmpty()) 
+        {
+            return;
+        }
+        for (DENOPTIMVertex child : lst) 
+        {   
+            if (children.contains(child)) 
+                continue;
+            
+            if (stopBeforeRCVs && child.isRCV())
+                continue;
+                
+            children.add(child);
+            if (!limitsInClone.contains(child))
+                getChildTreeLimited(child, children, limitsInClone, stopBeforeRCVs);
+        }
+    }
     
 //------------------------------------------------------------------------------
     
@@ -3461,7 +3497,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         return extractSubgraph(seed, Integer.MAX_VALUE, false);
     }
     
-  //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Creates a new graph that corresponds to the subgraph of this graph 
@@ -3513,6 +3549,63 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         return subGraph;
     }
     
+//------------------------------------------------------------------------------
+
+    /**
+     * Creates a new graph that corresponds to the subgraph of this graph 
+     * when exploring the spanning tree from a given seed vertex and visiting
+     * at most a given number of vertex layers, and optionally stopping the
+     * exploration of a branch before including any ring-closing vertex.
+     * Only the seed vertex and all child vertices (and further successors)
+     * are considered part of
+     * the subgraph, which includes also rings and symmetric sets. All
+     * rings that include vertices not belonging to the subgraph are lost.
+     * @param seed the vertex from which the extraction has to start.
+     * @param numLayers the maximum number of vertex layers after the seen 
+     * vertex that we want to consider before stopping. If this value is 2, we 
+     * will explore three layers: the seed, and two more layers away from it.
+     * @param stopBeforeRCVs set <code>true</code> to make the exploration of
+     * each branch stop before including ring closing vertexes.
+     * @return a new vertex that corresponds to the subgraph of this graph.
+     */
+//TODO-gg doc
+    public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, 
+            List<DENOPTIMVertex> limits, boolean stopBeforeRCVs) 
+                    throws DENOPTIMException
+    {
+        if (!this.gVertices.contains(seed))
+        {
+            throw new DENOPTIMException("Attempt to extract a subgraph giving "
+                    + "a seed vertex that is not contained in this graph.");
+        }
+        DENOPTIMGraph subGraph = this.clone();
+        DENOPTIMVertex seedClone = subGraph.getVertexAtPosition(
+                this.indexOf(seed));
+        
+        List<DENOPTIMVertex> limitsInClone =  new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : limits)
+            limitsInClone.add(subGraph.getVertexAtPosition(this.indexOf(v)));
+        
+        ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
+        subGrpVrtxs.add(seedClone);
+        subGraph.getChildTreeLimited(seedClone, subGrpVrtxs, limitsInClone, 
+                stopBeforeRCVs);
+        
+        ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : subGraph.gVertices)
+        {
+            if (!subGrpVrtxs.contains(v))
+            {
+                toRemove.add(v);
+            }
+        }
+        for (DENOPTIMVertex v : toRemove)
+        {
+            subGraph.removeVertex(v);
+        }
+        
+        return subGraph;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -5836,6 +5929,29 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         */
         return null;
+    }
+
+//------------------------------------------------------------------------------    
+    
+    /**
+     * Checks is the every edge in the graph can be defined in the opposite 
+     * direction according to the {@link APClass} compatibility rules. Note that
+     * the reversions operation on a branched subgraph generates a graph with 
+     * multiple source vertexes, which is not allowed. Yet, the reversion is
+     * formally possible.
+     * @return <code>true</code> if the all edges can be reverted and retain
+     * consistency with {@link APClass} compatibility rules.
+     */
+    public boolean isReversible()
+    {
+        for (DENOPTIMEdge e : gEdges)
+        {
+            if (!e.getTrgAPClass().isCPMapCompatibleWith(e.getSrcAPClass()))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
 //------------------------------------------------------------------------------    

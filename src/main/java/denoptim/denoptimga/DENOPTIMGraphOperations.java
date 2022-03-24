@@ -35,6 +35,7 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.GraphLinkFinder;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.graph.APClass;
+import denoptim.graph.APMapping;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMGraph;
@@ -77,6 +78,8 @@ public class DENOPTIMGraphOperations
      * @return the list of pairs of vertex (Pairs ordered as 
      * <code>male:female</code>) that can be used as crossover points.
      */
+    
+    //TODO-gg: make it respect template contract w.r.t. length of subgraph to swap
 
     protected static List<DENOPTIMVertex[]> locateCompatibleXOverPoints(
             DENOPTIMGraph male, DENOPTIMGraph female)
@@ -108,6 +111,8 @@ public class DENOPTIMGraphOperations
                 }
             }
         }
+        
+        //TODO-gg Look inside templates
         return pairs;
     }
     
@@ -1274,71 +1279,64 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
 
-    public static boolean performCrossover(DENOPTIMVertex mvert,
-            DENOPTIMVertex fvert, CrossoverType xoverTyp) throws DENOPTIMException
-    {
-        return performCrossover(mvert, fvert, xoverTyp, Integer.MAX_VALUE);
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Performs crossover between the two graphs owning each one of the two
-     * given vertexes. 
-     * The operation is performed on the graphs that own the given vertexes, 
-     * so the original version of the graph is lost.
-     * We expect the graphs to have an healthy set of vertex IDs. This can 
-     * be ensured by running {@link DENOPTIMGraph#renumberGraphVertices()}.
-     * @param mvert the root vertex of the branch of male to exchange.
-     * @param fvert the root vertex of the branch of female to exchange.
-     * @throws DENOPTIMException
-     */
-
+    //TODO-gg doc
     public static boolean performCrossover(DENOPTIMVertex mvert,
             DENOPTIMVertex fvert, CrossoverType xoverTyp, 
-            int maxSwappableChainLength) throws DENOPTIMException
+            List<List<DENOPTIMVertex>> subGraphEnds) throws DENOPTIMException
     {
         DENOPTIMGraph male = mvert.getGraphOwner();
         DENOPTIMGraph female = fvert.getGraphOwner();
         
         // Prepare subgraphs that will be exchanged
-        // NB: now this takes all the branch rooted at the given vertexes, but
-        // one day it should identify a subgraph from a vertex to set of end 
-        // vertexes. This may include the entire branch or a portion of it.
-        // TODO-gg add parameter that defined how long (i.e., how many vertexes)
-        // should the subgraph include after f/mvert.
-        int numLayersM = Integer.MAX_VALUE;
-        int numLayersF = Integer.MAX_VALUE;
         boolean excludeRCVsM = false;
         boolean excludeRCVsF = false;
         
         if (xoverTyp == CrossoverType.BRANCH)
         {
-            numLayersM = Integer.MAX_VALUE;
-            numLayersF = Integer.MAX_VALUE;
             excludeRCVsM = false;
             excludeRCVsF = false;
         }
         
         if (xoverTyp == CrossoverType.SUBGRAPH)
         {
-            numLayersM = maxSwappableChainLength;
-            numLayersF = maxSwappableChainLength;
             excludeRCVsM = true;
             excludeRCVsF = true;
         }
         
-        DENOPTIMGraph subG_M = male.extractSubgraph(mvert, numLayersM, 
+        DENOPTIMGraph subG_M = male.extractSubgraph(mvert, subGraphEnds.get(0), 
                 excludeRCVsM);
-        DENOPTIMGraph subG_F = female.extractSubgraph(fvert, numLayersF, 
+        DENOPTIMGraph subG_F = female.extractSubgraph(fvert, subGraphEnds.get(1),
                 excludeRCVsF);
+        
+
+        //TODO-gg del
+        DenoptimIO.writeGraphToSDF(new File("/tmp/subG_M.sdf"), subG_M, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/subG_F.sdf"), subG_F, false);
        
         // Identify a mapping of APs that allows swapping the subgraphs
         DENOPTIMTemplate tmplSubGrphM = new DENOPTIMTemplate(BBType.UNDEFINED);
         tmplSubGrphM.setInnerGraph(subG_M);
         DENOPTIMTemplate tmplSubGrphF = new DENOPTIMTemplate(BBType.UNDEFINED);
         tmplSubGrphF.setInnerGraph(subG_F);
-        APMapFinder apmf = new APMapFinder(tmplSubGrphM,tmplSubGrphF,false,true);
+        
+        // Check if the subgraphs can be used with reversed edge direction, or
+        // bias the AP mapping to use the original source vertexes.
+        APMapping fixedRootAPs = null;
+        //TODO-GG REACTIVATE ONCE REDIRECTION OF EDGES IS IMPLEMENTED
+        //if (!subG_M.isReversible() || !subG_F.isReversible())
+        if (true)
+        {
+            int apIndM = mvert.getEdgeToParent().getTrgAP().getIndexInOwner();
+            int apIndF = fvert.getEdgeToParent().getTrgAP().getIndexInOwner();
+            fixedRootAPs = new APMapping();
+            fixedRootAPs.put(tmplSubGrphM.getOuterAPFromInnerAP(
+                            subG_M.getVertexAtPosition(0).getAP(apIndM)), 
+                    tmplSubGrphF.getOuterAPFromInnerAP(
+                            subG_F.getVertexAtPosition(0).getAP(apIndF)));
+        }
+        
+        APMapFinder apmf = new APMapFinder(tmplSubGrphM, tmplSubGrphF, 
+                fixedRootAPs, false, true, false);
         if (!apmf.foundMapping())
         {
             //TODO-gg use monitor
@@ -1375,14 +1373,14 @@ public class DENOPTIMGraphOperations
 
         ArrayList<DENOPTIMVertex> vertexesToDelM = new ArrayList<DENOPTIMVertex>();
         vertexesToDelM.add(mvert);
-        male.getChildrenTree(mvert, vertexesToDelM, numLayersM, excludeRCVsM);
+        male.getChildTreeLimited(mvert, vertexesToDelM, subGraphEnds.get(0), excludeRCVsM);
          
         if (!male.replaceSubGraph(vertexesToDelM, subG_F, apMapM))
            return false;
         
         ArrayList<DENOPTIMVertex> vertexesToDelF = new ArrayList<DENOPTIMVertex>();
         vertexesToDelF.add(fvert);
-        female.getChildrenTree(fvert, vertexesToDelF, numLayersF, excludeRCVsF);
+        female.getChildTreeLimited(fvert, vertexesToDelF, subGraphEnds.get(1), excludeRCVsF);
         if (!female.replaceSubGraph(vertexesToDelF, subG_M, apMapF))
             return false;
         

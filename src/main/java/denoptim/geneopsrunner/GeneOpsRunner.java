@@ -19,6 +19,8 @@
 package denoptim.geneopsrunner;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -164,6 +166,11 @@ public class GeneOpsRunner extends ProgramTask
                 male, "crossover");
         DENOPTIMVertex vf = getEmbeddedVertex(GeneOpsRunnerParameters.xoverSrcFemale,
                 female, "crossover");
+        List<List<DENOPTIMVertex>> subGraphEnds = new ArrayList<List<DENOPTIMVertex>>();
+        subGraphEnds.add(getSubGraphEnds(male, 
+                GeneOpsRunnerParameters.xoverSubGraphEndMale, "crossover"));
+        subGraphEnds.add(getSubGraphEnds(female, 
+                GeneOpsRunnerParameters.xoverSubGraphEndFemale, "crossover"));
         
         // Ensure uniqueness on vertexID
         male.renumberGraphVertices();
@@ -181,8 +188,7 @@ public class GeneOpsRunner extends ProgramTask
         System.out.println(" ");
         
         DENOPTIMGraphOperations.performCrossover(vm, vf, 
-                GeneOpsRunnerParameters.xoverType, 
-                GeneOpsRunnerParameters.maxSwappableChainLength);
+                GeneOpsRunnerParameters.xoverType, subGraphEnds);
     
         System.out.println("Result of crossover:");
         System.out.println("MALE: " + male);
@@ -196,6 +202,19 @@ public class GeneOpsRunner extends ProgramTask
         DenoptimIO.writeSDFFile(GeneOpsRunnerParameters.outFileF, iacF, false);
     }
     
+//------------------------------------------------------------------------------
+    
+    private static List<DENOPTIMVertex> getSubGraphEnds(DENOPTIMGraph graph, 
+            List<int[]> embeddingPaths, String operation)
+    {
+        List<DENOPTIMVertex> result = new ArrayList<DENOPTIMVertex>();
+        for (int[] embeddingPath : embeddingPaths)
+        {
+            result.add(getEmbeddedVertex(embeddingPath, graph, operation));
+        }
+        return result;
+    }
+
 //------------------------------------------------------------------------------
     
     private static DENOPTIMVertex getEmbeddedVertex(int[] embeddingPath, 

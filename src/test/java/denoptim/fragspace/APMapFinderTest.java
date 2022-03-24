@@ -97,6 +97,8 @@ public class APMapFinderTest
         FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
         FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
     }
+    
+    //TODO-gg test testAPMapFinder_Constrained
 
 //------------------------------------------------------------------------------
     
@@ -138,7 +140,7 @@ public class APMapFinderTest
                 .count());
         
         //: we can restrict to all mappings that cover all APs on first vertex
-        apmf = new APMapFinder(vA, vB, true, true);
+        apmf = new APMapFinder(vA, vB, null, true, true, true);
         
         assertTrue(apmf.foundMapping());
         assertEquals(2, apmf.getAllAPMappings().size());

@@ -85,12 +85,12 @@ public class PathSubGraph
     private DENOPTIMVertex turningPointVert;
 
     /**
-     * The list of vertices involved
+     * The list of vertices of the original graph and involved in the path.
      */
     private List<DENOPTIMVertex> vertPathVAVB;
 
     /**
-     * The list of edges involved
+     * The list of edges of the original graph and involved in the path.
      */
     private List<DENOPTIMEdge> edgesPathVAVB;
 
@@ -212,11 +212,10 @@ public class PathSubGraph
             vertFrnt = vertPathVAVB.get(i+1);
             DENOPTIMEdge edgeToBack = edgesPathVAVB.get(i-1);
             DENOPTIMEdge edgeToFrnt = edgesPathVAVB.get(i);
-
-            // The first and the last verteces will always be RCA, and they
-            // may be from the capping library or from the fragments library
-            // and this will make the chainID be different for otherwise equal
-            // chains. Thus first and last vertex are not seen in the chainID
+            
+            // Avoid assumption that all paths need to go via scaffold
+            if (edgeToBack.getSrcAP().getOwner()==vertBack)
+                insideOut = true;
             
             int apIdBack2Here = -1;
             int apIdHere2Back = -1;
@@ -786,6 +785,16 @@ public class PathSubGraph
         return vB;
     }
 
+//-----------------------------------------------------------------------------
+
+    /**
+     * Returns the length of the list of edges involved in this path
+     */
+
+    public int getPathLength()
+    {
+        return edgesPathVAVB.size();
+    }
 //-----------------------------------------------------------------------------
 
     /**

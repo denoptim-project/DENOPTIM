@@ -31,6 +31,8 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.rings.PathSubGraph;
+import denoptim.utils.RandomUtils;
 
 /**
  * A collection of candidates. To speed-up operations such as the selection of
@@ -399,6 +401,120 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             Candidate parentB)
     {
         return xoverCompatibilities.get(parentA,parentB);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * For a pair of candidates (i.e., a pair of graphs), and a pair of valid 
+     * crossover points, this method tries to identify a pair of subgraph that 
+     * can be swapped between the two graphs. To this end it searches for 
+     * subgraph end-points, i.e., vertexes where the subgraph starting with the 
+     * vertexes given as parameters will end.
+     * This method should always be run after the 
+     * {@link Population#getXoverPartners(Candidate, ArrayList)}, which 
+     * populated the crossover compatibility data.
+     * @param maleCandidate 
+     * @param femaleCandidate
+     * @param maleGraph
+     * @param vertxOnMale
+     * @param femaleGraph
+     * @param vertxOnFemale
+     * @return
+     */
+    public List<List<DENOPTIMVertex>> getSwappableSubGraphEnds(
+            Candidate maleCandidate, Candidate femaleCandidate,
+            DENOPTIMGraph maleGraph, DENOPTIMVertex vertxOnMale,
+            DENOPTIMGraph femaleGraph, DENOPTIMVertex vertxOnFemale)
+    {
+        return getSwappableSubGraphEnds(maleCandidate, femaleCandidate, 
+                maleGraph, vertxOnMale, femaleGraph, vertxOnFemale,
+                null);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * For a pair of candidates (i.e., a pair of graphs), and a pair of valid 
+     * crossover points, this method tries to identify a pair of subgraph that 
+     * can be swapped between the two graphs. To this end it searches for 
+     * subgraph end-points, i.e., vertexes where the subgraph starting with the 
+     * vertexes given as parameters will end.
+     * This method should always be run after the 
+     * {@link Population#getXoverPartners(Candidate, ArrayList)}, which 
+     * populated the crossover compatibility data.
+     * @param maleCandidate 
+     * @param femaleCandidate
+     * @param maleGraph
+     * @param vertxOnMale
+     * @param femaleGraph
+     * @param vertxOnFemale
+     * @param sequence a sequence of integers used to by-pass random choices
+     * and ensure reproducibility of the results. Used only for testing.
+     * @return
+     */
+    protected List<List<DENOPTIMVertex>> getSwappableSubGraphEnds(
+            Candidate maleCandidate, Candidate femaleCandidate,
+            DENOPTIMGraph maleGraph, DENOPTIMVertex vertxOnMale,
+            DENOPTIMGraph femaleGraph, DENOPTIMVertex vertxOnFemale,
+            int[] sequence)
+    {
+        List<DENOPTIMVertex> childTreeM = new ArrayList<DENOPTIMVertex>();
+        maleGraph.getChildrenTree(vertxOnMale, childTreeM);
+        List<DENOPTIMVertex> childTreeF = new ArrayList<DENOPTIMVertex>();
+        femaleGraph.getChildrenTree(vertxOnFemale, childTreeF);
+        // The subGraphEndInM/F are supposed to be included
+        List<DENOPTIMVertex> subGraphEndInM = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> subGraphEndInF = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> alreadyIncludedFromM = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> alreadyIncludedFromF = new ArrayList<DENOPTIMVertex>();
+        //NB: the vertexes are the target sides of edges where we can do xover.
+        List<DENOPTIMVertex[]> xoverCompatPairs = new ArrayList<DENOPTIMVertex[]>();
+        xoverCompatPairs.addAll(getXoverSites(maleCandidate, 
+                femaleCandidate));
+        int initSize = xoverCompatPairs.size();
+        for (int iPair=0; iPair<initSize; iPair++)
+        {
+            DENOPTIMVertex[] pair = null;
+            if (sequence==null)
+            {
+                pair = RandomUtils.randomlyChooseOne(xoverCompatPairs);
+                xoverCompatPairs.remove(pair);
+            } else {
+                // This is only to ensure reproducibility in tests
+                if (iPair>=sequence.length)
+                    break;
+                pair = xoverCompatPairs.get(sequence[iPair]);
+            }
+            
+            // Exclude vertexes that are not downstream to the xover site
+            DENOPTIMVertex endOnM = pair[0];
+            DENOPTIMVertex endOnF = pair[1];
+            if (!childTreeM.contains(endOnM) || !childTreeF.contains(endOnF))
+                continue;
+            
+            // Ignore vertexes that are already part of the subgraph
+            if (alreadyIncludedFromM.contains(endOnM)
+                    || alreadyIncludedFromF.contains(endOnF))
+                continue;
+            
+            // Exclude combinations that identify a too short path
+            PathSubGraph pathM = new PathSubGraph(vertxOnMale, endOnM, maleGraph);
+            PathSubGraph pathF = new PathSubGraph(vertxOnFemale, endOnF, femaleGraph);
+            if (pathM.getPathLength()<2 || pathF.getPathLength()<2)
+                continue;
+            
+            // OK, these vertexes's parents are usable ends of the subgraph
+            // to swap
+            subGraphEndInM.add(endOnM.getParent());
+            subGraphEndInF.add(endOnF.getParent());
+            alreadyIncludedFromM.addAll(pathM.getVertecesPath());
+            alreadyIncludedFromF.addAll(pathF.getVertecesPath());
+        }
+        List<List<DENOPTIMVertex>> result = new ArrayList<List<DENOPTIMVertex>>();
+        result.add(subGraphEndInM);
+        result.add(subGraphEndInF);
+        return result;
     }
 
 //------------------------------------------------------------------------------

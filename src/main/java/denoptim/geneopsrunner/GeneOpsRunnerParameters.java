@@ -21,6 +21,8 @@ package denoptim.geneopsrunner;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import denoptim.denoptimga.GAParameters;
 import denoptim.exception.DENOPTIMException;
@@ -121,6 +123,13 @@ public class GeneOpsRunnerParameters
      * Multiple values indicate embedding into nested graphs.
      */
     protected static int[] xoverSrcMale;
+    
+    /**
+     * Male VertedID (not index) that represent the end of the subgraph that
+     * is swapped by crossover.
+     * Multiple values indicate embedding into nested graphs.
+     */
+    protected static List<int[]> xoverSubGraphEndMale = new ArrayList<int[]>();
 
     /**
      * Male AP index on which perform xover
@@ -132,6 +141,13 @@ public class GeneOpsRunnerParameters
      * Multiple values indicate embedding into nested graphs.
      */
     protected static int[] xoverSrcFemale;
+    
+    /**
+     * Female VertedID (not index) that represent the end of the subgraph that
+     * is swapped by crossover.
+     * Multiple values indicate embedding into nested graphs.
+     */
+    protected static List<int[]> xoverSubGraphEndFemale = new ArrayList<int[]>();
 
     /**
      * Female AP index on which perform xover
@@ -315,6 +331,28 @@ public class GeneOpsRunnerParameters
                 {
                     xoverSrcMale[i] = Integer.parseInt(parts[i].trim());
                 }
+                break;
+            }
+            case "TESTGENOPS-SUBGRAPHENDMALE=":
+            {
+                String[] parts = value.split(",");
+                int[] idList = new int[parts.length];
+                for (int i=0; i<parts.length; i++)
+                {
+                    idList[i] = Integer.parseInt(parts[i].trim());
+                }
+                xoverSubGraphEndMale.add(idList);
+                break;
+            }
+            case "TESTGENOPS-SUBGRAPHENDFEMALE=":
+            {
+                String[] parts = value.split(",");
+                int[] idList = new int[parts.length];
+                for (int i=0; i<parts.length; i++)
+                {
+                    idList[i] = Integer.parseInt(parts[i].trim());
+                }
+                xoverSubGraphEndFemale.add(idList);
                 break;
             }
             case "TESTGENOPS-APMALE=":

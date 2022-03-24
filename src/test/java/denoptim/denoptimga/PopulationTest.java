@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +24,9 @@ import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.logging.Monitor;
 import denoptim.graph.EmptyVertex;
+import denoptim.io.DenoptimIO;
 
 
 /**
@@ -38,8 +41,11 @@ public class PopulationTest
     
 //------------------------------------------------------------------------------
     
-    @BeforeEach
-    private void prepare() throws DENOPTIMException
+    /*
+     * We do not do @BeforeEach because this method must be static to be used
+     * in other unit tests.
+     */
+    static void prepare() throws DENOPTIMException
     {
         APCA = APClass.make("A", 0, BondType.SINGLE);
         APCB = APClass.make("B", 0, BondType.SINGLE);
@@ -87,9 +93,13 @@ public class PopulationTest
 
 //------------------------------------------------------------------------------
     
+    /**
+     * You must run {@link #prepare()} before asking this class for any graph.
+     */
     @Test
-    public void testXOverComatibility() throws Exception
+    public void testXOverCompatibility() throws Exception
     {
+        prepare();
         Population pop = new Population();
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -158,6 +168,7 @@ public class PopulationTest
     @Test
     public void testClone() throws Exception
     {
+        prepare();
         Population pop = new Population();
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -229,10 +240,14 @@ public class PopulationTest
 //------------------------------------------------------------------------------
 
     /**
+     * Produced a graph like this:
+     * <pre>
      *  -(A)v0(A)-(A)v1(A)-(A)v2(A)-(A)v3(B)-(B)v4(B)-(B)v5(B)-
-     *  
+     * </pre>
+     * 
+     * You must run {@link #prepare()} before asking this class for any graph.
      */
-    private DENOPTIMGraph makeGraphA() throws DENOPTIMException
+    static DENOPTIMGraph makeGraphA() throws DENOPTIMException
     {
         DENOPTIMGraph graphA = new DENOPTIMGraph();
         EmptyVertex v0 = new EmptyVertex(0);
@@ -275,9 +290,13 @@ public class PopulationTest
 //------------------------------------------------------------------------------
 
     /**
-     *  v0(A)-(A)v1(A)-(A)v2
+     * Produced a graph like this:
+     * <pre>
+     * v0(A)-(A)v1(A)-(A)v2
+     * </pre>
+     * You must run {@link #prepare()} before asking this class for any graph.
      */
-    private DENOPTIMGraph makeGraphB() throws DENOPTIMException
+    static DENOPTIMGraph makeGraphB() throws DENOPTIMException
     {
         DENOPTIMGraph graphB = new DENOPTIMGraph();
         EmptyVertex v0 = new EmptyVertex(0);
@@ -303,9 +322,13 @@ public class PopulationTest
 //------------------------------------------------------------------------------
 
     /**
-     *  -(C)v0(C)-(C)v1(A)-(A)v2
+     * Produced a graph like this:
+     * <pre>
+     * -(C)v0(C)-(C)v1(A)-(A)v2
+     * </pre>
+     * You must run {@link #prepare()} before asking this class for any graph.
      */
-    private DENOPTIMGraph makeGraphC() throws DENOPTIMException
+    static DENOPTIMGraph makeGraphC() throws DENOPTIMException
     {
         DENOPTIMGraph graphC = new DENOPTIMGraph();
         EmptyVertex v0 = new EmptyVertex(0);
@@ -332,9 +355,13 @@ public class PopulationTest
 //------------------------------------------------------------------------------
 
     /**
-     *  v0(D)-(D)v1
+     * Produced a graph like this:
+     * <pre>
+     * v0(D)-(D)v1
+     * </pre>
+     * You must run {@link #prepare()} before asking this class for any graph.
      */
-    private DENOPTIMGraph makeGraphD() throws DENOPTIMException
+    static DENOPTIMGraph makeGraphD() throws DENOPTIMException
     {
         DENOPTIMGraph graphD = new DENOPTIMGraph();
         EmptyVertex v0 = new EmptyVertex(0);
@@ -352,10 +379,56 @@ public class PopulationTest
     }
     
 //------------------------------------------------------------------------------
+
+    /**
+     * Produced a graph like this:
+     * <pre>
+     *  v0(B)-(B)v1(A)-(A)v2(B)-(B)v3(A)-(A)v4(B)-(B)v5
+     * </pre>
+     * You must run {@link #prepare()} before asking this class for any graph.
+     */
+    static DENOPTIMGraph makeGraphE() throws DENOPTIMException
+    {
+        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        v0.setBuildingBlockType(BBType.SCAFFOLD);
+        v0.addAP(APCB);
+        graphA.addVertex(v0);
+        EmptyVertex v1 = new EmptyVertex();
+        v1.addAP(APCB);
+        v1.addAP(APCA);
+        graphA.addVertex(v1);
+        EmptyVertex v2 = new EmptyVertex();
+        v2.addAP(APCA);
+        v2.addAP(APCB);
+        graphA.addVertex(v2);
+        EmptyVertex v3 = new EmptyVertex();
+        v3.addAP(APCB);
+        v3.addAP(APCA);
+        graphA.addVertex(v3);
+        EmptyVertex v4 = new EmptyVertex();
+        v4.addAP(APCA);
+        v4.addAP(APCB);
+        graphA.addVertex(v4);
+        EmptyVertex v5 = new EmptyVertex();
+        v5.addAP(APCB);
+        graphA.addVertex(v5);
+
+        graphA.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v3.getAP(1), v4.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0)));
+        
+        return graphA;
+    }
+    
+//------------------------------------------------------------------------------
     
     @Test
     public void testGetMinMax() throws Exception
     {
+        prepare();
         Population pop = new Population();
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -395,6 +468,7 @@ public class PopulationTest
     @Test
     public void testIsInPercentile() throws Exception
     {
+        prepare();
         Population pop = new Population();
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -435,6 +509,7 @@ public class PopulationTest
     @Test
     public void testPopulationVersion() throws Exception
     {
+        prepare();
         Population pop = new Population();
         int v0 = pop.getVersionID();
         
@@ -470,8 +545,55 @@ public class PopulationTest
         Candidate c5 = new Candidate("C5",g5);
         pop.set(1,c5);
         int v6 = pop.getVersionID();
-        assertTrue(v6>v5,"Version change 6");
+        assertTrue(v6>v5,"Version change 6");        
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetSwappableSubGraphEnds() throws Exception
+    {
+        prepare();
+        Population population = new Population();
         
+        /*
+         * -(A)v0(A)-(A)v1(A)-(A)v2(A)-(A)v3(B)-(B)v4(B)-(B)v5(B)-
+         */
+        DENOPTIMGraph gA = makeGraphA();
+        Candidate cA = new Candidate("CA",gA);
+        population.add(cA);
+        
+        /*
+         * v0(B)-(B)v1(A)-(A)v2(B)-(B)v3(A)-(A)v4(B)-(B)v5
+         */
+        DENOPTIMGraph gE = makeGraphE();
+        Candidate cE = new Candidate("CE",gE);
+        population.add(cE);
+        
+        ArrayList<Candidate> partners = population.getXoverPartners(cA, 
+                new ArrayList<Candidate>(Arrays.asList(cE)));
+        assertTrue(partners.contains(cE));
+        
+        List<DENOPTIMVertex[]> subGraphSeeds = population.getXoverSites(cA,cE);
+        assertEquals(12,subGraphSeeds.size());
+        
+        int hadCodedChoice = 2;
+        DENOPTIMVertex subGraphSeedA = subGraphSeeds.get(hadCodedChoice)[0];
+        DENOPTIMVertex subGraphSeedE = subGraphSeeds.get(hadCodedChoice)[1];
+        
+        List<List<DENOPTIMVertex>> subGraphEnds = 
+                population.getSwappableSubGraphEnds(cA,cE,gA,subGraphSeedA,
+                        gE,subGraphSeedE, new int[]{6,7,8,9,10,11});
+        
+        // NB: Of the 4 possible pairs of end-points we get one because the 
+        // method builds one combination, it does not explore all.
+        
+        assertEquals(1,subGraphEnds.get(0).size(), "Expected number of ends on A");
+        assertEquals(1,subGraphEnds.get(1).size(), "Expected number of ends on E");
+        assertEquals(gA.getVertexAtPosition(3),subGraphEnds.get(0).get(0), 
+                "Identity of end-point on A");
+        assertEquals(gE.getVertexAtPosition(4),subGraphEnds.get(1).get(0), 
+                "Identity of end-point on E");
     }
     
 //------------------------------------------------------------------------------

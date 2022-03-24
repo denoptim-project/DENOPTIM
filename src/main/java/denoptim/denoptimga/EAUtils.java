@@ -58,6 +58,7 @@ import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.rings.CyclicGraphHandler;
+import denoptim.rings.PathSubGraph;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
 import denoptim.threedim.ThreeDimTreeBuilder;
@@ -235,19 +236,35 @@ public class EAUtils
             return CandidateSource.CONSTRUCTION;
         }
     }
-    
+
 //------------------------------------------------------------------------------
+    
+    //TODO-gg
     
     protected static Candidate buildCandidateByXOver(
             ArrayList<Candidate> eligibleParents, Population population, 
             Monitor mnt) throws DENOPTIMException
+    {
+        return buildCandidateByXOver(eligibleParents, population, mnt, 
+                null, -1, null, -1);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    //TODO-gg
+    
+    protected static Candidate buildCandidateByXOver(
+            ArrayList<Candidate> eligibleParents, Population population, 
+            Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
+            int[] choiseOfXOverSubgraph, int choiceOfOffstring) throws DENOPTIMException
     {
         mnt.increase(CounterID.XOVERATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
         
         int numatt = 0;
         
-        // Identify a pair of parents that can do crossover
+        // Identify a pair of parents that can do crossover, and a pair of
+        // vertexes from which we can define a subgraph (or a branch) to swap
         Candidate maleCandidate = null, femaleCandidate = null;
         DENOPTIMGraph maleGraph = null, femaleGraph = null;
         DENOPTIMVertex vertxOnMale = null, vertxOnFemale = null;
@@ -257,7 +274,7 @@ public class EAUtils
             if (FragmentSpace.useAPclassBasedApproach())
             {
                 DENOPTIMVertex[] pair = EAUtils.performFBCC(eligibleParents, 
-                        population);
+                        population, choiceOfParents, choiceOfXOverSites);
                 if (pair == null)
                 {
                     numatt++;
@@ -270,6 +287,7 @@ public class EAUtils
                 femaleGraph = vertxOnFemale.getGraphOwner();
                 femaleCandidate = femaleGraph.getCandidateOwner();
             } else {
+                //TODO: make it reproducible using choiceOfParents and choiceOfXOverSites
                 Candidate[] parents = EAUtils.selectBasedOnFitness(
                         eligibleParents, 2);
                 if (parents[0] == null || parents[1] == null)
@@ -287,6 +305,7 @@ public class EAUtils
             
             // Avoid redundant xover, i.e., xover that swaps the same subgraph
             try {
+                // TODO-gg consider subgraph!!!
                 DENOPTIMGraph test1 = maleGraph.clone();
                 DENOPTIMGraph test2 = femaleGraph.clone();
                 DENOPTIMGraph subGraph1 = test1.extractSubgraph(
@@ -319,18 +338,57 @@ public class EAUtils
         int vid1 = maleGraph.indexOf(vertxOnMale);
         int vid2 = femaleGraph.indexOf(vertxOnFemale);
         
+        // Now we consider the possibility of doing SUBGRAPH crossover, i.e.,
+        // swap a portion of a branch instead of an entire branch.
+        List<List<DENOPTIMVertex>> subGraphEnds = 
+                population.getSwappableSubGraphEnds(maleCandidate, femaleCandidate,
+                    maleGraph, vertxOnMale, femaleGraph, vertxOnFemale,
+                    choiseOfXOverSubgraph);
+        
+        // Define crossover type
+        CrossoverType xoverType = CrossoverType.BRANCH;
+        if (subGraphEnds.get(0).size()>0)
+            xoverType = CrossoverType.SUBGRAPH;
+        
+        // Start building the offspring
         DENOPTIMGraph graph1 = maleCandidate.getGraph().clone();
         DENOPTIMGraph graph2 = femaleCandidate.getGraph().clone();
         
         graph1.renumberGraphVertices();
         graph2.renumberGraphVertices();
         
+        //TODO-gg del
+        DenoptimIO.writeGraphToSDF(new File("/tmp/a2.sdf"), graph1, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/e2.sdf"), graph2, false);
+        
+        // To use info on subgraph ends in the clones we need to translate the
+        // references to the original graphs to the clones.
+        List<List<DENOPTIMVertex>> subGraphEndsOnClones = 
+                new ArrayList<List<DENOPTIMVertex>>();
+        for (List<DENOPTIMVertex> lst : subGraphEnds)
+        { 
+            if (lst.size()==0)
+                break;
+            
+            DENOPTIMGraph graph1or2 = null;
+            if (maleGraph == lst.get(0).getGraphOwner())
+                graph1or2 = graph1;
+            else
+                graph1or2 = graph2;
+            
+            List<DENOPTIMVertex> lstCln = new ArrayList<DENOPTIMVertex>();
+            for (DENOPTIMVertex v : lst)
+                lstCln.add(graph1or2.getVertexAtPosition(
+                        v.getGraphOwner().indexOf(v)));
+            subGraphEndsOnClones.add(lstCln);
+        }
+        
         try
         {
-            //TODO-gg enable other crossover types
             if (!DENOPTIMGraphOperations.performCrossover(
-                    graph1.getVertexAtPosition(vid1),
-                    graph2.getVertexAtPosition(vid2),CrossoverType.BRANCH))
+                    graph1.getVertexAtPosition(vid1), 
+                    graph2.getVertexAtPosition(vid2), 
+                    xoverType, subGraphEndsOnClones))
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
@@ -415,16 +473,21 @@ public class EAUtils
             return null;
         }
         
-        Candidate chosenOffspring = RandomUtils.randomlyChooseOne(validOnes);
-        chosenOffspring.setName("M" + GenUtils.getPaddedString(
-                DENOPTIMConstants.MOLDIGITS,
-                GraphUtils.getUniqueMoleculeIndex()));
-        
+        Candidate chosenOffspring  = null;
+        if (choiceOfOffstring<0)
+        {
+            chosenOffspring = RandomUtils.randomlyChooseOne(validOnes);
+            chosenOffspring.setName("M" + GenUtils.getPaddedString(
+                    DENOPTIMConstants.MOLDIGITS,
+                    GraphUtils.getUniqueMoleculeIndex()));
+        } else {
+            chosenOffspring = validOnes.get(choiceOfOffstring);
+        }
         return chosenOffspring;
     }
     
 //------------------------------------------------------------------------------
-    
+
     protected static Candidate buildCandidateByMutation(
             ArrayList<Candidate> eligibleParents, Monitor mnt)
                     throws DENOPTIMException
@@ -858,18 +921,30 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Perform fitness-based, class-compatible selection of parents for 
-     * crossover.
+     * Perform fitness-based, class-compatible selection of parents that can do
+     * crossover operations.
      * @param eligibleParents list of candidates among which to choose.
      * @param population the dynamic population containing the eligible parents.
+     * @param choiceOfParents the integers dictating the selection of parents. 
+     * Use this only to ensure reproducibility in tests, 
+     * otherwise use <code>null</code>
+     * @param choiceOfXOverSites the integers dictating the selection of 
+     * crossover sites. Use this only to ensure reproducibility in tests, 
+     * otherwise use <code>negative</code>
      * @return returns the pair of vertexes where crossover can be performed,
      * or null if no possibility was found.
      */
 
     protected static DENOPTIMVertex[] performFBCC(
-            ArrayList<Candidate> eligibleParents, Population population)
+            ArrayList<Candidate> eligibleParents, Population population, 
+            int[] choiceOfParents, int choiceOfXOverSites)
     {
-        Candidate parentA = selectBasedOnFitness(eligibleParents, 1)[0];
+        Candidate parentA = null;
+        if (choiceOfParents==null)
+            parentA = selectBasedOnFitness(eligibleParents, 1)[0];
+        else
+            parentA = eligibleParents.get(choiceOfParents[0]);
+        
         if (parentA == null)
             return null;
         
@@ -878,12 +953,26 @@ public class EAUtils
         if (matesCompatibleWithFirst.size() == 0)
             return null;
         
-        Candidate parentB = selectBasedOnFitness(matesCompatibleWithFirst,1)[0];
+        Candidate parentB = null;
+        if (choiceOfParents==null)
+        {   
+            parentB = selectBasedOnFitness(matesCompatibleWithFirst,1)[0];
+        } else {
+            parentB = eligibleParents.get(choiceOfParents[1]);
+        }
         if (parentB == null)
             return null;
         
-        return RandomUtils.randomlyChooseOne(population.getXoverSites(parentA,
-                parentB));
+        DENOPTIMVertex[] result = null;
+        if (choiceOfXOverSites<0)
+        {
+            result = RandomUtils.randomlyChooseOne(population.getXoverSites(
+                    parentA, parentB));
+        } else {
+            result = population.getXoverSites(parentA, parentB).get(
+                    choiceOfXOverSites);
+        }
+        return result;
     }
 
 //------------------------------------------------------------------------------

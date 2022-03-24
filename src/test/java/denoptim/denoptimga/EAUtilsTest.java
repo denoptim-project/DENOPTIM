@@ -3,6 +3,7 @@ package denoptim.denoptimga;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.utils.RandomUtils;
 
@@ -161,6 +163,7 @@ public class EAUtilsTest
         }
         assertTrue(foundChange,"The initial inner graph has changed.");
     }
+
 //------------------------------------------------------------------------------
 
     @Test
@@ -195,7 +198,66 @@ public class EAUtilsTest
         Candidate offspring = EAUtils.buildCandidateByXOver(eligibleParents, 
                 population, mnt);
         
-        assertTrue(offspring==null, "Redudnat xover is not done");
+        assertTrue(offspring==null, "Redundat xover is not done");
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testBuildByXOver_SUBGRAPH() throws Exception
+    {
+        PopulationTest.prepare();
+        Population population = new Population();
+        
+        /*
+         * -(A)v0(A)-(A)v1(A)-(A)v2(A)-(A)v3(B)-(B)v4(B)-(B)v5(B)-
+         */
+        DENOPTIMGraph gA = PopulationTest.makeGraphA();
+        Candidate cA = new Candidate("CA",gA);
+        cA.setFitness(1.23);
+        population.add(cA);
+        
+        /*
+         * v0(B)-(B)v1(A)-(A)v2(B)-(B)v3(A)-(A)v4(B)-(B)v5
+         */
+        DENOPTIMGraph gE = PopulationTest.makeGraphE();
+        Candidate cE = new Candidate("CE",gE);
+        cE.setFitness(2.34);
+        population.add(cE);
+        
+        //TODO-gg del
+        DenoptimIO.writeGraphToSDF(new File("/tmp/a.sdf"), gA, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/e.sdf"), gE, false);
+        
+        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        eligibleParents.add(cA);
+        eligibleParents.add(cE);
+
+        Monitor mnt = new Monitor();
+        
+        Candidate offspring = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 4, new int[]{11}, 0);
+        
+
+        //TODO del
+        DenoptimIO.writeGraphToSDF(new File("/tmp/o.sdf"), offspring.getGraph(), false);
+        
+        
+        DENOPTIMGraph gO = offspring.getGraph();
+        assertEquals(7,gO.getVertexCount());
+        assertEquals(6,gO.getEdgeCount());
+        int maxLength = -1;
+        for (DENOPTIMVertex v : gO.getVertexList())
+        {
+            ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+            gO.getChildrenTree(v, childTree);
+            if (childTree.size()>maxLength)
+            {
+                maxLength = childTree.size();
+            }
+        }
+        assertEquals(6,maxLength);
+        
     }
     
 //------------------------------------------------------------------------------
