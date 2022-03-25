@@ -424,6 +424,66 @@ public class PopulationTest
     }
     
 //------------------------------------------------------------------------------
+
+    /**
+     * Produced a graph like this:
+     * <pre>
+     *  -(A)v0(A)-(A)v1(A)-(A)v2(A)-(A)v3(A)-(A)v4(A)-(A)v5(A)-(A)v6(A)-(A)v7(A)-
+     * </pre>
+     * 
+     * You must run {@link #prepare()} before asking this class for any graph.
+     */
+    static DENOPTIMGraph makeGraphF() throws DENOPTIMException
+    {
+        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        v0.setBuildingBlockType(BBType.SCAFFOLD);
+        v0.addAP(APCA);
+        v0.addAP(APCA);
+        graphA.addVertex(v0);
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(APCA);
+        v1.addAP(APCA);
+        graphA.addVertex(v1);
+        EmptyVertex v2 = new EmptyVertex(2);
+        v2.addAP(APCA);
+        v2.addAP(APCA);
+        graphA.addVertex(v2);
+        EmptyVertex v3 = new EmptyVertex(3);
+        v3.addAP(APCA);
+        v3.addAP(APCA);
+        graphA.addVertex(v3);
+        EmptyVertex v4 = new EmptyVertex(4);
+        v4.addAP(APCA);
+        v4.addAP(APCA);
+        graphA.addVertex(v4);
+        EmptyVertex v5 = new EmptyVertex(5);
+        v5.addAP(APCA);
+        v5.addAP(APCA);
+        graphA.addVertex(v5);
+        EmptyVertex v6 = new EmptyVertex(6);
+        v6.addAP(APCA);
+        v6.addAP(APCA);
+        graphA.addVertex(v6);
+        EmptyVertex v7 = new EmptyVertex(7);
+        v7.addAP(APCA);
+        v7.addAP(APCA);
+        graphA.addVertex(v7);
+
+        graphA.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v3.getAP(1), v4.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v5.getAP(1), v6.getAP(0)));
+        graphA.addEdge(new DENOPTIMEdge(v6.getAP(1), v7.getAP(0)));
+        
+        graphA.renumberGraphVertices();
+        
+        return graphA;
+    }
+    
+//------------------------------------------------------------------------------
     
     @Test
     public void testGetMinMax() throws Exception

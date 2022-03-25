@@ -27,6 +27,7 @@ import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
+import denoptim.rings.PathSubGraph;
 import denoptim.utils.RandomUtils;
 
 /**
@@ -225,25 +226,16 @@ public class EAUtilsTest
         cE.setFitness(2.34);
         population.add(cE);
         
-        //TODO-gg del
-        DenoptimIO.writeGraphToSDF(new File("/tmp/a.sdf"), gA, false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/e.sdf"), gE, false);
-        
         ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(cA);
         eligibleParents.add(cE);
 
         Monitor mnt = new Monitor();
         
-        Candidate offspring = EAUtils.buildCandidateByXOver(eligibleParents, 
+        Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
                 population, mnt, new int[]{0,1}, 4, new int[]{11}, 0);
         
-
-        //TODO del
-        DenoptimIO.writeGraphToSDF(new File("/tmp/o.sdf"), offspring.getGraph(), false);
-        
-        
-        DENOPTIMGraph gO = offspring.getGraph();
+        DENOPTIMGraph gO = offspring0.getGraph();
         assertEquals(7,gO.getVertexCount());
         assertEquals(6,gO.getEdgeCount());
         int maxLength = -1;
@@ -258,6 +250,63 @@ public class EAUtilsTest
         }
         assertEquals(6,maxLength);
         
+        Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 4, new int[]{11}, 1);
+        
+        DENOPTIMGraph g1 = offspring1.getGraph();
+        assertEquals(5,g1.getVertexCount());
+        assertEquals(4,g1.getEdgeCount());
+        maxLength = -1;
+        for (DENOPTIMVertex v : g1.getVertexList())
+        {
+            ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+            g1.getChildrenTree(v, childTree);
+            if (childTree.size()>maxLength)
+            {
+                maxLength = childTree.size();
+            }
+        }
+        assertEquals(4,maxLength);
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testSearchForANonRedundantSwappableSubgraph() throws Exception
+    {
+        PopulationTest.prepare();
+        Population population = new Population();
+        
+        DENOPTIMGraph gA = PopulationTest.makeGraphF();
+        Candidate cA = new Candidate("CA",gA);
+        cA.setFitness(1.23);
+        population.add(cA);
+        //NB: the two graphs are the equal... as a start
+        DENOPTIMGraph gA2 = PopulationTest.makeGraphF();
+       // ...but we want the two graph to be non-isomorfic
+        gA2.removeVertex(gA2.getVertexAtPosition(gA2.getVertexCount()-1)); 
+        Candidate cA2 = new Candidate("CA2",gA2);
+        cA2.setFitness(2.34);
+        population.add(cA2);
+        
+        // This is needed only to trigger detection of xover points.
+        List<Candidate> eligible = new ArrayList<Candidate>();
+        eligible.add(cA2);
+        population.getXoverPartners(cA2, population);
+        
+        int srcVrtPosition = 1;
+        List<List<DENOPTIMVertex>> subGraphEnds = 
+                EAUtils.searchForANonRedundantSwappableSubgraph(cA,cA2,
+                    gA, gA.getVertexAtPosition(srcVrtPosition),
+                    gA2, gA2.getVertexAtPosition(srcVrtPosition), 
+                    population);
+        
+        PathSubGraph pA = new PathSubGraph(gA.getVertexAtPosition(srcVrtPosition), 
+                subGraphEnds.get(0).get(0), gA);
+        PathSubGraph pA2 = new PathSubGraph(gA2.getVertexAtPosition(srcVrtPosition), 
+                subGraphEnds.get(1).get(0), gA2);
+        
+        assertTrue(pA.getPathLength() != pA2.getPathLength());
     }
     
 //------------------------------------------------------------------------------

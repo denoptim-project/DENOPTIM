@@ -13,6 +13,7 @@ import denoptim.utils.RandomUtils;
 /**
  * An utility class to encapsulate the search for an 
  * {@link DENOPTIMAttachmentPoint}-{@link DENOPTIMAttachmentPoint} mapping.
+ * Ignores symmetry, which is a potential thing to improve.
  * @author Marco Foscato
  */
 
@@ -196,15 +197,20 @@ public class APMapFinder
         List<DENOPTIMAttachmentPoint> keys = 
                 new ArrayList<DENOPTIMAttachmentPoint>(
                         apCompatilities.keySet());
-        if (keys.size() < vA.getNumberOfAPs())
-        {
-            return;
-        }
         if (fixedRootAPs!=null)
         {
+            if (keys.size()+fixedRootAPs.size() < vA.getNumberOfAPs())
+            {
+                return;
+            }
             // Since these are constrained we do not need them among the keys for 
             // looking over the combinations.
             keys.removeAll(fixedRootAPs.keySet());
+        } else {
+            if (keys.size() < vA.getNumberOfAPs())
+            {
+                return;
+            }
         }
             
         // Identify APs in old link that are used: we want a mapping that
@@ -250,17 +256,21 @@ public class APMapFinder
         APMapping currentMapping = new APMapping();
         if (fixedRootAPs!=null)
         {
-            for (DENOPTIMAttachmentPoint key : fixedRootAPs.keySet())
-            {
-                currentMapping.put(key, fixedRootAPs.get(key));
-            }
+            currentMapping = fixedRootAPs.clone(); //shallow
         }
         // We try the comprehensive approach, but if that is too demanding
         // and gets stopped, then we run a series of simplified attempts
         // to hit a decent combination with "lucky shots".
-        Boolean stopped = FragmentSpaceUtils.recursiveCombiner(keys, 
-                currentKey, apCompatilities, currentMapping, allAPMappings, 
-                screenAll, maxCombs);
+        Boolean stopped = false;
+        if (keys.size()>0)
+        {
+            stopped = FragmentSpaceUtils.recursiveCombiner(keys, 
+                    currentKey, apCompatilities, currentMapping, allAPMappings, 
+                    screenAll, maxCombs);
+        } else {
+            // This would have been done by the recursive combiner
+            allAPMappings.add(currentMapping);
+        }
         
         // Keep only mappings that allow retaining the structure 
         // (i.e., include all required/used APs of the original vertex)

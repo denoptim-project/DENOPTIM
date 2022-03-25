@@ -131,6 +131,30 @@ public class APMapFinderTest
             assertEquals(vB.getAP(4), apm.get(vA.getAP(2)));
         }
     }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testAPMapFinder_ConstrainAll() throws Exception
+    {
+        prepare();
+        EmptyVertex vA = new EmptyVertex();
+        vA.setBuildingBlockType(BBType.FRAGMENT);
+        vA.addAP(APCA);
+
+        EmptyVertex vB = new EmptyVertex();
+        vB.setBuildingBlockType(BBType.FRAGMENT);
+        vB.addAP(APCA);
+        
+        APMapping constrain = new APMapping();
+        constrain.put(vA.getAP(0), vB.getAP(0));
+        APMapFinder apmf = new APMapFinder(vA, vB, constrain, true, false, false);
+        
+        assertTrue(apmf.foundMapping());
+        assertEquals(1, apmf.getAllAPMappings().size());
+        assertTrue(apmf.getChosenAPMapping().containsKey(vA.getAP(0)));
+        assertEquals(vB.getAP(0), apmf.getChosenAPMapping().get(vA.getAP(0)));
+    }
 
 //------------------------------------------------------------------------------
     

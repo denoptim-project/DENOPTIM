@@ -18,6 +18,7 @@
 
 package denoptim.denoptimga;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,10 +28,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.io.DenoptimIO;
 import denoptim.rings.PathSubGraph;
 import denoptim.utils.RandomUtils;
 
@@ -450,7 +453,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * @param femaleGraph
      * @param vertxOnFemale
      * @param sequence a sequence of integers used to by-pass random choices
-     * and ensure reproducibility of the results. Used only for testing.
+     * and ensure reproducibility of the results. Used only for testing, 
+     * otherwise use <code>null</code>.
      * @return
      */
     protected List<List<DENOPTIMVertex>> getSwappableSubGraphEnds(
@@ -458,7 +462,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             DENOPTIMGraph maleGraph, DENOPTIMVertex vertxOnMale,
             DENOPTIMGraph femaleGraph, DENOPTIMVertex vertxOnFemale,
             int[] sequence)
-    {
+    {   
         List<DENOPTIMVertex> childTreeM = new ArrayList<DENOPTIMVertex>();
         maleGraph.getChildrenTree(vertxOnMale, childTreeM);
         List<DENOPTIMVertex> childTreeF = new ArrayList<DENOPTIMVertex>();

@@ -1339,7 +1339,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         if (subGrpVrtxs.size() == 0)
         {
             throw new DENOPTIMException("Capping groups cannot be the only "
-                    + "vertex in a subgraph to replase.");   
+                    + "vertex in a subgraph to replace.");   
         }
         
         // Refresh the symmetry set labels so that clones of the branch inherit
@@ -2364,6 +2364,39 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 
             children.add(child);
             getChildrenTree(child, children, numLayers-1, stopBeforeRCVs);
+        }
+    }
+    
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets all the children of the current vertex recursively.
+     * This method does not cross template 
+     * boundaries, thus all children belong to the same graph.
+     * @param vertex the vertex whose children are to be located
+     * @param children list containing the references to all the children
+     * @param stopBeforeRCVs set <code>true</code> to make the exploration of
+     * each branch stop before including ring closing vertexes.
+     */
+    public void getChildTreeLimited(DENOPTIMVertex vertex,
+            List<DENOPTIMVertex> children, boolean stopBeforeRCVs) 
+    {
+        List<DENOPTIMVertex> lst = getChildVertices(vertex);
+        if (lst.isEmpty()) 
+        {
+            return;
+        }
+        for (DENOPTIMVertex child : lst) 
+        {   
+            if (children.contains(child)) 
+                continue;
+              
+            if (stopBeforeRCVs && child.isRCV())
+                continue;
+                  
+            children.add(child);
+            getChildTreeLimited(child, children, stopBeforeRCVs);
         }
     }
     
@@ -3553,22 +3586,21 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
     /**
      * Creates a new graph that corresponds to the subgraph of this graph 
-     * when exploring the spanning tree from a given seed vertex and visiting
-     * at most a given number of vertex layers, and optionally stopping the
+     * when exploring the spanning tree from a given seed vertex and 
+     * stopping the exploration at the given end vertexes (i.e., limits).
+     * Optionally, you can ask to stop the
      * exploration of a branch before including any ring-closing vertex.
      * Only the seed vertex and all child vertices (and further successors)
      * are considered part of
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
      * @param seed the vertex from which the extraction has to start.
-     * @param numLayers the maximum number of vertex layers after the seen 
-     * vertex that we want to consider before stopping. If this value is 2, we 
-     * will explore three layers: the seed, and two more layers away from it.
+     * @param limits the vertexes playing the role of subgraph end-points that 
+     * stop the exploration of the graph.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
      * @return a new vertex that corresponds to the subgraph of this graph.
      */
-//TODO-gg doc
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, 
             List<DENOPTIMVertex> limits, boolean stopBeforeRCVs) 
                     throws DENOPTIMException
@@ -3578,6 +3610,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             throw new DENOPTIMException("Attempt to extract a subgraph giving "
                     + "a seed vertex that is not contained in this graph.");
         }
+        
+        if (limits.size()==0)
+        {
+            return extractSubgraph(seed, stopBeforeRCVs);
+        }
+        
         DENOPTIMGraph subGraph = this.clone();
         DENOPTIMVertex seedClone = subGraph.getVertexAtPosition(
                 this.indexOf(seed));
@@ -3590,6 +3628,55 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         subGrpVrtxs.add(seedClone);
         subGraph.getChildTreeLimited(seedClone, subGrpVrtxs, limitsInClone, 
                 stopBeforeRCVs);
+        
+        ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : subGraph.gVertices)
+        {
+            if (!subGrpVrtxs.contains(v))
+            {
+                toRemove.add(v);
+            }
+        }
+        for (DENOPTIMVertex v : toRemove)
+        {
+            subGraph.removeVertex(v);
+        }
+        
+        return subGraph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Creates a new graph that corresponds to the subgraph of this graph 
+     * when exploring the spanning tree from a given seed vertex.
+     * Optionally, you can ask to stop the
+     * exploration of a branch before including any ring-closing vertex.
+     * Only the seed vertex and all child vertices (and further successors)
+     * are considered part of
+     * the subgraph, which includes also rings and symmetric sets. All
+     * rings that include vertices not belonging to the subgraph are lost.
+     * @param seed the vertex from which the extraction has to start.
+     * @param stopBeforeRCVs set <code>true</code> to make the exploration of
+     * each branch stop before including ring closing vertexes.
+     * @return a new vertex that corresponds to the subgraph of this graph.
+     */
+    public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, boolean stopBeforeRCVs) 
+                    throws DENOPTIMException
+    {
+        if (!this.gVertices.contains(seed))
+        {
+            throw new DENOPTIMException("Attempt to extract a subgraph giving "
+                    + "a seed vertex that is not contained in this graph.");
+        }
+        
+        DENOPTIMGraph subGraph = this.clone();
+        DENOPTIMVertex seedClone = subGraph.getVertexAtPosition(
+                this.indexOf(seed));
+        
+        ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
+        subGrpVrtxs.add(seedClone);
+        subGraph.getChildTreeLimited(seedClone, subGrpVrtxs, stopBeforeRCVs);
         
         ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex v : subGraph.gVertices)

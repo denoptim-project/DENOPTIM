@@ -238,9 +238,17 @@ public class EAUtils
     }
 
 //------------------------------------------------------------------------------
-    
-    //TODO-gg
-    
+
+    /**
+     * Generates a new offspring by performing a crossover operation.
+     * @param eligibleParents candidates that can be used as parents of the 
+     * offspring.
+     * @param population the collection of candidates where eligible candidates
+     * are hosted.
+     * @param mnt monitoring tool used to record events during the run of the
+     * evolutionary algorithm.
+     * @return a candidate chosen in a stochastic manner.
+     */
     protected static Candidate buildCandidateByXOver(
             ArrayList<Candidate> eligibleParents, Population population, 
             Monitor mnt) throws DENOPTIMException
@@ -251,8 +259,34 @@ public class EAUtils
     
 //------------------------------------------------------------------------------
     
-    //TODO-gg
-    
+    /**
+     * Generates a new offspring by performing a crossover operation.
+     * @param eligibleParents candidates that can be used as parents of the 
+     * offspring.
+     * @param population the collection of candidates where eligible candidates
+     * are hosted.
+     * @param mnt monitoring tool used to record events during the run of the
+     * evolutionary algorithm.
+     * @param choiceOfParents a pair of indexes dictating which ones among the 
+     * eligible parents we should use as parents. This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param choiceOfXOverSites index indicating which crossover site to use.
+     * This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param choiseOfXOverSubgraph indexes dictating the order in which to 
+     * process candidate crossover sites. This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param choiceOfOffstring index dictating which among the available two
+     * offspring (at most two, for now) if returned as result. 
+     * This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @return
+     * @throws DENOPTIMException
+     */
     protected static Candidate buildCandidateByXOver(
             ArrayList<Candidate> eligibleParents, Population population, 
             Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
@@ -305,7 +339,6 @@ public class EAUtils
             
             // Avoid redundant xover, i.e., xover that swaps the same subgraph
             try {
-                // TODO-gg consider subgraph!!!
                 DENOPTIMGraph test1 = maleGraph.clone();
                 DENOPTIMGraph test2 = femaleGraph.clone();
                 DENOPTIMGraph subGraph1 = test1.extractSubgraph(
@@ -340,10 +373,20 @@ public class EAUtils
         
         // Now we consider the possibility of doing SUBGRAPH crossover, i.e.,
         // swap a portion of a branch instead of an entire branch.
-        List<List<DENOPTIMVertex>> subGraphEnds = 
-                population.getSwappableSubGraphEnds(maleCandidate, femaleCandidate,
-                    maleGraph, vertxOnMale, femaleGraph, vertxOnFemale,
+        List<List<DENOPTIMVertex>> subGraphEnds = null;
+        if (choiseOfXOverSubgraph!=null)
+        {
+            subGraphEnds = population.getSwappableSubGraphEnds(
+                    maleCandidate, femaleCandidate,
+                    maleGraph, vertxOnMale, 
+                    femaleGraph, vertxOnFemale,
                     choiseOfXOverSubgraph);
+        } else {
+            subGraphEnds = searchForANonRedundantSwappableSubgraph(
+                    maleCandidate, femaleCandidate, 
+                    maleGraph, vertxOnMale, 
+                    femaleGraph, vertxOnFemale, population);
+        }
         
         // Define crossover type
         CrossoverType xoverType = CrossoverType.BRANCH;
@@ -357,10 +400,6 @@ public class EAUtils
         graph1.renumberGraphVertices();
         graph2.renumberGraphVertices();
         
-        //TODO-gg del
-        DenoptimIO.writeGraphToSDF(new File("/tmp/a2.sdf"), graph1, false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/e2.sdf"), graph2, false);
-        
         // To use info on subgraph ends in the clones we need to translate the
         // references to the original graphs to the clones.
         List<List<DENOPTIMVertex>> subGraphEndsOnClones = 
@@ -368,7 +407,10 @@ public class EAUtils
         for (List<DENOPTIMVertex> lst : subGraphEnds)
         { 
             if (lst.size()==0)
-                break;
+            {
+                subGraphEndsOnClones.add(new ArrayList<DENOPTIMVertex>());
+                continue;
+            }
             
             DENOPTIMGraph graph1or2 = null;
             if (maleGraph == lst.get(0).getGraphOwner())
@@ -484,6 +526,44 @@ public class EAUtils
             chosenOffspring = validOnes.get(choiceOfOffstring);
         }
         return chosenOffspring;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * loops over combinations of subGraph end vertexes looking for the first
+     * case where the selection of subgraph ends does not return a pair of
+     * isomorphic graphs that could lead to redundant crossover.
+     */
+    static List<List<DENOPTIMVertex>> searchForANonRedundantSwappableSubgraph(
+            Candidate maleCandidate, Candidate femaleCandidate,
+            DENOPTIMGraph maleGraph, DENOPTIMVertex vertxOnMale,
+            DENOPTIMGraph femaleGraph, DENOPTIMVertex vertxOnFemale,
+            Population population) throws DENOPTIMException
+    {
+        List<List<DENOPTIMVertex>> subGraphEnds = null; // will not be null at the end
+        int attempts = 0;
+        // Max number of attempts is fixed:
+        while (attempts < maleGraph.getVertexCount()*femaleGraph.getVertexCount())
+        {
+            attempts++;
+            // This randomizes the selection because of the "null" given.
+            subGraphEnds = population.getSwappableSubGraphEnds(
+                    maleCandidate, femaleCandidate,
+                    maleGraph, vertxOnMale, 
+                    femaleGraph, vertxOnFemale,
+                    null);
+            
+            // Test for redundant subgraph crossover
+            DENOPTIMGraph subG_M = maleGraph.extractSubgraph(vertxOnMale, 
+                    subGraphEnds.get(0), false);
+            DENOPTIMGraph subG_F = femaleGraph.extractSubgraph(vertxOnFemale,
+                    subGraphEnds.get(1),false);
+            
+            if (!subG_M.isIsomorphicTo(subG_F))
+                break;
+        }
+        return subGraphEnds;
     }
     
 //------------------------------------------------------------------------------

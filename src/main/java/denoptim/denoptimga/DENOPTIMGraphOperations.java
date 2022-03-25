@@ -1276,10 +1276,14 @@ public class DENOPTIMGraphOperations
      * be ensured by running {@link DENOPTIMGraph#renumberGraphVertices()}.
      * @param mvert the root vertex of the branch of male to exchange.
      * @param fvert the root vertex of the branch of female to exchange.
+     * @param xoverTyp the type of crossover operation.
+     * @param subGraphEnds vertexes playing the role of subgraph ends, i.e.,
+     * they are the end of the subgraphs starting and <code>mvert</code> or 
+     * <code>fvert</code>. The first,
+     * list is for the graph owning <code>mvert</code>, the second for the graph
+     * owning <code>fvert</code>.
      * @throws DENOPTIMException
      */
-
-    //TODO-gg doc
     public static boolean performCrossover(DENOPTIMVertex mvert,
             DENOPTIMVertex fvert, CrossoverType xoverTyp, 
             List<List<DENOPTIMVertex>> subGraphEnds) throws DENOPTIMException
@@ -1307,11 +1311,6 @@ public class DENOPTIMGraphOperations
                 excludeRCVsM);
         DENOPTIMGraph subG_F = female.extractSubgraph(fvert, subGraphEnds.get(1),
                 excludeRCVsF);
-        
-
-        //TODO-gg del
-        DenoptimIO.writeGraphToSDF(new File("/tmp/subG_M.sdf"), subG_M, false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/subG_F.sdf"), subG_F, false);
        
         // Identify a mapping of APs that allows swapping the subgraphs
         DENOPTIMTemplate tmplSubGrphM = new DENOPTIMTemplate(BBType.UNDEFINED);
@@ -1330,9 +1329,9 @@ public class DENOPTIMGraphOperations
             int apIndF = fvert.getEdgeToParent().getTrgAP().getIndexInOwner();
             fixedRootAPs = new APMapping();
             fixedRootAPs.put(tmplSubGrphM.getOuterAPFromInnerAP(
-                            subG_M.getVertexAtPosition(0).getAP(apIndM)), 
+                            subG_M.getSourceVertex().getAP(apIndM)), 
                     tmplSubGrphF.getOuterAPFromInnerAP(
-                            subG_F.getVertexAtPosition(0).getAP(apIndF)));
+                            subG_F.getSourceVertex().getAP(apIndF)));
         }
         
         APMapFinder apmf = new APMapFinder(tmplSubGrphM, tmplSubGrphF, 
@@ -1359,6 +1358,7 @@ public class DENOPTIMGraphOperations
                     tmplSubGrphM.getInnerAPFromOuterAP(e.getKey());
             DENOPTIMAttachmentPoint apOnSubGraphF = 
                     tmplSubGrphF.getInnerAPFromOuterAP(e.getValue());
+
             // NB: assumption that vertex IDs are healthy, AND that order of APs
             // is retained upon cloning of the subgraph!
             DENOPTIMAttachmentPoint apOnMale = male.getVertexWithId(
