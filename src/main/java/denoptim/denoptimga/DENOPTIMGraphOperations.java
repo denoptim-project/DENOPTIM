@@ -112,7 +112,24 @@ public class DENOPTIMGraphOperations
             }
         }
         
-        //TODO-gg Look inside templates
+        // NB: we consider only templates that are at the same level of embedding
+        // So, in practice we do recursion at each embedding level.
+        for (DENOPTIMVertex vMale : male.getVertexList())
+        {
+            if (!(vMale instanceof DENOPTIMTemplate))
+                continue;
+            DENOPTIMTemplate tMale = (DENOPTIMTemplate) vMale;
+            
+            for (DENOPTIMVertex vFemale : female.getVertexList())
+            {
+                if (!(vFemale instanceof DENOPTIMTemplate))
+                    continue;
+                DENOPTIMTemplate tFemale = (DENOPTIMTemplate) vFemale;
+                
+                pairs.addAll(locateCompatibleXOverPoints(tMale.getInnerGraph(),
+                        tFemale.getInnerGraph()));
+            }
+        }
         return pairs;
     }
     

@@ -3,12 +3,15 @@ package denoptim.denoptimga;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -27,15 +30,19 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
+import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.GraphPattern;
+import denoptim.io.DenoptimIO;
+import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -46,6 +53,8 @@ import denoptim.utils.GraphUtils;
 
 public class DENOPTIMGraphOperationsTest {
 
+    private static APClass APCA, APCB, APCC, APCD;
+    
     IChemObjectBuilder chemBuilder = DefaultChemObjectBuilder.getInstance();
     private final Random rng = new Random();
     private static APClass DEFAULT_APCLASS;
@@ -402,6 +411,326 @@ public class DENOPTIMGraphOperationsTest {
             // Check that no graphs are missing from actual
             return unmatchedGraphs.size() == 0;
         }
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testLocateCompatibleXOverPoints() throws Exception
+    {
+        DENOPTIMGraph[] pair = getPairOfTestGraphs();
+        DENOPTIMGraph graphA = pair[0];
+        DENOPTIMGraph graphB = pair[1];
+        
+        List<DENOPTIMVertex[]> xoverSites = 
+                DENOPTIMGraphOperations.locateCompatibleXOverPoints(graphA, graphB);
+        
+        assertEquals(15, xoverSites.size());
+        
+        // NB: we exploit the fact that every vertex has a unique label as a 
+        // property and the combination of sites generates an invariant.
+        Set<String> expected = new HashSet<String>();
+        expected.add(getLabel(graphA,1)+"_"+getLabel(graphB,1));
+        expected.add(getLabel(graphA,1)+"_"+getLabel(graphB,2));
+        expected.add(getLabel(graphA,2)+"_"+getLabel(graphB,1));
+        expected.add(getLabel(graphA,2)+"_"+getLabel(graphB,2));
+        expected.add(getLabel(graphA,3)+"_"+getLabel(graphB,3));
+        expected.add(getLabel(graphA,4)+"_"+getLabel(graphB,4));
+        expected.add(getLabel(graphA,4)+"_"+getLabel(graphB,5));
+        expected.add(getLabel(graphA,5)+"_"+getLabel(graphB,1));
+        expected.add(getLabel(graphA,5)+"_"+getLabel(graphB,2));
+        // Using knowledge of where the template is (i.e., vertex at position 1)
+        // in the list of vertexes of the outer vertex. This assumes the graph
+        // will never change. If they do, this has to be updated.
+        DENOPTIMTemplate t1 = (DENOPTIMTemplate)graphA.getVertexAtPosition(1);
+        DENOPTIMTemplate t2 = (DENOPTIMTemplate)graphB.getVertexAtPosition(1);
+        expected.add(getLabel(t1.getInnerGraph(),1)
+                +"_"+getLabel(t2.getInnerGraph(),3));
+        
+        expected.add(getLabel(t1.getInnerGraph(),2)
+                +"_"+getLabel(t2.getInnerGraph(),1));
+        
+        expected.add(getLabel(t1.getInnerGraph(),2)
+                +"_"+getLabel(t2.getInnerGraph(),2));
+        
+        expected.add(getLabel(t1.getInnerGraph(),3)
+                +"_"+getLabel(t2.getInnerGraph(),3));
+        
+        expected.add(getLabel(t1.getInnerGraph(),4)
+                +"_"+getLabel(t2.getInnerGraph(),3));
+        
+        expected.add(getLabel(t1.getInnerGraph(),5)
+                +"_"+getLabel(t2.getInnerGraph(),3));
+        
+        for (DENOPTIMVertex[] sites : xoverSites)
+        {
+            String label = getLabel(sites[0])+"_"+getLabel(sites[1]);
+            assertTrue(expected.contains(label));
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private String getLabel(DENOPTIMVertex v)
+    {
+        if (!v.hasProperty("Label"))
+            return "";
+        return v.getGraphOwner().getGraphId()+"@"+v.getProperty(
+                "Label").toString();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private String getLabel(DENOPTIMGraph g, int vIdx)
+    {
+        if (!g.getVertexAtPosition(vIdx).hasProperty("Label"))
+            return "";
+        return g.getGraphId() + "@" + g.getVertexAtPosition(vIdx).getProperty(
+                "Label").toString();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Generates a pair of graphs. The first is
+     * <pre>
+     *                (A)--(A)-m5
+     *               /
+     *  m1-(A)--(A)-T1-(A)--(A)-m2-(B)--(B)-m3
+     *               \
+     *                (C)--(C)-m4
+     * </pre>
+     * where template 'T1' is:
+     * <pre> 
+     *     (A)         (C)
+     *    /           /
+     *  tv0-(A)--(A)-tv1-(B)--(C)-tv2-(A)--(A)-tv3-(A)-
+     *                \
+     *                 (A)--(A)-tv4-(A)--(A)-tv5-(A)-
+     * </pre>
+     * 
+     * And the second graph is
+     * <pre>
+     *  f1-(A)--(A)-T1-(A)--(A)-f2-(B)--(B)-f3-(C)--(C)-f4
+     *               \
+     *                (C)--(C)-f5
+     * </pre>
+     * where template 'T2' is:
+     * <pre> 
+     *         (C)
+     *        /
+     *  -(A)-tw1-(B)--(C)-tw2-(B)--(B)-tw3-(A)-(A)-tw4-(A)
+     * </pre>
+     */
+    @Test
+    private DENOPTIMGraph[] getPairOfTestGraphs() throws Exception
+    {
+        prepareAPClassCompatibility();
+        
+        // Prepare special building block: template T1
+        EmptyVertex v0 = new EmptyVertex(0);
+        v0.addAP(APCA);
+        v0.addAP(APCA);
+        v0.setProperty("Label", "tv0");
+        
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(APCA);
+        v1.addAP(APCA);
+        v1.addAP(APCB);
+        v1.addAP(APCC);
+        v1.setProperty("Label", "tv1");
+        
+        EmptyVertex v2 = new EmptyVertex(2);
+        v2.addAP(APCA);
+        v2.addAP(APCC);
+        v2.setProperty("Label", "tv2");
+        
+        EmptyVertex v3 = new EmptyVertex(3);
+        v3.addAP(APCA);
+        v3.addAP(APCA);
+        v3.setProperty("Label", "tv3");
+
+        EmptyVertex v4 = new EmptyVertex(4);
+        v4.addAP(APCA);
+        v4.addAP(APCA);
+        v4.setProperty("Label", "tv4");
+        
+        EmptyVertex v5 = new EmptyVertex(5);
+        v5.addAP(APCA);
+        v5.addAP(APCA);
+        v5.setProperty("Label", "tv5");
+        
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        g.addVertex(v0);
+        g.setGraphId(-1);
+        g.appendVertexOnAP(v0.getAP(0), v1.getAP(0));
+        g.appendVertexOnAP(v1.getAP(2), v2.getAP(1));
+        g.appendVertexOnAP(v2.getAP(0), v3.getAP(0));
+        g.appendVertexOnAP(v1.getAP(1), v4.getAP(1));
+        g.appendVertexOnAP(v4.getAP(0), v5.getAP(1));
+        
+        DENOPTIMTemplate t1 = new DENOPTIMTemplate(BBType.NONE);
+        t1.setInnerGraph(g);
+        t1.setProperty("Label", "t1");
+        
+        // Assemble the first graph: graphA
+        
+        EmptyVertex m1 = new EmptyVertex(101);
+        m1.addAP(APCA);
+        m1.setProperty("Label", "m101");
+        
+        EmptyVertex m2 = new EmptyVertex(102);
+        m2.addAP(APCA);
+        m2.addAP(APCB);
+        m2.setProperty("Label", "m102");
+        
+        EmptyVertex m3 = new EmptyVertex(103);
+        m3.addAP(APCB);
+        m3.setProperty("Label", "m103");
+
+        EmptyVertex m4 = new EmptyVertex(104);
+        m4.addAP(APCC);
+        m4.setProperty("Label", "m104");
+
+        EmptyVertex m5 = new EmptyVertex(105);
+        m5.addAP(APCA);
+        m5.setProperty("Label", "m105");
+        
+        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        graphA.addVertex(m1);
+        graphA.appendVertexOnAP(m1.getAP(0), t1.getAP(0));
+        graphA.appendVertexOnAP(t1.getAP(2), m2.getAP(0));
+        graphA.appendVertexOnAP(m2.getAP(1), m3.getAP(0));
+        graphA.appendVertexOnAP(t1.getAP(1), m4.getAP(0));
+        graphA.appendVertexOnAP(t1.getAP(3), m5.getAP(0));
+
+        graphA.setGraphId(11111);
+        
+        //Prepare special building block: template T2
+        EmptyVertex w1 = new EmptyVertex(11);
+        w1.addAP(APCA);
+        w1.addAP(APCB);
+        w1.addAP(APCC);
+        w1.setProperty("Label", "tw11");
+        
+        EmptyVertex w2 = new EmptyVertex(12);
+        w2.addAP(APCB);
+        w2.addAP(APCC);
+        w2.setProperty("Label", "tw12");
+        
+        EmptyVertex w3 = new EmptyVertex(13);
+        w3.addAP(APCA);
+        w3.addAP(APCB);
+        w3.setProperty("Label", "tw13");
+        
+        EmptyVertex w4 = new EmptyVertex(14);
+        w4.addAP(APCA);
+        w4.addAP(APCA);
+        w4.setProperty("Label", "tw14");
+        
+        DENOPTIMGraph g2 = new DENOPTIMGraph();
+        g2.addVertex(w1);
+        g2.appendVertexOnAP(w1.getAP(1), w2.getAP(1));
+        g2.appendVertexOnAP(w2.getAP(0), w3.getAP(1));
+        g2.appendVertexOnAP(w3.getAP(0), w4.getAP(0));
+        g2.setGraphId(-2);
+        
+        DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.NONE);
+        t2.setInnerGraph(g2);
+        t2.setProperty("Label", "t2");
+        
+        // Assemble the second graph: graphB
+        
+        EmptyVertex f1 = new EmptyVertex(1001);
+        f1.addAP(APCA);
+        f1.setProperty("Label", "f1001");
+        
+        EmptyVertex f2 = new EmptyVertex(1002);
+        f2.addAP(APCA);
+        f2.addAP(APCB);
+        f2.setProperty("Label", "f1002");
+        
+        EmptyVertex f3 = new EmptyVertex(1003);
+        f3.addAP(APCB);
+        f3.addAP(APCC);
+        f3.setProperty("Label", "f1003");
+
+        EmptyVertex f4 = new EmptyVertex(1004);
+        f4.addAP(APCC);
+        f4.setProperty("Label", "f1004");
+
+        EmptyVertex f5 = new EmptyVertex(1005);
+        f5.addAP(APCC);
+        f5.setProperty("Label", "f1005");
+        
+        DENOPTIMGraph graphB = new DENOPTIMGraph();
+        graphB.addVertex(f1);
+        graphB.appendVertexOnAP(f1.getAP(0), t2.getAP(0));
+        graphB.appendVertexOnAP(t2.getAP(2), f2.getAP(0));
+        graphB.appendVertexOnAP(f2.getAP(1), f3.getAP(0));
+        graphB.appendVertexOnAP(f3.getAP(1), f4.getAP(0));
+        graphB.appendVertexOnAP(t2.getAP(1), f5.getAP(0));
+        graphB.setGraphId(22222);
+        
+        DENOPTIMGraph[] pair = new DENOPTIMGraph[2];
+        pair[0] = graphA;
+        pair[1] = graphB;
+        
+        return pair;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the compatibility matrix (src -> trg);
+     * 
+     * <pre>
+     *      |  A  |  B  |  C  |  D  |
+     *    ---------------------------
+     *    A |  T  |     |     |     |
+     *    ---------------------------
+     *    B |     |  T  |  T  |     |
+     *    ---------------------------
+     *    C |     |     |  T   |     |
+     *    ---------------------------
+     *    D |     |     |     |  T  |
+     * </pre>
+     */
+    private void prepareAPClassCompatibility() throws Exception
+    {
+        // Prepare APClass compatibility rules
+        APCA = APClass.make("A", 0);
+        APCB = APClass.make("B", 0);
+        APCC = APClass.make("C", 0);
+        APCD = APClass.make("D", 0);
+        
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        lstA.add(APCA);
+        cpMap.put(APCA, lstA);
+        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        lstB.add(APCB);
+        lstB.add(APCC);
+        cpMap.put(APCB, lstB);
+        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        lstC.add(APCC);
+        cpMap.put(APCC, lstC);
+        ArrayList<APClass> lstD = new ArrayList<APClass>();
+        lstD.add(APCD);
+        cpMap.put(APCD, lstD);
+        
+        HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
+        HashSet<APClass> forbEnds = new HashSet<APClass>();
+        
+        FragmentSpace.setCompatibilityMatrix(cpMap);
+        FragmentSpace.setCappingMap(capMap);
+        FragmentSpace.setForbiddenEndList(forbEnds);
+        FragmentSpace.setAPclassBasedApproach(true);
+        
+        FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
+        FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
+        FragmentSpace.setCappingLibrary(new ArrayList<DENOPTIMVertex>());
     }
 
 //------------------------------------------------------------------------------

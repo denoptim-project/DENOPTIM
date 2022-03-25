@@ -2,14 +2,18 @@
 # Parameters for DENOPTIM
 #
 TESTGENOPS-OP=xover
-TESTGENOPS-inpFileMale=OTF_WDIR/male.sdf
-TESTGENOPS-inpFileFemale=OTF_WDIR/female.sdf
-TESTGENOPS-outFileMale=OTF_WDIR/male_xo.sdf
-TESTGENOPS-outFileFemale=OTF_WDIR/female_xo.sdf
+TESTGENOPS-inpFileMale=OTF_WDIR/male-2.sdf
+TESTGENOPS-inpFileFemale=OTF_WDIR/female-2.sdf
+TESTGENOPS-outFileMale=OTF_WDIR/male-2_xo.sdf
+TESTGENOPS-outFileFemale=OTF_WDIR/female-2_xo.sdf
 # this will change the structure of both templates.
 # So, they must have a permissive contract
-TESTGENOPS-VERTEXMALE=2, 4
-TESTGENOPS-VERTEXFEMALE=6, 3
+TESTGENOPS-VERTEXMALE=2
+TESTGENOPS-SUBGRAPHENDMALE=6
+TESTGENOPS-SUBGRAPHENDMALE=3
+TESTGENOPS-VERTEXFEMALE=3
+TESTGENOPS-SUBGRAPHENDFEMALE=4
+TESTGENOPS-SUBGRAPHENDFEMALE=5
 TESTGENOPS-XOVERTYPE=SUBGRAPH
 
 # Definition of the Fragment Space

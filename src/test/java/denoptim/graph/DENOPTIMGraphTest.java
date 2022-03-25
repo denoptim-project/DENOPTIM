@@ -58,12 +58,6 @@ public class DENOPTIMGraphTest {
         APCD = APClass.make(d, 99);
         CAPP = APClass.make(cap, 1);
         
-        HashMap<String,BondType> boMap = new HashMap<String,BondType>();
-        boMap.put(a,BondType.SINGLE);
-        boMap.put(b,BondType.SINGLE);
-        boMap.put(c,BondType.SINGLE);
-        boMap.put(d,BondType.DOUBLE);
-        
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
         ArrayList<APClass> lstA = new ArrayList<APClass>();

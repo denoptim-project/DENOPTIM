@@ -1,0 +1,26 @@
+#
+# Parameters for DENOPTIM
+#
+TESTGENOPS-OP=xover
+TESTGENOPS-inpFileMale=OTF_WDIR/male-3.sdf
+TESTGENOPS-inpFileFemale=OTF_WDIR/female-3.sdf
+TESTGENOPS-outFileMale=OTF_WDIR/male-3_xo.sdf
+TESTGENOPS-outFileFemale=OTF_WDIR/female-3_xo.sdf
+# this will change the structure of both templates.
+# So, they must have a permissive contract
+TESTGENOPS-VERTEXMALE=1, 225
+TESTGENOPS-SUBGRAPHENDMALE=1, 228
+TESTGENOPS-SUBGRAPHENDMALE=1, 226
+TESTGENOPS-VERTEXFEMALE=1, 241
+TESTGENOPS-SUBGRAPHENDFEMALE=1, 242
+TESTGENOPS-SUBGRAPHENDFEMALE=1, 243
+TESTGENOPS-XOVERTYPE=SUBGRAPH
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds
+

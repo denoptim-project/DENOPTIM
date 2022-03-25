@@ -15,36 +15,39 @@ do
     sed "$sedInPlace" "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
 done
 
-#Run sub tests
-"$javaDENOPTIM" -jar "$denoptimJar" -r GO "t28.params" > "t28.log" 2>&1 
-
-# Checking outcome
-nChecks=0
-for xoResult in 'male_xo.sdf' 'female_xo.sdf'
+for i in 1 2 3
 do
-    if [ ! -f "$xoResult" ]; then
-        echo "Test 't28' NOT PASSED (symptom: file $xoResult not found)"
-        exit -1
-    fi
-    nEnd=$(grep -n "M *END" "$xoResult" | awk -F':' '{print $1}')
-    nEndRef=$(grep -n "M *END" "expected_output/$xoResult" | awk -F':' '{print $1}')
-    for el in 'C' 'N' 'P' 'H' 'O' 'As'
+    #Run sub tests
+    "$javaDENOPTIM" -jar "$denoptimJar" -r GO "t28-$i.params" > "t28-$i.log" 2>&1 
+    
+    # Checking outcome
+    nChecks=0
+    for xoResult in "male-${i}_xo.sdf" "female-${i}_xo.sdf"
     do
-        nEl=$(head -n "$nEnd" "$xoResult" | grep -c " $el   ")
-        nElRef=$(head -n "$nEndRef" "expected_output/$xoResult" | grep -c " $el   ")
-        if [ "$nEl" -ne "$nElRef" ]; then
-            echo "Test 't28' NOT PASSED (symptom: wrong number of $el atoms in $xoResult: $nEl, should be $nElRef)"
+        if [ ! -f "$xoResult" ]; then
+            echo "Test 't28' NOT PASSED (symptom: file $xoResult not found)"
             exit -1
         fi
-        nChecks=$((nChecks+1))
+        nEnd=$(grep -n "M *END" "$xoResult" | awk -F':' '{print $1}')
+        nEndRef=$(grep -n "M *END" "expected_output/$xoResult" | awk -F':' '{print $1}')
+        for el in 'C' 'N' 'P' 'H' 'O' 'As'
+        do
+            nEl=$(head -n "$nEnd" "$xoResult" | grep -c " $el   ")
+            nElRef=$(head -n "$nEndRef" "expected_output/$xoResult" | grep -c " $el   ")
+            if [ "$nEl" -ne "$nElRef" ]; then
+                echo "Test 't28' NOT PASSED (symptom: wrong number of $el atoms in $xoResult: $nEl, should be $nElRef)"
+                exit -1
+            fi
+            nChecks=$((nChecks+1))
+        done
     done
+    
+    if [ "$nChecks" -ne 12 ]
+    then
+        echo "Test 't28-$i' NOT PASSED (sympton: wrong number of checks $nChecks)"
+        exit -1
+    fi
 done
-
-if [ "$nChecks" -ne 12 ]
-then
-    echo "Test 't28' NOT PASSED (sympton: wrong number of checks $nChecks)"
-    exit -1
-fi
 
 echo "Test 't28' PASSED"
 exit 0
