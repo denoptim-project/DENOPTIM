@@ -26,11 +26,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.APMapping;
 import denoptim.graph.Candidate;
+import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
@@ -64,7 +67,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     /**
      * Crossover compatibility between members
      */
-    private XoverCompatibilitySites xoverCompatibilities;
+    private XoverSitesAmongCandidates xoverCompatibilities;
    
 //------------------------------------------------------------------------------
 
@@ -73,7 +76,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         super();
         if (FragmentSpace.useAPclassBasedApproach())
         {
-            xoverCompatibilities = new XoverCompatibilitySites();
+            xoverCompatibilities = new XoverSitesAmongCandidates();
         }
     }
     
@@ -182,7 +185,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         return clone;
     }
     
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------    
     
     /**
      * A data structure collecting crossover-compatible sites. This class wants
@@ -194,48 +197,46 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * reproducibility in the generation of list of keys for the inner map. The
      * order of the keys is given by insertion order.
      */
-    private class XoverCompatibilitySites
+    private class XoverSitesAmongCandidates
     {
         private LinkedHashMap<Candidate,
-        LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>> data;
+        LinkedHashMap<Candidate,List<XoverSite>>> data;
         
         /**
          * Initializes an empty data structure.
          */
-        public XoverCompatibilitySites()
+        public XoverSitesAmongCandidates()
         {
             data = new LinkedHashMap<Candidate,LinkedHashMap<Candidate, 
-                    List<DENOPTIMVertex[]>>>();
+                    List<XoverSite>>>();
         }
         
         /**
          * Creates the entry corresponding to the pair of given candidates.
          * @param c1
          * @param c2
-         * @param pairs list of crossover-compatible pairs of vertexes. 
-         * The order is
+         * @param xoversite list of crossover-compatible sites. The order
          * of the vertexes is expected to be consistent to that of the arguments
          * given to this method.
          */
         public void put(Candidate c1, Candidate c2, 
-                List<DENOPTIMVertex[]> pairs)
+                List<XoverSite> xoversite)
         {     
             if (data.containsKey(c1))
             {
-                data.get(c1).put(c2, pairs);
+                data.get(c1).put(c2, xoversite);
             } else {
-                LinkedHashMap<Candidate,List<DENOPTIMVertex[]>> toC1 = 
-                        new LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>();
-                toC1.put(c2, pairs);
+                LinkedHashMap<Candidate,List<XoverSite>> toC1 = 
+                        new LinkedHashMap<Candidate,List<XoverSite>>();
+                toC1.put(c2, xoversite);
                 data.put(c1, toC1);
             }
             
-            List<DENOPTIMVertex[]> revPairs = 
-                    new ArrayList<DENOPTIMVertex[]>();
-            for (DENOPTIMVertex[] pair : pairs)
+            List<XoverSite> revPairs = 
+                    new ArrayList<XoverSite>();
+            for (XoverSite pair : xoversite)
             {
-                DENOPTIMVertex[] revPair = pair.clone();
-                Collections.reverse(Arrays.asList(revPair));
+                XoverSite revPair = pair.createMirror();
                 revPairs.add(revPair);
             }
             
@@ -243,8 +244,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             {
                 data.get(c2).put(c1, revPairs);
             } else {
-                LinkedHashMap<Candidate,List<DENOPTIMVertex[]>> toC2 = 
-                        new LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>();
+                LinkedHashMap<Candidate,List<XoverSite>> toC2 = 
+                        new LinkedHashMap<Candidate,List<XoverSite>>();
                 toC2.put(c1, revPairs);
                 data.put(c2, toC2);
             }
@@ -256,7 +257,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
          * @param c2
          * @return the list of compatible pairs or null.
          */
-        public List<DENOPTIMVertex[]> get(Candidate c1, Candidate c2)
+        public List<XoverSite> get(Candidate c1, Candidate c2)
         {
             if (data.containsKey(c1))
             {
@@ -311,7 +312,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         public void remove(Candidate c)
         {
             data.remove(c);
-            for (LinkedHashMap<Candidate, List<DENOPTIMVertex[]>> m : 
+            for (LinkedHashMap<Candidate, List<XoverSite>> m : 
                 data.values())
             {
                 m.remove(c);
@@ -323,19 +324,19 @@ public class Population extends ArrayList<Candidate> implements Cloneable
          * new objects, but the references to candidates and vertexes will point
          * to the original instances.
          */
-        public XoverCompatibilitySites clone()
+        public XoverSitesAmongCandidates clone()
         {
-            XoverCompatibilitySites cloned = new XoverCompatibilitySites();
+            XoverSitesAmongCandidates cloned = new XoverSitesAmongCandidates();
             for (Candidate c1 : data.keySet())
             {
-                LinkedHashMap<Candidate, List<DENOPTIMVertex[]>> inner =
-                        new LinkedHashMap<Candidate, List<DENOPTIMVertex[]>>();
+                LinkedHashMap<Candidate, List<XoverSite>> inner =
+                        new LinkedHashMap<Candidate, List<XoverSite>>();
                 for (Candidate c2 : data.get(c1).keySet())
                 {
-                    List<DENOPTIMVertex[]> lst = new ArrayList<DENOPTIMVertex[]>();
-                    for (DENOPTIMVertex[] arr : data.get(c1).get(c2))
+                    List<XoverSite> lst = new ArrayList<XoverSite>();
+                    for (XoverSite arr : data.get(c1).get(c2))
                     {
-                        lst.add(Arrays.copyOf(arr,arr.length));
+                        lst.add(arr.clone());
                     }
                     inner.put(c2,lst);
                 }
@@ -382,8 +383,21 @@ public class Population extends ArrayList<Candidate> implements Cloneable
                 
             List<DENOPTIMVertex[]> xoverSites = DENOPTIMGraphOperations
                     .locateCompatibleXOverPoints(gA, gB);
-   
-            xoverCompatibilities.put(memberA, memberB, xoverSites);
+ 
+            //TODO-gg this will change once consistency is achieved wrt xoversites format
+            ArrayList<XoverSite> sites = new ArrayList<XoverSite>();
+            for (DENOPTIMVertex[] pair : xoverSites)
+            {
+                List<DENOPTIMVertex> sgA = new ArrayList<DENOPTIMVertex>();
+                sgA.add(pair[0]);
+
+                List<DENOPTIMVertex> sgB = new ArrayList<DENOPTIMVertex>();
+                sgB.add(pair[1]);
+                XoverSite xos = new XoverSite(sgA, sgB);
+                sites.add(xos);
+            }
+            
+            xoverCompatibilities.put(memberA, memberB, sites);
         }
         
         return xoverCompatibilities.getMembersCompatibleWith(memberA);
@@ -401,7 +415,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * @param parentB
      * @return the list crossover sites.
      */
-    public List<DENOPTIMVertex[]> getXoverSites(Candidate parentA,
+    public List<XoverSite> getXoverSites(Candidate parentA,
             Candidate parentB)
     {
         return xoverCompatibilities.get(parentA,parentB);
@@ -483,13 +497,13 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         List<DENOPTIMVertex> alreadyIncludedFromM = new ArrayList<DENOPTIMVertex>();
         List<DENOPTIMVertex> alreadyIncludedFromF = new ArrayList<DENOPTIMVertex>();
         //NB: the vertexes are the target sides of edges where we can do xover.
-        List<DENOPTIMVertex[]> xoverCompatPairs = new ArrayList<DENOPTIMVertex[]>();
+        List<XoverSite> xoverCompatPairs = new ArrayList<XoverSite>();
         xoverCompatPairs.addAll(getXoverSites(maleCandidate, 
                 femaleCandidate));
         int initSize = xoverCompatPairs.size();
         for (int iPair=0; iPair<initSize; iPair++)
         {
-            DENOPTIMVertex[] pair = null;
+            XoverSite pair = null;
             if (sequence==null)
             {
                 pair = RandomUtils.randomlyChooseOne(xoverCompatPairs);
@@ -502,8 +516,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             }
             
             // Exclude vertexes that are not downstream to the xover site
-            DENOPTIMVertex endOnM = pair[0];
-            DENOPTIMVertex endOnF = pair[1];
+            DENOPTIMVertex endOnM = pair.getA().get(0);
+            DENOPTIMVertex endOnF = pair.getB().get(0);
             if (!childTreeM.contains(endOnM) || !childTreeF.contains(endOnF))
                 continue;
             

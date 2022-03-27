@@ -302,20 +302,21 @@ public class EAUtils
         Candidate maleCandidate = null, femaleCandidate = null;
         DENOPTIMGraph maleGraph = null, femaleGraph = null;
         DENOPTIMVertex vertxOnMale = null, vertxOnFemale = null;
+        XoverSite xos = null;
         boolean foundPars = false;
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
         {   
             if (FragmentSpace.useAPclassBasedApproach())
             {
-                DENOPTIMVertex[] pair = EAUtils.performFBCC(eligibleParents, 
+                xos = EAUtils.performFBCC(eligibleParents, 
                         population, choiceOfParents, choiceOfXOverSites);
-                if (pair == null)
+                if (xos == null)
                 {
                     numatt++;
                     continue;
                 }
-                vertxOnMale = pair[0];
-                vertxOnFemale = pair[1];
+                vertxOnMale = xos.getA().get(0);
+                vertxOnFemale = xos.getB().get(0);
                 maleGraph = vertxOnMale.getGraphOwner();
                 maleCandidate = maleGraph.getCandidateOwner();
                 femaleGraph = vertxOnFemale.getGraphOwner();
@@ -1011,11 +1012,11 @@ public class EAUtils
      * @param choiceOfXOverSites the integers dictating the selection of 
      * crossover sites. Use this only to ensure reproducibility in tests, 
      * otherwise use <code>negative</code>
-     * @return returns the pair of vertexes where crossover can be performed,
-     * or null if no possibility was found.
+     * @return returns the definition of the crossover in terms of subgraphs 
+     * to swap.
      */
 
-    protected static DENOPTIMVertex[] performFBCC(
+    protected static XoverSite performFBCC(
             ArrayList<Candidate> eligibleParents, Population population, 
             int[] choiceOfParents, int choiceOfXOverSites)
     {
@@ -1043,7 +1044,7 @@ public class EAUtils
         if (parentB == null)
             return null;
         
-        DENOPTIMVertex[] result = null;
+        XoverSite result = null;
         if (choiceOfXOverSites<0)
         {
             result = RandomUtils.randomlyChooseOne(population.getXoverSites(

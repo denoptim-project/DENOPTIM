@@ -210,15 +210,12 @@ public class PopulationTest
     /**
      * Assumes the two lists have equal size
      */
-    private void compareSitesLists(List<DENOPTIMVertex[]> listA,
-            List<DENOPTIMVertex[]> listB)
+    private void compareSitesLists(List<XoverSite> listA,
+            List<XoverSite> listB)
     {
         for (int i=0; i<listA.size(); i++)
         {
-            DENOPTIMVertex[] pairA = listA.get(i);
-            DENOPTIMVertex[] pairB = listB.get(i);
-            assertEquals(pairA[0],pairB[0],"Identity of xover site");
-            assertEquals(pairA[1],pairB[1],"Identity of xover site");
+            assertTrue(listA.get(i).equals(listB.get(i)));
         }
     }
     
@@ -637,11 +634,11 @@ public class PopulationTest
                 new ArrayList<Candidate>(Arrays.asList(cE)));
         assertTrue(partners.contains(cE));
         
-        List<DENOPTIMVertex[]> subGraphSeeds = population.getXoverSites(cA,cE);
+        List<XoverSite> subGraphSeeds = population.getXoverSites(cA,cE);
         assertEquals(12,subGraphSeeds.size());
         
-        DENOPTIMVertex subGraphSeedA = subGraphSeeds.get(2)[0];
-        DENOPTIMVertex subGraphSeedE = subGraphSeeds.get(2)[1];
+        DENOPTIMVertex subGraphSeedA = subGraphSeeds.get(2).getA().get(0);
+        DENOPTIMVertex subGraphSeedE = subGraphSeeds.get(2).getB().get(0);
         
         List<List<DENOPTIMVertex>> subGraphEnds = 
                 population.getSwappableSubGraphEnds(cA,cE,gA,subGraphSeedA,
@@ -684,7 +681,7 @@ public class PopulationTest
         DenoptimIO.writeGraphToSDF(new File("/tmp/graphA.sdf"), gA, false);
         DenoptimIO.writeGraphToSDF(new File("/tmp/graphB.sdf"), gB, false);
         
-        List<DENOPTIMVertex[]> subGraphSeeds = population.getXoverSites(cA,cB);
+        List<XoverSite> subGraphSeeds = population.getXoverSites(cA,cB);
         assertEquals(0,subGraphSeeds.size());
         
         
