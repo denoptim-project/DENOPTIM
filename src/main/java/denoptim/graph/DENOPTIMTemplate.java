@@ -169,6 +169,18 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 //------------------------------------------------------------------------------
     
     /**
+     * Returns the contract level of this template, i.e., to what extent the 
+     * content of this template can be changed.
+     * @return the contract level of this template.
+     */
+    public ContractLevel getContractLevel()
+    {
+        return contractLevel;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
      * Imposes the given contract to this template.
      * @param contract the contract to impose on this template.
      */

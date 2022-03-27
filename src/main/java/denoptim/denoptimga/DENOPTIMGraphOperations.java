@@ -40,6 +40,7 @@ import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.SymmetricSet;
@@ -65,22 +66,23 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * Identify pair of vertices that are suitable for crossover. The criterion
+     * Identify pair of vertices that are suitable for crossover, i.e., swapping
+     * of the branches starting from those vertices. The criterion
      * for allowing crossover between two graph branches is defined by 
      * {@link #isCrossoverPossible(DENOPTIMEdge, DENOPTIMEdge)}. In addition,
      * the pair of seed vertexes (i.e., the first vertex of each branch to be 
      * moved) must not represent the same building block. Scaffolds are also 
-     * excluded.
-     * @param male <code>DENOPTIMGraph</code> of one member (the male) of the
+     * excluded. Further conditions that apply to crossover of subgraphs are not
+     * evaluated here because they depend of how much the subgraph extends 
+     * from the vertexex identified here.
+     * @param male <code>DENOPTIMGraph</code> of one member of the
      * parents.
-     * @param female <code>DENOPTIMGraph</code> of one member (the female) of
+     * @param female <code>DENOPTIMGraph</code> of one member of
      * the parents.
      * @return the list of pairs of vertex (Pairs ordered as 
      * <code>male:female</code>) that can be used as crossover points.
      */
     
-    //TODO-gg: make it respect template contract w.r.t. length of subgraph to swap
-
     protected static List<DENOPTIMVertex[]> locateCompatibleXOverPoints(
             DENOPTIMGraph male, DENOPTIMGraph female)
     {
@@ -120,11 +122,17 @@ public class DENOPTIMGraphOperations
                 continue;
             DENOPTIMTemplate tMale = (DENOPTIMTemplate) vMale;
             
+            if (tMale.getContractLevel() == ContractLevel.FIXED)
+                continue;
+            
             for (DENOPTIMVertex vFemale : female.getVertexList())
             {
                 if (!(vFemale instanceof DENOPTIMTemplate))
                     continue;
                 DENOPTIMTemplate tFemale = (DENOPTIMTemplate) vFemale;
+                
+                if (tFemale.getContractLevel() == ContractLevel.FIXED)
+                    continue;
                 
                 pairs.addAll(locateCompatibleXOverPoints(tMale.getInnerGraph(),
                         tFemale.getInnerGraph()));
@@ -1338,7 +1346,7 @@ public class DENOPTIMGraphOperations
         // Check if the subgraphs can be used with reversed edge direction, or
         // bias the AP mapping to use the original source vertexes.
         APMapping fixedRootAPs = null;
-        //TODO-GG REACTIVATE ONCE REDIRECTION OF EDGES IS IMPLEMENTED
+        //TODO-GG REACTIVATE ONCE REVERSION of the subgrsph's spanning tree is in place.
         //if (!subG_M.isReversible() || !subG_F.isReversible())
         if (true)
         {

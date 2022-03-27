@@ -32,6 +32,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.rings.PathSubGraph;
@@ -199,7 +200,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>> data;
         
         /**
-         * Initialises an empty data structure.
+         * Initializes an empty data structure.
          */
         public XoverCompatibilitySites()
         {
@@ -360,8 +361,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     {   
         DENOPTIMGraph gA = memberA.getGraph();
         
-        // First, update to cover any combination of members that has not been 
-        // considered before
+        // Update to make sure we cover any combination of members that has not 
+        // been considered before
         for (Candidate memberB : eligibleParents)
         {
             if (memberA == memberB)
@@ -440,7 +441,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     /**
      * For a pair of candidates (i.e., a pair of graphs), and a pair of valid 
      * crossover points, this method tries to identify a pair of subgraph that 
-     * can be swapped between the two graphs. To this end it searches for 
+     * can be swapped between the two graphs. To this end, it searches for 
      * subgraph end-points, i.e., vertexes where the subgraph starting with the 
      * vertexes given as parameters will end.
      * This method should always be run after the 
@@ -448,15 +449,24 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * populated the crossover compatibility data.
      * @param maleCandidate 
      * @param femaleCandidate
-     * @param maleGraph
-     * @param vertxOnMale
-     * @param femaleGraph
-     * @param vertxOnFemale
-     * @param sequence a sequence of integers used to by-pass random choices
+     * @param maleGraph the graph where a subgraph should be swapped (male side).
+     * This graph owns <code>vertxOnMale</code>.
+     * @param vertxOnMale the vertex defining the beginning of the swappable 
+     * subgraph (i.e., the crossover point) on the male.
+     * @param femaleGraph the graph where a subgraph should be swapped (female 
+     * side). This graph owns <code>vertxOnFemale</code>.
+     * @param vertxOnFemale  the vertex defining the beginning of the swappable 
+     * subgraph (i.e., the crossover point) on the female.
+     * @param sequence integers used to by-pass random choices
      * and ensure reproducibility of the results. Used only for testing, 
      * otherwise use <code>null</code>.
-     * @return
+     * @return the list of vertexes that, together with those vertexes given as 
+     * parameters (<code>vertxOnMale</code>, <code>vertxOnFemale</code>), 
+     * define a subgraph that can be swapped.
      */
+    
+    //TODO-gg remove candidate AND graph as they should be obtained from the vertexes
+    
     protected List<List<DENOPTIMVertex>> getSwappableSubGraphEnds(
             Candidate maleCandidate, Candidate femaleCandidate,
             DENOPTIMGraph maleGraph, DENOPTIMVertex vertxOnMale,
@@ -507,6 +517,19 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             PathSubGraph pathF = new PathSubGraph(vertxOnFemale, endOnF, femaleGraph);
             if (pathM.getPathLength()<2 || pathF.getPathLength()<2)
                 continue;
+
+            // If any partner is a fixed-structure templates...
+            if ((maleGraph.getTemplateJacket()!=null 
+                    && maleGraph.getTemplateJacket().getContractLevel()
+                    == ContractLevel.FIXED_STRUCT)
+                    || (femaleGraph.getTemplateJacket()!=null 
+                            && femaleGraph.getTemplateJacket().getContractLevel()
+                            == ContractLevel.FIXED_STRUCT))
+            {
+                //...the two paths should have same length.
+                if (pathM.getPathLength()!=pathF.getPathLength())
+                    continue;
+            }
             
             // OK, these vertexes's parents are usable ends of the subgraph
             // to swap

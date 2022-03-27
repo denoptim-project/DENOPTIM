@@ -37,6 +37,7 @@ import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
@@ -470,8 +471,9 @@ public class DENOPTIMGraphOperationsTest {
     }
     
 //------------------------------------------------------------------------------
-    
-    private String getLabel(DENOPTIMVertex v)
+    //TODO-gg swap string components
+    //TODO-gg mode to utils?
+    static String getLabel(DENOPTIMVertex v)
     {
         if (!v.hasProperty("Label"))
             return "";
@@ -481,7 +483,7 @@ public class DENOPTIMGraphOperationsTest {
     
 //------------------------------------------------------------------------------
     
-    private String getLabel(DENOPTIMGraph g, int vIdx)
+    static String getLabel(DENOPTIMGraph g, int vIdx)
     {
         if (!g.getVertexAtPosition(vIdx).hasProperty("Label"))
             return "";
@@ -492,7 +494,8 @@ public class DENOPTIMGraphOperationsTest {
 //------------------------------------------------------------------------------
     
     /**
-     * Generates a pair of graphs. The first is
+     * Generates a pair of graphs that include templates with free content. 
+     * The first graph is
      * <pre>
      *                (A)--(A)-m5
      *               /
@@ -522,7 +525,6 @@ public class DENOPTIMGraphOperationsTest {
      *  -(A)-tw1-(B)--(C)-tw2-(B)--(B)-tw3-(A)-(A)-tw4-(A)
      * </pre>
      */
-    @Test
     private DENOPTIMGraph[] getPairOfTestGraphs() throws Exception
     {
         prepareAPClassCompatibility();
@@ -572,6 +574,7 @@ public class DENOPTIMGraphOperationsTest {
         DENOPTIMTemplate t1 = new DENOPTIMTemplate(BBType.NONE);
         t1.setInnerGraph(g);
         t1.setProperty("Label", "t1");
+        t1.setContractLevel(ContractLevel.FREE);
         
         // Assemble the first graph: graphA
         
@@ -638,6 +641,7 @@ public class DENOPTIMGraphOperationsTest {
         DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.NONE);
         t2.setInnerGraph(g2);
         t2.setProperty("Label", "t2");
+        t2.setContractLevel(ContractLevel.FREE);
         
         // Assemble the second graph: graphB
         

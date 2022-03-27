@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,9 @@ import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.logging.Monitor;
@@ -46,7 +49,7 @@ public class PopulationTest
      * in other unit tests.
      */
     static void prepare() throws DENOPTIMException
-    {
+    {   
         APCA = APClass.make("A", 0, BondType.SINGLE);
         APCB = APClass.make("B", 0, BondType.SINGLE);
         APCC = APClass.make("C", 0, BondType.SINGLE);
@@ -637,9 +640,8 @@ public class PopulationTest
         List<DENOPTIMVertex[]> subGraphSeeds = population.getXoverSites(cA,cE);
         assertEquals(12,subGraphSeeds.size());
         
-        int hadCodedChoice = 2;
-        DENOPTIMVertex subGraphSeedA = subGraphSeeds.get(hadCodedChoice)[0];
-        DENOPTIMVertex subGraphSeedE = subGraphSeeds.get(hadCodedChoice)[1];
+        DENOPTIMVertex subGraphSeedA = subGraphSeeds.get(2)[0];
+        DENOPTIMVertex subGraphSeedE = subGraphSeeds.get(2)[1];
         
         List<List<DENOPTIMVertex>> subGraphEnds = 
                 population.getSwappableSubGraphEnds(cA,cE,gA,subGraphSeedA,
@@ -657,5 +659,263 @@ public class PopulationTest
     }
     
 //------------------------------------------------------------------------------
-      
+    
+    //TODO-gg @Test
+    public void testGetXoverSites_FixedStructureTmpls() throws Exception
+    {
+        prepare();
+        Population population = new Population();
+
+        DENOPTIMGraph[] pair = getPairOfTestGraphsB();
+        DENOPTIMGraph gA = pair[0];
+        DENOPTIMGraph gB = pair[1];
+        
+        Candidate cA = new Candidate("CA",gA);
+        population.add(cA);        
+
+        Candidate cB = new Candidate("CB",gB);
+        population.add(cB);
+        
+        ArrayList<Candidate> partners = population.getXoverPartners(cA, 
+                new ArrayList<Candidate>(Arrays.asList(cB)));
+        assertTrue(partners.contains(cB));
+        
+        //TODO-gg del
+        DenoptimIO.writeGraphToSDF(new File("/tmp/graphA.sdf"), gA, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/graphB.sdf"), gB, false);
+        
+        List<DENOPTIMVertex[]> subGraphSeeds = population.getXoverSites(cA,cB);
+        assertEquals(0,subGraphSeeds.size());
+        
+        
+        /*
+        // We hard-code the selection of a pair of xover sites as to choose
+        // sites that are inside the template vertexes, AND sites that are
+        // peculiar. This one, is be a place where xover that preserve the 
+        // structure is not possible
+        DENOPTIMVertex subGraphSeedA = subGraphSeeds.get(4)[0];
+        DENOPTIMVertex subGraphSeedB = subGraphSeeds.get(4)[1];
+        
+        // We do as many independent attempts as the number of possible end points
+        // This, just to test multiple possibilities.
+        for (int i=0; i<sizeXoverSiteList; i++)
+        {
+            List<List<DENOPTIMVertex>> subGraphEnds = 
+                    population.getSwappableSubGraphEnds(cA,cB,subGraphSeedA.getGraphOwner(),subGraphSeedA,
+                            subGraphSeedB.getGraphOwner(),subGraphSeedB, null);
+            
+            DENOPTIMGraph subGraphA = gA.extractSubgraph(subGraphSeedA, 
+                    subGraphEnds.get(0), false);
+            DENOPTIMGraph subGraphB = gB.extractSubgraph(subGraphSeedB,
+                    subGraphEnds.get(1),false);
+            
+            assertEquals(subGraphA.getVertexCount(),subGraphB.getVertexCount());
+        }
+        */
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Builds a pair of graphs that contain templates with fixed structure
+     * contract.
+     * 
+     * First Graph structure:
+     * <pre>
+     *               (C)--(C)-v1
+     *              /
+     * v0-(A)--(A)-T1-(B)--(B)-v2-(C)--(C)-v3
+     * </pre>
+     * where template T1 is
+     * <pre>
+     *                     
+     *    (A)-v0-(A)--(A)-v1-(B)--(B)-v2-(C)
+     *         |           |
+     *        (A)         (A)--(A)-v5
+     *         |                    |
+     *         |                   chord
+     *         |                    |
+     *        (A)         (A)--(A)-v6
+     *         |           |
+     *        v3-(A)--(A)-v4-(B)
+     * </pre>
+     * 
+     * The second Graph structure:
+     * <pre>
+     * v0-(A)--(A)-T2-(B)--(B)-v2-(C)--(C)-v3
+     * </pre>
+     * where template T2 is
+     * <pre>
+     *                     
+     *    (A)-v0-(A)--(A)-v1-(B)--(B)-v2
+     *         |           
+     *        (A) 
+     *         |                 
+     *        (A)         (A)--(A)-v5
+     *         |           |
+     *        v3-(A)--(A)-v4-(B)
+     * </pre>
+     */
+    private DENOPTIMGraph[] getPairOfTestGraphsB() throws Exception
+    {   
+        // Prepare special building block: template T1
+        EmptyVertex v0 = new EmptyVertex(0);
+        v0.addAP(APCA);
+        v0.addAP(APCA);
+        v0.addAP(APCA);
+        v0.setProperty("Label", "tv0");
+        
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(APCA);
+        v1.addAP(APCA);
+        v1.addAP(APCB);
+        v1.setProperty("Label", "tv1");
+        
+        EmptyVertex v2 = new EmptyVertex(2);
+        v2.addAP(APCB);
+        v2.addAP(APCC);
+        v2.setProperty("Label", "tv2");
+        
+        EmptyVertex v3 = new EmptyVertex(3);
+        v3.addAP(APCA);
+        v3.addAP(APCA);
+        v3.setProperty("Label", "tv3");
+
+        EmptyVertex v4 = new EmptyVertex(4);
+        v4.addAP(APCA);
+        v4.addAP(APCB);
+        v4.addAP(APCA);
+        v4.setProperty("Label", "tv4");
+        
+        EmptyVertex v5 = new EmptyVertex(5);
+        v5.addAP(APCA);
+        v5.setProperty("Label", "tv5");
+        v5.setAsRCV(true);
+        
+        EmptyVertex v6 = new EmptyVertex(6);
+        v6.addAP(APCA);
+        v6.setProperty("Label", "tv6");
+        v6.setAsRCV(true);
+        
+        DENOPTIMGraph g = new DENOPTIMGraph();
+        g.addVertex(v0);
+        g.setGraphId(-1);
+        g.appendVertexOnAP(v0.getAP(1), v1.getAP(0));
+        g.appendVertexOnAP(v1.getAP(2), v2.getAP(0));
+        g.appendVertexOnAP(v1.getAP(1), v5.getAP(0));
+        g.appendVertexOnAP(v0.getAP(0), v3.getAP(0));
+        g.appendVertexOnAP(v3.getAP(1), v4.getAP(0));
+        g.appendVertexOnAP(v4.getAP(2), v6.getAP(0));
+        g.addRing(v5, v6, BondType.TRIPLE);
+        
+        DENOPTIMTemplate t1 = new DENOPTIMTemplate(BBType.NONE);
+        t1.setInnerGraph(g);
+        t1.setProperty("Label", "t1");
+        t1.setContractLevel(ContractLevel.FIXED_STRUCT);
+        
+        // Assemble the first graph: graphA
+        EmptyVertex m0 = new EmptyVertex(100);
+        m0.addAP(APCA);
+        m0.setProperty("Label", "m100");
+        
+        EmptyVertex m1 = new EmptyVertex(101);
+        m1.addAP(APCC);
+        m1.setProperty("Label", "m101");
+        
+        EmptyVertex m2 = new EmptyVertex(102);
+        m2.addAP(APCB);
+        m2.addAP(APCC);
+        m2.setProperty("Label", "m102");
+        
+        EmptyVertex m3 = new EmptyVertex(103);
+        m3.addAP(APCC);
+        m3.setProperty("Label", "m103");
+        
+        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        graphA.addVertex(m0);
+        graphA.appendVertexOnAP(m0.getAP(0), t1.getAP(0)); // A on T1
+        graphA.appendVertexOnAP(t1.getAP(1), m1.getAP(0)); // C on T1
+        graphA.appendVertexOnAP(t1.getAP(2), m2.getAP(0));
+        graphA.appendVertexOnAP(m2.getAP(1), m3.getAP(0));
+        graphA.setGraphId(11111);
+        
+        // Done with GraphA!
+        
+        // Prepare special building block: template T2
+        EmptyVertex w0 = new EmptyVertex(0);
+        w0.addAP(APCA);
+        w0.addAP(APCA);
+        w0.addAP(APCA);
+        w0.setProperty("Label", "tw0");
+        
+        EmptyVertex w1 = new EmptyVertex(1);
+        w1.addAP(APCA);
+        w1.addAP(APCB);
+        w1.setProperty("Label", "tw1");
+        
+        EmptyVertex w2 = new EmptyVertex(2);
+        w2.addAP(APCB);
+        w2.setProperty("Label", "tw2");
+        
+        EmptyVertex w3 = new EmptyVertex(3);
+        w3.addAP(APCA);
+        w3.addAP(APCA);
+        w3.setProperty("Label", "tw3");
+
+        EmptyVertex w4 = new EmptyVertex(4);
+        w4.addAP(APCA);
+        w4.addAP(APCB);
+        w4.addAP(APCA);
+        w4.setProperty("Label", "tw4");
+        
+        EmptyVertex w5 = new EmptyVertex(5);
+        w5.addAP(APCA);
+        w5.setProperty("Label", "tw5");
+        
+        DENOPTIMGraph g2 = new DENOPTIMGraph();
+        g2.addVertex(w0);
+        g2.setGraphId(-1);
+        g2.appendVertexOnAP(w0.getAP(1), w1.getAP(0));
+        g2.appendVertexOnAP(w1.getAP(1), w2.getAP(0));
+        g2.appendVertexOnAP(w0.getAP(0), w3.getAP(0));
+        g2.appendVertexOnAP(w3.getAP(1), w4.getAP(0));
+        g2.appendVertexOnAP(w4.getAP(2), w5.getAP(0));
+
+        DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.NONE);
+        t2.setInnerGraph(g2);
+        t2.setProperty("Label", "t2");
+        t2.setContractLevel(ContractLevel.FIXED_STRUCT);
+        
+        // Assemble the first graph: graphA
+        EmptyVertex n0 = new EmptyVertex(200);
+        n0.addAP(APCA);
+        n0.setProperty("Label", "m200");
+        
+        EmptyVertex n2 = new EmptyVertex(202);
+        n2.addAP(APCB);
+        n2.addAP(APCC);
+        n2.setProperty("Label", "m202");
+        
+        EmptyVertex n3 = new EmptyVertex(203);
+        n3.addAP(APCC);
+        n3.setProperty("Label", "m203");
+        
+        DENOPTIMGraph graphB = new DENOPTIMGraph();
+        graphB.addVertex(n0);
+        graphB.appendVertexOnAP(n0.getAP(0), t2.getAP(0)); // A on T2
+        graphB.appendVertexOnAP(t2.getAP(1), n2.getAP(0)); // B on T2
+        graphB.appendVertexOnAP(n2.getAP(1), n3.getAP(0));
+        graphB.setGraphId(22222);
+        
+        // Done with GraphB!
+        
+        DENOPTIMGraph[] pair = new DENOPTIMGraph[2];
+        pair[0] = graphA;
+        pair[1] = graphB;
+        
+        return pair;
+    }
+ 
+//------------------------------------------------------------------------------
+
 }
