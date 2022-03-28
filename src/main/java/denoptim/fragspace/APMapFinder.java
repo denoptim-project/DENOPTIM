@@ -62,10 +62,8 @@ public class APMapFinder
      * @param vB the second vertex.
      * @param screenAll use <code>true</code> to NOT stop at the first 
      * compatible combinations.
-     * @throws DENOPTIMException
      */
-    public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll) 
-            throws DENOPTIMException
+    public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll)
     {
         initialize(vA, vB, null, screenAll, false, true);
     }
@@ -92,12 +90,10 @@ public class APMapFinder
      * that include all of the APs on the first vertex.
      * @param compatibleIfFree use <code>true</code> to make APs that are 
      * available (i.e., available throughout the template barriers) be compatible.
-     * @throws DENOPTIMException
      */
     public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, 
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
-                    throws DENOPTIMException
     {
         initialize(vA, vB, fixedRootAPs, screenAll, onlyCompleteMappings,
                 compatibleIfFree);
@@ -125,11 +121,10 @@ public class APMapFinder
      * that include all of the APs on the first vertex.
      * @param compatibleIfFree use <code>true</code> to make APs that are 
      * available (i.e., available throughout the template barriers) be compatible.
-     * @throws DENOPTIMException
      */
     private void initialize(DENOPTIMVertex vA, DENOPTIMVertex vB, 
             APMapping fixedRootAPs, boolean screenAll, 
-            boolean onlyCompleteMappings, boolean compatibleIfFree) throws DENOPTIMException
+            boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
         // We map all the compatibilities before choosing a specific mapping
         LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 

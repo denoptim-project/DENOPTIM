@@ -277,7 +277,8 @@ public class EmptyVertex extends DENOPTIMVertex
         }
         c.setSymmetricAPSets(cLstSymAPs);
         c.setProperties(this.copyStringBasedProperties());
-        c.uniquefyingPropertyKeys.addAll(uniquefyingPropertyKeys);
+        if (uniquefyingPropertyKeys!=null)
+            c.uniquefyingPropertyKeys.addAll(uniquefyingPropertyKeys);
         return c;
     }
     

@@ -1149,7 +1149,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         {
             Object v = properties.get(k);
             if ((k instanceof String && v instanceof String)
-                    || uniquefyingPropertyKeys.contains(k))
+                    || (uniquefyingPropertyKeys!=null 
+                        && uniquefyingPropertyKeys.contains(k)))
             {
                 copy.put(k,v);
             }

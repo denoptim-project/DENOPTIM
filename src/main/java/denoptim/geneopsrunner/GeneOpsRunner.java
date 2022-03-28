@@ -176,9 +176,11 @@ public class GeneOpsRunner extends ProgramTask
             xoverType = CrossoverType.SUBGRAPH;
         
         List<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
+        subGraphA.add(vm);
         male.getChildTreeLimited(vm, subGraphA, getSubGraphEnds(male,
                 GeneOpsRunnerParameters.xoverSubGraphEndMale, "crossover"));
         List<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
+        subGraphB.add(vf);
         female.getChildTreeLimited(vf, subGraphB, getSubGraphEnds(female,
                 GeneOpsRunnerParameters.xoverSubGraphEndFemale, "crossover"));
         XoverSite xos = new XoverSite(subGraphA,subGraphB,xoverType);

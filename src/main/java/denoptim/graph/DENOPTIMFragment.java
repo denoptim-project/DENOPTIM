@@ -693,7 +693,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         clone.setSymmetricAPSets(cLstSymAPs);
         clone.setAsRCV(this.isRCV());
         clone.setProperties(this.copyStringBasedProperties());
-        clone.uniquefyingPropertyKeys.addAll(uniquefyingPropertyKeys);
+        if (uniquefyingPropertyKeys!=null)
+            clone.uniquefyingPropertyKeys.addAll(uniquefyingPropertyKeys);
 		return clone;
     }
 

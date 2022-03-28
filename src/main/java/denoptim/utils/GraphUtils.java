@@ -26,6 +26,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMVertex;
 
 
 /**
@@ -186,6 +187,26 @@ public class GraphUtils
         {
             iac.setProperty(DENOPTIMConstants.GMSGTAG,g.getLocalMsg());
         }
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static String getLabel(DENOPTIMVertex v)
+    {
+        if (!v.hasProperty("Label"))
+            return "";
+        return v.getGraphOwner().getGraphId()+"@"+v.getProperty(
+                "Label").toString();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static String getLabel(DENOPTIMGraph g, int vIdx)
+    {
+        if (!g.getVertexAtPosition(vIdx).hasProperty("Label"))
+            return "";
+        return g.getGraphId() + "@" + g.getVertexAtPosition(vIdx).getProperty(
+                "Label").toString();
     }
     
 //------------------------------------------------------------------------------

@@ -21,6 +21,7 @@ package denoptim.denoptimga;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +29,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
+
+import org.paukov.combinatorics3.Generator;
 
 import com.google.common.collect.Sets;
 
@@ -209,7 +212,10 @@ public class DENOPTIMGraphOperations
             
             // To limit the number of combination, we first get rid of endpoint
             // candidates that cannot be used
-            Set<DENOPTIMVertex[]> combinablePairs = new HashSet<DENOPTIMVertex[]>();
+
+            //TODO-gg delete Set
+            Set<DENOPTIMVertex[]> combinablePairsSet = new HashSet<DENOPTIMVertex[]>();
+            List<DENOPTIMVertex[]> combinablePairs = new ArrayList<DENOPTIMVertex[]>();
             for (DENOPTIMVertex[] otherPair : compatibleVrtxPairs)
             {
                 // Exclude vertexes that are not downstream to the seed of the subgraph
@@ -236,91 +242,18 @@ public class DENOPTIMGraphOperations
                     if (pathA.getPathLength()!=pathB.getPathLength())
                         continue;
                 }
-                combinablePairs.add(otherPair);
+                combinablePairsSet.add(otherPair);
+                if (!combinablePairs.contains(otherPair))
+                    combinablePairs.add(otherPair);
             }
             
-            //TODO-gg randomize and add limit to avoid explosion
-            for (int i=1; i<(combinablePairs.size()+1); i++)
-            {
-                Set<Set<DENOPTIMVertex[]>> allCominationOfEnds = 
-                        Sets.combinations(combinablePairs, i);
-                //NB in case of endpoints on the same branch this takes always the longest path
-                for (Set<DENOPTIMVertex[]> cominationOfEnds : allCominationOfEnds)
-                {
-                    // Exclude overlapping combinations
-                    boolean exclude = false;
-                    for (DENOPTIMVertex[] pairA : cominationOfEnds)
-                    {
-                        for (DENOPTIMVertex[] pairB : cominationOfEnds)
-                        {
-                            if (pairA==pairB)
-                                continue;
-                            
-                            if (pairA[0]==pairB[0] || pairA[1]==pairB[1])
-                            {
-                                exclude = true;
-                                break;
-                            }
-                        }
-                        if (exclude)
-                            break;
-                    }
-                    if (exclude)
-                        continue;
-                    
-                    List<DENOPTIMVertex> subGraphEndInA = new ArrayList<DENOPTIMVertex>();
-                    List<DENOPTIMVertex> subGraphEndInB = new ArrayList<DENOPTIMVertex>();
-                    List<DENOPTIMVertex> alreadyIncludedFromA = new ArrayList<DENOPTIMVertex>();
-                    List<DENOPTIMVertex> alreadyIncludedFromB = new ArrayList<DENOPTIMVertex>();
-                    for (DENOPTIMVertex[] otherPair : cominationOfEnds)
-                    {
-                        DENOPTIMVertex endOnA = otherPair[0];
-                        DENOPTIMVertex endOnB = otherPair[1];
-                        
-                        // Ignore vertexes that are already part of the subgraph
-                        if (alreadyIncludedFromA.contains(endOnA)
-                                || alreadyIncludedFromB.contains(endOnB))
-                            continue;
-                        
-                        PathSubGraph pathA = new PathSubGraph(vA, 
-                                endOnA.getParent(), gA);
-                        PathSubGraph pathB = new PathSubGraph(vB, 
-                                endOnB.getParent(), gB);
-                        subGraphEndInA.add(endOnA.getParent());
-                        subGraphEndInB.add(endOnB.getParent());
-                        alreadyIncludedFromA.addAll(pathA.getVertecesPath());
-                        alreadyIncludedFromB.addAll(pathB.getVertecesPath());
-                    }
-                    ArrayList<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
-                    subGraphA.add(vA);
-                    if (!subGraphEndInA.contains(vA))
-                        gA.getChildTreeLimited(vA, subGraphA, subGraphEndInA, true);
-
-                    ArrayList<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
-                    subGraphB.add(vB);
-                    if (!subGraphEndInB.contains(vB))
-                        gB.getChildTreeLimited(vB, subGraphB, subGraphEndInB, true);
-                    
-                    // The two subgraphs must not be isomorfic to prevent unproductive crossover
-                    try {
-                        DENOPTIMGraph subGraphCloneA = gA.extractSubgraph(subGraphA);
-                        DENOPTIMGraph subGraphCloneB = gB.extractSubgraph(subGraphB);
-                        if (subGraphCloneA.isIsomorphicTo(subGraphCloneB))
-                            continue;
-                    } catch (DENOPTIMException e)
-                    {
-                        //This will never happen
-                        e.printStackTrace();
-                        continue;
-                    }
-                    
-                    //TODO-gg for fixed.structure templates the two subgraphs
-                    // must have same structure.
-                    
-                    checkAndAddXoverSites(subGraphA, subGraphB, 
-                            CrossoverType.SUBGRAPH, sites);
-                }
-            }
+            // NB: use this combinatiorial generator because it retains the 
+            // sequence of generated subsets (important for reproducibility)
+            Generator.subset(combinablePairs)
+                .simple()
+                .stream()
+                .limit(500) // Prevent explosion!
+                .forEach(c -> processCombinationOfEndPoints(pair,c,sites));
         }
         
         // NB: we consider only templates that are at the same level of embedding
@@ -356,9 +289,110 @@ public class DENOPTIMGraphOperations
     
 //------------------------------------------------------------------------------
     
+    private static void processCombinationOfEndPoints(DENOPTIMVertex[] pair,
+            List<DENOPTIMVertex[]> cominationOfEnds,
+            List<XoverSite> xoverSitesCollector)
+    {
+        // Empty set corresponds to using the entire branch and subgraph and
+        // has been already dealt with at this point
+        if (cominationOfEnds.size()==0)
+            return;
+        
+        Generator.permutation(cominationOfEnds)
+            .simple()
+            .stream()
+            .limit(500) // Prevent explosion!
+            .forEach(c -> processPermutationOfEndPoints(pair,c,xoverSitesCollector));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static void processPermutationOfEndPoints(DENOPTIMVertex[] pair,
+            List<DENOPTIMVertex[]> chosenSequenceOfEndpoints,
+            List<XoverSite> xoverSitesCollector)
+    {
+        DENOPTIMVertex vA = pair[0];
+        DENOPTIMVertex vB = pair[1];
+        DENOPTIMGraph gA = vA.getGraphOwner();
+        DENOPTIMGraph gB = vB.getGraphOwner();
+        
+        // Exclude overlapping combinations
+        boolean exclude = false;
+        for (DENOPTIMVertex[] pairA : chosenSequenceOfEndpoints)
+        {
+            for (DENOPTIMVertex[] pairB : chosenSequenceOfEndpoints)
+            {
+                if (pairA==pairB)
+                    continue;
+                
+                if (pairA[0]==pairB[0] || pairA[1]==pairB[1])
+                {
+                    exclude = true;
+                    break;
+                }
+            }
+            if (exclude)
+                break;
+        }
+        if (exclude)
+            return;
+        
+        List<DENOPTIMVertex> subGraphEndInA = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> subGraphEndInB = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> alreadyIncludedFromA = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> alreadyIncludedFromB = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex[] otherPair : chosenSequenceOfEndpoints)
+        {
+            DENOPTIMVertex endOnA = otherPair[0];
+            DENOPTIMVertex endOnB = otherPair[1];
+            
+            // Ignore vertexes that are already part of the subgraph
+            if (alreadyIncludedFromA.contains(endOnA)
+                    || alreadyIncludedFromB.contains(endOnB))
+                continue;
+            
+            PathSubGraph pathA = new PathSubGraph(vA, 
+                    endOnA.getParent(), gA);
+            PathSubGraph pathB = new PathSubGraph(vB, 
+                    endOnB.getParent(), gB);
+            subGraphEndInA.add(endOnA.getParent());
+            subGraphEndInB.add(endOnB.getParent());
+            alreadyIncludedFromA.addAll(pathA.getVertecesPath());
+            alreadyIncludedFromB.addAll(pathB.getVertecesPath());
+        }
+        ArrayList<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
+        subGraphA.add(vA);
+        if (!subGraphEndInA.contains(vA))
+            gA.getChildTreeLimited(vA, subGraphA, subGraphEndInA, true);
+
+        ArrayList<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
+        subGraphB.add(vB);
+        if (!subGraphEndInB.contains(vB))
+            gB.getChildTreeLimited(vB, subGraphB, subGraphEndInB, true);
+        
+        // The two subgraphs must not be isomorfic to prevent unproductive crossover
+        DENOPTIMGraph subGraphCloneA = gA.extractSubgraph(subGraphA);
+        DENOPTIMGraph subGraphCloneB = gB.extractSubgraph(subGraphB);
+        if (subGraphCloneA.isIsomorphicTo(subGraphCloneB))
+            return;
+        
+        //TODO-gg for fixed.structure templates the two subgraphs
+        // must have same structure.
+        
+        checkAndAddXoverSites(subGraphA, subGraphB, 
+                CrossoverType.SUBGRAPH, xoverSitesCollector);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Here we check that the given subgraphs have a mapping that allows to swap
+     * them, and we create the corresponding crossover site in the collector of 
+     * such sites.
+     */
     private static void checkAndAddXoverSites(List<DENOPTIMVertex> subGraphA, 
             List<DENOPTIMVertex> subGraphB, CrossoverType xoverType,
-            List<XoverSite> collector) throws DENOPTIMException
+            List<XoverSite> collector)
     {
         // The compatibility of one AP that is needed to do branch swapping is
         // granted by the identification of the seeds of swappable subgraphs.
@@ -1571,8 +1605,7 @@ public class DENOPTIMGraphOperations
      */
     //TODO-gg update doc
     public static boolean performCrossover(XoverSite site) throws DENOPTIMException
-    {   
-        DENOPTIMGraph male = site.getA().get(0).getGraphOwner();
+    {          DENOPTIMGraph male = site.getA().get(0).getGraphOwner();
         DENOPTIMGraph female = site.getB().get(0).getGraphOwner();
         
         DENOPTIMGraph subG_M = male.extractSubgraph(site.getA());
@@ -1583,6 +1616,10 @@ public class DENOPTIMGraphOperations
         tmplSubGrphM.setInnerGraph(subG_M);
         DENOPTIMTemplate tmplSubGrphF = new DENOPTIMTemplate(BBType.UNDEFINED);
         tmplSubGrphF.setInnerGraph(subG_F);
+        
+        //TODO-gg
+        DenoptimIO.writeGraphToSDF(new File("/tmp/m.sdf"), male, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/f.sdf"), female, false);
         
         // Check if the subgraphs can be used with reversed edge direction, or
         // bias the AP mapping to use the original source vertexes.

@@ -465,7 +465,7 @@ public class DENOPTIMGraphOperationsTest {
                     else
                         g = "noGraph";
                     
-                    s = s + "+getLabel("+g+","+v.getGraphOwner().indexOf(v)+")+\"_\"";
+                    s = s + "+GraphUtils.getLabel("+g+","+v.getGraphOwner().indexOf(v)+")+\"_\"";
                 }
                 s = s + "+\"@@@_\"";
                 for (DENOPTIMVertex v : x.getB())
@@ -482,69 +482,48 @@ public class DENOPTIMGraphOperationsTest {
                     else
                         g = "noGraph";
                     
-                    s = s + "+getLabel("+g+","+v.getGraphOwner().indexOf(v)+")+\"_\"";
+                    s = s + "+GraphUtils.getLabel("+g+","+v.getGraphOwner().indexOf(v)+")+\"_\"";
                 }
                 System.out.println("expected.add("+s+");");
             }
         }
         
         Set<String> expected = new HashSet<String>();
-        expected.add(""+getLabel(graphA,1)+"_"+getLabel(graphA,4)+"_"+getLabel(graphA,2)+"_"+getLabel(graphA,3)+"_"+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
-        expected.add(""+getLabel(graphA,1)+"_"+getLabel(graphA,4)+"_"+getLabel(graphA,2)+"_"+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_");
-        expected.add(""+getLabel(graphA,1)+"_"+getLabel(graphA,4)+"_"+getLabel(graphA,2)+"_"+getLabel(graphA,3)+"_"+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
-        expected.add(""+getLabel(graphA,1)+"_"+getLabel(graphA,4)+"_"+getLabel(graphA,2)+"_"+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,2)+"_");
-        expected.add(""+getLabel(graphA,2)+"_"+getLabel(graphA,3)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
-        expected.add(""+getLabel(graphA,2)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_");
-        expected.add(""+getLabel(graphA,2)+"_"+getLabel(graphA,3)+"_"+"@@@_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
-        expected.add(""+getLabel(graphA,3)+"_"+"@@@_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
-        expected.add(""+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
-        expected.add(""+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
-        expected.add(""+getLabel(t1.getInnerGraph(),1)+"_"+getLabel(t1.getInnerGraph(),4)+"_"+getLabel(t1.getInnerGraph(),5)+"_"+getLabel(t1.getInnerGraph(),2)+"_"+getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),3)+"_");
-        expected.add(""+getLabel(t1.getInnerGraph(),2)+"_"+getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),1)+"_"+getLabel(t2.getInnerGraph(),2)+"_"+getLabel(t2.getInnerGraph(),3)+"_");
-        expected.add(""+getLabel(t1.getInnerGraph(),2)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),1)+"_"+getLabel(t2.getInnerGraph(),2)+"_");
-        expected.add(""+getLabel(t1.getInnerGraph(),2)+"_"+getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),2)+"_"+getLabel(t2.getInnerGraph(),3)+"_");
-        expected.add(""+getLabel(t1.getInnerGraph(),2)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),2)+"_");
-        expected.add(""+getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),3)+"_");
-        expected.add(""+getLabel(t1.getInnerGraph(),4)+"_"+getLabel(t1.getInnerGraph(),5)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),3)+"_");
-        expected.add(""+getLabel(t1.getInnerGraph(),5)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,1)+"_"+GraphUtils.getLabel(graphA,4)+"_"+GraphUtils.getLabel(graphA,2)+"_"+GraphUtils.getLabel(graphA,3)+"_"+GraphUtils.getLabel(graphA,5)+"_"+"@@@_"+GraphUtils.getLabel(graphB,1)+"_"+GraphUtils.getLabel(graphB,5)+"_"+GraphUtils.getLabel(graphB,2)+"_"+GraphUtils.getLabel(graphB,3)+"_"+GraphUtils.getLabel(graphB,4)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,1)+"_"+GraphUtils.getLabel(graphA,4)+"_"+GraphUtils.getLabel(graphA,2)+"_"+GraphUtils.getLabel(graphA,5)+"_"+"@@@_"+GraphUtils.getLabel(graphB,1)+"_"+GraphUtils.getLabel(graphB,5)+"_"+GraphUtils.getLabel(graphB,2)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,1)+"_"+GraphUtils.getLabel(graphA,4)+"_"+GraphUtils.getLabel(graphA,2)+"_"+GraphUtils.getLabel(graphA,3)+"_"+GraphUtils.getLabel(graphA,5)+"_"+"@@@_"+GraphUtils.getLabel(graphB,2)+"_"+GraphUtils.getLabel(graphB,3)+"_"+GraphUtils.getLabel(graphB,4)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,1)+"_"+GraphUtils.getLabel(graphA,4)+"_"+GraphUtils.getLabel(graphA,2)+"_"+GraphUtils.getLabel(graphA,5)+"_"+"@@@_"+GraphUtils.getLabel(graphB,2)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,2)+"_"+GraphUtils.getLabel(graphA,3)+"_"+"@@@_"+GraphUtils.getLabel(graphB,1)+"_"+GraphUtils.getLabel(graphB,5)+"_"+GraphUtils.getLabel(graphB,2)+"_"+GraphUtils.getLabel(graphB,3)+"_"+GraphUtils.getLabel(graphB,4)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,2)+"_"+"@@@_"+GraphUtils.getLabel(graphB,1)+"_"+GraphUtils.getLabel(graphB,5)+"_"+GraphUtils.getLabel(graphB,2)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,2)+"_"+GraphUtils.getLabel(graphA,3)+"_"+"@@@_"+GraphUtils.getLabel(graphB,2)+"_"+GraphUtils.getLabel(graphB,3)+"_"+GraphUtils.getLabel(graphB,4)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,3)+"_"+"@@@_"+GraphUtils.getLabel(graphB,3)+"_"+GraphUtils.getLabel(graphB,4)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,5)+"_"+"@@@_"+GraphUtils.getLabel(graphB,1)+"_"+GraphUtils.getLabel(graphB,5)+"_"+GraphUtils.getLabel(graphB,2)+"_"+GraphUtils.getLabel(graphB,3)+"_"+GraphUtils.getLabel(graphB,4)+"_");
+        expected.add(""+GraphUtils.getLabel(graphA,5)+"_"+"@@@_"+GraphUtils.getLabel(graphB,2)+"_"+GraphUtils.getLabel(graphB,3)+"_"+GraphUtils.getLabel(graphB,4)+"_");
+        expected.add(""+GraphUtils.getLabel(t1.getInnerGraph(),1)+"_"+GraphUtils.getLabel(t1.getInnerGraph(),4)+"_"+GraphUtils.getLabel(t1.getInnerGraph(),5)+"_"+GraphUtils.getLabel(t1.getInnerGraph(),2)+"_"+GraphUtils.getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+GraphUtils.getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+GraphUtils.getLabel(t1.getInnerGraph(),2)+"_"+GraphUtils.getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+GraphUtils.getLabel(t2.getInnerGraph(),1)+"_"+GraphUtils.getLabel(t2.getInnerGraph(),2)+"_"+GraphUtils.getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+GraphUtils.getLabel(t1.getInnerGraph(),2)+"_"+"@@@_"+GraphUtils.getLabel(t2.getInnerGraph(),1)+"_"+GraphUtils.getLabel(t2.getInnerGraph(),2)+"_");
+        expected.add(""+GraphUtils.getLabel(t1.getInnerGraph(),2)+"_"+GraphUtils.getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+GraphUtils.getLabel(t2.getInnerGraph(),2)+"_"+GraphUtils.getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+GraphUtils.getLabel(t1.getInnerGraph(),2)+"_"+"@@@_"+GraphUtils.getLabel(t2.getInnerGraph(),2)+"_");
+        expected.add(""+GraphUtils.getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+GraphUtils.getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+GraphUtils.getLabel(t1.getInnerGraph(),4)+"_"+GraphUtils.getLabel(t1.getInnerGraph(),5)+"_"+"@@@_"+GraphUtils.getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+GraphUtils.getLabel(t1.getInnerGraph(),5)+"_"+"@@@_"+GraphUtils.getLabel(t2.getInnerGraph(),3)+"_");
         
         for (XoverSite site : xoverSites)
         {
             String label = "";
             for (DENOPTIMVertex v : site.getA())
             {
-                label = label + getLabel(v.getGraphOwner(),
+                label = label + GraphUtils.getLabel(v.getGraphOwner(),
                         v.getGraphOwner().indexOf(v)) + "_";
             }
             label = label + "@@@_";
             for (DENOPTIMVertex v : site.getB())
             {
-                label = label + getLabel(v.getGraphOwner(),
+                label = label + GraphUtils.getLabel(v.getGraphOwner(),
                         v.getGraphOwner().indexOf(v)) + "_";
             }
             assertTrue(expected.contains(label), "Missing label: "+label);
         }
-    }
-    
-//------------------------------------------------------------------------------
-
-    //TODO-gg mode to utils?
-    static String getLabel(DENOPTIMVertex v)
-    {
-        if (!v.hasProperty("Label"))
-            return "";
-        return v.getGraphOwner().getGraphId()+"@"+v.getProperty(
-                "Label").toString();
-    }
-    
-//------------------------------------------------------------------------------
-    
-    static String getLabel(DENOPTIMGraph g, int vIdx)
-    {
-        if (!g.getVertexAtPosition(vIdx).hasProperty("Label"))
-            return "";
-        return g.getGraphId() + "@" + g.getVertexAtPosition(vIdx).getProperty(
-                "Label").toString();
     }
     
 //------------------------------------------------------------------------------

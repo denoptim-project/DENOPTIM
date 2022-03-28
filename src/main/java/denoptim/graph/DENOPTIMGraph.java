@@ -3713,19 +3713,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return a new graph that corresponds to the subgraph of this graph.
      */
     public DENOPTIMGraph extractSubgraph(List<DENOPTIMVertex> members) 
-                    throws DENOPTIMException
     {
         if (members.size()==0)
             return null;
-        
-        for (DENOPTIMVertex v : members)
-        {
-            if (!this.gVertices.contains(v))
-            {
-                throw new DENOPTIMException("Attempt to extract a subgraph giving "
-                        + "a vertex that is not contained in this graph.");
-            }
-        }
         
         DENOPTIMGraph subGraph = this.clone();
         
