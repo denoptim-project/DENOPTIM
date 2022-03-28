@@ -96,9 +96,6 @@ public class PopulationTest
 
 //------------------------------------------------------------------------------
     
-    /**
-     * You must run {@link #prepare()} before asking this class for any graph.
-     */
     @Test
     public void testXOverCompatibility() throws Exception
     {
@@ -106,24 +103,66 @@ public class PopulationTest
         Population pop = new Population();
         
         DENOPTIMGraph g1 = makeGraphA();
+        // We give uniquefying properties to the vertexes so that they
+        // are not seen as v.sameAs(o).
+        String k = "Uniquefying";
+        int counter = 0;
+        for (int i=0; i<g1.getVertexCount(); i++)
+        {
+            DENOPTIMVertex v = g1.getVertexAtPosition(i);
+            v.setUniquefyingProperty(k);
+            v.setProperty(k, counter);
+            counter++;
+        }
         Candidate c1 = new Candidate("C1",g1);
         pop.add(c1);
         
         DENOPTIMGraph g2 = makeGraphB();
+        for (int i=0; i<g2.getVertexCount(); i++)
+        {
+            DENOPTIMVertex v = g2.getVertexAtPosition(i);
+            v.setUniquefyingProperty(k);
+            v.setProperty(k, counter);
+            counter++;
+        }
         Candidate c2 = new Candidate("C2",g2);
         pop.add(c2);
         
         DENOPTIMGraph g3 = makeGraphB();
+        for (int i=0; i<g3.getVertexCount(); i++)
+        {
+            DENOPTIMVertex v = g3.getVertexAtPosition(i);
+            v.setUniquefyingProperty(k);
+            v.setProperty(k, counter);
+            counter++;
+        }
         Candidate c3 = new Candidate("C3",g3);
         pop.add(c3);
         
         DENOPTIMGraph g4 = makeGraphC();
+        for (int i=0; i<g4.getVertexCount(); i++)
+        {
+            DENOPTIMVertex v = g4.getVertexAtPosition(i);
+            v.setUniquefyingProperty(k);
+            v.setProperty(k, counter);
+            counter++;
+        }
         Candidate c4 = new Candidate("C4",g4);
         pop.add(c4);
         
         DENOPTIMGraph g5 = makeGraphD();
+        for (int i=0; i<g5.getVertexCount(); i++)
+        {
+            DENOPTIMVertex v = g5.getVertexAtPosition(i);
+            v.setUniquefyingProperty(k);
+            v.setProperty(k, counter);
+            counter++;
+        }
         Candidate c5 = new Candidate("C5",g5);
         pop.add(c5);
+
+        ArrayList<Candidate> partnersForCBUTTA = pop.getXoverPartners(c1, 
+                new ArrayList<Candidate>(Arrays.asList(c3)));
         
         ArrayList<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)));
@@ -135,21 +174,21 @@ public class PopulationTest
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)));
         ArrayList<Candidate> partnersForC5 = pop.getXoverPartners(c5, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)));
-        
+
         Map<Candidate,Map<Candidate,Integer>> expected = 
                 new HashMap<Candidate,Map<Candidate,Integer>>();
         Map<Candidate,Integer> expectedForC1 = new HashMap<Candidate,Integer>();
-        expectedForC1.put(c2, 6);
-        expectedForC1.put(c3, 6);
+        expectedForC1.put(c2, 9);
+        expectedForC1.put(c3, 9);
         expectedForC1.put(c4, 3);
         expected.put(c1, expectedForC1);
         Map<Candidate,Integer> expectedForC2 = new HashMap<Candidate,Integer>();
-        expectedForC2.put(c1, 6);
+        expectedForC2.put(c1, 9);
         //expectedForC2.put(c3, 4); NO xover between candidates with same graph!
         expectedForC2.put(c4, 2);
         expected.put(c2, expectedForC2);
         Map<Candidate,Integer> expectedForC3 = new HashMap<Candidate,Integer>();
-        expectedForC3.put(c1, 6);
+        expectedForC3.put(c1, 9);
         //expectedForC3.put(c2, 4); NO xover between candidates with same graph!
         expectedForC3.put(c4, 2);
         expected.put(c3, expectedForC3);
@@ -182,6 +221,13 @@ public class PopulationTest
         Candidate c2 = new Candidate("C2",g2);
         pop.add(c2);
         
+        //Addingptoperty to uniquefy a pair of vertexes
+        String k = "Uniquefying";
+        g1.getVertexAtPosition(1).setUniquefyingProperty(k);
+        g1.getVertexAtPosition(1).setProperty(k, 123);
+        g2.getVertexAtPosition(1).setUniquefyingProperty(k);
+        g2.getVertexAtPosition(1).setProperty(k, 456);
+        
         ArrayList<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2)));
         ArrayList<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
@@ -190,10 +236,10 @@ public class PopulationTest
         Map<Candidate,Map<Candidate,Integer>> expected = 
                 new HashMap<Candidate,Map<Candidate,Integer>>();
         Map<Candidate,Integer> expectedForC1 = new HashMap<Candidate,Integer>();
-        expectedForC1.put(c2, 6);
+        expectedForC1.put(c2, 9);
         expected.put(c1, expectedForC1);
         Map<Candidate,Integer> expectedForC2 = new HashMap<Candidate,Integer>();
-        expectedForC2.put(c1, 6);
+        expectedForC2.put(c1, 9);
         expected.put(c2, expectedForC2);
         
         Population clonedPop = pop.clone();
@@ -606,53 +652,6 @@ public class PopulationTest
         pop.set(1,c5);
         int v6 = pop.getVersionID();
         assertTrue(v6>v5,"Version change 6");        
-    }
-    
-//------------------------------------------------------------------------------
-    
-    @Test
-    public void testGetSwappableSubGraphEnds() throws Exception
-    {
-        prepare();
-        Population population = new Population();
-        
-        /*
-         * -(A)v0(A)-(A)v1(A)-(A)v2(A)-(A)v3(B)-(B)v4(B)-(B)v5(B)-
-         */
-        DENOPTIMGraph gA = makeGraphA();
-        Candidate cA = new Candidate("CA",gA);
-        population.add(cA);
-        
-        /*
-         * v0(B)-(B)v1(A)-(A)v2(B)-(B)v3(A)-(A)v4(B)-(B)v5
-         */
-        DENOPTIMGraph gE = makeGraphE();
-        Candidate cE = new Candidate("CE",gE);
-        population.add(cE);
-        
-        ArrayList<Candidate> partners = population.getXoverPartners(cA, 
-                new ArrayList<Candidate>(Arrays.asList(cE)));
-        assertTrue(partners.contains(cE));
-        
-        List<XoverSite> subGraphSeeds = population.getXoverSites(cA,cE);
-        assertEquals(12,subGraphSeeds.size());
-        
-        DENOPTIMVertex subGraphSeedA = subGraphSeeds.get(2).getA().get(0);
-        DENOPTIMVertex subGraphSeedE = subGraphSeeds.get(2).getB().get(0);
-        
-        List<List<DENOPTIMVertex>> subGraphEnds = 
-                population.getSwappableSubGraphEnds(cA,cE,gA,subGraphSeedA,
-                        gE,subGraphSeedE, new int[]{6,7,8,9,10,11});
-        
-        // NB: Of the 4 possible pairs of end-points we get one because the 
-        // method builds one combination, it does not explore all.
-        
-        assertEquals(1,subGraphEnds.get(0).size(), "Expected number of ends on A");
-        assertEquals(1,subGraphEnds.get(1).size(), "Expected number of ends on E");
-        assertEquals(gA.getVertexAtPosition(3),subGraphEnds.get(0).get(0), 
-                "Identity of end-point on A");
-        assertEquals(gE.getVertexAtPosition(4),subGraphEnds.get(1).get(0), 
-                "Identity of end-point on E");
     }
     
 //------------------------------------------------------------------------------

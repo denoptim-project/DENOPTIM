@@ -233,80 +233,74 @@ public class EAUtilsTest
         Monitor mnt = new Monitor();
         
         Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 4, new int[]{11}, 0);
-        
-        DENOPTIMGraph gO = offspring0.getGraph();
-        assertEquals(7,gO.getVertexCount());
-        assertEquals(6,gO.getEdgeCount());
-        int maxLength = -1;
-        for (DENOPTIMVertex v : gO.getVertexList())
-        {
-            ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
-            gO.getChildrenTree(v, childTree);
-            if (childTree.size()>maxLength)
-            {
-                maxLength = childTree.size();
-            }
-        }
-        assertEquals(6,maxLength);
+                population, mnt, new int[]{0,1}, 4, 0);
         
         Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 4, new int[]{11}, 1);
+                population, mnt, new int[]{0,1}, 4, 1);
         
-        DENOPTIMGraph g1 = offspring1.getGraph();
-        assertEquals(5,g1.getVertexCount());
-        assertEquals(4,g1.getEdgeCount());
-        maxLength = -1;
-        for (DENOPTIMVertex v : g1.getVertexList())
+        //TODO-gg make it dependent of reproducibility
+        
+        if (offspring0.getGraph().getVertexCount()==5)
         {
-            ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
-            g1.getChildrenTree(v, childTree);
-            if (childTree.size()>maxLength)
+            DENOPTIMGraph gLeft = offspring0.getGraph();
+            assertEquals(4,gLeft.getEdgeCount());
+            int maxLength = -1;
+            for (DENOPTIMVertex v : gLeft.getVertexList())
             {
-                maxLength = childTree.size();
+                ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+                gLeft.getChildrenTree(v, childTree);
+                if (childTree.size()>maxLength)
+                {
+                    maxLength = childTree.size();
+                }
             }
-        }
-        assertEquals(4,maxLength);
-    }
-    
-//------------------------------------------------------------------------------
+            assertEquals(4,maxLength);
 
-    @Test
-    public void testSearchForANonRedundantSwappableSubgraph() throws Exception
-    {
-        PopulationTest.prepare();
-        Population population = new Population();
-        
-        DENOPTIMGraph gA = PopulationTest.makeGraphF();
-        Candidate cA = new Candidate("CA",gA);
-        cA.setFitness(1.23);
-        population.add(cA);
-        //NB: the two graphs are the equal... as a start
-        DENOPTIMGraph gA2 = PopulationTest.makeGraphF();
-       // ...but we want the two graph to be non-isomorfic
-        gA2.removeVertex(gA2.getVertexAtPosition(gA2.getVertexCount()-1)); 
-        Candidate cA2 = new Candidate("CA2",gA2);
-        cA2.setFitness(2.34);
-        population.add(cA2);
-        
-        // This is needed only to trigger detection of xover points.
-        List<Candidate> eligible = new ArrayList<Candidate>();
-        eligible.add(cA2);
-        population.getXoverPartners(cA2, population);
-        
-        int srcVrtPosition = 1;
-        List<List<DENOPTIMVertex>> subGraphEnds = 
-                EAUtils.searchForANonRedundantSwappableSubgraph(cA,cA2,
-                    gA, gA.getVertexAtPosition(srcVrtPosition),
-                    gA2, gA2.getVertexAtPosition(srcVrtPosition), 
-                    population);
-        
-        PathSubGraph pA = new PathSubGraph(gA.getVertexAtPosition(srcVrtPosition), 
-                subGraphEnds.get(0).get(0), gA);
-        PathSubGraph pA2 = new PathSubGraph(gA2.getVertexAtPosition(srcVrtPosition), 
-                subGraphEnds.get(1).get(0), gA2);
-        
-        assertTrue(pA.getPathLength() != pA2.getPathLength());
+            DENOPTIMGraph gRight = offspring1.getGraph();
+            assertEquals(7,gRight.getVertexCount());
+            assertEquals(6,gRight.getEdgeCount());
+            maxLength = -1;
+            for (DENOPTIMVertex v : gRight.getVertexList())
+            {
+                ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+                gRight.getChildrenTree(v, childTree);
+                if (childTree.size()>maxLength)
+                {
+                    maxLength = childTree.size();
+                }
+            }
+            assertEquals(6,maxLength);
+        } else if (offspring0.getGraph().getVertexCount()==7)
+        {
+            DENOPTIMGraph gLeft = offspring1.getGraph();
+            assertEquals(5,gLeft.getVertexCount());
+            assertEquals(4,gLeft.getEdgeCount());
+            int maxLength = -1;
+            for (DENOPTIMVertex v : gLeft.getVertexList())
+            {
+                ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+                gLeft.getChildrenTree(v, childTree);
+                if (childTree.size()>maxLength)
+                {
+                    maxLength = childTree.size();
+                }
+            }
+            assertEquals(4,maxLength);
+
+            DENOPTIMGraph gRight = offspring0.getGraph();
+            assertEquals(6,gRight.getEdgeCount());
+            maxLength = -1;
+            for (DENOPTIMVertex v : gRight.getVertexList())
+            {
+                ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+                gRight.getChildrenTree(v, childTree);
+                if (childTree.size()>maxLength)
+                {
+                    maxLength = childTree.size();
+                }
+            }
+            assertEquals(6,maxLength);
+        }
     }
     
 //------------------------------------------------------------------------------

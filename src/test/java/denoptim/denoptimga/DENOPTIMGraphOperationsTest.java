@@ -423,55 +423,111 @@ public class DENOPTIMGraphOperationsTest {
         DENOPTIMGraph graphA = pair[0];
         DENOPTIMGraph graphB = pair[1];
         
-        List<DENOPTIMVertex[]> xoverSites = 
+        DENOPTIMTemplate t1 = (DENOPTIMTemplate) graphA.getVertexAtPosition(1);
+        DENOPTIMTemplate t2 = (DENOPTIMTemplate) graphB.getVertexAtPosition(1);
+        
+        // Making some empty vertexed unique to enable swapping (otherwise they
+        // are seen as the same node and excluded from xover sites list)
+        DENOPTIMVertex v5A = t1.getInnerGraph().getVertexAtPosition(5);
+        String k = "Uniquefier";
+        v5A.setUniquefyingProperty(k);
+        v5A.setProperty(k, "123");
+        DENOPTIMVertex v3B = t2.getInnerGraph().getVertexAtPosition(3);
+        v3B.setUniquefyingProperty(k);
+        v3B.setProperty(k, "789");
+        
+        List<XoverSite> xoverSites = 
                 DENOPTIMGraphOperations.locateCompatibleXOverPoints(graphA, graphB);
         
-        assertEquals(15, xoverSites.size());
-        
+        assertEquals(18, xoverSites.size());
+
         // NB: we exploit the fact that every vertex has a unique label as a 
         // property and the combination of sites generates an invariant.
-        Set<String> expected = new HashSet<String>();
-        expected.add(getLabel(graphA,1)+"_"+getLabel(graphB,1));
-        expected.add(getLabel(graphA,1)+"_"+getLabel(graphB,2));
-        expected.add(getLabel(graphA,2)+"_"+getLabel(graphB,1));
-        expected.add(getLabel(graphA,2)+"_"+getLabel(graphB,2));
-        expected.add(getLabel(graphA,3)+"_"+getLabel(graphB,3));
-        expected.add(getLabel(graphA,4)+"_"+getLabel(graphB,4));
-        expected.add(getLabel(graphA,4)+"_"+getLabel(graphB,5));
-        expected.add(getLabel(graphA,5)+"_"+getLabel(graphB,1));
-        expected.add(getLabel(graphA,5)+"_"+getLabel(graphB,2));
-        // Using knowledge of where the template is (i.e., vertex at position 1)
-        // in the list of vertexes of the outer vertex. This assumes the graph
-        // will never change. If they do, this has to be updated.
-        DENOPTIMTemplate t1 = (DENOPTIMTemplate)graphA.getVertexAtPosition(1);
-        DENOPTIMTemplate t2 = (DENOPTIMTemplate)graphB.getVertexAtPosition(1);
-        expected.add(getLabel(t1.getInnerGraph(),1)
-                +"_"+getLabel(t2.getInnerGraph(),3));
-        
-        expected.add(getLabel(t1.getInnerGraph(),2)
-                +"_"+getLabel(t2.getInnerGraph(),1));
-        
-        expected.add(getLabel(t1.getInnerGraph(),2)
-                +"_"+getLabel(t2.getInnerGraph(),2));
-        
-        expected.add(getLabel(t1.getInnerGraph(),3)
-                +"_"+getLabel(t2.getInnerGraph(),3));
-        
-        expected.add(getLabel(t1.getInnerGraph(),4)
-                +"_"+getLabel(t2.getInnerGraph(),3));
-        
-        expected.add(getLabel(t1.getInnerGraph(),5)
-                +"_"+getLabel(t2.getInnerGraph(),3));
-        
-        for (DENOPTIMVertex[] sites : xoverSites)
+        // To generate this labels programmatically the following code is used
+        // but only after having checked manually.
+        boolean writeCode = false;
+        if (writeCode)
         {
-            String label = getLabel(sites[0])+"_"+getLabel(sites[1]);
-            assertTrue(expected.contains(label));
+            for (XoverSite x : xoverSites)
+            {
+                String s = "\"\"";
+                for (DENOPTIMVertex v : x.getA())
+                {
+                    String g = "";
+                    if (v.getGraphOwner()==graphA)
+                        g = "graphA";
+                    else if (v.getGraphOwner()==graphB)
+                        g = "graphB";
+                    else if (v.getGraphOwner()==t1.getInnerGraph())
+                        g = "t1.getInnerGraph()";
+                    else if (v.getGraphOwner()==t2.getInnerGraph())
+                        g = "t2.getInnerGraph()";
+                    else
+                        g = "noGraph";
+                    
+                    s = s + "+getLabel("+g+","+v.getGraphOwner().indexOf(v)+")+\"_\"";
+                }
+                s = s + "+\"@@@_\"";
+                for (DENOPTIMVertex v : x.getB())
+                {
+                    String g = "";
+                    if (v.getGraphOwner()==graphA)
+                        g = "graphA";
+                    else if (v.getGraphOwner()==graphB)
+                        g = "graphB";
+                    else if (v.getGraphOwner()==t1.getInnerGraph())
+                        g = "t1.getInnerGraph()";
+                    else if (v.getGraphOwner()==t2.getInnerGraph())
+                        g = "t2.getInnerGraph()";
+                    else
+                        g = "noGraph";
+                    
+                    s = s + "+getLabel("+g+","+v.getGraphOwner().indexOf(v)+")+\"_\"";
+                }
+                System.out.println("expected.add("+s+");");
+            }
+        }
+        
+        Set<String> expected = new HashSet<String>();
+        expected.add(""+getLabel(graphA,1)+"_"+getLabel(graphA,4)+"_"+getLabel(graphA,2)+"_"+getLabel(graphA,3)+"_"+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
+        expected.add(""+getLabel(graphA,1)+"_"+getLabel(graphA,4)+"_"+getLabel(graphA,2)+"_"+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_");
+        expected.add(""+getLabel(graphA,1)+"_"+getLabel(graphA,4)+"_"+getLabel(graphA,2)+"_"+getLabel(graphA,3)+"_"+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
+        expected.add(""+getLabel(graphA,1)+"_"+getLabel(graphA,4)+"_"+getLabel(graphA,2)+"_"+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,2)+"_");
+        expected.add(""+getLabel(graphA,2)+"_"+getLabel(graphA,3)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
+        expected.add(""+getLabel(graphA,2)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_");
+        expected.add(""+getLabel(graphA,2)+"_"+getLabel(graphA,3)+"_"+"@@@_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
+        expected.add(""+getLabel(graphA,3)+"_"+"@@@_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
+        expected.add(""+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,1)+"_"+getLabel(graphB,5)+"_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
+        expected.add(""+getLabel(graphA,5)+"_"+"@@@_"+getLabel(graphB,2)+"_"+getLabel(graphB,3)+"_"+getLabel(graphB,4)+"_");
+        expected.add(""+getLabel(t1.getInnerGraph(),1)+"_"+getLabel(t1.getInnerGraph(),4)+"_"+getLabel(t1.getInnerGraph(),5)+"_"+getLabel(t1.getInnerGraph(),2)+"_"+getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+getLabel(t1.getInnerGraph(),2)+"_"+getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),1)+"_"+getLabel(t2.getInnerGraph(),2)+"_"+getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+getLabel(t1.getInnerGraph(),2)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),1)+"_"+getLabel(t2.getInnerGraph(),2)+"_");
+        expected.add(""+getLabel(t1.getInnerGraph(),2)+"_"+getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),2)+"_"+getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+getLabel(t1.getInnerGraph(),2)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),2)+"_");
+        expected.add(""+getLabel(t1.getInnerGraph(),3)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+getLabel(t1.getInnerGraph(),4)+"_"+getLabel(t1.getInnerGraph(),5)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),3)+"_");
+        expected.add(""+getLabel(t1.getInnerGraph(),5)+"_"+"@@@_"+getLabel(t2.getInnerGraph(),3)+"_");
+        
+        for (XoverSite site : xoverSites)
+        {
+            String label = "";
+            for (DENOPTIMVertex v : site.getA())
+            {
+                label = label + getLabel(v.getGraphOwner(),
+                        v.getGraphOwner().indexOf(v)) + "_";
+            }
+            label = label + "@@@_";
+            for (DENOPTIMVertex v : site.getB())
+            {
+                label = label + getLabel(v.getGraphOwner(),
+                        v.getGraphOwner().indexOf(v)) + "_";
+            }
+            assertTrue(expected.contains(label), "Missing label: "+label);
         }
     }
     
 //------------------------------------------------------------------------------
-    //TODO-gg swap string components
+
     //TODO-gg mode to utils?
     static String getLabel(DENOPTIMVertex v)
     {

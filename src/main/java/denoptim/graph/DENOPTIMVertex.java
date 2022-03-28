@@ -24,8 +24,10 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -147,7 +149,14 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     /**
      * Map of customizable properties
      */
-    private Map<Object, Object> properties;
+    protected Map<Object, Object> properties;
+    
+    /**
+     * List of properties required to make 
+     * {@link DENOPTIMVertex#sameAs(DENOPTIMVertex, StringBuilder)} method
+     * return <code>false</code> when property values differ.
+     */
+    protected Set<String> uniquefyingPropertyKeys = new HashSet<String>();
 
     /**
      * List of mutations that we can perform on this vertex
@@ -1062,6 +1071,26 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Add the given key among the properties that are checked for equality when
+     * comparing vertexes with the 
+     * {@link DENOPTIMVertex#sameAs(DENOPTIMVertex, StringBuilder)} method.
+     * @param key
+     */
+    public void setUniquefyingProperty(String key)
+    {
+        uniquefyingPropertyKeys.add(key);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public Map<Object, Object> getProperties()
+    {
+        return properties;
+    }
+    
+//------------------------------------------------------------------------------
+    
     public boolean hasProperty(Object property)
     {
         if (properties==null)
@@ -1106,7 +1135,8 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
 //------------------------------------------------------------------------------
     
     /**
-     * Copies all the string-based properties.
+     * Copies all the string-based properties and properties defined in the
+     * {@link DENOPTIMVertex#uniquefyingPropertyKeys} set.
      * @return the map of cloned properties.
      */
     protected Map<Object, Object> copyStringBasedProperties()
@@ -1118,8 +1148,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         for (Object k : properties.keySet())
         {
             Object v = properties.get(k);
-            if (k instanceof String && v instanceof String)
-            copy.put(k,v);
+            if ((k instanceof String && v instanceof String)
+                    || uniquefyingPropertyKeys.contains(k))
+            {
+                copy.put(k,v);
+            }
         }
         return copy;
     }

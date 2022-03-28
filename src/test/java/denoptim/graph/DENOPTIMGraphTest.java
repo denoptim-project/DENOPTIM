@@ -2531,6 +2531,29 @@ public class DENOPTIMGraphTest {
         assertTrue(g01.isIsomorphicTo(g01.clone()),
                 "single-vertex graph vs clone");
         
+        DENOPTIMGraph g03 = new DENOPTIMGraph();
+        EmptyVertex v1 = new EmptyVertex();
+        v1.addAP();
+        v1.addAP();
+        String k ="MyKey";
+        v1.setUniquefyingProperty(k);
+        v1.setProperty(k, 123);
+        g03.addVertex(v1);
+        EmptyVertex v2 = new EmptyVertex();
+        v2.addAP();
+        v2.addAP();
+        v2.setUniquefyingProperty(k);
+        v2.setProperty(k, 456);
+        g03.appendVertexOnAP(v1.getAP(0), v2.getAP(0));
+        
+        DENOPTIMGraph g04 = g03.clone();
+        assertTrue(g03.isIsomorphicTo(g04),
+                "graph with empty vertexes and same properties");
+        
+        v2.setProperty(k, 999);
+        assertFalse(g03.isIsomorphicTo(g04),
+                "graph with empty vertexes and different properties");
+        
         DENOPTIMGraph g11 = makeTestGraph1();
         DENOPTIMGraph g12 = makeTestGraph1();
         assertTrue(g11.isIsomorphicTo(g12),"two-vertex graph");

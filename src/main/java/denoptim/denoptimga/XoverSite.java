@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APMapping;
 import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.utils.CrossoverType;
 
 /**
  * This class collects the data identifying the subgraphs that would be swapped
@@ -25,6 +28,13 @@ public class XoverSite implements Cloneable
     private List<DENOPTIMVertex> subGraphB = null;
     
     /**
+     * Type of crossover
+     */
+    private CrossoverType xoverType = null;
+    
+//------------------------------------------------------------------------------
+    
+    /**
      * Initiate an empty data structure
      */
     public XoverSite()
@@ -33,18 +43,29 @@ public class XoverSite implements Cloneable
         subGraphB = new ArrayList<DENOPTIMVertex>();
     }
     
+//------------------------------------------------------------------------------
+    
     /**
      * Create a site by listing the vertexes that belong to each of the 
      * subgraphs that should be swapped by a crossover operation.
-     * @param subGraphA the vertexes defining a subgraph to be swapped.
+     * @param subGraphA the vertexes defining a subgraph to be swapped. The first
+     * vertex must be the deepest one, i.e., the source of a directed spanning 
+     * tree.
      * @param subGraphB the vertexes defining another subgraph to be swapped.
+     * The first
+     * vertex must be the deepest one, i.e., the source of a directed spanning 
+     * tree.
      */
-    public XoverSite(List<DENOPTIMVertex> subGraphA, List<DENOPTIMVertex> subGraphB)
+    public XoverSite(List<DENOPTIMVertex> subGraphA, List<DENOPTIMVertex> subGraphB,
+            CrossoverType xoverType)
     {
         this.subGraphA = new ArrayList<DENOPTIMVertex>(subGraphA);
         this.subGraphB = new ArrayList<DENOPTIMVertex>(subGraphB);
+        this.xoverType = xoverType;
     }
 
+//------------------------------------------------------------------------------
+    
     /**
      * Creates a new {@link XoverSite} that considers the opposite order of
      * candidates of this one.
@@ -54,8 +75,11 @@ public class XoverSite implements Cloneable
         XoverSite mirror = new XoverSite();
         mirror.subGraphA = new ArrayList<DENOPTIMVertex>(this.subGraphB);
         mirror.subGraphB = new ArrayList<DENOPTIMVertex>(this.subGraphA);
+        mirror.xoverType = xoverType;
         return mirror;
     }
+    
+//------------------------------------------------------------------------------
     
     /**
      * Creates a new {@link XoverSite} that contains the same information of
@@ -66,9 +90,12 @@ public class XoverSite implements Cloneable
         XoverSite clone = new XoverSite();
         clone.subGraphA = new ArrayList<DENOPTIMVertex>(this.subGraphA);
         clone.subGraphB = new ArrayList<DENOPTIMVertex>(this.subGraphB);
+        clone.xoverType = xoverType;
         return clone;
     }
 
+//------------------------------------------------------------------------------
+    
     /**
      * Returns the collection of vertexes belonging to the first subgraph.
      */
@@ -76,6 +103,8 @@ public class XoverSite implements Cloneable
     {
         return subGraphA;
     }
+    
+//------------------------------------------------------------------------------
     
     /**
      * Returns the collection of vertexes belonging to the second subgraph.
@@ -85,12 +114,66 @@ public class XoverSite implements Cloneable
         return subGraphB;
     }
     
-    public boolean equals(XoverSite other)
+//------------------------------------------------------------------------------
+
+    /**
+     * Compares this and another instance.
+     * @param other
+     * @return <code>true</code> is the two include lists of vertexes that have
+     * the same vertex in the same order (i.e., {@link List#equals} are true
+     * for each collections individually).
+     */
+    @Override
+    public boolean equals(Object o)
     {
-        return this.subGraphA.equals(other.subGraphA) 
-                && this.subGraphA.equals(other.subGraphA);
+        if (! (o instanceof XoverSite))
+            return false;
+        XoverSite other = (XoverSite) o;
+        return this.xoverType==other.xoverType
+                && this.subGraphA.equals(other.subGraphA) 
+                && this.subGraphB.equals(other.subGraphB);
     }
+
+//------------------------------------------------------------------------------
     
+    /**
+     * Creates a new instance of this class that contains the list of vertexes
+     * that correspond to this one but with references to the vertexes of 
+     * freshly made clones of the two graphs.
+     * @return an analog yet independent crossover site.
+     * @throws DENOPTIMException 
+     */
+    public XoverSite projectToClonedGraphs() throws DENOPTIMException
+    {
+        DENOPTIMGraph cloneA = subGraphA.get(0).getGraphOwner().clone(); 
+        DENOPTIMGraph cloneB = subGraphB.get(0).getGraphOwner().clone();
+        cloneA.renumberGraphVertices();
+        cloneB.renumberGraphVertices();
+        List<DENOPTIMVertex> refsOnCloneA = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex vA : subGraphA)
+        {
+            refsOnCloneA.add(cloneA.getVertexAtPosition(
+                    vA.getGraphOwner().indexOf(vA)));
+        }
+        List<DENOPTIMVertex> refsOnCloneB = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex vB : subGraphB)
+        {
+            refsOnCloneB.add(cloneB.getVertexAtPosition(
+                    vB.getGraphOwner().indexOf(vB)));
+        }
+        XoverSite xos = new XoverSite(refsOnCloneA, refsOnCloneB, xoverType);
+        return xos;
+    }
+  
+//------------------------------------------------------------------------------
+
+    /**
+     * Produced a string for showing what this object is.
+     */
+    public String toString()
+    {
+        return "[XoverSite: "+subGraphA+", "+subGraphB+"]";
+    }
 //------------------------------------------------------------------------------
     
 }

@@ -2773,8 +2773,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * graph isomorphism</a>
      * that differs from the most common meaning of isomorphism in graph theory.
      * In general, DENOPTIMGraphs are considered undirected when evaluating
-     * DENOPTIM-isomorphism. Next, 
-     * since a DENOPTIMGraph is effectively 
+     * DENOPTIM-isomorphism. 
+     * Next, since a DENOPTIMGraph is effectively 
      * a spanning tree (ST_i={{vertexes}, {acyclic edges}}) 
      * with a set of fundamental cycles (FC_i={C_1, C_2,...C_n}), 
      * any DENOPTIMGraph G={ST_i,FC_i} that contains one or more cycles 
@@ -2890,8 +2890,17 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     }
                     return 0;
                 } else {
-                    return Integer.compare(v1.getBuildingBlockId(),
-                            v2.getBuildingBlockId());
+                    // We must return something different than zero
+                    if (Integer.compare(v1.getBuildingBlockId(),
+                            v2.getBuildingBlockId())!=0)
+                        return Integer.compare(v1.getBuildingBlockId(),
+                                v2.getBuildingBlockId());
+                    if (Integer.compare(v1.hashCode(),
+                            v2.hashCode())!=0)
+                        return Integer.compare(v1.hashCode(),
+                                v2.hashCode());
+                    return Integer.compare(v1.getBuildingBlockId()+v1.hashCode(),
+                            v2.getBuildingBlockId()+v2.hashCode());
                 }
             }
         };
@@ -3502,7 +3511,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
      * @param index the position of the seed vertex in the list of vertexes of this graph.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
 
     public DENOPTIMGraph extractSubgraph(int index)
@@ -3521,7 +3530,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
      * @param seed the vertex from which the extraction has to start.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
 
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed)
@@ -3547,7 +3556,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * will explore three layers: the seed, and two more layers away from it.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
 
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, int numLayers, 
@@ -3599,7 +3608,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * stop the exploration of the graph.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, 
             List<DENOPTIMVertex> limits, boolean stopBeforeRCVs) 
@@ -3659,7 +3668,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param seed the vertex from which the extraction has to start.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, boolean stopBeforeRCVs) 
                     throws DENOPTIMException
@@ -3677,6 +3686,54 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
         subGrpVrtxs.add(seedClone);
         subGraph.getChildTreeLimited(seedClone, subGrpVrtxs, stopBeforeRCVs);
+        
+        ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : subGraph.gVertices)
+        {
+            if (!subGrpVrtxs.contains(v))
+            {
+                toRemove.add(v);
+            }
+        }
+        for (DENOPTIMVertex v : toRemove)
+        {
+            subGraph.removeVertex(v);
+        }
+        
+        return subGraph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Creates a new graph that corresponds to the subgraph of this graph 
+     * and that includes only the members corresponding to the given list of 
+     * vertexes belonging to this graph.
+     * @param members the vertexes belonging to the subgraph. 
+     * @return a new graph that corresponds to the subgraph of this graph.
+     */
+    public DENOPTIMGraph extractSubgraph(List<DENOPTIMVertex> members) 
+                    throws DENOPTIMException
+    {
+        if (members.size()==0)
+            return null;
+        
+        for (DENOPTIMVertex v : members)
+        {
+            if (!this.gVertices.contains(v))
+            {
+                throw new DENOPTIMException("Attempt to extract a subgraph giving "
+                        + "a vertex that is not contained in this graph.");
+            }
+        }
+        
+        DENOPTIMGraph subGraph = this.clone();
+        
+        List<DENOPTIMVertex> subGrpVrtxs =  new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : members)
+        {
+            subGrpVrtxs.add(subGraph.getVertexAtPosition(this.indexOf(v)));
+        }
         
         ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex v : subGraph.gVertices)
