@@ -40,6 +40,12 @@ do
             fi
             nChecks=$((nChecks+1))
         done
+        nRings=$(grep -c "\"gRings\": \[$" "$xoResult")
+        nRingsRef=$(grep -c "\"gRings\": \[$" "expected_output/$xoResult")
+        if [ "$nRings" -ne "$nRingsRef" ]; then
+            echo "Test 't28' NOT PASSED (symptom: wrong number of rings in $xoResult: $nRings, should be $nRingsRef)"
+            exit -1
+        fi
     done
     
     if [ "$nChecks" -ne 12 ]

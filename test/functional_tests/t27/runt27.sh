@@ -33,8 +33,9 @@ exec 2>&1
 exec 1>&6 6>&-
 
 #Check outcome
+# NB: these values must be consistent with the fitness provider script!
 candIdTo50="M00000027"
-candIdTo40="M00000026"
+candIdTo40="M00000028"
 runFolder=$(basename $(ls -lrtd "$wrkDir"/RUN*/ | tail -n 1 | awk '{print $NF}'))
 n50=$(grep -l "$candIdTo50" "$wrkDir/$runFolder/"*/Gen*.txt | wc -l | awk '{print $1}')
 n40=$(grep -l "$candIdTo40" "$wrkDir/$runFolder/"*/Gen*.txt | wc -l | awk '{print $1}')
