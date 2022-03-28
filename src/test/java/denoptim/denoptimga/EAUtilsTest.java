@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -238,7 +239,7 @@ public class EAUtilsTest
         Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
                 population, mnt, new int[]{0,1}, 4, 1);
         
-        //TODO-gg make it dependent of reproducibility
+        //TODO-gg make it dependent on reproducibility
         
         if (offspring0.getGraph().getVertexCount()==5)
         {
@@ -301,6 +302,38 @@ public class EAUtilsTest
             }
             assertEquals(6,maxLength);
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    //TODO @Test
+    public void testBuildByXOver_Embedded() throws Exception
+    {
+        PopulationTest.prepare();
+        Population population = new Population();
+
+        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
+        DENOPTIMGraph gA = pair[0];
+        DENOPTIMGraph gB = pair[1];
+        
+        Candidate cA = new Candidate("CA",gA);
+        population.add(cA);        
+
+        Candidate cB = new Candidate("CB",gB);
+        population.add(cB);
+  
+        
+        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        eligibleParents.add(cA);
+        eligibleParents.add(cB);
+
+        Monitor mnt = new Monitor();
+        
+        Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 4, 0);
+        
+        //TODO-gg evaluate
+        assertTrue(false);
     }
     
 //------------------------------------------------------------------------------

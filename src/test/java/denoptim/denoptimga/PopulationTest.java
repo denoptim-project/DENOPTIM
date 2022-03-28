@@ -752,7 +752,8 @@ public class PopulationTest
      *        v3-(A)--(A)-v4-(B)
      * </pre>
      */
-    private DENOPTIMGraph[] getPairOfTestGraphsB() throws Exception
+    //NB: must be visible from package!
+    static DENOPTIMGraph[] getPairOfTestGraphsB() throws Exception
     {   
         // Prepare special building block: template T1
         EmptyVertex v0 = new EmptyVertex(0);

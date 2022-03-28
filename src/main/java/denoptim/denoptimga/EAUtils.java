@@ -295,14 +295,8 @@ public class EAUtils
         
         // Identify a pair of parents that can do crossover, and a pair of
         // vertexes from which we can define a subgraph (or a branch) to swap
-        Candidate maleCandidate = null, femaleCandidate = null;
-        DENOPTIMGraph maleGraph = null, femaleGraph = null;
-        DENOPTIMVertex vertxOnMale = null, vertxOnFemale = null;
         XoverSite xos = null;
         boolean foundPars = false;
-        
-        //TODO-gg loop should not be needed
-        
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
         {   
             if (FragmentSpace.useAPclassBasedApproach())
@@ -314,12 +308,6 @@ public class EAUtils
                     numatt++;
                     continue;
                 }
-                vertxOnMale = xos.getA().get(0);
-                vertxOnFemale = xos.getB().get(0);
-                maleGraph = vertxOnMale.getGraphOwner();
-                maleCandidate = maleGraph.getCandidateOwner();
-                femaleGraph = vertxOnFemale.getGraphOwner();
-                femaleCandidate = femaleGraph.getCandidateOwner();
             } else {
                 //TODO: make it reproducible using choiceOfParents and choiceOfXOverSites
                 Candidate[] parents = EAUtils.selectBasedOnFitness(
@@ -329,12 +317,16 @@ public class EAUtils
                     numatt++;
                     continue;
                 }
-                maleCandidate = parents[0];
-                maleGraph = maleCandidate.getGraph();
-                femaleCandidate = parents[1];
-                femaleGraph = femaleCandidate.getGraph();
-                vertxOnMale = EAUtils.selectNonScaffoldNonCapVertex(maleGraph);
-                vertxOnFemale = EAUtils.selectNonScaffoldNonCapVertex(femaleGraph);
+                //NB: this does not go into templates!
+                DENOPTIMGraph gpA = parents[0].getGraph();
+                List<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
+                gpA.getChildrenTree(EAUtils.selectNonScaffoldNonCapVertex(
+                        gpA),subGraphA);
+
+                DENOPTIMGraph gpB = parents[1].getGraph();
+                List<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
+                gpB.getChildrenTree(EAUtils.selectNonScaffoldNonCapVertex(
+                        gpB),subGraphB);
             }
             foundPars = true;
             break;
@@ -348,17 +340,24 @@ public class EAUtils
             return null;
         }
         
-        String molid1 = maleCandidate.getName();
-        String molid2 = femaleCandidate.getName();
-        int gid1 = maleGraph.getGraphId();
-        int gid2 = femaleGraph.getGraphId();
-        int vid1 = maleGraph.indexOf(vertxOnMale);
-        int vid2 = femaleGraph.indexOf(vertxOnFemale);
+        Candidate cA = null, cB = null;
+        DENOPTIMVertex vA = null, vB = null;
+        vA = xos.getA().get(0);
+        vB = xos.getB().get(0);
+        DENOPTIMGraph gA = vA.getGraphOwner();
+        cA = gA.getOutermostGraphOwner().getCandidateOwner();
+        DENOPTIMGraph gB = vB.getGraphOwner();
+        cB = gB.getOutermostGraphOwner().getCandidateOwner();
+        
+        String candIdA = cA.getName();
+        String candIdB = cB.getName();
+        int gid1 = gA.getGraphId();
+        int gid2 = gB.getGraphId();
         
         // Start building the offspring
         XoverSite xosOnClones = xos.projectToClonedGraphs();
-        DENOPTIMGraph graph1 = xosOnClones.getA().get(0).getGraphOwner();
-        DENOPTIMGraph graph2 = xosOnClones.getB().get(0).getGraphOwner();
+        DENOPTIMGraph gAClone = xosOnClones.getA().get(0).getGraphOwner();
+        DENOPTIMGraph gBClone = xosOnClones.getB().get(0).getGraphOwner();
         
         try
         {
@@ -371,28 +370,34 @@ public class EAUtils
         } catch (Throwable t) {
             t.printStackTrace();
             ArrayList<DENOPTIMGraph> parents = new ArrayList<DENOPTIMGraph>();
-            parents.add(maleGraph);
-            parents.add(graph1);
-            parents.add(femaleGraph);
-            parents.add(graph2);
+            parents.add(xos.getA().get(0).getGraphOwner());
+            parents.add(xos.getB().get(0).getGraphOwner());
             DenoptimIO.writeGraphsToSDF(new File(GAParameters.getDataDirectory()
                     + "failed_xover.sdf"), parents, true);
             throw new DENOPTIMException("Error while performing crossover. "
                     + "Please, report this to the authors ",t);
         }
         
-        graph1.setGraphId(GraphUtils.getUniqueGraphIndex());
-        graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
-        graph1.addCappingGroups();
-        graph2.addCappingGroups();
-        String msg = "Xover: " + molid1 + "|" + gid1 + "|" + vid1 + "="
-                    + molid2 + "|" + gid2 + "|" + vid2;
-        graph1.setLocalMsg(msg);
-        graph2.setLocalMsg(msg);
+        gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
+        gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
+        gAClone.addCappingGroups();
+        gBClone.addCappingGroups();
+        String lstIdVA = "";
+        for (DENOPTIMVertex v : xosOnClones.getA())
+            lstIdVA = lstIdVA + "_" + v.getVertexId();
+        String lstIdVB = "";
+        for (DENOPTIMVertex v : xosOnClones.getB())
+            lstIdVB = lstIdVB + "_" + v.getVertexId();
+        String msgA = "Xover: " + candIdA + "|" + gid1 + "|" + lstIdVA + "="
+                    + candIdB + "|" + gid2 + "|" + lstIdVB;
+        String msgB = "Xover: " + candIdB + "|" + gid2 + "|" + lstIdVB + "="
+                + candIdA + "|" + gid1 + "|" + lstIdVA;
+        gAClone.setLocalMsg(msgA);
+        gBClone.setLocalMsg(msgB);
         
         DENOPTIMGraph[] graphs = new DENOPTIMGraph[2];
-        graphs[0] = graph1;
-        graphs[1] = graph2;
+        graphs[0] = gAClone;
+        graphs[1] = gBClone;
         
         List<Candidate> validOnes = new Population();
         for (DENOPTIMGraph g : graphs)
@@ -433,10 +438,11 @@ public class EAUtils
             
             g.renumberGraphVertices();
             
-            Candidate offspring = new Candidate(g);
+            Candidate offspring = new Candidate(g.getOutermostGraphOwner());
             offspring.setUID(res[0].toString().trim());
             offspring.setSmiles(res[1].toString().trim());
             offspring.setChemicalRepresentation((IAtomContainer) res[2]);
+            offspring.getGraph().setLocalMsg(g.getLocalMsg());
             
             validOnes.add(offspring);
         }
