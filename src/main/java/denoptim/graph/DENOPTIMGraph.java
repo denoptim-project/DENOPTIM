@@ -6012,9 +6012,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return the path of references that allow to reach this graph from the
      * outermost level of embedding.
      */
-    public List<DENOPTIMVertex> getEmbeddingPath()
+    public List<DENOPTIMTemplate> getEmbeddingPath()
     {
-        List<DENOPTIMVertex> path = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMTemplate> path = new ArrayList<DENOPTIMTemplate>();
         if (templateJacket==null)
             return path;
         if (templateJacket.getGraphOwner()!=null)

@@ -1164,23 +1164,23 @@ public class DENOPTIMGraphTest {
         prepareFragmentSpace();
         DENOPTIMGraph gOut = makeDeeplyEmbeddedGraph();
         
-        List<DENOPTIMVertex> expected = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMTemplate> expected = new ArrayList<DENOPTIMTemplate>();
         DENOPTIMGraph refToThisLayerGraph = gOut;
         DENOPTIMTemplate refToThisLayerVrtx = null;
         for (int embeddingLevel=0; embeddingLevel<10; embeddingLevel++)
         {
-            DENOPTIMVertex vrtx = refToThisLayerGraph.getVertexList().stream()
+            refToThisLayerVrtx = (DENOPTIMTemplate) refToThisLayerGraph
+                    .getVertexList().stream()
                         .filter(v -> v instanceof DENOPTIMTemplate)
                         .findAny()
                         .orElse(null);
-            expected.add(vrtx);
-            refToThisLayerVrtx = (DENOPTIMTemplate) vrtx;
+            expected.add(refToThisLayerVrtx);
             refToThisLayerGraph = refToThisLayerVrtx.getInnerGraph();
         }
         
-        assertEquals(new ArrayList<DENOPTIMVertex>(),gOut.getEmbeddingPath(),
+        assertEquals(new ArrayList<DENOPTIMTemplate>(),gOut.getEmbeddingPath(),
                 "Embedding path of graph that is not embedded");
-        List<DENOPTIMVertex> path = refToThisLayerGraph.getEmbeddingPath();
+        List<DENOPTIMTemplate> path = refToThisLayerGraph.getEmbeddingPath();
         assertEquals(expected, path, "Path of deepest embedded graph");
     }
 
