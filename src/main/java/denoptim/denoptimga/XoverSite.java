@@ -8,6 +8,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APMapping;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.utils.CrossoverType;
 
@@ -138,15 +139,43 @@ public class XoverSite implements Cloneable
     
     /**
      * Creates a new instance of this class that contains the list of vertexes
-     * that correspond to this one but with references to the vertexes of 
-     * freshly made clones of the two graphs.
+     * that correspond to those contained in this {@link XoverSite} 
+     * but with references to the vertexes of an entirely new pair of graphs 
+     * made as clones of the original graphs. Note that since the graphs can be
+     * embedded in templates, the entire embedding structure is cloned as well.
      * @return an analog yet independent crossover site.
      * @throws DENOPTIMException 
      */
     public XoverSite projectToClonedGraphs() throws DENOPTIMException
     {
-        DENOPTIMGraph cloneA = subGraphA.get(0).getGraphOwner().clone(); 
-        DENOPTIMGraph cloneB = subGraphB.get(0).getGraphOwner().clone();
+        DENOPTIMGraph gA = subGraphA.get(0).getGraphOwner(); 
+        DENOPTIMGraph gB = subGraphB.get(0).getGraphOwner();
+        List<DENOPTIMTemplate> embeddingPathA = gA.getEmbeddingPath();
+        List<DENOPTIMTemplate> embeddingPathB = gB.getEmbeddingPath();
+        
+        DENOPTIMGraph cloneOutermostGraphA, cloneA;
+        DENOPTIMGraph cloneOutermostGraphB, cloneB;
+        if (embeddingPathA.size()==0) 
+        {
+            cloneOutermostGraphA = gA.clone();
+            cloneA = cloneOutermostGraphA;
+        } else {
+            cloneOutermostGraphA = embeddingPathA.get(0)
+                    .getGraphOwner().clone();
+            cloneA = DENOPTIMGraph.getEmbeddedGraphInClone(cloneOutermostGraphA, 
+                    embeddingPathA.get(0).getGraphOwner(), embeddingPathA);
+        }
+        if (embeddingPathB.size()==0) 
+        {
+            cloneOutermostGraphB = gB.clone();
+            cloneB = cloneOutermostGraphB;
+        } else {
+            cloneOutermostGraphB = embeddingPathB.get(0)
+                    .getGraphOwner().clone();
+            cloneB = DENOPTIMGraph.getEmbeddedGraphInClone(cloneOutermostGraphB, 
+                    embeddingPathB.get(0).getGraphOwner(), embeddingPathB);
+        }
+        
         cloneA.renumberGraphVertices();
         cloneB.renumberGraphVertices();
         List<DENOPTIMVertex> refsOnCloneA = new ArrayList<DENOPTIMVertex>();
@@ -164,7 +193,7 @@ public class XoverSite implements Cloneable
         XoverSite xos = new XoverSite(refsOnCloneA, refsOnCloneB, xoverType);
         return xos;
     }
-  
+    
 //------------------------------------------------------------------------------
 
     /**

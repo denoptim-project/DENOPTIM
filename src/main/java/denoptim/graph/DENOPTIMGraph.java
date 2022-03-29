@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.Reader;
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.security.InvalidAlgorithmParameterException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6111,6 +6112,42 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             }
         }
         return true;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Searches for a graphs (<b><i>X</i></b>) embedded at any level in a graph 
+     * (<b><i>Y</i></b>) by knowing<ul>
+     * <li>the embedding path (<b><i>p</i></b>) of another graph <b><i>A</i></b> 
+     * that is embedded in graph <b><i>B</i></b></li> 
+     * <li>and that graph <b><i>Y</i></b> is a unmodified clone of graph 
+     * <b><i>B</i></b>, which implies that <b><i>X</i></b> is a clone of 
+     * <b><i>A</i></b>.
+     * @param graphY where we want to find the analogous of <code>graphA</code>.
+     * @param graphB the graph <code>graphB</code> where <code>path</code> 
+     * points to <code>graphA</code>.
+     * @param path the embedding path of <code>graphA</code> in 
+     * <code>graphB</code>.
+     * @return the graph embedded in <code>graphY</code>, i.e., 
+     * <code>graphX</code>.
+     */
+    public static DENOPTIMGraph getEmbeddedGraphInClone(DENOPTIMGraph graphY, 
+            DENOPTIMGraph graphB, List<DENOPTIMTemplate> path) 
+    {
+        if (path.isEmpty())
+            return graphY;
+        DENOPTIMTemplate currentLevelVertex = null;
+        DENOPTIMGraph currentLevelGraphEmdInB = graphB;
+        DENOPTIMGraph currentLevelGraphEmbInY = graphY;
+        for (DENOPTIMTemplate t : path)
+        {
+            currentLevelVertex = (DENOPTIMTemplate) currentLevelGraphEmbInY
+                    .getVertexAtPosition(currentLevelGraphEmdInB.indexOf(t));
+            currentLevelGraphEmdInB = t.getInnerGraph();
+            currentLevelGraphEmbInY = currentLevelVertex.getInnerGraph();
+        }
+        return currentLevelVertex.getInnerGraph();
     }
 
 //------------------------------------------------------------------------------    

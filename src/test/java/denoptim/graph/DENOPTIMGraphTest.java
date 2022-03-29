@@ -50,7 +50,7 @@ public class DENOPTIMGraphTest {
     
 //------------------------------------------------------------------------------
     
-    private void prepareFragmentSpace() throws DENOPTIMException
+    public static void prepareFragmentSpace() throws DENOPTIMException
     {
         APCA = APClass.make(a, 0);
         APCB = APClass.make(b, 0);
@@ -1122,8 +1122,10 @@ public class DENOPTIMGraphTest {
 
     /**
      * Returns a graph that contains a 10-layered recursive structure.
+     * Before running this you must run 
+     * {@link DENOPTIMGraphTest#prepareFragmentSpace()}
      */
-    private DENOPTIMGraph makeDeeplyEmbeddedGraph() throws DENOPTIMException
+    public static DENOPTIMGraph makeDeeplyEmbeddedGraph() throws DENOPTIMException
     {
         EmptyVertex vOut = new EmptyVertex(0);
         vOut.addAP(APCA);
@@ -1142,9 +1144,12 @@ public class DENOPTIMGraphTest {
             EmptyVertex v1 = new EmptyVertex(1+100*embeddingLevel);
             v1.addAP(APCB);
             v1.addAP(APCA);
+            EmptyVertex v2 = new EmptyVertex(2+100*embeddingLevel);
+            v2.addAP(APCB);
             DENOPTIMGraph g = new DENOPTIMGraph();
             g.addVertex(v0);
             g.appendVertexOnAP(v0.getAP(1), v1.getAP(0));
+            g.appendVertexOnAP(v1.getAP(1), v2.getAP(0));
             DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.UNDEFINED);
             t.setInnerGraph(g);
             
@@ -1182,6 +1187,61 @@ public class DENOPTIMGraphTest {
                 "Embedding path of graph that is not embedded");
         List<DENOPTIMTemplate> path = refToThisLayerGraph.getEmbeddingPath();
         assertEquals(expected, path, "Path of deepest embedded graph");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetEmbeddedGraphInClone() throws Exception
+    {
+        DENOPTIMGraphTest.prepareFragmentSpace();
+        DENOPTIMGraph gA = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
+        DENOPTIMGraph gB = gA.clone();
+        
+        // This works only because we know that the graphs  have only one
+        // template per level
+        List<DENOPTIMTemplate> expectedPathA = new ArrayList<DENOPTIMTemplate>();
+        List<DENOPTIMTemplate> expectedPathB = new ArrayList<DENOPTIMTemplate>();
+        DENOPTIMGraph refToThisLayerGraphB = gB;
+        DENOPTIMTemplate refToThisLayerVrtxB = null;
+        DENOPTIMGraph refToThisLayerGraphA = gA;
+        DENOPTIMTemplate refToThisLayerVrtxA = null;
+        for (int embeddingLevel=0; embeddingLevel<9; embeddingLevel++)
+        {
+            refToThisLayerVrtxA = (DENOPTIMTemplate) refToThisLayerGraphA
+                    .getVertexList().stream()
+                        .filter(v -> v instanceof DENOPTIMTemplate)
+                        .findAny()
+                        .orElse(null);
+            expectedPathA.add(refToThisLayerVrtxA);
+            refToThisLayerGraphA = refToThisLayerVrtxA.getInnerGraph();
+            
+            refToThisLayerVrtxB = (DENOPTIMTemplate) refToThisLayerGraphB
+                    .getVertexList().stream()
+                        .filter(v -> v instanceof DENOPTIMTemplate)
+                        .findAny()
+                        .orElse(null);
+            expectedPathB.add(refToThisLayerVrtxB);
+            refToThisLayerGraphB = refToThisLayerVrtxB.getInnerGraph();
+        }
+
+        DENOPTIMGraph expectedEmbeddedA = expectedPathA.get(8).getInnerGraph();
+        DENOPTIMGraph expectedEmbeddedB = expectedPathB.get(8).getInnerGraph();
+        
+        DENOPTIMGraph embeddedFoundB = DENOPTIMGraph.getEmbeddedGraphInClone(gB, 
+                gA, expectedPathA);
+        
+        assertEquals(expectedEmbeddedB,embeddedFoundB);
+        
+        List<DENOPTIMTemplate> pathFoundB = embeddedFoundB.getEmbeddingPath();
+        assertEquals(expectedPathB,pathFoundB);
+        
+        DENOPTIMGraph embeddedFoundA = DENOPTIMGraph.getEmbeddedGraphInClone(gA, 
+                gB, expectedPathB);
+        assertEquals(expectedEmbeddedA,embeddedFoundA);
+        
+        List<DENOPTIMTemplate> pathFoundA = embeddedFoundA.getEmbeddingPath();
+        assertEquals(expectedPathA,pathFoundA);
     }
 
 //------------------------------------------------------------------------------
