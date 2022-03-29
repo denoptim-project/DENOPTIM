@@ -234,74 +234,40 @@ public class EAUtilsTest
         Monitor mnt = new Monitor();
         
         Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 4, 0);
+                population, mnt, new int[]{0,1}, 3, 0);
         
         Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 4, 1);
-        
-        //TODO-gg make it dependent on reproducibility
-        
-        if (offspring0.getGraph().getVertexCount()==5)
+                population, mnt, new int[]{0,1}, 3, 1);
+    
+        DENOPTIMGraph g0 = offspring0.getGraph();
+        assertEquals(4,g0.getVertexCount());
+        assertEquals(3,g0.getEdgeCount());
+        int maxLength = -1;
+        for (DENOPTIMVertex v : g0.getVertexList())
         {
-            DENOPTIMGraph gLeft = offspring0.getGraph();
-            assertEquals(4,gLeft.getEdgeCount());
-            int maxLength = -1;
-            for (DENOPTIMVertex v : gLeft.getVertexList())
+            ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+            g0.getChildrenTree(v, childTree);
+            if (childTree.size()>maxLength)
             {
-                ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
-                gLeft.getChildrenTree(v, childTree);
-                if (childTree.size()>maxLength)
-                {
-                    maxLength = childTree.size();
-                }
+                maxLength = childTree.size();
             }
-            assertEquals(4,maxLength);
-
-            DENOPTIMGraph gRight = offspring1.getGraph();
-            assertEquals(7,gRight.getVertexCount());
-            assertEquals(6,gRight.getEdgeCount());
-            maxLength = -1;
-            for (DENOPTIMVertex v : gRight.getVertexList())
-            {
-                ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
-                gRight.getChildrenTree(v, childTree);
-                if (childTree.size()>maxLength)
-                {
-                    maxLength = childTree.size();
-                }
-            }
-            assertEquals(6,maxLength);
-        } else if (offspring0.getGraph().getVertexCount()==7)
-        {
-            DENOPTIMGraph gLeft = offspring1.getGraph();
-            assertEquals(5,gLeft.getVertexCount());
-            assertEquals(4,gLeft.getEdgeCount());
-            int maxLength = -1;
-            for (DENOPTIMVertex v : gLeft.getVertexList())
-            {
-                ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
-                gLeft.getChildrenTree(v, childTree);
-                if (childTree.size()>maxLength)
-                {
-                    maxLength = childTree.size();
-                }
-            }
-            assertEquals(4,maxLength);
-
-            DENOPTIMGraph gRight = offspring0.getGraph();
-            assertEquals(6,gRight.getEdgeCount());
-            maxLength = -1;
-            for (DENOPTIMVertex v : gRight.getVertexList())
-            {
-                ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
-                gRight.getChildrenTree(v, childTree);
-                if (childTree.size()>maxLength)
-                {
-                    maxLength = childTree.size();
-                }
-            }
-            assertEquals(6,maxLength);
         }
+        assertEquals(3,maxLength);
+
+        DENOPTIMGraph g1 = offspring1.getGraph();
+        assertEquals(8,g1.getVertexCount());
+        assertEquals(7,g1.getEdgeCount());
+        maxLength = -1;
+        for (DENOPTIMVertex v : g1.getVertexList())
+        {
+            ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+            g1.getChildrenTree(v, childTree);
+            if (childTree.size()>maxLength)
+            {
+                maxLength = childTree.size();
+            }
+        }
+        assertEquals(7,maxLength);
     }
     
 //------------------------------------------------------------------------------
