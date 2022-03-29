@@ -1117,6 +1117,72 @@ public class DENOPTIMGraphTest {
         graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
         return graph;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns a graph that contains a 10-layered recursive structure.
+     */
+    private DENOPTIMGraph makeDeeplyEmbeddedGraph() throws DENOPTIMException
+    {
+        EmptyVertex vOut = new EmptyVertex(0);
+        vOut.addAP(APCA);
+
+        DENOPTIMGraph gOut = new DENOPTIMGraph();
+        gOut.addVertex(vOut);
+        
+        DENOPTIMGraph refToPrevGraph = gOut;
+        DENOPTIMVertex refToPRevVrtx = vOut;
+        for (int embeddingLevel=0; embeddingLevel<10; embeddingLevel++)
+        {
+            EmptyVertex v0 = new EmptyVertex(0+100*embeddingLevel);
+            v0.addAP(APCA);
+            v0.addAP(APCB);
+            v0.addAP(APCC);
+            EmptyVertex v1 = new EmptyVertex(1+100*embeddingLevel);
+            v1.addAP(APCB);
+            v1.addAP(APCA);
+            DENOPTIMGraph g = new DENOPTIMGraph();
+            g.addVertex(v0);
+            g.appendVertexOnAP(v0.getAP(1), v1.getAP(0));
+            DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.UNDEFINED);
+            t.setInnerGraph(g);
+            
+            refToPrevGraph.appendVertexOnAP(refToPRevVrtx.getAP(0), t.getAP(1));
+            
+            refToPrevGraph = g;
+            refToPRevVrtx = v0;
+        }
+        return gOut;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetEmbeddingPath() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph gOut = makeDeeplyEmbeddedGraph();
+        
+        List<DENOPTIMVertex> expected = new ArrayList<DENOPTIMVertex>();
+        DENOPTIMGraph refToThisLayerGraph = gOut;
+        DENOPTIMTemplate refToThisLayerVrtx = null;
+        for (int embeddingLevel=0; embeddingLevel<10; embeddingLevel++)
+        {
+            DENOPTIMVertex vrtx = refToThisLayerGraph.getVertexList().stream()
+                        .filter(v -> v instanceof DENOPTIMTemplate)
+                        .findAny()
+                        .orElse(null);
+            expected.add(vrtx);
+            refToThisLayerVrtx = (DENOPTIMTemplate) vrtx;
+            refToThisLayerGraph = refToThisLayerVrtx.getInnerGraph();
+        }
+        
+        assertEquals(new ArrayList<DENOPTIMVertex>(),gOut.getEmbeddingPath(),
+                "Embedding path of graph that is not embedded");
+        List<DENOPTIMVertex> path = refToThisLayerGraph.getEmbeddingPath();
+        assertEquals(expected, path, "Path of deepest embedded graph");
+    }
 
 //------------------------------------------------------------------------------
     

@@ -5997,6 +5997,31 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         else
             return templateJacket.getGraphOwner().getOutermostGraphOwner();
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Find the path that one has to traverse to reach this graph from any 
+     * template-embedding structure. In practice, for a graph that is embedded 
+     * a template jacket <code>T1</code>, which is part of another graph which
+     * is itself embedded in a template <code>T2</code>, which is again part of 
+     * another graph, and so on it returns the references to the embedding 
+     * templates stating from the outermost to the template that embeds this 
+     * graph (Outermost reference come first in the resulting list). 
+     * Instead a graph that is not embedded returns an empty path.
+     * @return the path of references that allow to reach this graph from the
+     * outermost level of embedding.
+     */
+    public List<DENOPTIMVertex> getEmbeddingPath()
+    {
+        List<DENOPTIMVertex> path = new ArrayList<DENOPTIMVertex>();
+        if (templateJacket==null)
+            return path;
+        if (templateJacket.getGraphOwner()!=null)
+            path.addAll(templateJacket.getGraphOwner().getEmbeddingPath());
+        path.add(templateJacket);
+        return path;
+    }
 
 //------------------------------------------------------------------------------    
     
