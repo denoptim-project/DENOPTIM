@@ -6149,6 +6149,43 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return currentLevelVertex.getInnerGraph();
     }
+    
+//------------------------------------------------------------------------------    
+
+    /**
+     * Searches for all {@link DENOPTIMAttachmentPoint}s that represent the
+     * interface between a subgraph, identified by the given list of vertexes,
+     * and any other vertex, i.e., either belonging to the same graph but
+     * not to the same <i>sub</i>graph, or belonging to an outer embedding level.
+     * @param subGraphB list of vertexes belonging to the subgraph
+     * @return the list of attachment points at the interface of the subgraph.
+     */
+    public List<DENOPTIMAttachmentPoint> getInterfaceAPs(
+            List<DENOPTIMVertex> subGraphB)
+    {
+        List<DENOPTIMAttachmentPoint> interfaceAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMVertex v : subGraphB)
+        {
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            {
+                if (ap.isAvailableThroughout())
+                    continue;
+                if (ap.isAvailable())
+                {
+                    // This AP is used across the template boundary
+                    interfaceAPs.add(ap);
+                } else {
+                    DENOPTIMVertex user = ap.getLinkedAP().getOwner();
+                    if (!subGraphB.contains(user))
+                    {
+                        // AP used to make a connection to outside subgraph
+                        interfaceAPs.add(ap);
+                    }
+                }    
+            }      
+        }
+        return interfaceAPs;
+    }
 
 //------------------------------------------------------------------------------    
     

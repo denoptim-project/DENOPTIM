@@ -2463,12 +2463,11 @@ public class DENOPTIMGraphTest {
         return graph;
     }
 
-
 //------------------------------------------------------------------------------
 
 	@Test
-	public void testRemoveCapping() throws Exception {
-	    
+	public void testRemoveCapping() throws Exception 
+	{
 		DENOPTIMGraph graph = new DENOPTIMGraph();
 
 		IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
@@ -2697,7 +2696,6 @@ public class DENOPTIMGraphTest {
         DENOPTIMGraph gB2 = gB1.clone();
         assertTrue(gB1.isIsomorphicTo(gB2),"graph B vs its clone");
     }
-
     
 //-----------------------------------------------------------------------------
 	
@@ -3175,6 +3173,44 @@ public class DENOPTIMGraphTest {
         assertTrue(childTree.contains(g.getVertexAtPosition(2)));
         assertTrue(childTree.contains(g.getVertexAtPosition(3)));
         assertTrue(childTree.contains(g.getVertexAtPosition(4)));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetInterfaceAPs() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphI();
+        
+        List<DENOPTIMVertex> subGraph = new ArrayList<DENOPTIMVertex>();
+        subGraph.add(g.getVertexAtPosition(0));
+        subGraph.add(g.getVertexAtPosition(1));
+        
+        List<DENOPTIMAttachmentPoint> expected = new ArrayList<DENOPTIMAttachmentPoint>();
+        expected.add(g.getVertexAtPosition(0).getAP(1));
+        expected.add(g.getVertexAtPosition(1).getAP(1));
+        
+        List<DENOPTIMAttachmentPoint> interfaceAPs = g.getInterfaceAPs(subGraph);
+        
+        assertEquals(expected,interfaceAPs);
+        
+        DENOPTIMGraph innerGraph = ((DENOPTIMTemplate) g.getVertexAtPosition(0))
+                .getInnerGraph();
+        
+        subGraph = new ArrayList<DENOPTIMVertex>();
+        subGraph.add(innerGraph.getVertexAtPosition(0));
+        subGraph.add(innerGraph.getVertexAtPosition(1));
+        
+        expected = new ArrayList<DENOPTIMAttachmentPoint>();
+        expected.add(innerGraph.getVertexAtPosition(0).getAP(0));
+        expected.add(innerGraph.getVertexAtPosition(0).getAP(1));
+        expected.add(innerGraph.getVertexAtPosition(0).getAP(4));
+        expected.add(innerGraph.getVertexAtPosition(1).getAP(1));
+        
+        interfaceAPs = innerGraph.getInterfaceAPs(subGraph);
+        
+        assertEquals(expected,interfaceAPs);
     }
     
 //------------------------------------------------------------------------------
