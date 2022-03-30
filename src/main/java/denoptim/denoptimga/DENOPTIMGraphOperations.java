@@ -391,13 +391,6 @@ public class DENOPTIMGraphOperations
             return;
         }
         
-        DENOPTIMGraph gA = gOwnerA.extractSubgraph(subGraphA);
-        DENOPTIMGraph gB = gOwnerB.extractSubgraph(subGraphB);
-        DENOPTIMTemplate tmplSubGrphA = new DENOPTIMTemplate(BBType.UNDEFINED);
-        tmplSubGrphA.setInnerGraph(gA);
-        DENOPTIMTemplate tmplSubGrphB = new DENOPTIMTemplate(BBType.UNDEFINED);
-        tmplSubGrphB.setInnerGraph(gB);
-        
         // What APs need to find a corresponding AP in the other 
         // subgraph in order to allow swapping?
         List<DENOPTIMAttachmentPoint> needyAPsA = gOwnerA.getInterfaceAPs(
@@ -423,19 +416,10 @@ public class DENOPTIMGraphOperations
         // is the deepest among the vertexes.
         DENOPTIMVertex seedOnA = subGraphA.get(0);
         DENOPTIMVertex seedOnB = subGraphB.get(0);
-        int apIndM = seedOnA.getEdgeToParent().getTrgAP().getIndexInOwner();
-        int apIndF = seedOnB.getEdgeToParent().getTrgAP().getIndexInOwner();
+        
         APMapping fixedRootAPs = new APMapping();
-        
-        fixedRootAPs.put(tmplSubGrphA.getOuterAPFromInnerAP(
-                        gA.getSourceVertex().getAP(apIndM)), 
-                tmplSubGrphB.getOuterAPFromInnerAP(
-                        gB.getSourceVertex().getAP(apIndF)));
-        
-        /*//TODO-gg back to this
         fixedRootAPs.put(seedOnA.getEdgeToParent().getTrgAP(),
                 seedOnB.getEdgeToParent().getTrgAP());
-        */
             
         APMapFinder apmf = new APMapFinder(allAPsA, allAPsB, 
                 fixedRootAPs, 
