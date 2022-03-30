@@ -6157,7 +6157,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * interface between a subgraph, identified by the given list of vertexes,
      * and any other vertex, i.e., either belonging to the same graph but
      * not to the same <i>sub</i>graph, or belonging to an outer embedding level.
-     * @param subGraphB list of vertexes belonging to the subgraph
+     * @param subGraphB list of vertexes belonging to the subgraph.
      * @return the list of attachment points at the interface of the subgraph.
      */
     public List<DENOPTIMAttachmentPoint> getInterfaceAPs(
@@ -6187,6 +6187,39 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         return interfaceAPs;
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Searches for all {@link DENOPTIMAttachmentPoint}s that are owned by 
+     * vertexes in a subgraph but either available or used by vertexes that do 
+     * not belong to the subgraph.
+     * @param subGraphB list of vertexes belonging to the subgraph.
+     * @return the list of attachment points originating from the subgraph.
+     */
+    public List<DENOPTIMAttachmentPoint> getSubgraphAPs(
+            List<DENOPTIMVertex> subGraphB)
+    {
+        List<DENOPTIMAttachmentPoint> aps = new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMVertex v : subGraphB)
+        {
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            {
+                if (ap.isAvailable())
+                {
+                    aps.add(ap);
+                    continue;
+                } 
+                DENOPTIMVertex user = ap.getLinkedAP().getOwner();
+                if (!subGraphB.contains(user))
+                {
+                    // AP used to make a connection to outside subgraph
+                    aps.add(ap);
+                }    
+            }      
+        }
+        return aps;
+    }
+    
 //------------------------------------------------------------------------------    
     
 }

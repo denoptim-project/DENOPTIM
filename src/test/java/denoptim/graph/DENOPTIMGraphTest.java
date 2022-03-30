@@ -3214,5 +3214,34 @@ public class DENOPTIMGraphTest {
     }
     
 //------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetSubgraphAPs() throws Exception
+    {
+        prepareFragmentSpace();
+        DENOPTIMGraph g = makeTestGraphI();
+        
+        DENOPTIMGraph innerGraph = ((DENOPTIMTemplate) g.getVertexAtPosition(0))
+                .getInnerGraph();
+        
+        List<DENOPTIMVertex> subGraph = new ArrayList<DENOPTIMVertex>();
+        subGraph.add(innerGraph.getVertexAtPosition(0));
+        subGraph.add(innerGraph.getVertexAtPosition(1));
+        
+        List<DENOPTIMAttachmentPoint>expected = new ArrayList<DENOPTIMAttachmentPoint>();
+        expected.add(innerGraph.getVertexAtPosition(0).getAP(0));
+        expected.add(innerGraph.getVertexAtPosition(0).getAP(1));
+        expected.add(innerGraph.getVertexAtPosition(0).getAP(2));
+        expected.add(innerGraph.getVertexAtPosition(0).getAP(4));
+        expected.add(innerGraph.getVertexAtPosition(1).getAP(1));
+        
+        List<DENOPTIMAttachmentPoint> interfaceAPs = innerGraph.getSubgraphAPs(
+                subGraph);
+        
+        assertEquals(expected,interfaceAPs);
+    }
+    
+    
+//------------------------------------------------------------------------------
 	
 }

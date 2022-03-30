@@ -272,7 +272,7 @@ public class EAUtilsTest
     
 //------------------------------------------------------------------------------
     
-    //TODO @Test
+    //TODO-gg @Test
     public void testBuildByXOver_Embedded() throws Exception
     {
         PopulationTest.prepare();
@@ -287,6 +287,12 @@ public class EAUtilsTest
 
         Candidate cB = new Candidate("CB",gB);
         population.add(cB);
+        
+
+        
+        //TODO-gg del
+        DenoptimIO.writeGraphToSDF(new File("/tmp/a.sdf"), gA, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/b.sdf"), gB, false);
   
         
         ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();

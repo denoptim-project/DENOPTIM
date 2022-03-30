@@ -426,7 +426,7 @@ public class DENOPTIMGraphOperationsTest {
         DENOPTIMTemplate t1 = (DENOPTIMTemplate) graphA.getVertexAtPosition(1);
         DENOPTIMTemplate t2 = (DENOPTIMTemplate) graphB.getVertexAtPosition(1);
         
-        // Making some empty vertexed unique to enable swapping (otherwise they
+        // Making some empty vertexes unique to enable swapping (otherwise they
         // are seen as the same node and excluded from xover sites list)
         DENOPTIMVertex v5A = t1.getInnerGraph().getVertexAtPosition(5);
         String k = "Uniquefier";
@@ -439,7 +439,7 @@ public class DENOPTIMGraphOperationsTest {
         List<XoverSite> xoverSites = 
                 DENOPTIMGraphOperations.locateCompatibleXOverPoints(graphA, graphB);
         
-        assertEquals(18, xoverSites.size());
+        assertEquals(17, xoverSites.size());
 
         // NB: we exploit the fact that every vertex has a unique label as a 
         // property and the combination of sites generates an invariant.

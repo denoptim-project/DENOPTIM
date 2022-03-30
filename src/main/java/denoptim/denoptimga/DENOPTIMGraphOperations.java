@@ -135,12 +135,10 @@ public class DENOPTIMGraphOperations
             // Branches that are isomorfic are not considered for crossover
             DENOPTIMGraph test1 = gA.clone();
             DENOPTIMGraph test2 = gB.clone();
-            DENOPTIMGraph subGraph1;
-            DENOPTIMGraph subGraph2;
             try
             {
-                subGraph1 = test1.extractSubgraph(gA.indexOf(vA));
-                subGraph2 = test2.extractSubgraph(gB.indexOf(vB));
+                DENOPTIMGraph subGraph1 = test1.extractSubgraph(gA.indexOf(vA));
+                DENOPTIMGraph subGraph2 = test2.extractSubgraph(gB.indexOf(vB));
                 if (!subGraph1.isIsomorphicTo(subGraph2))
                 {
                   //TODO-gg: any criterion to respect (template frozen?)
@@ -372,14 +370,20 @@ public class DENOPTIMGraphOperations
      * Here we check that the given subgraphs have a mapping that allows to swap
      * them, and we create the corresponding crossover site in the collector of 
      * such sites.
+     * NB: This method assumes that no crossover can involve seed of the spanning
+     * tree (whether scaffold, of anything else.
      */
     private static void checkAndAddXoverSites(List<DENOPTIMVertex> subGraphA, 
             List<DENOPTIMVertex> subGraphB, CrossoverType xoverType,
             List<XoverSite> collector)
     {
+        DENOPTIMGraph gOwnerA = subGraphA.get(0).getGraphOwner();
+        DENOPTIMGraph gOwnerB = subGraphB.get(0).getGraphOwner();
         // The compatibility of one AP that is needed to do branch swapping is
-        // granted by the identification of the seeds of swappable subgraphs.
-        if (xoverType == CrossoverType.BRANCH)
+        // guaranteed by the identification of the seeds of swappable subgraphs.
+        if (xoverType == CrossoverType.BRANCH 
+                && gOwnerA.getTemplateJacket()==null
+                && gOwnerB.getTemplateJacket()==null)
         {
             XoverSite xos = new XoverSite(subGraphA, subGraphB, xoverType);
             if (!collector.contains(xos))
@@ -387,29 +391,57 @@ public class DENOPTIMGraphOperations
             return;
         }
         
-        DENOPTIMGraph gA = subGraphA.get(0).getGraphOwner().extractSubgraph(
-                subGraphA);
-        DENOPTIMGraph gB = subGraphB.get(0).getGraphOwner().extractSubgraph(
-                subGraphB);
-        DENOPTIMTemplate tmplSubGrphM = new DENOPTIMTemplate(BBType.UNDEFINED);
-        tmplSubGrphM.setInnerGraph(gA);
-        DENOPTIMTemplate tmplSubGrphF = new DENOPTIMTemplate(BBType.UNDEFINED);
-        tmplSubGrphF.setInnerGraph(gB);
+        DENOPTIMGraph gA = gOwnerA.extractSubgraph(subGraphA);
+        DENOPTIMGraph gB = gOwnerB.extractSubgraph(subGraphB);
+        DENOPTIMTemplate tmplSubGrphA = new DENOPTIMTemplate(BBType.UNDEFINED);
+        tmplSubGrphA.setInnerGraph(gA);
+        DENOPTIMTemplate tmplSubGrphB = new DENOPTIMTemplate(BBType.UNDEFINED);
+        tmplSubGrphB.setInnerGraph(gB);
         
-        // We check for "a mapping" by trying first of all to constrain on the
-        // original connection of the subgraphs to their parents.
+        // What APs need to find a corresponding AP in the other 
+        // subgraph in order to allow swapping?
+        List<DENOPTIMAttachmentPoint> needyAPsA = gOwnerA.getInterfaceAPs(
+                subGraphA);
+        List<DENOPTIMAttachmentPoint> allAPsA = gOwnerA.getSubgraphAPs(
+                subGraphA);
+        List<DENOPTIMAttachmentPoint> needyAPsB = gOwnerB.getInterfaceAPs(
+                subGraphB);
+        List<DENOPTIMAttachmentPoint> allAPsB = gOwnerB.getSubgraphAPs(
+                subGraphB);
+        if (allAPsA.size() < needyAPsB.size()
+                || allAPsB.size() < needyAPsA.size())
+        {
+            // Impossible to satisfy needy APs.
+            return;
+        }
+        
+        // Retain connection to parent to keep directionality of spanning tree!
+        
+        // NB: this assumes that no crossover can involve seed of the spanning
+        // tree (whether scaffold, of anything else)
+        // TODO: we could get rid of the assumption that the first in the list
+        // is the deepest among the vertexes.
         DENOPTIMVertex seedOnA = subGraphA.get(0);
         DENOPTIMVertex seedOnB = subGraphB.get(0);
         int apIndM = seedOnA.getEdgeToParent().getTrgAP().getIndexInOwner();
         int apIndF = seedOnB.getEdgeToParent().getTrgAP().getIndexInOwner();
         APMapping fixedRootAPs = new APMapping();
-        fixedRootAPs.put(tmplSubGrphM.getOuterAPFromInnerAP(
+        
+        fixedRootAPs.put(tmplSubGrphA.getOuterAPFromInnerAP(
                         gA.getSourceVertex().getAP(apIndM)), 
-                tmplSubGrphF.getOuterAPFromInnerAP(
+                tmplSubGrphB.getOuterAPFromInnerAP(
                         gB.getSourceVertex().getAP(apIndF)));
+        
+        /*//TODO-gg back to this
+        fixedRootAPs.put(seedOnA.getEdgeToParent().getTrgAP(),
+                seedOnB.getEdgeToParent().getTrgAP());
+        */
             
-        APMapFinder apmf = new APMapFinder(tmplSubGrphM, tmplSubGrphF, 
-                fixedRootAPs, false, true, false);
+        APMapFinder apmf = new APMapFinder(allAPsA, allAPsB, 
+                fixedRootAPs, 
+                false,  // false: we stop at the first good mapping
+                true,   // true: only complete mapping
+                false); // false: free APs are not compatible by default
         if (apmf.foundMapping())
         {
             XoverSite xos = new XoverSite(subGraphA, subGraphB, xoverType);
@@ -1613,8 +1645,16 @@ public class DENOPTIMGraphOperations
                     tmplSubGrphB.getOuterAPFromInnerAP(
                             subGraphB.getSourceVertex().getAP(apIndF)));
         }
+        boolean needCompleteMapping = true;
+        if (site.getType()==CrossoverType.BRANCH)
+        {
+            needCompleteMapping = false;
+        }
         APMapFinder apmf = new APMapFinder(tmplSubGrphA, tmplSubGrphB, 
-                fixedRootAPs, false, true, false);
+                fixedRootAPs, 
+                false,  // false means stop at the first compatible mapping.
+                needCompleteMapping,   // true means we require complete mapping.
+                false); // false means free AP are not considered compatible.
         if (!apmf.foundMapping())
         {
             // Since the xover site has been detected by searching for compatible

@@ -99,6 +99,7 @@ public class XoverSite implements Cloneable
     
     /**
      * Returns the collection of vertexes belonging to the first subgraph.
+     * @return the collection of vertexes belonging to the first subgraph.
      */
     public List<DENOPTIMVertex> getA()
     {
@@ -109,10 +110,22 @@ public class XoverSite implements Cloneable
     
     /**
      * Returns the collection of vertexes belonging to the second subgraph.
+     * @return the collection of vertexes belonging to the second subgraph.
      */
     public List<DENOPTIMVertex> getB()
     {
         return subGraphB;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the type of crossover.
+     * @return the type of crossover.
+     */
+    public CrossoverType getType()
+    {
+        return xoverType;
     }
     
 //------------------------------------------------------------------------------
@@ -204,5 +217,5 @@ public class XoverSite implements Cloneable
         return "[XoverSite: "+subGraphA+", "+subGraphB+"]";
     }
 //------------------------------------------------------------------------------
-    
+
 }

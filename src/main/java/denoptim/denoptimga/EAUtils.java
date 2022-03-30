@@ -359,6 +359,9 @@ public class EAUtils
         DENOPTIMGraph gAClone = xosOnClones.getA().get(0).getGraphOwner();
         DENOPTIMGraph gBClone = xosOnClones.getB().get(0).getGraphOwner();
         
+        //TODO-gg
+        DenoptimIO.writeGraphToSDF(new File("/tmp/ca.sdf"), gAClone, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/cb.sdf"), gBClone, false);
         try
         {
             if (!DENOPTIMGraphOperations.performCrossover(xosOnClones))
@@ -383,10 +386,10 @@ public class EAUtils
         gAClone.addCappingGroups();
         gBClone.addCappingGroups();
         String lstIdVA = "";
-        for (DENOPTIMVertex v : xosOnClones.getA())
+        for (DENOPTIMVertex v : xos.getA())
             lstIdVA = lstIdVA + "_" + v.getVertexId();
         String lstIdVB = "";
-        for (DENOPTIMVertex v : xosOnClones.getB())
+        for (DENOPTIMVertex v : xos.getB())
             lstIdVB = lstIdVB + "_" + v.getVertexId();
         String msgA = "Xover: " + candIdA + "|" + gid1 + "|" + lstIdVA + "="
                     + candIdB + "|" + gid2 + "|" + lstIdVB;

@@ -2,52 +2,17 @@ package denoptim.denoptimga;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-import javax.vecmath.Point3d;
-
-import org.jgrapht.alg.util.Pair;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMGraphTest;
-import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.graph.EmptyVertex;
-import denoptim.graph.GraphPattern;
-import denoptim.io.DenoptimIO;
-import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.utils.CrossoverType;
-import denoptim.utils.GraphUtils;
 
 /**
  * Unit test

@@ -48,13 +48,13 @@ public class APMapFinder
     /**
      * Constructor that launches the search for a mapping between the
      * {@link DENOPTIMAttachmentPoint}s on the first vertex to those of the
-     * second. Note that is APs are available throughout any template barrier
+     * second. Note that if APs are available throughout any template barrier
      * we consider only the existence of an AP to be a reason for a compatible 
      * AP-AP mapping, irrespectively of the {@link APClass}. All APs that are
      * available (i.e., available throughout the templates barriers) will be
      * considered compatible because they do not have any requirement from
      * APClass compatibility rules or bond types.
-     * @param vA the first vertex. This vertex defined the minimal requirements,
+     * @param vA the first vertex. This vertex defines the minimal requirements,
      * i.e., all {@link DENOPTIMAttachmentPoint}s on this vertex that are used
      * (also throughout the template barriers) will have
      * to be mapped into {@link DENOPTIMAttachmentPoint}s on the other vertex 
@@ -65,7 +65,8 @@ public class APMapFinder
      */
     public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll)
     {
-        initialize(vA, vB, null, screenAll, false, true);
+        initialize(vA.getAttachmentPoints(), vB.getAttachmentPoints(), null, 
+                screenAll, false, true);
     }
     
 //------------------------------------------------------------------------------
@@ -73,10 +74,10 @@ public class APMapFinder
     /**
      * Constructor that launches the search for a mapping between the
      * {@link DENOPTIMAttachmentPoint}s on the first vertex to those of the
-     * second. Note that is APs are available throughout any template barrier
+     * second. Note that if APs are available throughout any template barrier
      * we consider only the existence of an AP to be a reason for a compatible 
      * AP-AP mapping, irrespectively of the {@link APClass}.
-     * @param vA the first vertex. This vertex defined the minimal requirements,
+     * @param vA the first vertex. This vertex defines the minimal requirements,
      * i.e., all {@link DENOPTIMAttachmentPoint}s on this vertex that are used
      * (also throughout the template barriers) will have
      * to be mapped into {@link DENOPTIMAttachmentPoint}s on the other vertex 
@@ -95,8 +96,40 @@ public class APMapFinder
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
-        initialize(vA, vB, fixedRootAPs, screenAll, onlyCompleteMappings,
-                compatibleIfFree);
+        initialize(vA.getAttachmentPoints(), vB.getAttachmentPoints(), 
+                fixedRootAPs, screenAll, onlyCompleteMappings, compatibleIfFree);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor that launches the search for a mapping between the
+     * {@link DENOPTIMAttachmentPoint}s on two lists. 
+     * Note that if APs are available throughout any template barrier
+     * we consider only the existence of an AP to be a reason for a compatible 
+     * AP-AP mapping, irrespectively of the {@link APClass}.
+     * @param lstA the first list. This list defines the minimal requirements,
+     * i.e., all {@link DENOPTIMAttachmentPoint}s on this list that are used
+     * (also throughout the template barriers) will have
+     * to be mapped into {@link DENOPTIMAttachmentPoint}s on the other list 
+     * for the mapping to be successful.
+     * @param vB the second list.
+     * @param fixedRootAPs if not <code>null</code>, sets a required mapping 
+     * that must be present in the all the AP mappings.
+     * @param screenAll use <code>true</code> to NOT stop at the first 
+     * compatible combinations.
+     * @param onlyCompleteMappings use <code>true</code> to collect only mappings 
+     * that include all of the APs on the first vertex.
+     * @param compatibleIfFree use <code>true</code> to make APs that are 
+     * available (i.e., available throughout the template barriers) be compatible.
+     */
+    public APMapFinder(List<DENOPTIMAttachmentPoint> lstA, 
+            List<DENOPTIMAttachmentPoint> lstB, 
+            APMapping fixedRootAPs, boolean screenAll,
+            boolean onlyCompleteMappings, boolean compatibleIfFree) 
+    {
+        initialize(lstA, lstB, 
+                fixedRootAPs, screenAll, onlyCompleteMappings, compatibleIfFree);
     }
     
 //------------------------------------------------------------------------------
@@ -122,70 +155,15 @@ public class APMapFinder
      * @param compatibleIfFree use <code>true</code> to make APs that are 
      * available (i.e., available throughout the template barriers) be compatible.
      */
-    private void initialize(DENOPTIMVertex vA, DENOPTIMVertex vB, 
+    private void initialize(List<DENOPTIMAttachmentPoint> lstA, 
+            List<DENOPTIMAttachmentPoint> lstB, 
             APMapping fixedRootAPs, boolean screenAll, 
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
         // We map all the compatibilities before choosing a specific mapping
         LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
-            apCompatilities = new LinkedHashMap<DENOPTIMAttachmentPoint,
-            List<DENOPTIMAttachmentPoint>>();
-        
-        for (DENOPTIMAttachmentPoint oAP : vA.getAttachmentPoints())
-        {
-            for (DENOPTIMAttachmentPoint cAP : vB.getAttachmentPoints())
-            {  
-                boolean compatible = false;
-                if (FragmentSpace.useAPclassBasedApproach())
-                {
-                    // TODO: if the vertex is a template, we should
-                    // consider the required APs.
-                    
-                    if (oAP.getAPClass().equals(cAP.getAPClass()))
-                        compatible = true;
-                    
-                    if (oAP.isAvailableThroughout())
-                    {
-                        //TODO: template's required AP will have to be considered.
-                        if (compatibleIfFree)
-                        {
-                            compatible = true;
-                        }
-                    } else {
-                        DENOPTIMAttachmentPoint lAP = 
-                                oAP.getLinkedAPThroughout();
-                        if (oAP.isSrcInUserThroughout())
-                        {
-                            if (lAP!=null && cAP.getAPClass()
-                                  .isCPMapCompatibleWith(lAP.getAPClass()))
-                            {
-                                compatible = true;
-                            }
-                        } else {
-                            if (lAP!=null && lAP.getAPClass()
-                                  .isCPMapCompatibleWith(cAP.getAPClass()))
-                            {
-                                compatible = true;
-                            }
-                        }
-                    }
-                } else {
-                    compatible = true;
-                }
-                if (compatible)
-                {
-                    if (apCompatilities.containsKey(oAP))
-                    {
-                        apCompatilities.get(oAP).add(cAP);
-                    } else {
-                        List<DENOPTIMAttachmentPoint> lst = 
-                                new ArrayList<DENOPTIMAttachmentPoint>();
-                        lst.add(cAP);
-                        apCompatilities.put(oAP,lst);
-                    }
-                }
-            }
-        }
+            apCompatilities = findAllPossibleMappings(lstA, lstB, 
+                    compatibleIfFree);
         
         // keys is used just to keep the map keys sorted in a separate list
         // so that the order is randomized only once, then it is retained.
@@ -194,7 +172,7 @@ public class APMapFinder
                         apCompatilities.keySet());
         if (fixedRootAPs!=null)
         {
-            if (keys.size()+fixedRootAPs.size() < vA.getNumberOfAPs())
+            if (keys.size()+fixedRootAPs.size() < lstA.size())
             {
                 return;
             }
@@ -202,7 +180,7 @@ public class APMapFinder
             // looking over the combinations.
             keys.removeAll(fixedRootAPs.keySet());
         } else {
-            if (keys.size() < vA.getNumberOfAPs())
+            if (keys.size() < lstA.size())
             {
                 return;
             }
@@ -220,17 +198,25 @@ public class APMapFinder
         }
         if (onlyCompleteMappings)
         {
-            for (DENOPTIMAttachmentPoint oldAp : vA.getAttachmentPoints())
+            for (DENOPTIMAttachmentPoint oldAp : lstA)
             {
                 if (!oldAPsRequiredToHaveAMapping.contains(oldAp))
                     oldAPsRequiredToHaveAMapping.add(oldAp);
             }
         } else {
-            for (DENOPTIMAttachmentPoint oldAp : vA.getAttachmentPoints())
+            for (DENOPTIMAttachmentPoint oldAp : lstA)
             {
                 if (oldAp.isAvailableThroughout())
                 {
-                    apCompatilities.get(oldAp).add(null);
+                    if (apCompatilities.containsKey(oldAp))
+                    {
+                        apCompatilities.get(oldAp).add(null);
+                    } else {
+                        List<DENOPTIMAttachmentPoint> lst = 
+                                new ArrayList<DENOPTIMAttachmentPoint>();
+                        lst.add(null);
+                        apCompatilities.put(oldAp,lst);
+                    }
                 } else {
                     if (!oldAPsRequiredToHaveAMapping.contains(oldAp))
                     {
@@ -332,6 +318,89 @@ public class APMapFinder
         }
         if (allAPMappings.size() > 0)
             chosenAPMap = RandomUtils.randomlyChooseOne(allAPMappings);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares the {@link DENOPTIMAttachmentPoint} of two lists searching for
+     * all the APs of the second list that are "compatible" with each of the APs
+     * of the first list. Note that "compatible" does not mean {@link APClass}-
+     * compatible to form connection, but that can be interchanges, i.e., one
+     * AP from the second list is compatible with one from the first list, if it
+     * can replace the latter in whatever role that AP has.
+     * @param lstA the first list of APs.
+     * @param lstB the second list ofAPs.
+     * @param compatibleIfFree use <code>true</code> to make APs that are 
+     * available (i.e., available throughout the template barriers) be 
+     * compatible.
+     * @return the map between the APs in the first list (keys) and the list 
+     * (value) of all those from the second list that are "compatible" with it.
+     */
+    public static LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
+        findAllPossibleMappings(List<DENOPTIMAttachmentPoint> lstA, 
+            List<DENOPTIMAttachmentPoint> lstB, boolean compatibleIfFree)
+    {
+        LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
+        apCompatilities = new LinkedHashMap<DENOPTIMAttachmentPoint,
+        List<DENOPTIMAttachmentPoint>>();
+    
+        for (DENOPTIMAttachmentPoint oAP : lstA)
+        {
+            for (DENOPTIMAttachmentPoint cAP : lstB)
+            {  
+                boolean compatible = false;
+                if (FragmentSpace.useAPclassBasedApproach())
+                {
+                    // TODO: if the vertex is a template, we should
+                    // consider the required APs.
+                    
+                    if (oAP.getAPClass().equals(cAP.getAPClass()))
+                        compatible = true;
+                    
+                    if (oAP.isAvailableThroughout())
+                    {
+                        //TODO: template's required AP will have to be considered.
+                        if (compatibleIfFree)
+                        {
+                            compatible = true;
+                        }
+                    } else {
+                        DENOPTIMAttachmentPoint lAP = 
+                                oAP.getLinkedAPThroughout();
+                        if (oAP.isSrcInUserThroughout())
+                        {
+                            if (lAP!=null && cAP.getAPClass()
+                                  .isCPMapCompatibleWith(lAP.getAPClass()))
+                            {
+                                compatible = true;
+                            }
+                        } else {
+                            if (lAP!=null && lAP.getAPClass()
+                                  .isCPMapCompatibleWith(cAP.getAPClass()))
+                            {
+                                compatible = true;
+                            }
+                        }
+                    }
+                } else {
+                    compatible = true;
+                }
+                if (compatible)
+                {
+                    if (apCompatilities.containsKey(oAP))
+                    {
+                        apCompatilities.get(oAP).add(cAP);
+                    } else {
+                        List<DENOPTIMAttachmentPoint> lst = 
+                                new ArrayList<DENOPTIMAttachmentPoint>();
+                        lst.add(cAP);
+                        apCompatilities.put(oAP,lst);
+                    }
+                }
+            }
+        }
+        return apCompatilities;
     }
     
 //------------------------------------------------------------------------------
