@@ -1144,6 +1144,7 @@ public class DENOPTIMGraphTest {
             EmptyVertex v1 = new EmptyVertex(1+100*embeddingLevel);
             v1.addAP(APCB);
             v1.addAP(APCA);
+            v1.addAP(APCD);
             EmptyVertex v2 = new EmptyVertex(2+100*embeddingLevel);
             v2.addAP(APCB);
             DENOPTIMGraph g = new DENOPTIMGraph();

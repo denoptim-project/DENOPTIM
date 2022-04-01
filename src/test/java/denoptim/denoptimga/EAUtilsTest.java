@@ -206,7 +206,7 @@ public class EAUtilsTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testBuildByXOver_SUBGRAPH() throws Exception
+    public void testBuildByXOver_SubGraph() throws Exception
     {
         PopulationTest.prepare();
         Population population = new Population();
@@ -302,7 +302,7 @@ public class EAUtilsTest
         Monitor mnt = new Monitor();
         
         Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 4, 0);
+                population, mnt, new int[]{0,1}, 3, 0);
         
         //TODO-gg evaluate
         assertTrue(false);

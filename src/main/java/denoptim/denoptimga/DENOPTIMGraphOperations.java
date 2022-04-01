@@ -379,17 +379,6 @@ public class DENOPTIMGraphOperations
     {
         DENOPTIMGraph gOwnerA = subGraphA.get(0).getGraphOwner();
         DENOPTIMGraph gOwnerB = subGraphB.get(0).getGraphOwner();
-        // The compatibility of one AP that is needed to do branch swapping is
-        // guaranteed by the identification of the seeds of swappable subgraphs.
-        if (xoverType == CrossoverType.BRANCH 
-                && gOwnerA.getTemplateJacket()==null
-                && gOwnerB.getTemplateJacket()==null)
-        {
-            XoverSite xos = new XoverSite(subGraphA, subGraphB, xoverType);
-            if (!collector.contains(xos))
-                collector.add(xos);
-            return;
-        }
         
         // What APs need to find a corresponding AP in the other 
         // subgraph in order to allow swapping?
@@ -404,9 +393,29 @@ public class DENOPTIMGraphOperations
         if (allAPsA.size() < needyAPsB.size()
                 || allAPsB.size() < needyAPsA.size())
         {
-            // Impossible to satisfy needy APs.
+            // Impossible to satisfy needy APs. Crossover site is not usable.
             return;
         }
+        
+        // Shortcut: since the compatibility of one AP that is needed to do 
+        // branch swapping is guaranteed by the identification of the seeds of 
+        // swappable subgraphs, we can avoid searching for a valid A mapping 
+        // when the graphs are not embedded. This because any AP that is not
+        // the one connecting the subgraph to the parent can be left free or
+        // removed without side effects on templates that embed the graph 
+        // because there is no such template.
+        if (xoverType == CrossoverType.BRANCH 
+                && gOwnerA.getTemplateJacket()==null
+                && gOwnerB.getTemplateJacket()==null)
+        {
+            XoverSite xos = new XoverSite(subGraphA, needyAPsA, subGraphB, 
+                    needyAPsB, xoverType);
+            if (!collector.contains(xos))
+                collector.add(xos);
+            return;
+        }
+        
+        //TODO-gg mapping must ensure all needy APs are satisfied!!!!
         
         // Retain connection to parent to keep directionality of spanning tree!
         
@@ -421,14 +430,15 @@ public class DENOPTIMGraphOperations
         fixedRootAPs.put(seedOnA.getEdgeToParent().getTrgAP(),
                 seedOnB.getEdgeToParent().getTrgAP());
             
-        APMapFinder apmf = new APMapFinder(allAPsA, allAPsB, 
+        APMapFinder apmf = new APMapFinder(allAPsA, needyAPsA, allAPsB, needyAPsB,
                 fixedRootAPs, 
                 false,  // false: we stop at the first good mapping
                 true,   // true: only complete mapping
                 false); // false: free APs are not compatible by default
         if (apmf.foundMapping())
         {
-            XoverSite xos = new XoverSite(subGraphA, subGraphB, xoverType);
+            XoverSite xos = new XoverSite(subGraphA, needyAPsA, 
+                    subGraphB, needyAPsB, xoverType);
             if (!collector.contains(xos))
                 collector.add(xos);
         }
@@ -1600,15 +1610,43 @@ public class DENOPTIMGraphOperations
         DENOPTIMGraph gA = site.getA().get(0).getGraphOwner();
         DENOPTIMGraph gB = site.getB().get(0).getGraphOwner();
         
-        DENOPTIMGraph subGraphA = gA.extractSubgraph(site.getA());
-        DENOPTIMGraph subGraphB = gB.extractSubgraph(site.getB());
-       
-        // Identify a mapping of APs that allows swapping the subgraphs
-        DENOPTIMTemplate tmplSubGrphA = new DENOPTIMTemplate(BBType.UNDEFINED);
-        tmplSubGrphA.setInnerGraph(subGraphA);
-        DENOPTIMTemplate tmplSubGrphB = new DENOPTIMTemplate(BBType.UNDEFINED);
-        tmplSubGrphB.setInnerGraph(subGraphB);
+        // All the APs that point away from the subgraph
+        List<DENOPTIMAttachmentPoint> allAPsOnA = gA.getSubgraphAPs(site.getA());
+        List<DENOPTIMAttachmentPoint> allAPsOnB = gB.getSubgraphAPs(site.getB());
         
+        // The APs that are required to have a mapping for proper crossover,
+        // eg. because the change of subgraph needs to retain a super structure.
+        List<DENOPTIMAttachmentPoint> needyAPsOnA = site.getAPsNeedingMappingA();
+        List<DENOPTIMAttachmentPoint> needyAPsOnB = site.getAPsNeedingMappingB();
+        
+        // APs that connects the subgraphs' root to the parent vertex
+        DENOPTIMAttachmentPoint apToParentA = null;
+        DENOPTIMAttachmentPoint apToParentB = null;
+        for (DENOPTIMAttachmentPoint ap : needyAPsOnA)
+        {
+            if (!ap.isSrcInUserThroughout())
+            {
+                apToParentA = ap;
+                //WARNING: we assume there is one AND only one AP to parent!!!
+                break;
+            }
+        }
+        for (DENOPTIMAttachmentPoint ap : needyAPsOnB)
+        {
+            if (!ap.isSrcInUserThroughout())
+            {
+                apToParentB = ap;
+                //WARNING: we assume there is one AND only one AP to parent!!!
+                break;
+            }
+        }
+        if (apToParentA==null || apToParentB==null)
+        {
+            throw new DENOPTIMException("Could not identify any attachment "
+                    + "point connecting a subgraph to the rest of the graph. "
+                    + "This violates assumption that crossover does not "
+                    + "involve scaffold or vertexes without parent.");
+        }
         // Check if the subgraphs can be used with reversed edge direction, or
         // bias the AP mapping to use the original source vertexes.
         APMapping fixedRootAPs = null;
@@ -1619,66 +1657,57 @@ public class DENOPTIMGraphOperations
             // Constrain the AP mapping so that the AP originally used to
             // connect to the parent vertex, will also be used the same way.
             // Thus, forces retention of edge direction within the subgraph.
-            DENOPTIMVertex seedOnA = site.getA().get(0);
-            DENOPTIMVertex seedOnB = site.getB().get(0);
-            int apIndM = seedOnA.getEdgeToParent().getTrgAP().getIndexInOwner();
-            int apIndF = seedOnB.getEdgeToParent().getTrgAP().getIndexInOwner();
             fixedRootAPs = new APMapping();
-            fixedRootAPs.put(tmplSubGrphA.getOuterAPFromInnerAP(
-                            subGraphA.getSourceVertex().getAP(apIndM)), 
-                    tmplSubGrphB.getOuterAPFromInnerAP(
-                            subGraphB.getSourceVertex().getAP(apIndF)));
+            fixedRootAPs.put(apToParentA, apToParentB);
         }
-        boolean needCompleteMapping = true;
-        if (site.getType()==CrossoverType.BRANCH)
-        {
-            needCompleteMapping = false;
-        }
-        APMapFinder apmf = new APMapFinder(tmplSubGrphA, tmplSubGrphB, 
-                fixedRootAPs, 
+        
+        // Find an AP mapping that satisfies both root-vertex constrain and
+        // need to ensure the mapping of needy APs
+        APMapFinder apmf = new APMapFinder(allAPsOnA, needyAPsOnA, 
+                allAPsOnB, needyAPsOnB, fixedRootAPs, 
                 false,  // false means stop at the first compatible mapping.
-                needCompleteMapping,   // true means we require complete mapping.
+                false,  // false means we do not require complete mapping.
                 false); // false means free AP are not considered compatible.
         if (!apmf.foundMapping())
         {
             // Since the xover site has been detected by searching for compatible
             // sites that do have a mapping there should always be at least one 
             // mapping and this exception should never occur.
-            throw new DENOPTIMException("Missing APMapping for known XoverSite.");
+            throw new DENOPTIMException("Missing AP mapping for known XoverSite.");
         }
-        // NB: this maps the APs on the two subgraphs, which is OK...
-        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap =
-                apmf.getChosenAPMapping();
-        // ...but to replace each subgraph in the original graphs, we need to 
+        
+        // To replace each subgraph in the original graphs, we need to 
         // map the APs on the original A/B graph with those in the 
-        // corresponding incoming subgraph.
-        // Here we create the latter mappings (two, one for A other for B)
+        // corresponding incoming subgraph, which are clones of the original:
+        DENOPTIMGraph subGraphA = gA.extractSubgraph(site.getA());
+        DENOPTIMGraph subGraphB = gB.extractSubgraph(site.getB());
+        
+        // Here we create the two AP mappings we need: one for A other for B.
         LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
         apMapA = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
         LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
         apMapB = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
-        for (Map.Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e : apMap.entrySet())
+        for (Map.Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e : 
+            apmf.getChosenAPMapping().entrySet())
         {
-            DENOPTIMAttachmentPoint apOnSubGraphA = 
-                    tmplSubGrphA.getInnerAPFromOuterAP(e.getKey());
-            DENOPTIMAttachmentPoint apOnSubGraphB = 
-                    tmplSubGrphB.getInnerAPFromOuterAP(e.getValue());
+            DENOPTIMAttachmentPoint apOnA = e.getKey();
+            DENOPTIMAttachmentPoint apOnB = e.getValue();
 
             // NB: assumption that vertex IDs are healthy, AND that order of APs
             // is retained upon cloning of the subgraph!
-            DENOPTIMAttachmentPoint apOnA = gA.getVertexWithId(
-                    apOnSubGraphA.getOwner().getVertexId()).getAP(
-                            apOnSubGraphA.getIndexInOwner());
-            DENOPTIMAttachmentPoint apOnB = gB.getVertexWithId(
-                    apOnSubGraphB.getOwner().getVertexId()).getAP(
-                            apOnSubGraphB.getIndexInOwner());
+            DENOPTIMAttachmentPoint apOnSubGraphA = subGraphA.getVertexWithId(
+                    apOnA.getOwner().getVertexId()).getAP(
+                            apOnA.getIndexInOwner());
+            DENOPTIMAttachmentPoint apOnSubGraphB = subGraphB.getVertexWithId(
+                    apOnB.getOwner().getVertexId()).getAP(
+                            apOnB.getIndexInOwner());
             apMapA.put(apOnA, apOnSubGraphB);
             apMapB.put(apOnB, apOnSubGraphA);
         }
  
+        // Now we do the actual replacement of subgraphs
         if (!gA.replaceSubGraph(site.getA(), subGraphB, apMapA))
            return false;
-        
         if (!gB.replaceSubGraph(site.getB(), subGraphA, apMapB))
             return false;
         

@@ -29,6 +29,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.denoptimga.DENOPTIMGraphOperations;
 import denoptim.denoptimga.XoverSite;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
@@ -183,7 +184,8 @@ public class GeneOpsRunner extends ProgramTask
         subGraphB.add(vf);
         female.getChildTreeLimited(vf, subGraphB, getSubGraphEnds(female,
                 GeneOpsRunnerParameters.xoverSubGraphEndFemale, "crossover"));
-        XoverSite xos = new XoverSite(subGraphA,subGraphB,xoverType);
+
+        XoverSite xos = new XoverSite(subGraphA, subGraphB, xoverType);
         
         // Ensure uniqueness on vertexID
         male.renumberGraphVertices();

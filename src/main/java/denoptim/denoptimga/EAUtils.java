@@ -381,35 +381,53 @@ public class EAUtils
                     + "Please, report this to the authors ",t);
         }
         
+        //TODO-gg
+        DenoptimIO.writeGraphToSDF(new File("/tmp/ca2.sdf"), gAClone, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/cb2.sdf"), gBClone, false);
+        
         gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
-        gAClone.addCappingGroups();
-        gBClone.addCappingGroups();
         String lstIdVA = "";
         for (DENOPTIMVertex v : xos.getA())
             lstIdVA = lstIdVA + "_" + v.getVertexId();
         String lstIdVB = "";
         for (DENOPTIMVertex v : xos.getB())
             lstIdVB = lstIdVB + "_" + v.getVertexId();
-        String msgA = "Xover: " + candIdA + "|" + gid1 + "|" + lstIdVA + "="
-                    + candIdB + "|" + gid2 + "|" + lstIdVB;
-        String msgB = "Xover: " + candIdB + "|" + gid2 + "|" + lstIdVB + "="
+        String[] msgs = new String[2];
+        msgs[0] = "Xover: " + candIdA + "|" + gid1 + "|" + lstIdVA + "="
+                + candIdB + "|" + gid2 + "|" + lstIdVB;
+        msgs[1] = "Xover: " + candIdB + "|" + gid2 + "|" + lstIdVB + "="
                 + candIdA + "|" + gid1 + "|" + lstIdVA;
-        gAClone.setLocalMsg(msgA);
-        gBClone.setLocalMsg(msgB);
         
         DENOPTIMGraph[] graphs = new DENOPTIMGraph[2];
         graphs[0] = gAClone;
         graphs[1] = gBClone;
         
         List<Candidate> validOnes = new Population();
-        for (DENOPTIMGraph g : graphs)
+        for (int ig=0; ig<graphs.length; ig++)
         {
-            Object[] res = EAUtils.evaluateGraph(g);
+            DENOPTIMGraph g = graphs[ig];
 
+            // It makes sense to do this on the possibly embedded graph and not
+            // on their embedding owners because there cannot be any new cycle
+            // affecting the latter, but there can be ones affecting the first.
+            if (!EAUtils.setupRings(null,g))
+            {
+                mnt.increase(CounterID.FAILEDXOVERATTEMPTS_SETUPRINGS);
+                continue;
+            }
+
+            // Finalize the graph that is at the outermost level
+            DENOPTIMGraph gOutermost = g.getOutermostGraphOwner();
+            gOutermost.addCappingGroups();
+            gOutermost.renumberGraphVertices();
+            gOutermost.setLocalMsg(msgs[ig]);
+            
+            // Consider if the result can be used to define a new candidate
+            Object[] res = EAUtils.evaluateGraph(gOutermost);
             if (res != null)
             {
-                if (!EAUtils.setupRings(res,g))
+                if (!EAUtils.setupRings(res,gOutermost))
                 {
                     mnt.increase(CounterID.FAILEDXOVERATTEMPTS_SETUPRINGS);
                     res = null;
@@ -419,9 +437,7 @@ public class EAUtils
             }
             
             // Check if the chosen combination gives rise to forbidden ends
-            //TODO this should be considered already when making the list of
-            // possible combination of rings
-            for (DENOPTIMVertex rcv : g.getFreeRCVertices())
+            for (DENOPTIMVertex rcv : gOutermost.getFreeRCVertices())
             {
                 APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
                 if (FragmentSpace.getCappingMap().get(apc)==null 
@@ -431,17 +447,15 @@ public class EAUtils
                     res = null;
                 }
             }
-            
             if (res == null)
             {
-                g.cleanup();
-                g = null;
+                gOutermost.cleanup();
+                gOutermost = null;
                 continue;
             }
             
-            g.renumberGraphVertices();
-            
-            Candidate offspring = new Candidate(g.getOutermostGraphOwner());
+            // OK: we can now use it to make a new candidate
+            Candidate offspring = new Candidate(gOutermost);
             offspring.setUID(res[0].toString().trim());
             offspring.setSmiles(res[1].toString().trim());
             offspring.setChemicalRepresentation((IAtomContainer) res[2]);
@@ -456,7 +470,7 @@ public class EAUtils
             return null;
         }
         
-        Candidate chosenOffspring  = null;
+        Candidate chosenOffspring = null;
         if (choiceOfOffstring<0)
         {
             chosenOffspring = RandomUtils.randomlyChooseOne(validOnes);
@@ -1422,29 +1436,36 @@ public class EAUtils
         // Update the IAtomContainer representation
         //DENOPTIMMoleculeUtils.removeUsedRCA(mol,molGraph);
         // Done already at t3d.convertGraphTo3DAtomContainer
-        
-        res[2] = mol;
-
-        // Update the SMILES representation
-        String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
-        if (molsmiles == null)
+        if (res!=null)
         {
-            String msg = "Evaluation of graph: SMILES is null! "
-                                                        + molGraph.toString();
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-            molsmiles = "FAIL: NO SMILES GENERATED";
+            res[2] = mol;
         }
-        res[1] = molsmiles;
+        // Update the SMILES representation
+        if (res!=null)
+        {
+            String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
+            if (molsmiles == null)
+            {
+                String msg = "Evaluation of graph: SMILES is null! "
+                                                            + molGraph.toString();
+                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                molsmiles = "FAIL: NO SMILES GENERATED";
+            }
+            res[1] = molsmiles;
+        }
 
         // Update the INCHI key representation
-        ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
-        if (pr.getFirst() == null)
+        if (res!=null)
         {
-            String msg = "Evaluation of graph: INCHI is null!";
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-            pr.setFirst("UNDEFINED");
+            ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
+            if (pr.getFirst() == null)
+            {
+                String msg = "Evaluation of graph: INCHI is null!";
+                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                pr.setFirst("UNDEFINED");
+            }
+            res[0] = pr.getFirst();
         }
-        res[0] = pr.getFirst();
 
         return true;
     }
@@ -1458,8 +1479,7 @@ public class EAUtils
      * @return <code>true</code> if found
      */
 
-    protected static boolean containsMolecule(Population mols,
-                                                                String molcode)
+    protected static boolean containsMolecule(Population mols, String molcode)
     {
         if(mols.isEmpty())
             return false;

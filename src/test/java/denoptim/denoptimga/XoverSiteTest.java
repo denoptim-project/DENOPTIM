@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMGraphTest;
 import denoptim.graph.DENOPTIMTemplate;
@@ -62,13 +63,21 @@ public class XoverSiteTest
         DENOPTIMGraph gEmeddedA = pathA.get(8).getInnerGraph();
         DENOPTIMGraph gEmeddedB = pathB.get(8).getInnerGraph();
 
-        ArrayList<DENOPTIMVertex> lstA = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> lstA = new ArrayList<DENOPTIMVertex>();
         lstA.add(gEmeddedA.getVertexAtPosition(1));
         lstA.add(gEmeddedA.getVertexAtPosition(2));
-        ArrayList<DENOPTIMVertex> lstB = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMAttachmentPoint> lstNeedyAPsA =
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        lstNeedyAPsA.add(lstA.get(0).getAP(2));
+        List<DENOPTIMVertex> lstB = new ArrayList<DENOPTIMVertex>();
         lstB.add(gEmeddedB.getVertexAtPosition(1));
         lstB.add(gEmeddedB.getVertexAtPosition(2));
-        XoverSite xos = new XoverSite(lstA, lstB, CrossoverType.BRANCH);
+        List<DENOPTIMAttachmentPoint> lstNeedyAPsB =
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        lstNeedyAPsB.add(lstB.get(0).getAP(2));
+        
+        XoverSite xos = new XoverSite(lstA, lstNeedyAPsA, lstB, lstNeedyAPsB, 
+                CrossoverType.BRANCH);
         
         XoverSite xosOnClone = xos.projectToClonedGraphs();
         
@@ -86,6 +95,10 @@ public class XoverSiteTest
                 .getGraphOwner().getEmbeddingPath();
         assertEquals(pathSiteB.size(),pathClonedSiteB.size());
         
+        assertEquals(xosOnClone.getA().get(0).getAP(2),
+                xosOnClone.getAPsNeedingMappingA().get(0));
+        assertEquals(xosOnClone.getB().get(0).getAP(2),
+                xosOnClone.getAPsNeedingMappingB().get(0));
     }
 
 //------------------------------------------------------------------------------

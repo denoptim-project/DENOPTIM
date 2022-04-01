@@ -245,6 +245,10 @@ public class FragmentSpaceUtils
             {
                 combination.put(apA,apB);
             }
+            // NB: when one is null it means that the other will not be listed
+            // in the mapping. Therefore, it will be left out of any operation
+            // that uses the mapping. For example, the AP for which the is a 
+            // 'null' possibility will be left free.
             
             // go deeper, to the next key
             if (currentKey+1 < keys.size())

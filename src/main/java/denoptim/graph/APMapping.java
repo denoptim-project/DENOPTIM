@@ -2,6 +2,7 @@ package denoptim.graph;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import denoptim.exception.DENOPTIMException;
 
@@ -88,15 +89,29 @@ public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAt
 //------------------------------------------------------------------------------
     
     /**
-     * Check if this mapping contains all the key attachment points (APs)
-     * in the 1st position of its AP pairs.
+     * Check if this mapping contains all the given attachment points (APs)
+     * in the 1st positions of the AP pairs.
      * @param keys the list of key APs.
-     * @return <code>true</code> if this mapping contains all the key APs
-     * and they are all in the 1st position of a pair.
+     * @return <code>true</code> if this mapping contains all the APs
+     * and they are all in the 1st position of their pair.
      */
-    public boolean containsAllKeys(ArrayList<DENOPTIMAttachmentPoint> keys)
+    public boolean containsAllKeys(List<DENOPTIMAttachmentPoint> keys)
     {
         return this.keySet().containsAll(keys);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Check if this mapping contains all the given attachment points (APs)
+     * in the 2nd positions of the AP pairs.
+     * @param keys the list of APs.
+     * @return <code>true</code> if this mapping contains all the APs
+     * and they are all in the 2nd position of their pair.
+     */
+    public boolean containsAllValues(List<DENOPTIMAttachmentPoint> keys)
+    {
+        return this.values().containsAll(keys);
     }
     
 //------------------------------------------------------------------------------

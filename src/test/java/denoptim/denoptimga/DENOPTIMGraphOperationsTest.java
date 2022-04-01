@@ -528,6 +528,25 @@ public class DENOPTIMGraphOperationsTest {
     
 //------------------------------------------------------------------------------
     
+    //TODO-gg @Test
+    public void testLocateCompatibleXOverPointsB() throws Exception
+    {
+        PopulationTest.prepare();
+
+        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
+        DENOPTIMGraph gA = pair[0];
+        DENOPTIMGraph gB = pair[1];
+        
+        List<XoverSite> xoverSites = 
+                DENOPTIMGraphOperations.locateCompatibleXOverPoints(gA, gB);
+        
+        assertEquals(17, xoverSites.size()); //TODO-gg update
+        
+        assertTrue(false);//TODO-gg update
+    }
+    
+//------------------------------------------------------------------------------
+    
     /**
      * Generates a pair of graphs that include templates with free content. 
      * The first graph is

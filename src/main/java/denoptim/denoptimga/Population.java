@@ -371,7 +371,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
                 continue;
             }
             
-            if (xoverCompatibilities.contains(memberA,memberB))
+            if (xoverCompatibilities.contains(memberA, memberB))
             {
                 continue;
             }
@@ -383,6 +383,10 @@ public class Population extends ArrayList<Candidate> implements Cloneable
                 
             try
             {
+
+                //TODO-gg
+                DenoptimIO.writeGraphToSDF(new File("/tmp/xos_A.sdf"), gA, false);
+                DenoptimIO.writeGraphToSDF(new File("/tmp/xos_B.sdf"), gB, false);
                 List<XoverSite> xoverSites = DENOPTIMGraphOperations
                         .locateCompatibleXOverPoints(gA, gB);
                 xoverCompatibilities.put(memberA, memberB, xoverSites);
