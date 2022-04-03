@@ -3164,9 +3164,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	{
     		boolean found = false;
     		DENOPTIMEdge eo = null;
+    		StringBuilder innerSb = new StringBuilder();
+    		int otherEdgeI = 0;
     		for (DENOPTIMEdge e : edgesFromOther)
     		{
-    		    if (et.sameAs(e,reason))
+    		    innerSb.append(" Edge"+otherEdgeI+":");
+    		    if (et.sameAs(e,innerSb))
     			{
     				found = true;
     				eo = e;
@@ -3175,7 +3178,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		}
     		if (!found)
     		{
-    			reason.append("Edge not found in other("+et+")");
+    			reason.append("Edge not found in other("+et+"). "
+    			        + "Edges in othes: "+innerSb.toString());
     			return false;
     		}
 

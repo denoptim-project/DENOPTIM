@@ -636,6 +636,23 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
             return false;
         }
         
+        // Order of APs must be the same
+        for (int i=0; i<this.getNumberOfAPs(); i++)
+        {
+            DENOPTIMAttachmentPoint apT = this.getAP(i);
+            DENOPTIMAttachmentPoint apO = other.getAP(i);
+            if (!apT.sameAs(apO))
+            {
+                reason.append("Difference in AP "+i+": "+apT+" vs "+apO);
+                return false;
+            }
+        }
+        // The following fails for vertexes v1 and v2 like these:
+        // (APC_A)<--v1-->(APC_A)
+        // (APC_A)<--v2-->(APC_A)
+        // Because the AP0 on v1 will be compared to AP1 on v2 and their 
+        // different position in the list of APs will make them be non-same.
+        /*
         for (DENOPTIMAttachmentPoint apT : this.getAttachmentPoints())
         {
             boolean found = false;
@@ -653,6 +670,7 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
                 return false;
             }
         }
+        */
     	
     	return true;
     }
