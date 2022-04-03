@@ -339,8 +339,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     /**
      * Replaces a given link between APs on the surface of this template (i.e., 
      * outerAP) and the corresponding APs in the embedded graph 
-     * (i.e., innerAPs). This method does not change anything about the outerAP;
-     * it changes only the inner AP. If there is now mapping for the oldInnerAP,
+     * (i.e., innerAPs). This method does change the attributes of the outerAP 
+     * to reflect the change on innferAP, i.e., the {@link APClass} of innerAP 
+     * is assigned to the outerAP.
+     * If there is now mapping for the oldInnerAP,
      * then nothing happens.
      * @param oldInnerAP the inner AP to be changed
      * @param newInnerAP the inner AP to change the old one with.
@@ -353,6 +355,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             return;
         }
         DENOPTIMAttachmentPoint outerAP = innerToOuterAPs.get(oldInnerAP);
+        outerAP.setAPClass(newInnerAP.getAPClass());
+        
         innerToOuterAPs.remove(oldInnerAP);
         innerToOuterAPs.put(newInnerAP, outerAP);
     }

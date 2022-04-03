@@ -371,6 +371,13 @@ public class RingClosureParameters
 
 //-----------------------------------------------------------------------------
 
+    public static void allowRingClosures(boolean value)
+    {
+        closeRings = value;
+    }
+    
+//-----------------------------------------------------------------------------
+
     public static boolean allowRingClosures()
     {
         return closeRings;

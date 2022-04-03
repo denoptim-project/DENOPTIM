@@ -409,7 +409,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      * @param apClass the new APClass.
      */
     
-    public void setAPClass(APClass apClass) throws DENOPTIMException
+    public void setAPClass(APClass apClass)
     {
         this.apClass = apClass;
     }

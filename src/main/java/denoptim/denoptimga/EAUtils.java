@@ -53,6 +53,7 @@ import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
@@ -399,14 +400,14 @@ public class EAUtils
         msgs[1] = "Xover: " + candIdB + "|" + gid2 + "|" + lstIdVB + "="
                 + candIdA + "|" + gid1 + "|" + lstIdVA;
         
-        DENOPTIMGraph[] graphs = new DENOPTIMGraph[2];
-        graphs[0] = gAClone;
-        graphs[1] = gBClone;
+        DENOPTIMGraph[] graphsAffectedByXover = new DENOPTIMGraph[2];
+        graphsAffectedByXover[0] = gAClone;
+        graphsAffectedByXover[1] = gBClone;
         
-        List<Candidate> validOnes = new Population();
-        for (int ig=0; ig<graphs.length; ig++)
+        List<Candidate> validOffspring = new Population();
+        for (int ig=0; ig<graphsAffectedByXover.length; ig++)
         {
-            DENOPTIMGraph g = graphs[ig];
+            DENOPTIMGraph g = graphsAffectedByXover[ig];
 
             // It makes sense to do this on the possibly embedded graph and not
             // on their embedding owners because there cannot be any new cycle
@@ -459,12 +460,11 @@ public class EAUtils
             offspring.setUID(res[0].toString().trim());
             offspring.setSmiles(res[1].toString().trim());
             offspring.setChemicalRepresentation((IAtomContainer) res[2]);
-            offspring.getGraph().setLocalMsg(g.getLocalMsg());
             
-            validOnes.add(offspring);
+            validOffspring.add(offspring);
         }
         
-        if (validOnes.size() == 0)
+        if (validOffspring.size() == 0)
         {
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
             return null;
@@ -473,12 +473,12 @@ public class EAUtils
         Candidate chosenOffspring = null;
         if (choiceOfOffstring<0)
         {
-            chosenOffspring = RandomUtils.randomlyChooseOne(validOnes);
+            chosenOffspring = RandomUtils.randomlyChooseOne(validOffspring);
             chosenOffspring.setName("M" + GenUtils.getPaddedString(
                     DENOPTIMConstants.MOLDIGITS,
                     GraphUtils.getUniqueMoleculeIndex()));
         } else {
-            chosenOffspring = validOnes.get(choiceOfOffstring);
+            chosenOffspring = validOffspring.get(choiceOfOffstring);
         }
         return chosenOffspring;
     }
@@ -1952,11 +1952,15 @@ public class EAUtils
      * ring-closing vertexes and actual connections.
      * @return the integer representing how many AP rooted on the same atom that 
      * holds the given attachment point are used by non-capping group building 
-     * blocks.
+     * blocks. Returns zero for APs belonging to {@link EmptyVertex}s.
      */
     public static int getCrowdedness(DENOPTIMAttachmentPoint ap, 
             boolean ignoreFreeRCVs)
     {
+        if (ap.getOwner() instanceof EmptyVertex)
+        {
+            return 0;
+        }
         int crowdness = 0;
         DENOPTIMGraph g = ap.getOwner().getGraphOwner();
         for (DENOPTIMAttachmentPoint oap : ap.getOwner().getAttachmentPoints())

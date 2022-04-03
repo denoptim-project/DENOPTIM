@@ -272,8 +272,18 @@ public class EAUtilsTest
     
 //------------------------------------------------------------------------------
     
-    //TODO-gg @Test
-    public void testBuildByXOver_Embedded() throws Exception
+    /**
+     * NB: the graphs from methods {@link #getPairOfTestGraphsB()} and
+     * {@link #getPairOfTestGraphsBxo()} and  
+     * {@link #getPairOfTestGraphsBxoxo()} are a sequence resulting from 
+     * crossover operations. Note that the order of APs in on the templates
+     * changes as a result of the crossover. For this reason, the backwards 
+     * crossover of the graphs from {@link #getPairOfTestGraphsBxo()} does not
+     * produce the graphs from {@link #getPairOfTestGraphsB()}, but
+     * those from {@link #getPairOfTestGraphsBxoxo()}.
+     */
+    @Test
+    public void testBuildByXOver_Embedded_Free() throws Exception
     {
         PopulationTest.prepare();
         Population population = new Population();
@@ -281,6 +291,10 @@ public class EAUtilsTest
         DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
         DENOPTIMGraph gA = pair[0];
         DENOPTIMGraph gB = pair[1];
+        ((DENOPTIMTemplate)gA.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        ((DENOPTIMTemplate)gB.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
         
         Candidate cA = new Candidate("CA",gA);
         population.add(cA);        
@@ -288,12 +302,77 @@ public class EAUtilsTest
         Candidate cB = new Candidate("CB",gB);
         population.add(cB);
         
+        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        eligibleParents.add(cA);
+        eligibleParents.add(cB);
 
+        Monitor mnt = new Monitor();
         
+
         //TODO-gg del
         DenoptimIO.writeGraphToSDF(new File("/tmp/a.sdf"), gA, false);
         DenoptimIO.writeGraphToSDF(new File("/tmp/b.sdf"), gB, false);
-  
+        
+        Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 8, 0);
+        
+        Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 8, 1);
+        
+        DENOPTIMGraph g0xo = offspring0.getGraph();
+        DENOPTIMGraph g1xo = offspring1.getGraph();
+        
+        DENOPTIMGraph[] expectedPair = PopulationTest.getPairOfTestGraphsBxo();
+        DENOPTIMGraph expected0 = expectedPair[0];
+        DENOPTIMGraph expected1 = expectedPair[1];
+        ((DENOPTIMTemplate)expected0.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        ((DENOPTIMTemplate)expected1.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+
+        //TODO-gg
+        StringBuilder sb = new StringBuilder();
+        expected0.sameAs(g0xo, sb);        
+        DenoptimIO.writeGraphToSDF(new File("/tmp/act_a.sdf"), offspring0.getGraph(), false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/act_b.sdf"), offspring1.getGraph(), false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/ex_a.sdf"), expected0, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/ex_b.sdf"), expected1, false);
+        
+        assertTrue(expected0.sameAs(g0xo, new StringBuilder()));
+        assertTrue(expected1.sameAs(g1xo, new StringBuilder()));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * NB: the graphs from methods {@link #getPairOfTestGraphsB()} and
+     * {@link #getPairOfTestGraphsBxo()} and  
+     * {@link #getPairOfTestGraphsBxoxo()} are a sequence resulting from 
+     * crossover operations. Note that the order of APs in on the templates
+     * changes as a result of the crossover. For this reason, the backwards 
+     * crossover of the graphs from {@link #getPairOfTestGraphsBxo()} does not
+     * produce the graphs from {@link #getPairOfTestGraphsB()}, but
+     * those from {@link #getPairOfTestGraphsBxoxo()}.
+     */
+    @Test
+    public void testBuildByXOver_Embedded_FreeBackwards() throws Exception
+    {
+        PopulationTest.prepare();
+        Population population = new Population();
+
+        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsBxo();
+        DENOPTIMGraph gA = pair[0];
+        DENOPTIMGraph gB = pair[1];
+        ((DENOPTIMTemplate)gA.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        ((DENOPTIMTemplate)gB.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        
+        Candidate cA = new Candidate("CA",gA);
+        population.add(cA);        
+
+        Candidate cB = new Candidate("CB",gB);
+        population.add(cB);
         
         ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(cA);
@@ -302,12 +381,34 @@ public class EAUtilsTest
         Monitor mnt = new Monitor();
         
         Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 3, 0);
+                population, mnt, new int[]{0,1}, 17, 0);
         
-        //TODO-gg evaluate
-        assertTrue(false);
+        Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 17, 1);
+        
+        DENOPTIMGraph g0xo = offspring0.getGraph();
+        DENOPTIMGraph g1xo = offspring1.getGraph();
+        
+        DENOPTIMGraph[] expectedPair = PopulationTest.getPairOfTestGraphsBxoxo();
+        DENOPTIMGraph expected0 = expectedPair[0];
+        DENOPTIMGraph expected1 = expectedPair[1];
+        ((DENOPTIMTemplate)expected0.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        ((DENOPTIMTemplate)expected1.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        
+        assertTrue(expected0.sameAs(g0xo, new StringBuilder()));
+        assertTrue(expected1.sameAs(g1xo, new StringBuilder()));
     }
     
+    /*
+     * 
+        
+        //TODO-gg repeat this by setting contract level frozes_structure and 
+        // verify that the structure of the embedded graph is not disctroied
+     * the fixed structure need to preserve the ring !
+     * 
+     */
 //------------------------------------------------------------------------------
 
     @Test
