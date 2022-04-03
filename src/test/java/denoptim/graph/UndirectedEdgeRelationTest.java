@@ -50,15 +50,15 @@ public class UndirectedEdgeRelationTest {
         DENOPTIMAttachmentPoint apC = vC.getAP(0);
         
 
-        UndirectedEdgeRelation ue1 = new UndirectedEdgeRelation(apA1, apB2, BondType.UNDEFINED);
-        UndirectedEdgeRelation ue2 = new UndirectedEdgeRelation(apB2, apA1, BondType.UNDEFINED);
+        UndirectedEdge ue1 = new UndirectedEdge(apA1, apB2, BondType.UNDEFINED);
+        UndirectedEdge ue2 = new UndirectedEdge(apB2, apA1, BondType.UNDEFINED);
         assertEquals(0,ue1.compare(ue1),"Self-comparison");
         assertEquals(0,ue1.compare(ue2),"Inverse edges should be equal (A)");
         assertEquals(0,ue2.compare(ue1),"Inverse edges should be equal (B)");
         
 
-        UndirectedEdgeRelation ues = new UndirectedEdgeRelation(apA1, apS, BondType.UNDEFINED);
-        UndirectedEdgeRelation uec = new UndirectedEdgeRelation(apA1, apC, BondType.UNDEFINED);
+        UndirectedEdge ues = new UndirectedEdge(apA1, apS, BondType.UNDEFINED);
+        UndirectedEdge uec = new UndirectedEdge(apA1, apC, BondType.UNDEFINED);
         assertEquals(1,ue1.compare(ues),"Ranking (A)");
         assertEquals(-1,ues.compare(ue1),"Ranking (Arev)");
         assertEquals(-1,ue1.compare(uec),"Ranking (B)");
@@ -67,16 +67,16 @@ public class UndirectedEdgeRelationTest {
         assertEquals(-1,ues.compare(uec),"Ranking (Crev)");
         
         
-        UndirectedEdgeRelation ue41 = new UndirectedEdgeRelation(apA1, apB1, BondType.SINGLE);
-        UndirectedEdgeRelation ue42 = new UndirectedEdgeRelation(apA2, apB2, BondType.SINGLE);
+        UndirectedEdge ue41 = new UndirectedEdge(apA1, apB1, BondType.SINGLE);
+        UndirectedEdge ue42 = new UndirectedEdge(apA2, apB2, BondType.SINGLE);
         assertEquals(-1,ue41.compare(ue42),
                 "Different APs lead to different edge (A)");
         assertEquals(1,ue42.compare(ue41),
                 "Different APs lead to different edge (B)");
         
 
-        UndirectedEdgeRelation ue51 = new UndirectedEdgeRelation(apA1,apB1, BondType.SINGLE);
-        UndirectedEdgeRelation ue52 = new UndirectedEdgeRelation(apA1,apB1, BondType.UNDEFINED);
+        UndirectedEdge ue51 = new UndirectedEdge(apA1,apB1, BondType.SINGLE);
+        UndirectedEdge ue52 = new UndirectedEdge(apA1,apB1, BondType.UNDEFINED);
         assertTrue(0 < ue51.compare(ue52),
                 "Different bond types lead to different edge (A)");
         assertTrue(0 > ue52.compare(ue51),

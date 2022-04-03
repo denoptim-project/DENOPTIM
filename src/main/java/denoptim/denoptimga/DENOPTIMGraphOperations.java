@@ -116,9 +116,9 @@ public class DENOPTIMGraphOperations
         
         //TODO-gg: consider including also the first vertex if not a scaffold
         
-        // The crossover sites are the combination of the above sites that
-        // define subgraphs that respect the requirements for being swapped 
-        // between the two graphs.
+        // The crossover sites are the combination of the above compatible
+        // vertexes that define subgraphs respecting the requirements for 
+        // being swapped between the two graphs.
         ArrayList<XoverSite> sites = new ArrayList<XoverSite>();
         for (DENOPTIMVertex[] pair : compatibleVrtxPairs)
         {
@@ -415,13 +415,11 @@ public class DENOPTIMGraphOperations
             return;
         }
         
-        //TODO-gg mapping must ensure all needy APs are satisfied!!!!
-        
         // Retain connection to parent to keep directionality of spanning tree!
         
         // NB: this assumes that no crossover can involve seed of the spanning
         // tree (whether scaffold, of anything else)
-        // TODO: we could get rid of the assumption that the first in the list
+        // TODO-gg: we could get rid of the assumption that the first in the list
         // is the deepest among the vertexes.
         DENOPTIMVertex seedOnA = subGraphA.get(0);
         DENOPTIMVertex seedOnB = subGraphB.get(0);

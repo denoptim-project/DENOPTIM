@@ -21,6 +21,7 @@ package denoptim.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,19 +29,26 @@ import java.util.HashSet;
 
 import javax.vecmath.Point3d;
 
+import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.silent.Bond;
 
+import denoptim.denoptimga.PopulationTest;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DENOPTIMGraphTest;
+import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.NodeConnection;
+import denoptim.graph.Node;
+import denoptim.io.DenoptimIO;
 import denoptim.graph.DENOPTIMVertex.BBType;
 
 /**
@@ -187,6 +195,42 @@ public class GraphConversionToolTest
                 + "removal of 2 unused RCVs.");
         assertEquals(2, acyclicGraph.getEdgeCount(), "Number of edges after "
                 + "removal of 2 unused RCVs.");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetJGraphKernelFromGraph() throws Exception
+    {
+        PopulationTest.prepare();
+        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
+        DENOPTIMGraph gA = pair[0];
+        DENOPTIMGraph gB = pair[1];
+        DENOPTIMGraph gC = ((DENOPTIMTemplate) gA.getVertexAtPosition(1))
+                .getInnerGraph();
+        DENOPTIMGraph gD = ((DENOPTIMTemplate) gB.getVertexAtPosition(1))
+                .getInnerGraph();
+        
+        DefaultUndirectedGraph<Node, NodeConnection> gkA = 
+                GraphConversionTool.getJGraphKernelFromGraph(gA);
+        assertEquals(5,gkA.vertexSet().size());
+        assertEquals(4,gkA.edgeSet().size());
+        
+        DefaultUndirectedGraph<Node, NodeConnection> gkB = 
+                GraphConversionTool.getJGraphKernelFromGraph(gB);
+        assertEquals(4,gkB.vertexSet().size());
+        assertEquals(3,gkB.edgeSet().size());
+        
+        DefaultUndirectedGraph<Node, NodeConnection> gkC = 
+                GraphConversionTool.getJGraphKernelFromGraph(gC);
+        assertEquals(8,gkC.vertexSet().size());
+        assertEquals(8,gkC.edgeSet().size());
+        
+        DefaultUndirectedGraph<Node, NodeConnection> gkD = 
+                GraphConversionTool.getJGraphKernelFromGraph(gD);
+        assertEquals(8,gkD.vertexSet().size());
+        assertEquals(7,gkD.edgeSet().size());
+        
     }
     
 //------------------------------------------------------------------------------

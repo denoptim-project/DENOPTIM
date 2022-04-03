@@ -49,7 +49,7 @@ public class PopulationTest
      * We do not do @BeforeEach because this method must be static to be used
      * in other unit tests.
      */
-    static void prepare() throws DENOPTIMException
+    public static void prepare() throws DENOPTIMException
     {   
         APCA = APClass.make("A", 0, BondType.SINGLE);
         APCB = APClass.make("B", 0, BondType.SINGLE);
@@ -762,8 +762,7 @@ public class PopulationTest
      * produce the graphs from {@link #getPairOfTestGraphsB()}, but
      * those from {@link #getPairOfTestGraphsBxoxo()}.
      */
-    //NB: must be visible from package!
-    static DENOPTIMGraph[] getPairOfTestGraphsB() throws Exception
+    public static DENOPTIMGraph[] getPairOfTestGraphsB() throws Exception
     {   
         // Prepare special building block: template T1
         EmptyVertex v0 = new EmptyVertex(0);
@@ -972,8 +971,7 @@ public class PopulationTest
      * produce the graphs from {@link #getPairOfTestGraphsB()}, but
      * those from {@link #getPairOfTestGraphsBxoxo()}.
      */
-    //NB: must be visible from package!
-    static DENOPTIMGraph[] getPairOfTestGraphsBxo() throws Exception
+    public static DENOPTIMGraph[] getPairOfTestGraphsBxo() throws Exception
     {   
         // Prepare special building block: template T1
         EmptyVertex v0 = new EmptyVertex(0);
@@ -1187,8 +1185,7 @@ public class PopulationTest
      * graph returned here is the same as the second returned by 
      * {@link #getPairOfTestGraphsB()}
      */
-    //NB: must be visible from package!
-    static DENOPTIMGraph[] getPairOfTestGraphsBxoxo() throws Exception
+    public static DENOPTIMGraph[] getPairOfTestGraphsBxoxo() throws Exception
     {   
         // Prepare special building block: template T1
 

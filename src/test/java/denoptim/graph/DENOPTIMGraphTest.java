@@ -477,7 +477,6 @@ public class DENOPTIMGraphTest {
      *      | (B)-(C)-v6-(D)--(B)-v7
      *      |/
      *  (A)-v1-(B)-(C)-v6-(D)--(B)-v7
- 
      *   </pre>
      *   
      */
@@ -1195,8 +1194,8 @@ public class DENOPTIMGraphTest {
     @Test
     public void testGetEmbeddedGraphInClone() throws Exception
     {
-        DENOPTIMGraphTest.prepareFragmentSpace();
-        DENOPTIMGraph gA = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
+        prepareFragmentSpace();
+        DENOPTIMGraph gA = makeDeeplyEmbeddedGraph();
         DENOPTIMGraph gB = gA.clone();
         
         // This works only because we know that the graphs  have only one
@@ -3242,6 +3241,174 @@ public class DENOPTIMGraphTest {
         assertEquals(expected,interfaceAPs);
     }
     
+//------------------------------------------------------------------------------
+    
+    public DENOPTIMGraph[] makeIsostructuralGraphs() throws Exception
+    {
+        String unqProp = "UNQPROP";
+        EmptyVertex rcvA1 = new EmptyVertex(11002);
+        rcvA1.addAP(APCA);
+        rcvA1.setAsRCV(true);
+        EmptyVertex rcvA2 = new EmptyVertex(11003);
+        rcvA2.addAP(APCA);
+        rcvA2.setAsRCV(true);
+        EmptyVertex vA0 = new EmptyVertex(10000);
+        vA0.addAP(APCA);
+        vA0.addAP(APCA);
+        vA0.addAP(APCB);
+        vA0.setUniquefyingProperty(unqProp);
+        vA0.setProperty(unqProp, 111);
+        EmptyVertex vA1 = new EmptyVertex(10001);
+        vA1.addAP(APCA);
+        vA1.addAP(APCA);
+        vA1.setUniquefyingProperty(unqProp);
+        vA1.setProperty(unqProp, 222);
+        EmptyVertex vA2= new EmptyVertex(10002);
+        vA2.addAP(APCA);
+        vA2.addAP(APCA);
+        EmptyVertex vA3 = new EmptyVertex(10003);
+        vA3.addAP(APCA);
+        vA3.addAP(APCA);
+        vA3.addAP(APCB);
+        DENOPTIMGraph g3A = new DENOPTIMGraph();
+        g3A.addVertex(vA0);
+        g3A.appendVertexOnAP(vA0.getAP(0), vA1.getAP(0));
+        g3A.appendVertexOnAP(vA1.getAP(1), vA2.getAP(0));
+        g3A.appendVertexOnAP(vA2.getAP(1), vA3.getAP(0));
+        g3A.appendVertexOnAP(vA3.getAP(1), rcvA1.getAP(0));
+        g3A.appendVertexOnAP(vA0.getAP(1), rcvA2.getAP(0));
+        g3A.addRing(rcvA1, rcvA2);
+        
+        // now build  second
+        EmptyVertex rcvB1 = new EmptyVertex(21002);
+        rcvB1.addAP(APCA);
+        rcvB1.setAsRCV(true);
+        EmptyVertex rcvB2 = new EmptyVertex(21003);
+        rcvB2.addAP(APCA);
+        rcvB2.setAsRCV(true);
+        EmptyVertex vB0 = new EmptyVertex(20000);
+        vB0.addAP(APCA);
+        vB0.addAP(APCA);
+        vB0.addAP(APCB);
+        vA0.setUniquefyingProperty(unqProp);
+        vA0.setProperty(unqProp, 333);
+        EmptyVertex vB1 = new EmptyVertex(20001);
+        vB1.addAP(APCA);
+        vB1.addAP(APCA);
+        vA0.setUniquefyingProperty(unqProp);
+        vA0.setProperty(unqProp, 444);
+        EmptyVertex vB2= new EmptyVertex(20002);
+        vB2.addAP(APCA);
+        vB2.addAP(APCA);
+        EmptyVertex vB3 = new EmptyVertex(20003);
+        vB3.addAP(APCA);
+        vB3.addAP(APCA);
+        vB3.addAP(APCB);
+        DENOPTIMGraph g3B = new DENOPTIMGraph();
+        g3B.addVertex(vB1);
+        g3B.appendVertexOnAP(vB1.getAP(1), vB2.getAP(0));
+        g3B.appendVertexOnAP(vB2.getAP(1), vB3.getAP(0));
+        g3B.appendVertexOnAP(vB3.getAP(1), vB0.getAP(1));
+        g3B.appendVertexOnAP(vB0.getAP(0), rcvB1.getAP(0));
+        g3B.appendVertexOnAP(vB1.getAP(0), rcvB2.getAP(0));
+        g3B.addRing(rcvB1, rcvB2);
+        
+        DENOPTIMGraph[] pair = new DENOPTIMGraph[2];
+        pair[0] = g3A;
+        pair[1] = g3B;
+        return pair;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testIsIsostructuralTo() throws Exception
+    {
+        prepareFragmentSpace();
+        
+        DENOPTIMGraph gAempty = new DENOPTIMGraph();
+        DENOPTIMGraph gBempty = new DENOPTIMGraph();
+
+        assertTrue(gAempty.isIsostructuralTo(gAempty));
+        assertTrue(gAempty.isIsostructuralTo(gBempty));
+        
+        DENOPTIMGraph g01 = makeTestGraph0();
+        DENOPTIMGraph g02 = makeTestGraph0();
+        assertTrue(g01.isIsostructuralTo(g02));
+        assertTrue(g01.isIsostructuralTo(g01.clone()));
+        
+        DENOPTIMGraph g11 = makeTestGraph1();
+        DENOPTIMGraph g12 = makeTestGraph1();
+        assertTrue(g11.isIsostructuralTo(g12));
+        assertFalse(g11.isIsostructuralTo(g01));
+        assertFalse(g11.isIsostructuralTo(g02));
+        assertTrue(g11.isIsostructuralTo(g11.clone()));
+        
+        DENOPTIMGraph gD1 = makeTestGraphD();
+        DENOPTIMGraph gD2 = makeTestGraphD();
+        assertTrue(gD1.isIsostructuralTo(gD2));
+        assertFalse(gD1.isIsostructuralTo(gAempty));
+        assertFalse(gAempty.isIsostructuralTo(gD1));
+        
+        DENOPTIMGraph gB1 = makeTestGraphB();
+        assertFalse(gD1.isIsostructuralTo(gB1));
+        
+        DENOPTIMGraph gB2 = gB1.clone();
+        assertTrue(gB1.isIsostructuralTo(gB2));
+        
+        // Up to here we checked consistency with isIsomorficTo().
+        // Now, make a pair of graphs that are not isomorphic by replacing one 
+        // of the vertexes with a new vertex that does not satisfy sameAs()
+        DENOPTIMGraph g1 = makeTestGraphDSub1();
+        DENOPTIMGraph g2 = makeTestGraphDSub1();
+        
+        EmptyVertex v1 = new EmptyVertex(10001);
+        v1.addAP(APCD);
+        v1.addAP(APCC);
+        v1.setUniquefyingProperty("blabla123");
+        v1.setProperty("blabla123", 123);
+        
+        DENOPTIMGraph incomingSubGraph = new DENOPTIMGraph();
+        incomingSubGraph.addVertex(v1);
+        
+        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap =
+                new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        apMap.put(g2.getVertexAtPosition(1).getAP(0), v1.getAP(1));
+        apMap.put(g2.getVertexAtPosition(1).getAP(1), v1.getAP(0));
+        
+        List<DENOPTIMVertex> toReplace = new ArrayList<DENOPTIMVertex>();
+		toReplace.add(g2.getVertexAtPosition(1));
+        g2.replaceSingleSubGraph(toReplace, incomingSubGraph, apMap);
+        
+        assertFalse(g1.isIsomorphicTo(g2));
+        assertTrue(g1.isIsostructuralTo(g2));
+        
+        // Change structure by adding a bifurcation
+        EmptyVertex v2 = new EmptyVertex(10002);
+        v2.addAP(APCD);
+        v2.addAP(APCC);
+        v2.addAP(APCC);
+        v2.setUniquefyingProperty("blabla456");
+        v2.setProperty("blabla456", 456);
+        incomingSubGraph = new DENOPTIMGraph();
+        incomingSubGraph.addVertex(v2);
+        apMap = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        apMap.put(g2.getVertexAtPosition(2).getAP(0), v1.getAP(1));
+        apMap.put(g2.getVertexAtPosition(2).getAP(1), v1.getAP(0));
+        toReplace = new ArrayList<DENOPTIMVertex>();
+        toReplace.add(g2.getVertexAtPosition(2));
+        g2.replaceSingleSubGraph(toReplace, incomingSubGraph, apMap);
+        
+        assertFalse(g1.isIsomorphicTo(g2));
+        assertFalse(g1.isIsostructuralTo(g2));
+        
+        // Change graph retaining structure: move ring closure along ring.
+        DENOPTIMGraph[] pair = makeIsostructuralGraphs();
+        DENOPTIMGraph gisA = pair[0];
+        DENOPTIMGraph gisB = pair[1];
+        assertFalse(gisA.isIsomorphicTo(gisB));
+        assertTrue(gisA.isIsostructuralTo(gisB));
+    }
     
 //------------------------------------------------------------------------------
 	
