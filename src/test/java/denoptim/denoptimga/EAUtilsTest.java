@@ -401,14 +401,61 @@ public class EAUtilsTest
         assertTrue(expected1.sameAs(g1xo, new StringBuilder()));
     }
     
-    /*
-     * 
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testBuildByXOver_Embedded_FrixedStructure() throws Exception
+    {
+        PopulationTest.prepare();
+        Population population = new Population();
+
+        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
+        DENOPTIMGraph gA = pair[0];
+        DENOPTIMGraph gB = pair[1];
+        ((DENOPTIMTemplate)gA.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FIXED_STRUCT);
+        ((DENOPTIMTemplate)gB.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FIXED_STRUCT);
         
-        //TODO-gg repeat this by setting contract level frozes_structure and 
-        // verify that the structure of the embedded graph is not disctroied
-     * the fixed structure need to preserve the ring !
-     * 
-     */
+        Candidate cA = new Candidate("CA",gA);
+        population.add(cA);        
+
+        Candidate cB = new Candidate("CB",gB);
+        population.add(cB);
+        
+        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        eligibleParents.add(cA);
+        eligibleParents.add(cB);
+
+        Monitor mnt = new Monitor();
+        
+
+        //TODO-gg del
+        DenoptimIO.writeGraphToSDF(new File("/tmp/a.sdf"), gA, false);
+        DenoptimIO.writeGraphToSDF(new File("/tmp/b.sdf"), gB, false);
+        
+        for (int ixo=0; ixo<14; ixo++) //TODO-gg value 14 needs to be updated
+        {
+            Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                    population, mnt, new int[]{0,1}, 8, 0);
+            
+            Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                    population, mnt, new int[]{0,1}, 8, 1);
+            
+            DENOPTIMGraph g0xo = offspring0.getGraph();
+            DENOPTIMGraph g1xo = offspring1.getGraph();
+            
+            //TODO-gg del
+            DenoptimIO.writeGraphToSDF(new File("/tmp/act_a.sdf"), offspring0.getGraph(), false);
+            DenoptimIO.writeGraphToSDF(new File("/tmp/act_b.sdf"), offspring1.getGraph(), false);
+    
+            //TODO-gg uncomment when isIsostructuralTo is ready
+            assertTrue(false);
+            //assertTrue(offspring0.getGraph().isIsostructuralTo(gA));
+            //assertTrue(offspring1.getGraph().isIsostructuralTo(gB));
+        }
+    }
+    
 //------------------------------------------------------------------------------
 
     @Test
