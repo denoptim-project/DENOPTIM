@@ -19,7 +19,6 @@
 package denoptim.graph;
 
 import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.utils.GenUtils;
 
 /**
  * This class represents an edge that is undirected and ignores attachment

@@ -18,28 +18,17 @@
 
 package denoptim.denoptimga;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.APMapping;
 import denoptim.graph.Candidate;
-import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMTemplate.ContractLevel;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.io.DenoptimIO;
-import denoptim.rings.PathSubGraph;
-import denoptim.utils.RandomUtils;
 
 /**
  * A collection of candidates. To speed-up operations such as the selection of
@@ -383,10 +372,6 @@ public class Population extends ArrayList<Candidate> implements Cloneable
                 
             try
             {
-
-                //TODO-gg
-                DenoptimIO.writeGraphToSDF(new File("/tmp/xos_A.sdf"), gA, false);
-                DenoptimIO.writeGraphToSDF(new File("/tmp/xos_B.sdf"), gB, false);
                 List<XoverSite> xoverSites = DENOPTIMGraphOperations
                         .locateCompatibleXOverPoints(gA, gB);
                 xoverCompatibilities.put(memberA, memberB, xoverSites);

@@ -59,11 +59,9 @@ import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.rings.CyclicGraphHandler;
-import denoptim.rings.PathSubGraph;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
 import denoptim.threedim.ThreeDimTreeBuilder;
-import denoptim.utils.CrossoverType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
@@ -359,10 +357,6 @@ public class EAUtils
         XoverSite xosOnClones = xos.projectToClonedGraphs();
         DENOPTIMGraph gAClone = xosOnClones.getA().get(0).getGraphOwner();
         DENOPTIMGraph gBClone = xosOnClones.getB().get(0).getGraphOwner();
-        
-        //TODO-gg
-        DenoptimIO.writeGraphToSDF(new File("/tmp/ca.sdf"), gAClone, false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/cb.sdf"), gBClone, false);
         try
         {
             if (!DENOPTIMGraphOperations.performCrossover(xosOnClones))
@@ -381,11 +375,6 @@ public class EAUtils
             throw new DENOPTIMException("Error while performing crossover. "
                     + "Please, report this to the authors ",t);
         }
-        
-        //TODO-gg
-        DenoptimIO.writeGraphToSDF(new File("/tmp/ca2.sdf"), gAClone, false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/cb2.sdf"), gBClone, false);
-        
         gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         String lstIdVA = "";

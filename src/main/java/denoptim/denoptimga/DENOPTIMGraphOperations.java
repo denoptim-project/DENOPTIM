@@ -21,18 +21,13 @@ package denoptim.denoptimga;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 
 import org.paukov.combinatorics3.Generator;
-
-import com.google.common.collect.Sets;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -43,7 +38,6 @@ import denoptim.fragspace.GraphLinkFinder;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
-import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMGraph;
@@ -114,8 +108,6 @@ public class DENOPTIMGraphOperations
             }
         }
         
-        //TODO-gg: consider including also the first vertex if not a scaffold
-        
         // The crossover sites are the combination of the above compatible
         // vertexes that define subgraphs respecting the requirements for 
         // being swapped between the two graphs.
@@ -132,7 +124,7 @@ public class DENOPTIMGraphOperations
             List<DENOPTIMVertex> descendantsB = new ArrayList<DENOPTIMVertex>();
             gB.getChildrenTree(vB, descendantsB);
             
-            // Branches that are isomorfic are not considered for crossover
+            // Branches that are isomorphic are not considered for crossover
             DENOPTIMGraph test1 = gA.clone();
             DENOPTIMGraph test2 = gB.clone();
             try
@@ -141,7 +133,6 @@ public class DENOPTIMGraphOperations
                 DENOPTIMGraph subGraph2 = test2.extractSubgraph(gB.indexOf(vB));
                 if (!subGraph1.isIsomorphicTo(subGraph2))
                 {
-                  //TODO-gg: any criterion to respect (template frozen?)
                     List<DENOPTIMVertex> branchOnVA = new ArrayList<DENOPTIMVertex>();
                     branchOnVA.add(vA);
                     branchOnVA.addAll(descendantsA);
@@ -171,7 +162,7 @@ public class DENOPTIMGraphOperations
             // some combinations will have to cut some branches short while
             // taking some other branches completely till their last leaf.
             
-            // To limit the number of combination, we first get rid of endpoint
+            // To limit the number of combination, we first get rid of end-point
             // candidates that cannot be used
             List<DENOPTIMVertex[]> combinablePairs = new ArrayList<DENOPTIMVertex[]>();
             for (DENOPTIMVertex[] otherPair : compatibleVrtxPairs)
@@ -184,7 +175,7 @@ public class DENOPTIMGraphOperations
                     continue;
                 
                 // This is only the path between the seed and one of the 
-                // possibly many subgraph endpoints
+                // possibly many subgraph end-points
                 PathSubGraph pathA = new PathSubGraph(vA, endOnA, gA);
                 PathSubGraph pathB = new PathSubGraph(vB, endOnB, gB);
                 
@@ -196,7 +187,10 @@ public class DENOPTIMGraphOperations
                                 && gB.getTemplateJacket().getContractLevel()
                                 == ContractLevel.FIXED_STRUCT))
                 {
-                    //...the two paths must have same length.
+                    //...the two paths must have same length. This would be 
+                    // checked anyway later when checking for isostructural
+                    // subgraphs, but here it helps reducing the size of the 
+                    // combinatorial problem
                     if (pathA.getPathLength()!=pathB.getPathLength())
                         continue;
                 }
@@ -357,9 +351,6 @@ public class DENOPTIMGraphOperations
         if (subGraphCloneA.isIsomorphicTo(subGraphCloneB))
             return;
         
-        //TODO-gg for fixed.structure templates the two subgraphs
-        // must have same structure.
-        
         checkAndAddXoverSites(subGraphA, subGraphB, 
                 CrossoverType.SUBGRAPH, collector);
     }
@@ -368,10 +359,12 @@ public class DENOPTIMGraphOperations
     
     /**
      * Here we check that the given subgraphs have a mapping that allows to swap
-     * them, and we create the corresponding crossover site in the collector of 
-     * such sites.
-     * NB: This method assumes that no crossover can involve seed of the spanning
-     * tree (whether scaffold, of anything else.
+     * them, and full fill any other requirement other than not being isomorphic 
+     * (which is done in parent methods calling this one). Then, we create the 
+     * corresponding crossover site and place it in the collector of such sites.
+     * 
+     * <b>NB: This method assumes that no crossover can involve seed of the spanning
+     * tree (whether scaffold, of anything else).</b>
      */
     private static void checkAndAddXoverSites(List<DENOPTIMVertex> subGraphA, 
             List<DENOPTIMVertex> subGraphB, CrossoverType xoverType,
@@ -404,9 +397,11 @@ public class DENOPTIMGraphOperations
         // the one connecting the subgraph to the parent can be left free or
         // removed without side effects on templates that embed the graph 
         // because there is no such template.
+        DENOPTIMTemplate jacketTmplA = gOwnerA.getTemplateJacket();
+        DENOPTIMTemplate jacketTmplB = gOwnerB.getTemplateJacket();
         if (xoverType == CrossoverType.BRANCH 
-                && gOwnerA.getTemplateJacket()==null
-                && gOwnerB.getTemplateJacket()==null)
+                && jacketTmplA==null
+                && jacketTmplB==null)
         {
             XoverSite xos = new XoverSite(subGraphA, needyAPsA, subGraphB, 
                     needyAPsB, xoverType);
@@ -415,15 +410,22 @@ public class DENOPTIMGraphOperations
             return;
         }
         
+        if ((jacketTmplA!=null && jacketTmplA.getContractLevel()
+                ==ContractLevel.FIXED_STRUCT)
+                || (jacketTmplB!=null && jacketTmplB.getContractLevel()
+                        ==ContractLevel.FIXED_STRUCT))
+        {
+            DENOPTIMGraph subGraphCloneA = gOwnerA.extractSubgraph(subGraphA);
+            DENOPTIMGraph subGraphCloneB = gOwnerB.extractSubgraph(subGraphB);
+            if (!subGraphCloneA.isIsostructuralTo(subGraphCloneB))
+                return;
+        }
+        
         // Retain connection to parent to keep directionality of spanning tree!
-        
-        // NB: this assumes that no crossover can involve seed of the spanning
-        // tree (whether scaffold, of anything else)
-        // TODO-gg: we could get rid of the assumption that the first in the list
-        // is the deepest among the vertexes.
-        DENOPTIMVertex seedOnA = subGraphA.get(0);
-        DENOPTIMVertex seedOnB = subGraphB.get(0);
-        
+        // To this end, identify the seed of the subgraphs...
+        DENOPTIMVertex seedOnA = gOwnerA.getDeepestAmongThese(subGraphA);
+        DENOPTIMVertex seedOnB = gOwnerB.getDeepestAmongThese(subGraphB);
+        //...and ensure we use the same APs to link to the parent graph.
         APMapping fixedRootAPs = new APMapping();
         fixedRootAPs.put(seedOnA.getEdgeToParent().getTrgAP(),
                 seedOnB.getEdgeToParent().getTrgAP());
@@ -894,7 +896,7 @@ public class DENOPTIMGraphOperations
         toDoAPs.addAll(lstDaps);
         for (int i=0; i<lstDaps.size(); i++)
         {
-            // WARNING: randomisation decouples 'i' from the index of the AP
+            // WARNING: randomization decouples 'i' from the index of the AP
             // in the vertex's list of APs! So 'i' is just the i-th attempt on
             // the curVertex.
             

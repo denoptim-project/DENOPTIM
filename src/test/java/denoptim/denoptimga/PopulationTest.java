@@ -657,62 +657,6 @@ public class PopulationTest
     
 //------------------------------------------------------------------------------
     
-    //TODO-gg @Test
-    public void testGetXoverSites_FixedStructureTmpls() throws Exception
-    {
-        prepare();
-        Population population = new Population();
-
-        DENOPTIMGraph[] pair = getPairOfTestGraphsB();
-        DENOPTIMGraph gA = pair[0];
-        DENOPTIMGraph gB = pair[1];
-        
-        Candidate cA = new Candidate("CA",gA);
-        population.add(cA);        
-
-        Candidate cB = new Candidate("CB",gB);
-        population.add(cB);
-        
-        ArrayList<Candidate> partners = population.getXoverPartners(cA, 
-                new ArrayList<Candidate>(Arrays.asList(cB)));
-        assertTrue(partners.contains(cB));
-        
-        //TODO-gg del
-        DenoptimIO.writeGraphToSDF(new File("/tmp/graphA.sdf"), gA, false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/graphB.sdf"), gB, false);
-        
-        List<XoverSite> subGraphSeeds = population.getXoverSites(cA,cB);
-        assertEquals(0,subGraphSeeds.size());
-        
-        
-        /*
-        // We hard-code the selection of a pair of xover sites as to choose
-        // sites that are inside the template vertexes, AND sites that are
-        // peculiar. This one, is be a place where xover that preserve the 
-        // structure is not possible
-        DENOPTIMVertex subGraphSeedA = subGraphSeeds.get(4)[0];
-        DENOPTIMVertex subGraphSeedB = subGraphSeeds.get(4)[1];
-        
-        // We do as many independent attempts as the number of possible end points
-        // This, just to test multiple possibilities.
-        for (int i=0; i<sizeXoverSiteList; i++)
-        {
-            List<List<DENOPTIMVertex>> subGraphEnds = 
-                    population.getSwappableSubGraphEnds(cA,cB,subGraphSeedA.getGraphOwner(),subGraphSeedA,
-                            subGraphSeedB.getGraphOwner(),subGraphSeedB, null);
-            
-            DENOPTIMGraph subGraphA = gA.extractSubgraph(subGraphSeedA, 
-                    subGraphEnds.get(0), false);
-            DENOPTIMGraph subGraphB = gB.extractSubgraph(subGraphSeedB,
-                    subGraphEnds.get(1),false);
-            
-            assertEquals(subGraphA.getVertexCount(),subGraphB.getVertexCount());
-        }
-        */
-    }
-    
-//------------------------------------------------------------------------------
-    
     /**
      * Builds a pair of graphs that contain templates with 
      * {@link ContractLevel#FREE} contract.

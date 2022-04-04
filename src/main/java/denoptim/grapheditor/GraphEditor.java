@@ -19,14 +19,11 @@
 package denoptim.grapheditor;
 
 import java.io.File;
-import java.util.logging.Level;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.task.ProgramTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
 

@@ -1014,7 +1014,7 @@ public class CyclicGraphHandler
                 boolean isAtmI = vI instanceof DENOPTIMFragment;
                 if (isAtmI)
                 {
-                    mol.getAtom(vIdToAtmId.get(vI).get(0));
+                    atmI = mol.getAtom(vIdToAtmId.get(vI).get(0));
                 
                     // Dealing with the possibility that RCV is the scaffold
                     if (mol.getConnectedAtomsList(atmI).size()==0)

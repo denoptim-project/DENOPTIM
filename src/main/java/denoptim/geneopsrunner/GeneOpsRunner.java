@@ -29,7 +29,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.denoptimga.DENOPTIMGraphOperations;
 import denoptim.denoptimga.XoverSite;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;

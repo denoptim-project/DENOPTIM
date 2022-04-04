@@ -36,7 +36,6 @@ import org.apache.commons.cli.CommandLine;
 
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.main.CLIOptions;
 import denoptim.task.StaticTaskManager;
 
 /**

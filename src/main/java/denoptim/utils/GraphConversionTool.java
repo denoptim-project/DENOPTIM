@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jgrapht.graph.DefaultUndirectedGraph;
-import org.jgrapht.graph.SimpleGraph;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -38,11 +37,11 @@ import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.graph.NodeConnection;
 import denoptim.graph.EmptyVertex;
+import denoptim.graph.Node;
+import denoptim.graph.NodeConnection;
 import denoptim.graph.SymmetricSet;
 import denoptim.graph.UndirectedEdge;
-import denoptim.graph.Node;
 
 
 /**

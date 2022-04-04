@@ -2,10 +2,8 @@ package denoptim.denoptimga;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.APMapping;
 import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;

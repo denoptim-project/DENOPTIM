@@ -19,11 +19,8 @@
 package denoptim.fragspaceexplorer;
 
 import java.io.File;
-import java.util.logging.Level;
 
-import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.task.ProgramTask;
 
 

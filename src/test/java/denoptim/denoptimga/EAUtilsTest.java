@@ -1,6 +1,7 @@
 package denoptim.denoptimga;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -308,11 +309,6 @@ public class EAUtilsTest
 
         Monitor mnt = new Monitor();
         
-
-        //TODO-gg del
-        DenoptimIO.writeGraphToSDF(new File("/tmp/a.sdf"), gA, false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/b.sdf"), gB, false);
-        
         Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
                 population, mnt, new int[]{0,1}, 8, 0);
         
@@ -329,14 +325,6 @@ public class EAUtilsTest
                 ContractLevel.FREE);
         ((DENOPTIMTemplate)expected1.getVertexAtPosition(1)).setContractLevel(
                 ContractLevel.FREE);
-
-        //TODO-gg
-        StringBuilder sb = new StringBuilder();
-        expected0.sameAs(g0xo, sb);        
-        DenoptimIO.writeGraphToSDF(new File("/tmp/act_a.sdf"), offspring0.getGraph(), false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/act_b.sdf"), offspring1.getGraph(), false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/ex_a.sdf"), expected0, false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/ex_b.sdf"), expected1, false);
         
         assertTrue(expected0.sameAs(g0xo, new StringBuilder()));
         assertTrue(expected1.sameAs(g1xo, new StringBuilder()));
@@ -404,7 +392,7 @@ public class EAUtilsTest
 //------------------------------------------------------------------------------
     
     @Test
-    public void testBuildByXOver_Embedded_FrixedStructure() throws Exception
+    public void testBuildByXOver_Embedded_FixedStructure() throws Exception
     {
         PopulationTest.prepare();
         Population population = new Population();
@@ -412,48 +400,102 @@ public class EAUtilsTest
         DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
         DENOPTIMGraph gA = pair[0];
         DENOPTIMGraph gB = pair[1];
-        ((DENOPTIMTemplate)gA.getVertexAtPosition(1)).setContractLevel(
-                ContractLevel.FIXED_STRUCT);
-        ((DENOPTIMTemplate)gB.getVertexAtPosition(1)).setContractLevel(
-                ContractLevel.FIXED_STRUCT);
+        DENOPTIMTemplate embeddedTmplA = (DENOPTIMTemplate) gA.getVertexAtPosition(1);
+        embeddedTmplA.setContractLevel(ContractLevel.FIXED_STRUCT);
+        DENOPTIMGraph embeddedGraphA = embeddedTmplA.getInnerGraph();
+        DENOPTIMTemplate embeddedTmplB = (DENOPTIMTemplate) gB.getVertexAtPosition(1);
+        embeddedTmplB.setContractLevel(ContractLevel.FIXED_STRUCT);
+        DENOPTIMGraph embeddedGraphB = embeddedTmplB.getInnerGraph();
+        
+        // Make vertexes unique so, even though they are empty, they will be 
+        // seen as non equal and crossover will be seen as non-redundant.
+        String propName = "uniquefier";
+        int i=0;
+        for (DENOPTIMVertex v : embeddedGraphA.getVertexList())
+        {
+            v.setUniquefyingProperty(propName);
+            v.setProperty(propName, i);
+            i++;
+        }
         
         Candidate cA = new Candidate("CA",gA);
-        population.add(cA);        
-
+        population.add(cA);
         Candidate cB = new Candidate("CB",gB);
         population.add(cB);
-        
         ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(cA);
         eligibleParents.add(cB);
 
         Monitor mnt = new Monitor();
-        
-
-        //TODO-gg del
-        DenoptimIO.writeGraphToSDF(new File("/tmp/a.sdf"), gA, false);
-        DenoptimIO.writeGraphToSDF(new File("/tmp/b.sdf"), gB, false);
-        
-        for (int ixo=0; ixo<14; ixo++) //TODO-gg value 14 needs to be updated
+        boolean embeddedGraphHasBeenAlteredA = false;
+        boolean embeddedGraphHasBeenAlteredB = false;
+        for (int ixo=0; ixo<11; ixo++)
         {
-            Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                    population, mnt, new int[]{0,1}, 8, 0);
-            
-            Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                    population, mnt, new int[]{0,1}, 8, 1);
+            Candidate offspring0 = null;
+            Candidate offspring1 = null;
+            try
+            {
+                offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                        population, mnt, new int[]{0,1}, ixo, 0);
+                offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                        population, mnt, new int[]{0,1}, ixo, 1);
+            } catch (IndexOutOfBoundsException e)
+            {
+                if (e.getMessage().contains("Index 10 out of bounds"))
+                {
+                    // All good! We intentionally triggered this exception to 
+                    // verify that the list of xover points has the right size.
+                    break;
+                }
+                throw e;
+            }
             
             DENOPTIMGraph g0xo = offspring0.getGraph();
             DENOPTIMGraph g1xo = offspring1.getGraph();
+            DENOPTIMTemplate t0 = null;
+            DENOPTIMTemplate t1 = null;
+            for (DENOPTIMVertex v : g0xo.getVertexList())
+            {
+                if (v instanceof DENOPTIMTemplate)
+                {
+                    t0 = (DENOPTIMTemplate) v;
+                    break;
+                }
+            }
+            for (DENOPTIMVertex v : g1xo.getVertexList())
+            {
+                if (v instanceof DENOPTIMTemplate)
+                {
+                    t1 = (DENOPTIMTemplate) v;
+                    break;
+                }
+            }
+            assertNotNull(t0);
+            assertNotNull(t1);
             
-            //TODO-gg del
-            DenoptimIO.writeGraphToSDF(new File("/tmp/act_a.sdf"), offspring0.getGraph(), false);
-            DenoptimIO.writeGraphToSDF(new File("/tmp/act_b.sdf"), offspring1.getGraph(), false);
-    
-            //TODO-gg uncomment when isIsostructuralTo is ready
-            assertTrue(false);
-            //assertTrue(offspring0.getGraph().isIsostructuralTo(gA));
-            //assertTrue(offspring1.getGraph().isIsostructuralTo(gB));
+            DENOPTIMGraph embeddedGraph0 = t0.getInnerGraph();
+            DENOPTIMGraph embeddedGraph1 = t1.getInnerGraph();
+            
+            // Ensure there has been a change
+            if (!embeddedGraphA.isIsomorphicTo(embeddedGraph0) 
+                    && !embeddedGraphA.isIsomorphicTo(embeddedGraph1))
+            {
+                embeddedGraphHasBeenAlteredA = true;
+            }
+            if (!embeddedGraphB.isIsomorphicTo(embeddedGraph0) 
+                    && !embeddedGraphB.isIsomorphicTo(embeddedGraph1))
+            {
+                embeddedGraphHasBeenAlteredB = true;
+            }
+            
+            // Ensure consistency with "fixed-structure" contract
+            assertTrue(embeddedGraphA.isIsostructuralTo(embeddedGraph0)
+                    || embeddedGraphB.isIsostructuralTo(embeddedGraph0));
+            assertTrue(embeddedGraphA.isIsostructuralTo(embeddedGraph1)
+                    || embeddedGraphB.isIsostructuralTo(embeddedGraph1));
         }
+        assertTrue(embeddedGraphHasBeenAlteredA);
+        assertTrue(embeddedGraphHasBeenAlteredB);
     }
     
 //------------------------------------------------------------------------------
