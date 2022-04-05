@@ -36,8 +36,8 @@ import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.silent.Bond;
 
-import denoptim.denoptimga.PopulationTest;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.ga.PopulationTest;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;

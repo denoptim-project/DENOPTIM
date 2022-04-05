@@ -61,7 +61,7 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.SymmetricSet;
 import denoptim.io.DenoptimIO;
-import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphUtils;
 

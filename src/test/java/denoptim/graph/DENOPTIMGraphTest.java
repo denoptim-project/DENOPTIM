@@ -32,8 +32,8 @@ import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.DENOPTIMVertex.VertexType;
+import denoptim.graph.rings.PathSubGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.rings.PathSubGraph;
 import denoptim.utils.MutationType;
 
 

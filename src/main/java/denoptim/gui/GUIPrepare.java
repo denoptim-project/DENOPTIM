@@ -31,13 +31,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
-import denoptim.denoptimga.DenoptimGA;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.fitnessrunner.FitnessRunner;
-import denoptim.fragspaceexplorer.FragSpaceExplorer;
+import denoptim.ga.DenoptimGA;
 import denoptim.main.Main.RunType;
+import denoptim.programs.combinatorial.FragSpaceExplorer;
+import denoptim.programs.fitnessevaluator.FitnessRunner;
 import denoptim.task.ProgramTask;
 import denoptim.task.StaticTaskManager;
 

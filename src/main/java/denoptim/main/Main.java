@@ -15,19 +15,19 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.denoptimcg.DenoptimCG;
-import denoptim.denoptimga.DenoptimGA;
 import denoptim.exception.ExceptionUtils;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.fitnessrunner.FitnessRunner;
-import denoptim.fragspaceexplorer.FragSpaceExplorer;
-import denoptim.geneopsrunner.GeneOpsRunner;
-import denoptim.grapheditor.GraphEditor;
-import denoptim.graphlisthandler.GraphListsHandler;
+import denoptim.ga.DenoptimGA;
 import denoptim.gui.GUI;
-import denoptim.isomorphism.Isomorphism;
 import denoptim.logging.Version;
+import denoptim.programs.combinatorial.FragSpaceExplorer;
+import denoptim.programs.fitnessevaluator.FitnessRunner;
+import denoptim.programs.genetweeker.GeneOpsRunner;
+import denoptim.programs.grapheditor.GraphEditor;
+import denoptim.programs.graphlisthandler.GraphListsHandler;
+import denoptim.programs.isomorphism.Isomorphism;
+import denoptim.programs.moldecularmodelbuilder.MolecularModelBuilder;
 import denoptim.task.ProgramTask;
 import denoptim.task.StaticTaskManager;
 
@@ -150,7 +150,7 @@ public class Main
             GO.programTaskImpl = GeneOpsRunner.class;
             GUI.programTaskImpl = GUI.class;
             CLG.programTaskImpl = GraphListsHandler.class;
-            B3D.programTaskImpl = DenoptimCG.class;
+            B3D.programTaskImpl = MolecularModelBuilder.class;
         }
 
         /**

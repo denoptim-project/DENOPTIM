@@ -27,7 +27,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
-import denoptim.rings.RingClosingAttractor;
+import denoptim.graph.rings.RingClosingAttractor;
 
 
 /**

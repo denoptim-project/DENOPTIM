@@ -26,7 +26,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.json.DENOPTIMgson;
-import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.MutationType;
 

@@ -43,7 +43,7 @@ import denoptim.graph.EmptyVertex;
 import denoptim.gui.GraphViewerPanel.JVertex;
 import denoptim.gui.GraphViewerPanel.JVertexType;
 import denoptim.gui.GraphViewerPanel.LabelType;
-import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 

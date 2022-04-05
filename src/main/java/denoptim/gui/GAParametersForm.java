@@ -60,8 +60,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 
-import denoptim.denoptimga.EAUtils;
-import denoptim.denoptimga.GAParameters;
+import denoptim.ga.EAUtils;
+import denoptim.ga.GAParameters;
 
 
 /**

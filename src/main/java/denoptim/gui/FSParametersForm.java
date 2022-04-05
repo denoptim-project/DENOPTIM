@@ -45,7 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import denoptim.fragspace.FragmentSpace;
-import denoptim.rings.RingClosureParameters;
+import denoptim.graph.rings.RingClosureParameters;
 
 /**
  * Form collecting input parameters for defining the fragment space.

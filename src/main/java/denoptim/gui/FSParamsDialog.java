@@ -8,7 +8,7 @@ import javax.swing.UIManager;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.rings.RingClosureParameters;
+import denoptim.graph.rings.RingClosureParameters;
 
 /**
  * A modal dialog to define a fragment space and load it.

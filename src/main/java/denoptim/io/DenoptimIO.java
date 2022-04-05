@@ -105,7 +105,7 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;

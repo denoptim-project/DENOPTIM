@@ -38,7 +38,7 @@ import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.TaskUtils;
 
