@@ -11,9 +11,9 @@ GA-MOLGROWTHSIGMASTEEPNESS=0.2
 GA-MOLGROWTHSIGMAMIDDLE=20
 
 GA-XOverSelectionMode=TS
-GA-CrossoverWeight=0.0
-GA-MutationWeight=1
-GA-ConstructionWeight=1
+GA-CrossoverWeight=1.0
+GA-MutationWeight=0.0
+GA-ConstructionWeight=0.5
 GA-SymmetryProbability=0.0
 GA-ReplacementStrategy=ELITIST
 GA-NumParallelTasks=1

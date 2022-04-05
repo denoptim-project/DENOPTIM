@@ -404,7 +404,7 @@ M  END
     ],
     "symVertices": []
   },
-  "contractLevel": "FREE",
+  "contractLevel": "FIXED_STRUCT",
   "requiredAPs": [],
   "innerToOuterAPs": {},
   "vertexId": 200,
