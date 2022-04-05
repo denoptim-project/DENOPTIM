@@ -95,7 +95,7 @@ do
     echo "FS-FragmentLibFile=$wrkDir/frags.sdf" >> "$dnpParams"
     echo "FS-CappingFragmentLibFile=$wrkDir/cap.sdf" >> "$dnpParams"
     echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> "$dnpParams"
-    echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/DenoptimCG/data/rotatableBonds-1.0" >> "$dnpParams"
+    echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/main/resources/data/rotatableBonds-1.0" >> "$dnpParams"
 
     echo "CG-workDir=$wrkDir" >> "$dnpParams"
     # location of the TINKER tools
@@ -103,16 +103,16 @@ do
     echo "CG-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> "$dnpParams"
     echo "CG-toolINTXYZ=$tinkerPathDENOPTIM/intxyz" >> "$dnpParams"
     # param file used by Tinker
-    echo "CG-ForceFieldFile=$DENOPTIM_HOME/src/DenoptimCG/data/uff_vdw.prm" >> "$dnpParams"
+    echo "CG-ForceFieldFile=$DENOPTIM_HOME/src/main/resources/data/uff_vdw.prm" >> "$dnpParams"
     # key file to be used by tinker with PSSROT
     # this file is copied and edited for every molecule
-    echo "CG-KEYFILE=$DENOPTIM_HOME/src/DenoptimCG/data/build_uff.key" >> "$dnpParams"
+    echo "CG-KEYFILE=$DENOPTIM_HOME/src/main/resources/data/build_uff.key" >> "$dnpParams"
     # parameters used by PSSROT
     # this file is copied and edited for every molecule
-    echo "CG-PSSROTPARAMS=$DENOPTIM_HOME/src/DenoptimCG/data/submit_pssrot" >> "$dnpParams"
+    echo "CG-PSSROTPARAMS=$DENOPTIM_HOME/src/main/resources/data/submit_pssrot" >> "$dnpParams"
 
     #run builder
-    "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/DenoptimCG.jar" "$dnpParams" &> "$logFile"
+    "$javaDENOPTIM" -jar "$denoptimJar" -r B3D "$dnpParams" &> "$logFile"
 
     #Check output
     if [ -f "$logFile" ]; then
@@ -163,6 +163,6 @@ do
     compareElementalAnalysis "$outSDF" "$expRes"
 done
 echo " "
-
+echo "Test 't1' PASSED"
 exit 0
 
