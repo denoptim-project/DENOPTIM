@@ -34,24 +34,23 @@ public class GraphListsHandler extends ProgramTask
     @Override
     public void runProgram() throws Throwable
     {
-        GraphListsHandlerParameters.readParameterFile(
-                configFilePathName.getAbsolutePath());
-        GraphListsHandlerParameters.checkParameters();
-        GraphListsHandlerParameters.processParameters();
-        GraphListsHandlerParameters.printParameters();
+        GraphListsHandlerParameters glhParams = new GraphListsHandlerParameters();
+        glhParams.readParameterFile(configFilePathName.getAbsolutePath());
+        glhParams.checkParameters();
+        glhParams.processParameters();
+        glhParams.printParameters();
 
         Set<DENOPTIMGraph> matchedA = new HashSet<DENOPTIMGraph>();
         Set<DENOPTIMGraph> matchedB = new HashSet<DENOPTIMGraph>();
         
         int i = -1;
-        for (DENOPTIMGraph gA :  GraphListsHandlerParameters.inGraphsA)
+        for (DENOPTIMGraph gA :  glhParams.inGraphsA)
         {
             i++;
             int j = -1;
-            for (DENOPTIMGraph gB :  GraphListsHandlerParameters.inGraphsB)
+            for (DENOPTIMGraph gB :  glhParams.inGraphsB)
             {
                 j++;
-                
                 System.out.println(" ");
                 System.out.println("-> Comparing "+i+" and "+j);
                 if (gA.isIsomorphicTo(gB))
@@ -68,14 +67,14 @@ public class GraphListsHandler extends ProgramTask
         
         System.out.println(" ");
         System.out.println(" #Matches in list A: "+matchedA.size()+"/"
-                +GraphListsHandlerParameters.inGraphsA.size());
+                + glhParams.inGraphsA.size());
         System.out.println(" #Matches in list B: "+matchedB.size()+"/"
-                +GraphListsHandlerParameters.inGraphsB.size());
+                + glhParams.inGraphsB.size());
         
         System.out.println(" ");
         System.out.println(" ===> Un-matches in list A");
         int ii = -1;
-        for (DENOPTIMGraph gA :  GraphListsHandlerParameters.inGraphsA)
+        for (DENOPTIMGraph gA : glhParams.inGraphsA)
         {
             ii++;
             if (matchedA.contains(gA))
@@ -90,7 +89,7 @@ public class GraphListsHandler extends ProgramTask
         System.out.println(" ");
         System.out.println(" ===> Un-matches in list B");
         int jj = -1;
-        for (DENOPTIMGraph gB :  GraphListsHandlerParameters.inGraphsB)
+        for (DENOPTIMGraph gB : glhParams.inGraphsB)
         {
             jj++;
             if (matchedB.contains(gB))

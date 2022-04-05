@@ -35,6 +35,7 @@ import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.FitnessTask;
 import denoptim.utils.GraphConversionTool;
 
@@ -49,12 +50,16 @@ public class OffspringEvaluationTask extends FitnessTask
     private volatile Population population;
     private volatile Monitor mnt;
     
+    private GAParameters gaSettings;
 //------------------------------------------------------------------------------
     
-    public OffspringEvaluationTask(Candidate offspring, String workDir,
+    public OffspringEvaluationTask(GAParameters gaSettings, 
+            Candidate offspring, String workDir,
             Population popln, Monitor mnt, String fileUID)
     {
-        super(offspring);
+        super(((FitnessParameters) gaSettings.getParameters(
+                ParametersType.FIT_PARAMS)), offspring);
+        this.gaSettings = gaSettings;
         this.molName = offspring.getName();
         this.workDir = new File(workDir);
         this.fitProvMol = offspring.getChemicalRepresentation();
@@ -85,7 +90,7 @@ public class OffspringEvaluationTask extends FitnessTask
     	// Optionally improve the molecular representation, which
         // is otherwise only given by the collection of building
         // blocks (not aligned, nor roto-translated)
-        if (FitnessParameters.make3dTree())
+        if (settings.make3dTree())
         {
         	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
         	
@@ -165,17 +170,17 @@ public class OffspringEvaluationTask extends FitnessTask
 	                population.add(result);
 	                isWithinBestPrcentile = population.isWithinPercentile(
                             result.getFitness(),
-                            GAParameters.saveRingSystemsFitnessThreshold);
+                            gaSettings.saveRingSystemsFitnessThreshold);
                 }
         	}
 
-        	if ((GAParameters.saveRingSystemsAsTemplatesNonScaff
-        	        || GAParameters.saveRingSystemsAsTemplatesScaffolds)
+        	if ((gaSettings.saveRingSystemsAsTemplatesNonScaff
+        	        || gaSettings.saveRingSystemsAsTemplatesScaffolds)
         	    && isWithinBestPrcentile)
         	{   
                 FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
-                        GAParameters.saveRingSystemsAsTemplatesScaffolds,
-                        GAParameters.saveRingSystemsAsTemplatesNonScaff,
+                        gaSettings.saveRingSystemsAsTemplatesScaffolds,
+                        gaSettings.saveRingSystemsAsTemplatesNonScaff,
                         fitProvMol);
         	}
         }

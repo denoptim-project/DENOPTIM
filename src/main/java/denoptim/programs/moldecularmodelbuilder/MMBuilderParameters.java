@@ -33,6 +33,7 @@ import denoptim.graph.rings.RingClosureParameters;
 import denoptim.integration.tinker.TinkerUtils;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecularmodeling.MMBuilderUtils;
+import denoptim.programs.RunTimeParameters;
 
 /**
  * Parameters for the conformer generator (3D builder).
@@ -40,361 +41,268 @@ import denoptim.molecularmodeling.MMBuilderUtils;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public class MMBuilderParameters
+public class MMBuilderParameters extends RunTimeParameters
 {
-    /**
-     * Flag indicating that at least one parameter has been defined
-     */
-    private static boolean cgParamsInUse = false;
-
-    /**
-     * Verbosity level
-     */
-    protected static int verbosity = 0;
-
     /**
      * Flag controlling debug verbosity
      */
-    protected static boolean debug = false;
+    protected boolean debug = false;
 
     /**
      * Pathname to Tinker's pssrot executable
      */
-    protected static String toolPSSROT;
+    protected String toolPSSROT;
 
     /**
      * Pathname to Tinker's xyzint executable
      */
-    protected static String toolXYZINT;
+    protected String toolXYZINT;
 
     /**
      * Pathname to Tinker's intxyz executable
      */
-    protected static String toolINTXYZ;
+    protected String toolINTXYZ;
 
     /**
      * Flag controlling removal of dummy atoms from output geometry
      */
-    protected static boolean keepDummy = false;
+    protected boolean keepDummy = false;
 
     /**
      * Pathname to force field parameters file for Tinker
      */
-    protected static String forceFieldFile;
+    protected String forceFieldFile;
 
     /**
      * Pathname to parameters file for PSS part of Tinker's PSSROT
      */
-    protected static String pssrotFile;
+    protected String pssrotFile;
 
     /**
      * Pathname to parameters file for PSS part of Tinker's ring-closing PSSROT
      */
-    protected static String rsPssrotFile;
+    protected String rsPssrotFile;
 
     /**
      * Pathname to keywords file for Tinker's conformational search
      */
-    protected static String keyFile;
+    protected String keyFile;
 
     /**
      * Pathname to keywords file for Tinker's ring-closing conformational search
      */
-    protected static String rsKeyFile;
+    protected String rsKeyFile;
 
     /**
      * Parameters for PSS part of Tinker's PSSROT step
      */
-    protected static ArrayList<String> pssrotParams_Init;
+    protected ArrayList<String> pssrotParams_Init;
 
     /**
      * Parameters for linear search part of Tinker's PSSROT step
      */
-    protected static ArrayList<String> pssrotParams_Rest;
+    protected ArrayList<String> pssrotParams_Rest;
 
     /**
      * Keywords for Tinker's conformational search
      */
-    protected static ArrayList<String> keyFileParams;
+    protected ArrayList<String> keyFileParams;
 
     /**
      * Parameters for PSS part of Tinker's ring-closing PSSROT step
      */
-    protected static ArrayList<String> rsPssrotParams_Init;
+    protected ArrayList<String> rsPssrotParams_Init;
 
     /**
      * Parameters for linear search part of Tinker's ring-closing PSSROT step
      */
-    protected static ArrayList<String> rsPssrotParams_Rest;
+    protected ArrayList<String> rsPssrotParams_Rest;
 
     /**
      * Keywords for Tinker's ring-closing conformational search
      */
-    protected static ArrayList<String> rsKeyFileParams;
+    protected ArrayList<String> rsKeyFileParams;
 
     /**
      * Flag controlling the criterion used to reorder atom lists.
      * 1: branch-oriented (completes a branch before moving to the next one).
      * 2: layer-oriented) completes a layer before moving to the next one).
      */
-    protected static int atomOrderingScheme = 1;
+    protected int atomOrderingScheme = 1;
 
     /**
      * Atom type map
      */    
-    protected static HashMap<String, Integer> TINKER_MAP;
-
-    /**
-     * Log file //TODO: keep or get rid of it?
-     */
-    protected static String logFile = "";
+    protected HashMap<String, Integer> TINKER_MAP;
 
     /**
      * Unique task identifier
      */
-    protected static int taskID;
+    protected int taskID;
 
     /**
      * Pathname of input SDF file
      */
-    protected static String inpSDFFile;
+    protected String inpSDFFile;
 
     /**
      * Pathname of ouput SDF file
      */
-    protected static String outSDFFile;
-
-    /**
-     * Pathname to current working directory
-     */
-    protected static String wrkDir;
+    protected String outSDFFile;
     
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * Constructor
+     */
+    public MMBuilderParameters()
+    {
+        super(ParametersType.MMB_PARAM);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor
+     * @param paramType
+     */
+    private MMBuilderParameters(ParametersType paramType)
+    {
+        super(paramType);
+    }
 
-    public static int getTaskID()
+//------------------------------------------------------------------------------
+
+    public int getTaskID()
     {
         return taskID;
     }
 
 //------------------------------------------------------------------------------
 
-    public static String getInputSDFFile()
+    public String getInputSDFFile()
     {
         return inpSDFFile;
     }
 
 //------------------------------------------------------------------------------
 
-    public static String getOutputSDFFile()
+    public String getOutputSDFFile()
     {
         return outSDFFile;
     }
 
 //------------------------------------------------------------------------------
 
-    public static String getPSSROTTool()
+    public String getPSSROTTool()
     {
         return toolPSSROT;
     }
 
 //------------------------------------------------------------------------------
 
-    public static String getXYZINTTool()
+    public String getXYZINTTool()
     {
         return toolXYZINT;
     }
 
 //------------------------------------------------------------------------------
 
-    public static String getINTXYZTool()
+    public String getINTXYZTool()
     {
         return toolINTXYZ;
     }
 
 //------------------------------------------------------------------------------
 
-    public static String getParamFile()
+    public String getParamFile()
     {
         return forceFieldFile;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<String> getInitPSSROTParams()
+    public ArrayList<String> getInitPSSROTParams()
     {
         return pssrotParams_Init;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<String> getRSInitPSSROTParams()
+    public ArrayList<String> getRSInitPSSROTParams()
     {
         return rsPssrotParams_Init;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<String> getRestPSSROTParams()
+    public ArrayList<String> getRestPSSROTParams()
     {
         return pssrotParams_Rest;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<String> getRSRestPSSROTParams()
+    public ArrayList<String> getRSRestPSSROTParams()
     {
         return rsPssrotParams_Rest;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<String> getKeyFileParams()
+    public ArrayList<String> getKeyFileParams()
     {
         return keyFileParams;
     }
 
 //------------------------------------------------------------------------------
 
-    public static boolean getKeepDummyFlag()
+    public boolean getKeepDummyFlag()
     {
         return keepDummy;
     }
 
 //------------------------------------------------------------------------------
 
-    public static ArrayList<String> getRSKeyFileParams()
+    public ArrayList<String> getRSKeyFileParams()
     {
         return rsKeyFileParams;
     }
 
 //------------------------------------------------------------------------------
 
-    public static int getVerbosity()
+    public int getVerbosity()
     {
         return verbosity;
     }
 
 //------------------------------------------------------------------------------
 
-    public static boolean debug()
+    public boolean debug()
     {
         return debug;
     }
 
 //------------------------------------------------------------------------------
 
-    public static int getAtomOrderingScheme()
+    public int getAtomOrderingScheme()
     {
         return atomOrderingScheme;
     }
 
 //------------------------------------------------------------------------------
 
-    public static HashMap<String, Integer> getTinkerMap()
+    public HashMap<String, Integer> getTinkerMap()
     {
         return TINKER_MAP;
     }
 
 //------------------------------------------------------------------------------
 
-    public static String getWorkingDirectory()
+    public String getWorkingDirectory()
     {
-        return wrkDir;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Read the parameter file
-     * @param fname
-     * @throws DENOPTIMException
-     */
-    protected static void readParameterFile(String infile) 
-                                                        throws DENOPTIMException
-    {
-        String option, line;
-        BufferedReader br = null;
-        try
-        {
-            br = new BufferedReader(new FileReader(infile));
-
-            while ((line = br.readLine()) != null)
-            {
-                if ((line.trim()).length() == 0)
-                {
-                    continue;
-                }
-
-                if (line.startsWith("#"))
-                {
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("FS-"))
-                {
-                    FragmentSpaceParameters.interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("RC-"))
-                {
-                    RingClosureParameters.interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("CG-"))
-                {
-                    MMBuilderParameters.interpretKeyword(line);
-                    continue;
-                }
-            }
-        }
-        catch (NumberFormatException | IOException nfe)
-        {
-            throw new DENOPTIMException(nfe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
-                    br.close();
-                }
-            }
-            catch (IOException ioe)
-            {
-                throw new DENOPTIMException(ioe);
-            }
-        }
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Processes a string looking for keyword and a possibly associated value.
-     * @param line the string to parse
-     * @throws DENOPTIMException
-     */
-
-    public static void interpretKeyword(String line) throws DENOPTIMException
-    {
-        String key = line.trim();
-        String value = "";
-        if (line.contains("="))
-        {
-            key = line.substring(0,line.indexOf("=") + 1).trim();
-            value = line.substring(line.indexOf("=") + 1).trim();
-        }
-        try
-        {
-            interpretKeyword(key,value);
-        }
-        catch (DENOPTIMException e)
-        {
-            throw new DENOPTIMException(e.getMessage()+" Check line "+line);
-        }
+        return workDir;
     }
 
 //-----------------------------------------------------------------------------
@@ -406,32 +314,31 @@ public class MMBuilderParameters
      * @throws DENOPTIMException
      */
 
-    public static void interpretKeyword(String key, String value)
+    public void interpretKeyword(String key, String value)
                                                       throws DENOPTIMException
     {
-        cgParamsInUse = true;
         String msg = "";
         switch (key.toUpperCase())
         {
-        case "CG-TOOLPSSROT=":            
+        case "TOOLPSSROT=":            
             toolPSSROT = value;
             break;
-        case "CG-TOOLXYZINT=":
+        case "TOOLXYZINT=":
             toolXYZINT = value;
             break;
-        case "CG-TOOLINTXYZ=":
+        case "TOOLINTXYZ=":
             toolINTXYZ = value;
             break;
-        case "CG-FORCEFIELDFILE=":
+        case "FORCEFIELDFILE=":
             forceFieldFile = value;
             break;
-        case "CG-KEYFILE=":
+        case "KEYFILE=":
             keyFile = value;
             break;
-        case "CG-RCKEYFILE=":
+        case "RCKEYFILE=":
             rsKeyFile = value;
             break;
-        case "CG-VERBOSITY=":
+        case "VERBOSITY=":
             try
             {
                 verbosity = Integer.parseInt(value);
@@ -442,19 +349,19 @@ public class MMBuilderParameters
                 throw new DENOPTIMException(msg);
             }
             break;
-        case "CG-DEBUG=":
+        case "DEBUG=":
             debug = true;
             break;
-        case "CG-PSSROTPARAMS=":
+        case "PSSROTPARAMS=":
             pssrotFile = value;
             break;
-        case "CG-RCPSSROTPARAMS=":
+        case "RCPSSROTPARAMS=":
             rsPssrotFile = value;
             break;
-        case "CG-KEEPDUMMYATOMS=":
+        case "KEEPDUMMYATOMS=":
             keepDummy = true;
             break;
-        case "CG-ATOMORDERINGSCHEME=":
+        case "ATOMORDERINGSCHEME=":
             try
             {
                 atomOrderingScheme = Integer.parseInt(value);
@@ -465,17 +372,17 @@ public class MMBuilderParameters
                 throw new DENOPTIMException(msg);
             }
             break;
-        case "CG-INPSDF=":
+        case "INPSDF=":
             inpSDFFile = value;
             break;
-        case "CG-OUTSDF=":
+        case "OUTSDF=":
             outSDFFile = value;
             break;
-        case "CG-WORKDIR=":
-            wrkDir = value;
+        case "WORKDIR=":
+            workDir = value;
             break;
 /*
-        case "CG-=":
+        case "=":
             = value;
             break;
 */
@@ -490,67 +397,35 @@ public class MMBuilderParameters
 //------------------------------------------------------------------------------
 
     /**
-     * Ensures a pathname does lead to an existing file or stops with error
-     */
-
-    private static void checkFileExists(String pathname)
-    {
-	if (!FileUtils.checkExists(pathname))
-	{
-	    System.out.println("ERROR! File '" + pathname + "' not found!");
-	    System.exit(-1);
-	}
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Ensures that a parameter is not null or stops with error message.
-     */
-
-    private static void checkNotNull(String paramName, String param, String paramKey)
-    {
-        if (param == null)
-        {
-            System.out.println("ERROR! Parameter '" + paramName + "' is null! "
-				+ "Please, add '" + paramKey 
-				+ "' to the input parameters.");
-            System.exit(-1);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Check all parameters.
      */ 
 
-    public static void checkParameters() throws DENOPTIMException
+    public void checkParameters() throws DENOPTIMException
     {
-		checkNotNull("wrkDir",wrkDir,"CG-WORKDIR");
-		checkFileExists(wrkDir);
+		checkNotNull("wrkDir",workDir,"WORKDIR");
+		checkFileExists(workDir);
 
-        checkNotNull("inpSDFFile",inpSDFFile,"CG-INPSDF");
+        checkNotNull("inpSDFFile",inpSDFFile,"INPSDF");
         checkFileExists(inpSDFFile);
 
-        checkNotNull("outSDFFile",outSDFFile,"CG-OUTSDF");
+        checkNotNull("outSDFFile",outSDFFile,"OUTSDF");
 
-        checkNotNull("toolPSSROT",toolPSSROT,"CG-TOOLPSSROT");
+        checkNotNull("toolPSSROT",toolPSSROT,"TOOLPSSROT");
         checkFileExists(toolPSSROT);
 
-        checkNotNull("toolXYZINT",toolXYZINT,"CG-TOOLXYZINT");
+        checkNotNull("toolXYZINT",toolXYZINT,"TOOLXYZINT");
         checkFileExists(toolXYZINT);
 
-        checkNotNull("toolINTXYZ",toolINTXYZ,"CG-TOOLINTXYZ");
+        checkNotNull("toolINTXYZ",toolINTXYZ,"TOOLINTXYZ");
         checkFileExists(toolINTXYZ);
 
-        checkNotNull("forceFieldFile",forceFieldFile,"CG-FORCEFIELDFILE");
+        checkNotNull("forceFieldFile",forceFieldFile,"FORCEFIELDFILE");
         checkFileExists(forceFieldFile);
 
-        checkNotNull("keyFile",keyFile,"CG-KEYFILE");
+        checkNotNull("keyFile",keyFile,"KEYFILE");
         checkFileExists(keyFile);
 
-        checkNotNull("pssrotFile",pssrotFile,"CG-PSSROTPARAMS");
+        checkNotNull("pssrotFile",pssrotFile,"PSSROTPARAMS");
         checkFileExists(pssrotFile);
 
 
@@ -561,28 +436,27 @@ public class MMBuilderParameters
             System.exit(-1);
         }
 
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.checkParameters();
-        }
-
+        checkOtherParameters();
+        /*
+//TODO-gg 
         if (RingClosureParameters.rcParamsInUse())
         {
             RingClosureParameters.checkParameters();
             if (RingClosureParameters.allowRingClosures())
             {
-        	checkNotNull("rsPssrotFile",rsPssrotFile,"CG-RCPSSROTPARAMS");
+        	checkNotNull("rsPssrotFile",rsPssrotFile,"RCPSSROTPARAMS");
         	checkFileExists(rsPssrotFile);
 
-        	checkNotNull("rsKeyFile",rsKeyFile,"CG-RCKEYFILE");
+        	checkNotNull("rsKeyFile",rsKeyFile,"RCKEYFILE");
         	checkFileExists(rsKeyFile);
             }
         }
+        */
     }
     
 //------------------------------------------------------------------------------
 
-    protected static void processParameters() throws DENOPTIMException
+    public void processParameters() throws DENOPTIMException
     {
         pssrotParams_Init = new ArrayList<>();
         pssrotParams_Rest = new ArrayList<>();
@@ -596,45 +470,13 @@ public class MMBuilderParameters
                                                              pssrotParams_Rest);
         TINKER_MAP = TinkerUtils.readTinkerAtomTypes(forceFieldFile);
 
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.processParameters();
-        }
-
-        if (RingClosureParameters.allowRingClosures())
+        if (otherParameters.containsKey(ParametersType.RC_PARAMS))
         {
             TinkerUtils.readPSSROTParams(rsPssrotFile, rsPssrotParams_Init, 
                                                            rsPssrotParams_Rest);
             MMBuilderUtils.readKeyFileParams(rsKeyFile, rsKeyFileParams);
-            RingClosureParameters.processParameters();
         }
-    }
-
-//----------------------------------------------------------------------------
-
-    public static void printParameters()
-    {
-        String eol = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder(1024);
-        sb.append(" CGParameters ").append(eol);
-        for (Field f : MMBuilderParameters.class.getDeclaredFields())
-        {
-            try
-            {
-                sb.append(f.getName()).append(" = ").append(
-                                       f.get(MMBuilderParameters.class)).append(eol);
-            }
-            catch (Throwable t)
-            {
-                sb.append("ERROR! Unable to print CGParameters.");
-                break;
-            }
-        }
-        DENOPTIMLogger.appLogger.info(sb.toString());
-        sb.setLength(0);
-
-        FragmentSpaceParameters.printParameters();
-        RingClosureParameters.printParameters();
+        processOtherParameters();
     }
 
 //------------------------------------------------------------------------------

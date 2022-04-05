@@ -57,12 +57,15 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * Crossover compatibility between members
      */
     private XoverSitesAmongCandidates xoverCompatibilities;
+    
+    private GAParameters settings;
    
 //------------------------------------------------------------------------------
 
-    public Population()
+    public Population(GAParameters settings)
     {
         super();
+        this.settings = settings;
         if (FragmentSpace.useAPclassBasedApproach())
         {
             xoverCompatibilities = new XoverSitesAmongCandidates();
@@ -162,7 +165,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      */
     public Population clone()
     {
-        Population clone = new Population();
+        Population clone = new Population(settings);
 
         for (Candidate c : this)
         {
@@ -414,11 +417,11 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     public void trim(int populationSize)
     {
         int k = this.size();
-        for (Candidate c : this.subList(GAParameters.getPopulationSize(), k))
+        for (Candidate c : this.subList(settings.getPopulationSize(), k))
         {
             xoverCompatibilities.remove(c);
         }
-        this.subList(GAParameters.getPopulationSize(), k).clear();
+        this.subList(settings.getPopulationSize(), k).clear();
     }
     
 //------------------------------------------------------------------------------

@@ -114,7 +114,7 @@ public class Molecule3DBuilder
     /**
      * Verbosity level
      */
-    private int verbosity = MMBuilderParameters.getVerbosity();
+    private int verbosity = 0;
 
     /**
      * List of new ring closing environments
@@ -255,6 +255,13 @@ public class Molecule3DBuilder
         this.atmOveralScore = Double.NaN;
         this.oldToNewOrder = oldToNewOrder;
         this.newToOldOrder = newToOldOrder;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public void setVerbosity(int level)
+    {
+        this.verbosity = level;
     }
     
 //------------------------------------------------------------------------------

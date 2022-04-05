@@ -75,12 +75,12 @@ public class CombinatorialExplorerByLayer
     /**
      * Verbosity level
      */
-    private int verbosity = FSEParameters.getVerbosity();
+    private int verbosity = 0;
 
     /**
      * Flag indicating to restart from checkpoint file
      */
-    private boolean restartFromChkPt =  FSEParameters.restartFromCheckPoint();
+    private boolean restartFromChkPt = false;
 
     /**
      * Number of serialized graphs recovered from previous run database
@@ -97,6 +97,11 @@ public class CombinatorialExplorerByLayer
      * Flag identifying the first iteration after restart from checkpoint
      */
     private boolean firstAfterRestart = false;
+    
+    /**
+     * All settings controlling the tasks executed by this class.
+     */
+    private CEBLParameters settings = null;
 
 
 //-----------------------------------------------------------------------------
@@ -105,17 +110,17 @@ public class CombinatorialExplorerByLayer
      * Constructor
      */
 
-    public CombinatorialExplorerByLayer()
+    public CombinatorialExplorerByLayer(CEBLParameters settings)
     {
+        this.settings = settings;
         futures = new ArrayList<>();
         submitted = new ArrayList<>();
 
-        tpe = new ThreadPoolExecutor(FSEParameters.getNumberOfCPU(),
-                                       FSEParameters.getNumberOfCPU(), 
-                                       Long.MAX_VALUE,
-                                       TimeUnit.NANOSECONDS,
-                                       //TimeUnit.MILLISECONDS,
-                                       new ArrayBlockingQueue<Runnable>(1));
+        tpe = new ThreadPoolExecutor(settings.getNumberOfCPU(),
+                settings.getNumberOfCPU(),
+                Long.MAX_VALUE,
+                TimeUnit.NANOSECONDS,
+                new ArrayBlockingQueue<Runnable>(1));
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -262,7 +267,7 @@ public class CombinatorialExplorerByLayer
             if (storeChkPt)
             {
                 tsk = submitted.get(idToChkPt);
-                FSECheckPoint chk = FSEParameters.getCheckPoint();
+                FSECheckPoint chk = settings.getCheckPoint();
                 chk.setSafelyCompletedGraphId(tsk.getGraphId());
                 chk.setRootId(tsk.getRootId());
                 chk.setNextIds(tsk.getNextIds());
@@ -270,7 +275,7 @@ public class CombinatorialExplorerByLayer
                 chk.setUnqVrtId(GraphUtils.getUniqueVertexIndex());
                 chk.setUnqGraphId(GraphUtils.getUniqueGraphIndex());
                 chk.setUnqMolId(GraphUtils.getUniqueMoleculeIndex());
-                FSEUtils.serializeCheckPoint();
+                CEBLUtils.serializeCheckPoint(settings);
                 break;
             }
         }
@@ -301,7 +306,7 @@ public class CombinatorialExplorerByLayer
      * Run the combinatorial exploration 
      */
 
-    public void runPCE() throws DENOPTIMException
+    public void run() throws DENOPTIMException
     {
         String msg = "";
         StopWatch watch = new StopWatch();
@@ -313,7 +318,7 @@ public class CombinatorialExplorerByLayer
         if (restartFromChkPt)
         {
             firstAfterRestart = true;
-            FSECheckPoint chk = FSEParameters.getCheckPoint();
+            FSECheckPoint chk = settings.getCheckPoint();
             level = chk.getLevel();
             GraphUtils.resetUniqueVertexCounter(chk.getUnqVrtId());
             GraphUtils.resetUniqueGraphCounter(chk.getUnqGraphId());
@@ -336,12 +341,15 @@ public class CombinatorialExplorerByLayer
                   + ".txt')."
                   + DENOPTIMConstants.EOL
                   + "Now reading '" + DENOPTIMConstants.SERGFILENAMEEXT + "' "
-                  + "files from '" + FSEUtils.getNameOfStorageDir(level) + "'.";
+                  + "files from '" 
+                  + CEBLUtils.getNameOfStorageDir(settings, level) + "'.";
             DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
             
-            if (!denoptim.files.FileUtils.checkExists(FSEUtils.getNameOfStorageDir(level)))
+            if (!denoptim.files.FileUtils.checkExists(
+                    CEBLUtils.getNameOfStorageDir(settings, level)))
             {
-            	msg = "ERROR! Folder '" + FSEUtils.getNameOfStorageDir(level) 
+            	msg = "ERROR! Folder '" 
+            	        + CEBLUtils.getNameOfStorageDir(settings, level) 
             			+ "' does not exist! Use 'FSE-DBROOTFOLDER' to "
             			+ "provide the pathname to the existing folder where "
             			+ "the previously generated graphs are located.";
@@ -350,7 +358,7 @@ public class CombinatorialExplorerByLayer
             }
 
             Collection<File> lst = FileUtils.listFiles(
-            		new File(FSEUtils.getNameOfStorageDir(level)),
+            		new File(CEBLUtils.getNameOfStorageDir(settings, level)),
             		new String[] {DENOPTIMConstants.SERGFILENAMEEXT},false);
             // Keep only safely completed serialized graphs
             serFromChkRestart = lst.size();
@@ -366,14 +374,15 @@ public class CombinatorialExplorerByLayer
                     msg = "Removing non-safely completed graph '" + fName + "'";
                     DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
                     serFromChkRestart--;
-                    denoptim.files.FileUtils.deleteFile(FSEUtils.getNameOfStorageDir(level)
+                    denoptim.files.FileUtils.deleteFile(
+                            CEBLUtils.getNameOfStorageDir(settings, level)
                     		+ File.separator + fName);
                 }
             }
         }
 
         boolean interrupted = false;
-        while (level <= FSEParameters.getMaxLevel())
+        while (level <= settings.getMaxLevel())
         {
             msg = "Starting exploration of level " + level; 
             DENOPTIMLogger.appLogger.log(Level.INFO,msg);
@@ -391,7 +400,8 @@ public class CombinatorialExplorerByLayer
                     if (allTasksCompleted())
                     {
                         Collection<File> lst = FileUtils.listFiles(
-                        		new File(FSEUtils.getNameOfStorageDir(level)),
+                        		new File(CEBLUtils.getNameOfStorageDir(
+                        		        settings, level)),
                         		new String[]{DENOPTIMConstants.SERGFILENAMEEXT},
                                                                          false);
                         int outCount = lst.size() - serFromChkRestart;
@@ -401,7 +411,7 @@ public class CombinatorialExplorerByLayer
                             msg = "Mismatch between the number of submitted "
                                   + "tasks (" + totSubmSubTasks + ") and those "
                                   + "listed in " 
-                                  + FSEUtils.getNameOfStorageDir(level)
+                                  + CEBLUtils.getNameOfStorageDir(settings, level)
                                   + "(" + outCount + ")";
                             DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
                             throw new DENOPTIMException(msg);
@@ -429,7 +439,7 @@ public class CombinatorialExplorerByLayer
                         DENOPTIMLogger.appLogger.log(Level.INFO,msg);
                     }
     
-                    if (millis > FSEParameters.getMaxWait())
+                    if (millis > settings.getMaxWait())
                     {
                         stopRun();
                         msg = "Timeout reached: stopping all subtasks.";
@@ -440,7 +450,7 @@ public class CombinatorialExplorerByLayer
 
                     try
                     {
-                        Thread.sleep(FSEParameters.getWaitStep());
+                        Thread.sleep(settings.getWaitStep());
                     }
                     catch (Throwable t)
                     {
@@ -478,7 +488,8 @@ public class CombinatorialExplorerByLayer
                 try
                 {
                     Collection<File> lstRootsForNextLev = FileUtils.listFiles(
-                    		new File(FSEUtils.getNameOfStorageDir(level-1)),
+                    		new File(CEBLUtils.getNameOfStorageDir(settings,
+                    		        level-1)),
                     		new String[] {DENOPTIMConstants.SERGFILENAMEEXT},
                     		false);
                     if (lstRootsForNextLev.size() == 0)
@@ -537,7 +548,7 @@ public class CombinatorialExplorerByLayer
         if (level == -1)
         {
             ArrayList<DENOPTIMGraph> scafLevel = new ArrayList<DENOPTIMGraph>();
-            if (FSEParameters.useGivenRoots())
+            if (settings.useGivenRoots())
             {
                 // User defined root graphs
                 if (verbosity > 0)
@@ -550,7 +561,7 @@ public class CombinatorialExplorerByLayer
                            + "in the root graph.";
                     DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
                 }
-                for (DENOPTIMGraph rootGraph : FSEParameters.getRootGraphs())
+                for (DENOPTIMGraph rootGraph : settings.getRootGraphs())
                 {
                     // Vertex ID in root can be whatever and we ignore them
                     // when setting new vertex IDs. To do this, we change sign
@@ -572,7 +583,7 @@ public class CombinatorialExplorerByLayer
             }
             
             // Store them
-            FSEUtils.storeAllGraphsOfLevel(scafLevel,level);
+            CEBLUtils.storeAllGraphsOfLevel(settings, scafLevel,level);
 
             // All done
             return scafLevel.size();
@@ -584,7 +595,7 @@ public class CombinatorialExplorerByLayer
         int cntRoot = 0;
         int total = 0;
         int itersFromChkPt = 0;
-        String prevLevDirName = FSEUtils.getNameOfStorageDir(level-1);
+        String prevLevDirName = CEBLUtils.getNameOfStorageDir(settings,level-1);
         File prevLevDir = new File(prevLevDirName);
         if (!denoptim.files.FileUtils.checkExists(prevLevDirName))
         {
@@ -599,7 +610,7 @@ public class CombinatorialExplorerByLayer
         {
             cntRoot++;
             if (restartFromChkPt && 
-               FSEParameters.getCheckPoint().serFileAlreadyUsed(file.getName()))
+               settings.getCheckPoint().serFileAlreadyUsed(file.getName()))
             {
                 continue;
             }
@@ -614,7 +625,7 @@ public class CombinatorialExplorerByLayer
             if (restartFromChkPt && firstAfterRestart)
             {
                 firstAfterRestart = false;
-                fcf.setStartingPoint(FSEParameters.getCheckPoint()
+                fcf.setStartingPoint(settings.getCheckPoint()
                 		.getNextIds());
             }
 
@@ -668,9 +679,10 @@ public class CombinatorialExplorerByLayer
                     FragsCombination fragsToAdd = fcf.next();
 
                     GraphBuildingTask task = new GraphBuildingTask(
+                            settings,
                     		rootGraph, fragsToAdd, level,
-                    		FSEParameters.getWorkDirectory(),
-                    		FSEParameters.getVerbosity());
+                    		settings.getWorkDirectory(),
+                    		settings.getVerbosity());
 
                     ArrayList<Integer> nextIds = fcf.getNextIds();
                     task.setNextIds(nextIds);
@@ -678,7 +690,7 @@ public class CombinatorialExplorerByLayer
                     submitted.add(task);
                     futures.add(tpe.submit(task));
                     numSubTasks++;
-                    if (itersFromChkPt >= FSEParameters.getCheckPointStep())
+                    if (itersFromChkPt >= settings.getCheckPointStep())
                     {
                         itersFromChkPt = 0;
                         makeCheckPoint();
@@ -690,7 +702,7 @@ public class CombinatorialExplorerByLayer
                     // exploration of the space we want to stop.
                     int maxL = 2;
                     int maxI = 50;
-                    if (FSEParameters.prepareFilesForTests())
+                    if (settings.prepareFilesForTests())
                     {
                         System.out.println("Wait until "+level+"=="+maxL+" and "
                                  +(total+fcf.getNumGeneratedCombs())+"=="+maxI);
@@ -706,7 +718,7 @@ public class CombinatorialExplorerByLayer
                             ArrayList<Integer> nowIds =new ArrayList<Integer>();
                             makeCheckPoint();
                             oldIds.addAll(
-                                    FSEParameters.getCheckPoint().getNextIds());
+                                    settings.getCheckPoint().getNextIds());
                             while (true)
                             {
                                 iWait++;
@@ -721,7 +733,7 @@ public class CombinatorialExplorerByLayer
                                 makeCheckPoint();
                                 nowIds.clear();
                                 nowIds.addAll(
-                                    FSEParameters.getCheckPoint().getNextIds());
+                                    settings.getCheckPoint().getNextIds());
                                 System.out.println(oldIds + " " + nowIds 
                                                    + " nEqualChecks:" + nEqual);
                                 boolean converged = true;
@@ -795,7 +807,7 @@ public class CombinatorialExplorerByLayer
 
 /*
         // Code meant only to generate checkpoint file at the end of a level
-        if (FSEParameters.prepareFilesForTests())
+        if (settings.prepareFilesForTests())
         {
             System.out.println("Last submissions for level "+level+". Wait for "
                                 + "completion of the tasks.");
@@ -803,7 +815,7 @@ public class CombinatorialExplorerByLayer
             {
                 makeCheckPoint();
                 System.out.println("Ctrl-Z once converged: " +
-                                    FSEParameters.getCheckPoint().getNextIds());
+                                    settings.getCheckPoint().getNextIds());
                 GenUtils.pause();
             }
         }

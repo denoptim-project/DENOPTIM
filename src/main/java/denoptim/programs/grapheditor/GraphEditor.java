@@ -54,23 +54,23 @@ public class GraphEditor extends ProgramTask
     @Override
     public void runProgram() throws Throwable
     {
-        GraphEdParameters.readParameterFile(
-                configFilePathName.getAbsolutePath());
-        GraphEdParameters.checkParameters();
-        GraphEdParameters.processParameters();
-        GraphEdParameters.printParameters();
+        GraphEdParameters geParams = new GraphEdParameters();
+        geParams.readParameterFile(configFilePathName.getAbsolutePath());
+        geParams.checkParameters();
+        geParams.processParameters();
+        geParams.printParameters();
 
         int i = -1;
-        for (DENOPTIMGraph graph : GraphEdParameters.getInputGraphs())
+        for (DENOPTIMGraph graph : geParams.getInputGraphs())
         {
             i++;
             DENOPTIMGraph modGraph = graph.editGraph(
-                                     GraphEdParameters.getGraphEditTasks(),
-                                          GraphEdParameters.symmetryFlag(),
-                                         GraphEdParameters.getVerbosity()
+                    geParams.getGraphEditTasks(),
+                    geParams.symmetryFlag(),
+                    geParams.getVerbosity()
             );
            
-            if (GraphEdParameters.getVerbosity() > 0)
+            if (geParams.getVerbosity() > 0)
             {
                 System.out.println("Original graph: ");
                 System.out.println(graph.toString());
@@ -80,19 +80,18 @@ public class GraphEditor extends ProgramTask
             
             //TODO: upgrade to I/O with sepcification of format
 
-            switch (GraphEdParameters.getOutFormat())
+            switch (geParams.getOutFormat())
             {
-                case (GraphEdParameters.STRINGFORMATLABEL):
+                case ("STRING"):
                 {
-                    DenoptimIO.writeData(GraphEdParameters.getOutFile(),
-                                                  modGraph.toString(),true);
+                    DenoptimIO.writeData(geParams.getOutFile(),
+                            modGraph.toString(),true);
                     break;
                 }
-                case (GraphEdParameters.SERFORMATLABEL):
+                case ("SER"):
                 {
-                    DenoptimIO.serializeToFile(
-                                            GraphEdParameters.getOutFile(),
-                                                  modGraph.toString(),true);
+                    DenoptimIO.serializeToFile(geParams.getOutFile(),
+                            modGraph.toString(),true);
                     break;
                 }
                 case ("SDF"):
@@ -101,10 +100,9 @@ public class GraphEditor extends ProgramTask
                     ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
                     IAtomContainer newMol = t3d
                             .convertGraphTo3DAtomContainer(modGraph,true);
-                    if (GraphEdParameters.getInFormat().equals("SDF"))
+                    if (geParams.getInFormat().equals("SDF"))
                     {
-                        IAtomContainer oldMol = 
-                                             GraphEdParameters.getInpMol(i);
+                        IAtomContainer oldMol = geParams.getInpMol(i);
                         if (oldMol.getProperty("cdk:Title") != null)
                         {
                         	String name = oldMol.getProperty(
@@ -112,8 +110,7 @@ public class GraphEditor extends ProgramTask
                         	newMol.setProperty("cdk:Title",name);
                         }
                     }
-                    DenoptimIO.writeSDFFile(GraphEdParameters.getOutFile(),
-                                                               newMol,true);
+                    DenoptimIO.writeSDFFile(geParams.getOutFile(), newMol, true);
                     break;
                 }
             }

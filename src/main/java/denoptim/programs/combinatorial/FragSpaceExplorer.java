@@ -21,7 +21,7 @@ package denoptim.programs.combinatorial;
 import java.io.File;
 
 import denoptim.combinatorial.CombinatorialExplorerByLayer;
-import denoptim.combinatorial.FSEParameters;
+import denoptim.combinatorial.CEBLParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.task.ProgramTask;
 
@@ -52,7 +52,7 @@ import denoptim.task.ProgramTask;
 
 public class FragSpaceExplorer  extends ProgramTask
 {
-    private  CombinatorialExplorerByLayer pCombExp = null;
+    private  CombinatorialExplorerByLayer combinatorialAlgorithm = null;
 
 //------------------------------------------------------------------------------
     
@@ -71,31 +71,27 @@ public class FragSpaceExplorer  extends ProgramTask
     @Override
     public void runProgram() throws Throwable
     {
-        //TODO: get rid of this one parameters are not static anymore.
-        //needed by static parameters, and in case of subsequent runs in the same JVM
-    	FSEParameters.resetParameters(); 
-
+        CEBLParameters settings = new CEBLParameters();
         if (workDir != null)
         {
-            FSEParameters.workDir = workDir.getAbsolutePath();
+            settings.setWorkDirectory(workDir.getAbsolutePath());
         }
+        settings.readParameterFile(configFilePathName.getAbsolutePath());
+        settings.checkParameters();
+        settings.processParameters();
+        settings.printParameters();
         
-    	FSEParameters.readParameterFile(configFilePathName.getAbsolutePath());
-        FSEParameters.checkParameters();
-        FSEParameters.processParameters();
-        FSEParameters.printParameters();
-        
-        pCombExp = new CombinatorialExplorerByLayer();
-        pCombExp.runPCE();
+        combinatorialAlgorithm = new CombinatorialExplorerByLayer(settings);
+        combinatorialAlgorithm.run();
     }
     
 //------------------------------------------------------------------------------
 
     protected void handleThrowable()
     {
-        if (pCombExp != null)
+        if (combinatorialAlgorithm != null)
         {
-            pCombExp.stopRun();
+            combinatorialAlgorithm.stopRun();
         }
         super.handleThrowable();
     }

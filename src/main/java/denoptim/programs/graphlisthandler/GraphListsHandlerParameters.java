@@ -14,6 +14,8 @@ import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.programs.RunTimeParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 
 
 /**
@@ -22,202 +24,75 @@ import denoptim.logging.DENOPTIMLogger;
  * @author Marco Foscato
  */
 
-public class GraphListsHandlerParameters
+public class GraphListsHandlerParameters extends RunTimeParameters
 {
-    /**
-     * Flag indicating that at least one parameter has been defined
-     */
-    private static boolean grEdParamsInUse = false;
-
-    /**
-     * Working directory
-     */
-    private static String workDir = ".";
-
-    /**
-     * Log file
-     */
-    private static String logFile = "GraphEd.log";
-
     /**
      * File with input graphs
      */
-    private static String inGraphsFileA = null;
-    private static String inGraphsFileB = null;
-    protected static final String STRINGFORMATLABEL = "STRING";
-    protected static final String SERFORMATLABEL = "SER";
-    protected static final String SDFFORMATLABEL = "SDF";
-    private static String inGraphsFormat = STRINGFORMATLABEL; //Default
+    private String inGraphsFileA = null;
+    private String inGraphsFileB = null;
+    protected final String STRINGFORMATLABEL = "STRING";
+    protected final String SERFORMATLABEL = "SER";
+    protected final String SDFFORMATLABEL = "SDF";
+    private String inGraphsFormat = STRINGFORMATLABEL; //Default
 
     /**
      * Input graphs: first list
      */
-    protected static ArrayList<DENOPTIMGraph> inGraphsA =
+    protected ArrayList<DENOPTIMGraph> inGraphsA =
                              new ArrayList<DENOPTIMGraph>();
     
     /**
      * Input graphs: second list
      */
-    protected static ArrayList<DENOPTIMGraph> inGraphsB =
+    protected ArrayList<DENOPTIMGraph> inGraphsB =
                              new ArrayList<DENOPTIMGraph>();
 
     /**
      * File with output graphs
      */
-    private static String outGraphsFile = null;
-    private static String outGraphsFormat = STRINGFORMATLABEL; //Default
-
-
+    private String outGraphsFile = null;
+    private String outGraphsFormat = STRINGFORMATLABEL; //Default
+    
+//-----------------------------------------------------------------------------
+    
     /**
-     * Verbosity level
+     * Constructor
      */
-    private static int verbosity = 0;
-
-
-//-----------------------------------------------------------------------------
-
-    public static boolean grEdParamsInUse()
+    public GraphListsHandlerParameters()
     {
-        return grEdParamsInUse;
+        this(ParametersType.GLH_PARAMS);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Constructor
+     */
+    private GraphListsHandlerParameters(ParametersType paramType)
+    {
+        super(paramType);
     }
 
 //-----------------------------------------------------------------------------
 
-    public static String getWorkDirectory()
-    {
-        return workDir;
-    }
-
-//-----------------------------------------------------------------------------
-
-    public static String getLogFileName()
-    {
-        return logFile;
-    }
-
-//-----------------------------------------------------------------------------
-
-    public static int getVerbosity()
-    {
-        return verbosity;
-    }
-
-//-----------------------------------------------------------------------------
-
-    public static String getOutFile()
+    public String getOutFile()
     {
         return outGraphsFile;
     }
 
 //-----------------------------------------------------------------------------
 
-    public static String getInFormat()
+    public String getInFormat()
     {
         return inGraphsFormat;
     }
 
 //-----------------------------------------------------------------------------
 
-    public static String getOutFormat()
+    public String getOutFormat()
     {
         return outGraphsFormat;
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Read the parameter TXT file line by line and interpret its content.
-     * @param infile
-     * @throws DENOPTIMException
-     */
-
-    public static void readParameterFile(String infile) throws DENOPTIMException
-    {
-        String option, line;
-        BufferedReader br = null;
-        try
-        {
-            br = new BufferedReader(new FileReader(infile));
-            while ((line = br.readLine()) != null)
-            {
-                if ((line.trim()).length() == 0)
-                {
-                    continue;
-                }
-
-                if (line.startsWith("#"))
-                {
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("FS-"))
-                {
-                    FragmentSpaceParameters.interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("RC-"))
-                {
-                    RingClosureParameters.interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("GRAPHLISTS-"))
-                {
-                    interpretKeyword(line);
-                    continue;
-                }
-            }
-        }
-        catch (NumberFormatException | IOException nfe)
-        {
-            throw new DENOPTIMException(nfe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
-                    br.close();
-                    br = null;
-                }
-            }
-            catch (IOException ioe)
-            {
-                throw new DENOPTIMException(ioe);
-            }
-        }
-
-        option = null;
-        line = null;
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Processes a string looking for keyword and a possibly associated value.
-     * @param line the string to parse
-     * @throws DENOPTIMException
-     */
-
-    public static void interpretKeyword(String line) throws DENOPTIMException
-    {
-        String key = line.trim();
-        String value = "";
-        if (line.contains("="))
-        {
-            key = line.substring(0,line.indexOf("=") + 1).trim();
-            value = line.substring(line.indexOf("=") + 1).trim();
-        }
-        try
-        {
-            interpretKeyword(key,value);
-        }
-        catch (DENOPTIMException e)
-        {
-            throw new DENOPTIMException(e.getMessage()+" Check line "+line);
-        }
     }
 
 //-----------------------------------------------------------------------------
@@ -229,10 +104,9 @@ public class GraphListsHandlerParameters
      * @throws DENOPTIMException
      */
 
-    public static void interpretKeyword(String key, String value)
+    public void interpretKeyword(String key, String value)
                                                       throws DENOPTIMException
     {
-        grEdParamsInUse = true;
         String msg = "";
         switch (key.toUpperCase())
         {
@@ -282,14 +156,9 @@ public class GraphListsHandlerParameters
      * @throws DENOPTIMException
      */
 
-    public static void checkParameters() throws DENOPTIMException
+    public void checkParameters() throws DENOPTIMException
     {
         String msg = "";
-        if (!grEdParamsInUse)
-        {
-            return;
-        }
-
         if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
         {
            msg = "Directory " + workDir + " not found. Please specify an "
@@ -361,15 +230,7 @@ public class GraphListsHandlerParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.checkParameters();
-        }
-
-        if (RingClosureParameters.rcParamsInUse())
-        {
-            RingClosureParameters.checkParameters();
-        }
+        checkOtherParameters();
     }
 
 //------------------------------------------------------------------------------
@@ -378,18 +239,9 @@ public class GraphListsHandlerParameters
      * Processes all parameters and initialize related objects.
      * @throws DENOPTIMException
      */
-
-    public static void processParameters() throws DENOPTIMException
+    public void processParameters() throws DENOPTIMException
     {
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.processParameters();
-        }
-
-        if (RingClosureParameters.allowRingClosures())
-        {
-            RingClosureParameters.processParameters();
-        }
+        processOtherParameters();
 
         if (outGraphsFile == null)
         {
@@ -448,43 +300,6 @@ public class GraphListsHandlerParameters
         {
             throw new DENOPTIMException(ioe);
         }
-
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Print all parameters.
-     */
-
-    public static void printParameters()
-    {
-        if (!grEdParamsInUse)
-        {
-            return;
-        }
-        String eol = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder(1024);
-        sb.append(" GraphListsHandlerParameters ").append(eol);
-        for (Field f : GraphListsHandlerParameters.class.getDeclaredFields())
-        {
-            try
-            {
-                sb.append(f.getName()).append(" = ").append(
-                        f.get(GraphListsHandlerParameters.class)).append(eol);
-            }
-            catch (Throwable t)
-            {
-                sb.append("ERROR! Unable to print "
-                        + "GraphListsHandlerParameters. Cause: " + t);
-                break;
-            }
-        }
-        DENOPTIMLogger.appLogger.info(sb.toString());
-        sb.setLength(0);
-
-        FragmentSpaceParameters.printParameters();
-        RingClosureParameters.printParameters();
     }
 
 //------------------------------------------------------------------------------

@@ -59,7 +59,7 @@ public class RingClosureTool
     /**
      * Verbosity level
      */
-    private static int verbosity = MMBuilderParameters.getVerbosity();
+    private int verbosity = 0;
 
     /**
      * Iteration counter (for future use)
@@ -70,14 +70,20 @@ public class RingClosureTool
      * File separator
      */
     final String fsep = System.getProperty("file.separator");
+    
+    /**
+     * Settings controllign the calculation
+     */
+    private MMBuilderParameters settings;
 
 //------------------------------------------------------------------------------
 
     /**
      * Construct an empty RingClosureTool
      */
-    public RingClosureTool()
+    public RingClosureTool(MMBuilderParameters settings)
     {
+        this.settings = settings;
     }
 
 //------------------------------------------------------------------------------
@@ -93,7 +99,7 @@ public class RingClosureTool
      * @param tmol The tinker IC representation
      * @throws DENOPTIMException
      */
-    private static void setTinkerTypes(TinkerMolecule tmol) throws DENOPTIMException
+    private void setTinkerTypes(TinkerMolecule tmol) throws DENOPTIMException
     {
 
         ArrayList<TinkerAtom> lstAtoms = tmol.getAtoms();
@@ -103,12 +109,12 @@ public class RingClosureTool
             TinkerAtom tatom = lstAtoms.get(i);
 
             String st = tatom.getAtomString().trim();
-            if (!MMBuilderParameters.getTinkerMap().containsKey(st))
+            if (!settings.getTinkerMap().containsKey(st))
             {
                 String msg = "Unable to assign atom type to atom '" + st +"'.";
                 throw new DENOPTIMException(msg);
             }
-            Integer val = MMBuilderParameters.getTinkerMap().get(st);
+            Integer val = settings.getTinkerMap().get(st);
             if (val != null)
             {
                 tatom.setAtomType(val.intValue());
@@ -137,7 +143,7 @@ public class RingClosureTool
     {
         int lastIdx = MMBuilderUtils.countLinesWKeywordInFile(tinkerresfile,
                                 " Final Function Value and Deformation");
-        String workDir = MMBuilderParameters.getWorkingDirectory();
+        String workDir = settings.getWorkingDirectory();
         String xyzfile = workDir + fsep + fname + "." +
                                  GenUtils.getPaddedString(3, lastIdx - 1);
         return xyzfile;
@@ -156,7 +162,7 @@ public class RingClosureTool
     {
         int lastIdx = MMBuilderUtils.countLinesWKeywordInFile(tinkerresfile,
                                 " Final Function Value and Deformation");
-        String workDir = MMBuilderParameters.getWorkingDirectory();
+        String workDir = settings.getWorkingDirectory();
         String xyzfile = workDir + fsep + fname + "." +
                                  GenUtils.getPaddedString(3, lastIdx - 1);
 
@@ -201,7 +207,7 @@ public class RingClosureTool
             }
         }
 
-        String workDir = MMBuilderParameters.getWorkingDirectory();
+        String workDir = settings.getWorkingDirectory();
         String xyzfile = workDir + fsep + fname + "." + GenUtils.getPaddedString(3, idx);
         ArrayList<double[]> coords = TinkerUtils.readTinkerXYZ(xyzfile);
         return coords;
@@ -345,7 +351,7 @@ public class RingClosureTool
         Molecule3DBuilder rcMol3d = molIn.deepcopy();
         IAtomContainer fmol = rcMol3d.getIAtomContainer();
         TinkerMolecule tmol = rcMol3d.getTinkerMolecule();
-        String workDir = MMBuilderParameters.getWorkingDirectory();
+        String workDir = settings.getWorkingDirectory();
         String molName = rcMol3d.getName();
 
         // Increment iteration number (to make unique file names)
@@ -376,7 +382,7 @@ public class RingClosureTool
         String rsKeyFile = workDir + fsep + molName + "_rs" + itn + ".key";
         StringBuilder rsSbKey = new StringBuilder(512);
         // Molecule-independent keywords
-        for (String line : MMBuilderParameters.getRSKeyFileParams())
+        for (String line : settings.getRSKeyFileParams())
         {
             rsSbKey.append(line).append("\n");
         }
@@ -475,7 +481,7 @@ public class RingClosureTool
         StringBuilder rsSbSub = new StringBuilder(512);
         rsSbSub.append(rsIntFile).append("\n");
         // Molecule-independent section of SUB file
-        for (String line : MMBuilderParameters.getRSInitPSSROTParams())
+        for (String line : settings.getRSInitPSSROTParams())
         {
             rsSbSub.append(line).append("\n");
         }
@@ -491,7 +497,7 @@ public class RingClosureTool
         int sz = rcMol3d.getNumberRotatableBonds();
         if (sz > 1)
         {
-            ArrayList<String> txt = MMBuilderParameters.getRSRestPSSROTParams();
+            ArrayList<String> txt = settings.getRSRestPSSROTParams();
             for (int ir=0; ir<txt.size(); ir++)
             {
                 // Control number of linear search directions
@@ -519,9 +525,9 @@ public class RingClosureTool
             if (sz == 1)
             {
                 // No linear search if there is only 1 rotation bond
-                String firstLine = MMBuilderParameters.getRestPSSROTParams().get(0);
-                String lastLine = MMBuilderParameters.getRestPSSROTParams().get(
-                                 MMBuilderParameters.getRestPSSROTParams().size()-1);
+                String firstLine = settings.getRestPSSROTParams().get(0);
+                String lastLine = settings.getRestPSSROTParams().get(
+                                 settings.getRestPSSROTParams().size()-1);
                 rsSbSub.append(firstLine).append("\n");
                 rsSbSub.append("N").append("\n"); // no local search                
                 rsSbSub.append(lastLine).append("\n");
@@ -534,9 +540,9 @@ public class RingClosureTool
 
         // Perform Ring Search with Tinker's PSSROT
         String rsOutFile = workDir + fsep + molName + "_rs" + itn + ".log";
-        String rsCmdStr = MMBuilderParameters.getPSSROTTool() +
+        String rsCmdStr = settings.getPSSROTTool() +
                           " < " + rsSubFile + " > " + rsOutFile;
-        String rsID = "" + MMBuilderParameters.getTaskID();
+        String rsID = "" + settings.getTaskID();
         if (verbosity > 1)
         {
             System.err.println("CMD: " + rsCmdStr + " TskID: " + rsID);
@@ -564,8 +570,8 @@ public class RingClosureTool
         // template of the z-matrix
         String orsIntfile = getNameLastCycleFile(molName + "_rs" + itn, 
 								     rsOutFile);
-        String orsID = "" + MMBuilderParameters.getTaskID();
-        String orsCmd = MMBuilderParameters.getXYZINTTool() + " "
+        String orsID = "" + settings.getTaskID();
+        String orsCmd = settings.getXYZINTTool() + " "
                         + orsIntfile + " "
                         + " T"; //set use of template 
         if (verbosity > 1)
@@ -633,7 +639,7 @@ public class RingClosureTool
      * in this attempt.
      */
 
-    public static void closeRings(Molecule3DBuilder mol, 
+    public void closeRings(Molecule3DBuilder mol, 
 						 Set<ObjectPair> rcaCombination)
     {
         // Collect candidate RingClosures
@@ -738,7 +744,7 @@ public class RingClosureTool
      * @param mol the molecule
      */
 
-    public static void saturateRingClosingAttractor(Molecule3DBuilder mol)
+    public void saturateRingClosingAttractor(Molecule3DBuilder mol)
                                                        throws DENOPTIMException
     {
     	IAtomContainer fmol = mol.getIAtomContainer();

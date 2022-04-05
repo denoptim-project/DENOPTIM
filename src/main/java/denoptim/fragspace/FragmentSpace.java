@@ -34,6 +34,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.fitness.FitnessParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMAttachmentPoint;
@@ -158,6 +159,12 @@ public class FragmentSpace
      * Index used to keep the order in a list of attachment points
      */
     public static AtomicInteger apID = new AtomicInteger(0);
+    
+    /**
+     * Settings used to configure this fragment space. Contains the default
+     * values unless its value is reassigned.
+     */
+    static FragmentSpaceParameters settings = new FragmentSpaceParameters();
 
 //------------------------------------------------------------------------------
 
@@ -1109,7 +1116,7 @@ public class FragmentSpace
             }
         } else
         {
-            if (!FragmentSpaceParameters.enforceSymmetry())
+            if (!settings.enforceSymmetry())
             {
                 res = false;
             }
@@ -1467,10 +1474,8 @@ public class FragmentSpace
                     }
                     
                     String destFileName = type == BBType.FRAGMENT ?
-                            FragmentSpaceParameters
-                                    .getPathnameToAppendedFragments() :
-                                FragmentSpaceParameters
-                                         .getPathnameToAppendedScaffolds();
+                            settings.getPathnameToAppendedFragments() :
+                                settings.getPathnameToAppendedScaffolds();
                     try
                     {
                         if (has3Dgeometry)

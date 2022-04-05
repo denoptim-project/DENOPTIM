@@ -54,6 +54,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
@@ -692,12 +693,14 @@ public class DENOPTIMGraphOperations
      * @param chosenApId if greater than or equals to zero, 
      * sets the choice of the AP to the 
      * given index.
+     * @param maxHeavyAtoms maximum number of heavy atoms.
      * @return <code>true</code> if substitution is successful
      * @throws DENOPTIMException
      */
 
     protected static boolean rebuildBranch(DENOPTIMVertex vertex,
-            boolean force, int chosenVrtxIdx, int chosenApId)
+            boolean force, int chosenVrtxIdx, int chosenApId, 
+            GAParameters settings)
                                                     throws DENOPTIMException
     {
         DENOPTIMGraph g = vertex.getGraphOwner();
@@ -724,7 +727,7 @@ public class DENOPTIMGraphOperations
 
         // extend the graph at this vertex but without recursion
         return extendGraph(parentVrt,false,symmetry,force,chosenVrtxIdx,
-                chosenApId);
+                chosenApId, settings);
     }
 
 //------------------------------------------------------------------------------
@@ -835,10 +838,12 @@ public class DENOPTIMGraphOperations
      
     protected static boolean extendGraph(DENOPTIMVertex curVertex, 
                                          boolean extend, 
-                                         boolean symmetryOnAps)
-                                                        throws DENOPTIMException
+                                         boolean symmetryOnAps,
+                                         GAParameters settings)
+                                                 throws DENOPTIMException
     {
-        return extendGraph(curVertex,extend,symmetryOnAps,false,-1,-1);
+        return extendGraph(curVertex, extend, symmetryOnAps, false, -1, -1,
+                settings);
     }
     
 //------------------------------------------------------------------------------
@@ -861,6 +866,7 @@ public class DENOPTIMGraphOperations
      * @param chosenApId if greater than or equals to zero, sets the choice
      *                   of the AP to the given index. This selection applies
      *                   only to the first extension, not to further recursions.
+     * @param maxHeavyAtoms maximum number of heavy atoms.
      * @throws DENOPTIMException
      * @return <code>true</code> if the graph has been modified
      */
@@ -870,9 +876,14 @@ public class DENOPTIMGraphOperations
                                          boolean symmetryOnAps,
                                          boolean force,
                                          int chosenVrtxIdx,
-                                         int chosenApId) 
+                                         int chosenApId,
+                                         GAParameters settings) 
                                                         throws DENOPTIMException
     {  
+        // get settings
+        int maxHeavyAtoms = ((FragmentSpaceParameters)settings.getParameters(
+                ParametersType.FS_PARAMS)).getMaxHeavyAtom();
+        
         // return true if the append has been successful
         boolean status = false;
 
@@ -920,9 +931,12 @@ public class DENOPTIMGraphOperations
                 // Decide whether we want to extend the graph at this AP?
                 // Note that depending on the criterion (level/molSize) one
                 // of these two first factors is 1.0.
-                double molSizeProb = EAUtils.getMolSizeProbability(molGraph);
-                double byLevelProb = EAUtils.getGrowthByLevelProbability(lvl);
-                double crowdingProb = EAUtils.getCrowdingProbability(ap);
+                double molSizeProb = EAUtils.getMolSizeProbability(molGraph, 
+                        settings);
+                double byLevelProb = EAUtils.getGrowthByLevelProbability(lvl,
+                        settings);
+                double crowdingProb = EAUtils.getCrowdingProbability(ap,
+                        settings);
                 double extendGraphProb = molSizeProb * byLevelProb * crowdingProb;
                 boolean fgrow = RandomUtils.nextBoolean(extendGraphProb);
                 if (!fgrow)
@@ -942,7 +956,7 @@ public class DENOPTIMGraphOperations
                       RingClosureParameters.selectFragmentsFromClosableChains())
             {
                 boolean successful = attachFragmentInClosableChain(curVrtx,
-                        apId, molGraph, addedVertices);
+                        apId, molGraph, addedVertices, settings);
                 if (successful)
                 {
                     continue;
@@ -970,14 +984,15 @@ public class DENOPTIMGraphOperations
                             chosenFrgAndAp.getVertexMolId(), 
                             BBType.FRAGMENT);
             if ((curVrtx.getGraphOwner().getHeavyAtomsCount() + 
-                    incomingVertex.getHeavyAtomsCount()) > 
-                        FragmentSpaceParameters.getMaxHeavyAtom())
+                    incomingVertex.getHeavyAtomsCount()) > maxHeavyAtoms)
             {
                 continue;
             }
 
             // Decide on symmetric substitution within this vertex...
-            boolean cpOnSymAPs = applySymmetry(ap.getAPClass());
+            boolean cpOnSymAPs = applySymmetry(
+                    FragmentSpace.imposeSymmetryOnAPsOfClass(ap.getAPClass()),
+                    settings.getSymmetryProbability());
             SymmetricSet symAPs = new SymmetricSet();
             if (curVrtx.hasSymmetricAP() 
                     && (cpOnSymAPs || symmetryOnAps)
@@ -1024,7 +1039,7 @@ public class DENOPTIMGraphOperations
                                 continue;
                             
                             double crowdProb = EAUtils.getCrowdingProbability(
-                                    crowdedness);
+                                    crowdedness, settings);
                             
                             if (shot > crowdProb)
                                 break;
@@ -1060,8 +1075,8 @@ public class DENOPTIMGraphOperations
             
             // Consider size after application of symmetry
             if ((curVrtx.getGraphOwner().getHeavyAtomsCount() + 
-                    incomingVertex.getHeavyAtomsCount()*symVerts.size()*symAPs.size()) > 
-                        FragmentSpaceParameters.getMaxHeavyAtom())
+                    incomingVertex.getHeavyAtomsCount() * symVerts.size() 
+                    * symAPs.size()) > maxHeavyAtoms)
             {
                 continue;
             }
@@ -1115,7 +1130,7 @@ public class DENOPTIMGraphOperations
             {
                 int vid = addedVertices.get(i);
                 DENOPTIMVertex v = molGraph.getVertexWithId(vid);
-                extendGraph(v, extend, symmetryOnAps);
+                extendGraph(v, extend, symmetryOnAps, settings);
             }
         }
 
@@ -1254,7 +1269,8 @@ public class DENOPTIMGraphOperations
                                                DENOPTIMVertex curVertex, 
                                                int dapidx,
                                                DENOPTIMGraph molGraph,
-                                               ArrayList<Integer> addedVertices)
+                                               ArrayList<Integer> addedVertices,
+                                               GAParameters settings)
                                                         throws DENOPTIMException
     {
         boolean res = false;
@@ -1298,8 +1314,11 @@ public class DENOPTIMGraphOperations
                     // update list of candidate closable chains
                     molGraph.getClosableChains().removeAll(
                             chosenFfCc.getIncompatibleCC());
-                    if (applySymmetry(curVertex.getAttachmentPoints().get(
-                            dapidx).getAPClass()))
+                    APClass apc = curVertex.getAttachmentPoints().get(
+                            dapidx).getAPClass();
+                    if (applySymmetry(
+                            FragmentSpace.imposeSymmetryOnAPsOfClass(apc),
+                            settings.getSymmetryProbability()))
                     {
 //TODO: implement symmetric substitution with closability bias
                     }
@@ -1313,7 +1332,6 @@ public class DENOPTIMGraphOperations
                 }
             }
         }
-
         return res;
     }
 
@@ -1726,19 +1744,19 @@ public class DENOPTIMGraphOperations
      * {@link DENOPTIM.utils.GraphUtils.getSymmetricVertices getSymmetricVertices}.
      * This method takes into account the effect of the symmetric substitution 
      * probability, and the symmetry-related keywords.
-     * @param apClass the attachment point class.
      * @return <code>true</code> if symmetry is to be applied
      */
-    protected static boolean applySymmetry(APClass apClass)
+    protected static boolean applySymmetry(boolean apclassImposed, 
+            double symmetryProbability)
     {
         boolean r = false;
-        if (FragmentSpace.imposeSymmetryOnAPsOfClass(apClass))
+        if (apclassImposed)
         {
             r = true;
         }
         else
         {
-            r = RandomUtils.nextBoolean(GAParameters.getSymmetryProbability());
+            r = RandomUtils.nextBoolean(symmetryProbability);
         }
         return r;
     }
@@ -1757,13 +1775,13 @@ public class DENOPTIMGraphOperations
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
-    public static boolean performMutation(DENOPTIMGraph graph, Monitor mnt)
-            throws DENOPTIMException
+    public static boolean performMutation(DENOPTIMGraph graph, Monitor mnt, 
+            GAParameters settings) throws DENOPTIMException
     {  
         // Get vertices that can be mutated: they can be part of subgraphs
         // embedded in templates
         List<DENOPTIMVertex> mutable = graph.getMutableSites(
-                GAParameters.getExcludedMutationTypes());
+                settings.getExcludedMutationTypes());
         if (mutable.size() == 0)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOMUTSITE);
@@ -1773,18 +1791,18 @@ public class DENOPTIMGraphOperations
         }
         boolean doneMutation = true;
         int numberOfMutations = EAUtils.chooseNumberOfSitesToMutate(
-                GAParameters.getMultiSiteMutationWeights(), 
+                settings.getMultiSiteMutationWeights(), 
                 RandomUtils.nextDouble());
         for (int i=0; i<numberOfMutations; i++)
         {
             if (i>0)
             {
                 mutable = graph.getMutableSites(
-                        GAParameters.getExcludedMutationTypes());
+                        settings.getExcludedMutationTypes());
                 break;
             }
             DENOPTIMVertex v = RandomUtils.randomlyChooseOne(mutable);
-            doneMutation = performMutation(v,mnt);
+            doneMutation = performMutation(v,mnt,settings);
             if(!doneMutation)
                 break;
         }
@@ -1806,17 +1824,17 @@ public class DENOPTIMGraphOperations
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
-    public static boolean performMutation(DENOPTIMVertex vertex, Monitor mnt) 
-            throws DENOPTIMException
+    public static boolean performMutation(DENOPTIMVertex vertex, Monitor mnt, 
+            GAParameters settings) throws DENOPTIMException
     {
         List<MutationType> mTypes = vertex.getMutationTypes(
-                GAParameters.getExcludedMutationTypes());
+                settings.getExcludedMutationTypes());
         if (mTypes.size() == 0)
         {
             return false;
         }
         MutationType mType = RandomUtils.randomlyChooseOne(mTypes);
-        return performMutation(vertex, mType, mnt);
+        return performMutation(vertex, mType, mnt, settings);
     }
     
 //------------------------------------------------------------------------------
@@ -1833,18 +1851,19 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
     public static boolean performMutation(DENOPTIMVertex vertex, 
-            MutationType mType, Monitor mnt) throws DENOPTIMException
+            MutationType mType, Monitor mnt, GAParameters settings) 
+                    throws DENOPTIMException
     {
         DENOPTIMGraph c = vertex.getGraphOwner().clone();
         int pos = vertex.getGraphOwner().indexOf(vertex);
         try
         {
-            return performMutation(vertex, mType, false, -1 ,-1, mnt);
+            return performMutation(vertex, mType, false, -1 ,-1, mnt, settings);
         } catch (IllegalArgumentException|NullPointerException e)
         {
             String debugFile = "failedMutation_" + mType 
                     + "_" + vertex.getVertexId() + "(" + pos + ")_"
-                    + GAParameters.timeStamp + ".sdf";
+                    + settings.timeStamp + ".sdf";
             DenoptimIO.writeGraphToSDF(new File(debugFile), c, false);
             DENOPTIMLogger.appLogger.warning("Fatal exception while performing "
                     + "mutation. See file '" + debugFile + "' to reproduce the "
@@ -1882,7 +1901,8 @@ public class DENOPTIMGraphOperations
      */
     public static boolean performMutation(DENOPTIMVertex vertex, 
             MutationType mType, boolean force, int chosenVrtxIdx, 
-            int chosenApId, Monitor mnt) throws DENOPTIMException
+            int chosenApId, Monitor mnt, GAParameters settings) 
+                    throws DENOPTIMException
     {
         DENOPTIMGraph graph = vertex.getGraphOwner();
         if (graph == null)
@@ -1892,7 +1912,7 @@ public class DENOPTIMGraphOperations
                     + "Mutation aborted");
             return false;
         }
-        if (!vertex.getMutationTypes(GAParameters.getExcludedMutationTypes())
+        if (!vertex.getMutationTypes(settings.getExcludedMutationTypes())
                 .contains(mType))
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE);
@@ -1913,7 +1933,8 @@ public class DENOPTIMGraphOperations
         switch (mType) 
         {
             case CHANGEBRANCH:
-                done = rebuildBranch(vertex, force, chosenVrtxIdx, chosenApId);
+                done = rebuildBranch(vertex, force, chosenVrtxIdx, chosenApId, 
+                        settings);
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH);
@@ -1966,7 +1987,7 @@ public class DENOPTIMGraphOperations
             case EXTEND:
                 vertex.getGraphOwner().removeCappingGroupsOn(vertex);
                 done = extendGraph(vertex, false, false, force, chosenVrtxIdx, 
-                        chosenApId);
+                        chosenApId, settings);
                 if (!done)
                     mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOEXTEND);
                 break;

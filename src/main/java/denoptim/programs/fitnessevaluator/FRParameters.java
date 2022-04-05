@@ -31,6 +31,7 @@ import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.programs.RunTimeParameters;
 
 
 /**
@@ -39,206 +40,59 @@ import denoptim.logging.DENOPTIMLogger;
  * @author Marco Foscato
  */
 
-public class FRParameters
+public class FRParameters extends RunTimeParameters
 {
-    /**
-     * Flag indicating that at least one parameter has been defined
-     */
-    private static boolean frParamsInUse = false;
-
-    /**
-     * Working directory
-     */
-    protected static String workDir = System.getProperty("user.dir");
-
     /**
      * File with input for fitness provider
      */
-    private static File inpFile = null;
+    private File inpFile = null;
     
     /**
      * File where the results of the fitness evaluation will be printed
      */
-    private static File outFile = new File("output.sdf");
+    private File outFile = new File("output.sdf");
     
     /**
      * Flag controlling attempt to add templates to building block libraries
      */
-    protected static boolean addTemplatesToLibraries = false;
+    protected boolean addTemplatesToLibraries = false;
+
+//-----------------------------------------------------------------------------
+    //TODO-gg delete these and keep only the constructor()
+    /**
+     * Constructor
+     * @param paramType
+     */
+    public FRParameters(ParametersType paramType)
+    {
+        super(paramType);
+    }
+    
+//-----------------------------------------------------------------------------
     
     /**
-     * Verbosity level
+     * Constructor
+     * @param paramType
      */
-    private static int verbosity = 0;
-    
-    
-//-----------------------------------------------------------------------------
-
-    /**
-     * Restores the default values of the most important parameters. 
-     * Given that this is a static collection of parameters, running subsequent
-     * experiments from the GUI ends up reusing parameters from the previous
-     * run. This method allows to clean-up old values.
-     */
-    public static void resetParameters()
+    public FRParameters()
     {
-        frParamsInUse = false;
-        workDir = System.getProperty("user.dir");
-        inpFile = null;
-        outFile = new File("output.sdf");
-        verbosity = 0;
-        
-        FitnessParameters.resetParameters();        
-    }
-
-//-----------------------------------------------------------------------------
-
-    public static boolean frParamsInUse()
-    {
-        return frParamsInUse;
-    }
-
-//-----------------------------------------------------------------------------
-
-    public static String getWorkDirectory()
-    {
-        return workDir;
+        super(ParametersType.FR_PARAMS);
     }
    
 //-----------------------------------------------------------------------------
 
-    public static File getInputFile()
+    public File getInputFile()
     {
         return inpFile;
     }
     
 //-----------------------------------------------------------------------------
 
-    public static File getOutputFile()
+    public File getOutputFile()
     {
         return outFile;
     }
-
-//-----------------------------------------------------------------------------
-
-    public static int getVerbosity()
-    {
-	    return verbosity;
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Read the parameter TXT file line by line and interpret its content.
-     * @param infile
-     * @throws DENOPTIMException
-     */
-
-    public static void readParameterFile(String infile) throws DENOPTIMException
-    {
-        String option, line;
-        BufferedReader br = null;
-        try
-        {
-            br = new BufferedReader(new FileReader(infile));
-            while ((line = br.readLine()) != null)
-            {
-                if ((line.trim()).length() == 0)
-                {
-                    continue;
-                }
-
-                if (line.startsWith("#"))
-                {
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("FR-"))
-                {
-                    interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("FS-"))
-                {
-                    FragmentSpaceParameters.interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("RC-"))
-                {
-                    RingClosureParameters.interpretKeyword(line);
-                    continue;
-                }
-               
-                if (line.toUpperCase().startsWith("FP-"))
-                {
-                    FitnessParameters.interpretKeyword(line);
-                    continue;
-                }
-            }
-        }
-        catch (NumberFormatException | IOException nfe)
-        {
-            throw new DENOPTIMException(nfe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
-                    br.close();
-                    br = null;
-                }
-            }
-            catch (IOException ioe)
-            {
-                throw new DENOPTIMException(ioe);
-            }
-        }
-
-        option = null;
-        line = null;
-        
-        //NB: this is needed to use the workDir value without requiring a
-        // specific order in the input parameters, and because we might be
-        // asked to write in the "current directory" but what is actually meant
-        // is to write in the workDir
-        if (outFile != null && !outFile.isAbsolute())
-        {
-            outFile = new File(workDir + System.getProperty("file.separator")
-            + outFile.getPath());
-        }
-    }
-
-//-----------------------------------------------------------------------------
-
-    /**
-     * Processes a string looking for keyword and a possibly associated value.
-     * @param line the string to parse
-     * @throws DENOPTIMException
-     */
-
-    public static void interpretKeyword(String line) throws DENOPTIMException
-    {
-        String key = line.trim();
-        String value = "";
-        if (line.contains("="))
-        {
-            key = line.substring(0,line.indexOf("=") + 1).trim();
-            value = line.substring(line.indexOf("=") + 1).trim();
-        }
-        try
-        {
-            interpretKeyword(key,value);
-        }
-        catch (DENOPTIMException e)
-        {
-            throw new DENOPTIMException(e.getMessage()+" Check line "+line);
-        }
-    }
-
+    
 //-----------------------------------------------------------------------------
 
     /**
@@ -248,26 +102,25 @@ public class FRParameters
      * @throws DENOPTIMException
      */
 
-    public static void interpretKeyword(String key, String value)
-                                                      throws DENOPTIMException
+    public void interpretKeyword(String key, String value)
+            throws DENOPTIMException
     {
-        frParamsInUse = true;
         String msg = "";
         switch (key.toUpperCase())
         {
-        case "FR-WORKDIR=":
+        case "WORKDIR=":
             workDir = value;
             break;
-		case "FR-INPUT=":
+		case "INPUT=":
 		    inpFile = new File(value);
 		    break;
-        case "FR-OUTPUT=":
+        case "OUTPUT=":
             outFile = new File(value);
             break;
-        case "FR-EXTRACTTEMPLATES":
+        case "EXTRACTTEMPLATES":
             addTemplatesToLibraries = true;
             break;
-        case "FR-VERBOSITY=":
+        case "VERBOSITY=":
             try
             {
                 verbosity = Integer.parseInt(value);
@@ -279,8 +132,8 @@ public class FRParameters
             }
             break;
         default:
-             msg = "Keyword " + key + " is not a known FragmentSpaceExplorer-" 
-            		 + "related keyword. Check input files.";
+             msg = "Keyword " + key + " is not a known " 
+            		 + "related keyword for FitnessRunner. Check input files.";
             throw new DENOPTIMException(msg);
         }
     }
@@ -292,15 +145,10 @@ public class FRParameters
      * @throws DENOPTIMException
      */
 
-    public static void checkParameters() throws DENOPTIMException
+    public void checkParameters() throws DENOPTIMException
     {
         String msg = "";
-        if (!frParamsInUse)
-        {
-            return;
-        }
-    
-    	if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
+        if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
     	{
     	   msg = "Directory '" + workDir + "' not found. Please specify an "
     		 + "existing directory.";
@@ -321,15 +169,7 @@ public class FRParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.checkParameters();
-        }
-
-        if (RingClosureParameters.rcParamsInUse())
-        {
-            RingClosureParameters.checkParameters();
-        }
+        checkOtherParameters();
     }
 
 //----------------------------------------------------------------------------
@@ -339,63 +179,12 @@ public class FRParameters
      * @throws DENOPTIMException
      */
 
-    public static void processParameters() throws DENOPTIMException
+    public void processParameters() throws DENOPTIMException
     {
         FileUtils.addToRecentFiles(outFile, FileFormat.GRAPHSDF);
-
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.processParameters();
-        }
-
-        if (RingClosureParameters.allowRingClosures())
-        {
-            RingClosureParameters.processParameters();
-        }
-        
-        if (FitnessParameters.fitParamsInUse())
-        {
-            FitnessParameters.processParameters();
-        }
-        
-        System.err.println("Output files associated with the current run are " +
-                                "located in " + workDir);
-    }
-
-//----------------------------------------------------------------------------
-
-    /**
-     * Print all parameters. 
-     */
-
-    public static void printParameters()
-    {
-		if (!frParamsInUse)
-		{
-		    return;
-		}
-        String eol = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder(1024);
-        sb.append(" frParameters ").append(eol);
-        for (Field f : FRParameters.class.getDeclaredFields()) 
-        {
-            try
-            {
-                sb.append(f.getName()).append(" = ").append(
-                            f.get(FRParameters.class)).append(eol);
-            }
-            catch (Throwable t)
-            {
-                sb.append("ERROR! Unable to print FRParameters. Cause: " + t);
-                break;
-            }
-        }
-        DENOPTIMLogger.appLogger.info(sb.toString());
-        sb.setLength(0);
-
-        FragmentSpaceParameters.printParameters();
-        RingClosureParameters.printParameters();
-        FitnessParameters.printParameters();
+        processParameters();
+        System.err.println("Output files associated with the current run are " 
+        + "located in " + workDir);
     }
 
 //----------------------------------------------------------------------------

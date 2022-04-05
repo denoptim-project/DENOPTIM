@@ -26,6 +26,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.programs.RunTimeParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 
 
 /**
@@ -34,111 +36,36 @@ import denoptim.graph.rings.RingClosureParameters;
  * @author Marco Foscato
  */
 
-public class IsomorphismParameters
+public class IsomorphismParameters extends RunTimeParameters
 {   
     /**
      * Input file containing graph A
      */
-    protected static String inpFileGraphA;
+    protected String inpFileGraphA;
 
     /**
      * Input file containing graph B
      */
-    protected static String inpFileGraphB;
+    protected String inpFileGraphB;
 
 //-----------------------------------------------------------------------------
-
+    
     /**
-     * Read the parameter TXT file line by line and interpret its content.
-     * @param infile
-     * @throws DENOPTIMException
+     * Constructor
      */
-
-    public static void readParameterFile(String infile) throws DENOPTIMException
+    public IsomorphismParameters()
     {
-        String line;
-        BufferedReader br = null;
-        try
-        {
-            br = new BufferedReader(new FileReader(infile));
-            while ((line = br.readLine()) != null)
-            {
-                if ((line.trim()).length() == 0)
-                {
-                    continue;
-                }
-
-                if (line.startsWith("#"))
-                {
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("ISOMORPHISM-"))
-                {
-                    interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("FS-"))
-                {
-                    FragmentSpaceParameters.interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("RC-"))
-                {
-                    RingClosureParameters.interpretKeyword(line);
-                    continue;
-                }
-            }
-        }
-        catch (NumberFormatException | IOException nfe)
-        {
-            throw new DENOPTIMException(nfe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
-                    br.close();
-                    br = null;
-                }
-            }
-            catch (IOException ioe)
-            {
-                throw new DENOPTIMException(ioe);
-            }
-        }
-        line = null;
+        this(ParametersType.ISO_PARAMS);
     }
-
+    
 //-----------------------------------------------------------------------------
-
+    
     /**
-     * Processes a string looking for keyword and a possibly associated value.
-     * @param line the string to parse
-     * @throws DENOPTIMException
+     * Constructor
      */
-
-    public static void interpretKeyword(String line) throws DENOPTIMException
+    private IsomorphismParameters(ParametersType paramType)
     {
-        String key = line.trim();
-        String value = "";
-        if (line.contains("="))
-        {
-            key = line.substring(0,line.indexOf("=") + 1).trim();
-            value = line.substring(line.indexOf("=") + 1).trim();
-        }
-        try
-        {
-            interpretKeyword(key,value);
-        }
-        catch (DENOPTIMException e)
-        {
-            throw new DENOPTIMException(e.getMessage()+" Check line "+line);
-        }
+        super(paramType);
     }
 
 //-----------------------------------------------------------------------------
@@ -150,17 +77,17 @@ public class IsomorphismParameters
      * @throws DENOPTIMException
      */
 
-    public static void interpretKeyword(String key, String value)
+    public void interpretKeyword(String key, String value)
             throws DENOPTIMException
     {
 
         String msg = "";
         switch (key.toUpperCase())
         {
-            case "ISOMORPHISM-INPGRAPHA=":
+            case "INPGRAPHA=":
                 inpFileGraphA = value;
                 break;
-            case "ISOMORPHISM-INPGRAPHB=":
+            case "INPGRAPHB=":
     	        inpFileGraphB = value;
                 break;
             default:
@@ -177,7 +104,7 @@ public class IsomorphismParameters
      * @throws DENOPTIMException
      */
 
-    public static void checkParameters() throws DENOPTIMException
+    public void checkParameters() throws DENOPTIMException
     {
         String msg = "";
 
@@ -193,15 +120,7 @@ public class IsomorphismParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.checkParameters();
-        }
-
-        if (RingClosureParameters.rcParamsInUse())
-        {
-            RingClosureParameters.checkParameters();
-        }
+        checkOtherParameters();
     }
 
 //----------------------------------------------------------------------------
@@ -211,17 +130,9 @@ public class IsomorphismParameters
      * @throws DENOPTIMException
      */
 
-    public static void processParameters() throws DENOPTIMException
+    public void processParameters() throws DENOPTIMException
     {   
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.processParameters();
-        }
-
-        if (RingClosureParameters.allowRingClosures())
-        {
-            RingClosureParameters.processParameters();
-        }
+        processOtherParameters();
     }
 
 //----------------------------------------------------------------------------

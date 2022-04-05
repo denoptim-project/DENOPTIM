@@ -98,7 +98,7 @@ public class FragsCombinationIterator
     /**
      * Verbosity lvel
      */
-    private int verbosity = FragmentSpaceParameters.getVerbosity();
+    private int verbosity = FragmentSpace.settings.getVerbosity();
 
 
 //------------------------------------------------------------------------------
@@ -128,9 +128,9 @@ public class FragsCombinationIterator
            
             // deal with symmetric sets of vertices
             boolean keepThisVertex = true;
-            if ((FragmentSpaceParameters.enforceSymmetry()
+            if ((FragmentSpace.settings.enforceSymmetry()
                                             && this.rootGraph.hasSymmetricAP())
-                || (FragmentSpaceParameters.symmetryConstraints()))
+                || (FragmentSpace.settings.symmetryConstraints()))
             {
                 keepThisVertex = false;
                 boolean isInSymSet = false;
@@ -166,9 +166,9 @@ public class FragsCombinationIterator
                 int apIdx = v.getIndexOfAP(ap);
                 // deal with symmetric sets of APs on this vertex
                 boolean keepThisAP = true;
-                if ((FragmentSpaceParameters.enforceSymmetry() ||
-                     FragmentSpaceParameters.symmetryConstraints()) 
-                                                          && v.hasSymmetricAP())
+                if ((FragmentSpace.settings.enforceSymmetry() 
+                        || FragmentSpace.settings.symmetryConstraints()) 
+                        && v.hasSymmetricAP())
                 {
                     keepThisAP = false;
                     boolean isInSymSet = false;
@@ -540,8 +540,8 @@ public class FragsCombinationIterator
         }
 
         // Project selection onto symmetric positions
-        if (FragmentSpaceParameters.enforceSymmetry() 
-            || FragmentSpaceParameters.symmetryConstraints())
+        if (FragmentSpace.settings.enforceSymmetry() 
+            || FragmentSpace.settings.symmetryConstraints())
         {
             Map<IdFragmentAndAP,IdFragmentAndAP> pairsToAdd = 
                                 new HashMap<IdFragmentAndAP,IdFragmentAndAP>();

@@ -69,6 +69,11 @@ public class FPRunner
     final ThreadPoolExecutor tpe;
 
     private Throwable thrownByTask;
+    
+    /**
+     * The parameters controlling the 
+     */
+    private FRParameters settings;
 
 
 //-----------------------------------------------------------------------------
@@ -77,8 +82,9 @@ public class FPRunner
      * Constructor
      */
 
-    public FPRunner()
+    public FPRunner(FRParameters settings)
     {
+        this.settings = settings;
         futures = new ArrayList<>(1);
         submitted = new ArrayList<>(1);
 
@@ -163,13 +169,13 @@ public class FPRunner
         watch.start();
         
         List<DENOPTIMGraph> graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
-                FRParameters.getInputFile());
+                settings.getInputFile());
         List<IAtomContainer> iacs = DenoptimIO.readSDFFile(
-                FRParameters.getInputFile().getAbsolutePath());
+                settings.getInputFile().getAbsolutePath());
         if (graphs.size() != iacs.size())
         {
             throw new DENOPTIMException("Found " + graphs.size() + " and " 
-                    + iacs.size() + " in " + FRParameters.getInputFile());
+                    + iacs.size() + " in " + settings.getInputFile());
         }
         
         tpe.prestartAllCoreThreads();
@@ -180,9 +186,9 @@ public class FPRunner
             DENOPTIMGraph graph = graphs.get(i);
             IAtomContainer iac = iacs.get(i);
   
-            FitnessEvaluationTask task = new FitnessEvaluationTask(graph, iac, 
-                FRParameters.getWorkDirectory(), 
-                FRParameters.getOutputFile().getAbsolutePath()+"_"+i);
+            FitnessEvaluationTask task = new FitnessEvaluationTask(settings,
+                    graph, iac, settings.getWorkDirectory(), 
+                    settings.getOutputFile().getAbsolutePath()+"_"+i);
 
             submitted.add(task);
             futures.add(tpe.submit(task));
@@ -196,13 +202,13 @@ public class FPRunner
         for (int i=0; i<graphs.size(); i++)
         {
             String s = DenoptimIO.readText(
-                    FRParameters.getOutputFile().getAbsolutePath()+"_"+i);
+                    settings.getOutputFile().getAbsolutePath()+"_"+i);
             // Get rid of trailing newline character
             s = s.substring(0, s.length()-1);
-            DenoptimIO.writeData(FRParameters.getOutputFile().getAbsolutePath(), 
+            DenoptimIO.writeData(settings.getOutputFile().getAbsolutePath(), 
                     s, true);
             FileUtils.deleteQuietly(new File(
-                    FRParameters.getOutputFile().getAbsolutePath()+"_"+i));
+                    settings.getOutputFile().getAbsolutePath()+"_"+i));
         }
         
         watch.stop();

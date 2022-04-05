@@ -55,21 +55,20 @@ public class FitnessRunner extends ProgramTask
 
     @Override
     public void runProgram() throws Throwable
-    {   
-        //TODO: get rid of this one parameters are not static anymore.
-        FRParameters.resetParameters();
+    {
+        FRParameters frParams = new FRParameters();
         
         if (workDir != null)
         {
-            FRParameters.workDir = workDir.getAbsolutePath();
+            frParams.setWorkDirectory(workDir.getAbsolutePath());
         }
         
-    	FRParameters.readParameterFile(configFilePathName.getAbsolutePath());
-        FRParameters.checkParameters();
-        FRParameters.processParameters();
-        FRParameters.printParameters();
+        frParams.readParameterFile(configFilePathName.getAbsolutePath());
+        frParams.checkParameters();
+        frParams.processParameters();
+        frParams.printParameters();
         
-        runner = new FPRunner();
+        runner = new FPRunner(frParams);
         runner.run();
     }
     

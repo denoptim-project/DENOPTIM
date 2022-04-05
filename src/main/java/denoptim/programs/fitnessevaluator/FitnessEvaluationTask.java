@@ -23,12 +23,14 @@ import java.io.File;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.combinatorial.CEBLParameters;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.FitnessTask;
 import denoptim.utils.GraphConversionTool;
 
@@ -38,6 +40,10 @@ import denoptim.utils.GraphConversionTool;
 
 public class FitnessEvaluationTask extends FitnessTask
 {
+    /**
+     * Collection of settings controlling the execution of the task
+     */
+    private FRParameters frSettings = null;
     
 //------------------------------------------------------------------------------
     
@@ -47,11 +53,14 @@ public class FitnessEvaluationTask extends FitnessTask
      * @param workDir where files will be placed.
      * @param outFileName filename of the output file.
      */
-    public FitnessEvaluationTask(DENOPTIMGraph molGraph, IAtomContainer iac, 
+    public FitnessEvaluationTask(FRParameters settings, 
+            DENOPTIMGraph molGraph, IAtomContainer iac, 
             String workDir, String outFileName)
     {
-    	super(new Candidate(molGraph));
+    	super((FitnessParameters) settings.getParameters(
+                ParametersType.FIT_PARAMS), new Candidate(molGraph));
         this.workDir = new File(workDir);
+        this.frSettings = settings;
         fitProvMol = iac;
         fitProvOutFile = outFileName;
     }
@@ -64,7 +73,7 @@ public class FitnessEvaluationTask extends FitnessTask
         // Optionally improve the molecular representation, which
         // is otherwise only given by the collection of building
         // blocks (not aligned, nor roto-translated)
-        if (FitnessParameters.make3dTree())
+        if (settings.make3dTree())
         {
             ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
             
@@ -111,7 +120,7 @@ public class FitnessEvaluationTask extends FitnessTask
             throw new DENOPTIMException(ex);
         }
         
-        if (FRParameters.addTemplatesToLibraries)
+        if (frSettings.addTemplatesToLibraries)
         {   
             FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
                     true, true, fitProvMol);

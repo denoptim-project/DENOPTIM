@@ -34,6 +34,8 @@ import denoptim.task.ProgramTask;
 public class Isomorphism extends ProgramTask
 {
     
+//------------------------------------------------------------------------------
+    
     /**
      * Creates and configures the program task.
      * @param configFile the file containing the configuration parameters.
@@ -49,26 +51,19 @@ public class Isomorphism extends ProgramTask
     @Override
     public void runProgram() throws Throwable
     {
-        IsomorphismParameters.readParameterFile(
-                configFilePathName.getAbsolutePath());
-        IsomorphismParameters.checkParameters();
-        IsomorphismParameters.processParameters();
-        
-        checkIsomorphism();
-    }
+        IsomorphismParameters isomParams = new IsomorphismParameters();
+        isomParams.readParameterFile(configFilePathName.getAbsolutePath());
+        isomParams.checkParameters();
+        isomParams.processParameters();
 
-//------------------------------------------------------------------------------
-    
-    private static void checkIsomorphism() throws DENOPTIMException
-    {
         DENOPTIMGraph graphA = null;
         DENOPTIMGraph graphB = null;
         try
         {
             graphA = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(IsomorphismParameters.inpFileGraphA)).get(0);
+                    new File(isomParams.inpFileGraphA)).get(0);
             graphB = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(IsomorphismParameters.inpFileGraphB)).get(0);
+                    new File(isomParams.inpFileGraphB)).get(0);
         } catch (Exception e)
         {
             e.printStackTrace();

@@ -41,24 +41,24 @@ import denoptim.utils.ObjectPair;
 
 public class ConformationalSearchPSSROT
 {
-
-    /**
-     * Verbosity level
-     */
-    private static int verbosity = MMBuilderParameters.getVerbosity();
-
     /**
      * File separator
      */
     final String fsep = System.getProperty("file.separator");
+    
+    /**
+     * Settings controlling the execution of this task
+     */
+    private MMBuilderParameters settings;
 
 //------------------------------------------------------------------------------
 
     /**
      * Construct an empty ConformationalSearchPSSROT
      */
-    public ConformationalSearchPSSROT()
+    public ConformationalSearchPSSROT(MMBuilderParameters settings)
     {
+        this.settings = settings;
     }
 
 //------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public class ConformationalSearchPSSROT
     {
         int lastIdx = MMBuilderUtils.countLinesWKeywordInFile(tinkerresfile,
                                 " Final Function Value and Deformation");
-        String workDir = MMBuilderParameters.getWorkingDirectory();
+        String workDir = settings.getWorkingDirectory();
         String xyzfile = workDir + fsep + fname + "." +
                                  GenUtils.getPaddedString(3, lastIdx - 1);
         return xyzfile;
@@ -101,7 +101,7 @@ public class ConformationalSearchPSSROT
     								   DENOPTIMConstants.MOLERRORTAG);
     	    if (molErroProp == null)
     	    {
-        		if (verbosity > 1)
+        		if (settings.getVerbosity() > 1)
         		{
         		    System.out.println("Field MOL_ERROR is null: proceeding "
         				   + "with conformational search.");
@@ -109,7 +109,7 @@ public class ConformationalSearchPSSROT
                 Molecule3DBuilder csMol = performPSSROT(mols.get(i), i);
                 nMols.add(csMol);
     	    } else {
-        		if (verbosity > 1)
+        		if (settings.getVerbosity() > 1)
         		{
         		    System.out.println("Field MOL_ERROR is NOT null: skiping "
         				   + "conformational search. Reason: "
@@ -136,7 +136,7 @@ public class ConformationalSearchPSSROT
     public Molecule3DBuilder performPSSROT(Molecule3DBuilder mol, int idm)
 						throws DENOPTIMException, TinkerException
     {
-        if (verbosity > 1)
+        if (settings.getVerbosity() > 1)
         {
             System.out.println("Start conformational search on mol: " + idm);
         }
@@ -147,7 +147,7 @@ public class ConformationalSearchPSSROT
         int sz = csMol3d.getNumberRotatableBonds();
     	if (sz == 0)
     	{
-    	    if (verbosity > 1)
+    	    if (settings.getVerbosity() > 1)
     	    {
     	        System.out.println("No rotatable bond: skip PSSROT "
     				+ "conformational search.");
@@ -156,7 +156,7 @@ public class ConformationalSearchPSSROT
     	}
 
         TinkerMolecule tmol = csMol3d.getTinkerMolecule();
-        String workDir = MMBuilderParameters.getWorkingDirectory();
+        String workDir = settings.getWorkingDirectory();
         String molName = csMol3d.getName();
 
         // Prepare Tinker INT file (Internal coordinates)
@@ -168,9 +168,9 @@ public class ConformationalSearchPSSROT
         StringBuilder csSbKey = new StringBuilder(512);
         // Molecule-independent keywords
         csSbKey.append("parameters    ").append(
-				    MMBuilderParameters.getParamFile()).append("\n");
+				    settings.getParamFile()).append("\n");
         boolean isFirstLine = true;
-        for (String line : MMBuilderParameters.getKeyFileParams())
+        for (String line : settings.getKeyFileParams())
         {
     	    if (isFirstLine)
     	    {
@@ -186,7 +186,7 @@ public class ConformationalSearchPSSROT
         StringBuilder csSbSub = new StringBuilder(512);
         csSbSub.append(csIntFile).append("\n");
         // Molecule-independent section of SUB file
-        for (String line : MMBuilderParameters.getInitPSSROTParams())
+        for (String line : settings.getInitPSSROTParams())
         {
             csSbSub.append(line).append("\n");
         }
@@ -201,7 +201,7 @@ public class ConformationalSearchPSSROT
         // Linear search section of SUB file
         if (sz > 1)
         {
-            ArrayList<String> txt = MMBuilderParameters.getRestPSSROTParams();
+            ArrayList<String> txt = settings.getRestPSSROTParams();
             for (int ir=0; ir<txt.size(); ir++)
             {
         		// Control number of linear search directions
@@ -225,9 +225,9 @@ public class ConformationalSearchPSSROT
             if (sz == 1)
             {
                 // No linear search if there is only 1 rotation bond
-                String firstLine = MMBuilderParameters.getRestPSSROTParams().get(0);
-                String lastLine = MMBuilderParameters.getRestPSSROTParams().get(
-                                 MMBuilderParameters.getRestPSSROTParams().size()-1);
+                String firstLine = settings.getRestPSSROTParams().get(0);
+                String lastLine = settings.getRestPSSROTParams().get(
+                                 settings.getRestPSSROTParams().size()-1);
                 csSbSub.append(firstLine).append("\n");
                 csSbSub.append("N").append("\n"); // no local search                
                 csSbSub.append(lastLine).append("\n");
@@ -235,15 +235,15 @@ public class ConformationalSearchPSSROT
         }
         DenoptimIO.writeData(csSubFile, csSbSub.toString(), false);
 
-        if (verbosity > 0)
+        if (settings.getVerbosity() > 0)
             System.err.println("Submitting PSSTOR Conformational Search");
 
         // Perform Ring Search with Tinker's PSSROT
         String csLogFile = workDir + fsep + molName + "_cs" + idm + ".log";
-        String csCmdStr = MMBuilderParameters.getPSSROTTool() +
+        String csCmdStr = settings.getPSSROTTool() +
                           " < " + csSubFile + " > " + csLogFile;
-        String csID = "" + MMBuilderParameters.getTaskID();
-        if (verbosity > 1)
+        String csID = "" + settings.getTaskID();
+        if (settings.getVerbosity() > 1)
         {
             System.err.println("CMD: " + csCmdStr + " TskID: " + csID);
         }
@@ -280,12 +280,12 @@ public class ConformationalSearchPSSROT
     	fixLongeLinesInXYZ(ocsIntfile);
 
     	String newTnkICLog = workDir + fsep + molName + "_cs" + idm + ".log2";
-        String ocsID = "" + MMBuilderParameters.getTaskID();
-        String ocsCmd = MMBuilderParameters.getXYZINTTool() + " "
+        String ocsID = "" + settings.getTaskID();
+        String ocsCmd = settings.getXYZINTTool() + " "
                         + ocsIntfile + " "
                         + " T " //set use of template 
                         + " > " + newTnkICLog;
-        if (verbosity > 1)
+        if (settings.getVerbosity() > 1)
         {
             System.err.println("CMD: " + ocsCmd + " TskID: " + ocsID);
         }
@@ -323,7 +323,7 @@ public class ConformationalSearchPSSROT
         csMol3d.updateXYZFromINT();
 
         // Cleanup
-        if (verbosity < 2)
+        if (settings.getVerbosity() < 2)
         {
             FileUtils.deleteFilesContaining(workDir,molName + "_cs" + idm);
         }

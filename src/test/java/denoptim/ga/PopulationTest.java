@@ -106,7 +106,8 @@ public class PopulationTest
     public void testXOverCompatibility() throws Exception
     {
         prepare();
-        Population pop = new Population();
+        GAParameters gaparams = new GAParameters();
+        Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
         // We give uniquefying properties to the vertexes so that they
@@ -214,7 +215,8 @@ public class PopulationTest
     public void testClone() throws Exception
     {
         prepare();
-        Population pop = new Population();
+        GAParameters gaparams = new GAParameters();
+        Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
         Candidate c1 = new Candidate("C1",g1);
@@ -538,7 +540,8 @@ public class PopulationTest
     public void testGetMinMax() throws Exception
     {
         prepare();
-        Population pop = new Population();
+        GAParameters gaparams = new GAParameters();
+        Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
         Candidate c1 = new Candidate("C1",g1);
@@ -578,7 +581,8 @@ public class PopulationTest
     public void testIsInPercentile() throws Exception
     {
         prepare();
-        Population pop = new Population();
+        GAParameters gaparams = new GAParameters();
+        Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
         Candidate c1 = new Candidate("C1",g1);
@@ -595,7 +599,7 @@ public class PopulationTest
         assertFalse(pop.isWithinPercentile(69, 0.5), "69 is not in 50%");
         assertFalse(pop.isWithinPercentile(114, 0.05), "114 is not in 5%");
         
-        pop = new Population();
+        pop = new Population(gaparams);
         
         DENOPTIMGraph g1b = makeGraphA();
         Candidate c1b = new Candidate("C1",g1b);
@@ -619,7 +623,8 @@ public class PopulationTest
     public void testPopulationVersion() throws Exception
     {
         prepare();
-        Population pop = new Population();
+        GAParameters gaparams = new GAParameters();
+        Population pop = new Population(gaparams);
         int v0 = pop.getVersionID();
         
         DENOPTIMGraph g1 = makeGraphA();

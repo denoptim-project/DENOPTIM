@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.ProgramTask;
 
 /**
@@ -72,28 +73,25 @@ public class DenoptimGA extends ProgramTask
 
     @Override
     public void runProgram() throws Throwable
-    {   
-        //TODO: get rid of this one parameters are not static anymore.
-    	//needed by static parameters, and in case of subsequent runs in the same JVM
-    	GAParameters.resetParameters(); 
-
+    {
+        GAParameters settings = new GAParameters(ParametersType.GA_PARAMS);
         if (workDir != null)
         {
-        	GAParameters.setWorkingDirectory(workDir.getAbsolutePath());
+            settings.setWorkingDirectory(workDir.getAbsolutePath());
         }
         
-        GAParameters.readParameterFile(configFilePathName.getAbsolutePath());
-        GAParameters.checkParameters();
-        GAParameters.processParameters();
-        GAParameters.printParameters();
+        settings.readParameterFile(configFilePathName.getAbsolutePath());
+        settings.checkParameters();
+        settings.processParameters();
+        settings.printParameters();
         
         ecl = new ExternalCmdsListener(
-        		Paths.get(GAParameters.getInterfaceDir()));
+        		Paths.get(settings.getInterfaceDir()));
         executor = Executors.newSingleThreadExecutor();
         futureWatchers = executor.submit(ecl);
         executor.shutdown();
         
-        ea = new EvolutionaryAlgorithm(ecl);
+        ea = new EvolutionaryAlgorithm(settings, ecl);
         ea.run();
 
         stopExternalCmdListener();

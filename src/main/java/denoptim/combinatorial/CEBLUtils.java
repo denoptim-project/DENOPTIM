@@ -40,7 +40,7 @@ import denoptim.graph.DENOPTIMGraph;
  * @author Marco Foscato
  */
 
-public class FSEUtils
+public class CEBLUtils
 {
 
 //------------------------------------------------------------------------------
@@ -50,9 +50,9 @@ public class FSEUtils
      * are stored
      */
 
-    public static String getNameOfStorageDir(int level)
+    public static String getNameOfStorageDir(CEBLParameters settings, int level)
     {
-        String dirName = FSEParameters.getDBRoot()
+        String dirName = settings.getDBRoot()
                           + DENOPTIMConstants.FSEP
                           + DENOPTIMConstants.FSEIDXNAMEROOT
                           + level;
@@ -110,9 +110,10 @@ public class FSEUtils
      * @return the pathname of a FragSpaceExplorer storage file
      */
 
-    public static String getNameOfStorageFile(int level, int graphId)
+    public static String getNameOfStorageFile(CEBLParameters settings, int level,
+            int graphId)
     {
-        String fileName = FSEParameters.getDBRoot()
+        String fileName = settings.getDBRoot()
                           + DENOPTIMConstants.FSEP
                           + DENOPTIMConstants.FSEIDXNAMEROOT
                           + level
@@ -127,9 +128,10 @@ public class FSEUtils
      * @return the pathname of a FragSpaceExplorer storage file where
      */
 
-    public static String getNameOfStorageIndexFile(int level)
+    public static String getNameOfStorageIndexFile(CEBLParameters settings, 
+            int level)
     {
-        String fileName = FSEParameters.getDBRoot()
+        String fileName = settings.getDBRoot()
                           + DENOPTIMConstants.FSEP
                           + DENOPTIMConstants.FSEIDXNAMEROOT
                           + level
@@ -149,9 +151,8 @@ public class FSEUtils
      * @param level
      */
 
-    protected static void storeAllGraphsOfLevel(
-                                  ArrayList<DENOPTIMGraph> lstGraphs, int level)
-                                                        throws DENOPTIMException
+    protected static void storeAllGraphsOfLevel(CEBLParameters settings, 
+            ArrayList<DENOPTIMGraph> lstGraphs, int level) throws DENOPTIMException
     {
         for (DENOPTIMGraph g : lstGraphs)
               {
@@ -164,7 +165,7 @@ public class FSEUtils
             
             DENOPTIMGraph c = g.clone();
             
-            storeGraphOfLevel(c,level,0,new ArrayList<Integer>());
+            storeGraphOfLevel(settings, c,level,0,new ArrayList<Integer>());
         }
     }
 
@@ -181,11 +182,11 @@ public class FSEUtils
      * of fragment. 
      */
 
-    protected static void storeGraphOfLevel(DENOPTIMGraph graph, int level, 
-                            int rootId, ArrayList<Integer> nextIds) 
-                                                        throws DENOPTIMException
+    protected static void storeGraphOfLevel(CEBLParameters settings, 
+            DENOPTIMGraph graph, int level, int rootId, 
+            ArrayList<Integer> nextIds) throws DENOPTIMException
     {
-        String outDir = getNameOfStorageDir(level);
+        String outDir = getNameOfStorageDir(settings, level);
         if (!denoptim.files.FileUtils.checkExists(outDir))
         {
             try
@@ -199,8 +200,8 @@ public class FSEUtils
             }
         }
 
-        String fileSer = getNameOfStorageFile(level,graph.getGraphId());
-        String indexFile = getNameOfStorageIndexFile(level);
+        String fileSer = getNameOfStorageFile(settings, level,graph.getGraphId());
+        String indexFile = getNameOfStorageIndexFile(settings, level);
         String indexLine = graph.toString() + " => " + graph.getGraphId() + " " 
                            + rootId + " " + nextIds;
         
@@ -214,15 +215,16 @@ public class FSEUtils
      * Store the checkpoint in a serialized form
      */
 
-    protected static void serializeCheckPoint() throws DENOPTIMException
+    protected static void serializeCheckPoint(CEBLParameters settings) 
+            throws DENOPTIMException
     {
         FileOutputStream fos = null;
         ObjectOutputStream oos = null;
         try
         {
-            fos = new FileOutputStream(FSEParameters.getCheckPointName(),false);
+            fos = new FileOutputStream(settings.getCheckPointName(),false);
             oos = new ObjectOutputStream(fos);
-            oos.writeObject(FSEParameters.getCheckPoint());
+            oos.writeObject(settings.getCheckPoint());
             oos.close();
         }
         catch (Throwable t)

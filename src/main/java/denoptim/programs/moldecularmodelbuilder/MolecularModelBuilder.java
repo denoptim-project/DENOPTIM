@@ -35,14 +35,15 @@ import denoptim.molecularmodeling.MultiMolecularModelBuilder;
 import denoptim.task.ProgramTask;
 
 /**
- *
+ * Builder of molecular models. This program constructs a three-dimensional
+ * molecular model by converting a given DENOPTIM {@link Candidate}.
+ * 
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
 public class MolecularModelBuilder extends ProgramTask
 {
 
-    
 //------------------------------------------------------------------------------
     
     /**
@@ -59,31 +60,28 @@ public class MolecularModelBuilder extends ProgramTask
 
     @Override
     public void runProgram() throws Throwable
-    {   
-        //TODO: get rid of this one parameters are not static anymore.
-        //needed by static parameters, and in case of subsequent runs in the same JVM
-        GAParameters.resetParameters(); 
-
+    {
+        MMBuilderParameters mmbParams = new MMBuilderParameters();
         if (workDir != null)
         {
-            GAParameters.setWorkingDirectory(workDir.getAbsolutePath());
+            mmbParams.setWorkDirectory(workDir.getAbsolutePath());
         }
         
-        MMBuilderParameters.readParameterFile(configFilePathName.getAbsolutePath());
-        MMBuilderParameters.checkParameters();
-        MMBuilderParameters.processParameters();
-        MMBuilderParameters.printParameters();
+        mmbParams.readParameterFile(configFilePathName.getAbsolutePath());
+        mmbParams.checkParameters();
+        mmbParams.processParameters();
+        mmbParams.printParameters();
         
         // read the input molecule
         Candidate candidate = DenoptimIO.readCandidates(
-                new File(MMBuilderParameters.getInputSDFFile()), true).get(0);
+                new File(mmbParams.getInputSDFFile()), true).get(0);
         DENOPTIMGraph grph = candidate.getGraph();
         String mname = candidate.getName();
         Map<Object,Object> properties = candidate.getChemicalRepresentation()
                 .getProperties();
             
         MultiMolecularModelBuilder mbuild = 
-                new MultiMolecularModelBuilder(mname, grph);
+                new MultiMolecularModelBuilder(mname, grph, mmbParams);
 
         boolean normalTerm = false;
         try {
@@ -105,7 +103,7 @@ public class MolecularModelBuilder extends ProgramTask
                             propMolErr.toString());
                 }
             }
-            DenoptimIO.writeSDFFile(MMBuilderParameters.getOutputSDFFile(), nmols);
+            DenoptimIO.writeSDFFile(mmbParams.getOutputSDFFile(), nmols);
             normalTerm = true;
         } catch (TinkerException te)
         {
@@ -113,7 +111,7 @@ public class MolecularModelBuilder extends ProgramTask
                     + "'!";
             if (te.solution != "")
             {
-                msg = msg + System.getProperty("line.separator") + te.solution;
+                msg = msg + NL + te.solution;
             }
             System.out.println(msg);
         } 
@@ -123,7 +121,7 @@ public class MolecularModelBuilder extends ProgramTask
         } 
         if (normalTerm)
         {
-            System.out.println("DenoptimCG terminated normally!");
+            System.out.println("MolecularModelBuilder terminated normally!");
         }
     }
 }

@@ -28,6 +28,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.ga.DENOPTIMGraphOperations;
+import denoptim.ga.GAParameters;
 import denoptim.ga.XoverSite;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
@@ -35,6 +36,7 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.ProgramTask;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.MutationType;
@@ -48,6 +50,11 @@ import denoptim.utils.MutationType;
 
 public class GeneOpsRunner extends ProgramTask
 {
+    
+    /**
+     * Settings from input parameters
+     */
+    private GeneOpsRunnerParameters settings;
 
 //------------------------------------------------------------------------------
   
@@ -66,12 +73,14 @@ public class GeneOpsRunner extends ProgramTask
     @Override
     public void runProgram() throws Throwable
     {
-        GeneOpsRunnerParameters.readParameterFile(
-                configFilePathName.getAbsolutePath());
-        GeneOpsRunnerParameters.checkParameters();
-        GeneOpsRunnerParameters.processParameters();
+        GeneOpsRunnerParameters goParams = new GeneOpsRunnerParameters();
+        goParams.readParameterFile(configFilePathName.getAbsolutePath());
+        goParams.checkParameters();
+        goParams.processParameters();
+
+        this.settings = goParams;
         
-        switch (GeneOpsRunnerParameters.operatorToTest)
+        switch (goParams.operatorToTest)
         {
             case CROSSOVER:
                 runXOver();
@@ -87,13 +96,13 @@ public class GeneOpsRunner extends ProgramTask
     
 //------------------------------------------------------------------------------
     
-    private static void runMutation() throws DENOPTIMException
+    private void runMutation() throws DENOPTIMException
     {
         DENOPTIMGraph graph = null;
         try
         {
             graph = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(GeneOpsRunnerParameters.inpFileM)).get(0);
+                    new File(settings.inpFileM)).get(0);
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -102,11 +111,20 @@ public class GeneOpsRunner extends ProgramTask
         System.out.println("Initial graphs: ");
         System.out.println(graph);
         System.out.println(" ");
-        MutationType mt = GeneOpsRunnerParameters.mutationType;
+        MutationType mt = settings.mutationType;
+        
+        //Just in case we used some keyword to set something that affects 
+        //mutation operations
+        GAParameters gaParams = new GAParameters();
+        if (settings.containsParameters(ParametersType.GA_PARAMS))
+        {
+            gaParams = ((GAParameters) settings.getParameters(
+                    ParametersType.GA_PARAMS));
+        }
         
         if (mt != null)
         {
-            DENOPTIMVertex v = getEmbeddedVertex(GeneOpsRunnerParameters.mutationTarget,
+            DENOPTIMVertex v = getEmbeddedVertex(settings.mutationTarget,
                     graph, "mutation " + mt);
             
             if (v == null)
@@ -114,10 +132,10 @@ public class GeneOpsRunner extends ProgramTask
                 return;
             }
              
-            int apID = GeneOpsRunnerParameters.idNewAP;
+            int apID = settings.idNewAP;
             if (mt==MutationType.ADDLINK)
             {
-                apID = GeneOpsRunnerParameters.idTargetAP;
+                apID = settings.idTargetAP;
                 if (apID<0)
                     throw new DENOPTIMException("ID of target AP is negative. "
                             + "For mutation " + mt + " you should specify also "
@@ -127,12 +145,12 @@ public class GeneOpsRunner extends ProgramTask
             
             // NB: last boolean asks to ignore the growth probability
             DENOPTIMGraphOperations.performMutation(v,mt,true,
-                    GeneOpsRunnerParameters.idNewVrt, apID, new Monitor());
+                    settings.idNewVrt, apID, new Monitor(),gaParams);
 
         } else {
             System.out.println("Attempting mutation a random mutation on a "
                     + "random vertex");
-            DENOPTIMGraphOperations.performMutation(graph, new Monitor());
+            DENOPTIMGraphOperations.performMutation(graph,new Monitor(),gaParams);
         }
         System.out.println("Result of mutation:");
         System.out.println(graph);
@@ -140,21 +158,21 @@ public class GeneOpsRunner extends ProgramTask
         
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(graph, true);
-        DenoptimIO.writeSDFFile(GeneOpsRunnerParameters.outFileM, iac, false);
+        DenoptimIO.writeSDFFile(settings.outFileM, iac, false);
     }
     
 //------------------------------------------------------------------------------
     
-    private static void runXOver() throws DENOPTIMException
+    private void runXOver() throws DENOPTIMException
     {
         DENOPTIMGraph male = null;
         DENOPTIMGraph female = null;
         try
         {
             male = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(GeneOpsRunnerParameters.inpFileM)).get(0);
+                    new File(settings.inpFileM)).get(0);
             female = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(GeneOpsRunnerParameters.inpFileF)).get(0);
+                    new File(settings.inpFileF)).get(0);
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -166,23 +184,23 @@ public class GeneOpsRunner extends ProgramTask
         System.out.println(" ");
     
         // Identify the crossover operation to perform
-        DENOPTIMVertex vm = getEmbeddedVertex(GeneOpsRunnerParameters.xoverSrcMale,
+        DENOPTIMVertex vm = getEmbeddedVertex(settings.xoverSrcMale,
                 male, "crossover");
-        DENOPTIMVertex vf = getEmbeddedVertex(GeneOpsRunnerParameters.xoverSrcFemale,
+        DENOPTIMVertex vf = getEmbeddedVertex(settings.xoverSrcFemale,
                 female, "crossover");
         
         CrossoverType xoverType = CrossoverType.BRANCH;
-        if (GeneOpsRunnerParameters.xoverSubGraphEndMale.size()!=0)
+        if (settings.xoverSubGraphEndMale.size()!=0)
             xoverType = CrossoverType.SUBGRAPH;
         
         List<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
         subGraphA.add(vm);
         male.getChildTreeLimited(vm, subGraphA, getSubGraphEnds(male,
-                GeneOpsRunnerParameters.xoverSubGraphEndMale, "crossover"));
+                settings.xoverSubGraphEndMale, "crossover"));
         List<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
         subGraphB.add(vf);
         female.getChildTreeLimited(vf, subGraphB, getSubGraphEnds(female,
-                GeneOpsRunnerParameters.xoverSubGraphEndFemale, "crossover"));
+                settings.xoverSubGraphEndFemale, "crossover"));
 
         XoverSite xos = new XoverSite(subGraphA, subGraphB, xoverType);
         
@@ -206,13 +224,13 @@ public class GeneOpsRunner extends ProgramTask
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iacM = t3d.convertGraphTo3DAtomContainer(male, true);
         IAtomContainer iacF = t3d.convertGraphTo3DAtomContainer(female, true);
-        DenoptimIO.writeSDFFile(GeneOpsRunnerParameters.outFileM, iacM, false);
-        DenoptimIO.writeSDFFile(GeneOpsRunnerParameters.outFileF, iacF, false);
+        DenoptimIO.writeSDFFile(settings.outFileM, iacM, false);
+        DenoptimIO.writeSDFFile(settings.outFileF, iacF, false);
     }
     
 //------------------------------------------------------------------------------
     
-    private static Set<DENOPTIMVertex> getSubGraphEnds(DENOPTIMGraph graph, 
+    private Set<DENOPTIMVertex> getSubGraphEnds(DENOPTIMGraph graph, 
             List<int[]> embeddingPaths, String operation)
     {
         Set<DENOPTIMVertex> result = new HashSet<DENOPTIMVertex>();
@@ -225,7 +243,7 @@ public class GeneOpsRunner extends ProgramTask
 
 //------------------------------------------------------------------------------
     
-    private static DENOPTIMVertex getEmbeddedVertex(int[] embeddingPath, 
+    private DENOPTIMVertex getEmbeddedVertex(int[] embeddingPath, 
             DENOPTIMGraph graph, String operation)
     {
         String str = "";

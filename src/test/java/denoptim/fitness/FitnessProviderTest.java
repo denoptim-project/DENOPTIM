@@ -221,8 +221,9 @@ public class FitnessProviderTest
         String fileName = tempDir.getAbsolutePath() + SEP + "ref.sdf";
         IAtomContainer ref = sp.parseSmiles("CNC(=O)c1cc(OC)ccc1");
         DenoptimIO.writeSDFFile(fileName, ref, false);
+
+        FitnessParameters fitPar = new FitnessParameters();
         
-        FitnessParameters.resetParameters();
         String[] lines = new String[] {
                 "FP-Equation=${taniSym + taniBis + 0.02 * Zagreb - aHyb_1 +"
                 + " aHyb_2}",
@@ -237,13 +238,13 @@ public class FitnessProviderTest
         for (int i=0; i<lines.length; i++)
         {
             String line = lines[i];
-            FitnessParameters.interpretKeyword(line);
+            fitPar.interpretKeyword(line);
         }
-        FitnessParameters.processParameters();
+        fitPar.processParameters();
         
         FitnessProvider fp = new FitnessProvider(
-                FitnessParameters.getDescriptors(),
-                FitnessParameters.getFitnessExpression());
+                fitPar.getDescriptors(),
+                fitPar.getFitnessExpression());
         
         IAtomContainer mol = sp.parseSmiles("COc1ccccc1");
         
@@ -267,9 +268,6 @@ public class FitnessProviderTest
                     "Value of property '" + expectedProps[i] + "' should be "
                             + expectedValue[i] + " but is " + value);
         }
-        
-        // Cleanup static fields
-        FitnessParameters.resetParameters();
     }
     
 //------------------------------------------------------------------------------
@@ -277,13 +275,13 @@ public class FitnessProviderTest
     @Test
     public void testGetConstantFitness() throws Exception
     {
-        FitnessParameters.resetParameters();
-        FitnessParameters.interpretKeyword("FP-Equation=${1.23456}");
-        FitnessParameters.processParameters();
+        FitnessParameters fitPar = new FitnessParameters();
+        fitPar.interpretKeyword("FP-Equation=${1.23456}");
+        fitPar.processParameters();
         
         FitnessProvider fp = new FitnessProvider(
-                FitnessParameters.getDescriptors(),
-                FitnessParameters.getFitnessExpression());
+                fitPar.getDescriptors(),
+                fitPar.getFitnessExpression());
         
         IAtomContainer mol = sp.parseSmiles("COc1ccccc1");
         
@@ -294,8 +292,6 @@ public class FitnessProviderTest
         assertTrue(closeEnough(1.23456, Double.parseDouble(prop.toString())),
                 "Numerical result (" + Double.parseDouble(prop.toString()) 
                     + ") is correct");
-        // Cleanup static fields
-        FitnessParameters.resetParameters();
     }
  
 //------------------------------------------------------------------------------

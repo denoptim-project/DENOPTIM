@@ -143,7 +143,7 @@ public class FSECheckPoint implements Serializable
     public boolean serFileAlreadyUsed(String filename)
     {
 	File candFile = new File(filename);
-	File doneFile = new File(FSEUtils.getBaseNameOfStorageFile(rootId));
+	File doneFile = new File(CEBLUtils.getBaseNameOfStorageFile(rootId));
 	int res = candFile.compareTo(doneFile);
 	if (res < 0)
 	{

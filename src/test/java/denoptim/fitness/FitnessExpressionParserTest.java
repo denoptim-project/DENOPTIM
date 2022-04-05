@@ -70,7 +70,7 @@ public class FitnessExpressionParserTest
         IAtomContainer ref = sp.parseSmiles("CNC(=O)c1cc(OC)ccc1");
         DenoptimIO.writeSDFFile(fileName, ref, false);
         
-        FitnessParameters.resetParameters();
+        FitnessParameters fitPar = new FitnessParameters();
         String[] lines = new String[] {
                 "FP-Equation=${taniSym + taniBis + 3.3 * Zagreb - aHyb_1 + "
                 + "aHyb_2}",
@@ -85,18 +85,17 @@ public class FitnessExpressionParserTest
         for (int i=0; i<lines.length; i++)
         {
             String line = lines[i];
-            FitnessParameters.interpretKeyword(line);
+            fitPar.interpretKeyword(line);
         }
         
-        FitnessParameters.processParameters();
-        List<DescriptorForFitness> descriptors = 
-                FitnessParameters.getDescriptors();
+        fitPar.processParameters();
+        List<DescriptorForFitness> descriptors = fitPar.getDescriptors();
         
         assertEquals(4,descriptors.size(),
                 "Number of descriptor implementation");
         
         Map<String,Integer> counts = new HashMap<String,Integer>();
-        for (DescriptorForFitness d : FitnessParameters.getDescriptors())
+        for (DescriptorForFitness d : fitPar.getDescriptors())
         {
             String key = d.getShortName();
             if (counts.containsKey(key))
@@ -161,9 +160,6 @@ public class FitnessExpressionParserTest
         }
         assertTrue(foundA, "Tanimoto-variable A");
         assertTrue(foundB, "Tanimoto-variable B");
-        
-        // Cleanup static fields
-        FitnessParameters.resetParameters();
     }
  
 //------------------------------------------------------------------------------

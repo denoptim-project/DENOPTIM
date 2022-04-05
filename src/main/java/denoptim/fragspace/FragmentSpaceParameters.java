@@ -26,6 +26,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.programs.RunTimeParameters;
 
 
 /**
@@ -34,25 +35,20 @@ import denoptim.logging.DENOPTIMLogger;
  * @author Marco Foscato
  */
 
-public class FragmentSpaceParameters
+public class FragmentSpaceParameters extends RunTimeParameters
 {
-    /**
-     * Flag indicating that at least one FS-parameter has been defined
-     */
-    protected static boolean fsParamsInUse = false;
-
     /**
      * Pathname of the file containing the molecular representation of
      * building blocks: scaffolds section - fragments that can be used
      * as seed to grow a new molecule.
      */
-    protected static String scaffoldLibFile = "";
+    protected String scaffoldLibFile = "";
 
     /**
      * PathName of the file containing the molecular representation of
      * building blocks: fragment section - fragments for general use
      */
-    protected static String fragmentLibFile = "";
+    protected String fragmentLibFile = "";
 
     /**
      * Pathname of the file containing the molecular representation of
@@ -60,145 +56,124 @@ public class FragmentSpaceParameters
      * one attachment point used to saturate unused attachment
      * points on a graph.
      */
-    protected static String cappingLibFile = "";
+    protected String cappingLibFile = "";
 
     /**
      * Pathname of the file containing the compatibility matrix, bond
      * order to AP-class relation, and forbidden ends list.
      */
-    protected static String compMatrixFile = "";
+    protected String compMatrixFile = "";
 
     /**
      * Pathname of the file containing the RC-compatibility matrix
      */
-    protected static String rcCompMatrixFile = "";
+    protected String rcCompMatrixFile = "";
 
     /**
      * Rotatable bonds definition file
      */
-    protected static String rotBndsFile = "";
+    protected String rotBndsFile = "";
 
     /**
      * Flag defining use of AP class-based approach
      */
-    private static boolean apClassBasedApproch = false;
+    private boolean apClassBasedApproch = false;
 
     /**
      * Maximum number of heavy (non-hydrogen) atoms accepted
      */
-    protected static int maxHeavyAtom = 100;
+    protected int maxHeavyAtom = 100;
 
     /**
      * Maximum number of rotatable bonds accepted
      */
-    protected static int maxRotatableBond = 20;
+    protected int maxRotatableBond = 20;
 
     /**
      * Maximum molecular weight accepted
      */
-    protected static double maxMW = 500;
+    protected double maxMW = 500;
 
     /**
      * Flag enforcing constitutional symmetry
      */
-    protected static boolean enforceSymmetry = false;
+    protected boolean enforceSymmetry = false;
 
     /**
      * Flag for application of selected constitutional symmetry constraints
      */
-    protected static boolean symmetryConstraints = false;
+    protected boolean symmetryConstraints = false;
 
     /**
      * List of constitutional symmetry constraints
      */
-    protected static HashMap<APClass, Double> symmConstraintsMap = 
+    protected HashMap<APClass, Double> symmConstraintsMap = 
 						  new HashMap<APClass, Double>();
+//------------------------------------------------------------------------------
 
     /**
-     * Verbosity level
+     * Constructor
      */
-    protected static int verbosity = 0;
+    public FragmentSpaceParameters(ParametersType paramType)
+    {
+        super(paramType);
+    }
     
 //------------------------------------------------------------------------------
-    
-    public static void resetParameters()
-    {
-    	fsParamsInUse = false;
-    	scaffoldLibFile = "";
-    	fragmentLibFile = "";
-    	cappingLibFile = "";
-    	compMatrixFile = "";
-    	rcCompMatrixFile = "";
-    	rotBndsFile = "";
-    	apClassBasedApproch = false;
-    	maxHeavyAtom = 100;
-    	maxRotatableBond = 20;
-    	maxMW = 500;
-    	enforceSymmetry = false;
-    	symmetryConstraints = false;
-    	symmConstraintsMap = new HashMap<APClass, Double>();
-    	verbosity = 0;
-	}
 
-//------------------------------------------------------------------------------
-
-    public static boolean fsParamsInUse()
+    /**
+     * Constructor
+     */
+    public FragmentSpaceParameters()
     {
-        return fsParamsInUse;
+        super(ParametersType.FS_PARAMS);
     }
 
 //------------------------------------------------------------------------------
 
-    public static int getMaxHeavyAtom()
+    public int getMaxHeavyAtom()
     {
         return maxHeavyAtom;
     }
 
 //------------------------------------------------------------------------------
 
-    public static int getMaxRotatableBond()
+    public int getMaxRotatableBond()
     {
         return maxRotatableBond;
     }
 
 //------------------------------------------------------------------------------
 
-    public static double getMaxMW()
+    public double getMaxMW()
     {
         return maxMW;
     }
 
 //------------------------------------------------------------------------------
     
-    public static boolean enforceSymmetry()
+    public boolean enforceSymmetry()
     {
     	return enforceSymmetry;
     }
 
 //------------------------------------------------------------------------------
 
-    public static boolean symmetryConstraints()
+    public boolean symmetryConstraints()
     {
         return symmetryConstraints;
     }
 
 //------------------------------------------------------------------------------
 
-    public static int getVerbosity()
-    {
-    	return verbosity;
-    }
-
-//------------------------------------------------------------------------------
-
-    public static String getRotSpaceDefFile()
+    public String getRotSpaceDefFile()
     {
         return rotBndsFile;
     }
     
 //------------------------------------------------------------------------------
     
-    public static String getPathnameToAppendedFragments()
+    public String getPathnameToAppendedFragments()
     {
         File libFile = new File(fragmentLibFile);
         return libFile.getAbsolutePath() + "_addedFragments.sdf";
@@ -206,61 +181,39 @@ public class FragmentSpaceParameters
     
 //------------------------------------------------------------------------------
     
-    public static String getPathnameToAppendedScaffolds()
+    public String getPathnameToAppendedScaffolds()
     {
         File libFile = new File(scaffoldLibFile);
         return libFile.getAbsolutePath() + "_addedScaffolds.sdf";
     }
 
 //------------------------------------------------------------------------------
-    
-    public static void interpretKeyword(String line) throws DENOPTIMException
-    {
-        String key = line.trim();
-        String value = "";
-        if (line.contains("="))
-        {
-            key = line.substring(0,line.indexOf("=") + 1).trim();
-            value = line.substring(line.indexOf("=") + 1).trim();
-        }
-        try
-        {
-            interpretKeyword(key,value);
-        }
-        catch (DENOPTIMException e)
-        {
-            throw new DENOPTIMException(e.getMessage()+" Check line "+line);
-        }
-    }
 
-//------------------------------------------------------------------------------
-
-    public static void interpretKeyword(String key, String value) 
+    public void interpretKeyword(String key, String value) 
             throws DENOPTIMException
     {
-        fsParamsInUse = true;
         String msg = "";
         switch (key.toUpperCase())
         {
-        case "FS-SCAFFOLDLIBFILE=":
+        case "SCAFFOLDLIBFILE=":
             scaffoldLibFile = value;
             break;
-        case "FS-FRAGMENTLIBFILE=":
+        case "FRAGMENTLIBFILE=":
             fragmentLibFile = value;
             break;
-        case "FS-CAPPINGFRAGMENTLIBFILE=":
+        case "CAPPINGFRAGMENTLIBFILE=":
             cappingLibFile = value;
             break;
-        case "FS-COMPMATRIXFILE=":
+        case "COMPMATRIXFILE=":
             compMatrixFile = value;
             break;
-        case "FS-RCCOMPMATRIXFILE=":
+        case "RCCOMPMATRIXFILE=":
             rcCompMatrixFile = value;
             break;
-        case "FS-ROTBONDSDEFFILE=":
+        case "ROTBONDSDEFFILE=":
             rotBndsFile = value;
             break;
-        case "FS-MAXHEAVYATOM=":
+        case "MAXHEAVYATOM=":
             try
             {
                 if (value.length() > 0)
@@ -272,7 +225,7 @@ public class FragmentSpaceParameters
                 throw new DENOPTIMException(msg);
             }
             break;
-        case "FS-MAXROTATABLEBOND=":
+        case "MAXROTATABLEBOND=":
             try
             {
                 if (value.length() > 0)
@@ -284,7 +237,7 @@ public class FragmentSpaceParameters
                 throw new DENOPTIMException(msg);
             }
             break;
-        case "FS-MAXMW=":
+        case "MAXMW=":
             try
             {
                 if (value.length() > 0)
@@ -296,10 +249,10 @@ public class FragmentSpaceParameters
                 throw new DENOPTIMException(msg);
             }
             break;
-        case "FS-ENFORCESYMMETRY":
+        case "ENFORCESYMMETRY":
             enforceSymmetry = true;
             break;
-    	case "FS-CONSTRAINSYMMETRY=":
+    	case "CONSTRAINSYMMETRY=":
     	    symmetryConstraints = true;
     	    try
     	    {
@@ -342,7 +295,7 @@ public class FragmentSpaceParameters
                 throw new DENOPTIMException(msg);
     	    }
     	    break;
-    	case "FS-VERBOSITY=":
+    	case "VERBOSITY=":
     	    try
     	    {
     	        verbosity = Integer.parseInt(value);
@@ -362,14 +315,9 @@ public class FragmentSpaceParameters
 
 //------------------------------------------------------------------------------
 
-    public static void checkParameters() throws DENOPTIMException
+    public void checkParameters() throws DENOPTIMException
     {
         String msg = "";
-        if (!fsParamsInUse)
-        {
-            return;
-        }
-
         if (scaffoldLibFile.length() == 0)
         {
             msg = "No scaffold library file specified.";
@@ -428,6 +376,8 @@ public class FragmentSpaceParameters
                   + rotBndsFile;
             throw new DENOPTIMException(msg);
         }
+        
+        checkOtherParameters();
     }
     
 //------------------------------------------------------------------------------
@@ -437,39 +387,13 @@ public class FragmentSpaceParameters
      * and create the fragment space accordingly.
      * @throws DENOPTIMException
      */
-    public static void processParameters() throws DENOPTIMException
+    public void processParameters() throws DENOPTIMException
     {
+        FragmentSpace.settings = this;
         FragmentSpace.defineFragmentSpace(scaffoldLibFile, fragmentLibFile, 
                 cappingLibFile, compMatrixFile, rcCompMatrixFile, 
                 symmConstraintsMap); 
-    }
-
-//------------------------------------------------------------------------------
-
-    public static void printParameters()
-    {
-	if (!fsParamsInUse)
-	{
-	    return;
-	}
-        String eol = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder(1024);
-        sb.append(" FragmentSpaceParameters ").append(eol);
-        for (Field f : FragmentSpaceParameters.class.getDeclaredFields()) 
-        {
-            try
-            {
-                sb.append(f.getName()).append(" = ").append(
-                            f.get(FragmentSpaceParameters.class)).append(eol);
-            }
-            catch (Throwable t)
-            {
-                sb.append("ERROR! Unable to print FragmentSpaceParameters.");
-                break;
-            }
-        }
-        DENOPTIMLogger.appLogger.info(sb.toString());
-        sb.setLength(0);
+        processOtherParameters();
     }
 
 //------------------------------------------------------------------------------

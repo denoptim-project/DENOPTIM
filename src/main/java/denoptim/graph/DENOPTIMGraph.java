@@ -4615,7 +4615,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
 
-    public Object[] evaluateGraph()
+    public Object[] evaluateGraph(FragmentSpaceParameters settings)
             throws DENOPTIMException
     {
         // calculate the molecule representation
@@ -4660,10 +4660,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // criteria from definition of Fragment space
         // 1A) number of heavy atoms
-        if (FragmentSpaceParameters.getMaxHeavyAtom() > 0)
+        if (settings.getMaxHeavyAtom() > 0)
         {
             if (DENOPTIMMoleculeUtils.getHeavyAtomCount(mol) >
-                    FragmentSpaceParameters.getMaxHeavyAtom())
+                settings.getMaxHeavyAtom())
             {
                 String msg = "Evaluation of graph: Max atoms constraint "
                         + " violated: " + smiles;
@@ -4674,9 +4674,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // 1B) molecular weight
         double mw = DENOPTIMMoleculeUtils.getMolecularWeight(mol);
-        if (FragmentSpaceParameters.getMaxMW() > 0)
+        if (settings.getMaxMW() > 0)
         {
-            if (mw > FragmentSpaceParameters.getMaxMW())
+            if (mw > settings.getMaxMW())
             {
                 String msg = "Evaluation of graph: Molecular weight "
                         + "constraint violated: " + smiles + " | MW: " + mw;
@@ -4688,9 +4688,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // 1C) number of rotatable bonds
         int nrot = DENOPTIMMoleculeUtils.getNumberOfRotatableBonds(mol);
-        if (FragmentSpaceParameters.getMaxRotatableBond() > 0)
+        if (settings.getMaxRotatableBond() > 0)
         {
-            if (nrot > FragmentSpaceParameters.getMaxRotatableBond())
+            if (nrot > settings.getMaxRotatableBond())
             {
                 String msg = "Evaluation of graph: Max rotatable bonds "
                         + "constraint violated: "+ smiles;
@@ -4797,8 +4797,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> unless no ring can be set up even if required
      * @throws denoptim.exception.DENOPTIMException
      */
-    public ArrayList<DENOPTIMGraph> makeAllGraphsWithDifferentRingSets()
-            throws DENOPTIMException {
+    public ArrayList<DENOPTIMGraph> makeAllGraphsWithDifferentRingSets(
+            FragmentSpaceParameters settings)
+            throws DENOPTIMException 
+    {
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<>();
 
         boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
@@ -4816,8 +4818,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // Set rotatable property as property of IBond
         RotationalSpaceUtils.defineRotatableBonds(mol,
-                        FragmentSpaceParameters.getRotSpaceDefFile(),
-                        true, true);
+                settings.getRotSpaceDefFile(), true, true);
 
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler();

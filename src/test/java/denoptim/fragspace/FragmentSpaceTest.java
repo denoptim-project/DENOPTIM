@@ -435,16 +435,15 @@ public class FragmentSpaceTest
             List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
             fragLib.clear(); // Workaround. See @BeforeEach in this class.
             
-            FragmentSpaceParameters.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
-            FragmentSpaceParameters.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+            FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+            fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+            fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
 
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
             //Cleanup tmp files
-            FileUtils.deleteFile(
-                    FragmentSpaceParameters.getPathnameToAppendedFragments());
-            FileUtils.deleteFile(
-                    FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+            FileUtils.deleteFile(fsp.getPathnameToAppendedFragments());
+            FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
             
             assertEquals(1, fragLib.size());
             DENOPTIMVertex actual = fragLib.get(0);
@@ -475,17 +474,16 @@ public class FragmentSpaceTest
 
             List<DENOPTIMVertex> scaffLib = FragmentSpace.getScaffoldLibrary();
             scaffLib.clear();
-            
-            FragmentSpaceParameters.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
-            FragmentSpaceParameters.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+
+            FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+            fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+            fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
 
             FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
 
             //Cleanup tmp files
-            FileUtils.deleteFile(
-                    FragmentSpaceParameters.getPathnameToAppendedFragments());
-            FileUtils.deleteFile(
-                    FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+            FileUtils.deleteFile(fsp.getPathnameToAppendedFragments());
+            FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
 
             assertEquals(1, scaffLib.size());
             DENOPTIMVertex actual = scaffLib.get(0);
@@ -520,18 +518,17 @@ public class FragmentSpaceTest
         List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
         fragLib.clear();
 
-        FragmentSpaceParameters.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
-        FragmentSpaceParameters.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+        fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
         
         for (DENOPTIMGraph g : sameGraphs) {
             FragmentSpace.addFusedRingsToFragmentLibrary(g);
         }
 
         //Cleanup tmp files
-        FileUtils.deleteFile(
-                FragmentSpaceParameters.getPathnameToAppendedFragments());
-        FileUtils.deleteFile(
-                FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+        FileUtils.deleteFile(fsp.getPathnameToAppendedFragments());
+        FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
         
         assertEquals(1, fragLib.size());
     }
@@ -808,8 +805,10 @@ public class FragmentSpaceTest
         
         String scafFile = tempDir.getAbsolutePath() + SEP + "newScaf.sdf";
         String fragFile = tempDir.getAbsolutePath() + SEP + "newFrag.sdf";
-        FragmentSpaceParameters.scaffoldLibFile = scafFile;
-        FragmentSpaceParameters.fragmentLibFile = fragFile;
+
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        fsp.scaffoldLibFile = scafFile;
+        fsp.fragmentLibFile = fragFile;
 
         FragmentSpace.addFusedRingsToFragmentLibrary(wholeGraph, true, true,
                 wholeMol);
@@ -845,10 +844,8 @@ public class FragmentSpaceTest
         assertEquals(9,nP,"#P in new fragment");
         
         //Cleanup tmp files
-        FileUtils.deleteFile(
-                FragmentSpaceParameters.getPathnameToAppendedFragments());
-        FileUtils.deleteFile(
-                FragmentSpaceParameters.getPathnameToAppendedScaffolds());
+        FileUtils.deleteFile(fsp.getPathnameToAppendedFragments());
+        FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
     }
 
 //------------------------------------------------------------------------------

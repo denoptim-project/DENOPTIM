@@ -40,6 +40,7 @@ import denoptim.graph.Candidate;
 import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.FitnessTask;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
@@ -140,14 +141,21 @@ public class EvolutionaryAlgorithm
     private Throwable ex;
     
     private final String NL = System.getProperty("line.separator");
+    
+    /**
+     * Parameters controlling the execution of this evolutionary algorithm.
+     */
+    private GAParameters settings;
 
 //------------------------------------------------------------------------------
 
-    public EvolutionaryAlgorithm(ExternalCmdsListener cmdListener)
+    public EvolutionaryAlgorithm(GAParameters settings, 
+            ExternalCmdsListener cmdListener)
     {
+        this.settings = settings;
         this.cmdListener = cmdListener;
-        // There is currently nothing to initialise for the synchronous scheme
-        if (GAParameters.parallelizationScheme == 1)
+        // There is currently nothing to initialize for the synchronous scheme
+        if (settings.parallelizationScheme == 1)
         {
             isAsync = false;
         } else {
@@ -155,10 +163,10 @@ public class EvolutionaryAlgorithm
             futures = new ArrayList<>();
             submitted = new ArrayList<>();
             
-            tpe = new ThreadPoolExecutor(GAParameters.getNumberOfCPU(),
-                                    GAParameters.getNumberOfCPU(), 0L,
-                                    TimeUnit.MILLISECONDS,
-                                    new ArrayBlockingQueue<Runnable>(1));
+            tpe = new ThreadPoolExecutor(settings.getNumberOfCPU(),
+                    settings.getNumberOfCPU(), 0L,
+                    TimeUnit.MILLISECONDS,
+                    new ArrayBlockingQueue<Runnable>(1));
     
             Runtime.getRuntime().addShutdownHook(new Thread()
             {
@@ -210,8 +218,8 @@ public class EvolutionaryAlgorithm
         }
         
         scs = new SizeControlledSet(
-                GAParameters.maxUIDMemory, GAParameters.uidMemoryOnDisk, 
-                GAParameters.getUIDFileOut());
+                settings.maxUIDMemory, settings.uidMemoryOnDisk, 
+                settings.getUIDFileOut());
     }
 
 //------------------------------------------------------------------------------
@@ -227,14 +235,14 @@ public class EvolutionaryAlgorithm
             tpe.prestartAllCoreThreads();
         }
         Monitor mnt = new Monitor();
-        mnt.printHeader(GAParameters.getMonitorFile());
+        mnt.printHeader(settings.getMonitorFile());
         
         // Create initial population of candidates
-        EAUtils.createFolderForGeneration(0);
+        EAUtils.createFolderForGeneration(0, settings);
         Population population;
         try
         {
-            population = EAUtils.importInitialPopulation(scs);
+            population = EAUtils.importInitialPopulation(scs, settings);
         } catch (Exception e)
         {
             throw new DENOPTIMException("Unable to import initial population.", 
@@ -242,11 +250,11 @@ public class EvolutionaryAlgorithm
         }
         initializePopulation(population);
         EAUtils.outputPopulationDetails(population, 
-                EAUtils.getPathNameToGenerationDetailsFile(0));
+                EAUtils.getPathNameToGenerationDetailsFile(0, settings), settings);
         
         // Ensure that there is some variability in fitness values
         double sdev = EAUtils.getPopulationSD(population);
-        if (sdev < GAParameters.minFitnessSD)
+        if (sdev < settings.minFitnessSD)
         {
             String msg = "Fitness values have negligible standard deviation "
                     + "(STDDEV=" + String.format("%.6f", sdev) + "). "
@@ -258,7 +266,7 @@ public class EvolutionaryAlgorithm
 
         // Start evolution cycles, i.e., generations
         int numStag = 0, genId = 1;
-        while (genId <= GAParameters.getNumberOfGenerations())
+        while (genId <= settings.getNumberOfGenerations())
         {
             DENOPTIMLogger.appLogger.log(Level.INFO,"Starting Generation {0}"
                     + NL, genId);
@@ -277,7 +285,8 @@ public class EvolutionaryAlgorithm
             DENOPTIMLogger.appLogger.log(Level.INFO,txt + " in Generation {0}" 
                     + NL, genId);
             EAUtils.outputPopulationDetails(population, 
-                    EAUtils.getPathNameToGenerationDetailsFile(genId));
+                    EAUtils.getPathNameToGenerationDetailsFile(genId, settings),
+                    settings);
             
             if (stopped)
             {
@@ -294,7 +303,7 @@ public class EvolutionaryAlgorithm
                         + NL, genId);
             }
 
-            if (numStag >= GAParameters.getNumberOfConvergenceGenerations())
+            if (numStag >= settings.getNumberOfConvergenceGenerations())
             {
                 DENOPTIMLogger.appLogger.log(Level.WARNING, 
                         "No change in population over {0} iterations. "
@@ -325,13 +334,13 @@ public class EvolutionaryAlgorithm
 
         // Sort the population and trim it to desired size
         Collections.sort(population, Collections.reverseOrder());
-        if (GAParameters.getReplacementStrategy() == 1)
+        if (settings.getReplacementStrategy() == 1)
         {
-            population.trim(GAParameters.getPopulationSize());
+            population.trim(settings.getPopulationSize());
         }
 
         // And write final results
-        EAUtils.outputFinalResults(population);
+        EAUtils.outputFinalResults(population, settings);
         
         // Termination
         population.trim(0);
@@ -368,25 +377,25 @@ public class EvolutionaryAlgorithm
         	}
         	
             Collections.sort(population, Collections.reverseOrder());
-            if (GAParameters.getReplacementStrategy() == 1 && 
-                    population.size() > GAParameters.getPopulationSize())
+            if (settings.getReplacementStrategy() == 1 && 
+                    population.size() > settings.getPopulationSize())
             {
                 int k = population.size();
-                for (int l=GAParameters.getPopulationSize(); l<k; l++)
+                for (int l=settings.getPopulationSize(); l<k; l++)
                 {
                     population.get(l).cleanup();
                 }
-                population.subList(GAParameters.getPopulationSize(),k)
+                population.subList(settings.getPopulationSize(),k)
                     .clear();
             }
         }
-        if (population.size() == GAParameters.getPopulationSize())
+        if (population.size() == settings.getPopulationSize())
         {
             return;
         }
         
-        Monitor mnt = new Monitor("MonitorGen",0,GAParameters.getMonitorFile(),
-                GAParameters.getMonitorDumpStep(), GAParameters.dumpMonitor);
+        Monitor mnt = new Monitor("MonitorGen",0,settings.getMonitorFile(),
+                settings.getMonitorDumpStep(), settings.dumpMonitor);
         
         // Loop creation of candidates until we have created enough new valid 
         // candidates or we have reached the max number of attempts.
@@ -394,8 +403,8 @@ public class EvolutionaryAlgorithm
         ArrayList<Task> tasks = new ArrayList<>();
         try 
         {
-            while (i < GAParameters.getPopulationSize() *
-                    GAParameters.getMaxTriesFactor()) 
+            while (i < settings.getPopulationSize() *
+                    settings.getMaxTriesFactor()) 
             {
                 i++;
                 
@@ -413,16 +422,18 @@ public class EvolutionaryAlgorithm
                 
                 synchronized (population)
                 {
-                    if (population.size() >= GAParameters.getPopulationSize())
+                    if (population.size() >= settings.getPopulationSize())
                         break;
                 }
                 
-                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt);
+                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
+                        settings);
                   
                 if (candidate == null)
                     continue;
                
-                if (FitnessParameters.checkPreFitnessUID())
+                if (((FitnessParameters)settings.getParameters(
+                        ParametersType.FIT_PARAMS)).checkPreFitnessUID())
                 {
                     try
                     {
@@ -439,8 +450,10 @@ public class EvolutionaryAlgorithm
                 }
                
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
-                        candidate, EAUtils.getPathNameToGenerationFolder(0), 
-                        population, mnt, GAParameters.getUIDFileOut());
+                        settings,
+                        candidate, 
+                        EAUtils.getPathNameToGenerationFolder(0,settings), 
+                        population, mnt, settings.getUIDFileOut());
                 
                 // Submission is dependent on the parallelisation scheme
                 if (isAsync)
@@ -450,12 +463,12 @@ public class EvolutionaryAlgorithm
                 } else {
                     tasks.add(task);
                     if (tasks.size() >= Math.abs(
-                            population.size() - GAParameters.getPopulationSize())
+                            population.size() - settings.getPopulationSize())
                             ||
                             //This to avoid the fixed batch size to block the
                             //generation of new candidates for too long
-                            i >= (0.1 * GAParameters.getPopulationSize() *
-                                    GAParameters.getMaxTriesFactor()))
+                            i >= (0.1 * settings.getPopulationSize() *
+                                    settings.getMaxTriesFactor()))
                     {
                         // Now we have as many tasks as are needed to fill up the 
                         // population. Therefore we can run the execution service.
@@ -463,7 +476,7 @@ public class EvolutionaryAlgorithm
                         // them in batches of N, where N is given by the
                         // second argument.
                         TasksBatchManager.executeTasks(tasks,
-                                GAParameters.getNumberOfCPU());
+                                settings.getNumberOfCPU());
                         tasks.clear();
                     } else {
                         i = 0;
@@ -492,8 +505,8 @@ public class EvolutionaryAlgorithm
         
         mnt.printSummary();
 
-        if (i >= (GAParameters.getPopulationSize() * 
-                GAParameters.getMaxTriesFactor()))
+        if (i >= (settings.getPopulationSize() * 
+                settings.getMaxTriesFactor()))
         {
             if (isAsync)
             {
@@ -529,7 +542,7 @@ public class EvolutionaryAlgorithm
     private boolean evolvePopulation(Population population, 
             int genId) throws DENOPTIMException
     {
-        EAUtils.createFolderForGeneration(genId);
+        EAUtils.createFolderForGeneration(genId, settings);
         
         // Take a snapshot of the initial population members. This to exclude
         // that offsprings of this generation become parents in this generation.
@@ -544,18 +557,18 @@ public class EvolutionaryAlgorithm
             populationVersion = population.getVersionID();
         }
         
-        int newPopSize = GAParameters.getNumberOfChildren() 
+        int newPopSize = settings.getNumberOfChildren() 
                 + eligibleParents.size();
         
         int i=0;
         ArrayList<Task> syncronisedTasks = new ArrayList<>();
         Monitor mnt = new Monitor("MonitorGen", genId, 
-                GAParameters.getMonitorFile(),GAParameters.getMonitorDumpStep(), 
-                GAParameters.dumpMonitor);
+                settings.getMonitorFile(),settings.getMonitorDumpStep(), 
+                settings.dumpMonitor);
         try
         {
-            while (i < GAParameters.getPopulationSize() *
-                    GAParameters.getMaxTriesFactor()) 
+            while (i < settings.getPopulationSize() *
+                    settings.getMaxTriesFactor()) 
             {
                 i++;
                 
@@ -608,7 +621,7 @@ public class EvolutionaryAlgorithm
                         srcOfCandidate = new File(candidatesToAdd.get(0));
                         candidatesToAdd.remove(0);
                     } else {
-                        src = EAUtils.chooseGenerationMethod();
+                        src = EAUtils.chooseGenerationMethod(settings);
                     }
                 }
                 
@@ -617,7 +630,7 @@ public class EvolutionaryAlgorithm
                     case MANUAL:
                     {
                         candidate = EAUtils.readCandidateFromFile(
-                                srcOfCandidate, mnt);
+                                srcOfCandidate, mnt, settings);
                         if (candidate == null)
                             continue;
                         break;
@@ -625,7 +638,7 @@ public class EvolutionaryAlgorithm
                     case CROSSOVER:
                     {
                         candidate = EAUtils.buildCandidateByXOver(
-                                eligibleParents, population, mnt);
+                                eligibleParents, population, mnt, settings);
                         if (candidate == null)
                             continue;
                         break;
@@ -634,7 +647,7 @@ public class EvolutionaryAlgorithm
                     case MUTATION:
                     {
                         candidate = EAUtils.buildCandidateByMutation(
-                                eligibleParents, mnt);
+                                eligibleParents, mnt, settings);
                         if (candidate == null)
                             continue;
                         break;
@@ -642,7 +655,8 @@ public class EvolutionaryAlgorithm
                         
                     case CONSTRUCTION:
                     {
-                        candidate = EAUtils.buildCandidateFromScratch(mnt);
+                        candidate = EAUtils.buildCandidateFromScratch(mnt,
+                                settings);
                         if (candidate == null)
                             continue;
                         break;
@@ -652,7 +666,8 @@ public class EvolutionaryAlgorithm
                 if (candidate == null)
                     continue;
                 
-                if (FitnessParameters.checkPreFitnessUID())
+                if (((FitnessParameters)settings.getParameters(
+                        ParametersType.FIT_PARAMS)).checkPreFitnessUID())
                 {
                     try
                     {
@@ -669,8 +684,10 @@ public class EvolutionaryAlgorithm
                 }
                 
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
-                        candidate, EAUtils.getPathNameToGenerationFolder(genId), 
-                        population, mnt, GAParameters.getUIDFileOut());
+                        settings,
+                        candidate, 
+                        EAUtils.getPathNameToGenerationFolder(genId, settings), 
+                        population, mnt, settings.getUIDFileOut());
                 
                 if (isAsync)
                 {
@@ -685,8 +702,8 @@ public class EvolutionaryAlgorithm
                             ||
                             //This to avoid the fixed batch size to block the
                             //generation of new candidates for too long
-                            i >= (0.1 * GAParameters.getPopulationSize() *
-                                    GAParameters.getMaxTriesFactor()))
+                            i >= (0.1 * settings.getPopulationSize() *
+                                    settings.getMaxTriesFactor()))
                     {
                         // Now we have as many tasks as are needed to fill up 
                         // the population, or we got sick to wait.
@@ -694,7 +711,7 @@ public class EvolutionaryAlgorithm
                         // runs them in batches of N, where N is given by the
                         // second argument.
                         TasksBatchManager.executeTasks(syncronisedTasks,
-                                GAParameters.getNumberOfCPU());
+                                settings.getNumberOfCPU());
                         syncronisedTasks.clear();
                     }
                 }
@@ -723,8 +740,8 @@ public class EvolutionaryAlgorithm
         
         mnt.printSummary();
         
-        if (i >= (GAParameters.getPopulationSize() *
-                GAParameters.getMaxTriesFactor()))
+        if (i >= (settings.getPopulationSize() *
+                settings.getMaxTriesFactor()))
         {
             if (isAsync)
             {
@@ -741,9 +758,9 @@ public class EvolutionaryAlgorithm
         synchronized (population)
         {
             Collections.sort(population, Collections.reverseOrder());
-            if (GAParameters.getReplacementStrategy() == 1)
+            if (settings.getReplacementStrategy() == 1)
             {
-                population.trim(GAParameters.getPopulationSize());
+                population.trim(settings.getPopulationSize());
             }
         }
         

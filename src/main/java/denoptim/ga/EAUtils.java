@@ -62,6 +62,7 @@ import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
@@ -120,9 +121,11 @@ public class EAUtils
      * @param genId the generation's identity number
      * @throws DENOPTIMException
      */
-    protected static void createFolderForGeneration(int genId)
+    protected static void createFolderForGeneration(int genId, 
+            GAParameters settings)
     {
-        denoptim.files.FileUtils.createDirectory(EAUtils.getPathNameToGenerationFolder(genId));
+        denoptim.files.FileUtils.createDirectory(
+                EAUtils.getPathNameToGenerationFolder(genId, settings));
     }
 
 //------------------------------------------------------------------------------
@@ -133,26 +136,27 @@ public class EAUtils
      * @throws IOException 
      */
     protected static Population importInitialPopulation(
-            SizeControlledSet uniqueIDsSet) throws DENOPTIMException, IOException
+            SizeControlledSet uniqueIDsSet, GAParameters settings) 
+                    throws DENOPTIMException, IOException
     {
-        Population population = new Population();
+        Population population = new Population(settings);
 
         HashSet<String> lstUID = new HashSet<>(1024);
-        if (!GAParameters.getUIDFileIn().equals(""))
+        if (!settings.getUIDFileIn().equals(""))
         {
-            EAUtils.readUID(GAParameters.getUIDFileIn(),lstUID);
+            EAUtils.readUID(settings.getUIDFileIn(),lstUID);
             for (String uid : lstUID)
             {
                 uniqueIDsSet.addNewUniqueEntry(uid);
             }
             DENOPTIMLogger.appLogger.log(Level.INFO, "Read " + lstUID.size() 
-                + " known UIDs from " + GAParameters.getUIDFileIn());
+                + " known UIDs from " + settings.getUIDFileIn());
         }
-        String inifile = GAParameters.getInitialPopulationFile();
+        String inifile = settings.getInitialPopulationFile();
         if (inifile.length() > 0)
         {
             EAUtils.getPopulationFromFile(inifile, population, uniqueIDsSet, 
-                    EAUtils.getPathNameToGenerationFolder(0));
+                    EAUtils.getPathNameToGenerationFolder(0, settings));
             DENOPTIMLogger.appLogger.log(Level.INFO, "Read " + population.size() 
                 + " molecules from " + inifile);
         }
@@ -166,12 +170,12 @@ public class EAUtils
      * The choice is biased
      * by the weights of the methods as defined in the {@link GAParameters}.
      */
-    protected static CandidateSource chooseGenerationMethod()
+    protected static CandidateSource chooseGenerationMethod(GAParameters settings)
     {
         return pickNewCandidateGenerationMode(
-                GAParameters.getConstructionWeight(), 
-                GAParameters.getMutationWeight(),
-                GAParameters.getConstructionWeight());
+                settings.getConstructionWeight(), 
+                settings.getMutationWeight(),
+                settings.getConstructionWeight());
     }
     
 //------------------------------------------------------------------------------
@@ -250,10 +254,10 @@ public class EAUtils
      */
     protected static Candidate buildCandidateByXOver(
             ArrayList<Candidate> eligibleParents, Population population, 
-            Monitor mnt) throws DENOPTIMException
+            Monitor mnt, GAParameters settings) throws DENOPTIMException
     {
         return buildCandidateByXOver(eligibleParents, population, mnt, 
-                null, -1, -1);
+                null, -1, -1, settings);
     }
     
 //------------------------------------------------------------------------------
@@ -285,7 +289,7 @@ public class EAUtils
     protected static Candidate buildCandidateByXOver(
             ArrayList<Candidate> eligibleParents, Population population, 
             Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
-            int choiceOfOffstring) throws DENOPTIMException
+            int choiceOfOffstring, GAParameters settings) throws DENOPTIMException
     {
         mnt.increase(CounterID.XOVERATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
@@ -296,12 +300,13 @@ public class EAUtils
         // vertexes from which we can define a subgraph (or a branch) to swap
         XoverSite xos = null;
         boolean foundPars = false;
-        while (numatt < GAParameters.getMaxGeneticOpAttempts())
+        while (numatt < settings.getMaxGeneticOpAttempts())
         {   
             if (FragmentSpace.useAPclassBasedApproach())
             {
                 xos = EAUtils.performFBCC(eligibleParents, 
-                        population, choiceOfParents, choiceOfXOverSites);
+                        population, choiceOfParents, choiceOfXOverSites,
+                        settings);
                 if (xos == null)
                 {
                     numatt++;
@@ -310,7 +315,7 @@ public class EAUtils
             } else {
                 //TODO: make it reproducible using choiceOfParents and choiceOfXOverSites
                 Candidate[] parents = EAUtils.selectBasedOnFitness(
-                        eligibleParents, 2);
+                        eligibleParents, 2, settings);
                 if (parents[0] == null || parents[1] == null)
                 {
                     numatt++;
@@ -370,7 +375,7 @@ public class EAUtils
             ArrayList<DENOPTIMGraph> parents = new ArrayList<DENOPTIMGraph>();
             parents.add(xos.getA().get(0).getGraphOwner());
             parents.add(xos.getB().get(0).getGraphOwner());
-            DenoptimIO.writeGraphsToSDF(new File(GAParameters.getDataDirectory()
+            DenoptimIO.writeGraphsToSDF(new File(settings.getDataDirectory()
                     + "failed_xover.sdf"), parents, true);
             throw new DENOPTIMException("Error while performing crossover. "
                     + "Please, report this to the authors ",t);
@@ -393,7 +398,7 @@ public class EAUtils
         graphsAffectedByXover[0] = gAClone;
         graphsAffectedByXover[1] = gBClone;
         
-        List<Candidate> validOffspring = new Population();
+        List<Candidate> validOffspring = new Population(settings);
         for (int ig=0; ig<graphsAffectedByXover.length; ig++)
         {
             DENOPTIMGraph g = graphsAffectedByXover[ig];
@@ -401,7 +406,7 @@ public class EAUtils
             // It makes sense to do this on the possibly embedded graph and not
             // on their embedding owners because there cannot be any new cycle
             // affecting the latter, but there can be ones affecting the first.
-            if (!EAUtils.setupRings(null,g))
+            if (!EAUtils.setupRings(null, g, settings))
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_SETUPRINGS);
                 continue;
@@ -414,10 +419,10 @@ public class EAUtils
             gOutermost.setLocalMsg(msgs[ig]);
             
             // Consider if the result can be used to define a new candidate
-            Object[] res = EAUtils.evaluateGraph(gOutermost);
+            Object[] res = EAUtils.evaluateGraph(gOutermost, settings);
             if (res != null)
             {
-                if (!EAUtils.setupRings(res,gOutermost))
+                if (!EAUtils.setupRings(res, gOutermost, settings))
                 {
                     mnt.increase(CounterID.FAILEDXOVERATTEMPTS_SETUPRINGS);
                     res = null;
@@ -475,17 +480,17 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     protected static Candidate buildCandidateByMutation(
-            ArrayList<Candidate> eligibleParents, Monitor mnt)
-                    throws DENOPTIMException
+            ArrayList<Candidate> eligibleParents, Monitor mnt, 
+            GAParameters settings) throws DENOPTIMException
     {
         mnt.increase(CounterID.MUTATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
         
         int numatt = 0;
         Candidate parent = null;
-        while (numatt < GAParameters.getMaxGeneticOpAttempts())
+        while (numatt < settings.getMaxGeneticOpAttempts())
         {
-            parent = EAUtils.selectBasedOnFitness(eligibleParents,1)[0];
+            parent = EAUtils.selectBasedOnFitness(eligibleParents,1, settings)[0];
             if (parent == null)
             {
                 numatt++;
@@ -507,7 +512,7 @@ public class EAUtils
         int parentGraphId = parent.getGraph().getGraphId();
         graph.setLocalMsg("Mutation: " + parentMolName + "|" + parentGraphId);
         
-        if (!DENOPTIMGraphOperations.performMutation(graph,mnt))
+        if (!DENOPTIMGraphOperations.performMutation(graph,mnt,settings))
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
             mnt.increase(CounterID.FAILEDMUTATTEMTS);
@@ -521,7 +526,7 @@ public class EAUtils
         Object[] res = null;
         try
         {
-            res = EAUtils.evaluateGraph(graph);
+            res = EAUtils.evaluateGraph(graph,settings);
         } catch (NullPointerException|IllegalArgumentException e)
         {
             System.out.println("WRITING DEBUG FILE for "+graph.getLocalMsg());
@@ -532,7 +537,7 @@ public class EAUtils
         
         if (res != null)
         {
-            if (!EAUtils.setupRings(res,graph))
+            if (!EAUtils.setupRings(res,graph,settings))
             {
                 res = null;
                 mnt.increase(CounterID.FAILEDMUTATTEMTS_SETUPRINGS);
@@ -576,8 +581,8 @@ public class EAUtils
     
 //------------------------------------------------------------------------------
     
-    protected static Candidate readCandidateFromFile(File srcFile, Monitor mnt) 
-            throws DENOPTIMException
+    protected static Candidate readCandidateFromFile(File srcFile, Monitor mnt,
+            GAParameters settings) throws DENOPTIMException
     {
         mnt.increase(CounterID.MANUALADDATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
@@ -621,7 +626,7 @@ public class EAUtils
         // evaluate the graph, but in a permissive manner, meaning that 
         // several filters are disabled to permit the introduction of graphs 
         // that cannot be generated automatically.
-        Object[] res = EAUtils.evaluateGraph(graph, true);
+        Object[] res = EAUtils.evaluateGraph(graph, true, settings);
         
         if (res == null)
         {
@@ -649,13 +654,14 @@ public class EAUtils
     
 //------------------------------------------------------------------------------
     
-    protected static Candidate buildCandidateFromScratch(Monitor mnt) 
+    protected static Candidate buildCandidateFromScratch(Monitor mnt, 
+            GAParameters settings) 
             throws DENOPTIMException
     {
         mnt.increase(CounterID.BUILDANEWATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
-        DENOPTIMGraph graph = EAUtils.buildGraph();
+        DENOPTIMGraph graph = EAUtils.buildGraph(settings);
         if (graph == null)
         {
             mnt.increase(CounterID.FAILEDBUILDATTEMPTS_GRAPHBUILD);
@@ -664,11 +670,11 @@ public class EAUtils
         }
         graph.setLocalMsg("NEW");
         
-        Object[] res = EAUtils.evaluateGraph(graph);
+        Object[] res = EAUtils.evaluateGraph(graph, settings);
         
         if (res != null)
         {
-            if (!EAUtils.setupRings(res,graph))
+            if (!EAUtils.setupRings(res,graph, settings))
             {
                 graph.cleanup();
                 mnt.increase(CounterID.FAILEDBUILDATTEMPTS_SETUPRINGS);
@@ -736,7 +742,7 @@ public class EAUtils
      */
 
     protected static void outputPopulationDetails(Population population, 
-            String filename) throws DENOPTIMException
+            String filename, GAParameters settings) throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
         sb.append(String.format("%-20s", "#Name "));
@@ -747,15 +753,15 @@ public class EAUtils
         sb.append("Source ");
         sb.append(NL);
 
-        df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
-        df.setMinimumFractionDigits(GAParameters.getPrecisionLevel());
+        df.setMaximumFractionDigits(settings.getPrecisionLevel());
+        df.setMinimumFractionDigits(settings.getPrecisionLevel());
 
         // NB: we consider the configured size of the population, not the actual 
         // size of list representing the population.
         String stats = "";
         synchronized (population)
         {
-            for (int i=0; i<GAParameters.getPopulationSize(); i++)
+            for (int i=0; i<settings.getPopulationSize(); i++)
             {
                 Candidate mol = population.get(i);
                 if (mol != null)
@@ -774,7 +780,7 @@ public class EAUtils
             }
     
             // calculate descriptive statistics for the population
-            stats = getSummaryStatistics(population);
+            stats = getSummaryStatistics(population, settings);
         }
         if (stats.trim().length() > 0)
             sb.append(stats);
@@ -785,12 +791,13 @@ public class EAUtils
 
 //------------------------------------------------------------------------------
 
-    private static String getSummaryStatistics(Population popln)
+    private static String getSummaryStatistics(Population popln, 
+            GAParameters settings)
     {
         double[] fitness = getFitnesses(popln);
         double sdev = DENOPTIMStatUtils.stddev(fitness, true);
         String res = "";
-        df.setMaximumFractionDigits(GAParameters.getPrecisionLevel());
+        df.setMaximumFractionDigits(settings.getPrecisionLevel());
 
         StringBuilder sb = new StringBuilder(128);
         sb.append(NL+NL+"#####POPULATION SUMMARY#####"+NL);
@@ -867,10 +874,10 @@ public class EAUtils
      */
 
     protected static Candidate[] selectBasedOnFitness(
-            ArrayList<Candidate> candidates, int number)
+            ArrayList<Candidate> candidates, int number, GAParameters settings)
     {
         Candidate[] mates = new Candidate[number];
-        switch (GAParameters.getSelectionStrategyType())
+        switch (settings.getSelectionStrategyType())
         {
         case 1:
             mates = SelectionHelper.performTournamentSelection(candidates, 
@@ -923,11 +930,11 @@ public class EAUtils
 
     protected static XoverSite performFBCC(
             ArrayList<Candidate> eligibleParents, Population population, 
-            int[] choiceOfParents, int choiceOfXOverSites)
+            int[] choiceOfParents, int choiceOfXOverSites, GAParameters settings)
     {
         Candidate parentA = null;
         if (choiceOfParents==null)
-            parentA = selectBasedOnFitness(eligibleParents, 1)[0];
+            parentA = selectBasedOnFitness(eligibleParents, 1, settings)[0];
         else
             parentA = eligibleParents.get(choiceOfParents[0]);
         
@@ -942,7 +949,8 @@ public class EAUtils
         Candidate parentB = null;
         if (choiceOfParents==null)
         {   
-            parentB = selectBasedOnFitness(matesCompatibleWithFirst,1)[0];
+            parentB = selectBasedOnFitness(matesCompatibleWithFirst, 1, 
+                    settings)[0];
         } else {
             parentB = eligibleParents.get(choiceOfParents[1]);
         }
@@ -963,13 +971,14 @@ public class EAUtils
 
 //------------------------------------------------------------------------------
     
-    public static String getPathNameToGenerationFolder(int genID)
+    public static String getPathNameToGenerationFolder(int genID, 
+            GAParameters settings)
     {
         StringBuilder sb = new StringBuilder(32);
         
-        int ndigits = String.valueOf(GAParameters.getNumberOfGenerations()).length();
+        int ndigits = String.valueOf(settings.getNumberOfGenerations()).length();
         
-        sb.append(GAParameters.getDataDirectory()).append(FSEP).append("Gen")
+        sb.append(settings.getDataDirectory()).append(FSEP).append("Gen")
             .append(GenUtils.getPaddedString(ndigits, genID));
         
         return sb.toString();
@@ -977,13 +986,14 @@ public class EAUtils
     
 //------------------------------------------------------------------------------
     
-    public static String getPathNameToGenerationDetailsFile(int genID)
+    public static String getPathNameToGenerationDetailsFile(int genID, 
+            GAParameters settings)
     {
         StringBuilder sb = new StringBuilder(32);
         
-        int ndigits = String.valueOf(GAParameters.getNumberOfGenerations()).length();
+        int ndigits = String.valueOf(settings.getNumberOfGenerations()).length();
         
-        sb.append(GAParameters.getDataDirectory()).append(FSEP)
+        sb.append(settings.getDataDirectory()).append(FSEP)
             .append("Gen").append(GenUtils.getPaddedString(ndigits, genID))
             .append(FSEP)
             .append("Gen").append(GenUtils.getPaddedString(ndigits, genID))
@@ -994,19 +1004,20 @@ public class EAUtils
     
 //------------------------------------------------------------------------------
     
-    public static String getPathNameToFinalPopulationFolder()
+    public static String getPathNameToFinalPopulationFolder(GAParameters settings)
     {
         StringBuilder sb = new StringBuilder(32);
-        sb.append(GAParameters.getDataDirectory()).append(FSEP).append("Final");
+        sb.append(settings.getDataDirectory()).append(FSEP).append("Final");
         return sb.toString();
     }
     
 //------------------------------------------------------------------------------
     
-    public static String getPathNameToFinalPopulationDetailsFile()
+    public static String getPathNameToFinalPopulationDetailsFile(
+            GAParameters settings)
     {
         StringBuilder sb = new StringBuilder(32);
-        sb.append(GAParameters.getDataDirectory()).append(FSEP).append("Final")
+        sb.append(settings.getDataDirectory()).append(FSEP).append("Final")
             .append(FSEP).append("Final.txt");
         return sb.toString();
     }
@@ -1021,7 +1032,7 @@ public class EAUtils
      */
 
     protected static void outputFinalResults(Population popln,
-                            String destDir) throws DENOPTIMException
+            String destDir, GAParameters settings) throws DENOPTIMException
     {
         String genOutfile = destDir + System.getProperty("file.separator") +
                                 "Final.txt";
@@ -1030,7 +1041,7 @@ public class EAUtils
 
         try
         {
-            for (int i=0; i<GAParameters.getPopulationSize(); i++)
+            for (int i=0; i<settings.getPopulationSize(); i++)
             {
                 String sdfile = popln.get(i).getSDFFile();
                 String imgfile = popln.get(i).getImageFile();
@@ -1044,7 +1055,7 @@ public class EAUtils
                     FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
                 }
             }
-            outputPopulationDetails(popln, genOutfile);
+            outputPopulationDetails(popln, genOutfile, settings);
         }
         catch (IOException ioe)
         {
@@ -1061,9 +1072,10 @@ public class EAUtils
      * @param destDir the name of the output directory
      */
 
-    protected static void outputFinalResults(Population popln) throws DENOPTIMException
+    protected static void outputFinalResults(Population popln, 
+            GAParameters settings) throws DENOPTIMException
     {
-        String dirName = EAUtils.getPathNameToFinalPopulationFolder();
+        String dirName = EAUtils.getPathNameToFinalPopulationFolder(settings);
         denoptim.files.FileUtils.createDirectory(dirName);
         File fileDir = new File(dirName);
 
@@ -1095,7 +1107,8 @@ public class EAUtils
             }
         }
         outputPopulationDetails(popln,
-                EAUtils.getPathNameToFinalPopulationDetailsFile());        
+                EAUtils.getPathNameToFinalPopulationDetailsFile(settings),
+                settings);        
     }
 
 //------------------------------------------------------------------------------
@@ -1247,7 +1260,8 @@ public class EAUtils
      * @throws DENOPTIMException
      */
 
-    protected static DENOPTIMGraph buildGraph() throws DENOPTIMException
+    protected static DENOPTIMGraph buildGraph(GAParameters settings) 
+            throws DENOPTIMException
     {
         DENOPTIMGraph graph = new DENOPTIMGraph();
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
@@ -1256,7 +1270,8 @@ public class EAUtils
         int scafIdx = selectRandomScaffold();
 
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), scafIdx, DENOPTIMVertex.BBType.SCAFFOLD);
+                GraphUtils.getUniqueVertexIndex(), scafIdx, 
+                DENOPTIMVertex.BBType.SCAFFOLD);
         
         // add the scaffold as a vertex
         graph.addVertex(scafVertex);
@@ -1268,7 +1283,7 @@ public class EAUtils
             Monitor mnt = new Monitor();
             mnt.name = "IntraTemplateBuild";
             List<DENOPTIMVertex> initialMutableSites = graph.getMutableSites(
-                    GAParameters.getExcludedMutationTypes());
+                    settings.getExcludedMutationTypes());
             for (DENOPTIMVertex mutableSite : initialMutableSites)
             {
                 // This accounts for the possibility that a mutation changes a 
@@ -1276,7 +1291,8 @@ public class EAUtils
                 if (!graph.containsOrEmbedsVertex(mutableSite))
                     continue;
                 
-                if (!DENOPTIMGraphOperations.performMutation(mutableSite,mnt))
+                if (!DENOPTIMGraphOperations.performMutation(mutableSite, mnt,
+                        settings))
                 {
                     mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
                     mnt.increase(CounterID.FAILEDMUTATTEMTS);
@@ -1293,7 +1309,7 @@ public class EAUtils
 
         if (scafVertex.hasFreeAP())
         {
-            DENOPTIMGraphOperations.extendGraph(scafVertex, true, false);
+            DENOPTIMGraphOperations.extendGraph(scafVertex, true, false, settings);
         }
         
         if (!(scafVertex instanceof DENOPTIMTemplate) 
@@ -1320,8 +1336,8 @@ public class EAUtils
      * @return <code>true</code> unless no ring can be set up even if required
      */
 
-    protected static boolean setupRings(Object[] res, DENOPTIMGraph molGraph)
-                                                    throws DENOPTIMException
+    protected static boolean setupRings(Object[] res, DENOPTIMGraph molGraph, 
+            GAParameters settings) throws DENOPTIMException
     {
         if (!FragmentSpace.useAPclassBasedApproach())
             return true;
@@ -1335,10 +1351,13 @@ public class EAUtils
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
         
         // Set rotatability property as property of IBond
-        ArrayList<ObjectPair> rotBonds = 
-                                 RotationalSpaceUtils.defineRotatableBonds(mol,
-                                  FragmentSpaceParameters.getRotSpaceDefFile(),
-                                                                   true, true);
+        String rotoSpaceFile = "";
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            rotoSpaceFile = ((FragmentSpaceParameters) settings.getParameters(
+                    ParametersType.FS_PARAMS)).getRotSpaceDefFile();
+        }
+        RotationalSpaceUtils.defineRotatableBonds(mol, rotoSpaceFile, true, true);
         
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler();
@@ -1363,8 +1382,10 @@ public class EAUtils
                     int crowdOnT = EAUtils.getCrowdedness(
                             ring.getTailVertex().getEdgeToParent().getSrcAP(),
                             true);
-                    double crowdProbH = EAUtils.getCrowdingProbability(crowdOnH);
-                    double crowdProbT = EAUtils.getCrowdingProbability(crowdOnT);
+                    double crowdProbH = EAUtils.getCrowdingProbability(crowdOnH,
+                            settings);
+                    double crowdProbT = EAUtils.getCrowdingProbability(crowdOnT,
+                            settings);
                     
                     if (shot < crowdProbH && shot < crowdProbT)
                     {
@@ -1529,10 +1550,11 @@ public class EAUtils
      * An additional check is the number of atoms in the graph
      */
 
-    protected static Object[] evaluateGraph(DENOPTIMGraph molGraph) 
+    protected static Object[] evaluateGraph(DENOPTIMGraph molGraph, 
+            GAParameters settings) 
             throws DENOPTIMException
     {
-        return evaluateGraph(molGraph, false);
+        return evaluateGraph(molGraph, false, settings);
     }
 
 //------------------------------------------------------------------------------
@@ -1553,8 +1575,15 @@ public class EAUtils
      */
 
     protected static Object[] evaluateGraph(DENOPTIMGraph molGraph, 
-            boolean permissive) throws DENOPTIMException
+            boolean permissive, GAParameters settings) throws DENOPTIMException
     {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters) 
+                    settings.getParameters(ParametersType.FS_PARAMS);
+        }
+        
         if (molGraph == null)
         {
             String msg = "Evaluation of graph: graph is null!";
@@ -1610,10 +1639,10 @@ public class EAUtils
             return null;
         }
 
-        if (FragmentSpaceParameters.getMaxHeavyAtom() > 0 && !permissive)
+        if (fsParams.getMaxHeavyAtom() > 0 && !permissive)
         {
             if (DENOPTIMMoleculeUtils.getHeavyAtomCount(mol) >
-                                        FragmentSpaceParameters.getMaxHeavyAtom())
+                fsParams.getMaxHeavyAtom())
             {
                 //System.err.println("Max atoms constraint violated");
                 String msg = "Evaluation of graph: Max atoms constraint "
@@ -1627,9 +1656,9 @@ public class EAUtils
 
         double mw = DENOPTIMMoleculeUtils.getMolecularWeight(mol);
 
-        if (FragmentSpaceParameters.getMaxMW() > 0 && !permissive)
+        if (fsParams.getMaxMW() > 0 && !permissive)
         {
-            if (mw > FragmentSpaceParameters.getMaxMW())
+            if (mw > fsParams.getMaxMW())
             {
                 //System.err.println("Max weight constraint violated");
                 String msg = "Evaluation of graph: Molecular weight "
@@ -1643,9 +1672,9 @@ public class EAUtils
         mol.setProperty("MOL_WT", mw);
 
         int nrot = DENOPTIMMoleculeUtils.getNumberOfRotatableBonds(mol);
-        if (FragmentSpaceParameters.getMaxRotatableBond() > 0 && !permissive)
+        if (fsParams.getMaxRotatableBond() > 0 && !permissive)
         {
-            if (nrot > FragmentSpaceParameters.getMaxRotatableBond())
+            if (nrot > fsParams.getMaxRotatableBond())
             {
                 String msg = "Evaluation of graph: Max rotatable bonds "
                                          + "constraint violated: "+ molsmiles;
@@ -1786,14 +1815,15 @@ public class EAUtils
      * @param sigmaTwo parameter used by scheme 2 (middle point)
      * @return the crowding probability.
      */
-    public static double getMolSizeProbability(DENOPTIMGraph graph)
+    public static double getMolSizeProbability(DENOPTIMGraph graph, 
+            GAParameters settings)
     {
-        if (!GAParameters.useMolSizeBasedProb)
+        if (!settings.useMolSizeBasedProb)
             return 1.0;
-        int scheme = GAParameters.getMolGrowthProbabilityScheme();
-        double lambda =GAParameters.getMolGrowthMultiplier();
-        double sigmaOne = GAParameters.getMolGrowthFactorSteepSigma();
-        double sigmaTwo = GAParameters.getMolGrowthFactorMiddleSigma();
+        int scheme = settings.getMolGrowthProbabilityScheme();
+        double lambda =settings.getMolGrowthMultiplier();
+        double sigmaOne = settings.getMolGrowthFactorSteepSigma();
+        double sigmaTwo = settings.getMolGrowthFactorMiddleSigma();
         return getMolSizeProbability(graph, scheme, lambda, sigmaOne, sigmaTwo);
     }
     
@@ -1862,14 +1892,15 @@ public class EAUtils
      * @param level level of the graph at which fragment is to be added
      * @return probability of adding a new fragment at this level.
      */
-    public static double getGrowthByLevelProbability(int level)
+    public static double getGrowthByLevelProbability(int level, 
+            GAParameters settings)
     {
-        if (!GAParameters.useLevelBasedProb)
+        if (!settings.useLevelBasedProb)
             return 1.0;
-        int scheme = GAParameters.getGrowthProbabilityScheme();
-        double lambda =GAParameters.getGrowthMultiplier();
-        double sigmaOne = GAParameters.getGrowthFactorSteepSigma();
-        double sigmaTwo = GAParameters.getGrowthFactorMiddleSigma();
+        int scheme = settings.getGrowthProbabilityScheme();
+        double lambda =settings.getGrowthMultiplier();
+        double sigmaOne = settings.getGrowthFactorSteepSigma();
+        double sigmaTwo = settings.getGrowthFactorMiddleSigma();
         return getGrowthProbabilityAtLevel(level, scheme, lambda, sigmaOne, 
                 sigmaTwo);
     }
@@ -1884,12 +1915,13 @@ public class EAUtils
      * @return probability of adding a new building block on the given 
      * attachment point.
      */
-    public static double getCrowdingProbability(DENOPTIMAttachmentPoint ap)
+    public static double getCrowdingProbability(DENOPTIMAttachmentPoint ap,
+            GAParameters settings)
     {
-        int scheme = GAParameters.getCrowdingProbabilityScheme();
-        double lambda =GAParameters.getCrowdingMultiplier();
-        double sigmaOne = GAParameters.getCrowdingFactorSteepSigma();
-        double sigmaTwo = GAParameters.getCrowdingFactorMiddleSigma();
+        int scheme = settings.getCrowdingProbabilityScheme();
+        double lambda =settings.getCrowdingMultiplier();
+        double sigmaOne = settings.getCrowdingFactorSteepSigma();
+        double sigmaTwo = settings.getCrowdingFactorMiddleSigma();
         return getCrowdingProbability(ap, scheme, lambda, sigmaOne, sigmaTwo);
     }
     
@@ -1908,12 +1940,13 @@ public class EAUtils
      * @return probability of adding a new building block on an attachment point
      * with the given crowdedness.
      */
-    public static double getCrowdingProbability(int crowdedness)
+    public static double getCrowdingProbability(int crowdedness, 
+            GAParameters settings)
     {
-        int scheme = GAParameters.getCrowdingProbabilityScheme();
-        double lambda =GAParameters.getCrowdingMultiplier();
-        double sigmaOne = GAParameters.getCrowdingFactorSteepSigma();
-        double sigmaTwo = GAParameters.getCrowdingFactorMiddleSigma();
+        int scheme = settings.getCrowdingProbabilityScheme();
+        double lambda =settings.getCrowdingMultiplier();
+        double sigmaOne = settings.getCrowdingFactorSteepSigma();
+        double sigmaTwo = settings.getCrowdingFactorMiddleSigma();
         return getCrowdingProbabilityForCrowdedness(crowdedness, scheme, lambda,
                 sigmaOne, sigmaTwo);
     }

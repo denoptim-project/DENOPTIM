@@ -30,6 +30,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.graph.APClass;
@@ -39,6 +40,7 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.SymmetricSet;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.FitnessTask;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
@@ -92,18 +94,25 @@ public class GraphBuildingTask extends FitnessTask
      * Tool for generating 3D models assembling 3D building blocks.
      */
     private ThreeDimTreeBuilder tb3d;
+    
+    /**
+     * Collection of settings controlling the execution of the task
+     */
+    private CEBLParameters ceblSettings = null;
 
 //------------------------------------------------------------------------------
    
     /**
      * Constructor
      */
- 
-    public GraphBuildingTask(DENOPTIMGraph molGraph,
+    public GraphBuildingTask(CEBLParameters settings, DENOPTIMGraph molGraph,
     		FragsCombination fragsToAdd, int level, String workDir, 
     		int verbosity) throws DENOPTIMException
     {
-        super(new Candidate(molGraph.clone()));
+        super((FitnessParameters) settings.getParameters(
+                ParametersType.FIT_PARAMS),
+                new Candidate(molGraph.clone()));
+        this.ceblSettings = settings;
         dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
         rootId = molGraph.getGraphId();
         graphId = dGraph.getGraphId();
@@ -221,7 +230,7 @@ public class GraphBuildingTask extends FitnessTask
             
             // Initialize the 3d model builder
             tb3d = new ThreeDimTreeBuilder();
-            if (!FitnessParameters.make3dTree())
+            if (!settings.make3dTree())
             {
             	tb3d.setAlidnBBsIn3D(false);
             }
@@ -284,7 +293,9 @@ public class GraphBuildingTask extends FitnessTask
             }
 
             // Evaluate graph
-            Object[] res = dGraph.evaluateGraph();
+            Object[] res = dGraph.evaluateGraph(
+                    (FragmentSpaceParameters) settings.getParameters(
+                    ParametersType.FS_PARAMS));
             if (res == null) // null is used to indicate an unacceptable graph
             {
                 if (verbosity > 1)
@@ -296,7 +307,8 @@ public class GraphBuildingTask extends FitnessTask
                 nSubTasks = 1;
 
                 // Store graph
-                FSEUtils.storeGraphOfLevel(dGraph.clone(),level,rootId,nextIds);
+                CEBLUtils.storeGraphOfLevel(ceblSettings, dGraph.clone(), level,
+                        rootId, nextIds);
             }
             else
             {
@@ -315,8 +327,9 @@ public class GraphBuildingTask extends FitnessTask
                 ArrayList<DENOPTIMGraph> altCyclicGraphs = new ArrayList<DENOPTIMGraph>();
                 if (!needsCaps)
                 {
-                    altCyclicGraphs =
-                            dGraph.makeAllGraphsWithDifferentRingSets();
+                    altCyclicGraphs = dGraph.makeAllGraphsWithDifferentRingSets(
+                            (FragmentSpaceParameters) settings.getParameters(
+                                    ParametersType.FS_PARAMS));
                 }
                 int sz = altCyclicGraphs.size();
                 
@@ -402,11 +415,12 @@ public class GraphBuildingTask extends FitnessTask
                             altRes[0] = pr.getFirst();
                             
                             // Store graph
-                            FSEUtils.storeGraphOfLevel(g.clone(),level,rootId,nextIds);
+                            CEBLUtils.storeGraphOfLevel(ceblSettings, g.clone(), 
+                                    level, rootId, nextIds);
                             graphId = gId;
     
                             // Optionally perform external task
-                            if (FSEParameters.submitFitnessTask())
+                            if (ceblSettings.submitFitnessTask())
                             {
                                 sendToFitnessProvider(altRes);
                             }
@@ -424,12 +438,13 @@ public class GraphBuildingTask extends FitnessTask
 
                     // Store graph
                     DENOPTIMGraph gClone = dGraph.clone();
-                    FSEUtils.storeGraphOfLevel(gClone,level,rootId,nextIds);
+                    CEBLUtils.storeGraphOfLevel(ceblSettings, gClone, level, rootId, 
+                            nextIds);
                     
                     // Optionally improve the molecular representation, which
                     // is otherwise only given by the collection of building
                     // blocks (not aligned, nor roto-translated)
-                	if (FitnessParameters.make3dTree())
+                	if (settings.make3dTree())
                 	{
                 	    //NB: this replaces unused RCVs with capping groups
                         GraphConversionTool.replaceUnusedRCVsWithCapps(gClone);
@@ -440,7 +455,7 @@ public class GraphBuildingTask extends FitnessTask
                 	}
                    
                     // Optionally perform external task 
-                    if (FSEParameters.submitFitnessTask() && !needsCaps)
+                    if (ceblSettings.submitFitnessTask() && !needsCaps)
                     {
                     	Object[] fseRes = new Object[5];
                     	fseRes[0] = res[0];
@@ -495,7 +510,7 @@ public class GraphBuildingTask extends FitnessTask
         		+ DENOPTIMConstants.FITFILENAMEEXTOUT;
         fitProvPNGFile = workDir + SEP + molName 
                 + DENOPTIMConstants.CANDIDATE2DEXTENSION;
-        fitProvUIDFile = FSEParameters.getUIDFileName();
+        fitProvUIDFile = ceblSettings.getUIDFileName();
         
         runFitnessProvider();
     }

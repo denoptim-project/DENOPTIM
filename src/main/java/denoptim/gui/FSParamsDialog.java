@@ -107,6 +107,10 @@ class FSParamsDialog extends GUIModalDialog
 		StringBuilder sbPars = new StringBuilder();
 		fsParsForm.putParametersToString(sbPars);
 		
+		FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+		RingClosureParameters rcParams = new RingClosureParameters();
+		
+		boolean foundRC = false;
 		String[] lines = sbPars.toString().split(
 				System.getProperty("line.separator"));
 		for (String line : lines)
@@ -121,26 +125,24 @@ class FSParamsDialog extends GUIModalDialog
             }
 			if (line.toUpperCase().startsWith("FS-"))
             {
-                FragmentSpaceParameters.interpretKeyword(line);
+			    fsParams.interpretKeyword(line);
                 continue;
             }
             if (line.toUpperCase().startsWith("RC-"))
             {
-                RingClosureParameters.interpretKeyword(line);
+                rcParams.interpretKeyword(line);
+                foundRC = true;
                 continue;
             }
 		}
 		
 		// This creates the static FragmentSpace object
-		if (FragmentSpaceParameters.fsParamsInUse())
+	    fsParams.checkParameters();
+	    fsParams.processParameters();
+	    if (foundRC)
         {
-            FragmentSpaceParameters.checkParameters();
-            FragmentSpaceParameters.processParameters();
-        }
-        if (RingClosureParameters.rcParamsInUse())
-        {
-            RingClosureParameters.checkParameters();
-            RingClosureParameters.processParameters();
+	        rcParams.checkParameters();
+	        rcParams.processParameters();
         }
 	}
 	

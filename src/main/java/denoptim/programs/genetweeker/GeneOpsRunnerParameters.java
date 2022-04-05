@@ -29,6 +29,8 @@ import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.GAParameters;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.programs.RunTimeParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
@@ -40,22 +42,12 @@ import denoptim.utils.RandomUtils;
  * @author Marco Foscato
  */
 
-public class GeneOpsRunnerParameters
+public class GeneOpsRunnerParameters extends RunTimeParameters
 {
-    /**
-     * Flag indicating that at least one parameter has been defined
-     */
-    protected static boolean paramsInUse = false;
-
-    /**
-     * Working directory
-     */
-    protected static String workDir = ".";
-    
     /**
      * Seed for generation of pseudo-random numbers
      */
-    protected static long randomSeed = 1234567890L;
+    protected long randomSeed = 1234567890L;
     
     /**
      * Testable Operators. {@link #XOVER} is an alias for {@link #CROSSOVER}
@@ -65,206 +57,123 @@ public class GeneOpsRunnerParameters
     /**
      * Chosen operator
      */
-    protected static Operator operatorToTest = Operator.XOVER;
+    protected Operator operatorToTest = Operator.XOVER;
 
     /**
      * Target vertex ID for mutation. Multiple values indicate embedding into 
      * nested graphs.
      */
-    protected static int[] mutationTarget;
+    protected int[] mutationTarget;
     
     /**
      * Target attachment point ID for mutation (AP belonging already to the 
      * graph). Zero-based index.
      */
-    protected static int idTargetAP = -1;
+    protected int idTargetAP = -1;
     
     /**
      * Type of mutation to perform
      */
-    protected static MutationType mutationType;
+    protected MutationType mutationType;
     
     /**
      * The given vertex index.  Zero-based index.
      * Used whenever a vertex id has to be given. For
      * example, when specifying how to mutate a graph. 
      */
-    protected static int idNewVrt = -1;
+    protected int idNewVrt = -1;
     
     /**
      * The given attachment point index. 
      * Used whenever an AP id has to be given. 
      * For example, when specifying how to mutate a graph. Zero-based index.
      */
-    protected static int idNewAP = -1;
+    protected int idNewAP = -1;
     
     /**
      * Input File male
      */
-    protected static String inpFileM;
+    protected String inpFileM;
 
     /**
      * Input File female
      */
-    protected static String inpFileF;
+    protected String inpFileF;
     
     /**
      * Type of crossover to perform
      */
-    protected static CrossoverType xoverType = CrossoverType.BRANCH;
+    protected CrossoverType xoverType = CrossoverType.BRANCH;
     
     /**
      * Maximum length of the subgraph that is swapped in a crossover operation
      */
-    protected static int maxSwappableChainLength = Integer.MAX_VALUE;
+    protected int maxSwappableChainLength = Integer.MAX_VALUE;
 
     /**
      * Male VertedID (not index) on which perform xover. 
      * Multiple values indicate embedding into nested graphs.
      */
-    protected static int[] xoverSrcMale;
+    protected int[] xoverSrcMale;
     
     /**
      * Male VertedID (not index) that represent the end of the subgraph that
      * is swapped by crossover.
      * Multiple values indicate embedding into nested graphs.
      */
-    protected static List<int[]> xoverSubGraphEndMale = new ArrayList<int[]>();
+    protected List<int[]> xoverSubGraphEndMale = new ArrayList<int[]>();
 
     /**
      * Male AP index on which perform xover
      */
-    protected static int mapid;
+    protected int mapid;
 
     /**
      * Female VertexID (not index) on which perform xover.
      * Multiple values indicate embedding into nested graphs.
      */
-    protected static int[] xoverSrcFemale;
+    protected int[] xoverSrcFemale;
     
     /**
      * Female VertedID (not index) that represent the end of the subgraph that
      * is swapped by crossover.
      * Multiple values indicate embedding into nested graphs.
      */
-    protected static List<int[]> xoverSubGraphEndFemale = new ArrayList<int[]>();
+    protected List<int[]> xoverSubGraphEndFemale = new ArrayList<int[]>();
 
     /**
      * Female AP index on which perform xover
      */
-    protected static int fapid;
+    protected int fapid;
 
     /**
      * Output file male
      */
-    protected static String outFileM;
+    protected String outFileM;
 
     /**
      * Output file female
      */
-    protected static String outFileF;
-
-
+    protected String outFileF;
+    
 //-----------------------------------------------------------------------------
-
+    
     /**
-     * Read the parameter TXT file line by line and interpret its content.
-     * @param infile
-     * @throws DENOPTIMException
+     * Constructor
      */
-
-    public static void readParameterFile(String infile) throws DENOPTIMException
+    public GeneOpsRunnerParameters()
     {
-        String line;
-        BufferedReader br = null;
-        try
-        {
-            br = new BufferedReader(new FileReader(infile));
-            while ((line = br.readLine()) != null)
-            {
-                if ((line.trim()).length() == 0)
-                {
-                    continue;
-                }
-
-                if (line.startsWith("#"))
-                {
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("TESTGENOPS-"))
-                {
-                    interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("FS-"))
-                {
-                    FragmentSpaceParameters.interpretKeyword(line);
-                    continue;
-                }
-
-                if (line.toUpperCase().startsWith("RC-"))
-                {
-                    RingClosureParameters.interpretKeyword(line);
-                    continue;
-                }
-                
-                if (line.toUpperCase().startsWith("GA-"))
-                {
-                    GAParameters.interpretKeyword(line);
-                    continue;
-                }
-            }
-        }
-        catch (NumberFormatException | IOException nfe)
-        {
-            throw new DENOPTIMException(nfe);
-        }
-        finally
-        {
-            try
-            {
-                if (br != null)
-                {
-                    br.close();
-                    br = null;
-                }
-            }
-            catch (IOException ioe)
-            {
-                throw new DENOPTIMException(ioe);
-            }
-        }
-
-        line = null;
+        this(ParametersType.GO_PARAMS);
     }
-
+    
 //-----------------------------------------------------------------------------
-
+    
     /**
-     * Processes a string looking for keyword and a possibly associated value.
-     * @param line the string to parse
-     * @throws DENOPTIMException
+     * Constructor
      */
-
-    public static void interpretKeyword(String line) throws DENOPTIMException
+    private GeneOpsRunnerParameters(ParametersType paramType)
     {
-        String key = line.trim();
-        String value = "";
-        if (line.contains("="))
-        {
-            key = line.substring(0,line.indexOf("=") + 1).trim();
-            value = line.substring(line.indexOf("=") + 1).trim();
-        }
-        try
-        {
-            interpretKeyword(key,value);
-        }
-        catch (DENOPTIMException e)
-        {
-            throw new DENOPTIMException(e.getMessage()+" Check line "+line);
-        }
+        super(paramType);
     }
 
 //-----------------------------------------------------------------------------
@@ -276,23 +185,22 @@ public class GeneOpsRunnerParameters
      * @throws DENOPTIMException
      */
 
-    public static void interpretKeyword(String key, String value)
-                                                      throws DENOPTIMException
+    public void interpretKeyword(String key, String value)
+            throws DENOPTIMException
     {
-        paramsInUse = true;
         String msg = "";        
         switch (key.toUpperCase())
         {
-            case "TESTGENOPS-OP=":
+            case "OP=":
                 operatorToTest = Operator.valueOf(value.toUpperCase());
                 break;
-            case "TESTGENOPS-INPFILE=":
+            case "INPFILE=":
                 inpFileM = value;
                 break;
-            case "TESTGENOPS-OUTFILE=":
+            case "OUTFILE=":
                 outFileM = value;
                 break;
-            case "TESTGENOPS-MUTATIONTARGET=":
+            case "MUTATIONTARGET=":
             {
                 String[] parts = value.split(",");
                 mutationTarget = new int[parts.length];
@@ -302,28 +210,28 @@ public class GeneOpsRunnerParameters
                 }
                 break;
             }
-            case "TESTGENOPS-APIDONTARGETVERTEX=":
+            case "APIDONTARGETVERTEX=":
                 idTargetAP = Integer.parseInt(value);
                 break;
-            case "TESTGENOPS-MUTATIONTYPE=":
+            case "MUTATIONTYPE=":
                 mutationType = MutationType.valueOf(value);
                 break;
-            case "TESTGENOPS-NEWVERTEXMOLID=":
+            case "NEWVERTEXMOLID=":
                 idNewVrt = Integer.parseInt(value);
                 break;
-            case "TESTGENOPS-NEWAPID=":
+            case "NEWAPID=":
                 idNewAP = Integer.parseInt(value);
                 break;
-            case "TESTGENOPS-WORKDIR=":
+            case "WORKDIR=":
                 workDir = value;
                 break;
-            case "TESTGENOPS-INPFILEMALE=":
+            case "INPFILEMALE=":
                 inpFileM = value;
                 break;
-            case "TESTGENOPS-INPFILEFEMALE=":
+            case "INPFILEFEMALE=":
     	        inpFileF = value;
                 break;
-            case "TESTGENOPS-VERTEXMALE=":
+            case "VERTEXMALE=":
             {
                 String[] parts = value.split(",");
                 xoverSrcMale = new int[parts.length];
@@ -333,7 +241,7 @@ public class GeneOpsRunnerParameters
                 }
                 break;
             }
-            case "TESTGENOPS-SUBGRAPHENDMALE=":
+            case "SUBGRAPHENDMALE=":
             {
                 String[] parts = value.split(",");
                 int[] idList = new int[parts.length];
@@ -344,7 +252,7 @@ public class GeneOpsRunnerParameters
                 xoverSubGraphEndMale.add(idList);
                 break;
             }
-            case "TESTGENOPS-SUBGRAPHENDFEMALE=":
+            case "SUBGRAPHENDFEMALE=":
             {
                 String[] parts = value.split(",");
                 int[] idList = new int[parts.length];
@@ -355,16 +263,16 @@ public class GeneOpsRunnerParameters
                 xoverSubGraphEndFemale.add(idList);
                 break;
             }
-            case "TESTGENOPS-APMALE=":
+            case "APMALE=":
                 mapid = Integer.parseInt(value);
                 break;
-            case "TESTGENOPS-XOVERTYPE=":
+            case "XOVERTYPE=":
                 xoverType = CrossoverType.valueOf(value);
                 break;
-            case "TESTGENOPS-CROSSOVERTYPE=":
+            case "CROSSOVERTYPE=":
                 xoverType = CrossoverType.valueOf(value);
                 break;
-            case "TESTGENOPS-VERTEXFEMALE=":
+            case "VERTEXFEMALE=":
             {
                 String[] parts = value.split(",");
                 xoverSrcFemale = new int[parts.length];
@@ -374,13 +282,13 @@ public class GeneOpsRunnerParameters
                 }
                 break;
             }
-            case "TESTGENOPS-APFEMALE=":
+            case "APFEMALE=":
                 fapid = Integer.parseInt(value);
                 break;
-            case "TESTGENOPS-OUTFILEMALE=":
+            case "OUTFILEMALE=":
                 outFileM = value;
                 break;
-            case "TESTGENOPS-OUTFILEFEMALE=":
+            case "OUTFILEFEMALE=":
                 outFileF = value;
                 break;
             default:
@@ -397,14 +305,9 @@ public class GeneOpsRunnerParameters
      * @throws DENOPTIMException
      */
 
-    public static void checkParameters() throws DENOPTIMException
+    public void checkParameters() throws DENOPTIMException
     {
         String msg = "";
-        if (!paramsInUse)
-        {
-            return;
-        }
-
     	if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
     	{
     	   msg = "Directory " + workDir + " not found. Please specify an "
@@ -425,15 +328,7 @@ public class GeneOpsRunnerParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.checkParameters();
-        }
-
-        if (RingClosureParameters.rcParamsInUse())
-        {
-            RingClosureParameters.checkParameters();
-        }
+        checkOtherParameters();
     }
 
 //----------------------------------------------------------------------------
@@ -443,19 +338,10 @@ public class GeneOpsRunnerParameters
      * @throws DENOPTIMException
      */
 
-    public static void processParameters() throws DENOPTIMException
+    public void processParameters() throws DENOPTIMException
     {
         RandomUtils.initialiseRNG(randomSeed);
-        
-        if (FragmentSpaceParameters.fsParamsInUse())
-        {
-            FragmentSpaceParameters.processParameters();
-        }
-
-        if (RingClosureParameters.allowRingClosures())
-        {
-            RingClosureParameters.processParameters();
-        }
+        processOtherParameters();
     }
 
 //----------------------------------------------------------------------------

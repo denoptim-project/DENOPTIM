@@ -147,7 +147,7 @@ public class EAUtilsTest
     {      
         prepareFragmentSpace();
         
-        DENOPTIMGraph g = EAUtils.buildGraph();
+        DENOPTIMGraph g = EAUtils.buildGraph(new GAParameters());
         
         if (g == null)
             assertTrue(false,"faild construction of graph");
@@ -195,13 +195,13 @@ public class EAUtilsTest
         ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(c1);
         eligibleParents.add(c2);
-        Population population = new Population();
+        Population population = new Population(new GAParameters());
         population.add(c1);
         population.add(c2);
         Monitor mnt = new Monitor();
         
         Candidate offspring = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt);
+                population, mnt, new GAParameters());
         
         assertTrue(offspring==null, "Redundat xover is not done");
     }
@@ -212,7 +212,8 @@ public class EAUtilsTest
     public void testBuildByXOver_SubGraph() throws Exception
     {
         PopulationTest.prepare();
-        Population population = new Population();
+        GAParameters gaparams = new GAParameters();
+        Population population = new Population(gaparams);
         
         /*
          * -(A)v0(A)-(A)v1(A)-(A)v2(A)-(A)v3(B)-(B)v4(B)-(B)v5(B)-
@@ -237,10 +238,10 @@ public class EAUtilsTest
         Monitor mnt = new Monitor();
         
         Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 3, 0);
+                population, mnt, new int[]{0,1}, 3, 0, gaparams);
         
         Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 3, 1);
+                population, mnt, new int[]{0,1}, 3, 1, gaparams);
     
         DENOPTIMGraph g0 = offspring0.getGraph();
         assertEquals(4,g0.getVertexCount());
@@ -289,7 +290,8 @@ public class EAUtilsTest
     public void testBuildByXOver_Embedded_Free() throws Exception
     {
         PopulationTest.prepare();
-        Population population = new Population();
+        GAParameters gaparams = new GAParameters();
+        Population population = new Population(gaparams);
 
         DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
         DENOPTIMGraph gA = pair[0];
@@ -312,10 +314,10 @@ public class EAUtilsTest
         Monitor mnt = new Monitor();
         
         Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 8, 0);
+                population, mnt, new int[]{0,1}, 8, 0, gaparams);
         
         Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 8, 1);
+                population, mnt, new int[]{0,1}, 8, 1, gaparams);
         
         DENOPTIMGraph g0xo = offspring0.getGraph();
         DENOPTIMGraph g1xo = offspring1.getGraph();
@@ -348,7 +350,8 @@ public class EAUtilsTest
     public void testBuildByXOver_Embedded_FreeBackwards() throws Exception
     {
         PopulationTest.prepare();
-        Population population = new Population();
+        GAParameters gaparams = new GAParameters();
+        Population population = new Population(gaparams);
 
         DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsBxo();
         DENOPTIMGraph gA = pair[0];
@@ -371,10 +374,10 @@ public class EAUtilsTest
         Monitor mnt = new Monitor();
         
         Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 17, 0);
+                population, mnt, new int[]{0,1}, 17, 0, gaparams);
         
         Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 17, 1);
+                population, mnt, new int[]{0,1}, 17, 1, gaparams);
         
         DENOPTIMGraph g0xo = offspring0.getGraph();
         DENOPTIMGraph g1xo = offspring1.getGraph();
@@ -397,7 +400,8 @@ public class EAUtilsTest
     public void testBuildByXOver_Embedded_FixedStructure() throws Exception
     {
         PopulationTest.prepare();
-        Population population = new Population();
+        GAParameters gaparams = new GAParameters();
+        Population population = new Population(gaparams);
 
         DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
         DENOPTIMGraph gA = pair[0];
@@ -438,9 +442,9 @@ public class EAUtilsTest
             try
             {
                 offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                        population, mnt, new int[]{0,1}, ixo, 0);
+                        population, mnt, new int[]{0,1}, ixo, 0, gaparams);
                 offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                        population, mnt, new int[]{0,1}, ixo, 1);
+                        population, mnt, new int[]{0,1}, ixo, 1, gaparams);
             } catch (IndexOutOfBoundsException e)
             {
                 if (e.getMessage().contains("Index 10 out of bounds"))
