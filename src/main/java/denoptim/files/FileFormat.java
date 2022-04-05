@@ -17,7 +17,7 @@ public enum FileFormat {
     FSE_RUN, GA_RUN,
     
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP, GO_PARAM, CLG_PARAM, GE_PARAM, 
-    GI_PARAM,
+    GI_PARAM, B3D_PARAM,
     
     TXT, GRAPHTXT,
     UNRECOGNIZED;
@@ -154,6 +154,10 @@ public enum FileFormat {
         GI_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
                 "^ISOMORPHISM-.*"));
         
+        B3D_PARAM.extension = "";
+        B3D_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
+                "^CG-.*"));
+        
         //------------------------------------
         
         TXT.extension = "";
@@ -163,8 +167,11 @@ public enum FileFormat {
         GRAPHTXT.extension = "txt";
     }
     
+    /**
+     * The kind of data found in a file.
+     */
     public enum DataKind {GRAPH, VERTEX, GA_RUN, FSE_RUN, GA_PARAM, FSE_PARAM,
-        FR_PARAM, GO_PARAM, CLG_PARAM, GE_PARAM, GI_PARAM, COMP_MAP}
+        FR_PARAM, GO_PARAM, CLG_PARAM, GE_PARAM, GI_PARAM, COMP_MAP, B3D_PARAM}
     
 //------------------------------------------------------------------------------
 
@@ -245,6 +252,9 @@ public enum FileFormat {
                     case COMP_MAP:
                         ff = COMP_MAP;
                         break;
+                    case B3D_PARAM:
+                        ff = B3D_PARAM;
+                        break;
                 }
                 break;
         }
@@ -279,7 +289,8 @@ public enum FileFormat {
             FileFormat.GO_PARAM,  
             FileFormat.GE_PARAM,
             FileFormat.CLG_PARAM,
-            FileFormat.GI_PARAM,
+            FileFormat.GI_PARAM, 
+            FileFormat.B3D_PARAM,
          // GA must come after others that might use GA parameters, for example 
          // the setting of the random seed)
             FileFormat.GA_PARAM,  

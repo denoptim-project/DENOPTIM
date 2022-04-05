@@ -1160,7 +1160,7 @@ public class DenoptimIO
         ArrayList<Candidate> candidates = new ArrayList<>();
         ArrayList<IAtomContainer> iacs = readSDFFile(file.getAbsolutePath());
         for (IAtomContainer iac : iacs) {
-            Candidate mol = new Candidate(iac, allowNoUID);
+            Candidate mol = new Candidate(iac, false, allowNoUID);
             mol.setSDFFile(filename);
             candidates.add(mol);
         }

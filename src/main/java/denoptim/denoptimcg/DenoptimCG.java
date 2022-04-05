@@ -21,65 +21,71 @@ package denoptim.denoptimcg;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.denoptimga.GAParameters;
+import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.io.DenoptimIO;
+import denoptim.task.ProgramTask;
 
 /**
  *
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public class DenoptimCG 
+public class DenoptimCG extends ProgramTask
 {
 
+    
+//------------------------------------------------------------------------------
+    
     /**
-     * @param args the command line arguments
+     * Creates and configures the program task.
+     * @param configFile the file containing the configuration parameters.
+     * @param workDir the file system location from which to run the program.
      */
-    public static void main(String[] args) 
+    public DenoptimCG(File configFile, File workDir)
     {
-        if (args.length < 1)
+        super(configFile,workDir);
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
+    public void runProgram() throws Throwable
+    {   
+        //TODO: get rid of this one parameters are not static anymore.
+        //needed by static parameters, and in case of subsequent runs in the same JVM
+        GAParameters.resetParameters(); 
+
+        if (workDir != null)
         {
-            System.err.println("Usage: java DenoptimCG paramFile");
-            System.exit(-1);
+            GAParameters.setWorkingDirectory(workDir.getAbsolutePath());
         }
         
-        String paramFile = args[0];
+        CGParameters.readParameterFile(configFilePathName.getAbsolutePath());
+        CGParameters.checkParameters();
+        CGParameters.processParameters();
+        CGParameters.printParameters();
         
-        try
-        {
-            CGParameters.readParameterFile(paramFile);
-	        CGParameters.checkParameters();
-            CGParameters.processParameters();
-            CGParameters.printParameters();
+        // read the input molecule
+        Candidate candidate = DenoptimIO.readCandidates(
+                new File(CGParameters.getInputSDFFile()), true).get(0);
+        DENOPTIMGraph grph = candidate.getGraph();
+        String mname = candidate.getName();
+        Map<Object,Object> properties = candidate.getChemicalRepresentation()
+                .getProperties();
             
-            // read the input molecule
-            DENOPTIMGraph grph = DenoptimIO.readDENOPTIMGraphsFromFile(
-                    new File(CGParameters.getInputSDFFile())).get(0);
-            
-            IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(
-                    CGParameters.getInputSDFFile());
-            
-            String mname = "noname";
-            Object propName = mol.getProperty("cdk:Title");
-            if (propName != null)
-            {
-                mname = propName.toString();
-            } else {
-                Object propTitle = mol.getTitle();
-                if (propTitle != null)
-                {
-                    mname = propTitle.toString();
-                }
-            }
-            
-            DENOPTIM3DMoleculeBuilder mbuild = 
-                    new DENOPTIM3DMoleculeBuilder(mname, grph);
+        DENOPTIM3DMoleculeBuilder mbuild = 
+                new DENOPTIM3DMoleculeBuilder(mname, grph);
 
+        boolean normalTerm = false;
+        try {
             ArrayList<IAtomContainer> nmols = mbuild.buildMulti3DStructure();
             for (int i = 0; i<nmols.size(); i++)
             {
@@ -89,7 +95,7 @@ public class DenoptimCG
                         DENOPTIMConstants.ATMPROPVERTEXID).toString();
                 Object propMolErr = nmols.get(i).getProperty(
                         DENOPTIMConstants.MOLERRORTAG);
-                nmols.get(i).setProperties(mol.getProperties());
+                nmols.get(i).setProperties(properties);
                 nmols.get(i).setProperty(
                         DENOPTIMConstants.ATMPROPVERTEXID, propVIDs);
                 if (propMolErr != null)
@@ -98,9 +104,8 @@ public class DenoptimCG
                             propMolErr.toString());
                 }
             }
-            // write file
             DenoptimIO.writeSDFFile(CGParameters.getOutputSDFFile(), nmols);
-            
+            normalTerm = true;
         } catch (TinkerException te)
         {
             String msg = "ERROR! Tinker failed on task '" + te.taskName 
@@ -110,15 +115,14 @@ public class DenoptimCG
                 msg = msg + System.getProperty("line.separator") + te.solution;
             }
             System.out.println(msg);
-            System.exit(-1);
         } 
         catch (Exception de)
         {
             de.printStackTrace(System.err);
-            System.exit(-1);
         } 
-        
-        System.out.println("DenoptimCG terminated normally!");
-        System.exit(0);
+        if (normalTerm)
+        {
+            System.out.println("DenoptimCG terminated normally!");
+        }
     }
 }

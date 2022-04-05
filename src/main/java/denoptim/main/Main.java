@@ -15,6 +15,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.denoptimcg.DenoptimCG;
 import denoptim.denoptimga.DenoptimGA;
 import denoptim.exception.ExceptionUtils;
 import denoptim.files.FileFormat;
@@ -61,6 +62,12 @@ public class Main
         FIT,
         
         /**
+         * Run the stand-alone conversion of graph into a three-dimensional 
+         * molecular model
+         */
+        B3D,
+        
+        /**
          * Only prints help or version and close program.
          */
         DRY,
@@ -86,7 +93,6 @@ public class Main
         CLG;
         
         
-        
         // NB: to define a new run type: 
         //  1) add the enum alternative. The order is somewhat related to the
         //     importance (i.e., common use) of a run type.
@@ -94,7 +100,7 @@ public class Main
         //  3) set the value of "isCLIEnabled" in the static block below
         //  4) set the value of "programTaskImpl" in the static block below
         //  5) consider whether a new parameter file format should be added
-        //     in FileFormats
+        //     in FileFormats.
         
         /**
          * The implementation of {@link ProgramTask} capable of this run type.
@@ -121,6 +127,8 @@ public class Main
             GO.description = "stand-alone Genetic Operation";
             GUI.description = "Graphycal User Interface";
             CLG.description = "Comparison of Lists of Graphs";
+            B3D.description = "stand-alone build a 3D molecular model from a "
+                    + "graph";
             
             DRY.isCLIEnabled = false;
             FSE.isCLIEnabled = true;
@@ -131,6 +139,7 @@ public class Main
             GO.isCLIEnabled = true;
             GUI.isCLIEnabled = false;
             CLG.isCLIEnabled = true;
+            B3D.isCLIEnabled = true;
             
             DRY.programTaskImpl = null;
             FSE.programTaskImpl = FragSpaceExplorer.class;
@@ -141,6 +150,7 @@ public class Main
             GO.programTaskImpl = GeneOpsRunner.class;
             GUI.programTaskImpl = GUI.class;
             CLG.programTaskImpl = GraphListsHandler.class;
+            B3D.programTaskImpl = DenoptimCG.class;
         }
 
         /**
@@ -232,8 +242,11 @@ public class Main
                         + " files: " + inputFiles, 1);
             }
             File inpFile = new File(inputFiles.get(0));
-            //TODO Check existence of parent
             File wDir = inpFile.getParentFile();
+            if (wDir==null)
+            {
+                wDir = new File(System.getProperty("user.dir"));
+            }
             runProgramTask(behavior.runType.getProgramTaskImpl(), inpFile, wDir);
             terminate();
         } else if (RunType.GUI.equals(behavior.runType)) {
