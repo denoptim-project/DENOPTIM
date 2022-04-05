@@ -20,11 +20,14 @@ package denoptim.geneopsrunner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.denoptimga.DENOPTIMGraphOperations;
+import denoptim.denoptimga.XoverSite;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
@@ -33,6 +36,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.task.ProgramTask;
 import denoptim.threedim.ThreeDimTreeBuilder;
+import denoptim.utils.CrossoverType;
 import denoptim.utils.MutationType;
 
 /**
@@ -161,34 +165,38 @@ public class GeneOpsRunner extends ProgramTask
         System.out.println("FEMALE: "+female);
         System.out.println(" ");
     
-        // Remember position of vertex chosen for xover
+        // Identify the crossover operation to perform
         DENOPTIMVertex vm = getEmbeddedVertex(GeneOpsRunnerParameters.xoverSrcMale,
                 male, "crossover");
         DENOPTIMVertex vf = getEmbeddedVertex(GeneOpsRunnerParameters.xoverSrcFemale,
                 female, "crossover");
-        List<List<DENOPTIMVertex>> subGraphEnds = new ArrayList<List<DENOPTIMVertex>>();
-        subGraphEnds.add(getSubGraphEnds(male, 
+        
+        CrossoverType xoverType = CrossoverType.BRANCH;
+        if (GeneOpsRunnerParameters.xoverSubGraphEndMale.size()!=0)
+            xoverType = CrossoverType.SUBGRAPH;
+        
+        List<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
+        subGraphA.add(vm);
+        male.getChildTreeLimited(vm, subGraphA, getSubGraphEnds(male,
                 GeneOpsRunnerParameters.xoverSubGraphEndMale, "crossover"));
-        subGraphEnds.add(getSubGraphEnds(female, 
+        List<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
+        subGraphB.add(vf);
+        female.getChildTreeLimited(vf, subGraphB, getSubGraphEnds(female,
                 GeneOpsRunnerParameters.xoverSubGraphEndFemale, "crossover"));
+
+        XoverSite xos = new XoverSite(subGraphA, subGraphB, xoverType);
         
         // Ensure uniqueness on vertexID
         male.renumberGraphVertices();
         female.renumberGraphVertices();
     
-        // Get new vid of chosen frags
-        int newmvid = vm.getVertexId();
-        int newfvid = vf.getVertexId();
-    
-        // do crossover
         System.out.println(" ");
         System.out.println("Initial graphs now with unique vertexID: ");
-        System.out.println("v: "+ newmvid + " of MALE: " + male);
-        System.out.println("v:" + newfvid + " of FEMALE: " + female);
+        System.out.println("v: "+ vm.getVertexId() + " of MALE: " + male);
+        System.out.println("v:" + vf.getVertexId() + " of FEMALE: " + female);
         System.out.println(" ");
         
-        DENOPTIMGraphOperations.performCrossover(vm, vf, 
-                GeneOpsRunnerParameters.xoverType, subGraphEnds);
+        DENOPTIMGraphOperations.performCrossover(xos);
     
         System.out.println("Result of crossover:");
         System.out.println("MALE: " + male);
@@ -204,10 +212,10 @@ public class GeneOpsRunner extends ProgramTask
     
 //------------------------------------------------------------------------------
     
-    private static List<DENOPTIMVertex> getSubGraphEnds(DENOPTIMGraph graph, 
+    private static Set<DENOPTIMVertex> getSubGraphEnds(DENOPTIMGraph graph, 
             List<int[]> embeddingPaths, String operation)
     {
-        List<DENOPTIMVertex> result = new ArrayList<DENOPTIMVertex>();
+        Set<DENOPTIMVertex> result = new HashSet<DENOPTIMVertex>();
         for (int[] embeddingPath : embeddingPaths)
         {
             result.add(getEmbeddedVertex(embeddingPath, graph, operation));

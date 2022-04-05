@@ -1,10 +1,12 @@
 package denoptim.denoptimga;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -205,7 +207,7 @@ public class EAUtilsTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testBuildByXOver_SUBGRAPH() throws Exception
+    public void testBuildByXOver_SubGraph() throws Exception
     {
         PopulationTest.prepare();
         Population population = new Population();
@@ -233,29 +235,29 @@ public class EAUtilsTest
         Monitor mnt = new Monitor();
         
         Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 4, new int[]{11}, 0);
+                population, mnt, new int[]{0,1}, 3, 0);
         
-        DENOPTIMGraph gO = offspring0.getGraph();
-        assertEquals(7,gO.getVertexCount());
-        assertEquals(6,gO.getEdgeCount());
+        Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 3, 1);
+    
+        DENOPTIMGraph g0 = offspring0.getGraph();
+        assertEquals(4,g0.getVertexCount());
+        assertEquals(3,g0.getEdgeCount());
         int maxLength = -1;
-        for (DENOPTIMVertex v : gO.getVertexList())
+        for (DENOPTIMVertex v : g0.getVertexList())
         {
             ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
-            gO.getChildrenTree(v, childTree);
+            g0.getChildrenTree(v, childTree);
             if (childTree.size()>maxLength)
             {
                 maxLength = childTree.size();
             }
         }
-        assertEquals(6,maxLength);
-        
-        Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new int[]{0,1}, 4, new int[]{11}, 1);
-        
+        assertEquals(3,maxLength);
+
         DENOPTIMGraph g1 = offspring1.getGraph();
-        assertEquals(5,g1.getVertexCount());
-        assertEquals(4,g1.getEdgeCount());
+        assertEquals(8,g1.getVertexCount());
+        assertEquals(7,g1.getEdgeCount());
         maxLength = -1;
         for (DENOPTIMVertex v : g1.getVertexList())
         {
@@ -266,47 +268,234 @@ public class EAUtilsTest
                 maxLength = childTree.size();
             }
         }
-        assertEquals(4,maxLength);
+        assertEquals(7,maxLength);
     }
     
 //------------------------------------------------------------------------------
-
+    
+    /**
+     * NB: the graphs from methods {@link #getPairOfTestGraphsB()} and
+     * {@link #getPairOfTestGraphsBxo()} and  
+     * {@link #getPairOfTestGraphsBxoxo()} are a sequence resulting from 
+     * crossover operations. Note that the order of APs in on the templates
+     * changes as a result of the crossover. For this reason, the backwards 
+     * crossover of the graphs from {@link #getPairOfTestGraphsBxo()} does not
+     * produce the graphs from {@link #getPairOfTestGraphsB()}, but
+     * those from {@link #getPairOfTestGraphsBxoxo()}.
+     */
     @Test
-    public void testSearchForANonRedundantSwappableSubgraph() throws Exception
+    public void testBuildByXOver_Embedded_Free() throws Exception
     {
         PopulationTest.prepare();
         Population population = new Population();
+
+        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
+        DENOPTIMGraph gA = pair[0];
+        DENOPTIMGraph gB = pair[1];
+        ((DENOPTIMTemplate)gA.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        ((DENOPTIMTemplate)gB.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
         
-        DENOPTIMGraph gA = PopulationTest.makeGraphF();
         Candidate cA = new Candidate("CA",gA);
-        cA.setFitness(1.23);
+        population.add(cA);        
+
+        Candidate cB = new Candidate("CB",gB);
+        population.add(cB);
+        
+        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        eligibleParents.add(cA);
+        eligibleParents.add(cB);
+
+        Monitor mnt = new Monitor();
+        
+        Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 8, 0);
+        
+        Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 8, 1);
+        
+        DENOPTIMGraph g0xo = offspring0.getGraph();
+        DENOPTIMGraph g1xo = offspring1.getGraph();
+        
+        DENOPTIMGraph[] expectedPair = PopulationTest.getPairOfTestGraphsBxo();
+        DENOPTIMGraph expected0 = expectedPair[0];
+        DENOPTIMGraph expected1 = expectedPair[1];
+        ((DENOPTIMTemplate)expected0.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        ((DENOPTIMTemplate)expected1.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        
+        assertTrue(expected0.sameAs(g0xo, new StringBuilder()));
+        assertTrue(expected1.sameAs(g1xo, new StringBuilder()));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * NB: the graphs from methods {@link #getPairOfTestGraphsB()} and
+     * {@link #getPairOfTestGraphsBxo()} and  
+     * {@link #getPairOfTestGraphsBxoxo()} are a sequence resulting from 
+     * crossover operations. Note that the order of APs in on the templates
+     * changes as a result of the crossover. For this reason, the backwards 
+     * crossover of the graphs from {@link #getPairOfTestGraphsBxo()} does not
+     * produce the graphs from {@link #getPairOfTestGraphsB()}, but
+     * those from {@link #getPairOfTestGraphsBxoxo()}.
+     */
+    @Test
+    public void testBuildByXOver_Embedded_FreeBackwards() throws Exception
+    {
+        PopulationTest.prepare();
+        Population population = new Population();
+
+        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsBxo();
+        DENOPTIMGraph gA = pair[0];
+        DENOPTIMGraph gB = pair[1];
+        ((DENOPTIMTemplate)gA.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        ((DENOPTIMTemplate)gB.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        
+        Candidate cA = new Candidate("CA",gA);
+        population.add(cA);        
+
+        Candidate cB = new Candidate("CB",gB);
+        population.add(cB);
+        
+        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        eligibleParents.add(cA);
+        eligibleParents.add(cB);
+
+        Monitor mnt = new Monitor();
+        
+        Candidate offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 17, 0);
+        
+        Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                population, mnt, new int[]{0,1}, 17, 1);
+        
+        DENOPTIMGraph g0xo = offspring0.getGraph();
+        DENOPTIMGraph g1xo = offspring1.getGraph();
+        
+        DENOPTIMGraph[] expectedPair = PopulationTest.getPairOfTestGraphsBxoxo();
+        DENOPTIMGraph expected0 = expectedPair[0];
+        DENOPTIMGraph expected1 = expectedPair[1];
+        ((DENOPTIMTemplate)expected0.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        ((DENOPTIMTemplate)expected1.getVertexAtPosition(1)).setContractLevel(
+                ContractLevel.FREE);
+        
+        assertTrue(expected0.sameAs(g0xo, new StringBuilder()));
+        assertTrue(expected1.sameAs(g1xo, new StringBuilder()));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testBuildByXOver_Embedded_FixedStructure() throws Exception
+    {
+        PopulationTest.prepare();
+        Population population = new Population();
+
+        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
+        DENOPTIMGraph gA = pair[0];
+        DENOPTIMGraph gB = pair[1];
+        DENOPTIMTemplate embeddedTmplA = (DENOPTIMTemplate) gA.getVertexAtPosition(1);
+        embeddedTmplA.setContractLevel(ContractLevel.FIXED_STRUCT);
+        DENOPTIMGraph embeddedGraphA = embeddedTmplA.getInnerGraph();
+        DENOPTIMTemplate embeddedTmplB = (DENOPTIMTemplate) gB.getVertexAtPosition(1);
+        embeddedTmplB.setContractLevel(ContractLevel.FIXED_STRUCT);
+        DENOPTIMGraph embeddedGraphB = embeddedTmplB.getInnerGraph();
+        
+        // Make vertexes unique so, even though they are empty, they will be 
+        // seen as non equal and crossover will be seen as non-redundant.
+        String propName = "uniquefier";
+        int i=0;
+        for (DENOPTIMVertex v : embeddedGraphA.getVertexList())
+        {
+            v.setUniquefyingProperty(propName);
+            v.setProperty(propName, i);
+            i++;
+        }
+        
+        Candidate cA = new Candidate("CA",gA);
         population.add(cA);
-        //NB: the two graphs are the equal... as a start
-        DENOPTIMGraph gA2 = PopulationTest.makeGraphF();
-       // ...but we want the two graph to be non-isomorfic
-        gA2.removeVertex(gA2.getVertexAtPosition(gA2.getVertexCount()-1)); 
-        Candidate cA2 = new Candidate("CA2",gA2);
-        cA2.setFitness(2.34);
-        population.add(cA2);
-        
-        // This is needed only to trigger detection of xover points.
-        List<Candidate> eligible = new ArrayList<Candidate>();
-        eligible.add(cA2);
-        population.getXoverPartners(cA2, population);
-        
-        int srcVrtPosition = 1;
-        List<List<DENOPTIMVertex>> subGraphEnds = 
-                EAUtils.searchForANonRedundantSwappableSubgraph(cA,cA2,
-                    gA, gA.getVertexAtPosition(srcVrtPosition),
-                    gA2, gA2.getVertexAtPosition(srcVrtPosition), 
-                    population);
-        
-        PathSubGraph pA = new PathSubGraph(gA.getVertexAtPosition(srcVrtPosition), 
-                subGraphEnds.get(0).get(0), gA);
-        PathSubGraph pA2 = new PathSubGraph(gA2.getVertexAtPosition(srcVrtPosition), 
-                subGraphEnds.get(1).get(0), gA2);
-        
-        assertTrue(pA.getPathLength() != pA2.getPathLength());
+        Candidate cB = new Candidate("CB",gB);
+        population.add(cB);
+        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        eligibleParents.add(cA);
+        eligibleParents.add(cB);
+
+        Monitor mnt = new Monitor();
+        boolean embeddedGraphHasBeenAlteredA = false;
+        boolean embeddedGraphHasBeenAlteredB = false;
+        for (int ixo=0; ixo<11; ixo++)
+        {
+            Candidate offspring0 = null;
+            Candidate offspring1 = null;
+            try
+            {
+                offspring0 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                        population, mnt, new int[]{0,1}, ixo, 0);
+                offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
+                        population, mnt, new int[]{0,1}, ixo, 1);
+            } catch (IndexOutOfBoundsException e)
+            {
+                if (e.getMessage().contains("Index 10 out of bounds"))
+                {
+                    // All good! We intentionally triggered this exception to 
+                    // verify that the list of xover points has the right size.
+                    break;
+                }
+                throw e;
+            }
+            
+            DENOPTIMGraph g0xo = offspring0.getGraph();
+            DENOPTIMGraph g1xo = offspring1.getGraph();
+            DENOPTIMTemplate t0 = null;
+            DENOPTIMTemplate t1 = null;
+            for (DENOPTIMVertex v : g0xo.getVertexList())
+            {
+                if (v instanceof DENOPTIMTemplate)
+                {
+                    t0 = (DENOPTIMTemplate) v;
+                    break;
+                }
+            }
+            for (DENOPTIMVertex v : g1xo.getVertexList())
+            {
+                if (v instanceof DENOPTIMTemplate)
+                {
+                    t1 = (DENOPTIMTemplate) v;
+                    break;
+                }
+            }
+            assertNotNull(t0);
+            assertNotNull(t1);
+            
+            DENOPTIMGraph embeddedGraph0 = t0.getInnerGraph();
+            DENOPTIMGraph embeddedGraph1 = t1.getInnerGraph();
+            
+            // Ensure there has been a change
+            if (!embeddedGraphA.isIsomorphicTo(embeddedGraph0) 
+                    && !embeddedGraphA.isIsomorphicTo(embeddedGraph1))
+            {
+                embeddedGraphHasBeenAlteredA = true;
+            }
+            if (!embeddedGraphB.isIsomorphicTo(embeddedGraph0) 
+                    && !embeddedGraphB.isIsomorphicTo(embeddedGraph1))
+            {
+                embeddedGraphHasBeenAlteredB = true;
+            }
+            
+            // Ensure consistency with "fixed-structure" contract
+            assertTrue(embeddedGraphA.isIsostructuralTo(embeddedGraph0)
+                    || embeddedGraphB.isIsostructuralTo(embeddedGraph0));
+            assertTrue(embeddedGraphA.isIsostructuralTo(embeddedGraph1)
+                    || embeddedGraphB.isIsostructuralTo(embeddedGraph1));
+        }
+        assertTrue(embeddedGraphHasBeenAlteredA);
+        assertTrue(embeddedGraphHasBeenAlteredB);
     }
     
 //------------------------------------------------------------------------------

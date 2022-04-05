@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
+import org.paukov.combinatorics3.Generator;
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.APMapFinder;
@@ -40,6 +42,7 @@ import denoptim.graph.DENOPTIMAttachmentPoint;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DENOPTIMTemplate.ContractLevel;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.SymmetricSet;
@@ -49,6 +52,7 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.rings.ChainLink;
 import denoptim.rings.ClosableChain;
+import denoptim.rings.PathSubGraph;
 import denoptim.rings.RingClosureParameters;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.GraphUtils;
@@ -61,76 +65,383 @@ import denoptim.utils.RandomUtils;
 
 public class DENOPTIMGraphOperations
 {
-
+    
 //------------------------------------------------------------------------------
 
     /**
-     * Identify pair of vertices that are suitable for crossover. The criterion
-     * for allowing crossover between two graph branches is defined by 
-     * {@link #isCrossoverPossible(DENOPTIMEdge, DENOPTIMEdge)}. In addition,
-     * the pair of seed vertexes (i.e., the first vertex of each branch to be 
-     * moved) must not represent the same building block. Scaffolds are also 
-     * excluded.
-     * @param male <code>DENOPTIMGraph</code> of one member (the male) of the
-     * parents.
-     * @param female <code>DENOPTIMGraph</code> of one member (the female) of
-     * the parents.
-     * @return the list of pairs of vertex (Pairs ordered as 
-     * <code>male:female</code>) that can be used as crossover points.
+     * Identify crossover sites, i.e., subgraphs that can be swapped between 
+     * two graphs (i.e., the parents). This method will try to locate as many as 
+     * possible crossover sites without falling into combinatorial explosion.
+     * @param gA one of the parent graphs.
+     * @param gB the other of the parent graphs.
+     * @return the list of pairs of crossover sites.
+     * @throws DENOPTIMException 
      */
-    
-    //TODO-gg: make it respect template contract w.r.t. length of subgraph to swap
-
-    protected static List<DENOPTIMVertex[]> locateCompatibleXOverPoints(
-            DENOPTIMGraph male, DENOPTIMGraph female)
+    protected static List<XoverSite> locateCompatibleXOverPoints(
+            DENOPTIMGraph graphA, DENOPTIMGraph graphB) 
+                    throws DENOPTIMException
     {
-        List<DENOPTIMVertex[]> pairs = new ArrayList<DENOPTIMVertex[]>();
-
-        for (DENOPTIMEdge eMale : male.getEdgeList())
+        // First, we identify all the edges that allow crossover, and collect
+        // their target vertexes (i.e., all the potential seed vertexes of 
+        // subgraphs that crossover could swap.
+        List<DENOPTIMVertex[]> compatibleVrtxPairs = new ArrayList<DENOPTIMVertex[]>();
+        for (DENOPTIMEdge eA : graphA.getEdgeList())
         {
-            DENOPTIMVertex vMale = eMale.getTrgAP().getOwner();
+            DENOPTIMVertex vA = eA.getTrgAP().getOwner();
             // We don't do genetic operations on capping vertexes
-            if (vMale.getBuildingBlockType() == BBType.CAP)
+            if (vA.getBuildingBlockType() == BBType.CAP)
                 continue;
             
-            for (DENOPTIMEdge eFemale : female.getEdgeList())
+            for (DENOPTIMEdge eB : graphB.getEdgeList())
             {
-                DENOPTIMVertex vFemale = eFemale.getTrgAP().getOwner();
+                DENOPTIMVertex vB = eB.getTrgAP().getOwner();
                 // We don't do genetic operations on capping vertexes
-                if (vFemale.getBuildingBlockType() == BBType.CAP)
+                if (vB.getBuildingBlockType() == BBType.CAP)
                     continue;
                 
                 //Check condition for considering this combination
-                if (isCrossoverPossible(eMale, eFemale))
+                if (isCrossoverPossible(eA, eB))
                 {
-                    //TODO: should verify that the crossover is also "productive"
-                    // meaning that is produced graphs that are different from 
-                    // the parents.
-                    DENOPTIMVertex[] pair = new DENOPTIMVertex[]{vMale,vFemale};
-                    pairs.add(pair);
+                    DENOPTIMVertex[] pair = new DENOPTIMVertex[]{vA,vB};
+                    compatibleVrtxPairs.add(pair);
                 }
             }
         }
         
-        // NB: we consider only templates that are at the same level of embedding
-        // So, in practice we do recursion at each embedding level.
-        for (DENOPTIMVertex vMale : male.getVertexList())
+        // The crossover sites are the combination of the above compatible
+        // vertexes that define subgraphs respecting the requirements for 
+        // being swapped between the two graphs.
+        ArrayList<XoverSite> sites = new ArrayList<XoverSite>();
+        for (DENOPTIMVertex[] pair : compatibleVrtxPairs)
         {
-            if (!(vMale instanceof DENOPTIMTemplate))
-                continue;
-            DENOPTIMTemplate tMale = (DENOPTIMTemplate) vMale;
+            DENOPTIMVertex vA = pair[0];
+            DENOPTIMVertex vB = pair[1];
+            DENOPTIMGraph gA = vA.getGraphOwner();
+            DENOPTIMGraph gB = vB.getGraphOwner();
             
-            for (DENOPTIMVertex vFemale : female.getVertexList())
+            List<DENOPTIMVertex> descendantsA = new ArrayList<DENOPTIMVertex>();
+            gA.getChildrenTree(vA, descendantsA);
+            List<DENOPTIMVertex> descendantsB = new ArrayList<DENOPTIMVertex>();
+            gB.getChildrenTree(vB, descendantsB);
+            
+            // Branches that are isomorphic are not considered for crossover
+            DENOPTIMGraph test1 = gA.clone();
+            DENOPTIMGraph test2 = gB.clone();
+            try
             {
-                if (!(vFemale instanceof DENOPTIMTemplate))
+                DENOPTIMGraph subGraph1 = test1.extractSubgraph(gA.indexOf(vA));
+                DENOPTIMGraph subGraph2 = test2.extractSubgraph(gB.indexOf(vB));
+                if (!subGraph1.isIsomorphicTo(subGraph2))
+                {
+                    List<DENOPTIMVertex> branchOnVA = new ArrayList<DENOPTIMVertex>();
+                    branchOnVA.add(vA);
+                    branchOnVA.addAll(descendantsA);
+                    List<DENOPTIMVertex> branchOnVB = new ArrayList<DENOPTIMVertex>();
+                    branchOnVB.add(vB);
+                    branchOnVB.addAll(descendantsB);
+                    
+                    checkAndAddXoverSites(branchOnVA, branchOnVB, 
+                            CrossoverType.BRANCH, sites);
+                }
+            } catch (DENOPTIMException e)
+            {
+                //We should never end up here.
+                e.printStackTrace();
+            }
+            
+            // To identify subgraphs smaller than the full branch we need to find
+            // where such subgraphs end, i.e., the vertexes at the end of
+            // such subgraphs (included in them), a.k.a. the subgraph ends.
+            // Since these subgraph ends will need to allow connection with the
+            // rest of the original graph, they are indeed crossover-compatible
+            // sites, i.e., they are the parents of the vertexes collected in 
+            // compatibleVrtxPairs. Yet, we can combine them
+            // * in any number from 1 to all of them (outer loop)
+            // * in any combination of the chosen number of them (inner loop)
+            // Also, note that the ends need not to cover all the branches. So,
+            // some combinations will have to cut some branches short while
+            // taking some other branches completely till their last leaf.
+            
+            // To limit the number of combination, we first get rid of end-point
+            // candidates that cannot be used
+            List<DENOPTIMVertex[]> combinablePairs = new ArrayList<DENOPTIMVertex[]>();
+            for (DENOPTIMVertex[] otherPair : compatibleVrtxPairs)
+            {
+                // Exclude vertexes that are not downstream to the seed of the subgraph
+                DENOPTIMVertex endOnA = otherPair[0];
+                DENOPTIMVertex endOnB = otherPair[1];
+                if (!descendantsA.contains(endOnA)
+                        || !descendantsB.contains(endOnB))
                     continue;
-                DENOPTIMTemplate tFemale = (DENOPTIMTemplate) vFemale;
                 
-                pairs.addAll(locateCompatibleXOverPoints(tMale.getInnerGraph(),
-                        tFemale.getInnerGraph()));
+                // This is only the path between the seed and one of the 
+                // possibly many subgraph end-points
+                PathSubGraph pathA = new PathSubGraph(vA, endOnA, gA);
+                PathSubGraph pathB = new PathSubGraph(vB, endOnB, gB);
+                
+                // If any partner is a fixed-structure templates...
+                if ((gA.getTemplateJacket()!=null 
+                        && gA.getTemplateJacket().getContractLevel()
+                        == ContractLevel.FIXED_STRUCT)
+                        || (gB.getTemplateJacket()!=null 
+                                && gB.getTemplateJacket().getContractLevel()
+                                == ContractLevel.FIXED_STRUCT))
+                {
+                    //...the two paths must have same length. This would be 
+                    // checked anyway later when checking for isostructural
+                    // subgraphs, but here it helps reducing the size of the 
+                    // combinatorial problem
+                    if (pathA.getPathLength()!=pathB.getPathLength())
+                        continue;
+                }
+                if (!combinablePairs.contains(otherPair))
+                    combinablePairs.add(otherPair);
+            }
+            
+            // NB: use this combinatorial generator because it retains the 
+            // sequence of generated subsets (important for reproducibility)
+            Generator.subset(combinablePairs)
+                .simple()
+                .stream()
+                .limit(500) // Prevent explosion!
+                .forEach(c -> processCombinationOfEndPoints(pair,c,sites));
+        }
+        
+        // NB: we consider only templates that are at the same level of embedding
+        for (DENOPTIMVertex vA : graphA.getVertexList())
+        {
+            if (!(vA instanceof DENOPTIMTemplate))
+                continue;
+            DENOPTIMTemplate tA = (DENOPTIMTemplate) vA;
+            
+            if (tA.getContractLevel() == ContractLevel.FIXED)
+                continue;
+            
+            for (DENOPTIMVertex vB : graphB.getVertexList())
+            {
+                if (!(vB instanceof DENOPTIMTemplate))
+                    continue;
+                DENOPTIMTemplate tB = (DENOPTIMTemplate) vB;
+                
+                if (tB.getContractLevel() == ContractLevel.FIXED)
+                    continue;
+                
+                for (XoverSite xos : locateCompatibleXOverPoints(
+                        tA.getInnerGraph(), tB.getInnerGraph()))
+                {
+                    if (!sites.contains(xos))
+                        sites.add(xos);
+                }
             }
         }
-        return pairs;
+        
+        return sites;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Given a pair of seed vertexes that define where a pair of subgraphs stars 
+     * in the corresponding original graphs, this method evaluates the use of
+     * a given list of candidate subgraph end points. When it finds a pair of 
+     * subgraphs that can be used to do crossover it stores them as a
+     * {@link XoverSite} in the given collector.
+     * @param pair the seed vertexes in each of the graph
+     * @param cominationOfEnds the combination of subgraph end points to be 
+     * evaluated. The order of the entries does not matter as we will consider
+     * the permutations of this list.
+     * @param collector this is where the crossover sites are stored.
+     */
+    private static void processCombinationOfEndPoints(DENOPTIMVertex[] pair,
+            List<DENOPTIMVertex[]> cominationOfEnds,
+            List<XoverSite> collector)
+    {
+        // Empty set corresponds to using the entire branch and subgraph and
+        // has been already dealt with at this point
+        if (cominationOfEnds.size()==0)
+            return;
+        
+        Generator.permutation(cominationOfEnds)
+            .simple()
+            .stream()
+            .limit(500) // Prevent explosion!
+            .forEach(c -> processPermutationOfEndPoints(pair, c, collector));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Given a pair of seed vertexes that define where a pair of subgraphs stars 
+     * in the corresponding original graphs, this method evaluates the use of
+     * a given <b>ordered</b> list of candidate subgraph end points. 
+     * When it finds a pair of 
+     * subgraphs that can be used to do crossover it stores them as a
+     * {@link XoverSite} in the given collector.
+     * @param pair the seed vertexes in each of the graph
+     * @param chosenSequenceOfEndpoints the specific permutation of subgraph end
+     * points to be evaluated.
+     * @param collector this is where the crossover sites are stored.
+     */
+    private static void processPermutationOfEndPoints(DENOPTIMVertex[] pair,
+            List<DENOPTIMVertex[]> chosenSequenceOfEndpoints,
+            List<XoverSite> collector)
+    {
+        DENOPTIMVertex vA = pair[0];
+        DENOPTIMVertex vB = pair[1];
+        DENOPTIMGraph gA = vA.getGraphOwner();
+        DENOPTIMGraph gB = vB.getGraphOwner();
+        
+        // Exclude overlapping combinations
+        boolean exclude = false;
+        for (DENOPTIMVertex[] pairA : chosenSequenceOfEndpoints)
+        {
+            for (DENOPTIMVertex[] pairB : chosenSequenceOfEndpoints)
+            {
+                if (pairA==pairB)
+                    continue;
+                
+                if (pairA[0]==pairB[0] || pairA[1]==pairB[1])
+                {
+                    exclude = true;
+                    break;
+                }
+            }
+            if (exclude)
+                break;
+        }
+        if (exclude)
+            return;
+        
+        List<DENOPTIMVertex> subGraphEndInA = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> subGraphEndInB = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> alreadyIncludedFromA = new ArrayList<DENOPTIMVertex>();
+        List<DENOPTIMVertex> alreadyIncludedFromB = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex[] otherPair : chosenSequenceOfEndpoints)
+        {
+            DENOPTIMVertex endOnA = otherPair[0];
+            DENOPTIMVertex endOnB = otherPair[1];
+            
+            // Ignore vertexes that are already part of the subgraph
+            if (alreadyIncludedFromA.contains(endOnA)
+                    || alreadyIncludedFromB.contains(endOnB))
+                continue;
+            
+            PathSubGraph pathA = new PathSubGraph(vA, 
+                    endOnA.getParent(), gA);
+            PathSubGraph pathB = new PathSubGraph(vB, 
+                    endOnB.getParent(), gB);
+            subGraphEndInA.add(endOnA.getParent());
+            subGraphEndInB.add(endOnB.getParent());
+            alreadyIncludedFromA.addAll(pathA.getVertecesPath());
+            alreadyIncludedFromB.addAll(pathB.getVertecesPath());
+        }
+        ArrayList<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
+        subGraphA.add(vA);
+        if (!subGraphEndInA.contains(vA))
+            gA.getChildTreeLimited(vA, subGraphA, subGraphEndInA, true);
+
+        ArrayList<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
+        subGraphB.add(vB);
+        if (!subGraphEndInB.contains(vB))
+            gB.getChildTreeLimited(vB, subGraphB, subGraphEndInB, true);
+        
+        // The two subgraphs must not be isomorfic to prevent unproductive crossover
+        DENOPTIMGraph subGraphCloneA = gA.extractSubgraph(subGraphA);
+        DENOPTIMGraph subGraphCloneB = gB.extractSubgraph(subGraphB);
+        if (subGraphCloneA.isIsomorphicTo(subGraphCloneB))
+            return;
+        
+        checkAndAddXoverSites(subGraphA, subGraphB, 
+                CrossoverType.SUBGRAPH, collector);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Here we check that the given subgraphs have a mapping that allows to swap
+     * them, and full fill any other requirement other than not being isomorphic 
+     * (which is done in parent methods calling this one). Then, we create the 
+     * corresponding crossover site and place it in the collector of such sites.
+     * 
+     * <b>NB: This method assumes that no crossover can involve seed of the spanning
+     * tree (whether scaffold, of anything else).</b>
+     */
+    private static void checkAndAddXoverSites(List<DENOPTIMVertex> subGraphA, 
+            List<DENOPTIMVertex> subGraphB, CrossoverType xoverType,
+            List<XoverSite> collector)
+    {
+        DENOPTIMGraph gOwnerA = subGraphA.get(0).getGraphOwner();
+        DENOPTIMGraph gOwnerB = subGraphB.get(0).getGraphOwner();
+        
+        // What APs need to find a corresponding AP in the other 
+        // subgraph in order to allow swapping?
+        List<DENOPTIMAttachmentPoint> needyAPsA = gOwnerA.getInterfaceAPs(
+                subGraphA);
+        List<DENOPTIMAttachmentPoint> allAPsA = gOwnerA.getSubgraphAPs(
+                subGraphA);
+        List<DENOPTIMAttachmentPoint> needyAPsB = gOwnerB.getInterfaceAPs(
+                subGraphB);
+        List<DENOPTIMAttachmentPoint> allAPsB = gOwnerB.getSubgraphAPs(
+                subGraphB);
+        if (allAPsA.size() < needyAPsB.size()
+                || allAPsB.size() < needyAPsA.size())
+        {
+            // Impossible to satisfy needy APs. Crossover site is not usable.
+            return;
+        }
+        
+        // Shortcut: since the compatibility of one AP that is needed to do 
+        // branch swapping is guaranteed by the identification of the seeds of 
+        // swappable subgraphs, we can avoid searching for a valid A mapping 
+        // when the graphs are not embedded. This because any AP that is not
+        // the one connecting the subgraph to the parent can be left free or
+        // removed without side effects on templates that embed the graph 
+        // because there is no such template.
+        DENOPTIMTemplate jacketTmplA = gOwnerA.getTemplateJacket();
+        DENOPTIMTemplate jacketTmplB = gOwnerB.getTemplateJacket();
+        if (xoverType == CrossoverType.BRANCH 
+                && jacketTmplA==null
+                && jacketTmplB==null)
+        {
+            XoverSite xos = new XoverSite(subGraphA, needyAPsA, subGraphB, 
+                    needyAPsB, xoverType);
+            if (!collector.contains(xos))
+                collector.add(xos);
+            return;
+        }
+        
+        if ((jacketTmplA!=null && jacketTmplA.getContractLevel()
+                ==ContractLevel.FIXED_STRUCT)
+                || (jacketTmplB!=null && jacketTmplB.getContractLevel()
+                        ==ContractLevel.FIXED_STRUCT))
+        {
+            DENOPTIMGraph subGraphCloneA = gOwnerA.extractSubgraph(subGraphA);
+            DENOPTIMGraph subGraphCloneB = gOwnerB.extractSubgraph(subGraphB);
+            if (!subGraphCloneA.isIsostructuralTo(subGraphCloneB))
+                return;
+        }
+        
+        // Retain connection to parent to keep directionality of spanning tree!
+        // To this end, identify the seed of the subgraphs...
+        DENOPTIMVertex seedOnA = gOwnerA.getDeepestAmongThese(subGraphA);
+        DENOPTIMVertex seedOnB = gOwnerB.getDeepestAmongThese(subGraphB);
+        //...and ensure we use the same APs to link to the parent graph.
+        APMapping fixedRootAPs = new APMapping();
+        fixedRootAPs.put(seedOnA.getEdgeToParent().getTrgAP(),
+                seedOnB.getEdgeToParent().getTrgAP());
+            
+        APMapFinder apmf = new APMapFinder(allAPsA, needyAPsA, allAPsB, needyAPsB,
+                fixedRootAPs, 
+                false,  // false: we stop at the first good mapping
+                true,   // true: only complete mapping
+                false); // false: free APs are not compatible by default
+        if (apmf.foundMapping())
+        {
+            XoverSite xos = new XoverSite(subGraphA, needyAPsA, 
+                    subGraphB, needyAPsB, xoverType);
+            if (!collector.contains(xos))
+                collector.add(xos);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -585,7 +896,7 @@ public class DENOPTIMGraphOperations
         toDoAPs.addAll(lstDaps);
         for (int i=0; i<lstDaps.size(); i++)
         {
-            // WARNING: randomisation decouples 'i' from the index of the AP
+            // WARNING: randomization decouples 'i' from the index of the AP
             // in the vertex's list of APs! So 'i' is just the i-th attempt on
             // the curVertex.
             
@@ -1285,120 +1596,119 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * Performs crossover between the two graphs owning each one of the two
-     * given vertexes. 
-     * The operation is performed on the graphs that own the given vertexes, 
-     * so the original version of the graph is lost.
+     * Performs the crossover that swaps the two subgraphs defining the given
+     * {@link XoverSite}. 
+     * The operation is performed on the graphs that own the vertexes referred
+     * in the {@link XoverSite}, so the original version of the graphs is lost.
      * We expect the graphs to have an healthy set of vertex IDs. This can 
      * be ensured by running {@link DENOPTIMGraph#renumberGraphVertices()}.
-     * @param mvert the root vertex of the branch of male to exchange.
-     * @param fvert the root vertex of the branch of female to exchange.
-     * @param xoverTyp the type of crossover operation.
-     * @param subGraphEnds vertexes playing the role of subgraph ends, i.e.,
-     * they are the end of the subgraphs starting and <code>mvert</code> or 
-     * <code>fvert</code>. The first,
-     * list is for the graph owning <code>mvert</code>, the second for the graph
-     * owning <code>fvert</code>.
+     * @param site the definition of the crossover site.
      * @throws DENOPTIMException
      */
-    public static boolean performCrossover(DENOPTIMVertex mvert,
-            DENOPTIMVertex fvert, CrossoverType xoverTyp, 
-            List<List<DENOPTIMVertex>> subGraphEnds) throws DENOPTIMException
-    {
-        DENOPTIMGraph male = mvert.getGraphOwner();
-        DENOPTIMGraph female = fvert.getGraphOwner();
+    public static boolean performCrossover(XoverSite site) throws DENOPTIMException
+    {          
+        DENOPTIMGraph gA = site.getA().get(0).getGraphOwner();
+        DENOPTIMGraph gB = site.getB().get(0).getGraphOwner();
         
-        // Prepare subgraphs that will be exchanged
-        boolean excludeRCVsM = false;
-        boolean excludeRCVsF = false;
+        // All the APs that point away from the subgraph
+        List<DENOPTIMAttachmentPoint> allAPsOnA = gA.getSubgraphAPs(site.getA());
+        List<DENOPTIMAttachmentPoint> allAPsOnB = gB.getSubgraphAPs(site.getB());
         
-        if (xoverTyp == CrossoverType.BRANCH)
+        // The APs that are required to have a mapping for proper crossover,
+        // eg. because the change of subgraph needs to retain a super structure.
+        List<DENOPTIMAttachmentPoint> needyAPsOnA = site.getAPsNeedingMappingA();
+        List<DENOPTIMAttachmentPoint> needyAPsOnB = site.getAPsNeedingMappingB();
+        
+        // APs that connects the subgraphs' root to the parent vertex
+        DENOPTIMAttachmentPoint apToParentA = null;
+        DENOPTIMAttachmentPoint apToParentB = null;
+        for (DENOPTIMAttachmentPoint ap : needyAPsOnA)
         {
-            excludeRCVsM = false;
-            excludeRCVsF = false;
+            if (!ap.isSrcInUserThroughout())
+            {
+                apToParentA = ap;
+                //WARNING: we assume there is one AND only one AP to parent!!!
+                break;
+            }
         }
-        
-        if (xoverTyp == CrossoverType.SUBGRAPH)
+        for (DENOPTIMAttachmentPoint ap : needyAPsOnB)
         {
-            excludeRCVsM = true;
-            excludeRCVsF = true;
+            if (!ap.isSrcInUserThroughout())
+            {
+                apToParentB = ap;
+                //WARNING: we assume there is one AND only one AP to parent!!!
+                break;
+            }
         }
-        
-        DENOPTIMGraph subG_M = male.extractSubgraph(mvert, subGraphEnds.get(0), 
-                excludeRCVsM);
-        DENOPTIMGraph subG_F = female.extractSubgraph(fvert, subGraphEnds.get(1),
-                excludeRCVsF);
-       
-        // Identify a mapping of APs that allows swapping the subgraphs
-        DENOPTIMTemplate tmplSubGrphM = new DENOPTIMTemplate(BBType.UNDEFINED);
-        tmplSubGrphM.setInnerGraph(subG_M);
-        DENOPTIMTemplate tmplSubGrphF = new DENOPTIMTemplate(BBType.UNDEFINED);
-        tmplSubGrphF.setInnerGraph(subG_F);
-        
+        if (apToParentA==null || apToParentB==null)
+        {
+            throw new DENOPTIMException("Could not identify any attachment "
+                    + "point connecting a subgraph to the rest of the graph. "
+                    + "This violates assumption that crossover does not "
+                    + "involve scaffold or vertexes without parent.");
+        }
         // Check if the subgraphs can be used with reversed edge direction, or
         // bias the AP mapping to use the original source vertexes.
         APMapping fixedRootAPs = null;
-        //TODO-GG REACTIVATE ONCE REDIRECTION OF EDGES IS IMPLEMENTED
+        //TODO: REACTIVATE ONCE REVERSION of the subgrsph's spanning tree is in place.
         //if (!subG_M.isReversible() || !subG_F.isReversible())
         if (true)
         {
-            int apIndM = mvert.getEdgeToParent().getTrgAP().getIndexInOwner();
-            int apIndF = fvert.getEdgeToParent().getTrgAP().getIndexInOwner();
+            // Constrain the AP mapping so that the AP originally used to
+            // connect to the parent vertex, will also be used the same way.
+            // Thus, forces retention of edge direction within the subgraph.
             fixedRootAPs = new APMapping();
-            fixedRootAPs.put(tmplSubGrphM.getOuterAPFromInnerAP(
-                            subG_M.getSourceVertex().getAP(apIndM)), 
-                    tmplSubGrphF.getOuterAPFromInnerAP(
-                            subG_F.getSourceVertex().getAP(apIndF)));
+            fixedRootAPs.put(apToParentA, apToParentB);
         }
         
-        APMapFinder apmf = new APMapFinder(tmplSubGrphM, tmplSubGrphF, 
-                fixedRootAPs, false, true, false);
+        // Find an AP mapping that satisfies both root-vertex constrain and
+        // need to ensure the mapping of needy APs
+        APMapFinder apmf = new APMapFinder(allAPsOnA, needyAPsOnA, 
+                allAPsOnB, needyAPsOnB, fixedRootAPs, 
+                false,  // false means stop at the first compatible mapping.
+                false,  // false means we do not require complete mapping.
+                false); // false means free AP are not considered compatible.
         if (!apmf.foundMapping())
         {
-            //TODO-gg use monitor
-            return false;
+            // Since the xover site has been detected by searching for compatible
+            // sites that do have a mapping there should always be at least one 
+            // mapping and this exception should never occur.
+            throw new DENOPTIMException("Missing AP mapping for known XoverSite.");
         }
-        // NB: this maps the APs on the two subgraphs, which is OK...
-        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap =
-                apmf.getChosenAPMapping();
-        // ...but to replace each subgraph in the original graphs, we need to 
-        // map the APs on the original male/female graph with those in the 
-        // corresponding incoming subgraph.
-        // Here we create the latter mappings (two, one for male other for female)
+        
+        // To replace each subgraph in the original graphs, we need to 
+        // map the APs on the original A/B graph with those in the 
+        // corresponding incoming subgraph, which are clones of the original:
+        DENOPTIMGraph subGraphA = gA.extractSubgraph(site.getA());
+        DENOPTIMGraph subGraphB = gB.extractSubgraph(site.getB());
+        
+        // Here we create the two AP mappings we need: one for A other for B.
         LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
-        apMapM = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        apMapA = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
         LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
-        apMapF = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
-        for (Map.Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e : apMap.entrySet())
+        apMapB = new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+        for (Map.Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e : 
+            apmf.getChosenAPMapping().entrySet())
         {
-            DENOPTIMAttachmentPoint apOnSubGraphM = 
-                    tmplSubGrphM.getInnerAPFromOuterAP(e.getKey());
-            DENOPTIMAttachmentPoint apOnSubGraphF = 
-                    tmplSubGrphF.getInnerAPFromOuterAP(e.getValue());
+            DENOPTIMAttachmentPoint apOnA = e.getKey();
+            DENOPTIMAttachmentPoint apOnB = e.getValue();
 
             // NB: assumption that vertex IDs are healthy, AND that order of APs
             // is retained upon cloning of the subgraph!
-            DENOPTIMAttachmentPoint apOnMale = male.getVertexWithId(
-                    apOnSubGraphM.getOwner().getVertexId()).getAP(
-                            apOnSubGraphM.getIndexInOwner());
-            DENOPTIMAttachmentPoint apOnFemale = female.getVertexWithId(
-                    apOnSubGraphF.getOwner().getVertexId()).getAP(
-                            apOnSubGraphF.getIndexInOwner());
-            apMapM.put(apOnMale, apOnSubGraphF);
-            apMapF.put(apOnFemale, apOnSubGraphM);
+            DENOPTIMAttachmentPoint apOnSubGraphA = subGraphA.getVertexWithId(
+                    apOnA.getOwner().getVertexId()).getAP(
+                            apOnA.getIndexInOwner());
+            DENOPTIMAttachmentPoint apOnSubGraphB = subGraphB.getVertexWithId(
+                    apOnB.getOwner().getVertexId()).getAP(
+                            apOnB.getIndexInOwner());
+            apMapA.put(apOnA, apOnSubGraphB);
+            apMapB.put(apOnB, apOnSubGraphA);
         }
-
-        ArrayList<DENOPTIMVertex> vertexesToDelM = new ArrayList<DENOPTIMVertex>();
-        vertexesToDelM.add(mvert);
-        male.getChildTreeLimited(mvert, vertexesToDelM, subGraphEnds.get(0), excludeRCVsM);
-         
-        if (!male.replaceSubGraph(vertexesToDelM, subG_F, apMapM))
+ 
+        // Now we do the actual replacement of subgraphs
+        if (!gA.replaceSubGraph(site.getA(), subGraphB, apMapA))
            return false;
-        
-        ArrayList<DENOPTIMVertex> vertexesToDelF = new ArrayList<DENOPTIMVertex>();
-        vertexesToDelF.add(fvert);
-        female.getChildTreeLimited(fvert, vertexesToDelF, subGraphEnds.get(1), excludeRCVsF);
-        if (!female.replaceSubGraph(vertexesToDelF, subG_M, apMapF))
+        if (!gB.replaceSubGraph(site.getB(), subGraphA, apMapB))
             return false;
         
         return true;
@@ -1419,7 +1729,6 @@ public class DENOPTIMGraphOperations
      * @param apClass the attachment point class.
      * @return <code>true</code> if symmetry is to be applied
      */
-
     protected static boolean applySymmetry(APClass apClass)
     {
         boolean r = false;
@@ -1448,9 +1757,8 @@ public class DENOPTIMGraphOperations
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
-    
     public static boolean performMutation(DENOPTIMGraph graph, Monitor mnt)
-                                                    throws DENOPTIMException
+            throws DENOPTIMException
     {  
         // Get vertices that can be mutated: they can be part of subgraphs
         // embedded in templates
@@ -1498,7 +1806,6 @@ public class DENOPTIMGraphOperations
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
-    
     public static boolean performMutation(DENOPTIMVertex vertex, Monitor mnt) 
             throws DENOPTIMException
     {
@@ -1525,7 +1832,6 @@ public class DENOPTIMGraphOperations
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
-    
     public static boolean performMutation(DENOPTIMVertex vertex, 
             MutationType mType, Monitor mnt) throws DENOPTIMException
     {
@@ -1574,7 +1880,6 @@ public class DENOPTIMGraphOperations
      * @return <code>true</code> if the mutation is successful.
      * @throws DENOPTIMException
      */
-    
     public static boolean performMutation(DENOPTIMVertex vertex, 
             MutationType mType, boolean force, int chosenVrtxIdx, 
             int chosenApId, Monitor mnt) throws DENOPTIMException

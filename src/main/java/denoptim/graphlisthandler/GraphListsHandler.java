@@ -3,11 +3,8 @@ package  denoptim.graphlisthandler;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 
-import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.task.ProgramTask;
 
 

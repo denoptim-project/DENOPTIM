@@ -64,7 +64,6 @@ import org.openscience.cdk.qsar.IDescriptor;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.DescriptorForFitness;
 import denoptim.fitness.DescriptorUtils;
-import denoptim.graph.APClass;
 
 /**
  * Form collecting input parameters for a setting-up the fitness provider.

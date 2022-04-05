@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jgrapht.graph.DefaultUndirectedGraph;
-import org.jgrapht.graph.SimpleGraph;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -39,8 +38,10 @@ import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
+import denoptim.graph.Node;
+import denoptim.graph.NodeConnection;
 import denoptim.graph.SymmetricSet;
-import denoptim.graph.UndirectedEdgeRelation;
+import denoptim.graph.UndirectedEdge;
 
 
 /**
@@ -360,24 +361,24 @@ public class GraphConversionTool
 //------------------------------------------------------------------------------
     
     /**
-     * Converts a DENOPTIMGraph into a JGraphT {@link SimpleGraph}. Note that
-     * the conversion does not produce a 1:1 list of vertexes and edges. 
+     * Converts a {@link DENOPTIMGraph} into a simplified JGraphT 
+     * {@link DefaultUndirectedGraph}. 
+     * The simplification consist of not producing a 1:1 list of vertexes and 
+     * edges compared to the {@link DENOPTIMGraph}. 
      * Instead,
      * <ul>
-     * <li>used pairs of RCVs are removed and the attachment points to
+     * <li>pairs of used RCVs are removed and the attachment points to
      * which they were bound are considered to be connected by an edge.</li>
      * <li>all edges are considered undirected.</li>
      * </ul>
-     * @param dg
-     * @return
+     * @param dg the graph to convert.
+     * @return the simplified graph.
      */
-    public static DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation>
-    getJGraphFromGraph(DENOPTIMGraph dg)
+    public static DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdge>
+        getJGraphFromGraph(DENOPTIMGraph dg)
     {
-        //TODO: consider using DefaultUndirectedGraph to allow for loops
-        // (i.e., rings involving only three vertexes: one proper vertex, and two RCVs)
-        DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> g = 
-                        new DefaultUndirectedGraph<>(UndirectedEdgeRelation.class);
+        DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdge> g = 
+                        new DefaultUndirectedGraph<>(UndirectedEdge.class);
         Map<DENOPTIMVertex,Integer> vis = new HashMap<DENOPTIMVertex,Integer>();
         int i = 0;
         for (DENOPTIMVertex v : dg.getVertexList())
@@ -401,7 +402,7 @@ public class GraphConversionTool
             DENOPTIMVertex vB = e.getTrgAP().getOwner();
             if (!vA.isRCV() && !vB.isRCV())
             {
-                g.addEdge(vA, vB, new UndirectedEdgeRelation(e.getSrcAP(), 
+                g.addEdge(vA, vB, new UndirectedEdge(e.getSrcAP(), 
                         e.getTrgAP(), e.getBondType()));
             }
         }
@@ -413,10 +414,89 @@ public class GraphConversionTool
             DENOPTIMVertex pA = vA.getParent();
             DENOPTIMVertex pB = vB.getParent();
 
-            g.addEdge(pA, pB, new UndirectedEdgeRelation(
+            g.addEdge(pA, pB, new UndirectedEdge(
                     vA.getEdgeToParent().getSrcAP(), 
                     vB.getEdgeToParent().getSrcAP(), r.getBondType()));
         }
+        return g;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Converts a {@link DENOPTIMGraph} into a simplified JGraphT 
+     * {@link DefaultUndirectedGraph}. The simplification is even greater
+     * than for graphs produced by  
+     * {@link #getJGraphFromGraph(DENOPTIMGraph)} in that the content of each 
+     * vertex and the identify of the attachment points are both ignored.
+     * However, in this method any free {@link DENOPTIMAttachmentPoint} on the 
+     * given graph will be converted into a node of the JGraphT, so that the
+     * location of {@link DENOPTIMAttachmentPoint}s relative to the structure of
+     * the graph can be detected.
+     * @param dg the graph to convert.
+     * @return the simplified graph.
+     */
+    public static DefaultUndirectedGraph<Node, NodeConnection>
+        getJGraphKernelFromGraph(DENOPTIMGraph dg)
+    {
+        DefaultUndirectedGraph<Node, NodeConnection> g = 
+                        new DefaultUndirectedGraph<>(NodeConnection.class);
+        for (DENOPTIMVertex v : dg.getVertexList())
+        {
+            if (v.isRCV())
+            {
+                if (!dg.isVertexInRing(v))
+                {
+                    g.addVertex(new Node(v));
+                }
+            } else {
+                g.addVertex(new Node(v));
+            }
+        }
+
+        for (DENOPTIMEdge e : dg.getEdgeList())
+        {
+            DENOPTIMVertex vA = e.getSrcAP().getOwner();
+            DENOPTIMVertex vB = e.getTrgAP().getOwner();
+            if (!vA.isRCV() && !vB.isRCV())
+            {
+                Node vkA = (Node) vA.getProperty(
+                        Node.REFTOVERTEXKERNEL);
+                Node vkB = (Node) vB.getProperty(
+                        Node.REFTOVERTEXKERNEL);
+                g.addEdge(vkA, vkB, new NodeConnection(e.getBondType()));
+            }
+        }
+        
+        for (DENOPTIMRing r : dg.getRings())
+        {
+            DENOPTIMVertex vA = r.getHeadVertex();
+            DENOPTIMVertex vB = r.getTailVertex();
+            DENOPTIMVertex pA = vA.getParent();
+            DENOPTIMVertex pB = vB.getParent();
+            Node pvkA = (Node) pA.getProperty(
+                    Node.REFTOVERTEXKERNEL);
+            Node pvkB = (Node) pB.getProperty(
+                    Node.REFTOVERTEXKERNEL);
+            g.addEdge(pvkA, pvkB, new NodeConnection(r.getBondType()));
+        }
+        
+        for (DENOPTIMAttachmentPoint ap : dg.getAvailableAPs())
+        {
+            Node vap = new Node(ap);
+            DENOPTIMVertex srcVrtx = ap.getOwner();
+            Node pSrcVrtx = (Node) srcVrtx.getProperty(
+                    Node.REFTOVERTEXKERNEL);
+            g.addVertex(vap);
+            g.addEdge(pSrcVrtx, vap, new NodeConnection(ap.getBondType()));
+        }
+        
+        // Cleanup
+        for (DENOPTIMVertex v : dg.getVertexList())
+        {
+            v.removeProperty(Node.REFTOVERTEXKERNEL);
+        }
+        
         return g;
     }
 

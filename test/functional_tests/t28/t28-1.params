@@ -9,7 +9,9 @@ TESTGENOPS-outFileFemale=OTF_WDIR/female-1_xo.sdf
 # this will change the structure of both templates.
 # So, they must have a permissive contract
 TESTGENOPS-VERTEXMALE=2, 4
+TESTGENOPS-SUBGRAPHENDMALE=2, 6
 TESTGENOPS-VERTEXFEMALE=6, 3
+TESTGENOPS-SUBGRAPHENDFEMALE=6, 5
 TESTGENOPS-XOVERTYPE=SUBGRAPH
 
 # Definition of the Fragment Space

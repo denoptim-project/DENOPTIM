@@ -48,6 +48,7 @@ import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.EmptyVertex;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.ManySMARTSQuery;
@@ -188,7 +189,11 @@ public class CyclicGraphHandler
                     wLstVrtI.removeAll(Collections.singleton(vJ));
 
                     // Update ring sizes according to the newly added bond
-                    rsm.addRingClosingBond(vI,vJ);
+                    if (vI instanceof DENOPTIMFragment 
+                            && vJ instanceof DENOPTIMFragment)
+                    {
+                        rsm.addRingClosingBond(vI,vJ);
+                    }
                     rsm.setVertexAsDone(vJ);
                     break;
                 }
@@ -903,7 +908,7 @@ public class CyclicGraphHandler
          * List of weight factors used to control the likeliness of choosing 
          * rings of a given size for the current system
          */
-        private ArrayList<Double> w;
+        private ArrayList<Double> weigths;
 
         /**
          * List of flags defining if an RCA has been "used", i.e., not used to
@@ -999,40 +1004,67 @@ public class CyclicGraphHandler
         private void calculateCompatibilityOfAllRCAPairs() 
                                                        throws DENOPTIMException
         {
-            w = new ArrayList<Double>(Collections.nCopies(sz, 0.0));
+            weigths = new ArrayList<Double>(Collections.nCopies(sz, 0.0));
             compatibilityOfPairs = new boolean[sz][sz];
             for (int i=0; i<sz; i++)
             {
                 DENOPTIMVertex vI = lstVert.get(i);
-                IAtom atmI = mol.getAtom(vIdToAtmId.get(vI).get(0));
+                IAtom atmI = null;
+                RingClosingAttractor rcaI = null;
+                boolean isAtmI = vI instanceof DENOPTIMFragment;
+                if (isAtmI)
+                {
+                    atmI = mol.getAtom(vIdToAtmId.get(vI).get(0));
                 
-                // Dealing with the possibility that RCV is the scaffold
-                if (mol.getConnectedAtomsList(atmI).size()==0)
-                    continue;
+                    // Dealing with the possibility that RCV is the scaffold
+                    if (mol.getConnectedAtomsList(atmI).size()==0)
+                        continue;
                     
-                RingClosingAttractor rcaI = new RingClosingAttractor(atmI,mol);
-                if (!rcaI.isAttractor())
-                {
-                    String s = "Attempt to evaluate RCA pair compatibility "
-                               + "with a non-RCA end (" + atmI + ").";
-                    throw new DENOPTIMException(s);
-                }
-                for (int j=i+1; j<sz; j++)
-                {
-                    DENOPTIMVertex vJ = lstVert.get(j);
-                    IAtom atmJ = mol.getAtom(vIdToAtmId.get(vJ).get(0));
-                    RingClosingAttractor rcaJ = 
-                                             new RingClosingAttractor(atmJ,mol);
+                    rcaI = new RingClosingAttractor(atmI,mol);
                     if (!rcaI.isAttractor())
                     {
                         String s = "Attempt to evaluate RCA pair compatibility "
                                    + "with a non-RCA end (" + atmI + ").";
                         throw new DENOPTIMException(s);
                     }
-                    if (rcaI.isCompatible(rcaJ) &&
-                        evaluateRCVPair(vI,vJ,graph))
+                }   
+                
+                for (int j=i+1; j<sz; j++)
+                {
+                    DENOPTIMVertex vJ = lstVert.get(j);
+                    IAtom atmJ = null;
+                    RingClosingAttractor rcaJ = null;
+                    boolean isAtmJ = vJ instanceof DENOPTIMFragment;
+                    if (isAtmJ)
                     {
-                        //TODO: evluate the use of ShortestPath instead of this
+                        atmJ = mol.getAtom(vIdToAtmId.get(vJ).get(0));
+                        
+                        rcaJ = new RingClosingAttractor(atmJ,mol);
+                        if (!rcaJ.isAttractor())
+                        {
+                            String s = "Attempt to evaluate RCA pair compatibility "
+                                       + "with a non-RCA end (" + atmJ + ").";
+                            throw new DENOPTIMException(s);
+                        }
+                    }
+                    
+                    if ((isAtmI && !isAtmJ) || (!isAtmI && isAtmJ))
+                    {
+                        continue;
+                    }
+                    if (!isAtmI && !isAtmJ)
+                    {
+                        // Ring size is ignored when RCVs are empty vertexes
+                        compatibilityOfPairs[i][j] = true;
+                        compatibilityOfPairs[j][i] = true;
+                        weigths.set(i, weigths.get(i) + 1.0);
+                        weigths.set(j, weigths.get(j) + 1.0);
+                        continue;
+                    }
+                    
+                    if (rcaI.isCompatible(rcaJ) && evaluateRCVPair(vI,vJ,graph))
+                    {
+                        //TODO: evaluate the use of ShortestPath instead of this
                         int ringSize = topoMat[vIdToAtmId.get(vI).get(0)]
                                               [vIdToAtmId.get(vJ).get(0)] - 1;
                         int szFct = 0;
@@ -1044,14 +1076,14 @@ public class CyclicGraphHandler
                         {
                             compatibilityOfPairs[i][j] = true;
                             compatibilityOfPairs[j][i] = true;
-                            w.set(i, w.get(i) + szFct);
-                            w.set(j, w.get(j) + szFct);
+                            weigths.set(i, weigths.get(i) + szFct);
+                            weigths.set(j, weigths.get(j) + szFct);
                         }
 
                         if (verbosity > 1)
                         {
                             System.out.println(" i:" + i + " j:" + j  
-                                     + " size:" + ringSize + " factors:" + w);
+                                     + " size:" + ringSize + " factors:" + weigths);
                         }
                     }
                 }
@@ -1088,7 +1120,7 @@ public class CyclicGraphHandler
                     continue;
                 }
                 DENOPTIMVertex v = lstVert.get(i);
-                for (int j=0; j<w.get(i); j++)
+                for (int j=0; j<weigths.get(i); j++)
                 {
                     wLst.add(v);
                 }
@@ -1117,6 +1149,12 @@ public class CyclicGraphHandler
                 }
 
                 DENOPTIMVertex vJ = lstVert.get(j);
+                
+                if (vI instanceof EmptyVertex && vJ instanceof EmptyVertex)
+                {
+                    wLst.add(vJ);
+                    continue;
+                }
 
                 int ringSize = topoMat[vIdToAtmId.get(vI).get(0)]
                                       [vIdToAtmId.get(vJ).get(0)] - 1;

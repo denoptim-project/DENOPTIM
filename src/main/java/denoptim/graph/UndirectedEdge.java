@@ -27,7 +27,7 @@ import denoptim.utils.GenUtils;
  * with the available state of the attachment points.
  */
 
-public class UndirectedEdgeRelation 
+public class UndirectedEdge 
 {
     /**
      * Attachment point A
@@ -60,7 +60,7 @@ public class UndirectedEdgeRelation
      * converted to when converting a graph into a chemical representation.
      */
     
-    public UndirectedEdgeRelation(DENOPTIMAttachmentPoint apA,
+    public UndirectedEdge(DENOPTIMAttachmentPoint apA,
                           DENOPTIMAttachmentPoint apB, BondType bondType) {
         this.apA = apA;
         this.apB = apB;
@@ -77,7 +77,7 @@ public class UndirectedEdgeRelation
      * @param apB another of the attachment points connected by this edge
      */
     
-    public UndirectedEdgeRelation(DENOPTIMAttachmentPoint apA, 
+    public UndirectedEdge(DENOPTIMAttachmentPoint apA, 
             DENOPTIMAttachmentPoint apB) {
         this(apA, apB, apA.getAPClass().getBondType());
     }
@@ -106,7 +106,7 @@ public class UndirectedEdgeRelation
     
 //------------------------------------------------------------------------------
  
-    public int compare(UndirectedEdgeRelation other)
+    public int compare(UndirectedEdge other)
     {
         if (this.invariant == null)
         {

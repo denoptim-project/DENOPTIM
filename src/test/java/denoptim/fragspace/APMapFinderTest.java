@@ -146,6 +146,7 @@ public class APMapFinderTest
         vB.setBuildingBlockType(BBType.FRAGMENT);
         vB.addAP(APCA);
         
+        // NB "all" in "ConstrainAll" means that a single constraint covers all APs
         APMapping constrain = new APMapping();
         constrain.put(vA.getAP(0), vB.getAP(0));
         APMapFinder apmf = new APMapFinder(vA, vB, constrain, true, false, false);

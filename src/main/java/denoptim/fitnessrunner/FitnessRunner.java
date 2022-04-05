@@ -19,12 +19,9 @@
 package denoptim.fitnessrunner;
 
 import java.io.File;
-import java.util.logging.Level;
 
 import denoptim.denoptimga.DenoptimGA;
-import denoptim.exception.DENOPTIMException;
 import denoptim.fragspaceexplorer.FragSpaceExplorer;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.task.ProgramTask;
 
 

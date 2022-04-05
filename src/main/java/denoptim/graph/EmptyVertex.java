@@ -277,6 +277,8 @@ public class EmptyVertex extends DENOPTIMVertex
         }
         c.setSymmetricAPSets(cLstSymAPs);
         c.setProperties(this.copyStringBasedProperties());
+        if (uniquefyingPropertyKeys!=null)
+            c.uniquefyingPropertyKeys.addAll(uniquefyingPropertyKeys);
         return c;
     }
     
@@ -306,7 +308,9 @@ public class EmptyVertex extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     /**
-     * Compares this and another vertex ignoring vertex IDs.
+     * Compares this and another vertex ignoring vertex IDs. A difference in 
+     * any property that has been marked as an uniquefying property with the
+     * {} method makes this method return false.
      * @param other
      * @param reason string builder used to build the message clarifying the
      * reason for returning <code>false</code>.
@@ -316,6 +320,18 @@ public class EmptyVertex extends DENOPTIMVertex
 
     public boolean sameAs(EmptyVertex other, StringBuilder reason)
     {
+        if (this.uniquefyingPropertyKeys.size()!=0
+                || other.uniquefyingPropertyKeys.size()!=0)
+        {
+            if (!this.uniquefyingPropertyKeys.equals(other.uniquefyingPropertyKeys))
+                return false;
+            
+            for (String k : this.uniquefyingPropertyKeys)
+            {
+                if (!this.properties.get(k).equals(other.properties.get(k)))
+                    return false;
+            }
+        }
         return sameVertexFeatures(other, reason);
     }
     

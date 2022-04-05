@@ -76,8 +76,20 @@ public class DENOPTIMVertexTest
         vB.addAP();
         vB.addAP();
         //NB: vertex ID must be ignores by the sameAs method
-
     	assertTrue(vA.sameAs(vB, reason));	
+    	
+    	// ... one can use properties to uniquefy empty vertexes
+    	String k = "MyPropKey";
+    	vA.setProperty(k, 123);
+    	vA.setUniquefyingProperty(k);
+        vB.setProperty(k, 123);
+        vB.setUniquefyingProperty(k);
+        // if the value of the uniquefying property is the same
+        assertTrue(vA.sameAs(vB, reason));  
+        
+        // otherwise
+        vB.setProperty(k, 456);
+        assertFalse(vA.sameAs(vB, reason)); 
     }
     
 //------------------------------------------------------------------------------

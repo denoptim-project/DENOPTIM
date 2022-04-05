@@ -149,8 +149,14 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     /**
      * JGraph representation used to detect DENOPTIM-isomorphism
      */
-    private DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdgeRelation> 
+    private DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdge> 
         jGraph = null;
+    
+    /**
+     * JGraph representation used to detect DENOPTIM-isostructural graphs
+     */
+    private DefaultUndirectedGraph<Node, NodeConnection> 
+        jGraphKernel = null;
 
     /**
      * Identifier for the format of string representations of a graph
@@ -421,6 +427,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         gVertices = vertices;
         jGraph = null;
+        jGraphKernel = null;
     }
 
 //------------------------------------------------------------------------------
@@ -429,6 +436,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         gEdges = edges;
         jGraph = null;
+        jGraphKernel = null;
     }
 
 //------------------------------------------------------------------------------
@@ -437,6 +445,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         gRings = rings;
         jGraph = null;
+        jGraphKernel = null;
     }
 
 //------------------------------------------------------------------------------
@@ -709,6 +718,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         gEdges.add(edge);
         jGraph = null;
+        jGraphKernel = null;
     }
 
 //------------------------------------------------------------------------------
@@ -717,6 +727,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     {
         gRings.add(ring);
         jGraph = null;
+        jGraphKernel = null;
     }
     
 //------------------------------------------------------------------------------
@@ -745,6 +756,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         addRing(vI,vJ,bndTypI);
         jGraph = null;
+        jGraphKernel = null;
     }
     
 //------------------------------------------------------------------------------
@@ -766,6 +778,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         ring.setBondType(bndTyp);
         this.addRing(ring);
         jGraph = null;
+        jGraphKernel = null;
     }
 
 //------------------------------------------------------------------------------
@@ -788,6 +801,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         vertex.setGraphOwner(this);
         gVertices.add(vertex);
         jGraph = null;
+        jGraphKernel = null;
     }
 
 //------------------------------------------------------------------------------
@@ -863,6 +877,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         gVertices.remove(vertex);
         
         jGraph = null;
+        jGraphKernel = null;
     }
     
 //------------------------------------------------------------------------------
@@ -1193,6 +1208,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
 
         jGraph = null;
+        jGraphKernel = null;
         
         return !this.containsVertex(vertex);
     }
@@ -1809,6 +1825,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         
         jGraph = null;
+        jGraphKernel = null;
         
         for (DENOPTIMVertex vOld : subGrpVrtxs)
             if (this.containsVertex(vOld))
@@ -2049,6 +2066,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         } 
         
         jGraph = null;
+        jGraphKernel = null;
         
         return !gEdges.contains(edge) && this.containsVertex(newLink);
     }
@@ -2173,6 +2191,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             gEdges.remove(edge);
         }
         jGraph = null;
+        jGraphKernel = null;
     }
 
 //------------------------------------------------------------------------------
@@ -2184,6 +2203,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             gRings.remove(ring);
         }
         jGraph = null;
+        jGraphKernel = null;
     }
 
 //------------------------------------------------------------------------------
@@ -2762,6 +2782,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             closableChains.clear();
         }
         jGraph = null;
+        jGraphKernel = null;
     }
     
 //------------------------------------------------------------------------------
@@ -2773,8 +2794,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * graph isomorphism</a>
      * that differs from the most common meaning of isomorphism in graph theory.
      * In general, DENOPTIMGraphs are considered undirected when evaluating
-     * DENOPTIM-isomorphism. Next, 
-     * since a DENOPTIMGraph is effectively 
+     * DENOPTIM-isomorphism. 
+     * Next, since a DENOPTIMGraph is effectively 
      * a spanning tree (ST_i={{vertexes}, {acyclic edges}}) 
      * with a set of fundamental cycles (FC_i={C_1, C_2,...C_n}), 
      * any DENOPTIMGraph G={ST_i,FC_i} that contains one or more cycles 
@@ -2798,7 +2819,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * that are connected to each other forming the same vertex-chains) can be 
      * non-isomorphic when the APs used to connect two vertexes are not the
      * same. Chemically, this means the stereochemistry around one or both
-     * vertexed, is different in the two graphs. Therefore two otherwise 
+     * vertexes, is different in the two graphs. Therefore two otherwise 
      * equal-looking graphs can very well be, de facto, not isomorphic.</li>
      * </ul>
      * <p>
@@ -2811,7 +2832,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * for graphs with large symmetric systems! TODO: consider adding a 
      * runtime limit or a further simplification/speed-up exploiting symmetry.
      * The symmetry, however, does not help detecting isomorphism between a
-     * graph with symmetric branches and its isomorphic analogue that is fully
+     * graph with symmetric branches and its isomorphic analog that is fully
      * asymmetric.</p>
      * 
      * @param other the graph to be compared with this.
@@ -2826,7 +2847,6 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         {
             other.jGraph = GraphConversionTool.getJGraphFromGraph(other);
         }
-        
         
         // Simple but slow because it ignores symmetry
         /*
@@ -2890,14 +2910,23 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     }
                     return 0;
                 } else {
-                    return Integer.compare(v1.getBuildingBlockId(),
-                            v2.getBuildingBlockId());
+                    // We must return something different than zero
+                    if (Integer.compare(v1.getBuildingBlockId(),
+                            v2.getBuildingBlockId())!=0)
+                        return Integer.compare(v1.getBuildingBlockId(),
+                                v2.getBuildingBlockId());
+                    if (Integer.compare(v1.hashCode(),
+                            v2.hashCode())!=0)
+                        return Integer.compare(v1.hashCode(),
+                                v2.hashCode());
+                    return Integer.compare(v1.getBuildingBlockId()+v1.hashCode(),
+                            v2.getBuildingBlockId()+v2.hashCode());
                 }
             }
         };
         
-        Comparator<UndirectedEdgeRelation> eComp =
-                UndirectedEdgeRelation::compare;
+        Comparator<UndirectedEdge> eComp =
+                UndirectedEdge::compare;
         
         // NB: these two were created to evaluate the simplest and fasted 
         // possible scenario. It turns out that for a graph like the following
@@ -2922,9 +2951,107 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         };
         */
         
-        VF2GraphIsomorphismInspector<DENOPTIMVertex, UndirectedEdgeRelation> vf2 =
+        VF2GraphIsomorphismInspector<DENOPTIMVertex, UndirectedEdge> vf2 =
                 new VF2GraphIsomorphismInspector<>(this.jGraph, other.jGraph, 
                         vComp, eComp);
+
+        return vf2.isomorphismExists();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if this graph is "DENOPTIM-isostructural" to the other one given. 
+     * "DENOPTIM-isostructural" means that the two graphs are isomorfic when:
+     * <ul>
+     * <li>the comparison of the vertexes considers any implementation of 
+     * {@link DENOPTIMVertex} equals to itself unless two vertexes differ by the
+     * return value of {@link DENOPTIMVertex#isRCV()},</li>
+     * <li>the comparison of the vertexes considers only the type of bond the 
+     * edge corresponds to (if any),</li>
+     * <li>free {@link DENOPTIMAttachmentPoint}s that are marked as required
+     * in either graph are reflected in the other.</li>
+     * </ul>
+     * @param other
+     * @return
+     */
+    public boolean isIsostructuralTo(DENOPTIMGraph other) {
+        if (this.jGraphKernel == null)
+        {
+            this.jGraphKernel = GraphConversionTool.getJGraphKernelFromGraph(this);
+        }
+        if (other.jGraphKernel == null)
+        {
+            other.jGraphKernel = GraphConversionTool.getJGraphKernelFromGraph(other);
+        }
+        
+        Comparator<Node> vComp = new Comparator<Node>() {
+            
+            Map<Node,Set<Node>> symmetryShortCuts = 
+                    new HashMap<Node,Set<Node>>();
+            
+            @Override
+            public int compare(Node v1, Node v2) {
+                
+                // exploit symmetric relations between vertexes
+                if (symmetryShortCuts.containsKey(v1) 
+                        && symmetryShortCuts.get(v1).contains(v2))
+                {
+                    return 0;
+                }
+                
+                int result = v1.compare(v2);
+                if (result==0) 
+                {
+                    DENOPTIMVertex dv1 = v1.getDNPVertex();
+                    DENOPTIMVertex dv2 = v2.getDNPVertex();
+                    if (dv1==null && dv2==null)
+                    {
+                        return result;
+                    }
+                    
+                    Set<Node> symToV2 = new HashSet<Node>();
+                    SymmetricSet ssV2 = dv2.getGraphOwner()
+                            .getSymSetForVertex(dv2);
+                    for (Integer sVrtId : ssV2.getList())
+                    {
+                        DENOPTIMVertex sv = dv2.getGraphOwner()
+                                .getVertexWithId(sVrtId);
+                        symToV2.add((Node) sv.getProperty(
+                                Node.REFTOVERTEXKERNEL));
+                    }
+                    
+                    Set<Node> symToV1 = new HashSet<Node>();
+                    SymmetricSet ssV1 = dv1.getGraphOwner()
+                            .getSymSetForVertex(dv1);
+                    for (Integer sVrtId : ssV1.getList())
+                    {
+                        DENOPTIMVertex sv = dv1.getGraphOwner()
+                                .getVertexWithId(sVrtId);
+                        symToV1.add((Node) sv.getProperty(
+                                Node.REFTOVERTEXKERNEL));
+                    }
+                    
+                    for (Node v1s : symToV1)
+                    {
+                        if (symmetryShortCuts.containsKey(v1s))
+                        {
+                            symmetryShortCuts.get(v1s).addAll(symToV2);
+                        } else {
+                            symmetryShortCuts.put(v1s,symToV2);
+                        }
+                    }
+                    return 0;
+                }
+                return result;
+            }
+        };
+        
+        Comparator<NodeConnection> eComp = NodeConnection::compare;
+        
+        VF2GraphIsomorphismInspector<Node, NodeConnection> vf2 =
+                new VF2GraphIsomorphismInspector<>(this.jGraphKernel, 
+                        other.jGraphKernel, vComp, eComp);
 
         return vf2.isomorphismExists();
     }
@@ -3154,9 +3281,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     	{
     		boolean found = false;
     		DENOPTIMEdge eo = null;
+    		StringBuilder innerSb = new StringBuilder();
+    		int otherEdgeI = 0;
     		for (DENOPTIMEdge e : edgesFromOther)
     		{
-    		    if (et.sameAs(e,reason))
+    		    innerSb.append(" Edge"+otherEdgeI+":");
+    		    if (et.sameAs(e,innerSb))
     			{
     				found = true;
     				eo = e;
@@ -3165,7 +3295,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     		}
     		if (!found)
     		{
-    			reason.append("Edge not found in other("+et+")");
+    			reason.append("Edge not found in other("+et+"). "
+    			        + "Edges in othes: "+innerSb.toString());
     			return false;
     		}
 
@@ -3502,7 +3633,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
      * @param index the position of the seed vertex in the list of vertexes of this graph.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
 
     public DENOPTIMGraph extractSubgraph(int index)
@@ -3521,7 +3652,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
      * @param seed the vertex from which the extraction has to start.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
 
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed)
@@ -3547,7 +3678,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * will explore three layers: the seed, and two more layers away from it.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
 
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, int numLayers, 
@@ -3599,7 +3730,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * stop the exploration of the graph.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, 
             List<DENOPTIMVertex> limits, boolean stopBeforeRCVs) 
@@ -3659,7 +3790,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @param seed the vertex from which the extraction has to start.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
-     * @return a new vertex that corresponds to the subgraph of this graph.
+     * @return a new graph that corresponds to the subgraph of this graph.
      */
     public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, boolean stopBeforeRCVs) 
                     throws DENOPTIMException
@@ -3677,6 +3808,44 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
         subGrpVrtxs.add(seedClone);
         subGraph.getChildTreeLimited(seedClone, subGrpVrtxs, stopBeforeRCVs);
+        
+        ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : subGraph.gVertices)
+        {
+            if (!subGrpVrtxs.contains(v))
+            {
+                toRemove.add(v);
+            }
+        }
+        for (DENOPTIMVertex v : toRemove)
+        {
+            subGraph.removeVertex(v);
+        }
+        
+        return subGraph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Creates a new graph that corresponds to the subgraph of this graph 
+     * and that includes only the members corresponding to the given list of 
+     * vertexes belonging to this graph.
+     * @param members the vertexes belonging to the subgraph. 
+     * @return a new graph that corresponds to the subgraph of this graph.
+     */
+    public DENOPTIMGraph extractSubgraph(List<DENOPTIMVertex> members) 
+    {
+        if (members.size()==0)
+            return null;
+        
+        DENOPTIMGraph subGraph = this.clone();
+        
+        List<DENOPTIMVertex> subGrpVrtxs =  new ArrayList<DENOPTIMVertex>();
+        for (DENOPTIMVertex v : members)
+        {
+            subGrpVrtxs.add(subGraph.getVertexAtPosition(this.indexOf(v)));
+        }
         
         ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
         for (DENOPTIMVertex v : subGraph.gVertices)
@@ -5950,6 +6119,31 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         else
             return templateJacket.getGraphOwner().getOutermostGraphOwner();
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Find the path that one has to traverse to reach this graph from any 
+     * template-embedding structure. In practice, for a graph that is embedded 
+     * a template jacket <code>T1</code>, which is part of another graph which
+     * is itself embedded in a template <code>T2</code>, which is again part of 
+     * another graph, and so on it returns the references to the embedding 
+     * templates stating from the outermost to the template that embeds this 
+     * graph (Outermost reference come first in the resulting list). 
+     * Instead a graph that is not embedded returns an empty path.
+     * @return the path of references that allow to reach this graph from the
+     * outermost level of embedding.
+     */
+    public List<DENOPTIMTemplate> getEmbeddingPath()
+    {
+        List<DENOPTIMTemplate> path = new ArrayList<DENOPTIMTemplate>();
+        if (templateJacket==null)
+            return path;
+        if (templateJacket.getGraphOwner()!=null)
+            path.addAll(templateJacket.getGraphOwner().getEmbeddingPath());
+        path.add(templateJacket);
+        return path;
+    }
 
 //------------------------------------------------------------------------------    
     
@@ -6040,7 +6234,113 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         return true;
     }
+    
+//------------------------------------------------------------------------------
 
+    /**
+     * Searches for a graphs (<b><i>X</i></b>) embedded at any level in a graph 
+     * (<b><i>Y</i></b>) by knowing<ul>
+     * <li>the embedding path (<b><i>p</i></b>) of another graph <b><i>A</i></b> 
+     * that is embedded in graph <b><i>B</i></b></li> 
+     * <li>and that graph <b><i>Y</i></b> is a unmodified clone of graph 
+     * <b><i>B</i></b>, which implies that <b><i>X</i></b> is a clone of 
+     * <b><i>A</i></b>.
+     * @param graphY where we want to find the analogous of <code>graphA</code>.
+     * @param graphB the graph <code>graphB</code> where <code>path</code> 
+     * points to <code>graphA</code>.
+     * @param path the embedding path of <code>graphA</code> in 
+     * <code>graphB</code>.
+     * @return the graph embedded in <code>graphY</code>, i.e., 
+     * <code>graphX</code>.
+     */
+    public static DENOPTIMGraph getEmbeddedGraphInClone(DENOPTIMGraph graphY, 
+            DENOPTIMGraph graphB, List<DENOPTIMTemplate> path) 
+    {
+        if (path.isEmpty())
+            return graphY;
+        DENOPTIMTemplate currentLevelVertex = null;
+        DENOPTIMGraph currentLevelGraphEmdInB = graphB;
+        DENOPTIMGraph currentLevelGraphEmbInY = graphY;
+        for (DENOPTIMTemplate t : path)
+        {
+            currentLevelVertex = (DENOPTIMTemplate) currentLevelGraphEmbInY
+                    .getVertexAtPosition(currentLevelGraphEmdInB.indexOf(t));
+            currentLevelGraphEmdInB = t.getInnerGraph();
+            currentLevelGraphEmbInY = currentLevelVertex.getInnerGraph();
+        }
+        return currentLevelVertex.getInnerGraph();
+    }
+    
+//------------------------------------------------------------------------------    
+
+    /**
+     * Searches for all {@link DENOPTIMAttachmentPoint}s that represent the
+     * interface between a subgraph, identified by the given list of vertexes,
+     * and any other vertex, i.e., either belonging to the same graph but
+     * not to the same <i>sub</i>graph, or belonging to an outer embedding level.
+     * @param subGraphB list of vertexes belonging to the subgraph.
+     * @return the list of attachment points at the interface of the subgraph.
+     */
+    public List<DENOPTIMAttachmentPoint> getInterfaceAPs(
+            List<DENOPTIMVertex> subGraphB)
+    {
+        List<DENOPTIMAttachmentPoint> interfaceAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMVertex v : subGraphB)
+        {
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            {
+                if (ap.isAvailableThroughout())
+                    continue;
+                if (ap.isAvailable())
+                {
+                    // This AP is used across the template boundary
+                    interfaceAPs.add(ap);
+                } else {
+                    DENOPTIMVertex user = ap.getLinkedAP().getOwner();
+                    if (!subGraphB.contains(user))
+                    {
+                        // AP used to make a connection to outside subgraph
+                        interfaceAPs.add(ap);
+                    }
+                }    
+            }      
+        }
+        return interfaceAPs;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Searches for all {@link DENOPTIMAttachmentPoint}s that are owned by 
+     * vertexes in a subgraph but either available or used by vertexes that do 
+     * not belong to the subgraph.
+     * @param subGraphB list of vertexes belonging to the subgraph.
+     * @return the list of attachment points originating from the subgraph.
+     */
+    public List<DENOPTIMAttachmentPoint> getSubgraphAPs(
+            List<DENOPTIMVertex> subGraphB)
+    {
+        List<DENOPTIMAttachmentPoint> aps = new ArrayList<DENOPTIMAttachmentPoint>();
+        for (DENOPTIMVertex v : subGraphB)
+        {
+            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            {
+                if (ap.isAvailable())
+                {
+                    aps.add(ap);
+                    continue;
+                } 
+                DENOPTIMVertex user = ap.getLinkedAP().getOwner();
+                if (!subGraphB.contains(user))
+                {
+                    // AP used to make a connection to outside subgraph
+                    aps.add(ap);
+                }    
+            }      
+        }
+        return aps;
+    }
+    
 //------------------------------------------------------------------------------    
     
 }

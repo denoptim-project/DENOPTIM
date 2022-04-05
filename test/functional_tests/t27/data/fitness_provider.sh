@@ -107,7 +107,10 @@ sleep 0.1
 
 # These are the candidates that will have an artificially high fitness:
 candIdTo50="M00000027"
-candIdTo40="M00000026"
+candIdTo40="M00000028"
+# Note that these values are used also in the run.sh script! Make sure there
+# is consistency.
+
 # And this is the moment (i.e., the generation) where we'll ask to remove the 
 #two high-fitness candidates, and  we'll add a brand new candidate that is 
 # defined further below (i.e., see $newCandSrc)

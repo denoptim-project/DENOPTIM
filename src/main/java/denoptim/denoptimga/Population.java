@@ -18,11 +18,8 @@
 
 package denoptim.denoptimga;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,10 +29,6 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.io.DenoptimIO;
-import denoptim.rings.PathSubGraph;
-import denoptim.utils.RandomUtils;
 
 /**
  * A collection of candidates. To speed-up operations such as the selection of
@@ -63,7 +56,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     /**
      * Crossover compatibility between members
      */
-    private XoverCompatibilitySites xoverCompatibilities;
+    private XoverSitesAmongCandidates xoverCompatibilities;
    
 //------------------------------------------------------------------------------
 
@@ -72,7 +65,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         super();
         if (FragmentSpace.useAPclassBasedApproach())
         {
-            xoverCompatibilities = new XoverCompatibilitySites();
+            xoverCompatibilities = new XoverSitesAmongCandidates();
         }
     }
     
@@ -181,7 +174,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         return clone;
     }
     
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------    
     
     /**
      * A data structure collecting crossover-compatible sites. This class wants
@@ -193,48 +186,46 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * reproducibility in the generation of list of keys for the inner map. The
      * order of the keys is given by insertion order.
      */
-    private class XoverCompatibilitySites
+    private class XoverSitesAmongCandidates
     {
         private LinkedHashMap<Candidate,
-        LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>> data;
+        LinkedHashMap<Candidate,List<XoverSite>>> data;
         
         /**
-         * Initialises an empty data structure.
+         * Initializes an empty data structure.
          */
-        public XoverCompatibilitySites()
+        public XoverSitesAmongCandidates()
         {
             data = new LinkedHashMap<Candidate,LinkedHashMap<Candidate, 
-                    List<DENOPTIMVertex[]>>>();
+                    List<XoverSite>>>();
         }
         
         /**
          * Creates the entry corresponding to the pair of given candidates.
          * @param c1
          * @param c2
-         * @param pairs list of crossover-compatible pairs of vertexes. 
-         * The order is
+         * @param xoversite list of crossover-compatible sites. The order
          * of the vertexes is expected to be consistent to that of the arguments
          * given to this method.
          */
         public void put(Candidate c1, Candidate c2, 
-                List<DENOPTIMVertex[]> pairs)
+                List<XoverSite> xoversite)
         {     
             if (data.containsKey(c1))
             {
-                data.get(c1).put(c2, pairs);
+                data.get(c1).put(c2, xoversite);
             } else {
-                LinkedHashMap<Candidate,List<DENOPTIMVertex[]>> toC1 = 
-                        new LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>();
-                toC1.put(c2, pairs);
+                LinkedHashMap<Candidate,List<XoverSite>> toC1 = 
+                        new LinkedHashMap<Candidate,List<XoverSite>>();
+                toC1.put(c2, xoversite);
                 data.put(c1, toC1);
             }
             
-            List<DENOPTIMVertex[]> revPairs = 
-                    new ArrayList<DENOPTIMVertex[]>();
-            for (DENOPTIMVertex[] pair : pairs)
+            List<XoverSite> revPairs = 
+                    new ArrayList<XoverSite>();
+            for (XoverSite pair : xoversite)
             {
-                DENOPTIMVertex[] revPair = pair.clone();
-                Collections.reverse(Arrays.asList(revPair));
+                XoverSite revPair = pair.createMirror();
                 revPairs.add(revPair);
             }
             
@@ -242,8 +233,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             {
                 data.get(c2).put(c1, revPairs);
             } else {
-                LinkedHashMap<Candidate,List<DENOPTIMVertex[]>> toC2 = 
-                        new LinkedHashMap<Candidate,List<DENOPTIMVertex[]>>();
+                LinkedHashMap<Candidate,List<XoverSite>> toC2 = 
+                        new LinkedHashMap<Candidate,List<XoverSite>>();
                 toC2.put(c1, revPairs);
                 data.put(c2, toC2);
             }
@@ -255,7 +246,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
          * @param c2
          * @return the list of compatible pairs or null.
          */
-        public List<DENOPTIMVertex[]> get(Candidate c1, Candidate c2)
+        public List<XoverSite> get(Candidate c1, Candidate c2)
         {
             if (data.containsKey(c1))
             {
@@ -310,7 +301,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
         public void remove(Candidate c)
         {
             data.remove(c);
-            for (LinkedHashMap<Candidate, List<DENOPTIMVertex[]>> m : 
+            for (LinkedHashMap<Candidate, List<XoverSite>> m : 
                 data.values())
             {
                 m.remove(c);
@@ -322,19 +313,19 @@ public class Population extends ArrayList<Candidate> implements Cloneable
          * new objects, but the references to candidates and vertexes will point
          * to the original instances.
          */
-        public XoverCompatibilitySites clone()
+        public XoverSitesAmongCandidates clone()
         {
-            XoverCompatibilitySites cloned = new XoverCompatibilitySites();
+            XoverSitesAmongCandidates cloned = new XoverSitesAmongCandidates();
             for (Candidate c1 : data.keySet())
             {
-                LinkedHashMap<Candidate, List<DENOPTIMVertex[]>> inner =
-                        new LinkedHashMap<Candidate, List<DENOPTIMVertex[]>>();
+                LinkedHashMap<Candidate, List<XoverSite>> inner =
+                        new LinkedHashMap<Candidate, List<XoverSite>>();
                 for (Candidate c2 : data.get(c1).keySet())
                 {
-                    List<DENOPTIMVertex[]> lst = new ArrayList<DENOPTIMVertex[]>();
-                    for (DENOPTIMVertex[] arr : data.get(c1).get(c2))
+                    List<XoverSite> lst = new ArrayList<XoverSite>();
+                    for (XoverSite arr : data.get(c1).get(c2))
                     {
-                        lst.add(Arrays.copyOf(arr,arr.length));
+                        lst.add(arr.clone());
                     }
                     inner.put(c2,lst);
                 }
@@ -360,8 +351,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     {   
         DENOPTIMGraph gA = memberA.getGraph();
         
-        // First, update to cover any combination of members that has not been 
-        // considered before
+        // Update to make sure we cover any combination of members that has not 
+        // been considered before
         for (Candidate memberB : eligibleParents)
         {
             if (memberA == memberB)
@@ -369,7 +360,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
                 continue;
             }
             
-            if (xoverCompatibilities.contains(memberA,memberB))
+            if (xoverCompatibilities.contains(memberA, memberB))
             {
                 continue;
             }
@@ -379,10 +370,18 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             if (gA.sameAs(gB, new StringBuilder()))
                 continue;
                 
-            List<DENOPTIMVertex[]> xoverSites = DENOPTIMGraphOperations
-                    .locateCompatibleXOverPoints(gA, gB);
-   
-            xoverCompatibilities.put(memberA, memberB, xoverSites);
+            try
+            {
+                List<XoverSite> xoverSites = DENOPTIMGraphOperations
+                        .locateCompatibleXOverPoints(gA, gB);
+                xoverCompatibilities.put(memberA, memberB, xoverSites);
+            } catch (DENOPTIMException e)
+            {
+                System.err.println("Could not identify crossover sites between "
+                        + memberA.getName() + " and " + memberB.getName() + ".");
+                e.printStackTrace();
+                
+            }
         }
         
         return xoverCompatibilities.getMembersCompatibleWith(memberA);
@@ -400,125 +399,10 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * @param parentB
      * @return the list crossover sites.
      */
-    public List<DENOPTIMVertex[]> getXoverSites(Candidate parentA,
+    public List<XoverSite> getXoverSites(Candidate parentA,
             Candidate parentB)
     {
         return xoverCompatibilities.get(parentA,parentB);
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * For a pair of candidates (i.e., a pair of graphs), and a pair of valid 
-     * crossover points, this method tries to identify a pair of subgraph that 
-     * can be swapped between the two graphs. To this end it searches for 
-     * subgraph end-points, i.e., vertexes where the subgraph starting with the 
-     * vertexes given as parameters will end.
-     * This method should always be run after the 
-     * {@link Population#getXoverPartners(Candidate, ArrayList)}, which 
-     * populated the crossover compatibility data.
-     * @param maleCandidate 
-     * @param femaleCandidate
-     * @param maleGraph
-     * @param vertxOnMale
-     * @param femaleGraph
-     * @param vertxOnFemale
-     * @return
-     */
-    public List<List<DENOPTIMVertex>> getSwappableSubGraphEnds(
-            Candidate maleCandidate, Candidate femaleCandidate,
-            DENOPTIMGraph maleGraph, DENOPTIMVertex vertxOnMale,
-            DENOPTIMGraph femaleGraph, DENOPTIMVertex vertxOnFemale)
-    {
-        return getSwappableSubGraphEnds(maleCandidate, femaleCandidate, 
-                maleGraph, vertxOnMale, femaleGraph, vertxOnFemale,
-                null);
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * For a pair of candidates (i.e., a pair of graphs), and a pair of valid 
-     * crossover points, this method tries to identify a pair of subgraph that 
-     * can be swapped between the two graphs. To this end it searches for 
-     * subgraph end-points, i.e., vertexes where the subgraph starting with the 
-     * vertexes given as parameters will end.
-     * This method should always be run after the 
-     * {@link Population#getXoverPartners(Candidate, ArrayList)}, which 
-     * populated the crossover compatibility data.
-     * @param maleCandidate 
-     * @param femaleCandidate
-     * @param maleGraph
-     * @param vertxOnMale
-     * @param femaleGraph
-     * @param vertxOnFemale
-     * @param sequence a sequence of integers used to by-pass random choices
-     * and ensure reproducibility of the results. Used only for testing, 
-     * otherwise use <code>null</code>.
-     * @return
-     */
-    protected List<List<DENOPTIMVertex>> getSwappableSubGraphEnds(
-            Candidate maleCandidate, Candidate femaleCandidate,
-            DENOPTIMGraph maleGraph, DENOPTIMVertex vertxOnMale,
-            DENOPTIMGraph femaleGraph, DENOPTIMVertex vertxOnFemale,
-            int[] sequence)
-    {   
-        List<DENOPTIMVertex> childTreeM = new ArrayList<DENOPTIMVertex>();
-        maleGraph.getChildrenTree(vertxOnMale, childTreeM);
-        List<DENOPTIMVertex> childTreeF = new ArrayList<DENOPTIMVertex>();
-        femaleGraph.getChildrenTree(vertxOnFemale, childTreeF);
-        // The subGraphEndInM/F are supposed to be included
-        List<DENOPTIMVertex> subGraphEndInM = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMVertex> subGraphEndInF = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMVertex> alreadyIncludedFromM = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMVertex> alreadyIncludedFromF = new ArrayList<DENOPTIMVertex>();
-        //NB: the vertexes are the target sides of edges where we can do xover.
-        List<DENOPTIMVertex[]> xoverCompatPairs = new ArrayList<DENOPTIMVertex[]>();
-        xoverCompatPairs.addAll(getXoverSites(maleCandidate, 
-                femaleCandidate));
-        int initSize = xoverCompatPairs.size();
-        for (int iPair=0; iPair<initSize; iPair++)
-        {
-            DENOPTIMVertex[] pair = null;
-            if (sequence==null)
-            {
-                pair = RandomUtils.randomlyChooseOne(xoverCompatPairs);
-                xoverCompatPairs.remove(pair);
-            } else {
-                // This is only to ensure reproducibility in tests
-                if (iPair>=sequence.length)
-                    break;
-                pair = xoverCompatPairs.get(sequence[iPair]);
-            }
-            
-            // Exclude vertexes that are not downstream to the xover site
-            DENOPTIMVertex endOnM = pair[0];
-            DENOPTIMVertex endOnF = pair[1];
-            if (!childTreeM.contains(endOnM) || !childTreeF.contains(endOnF))
-                continue;
-            
-            // Ignore vertexes that are already part of the subgraph
-            if (alreadyIncludedFromM.contains(endOnM)
-                    || alreadyIncludedFromF.contains(endOnF))
-                continue;
-            
-            // Exclude combinations that identify a too short path
-            PathSubGraph pathM = new PathSubGraph(vertxOnMale, endOnM, maleGraph);
-            PathSubGraph pathF = new PathSubGraph(vertxOnFemale, endOnF, femaleGraph);
-            if (pathM.getPathLength()<2 || pathF.getPathLength()<2)
-                continue;
-            
-            // OK, these vertexes's parents are usable ends of the subgraph
-            // to swap
-            subGraphEndInM.add(endOnM.getParent());
-            subGraphEndInF.add(endOnF.getParent());
-            alreadyIncludedFromM.addAll(pathM.getVertecesPath());
-            alreadyIncludedFromF.addAll(pathF.getVertecesPath());
-        }
-        List<List<DENOPTIMVertex>> result = new ArrayList<List<DENOPTIMVertex>>();
-        result.add(subGraphEndInM);
-        result.add(subGraphEndInF);
-        return result;
     }
 
 //------------------------------------------------------------------------------

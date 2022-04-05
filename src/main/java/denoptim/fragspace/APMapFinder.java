@@ -1,12 +1,15 @@
 package denoptim.fragspace;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
-import denoptim.exception.DENOPTIMException;
+import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
 import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.utils.RandomUtils;
 
@@ -48,26 +51,25 @@ public class APMapFinder
     /**
      * Constructor that launches the search for a mapping between the
      * {@link DENOPTIMAttachmentPoint}s on the first vertex to those of the
-     * second. Note that is APs are available throughout any template barrier
+     * second. Note that if APs are available throughout any template barrier
      * we consider only the existence of an AP to be a reason for a compatible 
      * AP-AP mapping, irrespectively of the {@link APClass}. All APs that are
      * available (i.e., available throughout the templates barriers) will be
      * considered compatible because they do not have any requirement from
      * APClass compatibility rules or bond types.
-     * @param vA the first vertex. This vertex defined the minimal requirements,
-     * i.e., all {@link DENOPTIMAttachmentPoint}s on this vertex that are used
-     * (also throughout the template barriers) will have
-     * to be mapped into {@link DENOPTIMAttachmentPoint}s on the other vertex 
-     * for the mapping to be successful.
+     * The present status of the APs on each vertex (i.e., whether they are used
+     * or available as defined by the 
+     * {@link DENOPTIMGraph#getInterfaceAPs(List)} method when considering a
+     * single-vertex subgraph) 
+     * determines which APs will be required to have a mapping.
+     * @param vA the first vertex. 
      * @param vB the second vertex.
      * @param screenAll use <code>true</code> to NOT stop at the first 
      * compatible combinations.
-     * @throws DENOPTIMException
      */
-    public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll) 
-            throws DENOPTIMException
+    public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll)
     {
-        initialize(vA, vB, null, screenAll, false, true);
+        this(vA, vB, null, screenAll, false, true);
     }
     
 //------------------------------------------------------------------------------
@@ -75,14 +77,15 @@ public class APMapFinder
     /**
      * Constructor that launches the search for a mapping between the
      * {@link DENOPTIMAttachmentPoint}s on the first vertex to those of the
-     * second. Note that is APs are available throughout any template barrier
+     * second. Note that if APs are available throughout any template barrier
      * we consider only the existence of an AP to be a reason for a compatible 
      * AP-AP mapping, irrespectively of the {@link APClass}.
-     * @param vA the first vertex. This vertex defined the minimal requirements,
-     * i.e., all {@link DENOPTIMAttachmentPoint}s on this vertex that are used
-     * (also throughout the template barriers) will have
-     * to be mapped into {@link DENOPTIMAttachmentPoint}s on the other vertex 
-     * for the mapping to be successful.
+     * The present status of the APs on each vertex (i.e., whether they are used
+     * or available as defined by the 
+     * {@link DENOPTIMGraph#getInterfaceAPs(List)} method when considering a
+     * single-vertex subgraph) 
+     * determines which APs will be required to have a mapping.
+     * @param vA the first vertex.
      * @param vB the second vertex.
      * @param fixedRootAPs if not <code>null</code>, sets a required mapping 
      * that must be present in the all the AP mappings.
@@ -92,31 +95,46 @@ public class APMapFinder
      * that include all of the APs on the first vertex.
      * @param compatibleIfFree use <code>true</code> to make APs that are 
      * available (i.e., available throughout the template barriers) be compatible.
-     * @throws DENOPTIMException
      */
     public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, 
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
-                    throws DENOPTIMException
     {
-        initialize(vA, vB, fixedRootAPs, screenAll, onlyCompleteMappings,
-                compatibleIfFree);
+        List<DENOPTIMAttachmentPoint> needyAPsA = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        if (vA.getGraphOwner()!=null)
+        {
+            List<DENOPTIMVertex> subgraph = new ArrayList<DENOPTIMVertex>();
+            subgraph.add(vA);
+            needyAPsA = vA.getGraphOwner().getInterfaceAPs(subgraph);
+        }
+        List<DENOPTIMAttachmentPoint> needyAPsB = 
+                new ArrayList<DENOPTIMAttachmentPoint>();
+        if (vB.getGraphOwner()!=null)
+        {
+            List<DENOPTIMVertex> subgraph = new ArrayList<DENOPTIMVertex>();
+            subgraph.add(vB);
+            needyAPsB = vB.getGraphOwner().getInterfaceAPs(subgraph);
+        }
+        findAllMappings(vA.getAttachmentPoints(), needyAPsA, 
+                vB.getAttachmentPoints(), needyAPsB,
+                fixedRootAPs, screenAll, onlyCompleteMappings, compatibleIfFree);
     }
     
 //------------------------------------------------------------------------------
 
     /**
      * Constructor that launches the search for a mapping between the
-     * {@link DENOPTIMAttachmentPoint}s on the first vertex to those of the
-     * second. Note that is APs are available throughout any template barrier
+     * {@link DENOPTIMAttachmentPoint}s on two lists. 
+     * Note that if APs are available throughout any template barrier
      * we consider only the existence of an AP to be a reason for a compatible 
      * AP-AP mapping, irrespectively of the {@link APClass}.
-     * @param vA the first vertex. This vertex defined the minimal requirements,
-     * i.e., all {@link DENOPTIMAttachmentPoint}s on this vertex that are used
-     * (also throughout the template barriers) will have
-     * to be mapped into {@link DENOPTIMAttachmentPoint}s on the other vertex 
-     * for the mapping to be successful.
-     * @param vB the second vertex.
+     * @param lstA the first list.
+     * @param needyAPsA a subset of the attachment points in the first list and 
+     * that are required to have appear in any mapping.
+     * @param lstB the second list.
+     * @param needyAPsB a subset of the attachment points in the second list and 
+     * that are required to have appear in any mapping.
      * @param fixedRootAPs if not <code>null</code>, sets a required mapping 
      * that must be present in the all the AP mappings.
      * @param screenAll use <code>true</code> to NOT stop at the first 
@@ -125,20 +143,247 @@ public class APMapFinder
      * that include all of the APs on the first vertex.
      * @param compatibleIfFree use <code>true</code> to make APs that are 
      * available (i.e., available throughout the template barriers) be compatible.
-     * @throws DENOPTIMException
      */
-    private void initialize(DENOPTIMVertex vA, DENOPTIMVertex vB, 
-            APMapping fixedRootAPs, boolean screenAll, 
-            boolean onlyCompleteMappings, boolean compatibleIfFree) throws DENOPTIMException
+    public APMapFinder(List<DENOPTIMAttachmentPoint> lstA, 
+            List<DENOPTIMAttachmentPoint> needyAPsA,
+            List<DENOPTIMAttachmentPoint> lstB, 
+            List<DENOPTIMAttachmentPoint> needyAPsB,
+            APMapping fixedRootAPs, boolean screenAll,
+            boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
-        // We map all the compatibilities before choosing a specific mapping
-        LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
-            apCompatilities = new LinkedHashMap<DENOPTIMAttachmentPoint,
-            List<DENOPTIMAttachmentPoint>>();
-        
-        for (DENOPTIMAttachmentPoint oAP : vA.getAttachmentPoints())
+        findAllMappings(lstA, needyAPsA, lstB, needyAPsB,
+                fixedRootAPs, screenAll, onlyCompleteMappings, compatibleIfFree);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Searches for mappings between the
+     * {@link DENOPTIMAttachmentPoint}s on the two lists. 
+     * Note that is APs are available throughout any template barrier
+     * we consider only the existence of an AP to be a reason for a compatible 
+     * AP-AP mapping, irrespectively of the {@link APClass}.
+     * @param lstA the first list
+     * @param lstB the second list.
+     * @param fixedRootAPs if not <code>null</code>, sets a required mapping 
+     * that will be added to all the AP mappings.
+     * @param screenAll use <code>true</code> to NOT stop at the first 
+     * compatible combinations.
+     * @param onlyCompleteMappings use <code>true</code> to collect only mappings 
+     * that include all of the APs on the first vertex.
+     * @param compatibleIfFree use <code>true</code> to make APs that are 
+     * available (i.e., available throughout the template barriers) be compatible.
+     */
+    private void findAllMappings(List<DENOPTIMAttachmentPoint> lstA, 
+            List<DENOPTIMAttachmentPoint> needyAPsA,
+            List<DENOPTIMAttachmentPoint> lstB, 
+            List<DENOPTIMAttachmentPoint> needyAPsB,
+            APMapping fixedRootAPs, boolean screenAll, 
+            boolean onlyCompleteMappings, boolean compatibleIfFree) 
+    {
+        // Remove from the lists those APs that have already a mapping
+        List<DENOPTIMAttachmentPoint> purgedLstA = 
+                new ArrayList<DENOPTIMAttachmentPoint>(lstA);
+        if (fixedRootAPs!=null)
         {
-            for (DENOPTIMAttachmentPoint cAP : vB.getAttachmentPoints())
+            purgedLstA.removeAll(fixedRootAPs.keySet());
+        }
+        List<DENOPTIMAttachmentPoint> purgedLstB = 
+                new ArrayList<DENOPTIMAttachmentPoint>(lstB);
+        if (fixedRootAPs!=null)
+        {
+            purgedLstB.removeAll(fixedRootAPs.values());
+        }
+        
+        // Map all the compatibilities before choosing a specific mapping
+        LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
+            apCompatilities = findMappingCompatibileAPs(purgedLstA, purgedLstB, 
+                    compatibleIfFree);
+        
+        // The 'keys' is used just to keep the map keys sorted in a separate list
+        // so that the order is randomized only once, then it is retained.
+        List<DENOPTIMAttachmentPoint> keys = 
+                new ArrayList<DENOPTIMAttachmentPoint>(
+                        apCompatilities.keySet());
+        if (fixedRootAPs!=null)
+        {
+            // Since these are constrained we do not need them among the keys 
+            // when looking over the combinations of keys
+            keys.removeAll(fixedRootAPs.keySet());
+        }
+        
+        // Test if we have enough AP compatibilities to satisfy the constraints
+        Set<DENOPTIMAttachmentPoint> doableAPsA = 
+                new HashSet<DENOPTIMAttachmentPoint>(keys);
+        if (fixedRootAPs!=null)
+            doableAPsA.addAll(fixedRootAPs.keySet());
+        Set<DENOPTIMAttachmentPoint> doableAPsB = 
+                new HashSet<DENOPTIMAttachmentPoint>();
+        apCompatilities.values().stream().forEach(l -> doableAPsB.addAll(l));
+        if (onlyCompleteMappings)
+        {
+            for (DENOPTIMAttachmentPoint oldAp : lstA)
+            {
+                if (!needyAPsA.contains(oldAp))
+                    needyAPsA.add(oldAp);
+            }
+            for (DENOPTIMAttachmentPoint oldAp : lstB)
+            {
+                if (!needyAPsB.contains(oldAp))
+                    needyAPsB.add(oldAp);
+            }
+        }
+        Set<DENOPTIMAttachmentPoint> mustBeDoableA = 
+                new HashSet<DENOPTIMAttachmentPoint>(needyAPsA);
+        Set<DENOPTIMAttachmentPoint> mustBeDoableB = 
+                new HashSet<DENOPTIMAttachmentPoint>(needyAPsB);
+        if (fixedRootAPs!=null)
+        {
+            mustBeDoableA.removeAll(fixedRootAPs.keySet());
+            mustBeDoableB.removeAll(fixedRootAPs.values());
+        }
+        if (!doableAPsA.containsAll(mustBeDoableA) 
+                || !doableAPsB.containsAll(mustBeDoableB))
+        {
+            return;
+        }
+        
+        if (!onlyCompleteMappings)
+        {
+            for (DENOPTIMAttachmentPoint oldAp : lstA)
+            {
+                if (oldAp.isAvailableThroughout())
+                {
+                    // NB: adding 'null' will allow the presence of AP mappings
+                    // where oldAP is intentionally left out of the mapping thus
+                    // allowing to let it stay free.
+                    if (apCompatilities.containsKey(oldAp))
+                    {
+                        apCompatilities.get(oldAp).add(null);
+                    }
+                }
+            }
+        }
+        
+        // Get all possible combinations of compatible AP pairs
+        int currentKey = 0;
+        APMapping currentMapping = new APMapping();
+        if (fixedRootAPs!=null)
+        {
+            currentMapping = fixedRootAPs.clone(); //shallow
+        }
+        // We try the comprehensive approach, but if that is too demanding
+        // and gets stopped, then we run a series of simplified attempts
+        // to hit a decent combination with "lucky shots".
+        Boolean stopped = false;
+        if (keys.size()>0)
+        {
+            stopped = FragmentSpaceUtils.recursiveCombiner(keys, 
+                    currentKey, apCompatilities, currentMapping, allAPMappings, 
+                    screenAll, maxCombs);
+        } else {
+            // This would have been done by the recursive combiner
+            allAPMappings.add(currentMapping);
+        }
+        
+        // Purge according to lists of APs that needs a mapping
+        List<APMapping> toRemove = new ArrayList<APMapping>();
+        for (APMapping c : allAPMappings)
+        {
+            if (!c.containsAllKeys(needyAPsA))
+            {
+                toRemove.add(c);
+            }
+            if (!c.containsAllValues(needyAPsB))
+            {
+                toRemove.add(c);
+            }
+        }
+        allAPMappings.removeAll(toRemove);
+        
+        // If we where interrupted, we try to get a proper mapping again.
+        // This time we ignore all the possibilities and try a more direct 
+        // approach, which, however, cannot account for all possible combs.
+        if (stopped && allAPMappings.isEmpty())
+        {
+            for (int iTry = 0; iTry < maxCombs; iTry++)
+            {
+                APMapping apMap = new APMapping();
+                List<DENOPTIMAttachmentPoint> used = 
+                        new ArrayList<DENOPTIMAttachmentPoint>();
+                List<DENOPTIMAttachmentPoint> availKeys = 
+                        new ArrayList<DENOPTIMAttachmentPoint>();
+                availKeys.addAll(needyAPsA);
+                boolean abandon = false;
+                for (int jj=0; jj<needyAPsA.size(); jj++)
+                {
+                    DENOPTIMAttachmentPoint ap =
+                            RandomUtils.randomlyChooseOne(availKeys);
+                    availKeys.remove(ap);
+                    List<DENOPTIMAttachmentPoint> availPartners = 
+                            new ArrayList<DENOPTIMAttachmentPoint>();
+                    availPartners.addAll(apCompatilities.get(ap));
+                    boolean done = false;
+                    for (int j=0; j<apCompatilities.get(ap).size(); j++)
+                    {
+                        DENOPTIMAttachmentPoint chosenAvail = 
+                                RandomUtils.randomlyChooseOne(availPartners);
+                        availPartners.remove(chosenAvail);
+                        if (used.contains(chosenAvail))
+                        {
+                            continue;
+                        }
+                        used.add(chosenAvail);
+                        apMap.put(ap,chosenAvail);
+                        done = true;
+                        break;
+                    }
+                    if (!done)
+                    {
+                        abandon = true;
+                        break;
+                    }
+                }
+                
+                if (!abandon)
+                {
+                    allAPMappings.add(apMap);
+                    break;
+                }
+            }
+        }
+        if (allAPMappings.size() > 0)
+            chosenAPMap = RandomUtils.randomlyChooseOne(allAPMappings);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares the {@link DENOPTIMAttachmentPoint} of two lists searching for
+     * all the APs of the second list that are "compatible" with each of the APs
+     * of the first list. Note that "compatible" does not mean {@link APClass}-
+     * compatible to form connection, but that can be interchanges, i.e., one
+     * AP from the second list is compatible with one from the first list, if it
+     * can replace the latter in whatever role that AP has.
+     * @param lstA the first list of APs.
+     * @param lstB the second list ofAPs.
+     * @param compatibleIfFree use <code>true</code> to make APs that are 
+     * available (i.e., available throughout the template barriers) be 
+     * compatible.
+     * @return the map between the APs in the first list (keys) and the list 
+     * (value) of all those from the second list that are "compatible" with it.
+     */
+    public static LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
+        findMappingCompatibileAPs(List<DENOPTIMAttachmentPoint> lstA, 
+            List<DENOPTIMAttachmentPoint> lstB, boolean compatibleIfFree)
+    {
+        LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
+        apCompatilities = new LinkedHashMap<DENOPTIMAttachmentPoint,
+        List<DENOPTIMAttachmentPoint>>();
+    
+        for (DENOPTIMAttachmentPoint oAP : lstA)
+        {
+            for (DENOPTIMAttachmentPoint cAP : lstB)
             {  
                 boolean compatible = false;
                 if (FragmentSpace.useAPclassBasedApproach())
@@ -191,152 +436,7 @@ public class APMapFinder
                 }
             }
         }
-        
-        // keys is used just to keep the map keys sorted in a separate list
-        // so that the order is randomized only once, then it is retained.
-        List<DENOPTIMAttachmentPoint> keys = 
-                new ArrayList<DENOPTIMAttachmentPoint>(
-                        apCompatilities.keySet());
-        if (fixedRootAPs!=null)
-        {
-            if (keys.size()+fixedRootAPs.size() < vA.getNumberOfAPs())
-            {
-                return;
-            }
-            // Since these are constrained we do not need them among the keys for 
-            // looking over the combinations.
-            keys.removeAll(fixedRootAPs.keySet());
-        } else {
-            if (keys.size() < vA.getNumberOfAPs())
-            {
-                return;
-            }
-        }
-            
-        // Identify APs in old link that are used: we want a mapping that
-        // includes all of those. This, to be able to change the link without
-        // removing any existing branch.
-        ArrayList<DENOPTIMAttachmentPoint> oldAPsRequiredToHaveAMapping = new
-                ArrayList<DENOPTIMAttachmentPoint>();
-        if (fixedRootAPs!=null)
-        {
-            // There should be only one key.
-            oldAPsRequiredToHaveAMapping.addAll(fixedRootAPs.keySet());
-        }
-        if (onlyCompleteMappings)
-        {
-            for (DENOPTIMAttachmentPoint oldAp : vA.getAttachmentPoints())
-            {
-                if (!oldAPsRequiredToHaveAMapping.contains(oldAp))
-                    oldAPsRequiredToHaveAMapping.add(oldAp);
-            }
-        } else {
-            for (DENOPTIMAttachmentPoint oldAp : vA.getAttachmentPoints())
-            {
-                if (oldAp.isAvailableThroughout())
-                {
-                    apCompatilities.get(oldAp).add(null);
-                } else {
-                    if (!oldAPsRequiredToHaveAMapping.contains(oldAp))
-                    {
-                        oldAPsRequiredToHaveAMapping.add(oldAp);
-                    }
-                    if (!keys.contains(oldAp))
-                    {
-                        // In this case we have no hope of finding a mapping 
-                        // that satisfies out needs.
-                        continue;
-                    }
-                }
-            }
-        }
-        
-        // Get all possible combinations of compatible AP pairs
-        int currentKey = 0;
-        APMapping currentMapping = new APMapping();
-        if (fixedRootAPs!=null)
-        {
-            currentMapping = fixedRootAPs.clone(); //shallow
-        }
-        // We try the comprehensive approach, but if that is too demanding
-        // and gets stopped, then we run a series of simplified attempts
-        // to hit a decent combination with "lucky shots".
-        Boolean stopped = false;
-        if (keys.size()>0)
-        {
-            stopped = FragmentSpaceUtils.recursiveCombiner(keys, 
-                    currentKey, apCompatilities, currentMapping, allAPMappings, 
-                    screenAll, maxCombs);
-        } else {
-            // This would have been done by the recursive combiner
-            allAPMappings.add(currentMapping);
-        }
-        
-        // Keep only mappings that allow retaining the structure 
-        // (i.e., include all required/used APs of the original vertex)
-        List<APMapping> toRemove = new ArrayList<APMapping>();
-        for (APMapping c : allAPMappings)
-        {
-            if (!c.containsAllKeys(oldAPsRequiredToHaveAMapping))
-            {
-                toRemove.add(c);
-            }
-        }
-        allAPMappings.removeAll(toRemove);
-        
-        // If we where interrupted, we try to get a proper mapping again.
-        // This time we ignore all the possibilities and try a more direct 
-        // approach, which, however, cannot account for all possible combs.
-        if (stopped && allAPMappings.isEmpty())
-        {
-            for (int iTry = 0; iTry < maxCombs; iTry++)
-            {
-                APMapping apMap = new APMapping();
-                List<DENOPTIMAttachmentPoint> used = 
-                        new ArrayList<DENOPTIMAttachmentPoint>();
-                List<DENOPTIMAttachmentPoint> availKeys = 
-                        new ArrayList<DENOPTIMAttachmentPoint>();
-                availKeys.addAll(oldAPsRequiredToHaveAMapping);
-                boolean abandon = false;
-                for (int jj=0; jj<oldAPsRequiredToHaveAMapping.size(); jj++)
-                {
-                    DENOPTIMAttachmentPoint ap =
-                            RandomUtils.randomlyChooseOne(availKeys);
-                    availKeys.remove(ap);
-                    List<DENOPTIMAttachmentPoint> availPartners = 
-                            new ArrayList<DENOPTIMAttachmentPoint>();
-                    availPartners.addAll(apCompatilities.get(ap));
-                    boolean done = false;
-                    for (int j=0; j<apCompatilities.get(ap).size(); j++)
-                    {
-                        DENOPTIMAttachmentPoint chosenAvail = 
-                                RandomUtils.randomlyChooseOne(availPartners);
-                        availPartners.remove(chosenAvail);
-                        if (used.contains(chosenAvail))
-                        {
-                            continue;
-                        }
-                        used.add(chosenAvail);
-                        apMap.put(ap,chosenAvail);
-                        done = true;
-                        break;
-                    }
-                    if (!done)
-                    {
-                        abandon = true;
-                        break;
-                    }
-                }
-                
-                if (!abandon)
-                {
-                    allAPMappings.add(apMap);
-                    break;
-                }
-            }
-        }
-        if (allAPMappings.size() > 0)
-            chosenAPMap = RandomUtils.randomlyChooseOne(allAPMappings);
+        return apCompatilities;
     }
     
 //------------------------------------------------------------------------------

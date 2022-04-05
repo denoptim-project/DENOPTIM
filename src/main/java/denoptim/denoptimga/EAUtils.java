@@ -53,16 +53,15 @@ import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMTemplate;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.rings.CyclicGraphHandler;
-import denoptim.rings.PathSubGraph;
 import denoptim.rings.RingClosureParameters;
 import denoptim.rings.RingClosuresArchive;
 import denoptim.threedim.ThreeDimTreeBuilder;
-import denoptim.utils.CrossoverType;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
@@ -254,7 +253,7 @@ public class EAUtils
             Monitor mnt) throws DENOPTIMException
     {
         return buildCandidateByXOver(eligibleParents, population, mnt, 
-                null, -1, null, -1);
+                null, -1, -1);
     }
     
 //------------------------------------------------------------------------------
@@ -275,10 +274,6 @@ public class EAUtils
      * This avoids randomized 
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
-     * @param choiseOfXOverSubgraph indexes dictating the order in which to 
-     * process candidate crossover sites. This avoids randomized 
-     * decision making in case of test that need to be reproducible, 
-     * but can be <code>null</code> which means "use random choice".
      * @param choiceOfOffstring index dictating which among the available two
      * offspring (at most two, for now) if returned as result. 
      * This avoids randomized 
@@ -290,7 +285,7 @@ public class EAUtils
     protected static Candidate buildCandidateByXOver(
             ArrayList<Candidate> eligibleParents, Population population, 
             Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
-            int[] choiseOfXOverSubgraph, int choiceOfOffstring) throws DENOPTIMException
+            int choiceOfOffstring) throws DENOPTIMException
     {
         mnt.increase(CounterID.XOVERATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
@@ -299,27 +294,19 @@ public class EAUtils
         
         // Identify a pair of parents that can do crossover, and a pair of
         // vertexes from which we can define a subgraph (or a branch) to swap
-        Candidate maleCandidate = null, femaleCandidate = null;
-        DENOPTIMGraph maleGraph = null, femaleGraph = null;
-        DENOPTIMVertex vertxOnMale = null, vertxOnFemale = null;
+        XoverSite xos = null;
         boolean foundPars = false;
         while (numatt < GAParameters.getMaxGeneticOpAttempts())
         {   
             if (FragmentSpace.useAPclassBasedApproach())
             {
-                DENOPTIMVertex[] pair = EAUtils.performFBCC(eligibleParents, 
+                xos = EAUtils.performFBCC(eligibleParents, 
                         population, choiceOfParents, choiceOfXOverSites);
-                if (pair == null)
+                if (xos == null)
                 {
                     numatt++;
                     continue;
                 }
-                vertxOnMale = pair[0];
-                vertxOnFemale = pair[1];
-                maleGraph = vertxOnMale.getGraphOwner();
-                maleCandidate = maleGraph.getCandidateOwner();
-                femaleGraph = vertxOnFemale.getGraphOwner();
-                femaleCandidate = femaleGraph.getCandidateOwner();
             } else {
                 //TODO: make it reproducible using choiceOfParents and choiceOfXOverSites
                 Candidate[] parents = EAUtils.selectBasedOnFitness(
@@ -329,30 +316,18 @@ public class EAUtils
                     numatt++;
                     continue;
                 }
-                maleCandidate = parents[0];
-                maleGraph = maleCandidate.getGraph();
-                femaleCandidate = parents[1];
-                femaleGraph = femaleCandidate.getGraph();
-                vertxOnMale = EAUtils.selectNonScaffoldNonCapVertex(maleGraph);
-                vertxOnFemale = EAUtils.selectNonScaffoldNonCapVertex(femaleGraph);
+                //NB: this does not go into templates!
+                DENOPTIMGraph gpA = parents[0].getGraph();
+                List<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
+                gpA.getChildrenTree(EAUtils.selectNonScaffoldNonCapVertex(
+                        gpA),subGraphA);
+
+                DENOPTIMGraph gpB = parents[1].getGraph();
+                List<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
+                gpB.getChildrenTree(EAUtils.selectNonScaffoldNonCapVertex(
+                        gpB),subGraphB);
             }
-            
-            // Avoid redundant xover, i.e., xover that swaps the same subgraph
-            try {
-                DENOPTIMGraph test1 = maleGraph.clone();
-                DENOPTIMGraph test2 = femaleGraph.clone();
-                DENOPTIMGraph subGraph1 = test1.extractSubgraph(
-                        maleGraph.indexOf(vertxOnMale));
-                DENOPTIMGraph subGraph2 = test2.extractSubgraph(
-                        femaleGraph.indexOf(vertxOnFemale));
-                if (!subGraph1.isIsomorphicTo(subGraph2))
-                {
-                    foundPars = true;
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-                continue;
-            }
+            foundPars = true;
             break;
         }
         mnt.increaseBy(CounterID.XOVERPARENTSEARCH, numatt);
@@ -364,73 +339,27 @@ public class EAUtils
             return null;
         }
         
-        String molid1 = maleCandidate.getName();
-        String molid2 = femaleCandidate.getName();
-        int gid1 = maleGraph.getGraphId();
-        int gid2 = femaleGraph.getGraphId();
-        int vid1 = maleGraph.indexOf(vertxOnMale);
-        int vid2 = femaleGraph.indexOf(vertxOnFemale);
+        Candidate cA = null, cB = null;
+        DENOPTIMVertex vA = null, vB = null;
+        vA = xos.getA().get(0);
+        vB = xos.getB().get(0);
+        DENOPTIMGraph gA = vA.getGraphOwner();
+        cA = gA.getOutermostGraphOwner().getCandidateOwner();
+        DENOPTIMGraph gB = vB.getGraphOwner();
+        cB = gB.getOutermostGraphOwner().getCandidateOwner();
         
-        // Now we consider the possibility of doing SUBGRAPH crossover, i.e.,
-        // swap a portion of a branch instead of an entire branch.
-        List<List<DENOPTIMVertex>> subGraphEnds = null;
-        if (choiseOfXOverSubgraph!=null)
-        {
-            subGraphEnds = population.getSwappableSubGraphEnds(
-                    maleCandidate, femaleCandidate,
-                    maleGraph, vertxOnMale, 
-                    femaleGraph, vertxOnFemale,
-                    choiseOfXOverSubgraph);
-        } else {
-            subGraphEnds = searchForANonRedundantSwappableSubgraph(
-                    maleCandidate, femaleCandidate, 
-                    maleGraph, vertxOnMale, 
-                    femaleGraph, vertxOnFemale, population);
-        }
-        
-        // Define crossover type
-        CrossoverType xoverType = CrossoverType.BRANCH;
-        if (subGraphEnds.get(0).size()>0)
-            xoverType = CrossoverType.SUBGRAPH;
+        String candIdA = cA.getName();
+        String candIdB = cB.getName();
+        int gid1 = gA.getGraphId();
+        int gid2 = gB.getGraphId();
         
         // Start building the offspring
-        DENOPTIMGraph graph1 = maleCandidate.getGraph().clone();
-        DENOPTIMGraph graph2 = femaleCandidate.getGraph().clone();
-        
-        graph1.renumberGraphVertices();
-        graph2.renumberGraphVertices();
-        
-        // To use info on subgraph ends in the clones we need to translate the
-        // references to the original graphs to the clones.
-        List<List<DENOPTIMVertex>> subGraphEndsOnClones = 
-                new ArrayList<List<DENOPTIMVertex>>();
-        for (List<DENOPTIMVertex> lst : subGraphEnds)
-        { 
-            if (lst.size()==0)
-            {
-                subGraphEndsOnClones.add(new ArrayList<DENOPTIMVertex>());
-                continue;
-            }
-            
-            DENOPTIMGraph graph1or2 = null;
-            if (maleGraph == lst.get(0).getGraphOwner())
-                graph1or2 = graph1;
-            else
-                graph1or2 = graph2;
-            
-            List<DENOPTIMVertex> lstCln = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : lst)
-                lstCln.add(graph1or2.getVertexAtPosition(
-                        v.getGraphOwner().indexOf(v)));
-            subGraphEndsOnClones.add(lstCln);
-        }
-        
+        XoverSite xosOnClones = xos.projectToClonedGraphs();
+        DENOPTIMGraph gAClone = xosOnClones.getA().get(0).getGraphOwner();
+        DENOPTIMGraph gBClone = xosOnClones.getB().get(0).getGraphOwner();
         try
         {
-            if (!DENOPTIMGraphOperations.performCrossover(
-                    graph1.getVertexAtPosition(vid1), 
-                    graph2.getVertexAtPosition(vid2), 
-                    xoverType, subGraphEndsOnClones))
+            if (!DENOPTIMGraphOperations.performCrossover(xosOnClones))
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
@@ -439,37 +368,56 @@ public class EAUtils
         } catch (Throwable t) {
             t.printStackTrace();
             ArrayList<DENOPTIMGraph> parents = new ArrayList<DENOPTIMGraph>();
-            parents.add(maleGraph);
-            parents.add(graph1);
-            parents.add(femaleGraph);
-            parents.add(graph2);
+            parents.add(xos.getA().get(0).getGraphOwner());
+            parents.add(xos.getB().get(0).getGraphOwner());
             DenoptimIO.writeGraphsToSDF(new File(GAParameters.getDataDirectory()
                     + "failed_xover.sdf"), parents, true);
             throw new DENOPTIMException("Error while performing crossover. "
                     + "Please, report this to the authors ",t);
         }
+        gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
+        gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
+        String lstIdVA = "";
+        for (DENOPTIMVertex v : xos.getA())
+            lstIdVA = lstIdVA + "_" + v.getVertexId();
+        String lstIdVB = "";
+        for (DENOPTIMVertex v : xos.getB())
+            lstIdVB = lstIdVB + "_" + v.getVertexId();
+        String[] msgs = new String[2];
+        msgs[0] = "Xover: " + candIdA + "|" + gid1 + "|" + lstIdVA + "="
+                + candIdB + "|" + gid2 + "|" + lstIdVB;
+        msgs[1] = "Xover: " + candIdB + "|" + gid2 + "|" + lstIdVB + "="
+                + candIdA + "|" + gid1 + "|" + lstIdVA;
         
-        graph1.setGraphId(GraphUtils.getUniqueGraphIndex());
-        graph2.setGraphId(GraphUtils.getUniqueGraphIndex());
-        graph1.addCappingGroups();
-        graph2.addCappingGroups();
-        String msg = "Xover: " + molid1 + "|" + gid1 + "|" + vid1 + "="
-                    + molid2 + "|" + gid2 + "|" + vid2;
-        graph1.setLocalMsg(msg);
-        graph2.setLocalMsg(msg);
+        DENOPTIMGraph[] graphsAffectedByXover = new DENOPTIMGraph[2];
+        graphsAffectedByXover[0] = gAClone;
+        graphsAffectedByXover[1] = gBClone;
         
-        DENOPTIMGraph[] graphs = new DENOPTIMGraph[2];
-        graphs[0] = graph1;
-        graphs[1] = graph2;
-        
-        List<Candidate> validOnes = new Population();
-        for (DENOPTIMGraph g : graphs)
+        List<Candidate> validOffspring = new Population();
+        for (int ig=0; ig<graphsAffectedByXover.length; ig++)
         {
-            Object[] res = EAUtils.evaluateGraph(g);
+            DENOPTIMGraph g = graphsAffectedByXover[ig];
 
+            // It makes sense to do this on the possibly embedded graph and not
+            // on their embedding owners because there cannot be any new cycle
+            // affecting the latter, but there can be ones affecting the first.
+            if (!EAUtils.setupRings(null,g))
+            {
+                mnt.increase(CounterID.FAILEDXOVERATTEMPTS_SETUPRINGS);
+                continue;
+            }
+
+            // Finalize the graph that is at the outermost level
+            DENOPTIMGraph gOutermost = g.getOutermostGraphOwner();
+            gOutermost.addCappingGroups();
+            gOutermost.renumberGraphVertices();
+            gOutermost.setLocalMsg(msgs[ig]);
+            
+            // Consider if the result can be used to define a new candidate
+            Object[] res = EAUtils.evaluateGraph(gOutermost);
             if (res != null)
             {
-                if (!EAUtils.setupRings(res,g))
+                if (!EAUtils.setupRings(res,gOutermost))
                 {
                     mnt.increase(CounterID.FAILEDXOVERATTEMPTS_SETUPRINGS);
                     res = null;
@@ -479,9 +427,7 @@ public class EAUtils
             }
             
             // Check if the chosen combination gives rise to forbidden ends
-            //TODO this should be considered already when making the list of
-            // possible combination of rings
-            for (DENOPTIMVertex rcv : g.getFreeRCVertices())
+            for (DENOPTIMVertex rcv : gOutermost.getFreeRCVertices())
             {
                 APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
                 if (FragmentSpace.getCappingMap().get(apc)==null 
@@ -491,79 +437,39 @@ public class EAUtils
                     res = null;
                 }
             }
-            
             if (res == null)
             {
-                g.cleanup();
-                g = null;
+                gOutermost.cleanup();
+                gOutermost = null;
                 continue;
             }
             
-            g.renumberGraphVertices();
-            
-            Candidate offspring = new Candidate(g);
+            // OK: we can now use it to make a new candidate
+            Candidate offspring = new Candidate(gOutermost);
             offspring.setUID(res[0].toString().trim());
             offspring.setSmiles(res[1].toString().trim());
             offspring.setChemicalRepresentation((IAtomContainer) res[2]);
             
-            validOnes.add(offspring);
+            validOffspring.add(offspring);
         }
         
-        if (validOnes.size() == 0)
+        if (validOffspring.size() == 0)
         {
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
             return null;
         }
         
-        Candidate chosenOffspring  = null;
+        Candidate chosenOffspring = null;
         if (choiceOfOffstring<0)
         {
-            chosenOffspring = RandomUtils.randomlyChooseOne(validOnes);
+            chosenOffspring = RandomUtils.randomlyChooseOne(validOffspring);
             chosenOffspring.setName("M" + GenUtils.getPaddedString(
                     DENOPTIMConstants.MOLDIGITS,
                     GraphUtils.getUniqueMoleculeIndex()));
         } else {
-            chosenOffspring = validOnes.get(choiceOfOffstring);
+            chosenOffspring = validOffspring.get(choiceOfOffstring);
         }
         return chosenOffspring;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * loops over combinations of subGraph end vertexes looking for the first
-     * case where the selection of subgraph ends does not return a pair of
-     * isomorphic graphs that could lead to redundant crossover.
-     */
-    static List<List<DENOPTIMVertex>> searchForANonRedundantSwappableSubgraph(
-            Candidate maleCandidate, Candidate femaleCandidate,
-            DENOPTIMGraph maleGraph, DENOPTIMVertex vertxOnMale,
-            DENOPTIMGraph femaleGraph, DENOPTIMVertex vertxOnFemale,
-            Population population) throws DENOPTIMException
-    {
-        List<List<DENOPTIMVertex>> subGraphEnds = null; // will not be null at the end
-        int attempts = 0;
-        // Max number of attempts is fixed:
-        while (attempts < maleGraph.getVertexCount()*femaleGraph.getVertexCount())
-        {
-            attempts++;
-            // This randomizes the selection because of the "null" given.
-            subGraphEnds = population.getSwappableSubGraphEnds(
-                    maleCandidate, femaleCandidate,
-                    maleGraph, vertxOnMale, 
-                    femaleGraph, vertxOnFemale,
-                    null);
-            
-            // Test for redundant subgraph crossover
-            DENOPTIMGraph subG_M = maleGraph.extractSubgraph(vertxOnMale, 
-                    subGraphEnds.get(0), false);
-            DENOPTIMGraph subG_F = femaleGraph.extractSubgraph(vertxOnFemale,
-                    subGraphEnds.get(1),false);
-            
-            if (!subG_M.isIsomorphicTo(subG_F))
-                break;
-        }
-        return subGraphEnds;
     }
     
 //------------------------------------------------------------------------------
@@ -1011,11 +917,11 @@ public class EAUtils
      * @param choiceOfXOverSites the integers dictating the selection of 
      * crossover sites. Use this only to ensure reproducibility in tests, 
      * otherwise use <code>negative</code>
-     * @return returns the pair of vertexes where crossover can be performed,
-     * or null if no possibility was found.
+     * @return returns the definition of the crossover in terms of subgraphs 
+     * to swap.
      */
 
-    protected static DENOPTIMVertex[] performFBCC(
+    protected static XoverSite performFBCC(
             ArrayList<Candidate> eligibleParents, Population population, 
             int[] choiceOfParents, int choiceOfXOverSites)
     {
@@ -1043,7 +949,7 @@ public class EAUtils
         if (parentB == null)
             return null;
         
-        DENOPTIMVertex[] result = null;
+        XoverSite result = null;
         if (choiceOfXOverSites<0)
         {
             result = RandomUtils.randomlyChooseOne(population.getXoverSites(
@@ -1519,29 +1425,36 @@ public class EAUtils
         // Update the IAtomContainer representation
         //DENOPTIMMoleculeUtils.removeUsedRCA(mol,molGraph);
         // Done already at t3d.convertGraphTo3DAtomContainer
-        
-        res[2] = mol;
-
-        // Update the SMILES representation
-        String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
-        if (molsmiles == null)
+        if (res!=null)
         {
-            String msg = "Evaluation of graph: SMILES is null! "
-                                                        + molGraph.toString();
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-            molsmiles = "FAIL: NO SMILES GENERATED";
+            res[2] = mol;
         }
-        res[1] = molsmiles;
+        // Update the SMILES representation
+        if (res!=null)
+        {
+            String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
+            if (molsmiles == null)
+            {
+                String msg = "Evaluation of graph: SMILES is null! "
+                                                            + molGraph.toString();
+                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                molsmiles = "FAIL: NO SMILES GENERATED";
+            }
+            res[1] = molsmiles;
+        }
 
         // Update the INCHI key representation
-        ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
-        if (pr.getFirst() == null)
+        if (res!=null)
         {
-            String msg = "Evaluation of graph: INCHI is null!";
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
-            pr.setFirst("UNDEFINED");
+            ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
+            if (pr.getFirst() == null)
+            {
+                String msg = "Evaluation of graph: INCHI is null!";
+                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                pr.setFirst("UNDEFINED");
+            }
+            res[0] = pr.getFirst();
         }
-        res[0] = pr.getFirst();
 
         return true;
     }
@@ -1555,8 +1468,7 @@ public class EAUtils
      * @return <code>true</code> if found
      */
 
-    protected static boolean containsMolecule(Population mols,
-                                                                String molcode)
+    protected static boolean containsMolecule(Population mols, String molcode)
     {
         if(mols.isEmpty())
             return false;
@@ -2029,11 +1941,15 @@ public class EAUtils
      * ring-closing vertexes and actual connections.
      * @return the integer representing how many AP rooted on the same atom that 
      * holds the given attachment point are used by non-capping group building 
-     * blocks.
+     * blocks. Returns zero for APs belonging to {@link EmptyVertex}s.
      */
     public static int getCrowdedness(DENOPTIMAttachmentPoint ap, 
             boolean ignoreFreeRCVs)
     {
+        if (ap.getOwner() instanceof EmptyVertex)
+        {
+            return 0;
+        }
         int crowdness = 0;
         DENOPTIMGraph g = ap.getOwner().getGraphOwner();
         for (DENOPTIMAttachmentPoint oap : ap.getOwner().getAttachmentPoints())

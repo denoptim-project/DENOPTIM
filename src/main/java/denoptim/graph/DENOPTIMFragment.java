@@ -21,7 +21,6 @@ package denoptim.graph;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.vecmath.Point3d;
 
@@ -693,6 +692,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         clone.setSymmetricAPSets(cLstSymAPs);
         clone.setAsRCV(this.isRCV());
         clone.setProperties(this.copyStringBasedProperties());
+        if (uniquefyingPropertyKeys!=null)
+            clone.uniquefyingPropertyKeys.addAll(uniquefyingPropertyKeys);
 		return clone;
     }
 
