@@ -123,7 +123,7 @@ public enum FileFormat {
         
         FR_PARAM.extension = "";
         FR_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
-                "^" + ParametersType.FR_PARAMS.getKeywordRoot() + "-.*"));
+                "^" + ParametersType.FR_PARAMS.getKeywordRoot() + ".*"));
 
         //------------------------------------
         
