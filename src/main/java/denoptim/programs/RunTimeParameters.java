@@ -173,7 +173,7 @@ public abstract class RunTimeParameters
             RC_PARAMS.keywordRoot = "RC-";
             FIT_PARAMS.keywordRoot = "FP-";
             FR_PARAMS.keywordRoot = "FR-";
-            MMB_PARAM.keywordRoot = "CG-";
+            MMB_PARAM.keywordRoot = "3DB-";
             GO_PARAMS.keywordRoot = "TESTGENOPS-";
             GE_PARAMS.keywordRoot = "GRAPHEDIT-";
             GLH_PARAMS.keywordRoot = "GRAPHLISTS-";

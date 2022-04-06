@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.programs.RunTimeParameters.ParametersType;
 
 /**
  * File formats identified by DENOPTIM.
@@ -110,19 +111,19 @@ public enum FileFormat {
         
         GA_PARAM.extension = "";
         GA_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
-                "^GA-.*"));
+                "^" + ParametersType.GA_PARAMS.getKeywordRoot() + ".*"));
 
         //------------------------------------
         
         FSE_PARAM.extension = "";
         FSE_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
-                "^FSE-.*"));
+                "^" + ParametersType.CEBL_PARAMS.getKeywordRoot() + ".*"));
         
         //------------------------------------
         
         FR_PARAM.extension = "";
         FR_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
-                "^FR-.*"));
+                "^" + ParametersType.FR_PARAMS.getKeywordRoot() + "-.*"));
 
         //------------------------------------
         
@@ -134,29 +135,29 @@ public enum FileFormat {
         
         GO_PARAM.extension = "";
         GO_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
-                "^TESTGENOPS-.*"));
+                "^" + ParametersType.GO_PARAMS.getKeywordRoot() + ".*"));
         
         //------------------------------------
         
         GE_PARAM.extension = "";
         GE_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
-                "^GRAPHEDIT-.*"));
+                "^" + ParametersType.GE_PARAMS.getKeywordRoot() + ".*"));
         
         //------------------------------------
         
         CLG_PARAM.extension = "";
         CLG_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
-                "^GRAPHLISTS-.*"));
+                "^" + ParametersType.GLH_PARAMS.getKeywordRoot() + ".*"));
         
         //------------------------------------
         
         GI_PARAM.extension = "";
         GI_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
-                "^ISOMORPHISM-.*"));
+                "^" + ParametersType.ISO_PARAMS.getKeywordRoot() + ".*"));
         
         B3D_PARAM.extension = "";
         B3D_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
-                "^CG-.*"));
+                "^" + ParametersType.MMB_PARAM.getKeywordRoot() + ".*"));
         
         //------------------------------------
         

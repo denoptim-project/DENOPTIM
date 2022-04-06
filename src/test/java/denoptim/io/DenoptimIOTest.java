@@ -60,6 +60,7 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.SymmetricSet;
+import denoptim.programs.RunTimeParameters.ParametersType;
 
 /**
  * Unit test for input/output.
@@ -394,11 +395,13 @@ public class DenoptimIOTest
         pathName = tempDir.getAbsolutePath() + SEP + "filename";
         file = new File(pathName);
         
-        DenoptimIO.writeData(pathName, "FSE-SOMETING", false);
+        DenoptimIO.writeData(pathName, ParametersType.CEBL_PARAMS.getKeywordRoot() 
+                + "SOMETING", false);
         assertTrue(FileFormat.FSE_PARAM == FileUtils.detectFileFormat(file),
                 "FSE params");
         
-        DenoptimIO.writeData(pathName, "GA-SOMETING", false);
+        DenoptimIO.writeData(pathName, ParametersType.GA_PARAMS.getKeywordRoot() 
+                + "SOMETING", false);
         assertTrue(FileFormat.GA_PARAM == FileUtils.detectFileFormat(file),
                 "GA params");
         

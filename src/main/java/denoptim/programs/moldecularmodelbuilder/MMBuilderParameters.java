@@ -377,8 +377,8 @@ public class MMBuilderParameters extends RunTimeParameters
 */
 
         default:
-             msg = "Keyword " + key + " is not a known DenoptimCG-"
-                                       + "related keyword. Check input files.";
+             msg = "Keyword " + key + " is not a known keyword for the "
+                     + "3d-molecular model builder. Check input files.";
             throw new DENOPTIMException(msg);
         }
     }

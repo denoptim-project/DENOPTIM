@@ -89,27 +89,27 @@ do
     echo -ne ' progress: '$fname' / '$nFiles' \r'
 
     #Prepare parameters
-    echo "CG-inpSDF=$inpSDF" > "$dnpParams"
-    echo "CG-outSDF=$outSDF" >> "$dnpParams"
+    echo "3DB-inpSDF=$inpSDF" > "$dnpParams"
+    echo "3DB-outSDF=$outSDF" >> "$dnpParams"
     echo "FS-ScaffoldLibFile=$wrkDir/scaff.sdf" >> "$dnpParams"
     echo "FS-FragmentLibFile=$wrkDir/frags.sdf" >> "$dnpParams"
     echo "FS-CappingFragmentLibFile=$wrkDir/cap.sdf" >> "$dnpParams"
     echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> "$dnpParams"
     echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/main/resources/data/rotatableBonds-1.0" >> "$dnpParams"
 
-    echo "CG-workDir=$wrkDir" >> "$dnpParams"
+    echo "3DB-workDir=$wrkDir" >> "$dnpParams"
     # location of the TINKER tools
-    echo "CG-toolPSSROT=$tinkerPathDENOPTIM/pssrot" >> "$dnpParams"
-    echo "CG-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> "$dnpParams"
-    echo "CG-toolINTXYZ=$tinkerPathDENOPTIM/intxyz" >> "$dnpParams"
+    echo "3DB-toolPSSROT=$tinkerPathDENOPTIM/pssrot" >> "$dnpParams"
+    echo "3DB-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> "$dnpParams"
+    echo "3DB-toolINTXYZ=$tinkerPathDENOPTIM/intxyz" >> "$dnpParams"
     # param file used by Tinker
-    echo "CG-ForceFieldFile=$DENOPTIM_HOME/src/main/resources/data/uff_vdw.prm" >> "$dnpParams"
+    echo "3DB-ForceFieldFile=$DENOPTIM_HOME/src/main/resources/data/uff_vdw.prm" >> "$dnpParams"
     # key file to be used by tinker with PSSROT
     # this file is copied and edited for every molecule
-    echo "CG-KEYFILE=$DENOPTIM_HOME/src/main/resources/data/build_uff.key" >> "$dnpParams"
+    echo "3DB-KEYFILE=$DENOPTIM_HOME/src/main/resources/data/build_uff.key" >> "$dnpParams"
     # parameters used by PSSROT
     # this file is copied and edited for every molecule
-    echo "CG-PSSROTPARAMS=$DENOPTIM_HOME/src/main/resources/data/submit_pssrot" >> "$dnpParams"
+    echo "3DB-PSSROTPARAMS=$DENOPTIM_HOME/src/main/resources/data/submit_pssrot" >> "$dnpParams"
 
     #run builder
     "$javaDENOPTIM" -jar "$denoptimJar" -r B3D "$dnpParams" &> "$logFile"

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.io.TempDir;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Version;
 import denoptim.main.Main.RunType;
+import denoptim.programs.RunTimeParameters.ParametersType;
 
 
 public class MainTest
@@ -27,9 +28,11 @@ public class MainTest
     {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory");
         String inputPathName = tempDir.getAbsolutePath() + SEP + "input.par";
-        DenoptimIO.writeData(inputPathName, "GA-", false);
+        DenoptimIO.writeData(inputPathName, 
+                ParametersType.GA_PARAMS.getKeywordRoot(), false);
         String inputPathName2 = tempDir.getAbsolutePath() + SEP + "input2.par";
-        DenoptimIO.writeData(inputPathName2, "GA-", false);
+        DenoptimIO.writeData(inputPathName2, 
+                ParametersType.GA_PARAMS.getKeywordRoot(), false);
 
         //
         // Simplest call (launch GUI)
