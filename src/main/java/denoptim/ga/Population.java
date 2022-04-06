@@ -29,6 +29,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.programs.denovo.GAParameters;
 
 /**
  * A collection of candidates. To speed-up operations such as the selection of

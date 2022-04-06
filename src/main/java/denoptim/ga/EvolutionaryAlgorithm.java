@@ -41,6 +41,7 @@ import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.task.FitnessTask;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
@@ -155,7 +156,7 @@ public class EvolutionaryAlgorithm
         this.settings = settings;
         this.cmdListener = cmdListener;
         // There is currently nothing to initialize for the synchronous scheme
-        if (settings.parallelizationScheme == 1)
+        if (settings.getParallelizationScheme() == 1)
         {
             isAsync = false;
         } else {
@@ -254,7 +255,7 @@ public class EvolutionaryAlgorithm
         
         // Ensure that there is some variability in fitness values
         double sdev = EAUtils.getPopulationSD(population);
-        if (sdev < settings.minFitnessSD)
+        if (sdev < settings.getMinFitnessSD())
         {
             String msg = "Fitness values have negligible standard deviation "
                     + "(STDDEV=" + String.format("%.6f", sdev) + "). "
@@ -395,7 +396,7 @@ public class EvolutionaryAlgorithm
         }
         
         Monitor mnt = new Monitor("MonitorGen",0,settings.getMonitorFile(),
-                settings.getMonitorDumpStep(), settings.dumpMonitor);
+                settings.getMonitorDumpStep(), settings.dumpMonitor());
         
         // Loop creation of candidates until we have created enough new valid 
         // candidates or we have reached the max number of attempts.
@@ -564,7 +565,7 @@ public class EvolutionaryAlgorithm
         ArrayList<Task> syncronisedTasks = new ArrayList<>();
         Monitor mnt = new Monitor("MonitorGen", genId, 
                 settings.getMonitorFile(),settings.getMonitorDumpStep(), 
-                settings.dumpMonitor);
+                settings.dumpMonitor());
         try
         {
             while (i < settings.getPopulationSize() *

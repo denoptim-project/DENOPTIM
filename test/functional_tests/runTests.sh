@@ -23,7 +23,7 @@
 
 # Path to TINKER executables
 # Currently required only by t1 that will be skipped if the following is empty.
-export tinkerPathDENOPTIM="/Users/marcof/tools/tinker-8.10.2/bin"
+export tinkerPathDENOPTIM=""
 
 # Directory created for running tests (must be shorter than 40 characters).
 wDir="/tmp/denoptim_test"

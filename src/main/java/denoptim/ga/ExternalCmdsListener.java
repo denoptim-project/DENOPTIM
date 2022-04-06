@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.programs.denovo.GAParameters;
 
 /**
  * Service that watches the <code>interface</code> folder (i.e., see 

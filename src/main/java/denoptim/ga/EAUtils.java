@@ -63,6 +63,7 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.DENOPTIMStatUtils;
 import denoptim.utils.GenUtils;
@@ -1845,7 +1846,7 @@ public class EAUtils
     public static double getMolSizeProbability(DENOPTIMGraph graph, 
             GAParameters settings)
     {
-        if (!settings.useMolSizeBasedProb)
+        if (!settings.useMolSizeBasedProb())
             return 1.0;
         int scheme = settings.getMolGrowthProbabilityScheme();
         double lambda =settings.getMolGrowthMultiplier();
@@ -1922,7 +1923,7 @@ public class EAUtils
     public static double getGrowthByLevelProbability(int level, 
             GAParameters settings)
     {
-        if (!settings.useLevelBasedProb)
+        if (!settings.useLevelBasedProb())
             return 1.0;
         int scheme = settings.getGrowthProbabilityScheme();
         double lambda =settings.getGrowthMultiplier();

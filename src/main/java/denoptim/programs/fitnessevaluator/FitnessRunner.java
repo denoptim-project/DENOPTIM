@@ -20,8 +20,8 @@ package denoptim.programs.fitnessevaluator;
 
 import java.io.File;
 
-import denoptim.ga.DenoptimGA;
 import denoptim.programs.combinatorial.FragSpaceExplorer;
+import denoptim.programs.denovo.GARunner;
 import denoptim.task.ProgramTask;
 
 
@@ -30,7 +30,7 @@ import denoptim.task.ProgramTask;
  * that allows to run a fitness evaluation in a stand-alone fashion. 
  * The configuration of the fitness provider is given as a DENOPTIM's input 
  * parameter file, that is in all equal to the parameters file used by 
- * {@link DenoptimGA} and {@link FragSpaceExplorer}.
+ * {@link GARunner} and {@link FragSpaceExplorer}.
  * 
  * @author Marco Foscato
  */

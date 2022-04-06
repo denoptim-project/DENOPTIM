@@ -34,18 +34,18 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.ga.DenoptimGA;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.programs.combinatorial.FragSpaceExplorer;
+import denoptim.programs.denovo.GARunner;
 import denoptim.task.FitnessTask;
 
 
 /**
  * Runs a fitness provider task as defined in the static parameters. This class
  * is meant to execute fitness provider tasks from the GUI or the CLI in a
- * stand-alone fashion, i.e., without running {@link DenoptimGA} or 
+ * stand-alone fashion, i.e., without running {@link GARunner} or 
  * {@link FragSpaceExplorer}.
  *
  * @author Marco Foscato

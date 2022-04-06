@@ -32,6 +32,7 @@ import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 

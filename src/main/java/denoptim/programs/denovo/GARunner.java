@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.ga;
+package denoptim.programs.denovo;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,15 +26,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import denoptim.ga.EvolutionaryAlgorithm;
+import denoptim.ga.ExternalCmdsListener;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.ProgramTask;
 
 /**
- * The genetic algorithms entry point.
+ * Programs that runs de novo design by a genetic algorithms.
+ * 
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public class DenoptimGA extends ProgramTask
+public class GARunner extends ProgramTask
 {
     /**
      * The implementation of the evolutionary algorithm we run here.
@@ -64,7 +67,7 @@ public class DenoptimGA extends ProgramTask
      * @param configFile the file containing the configuration parameters.
      * @param workDir the file system location from which to run the program.
      */
-    public DenoptimGA(File configFile, File workDir)
+    public GARunner(File configFile, File workDir)
     {
         super(configFile,workDir);
     }

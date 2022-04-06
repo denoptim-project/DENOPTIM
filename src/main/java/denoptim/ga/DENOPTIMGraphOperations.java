@@ -55,6 +55,7 @@ import denoptim.logging.CounterID;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;

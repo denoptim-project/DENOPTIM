@@ -32,6 +32,7 @@ import denoptim.graph.rings.PathSubGraph;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.RandomUtils;
 
 /**

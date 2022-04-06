@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import denoptim.ga.GAParameters;
+import denoptim.programs.denovo.GAParameters;
 
 /**
  * Unit test

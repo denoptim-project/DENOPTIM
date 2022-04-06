@@ -34,9 +34,9 @@ import javax.swing.UIManager;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.ga.DenoptimGA;
 import denoptim.main.Main.RunType;
 import denoptim.programs.combinatorial.FragSpaceExplorer;
+import denoptim.programs.denovo.GARunner;
 import denoptim.programs.fitnessevaluator.FitnessRunner;
 import denoptim.task.ProgramTask;
 import denoptim.task.StaticTaskManager;
@@ -405,7 +405,7 @@ public class GUIPrepare extends GUICardPanel
 		ProgramTask task = null;
 		if (this instanceof GUIPrepareGARun)
 		{
-			task = new DenoptimGA(configFile, workDir);
+			task = new GARunner(configFile, workDir);
 		} else if (this instanceof GUIPrepareFSERun)
 		{
 			task = new FragSpaceExplorer(configFile, workDir);

@@ -26,12 +26,12 @@ import java.util.Map;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.ga.GAParameters;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.MultiMolecularModelBuilder;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.task.ProgramTask;
 
 /**

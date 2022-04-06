@@ -28,7 +28,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.ga.DENOPTIMGraphOperations;
-import denoptim.ga.GAParameters;
 import denoptim.ga.XoverSite;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMTemplate;
@@ -37,6 +36,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.task.ProgramTask;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.MutationType;

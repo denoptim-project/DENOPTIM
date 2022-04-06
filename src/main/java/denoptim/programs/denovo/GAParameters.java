@@ -17,7 +17,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.ga;
+package denoptim.programs.denovo;
 
 import java.io.File;
 import java.io.IOException;
@@ -354,21 +354,21 @@ public class GAParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
 
-    protected String getUIDFileIn()
+    public String getUIDFileIn()
     {
         return uidFileIn;
     }
 
 //------------------------------------------------------------------------------
 
-    protected String getUIDFileOut()
+    public String getUIDFileOut()
     {
         return uidFileOut;
     }
 
 //------------------------------------------------------------------------------
 
-    protected String getVisitedGraphsFile()
+    public String getVisitedGraphsFile()
     {
         return visitedGraphsFile;
     }
@@ -382,63 +382,63 @@ public class GAParameters extends RunTimeParameters
     
 //------------------------------------------------------------------------------
 
-    protected String getMonitorFile()
+    public String getMonitorFile()
     {
         return monitorFile;
     }
     
 //------------------------------------------------------------------------------
     
-    protected int getMonitorDumpStep()
+    public int getMonitorDumpStep()
     {
         return monitorDumpStep;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getPrecisionLevel()
+    public int getPrecisionLevel()
     {
         return precisionLevel;
     }
     
 //------------------------------------------------------------------------------
 
-    protected int getPrintLevel()
+    public int getPrintLevel()
     {
         return print_level;
     }
     
 //------------------------------------------------------------------------------
 
-    protected int getNumberOfCPU()
+    public int getNumberOfCPU()
     {
         return numParallelTasks;
     }    
 
 //------------------------------------------------------------------------------
 
-    protected boolean isSortOrderDecreasing()
+    public boolean isSortOrderDecreasing()
     {
         return sortOrderDecreasing;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getMaxTriesFactor()
+    public int getMaxTriesFactor()
     {
         return maxTriesPerPop;
     }
     
 //------------------------------------------------------------------------------
 
-    protected int getMaxGeneticOpAttempts()
+    public int getMaxGeneticOpAttempts()
     {
         return maxGeneticOpAttempts;
     }
 
 //------------------------------------------------------------------------------
 
-    protected String getDataDirectory()
+    public String getDataDirectory()
     {
         return dataDir;
     }
@@ -461,174 +461,174 @@ public class GAParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
 
-    protected int getReplacementStrategy()
+    public int getReplacementStrategy()
     {
         return replacementStrategy;
     }
 
 //------------------------------------------------------------------------------
 
-    protected double getCrowdingFactorSteepSigma()
+    public double getCrowdingFactorSteepSigma()
     {
         return crowdingSigmaSteepness;
     }
 
 //------------------------------------------------------------------------------
 
-    protected double getCrowdingFactorMiddleSigma()
+    public double getCrowdingFactorMiddleSigma()
     {
         return crowdingSigmaMiddle;
     }
 
 //------------------------------------------------------------------------------
 
-    protected double getCrowdingMultiplier()
+    public double getCrowdingMultiplier()
     {
         return crowdingMultiplier;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getCrowdingProbabilityScheme()
+    public int getCrowdingProbabilityScheme()
     {
         return crowdingProbabilityScheme;
     }
     
 //------------------------------------------------------------------------------
 
-    protected double getGrowthFactorSteepSigma()
+    public double getGrowthFactorSteepSigma()
     {
         return lvlGrowthSigmaSteepness;
     }
 
 //------------------------------------------------------------------------------
 
-    protected double getGrowthFactorMiddleSigma()
+    public double getGrowthFactorMiddleSigma()
     {
         return lvlGrowthSigmaMiddle;
     }
 
 //------------------------------------------------------------------------------
 
-    protected double getGrowthMultiplier()
+    public double getGrowthMultiplier()
     {
         return lvlGrowthMultiplier;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getGrowthProbabilityScheme()
+    public int getGrowthProbabilityScheme()
     {
         return lvlGrowthProbabilityScheme;
     }
     
 //------------------------------------------------------------------------------
 
-    protected double getMolGrowthFactorSteepSigma()
+    public double getMolGrowthFactorSteepSigma()
     {
         return molGrowthSigmaSteepness;
     }
 
 //------------------------------------------------------------------------------
 
-    protected double getMolGrowthFactorMiddleSigma()
+    public double getMolGrowthFactorMiddleSigma()
     {
         return molGrowthSigmaMiddle;
     }
 
 //------------------------------------------------------------------------------
 
-    protected double getMolGrowthMultiplier()
+    public double getMolGrowthMultiplier()
     {
         return molGrowthMultiplier;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getMolGrowthProbabilityScheme()
+    public int getMolGrowthProbabilityScheme()
     {
         return molGrowthProbabilityScheme;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getPopulationSize()
+    public int getPopulationSize()
     {
         return populationSize;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getNumberOfGenerations()
+    public int getNumberOfGenerations()
     {
         return numGenerations;
     }
 
 //------------------------------------------------------------------------------
 
-    protected String getSelectionStrategy()
+    public String getSelectionStrategy()
     {
         return strXoverSelectionMode;
     }
     
 //------------------------------------------------------------------------------
     
-    protected List<MutationType> getExcludedMutationTypes()
+    public List<MutationType> getExcludedMutationTypes()
     {
         return excludedMutationTypes;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getSelectionStrategyType()
+    public int getSelectionStrategyType()
     {
         return xoverSelectionMode;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getNumberOfConvergenceGenerations()
+    public int getNumberOfConvergenceGenerations()
     {
         return numConvGen;
     }
 
 //------------------------------------------------------------------------------
 
-    protected int getNumberOfChildren()
+    public int getNumberOfChildren()
     {
         return numOfChildren;
     }
     
 //------------------------------------------------------------------------------
-    protected double getCrossoverWeight()
+    public double getCrossoverWeight()
     {
         return crossoverWeight;
     }
 
 //------------------------------------------------------------------------------
 
-    protected double getMutationWeight()
+    public double getMutationWeight()
     {
         return mutationWeight;
     }
     
 //------------------------------------------------------------------------------
 
-    protected double getConstructionWeight()
+    public double getConstructionWeight()
     {
         return builtAnewWeight;
     }
 
 //------------------------------------------------------------------------------
 
-    protected double getSymmetryProbability()
+    public double getSymmetryProbability()
     {
         return symmetricSubProbability;
     }
     
 //------------------------------------------------------------------------------
 
-    protected String getInitialPopulationFile()
+    public String getInitialPopulationFile()
     {
         return initPoplnFile;
     }
@@ -641,6 +641,62 @@ public class GAParameters extends RunTimeParameters
         return mutliSiteMutationWeights;
     }
 
+//------------------------------------------------------------------------------
+   
+    public boolean useMolSizeBasedProb()
+    {
+        return useMolSizeBasedProb;
+    }
+    
+//------------------------------------------------------------------------------
+   
+    public boolean useLevelBasedProb()
+    {
+        return useLevelBasedProb;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public int getParallelizationScheme()
+    {
+        return parallelizationScheme;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public double getMinFitnessSD()
+    {
+        return minFitnessSD;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public boolean dumpMonitor()
+    {
+        return dumpMonitor;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public double getSaveRingSystemsFitnessThreshold()
+    {
+        return saveRingSystemsFitnessThreshold;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public boolean getSaveRingSystemsAsTemplatesNonScaff()
+    {
+        return saveRingSystemsAsTemplatesNonScaff;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public boolean getSaveRingSystemsAsTemplatesScaff()
+    {
+        return saveRingSystemsAsTemplatesScaffolds;
+    }
+    
 //-----------------------------------------------------------------------------
 
     /**

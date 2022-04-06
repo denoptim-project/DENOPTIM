@@ -36,6 +36,7 @@ import denoptim.logging.DENOPTIMLogger;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.task.FitnessTask;
 import denoptim.utils.GraphConversionTool;
 
@@ -170,17 +171,17 @@ public class OffspringEvaluationTask extends FitnessTask
 	                population.add(result);
 	                isWithinBestPrcentile = population.isWithinPercentile(
                             result.getFitness(),
-                            gaSettings.saveRingSystemsFitnessThreshold);
+                            gaSettings.getSaveRingSystemsFitnessThreshold());
                 }
         	}
 
-        	if ((gaSettings.saveRingSystemsAsTemplatesNonScaff
-        	        || gaSettings.saveRingSystemsAsTemplatesScaffolds)
+        	if ((gaSettings.getSaveRingSystemsAsTemplatesNonScaff()
+        	        || gaSettings.getSaveRingSystemsAsTemplatesScaff())
         	    && isWithinBestPrcentile)
         	{   
                 FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
-                        gaSettings.saveRingSystemsAsTemplatesScaffolds,
-                        gaSettings.saveRingSystemsAsTemplatesNonScaff,
+                        gaSettings.getSaveRingSystemsAsTemplatesScaff(),
+                        gaSettings.getSaveRingSystemsAsTemplatesNonScaff(),
                         fitProvMol);
         	}
         }

@@ -61,7 +61,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 
 import denoptim.ga.EAUtils;
-import denoptim.ga.GAParameters;
+import denoptim.programs.denovo.GAParameters;
 
 
 /**
