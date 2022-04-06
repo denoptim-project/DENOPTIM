@@ -37,7 +37,9 @@ import java.util.ArrayList;
  * @author Marco Foscato
  */
 
-public class FSECheckPoint implements Serializable
+//TODO: use json
+
+public class CheckPoint implements Serializable
 {
     /**
      * Level
@@ -70,14 +72,14 @@ public class FSECheckPoint implements Serializable
     private int graphId = -1;
 
     /**
-     * Set of indeces for the next iteration in combination of frags 
+     * Set of indexes for the next iteration in combination of building blocks.
      */
     private ArrayList<Integer> nextIds;
 
 
 //-----------------------------------------------------------------------------
 
-    public FSECheckPoint()
+    public CheckPoint()
     {
         nextIds = new ArrayList<Integer>();
     }
@@ -114,21 +116,21 @@ public class FSECheckPoint implements Serializable
 
     public ArrayList<Integer> getNextIds()
     {
-	return nextIds;
+        return nextIds;
     }
 
 //-----------------------------------------------------------------------------
 
     public int getLatestSafelyCompletedGraphId()
     {
-	return graphId;
+        return graphId;
     }
 
 //-----------------------------------------------------------------------------
 
     public int getRootId()
     {
-	return rootId;
+        return rootId;
     }
 
 //-----------------------------------------------------------------------------
@@ -142,26 +144,26 @@ public class FSECheckPoint implements Serializable
     
     public boolean serFileAlreadyUsed(String filename)
     {
-	File candFile = new File(filename);
-	File doneFile = new File(CEBLUtils.getBaseNameOfStorageFile(rootId));
-	int res = candFile.compareTo(doneFile);
-	if (res < 0)
-	{
-	    return true;
-	}
-	return false;
+    	File candFile = new File(filename);
+    	File doneFile = new File(CEBLUtils.getBaseNameOfStorageFile(rootId));
+    	int res = candFile.compareTo(doneFile);
+    	if (res < 0)
+    	{
+    	    return true;
+    	}
+    	return false;
     }
 
 //-----------------------------------------------------------------------------
 
     /**
-     * Set the indeces that identify the combination of fragments next to the
+     * Set the indexes that identify the combination of fragments next to the
      * latest one that has been properly processed.
      */
 
     public void setNextIds(ArrayList<Integer> nextIds)
     {
-	this.nextIds = nextIds;
+        this.nextIds = nextIds;
     }
 
 //-----------------------------------------------------------------------------
@@ -172,7 +174,7 @@ public class FSECheckPoint implements Serializable
 
     public void setLevel(int level)
     {
-	this.level = level;
+        this.level = level;
     }
 
 //-----------------------------------------------------------------------------
@@ -227,7 +229,7 @@ public class FSECheckPoint implements Serializable
 
     public void setRootId(int val)
     {
-	rootId = val;
+        rootId = val;
     }
 
 //-----------------------------------------------------------------------------
@@ -235,16 +237,16 @@ public class FSECheckPoint implements Serializable
     @Override
     public String toString()
     {
-	StringBuilder sb = new StringBuilder();
-	sb.append("FSECheckPoint[");
-	sb.append("level=").append(level);
-	sb.append(", unqVrtId=").append(unqVrtId);
-	sb.append(", unqGraphId=").append(unqGraphId);
-	sb.append(", unqMolId=").append(unqMolId);
-	sb.append(", graphId=").append(graphId);
-	sb.append(", rootId=").append(rootId);
-	sb.append(", nextIds=").append(nextIds);
-	return sb.toString();
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("FSECheckPoint[");
+    	sb.append("level=").append(level);
+    	sb.append(", unqVrtId=").append(unqVrtId);
+    	sb.append(", unqGraphId=").append(unqGraphId);
+    	sb.append(", unqMolId=").append(unqMolId);
+    	sb.append(", graphId=").append(graphId);
+    	sb.append(", rootId=").append(rootId);
+    	sb.append(", nextIds=").append(nextIds);
+    	return sb.toString();
     }
 
 //-----------------------------------------------------------------------------

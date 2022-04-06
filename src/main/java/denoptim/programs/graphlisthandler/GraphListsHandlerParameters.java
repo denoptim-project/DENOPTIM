@@ -61,17 +61,7 @@ public class GraphListsHandlerParameters extends RunTimeParameters
      */
     public GraphListsHandlerParameters()
     {
-        this(ParametersType.GLH_PARAMS);
-    }
-    
-//-----------------------------------------------------------------------------
-    
-    /**
-     * Constructor
-     */
-    private GraphListsHandlerParameters(ParametersType paramType)
-    {
-        super(paramType);
+        super(ParametersType.GLH_PARAMS);
     }
 
 //-----------------------------------------------------------------------------
@@ -110,28 +100,28 @@ public class GraphListsHandlerParameters extends RunTimeParameters
         String msg = "";
         switch (key.toUpperCase())
         {
-        case "GRAPHLISTS-WORKDIR=":
+        case "WORKDIR=":
             workDir = value;
             break;
-        case "GRAPHLISTS-INPUTGRAPHS-A=":
+        case "INPUTGRAPHS-A=":
             inGraphsFileA = value;
             break;
-        case "GRAPHLISTS-INPUTGRAPHS-B=":
+        case "INPUTGRAPHS-B=":
             inGraphsFileB = value;
             break;
-        case "GRAPHLISTS-OUTPUTGRAPHS=":
+        case "OUTPUTGRAPHS=":
             outGraphsFile = value;
             break;
-        case "GRAPHLISTS-INPUTGRAPHSFORMAT=":
+        case "INPUTGRAPHSFORMAT=":
             inGraphsFormat = value.toUpperCase();
             break;
-        case "GRAPHLISTS-OUTPUTGRAPHSFORMAT=":
+        case "OUTPUTGRAPHSFORMAT=":
             outGraphsFormat = value.toUpperCase();
             break;
-        case "GRAPHLISTS-LOGFILE=":
+        case "LOGFILE=":
             logFile = value;
             break;
-        case "GRAPHLISTS-VERBOSITY=":
+        case "VERBOSITY=":
             try
             {
                 verbosity = Integer.parseInt(value);
@@ -143,10 +133,43 @@ public class GraphListsHandlerParameters extends RunTimeParameters
             }
             break;
         default:
-             msg = "Keyword " + key + " is not a known GraphEditor-"
+             msg = "Keyword " + key + " is not a known GraphListHandler-"
                                        + "related keyword. Check input files.";
             throw new DENOPTIMException(msg);
         }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
 
 //------------------------------------------------------------------------------

@@ -52,8 +52,16 @@ import denoptim.task.ProgramTask;
 
 
 /**
- * Parameters controlling execution of the combinatorial algorithm for 
- * exploration of a fragment space by layer (CEBL).
+ * Collection of parameters controlling the behavior of the software. 
+ * These parameters have a default value and are optionally defined at startup 
+ * by reading in input parameter file.
+ * Parameters are collected in a hierarchical structure so that those parameters
+ * that determine the primary behavior of the software, i.e., define the 
+ * {@link RunType}, determine also the type of the main parameter collector, 
+ * i.e., any one of the implementations of this class. Other parameters, such as
+ * those defining the settings of functions used by the main program, are 
+ * collected as secondary parameters that can be accessed via the primary one
+ * by means of the {@link #getParameters(ParametersType)} method.
  * 
  * @author Marco Foscato
  */
@@ -91,22 +99,22 @@ public abstract class RunTimeParameters
      */
     public static enum ParametersType { 
         /**
-         * Parameters pertaining the combinatorial exploration by layer
+         * Parameters pertaining the combinatorial exploration by layer.
          */
         CEBL_PARAMS,
         
         /**
-         * Parameters pertaining the genetic algorithm
+         * Parameters pertaining the genetic algorithm.
          */
         GA_PARAMS,
         
         /**
-         * Parameters pertaining the definition of the fragment space
+         * Parameters pertaining the definition of the fragment space.
          */
         FS_PARAMS,
         
         /**
-         * Parameters pertaining to ring closures in graphs
+         * Parameters pertaining to ring closures in graphs.
          */
         RC_PARAMS,
         
@@ -202,6 +210,22 @@ public abstract class RunTimeParameters
         }
     }
     
+    /*
+     * TODO: if we want a general Parameter class it will have to define
+     * - unique name of the parameter
+     * - java type used to collect the value
+     * - default value
+     * - description of what the parameter is or what it controls
+     * - code for parsing the value from input files
+     * - code for checking
+     * - core for processing the parameter
+     * - what else?
+     * 
+     *  Challenge: what about parameters that depend on other parameters?
+     *  Need to control order of processing the parameters, in some occasions.
+     */
+    
+    
     /**
      * New line character
      */
@@ -216,6 +240,17 @@ public abstract class RunTimeParameters
     public RunTimeParameters(ParametersType paramType)
     {
         this.paramType = paramType;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Returns a string defining the type the parameters collected here.
+     * @return a string defining the type the parameters collected here.
+     */
+    public String paramTypeName()
+    {
+        return paramType.toString();
     }
 
 //-----------------------------------------------------------------------------
@@ -290,31 +325,7 @@ public abstract class RunTimeParameters
             br = new BufferedReader(new FileReader(infile));
             while ((line = br.readLine()) != null)
             {
-                if ((line.trim()).length() == 0)
-                    continue;
-
-                if (line.startsWith("#")) //commented out lines
-                    continue;
-                
-                if (line.toUpperCase().startsWith(paramType.keywordRoot))
-                {
-                    interpretKeyword(line);
-                    continue;
-                } else {
-                    for (ParametersType parType : ParametersType.values())
-                    {
-                        if (line.toUpperCase().startsWith(parType.keywordRoot))
-                        {
-                            if (!otherParameters.containsKey(parType))
-                            {
-                                otherParameters.put(parType, 
-                                        RunTimeParameters.getInstanceFor(
-                                                paramType));
-                            }
-                            otherParameters.get(parType).interpretKeyword(line);
-                        }
-                    }
-                }
+                readParameterLine(line);
             }
         }
         catch (NumberFormatException | IOException nfe)
@@ -337,6 +348,42 @@ public abstract class RunTimeParameters
             }
         }
     }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @param line the line to try to interpret.
+     * @throws DENOPTIMException if the parameter could be read but not 
+     * interpreted, i.e., any wrong format of syntax.
+     */
+    public void readParameterLine(String line) throws DENOPTIMException
+    {
+        if ((line.trim()).length() == 0)
+            return;
+
+        if (line.startsWith("#")) //commented out lines
+            return;
+        
+        if (line.toUpperCase().startsWith(paramType.keywordRoot))
+        {
+            interpretKeyword(line);
+            
+        } else {
+            for (ParametersType parType : ParametersType.values())
+            {
+                if (line.toUpperCase().startsWith(parType.keywordRoot))
+                {
+                    if (!otherParameters.containsKey(parType))
+                    {
+                        otherParameters.put(parType, 
+                                RunTimeParameters.getInstanceFor(
+                                        parType));
+                    }
+                    otherParameters.get(parType).interpretKeyword(line);
+                }
+            }
+        }
+    }
 
 //-----------------------------------------------------------------------------
 
@@ -352,9 +399,8 @@ public abstract class RunTimeParameters
         RunTimeParameters instance = null;
         try
         {
-            Constructor<?> constructor = paramType.getImplementation()
-                    .getConstructor(ParametersType.class);
-            instance = (RunTimeParameters) constructor.newInstance(paramType);
+            Constructor<?> c = paramType.getImplementation().getConstructor();
+            instance = (RunTimeParameters) c.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
             //This should never happen
@@ -384,6 +430,31 @@ public abstract class RunTimeParameters
     {
         return otherParameters.get(type);
     }
+    
+//------------------------------------------------------------------------------
+    
+// TODO: consider this mechanism for retrieving parameters once all parameters
+//       will be of type Parameter.
+//
+//    /**
+//     * @param type the type of embedded parameters to search for.
+//     * @return the requested parameter, or null.
+//     */
+//    public RunTimeParameters getParameter(ParametersType type, 
+//            String parName)
+//    {
+//        if (!containsParameters(type))
+//            otherParameters.put(type, getInstanceFor(type));
+//
+//        return otherParameters.get(type).get(parName);
+//    }
+//    
+////----------------------------------------------------------------------------
+//    
+//    public Parameter get(String parameterName)
+//    {
+//        return ...;
+//    }
 
 //-----------------------------------------------------------------------------
 
@@ -401,6 +472,8 @@ public abstract class RunTimeParameters
             key = line.substring(paramType.keywordRoot.length(),
                     line.indexOf("=") + 1).trim();
             value = line.substring(line.indexOf("=") + 1).trim();
+        } else {
+            key = line.substring(paramType.keywordRoot.length());
         }
         try
         {
@@ -476,20 +549,26 @@ public abstract class RunTimeParameters
      * @return the list of parameters in a string with newline characters as
      * delimiters.
      */
+    //NB: this must be abstract because the superclass cannot look into the
+    // private fields of the subclass. When the parameters will be stored as
+    // objects rather then fields, then we should be able to have the 
+    // public String getPrintedList only in this class.
+    public abstract String getPrintedList();
+    /*
     public String getPrintedList()
     {
         StringBuilder sb = new StringBuilder(1024);
-        sb.append(" " + paramType + " ").append(NL);
-        for (Field f : RunTimeParameters.class.getDeclaredFields()) 
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
         {
             try
             {
                 sb.append(f.getName()).append(" = ").append(
-                            f.get(RunTimeParameters.class)).append(NL);
+                            f.get(this)).append(NL);
             }
             catch (Throwable t)
             {
-                sb.append("ERROR! Unable to print " + paramType 
+                sb.append("ERROR! Unable to print " + paramTypeName() 
                         + " parameters. Cause: " + t);
                 break;
             }
@@ -500,6 +579,7 @@ public abstract class RunTimeParameters
         }
         return sb.toString();
     }
+    */
     
 //----------------------------------------------------------------------------
 
@@ -510,7 +590,7 @@ public abstract class RunTimeParameters
     public void printParameters()
     {
         StringBuilder sb = new StringBuilder(1024);
-        sb.append(getPrintedList());
+        sb.append(getPrintedList()).append(NL);
         sb.append("-------------------------------------------"
                 + "----------------------").append(NL);
         DENOPTIMLogger.appLogger.info(sb.toString());

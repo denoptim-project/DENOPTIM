@@ -102,14 +102,14 @@ public abstract class FitnessTask extends Task
     /**
      * Settings for the calculation of the fitness
      */
-    protected FitnessParameters settings;
+    protected FitnessParameters fitnessSettings;
 
 //------------------------------------------------------------------------------
     
     public FitnessTask(FitnessParameters settings, Candidate c)
     {
     	super(TaskUtils.getUniqueTaskIndex());
-    	this.settings = settings;
+    	this.fitnessSettings = settings;
     	this.result = c;
         this.dGraph = c.getGraph();
     }
@@ -142,7 +142,7 @@ public abstract class FitnessTask extends Task
         
         // Run fitness provider
         boolean status = false;
-        if (settings.useExternalFitness()) {
+        if (fitnessSettings.useExternalFitness()) {
             // Write file with input data to fitness provider
             DenoptimIO.writeSDFFile(fitProvInputFile, fitProvMol, false);
 
@@ -160,7 +160,7 @@ public abstract class FitnessTask extends Task
         DenoptimIO.writeCandidateToFile(new File(fitProvOutFile), result, false);
         
         // Optional image creation
-        if (status && settings.makePictures())
+        if (status && fitnessSettings.makePictures())
         {
             try
             {
@@ -191,9 +191,9 @@ public abstract class FitnessTask extends Task
 	private boolean runExternalFitness() throws DENOPTIMException
 	{
 		StringBuilder sb = new StringBuilder();
-        sb.append(settings.getExternalFitnessProviderInterpreter());
+        sb.append(fitnessSettings.getExternalFitnessProviderInterpreter());
         sb.append(" ").append(
-        		settings.getExternalFitnessProvider())
+        		fitnessSettings.getExternalFitnessProvider())
               .append(" ").append(fitProvInputFile)
               .append(" ").append(fitProvOutFile)
               .append(" ").append(workDir)
@@ -214,9 +214,9 @@ public abstract class FitnessTask extends Task
         if (processHandler.getExitCode() != 0)
         {
             msg = "Failed to execute fitness provider " 
-                + settings.getExternalFitnessProviderInterpreter()
+                + fitnessSettings.getExternalFitnessProviderInterpreter()
                     .toString()
-		        + " command '" + settings.getExternalFitnessProvider()
+		        + " command '" + fitnessSettings.getExternalFitnessProvider()
 		        + "' on " + fitProvInputFile;
             DENOPTIMLogger.appLogger.severe(msg);
             DENOPTIMLogger.appLogger.severe(
@@ -399,8 +399,8 @@ public abstract class FitnessTask extends Task
 	    double fitVal = Double.NaN;
 		try {
 			FitnessProvider fp = new FitnessProvider(
-					settings.getDescriptors(),
-					settings.getFitnessExpression());
+					fitnessSettings.getDescriptors(),
+					fitnessSettings.getFitnessExpression());
 			// NB: here we remove dummy atoms!
 			fitVal = fp.getFitness(fitProvMol);
 		} catch (Exception e) {

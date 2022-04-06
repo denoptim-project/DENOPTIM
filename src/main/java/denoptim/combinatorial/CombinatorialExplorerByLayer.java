@@ -113,6 +113,9 @@ public class CombinatorialExplorerByLayer
     public CombinatorialExplorerByLayer(CEBLParameters settings)
     {
         this.settings = settings;
+        this.verbosity = settings.getVerbosity();
+        this.restartFromChkPt = settings.restartFromCheckPoint();
+        
         futures = new ArrayList<>();
         submitted = new ArrayList<>();
 
@@ -267,7 +270,7 @@ public class CombinatorialExplorerByLayer
             if (storeChkPt)
             {
                 tsk = submitted.get(idToChkPt);
-                FSECheckPoint chk = settings.getCheckPoint();
+                CheckPoint chk = settings.getCheckPoint();
                 chk.setSafelyCompletedGraphId(tsk.getGraphId());
                 chk.setRootId(tsk.getRootId());
                 chk.setNextIds(tsk.getNextIds());
@@ -318,13 +321,13 @@ public class CombinatorialExplorerByLayer
         if (restartFromChkPt)
         {
             firstAfterRestart = true;
-            FSECheckPoint chk = settings.getCheckPoint();
+            CheckPoint chk = settings.getCheckPoint();
             level = chk.getLevel();
             GraphUtils.resetUniqueVertexCounter(chk.getUnqVrtId());
             GraphUtils.resetUniqueGraphCounter(chk.getUnqGraphId());
             GraphUtils.resetUniqueMoleculeCounter(chk.getUnqMolId());
 
-            msg = "Restarting FragSpaseExplorer from checkpoint file. "
+            msg = "Restarting Combinatorial job from checkpoint file. "
                   + DENOPTIMConstants.EOL
                   + "All graphs with ID higher than "
                   + chk.getLatestSafelyCompletedGraphId()
@@ -596,7 +599,6 @@ public class CombinatorialExplorerByLayer
         int total = 0;
         int itersFromChkPt = 0;
         String prevLevDirName = CEBLUtils.getNameOfStorageDir(settings,level-1);
-        File prevLevDir = new File(prevLevDirName);
         if (!denoptim.files.FileUtils.checkExists(prevLevDirName))
         {
              msg = "Previous level folder '" + prevLevDirName + "' not found!";

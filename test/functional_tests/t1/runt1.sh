@@ -116,7 +116,7 @@ do
 
     #Check output
     if [ -f "$logFile" ]; then
-        if ! grep -q 'DenoptimCG terminated normally' "$logFile"; then
+        if ! grep -q 'MolecularModelBuilder terminated normally' "$logFile"; then
             if grep -q 'Tinker failed on task' "$logFile"; then
                 # In this case, Denoptim detected a problem in the Tinker job
                 # and cannot proceed. This kind of error is most ofted due to

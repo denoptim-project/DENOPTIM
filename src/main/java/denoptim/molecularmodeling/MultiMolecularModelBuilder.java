@@ -95,13 +95,21 @@ public class MultiMolecularModelBuilder
                   + " #atoms: " + mol.getIAtomContainer().getAtomCount();
             System.out.println(msg);
         }
+        
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
 
         // Evaluate source of isomerism
         // 1: Attempt Ring Closures 
         RingClosureTool rct = new RingClosureTool(settings);
         ArrayList<Molecule3DBuilder> rcMols =new ArrayList<Molecule3DBuilder>();
         boolean skipConfSearch = false;
-        if (RingClosureParameters.allowRingClosures() && 
+        if (rcParams.allowRingClosures() && 
             mol.getGraph().getRings().size() != 0)
         {
             startTime = System.nanoTime();
@@ -126,8 +134,7 @@ public class MultiMolecularModelBuilder
                       + " #allClosedRCSCombs: " + numAllClosedCombs;
                 System.out.println(msg);
             }
-            if (RingClosureParameters.requireCompleteRingclosure 
-                    && numAllClosedCombs<1)
+            if (rcParams.requireCompleteRingclosure && numAllClosedCombs<1)
             {
                 msg = "No fully closed RCS combinaton. Nothing to send to "
                         + "conformational search.";

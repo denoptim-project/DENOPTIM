@@ -211,8 +211,7 @@ public class EAUtilsTest
     @Test
     public void testBuildByXOver_SubGraph() throws Exception
     {
-        PopulationTest.prepare();
-        GAParameters gaparams = new GAParameters();
+        GAParameters gaparams = PopulationTest.prepare();
         Population population = new Population(gaparams);
         
         /*
@@ -289,8 +288,7 @@ public class EAUtilsTest
     @Test
     public void testBuildByXOver_Embedded_Free() throws Exception
     {
-        PopulationTest.prepare();
-        GAParameters gaparams = new GAParameters();
+        GAParameters gaparams = PopulationTest.prepare();
         Population population = new Population(gaparams);
 
         DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
@@ -349,8 +347,7 @@ public class EAUtilsTest
     @Test
     public void testBuildByXOver_Embedded_FreeBackwards() throws Exception
     {
-        PopulationTest.prepare();
-        GAParameters gaparams = new GAParameters();
+        GAParameters gaparams = PopulationTest.prepare();
         Population population = new Population(gaparams);
 
         DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsBxo();
@@ -399,8 +396,7 @@ public class EAUtilsTest
     @Test
     public void testBuildByXOver_Embedded_FixedStructure() throws Exception
     {
-        PopulationTest.prepare();
-        GAParameters gaparams = new GAParameters();
+        GAParameters gaparams = PopulationTest.prepare();
         Population population = new Population(gaparams);
 
         DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();

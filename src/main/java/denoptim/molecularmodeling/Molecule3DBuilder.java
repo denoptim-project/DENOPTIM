@@ -51,7 +51,6 @@ import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ObjectPair;

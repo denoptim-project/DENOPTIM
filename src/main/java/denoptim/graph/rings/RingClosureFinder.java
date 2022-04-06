@@ -47,25 +47,6 @@ import denoptim.utils.GenUtils;
 public class RingClosureFinder
 {
 
-    /**
-     * verbosity level
-     */
-    private static int verbosity = RingClosureParameters.getVerbosity();
-
-    /**
-     * Flag to exit conformational search as soon as possible
-     */
-    private static boolean stopAtFirstMatch = 
-				!RingClosureParameters.doExhaustiveConfSrch();
-
-    // hard coded flag for debug: ***VERY*** time consuming
-    private static boolean writeAllConfs = false; 
-
-    /**
-     * Recursion counter for debug purposes
-     */
-    private static int rec = 0;
-
 //----------------------------------------------------------------------------
 
     /**
@@ -81,7 +62,8 @@ public class RingClosureFinder
     public static boolean evaluateClosability(List<IAtom> path, 
                                    ArrayList<Boolean> rotatability,
                                    ArrayList<ArrayList<Point3d>> dihRefs,
-                                   ArrayList<ArrayList<Double>> closableConfs)
+                                   ArrayList<ArrayList<Double>> closableConfs,
+                                   RingClosureParameters settings)
     {
         boolean res = false;
 
@@ -96,9 +78,9 @@ public class RingClosureFinder
             System.exit(1);
         }
         //NB: the '+2' comes from the 'bonds' to RCAs: 2 per fundamental ring
-        if (sz > RingClosureParameters.getMaxNumberRotatableBonds()+2)
+        if (sz > settings.getMaxNumberRotatableBonds()+2)
         {
-            if (verbosity > 0)
+            if (settings.getVerbosity() > 0)
             {
                 System.out.println("Too many rotatable bonds for systematic "
                         + "search. We assume the path is closable.");
@@ -127,8 +109,8 @@ public class RingClosureFinder
                                          path.get(t1).getPoint3d(),
                                          path.get(t2).getPoint3d());
         ArrayList<Double> clsablConds = rc.getClosabilityConditions(
-                           RingClosureParameters.getConfPathExtraTolerance());
-        if (verbosity > 1)
+                settings.getConfPathExtraTolerance());
+        if (settings.getVerbosity() > 1)
         {
             System.out.println("RingClosability conditions vector:");
             System.out.println(clsablConds);
@@ -144,9 +126,9 @@ public class RingClosureFinder
             double a = DENOPTIMMathUtils.angle(ptsChain.get(i-2),
                                                ptsChain.get(i-1),
                                                ptsChain.get(i));
-            if (a >= RingClosureParameters.getLinearityLimit())
+            if (a >= settings.getLinearityLimit())
             {
-                if (verbosity > 0)
+                if (settings.getVerbosity() > 0)
                     System.out.println("Skipping linearity in point "+i);
                 rotatability.set(i-1,false);
             }
@@ -175,11 +157,10 @@ public class RingClosureFinder
         dihedrals.add(0.0);
         dihIncement.add(0.0);
 
-        if (verbosity > 0)
+        if (settings.getVerbosity() > 0)
         {
             System.out.println("Exploring torsional space... (dim:"
-                               + nn + " - complete:" + !stopAtFirstMatch
-			       + ")");
+                    + nn + " - complete:" + settings.doExhaustiveConfSrch()+")");
         }
 
         long startTime = System.nanoTime();
@@ -188,16 +169,20 @@ public class RingClosureFinder
                                 dihedrals,
                                 dihIncement,
                                 0,
-                                RingClosureParameters.getPathConfSearchStep(),
+                                settings.getPathConfSearchStep(),
                                 h1,h2,t1,t2,
                                 clsablConds,
-                                closableConfs);
+                                closableConfs,
+                                settings.doExhaustiveConfSrch(),
+                                false, //true for debug only!
+                                settings.getVerbosity(),
+                                0);
         long endTime = System.nanoTime();
         long time = (endTime - startTime) / (long) 1000.0;
 
-        if (verbosity > 0)
+        if (settings.getVerbosity() > 0)
         {
-	    String s = "TIME (microsec) for exploration of torsional space: ";
+            String s = "TIME (microsec) for exploration of torsional space: ";
             System.out.println(s + time);
         }
 
@@ -235,7 +220,11 @@ public class RingClosureFinder
                                 double step,
                                 int h1, int h2, int t1, int t2,
                                 ArrayList<Double> clsablConds,
-                                ArrayList<ArrayList<Double>> closableConfs)
+                                ArrayList<ArrayList<Double>> closableConfs,
+                                boolean doExhaustiveSearch,
+                                boolean writeAllConfs,
+                                int verbosity,
+                                int rec)
     {
 
         boolean res = false;
@@ -305,7 +294,11 @@ public class RingClosureFinder
                                 step,
                                 h1,h2,t1,t2,
                                 clsablConds,
-                                closableConfs);
+                                closableConfs,
+                                doExhaustiveSearch,
+                                writeAllConfs,
+                                verbosity,
+                                rec);
                 rec--;
             }
             else
@@ -362,7 +355,7 @@ public class RingClosureFinder
                     }
                 }
             }
-    	    if (stopAtFirstMatch)
+    	    if (!doExhaustiveSearch)
     	    {
                 if (res)
                 {

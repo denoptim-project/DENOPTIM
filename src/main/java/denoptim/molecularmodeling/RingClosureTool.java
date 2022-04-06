@@ -42,6 +42,7 @@ import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 import denoptim.task.ProcessHandler;
 import denoptim.utils.GenUtils;
@@ -84,6 +85,7 @@ public class RingClosureTool
     public RingClosureTool(MMBuilderParameters settings)
     {
         this.settings = settings;
+        this.verbosity = settings.getVerbosity();
     }
 
 //------------------------------------------------------------------------------
@@ -347,7 +349,6 @@ public class RingClosureTool
     public Molecule3DBuilder attemptRingClosure(Molecule3DBuilder molIn,
                       Set<ObjectPair> rcaCombination) throws DENOPTIMException
     {
-
         Molecule3DBuilder rcMol3d = molIn.deepcopy();
         IAtomContainer fmol = rcMol3d.getIAtomContainer();
         TinkerMolecule tmol = rcMol3d.getTinkerMolecule();
@@ -398,8 +399,17 @@ public class RingClosureTool
             rsSbKey.append("RC-PAIR");
             rsSbKey.append(" " + iTnkAtmRcaA + " " + iTnkAtmRcaB + "\n");
         }
+
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        
         // Definition of RingClosingPotential
-        String rcStrategy = RingClosureParameters.getRCStrategy();
+        String rcStrategy = rcParams.getRCStrategy();
 
         if (rcStrategy.equals("BONDOVERLAP"))
         {
@@ -414,8 +424,8 @@ public class RingClosureTool
                 int iRcaB = ((Integer) op.getSecond()).intValue();
                 RingClosingAttractor rca0 = rcMol3d.getAttractor(iRcaA);
                 RingClosingAttractor rca1 = rcMol3d.getAttractor(iRcaB);
-                int s0t = fmol.getAtomNumber(rca0.getSrcAtom()) + 1;
-                int s1t = fmol.getAtomNumber(rca1.getSrcAtom()) + 1;
+                int s0t = fmol.indexOf(rca0.getSrcAtom()) + 1;
+                int s1t = fmol.indexOf(rca1.getSrcAtom()) + 1;
                 int i0t = rcMol3d.getTnkAtmIdOfRCA(rca0);
                 int i1t = rcMol3d.getTnkAtmIdOfRCA(rca1);
 
@@ -444,8 +454,8 @@ public class RingClosureTool
                 int iRcaB = ((Integer) op.getSecond()).intValue();
                 RingClosingAttractor rca0 = rcMol3d.getAttractor(iRcaA);
                 RingClosingAttractor rca1 = rcMol3d.getAttractor(iRcaB);
-                int s0t = fmol.getAtomNumber(rca0.getSrcAtom()) + 1;
-                int s1t = fmol.getAtomNumber(rca1.getSrcAtom()) + 1;
+                int s0t = fmol.indexOf(rca0.getSrcAtom()) + 1;
+                int s1t = fmol.indexOf(rca1.getSrcAtom()) + 1;
                 int i0t = rcMol3d.getTnkAtmIdOfRCA(rca0);
                 int i1t = rcMol3d.getTnkAtmIdOfRCA(rca1);
 
@@ -642,6 +652,14 @@ public class RingClosureTool
     public void closeRings(Molecule3DBuilder mol, 
 						 Set<ObjectPair> rcaCombination)
     {
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        
         // Collect candidate RingClosures
         List<RingClosure> candidatesClosures = new ArrayList<RingClosure>();
         for (ObjectPair op : rcaCombination)
@@ -665,8 +683,7 @@ public class RingClosureTool
             double lenT = srcB.distance(atmB);
             double distTolerance = (lenH + lenT) / 2.0;
 //TODO may want to use different set criteria
-            distTolerance = distTolerance 
-				   * RingClosureParameters.getRCDistTolerance();
+            distTolerance = distTolerance * rcParams.getRCDistTolerance();
 //
             double minDistH1T2 = -1.0;
             double minDistH2T1 = -1.0;
@@ -675,16 +692,15 @@ public class RingClosureTool
             double maxDistH2T1 = 0.0;
             double maxDistH2T2 = 0.0;
 //TODO may want to use different set criteria
-            double maxDotProdHT = RingClosureParameters.getRCDotPrTolerance();
+            double maxDotProdHT = rcParams.getRCDotPrTolerance();
 
-            if (RingClosureParameters.getRCStrategy().equals("BONDOVERLAP"))
+            if (rcParams.getRCStrategy().equals("BONDOVERLAP"))
             {
                 maxDistH1T2 = distTolerance;
                 maxDistH2T1 = distTolerance;
                 maxDistH2T2 = lenH + lenT;
             }
-            else if (RingClosureParameters.getRCStrategy().equals(
-                                                         "BONDCOMPLEMENTARITY"))
+            else if (rcParams.getRCStrategy().equals("BONDCOMPLEMENTARITY"))
             {
                 distTolerance = distTolerance / 2.0;
                 minDistH1T2 = lenH - distTolerance;
@@ -692,8 +708,7 @@ public class RingClosureTool
                 maxDistH1T2 = lenH + distTolerance;
                 maxDistH2T1 = lenT + distTolerance;
 //TODO may want to use different set criteria
-                maxDistH2T2 = distTolerance 
-				   * RingClosureParameters.getRCDistTolerance();
+                maxDistH2T2 = distTolerance * rcParams.getRCDistTolerance();
             }
 
     	    boolean closeThisBnd = false;

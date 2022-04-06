@@ -230,7 +230,7 @@ public class GraphBuildingTask extends FitnessTask
             
             // Initialize the 3d model builder
             tb3d = new ThreeDimTreeBuilder();
-            if (!settings.make3dTree())
+            if (!fitnessSettings.make3dTree())
             {
             	tb3d.setAlidnBBsIn3D(false);
             }
@@ -294,7 +294,7 @@ public class GraphBuildingTask extends FitnessTask
 
             // Evaluate graph
             Object[] res = dGraph.evaluateGraph(
-                    (FragmentSpaceParameters) settings.getParameters(
+                    (FragmentSpaceParameters) ceblSettings.getParameters(
                     ParametersType.FS_PARAMS));
             if (res == null) // null is used to indicate an unacceptable graph
             {
@@ -328,8 +328,7 @@ public class GraphBuildingTask extends FitnessTask
                 if (!needsCaps)
                 {
                     altCyclicGraphs = dGraph.makeAllGraphsWithDifferentRingSets(
-                            (FragmentSpaceParameters) settings.getParameters(
-                                    ParametersType.FS_PARAMS));
+                            ceblSettings);
                 }
                 int sz = altCyclicGraphs.size();
                 
@@ -444,7 +443,7 @@ public class GraphBuildingTask extends FitnessTask
                     // Optionally improve the molecular representation, which
                     // is otherwise only given by the collection of building
                     // blocks (not aligned, nor roto-translated)
-                	if (settings.make3dTree())
+                	if (fitnessSettings.make3dTree())
                 	{
                 	    //NB: this replaces unused RCVs with capping groups
                         GraphConversionTool.replaceUnusedRCVsWithCapps(gClone);

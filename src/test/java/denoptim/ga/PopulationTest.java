@@ -31,6 +31,7 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.logging.Monitor;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 
@@ -46,12 +47,8 @@ public class PopulationTest
     private static APClass APCA, APCB, APCC, APCD;
     
 //------------------------------------------------------------------------------
-    
-    /*
-     * We do not do @BeforeEach because this method must be static to be used
-     * in other unit tests.
-     */
-    public static void prepare() throws DENOPTIMException
+
+    public static GAParameters prepare() throws DENOPTIMException
     {   
         APCA = APClass.make("A", 0, BondType.SINGLE);
         APCB = APClass.make("B", 0, BondType.SINGLE);
@@ -97,7 +94,10 @@ public class PopulationTest
         FragmentSpace.setForbiddenEndList(forbEnds);
         FragmentSpace.setAPclassBasedApproach(true);
         
-        RingClosureParameters.allowRingClosures(true);
+        GAParameters settings = new GAParameters();
+        settings.readParameterLine(ParametersType.RC_PARAMS.getKeywordRoot() 
+                + "CLOSERINGS");
+        return settings;
     }
 
 //------------------------------------------------------------------------------
@@ -105,8 +105,7 @@ public class PopulationTest
     @Test
     public void testXOverCompatibility() throws Exception
     {
-        prepare();
-        GAParameters gaparams = new GAParameters();
+        GAParameters gaparams = prepare();
         Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -214,8 +213,7 @@ public class PopulationTest
     @Test
     public void testClone() throws Exception
     {
-        prepare();
-        GAParameters gaparams = new GAParameters();
+        GAParameters gaparams = prepare();
         Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -539,8 +537,7 @@ public class PopulationTest
     @Test
     public void testGetMinMax() throws Exception
     {
-        prepare();
-        GAParameters gaparams = new GAParameters();
+        GAParameters gaparams = prepare();
         Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -580,8 +577,7 @@ public class PopulationTest
     @Test
     public void testIsInPercentile() throws Exception
     {
-        prepare();
-        GAParameters gaparams = new GAParameters();
+        GAParameters gaparams = prepare();
         Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -622,8 +618,7 @@ public class PopulationTest
     @Test
     public void testPopulationVersion() throws Exception
     {
-        prepare();
-        GAParameters gaparams = new GAParameters();
+        GAParameters gaparams = prepare();
         Population pop = new Population(gaparams);
         int v0 = pop.getVersionID();
         

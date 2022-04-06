@@ -160,17 +160,6 @@ public class MMBuilderParameters extends RunTimeParameters
     {
         super(ParametersType.MMB_PARAM);
     }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Constructor
-     * @param paramType
-     */
-    private MMBuilderParameters(ParametersType paramType)
-    {
-        super(paramType);
-    }
 
 //------------------------------------------------------------------------------
 
@@ -452,6 +441,38 @@ public class MMBuilderParameters extends RunTimeParameters
             }
         }
         */
+    }
+    
+//------------------------------------------------------------------------------
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
     
 //------------------------------------------------------------------------------

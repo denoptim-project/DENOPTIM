@@ -56,17 +56,6 @@ public class FRParameters extends RunTimeParameters
      * Flag controlling attempt to add templates to building block libraries
      */
     protected boolean addTemplatesToLibraries = false;
-
-//-----------------------------------------------------------------------------
-    //TODO-gg delete these and keep only the constructor()
-    /**
-     * Constructor
-     * @param paramType
-     */
-    public FRParameters(ParametersType paramType)
-    {
-        super(paramType);
-    }
     
 //-----------------------------------------------------------------------------
     
@@ -168,7 +157,6 @@ public class FRParameters extends RunTimeParameters
                     + ")already exists and we do not overwrite.";
             throw new DENOPTIMException(msg);
         }
-
         checkOtherParameters();
     }
 
@@ -182,9 +170,43 @@ public class FRParameters extends RunTimeParameters
     public void processParameters() throws DENOPTIMException
     {
         FileUtils.addToRecentFiles(outFile, FileFormat.GRAPHSDF);
-        processParameters();
+        processOtherParameters();
+        
         System.err.println("Output files associated with the current run are " 
         + "located in " + workDir);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
 
 //----------------------------------------------------------------------------

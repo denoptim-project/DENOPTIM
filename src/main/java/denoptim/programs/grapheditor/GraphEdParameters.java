@@ -100,17 +100,7 @@ public class GraphEdParameters extends RunTimeParameters
      */
     public GraphEdParameters()
     {
-        this(ParametersType.GE_PARAMS);
-    }
-    
-//-----------------------------------------------------------------------------
-    
-    /**
-     * Constructor
-     */
-    private GraphEdParameters(ParametersType paramType)
-    {
-        super(paramType);
+        super(ParametersType.GE_PARAMS);
     }
 
 //-----------------------------------------------------------------------------
@@ -221,6 +211,39 @@ public class GraphEdParameters extends RunTimeParameters
                                        + "related keyword. Check input files.";
             throw new DENOPTIMException(msg);
         }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
 
 //-----------------------------------------------------------------------------

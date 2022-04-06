@@ -74,7 +74,7 @@ public class DenoptimGA extends ProgramTask
     @Override
     public void runProgram() throws Throwable
     {
-        GAParameters settings = new GAParameters(ParametersType.GA_PARAMS);
+        GAParameters settings = new GAParameters();
         if (workDir != null)
         {
             settings.setWorkingDirectory(workDir.getAbsolutePath());

@@ -50,7 +50,7 @@ public class RingClosuresArchive
     /**
      * Index of the next entry to be added to the archive
      */
-    private static int nextRccId = 0;
+    private int nextRccId = 0;
 
     /**
      * Data structure containing the main information about the
@@ -60,7 +60,7 @@ public class RingClosuresArchive
      * conformations from the archive of serialized objects, and 
      * (ii) the closability of the chain.
      */
-    private static HashMap<String,ArrayList<String>> rccsPerChainId =
+    private HashMap<String,ArrayList<String>> rccsPerChainId =
 							     new HashMap<>();
 
     /**
@@ -72,14 +72,21 @@ public class RingClosuresArchive
      * identified by the molecular fragment Id in the proper library of
      * fragments.
      */
-    private static HashMap<Integer,ArrayList<ClosableChain>> libCCxTPMolId =
+    private HashMap<Integer,ArrayList<ClosableChain>> libCCxTPMolId =
                                                              new HashMap<>();
+    
+    /**
+     * Parameters
+     */
+    private RingClosureParameters settings;
+
+  //----------------------------------------------------------------------------
 
     /**
-     * Verbosity level
+     * Construct an empty archive.
      */
-    private static int verbosity = RingClosureParameters.getVerbosity();
-
+    public RingClosuresArchive(){}
+    
 //----------------------------------------------------------------------------
 
     /**
@@ -88,11 +95,11 @@ public class RingClosuresArchive
      * @param rccIndex the index file.
      */
 
-    public RingClosuresArchive(String rccIndex) throws DENOPTIMException
+    public RingClosuresArchive(RingClosureParameters settings) throws DENOPTIMException
     {
-        if (FileUtils.checkExists(rccIndex))
+        if (FileUtils.checkExists(settings.getRCCLibraryIndexFile()))
         {
-            readLibraryOfRCCs(rccIndex);
+            readLibraryOfRCCs(settings.getRCCLibraryIndexFile());
         }
     }
 
@@ -163,40 +170,39 @@ public class RingClosuresArchive
 
 //----------------------------------------------------------------------------
 
-    private static void addRecord(String chainId, String rccIdNum, 
-                                  String closability) throws DENOPTIMException
+    private void addRecord(String chainId, String rccIdNum,
+            String closability) throws DENOPTIMException
     {
-            // Create record for RCC
-            ArrayList<String> record = new ArrayList<String>();
-            record.add(rccIdNum);
-            record.add(closability);
+        // Create record for RCC
+        ArrayList<String> record = new ArrayList<String>();
+        record.add(rccIdNum);
+        record.add(closability);
 
-            // Store (closability,rccIndex)-x-chainID
-            rccsPerChainId.put(chainId,record);
+        // Store (closability,rccIndex)-x-chainID
+        rccsPerChainId.put(chainId,record);
 
-            // Store (closable chain)-x-vertexMolId
-            if (closability.equals("T"))
-            {
+        // Store (closable chain)-x-vertexMolId
+        if (closability.equals("T"))
+        {
 //TODO per each fragment with more than 3 APs store the link to a ClosableChain
 // not a new one. Might need to store the number of APs as a property of
 // the ChainLinks, that is, change to format of the chainId string to include also that info
-                ClosableChain cc = new ClosableChain(chainId);
-                int tpId = cc.getTurningPointMolID();
-                if (libCCxTPMolId.containsKey(tpId))
-                {
-                    libCCxTPMolId.get(tpId).add(cc);
-                }
-                else
-                {
-                    ArrayList<ClosableChain> lstCC =
-                                    new ArrayList<ClosableChain>();
-                    lstCC.add(cc);
-                    libCCxTPMolId.put(tpId,lstCC);
-                }
+            ClosableChain cc = new ClosableChain(chainId);
+            int tpId = cc.getTurningPointMolID();
+            if (libCCxTPMolId.containsKey(tpId))
+            {
+                libCCxTPMolId.get(tpId).add(cc);
             }
+            else
+            {
+                ArrayList<ClosableChain> lstCC = new ArrayList<ClosableChain>();
+                lstCC.add(cc);
+                libCCxTPMolId.put(tpId,lstCC);
+            }
+        }
 
-            // Increment counter
-            nextRccId++;
+        // Increment counter
+        nextRccId++;
     }
 
 //----------------------------------------------------------------------------
@@ -209,8 +215,8 @@ public class RingClosuresArchive
      * the chain
      */
 
-    public static void storeEntry(String chainId, boolean closable, 
-                       RingClosingConformations rcc) throws DENOPTIMException
+    public void storeEntry(String chainId, boolean closable,
+            RingClosingConformations rcc) throws DENOPTIMException
     {
     	String closability = "F";
     	if (closable)
@@ -218,7 +224,7 @@ public class RingClosuresArchive
     	    closability = "T";
     	}
 
-        File file = new File(RingClosureParameters.getRCCLibraryIndexFile());
+        File file = new File(settings.getRCCLibraryIndexFile());
         long fileLength = file.length();
         RandomAccessFile rafile = null;
         FileChannel channel = null;
@@ -241,11 +247,11 @@ public class RingClosuresArchive
                 catch (OverlappingFileLockException e)
                 {
                     nTry++;
-                    if (verbosity > 1)
+                    if (settings.getVerbosity() > 1)
                     {
                        System.out.println("Attempt " + nTry
                              + " to get lock " + "for '"
-                             + RingClosureParameters.getRCCLibraryIndexFile()
+                             + settings.getRCCLibraryIndexFile()
                              + "' failed. ");
                     }
                 }
@@ -267,11 +273,10 @@ public class RingClosuresArchive
                 rafile.seek(fileLength);
                 rafile.writeBytes(chainId + " " + rccId + " " + "T" +"\n");
                 channel.force(true);
-        		if (RingClosureParameters.serializeRCCs())
+        		if (settings.serializeRCCs())
         		{
-                    String rccFileName = 
-		                  RingClosureParameters.getRCCLibraryFolder()
-			                              + "/" + rccId + ".ser";
+                    String rccFileName = settings.getRCCLibraryFolder()
+                            + "/" + rccId + ".ser";
                     FileOutputStream fos = null;
                     ObjectOutputStream oos = null;
                     try
@@ -280,7 +285,7 @@ public class RingClosuresArchive
                         oos = new ObjectOutputStream(fos);
                         oos.writeObject(rcc);
                         oos.close();
-                        if (verbosity > 1)
+                        if (settings.getVerbosity() > 1)
                         {
                             System.out.println("Serialization to file "
                                                                + rccFileName);
@@ -325,8 +330,8 @@ public class RingClosuresArchive
             {
                 throw new DENOPTIMException("RingClosuresArchive is unable "
                         + "to unlock file '" 
-			+ RingClosureParameters.getRCCLibraryIndexFile() 
-			+ "'. " + t);
+            			+ settings.getRCCLibraryIndexFile() 
+            			+ "'. " + t);
             }
         }
     }
@@ -336,11 +341,11 @@ public class RingClosuresArchive
     /**
      * Returns the library of closable chains having the given turning point
      * (i.e., the
-     * fragments invloved in the ring that  has lower level).
+     * fragments involved in the ring that  has lower level).
      * @param tpId the turning point molecule Id in the libraries.
      */
 
-    public static ArrayList<ClosableChain> getCCFromTurningPointId(int tpId)
+    public ArrayList<ClosableChain> getCCFromTurningPointId(int tpId)
     {
         if (libCCxTPMolId.containsKey(tpId))
         {
@@ -358,7 +363,7 @@ public class RingClosuresArchive
      * is returned.
      */
 
-    public static String containsChain(PathSubGraph chain)
+    public String containsChain(PathSubGraph chain)
     {
     	String result = "";
     	for (String altChId : chain.getAllAlternativeChainIDs())
@@ -378,7 +383,7 @@ public class RingClosuresArchive
      * @return the closability of a chain
      */
 
-    public static boolean getClosabilityOfChain(String chainId)
+    public boolean getClosabilityOfChain(String chainId)
     {
         ArrayList<String> rccRecord = rccsPerChainId.get(chainId);
         String closability = rccRecord.get(1);
@@ -392,7 +397,7 @@ public class RingClosuresArchive
      * stored in the archive 
      */
 
-    public static RingClosingConformations getRCCsOfChain(String chainId)
+    public RingClosingConformations getRCCsOfChain(String chainId)
                                                      throws DENOPTIMException
     {
         ArrayList<String> rccRecord = rccsPerChainId.get(chainId);
@@ -403,7 +408,7 @@ public class RingClosuresArchive
         if (closability.equals("T"))
         {
             rcc = getRCCsFromArchive(rccId);
-            if (verbosity > 1)
+            if (settings.getVerbosity() > 1)
             {
                 String msg = "Path is closable (from DB)";
                 DENOPTIMLogger.appLogger.info(msg);
@@ -411,7 +416,7 @@ public class RingClosuresArchive
         }
         else
         {
-            if (verbosity > 1)
+            if (settings.getVerbosity() > 1)
             {
                 String msg = "Path is NOT closable (from DB)";
                 DENOPTIMLogger.appLogger.info(msg);
@@ -428,13 +433,13 @@ public class RingClosuresArchive
      * <code>RingClosingConformations</code> in the archive 
      */
 
-    public static RingClosingConformations getRCCsFromArchive(int rccId)
+    public RingClosingConformations getRCCsFromArchive(int rccId)
                                                      throws DENOPTIMException
     {
         RingClosingConformations rcc = new RingClosingConformations();
         
-        String rccFileName1 = RingClosureParameters.getRCCLibraryFolder()
-                              + "/" + rccId + ".ser";
+        String rccFileName1 = settings.getRCCLibraryFolder() + 
+                System.getProperty("file.separator") + rccId + ".ser";
         FileInputStream fis = null;
         ObjectInputStream ois = null;
         boolean recoveringDone = false;
@@ -444,7 +449,7 @@ public class RingClosuresArchive
             ois = new ObjectInputStream(fis);
             rcc = (RingClosingConformations) ois.readObject();
             ois.close();
-            if (verbosity > 1)
+            if (settings.getVerbosity() > 1)
             {
                 System.out.println("Got serialized RCC from " + rccFileName1);
             }

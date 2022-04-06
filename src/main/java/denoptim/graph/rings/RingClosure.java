@@ -86,6 +86,11 @@ public class RingClosure
      * Quality score of the head and tail vectors alignement
      */
     private double qscore = Double.NaN;
+    
+    /**
+     * Parameters
+     */
+    private RingClosureParameters settings;
 
 //-----------------------------------------------------------------------------
 
@@ -93,8 +98,9 @@ public class RingClosure
      *  Constructs an empty RingClosure
      */
 
-    public RingClosure()
+    public RingClosure(RingClosureParameters settings)
     {
+        this.settings = settings;
     }
 
 //-----------------------------------------------------------------------------
@@ -233,13 +239,12 @@ public class RingClosure
             double optDistH2T1 = 0.0;
             double optDistH1T1 = 0.0;
             double optDistH2T2 = 0.0;
-            if (RingClosureParameters.getRCStrategy().equals("BONDOVERLAP"))
+            if (settings.getRCStrategy().equals("BONDOVERLAP"))
             {
                 optDistH1T1 = (lenH + lenT) / 2.0;
                 optDistH2T2 = optDistH1T1;
             }
-            else if (RingClosureParameters.getRCStrategy().
-					     equals("BONDCOMPLEMENTARITY"))
+            else if (settings.getRCStrategy().equals("BONDCOMPLEMENTARITY"))
             {
                 optDistH1T2 = lenH;
                 optDistH2T1 = lenT;
@@ -316,31 +321,28 @@ public class RingClosure
         double lenH = h1.distance(h2);
         double lenT = t1.distance(t2);
         double distTolerance = (lenH + lenT) / 2.0;
-        distTolerance = distTolerance 
-                        * etrxTol * RingClosureParameters.getRCDistTolerance();
+        distTolerance = distTolerance * etrxTol * settings.getRCDistTolerance();
         double minDistH1T2 = -1.0;
         double minDistH2T1 = -1.0;
         double minDistH2T2 = -1.0;
         double maxDistH1T2 = 0.0;
         double maxDistH2T1 = 0.0;
         double maxDistH2T2 = 0.0;
-        double maxDotProdHT = RingClosureParameters.getRCDotPrTolerance();
-        if (RingClosureParameters.getRCStrategy().equals("BONDOVERLAP"))
+        double maxDotProdHT = settings.getRCDotPrTolerance();
+        if (settings.getRCStrategy().equals("BONDOVERLAP"))
         {
             maxDistH1T2 = distTolerance;
             maxDistH2T1 = distTolerance;
             maxDistH2T2 = lenH + lenT;
         }
-        else if (RingClosureParameters.getRCStrategy().
-						equals("BONDCOMPLEMENTARITY"))
+        else if (settings.getRCStrategy().equals("BONDCOMPLEMENTARITY"))
         {
             distTolerance = distTolerance / 2.0;
             minDistH1T2 = lenH - distTolerance;
             minDistH2T1 = lenT - distTolerance;
             maxDistH1T2 = lenH + distTolerance;
             maxDistH2T1 = lenT + distTolerance;
-            maxDistH2T2 = distTolerance 
-			   * RingClosureParameters.getRCDistTolerance();
+            maxDistH2T2 = distTolerance * settings.getRCDistTolerance();
         }
 
         //Collect conditions as a vector

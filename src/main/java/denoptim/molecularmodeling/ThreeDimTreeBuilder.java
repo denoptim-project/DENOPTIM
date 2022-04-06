@@ -46,6 +46,8 @@ import denoptim.graph.rings.RingClosureParameters;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
 import denoptim.io.DenoptimIO;
+import denoptim.programs.RunTimeParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.DENOPTIMMathUtils;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;
@@ -487,7 +489,7 @@ public class ThreeDimTreeBuilder
             System.err.println("Appending 3D fragment via edge: "+edge);
             System.err.println("#Atoms on growing mol: "+mol.getAtomCount());
         }
-
+        
         // Get the incoming fragment and its AP
         DENOPTIMVertex inVtx = edge.getTrgAP().getOwner();
         DENOPTIMAttachmentPoint apB = edge.getTrgAP();
@@ -646,8 +648,11 @@ public class ThreeDimTreeBuilder
                 }
             
                 // Check whether this edge involves a Ring Closing Attractors
-                boolean edgeToRCA = false;
-                if (RingClosureParameters.getRCStrategy().equals("BONDOVERLAP"))
+                //TODO-gg remove nonOVERLAP case
+               
+                boolean edgeToRCA = false; 
+                //if (rcParams.getRCStrategy().equals("BONDOVERLAP"))
+                if (true)
                 {
                     if (edge.getSrcAP().getOwner().isRCV() || 
                             edge.getTrgAP().getOwner().isRCV())

@@ -21,6 +21,7 @@ package denoptim.programs.isomorphism;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
@@ -55,17 +56,7 @@ public class IsomorphismParameters extends RunTimeParameters
      */
     public IsomorphismParameters()
     {
-        this(ParametersType.ISO_PARAMS);
-    }
-    
-//-----------------------------------------------------------------------------
-    
-    /**
-     * Constructor
-     */
-    private IsomorphismParameters(ParametersType paramType)
-    {
-        super(paramType);
+        super(ParametersType.ISO_PARAMS);
     }
 
 //-----------------------------------------------------------------------------
@@ -133,6 +124,39 @@ public class IsomorphismParameters extends RunTimeParameters
     public void processParameters() throws DENOPTIMException
     {   
         processOtherParameters();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
 
 //----------------------------------------------------------------------------

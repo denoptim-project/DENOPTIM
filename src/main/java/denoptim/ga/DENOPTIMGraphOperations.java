@@ -880,9 +880,20 @@ public class DENOPTIMGraphOperations
                                          GAParameters settings) 
                                                         throws DENOPTIMException
     {  
-        // get settings
-        int maxHeavyAtoms = ((FragmentSpaceParameters)settings.getParameters(
-                ParametersType.FS_PARAMS)).getMaxHeavyAtom();
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        int maxHeavyAtoms = fsParams.getMaxHeavyAtom();
         
         // return true if the append has been successful
         boolean status = false;
@@ -941,7 +952,7 @@ public class DENOPTIMGraphOperations
                 boolean fgrow = RandomUtils.nextBoolean(extendGraphProb);
                 if (!fgrow)
                 {
-                    if (RingClosureParameters.allowRingClosures() 
+                    if (rcParams.allowRingClosures() 
                             && RandomUtils.nextBoolean(byLevelProb * crowdingProb))
                     {
                         allowOnlyRingClosure = true;
@@ -952,8 +963,9 @@ public class DENOPTIMGraphOperations
             }
 
             // Apply closability bias in selection of next fragment
-            if (!allowOnlyRingClosure && RingClosureParameters.allowRingClosures() && 
-                      RingClosureParameters.selectFragmentsFromClosableChains())
+            if (!allowOnlyRingClosure 
+                    && rcParams.allowRingClosures() 
+                    && rcParams.selectFragmentsFromClosableChains())
             {
                 boolean successful = attachFragmentInClosableChain(curVrtx,
                         apId, molGraph, addedVertices, settings);

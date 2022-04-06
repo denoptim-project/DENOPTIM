@@ -21,6 +21,7 @@ package denoptim.ga;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,11 +62,6 @@ public class GAParameters extends RunTimeParameters
      */
     private String interfaceDir = dataDir 
     		+ System.getProperty("file.separator") + "interface";
-
-    /**
-     * Pathname of user defined parameters
-     */
-    protected String paramFile = "";
 
     /** 
      * Pathname of the initial population file. The file itself can be an SDF or
@@ -355,18 +351,7 @@ public class GAParameters extends RunTimeParameters
     {
         super(ParametersType.GA_PARAMS);
     }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Constructor
-     * @param paramType
-     */
-    public GAParameters(ParametersType paramType)
-    {
-        super(paramType);
-    }
-    
+
 //------------------------------------------------------------------------------
 
     protected String getUIDFileIn()
@@ -1141,7 +1126,6 @@ public class GAParameters extends RunTimeParameters
         try
         {
             DENOPTIMLogger.getInstance().setupLogger(logFile);
-            FileUtils.copyFileToDirectory(new File(paramFile), new File(dataDir));
         }
         catch (IOException ioe)
         {
@@ -1240,15 +1224,49 @@ public class GAParameters extends RunTimeParameters
             throw new DENOPTIMException(error);
         }
         
-        if ((useMolSizeBasedProb && useLevelBasedProb) 
-                || (!useMolSizeBasedProb && !useLevelBasedProb) )
+        if (useMolSizeBasedProb && useLevelBasedProb)
         {
             error = "Cannot use both graph level or molecular size as criterion "
                     + "for controlling the growth of graphs. "
                     + "Please, use either of them.";
             throw new DENOPTIMException(error);
+        } else if (!useMolSizeBasedProb && !useLevelBasedProb) {
+            useMolSizeBasedProb = true;
         }
         checkOtherParameters();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
 
 //------------------------------------------------------------------------------

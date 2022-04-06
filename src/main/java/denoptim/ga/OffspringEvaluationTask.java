@@ -90,7 +90,7 @@ public class OffspringEvaluationTask extends FitnessTask
     	// Optionally improve the molecular representation, which
         // is otherwise only given by the collection of building
         // blocks (not aligned, nor roto-translated)
-        if (settings.make3dTree())
+        if (fitnessSettings.make3dTree())
         {
         	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
         	

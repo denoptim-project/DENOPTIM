@@ -18,6 +18,7 @@
 
 package denoptim.fitness;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,18 +97,12 @@ public class FitnessParameters extends RunTimeParameters
      * a molecular entity. See 
      */
     private boolean checkPreFitnessUID = true;
-
-
-//------------------------------------------------------------------------------
-
+    
     /**
-     * Constructor
-     * @param paramType
+     * Flag recording that we have explicitly expressed the choice of checkPreFitnessUID
      */
-    public FitnessParameters(ParametersType paramType)
-    {
-        super(paramType);
-    }
+    private boolean checkPreFitnessUIDFromInput = false;
+
     
 //------------------------------------------------------------------------------
 
@@ -242,6 +237,7 @@ public class FitnessParameters extends RunTimeParameters
             	
             case "CHECKUIDBEFOREFITNESS":
                 checkPreFitnessUID = true; 
+                checkPreFitnessUIDFromInput = true;
                 break;
     
             default:
@@ -297,7 +293,43 @@ public class FitnessParameters extends RunTimeParameters
     	    variables = fep.getVariables();
     	    descriptors = fep.getDescriptors();
     	}
+    	if (!checkPreFitnessUIDFromInput && useExternalFitness)
+    	    checkPreFitnessUID = false;
+    	    
     	processOtherParameters();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
     
 //------------------------------------------------------------------------------

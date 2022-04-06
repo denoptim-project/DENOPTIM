@@ -796,8 +796,10 @@ public class FSParametersForm extends ParametersForm
         lblPar22.setToolTipText(toolTipPar22);
         tabModPar22 = new DefaultTableModel();
         tabModPar22.setColumnCount(2);
-        tabModPar22.addRow(new Object[]{"<html><b>Ring Size</b></html>", "<html><b>Bias (int)</b></html>"});
-        ArrayList<Integer> ringSizeBias = RingClosureParameters.getRingSizeBias();
+        tabModPar22.addRow(new Object[]{"<html><b>Ring Size</b></html>", 
+                "<html><b>Bias (int)</b></html>"});
+        RingClosureParameters rcParamsDefault = new RingClosureParameters();
+        ArrayList<Integer> ringSizeBias = rcParamsDefault.getRingSizeBias();
         for (int ib=0; ib<ringSizeBias.size(); ib++)
         {
         	int w = ringSizeBias.get(ib);

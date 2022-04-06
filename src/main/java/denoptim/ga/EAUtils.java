@@ -1301,11 +1301,18 @@ public class EAUtils
             }
         }
         
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
 //TODO this works only for scaffolds at the moment. make the preference for 
 // fragments that lead to known closable chains operate also when fragments are
 // the "turning point".
-        graph.setCandidateClosableChains(
-                        RingClosuresArchive.getCCFromTurningPointId(scafIdx));
+        RingClosuresArchive rca = rcParams.getRingClosuresArchive();
+        graph.setCandidateClosableChains(rca.getCCFromTurningPointId(scafIdx));
 
         if (scafVertex.hasFreeAP())
         {
@@ -1339,10 +1346,23 @@ public class EAUtils
     protected static boolean setupRings(Object[] res, DENOPTIMGraph molGraph, 
             GAParameters settings) throws DENOPTIMException
     {
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
         if (!FragmentSpace.useAPclassBasedApproach())
             return true;
 
-        if (!RingClosureParameters.allowRingClosures())
+        if (!rcParams.allowRingClosures())
             return true;
 
         // get a atoms/bonds molecular representation (no 3D needed)
@@ -1360,7 +1380,7 @@ public class EAUtils
         RotationalSpaceUtils.defineRotatableBonds(mol, rotoSpaceFile, true, true);
         
         // get the set of possible RCA combinations = ring closures
-        CyclicGraphHandler cgh = new CyclicGraphHandler();
+        CyclicGraphHandler cgh = new CyclicGraphHandler(rcParams);
 
         //TODO: remove hard-coded variable that exclude considering all 
         // combination of rings
@@ -1369,7 +1389,7 @@ public class EAUtils
         if (onlyRandomCombOfRings)
         {
             List<DENOPTIMRing> combsOfRings = cgh.getRandomCombinationOfRings(
-                    mol, molGraph, RingClosureParameters.getMaxRingClosures());
+                    mol, molGraph, rcParams.getMaxRingClosures());
             if (combsOfRings.size() > 0)
             {
                 for (DENOPTIMRing ring : combsOfRings)
@@ -1400,7 +1420,7 @@ public class EAUtils
                             cgh.getPossibleCombinationOfRings(mol, molGraph);
         
             // Keep closable chains that are relevant for chelate formation
-            if (RingClosureParameters.buildChelatesMode())
+            if (rcParams.buildChelatesMode())
             {
                 ArrayList<List<DENOPTIMRing>> toRemove = new ArrayList<>();
                 for (List<DENOPTIMRing> setRings : allCombsOfRings)
@@ -1577,11 +1597,18 @@ public class EAUtils
     protected static Object[] evaluateGraph(DENOPTIMGraph molGraph, 
             boolean permissive, GAParameters settings) throws DENOPTIMException
     {
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
         {
-            fsParams = (FragmentSpaceParameters) 
-                    settings.getParameters(ParametersType.FS_PARAMS);
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
         }
         
         if (molGraph == null)
@@ -1700,7 +1727,7 @@ public class EAUtils
             }
         }
         
-        if (RingClosureParameters.allowRingClosures() && !permissive)
+        if (rcParams.allowRingClosures() && !permissive)
         {
             // Count rings and RCAs
             int nPossRings = 0;
@@ -1728,8 +1755,8 @@ public class EAUtils
                 }
 
                 // check number of rca per type
-                if (nThisType > RingClosureParameters.getMaxRcaPerType() || 
-                         nCompType > RingClosureParameters.getMaxRcaPerType())
+                if (nThisType > rcParams.getMaxRcaPerType() || 
+                         nCompType > rcParams.getMaxRcaPerType())
                 {
                     String msg = "Evaluation of graph: too many RCAs! "
                                   + rcaTyp + ":" + nThisType + " "
@@ -1737,8 +1764,8 @@ public class EAUtils
                     DENOPTIMLogger.appLogger.log(Level.INFO, msg);
                     return null;
                 }
-                if (nThisType < RingClosureParameters.getMinRcaPerType() ||
-                         nCompType < RingClosureParameters.getMinRcaPerType())
+                if (nThisType < rcParams.getMinRcaPerType() ||
+                         nCompType < rcParams.getMinRcaPerType())
                 {
                     String msg = "Evaluation of graph: too few RCAs! "
                                   + rcaTyp + ":" + nThisType + " "
@@ -1752,7 +1779,7 @@ public class EAUtils
                 doneType.add(rcaTypes.get(rcaTyp));
             }
 
-            if (nPossRings < RingClosureParameters.getMinRingClosures())
+            if (nPossRings < rcParams.getMinRingClosures())
             {
                 String msg = "Evaluation of graph: too few ring candidates";
                 DENOPTIMLogger.appLogger.log(Level.INFO, msg);

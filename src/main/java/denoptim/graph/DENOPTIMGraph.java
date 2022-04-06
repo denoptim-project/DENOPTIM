@@ -76,6 +76,8 @@ import denoptim.json.DENOPTIMgson;
 import denoptim.json.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.DENOPTIMGraphEdit;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GenUtils;
@@ -4605,7 +4607,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * criteria defined by <code>FragmentSpaceParameters</code> and
      * <code>RingClosureParameters</code>.
      * <b>WARNING</b> Although Cartesian coordinates are assigned to each atom
-     * and pseudo-atom in the molecular representation ,
+     * and pseudo-atom in the molecular representation,
      * such coordinates do <b>NOT</b> represent a valid 3D model.
      * As a consequence stereochemical descriptors in the INCHI representation
      * are not consistent with the actual arrangement of fragments.
@@ -4614,10 +4616,23 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      *         <code>null</code> is returned if any check or conversion fails.
      * @throws DENOPTIMException
      */
-
-    public Object[] evaluateGraph(FragmentSpaceParameters settings)
+    
+    public Object[] evaluateGraph(RunTimeParameters settings)
             throws DENOPTIMException
     {
+        RingClosureParameters rcSettings = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcSettings = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        FragmentSpaceParameters fsSettings = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsSettings = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        
         // calculate the molecule representation
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         t3d.setAlidnBBsIn3D(false);
@@ -4660,10 +4675,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // criteria from definition of Fragment space
         // 1A) number of heavy atoms
-        if (settings.getMaxHeavyAtom() > 0)
+        if (fsSettings.getMaxHeavyAtom() > 0)
         {
             if (DENOPTIMMoleculeUtils.getHeavyAtomCount(mol) >
-                settings.getMaxHeavyAtom())
+                fsSettings.getMaxHeavyAtom())
             {
                 String msg = "Evaluation of graph: Max atoms constraint "
                         + " violated: " + smiles;
@@ -4674,9 +4689,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // 1B) molecular weight
         double mw = DENOPTIMMoleculeUtils.getMolecularWeight(mol);
-        if (settings.getMaxMW() > 0)
+        if (fsSettings.getMaxMW() > 0)
         {
-            if (mw > settings.getMaxMW())
+            if (mw > fsSettings.getMaxMW())
             {
                 String msg = "Evaluation of graph: Molecular weight "
                         + "constraint violated: " + smiles + " | MW: " + mw;
@@ -4688,9 +4703,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // 1C) number of rotatable bonds
         int nrot = DENOPTIMMoleculeUtils.getNumberOfRotatableBonds(mol);
-        if (settings.getMaxRotatableBond() > 0)
+        if (fsSettings.getMaxRotatableBond() > 0)
         {
-            if (nrot > settings.getMaxRotatableBond())
+            if (nrot > fsSettings.getMaxRotatableBond())
             {
                 String msg = "Evaluation of graph: Max rotatable bonds "
                         + "constraint violated: "+ smiles;
@@ -4712,7 +4727,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
 
         // criteria from settings of ring closures
-        if (RingClosureParameters.allowRingClosures())
+        if (rcSettings.allowRingClosures())
         {
             // Count rings and RCAs
             int nPossRings = 0;
@@ -4740,8 +4755,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 }
 
                 // check number of rca per type
-                if (nThisType > RingClosureParameters.getMaxRcaPerType() ||
-                        nCompType > RingClosureParameters.getMaxRcaPerType())
+                if (nThisType > rcSettings.getMaxRcaPerType() ||
+                        nCompType > rcSettings.getMaxRcaPerType())
                 {
                     String msg = "Evaluation of graph: too many RCAs! "
                             + rcaTyp + ":" + nThisType + " "
@@ -4749,8 +4764,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                     DENOPTIMLogger.appLogger.log(Level.INFO, msg);
                     return null;
                 }
-                if (nThisType < RingClosureParameters.getMinRcaPerType() ||
-                        nCompType < RingClosureParameters.getMinRcaPerType())
+                if (nThisType < rcSettings.getMinRcaPerType() ||
+                        nCompType < rcSettings.getMinRcaPerType())
                 {
                     String msg = "Evaluation of graph: too few RCAs! "
                             + rcaTyp + ":" + nThisType + " "
@@ -4763,7 +4778,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 doneType.add(rcaTyp);
                 doneType.add(rcaTypes.get(rcaTyp));
             }
-            if (nPossRings < RingClosureParameters.getMinRingClosures())
+            if (nPossRings < rcSettings.getMinRingClosures())
             {
                 String msg = "Evaluation of graph: too few ring candidates";
                 DENOPTIMLogger.appLogger.log(Level.INFO, msg);
@@ -4798,16 +4813,28 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws denoptim.exception.DENOPTIMException
      */
     public ArrayList<DENOPTIMGraph> makeAllGraphsWithDifferentRingSets(
-            FragmentSpaceParameters settings)
+            RunTimeParameters settings)
             throws DENOPTIMException 
     {
+        RingClosureParameters rcSettings = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcSettings = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        FragmentSpaceParameters fsSettings = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsSettings = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<>();
 
         boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
         if (!rcnEnabled)
             return lstGraphs;
 
-        boolean evaluateRings = RingClosureParameters.allowRingClosures();
+        boolean evaluateRings = rcSettings.allowRingClosures();
         if (!evaluateRings)
             return lstGraphs;
 
@@ -4818,15 +4845,15 @@ public class DENOPTIMGraph implements Serializable, Cloneable
 
         // Set rotatable property as property of IBond
         RotationalSpaceUtils.defineRotatableBonds(mol,
-                settings.getRotSpaceDefFile(), true, true);
+                fsSettings.getRotSpaceDefFile(), true, true);
 
         // get the set of possible RCA combinations = ring closures
-        CyclicGraphHandler cgh = new CyclicGraphHandler();
+        CyclicGraphHandler cgh = new CyclicGraphHandler(rcSettings);
         ArrayList<List<DENOPTIMRing>> allCombsOfRings =
                 cgh.getPossibleCombinationOfRings(mol, this);
 
         // Keep closable chains that are relevant for chelate formation
-        if (RingClosureParameters.buildChelatesMode())
+        if (rcSettings.buildChelatesMode())
         {
             ArrayList<List<DENOPTIMRing>> toRemove = new ArrayList<>();
             for (List<DENOPTIMRing> setRings : allCombsOfRings)

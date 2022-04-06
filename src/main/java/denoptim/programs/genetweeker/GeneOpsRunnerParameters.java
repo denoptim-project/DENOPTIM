@@ -21,6 +21,7 @@ package denoptim.programs.genetweeker;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,17 +164,7 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
      */
     public GeneOpsRunnerParameters()
     {
-        this(ParametersType.GO_PARAMS);
-    }
-    
-//-----------------------------------------------------------------------------
-    
-    /**
-     * Constructor
-     */
-    private GeneOpsRunnerParameters(ParametersType paramType)
-    {
-        super(paramType);
+        super(ParametersType.GO_PARAMS);
     }
 
 //-----------------------------------------------------------------------------
@@ -342,6 +333,39 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
     {
         RandomUtils.initialiseRNG(randomSeed);
         processOtherParameters();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
 
 //----------------------------------------------------------------------------

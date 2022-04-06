@@ -49,8 +49,10 @@ import denoptim.graph.DENOPTIMFragment;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMRing;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.programs.RunTimeParameters;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;
@@ -82,7 +84,12 @@ public class CyclicGraphHandler
     /**
      * Verbosity level
      */
-    private int verbosity = RingClosureParameters.getVerbosity();
+    private int verbosity = 0;
+    
+    /**
+     * Parameters 
+     */
+    private RingClosureParameters settings;
     
 //-----------------------------------------------------------------------------
 
@@ -93,7 +100,10 @@ public class CyclicGraphHandler
      * @param libCap the library of capping groups
      */
 
-    public CyclicGraphHandler() {}
+    public CyclicGraphHandler(RingClosureParameters settings) {
+        this.settings = settings;
+        this.verbosity = settings.getVerbosity();
+    }
     
 //-----------------------------------------------------------------------------
 
@@ -333,7 +343,7 @@ public class CyclicGraphHandler
         // Identify paths that share bonds (interdependent paths)
         Map<IBond,List<PathSubGraph>> interdepPaths =
                                 new HashMap<IBond,List<PathSubGraph>>();
-        if (RingClosureParameters.checkInterdependentChains())
+        if (settings.checkInterdependentChains())
         {
             for (PathSubGraph rpA : allGoodPaths.values())
             {
@@ -531,7 +541,7 @@ public class CyclicGraphHandler
                         System.out.println(objId+"-"+recLab+"> in A");
 
                     boolean closable = true;
-                    if (RingClosureParameters.checkInterdependentChains() &&
+                    if (settings.checkInterdependentChains() &&
                                hasInterdependentPaths(lstPairs, interdepPaths))
                     {
                         closable = checkClosabilityOfInterdependentPaths(
@@ -922,8 +932,7 @@ public class CyclicGraphHandler
         private Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId;
 
         // Parameters setting the bias for selecting rings of given size
-        private ArrayList<Integer> ringSizeBias = 
-                                       RingClosureParameters.getRingSizeBias();
+        private ArrayList<Integer> ringSizeBias = settings.getRingSizeBias();
 
         //---------------------------------------------------------------------
 
@@ -1069,7 +1078,7 @@ public class CyclicGraphHandler
                         int ringSize = topoMat[vIdToAtmId.get(vI).get(0)]
                                               [vIdToAtmId.get(vJ).get(0)] - 1;
                         int szFct = 0;
-                        if (ringSize < RingClosureParameters.getMaxRingSize())
+                        if (ringSize < settings.getMaxRingSize())
                         {
                             szFct = ringSizeBias.get(ringSize);
                         }
@@ -1167,7 +1176,7 @@ public class CyclicGraphHandler
                 // the larger the likeliness of picking it when randomly
                 // choosing the partner for vI.
                 int szFct = 0; //This is the ring-size factor
-                if (ringSize < RingClosureParameters.getMaxRingSize())
+                if (ringSize < settings.getMaxRingSize())
                 {
                     szFct = ringSizeBias.get(ringSize);
                 }
@@ -1298,7 +1307,7 @@ public class CyclicGraphHandler
         public boolean canCoexistWith(ClosableConf other)
         {
             boolean canCoexist = true;
-            double thrs = RingClosureParameters.getPathConfSearchStep() / 2.0;
+            double thrs = settings.getPathConfSearchStep() / 2.0;
             for (int i=0; i<this.bonds.size(); i++)
             {
                 IBond tBnd = this.bonds.get(i);
@@ -1466,24 +1475,24 @@ public class CyclicGraphHandler
                                   IAtomContainer mol) throws DENOPTIMException
     {
         boolean closable = false;
-        switch (RingClosureParameters.getClosabilityEvalMode())
+        switch (settings.getClosabilityEvalMode())
         {
-        case -1:
-        	closable = true; // ring size has been evaluated before
-        	break;
-        case 0:
-            closable = evaluateConstitutionalClosability(subGraph,mol);
-            break;
-        case 1:
-            closable = evaluate3DPathClosability(subGraph,mol);
-            break;
-        case 2:
-            closable = evaluateConstitutionalClosability(subGraph,mol) &&
-                       evaluate3DPathClosability(subGraph,mol);
-            break;
-        default:
-            String s = "Unrecognized closability evaluation mode";
-            throw new DENOPTIMException(s);
+            case -1:
+            	closable = true; // ring size has been evaluated before
+            	break;
+            case 0:
+                closable = evaluateConstitutionalClosability(subGraph,mol);
+                break;
+            case 1:
+                closable = evaluate3DPathClosability(subGraph,mol);
+                break;
+            case 2:
+                closable = evaluateConstitutionalClosability(subGraph,mol) &&
+                           evaluate3DPathClosability(subGraph,mol);
+                break;
+            default:
+                String s = "Unrecognized closability evaluation mode";
+                throw new DENOPTIMException(s);
         }
         return closable;
     }
@@ -1598,7 +1607,7 @@ public class CyclicGraphHandler
 
         // Evaluate requirement based on elements contained in the ring
         boolean spanRequiredEls = false;
-        Set<String> reqRingEl = RingClosureParameters.getRequiredRingElements();
+        Set<String> reqRingEl = settings.getRequiredRingElements();
         if (reqRingEl.size() != 0)
         {
             // Prepare shortest atom path 
@@ -1641,8 +1650,7 @@ public class CyclicGraphHandler
         }
 
         // Try to find a match for any of the SMARTS queries
-        Map<String,String> smarts = 
-                      RingClosureParameters.getConstitutionalClosabilityConds();
+        Map<String,String> smarts = settings.getConstitutionalClosabilityConds();
         if (smarts.size() != 0)
         {
             closable = false;
@@ -1692,7 +1700,7 @@ public class CyclicGraphHandler
      */
 
     private boolean evaluate3DPathClosability(PathSubGraph subGraph, 
-                                  IAtomContainer mol) throws DENOPTIMException
+            IAtomContainer mol) throws DENOPTIMException
     {
         String chainId = subGraph.getChainID();
         if (verbosity > 0)
@@ -1702,17 +1710,19 @@ public class CyclicGraphHandler
                             + subGraph.getVertecesPath()+" ChainID: "+chainId);
         }
 
+        RingClosuresArchive rca = settings.getRingClosuresArchive();
+        
         RingClosingConformations rcc;
         boolean closable = false;
         
-        String foundID = RingClosuresArchive.containsChain(subGraph);
+        String foundID = rca.containsChain(subGraph);
         if (foundID != "")
         {
             // Get all info from archive
-            closable = RingClosuresArchive.getClosabilityOfChain(foundID);
-            rcc = RingClosuresArchive.getRCCsOfChain(foundID);
-            if (RingClosureParameters.checkInterdependentChains() && 
-                                  RingClosureParameters.doExhaustiveConfSrch())
+            closable = rca.getClosabilityOfChain(foundID);
+            rcc = rca.getRCCsOfChain(foundID);
+            if (settings.checkInterdependentChains() 
+                    && settings.doExhaustiveConfSrch())
             {
                 subGraph.makeMolecularRepresentation(mol,false);
                 subGraph.setRCC(rcc);        
@@ -1766,14 +1776,15 @@ public class CyclicGraphHandler
             closable = RingClosureFinder.evaluateClosability(atomsPath,
                                                          rotatability,
                                                          dihRefs,
-                                                         closableConfs);
+                                                         closableConfs,
+                                                         settings);
 
             // store in object graph
             rcc = new RingClosingConformations(chainId, closableConfs);
             subGraph.setRCC(rcc);
 
             // put ring-closure information in archive for further use
-            RingClosuresArchive.storeEntry(chainId,closable,rcc);
+            rca.storeEntry(chainId,closable,rcc);
         }
 
         if (verbosity > 0)
@@ -1821,12 +1832,12 @@ public class CyclicGraphHandler
             // they have RCAs but none of them is included in a rings
             int levelOfVert = molGraph.getLevel(vert);
             if (levelOfVert == 0 
-                    && vertFrag.getBuildingBlockType() == DENOPTIMVertex.BBType.FRAGMENT)
+                    && vertFrag.getBuildingBlockType() == BBType.FRAGMENT)
             {
                 DENOPTIMEdge edgeToParnt = molGraph.getEdgeWithParent(vId);
                 APClass apClassToScaffold = edgeToParnt.getTrgAPClass();
-                if (RingClosureParameters.metalCoordinatingAPClasses
-                        .contains(apClassToScaffold))
+                if (settings.metalCoordinatingAPClasses.contains(
+                        apClassToScaffold))
                 {
                     continue;
                 }

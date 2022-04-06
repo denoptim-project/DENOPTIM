@@ -20,6 +20,7 @@ package denoptim.combinatorial;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -106,7 +107,7 @@ public class CEBLParameters extends RunTimeParameters
     /**
      * Checkpoint for restarting an interrupted FSE run
      */
-    private FSECheckPoint chkpt = null;
+    private CheckPoint chkpt = null;
 
     /**
      * Name of checkpoint file for restarting an interrupted FSE run
@@ -133,17 +134,7 @@ public class CEBLParameters extends RunTimeParameters
      */
     public CEBLParameters()
     {
-        this(ParametersType.CEBL_PARAMS);
-    }
-    
-//-----------------------------------------------------------------------------
-    
-    /**
-     * Constructor
-     */
-    private CEBLParameters(ParametersType paramType)
-    {
-        super(paramType);
+        super(ParametersType.CEBL_PARAMS);
     }
 
 //-----------------------------------------------------------------------------
@@ -232,7 +223,7 @@ public class CEBLParameters extends RunTimeParameters
 
 //-----------------------------------------------------------------------------
 
-    public FSECheckPoint getCheckPoint()
+    public CheckPoint getCheckPoint()
     {
 	    return chkpt;
     }
@@ -485,13 +476,46 @@ public class CEBLParameters extends RunTimeParameters
 		}
         else
         {
-	    chkpt = new FSECheckPoint();
+	    chkpt = new CheckPoint();
             chkptFile = workDir + ".chk";
         }
 
         System.err.println("Program log file: " + logFile);
         System.err.println("Output files associated with the current run are " +
                                 "located in " + workDir);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
 
 //----------------------------------------------------------------------------

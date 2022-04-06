@@ -148,7 +148,7 @@ public class RingClosingAttractor
     private boolean used = false;
 
     // Verbosity level
-    private static int verbosity = RingClosureParameters.getVerbosity();
+    private static int verbosity = 0;
 
 
 //-----------------------------------------------------------------------------

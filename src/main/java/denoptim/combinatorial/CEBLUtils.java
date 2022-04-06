@@ -178,7 +178,7 @@ public class CEBLUtils
      * @param graph the graph to store
      * @param level the level of modification from which the graph is generated
      * @param rootId the ID of the root graph used to build the graph
-     * @param nextIds the set of indeces used to generate the next combination
+     * @param nextIds the set of indexes used to generate the next combination
      * of fragment. 
      */
 
@@ -200,13 +200,15 @@ public class CEBLUtils
             }
         }
 
-        String fileSer = getNameOfStorageFile(settings, level,graph.getGraphId());
+        String fileSer = getNameOfStorageFile(settings, level, 
+                graph.getGraphId());
         String indexFile = getNameOfStorageIndexFile(settings, level);
         String indexLine = graph.toString() + " => " + graph.getGraphId() + " " 
                            + rootId + " " + nextIds;
         
-        SingletonFileAccess.getInstance().writeData(fileSer,graph.toJson(),true);
-        SingletonFileAccess.getInstance().writeData(indexFile,indexLine,true);
+        SingletonFileAccess.getInstance().writeData(fileSer, graph.toJson(),
+                false);
+        SingletonFileAccess.getInstance().writeData(indexFile, indexLine, true);
     }
 
 //------------------------------------------------------------------------------
@@ -253,17 +255,17 @@ public class CEBLUtils
      * @param file the pathname of the file to convert
      */
 
-    public static FSECheckPoint deserializeCheckpoint(String file)
+    public static CheckPoint deserializeCheckpoint(String file)
                                                         throws DENOPTIMException
     {
-        FSECheckPoint chkpt = null;
+        CheckPoint chkpt = null;
         FileInputStream fis = null;
         ObjectInputStream ois = null;
         try
         {
             fis = new FileInputStream(new File(file));
             ois = new ObjectInputStream(fis);
-            chkpt = (FSECheckPoint) ois.readObject();
+            chkpt = (CheckPoint) ois.readObject();
             ois.close();
         }
         catch (Throwable t)

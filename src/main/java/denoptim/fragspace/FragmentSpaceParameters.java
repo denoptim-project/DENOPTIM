@@ -108,13 +108,14 @@ public class FragmentSpaceParameters extends RunTimeParameters
      * List of constitutional symmetry constraints
      */
     protected HashMap<APClass, Double> symmConstraintsMap = 
-						  new HashMap<APClass, Double>();
+            new HashMap<APClass, Double>();
+    
 //------------------------------------------------------------------------------
 
     /**
      * Constructor
      */
-    public FragmentSpaceParameters(ParametersType paramType)
+    private FragmentSpaceParameters(ParametersType paramType)
     {
         super(paramType);
     }
@@ -126,7 +127,7 @@ public class FragmentSpaceParameters extends RunTimeParameters
      */
     public FragmentSpaceParameters()
     {
-        super(ParametersType.FS_PARAMS);
+        this(ParametersType.FS_PARAMS);
     }
 
 //------------------------------------------------------------------------------
@@ -394,6 +395,39 @@ public class FragmentSpaceParameters extends RunTimeParameters
                 cappingLibFile, compMatrixFile, rcCompMatrixFile, 
                 symmConstraintsMap); 
         processOtherParameters();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of parameters in a string with newline characters as
+     * delimiters.
+     * @return the list of parameters in a string with newline characters as
+     * delimiters.
+     */
+    public String getPrintedList()
+    {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append(" " + paramTypeName() + " ").append(NL);
+        for (Field f : this.getClass().getDeclaredFields()) 
+        {
+            try
+            {
+                sb.append(f.getName()).append(" = ").append(
+                            f.get(this)).append(NL);
+            }
+            catch (Throwable t)
+            {
+                sb.append("ERROR! Unable to print " + paramTypeName() 
+                        + " parameters. Cause: " + t);
+                break;
+            }
+        }
+        for (RunTimeParameters otherCollector : otherParameters.values())
+        {
+            sb.append(otherCollector.getPrintedList());
+        }
+        return sb.toString();
     }
 
 //------------------------------------------------------------------------------

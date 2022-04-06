@@ -203,7 +203,7 @@ public final class DENOPTIMConstants
     /**
      * Extension filenames of serialized graphs
      */
-    public static final String SERGFILENAMEEXT = "ser";
+    public static final String SERGFILENAMEEXT = "json";
     
     /**
      * Prefix of filenames for input/output files related to fitness
