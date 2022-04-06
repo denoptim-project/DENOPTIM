@@ -50,7 +50,7 @@ if [ "$n40" -lt 5 ] || [ "$n40" -gt 13 ]; then
     echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of populations including "$candIdTo40": $n40)"
     exit 1
 fi
-if [ "$nMAX28" -lt 5 ]; then
+if [ "$nMAX28" -lt 4 ]; then
     echo " "
     echo "Test 't27' NOT PASSED (Lack of reproducibility - symptom: wrong number of generation with max fitness from manually added molecule: $nMAX28)"
     exit 1
