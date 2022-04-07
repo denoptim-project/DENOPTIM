@@ -197,7 +197,7 @@ runTest "t2e"
 runTest "t3"
 
 #
-# t4: parallel combinatorial builder from STRING-like user-provided root graph and enforced symmetry
+# t4: parallel combinatorial builder from given roots with symmetry constraints
 #
 runTest "t4"
 
@@ -217,21 +217,12 @@ runTest "p6"
 runTest "t6"
 
 #
-# p7: exploration of fragment space that generates serialized graphs for t7
+# t7: removed
 #
-## runTest "p7" # Repaced by unit testing
-echo "t7 replaced by unit test"
 
 #
-# t7: conversion of serialized DENOPTIMgraph to SDF
+# t8: removed
 #
-# runTest "t7" # Repaced by unit testing
-
-#
-# t8: conversion of serialized checkpoint file to human readable string
-#
-echo TODO: change t8
-#runTest "t8"
 
 #
 # t9: FragSpaceExplorer with symmetry constraints
@@ -295,17 +286,11 @@ echo TODO: refactor DenoptimRND
 #runTest "t17"
 
 #
-# t18: comparison of graph lists
+# t18: removed
 #
-echo TODO: change or remove
-#runTest "t18"
 
 #
-# t19: conversion of graph's string representations (with templates and empty
-# vertices)
-#
-echo TODO: remove StringConverter
-#runTest "t19"
+# t19: removed 
 
 #
 # t20: crossover with templates (outside templates)

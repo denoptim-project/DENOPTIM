@@ -1,0 +1,6 @@
+This test is outdated: it served to verify the conversion from the old GraphENC 
+string representation used before vertion 3.0 and the new JSON-based representation made operative since version 3.0. 
+Should there be any need to recover data from runs that used vertion<3.0, then
+we will activate conversion of GraphENC into JSON. For the moment this is not
+a manifested need. Please, contact the development team if you feel you need
+such functionality.
