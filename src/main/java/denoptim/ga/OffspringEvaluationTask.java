@@ -29,6 +29,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.logging.CounterID;
@@ -51,7 +52,16 @@ public class OffspringEvaluationTask extends FitnessTask
     private volatile Population population;
     private volatile Monitor mnt;
     
+    /**
+     * Parameters controlling GA experiments
+     */
     private GAParameters gaSettings;
+    
+    /**
+     * The fragment space
+     */
+    private FragmentSpace fragSpace;
+    
 //------------------------------------------------------------------------------
     
     public OffspringEvaluationTask(GAParameters gaSettings, 
@@ -61,6 +71,13 @@ public class OffspringEvaluationTask extends FitnessTask
         super(((FitnessParameters) gaSettings.getParameters(
                 ParametersType.FIT_PARAMS)), offspring);
         this.gaSettings = gaSettings;
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (gaSettings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)gaSettings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        this.fragSpace = fsParams.getFragmentSpace();
         this.molName = offspring.getName();
         this.workDir = new File(workDir);
         this.fitProvMol = offspring.getChemicalRepresentation();
@@ -99,7 +116,8 @@ public class OffspringEvaluationTask extends FitnessTask
                 DENOPTIMGraph gWithNoRCVs = dGraph.clone();
                 
                 //NB: this replaces unused RCVs with capping groups
-                GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs);
+                GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs, 
+                        fragSpace);
                 
             	// To get a proper molecular representation we need
             	// 1) build a 3d tree
@@ -179,7 +197,7 @@ public class OffspringEvaluationTask extends FitnessTask
         	        || gaSettings.getSaveRingSystemsAsTemplatesScaff())
         	    && isWithinBestPrcentile)
         	{   
-                FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
+        	    fragSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
                         gaSettings.getSaveRingSystemsAsTemplatesScaff(),
                         gaSettings.getSaveRingSystemsAsTemplatesNonScaff(),
                         fitProvMol);

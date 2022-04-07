@@ -18,16 +18,11 @@
 
 package denoptim.fragspace;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
 import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMVertex;
 
 
 /**
@@ -37,170 +32,6 @@ import denoptim.graph.DENOPTIMVertex;
  */
 public class FragmentSpaceUtils
 {
-	
-//------------------------------------------------------------------------------
-	
-	/**
-	 * Performs grouping and classification operations on the fragment library
-	 * @param apClassBasedApproch <code>true</code> if you are using class based
-	 * approach
-	 */
-	public static void groupAndClassifyFragments(boolean apClassBasedApproch)
-	 throws DENOPTIMException
-	{	
-		FragmentSpace.setFragPoolPerNumAP(
-					     new HashMap<Integer,ArrayList<Integer>>());
-		if (apClassBasedApproch)
-		{
-		    FragmentSpace.setFragsApsPerApClass(
-				   new HashMap<APClass,ArrayList<ArrayList<Integer>>>());
-		    FragmentSpace.setAPClassesPerFrag(
-					      new HashMap<Integer,ArrayList<APClass>>());
-		}
-		for (int j=0; j<FragmentSpace.getFragmentLibrary().size(); j++)
-		{
-			DENOPTIMVertex frag = FragmentSpace.getFragmentLibrary().get(j);
-		    classifyFragment(frag,j);
-		}
-	}
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Classify a fragment in terms of the number of APs and possibly their 
-     * type (AP-Class).
-     * @param frg the building block to classify
-     * @param id the index of the fragment in the library
-     * @throws DENOPTIMException
-     */
-
-    static void classifyFragment(DENOPTIMVertex frg,int fragId)
-    {   
-		// Classify according to number of APs
-        int nAps = frg.getFreeAPCount();
-		if (nAps != 0)
-		{
-            if (FragmentSpace.getMapOfFragsPerNumAps().containsKey(nAps))
-            {
-                FragmentSpace.getFragsWithNumAps(nAps).add(fragId);
-            }
-            else
-            {
-                ArrayList<Integer> lst = new ArrayList<>();
-                lst.add(fragId);
-                FragmentSpace.getMapOfFragsPerNumAps().put(nAps,lst);
-            }
-		}
-	
-		if (FragmentSpace.useAPclassBasedApproach())
-		{
-		    // Collect classes per fragment
-		    ArrayList<APClass> lstAPC = frg.getAllAPClasses();
-	        FragmentSpace.getMapAPClassesPerFragment().put(fragId,lstAPC);
-	        
-		    // Classify according to AP-Classes
-	        ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
-	                frg.getAttachmentPoints();
-	        
-		    for (int j=0; j<lstAPs.size(); j++)
-		    {
-		        DENOPTIMAttachmentPoint ap = lstAPs.get(j);
-				ArrayList<Integer> apId = new ArrayList<Integer>();
-				apId.add(fragId);
-				apId.add(j);
-				APClass cls = ap.getAPClass();
-				
-				if (!ap.isAvailable())
-				{
-				    continue;
-				}
-				
-			    if (FragmentSpace.getMapFragsAPsPerAPClass().containsKey(cls))
-				{
-				    FragmentSpace.getMapFragsAPsPerAPClass().get(cls)
-				    .add(apId);
-				}
-				else
-				{
-				    ArrayList<ArrayList<Integer>> outLst = 
-							    new ArrayList<ArrayList<Integer>>();
-				    outLst.add(apId);
-				    FragmentSpace.getMapFragsAPsPerAPClass().put(cls,outLst);
-				}
-		    }
-		    
-		    if (frg.isRCV())
-		        FragmentSpace.registerRCV(frg);
-		}
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Given two lists of APs this method maps the APClass-compatibilities 
-     * from between the two lists considering the APs in the first list the 
-     * for the role of source AP in the hypothetical edge.
-     * @param listA list of candidate source APs
-     * @param listB list of candidate target APs
-     * @param maxCombinations a maximum limit; if reached we are happy we give
-     * up finding more combination.
-     * @return 
-     */
-    public static List<APMapping> mapAPClassCompatibilities(
-            List<DENOPTIMAttachmentPoint> listA, 
-            List<DENOPTIMAttachmentPoint> listB, int maxCombinations)
-    {
-        Map<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
-                new HashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
-        
-        for (DENOPTIMAttachmentPoint apA : listA)
-        {
-            for (DENOPTIMAttachmentPoint apB : listB)
-            {  
-                boolean compatible = false;
-                if (FragmentSpace.useAPclassBasedApproach())
-                {   
-                    if (apA.getAPClass().isCPMapCompatibleWith(apB.getAPClass()))
-                    {
-                        compatible = true;
-                    }
-                } else {
-                    compatible = true;
-                }
-                if (compatible)
-                {
-                    if (apCompatilities.containsKey(apA))
-                    {
-                        apCompatilities.get(apA).add(apB);
-                    } else {
-                        List<DENOPTIMAttachmentPoint> lst = 
-                                new ArrayList<DENOPTIMAttachmentPoint>();
-                        lst.add(apB);
-                        apCompatilities.put(apA,lst);
-                    }
-                }
-            }
-        }
-        
-        // This is used only to keep a sorted list of the map keys
-        List<DENOPTIMAttachmentPoint> keys = 
-                new ArrayList<DENOPTIMAttachmentPoint>(
-                        apCompatilities.keySet());
-        
-        // Get all possible combinations of compatible AP pairs
-        List<APMapping> apMappings = new ArrayList<APMapping>();
-        if (keys.size() > 0)
-        {
-            int currentKey = 0;
-            APMapping currentMapping = new APMapping();
-            Boolean stopped = recursiveCombiner(keys, currentKey, 
-                    apCompatilities, currentMapping, apMappings, true, 
-                    maxCombinations);
-        }
-        
-        return apMappings;
-    }
-    
 
 //------------------------------------------------------------------------------
       

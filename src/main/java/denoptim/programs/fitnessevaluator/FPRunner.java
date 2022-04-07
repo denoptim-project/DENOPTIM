@@ -35,6 +35,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.programs.combinatorial.FragSpaceExplorer;

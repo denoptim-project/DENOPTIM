@@ -37,7 +37,7 @@ public class GraphLinkFinderTest
     
 //------------------------------------------------------------------------------
     
-    private void prepare() throws DENOPTIMException
+    private FragmentSpace prepare() throws DENOPTIMException
     {
         APCA = APClass.make("A", 0);
         APCB = APClass.make("B", 0);
@@ -89,82 +89,72 @@ public class GraphLinkFinderTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setCompatibilityMatrix(cpMap);
-        FragmentSpace.setCappingMap(capMap);
-        FragmentSpace.setForbiddenEndList(forbEnds);
-        FragmentSpace.setAPclassBasedApproach(true);
-        
-        FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
-        FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(), 
+                cpMap, capMap, forbEnds, cpMap);
+        fs.setAPclassBasedApproach(true);
         
         EmptyVertex s = new EmptyVertex();
         s.setBuildingBlockType(BBType.SCAFFOLD);
         s.addAP(APCA);
-        FragmentSpace.appendVertexToLibrary(s, BBType.SCAFFOLD,
-                FragmentSpace.getScaffoldLibrary());
+        fs.appendVertexToLibrary(s, BBType.SCAFFOLD, fs.getScaffoldLibrary());
         
         EmptyVertex v0 = new EmptyVertex();
         v0.setBuildingBlockType(BBType.FRAGMENT);
         v0.addAP(APCA);
         v0.addAP(APCB);
         v0.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v0, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v0, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
         v1.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v1, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v2 = new EmptyVertex();
         v2.setBuildingBlockType(BBType.FRAGMENT);
         v2.addAP(APCA);
         v2.addAP(APCA);
-        FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v2, BBType.FRAGMENT,fs.getFragmentLibrary());
         
         EmptyVertex v3 = new EmptyVertex();
         v3.setBuildingBlockType(BBType.FRAGMENT);
         v3.addAP(APCB);
         v3.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v3, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v3, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v4 = new EmptyVertex();
         v4.setBuildingBlockType(BBType.FRAGMENT);
         v4.addAP(APCA);
         v4.addAP(APCB);
         v4.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v4, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v4, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v5 = new EmptyVertex();
         v5.setBuildingBlockType(BBType.FRAGMENT);
         v5.addAP(APCA);
         v5.addAP(APCC);
         v5.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v5, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v5, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v6 = new EmptyVertex();
         v6.setBuildingBlockType(BBType.FRAGMENT);
         v6.addAP(APCD);
         v6.addAP(APCD);
-        FragmentSpace.appendVertexToLibrary(v6, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v6, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v7 = new EmptyVertex();
         v7.setBuildingBlockType(BBType.FRAGMENT);
         v7.addAP(APCA);
-        FragmentSpace.appendVertexToLibrary(v7, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v7, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v8 = new EmptyVertex();
         v8.setBuildingBlockType(BBType.FRAGMENT);
         v8.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v8, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v8, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v9 = new EmptyVertex();
         v9.setBuildingBlockType(BBType.FRAGMENT);
@@ -172,8 +162,7 @@ public class GraphLinkFinderTest
         v9.addAP(APCA);
         v9.addAP(APCB);
         v9.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v9, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v9, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v10 = new EmptyVertex();
         v10.setBuildingBlockType(BBType.FRAGMENT);
@@ -181,8 +170,7 @@ public class GraphLinkFinderTest
         v10.addAP(APCC);
         v10.addAP(APCD);
         v10.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v10, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v10, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v11 = new EmptyVertex();
         v11.setBuildingBlockType(BBType.FRAGMENT);
@@ -194,26 +182,24 @@ public class GraphLinkFinderTest
         v11.addAP(APCB);
         v11.addAP(APCB);
         v11.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v11, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v11, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v12 = new EmptyVertex();
         v12.setBuildingBlockType(BBType.FRAGMENT);
         v12.addAP(APCE);
         v12.addAP(APCE);
         v12.addAP(APCE);
-        FragmentSpace.appendVertexToLibrary(v12, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v12, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v13 = new EmptyVertex();
         v13.setBuildingBlockType(BBType.FRAGMENT);
         v13.addAP(APCF);
         v13.addAP(APCB);
         v13.addAP(APCA);
-        FragmentSpace.appendVertexToLibrary(v13, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v13, BBType.FRAGMENT, fs.getFragmentLibrary());
+        fs.groupAndClassifyFragments(true);
         
-        FragmentSpaceUtils.groupAndClassifyFragments(true);
+        return fs;
     }
 
 //------------------------------------------------------------------------------
@@ -225,15 +211,13 @@ public class GraphLinkFinderTest
      */
     private DENOPTIMGraph makeTestGraphA() throws DENOPTIMException
     {
+        FragmentSpace fs = prepare();
         DENOPTIMGraph graph = new DENOPTIMGraph();
-        DENOPTIMVertex s = FragmentSpace.getVertexFromLibrary(
-                BBType.SCAFFOLD,0);
+        DENOPTIMVertex s = fs.getVertexFromLibrary(BBType.SCAFFOLD,0);
         graph.addVertex(s);
-        DENOPTIMVertex v0 = FragmentSpace.getVertexFromLibrary(
-                BBType.FRAGMENT,0);
+        DENOPTIMVertex v0 = fs.getVertexFromLibrary(BBType.FRAGMENT,0);
         graph.addVertex(v0);
-        DENOPTIMVertex v1 = FragmentSpace.getVertexFromLibrary(
-                BBType.FRAGMENT,1);
+        DENOPTIMVertex v1 = fs.getVertexFromLibrary(BBType.FRAGMENT,1);
         graph.addVertex(v1);
         graph.addEdge(new DENOPTIMEdge(s.getAP(0), v0.getAP(0)));
         graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(0)));
@@ -250,12 +234,11 @@ public class GraphLinkFinderTest
      */
     private DENOPTIMGraph makeTestGraphE() throws DENOPTIMException
     {
+        FragmentSpace fs = prepare();
         DENOPTIMGraph graph = new DENOPTIMGraph();
-        DENOPTIMVertex v0 = FragmentSpace.getVertexFromLibrary(
-                BBType.FRAGMENT,12);
+        DENOPTIMVertex v0 = fs.getVertexFromLibrary(BBType.FRAGMENT,12);
         graph.addVertex(v0);
-        DENOPTIMVertex v1 = FragmentSpace.getVertexFromLibrary(
-                BBType.FRAGMENT,12);
+        DENOPTIMVertex v1 = fs.getVertexFromLibrary(BBType.FRAGMENT,12);
         graph.addVertex(v1);
         graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(1)));
         graph.renumberGraphVertices();
@@ -271,12 +254,11 @@ public class GraphLinkFinderTest
      */
     private DENOPTIMGraph makeTestGraphF() throws DENOPTIMException
     {
+        FragmentSpace fs = prepare();
         DENOPTIMGraph graph = new DENOPTIMGraph();
-        DENOPTIMVertex v0 = FragmentSpace.getVertexFromLibrary(
-                BBType.FRAGMENT,13);
+        DENOPTIMVertex v0 = fs.getVertexFromLibrary(BBType.FRAGMENT,13);
         graph.addVertex(v0);
-        DENOPTIMVertex v1 = FragmentSpace.getVertexFromLibrary(
-                BBType.FRAGMENT,13);
+        DENOPTIMVertex v1 = fs.getVertexFromLibrary(BBType.FRAGMENT,13);
         graph.addVertex(v1);
         graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
         graph.renumberGraphVertices();
@@ -288,10 +270,10 @@ public class GraphLinkFinderTest
     @Test
     public void testLinkFromVertex() throws Exception
     {
-        prepare();
+        FragmentSpace fs = prepare();
         DENOPTIMGraph graph = makeTestGraphA();
-        GraphLinkFinder glf = new GraphLinkFinder(graph.getVertexAtPosition(1),
-                -1, true); 
+        GraphLinkFinder glf = new GraphLinkFinder(fs,
+                graph.getVertexAtPosition(1), -1, true); 
         // NB: the boolean makes the search complete (within the limits that
         // prevent combinatorial explosion)
         // NB: "-1" is for "no selection of specific new building block".
@@ -324,10 +306,10 @@ public class GraphLinkFinderTest
     @Test
     public void testLinkFromEdge() throws Exception
     {
-        prepare();
+        FragmentSpace fs = prepare();
         DENOPTIMGraph graph = makeTestGraphA();
         DENOPTIMEdge targetEdge = graph.getEdgeAtPosition(1);
-        GraphLinkFinder glf = new GraphLinkFinder(targetEdge, -1, true); 
+        GraphLinkFinder glf = new GraphLinkFinder(fs, targetEdge, -1, true); 
         // NB: the boolean makes the search complete (within the limits the 
         // prevent combinatorial explosion)
         // NB: "-1" is for "no selection of specific new building block".
@@ -370,10 +352,10 @@ public class GraphLinkFinderTest
     @Test
     public void testLinkFromEdgeOneMatch() throws Exception
     {
-        prepare();
+        FragmentSpace fs = prepare();
         DENOPTIMGraph graph = makeTestGraphE();
         DENOPTIMEdge targetEdge = graph.getEdgeAtPosition(0);
-        GraphLinkFinder glf = new GraphLinkFinder(targetEdge, -1, true); 
+        GraphLinkFinder glf = new GraphLinkFinder(fs, targetEdge, -1, true); 
         // NB: the boolean makes the search complete (within the limits the 
         // prevent combinatorial explosion)
         // NB: "-1" is for "no selection of specific new building block".
@@ -395,10 +377,10 @@ public class GraphLinkFinderTest
     @Test
     public void testLinkFromEdgeNoMatch() throws Exception
     {
-        prepare();
+        FragmentSpace fs = prepare();
         DENOPTIMGraph graph = makeTestGraphF();
         DENOPTIMEdge targetEdge = graph.getEdgeAtPosition(0);
-        GraphLinkFinder glf = new GraphLinkFinder(targetEdge, -1, true); 
+        GraphLinkFinder glf = new GraphLinkFinder(fs, targetEdge, -1, true); 
         // NB: the boolean makes the search complete (within the limits the 
         // prevent combinatorial explosion)
         // NB: "-1" is for "no selection of specific new building block".

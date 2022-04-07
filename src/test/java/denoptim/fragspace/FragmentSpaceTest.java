@@ -106,14 +106,7 @@ public class FragmentSpaceTest
 
 //------------------------------------------------------------------------------
 	
-	/*
-	 * Ideally this could be run once before all tests of this class. However,
-	 * attempts to use @BeforeAll have shown that the static FragmentSpace does 
-	 * not remain defined after for all tests. As a workaround, the definition
-	 * of the fragment space is run @BeforeEach test.
-	 */
-	@BeforeEach
-	private void buildFragmentSpace() throws DENOPTIMException
+	private FragmentSpaceParameters buildFragmentSpace() throws DENOPTIMException
 	{
 	    assertTrue(tempDir.isDirectory(),"Should be a directory ");
 	    
@@ -272,8 +265,10 @@ public class FragmentSpaceTest
     			new HashMap<APClass,ArrayList<APClass>>();
     	*/
     	
-    	FragmentSpace.defineFragmentSpace(scaffLibFile, fragLibFile, capLibFile,
-    	        cpmFile);
+    	FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+    	FragmentSpace fs = new FragmentSpace(fsp, scaffLibFile, fragLibFile, 
+    	        capLibFile, cpmFile);
+    	return fsp;
 	}
 	
 //-----------------------------------------------------------------------------        
@@ -281,9 +276,11 @@ public class FragmentSpaceTest
     @Test
     public void testSymmetry() throws Exception
     {
-        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        assertTrue(fsp.getFragmentSpace().isDefined(),"FragmentSpace is defined");
         DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(),3,BBType.FRAGMENT);
+                GraphUtils.getUniqueVertexIndex(),3,BBType.FRAGMENT,
+                fsp.getFragmentSpace());
         
         assertEquals(2,v.getSymmetricAPSets().size(),
                 "Number of symmetric sets of APs");
@@ -304,8 +301,10 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragsWithAPClass() throws Exception
     {
-        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
-    	ArrayList<IdFragmentAndAP> l = FragmentSpace.getFragsWithAPClass(APC2);
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpace fs = fsp.getFragmentSpace();
+        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+    	ArrayList<IdFragmentAndAP> l = fs.getFragsWithAPClass(APC2);
     	assertEquals(4,l.size(),"Wrong size of AP IDs with given APClass.");
 
     	int i = -1;
@@ -313,12 +312,10 @@ public class FragmentSpaceTest
     	{
     	    i++;
     	    DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
-    	            id.getVertexMolId(), id.getVertexMolType());
+    	            id.getVertexMolId(), id.getVertexMolType(), fs);
     	    assertEquals(APC2, v.getAP(id.getApId()).getAPClass(),
     	            "APClass of "+i);
     	}
-    	
-    	FragmentSpace.clearAll();
     }
 
 //-----------------------------------------------------------------------------    	
@@ -326,9 +323,11 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragAPsCompatibleWithClass() throws Exception
     {
-        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
-    	ArrayList<IdFragmentAndAP> lst = 
-    			FragmentSpace.getFragAPsCompatibleWithClass(APC1);
+
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpace fs = fsp.getFragmentSpace();
+        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+    	ArrayList<IdFragmentAndAP> lst = fs.getFragAPsCompatibleWithClass(APC1);
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
 
@@ -337,13 +336,11 @@ public class FragmentSpaceTest
         {
             i++;
             DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
-                    id.getVertexMolId(), id.getVertexMolType());
+                    id.getVertexMolId(), id.getVertexMolType(), fs);
             DENOPTIMAttachmentPoint ap = v.getAP(id.getApId());
-            assertTrue(APC1.isCPMapCompatibleWith(ap.getAPClass()), 
+            assertTrue(APC1.isCPMapCompatibleWith(ap.getAPClass(), fs), 
                     "Incompatible choice at "+i);
         }
-        
-    	FragmentSpace.clearAll();
     }
     
 //------------------------------------------------------------------------------
@@ -351,33 +348,35 @@ public class FragmentSpaceTest
     @Test
     public void testGetFragAPsCompatibleWithTheseAPs() throws Exception
     {
-        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpace fs = fsp.getFragmentSpace();
+        assertTrue(fs.isDefined(),"FragmentSpace is defined");
     	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
     	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
     	DENOPTIMVertex src1V = DENOPTIMVertex.newVertexFromLibrary(-1,
-    	        src1.getVertexMolId(), src1.getVertexMolType());
+    	        src1.getVertexMolId(), src1.getVertexMolType(), fs);
     	APClass src1APC = src1V.getAP(src1.getApId()).getAPClass();
         DENOPTIMVertex src2V = DENOPTIMVertex.newVertexFromLibrary(-1,
-                src2.getVertexMolId(), src2.getVertexMolType());
+                src2.getVertexMolId(), src2.getVertexMolType(), fs);
         APClass src2APC = src2V.getAP(src2.getApId()).getAPClass();
     	
     	
     	/*
-    	System.out.println("SRC1 "+FragmentSpace.getAPClassForFragment(src1)+" => "
-    	+FragmentSpace.getCompatibleAPClasses(FragmentSpace.getAPClassForFragment(src1)));
-    	System.out.println("SRC2 "+FragmentSpace.getAPClassForFragment(src2)+" => "
-    	+FragmentSpace.getCompatibleAPClasses(FragmentSpace.getAPClassForFragment(src2)));
-    	System.out.println("Frags with SRC1: "+FragmentSpace.getFragAPsCompatibleWithClass(
-    	        FragmentSpace.getAPClassForFragment(src1)));
-        System.out.println("Frags with SRC2: "+FragmentSpace.getFragAPsCompatibleWithClass(
-                FragmentSpace.getAPClassForFragment(src2)));
+    	System.out.println("SRC1 "+fs.getAPClassForFragment(src1)+" => "
+    	+fs.getCompatibleAPClasses(fs.getAPClassForFragment(src1)));
+    	System.out.println("SRC2 "+fs.getAPClassForFragment(src2)+" => "
+    	+fs.getCompatibleAPClasses(fs.getAPClassForFragment(src2)));
+    	System.out.println("Frags with SRC1: "+fs.getFragAPsCompatibleWithClass(
+    	        fs.getAPClassForFragment(src1)));
+        System.out.println("Frags with SRC2: "+fs.getFragAPsCompatibleWithClass(
+                fs.getAPClassForFragment(src2)));
     	*/
     	
-    	ArrayList<IdFragmentAndAP> lst = 
-    			FragmentSpace.getFragAPsCompatibleWithTheseAPs(srcAPs);
+    	ArrayList<IdFragmentAndAP> lst = fs.getFragAPsCompatibleWithTheseAPs(
+    	        srcAPs);
     	
     	assertEquals(4,lst.size(),"Size of compatible APs list is wrong.");
     	
@@ -386,34 +385,32 @@ public class FragmentSpaceTest
         {
             i++;
             DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
-                    id.getVertexMolId(), id.getVertexMolType());
+                    id.getVertexMolId(), id.getVertexMolType(), fs);
             DENOPTIMAttachmentPoint ap = v.getAP(id.getApId());
-            assertTrue(src1APC.isCPMapCompatibleWith(ap.getAPClass())
-                    || src2APC.isCPMapCompatibleWith(ap.getAPClass()), 
+            assertTrue(src1APC.isCPMapCompatibleWith(ap.getAPClass(), fs)
+                    || src2APC.isCPMapCompatibleWith(ap.getAPClass(), fs), 
                     "Incompatible choice at "+i);
         }
-    	
-    	FragmentSpace.clearAll();
     }
     
 //------------------------------------------------------------------------------
     
     @Test
-    public void testGetFragmentsCompatibleWithTheseAPs()
+    public void testGetFragmentsCompatibleWithTheseAPs() throws Exception
     {
-        assertTrue(FragmentSpace.isDefined(),"FragmentSpace is defined");
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpace fs = fsp.getFragmentSpace();
+        assertTrue(fs.isDefined(),"FragmentSpace is defined");
     	IdFragmentAndAP src1 = new IdFragmentAndAP(-1,2,BBTFRAG,0,-1,-1);
     	IdFragmentAndAP src2 = new IdFragmentAndAP(-1,2,BBTFRAG,1,-1,-1);
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
     	
-    	ArrayList<DENOPTIMVertex> lst = 
-    			FragmentSpace.getFragmentsCompatibleWithTheseAPs(srcAPs);
+    	ArrayList<DENOPTIMVertex> lst = fs.getFragmentsCompatibleWithTheseAPs(
+    	        srcAPs);
     	
-    	assertEquals(3,lst.size(),"Wrong number of compatible fragments.");
-    	
-    	FragmentSpace.clearAll();	
+    	assertEquals(3,lst.size(),"Wrong number of compatible fragments.");	
     }
 
 //------------------------------------------------------------------------------
@@ -426,34 +423,32 @@ public class FragmentSpaceTest
      *   .  / |    ↓
      *   C4 . C5 →
      *   ↓    ↓
+     * @throws Exception 
      */
     @Test
-    public void testFusedRingAddedToFragmentLibrary() {
-        try {
-            TestCase testCase = getTestCase();
+    public void testFusedRingAddedToFragmentLibrary() throws Exception 
+    {
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+        fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+        FragmentSpace fs = fsp.getFragmentSpace();
+        
+        TestCase testCase = getTestCase();
 
-            List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
-            fragLib.clear(); // Workaround. See @BeforeEach in this class.
-            
-            FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-            fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
-            fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+        List<DENOPTIMVertex> fragLib = fs.getFragmentLibrary();
+        fragLib.clear();
 
-            FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
+        fs.addFusedRingsToFragmentLibrary(testCase.graph);
 
-            //Cleanup tmp files
-            FileUtils.deleteFile(fsp.getPathnameToAppendedFragments());
-            FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
-            
-            assertEquals(1, fragLib.size());
-            DENOPTIMVertex actual = fragLib.get(0);
-            StringBuilder sb = new StringBuilder();
-            assertTrue(testCase.expected.sameAs(actual, sb),
-                    "Problem is "+sb.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("Unexpected exception thrown.");
-        }
+        //Cleanup tmp files
+        FileUtils.deleteFile(fsp.getPathnameToAppendedFragments());
+        FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
+        
+        assertEquals(1, fragLib.size());
+        DENOPTIMVertex actual = fragLib.get(0);
+        StringBuilder sb = new StringBuilder();
+        assertTrue(testCase.expected.sameAs(actual, sb),
+                "Problem is "+sb.toString());
     }
 
 //------------------------------------------------------------------------------
@@ -461,37 +456,34 @@ public class FragmentSpaceTest
     /**
      * Checks that a graph with a fused ring containing a scaffold vertex is
      * added to the scaffold library.
+     * @throws Exception 
      */
     @Test
-    public void testFusedRingAddedToScaffoldLibrary() {
-        try {
-            TestCase testCase = getTestCase();
-            testCase.graph.getVertexList().get(0)
-                    .setBuildingBlockType(BBType.SCAFFOLD);
-            testCase.expected.setBuildingBlockType(BBType.SCAFFOLD);
-            testCase.expected.getInnerGraph().getVertexList().get(0)
-                    .setBuildingBlockType(BBType.SCAFFOLD);
+    public void testFusedRingAddedToScaffoldLibrary() throws Exception 
+    {
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+        fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+        FragmentSpace fs = fsp.getFragmentSpace();
+        TestCase testCase = getTestCase();
+        testCase.graph.getVertexList().get(0)
+                .setBuildingBlockType(BBType.SCAFFOLD);
+        testCase.expected.setBuildingBlockType(BBType.SCAFFOLD);
+        testCase.expected.getInnerGraph().getVertexList().get(0)
+                .setBuildingBlockType(BBType.SCAFFOLD);
 
-            List<DENOPTIMVertex> scaffLib = FragmentSpace.getScaffoldLibrary();
-            scaffLib.clear();
+        List<DENOPTIMVertex> scaffLib = fs.getScaffoldLibrary();
+        scaffLib.clear();
 
-            FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-            fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
-            fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+        fs.addFusedRingsToFragmentLibrary(testCase.graph);
 
-            FragmentSpace.addFusedRingsToFragmentLibrary(testCase.graph);
+        //Cleanup tmp files
+        FileUtils.deleteFile(fsp.getPathnameToAppendedFragments());
+        FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
 
-            //Cleanup tmp files
-            FileUtils.deleteFile(fsp.getPathnameToAppendedFragments());
-            FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
-
-            assertEquals(1, scaffLib.size());
-            DENOPTIMVertex actual = scaffLib.get(0);
-            assertTrue(testCase.expected.sameAs(actual, new StringBuilder()));
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
-            fail("Unexpected exception thrown.");
-        }
+        assertEquals(1, scaffLib.size());
+        DENOPTIMVertex actual = scaffLib.get(0);
+        assertTrue(testCase.expected.sameAs(actual, new StringBuilder()));
     }
 
 //------------------------------------------------------------------------------
@@ -499,6 +491,10 @@ public class FragmentSpaceTest
     @Test
     public void testFusedRingOnlyAddedOnce() throws DENOPTIMException
     {
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+        fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+        FragmentSpace fs = fsp.getFragmentSpace();
         TestCase testCase = getTestCase();
         final int TRY_ADDING = 10;
         List<DENOPTIMGraph> sameGraphs = IntStream
@@ -515,15 +511,11 @@ public class FragmentSpaceTest
                 })
                 .collect(Collectors.toList());
 
-        List<DENOPTIMVertex> fragLib = FragmentSpace.getFragmentLibrary();
+        List<DENOPTIMVertex> fragLib = fs.getFragmentLibrary();
         fragLib.clear();
-
-        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-        fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
-        fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
         
         for (DENOPTIMGraph g : sameGraphs) {
-            FragmentSpace.addFusedRingsToFragmentLibrary(g);
+            fs.addFusedRingsToFragmentLibrary(g);
         }
 
         //Cleanup tmp files
@@ -656,11 +648,10 @@ public class FragmentSpaceTest
         }
     }
     
-    
 //------------------------------------------------------------------------------
     
     /**
-     * Wotks with this graph:
+     * Works with this graph:
      * <pre>
      *            c1 
      *            | 
@@ -684,6 +675,10 @@ public class FragmentSpaceTest
     @Test
     public void testUseWholeMolGeometryForExtractedTemplates() throws Exception
     {   
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
+        fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
+        FragmentSpace fs = fsp.getFragmentSpace();
         DENOPTIMFragment scaf = new DENOPTIMFragment();
         IAtom s1 = new Atom("C", new Point3d(0,0,0));
         scaf.addAtom(s1);
@@ -692,9 +687,8 @@ public class FragmentSpaceTest
         scaf.addAPOnAtom(s1, APC4, new Point3d(-1,-1,0));
         scaf.projectAPsToProperties();
         
-        FragmentSpace.appendVertexToLibrary(scaf, BBType.SCAFFOLD, 
-                FragmentSpace.getScaffoldLibrary());
-        int sId = FragmentSpace.getScaffoldLibrary().size() - 1;
+        fs.appendVertexToLibrary(scaf, BBType.SCAFFOLD, fs.getScaffoldLibrary());
+        int sId = fs.getScaffoldLibrary().size() - 1;
         
         DENOPTIMFragment frg = new DENOPTIMFragment();
         IAtom a1 = new Atom("C", new Point3d(0,0,0));
@@ -710,9 +704,8 @@ public class FragmentSpaceTest
         frg.addAPOnAtom(a3, APC4, new Point3d(-1,-1,0));
         frg.projectAPsToProperties();
         
-        FragmentSpace.appendVertexToLibrary(frg, BBTFRAG, 
-                FragmentSpace.getFragmentLibrary());
-        int bbId = FragmentSpace.getFragmentLibrary().size() - 1;
+        fs.appendVertexToLibrary(frg, BBTFRAG, fs.getFragmentLibrary());
+        int bbId = fs.getFragmentLibrary().size() - 1;
         
         DENOPTIMFragment rcv = new DENOPTIMFragment();
         IAtom a4 = new PseudoAtom("ATN", new Point3d(0,0,0));
@@ -721,29 +714,27 @@ public class FragmentSpaceTest
         rcv.projectAPsToProperties();
         rcv.setAsRCV(true);
         
-        FragmentSpace.appendVertexToLibrary(rcv, BBTFRAG, 
-                FragmentSpace.getFragmentLibrary());
-        int rcvId = FragmentSpace.getFragmentLibrary().size() - 1;
+        fs.appendVertexToLibrary(rcv, BBTFRAG, fs.getFragmentLibrary());
+        int rcvId = fs.getFragmentLibrary().size() - 1;
         
         DENOPTIMGraph wholeGraph = new DENOPTIMGraph();
-        DENOPTIMVertex v1 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v2 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v3 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v4 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v5 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v6 = FragmentSpace.getVertexFromLibrary(BBType.SCAFFOLD, 
-                sId);
-        DENOPTIMVertex v7 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v8 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v9 = FragmentSpace.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v10 = FragmentSpace.getVertexFromLibrary(BBTFRAG, rcvId);
-        DENOPTIMVertex v11 = FragmentSpace.getVertexFromLibrary(BBTFRAG, rcvId);
-        DENOPTIMVertex v12 = FragmentSpace.getVertexFromLibrary(BBTFRAG, rcvId);
-        DENOPTIMVertex v13 = FragmentSpace.getVertexFromLibrary(BBTFRAG, rcvId);
-        DENOPTIMVertex c1 = FragmentSpace.getVertexFromLibrary(BBType.CAP, 0);
-        DENOPTIMVertex c2 = FragmentSpace.getVertexFromLibrary(BBType.CAP, 0);
-        DENOPTIMVertex c3 = FragmentSpace.getVertexFromLibrary(BBType.CAP, 0);
-        DENOPTIMVertex c4 = FragmentSpace.getVertexFromLibrary(BBType.CAP, 0);
+        DENOPTIMVertex v1 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v2 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v3 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v4 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v5 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v6 = fs.getVertexFromLibrary(BBType.SCAFFOLD,sId);
+        DENOPTIMVertex v7 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v8 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v9 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        DENOPTIMVertex v10 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
+        DENOPTIMVertex v11 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
+        DENOPTIMVertex v12 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
+        DENOPTIMVertex v13 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
+        DENOPTIMVertex c1 = fs.getVertexFromLibrary(BBType.CAP, 0);
+        DENOPTIMVertex c2 = fs.getVertexFromLibrary(BBType.CAP, 0);
+        DENOPTIMVertex c3 = fs.getVertexFromLibrary(BBType.CAP, 0);
+        DENOPTIMVertex c4 = fs.getVertexFromLibrary(BBType.CAP, 0);
         
         // Disordered... just for the fun of it. Still, do not change it further
         // as we need to wholeMol to be created consistently
@@ -786,7 +777,7 @@ public class FragmentSpaceTest
         
         ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
         IAtomContainer wholeMol = tb3d.convertGraphTo3DAtomContainer(
-                wholeGraph.clone(),true);
+                wholeGraph.clone(), true);
         
         double r = 10;
         for (int i=0; i<wholeMol.getAtomCount(); i++)
@@ -800,26 +791,23 @@ public class FragmentSpaceTest
                     r*Math.sin(Math.toRadians(360/34 * i)),0));
         }
         
-        int szScafLibPre = FragmentSpace.getScaffoldLibrary().size();
-        int szFragLibPre = FragmentSpace.getFragmentLibrary().size();
+        int szScafLibPre = fs.getScaffoldLibrary().size();
+        int szFragLibPre = fs.getFragmentLibrary().size();
         
         String scafFile = tempDir.getAbsolutePath() + SEP + "newScaf.sdf";
         String fragFile = tempDir.getAbsolutePath() + SEP + "newFrag.sdf";
-
-        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
         fsp.scaffoldLibFile = scafFile;
         fsp.fragmentLibFile = fragFile;
 
-        FragmentSpace.addFusedRingsToFragmentLibrary(wholeGraph, true, true,
-                wholeMol);
+        fs.addFusedRingsToFragmentLibrary(wholeGraph, true, true, wholeMol);
         
         // NB: in here there is cloning of template with mol representation
-        assertEquals(szScafLibPre+1,FragmentSpace.getScaffoldLibrary().size(),
+        assertEquals(szScafLibPre+1,fs.getScaffoldLibrary().size(),
                 "Size scaffolds library");
-        assertEquals(szFragLibPre+1,FragmentSpace.getFragmentLibrary().size(),
+        assertEquals(szFragLibPre+1,fs.getFragmentLibrary().size(),
                 "Size fragments library");
         
-        DENOPTIMVertex newScaff = FragmentSpace.getVertexFromLibrary(
+        DENOPTIMVertex newScaff = fs.getVertexFromLibrary(
                 BBType.SCAFFOLD,szScafLibPre); // szScafLibPre+1-1
         assertEquals(4,newScaff.getAttachmentPoints().size(), 
                 "#APs on new scaffold");
@@ -831,7 +819,7 @@ public class FragmentSpaceTest
         }
         assertEquals(10,nP,"#P in new scaffold");
         
-        DENOPTIMVertex newFrag = FragmentSpace.getVertexFromLibrary(
+        DENOPTIMVertex newFrag = fs.getVertexFromLibrary(
                 BBType.FRAGMENT,szFragLibPre); // szFragLibPre+1-1
         assertEquals(3,newFrag.getAttachmentPoints().size(), 
                 "#APs on new fragment");

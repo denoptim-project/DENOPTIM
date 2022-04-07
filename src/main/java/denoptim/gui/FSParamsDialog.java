@@ -23,14 +23,14 @@ class FSParamsDialog extends GUIModalDialog
 
     private FSParametersForm fsParsForm;
 	
-	private ILoadFragSpace parent;
+	private GUICardPanel parent;
 	
 //-----------------------------------------------------------------------------
 	
 	/**
 	 * Constructor
 	 */
-	public FSParamsDialog(ILoadFragSpace parentPanel)
+	public FSParamsDialog(GUICardPanel parentPanel)
 	{
 		super();
 		this.parent = parentPanel;
@@ -77,17 +77,13 @@ class FSParamsDialog extends GUIModalDialog
 			                "Error",
 			                JOptionPane.ERROR_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));
-					
-					parent.renderForLackOfFragSpace();
 					return;
 				}
-				parent.renderForPresenceOfFragSpace();
 				close();
 			}
 		});
 		
-		this.btnCanc.setToolTipText("Exit without creating a fragment "
-				+ "space.");
+		this.btnCanc.setToolTipText("Exit without creating a fragment space.");
 	}
 	
 //-----------------------------------------------------------------------------

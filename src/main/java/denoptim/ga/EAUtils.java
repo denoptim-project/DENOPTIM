@@ -292,6 +292,14 @@ public class EAUtils
             Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
             int choiceOfOffstring, GAParameters settings) throws DENOPTIMException
     {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        
         mnt.increase(CounterID.XOVERATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
         
@@ -303,7 +311,7 @@ public class EAUtils
         boolean foundPars = false;
         while (numatt < settings.getMaxGeneticOpAttempts())
         {   
-            if (FragmentSpace.useAPclassBasedApproach())
+            if (fragSpace.useAPclassBasedApproach())
             {
                 xos = EAUtils.performFBCC(eligibleParents, 
                         population, choiceOfParents, choiceOfXOverSites,
@@ -365,7 +373,7 @@ public class EAUtils
         DENOPTIMGraph gBClone = xosOnClones.getB().get(0).getGraphOwner();
         try
         {
-            if (!DENOPTIMGraphOperations.performCrossover(xosOnClones))
+            if (!DENOPTIMGraphOperations.performCrossover(xosOnClones,fragSpace))
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
@@ -415,7 +423,7 @@ public class EAUtils
 
             // Finalize the graph that is at the outermost level
             DENOPTIMGraph gOutermost = g.getOutermostGraphOwner();
-            gOutermost.addCappingGroups();
+            gOutermost.addCappingGroups(fragSpace);
             gOutermost.renumberGraphVertices();
             gOutermost.setLocalMsg(msgs[ig]);
             
@@ -436,8 +444,8 @@ public class EAUtils
             for (DENOPTIMVertex rcv : gOutermost.getFreeRCVertices())
             {
                 APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
-                if (FragmentSpace.getCappingMap().get(apc)==null 
-                        && FragmentSpace.getForbiddenEndList().contains(apc))
+                if (fragSpace.getCappingMap().get(apc)==null 
+                        && fragSpace.getForbiddenEndList().contains(apc))
                 {
                     mnt.increase(CounterID.FAILEDXOVERATTEMPTS_FORBENDS);
                     res = null;
@@ -484,6 +492,14 @@ public class EAUtils
             ArrayList<Candidate> eligibleParents, Monitor mnt, 
             GAParameters settings) throws DENOPTIMException
     {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        
         mnt.increase(CounterID.MUTATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
         
@@ -522,7 +538,7 @@ public class EAUtils
         
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
         
-        graph.addCappingGroups();
+        graph.addCappingGroups(fragSpace);
         
         Object[] res = null;
         try
@@ -530,9 +546,12 @@ public class EAUtils
             res = EAUtils.evaluateGraph(graph,settings);
         } catch (NullPointerException|IllegalArgumentException e)
         {
+            //TODO: make crossplatform
             System.out.println("WRITING DEBUG FILE for "+graph.getLocalMsg());
-            DenoptimIO.writeGraphToSDF(new File("/tmp/debug_evalGrp_parent.sdf"), parent.getGraph(),false);
-            DenoptimIO.writeGraphToSDF(new File("/tmp/debug_evalGrp_curr.sdf"), graph,false);
+            DenoptimIO.writeGraphToSDF(new File("/tmp/debug_evalGrp_parent.sdf"),
+                    parent.getGraph(),false);
+            DenoptimIO.writeGraphToSDF(new File("/tmp/debug_evalGrp_curr.sdf"), 
+                    graph,false);
             throw e;
         }
         
@@ -553,8 +572,8 @@ public class EAUtils
         for (DENOPTIMVertex rcv : graph.getFreeRCVertices())
         {
             APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
-            if (FragmentSpace.getCappingMap().get(apc)==null 
-                    && FragmentSpace.getForbiddenEndList().contains(apc))
+            if (fragSpace.getCappingMap().get(apc)==null 
+                    && fragSpace.getForbiddenEndList().contains(apc))
             {
                 res = null;
                 mnt.increase(CounterID.FAILEDMUTATTEMTS_FORBENDS);
@@ -582,6 +601,7 @@ public class EAUtils
     
 //------------------------------------------------------------------------------
     
+    //TODO: move to IO class
     protected static Candidate readCandidateFromFile(File srcFile, Monitor mnt,
             GAParameters settings) throws DENOPTIMException
     {
@@ -659,6 +679,14 @@ public class EAUtils
             GAParameters settings) 
             throws DENOPTIMException
     {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        
         mnt.increase(CounterID.BUILDANEWATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
@@ -706,8 +734,8 @@ public class EAUtils
                 continue;
             }
             APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
-            if (FragmentSpace.getCappingMap().get(apc)==null 
-                    && FragmentSpace.getForbiddenEndList().contains(apc))
+            if (fragSpace.getCappingMap().get(apc)==null 
+                    && fragSpace.getForbiddenEndList().contains(apc))
             {
                 res = null;
                 mnt.increase(CounterID.FAILEDBUILDATTEMPTS_FORBIDENDS);
@@ -795,6 +823,14 @@ public class EAUtils
     private static String getSummaryStatistics(Population popln, 
             GAParameters settings)
     {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        
         double[] fitness = getFitnesses(popln);
         double sdev = DENOPTIMStatUtils.stddev(fitness, true);
         String res = "";
@@ -846,7 +882,7 @@ public class EAUtils
         }
 
         sb.append(NL+NL+"#####SCAFFOLD ANALYSIS##### (Scaffolds list current "
-                + "size: " + FragmentSpace.getScaffoldLibrary().size() + ")" 
+                + "size: " + fragSpace.getScaffoldLibrary().size() + ")" 
                 + NL);
         List<Integer> sortedKeys = new ArrayList<Integer>(scf_cntr.keySet());
         Collections.sort(sortedKeys);
@@ -942,8 +978,15 @@ public class EAUtils
         if (parentA == null)
             return null;
         
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
         ArrayList<Candidate> matesCompatibleWithFirst = 
-                population.getXoverPartners(parentA,eligibleParents);
+                population.getXoverPartners(parentA, eligibleParents, fragSpace);
         if (matesCompatibleWithFirst.size() == 0)
             return null;
         
@@ -1224,13 +1267,13 @@ public class EAUtils
      * @return index of a seed fragment
      */
 
-    protected static int selectRandomScaffold()
+    protected static int selectRandomScaffold(FragmentSpace fragSpace)
     {
-        if (FragmentSpace.getScaffoldLibrary().size() == 1)
+        if (fragSpace.getScaffoldLibrary().size() == 1)
             return 0;
         else
         {
-            return RandomUtils.nextInt(FragmentSpace.getScaffoldLibrary().size());
+            return RandomUtils.nextInt(fragSpace.getScaffoldLibrary().size());
         }
     }
 
@@ -1241,14 +1284,13 @@ public class EAUtils
      * @return the fragment index
      */
 
-    protected static int selectRandomFragment()
+    protected static int selectRandomFragment(FragmentSpace fragSpace)
     {
-        if (FragmentSpace.getFragmentLibrary().size() == 1)
+        if (fragSpace.getFragmentLibrary().size() == 1)
             return 0;
         else
         {
-            return RandomUtils.nextInt(
-                    FragmentSpace.getFragmentLibrary().size());
+            return RandomUtils.nextInt(fragSpace.getFragmentLibrary().size());
         }
     }
 
@@ -1264,15 +1306,23 @@ public class EAUtils
     protected static DENOPTIMGraph buildGraph(GAParameters settings) 
             throws DENOPTIMException
     {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        
         DENOPTIMGraph graph = new DENOPTIMGraph();
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
         
         // building a molecule starts by selecting a random scaffold
-        int scafIdx = selectRandomScaffold();
+        int scafIdx = selectRandomScaffold(fragSpace);
 
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), scafIdx, 
-                DENOPTIMVertex.BBType.SCAFFOLD);
+                GraphUtils.getUniqueVertexIndex(), scafIdx, BBType.SCAFFOLD, 
+                fragSpace);
         
         // add the scaffold as a vertex
         graph.addVertex(scafVertex);
@@ -1326,7 +1376,7 @@ public class EAUtils
             return null;
         }
         
-        graph.addCappingGroups();
+        graph.addCappingGroups(fragSpace);
         return graph;
     }
 
@@ -1360,7 +1410,9 @@ public class EAUtils
             fsParams = (FragmentSpaceParameters)settings.getParameters(
                     ParametersType.FS_PARAMS);
         }
-        if (!FragmentSpace.useAPclassBasedApproach())
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        
+        if (!fragSpace.useAPclassBasedApproach())
             return true;
 
         if (!rcParams.allowRingClosures())
@@ -1381,7 +1433,7 @@ public class EAUtils
         RotationalSpaceUtils.defineRotatableBonds(mol, rotoSpaceFile, true, true);
         
         // get the set of possible RCA combinations = ring closures
-        CyclicGraphHandler cgh = new CyclicGraphHandler(rcParams);
+        CyclicGraphHandler cgh = new CyclicGraphHandler(rcParams,fragSpace);
 
         //TODO: remove hard-coded variable that exclude considering all 
         // combination of rings
@@ -1611,6 +1663,7 @@ public class EAUtils
             fsParams = (FragmentSpaceParameters)settings.getParameters(
                     ParametersType.FS_PARAMS);
         }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
         
         if (molGraph == null)
         {
@@ -1714,11 +1767,10 @@ public class EAUtils
         }
         mol.setProperty("ROT_BND", nrot);
 
-
         //Detect free AP that are not permitted
-        if (FragmentSpace.useAPclassBasedApproach())
+        if (fragSpace.useAPclassBasedApproach())
         {
-            if (foundForbiddenEnd(molGraph))
+            if (foundForbiddenEnd(molGraph, fragSpace))
             {
                 String msg = "Evaluation of graph: forbidden end in graph!";
                 DENOPTIMLogger.appLogger.log(Level.INFO, msg);
@@ -2088,10 +2140,11 @@ public class EAUtils
      * @return <code>true</code> if a forbidden end is found
      */
 
-    protected static boolean foundForbiddenEnd(DENOPTIMGraph molGraph)
+    protected static boolean foundForbiddenEnd(DENOPTIMGraph molGraph,
+            FragmentSpace fragSpace)
     {
         ArrayList<DENOPTIMVertex> vertices = molGraph.getVertexList();
-        Set<APClass> classOfForbEnds = FragmentSpace.getForbiddenEndList();
+        Set<APClass> classOfForbEnds = fragSpace.getForbiddenEndList();
         for (DENOPTIMVertex vtx : vertices)
         {
             ArrayList<DENOPTIMAttachmentPoint> daps = vtx.getAttachmentPoints();

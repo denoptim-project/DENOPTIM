@@ -100,6 +100,11 @@ public class GraphBuildingTask extends FitnessTask
      */
     private CEBLParameters ceblSettings = null;
 
+    /**
+     * The fragment space
+     */
+    private FragmentSpace fragSpace;
+    
 //------------------------------------------------------------------------------
    
     /**
@@ -113,6 +118,13 @@ public class GraphBuildingTask extends FitnessTask
                 ParametersType.FIT_PARAMS),
                 new Candidate(molGraph.clone()));
         this.ceblSettings = settings;
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        this.fragSpace = fsParams.getFragmentSpace();
         dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
         rootId = molGraph.getGraphId();
         graphId = dGraph.getGraphId();
@@ -276,7 +288,7 @@ public class GraphBuildingTask extends FitnessTask
                 }
     
                 DENOPTIMVertex trgVrtx = DENOPTIMVertex.newVertexFromLibrary(
-                        tVId, tFId, tFTyp);
+                        tVId, tFId, tFTyp, fragSpace);
                 
                 dGraph.appendVertexOnAP(srcVrtx.getAP(sApId), 
                         trgVrtx.getAP(tApId));
@@ -293,9 +305,7 @@ public class GraphBuildingTask extends FitnessTask
             }
 
             // Evaluate graph
-            Object[] res = dGraph.evaluateGraph(
-                    (FragmentSpaceParameters) ceblSettings.getParameters(
-                    ParametersType.FS_PARAMS));
+            Object[] res = dGraph.evaluateGraph(ceblSettings);
             if (res == null) // null is used to indicate an unacceptable graph
             {
                 if (verbosity > 1)
@@ -319,9 +329,9 @@ public class GraphBuildingTask extends FitnessTask
                 // will be further grown, so no need to perceive rings or
                 // submit any external task.
                 boolean needsCaps = false;
-                if (FragmentSpace.useAPclassBasedApproach())
+                if (fragSpace.useAPclassBasedApproach())
                 {
-                    needsCaps = dGraph.graphNeedsCappingGroups();
+                    needsCaps = dGraph.graphNeedsCappingGroups(fragSpace);
                 }
 
                 ArrayList<DENOPTIMGraph> altCyclicGraphs = new ArrayList<DENOPTIMGraph>();
@@ -382,7 +392,8 @@ public class GraphBuildingTask extends FitnessTask
                             // Prepare molecular representation
                         	DENOPTIMGraph gWithNoRCVs = g.clone();
                         	//NB: this replaces unused RCVs with capping groups
-                        	GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs);
+                        	GraphConversionTool.replaceUnusedRCVsWithCapps(
+                        	        gWithNoRCVs, fragSpace);
                         	IAtomContainer mol = 
                         	        tb3d.convertGraphTo3DAtomContainer(
 	                                    gWithNoRCVs,true);
@@ -446,7 +457,8 @@ public class GraphBuildingTask extends FitnessTask
                 	if (fitnessSettings.make3dTree())
                 	{
                 	    //NB: this replaces unused RCVs with capping groups
-                        GraphConversionTool.replaceUnusedRCVsWithCapps(gClone);
+                        GraphConversionTool.replaceUnusedRCVsWithCapps(
+                                gClone, fragSpace);
                         IAtomContainer mol = 
                                 tb3d.convertGraphTo3DAtomContainer(
                                         gClone,true);

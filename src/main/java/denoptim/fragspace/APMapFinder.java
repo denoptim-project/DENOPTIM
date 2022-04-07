@@ -46,6 +46,11 @@ public class APMapFinder
      */
     private static int maxCombs = 250;
     
+    /**
+     * Reference to the fragment space
+     */
+    private FragmentSpace fragSpace = null;
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -67,9 +72,10 @@ public class APMapFinder
      * @param screenAll use <code>true</code> to NOT stop at the first 
      * compatible combinations.
      */
-    public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll)
+    public APMapFinder(FragmentSpace fragSpace, 
+            DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll)
     {
-        this(vA, vB, null, screenAll, false, true);
+        this(fragSpace, vA, vB, null, screenAll, false, true);
     }
     
 //------------------------------------------------------------------------------
@@ -96,10 +102,12 @@ public class APMapFinder
      * @param compatibleIfFree use <code>true</code> to make APs that are 
      * available (i.e., available throughout the template barriers) be compatible.
      */
-    public APMapFinder(DENOPTIMVertex vA, DENOPTIMVertex vB, 
+    public APMapFinder(FragmentSpace fragSpace,
+            DENOPTIMVertex vA, DENOPTIMVertex vB, 
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
+        this.fragSpace = fragSpace;
         List<DENOPTIMAttachmentPoint> needyAPsA = 
                 new ArrayList<DENOPTIMAttachmentPoint>();
         if (vA.getGraphOwner()!=null)
@@ -144,13 +152,15 @@ public class APMapFinder
      * @param compatibleIfFree use <code>true</code> to make APs that are 
      * available (i.e., available throughout the template barriers) be compatible.
      */
-    public APMapFinder(List<DENOPTIMAttachmentPoint> lstA, 
+    public APMapFinder(FragmentSpace fragSpace,
+            List<DENOPTIMAttachmentPoint> lstA, 
             List<DENOPTIMAttachmentPoint> needyAPsA,
             List<DENOPTIMAttachmentPoint> lstB, 
             List<DENOPTIMAttachmentPoint> needyAPsB,
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
+        this.fragSpace = fragSpace;
         findAllMappings(lstA, needyAPsA, lstB, needyAPsB,
                 fixedRootAPs, screenAll, onlyCompleteMappings, compatibleIfFree);
     }
@@ -198,7 +208,7 @@ public class APMapFinder
         // Map all the compatibilities before choosing a specific mapping
         LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
             apCompatilities = findMappingCompatibileAPs(purgedLstA, purgedLstB, 
-                    compatibleIfFree);
+                    compatibleIfFree, fragSpace);
         
         // The 'keys' is used just to keep the map keys sorted in a separate list
         // so that the order is randomized only once, then it is retained.
@@ -375,7 +385,8 @@ public class APMapFinder
      */
     public static LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
         findMappingCompatibileAPs(List<DENOPTIMAttachmentPoint> lstA, 
-            List<DENOPTIMAttachmentPoint> lstB, boolean compatibleIfFree)
+            List<DENOPTIMAttachmentPoint> lstB, boolean compatibleIfFree,
+            FragmentSpace fragSpace)
     {
         LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
         apCompatilities = new LinkedHashMap<DENOPTIMAttachmentPoint,
@@ -386,7 +397,7 @@ public class APMapFinder
             for (DENOPTIMAttachmentPoint cAP : lstB)
             {  
                 boolean compatible = false;
-                if (FragmentSpace.useAPclassBasedApproach())
+                if (fragSpace.useAPclassBasedApproach())
                 {
                     // TODO: if the vertex is a template, we should
                     // consider the required APs.
@@ -407,13 +418,15 @@ public class APMapFinder
                         if (oAP.isSrcInUserThroughout())
                         {
                             if (lAP!=null && cAP.getAPClass()
-                                  .isCPMapCompatibleWith(lAP.getAPClass()))
+                                  .isCPMapCompatibleWith(lAP.getAPClass(), 
+                                          fragSpace))
                             {
                                 compatible = true;
                             }
                         } else {
                             if (lAP!=null && lAP.getAPClass()
-                                  .isCPMapCompatibleWith(cAP.getAPClass()))
+                                  .isCPMapCompatibleWith(cAP.getAPClass(), 
+                                          fragSpace))
                             {
                                 compatible = true;
                             }

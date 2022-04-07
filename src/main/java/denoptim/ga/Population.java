@@ -27,8 +27,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 
 /**
@@ -59,6 +61,9 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      */
     private XoverSitesAmongCandidates xoverCompatibilities;
     
+    /**
+     * Parameters controlling the GA experiment
+     */
     private GAParameters settings;
    
 //------------------------------------------------------------------------------
@@ -67,7 +72,9 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     {
         super();
         this.settings = settings;
-        if (FragmentSpace.useAPclassBasedApproach())
+        if (((FragmentSpaceParameters) settings.getParameters(
+                ParametersType.FS_PARAMS)).getFragmentSpace()
+                .useAPclassBasedApproach())
         {
             xoverCompatibilities = new XoverSitesAmongCandidates();
         }
@@ -351,7 +358,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * @return the list of crossover-compatible population members.
      */
     public ArrayList<Candidate> getXoverPartners(Candidate memberA,
-            ArrayList<Candidate> eligibleParents)
+            ArrayList<Candidate> eligibleParents, FragmentSpace fragSpace)
     {   
         DENOPTIMGraph gA = memberA.getGraph();
         
@@ -377,7 +384,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             try
             {
                 List<XoverSite> xoverSites = DENOPTIMGraphOperations
-                        .locateCompatibleXOverPoints(gA, gB);
+                        .locateCompatibleXOverPoints(gA, gB, fragSpace);
                 xoverCompatibilities.put(memberA, memberB, xoverSites);
             } catch (DENOPTIMException e)
             {

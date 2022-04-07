@@ -37,6 +37,7 @@ import denoptim.graph.DENOPTIMVertex;
  */
 public class GraphUtils
 {
+    private static AtomicInteger apCounter = new AtomicInteger(1);
     public static AtomicInteger vertexCounter = new AtomicInteger(1);
     private static AtomicInteger graphCounter = new AtomicInteger(1);
     private static AtomicInteger molCounter = new AtomicInteger(1);
@@ -74,7 +75,7 @@ public class GraphUtils
      */
 
     public static synchronized void resetUniqueVertexCounter(int val)
-                                                        throws DENOPTIMException
+            throws DENOPTIMException
     {
         if (vertexCounter.get() >= val)
         {
@@ -172,6 +173,18 @@ public class GraphUtils
     public static synchronized int getUniqueMoleculeIndex()
     {
         return molCounter.getAndIncrement();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Unique counter for the number of molecules generated.
+     * @return the new molecule id (number)
+     */
+
+    public static synchronized int getUniqueAPIndex()
+    {
+        return apCounter.getAndIncrement();
     }
   
 //------------------------------------------------------------------------------

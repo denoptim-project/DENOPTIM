@@ -81,7 +81,7 @@ import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
  * @author Marco Foscato
  */
 
-public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
+public class GUIGraphHandler extends GUICardPanel
 {
 	/**
 	 * Version UID
@@ -187,6 +187,11 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
     private final String BBTYPEKEY = "BBTYPE";
 	
 	private boolean painted;
+	
+	/**
+	 * The fragment space this handler works with
+	 */
+	private FragmentSpace fragSpace = null;
 
 //-----------------------------------------------------------------------------
 	
@@ -268,7 +273,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				switch (res)
 				{
 					case 0:
-						if (!FragmentSpace.isDefined())
+						if (fragSpace==null)
 						{
 							JOptionPane.showMessageDialog(btnAddGraph,
 					                "<html>No fragment space is currently loaded!<br>"
@@ -413,7 +418,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		btnAddLibVrtx.setEnabled(false);
 		btnAddLibVrtx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {	
-				if (!FragmentSpace.isDefined())
+				if (fragSpace==null)
 				{
 					JOptionPane.showMessageDialog(btnAddLibVrtx,
 			                "<html>No fragment space is currently "
@@ -980,7 +985,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 + "vertex of the graph.";
 	    String[] options = null;
 	    String defaultOpt = null;
-	    if (FragmentSpace.isDefined())
+	    if (fragSpace!=null)
 	    {
 	        options = new String[]{"Scaffold", "Fragment", "EmptyVertex", 
 	            "Cancel"};
@@ -998,7 +1003,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 UIManager.getIcon("OptionPane.warningIcon"),
                 options,
                 defaultOpt);
-        if (!FragmentSpace.isDefined())
+        if (fragSpace==null)
         {
             res = res + 10;
         }
@@ -1008,7 +1013,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
         {
             case 0:
                 rootType = BBType.SCAFFOLD;
-                for (DENOPTIMVertex bb : FragmentSpace.getScaffoldLibrary())
+                for (DENOPTIMVertex bb : fragSpace.getScaffoldLibrary())
                 {
                     vrtxLib.add(bb.clone());
                 }
@@ -1016,7 +1021,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
                 
             case 1:
                 rootType = BBType.FRAGMENT;
-                for (DENOPTIMVertex bb : FragmentSpace.getFragmentLibrary())
+                for (DENOPTIMVertex bb : fragSpace.getFragmentLibrary())
                 {
                     vrtxLib.add(bb.clone());
                 }
@@ -1071,7 +1076,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
         try
         {
             firstVertex = DENOPTIMVertex.newVertexFromLibrary(
-                    firstBBId, scaffFragId, rootType);
+                    firstBBId, scaffFragId, rootType, fragSpace);
         } catch (DENOPTIMException e)
         {
             JOptionPane.showMessageDialog(this,"Could not retrieve the "
@@ -1182,9 +1187,9 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		switch (res)
 		{
 			case 0:
-			    ArrayList<DENOPTIMVertex> tmp = FragmentSpace.getFragmentLibrary();
+			    ArrayList<DENOPTIMVertex> tmp = fragSpace.getFragmentLibrary();
 				vertxLib = new  ArrayList<DENOPTIMVertex>();
-		        for (DENOPTIMVertex bb : FragmentSpace.getFragmentLibrary())
+		        for (DENOPTIMVertex bb : fragSpace.getFragmentLibrary())
 		        {
 		        	vertxLib.add(bb.clone());
 		        }
@@ -1198,7 +1203,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				
 			case 2:
 				vertxLib = new ArrayList<DENOPTIMVertex>();
-		        for (DENOPTIMVertex bb : FragmentSpace.getCappingLibrary())
+		        for (DENOPTIMVertex bb : fragSpace.getCappingLibrary())
 		        {
 		            vertxLib.add(bb.clone());
 		        }
@@ -1280,7 +1285,7 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 		
     	// First we get all possible APs on any fragment
     	ArrayList<DENOPTIMAttachmentPoint> compatAps = 
-				FragmentSpace.getAPsCompatibleWithThese(srcAPs);
+    	        fragSpace.getAPsCompatibleWithThese(srcAPs);
     	
     	// then keep unique fragment identifiers, and store unique
 		genToLocIDMap = new HashMap<Integer,Integer>();
@@ -1306,27 +1311,6 @@ public class GUIGraphHandler extends GUICardPanel implements ILoadFragSpace
 				compatVrtxs.add(bb);
 			}
 		}
-	}
-	
-//-----------------------------------------------------------------------------
-
-	/**
-	 * Changes the GUI appearance compatibly to no loaded fragment space
-	 */
-	public void renderForLackOfFragSpace() 
-	{
-	    mainPanel.toolBar.renderForLackOfFragSpace();
-	}
-	
-//-----------------------------------------------------------------------------
-
-	/**
-     * Changes the GUI appearance and activated buttons that depend on the
-     * fragment space being loaded
-     */
-	public void renderForPresenceOfFragSpace() 
-	{
-	    mainPanel.toolBar.renderForPresenceOfFragSpace();
 	}
 
 //-----------------------------------------------------------------------------

@@ -91,6 +91,11 @@ public class CyclicGraphHandler
      */
     private RingClosureParameters settings;
     
+    /**
+     * Fragment space definition
+     */
+    private FragmentSpace fragSpace;
+    
 //-----------------------------------------------------------------------------
 
     /**
@@ -100,9 +105,12 @@ public class CyclicGraphHandler
      * @param libCap the library of capping groups
      */
 
-    public CyclicGraphHandler(RingClosureParameters settings) {
+    public CyclicGraphHandler(RingClosureParameters settings, 
+            FragmentSpace fragSpace) 
+    {
         this.settings = settings;
         this.verbosity = settings.getVerbosity();
+        this.fragSpace = fragSpace;
     }
     
 //-----------------------------------------------------------------------------
@@ -134,7 +142,7 @@ public class CyclicGraphHandler
         }
 
         // Get manager of ring size problems
-        RingSizeManager rsm = new RingSizeManager();
+        RingSizeManager rsm = new RingSizeManager(fragSpace);
         
         rsm.initialize(mol, molGraph);
 
@@ -238,9 +246,8 @@ public class CyclicGraphHandler
      */
 
     public ArrayList<List<DENOPTIMRing>> getPossibleCombinationOfRings(
-                                                            IAtomContainer mol,
-                                                        DENOPTIMGraph molGraph)
-                                                       throws DENOPTIMException
+            IAtomContainer mol, DENOPTIMGraph molGraph)
+                    throws DENOPTIMException
     {
         // All the candidate paths 
         Map<ObjectPair,PathSubGraph> allGoodPaths = 
@@ -248,7 +255,7 @@ public class CyclicGraphHandler
         ArrayList<DENOPTIMVertex> rcaVertLst = molGraph.getFreeRCVertices();
         
         // Get manager of ring size problems
-        RingSizeManager rsm = new RingSizeManager();
+        RingSizeManager rsm = new RingSizeManager(fragSpace);
         rsm.initialize(mol, molGraph);
 
         // identify compatible pairs of RCA vertices
@@ -933,11 +940,18 @@ public class CyclicGraphHandler
 
         // Parameters setting the bias for selecting rings of given size
         private ArrayList<Integer> ringSizeBias = settings.getRingSizeBias();
+        
+        /**
+         * Definition of the fragment space
+         */
+        private FragmentSpace fragSpace = null;
 
         //---------------------------------------------------------------------
 
-        public RingSizeManager()
-        {}
+        public RingSizeManager(FragmentSpace fragSpace)
+        {
+            this.fragSpace = fragSpace;
+        }
 
         //---------------------------------------------------------------------
 
@@ -1011,8 +1025,7 @@ public class CyclicGraphHandler
         // NOTE: this method considers the ring size bias and sets also 
         // the weight factors
 
-        private void calculateCompatibilityOfAllRCAPairs() 
-                                                       throws DENOPTIMException
+        private void calculateCompatibilityOfAllRCAPairs() throws DENOPTIMException
         {
             weigths = new ArrayList<Double>(Collections.nCopies(sz, 0.0));
             compatibilityOfPairs = new boolean[sz][sz];
@@ -1072,7 +1085,8 @@ public class CyclicGraphHandler
                         continue;
                     }
                     
-                    if (rcaI.isCompatible(rcaJ) && evaluateRCVPair(vI,vJ,graph))
+                    if (rcaI.isCompatible(rcaJ) 
+                            && evaluateRCVPair(vI,vJ,graph,fragSpace))
                     {
                         //TODO: evaluate the use of ShortestPath instead of this
                         int ringSize = topoMat[vIdToAtmId.get(vI).get(0)]
@@ -1363,8 +1377,8 @@ public class CyclicGraphHandler
      */
 
     private boolean evaluateRCVPair(DENOPTIMVertex vI, DENOPTIMVertex vJ,
-                                                       DENOPTIMGraph molGraph)
-                                                      throws DENOPTIMException
+            DENOPTIMGraph molGraph, FragmentSpace fragSpace)
+                    throws DENOPTIMException
     {
         String s = "Evaluation of RCV pair " + vI + " " + vJ + ": ";
 
@@ -1388,7 +1402,7 @@ public class CyclicGraphHandler
         APClass parentAPClsJ = edgeJ.getSrcAPClass();
         
         // exclude if no entry in RC-Compatibility map
-        if (!FragmentSpace.getRCCompatibilityMatrix().containsKey(parentAPClsI))
+        if (!fragSpace.getRCCompatibilityMatrix().containsKey(parentAPClsI))
         {
             if (verbosity > 1)
             {
@@ -1397,11 +1411,11 @@ public class CyclicGraphHandler
             }
             return false;
         }
-        ArrayList<APClass> compatClassesI = FragmentSpace
-                .getRCCompatibilityMatrix().get(parentAPClsI);
+        ArrayList<APClass> compatClassesI = fragSpace.getRCCompatibilityMatrix()
+                .get(parentAPClsI);
 
         // exclude if no entry in RC-Compatibility map
-        if (!FragmentSpace.getRCCompatibilityMatrix().containsKey(parentAPClsJ))
+        if (!fragSpace.getRCCompatibilityMatrix().containsKey(parentAPClsJ))
         {
             if (verbosity > 1)
             {
@@ -1410,8 +1424,8 @@ public class CyclicGraphHandler
             }
             return false;
         }
-        ArrayList<APClass> compatClassesJ = FragmentSpace
-                .getRCCompatibilityMatrix().get(parentAPClsJ);
+        ArrayList<APClass> compatClassesJ = fragSpace.getRCCompatibilityMatrix()
+                .get(parentAPClsJ);
 
         // exclude loops included within a single vertex 
         if (vI == vJ)

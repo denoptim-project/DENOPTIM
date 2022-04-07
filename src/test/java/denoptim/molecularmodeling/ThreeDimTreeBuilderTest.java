@@ -36,6 +36,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMEdge;
 import denoptim.graph.DENOPTIMEdge.BondType;
@@ -133,18 +134,20 @@ public class ThreeDimTreeBuilderTest
     	ArrayList<DENOPTIMVertex> caps = new ArrayList<DENOPTIMVertex>();
     	caps.add(cap);
     	
-    	FragmentSpace.defineFragmentSpace(scaff,frags,caps,cpMap,capMap,
-    			forbEnds,null);
+    	FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp, scaff, frags, caps,
+                cpMap, capMap, forbEnds, cpMap);
+        fs.setAPclassBasedApproach(true);
     	
     	DENOPTIMGraph g1 = new DENOPTIMGraph();
     	DENOPTIMVertex v1 = DENOPTIMVertex.newVertexFromLibrary(1, 0, 
-    	        BBType.SCAFFOLD);
+    	        BBType.SCAFFOLD, fs);
     	DENOPTIMVertex v2 = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
     	DENOPTIMVertex v3 = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
     	DENOPTIMVertex v4 = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         g1.addVertex(v1);
         g1.addVertex(v2);
         g1.addVertex(v3);
@@ -183,13 +186,13 @@ public class ThreeDimTreeBuilderTest
     	
         DENOPTIMGraph g2 = new DENOPTIMGraph();
         DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1, 0, 
-                BBType.SCAFFOLD);
+                BBType.SCAFFOLD, fs);
         DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         DENOPTIMVertex v4b = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         g2.addVertex(v1b);
         g2.addVertex(v2b);
         g2.addVertex(v3b);
@@ -218,11 +221,11 @@ public class ThreeDimTreeBuilderTest
         v1c.addAP(a0);
         v1c.addAP(a0);
         DENOPTIMVertex v2c = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         DENOPTIMVertex v3c = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         DENOPTIMVertex v4c = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         g3.addVertex(v1c);
         g3.addVertex(v2c);
         g3.addVertex(v3c);
@@ -254,16 +257,16 @@ public class ThreeDimTreeBuilderTest
         v2d.addAP(a0);
         v2d.addAP(b0);
         DENOPTIMVertex v3d = DENOPTIMVertex.newVertexFromLibrary(3, 3, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         DENOPTIMVertex v4d = DENOPTIMVertex.newVertexFromLibrary(4, 0, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         EmptyVertex v5d = new EmptyVertex(5);
         v5d.addAP(b0);
         v5d.addAP(b0);
         DENOPTIMVertex v6d = DENOPTIMVertex.newVertexFromLibrary(6, 0, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         DENOPTIMVertex v7d = DENOPTIMVertex.newVertexFromLibrary(7, 0, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         g4.addVertex(v1d);
         g4.addVertex(v2d);
         g4.addVertex(v3d);

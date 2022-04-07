@@ -22,9 +22,12 @@ import java.io.File;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.ProgramTask;
 
 
@@ -36,6 +39,10 @@ import denoptim.task.ProgramTask;
 
 public class GraphEditor extends ProgramTask
 {
+    /**
+     * Fragment space in use.
+     */
+    private FragmentSpace fragSpace;
 
 //------------------------------------------------------------------------------
     
@@ -59,6 +66,17 @@ public class GraphEditor extends ProgramTask
         geParams.checkParameters();
         geParams.processParameters();
         geParams.printParameters();
+        
+        // We might need the fragment space to read the input graphs with 
+        // string-based encoding.
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (geParams.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)geParams.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        this.fragSpace = fsParams.getFragmentSpace();
+        geParams.readInputGraphs(fragSpace);
 
         int i = -1;
         for (DENOPTIMGraph graph : geParams.getInputGraphs())

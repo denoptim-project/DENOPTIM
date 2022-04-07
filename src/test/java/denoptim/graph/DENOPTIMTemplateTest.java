@@ -69,12 +69,6 @@ public class DENOPTIMTemplateTest
     private final String NL = System.getProperty("line.separator");
     private final String SEP = System.getProperty("file.separator");
     
-    @BeforeEach
-    public void setUp() {
-        FragmentSpace.setFragmentLibrary(new ArrayList<>());
-        FragmentSpace.setCompatibilityMatrix(new HashMap<>());
-    }
-    
 //------------------------------------------------------------------------------
     
     @Test

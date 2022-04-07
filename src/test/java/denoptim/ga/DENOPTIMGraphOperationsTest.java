@@ -31,6 +31,7 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.DENOPTIMGraphOperations;
 import denoptim.ga.XoverSite;
 import denoptim.graph.APClass;
@@ -420,7 +421,7 @@ public class DENOPTIMGraphOperationsTest {
     @Test
     public void testLocateCompatibleXOverPoints() throws Exception
     {
-        // Prepare the test graphs
+        FragmentSpace fragSpace = prepare();
         DENOPTIMGraph[] pair = getPairOfTestGraphs();
         DENOPTIMGraph graphA = pair[0];
         DENOPTIMGraph graphB = pair[1];
@@ -501,7 +502,8 @@ public class DENOPTIMGraphOperationsTest {
             t2.setContractLevel(contracts.get(i));
             
             List<XoverSite> xoverSites = 
-                    DENOPTIMGraphOperations.locateCompatibleXOverPoints(graphA, graphB);
+                    DENOPTIMGraphOperations.locateCompatibleXOverPoints(graphA, 
+                            graphB, fragSpace);
             
             assertEquals(expectedNumberOfSites.get(i), xoverSites.size());
     
@@ -614,7 +616,7 @@ public class DENOPTIMGraphOperationsTest {
      */
     private DENOPTIMGraph[] getPairOfTestGraphs() throws Exception
     {
-        prepareAPClassCompatibility();
+        prepare();
         
         // Prepare special building block: template T1
         EmptyVertex v0 = new EmptyVertex(0);
@@ -787,7 +789,7 @@ public class DENOPTIMGraphOperationsTest {
      *    D |     |     |     |  T  |
      * </pre>
      */
-    private void prepareAPClassCompatibility() throws Exception
+    private FragmentSpace prepare() throws Exception
     {
         // Prepare APClass compatibility rules
         APCA = APClass.make("A", 0);
@@ -814,14 +816,15 @@ public class DENOPTIMGraphOperationsTest {
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setCompatibilityMatrix(cpMap);
-        FragmentSpace.setCappingMap(capMap);
-        FragmentSpace.setForbiddenEndList(forbEnds);
-        FragmentSpace.setAPclassBasedApproach(true);
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(), 
+                cpMap, capMap, forbEnds, cpMap);
+        fs.setAPclassBasedApproach(true);
         
-        FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
-        FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
-        FragmentSpace.setCappingLibrary(new ArrayList<DENOPTIMVertex>());
+        return fs;
     }
 
 //------------------------------------------------------------------------------

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import javax.vecmath.Point3d;
@@ -35,6 +36,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.utils.GraphUtils;
 
 /**
  * An attachment point (AP) is a possibility to attach a {@link DENOPTIMVertex} 
@@ -100,7 +102,6 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
      */
     private Map<Object, Object> properties;
 
-
 //------------------------------------------------------------------------------
 
     /**
@@ -117,7 +118,7 @@ public class DENOPTIMAttachmentPoint implements Serializable, Cloneable,
     public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) 
     {
         this.owner = owner;
-        id = FragmentSpace.apID.getAndIncrement();
+        id = GraphUtils.getUniqueAPIndex();
     }
 
 //------------------------------------------------------------------------------

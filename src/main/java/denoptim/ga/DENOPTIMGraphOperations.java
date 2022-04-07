@@ -80,7 +80,7 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException 
      */
     protected static List<XoverSite> locateCompatibleXOverPoints(
-            DENOPTIMGraph graphA, DENOPTIMGraph graphB) 
+            DENOPTIMGraph graphA, DENOPTIMGraph graphB, FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {
         // First, we identify all the edges that allow crossover, and collect
@@ -102,7 +102,7 @@ public class DENOPTIMGraphOperations
                     continue;
                 
                 //Check condition for considering this combination
-                if (isCrossoverPossible(eA, eB))
+                if (isCrossoverPossible(eA, eB, fragSpace))
                 {
                     DENOPTIMVertex[] pair = new DENOPTIMVertex[]{vA,vB};
                     compatibleVrtxPairs.add(pair);
@@ -142,7 +142,7 @@ public class DENOPTIMGraphOperations
                     branchOnVB.add(vB);
                     branchOnVB.addAll(descendantsB);
                     
-                    checkAndAddXoverSites(branchOnVA, branchOnVB, 
+                    checkAndAddXoverSites(fragSpace, branchOnVA, branchOnVB, 
                             CrossoverType.BRANCH, sites);
                 }
             } catch (DENOPTIMException e)
@@ -206,7 +206,8 @@ public class DENOPTIMGraphOperations
                 .simple()
                 .stream()
                 .limit(500) // Prevent explosion!
-                .forEach(c -> processCombinationOfEndPoints(pair,c,sites));
+                .forEach(c -> processCombinationOfEndPoints(pair, c, sites,
+                        fragSpace));
         }
         
         // NB: we consider only templates that are at the same level of embedding
@@ -229,7 +230,7 @@ public class DENOPTIMGraphOperations
                     continue;
                 
                 for (XoverSite xos : locateCompatibleXOverPoints(
-                        tA.getInnerGraph(), tB.getInnerGraph()))
+                        tA.getInnerGraph(), tB.getInnerGraph(), fragSpace))
                 {
                     if (!sites.contains(xos))
                         sites.add(xos);
@@ -256,7 +257,7 @@ public class DENOPTIMGraphOperations
      */
     private static void processCombinationOfEndPoints(DENOPTIMVertex[] pair,
             List<DENOPTIMVertex[]> cominationOfEnds,
-            List<XoverSite> collector)
+            List<XoverSite> collector, FragmentSpace fragSpace)
     {
         // Empty set corresponds to using the entire branch and subgraph and
         // has been already dealt with at this point
@@ -267,7 +268,8 @@ public class DENOPTIMGraphOperations
             .simple()
             .stream()
             .limit(500) // Prevent explosion!
-            .forEach(c -> processPermutationOfEndPoints(pair, c, collector));
+            .forEach(c -> processPermutationOfEndPoints(pair, c, collector,
+                    fragSpace));
     }
     
 //------------------------------------------------------------------------------
@@ -286,7 +288,7 @@ public class DENOPTIMGraphOperations
      */
     private static void processPermutationOfEndPoints(DENOPTIMVertex[] pair,
             List<DENOPTIMVertex[]> chosenSequenceOfEndpoints,
-            List<XoverSite> collector)
+            List<XoverSite> collector, FragmentSpace fragSpace)
     {
         DENOPTIMVertex vA = pair[0];
         DENOPTIMVertex vB = pair[1];
@@ -353,7 +355,7 @@ public class DENOPTIMGraphOperations
         if (subGraphCloneA.isIsomorphicTo(subGraphCloneB))
             return;
         
-        checkAndAddXoverSites(subGraphA, subGraphB, 
+        checkAndAddXoverSites(fragSpace, subGraphA, subGraphB, 
                 CrossoverType.SUBGRAPH, collector);
     }
     
@@ -368,7 +370,8 @@ public class DENOPTIMGraphOperations
      * <b>NB: This method assumes that no crossover can involve seed of the spanning
      * tree (whether scaffold, of anything else).</b>
      */
-    private static void checkAndAddXoverSites(List<DENOPTIMVertex> subGraphA, 
+    private static void checkAndAddXoverSites(FragmentSpace fragSpace,
+            List<DENOPTIMVertex> subGraphA, 
             List<DENOPTIMVertex> subGraphB, CrossoverType xoverType,
             List<XoverSite> collector)
     {
@@ -432,7 +435,8 @@ public class DENOPTIMGraphOperations
         fixedRootAPs.put(seedOnA.getEdgeToParent().getTrgAP(),
                 seedOnB.getEdgeToParent().getTrgAP());
             
-        APMapFinder apmf = new APMapFinder(allAPsA, needyAPsA, allAPsB, needyAPsB,
+        APMapFinder apmf = new APMapFinder(fragSpace,
+                allAPsA, needyAPsA, allAPsB, needyAPsB,
                 fixedRootAPs, 
                 false,  // false: we stop at the first good mapping
                 true,   // true: only complete mapping
@@ -459,16 +463,17 @@ public class DENOPTIMGraphOperations
      * @param eB second edge of the pair
      * @return <code>true</code> if the condition is satisfied
      */
-    private static boolean isCrossoverPossible(DENOPTIMEdge eA, DENOPTIMEdge eB)
+    private static boolean isCrossoverPossible(DENOPTIMEdge eA, DENOPTIMEdge eB,
+            FragmentSpace fragSpace)
     {
         APClass apClassSrcA = eA.getSrcAPClass();
         APClass apClassTrgA = eA.getTrgAPClass();
         APClass apClassSrcB = eB.getSrcAPClass();
         APClass apClassTrgB = eB.getTrgAPClass();
         
-        if (apClassSrcA.isCPMapCompatibleWith(apClassTrgB))
+        if (apClassSrcA.isCPMapCompatibleWith(apClassTrgB, fragSpace))
         {
-            if (apClassSrcB.isCPMapCompatibleWith(apClassTrgA))
+            if (apClassSrcB.isCPMapCompatibleWith(apClassTrgA, fragSpace))
             {
                 return true;
             }
@@ -490,10 +495,11 @@ public class DENOPTIMGraphOperations
      */
 
     protected static boolean deleteLink(DENOPTIMVertex vertex,
-            int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
+            int chosenVrtxIdx, Monitor mnt, FragmentSpace fragSpace) 
+                    throws DENOPTIMException
     {
         DENOPTIMGraph graph = vertex.getGraphOwner();
-        boolean done = graph.removeVertexAndWeld(vertex);
+        boolean done = graph.removeVertexAndWeld(vertex, fragSpace);
         if (!done)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NODELLINK_EDIT);
@@ -520,7 +526,8 @@ public class DENOPTIMGraphOperations
      */
 
     protected static boolean substituteLink(DENOPTIMVertex vertex,
-            int chosenVrtxIdx, Monitor mnt) throws DENOPTIMException
+            int chosenVrtxIdx, Monitor mnt, FragmentSpace fragSpace)
+                    throws DENOPTIMException
     {
         //TODO: for reproducibility, the AP mapping should become an optional
         // parameter: if given we try to use it, if not given, GraphLinkFinder
@@ -529,9 +536,9 @@ public class DENOPTIMGraphOperations
         GraphLinkFinder glf = null;
         if (chosenVrtxIdx<0)
         {
-            glf = new GraphLinkFinder(vertex);
+            glf = new GraphLinkFinder(fragSpace, vertex);
         } else {
-            glf = new GraphLinkFinder(vertex,chosenVrtxIdx);
+            glf = new GraphLinkFinder(fragSpace, vertex,chosenVrtxIdx);
         }
         if (!glf.foundAlternativeLink())
         {
@@ -543,7 +550,8 @@ public class DENOPTIMGraphOperations
         boolean done = graph.replaceVertex(vertex,
                 glf.getChosenAlternativeLink().getBuildingBlockId(),
                 glf.getChosenAlternativeLink().getBuildingBlockType(),
-                glf.getChosenAPMapping().toIntMappig());
+                glf.getChosenAPMapping().toIntMappig(),
+                fragSpace);
         if (!done)
         {
             mnt.increase(
@@ -570,9 +578,10 @@ public class DENOPTIMGraphOperations
      * does not exist on the given vertex.
      */
     public static boolean extendLink(DENOPTIMVertex vertex,
-            int chosenAPId, Monitor mnt) throws DENOPTIMException
+            int chosenAPId, Monitor mnt, FragmentSpace fragSpace) 
+                    throws DENOPTIMException
     {
-        return extendLink(vertex, chosenAPId, -1 , mnt);
+        return extendLink(vertex, chosenAPId, -1 , mnt, fragSpace);
     }
     
 //------------------------------------------------------------------------------
@@ -594,8 +603,8 @@ public class DENOPTIMGraphOperations
      * vertex is not the source of an edge at the given AP, or because such AP 
      * does not exist on the given vertex.
      */
-    public static boolean extendLink(DENOPTIMVertex vertex,
-            int chosenAPId, int chosenNewVrtxId, Monitor mnt) 
+    public static boolean extendLink(DENOPTIMVertex vertex, int chosenAPId, 
+            int chosenNewVrtxId, Monitor mnt, FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {
         DENOPTIMAttachmentPoint ap = vertex.getAP(chosenAPId);
@@ -616,7 +625,7 @@ public class DENOPTIMGraphOperations
             throw new DENOPTIMException("Request to extend a link from a child "
                     + "vertex (AP "+chosenAPId+" of vertex "+vertex+").");
         }
-        return extendLink(e, chosenNewVrtxId, mnt);
+        return extendLink(e, chosenNewVrtxId, mnt, fragSpace);
     }
     
 //------------------------------------------------------------------------------
@@ -634,7 +643,7 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
     public static boolean extendLink(DENOPTIMEdge edge, int chosenBBIdx,
-            Monitor mnt) throws DENOPTIMException
+            Monitor mnt, FragmentSpace fragSpace) throws DENOPTIMException
     {
         //TODO: for reproducibility, the AP mapping should become an optional
         // parameter: if given we try to use it, if not given we GraphLinkFinder
@@ -643,9 +652,9 @@ public class DENOPTIMGraphOperations
         GraphLinkFinder glf = null;
         if (chosenBBIdx < 0)
         {
-            glf = new GraphLinkFinder(edge);
+            glf = new GraphLinkFinder(fragSpace, edge);
         } else {
-            glf = new GraphLinkFinder(edge,chosenBBIdx);
+            glf = new GraphLinkFinder(fragSpace, edge,chosenBBIdx);
         }
         if (!glf.foundAlternativeLink())
         {
@@ -667,7 +676,7 @@ public class DENOPTIMGraphOperations
         boolean done = graph.insertVertex(edge,
                 glf.getChosenAlternativeLink().getBuildingBlockId(),
                 glf.getChosenAlternativeLink().getBuildingBlockType(),
-                apMap);
+                apMap, fragSpace);
         if (!done)
         {
             mnt.increase(
@@ -701,8 +710,7 @@ public class DENOPTIMGraphOperations
 
     protected static boolean rebuildBranch(DENOPTIMVertex vertex,
             boolean force, int chosenVrtxIdx, int chosenApId, 
-            GAParameters settings)
-                                                    throws DENOPTIMException
+            GAParameters settings) throws DENOPTIMException
     {
         DENOPTIMGraph g = vertex.getGraphOwner();
 
@@ -788,8 +796,8 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
     
-    protected static boolean deleteChain(DENOPTIMVertex vertex, Monitor mnt)
-                                                    throws DENOPTIMException
+    protected static boolean deleteChain(DENOPTIMVertex vertex, Monitor mnt,
+            FragmentSpace fragSpace) throws DENOPTIMException
     {
         int vid = vertex.getVertexId();
         DENOPTIMGraph molGraph = vertex.getGraphOwner();
@@ -808,12 +816,12 @@ public class DENOPTIMGraphOperations
                 if (v == null || !v.getMutationTypes(new ArrayList<MutationType>())
                         .contains(MutationType.DELETECHAIN))
                     continue;
-                molGraph.removeChainUpToBranching(v);
+                molGraph.removeChainUpToBranching(v, fragSpace);
             }
         }
         else
         {
-            molGraph.removeChainUpToBranching(vertex);
+            molGraph.removeChainUpToBranching(vertex, fragSpace);
         }
 
         if (molGraph.getVertexWithId(vid) == null && molGraph.getVertexCount() > 1)
@@ -980,10 +988,11 @@ public class DENOPTIMGraphOperations
             IdFragmentAndAP chosenFrgAndAp = null;
             if (allowOnlyRingClosure)
             {
-                chosenFrgAndAp = getRCVForSrcAp(curVrtx,apId);
+                chosenFrgAndAp = getRCVForSrcAp(curVrtx, apId, 
+                        fsParams.getFragmentSpace());
             } else {
                 chosenFrgAndAp = getFrgApForSrcAp(curVrtx, 
-                    apId, chosenVrtxIdx, chosenApId);
+                    apId, chosenVrtxIdx, chosenApId, fsParams.getFragmentSpace());
             }
             int fid = chosenFrgAndAp.getVertexMolId();
             if (fid == -1)
@@ -995,7 +1004,8 @@ public class DENOPTIMGraphOperations
             DENOPTIMVertex incomingVertex = 
                     DENOPTIMVertex.newVertexFromLibrary(-1, 
                             chosenFrgAndAp.getVertexMolId(), 
-                            BBType.FRAGMENT);
+                            BBType.FRAGMENT, 
+                            fsParams.getFragmentSpace());
             if ((curVrtx.getGraphOwner().getHeavyAtomsCount() + 
                     incomingVertex.getHeavyAtomsCount()) > maxHeavyAtoms)
             {
@@ -1004,7 +1014,8 @@ public class DENOPTIMGraphOperations
 
             // Decide on symmetric substitution within this vertex...
             boolean cpOnSymAPs = applySymmetry(
-                    FragmentSpace.imposeSymmetryOnAPsOfClass(ap.getAPClass()),
+                    fsParams.getFragmentSpace().imposeSymmetryOnAPsOfClass(
+                            ap.getAPClass()),
                     settings.getSymmetryProbability());
             SymmetricSet symAPs = new SymmetricSet();
             if (curVrtx.hasSymmetricAP() 
@@ -1118,7 +1129,8 @@ public class DENOPTIMGraphOperations
                     DENOPTIMVertex fragVertex = 
                             DENOPTIMVertex.newVertexFromLibrary(newVrtId, 
                                     chosenFrgAndAp.getVertexMolId(), 
-                                    BBType.FRAGMENT);
+                                    BBType.FRAGMENT,
+                                    fsParams.getFragmentSpace());
                     DENOPTIMAttachmentPoint trgAP = fragVertex.getAP(
                             chosenFrgAndAp.getApId());
                     
@@ -1166,10 +1178,10 @@ public class DENOPTIMGraphOperations
      * @throws DENOPTIMException
      */
 
-    protected static IdFragmentAndAP getFrgApForSrcAp(DENOPTIMVertex curVertex, 
-                                           int dapidx) throws DENOPTIMException
+    protected static IdFragmentAndAP getFrgApForSrcAp(DENOPTIMVertex curVertex,
+            int dapidx, FragmentSpace fragSpace) throws DENOPTIMException
     {
-        return getFrgApForSrcAp(curVertex, dapidx, -1, -1);
+        return getFrgApForSrcAp(curVertex, dapidx, -1, -1, fragSpace);
     }
     
 //------------------------------------------------------------------------------
@@ -1192,8 +1204,8 @@ public class DENOPTIMGraphOperations
      */
 
     protected static IdFragmentAndAP getFrgApForSrcAp(DENOPTIMVertex curVertex, 
-            int dapidx, int chosenVrtxIdx, int chosenApId) 
-                    throws DENOPTIMException
+            int dapidx, int chosenVrtxIdx, int chosenApId, 
+            FragmentSpace fragSpace) throws DENOPTIMException
     {
         ArrayList<DENOPTIMAttachmentPoint> lstDaps =
                                               curVertex.getAttachmentPoints();
@@ -1202,15 +1214,15 @@ public class DENOPTIMGraphOperations
         // Initialize with an empty pointer
         IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, BBType.FRAGMENT, -1, 
                 -1, -1);
-        if (!FragmentSpace.useAPclassBasedApproach())
+        if (!fragSpace.useAPclassBasedApproach())
         {
-            int fid = EAUtils.selectRandomFragment();
+            int fid = EAUtils.selectRandomFragment(fragSpace);
             res = new IdFragmentAndAP(-1,fid,BBType.FRAGMENT,-1,-1,-1);
         }
         else
         {
             ArrayList<IdFragmentAndAP> candidates = 
-                    FragmentSpace.getFragAPsCompatibleWithClass(
+                    fragSpace.getFragAPsCompatibleWithClass(
                     curDap.getAPClass());
             if (candidates.size() > 0)
             {
@@ -1240,7 +1252,7 @@ public class DENOPTIMGraphOperations
      */
 
     protected static IdFragmentAndAP getRCVForSrcAp(DENOPTIMVertex curVertex, 
-            int dapidx) throws DENOPTIMException
+            int dapidx, FragmentSpace fragSpace) throws DENOPTIMException
     {
         DENOPTIMAttachmentPoint curDap = curVertex.getAP(dapidx);
 
@@ -1248,9 +1260,9 @@ public class DENOPTIMGraphOperations
         IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, BBType.FRAGMENT, -1, 
                 -1, -1);
         
-        ArrayList<DENOPTIMVertex> rcvs = FragmentSpace.getRCVs();
+        ArrayList<DENOPTIMVertex> rcvs = fragSpace.getRCVs();
         DENOPTIMVertex chosen = null;
-        if (!FragmentSpace.useAPclassBasedApproach())
+        if (!fragSpace.useAPclassBasedApproach())
         {
             chosen = RandomUtils.randomlyChooseOne(rcvs);
             res = new IdFragmentAndAP(-1,chosen.getBuildingBlockId(),
@@ -1262,7 +1274,7 @@ public class DENOPTIMGraphOperations
             for (DENOPTIMVertex v : rcvs)
             {
                 if (curDap.getAPClass().isCPMapCompatibleWith(
-                        v.getAP(0).getAPClass()))
+                        v.getAP(0).getAPClass(), fragSpace))
                 {
                     candidates.add(new IdFragmentAndAP(-1,v.getBuildingBlockId(),
                             v.getBuildingBlockType(),0,-1,-1));
@@ -1279,20 +1291,21 @@ public class DENOPTIMGraphOperations
 //------------------------------------------------------------------------------
 
     protected static boolean attachFragmentInClosableChain(
-                                               DENOPTIMVertex curVertex, 
-                                               int dapidx,
-                                               DENOPTIMGraph molGraph,
-                                               ArrayList<Integer> addedVertices,
-                                               GAParameters settings)
-                                                        throws DENOPTIMException
+            DENOPTIMVertex curVertex, int dapidx, DENOPTIMGraph molGraph,
+            ArrayList<Integer> addedVertices, GAParameters settings)
+                    throws DENOPTIMException
     {
         boolean res = false;
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
 
         // Get candidate fragments
         ArrayList<FragForClosabChains> lscFfCc = getFragmentForClosableChain(
-                                                                     curVertex,
-                                                                        dapidx,
-                                                                      molGraph);
+                curVertex, dapidx, molGraph);
 
         // Here we can get:
         // 1) a selection of fragments that allow to close rings
@@ -1316,7 +1329,8 @@ public class DENOPTIMGraphOperations
             {
                 int newvid = GraphUtils.getUniqueVertexIndex();
                 DENOPTIMVertex newVrtx = DENOPTIMVertex.newVertexFromLibrary(
-                        newvid, molIdNewFrag, typeNewFrag);
+                        newvid, molIdNewFrag, typeNewFrag, 
+                        fsParams.getFragmentSpace());
                 
                 molGraph.appendVertexOnAP(curVertex.getAP(dapidx), 
                         newVrtx.getAP(dapNewFrag));
@@ -1330,7 +1344,7 @@ public class DENOPTIMGraphOperations
                     APClass apc = curVertex.getAttachmentPoints().get(
                             dapidx).getAPClass();
                     if (applySymmetry(
-                            FragmentSpace.imposeSymmetryOnAPsOfClass(apc),
+                            fsParams.getFragmentSpace().imposeSymmetryOnAPsOfClass(apc),
                             settings.getSymmetryProbability()))
                     {
 //TODO: implement symmetric substitution with closability bias
@@ -1636,7 +1650,8 @@ public class DENOPTIMGraphOperations
      * @param site the definition of the crossover site.
      * @throws DENOPTIMException
      */
-    public static boolean performCrossover(XoverSite site) throws DENOPTIMException
+    public static boolean performCrossover(XoverSite site, 
+            FragmentSpace fragSpace) throws DENOPTIMException
     {          
         DENOPTIMGraph gA = site.getA().get(0).getGraphOwner();
         DENOPTIMGraph gB = site.getB().get(0).getGraphOwner();
@@ -1694,7 +1709,8 @@ public class DENOPTIMGraphOperations
         
         // Find an AP mapping that satisfies both root-vertex constrain and
         // need to ensure the mapping of needy APs
-        APMapFinder apmf = new APMapFinder(allAPsOnA, needyAPsOnA, 
+        APMapFinder apmf = new APMapFinder(fragSpace, 
+                allAPsOnA, needyAPsOnA, 
                 allAPsOnB, needyAPsOnB, fixedRootAPs, 
                 false,  // false means stop at the first compatible mapping.
                 false,  // false means we do not require complete mapping.
@@ -1737,9 +1753,9 @@ public class DENOPTIMGraphOperations
         }
  
         // Now we do the actual replacement of subgraphs
-        if (!gA.replaceSubGraph(site.getA(), subGraphB, apMapA))
+        if (!gA.replaceSubGraph(site.getA(), subGraphB, apMapA, fragSpace))
            return false;
-        if (!gB.replaceSubGraph(site.getB(), subGraphA, apMapB))
+        if (!gB.replaceSubGraph(site.getB(), subGraphA, apMapB, fragSpace))
             return false;
         
         return true;
@@ -1917,6 +1933,13 @@ public class DENOPTIMGraphOperations
             int chosenApId, Monitor mnt, GAParameters settings) 
                     throws DENOPTIMException
     {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        
         DENOPTIMGraph graph = vertex.getGraphOwner();
         if (graph == null)
         {
@@ -1954,21 +1977,23 @@ public class DENOPTIMGraphOperations
                 break;
                 
             case CHANGELINK:
-                done = substituteLink(vertex, chosenVrtxIdx, mnt);
+                done = substituteLink(vertex, chosenVrtxIdx, mnt, 
+                        fsParams.getFragmentSpace());
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
                 break;
                 
             case DELETELINK:
-                done = deleteLink(vertex, chosenApId, mnt);
+                done = deleteLink(vertex, chosenApId, mnt, 
+                        fsParams.getFragmentSpace());
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK);
                 break;
                 
             case DELETECHAIN:
-                done = deleteChain(vertex, mnt);
+                done = deleteChain(vertex, mnt, fsParams.getFragmentSpace());
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NODELETECHAIN);
@@ -1991,7 +2016,8 @@ public class DENOPTIMGraphOperations
                     }   
                     chosenApId = RandomUtils.randomlyChooseOne(candidates);
                 }
-                done = extendLink(vertex, chosenApId, chosenVrtxIdx, mnt);
+                done = extendLink(vertex, chosenApId, chosenVrtxIdx, mnt,
+                        fsParams.getFragmentSpace());
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);

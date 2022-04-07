@@ -63,7 +63,7 @@ import denoptim.task.StaticTaskManager;
  * @author Marco Foscato
  */
 
-public class MainToolBar extends JMenuBar implements ILoadFragSpace
+public class MainToolBar extends JMenuBar
 {
 	
 	/**
@@ -90,16 +90,6 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 	 * The menu listing the active panels in the deck of cards
 	 */	 
 	private JMenu activeTabsMenu;
-	
-	/**
-     * The fragment space menu
-     */  
-    private JMenu fragSpaceMenu;
-    
-    /**
-     * An indicator to whether a fragment space is loaded or not
-     */
-    private JTextField fragSpaceIndicator;
     
     /**
      * Progress bar indicating the queue of task to complete.
@@ -365,25 +355,6 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
 		activeTabsMenu = new JMenu("Active Tabs");
 		this.add(activeTabsMenu);
 		
-		fragSpaceMenu = new JMenu("Building Block Space");
-		JMenuItem loadSpace = new JMenuItem("Load Space of Building Blocks");
-		loadSpace.setToolTipText(String.format("<html><body width='%1s'>"
-		        + "Use this to load or define a space of building blocks, "
-		        + "i.e., a combination of building blocks "
-		        + "and rules on how we can connect those building blocks. ",
-		        350));
-		loadSpace.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (checkForLoadedFragmentSpace())
-                {
-                    return;
-                }
-                loadFragmentSpace();
-            }
-        });
-		fragSpaceMenu.add(loadSpace);
-		this.add(fragSpaceMenu);
-		
 		JMenu menuHelp = new JMenu("Help");
 		this.add(menuHelp);
 		
@@ -416,17 +387,6 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
         queueStatusBar.setValue(1);
         queueStatusBar.setToolTipText("Status of tasks");
         this.add(queueStatusBar);
-        
-		fragSpaceIndicator = new JTextField("BBSpace");
-		fragSpaceIndicator.setHorizontalAlignment(JTextField.CENTER);
-		fragSpaceIndicator.setMaximumSize(new Dimension(80,25));
-		fragSpaceIndicator.setToolTipText("<html>Status of fragment space:<ul>"
-		        + "<li>Green: loaded</li>"
-		        + "<li>Orange: unloaded</li></ul></html>");
-		fragSpaceIndicator.setEditable(false);
-		this.add(fragSpaceIndicator);
-		
-		renderForLackOfFragSpace();
 	}
 
 //-----------------------------------------------------------------------------
@@ -468,77 +428,6 @@ public class MainToolBar extends JMenuBar implements ILoadFragSpace
             this.file = file;
             this.ff = ff;
         }
-    }
-
-//-----------------------------------------------------------------------------
-	
-	private void loadFragmentSpace()
-	{
-	    FSParamsDialog fsParams = new FSParamsDialog(this);
-        fsParams.pack();
-        fsParams.setVisible(true);
-	}
-	
-//-----------------------------------------------------------------------------
-	
-    /**
-     * Changes the GUI appearance compatibly to no loaded fragment space
-     */
-    public void renderForLackOfFragSpace() 
-    {
-        fragSpaceIndicator.setBackground(Color.ORANGE);
-    }
-    
-//-----------------------------------------------------------------------------
-
-    /**
-     * Changes the GUI appearance and activated buttons that depend on the
-     * fragment space being loaded
-     */
-    public void renderForPresenceOfFragSpace()
-    {
-        fragSpaceIndicator.setBackground(Color.decode("#4cc253"));
-    }
-	
-//-----------------------------------------------------------------------------
-	
-	/**
-	 * Check if there is any potential source of conflict between currently 
-	 * open/loaded data and the possibility of changing fragment space. If there
-	 * are conflicts, we bring up a warning that allows the user to cancel or
-	 * impose the change of fragment space.
-	 * @return <code>true</code> if we have decided not to load a fragment space
-	 * after all.
-	 */
-    private boolean checkForLoadedFragmentSpace()
-    {
-        String msg = "<html><body width='%1s'><b>WARNING</b>: ";
-        boolean showWarning = false;
-
-        if (FragmentSpace.isDefined())
-        {
-            msg = msg + "A space of building block is alredy loaded. ";
-            showWarning = true;
-        }
-        if (showWarning)
-        {
-            msg = msg + "Do you want to change the building blocks "
-                    + "space? </html>";
-            String[] options = new String[]{"Yes", "No"};
-            int res = JOptionPane.showOptionDialog(this,
-                    String.format(msg,350),                     
-                    "Change Space?",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.WARNING_MESSAGE,
-                    UIManager.getIcon("OptionPane.warningIcon"),
-                    options,
-                    options[1]);
-            if (res == 1)
-            {
-                return true;
-            }
-        }
-        return false;
     }
 	
 //-----------------------------------------------------------------------------

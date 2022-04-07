@@ -67,6 +67,11 @@ public class GraphLinkFinder
      */
     private boolean foundNewLink = false;
     
+    /**
+     * Parameter and reference to the fragment space
+     */
+    private FragmentSpace fragmentSpace = null;
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -76,9 +81,10 @@ public class GraphLinkFinder
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
-    public GraphLinkFinder(DENOPTIMVertex originalLink) throws DENOPTIMException
+    public GraphLinkFinder(FragmentSpace fragSpace, 
+            DENOPTIMVertex originalLink) throws DENOPTIMException
     {  
-        this(originalLink,-1,false);
+        this(fragSpace, originalLink, -1, false);
     }
     
 //------------------------------------------------------------------------------
@@ -93,10 +99,11 @@ public class GraphLinkFinder
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
-    public GraphLinkFinder(DENOPTIMVertex originalLink, int newBuildingBlockID) 
+    public GraphLinkFinder(FragmentSpace fragSpace,
+            DENOPTIMVertex originalLink, int newBuildingBlockID) 
             throws DENOPTIMException
     {  
-        this(originalLink,newBuildingBlockID,false);
+        this(fragSpace, originalLink, newBuildingBlockID, false);
     }
     
 //------------------------------------------------------------------------------
@@ -114,9 +121,12 @@ public class GraphLinkFinder
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
-    public GraphLinkFinder(DENOPTIMVertex originalLink, int newBuildingBlockID,
+    public GraphLinkFinder(FragmentSpace fragSpace,
+            DENOPTIMVertex originalLink, int newBuildingBlockID,
             boolean screenAll) throws DENOPTIMException 
     {   
+        this.fragmentSpace = fragSpace;
+        
         ArrayList<DENOPTIMVertex> candidates = getCandidateBBs(
                 originalLink.getBuildingBlockType(), newBuildingBlockID);
         
@@ -131,7 +141,7 @@ public class GraphLinkFinder
             candidates.remove(originalBB);
             try
             {
-                chosenNewLink = FragmentSpace.getVertexFromLibrary(
+                chosenNewLink = fragmentSpace.getVertexFromLibrary(
                         originalBB.getBuildingBlockType(), 
                         originalBB.getBuildingBlockId());
             } catch (DENOPTIMException e)
@@ -154,8 +164,8 @@ public class GraphLinkFinder
             }
             
             // We map all the compatibilities before choosing a specific mapping
-            APMapFinder apmf = new APMapFinder(originalLink, chosenNewLink, 
-                    screenAll);
+            APMapFinder apmf = new APMapFinder(fragSpace, originalLink, 
+                    chosenNewLink, screenAll);
             
             if (!apmf.foundMapping())
             {
@@ -185,18 +195,17 @@ public class GraphLinkFinder
             switch (bbt)
             {
                 case FRAGMENT:
-                    candidates.addAll(FragmentSpace.getFragmentLibrary());
+                    candidates.addAll(fragmentSpace.getFragmentLibrary());
                     break;
                 case SCAFFOLD:
-                    candidates.addAll(FragmentSpace.getScaffoldLibrary());
+                    candidates.addAll(fragmentSpace.getScaffoldLibrary());
                 case CAP:
                     break;
                 default:
                     break;
             }
         } else {
-            DENOPTIMVertex chosenOne =  FragmentSpace.getVertexFromLibrary(
-                    bbt, bbId);
+            DENOPTIMVertex chosenOne =  fragmentSpace.getVertexFromLibrary(bbt, bbId);
             candidates.add(chosenOne);
         }
         return candidates;
@@ -216,10 +225,10 @@ public class GraphLinkFinder
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
-    public GraphLinkFinder(DENOPTIMEdge originalEdge) 
+    public GraphLinkFinder(FragmentSpace fragSpace, DENOPTIMEdge originalEdge) 
             throws DENOPTIMException
     {  
-        this(originalEdge,-1,false);
+        this(fragSpace, originalEdge,-1,false);
     }
     
 //------------------------------------------------------------------------------
@@ -236,10 +245,10 @@ public class GraphLinkFinder
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
-    public GraphLinkFinder(DENOPTIMEdge originalEdge, int newBuildingBlockID) 
-            throws DENOPTIMException
+    public GraphLinkFinder(FragmentSpace fragSpace, DENOPTIMEdge originalEdge, 
+            int newBuildingBlockID) throws DENOPTIMException
     {  
-        this(originalEdge,newBuildingBlockID,false);
+        this(fragSpace, originalEdge,newBuildingBlockID,false);
     }
     
 //------------------------------------------------------------------------------
@@ -259,9 +268,11 @@ public class GraphLinkFinder
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
-    public GraphLinkFinder(DENOPTIMEdge originalEdge, int newBuildingBlockID,
+    public GraphLinkFinder(FragmentSpace fragSpace,
+            DENOPTIMEdge originalEdge, int newBuildingBlockID,
             boolean screenAll) throws DENOPTIMException 
-    {   
+    {
+        this.fragmentSpace = fragSpace;
         ArrayList<DENOPTIMVertex> candidates = getCandidateBBs(
                 originalEdge.getTrgAP().getOwner().getBuildingBlockType(), 
                 newBuildingBlockID);
@@ -277,7 +288,7 @@ public class GraphLinkFinder
             candidates.remove(originalBB);
             try
             {
-                chosenNewLink = FragmentSpace.getVertexFromLibrary(
+                chosenNewLink = fragmentSpace.getVertexFromLibrary(
                         originalBB.getBuildingBlockType(), 
                         originalBB.getBuildingBlockId());
             } catch (DENOPTIMException e)
@@ -305,13 +316,16 @@ public class GraphLinkFinder
                 for (DENOPTIMAttachmentPoint cAP : chosenNewLink.getAttachmentPoints())
                 {  
                     boolean compatible = false;
-                    if (FragmentSpace.useAPclassBasedApproach())
+                    if (fragmentSpace.useAPclassBasedApproach())
                     {
                         if (j==0 
-                                && oriAPC.isCPMapCompatibleWith(cAP.getAPClass()))
+                                && oriAPC.isCPMapCompatibleWith(
+                                        cAP.getAPClass(),
+                                        fragmentSpace))
                             compatible = true;
                         else if (j==1 
-                                && cAP.getAPClass().isCPMapCompatibleWith(oriAPC))
+                                && cAP.getAPClass().isCPMapCompatibleWith(
+                                        oriAPC, fragmentSpace))
                             compatible = true;
                     } else {
                         compatible = true;

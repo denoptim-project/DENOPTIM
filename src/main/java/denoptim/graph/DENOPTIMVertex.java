@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -170,7 +171,16 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      */
     protected final VertexType vertexType;
     // NB: Don't make static or Gson will ignore it!
+
+    /**
+     * Unique identified for vertices
+     */
+    //TODO-gg keep or trash?
+    public AtomicInteger vrtxID = new AtomicInteger(0);
     
+    /**
+     * 
+     */
     public enum VertexType {
         MolecularFragment,
         EmptyVertex,
@@ -214,9 +224,11 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @throws DENOPTIMException 
      */
     public static DENOPTIMVertex newVertexFromLibrary(int bbId, 
-            DENOPTIMVertex.BBType bbt) throws DENOPTIMException
+            DENOPTIMVertex.BBType bbt, FragmentSpace fragSpace) 
+                    throws DENOPTIMException
     {
-        return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(),bbId,bbt);
+        return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(), bbId, bbt,
+                fragSpace);
     }
     
 //------------------------------------------------------------------------------
@@ -229,12 +241,13 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
      * @throws DENOPTIMException 
      */
     public static DENOPTIMVertex newVertexFromLibrary(int vertexId, int bbId, 
-            DENOPTIMVertex.BBType bbt) throws DENOPTIMException
+            DENOPTIMVertex.BBType bbt, FragmentSpace fragSpace) 
+                    throws DENOPTIMException
     {   
         // The actual type of vertex
         // returned by this method depends on the what we get from the
         // FragmentSpace.getVertexFromLibrary call
-        DENOPTIMVertex v = FragmentSpace.getVertexFromLibrary(bbt,bbId);
+        DENOPTIMVertex v = fragSpace.getVertexFromLibrary(bbt,bbId);
         v.setVertexId(vertexId);
         
         v.setAsRCV(v.getNumberOfAPs() == 1
@@ -673,35 +686,6 @@ public abstract class DENOPTIMVertex implements Cloneable, Serializable
         */
     	
     	return true;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     *
-     * @param cmpReac list of APClasses of the attachment point we want to 
-     * @return list of indices of the attachment points in vertex that has
-     * the corresponding reaction
-     */
-
-    public ArrayList<Integer> getCompatibleClassAPIndex(
-            APClass cmpReac) {
-        ArrayList<DENOPTIMAttachmentPoint> apLst = getAttachmentPoints();
-        ArrayList<Integer> apIdx = new ArrayList<>();
-        for (int i = 0; i < apLst.size(); i++)
-        {
-            DENOPTIMAttachmentPoint dap = apLst.get(i);
-            if (dap.isAvailable())
-            {
-                // check if this AP has the compatible reactions
-                APClass dapReac = dap.getAPClass();
-                if (dapReac.isCPMapCompatibleWith(cmpReac))
-                {
-                    apIdx.add(i);
-                }
-            }
-        }
-        return apIdx;
     }
 
 //------------------------------------------------------------------------------

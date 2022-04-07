@@ -26,6 +26,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.GraphConversionTool;
 
@@ -285,29 +286,8 @@ Serializable, Cloneable
                     DENOPTIMConstants.GMSGTAG).toString();
         }
         
-        try
-        {
-            //Something very similar is done also in DenoptimIO
-            Object graphEnc = iac.getProperty(DENOPTIMConstants.GRAPHTAG);
-            Object json = iac.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
-            if (graphEnc == null && json == null) {
-                throw new DENOPTIMException("Attempt to load graph to "
-                        + "Candidate but the IAtomContainer "
-                        + "has neither '" + DENOPTIMConstants.GRAPHTAG
-                        + "' nor '" + DENOPTIMConstants.GRAPHJSONTAG);
-            } else if (json != null) {
-                String js = json.toString();
-                this.graph = DENOPTIMGraph.fromJson(js);
-                graph.setCandidateOwner(this);
-            } else {
-                this.graph = GraphConversionTool.getGraphFromString(
-                        graphEnc.toString().trim(), useFragSpace);
-                graph.setCandidateOwner(this);
-            }
-        } catch (Exception e) {
-        	throw new DENOPTIMException("Could not read Graph to make "
-        			+ "Candidate.", e);
-        }
+        this.graph = DenoptimIO.readGraphFromSDFileIAC(iac);
+        this.graph.setCandidateOwner(this);
     }
 
 //------------------------------------------------------------------------------

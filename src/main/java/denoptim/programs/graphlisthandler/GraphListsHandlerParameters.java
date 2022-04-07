@@ -1,6 +1,7 @@
 package denoptim.programs.graphlisthandler;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DENOPTIMGraph;
@@ -31,10 +33,6 @@ public class GraphListsHandlerParameters extends RunTimeParameters
      */
     private String inGraphsFileA = null;
     private String inGraphsFileB = null;
-    protected final String STRINGFORMATLABEL = "STRING";
-    protected final String SERFORMATLABEL = "SER";
-    protected final String SDFFORMATLABEL = "SDF";
-    private String inGraphsFormat = STRINGFORMATLABEL; //Default
 
     /**
      * Input graphs: first list
@@ -52,7 +50,7 @@ public class GraphListsHandlerParameters extends RunTimeParameters
      * File with output graphs
      */
     private String outGraphsFile = null;
-    private String outGraphsFormat = STRINGFORMATLABEL; //Default
+    private FileFormat outGraphsFormat = FileFormat.GRAPHSDF; //Default
     
 //-----------------------------------------------------------------------------
     
@@ -73,14 +71,7 @@ public class GraphListsHandlerParameters extends RunTimeParameters
 
 //-----------------------------------------------------------------------------
 
-    public String getInFormat()
-    {
-        return inGraphsFormat;
-    }
-
-//-----------------------------------------------------------------------------
-
-    public String getOutFormat()
+    public FileFormat getOutFormat()
     {
         return outGraphsFormat;
     }
@@ -112,11 +103,8 @@ public class GraphListsHandlerParameters extends RunTimeParameters
         case "OUTPUTGRAPHS=":
             outGraphsFile = value;
             break;
-        case "INPUTGRAPHSFORMAT=":
-            inGraphsFormat = value.toUpperCase();
-            break;
         case "OUTPUTGRAPHSFORMAT=":
-            outGraphsFormat = value.toUpperCase();
+            outGraphsFormat = FileFormat.valueOf(value.toUpperCase());
             break;
         case "LOGFILE=":
             logFile = value;
@@ -213,46 +201,6 @@ public class GraphListsHandlerParameters extends RunTimeParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (inGraphsFormat != null
-            && !inGraphsFormat.equals(STRINGFORMATLABEL)
-            && !inGraphsFormat.equals(SDFFORMATLABEL))
-        {
-            msg = " The format for providing input graph must be either '"
-                  + STRINGFORMATLABEL + "' (default), or '"
-                  + SDFFORMATLABEL +"'."
-                  + "Unable to understand '" + inGraphsFormat + "'.";
-            throw new DENOPTIMException(msg);
-        }
-        else if (inGraphsFormat.equals(STRINGFORMATLABEL))
-        {
-            msg = "When in graphs are given as '"+ STRINGFORMATLABEL
-                  + "' existing symmetry relations between vertices belonging "
-                  + "to the in graphs are NOT perceived. Symmetry may only "
-                  + "be enforced starting from the first new layer of "
-                  + "vertices.";
-            DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
-        }
-        else if (inGraphsFormat.equals(SERFORMATLABEL))
-        {
-            msg = "For now, only one serialized DENOPTIMGraph can by "
-                  + "given as user-defined input graph using format '"
-                  + SERFORMATLABEL + "'.";
-            DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
-        }
-
-        if (outGraphsFormat != null
-            && !outGraphsFormat.equals("SDF")
-            && !outGraphsFormat.equals(STRINGFORMATLABEL)
-            && !outGraphsFormat.equals(SERFORMATLABEL))
-        {
-            msg = " The format chosed for output graphs must be either '"
-                  + STRINGFORMATLABEL + "' (default) for human readable "
-                  + "strings, or '" + SERFORMATLABEL
-                  + "' for serialized objects. "
-                  + "Unable to understand '" + inGraphsFormat + "'.";
-            throw new DENOPTIMException(msg);
-        }
-
         checkOtherParameters();
     }
 
@@ -279,33 +227,10 @@ public class GraphListsHandlerParameters extends RunTimeParameters
 
         try
         {
-            switch (inGraphsFormat)
-            {
-                case (STRINGFORMATLABEL):
-                {
-                    inGraphsA = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
-                            inGraphsFileA);
-                    inGraphsB = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
-                            inGraphsFileB);
-                    break;
-                }
-
-                case (SDFFORMATLABEL):
-                {
-                    inGraphsA = DenoptimIO.readDENOPTIMGraphsFromSDFile(
-                            inGraphsFileA);
-                    inGraphsB = DenoptimIO.readDENOPTIMGraphsFromSDFile(
-                            inGraphsFileB);
-                    break;
-                }
-
-                default:
-                {
-                    String msg = "'" + inGraphsFormat + "'"
-                                         + " is not a valid format for graphs.";
-                    throw new DENOPTIMException(msg);
-                }
-            }
+            inGraphsA = DenoptimIO.readDENOPTIMGraphsFromFile(new File(
+                    inGraphsFileA));
+            inGraphsB = DenoptimIO.readDENOPTIMGraphsFromFile(new File(
+                    inGraphsFileB));
         }
         catch (Throwable t)
         {

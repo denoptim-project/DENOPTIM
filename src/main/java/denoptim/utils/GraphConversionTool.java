@@ -63,8 +63,9 @@ public class GraphConversionTool
      * @param g the graph to modify.
      * @throws DENOPTIMException 
      */
-    public static void replaceUnusedRCVsWithCapps(DENOPTIMGraph g) 
-            throws DENOPTIMException
+    //TODO-gg move to graph
+    public static void replaceUnusedRCVsWithCapps(DENOPTIMGraph g, 
+            FragmentSpace fragSpace) throws DENOPTIMException
     {
         for (DENOPTIMVertex v : g.getRCVertices())
         {
@@ -74,15 +75,15 @@ public class GraphConversionTool
                 DENOPTIMAttachmentPoint apOnG = v.getEdgeToParent().getSrcAP();
                 g.removeVertex(v);
                 
-                APClass cappAPClass = FragmentSpace.getAPClassOfCappingVertex(
+                APClass cappAPClass = fragSpace.getAPClassOfCappingVertex(
                         apOnG.getAPClass());
                 
                 if (cappAPClass != null)
                 {
-                    int capId = FragmentSpace.getCappingGroupsWithAPClass(
+                    int capId = fragSpace.getCappingGroupsWithAPClass(
                             cappAPClass).get(0);
                     DENOPTIMVertex capVrt = DENOPTIMVertex.newVertexFromLibrary(
-                            capId,BBType.CAP);
+                            capId,BBType.CAP, fragSpace);
                     capVrt.setVertexId(v.getVertexId());
                     g.appendVertexOnAP(apOnG, capVrt.getAP(0));
                 }
@@ -106,10 +107,10 @@ public class GraphConversionTool
      * @throws denoptim.exception.DENOPTIMException
      */
 
-    public static DENOPTIMGraph getGraphFromString(String strGraph)
-                                                        throws DENOPTIMException
+    public static DENOPTIMGraph getGraphFromString(String strGraph,
+            FragmentSpace fragSpace) throws DENOPTIMException
     {
-    	return getGraphFromString(strGraph,true);
+    	return getGraphFromString(strGraph, true, fragSpace);
     }
 
 //------------------------------------------------------------------------------
@@ -135,7 +136,7 @@ public class GraphConversionTool
 
     @Deprecated
     public static DENOPTIMGraph getGraphFromString(String strGraph, 
-				    boolean useMolInfo) throws DENOPTIMException
+            boolean useMolInfo, FragmentSpace fragSpace) throws DENOPTIMException
     {  
     	// get the main blocks to parse: graphID, vertices, edges, rings, symSet
         String[] s1 = strGraph.split("\\s+");
@@ -183,16 +184,16 @@ public class GraphConversionTool
                     Integer.parseInt(s3[2]));
 	            
             DENOPTIMVertex dv;
-            if (FragmentSpace.isDefined())
+            if (fragSpace.isDefined())
             {
-                dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid, fragtype);
+                dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid, fragtype,
+                        fragSpace);
             } else {
                 // WARNING: in this case we cannot know the exact number of
                 // attachment points, so we will add as many as needed to 
                 // build the graph.
                 dv =  new EmptyVertex(vid);
             }
-
             vertices.add(dv);
         }
         

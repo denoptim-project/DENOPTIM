@@ -72,7 +72,34 @@ M  END
 >  <GCODE>
 1
 
->  <GraphENC>
-1 1_1_0_-1,
+> <GraphJson>
+{
+  "graphId": 0,
+  "gVertices": [
+    {
+      "lstAPs": [],
+      "lstSymAPs": [],
+      "vertexId": 1,
+      "buildingBlockId": -99,
+      "buildingBlockType": "UNDEFINED",
+      "isRCV": false,
+      "uniquefyingPropertyKeys": [],
+      "allowedMutationTypes": [
+        "DELETE",
+        "EXTEND",
+        "CHANGEBRANCH",
+        "CHANGELINK",
+        "ADDLINK",
+        "DELETELINK",
+        "DELETECHAIN"
+      ],
+      "vertexType": "EmptyVertex",
+      "vrtxID": 0
+    }
+  ],
+  "gEdges": [],
+  "gRings": [],
+  "symVertices": []
+}
 
 $$$$

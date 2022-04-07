@@ -33,18 +33,17 @@ import denoptim.graph.EmptyVertex;
 
 public class APMapFinderTest
 {
-    private static APClass APCA, APCB, APCC, APCD, APCE, APCF;
+    private static APClass APCA, APCB, APCC, APCD, APCE;
     
 //------------------------------------------------------------------------------
     
-    private void prepare() throws DENOPTIMException
+    private FragmentSpace prepare() throws DENOPTIMException
     {
         APCA = APClass.make("A", 0);
         APCB = APClass.make("B", 0);
         APCC = APClass.make("C", 0);
         APCD = APClass.make("D", 99);
         APCE = APClass.make("E", 13);
-        APCF = APClass.make("F", 17);
         
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
@@ -89,13 +88,15 @@ public class APMapFinderTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setCompatibilityMatrix(cpMap);
-        FragmentSpace.setCappingMap(capMap);
-        FragmentSpace.setForbiddenEndList(forbEnds);
-        FragmentSpace.setAPclassBasedApproach(true);
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(), 
+                cpMap, capMap, forbEnds, cpMap);
+        fs.setAPclassBasedApproach(true);
         
-        FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
-        FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
+        return fs;
     }
     
 //------------------------------------------------------------------------------
@@ -103,7 +104,7 @@ public class APMapFinderTest
     @Test
     public void testAPMapFinder_Constrained() throws Exception
     {
-        prepare();
+        FragmentSpace fs = prepare();
         EmptyVertex vA = new EmptyVertex();
         vA.setBuildingBlockType(BBType.FRAGMENT);
         vA.addAP(APCA);
@@ -121,7 +122,7 @@ public class APMapFinderTest
         
         APMapping constrain = new APMapping();
         constrain.put(vA.getAP(2), vB.getAP(4));
-        APMapFinder apmf = new APMapFinder(vA, vB, constrain, true, false, false);
+        APMapFinder apmf = new APMapFinder(fs,vA,vB,constrain,true,false,false);
         
         assertTrue(apmf.foundMapping());
         assertEquals(21, apmf.getAllAPMappings().size());
@@ -137,7 +138,7 @@ public class APMapFinderTest
     @Test
     public void testAPMapFinder_ConstrainAll() throws Exception
     {
-        prepare();
+        FragmentSpace fs = prepare();
         EmptyVertex vA = new EmptyVertex();
         vA.setBuildingBlockType(BBType.FRAGMENT);
         vA.addAP(APCA);
@@ -149,7 +150,7 @@ public class APMapFinderTest
         // NB "all" in "ConstrainAll" means that a single constraint covers all APs
         APMapping constrain = new APMapping();
         constrain.put(vA.getAP(0), vB.getAP(0));
-        APMapFinder apmf = new APMapFinder(vA, vB, constrain, true, false, false);
+        APMapFinder apmf = new APMapFinder(fs,vA,vB,constrain,true,false,false);
         
         assertTrue(apmf.foundMapping());
         assertEquals(1, apmf.getAllAPMappings().size());
@@ -162,7 +163,7 @@ public class APMapFinderTest
     @Test
     public void testAPMapFinder() throws Exception
     {
-        prepare();
+        FragmentSpace fs = prepare();
         EmptyVertex vA = new EmptyVertex();
         vA.setBuildingBlockType(BBType.FRAGMENT);
         vA.addAP(APCA);
@@ -176,7 +177,7 @@ public class APMapFinderTest
         // NB: when APs are NOT used, the mapping is permissive and is happy
         // to find "a" AP to map another AP with, irrespectively on the APClass
         
-        APMapFinder apmf = new APMapFinder(vA, vB, true);
+        APMapFinder apmf = new APMapFinder(fs, vA, vB, true);
         
         assertTrue(apmf.foundMapping());
         assertEquals(6, apmf.getAllAPMappings().size());
@@ -197,7 +198,7 @@ public class APMapFinderTest
                 .count());
         
         //: we can restrict to all mappings that cover all APs on first vertex
-        apmf = new APMapFinder(vA, vB, null, true, true, true);
+        apmf = new APMapFinder(fs, vA, vB, null, true, true, true);
         
         assertTrue(apmf.foundMapping());
         assertEquals(2, apmf.getAllAPMappings().size());
@@ -227,7 +228,7 @@ public class APMapFinderTest
         // NB: when APs are used the mapping is much more restrictive,
         // because it is forced to respect the APClass compatibility rules.
 
-        apmf = new APMapFinder(vA, vB, true);
+        apmf = new APMapFinder(fs, vA, vB, true);
         
         assertTrue(apmf.foundMapping());
         assertEquals(1, apmf.getAllAPMappings().size());
@@ -254,7 +255,7 @@ public class APMapFinderTest
         g2.addVertex(vG);
         g2.addEdge(new DENOPTIMEdge(vF.getAP(0), vG.getAP(0)));
         
-        apmf = new APMapFinder(vF, vG, true);
+        apmf = new APMapFinder(fs, vF, vG, true);
         
         assertTrue(apmf.foundMapping());
         assertEquals(vG.getAP(0), apmf.getChosenAPMapping().get(vF.getAP(0)));

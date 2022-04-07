@@ -105,10 +105,13 @@ public class FragmentSpaceParameters extends RunTimeParameters
     protected boolean symmetryConstraints = false;
 
     /**
-     * List of constitutional symmetry constraints
+     * List of constitutional symmetry constraints.
      */
+    //TODO-gg this will go one Fragment space is in place
     protected HashMap<APClass, Double> symmConstraintsMap = 
             new HashMap<APClass, Double>();
+    
+    private FragmentSpace buildingBlocksSpace = null;
     
 //------------------------------------------------------------------------------
 
@@ -130,6 +133,19 @@ public class FragmentSpaceParameters extends RunTimeParameters
         this(ParametersType.FS_PARAMS);
     }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor of a default set of parameters coupled with a given fragment 
+     * space.
+     * @param fs
+     */
+    public FragmentSpaceParameters(FragmentSpace fs)
+    {
+        this(ParametersType.FS_PARAMS);
+        buildingBlocksSpace = fs;
+    }
+    
 //------------------------------------------------------------------------------
 
     public int getMaxHeavyAtom()
@@ -186,6 +202,13 @@ public class FragmentSpaceParameters extends RunTimeParameters
     {
         File libFile = new File(scaffoldLibFile);
         return libFile.getAbsolutePath() + "_addedScaffolds.sdf";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public FragmentSpace getFragmentSpace()
+    {
+        return buildingBlocksSpace;
     }
 
 //------------------------------------------------------------------------------
@@ -390,10 +413,10 @@ public class FragmentSpaceParameters extends RunTimeParameters
      */
     public void processParameters() throws DENOPTIMException
     {
-        FragmentSpace.settings = this;
-        FragmentSpace.defineFragmentSpace(scaffoldLibFile, fragmentLibFile, 
-                cappingLibFile, compMatrixFile, rcCompMatrixFile, 
-                symmConstraintsMap); 
+        buildingBlocksSpace = new FragmentSpace(this, 
+                scaffoldLibFile, fragmentLibFile, cappingLibFile, 
+                compMatrixFile, rcCompMatrixFile, 
+                symmConstraintsMap);
         processOtherParameters();
     }
     
@@ -428,6 +451,19 @@ public class FragmentSpaceParameters extends RunTimeParameters
             sb.append(otherCollector.getPrintedList());
         }
         return sb.toString();
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the fragment space linked to these parameters. This method should 
+     * be used only in unit test to by-pass the creation of a
+     * {@link FragmentSpace} from parameters.
+     * @param fragmentSpace
+     */
+    public void setFragmentSpace(FragmentSpace fragmentSpace)
+    {
+        buildingBlocksSpace = fragmentSpace;
     }
 
 //------------------------------------------------------------------------------

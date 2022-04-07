@@ -95,6 +95,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
 import denoptim.graph.CandidateLW;
@@ -1503,8 +1504,9 @@ public class DenoptimIO
                         inFile.getAbsolutePath());
                 
             case GRAPHTXT:
-                return DenoptimIO.readDENOPTIMGraphsFromTxtFile(
-                        inFile.getAbsolutePath());
+                throw new DENOPTIMException("Use of string representation '" 
+                        + DENOPTIMConstants.GRAPHTAG + "' is deprecated. Use "
+                        + "JSON format instead.");
                 
             case CANDIDATESDF:
                 return DenoptimIO.readDENOPTIMGraphsFromSDFile(
@@ -1569,10 +1571,10 @@ public class DenoptimIO
      * @throws DENOPTIMException is the atom container cannot be converted due
      * to lack of the proper SDF tags, or failure in the conversion.
      */
-    public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol, 
-            int molId) throws DENOPTIMException
+    public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol) 
+            throws DENOPTIMException
     {
-        return readGraphFromSDFileIAC(mol, molId, "unKnown");
+        return readGraphFromSDFileIAC(mol, -1, "");
     }
     
 //------------------------------------------------------------------------------
@@ -1581,9 +1583,28 @@ public class DenoptimIO
      * Converts an atom container read in from an SDF file into a graph, if 
      * possible. Otherwise, throws an exception.
      * @param mol the atom container coming from SDF representation
-     * @param molId identified used only for logging purposes.
+     * @param molId identified used only for logging purposed
+     * @return the corresponding graph or null.
+     * @throws DENOPTIMException is the atom container cannot be converted due
+     * to lack of the proper SDF tags, or failure in the conversion.
+     */
+    public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol, 
+            int molId) throws DENOPTIMException
+    {
+        return readGraphFromSDFileIAC(mol, molId, "");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Converts an atom container read in from an SDF file into a graph, if 
+     * possible. Otherwise, throws an exception.
+     * @param mol the atom container coming from SDF representation
+     * @param molId identified used only for logging purposes. If negative it is
+     *  ignored.
      * @param fileName a pathname used only for logging errors. This is usually
-     * the pathname to the file from which we took the atom container.
+     * the pathname to the file from which we took the atom container. If empty
+     * it is ignored
      * @return the corresponding graph or null.
      * @throws DENOPTIMException is the atom container cannot be converted due
      * to lack of the proper SDF tags, or failure in the conversion.
@@ -1594,25 +1615,49 @@ public class DenoptimIO
         // Something very similar is done also in Candidate
         DENOPTIMGraph g = null;
         Object json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
-        Object graphEnc = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
-        if (graphEnc == null && json == null) {
-            throw new DENOPTIMException("Attempt to load graph form "
-                    + "SDF that has neither '" + DENOPTIMConstants.GRAPHTAG
-                    + "' nor '" + DENOPTIMConstants.GRAPHJSONTAG 
-                    + "' tag. Check molecule " + molId + " in the SDF file.");
-        } else if (json != null) {
+        if (json == null) {
+            Object graphEnc = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
+            if (graphEnc!=null)
+            {
+                throw new DENOPTIMException("Use of '" 
+                        + DENOPTIMConstants.GRAPHTAG + "' is deprecated. SDF "
+                        + "files containing graphs must include the "
+                        + "tag '" + DENOPTIMConstants.GRAPHJSONTAG + "'.");
+            }
+            String msg = "Attempt to load graph form "
+                    + "SDF that has no '" + DENOPTIMConstants.GRAPHJSONTAG 
+                    + "' tag.";
+            if (molId>-1)
+            {
+                msg = msg + " Check molecule " + molId;
+                if (!fileName.isEmpty())
+                {
+                    msg = msg + " in the SDF file '" + fileName + "'";
+                } else {
+                    msg = msg + ".";
+                }
+            }
+            throw new DENOPTIMException(msg);
+        } else {
             String js = json.toString();
             try
             {
                 g = DENOPTIMGraph.fromJson(js);
             } catch (Exception e)
             {
-                throw new DENOPTIMException(e.getMessage()+" Check file '" 
-                        + fileName + "'", e);
+                String msg = e.getMessage();
+                if (molId>-1)
+                {
+                    msg = msg + " Check molecule " + molId;
+                    if (!fileName.isEmpty())
+                    {
+                        msg = msg + " in the SDF file '" + fileName + "'";
+                    } else {
+                        msg = msg + ".";
+                    }
+                }
+                throw new DENOPTIMException(msg, e);
             }
-        } else {
-            g = GraphConversionTool.getGraphFromString(
-                    graphEnc.toString().trim());
         }
         return g;
     }
@@ -1627,7 +1672,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromTxtFile(
-            String fileName) throws DENOPTIMException 
+            String fileName, FragmentSpace fragSpace) throws DENOPTIMException 
     {
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
         BufferedReader br = null;
@@ -1645,7 +1690,8 @@ public class DenoptimIO
 
                 DENOPTIMGraph g;
                 try {
-                    g = GraphConversionTool.getGraphFromString(line.trim());
+                    g = GraphConversionTool.getGraphFromString(line.trim(), 
+                            fragSpace);
                 } catch (Throwable t) {
                     String msg = "Cannot convert string to DENOPTIMGraph. "
                             + "Check line '" + line.trim() + "'";

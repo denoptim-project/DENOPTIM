@@ -433,6 +433,16 @@ public abstract class RunTimeParameters
     
 //------------------------------------------------------------------------------
     
+    /**
+     * @param otherParams the parameters to add/set as other in this collection.
+     */
+    public void setParameters(RunTimeParameters otherParams)
+    {
+        otherParameters.put(otherParams.paramType, otherParams);
+    }
+    
+//------------------------------------------------------------------------------
+    
 // TODO: consider this mechanism for retrieving parameters once all parameters
 //       will be of type Parameter.
 //

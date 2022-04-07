@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.Population;
 import denoptim.ga.XoverSite;
 import denoptim.graph.APClass;
@@ -90,15 +91,19 @@ public class PopulationTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setCompatibilityMatrix(cpMap);
-        FragmentSpace.setCappingMap(capMap);
-        FragmentSpace.setForbiddenEndList(forbEnds);
-        FragmentSpace.setAPclassBasedApproach(true);
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(), 
+                cpMap, capMap, forbEnds, cpMap);
+        fs.setAPclassBasedApproach(true);
         
-        GAParameters settings = new GAParameters();
-        settings.readParameterLine(ParametersType.RC_PARAMS.getKeywordRoot() 
+        GAParameters gaSettings = new GAParameters();
+        gaSettings.readParameterLine(ParametersType.RC_PARAMS.getKeywordRoot() 
                 + "CLOSERINGS");
-        return settings;
+        gaSettings.setParameters(fsp);
+        return gaSettings;
     }
 
 //------------------------------------------------------------------------------
@@ -107,6 +112,10 @@ public class PopulationTest
     public void testXOverCompatibility() throws Exception
     {
         GAParameters gaparams = prepare();
+        FragmentSpaceParameters fsParams = (FragmentSpaceParameters) gaparams
+                .getParameters(ParametersType.FS_PARAMS);
+        FragmentSpace fs = fsParams.getFragmentSpace();
+        
         Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -169,15 +178,15 @@ public class PopulationTest
         pop.add(c5);
         
         ArrayList<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
-                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)));
+                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
         ArrayList<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
-                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)));
+                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
         ArrayList<Candidate> partnersForC3 = pop.getXoverPartners(c3, 
-                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)));
+                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
         ArrayList<Candidate> partnersForC4 = pop.getXoverPartners(c4, 
-                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)));
+                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
         ArrayList<Candidate> partnersForC5 = pop.getXoverPartners(c5, 
-                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)));
+                new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
 
         Map<Candidate,Map<Candidate,Integer>> expected = 
                 new HashMap<Candidate,Map<Candidate,Integer>>();
@@ -215,6 +224,10 @@ public class PopulationTest
     public void testClone() throws Exception
     {
         GAParameters gaparams = prepare();
+        FragmentSpaceParameters fsParams = (FragmentSpaceParameters) gaparams
+                .getParameters(ParametersType.FS_PARAMS);
+        FragmentSpace fs = fsParams.getFragmentSpace();
+        
         Population pop = new Population(gaparams);
         
         DENOPTIMGraph g1 = makeGraphA();
@@ -233,9 +246,9 @@ public class PopulationTest
         g2.getVertexAtPosition(1).setProperty(k, 456);
         
         ArrayList<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
-                new ArrayList<Candidate>(Arrays.asList(c1,c2)));
+                new ArrayList<Candidate>(Arrays.asList(c1,c2)), fs);
         ArrayList<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
-                new ArrayList<Candidate>(Arrays.asList(c1,c2)));
+                new ArrayList<Candidate>(Arrays.asList(c1,c2)), fs);
         
         Map<Candidate,Map<Candidate,Integer>> expected = 
                 new HashMap<Candidate,Map<Candidate,Integer>>();

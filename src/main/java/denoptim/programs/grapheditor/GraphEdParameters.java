@@ -31,6 +31,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.rings.RingClosureParameters;
@@ -357,52 +358,6 @@ public class GraphEdParameters extends RunTimeParameters
             }
         }
 
-        try
-        {
-    	    switch (inGraphsFormat)
-    	    {
-        		case (STRINGFORMATLABEL):
-        		{
-                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
-                            inGraphsFile);
-        		    break;
-        		}
-        		case (SERFORMATLABEL):
-                {
-                    //TODO get arraylist of graphs or accept multiple files
-                    DENOPTIMGraph g = DenoptimIO.deserializeDENOPTIMGraph(
-                                                        new File(inGraphsFile));
-                    inGraphs.add(g);
-        		    break;
-                }
-        		case ("SDF"):
-        		{
-        		    inMols = DenoptimIO.readSDFFile(inGraphsFile);
-        		    int i = 0;
-        		    for (IAtomContainer m : inMols)
-        		    {
-            			i++;
-            			DENOPTIMGraph g = DenoptimIO.readGraphFromSDFileIAC(m, 
-            			        i, inGraphsFile);
-            			inGraphs.add(g);
-        		    }
-        		    break;
-        		}
-        		default:
-                {
-                    String msg = "'" + inGraphsFormat + "'"
-                                         + " is not a valid format for graphs.";
-                    throw new DENOPTIMException(msg);
-        		}
-            }
-        }
-        catch (Throwable t)
-        {
-            String msg = "Cannot read in graphs from " + inGraphsFile;
-            DENOPTIMLogger.appLogger.log(Level.INFO,msg);
-            throw new DENOPTIMException(msg,t);
-        }
-
         if (graphEditsFile != null)
         {
             try
@@ -429,6 +384,57 @@ public class GraphEdParameters extends RunTimeParameters
         }
     }
     
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+    
+    protected void readInputGraphs(FragmentSpace fragSpace) throws DENOPTIMException
+    {
+        try
+        {
+            switch (inGraphsFormat)
+            {
+                case (STRINGFORMATLABEL):
+                {
+                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
+                            inGraphsFile, fragSpace);
+                    break;
+                }
+                case (SERFORMATLABEL):
+                {
+                    //TODO get arraylist of graphs or accept multiple files
+                    DENOPTIMGraph g = DenoptimIO.deserializeDENOPTIMGraph(
+                                                        new File(inGraphsFile));
+                    inGraphs.add(g);
+                    break;
+                }
+                case ("SDF"):
+                {
+                    inMols = DenoptimIO.readSDFFile(inGraphsFile);
+                    int i = 0;
+                    for (IAtomContainer m : inMols)
+                    {
+                        i++;
+                        DENOPTIMGraph g = DenoptimIO.readGraphFromSDFileIAC(m, 
+                                i, inGraphsFile);
+                        inGraphs.add(g);
+                    }
+                    break;
+                }
+                default:
+                {
+                    String msg = "'" + inGraphsFormat + "'"
+                                         + " is not a valid format for graphs.";
+                    throw new DENOPTIMException(msg);
+                }
+            }
+        }
+        catch (Throwable t)
+        {
+            String msg = "Cannot read in graphs from " + inGraphsFile;
+            DENOPTIMLogger.appLogger.log(Level.INFO,msg);
+            throw new DENOPTIMException(msg,t);
+        }
+    }
+    
+//-----------------------------------------------------------------------------
 
 }

@@ -297,7 +297,8 @@ echo TODO: refactor DenoptimRND
 #
 # t18: comparison of graph lists
 #
-runTest "t18"
+echo TODO: change or remove
+#runTest "t18"
 
 #
 # t19: conversion of graph's string representations (with templates and empty

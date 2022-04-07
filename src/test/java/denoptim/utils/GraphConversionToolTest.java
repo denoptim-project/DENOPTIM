@@ -37,6 +37,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.PopulationTest;
 import denoptim.graph.APClass;
 import denoptim.graph.DENOPTIMEdge;
@@ -125,18 +126,20 @@ public class GraphConversionToolTest
     	ArrayList<DENOPTIMVertex> caps = new ArrayList<DENOPTIMVertex>();
     	caps.add(cap);
     	
-    	FragmentSpace.defineFragmentSpace(scaff,frags,caps,cpMap,capMap,
-    			forbEnds,null);
+    	FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+    	FragmentSpace fs = new FragmentSpace(fsp, scaff, frags, caps,
+                cpMap, capMap, forbEnds, cpMap);
+        fs.setAPclassBasedApproach(true);
     	
     	DENOPTIMGraph dg = new DENOPTIMGraph();
     	DENOPTIMVertex v1 = DENOPTIMVertex.newVertexFromLibrary(1, 0, 
-    	        BBType.SCAFFOLD);
+    	        BBType.SCAFFOLD, fs);
     	DENOPTIMVertex v2 = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
     	DENOPTIMVertex v3 = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
     	DENOPTIMVertex v4 = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         dg.addVertex(v1);
         dg.addVertex(v2);
         dg.addVertex(v3);
@@ -155,7 +158,7 @@ public class GraphConversionToolTest
         dg.addRing(v3, v4);
         
         //NB: this replaces unused RCVs with capping groups
-        GraphConversionTool.replaceUnusedRCVsWithCapps(dg);
+        GraphConversionTool.replaceUnusedRCVsWithCapps(dg, fs);
         
         assertEquals(4, dg.getVertexCount(), "Number of vertexes after "
                 + "removal of 0 unused RCVs.");
@@ -164,13 +167,13 @@ public class GraphConversionToolTest
     	
         DENOPTIMGraph acyclicGraph = new DENOPTIMGraph();
         DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1, 0, 
-                BBType.SCAFFOLD);
+                BBType.SCAFFOLD, fs);
         DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         DENOPTIMVertex v4b = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         acyclicGraph.addVertex(v1b);
         acyclicGraph.addVertex(v2b);
         acyclicGraph.addVertex(v3b);
@@ -187,7 +190,7 @@ public class GraphConversionToolTest
         acyclicGraph.addEdge(e3b);
     	
         //NB: this replaces unused RCVs with capping groups
-        GraphConversionTool.replaceUnusedRCVsWithCapps(acyclicGraph);
+        GraphConversionTool.replaceUnusedRCVsWithCapps(acyclicGraph, fs);
        
         assertEquals(0, acyclicGraph.getRCVertices().size(), "Number of RCVs after "
                 + "removal of 2 unused RCVs.");

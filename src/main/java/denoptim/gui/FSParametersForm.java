@@ -529,7 +529,8 @@ public class FSParametersForm extends ParametersForm
         tabPar11 = new JTable(tabModPar11);
         tabPar11.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         btnPar11Insert = new JButton("Add Constraint");
-        btnPar11Insert.setToolTipText("Click to choose an AP-Class from the current lists of scaffolds and fragments.");
+        btnPar11Insert.setToolTipText("Click to choose an AP-Class from the "
+                + "compatibility matrix specified above.");
         btnPar11Insert.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
         		
@@ -541,9 +542,10 @@ public class FSParametersForm extends ParametersForm
         		Object[] allAPClasses = new Object[]{};
         		try
         		{
-        			FragmentSpace.importCompatibilityMatrixFromFile(txtCPMat.getText());
-        			allAPClasses = new Object[FragmentSpace.getAllAPClassesFromCPMap().size()];
-        			FragmentSpace.getAllAPClassesFromCPMap().toArray(allAPClasses);
+        		    FragmentSpace fs = new FragmentSpace();
+        			fs.importCompatibilityMatrixFromFile(txtCPMat.getText());
+        			allAPClasses = new Object[fs.getAllAPClassesFromCPMap().size()];
+        			fs.getAllAPClassesFromCPMap().toArray(allAPClasses);
         			apClassesFromCPMap=true;
         		}
         		catch (Throwable t)

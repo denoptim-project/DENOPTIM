@@ -34,12 +34,7 @@ public class DENOPTIMVertexTest
 
     @Test
     public void testFromToJSON_minimal() throws Exception 
-    {
-        // This is because we do not know in which order the unit test run,
-        // so, there could be a previous test that defines the fragment space,
-        // while here we expect no fragment space to be defined.
-        FragmentSpace.clearAll();
-        
+    {   
         EmptyVertex ev = new EmptyVertex();
         assertEquals(VertexType.EmptyVertex,ev.vertexType);
         String evStr = ev.toJson();

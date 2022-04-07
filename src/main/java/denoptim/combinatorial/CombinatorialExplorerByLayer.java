@@ -37,13 +37,16 @@ import org.apache.commons.lang3.time.StopWatch;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragsCombinationIterator;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.GraphUtils;
 
 
@@ -103,7 +106,12 @@ public class CombinatorialExplorerByLayer
      */
     private CEBLParameters settings = null;
 
+    /**
+     * Settings and definition of the fragment space
+     */
+    private FragmentSpaceParameters fsSettings = null;
 
+    
 //-----------------------------------------------------------------------------
 
     /**
@@ -115,6 +123,13 @@ public class CombinatorialExplorerByLayer
         this.settings = settings;
         this.verbosity = settings.getVerbosity();
         this.restartFromChkPt = settings.restartFromCheckPoint();
+        
+        fsSettings = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsSettings = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
         
         futures = new ArrayList<>();
         submitted = new ArrayList<>();
@@ -160,8 +175,8 @@ public class CombinatorialExplorerByLayer
         tpe.setRejectedExecutionHandler(new RejectedExecutionHandler()
         {
             @Override
-            public void rejectedExecution(Runnable r,
-            		ThreadPoolExecutor executor)
+            public void rejectedExecution(Runnable r, 
+                    ThreadPoolExecutor executor)
             {
                 try
                 {
@@ -579,7 +594,8 @@ public class CombinatorialExplorerByLayer
             else
             {
                 // Make the root graphs from the scaffolds
-                for (int i=0; i<FragmentSpace.getScaffoldLibrary().size(); i++)
+                for (int i=0; i<fsSettings.getFragmentSpace()
+                        .getScaffoldLibrary().size(); i++)
                 {
                     scafLevel.add(startNewGraphFromScaffold(i));
                 }
@@ -622,7 +638,7 @@ public class CombinatorialExplorerByLayer
                     
             // Get combination factory
             FragsCombinationIterator fcf = new FragsCombinationIterator(
-                                                                     rootGraph);
+                    fsSettings, rootGraph);
 
             if (restartFromChkPt && firstAfterRestart)
             {
@@ -840,8 +856,8 @@ public class CombinatorialExplorerByLayer
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
         DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(),scafIdx,
-                DENOPTIMVertex.BBType.SCAFFOLD);
+                GraphUtils.getUniqueVertexIndex(), scafIdx, BBType.SCAFFOLD,
+                fsSettings.getFragmentSpace());
 
         // add the scaffold as a vertex
         molGraph.addVertex(scafVertex);

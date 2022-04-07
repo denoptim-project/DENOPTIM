@@ -99,17 +99,9 @@ public class DENOPTIMgsonTest
     
 //------------------------------------------------------------------------------
     
-    public void setUp() {
-        FragmentSpace.setFragmentLibrary(new ArrayList<>());
-        FragmentSpace.setCompatibilityMatrix(new HashMap<>());
-    }
-    
-//------------------------------------------------------------------------------
-    
     @Test
     public void testTemplateSerialization() throws Exception
     {
-        setUp();
         DENOPTIMTemplate tmpl = DENOPTIMTemplateTest.getTestAmideTemplate();
         tmpl.setBuildingBlockId(-206); //just any number
         tmpl.setBuildingBlockType(BBType.CAP); //just a type easy to spot

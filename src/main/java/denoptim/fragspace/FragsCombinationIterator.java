@@ -98,7 +98,12 @@ public class FragsCombinationIterator
     /**
      * Verbosity lvel
      */
-    private int verbosity = FragmentSpace.settings.getVerbosity();
+    private int verbosity = 0;
+    
+    /**
+     * Parameters defining the fragment space
+     */
+    private FragmentSpaceParameters settings = null;
 
 
 //------------------------------------------------------------------------------
@@ -110,10 +115,11 @@ public class FragsCombinationIterator
      * @throws DENOPTIMException
      */
 
-    public FragsCombinationIterator(DENOPTIMGraph rootGraph) 
-                                                        throws DENOPTIMException
+    public FragsCombinationIterator(FragmentSpaceParameters settings,
+            DENOPTIMGraph rootGraph) throws DENOPTIMException
     {
         this.rootGraph = rootGraph;
+        this.settings = settings;
 
         // Identify all candidate source APs: free APs on the root graph/vertex.
         // In case of symmetry, store only the first among the symmetric 
@@ -128,9 +134,8 @@ public class FragsCombinationIterator
            
             // deal with symmetric sets of vertices
             boolean keepThisVertex = true;
-            if ((FragmentSpace.settings.enforceSymmetry()
-                                            && this.rootGraph.hasSymmetricAP())
-                || (FragmentSpace.settings.symmetryConstraints()))
+            if ((settings.enforceSymmetry() && this.rootGraph.hasSymmetricAP())
+                || (settings.symmetryConstraints()))
             {
                 keepThisVertex = false;
                 boolean isInSymSet = false;
@@ -166,8 +171,8 @@ public class FragsCombinationIterator
                 int apIdx = v.getIndexOfAP(ap);
                 // deal with symmetric sets of APs on this vertex
                 boolean keepThisAP = true;
-                if ((FragmentSpace.settings.enforceSymmetry() 
-                        || FragmentSpace.settings.symmetryConstraints()) 
+                if ((settings.enforceSymmetry() 
+                        || settings.symmetryConstraints()) 
                         && v.hasSymmetricAP())
                 {
                     keepThisAP = false;
@@ -178,8 +183,8 @@ public class FragsCombinationIterator
                         {
                             APClass apClass = v.getAttachmentPoints().get(
                                     apIdx).getAPClass();
-                            if (!FragmentSpace.imposeSymmetryOnAPsOfClass(
-                                    apClass))
+                            if (!settings.getFragmentSpace()
+                                    .imposeSymmetryOnAPsOfClass(apClass))
                             {
                                 continue;
                             }
@@ -214,7 +219,8 @@ public class FragsCombinationIterator
             DENOPTIMVertex.BBType fTyp = candSrcAp.getVertexMolType();
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
-            DENOPTIMVertex frag = FragmentSpace.getVertexFromLibrary(fTyp, fIdx); 
+            DENOPTIMVertex frag = settings.getFragmentSpace()
+                    .getVertexFromLibrary(fTyp, fIdx); 
             APClass srcApCls = frag.getAttachmentPoints().get(apId).getAPClass();
 
             // Create data structure for candidates 
@@ -223,7 +229,8 @@ public class FragsCombinationIterator
 
             // Get all compatible fragments
             ArrayList<IdFragmentAndAP> compatFragAps = 
-                           FragmentSpace.getFragAPsCompatibleWithClass(srcApCls);
+                    settings.getFragmentSpace().getFragAPsCompatibleWithClass(
+                            srcApCls);
 
             for (IdFragmentAndAP compatApId : compatFragAps)
             {
@@ -241,15 +248,16 @@ public class FragsCombinationIterator
             // Get other possible destinies for the free AP
             // NOTE: in principle there should be only ONE capping group, but
             //       this is made to work also in case of more than one group.
-            APClass capApCls = FragmentSpace.getAPClassOfCappingVertex(srcApCls);
+            APClass capApCls = settings.getFragmentSpace()
+                    .getAPClassOfCappingVertex(srcApCls);
             if (capApCls != null)
             {
                 // Use of capping groups
                 // NOTE: in principle there should be only ONE capping group,
                 //       but this is made to work also in case of more than 
                 //       one group.
-                ArrayList<Integer> capGrpIds =
-                            FragmentSpace.getCappingGroupsWithAPClass(capApCls);
+                ArrayList<Integer> capGrpIds = settings.getFragmentSpace()
+                            .getCappingGroupsWithAPClass(capApCls);
                 for (Integer i : capGrpIds)
                 {
                     int vid = GraphUtils.getUniqueVertexIndex();
@@ -265,7 +273,8 @@ public class FragsCombinationIterator
             else
             {
                 // No capping, so can we also leave the AP empty?
-                if (!FragmentSpace.getForbiddenEndList().contains(srcApCls))
+                if (!settings.getFragmentSpace().getForbiddenEndList()
+                        .contains(srcApCls))
                 {
                     // An empty pointer is used to represent the possibility of
                     // having no fragment
@@ -540,8 +549,8 @@ public class FragsCombinationIterator
         }
 
         // Project selection onto symmetric positions
-        if (FragmentSpace.settings.enforceSymmetry() 
-            || FragmentSpace.settings.symmetryConstraints())
+        if (settings.enforceSymmetry() 
+            || settings.symmetryConstraints())
         {
             Map<IdFragmentAndAP,IdFragmentAndAP> pairsToAdd = 
                                 new HashMap<IdFragmentAndAP,IdFragmentAndAP>();
@@ -562,7 +571,8 @@ public class FragsCombinationIterator
                     {
                         APClass apClass = v.getAttachmentPoints().get(srcApId)
                                 .getAPClass();
-                        if (!FragmentSpace.imposeSymmetryOnAPsOfClass(apClass))
+                        if (!settings.getFragmentSpace()
+                                .imposeSymmetryOnAPsOfClass(apClass))
                         {
                             continue;
                         }

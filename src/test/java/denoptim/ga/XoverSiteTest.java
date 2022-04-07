@@ -30,7 +30,7 @@ public class XoverSiteTest
     @Test
     public void testProjectToClonedGraphs() throws Exception
     {
-        DENOPTIMGraphTest.prepareFragmentSpace();
+        DENOPTIMGraphTest.prepare();
         DENOPTIMGraph gA = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
         DENOPTIMGraph gB = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
         

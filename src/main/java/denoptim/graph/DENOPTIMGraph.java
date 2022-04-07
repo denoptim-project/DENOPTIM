@@ -61,7 +61,6 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.fragspace.FragmentSpaceUtils;
 import denoptim.graph.APClass.APClassDeserializer;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.graph.DENOPTIMVertex.BBType;
@@ -893,7 +892,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> if the operation is successful.
      * @throws DENOPTIMException
      */
-    public boolean removeVertexAndWeld(DENOPTIMVertex vertex) throws DENOPTIMException
+    public boolean removeVertexAndWeld(DENOPTIMVertex vertex,
+            FragmentSpace fragSpace) throws DENOPTIMException
     {
         if (!gVertices.contains(vertex))
         {
@@ -910,7 +910,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         for (DENOPTIMVertex oldLink : symSites)
         {
             GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
-            if (!removeSingleVertexAndWeld(oldLink))
+            if (!removeSingleVertexAndWeld(oldLink, fragSpace))
             {
                 return false;
             }
@@ -944,8 +944,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> if the operation is successful.
      * @throws DENOPTIMException
      */
-    public boolean removeSingleVertexAndWeld(DENOPTIMVertex vertex) 
-            throws DENOPTIMException
+    public boolean removeSingleVertexAndWeld(DENOPTIMVertex vertex, 
+            FragmentSpace fragSpace) throws DENOPTIMException
     {
         if (!gVertices.contains(vertex))
         {
@@ -974,7 +974,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             if (gVertices.size()==1 && templateJacket!=null)
             {
                 return templateJacket.getGraphOwner().removeSingleVertexAndWeld(
-                        templateJacket);
+                        templateJacket, fragSpace);
             }
         }
         
@@ -1013,7 +1013,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         
         // Get all possible parentAPs-childAPs mappings
-        List<APMapping> mappings = FragmentSpaceUtils.mapAPClassCompatibilities(
+        List<APMapping> mappings = fragSpace.mapAPClassCompatibilities(
                 freeAPsOnParent, needyAPsOnChildren, 500);
         if (mappings.size() == 0)
         {
@@ -1339,8 +1339,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      */
     public boolean replaceSubGraph(List<DENOPTIMVertex> subGrpVrtxs, 
             DENOPTIMGraph incomingGraph, 
-            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
-                    throws DENOPTIMException
+            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap,
+            FragmentSpace fragSpace) throws DENOPTIMException
     {
         for (DENOPTIMVertex vToRemove : subGrpVrtxs)
         {
@@ -1400,7 +1400,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 return false;
             }
-            addCappingGroups(vertexAddedToThis);
+            addCappingGroups(vertexAddedToThis, fragSpace);
         }
         convertSymmetricLabelsToSymmetricSets();
         return true;
@@ -1857,7 +1857,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException
      */
     public boolean replaceVertex(DENOPTIMVertex vertex, int bbId, BBType bbt,
-            LinkedHashMap<Integer, Integer> apIdMap) throws DENOPTIMException
+            LinkedHashMap<Integer, Integer> apIdMap, FragmentSpace fragSpace)
+                    throws DENOPTIMException
     {
         if (!gVertices.contains(vertex))
         {
@@ -1872,7 +1873,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         
         GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
         DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), bbId, bbt);
+                GraphUtils.getUniqueVertexIndex(), bbId, bbt, fragSpace);
         DENOPTIMGraph incomingGraph = new DENOPTIMGraph();
         incomingGraph.addVertex(newLink);
         incomingGraph.reassignSymmetricLabels();
@@ -1929,7 +1930,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
     //NB: LinkedHashMap is used to retain reproducibility between runs.
     
     public boolean insertVertex(DENOPTIMEdge edge, int bbId, BBType bbt,
-            LinkedHashMap<DENOPTIMAttachmentPoint,Integer> apMap) 
+            LinkedHashMap<DENOPTIMAttachmentPoint,Integer> apMap, 
+            FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {
         if (!gEdges.contains(edge))
@@ -1968,7 +1970,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             
             GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
             DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
-                    GraphUtils.getUniqueVertexIndex(), bbId, bbt);
+                    GraphUtils.getUniqueVertexIndex(), bbId, bbt, fragSpace);
             newSS.add(newLink.getVertexId());
             LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apToApMap =
                     new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
@@ -3440,12 +3442,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * to be capped
      */
 
-    public boolean graphNeedsCappingGroups()
+    public boolean graphNeedsCappingGroups(FragmentSpace fragSpace)
     {
         for (DENOPTIMVertex v : getVertexList()) {
             for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints()) {
-                if (ap.isAvailable()
-                        && FragmentSpace.getAPClassOfCappingVertex(ap.getAPClass()) !=null
+                if (ap.isAvailable()  && fragSpace.getAPClassOfCappingVertex(
+                        ap.getAPClass()) !=null
                 ) {
                     return true;
                 }
@@ -3545,11 +3547,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * for a symmetric graph.
      */
 
-    public void addCappingGroups() throws DENOPTIMException
+    public void addCappingGroups(FragmentSpace fragSpace) throws DENOPTIMException
     {
-        if (!FragmentSpace.useAPclassBasedApproach())
+        if (!fragSpace.useAPclassBasedApproach())
             return;
-        addCappingGroups(new ArrayList<DENOPTIMVertex>(gVertices));
+        addCappingGroups(new ArrayList<DENOPTIMVertex>(gVertices), fragSpace);
     }
     
 //------------------------------------------------------------------------------
@@ -3568,10 +3570,11 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * performed.
      */
 
-    public void addCappingGroups(List<DENOPTIMVertex> vertexAddedToThis)
+    public void addCappingGroups(List<DENOPTIMVertex> vertexAddedToThis, 
+            FragmentSpace fragSpace)
                                                     throws DENOPTIMException
     {
-        if (!FragmentSpace.useAPclassBasedApproach())
+        if (!fragSpace.useAPclassBasedApproach())
             return;
 
         for (DENOPTIMVertex curVertex : vertexAddedToThis)
@@ -3590,19 +3593,18 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 if (curDap.isAvailableThroughout())
                 {
-                    APClass apcCap = FragmentSpace.getAPClassOfCappingVertex(
+                    APClass apcCap = fragSpace.getAPClassOfCappingVertex(
                             curDap.getAPClass());
                     if (apcCap != null)
                     {
-                        int bbIdCap = FragmentSpace.getCappingFragment(apcCap);
+                        int bbIdCap = fragSpace.getCappingFragment(apcCap);
 
                         if (bbIdCap != -1)
                         {
                             DENOPTIMVertex capVrtx = 
                                     DENOPTIMVertex.newVertexFromLibrary(
                                         GraphUtils.getUniqueVertexIndex(), 
-                                        bbIdCap, 
-                                        DENOPTIMVertex.BBType.CAP);
+                                        bbIdCap, BBType.CAP, fragSpace);
                             DENOPTIMGraph molGraph = curDap.getOwner()
                                     .getGraphOwner();
                             if (molGraph == null)
@@ -4111,7 +4113,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @throws DENOPTIMException is any assumption on the healthy structure of 
      * this graph is not verified.
      */
-    public boolean removeChainUpToBranching(DENOPTIMVertex v) throws DENOPTIMException
+    public boolean removeChainUpToBranching(DENOPTIMVertex v, 
+            FragmentSpace fragSpace) throws DENOPTIMException
     {
         List<DENOPTIMRing> rings = getRingsInvolvingVertex(v);
         if (rings.isEmpty())
@@ -4376,7 +4379,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                             DENOPTIMAttachmentPoint newTrgAP = 
                                     edgeToPrevious.getSrcAP();
                             if (newSrcAP.getAPClass().isCPMapCompatibleWith(
-                                    newTrgAP.getAPClass()))
+                                    newTrgAP.getAPClass(), fragSpace))
                             {
                                 BondType oldBt = edgeToPrevious.getBondType();
                                 removeEdge(edgeToPrevious);
@@ -4716,9 +4719,9 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         mol.setProperty("ROT_BND", nrot);
 
         // 1D) unacceptable free APs
-        if (FragmentSpace.useAPclassBasedApproach())
+        if (fsSettings.getFragmentSpace().useAPclassBasedApproach())
         {
-            if (hasForbiddenEnd())
+            if (hasForbiddenEnd(fsSettings.getFragmentSpace()))
             {
                 String msg = "Evaluation of graph: forbidden end in graph!";
                 DENOPTIMLogger.appLogger.log(Level.INFO, msg);
@@ -4830,7 +4833,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
         }
         ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<>();
 
-        boolean rcnEnabled = FragmentSpace.useAPclassBasedApproach();
+        boolean rcnEnabled = fsSettings.getFragmentSpace()
+                .useAPclassBasedApproach();
         if (!rcnEnabled)
             return lstGraphs;
 
@@ -4848,7 +4852,8 @@ public class DENOPTIMGraph implements Serializable, Cloneable
                 fsSettings.getRotSpaceDefFile(), true, true);
 
         // get the set of possible RCA combinations = ring closures
-        CyclicGraphHandler cgh = new CyclicGraphHandler(rcSettings);
+        CyclicGraphHandler cgh = new CyclicGraphHandler(rcSettings,
+                fsSettings.getFragmentSpace());
         ArrayList<List<DENOPTIMRing>> allCombsOfRings =
                 cgh.getPossibleCombinationOfRings(mol, this);
 
@@ -4905,10 +4910,10 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> if a forbidden end is found
      */
 
-    public boolean hasForbiddenEnd()
+    public boolean hasForbiddenEnd(FragmentSpace fragSpace)
     {
         ArrayList<DENOPTIMVertex> vertices = getVertexList();
-        Set<APClass> classOfForbEnds = FragmentSpace.getForbiddenEndList();
+        Set<APClass> classOfForbEnds = fragSpace.getForbiddenEndList();
         boolean found = false;
         for (DENOPTIMVertex vtx : vertices)
         {
@@ -5910,7 +5915,7 @@ public class DENOPTIMGraph implements Serializable, Cloneable
             {
                 for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
                 {
-                    ap.setID(FragmentSpace.apID.getAndIncrement());
+                    ap.setID(GraphUtils.getUniqueAPIndex());
                 }
             }
         }
@@ -6251,11 +6256,12 @@ public class DENOPTIMGraph implements Serializable, Cloneable
      * @return <code>true</code> if the all edges can be reverted and retain
      * consistency with {@link APClass} compatibility rules.
      */
-    public boolean isReversible()
+    public boolean isReversible(FragmentSpace fragSpace)
     {
         for (DENOPTIMEdge e : gEdges)
         {
-            if (!e.getTrgAPClass().isCPMapCompatibleWith(e.getSrcAPClass()))
+            if (!e.getTrgAPClass().isCPMapCompatibleWith(e.getSrcAPClass(),
+                    fragSpace))
             {
                 return false;
             }

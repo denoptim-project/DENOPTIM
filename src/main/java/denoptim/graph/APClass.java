@@ -422,14 +422,15 @@ public class APClass implements Cloneable,Comparable<APClass>
     /**
      * Check compatibility as defined in the compatibility matrix considering
      * this AP as source and the other as target.
-     * @param other
+     * @param other AP.
+     * @param the fragment space that defines APClass compatibility rules.
      * @return <code>true</code> is APs of these two classes are allowed to
      * form new vertex-vertex connections where this AP is source and other is
      * target.
      */
-    public boolean isCPMapCompatibleWith(APClass other)
+    public boolean isCPMapCompatibleWith(APClass other, FragmentSpace fragSpace)
     {
-        return FragmentSpace.getCompatibleAPClasses(this).contains(other);
+        return fragSpace.getCompatibleAPClasses(this).contains(other);
     }
 
 //------------------------------------------------------------------------------

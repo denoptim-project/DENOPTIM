@@ -27,6 +27,8 @@ import java.util.Set;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.DENOPTIMGraphOperations;
 import denoptim.ga.XoverSite;
 import denoptim.graph.DENOPTIMGraph;
@@ -55,6 +57,11 @@ public class GeneOpsRunner extends ProgramTask
      * Settings from input parameters
      */
     private GeneOpsRunnerParameters settings;
+    
+    /**
+     * Fragment space in use
+     */
+    private FragmentSpace fragSpace;
 
 //------------------------------------------------------------------------------
   
@@ -78,7 +85,14 @@ public class GeneOpsRunner extends ProgramTask
         goParams.checkParameters();
         goParams.processParameters();
 
-        this.settings = goParams;
+        this.settings = goParams;       
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        this.fragSpace = fsParams.getFragmentSpace();
         
         switch (goParams.operatorToTest)
         {
@@ -121,6 +135,8 @@ public class GeneOpsRunner extends ProgramTask
             gaParams = ((GAParameters) settings.getParameters(
                     ParametersType.GA_PARAMS));
         }
+        gaParams.setParameters(((FragmentSpaceParameters) settings.getParameters(
+                    ParametersType.FS_PARAMS)));
         
         if (mt != null)
         {
@@ -214,7 +230,7 @@ public class GeneOpsRunner extends ProgramTask
         System.out.println("v:" + vf.getVertexId() + " of FEMALE: " + female);
         System.out.println(" ");
         
-        DENOPTIMGraphOperations.performCrossover(xos);
+        DENOPTIMGraphOperations.performCrossover(xos, fragSpace);
     
         System.out.println("Result of crossover:");
         System.out.println("MALE: " + male);

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.EAUtils;
 import denoptim.ga.Population;
 import denoptim.ga.EAUtils.CandidateSource;
@@ -49,7 +50,7 @@ public class EAUtilsTest
     
 //------------------------------------------------------------------------------
     
-    private void prepareFragmentSpace() throws DENOPTIMException
+    private FragmentSpaceParameters prepare() throws DENOPTIMException
     {
         APCA = APClass.make(a, 0,BondType.SINGLE);
         APCB = APClass.make(b, 1,BondType.SINGLE);
@@ -84,52 +85,49 @@ public class EAUtilsTest
         HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         
-        FragmentSpace.setCompatibilityMatrix(cpMap);
-        FragmentSpace.setCappingMap(capMap);
-        FragmentSpace.setForbiddenEndList(forbEnds);
-        FragmentSpace.setAPclassBasedApproach(true);
-        
-        FragmentSpace.setScaffoldLibrary(new ArrayList<DENOPTIMVertex>());
-        FragmentSpace.setFragmentLibrary(new ArrayList<DENOPTIMVertex>());
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(),
+                new ArrayList<DENOPTIMVertex>(), 
+                cpMap, capMap, forbEnds, cpMap);
+        fs.setAPclassBasedApproach(true);
         
         EmptyVertex v1 = new EmptyVertex();
         v1.setBuildingBlockType(BBType.FRAGMENT);
         v1.addAP(APCB);
         v1.addAP(APCB);
-        FragmentSpace.appendVertexToLibrary(v1, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v1, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex v2 = new EmptyVertex();
         v2.setBuildingBlockType(BBType.FRAGMENT);
         v2.addAP(APCC);
         v2.addAP(APCC);
-        FragmentSpace.appendVertexToLibrary(v2, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(v2, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         EmptyVertex rcv = new EmptyVertex();
         rcv.setBuildingBlockType(BBType.FRAGMENT);
         rcv.addAP(APCC);
         rcv.setAsRCV(true);
-        FragmentSpace.appendVertexToLibrary(rcv, BBType.FRAGMENT,
-                FragmentSpace.getFragmentLibrary());
+        fs.appendVertexToLibrary(rcv, BBType.FRAGMENT, fs.getFragmentLibrary());
         
         DENOPTIMGraph graphForTemplate = new DENOPTIMGraph();
         DENOPTIMVertex vg1 = DENOPTIMVertex.newVertexFromLibrary(0,
-                        BBType.FRAGMENT);
+                        BBType.FRAGMENT, fs);
         graphForTemplate.addVertex(vg1);
         for (int i=1; i<6; i++)
         {
             DENOPTIMVertex vgi = DENOPTIMVertex.newVertexFromLibrary(0,
-                    BBType.FRAGMENT);
+                    BBType.FRAGMENT, fs);
             DENOPTIMVertex vgi_1 = graphForTemplate.getVertexAtPosition(i-1);
             graphForTemplate.appendVertexOnAP(vgi_1.getAP(1), vgi.getAP(0));
         }
         DENOPTIMVertex rcv1 = DENOPTIMVertex.newVertexFromLibrary(2,
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         graphForTemplate.appendVertexOnAP(
                 graphForTemplate.getVertexAtPosition(5).getAP(1),rcv1.getAP(0));
         DENOPTIMVertex rcv2 = DENOPTIMVertex.newVertexFromLibrary(2,
-                BBType.FRAGMENT);
+                BBType.FRAGMENT, fs);
         graphForTemplate.appendVertexOnAP(
                 graphForTemplate.getVertexAtPosition(0).getAP(0),rcv2.getAP(0));
         graphForTemplate.addRing(rcv1, rcv2);
@@ -137,18 +135,21 @@ public class EAUtilsTest
         DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.SCAFFOLD);
         template.setInnerGraph(graphForTemplate);
         template.setContractLevel(ContractLevel.FIXED_STRUCT);
-        FragmentSpace.appendVertexToLibrary(template, BBType.SCAFFOLD,
-                FragmentSpace.getScaffoldLibrary());
+        fs.appendVertexToLibrary(template, BBType.SCAFFOLD,
+                fs.getScaffoldLibrary());
+        
+        return fsp;
     }
 
 //------------------------------------------------------------------------------
 
     @Test
     public void testBuildGraphFromTemplateScaffold() throws Exception
-    {      
-        prepareFragmentSpace();
-        
-        DENOPTIMGraph g = EAUtils.buildGraph(new GAParameters());
+    {
+        FragmentSpaceParameters fsp = prepare();
+        GAParameters gaParams = new GAParameters();
+        gaParams.setParameters(fsp);
+        DENOPTIMGraph g = EAUtils.buildGraph(gaParams);
         
         if (g == null)
             assertTrue(false,"faild construction of graph");
@@ -193,16 +194,20 @@ public class EAUtilsTest
         DENOPTIMGraph g2 = g1.clone();
         Candidate c2 = new Candidate(g2);
         
+        FragmentSpaceParameters fsp = prepare();
+        GAParameters gaParams = new GAParameters();
+        gaParams.setParameters(fsp);
+        
         ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
         eligibleParents.add(c1);
         eligibleParents.add(c2);
-        Population population = new Population(new GAParameters());
+        Population population = new Population(gaParams);
         population.add(c1);
         population.add(c2);
         Monitor mnt = new Monitor();
         
         Candidate offspring = EAUtils.buildCandidateByXOver(eligibleParents, 
-                population, mnt, new GAParameters());
+                population, mnt, gaParams);
         
         assertTrue(offspring==null, "Redundat xover is not done");
     }

@@ -27,6 +27,7 @@ import denoptim.combinatorial.CEBLParameters;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Candidate;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
@@ -45,6 +46,11 @@ public class FitnessEvaluationTask extends FitnessTask
      */
     private FRParameters frSettings = null;
     
+    /**
+     * Fragment space in use.
+     */
+    private FragmentSpace fragSpace;
+    
 //------------------------------------------------------------------------------
     
     /**
@@ -59,6 +65,13 @@ public class FitnessEvaluationTask extends FitnessTask
     {
     	super((FitnessParameters) settings.getParameters(
                 ParametersType.FIT_PARAMS), new Candidate(molGraph));
+    	FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        this.fragSpace = fsParams.getFragmentSpace();
         this.workDir = new File(workDir);
         this.frSettings = settings;
         fitProvMol = iac;
@@ -81,7 +94,8 @@ public class FitnessEvaluationTask extends FitnessTask
                 DENOPTIMGraph gWithNoRCVs = dGraph.clone();
                 
                 //NB: this replaces unused RCVs with capping groups
-                GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs);
+                GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs,
+                        fragSpace);
                 
                 // To get a proper molecular representation we need
                 // 1) build a 3d tree
@@ -122,7 +136,7 @@ public class FitnessEvaluationTask extends FitnessTask
         
         if (frSettings.addTemplatesToLibraries)
         {   
-            FragmentSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
+            fragSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
                     true, true, fitProvMol);
         }
 
