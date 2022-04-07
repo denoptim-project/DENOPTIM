@@ -30,6 +30,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -54,13 +55,6 @@ public class GraphEdParameters extends RunTimeParameters
      * File with input graphs
      */
     private String inGraphsFile = null;
-    
-
-    //TODO: get rid of these and detect file format
-    protected final String STRINGFORMATLABEL = "STRING";
-    protected final String SERFORMATLABEL = "SER";
-    //TODO: use FileFormat
-    private String inGraphsFormat = STRINGFORMATLABEL; //Default
 
     /**
      * Input graphs
@@ -87,7 +81,7 @@ public class GraphEdParameters extends RunTimeParameters
      * File with output graphs
      */
     private String outGraphsFile = null;
-    private String outGraphsFormat = STRINGFORMATLABEL; //Default
+    private FileFormat outGraphsFormat = FileFormat.GRAPHSDF;
 
     /**
      * Flag controlling strategy with respect to symmetry
@@ -134,25 +128,18 @@ public class GraphEdParameters extends RunTimeParameters
 
 //-----------------------------------------------------------------------------
 
-    public String getInFormat()
-    {
-        return inGraphsFormat;
-    }
-
-//-----------------------------------------------------------------------------
-
-    public String getOutFormat()
-    {
-        return outGraphsFormat;
-    }
-
-//-----------------------------------------------------------------------------
-
     public boolean symmetryFlag()
     {
         return symmetry;
     }
 
+//-----------------------------------------------------------------------------
+    
+    public FileFormat getOutFormat()
+    {
+        return outGraphsFormat;
+    }
+    
 //-----------------------------------------------------------------------------
 
     /**
@@ -187,11 +174,18 @@ public class GraphEdParameters extends RunTimeParameters
         case "OUTPUTGRAPHS=":
             outGraphsFile = value;
             break;
-        case "INPUTGRAPHSFORMAT=":
-            inGraphsFormat = value.toUpperCase();
-            break;
         case "OUTPUTGRAPHSFORMAT=":
-            outGraphsFormat = value.toUpperCase();
+            switch (value.toUpperCase())
+            {
+                case "SDF":
+                    outGraphsFormat = FileFormat.GRAPHSDF;
+                    break;
+                case "JSON":
+                    outGraphsFormat = FileFormat.GRAPHJSON;
+                    break;
+                default:
+                    outGraphsFormat = FileFormat.valueOf(value.toUpperCase());
+            }
             break;
     	case "LOGFILE=":
     	    logFile = value;
@@ -266,7 +260,7 @@ public class GraphEdParameters extends RunTimeParameters
 
         if (inGraphsFile == null)
         {
-            msg = "Input file with graphs to edit not define. Check you input.";
+            msg = "Input file with graphs to edit not defined. Check you input.";
             throw new DENOPTIMException(msg);
 	    }
         else if (inGraphsFile != null && !FileUtils.checkExists(inGraphsFile))
@@ -274,11 +268,6 @@ public class GraphEdParameters extends RunTimeParameters
             msg = "File with input graphs not found. Check " + inGraphsFile;
             throw new DENOPTIMException(msg);
         }
-	    else
-	    {
-	        inGraphsFormat = FilenameUtils.getExtension(
-			    			    inGraphsFile).toUpperCase();
-	    }
 
         if (graphEditsFile != null && !FileUtils.checkExists(graphEditsFile))
         {
@@ -293,47 +282,6 @@ public class GraphEdParameters extends RunTimeParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (inGraphsFormat != null 
-            && !inGraphsFormat.equals("SDF")
-            && !inGraphsFormat.equals(STRINGFORMATLABEL)
-            && !inGraphsFormat.equals(SERFORMATLABEL))
-        {
-            msg = " The format for providing input graph must be either '" 
-                  + STRINGFORMATLABEL + "' (default) for human readable "
-                  + "strings, or '" + SERFORMATLABEL 
-                  + "' for serialized objects. "
-                  + "Unable to understand '" + inGraphsFormat + "'.";
-            throw new DENOPTIMException(msg);
-        }
-        else if (inGraphsFormat.equals(STRINGFORMATLABEL))
-        {
-            msg = "When in graphs are given as '"+ STRINGFORMATLABEL 
-                  + "' existing symmetry relations between vertices belonging "
-                  + "to the in graphs are NOT perceived. Symmetry may only "
-                  + "be enforced starting from the first new layer of "
-                  + "vertices.";
-            DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
-        }
-        else if (inGraphsFormat.equals(SERFORMATLABEL))
-        {
-            msg = "For now, only one serialized DENOPTIMGraph can by "
-                  + "given as user-defined input graph using format '" 
-                  + SERFORMATLABEL + "'.";
-            DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
-        }
-
-        if (outGraphsFormat != null
-            && !outGraphsFormat.equals("SDF")
-            && !outGraphsFormat.equals(STRINGFORMATLABEL)
-            && !outGraphsFormat.equals(SERFORMATLABEL))
-        {
-            msg = " The format chosed for output graphs must be either '"
-                  + STRINGFORMATLABEL + "' (default) for human readable "
-                  + "strings, or '" + SERFORMATLABEL
-                  + "' for serialized objects. "
-                  + "Unable to understand '" + inGraphsFormat + "'.";
-            throw new DENOPTIMException(msg);
-        }
         checkOtherParameters();
     }
 
@@ -386,46 +334,12 @@ public class GraphEdParameters extends RunTimeParameters
     
 //-----------------------------------------------------------------------------
     
-    protected void readInputGraphs(FragmentSpace fragSpace) throws DENOPTIMException
+    protected void readInputGraphs() throws DENOPTIMException
     {
         try
         {
-            switch (inGraphsFormat)
-            {
-                case (STRINGFORMATLABEL):
-                {
-                    inGraphs = DenoptimIO.readDENOPTIMGraphsFromTxtFile(
-                            inGraphsFile, fragSpace);
-                    break;
-                }
-                case (SERFORMATLABEL):
-                {
-                    //TODO get arraylist of graphs or accept multiple files
-                    DENOPTIMGraph g = DenoptimIO.deserializeDENOPTIMGraph(
-                                                        new File(inGraphsFile));
-                    inGraphs.add(g);
-                    break;
-                }
-                case ("SDF"):
-                {
-                    inMols = DenoptimIO.readSDFFile(inGraphsFile);
-                    int i = 0;
-                    for (IAtomContainer m : inMols)
-                    {
-                        i++;
-                        DENOPTIMGraph g = DenoptimIO.readGraphFromSDFileIAC(m, 
-                                i, inGraphsFile);
-                        inGraphs.add(g);
-                    }
-                    break;
-                }
-                default:
-                {
-                    String msg = "'" + inGraphsFormat + "'"
-                                         + " is not a valid format for graphs.";
-                    throw new DENOPTIMException(msg);
-                }
-            }
+            inGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(new File(
+                    inGraphsFile));
         }
         catch (Throwable t)
         {

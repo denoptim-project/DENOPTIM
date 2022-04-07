@@ -19,6 +19,8 @@
 package denoptim.programs.grapheditor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -39,10 +41,6 @@ import denoptim.task.ProgramTask;
 
 public class GraphEditor extends ProgramTask
 {
-    /**
-     * Fragment space in use.
-     */
-    private FragmentSpace fragSpace;
 
 //------------------------------------------------------------------------------
     
@@ -68,16 +66,10 @@ public class GraphEditor extends ProgramTask
         geParams.printParameters();
         
         // We might need the fragment space to read the input graphs with 
-        // string-based encoding.
-        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
-        if (geParams.containsParameters(ParametersType.FS_PARAMS))
-        {
-            fsParams = (FragmentSpaceParameters)geParams.getParameters(
-                    ParametersType.FS_PARAMS);
-        }
-        this.fragSpace = fsParams.getFragmentSpace();
-        geParams.readInputGraphs(fragSpace);
+        // string-based encoding. Therefore, we read the graph after.
+        geParams.readInputGraphs();
 
+        List<DENOPTIMGraph> modGraphs = new ArrayList<DENOPTIMGraph>();
         int i = -1;
         for (DENOPTIMGraph graph : geParams.getInputGraphs())
         {
@@ -85,54 +77,11 @@ public class GraphEditor extends ProgramTask
             DENOPTIMGraph modGraph = graph.editGraph(
                     geParams.getGraphEditTasks(),
                     geParams.symmetryFlag(),
-                    geParams.getVerbosity()
-            );
-           
-            if (geParams.getVerbosity() > 0)
-            {
-                System.out.println("Original graph: ");
-                System.out.println(graph.toString());
-                System.out.println("Modified graph: ");
-                System.out.println(modGraph.toString());
-            }
-            
-            //TODO: upgrade to I/O with sepcification of format
-
-            switch (geParams.getOutFormat())
-            {
-                case ("STRING"):
-                {
-                    DenoptimIO.writeData(geParams.getOutFile(),
-                            modGraph.toString(),true);
-                    break;
-                }
-                case ("SER"):
-                {
-                    DenoptimIO.serializeToFile(geParams.getOutFile(),
-                            modGraph.toString(),true);
-                    break;
-                }
-                case ("SDF"):
-                {
-
-                    ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
-                    IAtomContainer newMol = t3d
-                            .convertGraphTo3DAtomContainer(modGraph,true);
-                    if (geParams.getInFormat().equals("SDF"))
-                    {
-                        IAtomContainer oldMol = geParams.getInpMol(i);
-                        if (oldMol.getProperty("cdk:Title") != null)
-                        {
-                        	String name = oldMol.getProperty(
-                                                    "cdk:Title").toString();
-                        	newMol.setProperty("cdk:Title",name);
-                        }
-                    }
-                    DenoptimIO.writeSDFFile(geParams.getOutFile(), newMol, true);
-                    break;
-                }
-            }
+                    geParams.getVerbosity());
+            modGraphs.add(modGraph);
         }
+        DenoptimIO.writeGraphsToFile(new File(geParams.getOutFile()), 
+                geParams.getOutFormat(), modGraphs);
     }
     
 //-----------------------------------------------------------------------------
