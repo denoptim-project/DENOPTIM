@@ -146,13 +146,20 @@ fi
 cd "$wDir"
 
 # Run a selected test
-if [[ "$chosenTest" == t* ]]
+if [ ! -z "$chosenTest" ]
 then
-    runTest "$chosenTest"
-    exit 0
+    if [[ "$chosenTest" =~ ^[t,p].*$ ]]
+    then
+        runTest "$chosenTest"
+        exit 0
+    elif [[ "$chosenTest" =~ ^[1-9]*$ ]]
+    then
+        runTest "t$chosenTest"
+        exit 0
+    fi
 fi
 
-# Run tests
+# Run all tests
 
 #
 # t1: use DenoptimCG to build funny molecules.
