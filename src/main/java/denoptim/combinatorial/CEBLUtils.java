@@ -28,10 +28,14 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.SingletonFileAccess;
 import denoptim.graph.DENOPTIMGraph;
+import denoptim.io.DenoptimIO;
 
 
 /**
@@ -214,75 +218,30 @@ public class CEBLUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Store the checkpoint in a serialized form
+     * Store the checkpoint in a text file with json format.
      */
 
     protected static void serializeCheckPoint(CEBLParameters settings) 
             throws DENOPTIMException
     {
-        FileOutputStream fos = null;
-        ObjectOutputStream oos = null;
-        try
-        {
-            fos = new FileOutputStream(settings.getCheckPointName(),false);
-            oos = new ObjectOutputStream(fos);
-            oos.writeObject(settings.getCheckPoint());
-            oos.close();
-        }
-        catch (Throwable t)
-        {
-            throw new DENOPTIMException("Cannot serialize checkpoint.", t);
-        }
-        finally
-        {
-            try
-            {
-                fos.flush();
-                fos.close();
-                fos = null;
-            }
-            catch (Throwable t)
-            {
-                throw new DENOPTIMException("cannot close FileOutputStream",t);
-            }
-        }
+        Gson writer = new GsonBuilder().setPrettyPrinting().create();
+        DenoptimIO.writeData(settings.getCheckPointName(), writer.toJson(
+                settings.getCheckPoint()), false);
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Converts a binary file into the corresponding checkpoint object
-     * @param file the pathname of the file to convert
+     * Converts a text file into the corresponding checkpoint object.
+     * @param file the pathname of the file to convert.
      */
 
     public static CheckPoint deserializeCheckpoint(String file)
-                                                        throws DENOPTIMException
+            throws DENOPTIMException
     {
-        CheckPoint chkpt = null;
-        FileInputStream fis = null;
-        ObjectInputStream ois = null;
-        try
-        {
-            fis = new FileInputStream(new File(file));
-            ois = new ObjectInputStream(fis);
-            chkpt = (CheckPoint) ois.readObject();
-            ois.close();
-        }
-        catch (Throwable t)
-        {
-            throw new DENOPTIMException(t);
-        }
-        finally
-        {
-            try
-            {
-                fis.close();
-            }
-            catch (Throwable t)
-            {
-                throw new DENOPTIMException(t);
-            }
-        }
+        String s = DenoptimIO.readText(file);
+        Gson writer = new GsonBuilder().create();
+        CheckPoint chkpt = writer.fromJson(s, CheckPoint.class);
         return chkpt;
     }
 

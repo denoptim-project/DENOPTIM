@@ -19,7 +19,6 @@
 package denoptim.combinatorial;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -37,44 +36,42 @@ import java.util.ArrayList;
  * @author Marco Foscato
  */
 
-//TODO: use json
-
-public class CheckPoint implements Serializable
+public class CheckPoint
 {
     /**
      * Level
      */
-    private int level = -1;
+    protected int level = -1;
 
     /** 
      * Unique vertex index
      */
-    private int unqVrtId = -1;
+    protected int unqVrtId = -1;
 
     /**
      * Unique graph index
      */
-    private int unqGraphId = -1;
+    protected int unqGraphId = -1;
 
     /**
      * Unique molecule index
      */
-    private int unqMolId = -1;
+    protected int unqMolId = -1;
 
     /**
      * ID of the root graph used to build this graph
      */
-    private int rootId = -1;
+    protected int rootId = -1;
 
     /**
      * ID of safely completed graph
      */
-    private int graphId = -1;
+    protected int graphId = -1;
 
     /**
      * Set of indexes for the next iteration in combination of building blocks.
      */
-    private ArrayList<Integer> nextIds;
+    protected ArrayList<Integer> nextIds;
 
 
 //-----------------------------------------------------------------------------
