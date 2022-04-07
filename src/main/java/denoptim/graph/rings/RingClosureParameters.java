@@ -32,7 +32,6 @@ import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
 import denoptim.logging.DENOPTIMLogger;
 import denoptim.programs.RunTimeParameters;
-import denoptim.programs.RunTimeParameters.ParametersType;
 
 
 /**

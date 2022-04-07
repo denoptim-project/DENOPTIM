@@ -18,17 +18,11 @@
 
 package denoptim.programs.isomorphism;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Field;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
-import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.graph.rings.RingClosureParameters;
 import denoptim.programs.RunTimeParameters;
-import denoptim.programs.RunTimeParameters.ParametersType;
 
 
 /**

@@ -236,7 +236,6 @@ public class DenoptimIOTest
 	@Test
 	public void testSerializeDeserializeDENOPTIMGraphs() throws Exception {
 	    assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
-        String serFile = tempDir.getAbsolutePath() + SEP + "graph.ser";
         String jsonFile = tempDir.getAbsolutePath() + SEP + "graph.json";
         
 		DENOPTIMGraph graph = new DENOPTIMGraph();
@@ -282,17 +281,13 @@ public class DenoptimIOTest
 
 		graph.addSymmetricSetOfVertices(new SymmetricSet(
 				new ArrayList<>(Arrays.asList(6, 7))));
-
-		DenoptimIO.serializeToFile(serFile, graph, false);
-        DENOPTIMGraph graphA = DenoptimIO.deserializeDENOPTIMGraph(
-                new File(serFile));
-        StringBuilder reason = new StringBuilder();
-        assertTrue(graph.sameAs(graphA, reason));
         
 		DenoptimIO.writeData(jsonFile, graph.toJson(), false);
 		DENOPTIMGraph graphJ = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
 		        jsonFile).get(0);
 		assertNotNull(graphJ,"Graph read from JSON file is null");
+
+        StringBuilder reason = new StringBuilder();
 		assertTrue(graph.sameAs(graphJ, reason));
 	}
 

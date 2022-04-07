@@ -18,20 +18,13 @@
 
 package denoptim.programs.genetweeker;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
-import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.graph.rings.RingClosureParameters;
 import denoptim.programs.RunTimeParameters;
-import denoptim.programs.RunTimeParameters.ParametersType;
-import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;

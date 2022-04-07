@@ -19,7 +19,6 @@
 
 package denoptim.programs.denovo;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
@@ -27,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
-
-import org.apache.commons.io.FileUtils;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;

@@ -41,11 +41,6 @@ import java.util.ArrayList;
 public class RingClosingConformations implements Serializable
 {
     /**
-     * Version ID
-     */
-    private static final long serialVersionUID = 1L;
-    
-    /**
      * The identifier of the chain
      */
     private String chainID;
@@ -63,8 +58,8 @@ public class RingClosingConformations implements Serializable
 
     public RingClosingConformations()
     {
-	this.chainID = "";
-	this.lstConfs = new ArrayList<ArrayList<Double>>();
+    	this.chainID = "";
+    	this.lstConfs = new ArrayList<ArrayList<Double>>();
     }
 
 //-----------------------------------------------------------------------------

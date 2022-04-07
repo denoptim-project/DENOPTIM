@@ -23,7 +23,6 @@ import java.io.File;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import denoptim.combinatorial.CEBLParameters;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;

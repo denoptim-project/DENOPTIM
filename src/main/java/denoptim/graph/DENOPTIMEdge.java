@@ -18,7 +18,6 @@
 
 package denoptim.graph;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 
 import org.openscience.cdk.interfaces.IBond;
@@ -35,13 +34,8 @@ import denoptim.utils.GenUtils;
  * This class represents the edge between two vertices.
  */
 
-public class DENOPTIMEdge implements Serializable
+public class DENOPTIMEdge
 {
-    /**
-     * Version UID
-     */
-    private static final long serialVersionUID = 3L;
-
     /**
      * Attachment point at source end
      */

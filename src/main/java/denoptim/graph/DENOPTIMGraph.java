@@ -21,7 +21,6 @@ package denoptim.graph;
 
 import java.io.File;
 import java.io.Reader;
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -92,13 +91,8 @@ import denoptim.utils.RotationalSpaceUtils;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public class DENOPTIMGraph implements Serializable, Cloneable
+public class DENOPTIMGraph implements Cloneable
 {
-    /**
-     * Version UID
-     */
-    private static final long serialVersionUID = 8245921129778644804L;
-
     /**
      * The vertices belonging to this graph.
      */

@@ -19,7 +19,6 @@
 
 package denoptim.graph;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -34,7 +33,7 @@ import java.util.ArrayList;
  * @author Marco Foscato
  */
 
-public class SymmetricSet implements Serializable,Cloneable
+public class SymmetricSet implements Cloneable
 {
     private ArrayList<Integer> symIds;
 

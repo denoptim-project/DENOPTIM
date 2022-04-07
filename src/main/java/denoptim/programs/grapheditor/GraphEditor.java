@@ -22,14 +22,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.ProgramTask;
 
 

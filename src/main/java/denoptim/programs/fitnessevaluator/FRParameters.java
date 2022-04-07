@@ -18,19 +18,12 @@
 
 package denoptim.programs.fitnessevaluator;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Field;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.fitness.FitnessParameters;
-import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.graph.rings.RingClosureParameters;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.programs.RunTimeParameters;
 
 

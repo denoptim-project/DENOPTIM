@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 import denoptim.ga.EvolutionaryAlgorithm;
 import denoptim.ga.ExternalCmdsListener;
-import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.ProgramTask;
 
 /**

@@ -52,7 +52,6 @@ import denoptim.graph.DENOPTIMVertex;
 import denoptim.graph.DENOPTIMVertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.logging.DENOPTIMLogger;
-import denoptim.programs.RunTimeParameters;
 import denoptim.utils.DENOPTIMMoleculeUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;

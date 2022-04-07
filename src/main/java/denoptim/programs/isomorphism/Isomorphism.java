@@ -20,7 +20,6 @@ package denoptim.programs.isomorphism;
 
 import java.io.File;
 
-import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DENOPTIMGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.task.ProgramTask;

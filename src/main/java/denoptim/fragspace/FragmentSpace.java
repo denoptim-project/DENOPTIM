@@ -34,7 +34,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.UndetectedFileFormatException;
-import denoptim.fitness.FitnessParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
 import denoptim.graph.Candidate;

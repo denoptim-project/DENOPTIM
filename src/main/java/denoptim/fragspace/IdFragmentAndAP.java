@@ -18,7 +18,6 @@
 
 package denoptim.fragspace;
 
-import java.io.Serializable;
 
 import denoptim.graph.DENOPTIMVertex.BBType;
 
@@ -30,13 +29,8 @@ import denoptim.graph.DENOPTIMVertex.BBType;
  * @author Marco Foscato
  */
 
-public class IdFragmentAndAP implements Serializable
+public class IdFragmentAndAP
 {
-    /**
-     * Vedrsion UID
-     */
-    private static final long serialVersionUID = -863201756763649026L;
-
     /**
      * the ID of the vertex containing the fragment.
      */

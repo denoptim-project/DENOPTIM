@@ -31,7 +31,6 @@ import denoptim.graph.DENOPTIMGraph;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.MultiMolecularModelBuilder;
-import denoptim.programs.denovo.GAParameters;
 import denoptim.task.ProgramTask;
 
 /**

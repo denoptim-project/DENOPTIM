@@ -25,7 +25,6 @@ import java.util.HashMap;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.programs.RunTimeParameters;
 
 

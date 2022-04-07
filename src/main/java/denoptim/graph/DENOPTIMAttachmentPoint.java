@@ -19,13 +19,11 @@
 
 package denoptim.graph;
 
-import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import javax.vecmath.Point3d;
@@ -34,7 +32,6 @@ import org.openscience.cdk.interfaces.IAtom;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.DENOPTIMEdge.BondType;
 import denoptim.utils.GraphUtils;
 
@@ -53,14 +50,9 @@ import denoptim.utils.GraphUtils;
  */
 
 
-public class DENOPTIMAttachmentPoint implements Serializable, Cloneable, 
+public class DENOPTIMAttachmentPoint implements Cloneable, 
     Comparable<DENOPTIMAttachmentPoint>
 {
-    /**
-     * Version UID
-     */
-    private static final long serialVersionUID = 3L;
-    
     /**
      * Index used to keep the order in a list of attachment points
      */

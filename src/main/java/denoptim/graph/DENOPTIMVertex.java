@@ -19,7 +19,6 @@
 
 package denoptim.graph;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,13 +57,8 @@ import denoptim.utils.MutationType;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public abstract class DENOPTIMVertex implements Cloneable, Serializable
+public abstract class DENOPTIMVertex implements Cloneable
 {
-    /**
-     * Version UID
-     */
-    private static final long serialVersionUID = 3L;
-    
     /**
      * Graph that includes this vertex
      */

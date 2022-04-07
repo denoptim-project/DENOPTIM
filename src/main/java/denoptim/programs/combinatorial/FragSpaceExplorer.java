@@ -20,8 +20,8 @@ package denoptim.programs.combinatorial;
 
 import java.io.File;
 
-import denoptim.combinatorial.CombinatorialExplorerByLayer;
 import denoptim.combinatorial.CEBLParameters;
+import denoptim.combinatorial.CombinatorialExplorerByLayer;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.task.ProgramTask;
 

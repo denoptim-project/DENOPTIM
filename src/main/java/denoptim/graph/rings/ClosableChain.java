@@ -18,7 +18,6 @@
 
 package denoptim.graph.rings;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import denoptim.graph.DENOPTIMFragment;
@@ -32,13 +31,8 @@ import denoptim.graph.DENOPTIMVertex.BBType;
  * @author Marco Foscato 
  */
 
-public class ClosableChain implements Cloneable, Serializable
+public class ClosableChain implements Cloneable
 {
-    /**
-     * Version ID
-     */
-    private static final long serialVersionUID = 3L;
-
     /**
      * List of <code>ChainLink</code>s in this chain
      */

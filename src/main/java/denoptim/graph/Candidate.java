@@ -19,7 +19,6 @@
 package denoptim.graph;
 
 import java.io.File;
-import java.io.Serializable;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -28,7 +27,6 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.GraphConversionTool;
 
 
 /**
@@ -36,14 +34,8 @@ import denoptim.utils.GraphConversionTool;
  * representation and may include also fitness/error, and possibly other stuff.
  */
 
-public class Candidate implements Comparable<Candidate>, 
-Serializable, Cloneable
+public class Candidate implements Comparable<Candidate>, Cloneable
 {
-    /**
-	 * Version UID
-	 */
-	private static final long serialVersionUID = -3132192038061270220L;
-
     /**
      * Unique identifier of this candidate
      */

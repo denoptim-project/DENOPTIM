@@ -19,19 +19,12 @@
 
 package denoptim.programs.moldecularmodelbuilder;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.files.FileUtils;
-import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.graph.rings.RingClosureParameters;
 import denoptim.integration.tinker.TinkerUtils;
-import denoptim.logging.DENOPTIMLogger;
 import denoptim.molecularmodeling.MMBuilderUtils;
 import denoptim.programs.RunTimeParameters;
 

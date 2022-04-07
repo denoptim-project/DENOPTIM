@@ -19,28 +19,20 @@
 package denoptim.programs;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import denoptim.combinatorial.CEBLParameters;
 import denoptim.exception.DENOPTIMException;
-import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.graph.DENOPTIMGraph;
 import denoptim.graph.rings.RingClosureParameters;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.DENOPTIMLogger;
+import denoptim.main.Main.RunType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fitnessevaluator.FRParameters;
 import denoptim.programs.genetweeker.GeneOpsRunnerParameters;
@@ -48,7 +40,6 @@ import denoptim.programs.grapheditor.GraphEdParameters;
 import denoptim.programs.graphlisthandler.GraphListsHandlerParameters;
 import denoptim.programs.isomorphism.IsomorphismParameters;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
-import denoptim.task.ProgramTask;
 
 
 /**

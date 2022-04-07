@@ -18,7 +18,6 @@
 
 package denoptim.graph;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,9 +36,8 @@ import denoptim.graph.DENOPTIMEdge.BondType;
  *
  * @author Marco Foscato
  */
-public class DENOPTIMRing implements Serializable 
+public class DENOPTIMRing
 {
-
     /**
      * List of <code>DENOPTIMVertex</code> involved in the ring. 
      */

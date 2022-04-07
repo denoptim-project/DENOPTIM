@@ -18,7 +18,6 @@
 
 package denoptim.utils;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -27,7 +26,7 @@ import java.util.Objects;
  * it does not have a setValue method. 
  * @author Vishwesh Venkatraman
  */
-public class ObjectPair implements Serializable
+public class ObjectPair
 {
     private Object o1;
     private Object o2;

@@ -18,19 +18,12 @@
 
 package denoptim.integration.tinker;
 
-import java.io.Serializable;
-
 /**
  * Based on the code from ffx.kenai.com Michael J. Schnieders
  * @author Vishwesh Venkatraman
  */
-public class TinkerAtom implements Serializable, Cloneable
+public class TinkerAtom implements Cloneable
 {
-    /**
-     * Version ID
-     */
-    private static final long serialVersionUID = 3L;
-
     /*
      * tinker assigned atom type
      */

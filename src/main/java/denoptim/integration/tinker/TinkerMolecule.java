@@ -19,7 +19,6 @@
 
 package denoptim.integration.tinker;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -28,20 +27,14 @@ import java.util.ArrayList;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public class TinkerMolecule implements Serializable, Cloneable
-{
-    /**
-     * Version ID
-     */
-    private static final long serialVersionUID = 3L;
-    
+public class TinkerMolecule implements Cloneable
+{   
     private ArrayList<TinkerAtom> lstAtoms;
     ArrayList<int[]> zdel;
     ArrayList<int[]> zadd;
     String molName;
 
     private boolean debug = false;
-
 
 //------------------------------------------------------------------------------
 

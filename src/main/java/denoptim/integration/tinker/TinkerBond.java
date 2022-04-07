@@ -18,19 +18,12 @@
 
 package denoptim.integration.tinker;
 
-import java.io.Serializable;
-
 /**
  *
  * @author Vishwesh Venkatraman
  */
-public class TinkerBond implements Serializable,Cloneable
-{
-    /**
-     * Version ID
-     */
-    private static final long serialVersionUID = 3L;
-    
+public class TinkerBond implements Cloneable
+{   
     private TinkerAtom atoms[];
 
 //------------------------------------------------------------------------------
