@@ -83,7 +83,7 @@ public class DummyAtomHandler
         //Identify the target atoms to be treated
         for (IAtom atm : mol.atoms())
         {
-            String symbol = DENOPTIMMoleculeUtils.getSymbolOrLabel(atm);
+            String symbol = MoleculeUtils.getSymbolOrLabel(atm);
             if (elm.equals(""))
             {
                 if (!isElement(symbol))
@@ -136,7 +136,7 @@ public class DummyAtomHandler
         //Identify the target atoms to be treated
         for (IAtom atm : mol.atoms())
         {
-            String symbol = DENOPTIMMoleculeUtils.getSymbolOrLabel(atm);
+            String symbol = MoleculeUtils.getSymbolOrLabel(atm);
             if (elm.equals(""))
             {
                 if (!isElement(symbol))
@@ -212,7 +212,7 @@ public class DummyAtomHandler
                     for (IAtom sa : s)
                     {
                         System.err.print((mol.getAtomNumber(sa)+1)+
-                                DENOPTIMMoleculeUtils.getSymbolOrLabel(sa)+" ");
+                                MoleculeUtils.getSymbolOrLabel(sa)+" ");
                     }
                     System.err.println(" ");
                 }
@@ -317,10 +317,10 @@ public class DummyAtomHandler
                             {
                                 System.err.println("Making a bond between: " + 
                                     mol.getAtomNumber(ligandAtm) + 
-                                    DENOPTIMMoleculeUtils.getSymbolOrLabel(
+                                    MoleculeUtils.getSymbolOrLabel(
                                             ligandAtm) + " - " + 
                                     mol.getAtomNumber(centralAtm) + 
-                                    DENOPTIMMoleculeUtils.getSymbolOrLabel(
+                                    MoleculeUtils.getSymbolOrLabel(
                                             centralAtm));
                             }
                             IBond bnd = new Bond(ligandAtm,centralAtm);

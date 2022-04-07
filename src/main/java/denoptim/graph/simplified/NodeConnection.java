@@ -16,14 +16,16 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.graph;
+package denoptim.graph.simplified;
 
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge;
+import denoptim.graph.Vertex;
+import denoptim.graph.Edge.BondType;
 
 /**
  * This class represents an edge that is undirected and ignores attachment
  * points. This class represents a connection between {@link Node}s that
- * may or may not be {@link DENOPTIMVertex}s.
+ * may or may not be {@link Vertex}s.
  */
 
 public class NodeConnection 

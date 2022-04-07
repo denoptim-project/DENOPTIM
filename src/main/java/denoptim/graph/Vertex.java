@@ -44,7 +44,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.json.DENOPTIMgson;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
 
@@ -57,12 +57,12 @@ import denoptim.utils.MutationType;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public abstract class DENOPTIMVertex implements Cloneable
+public abstract class Vertex implements Cloneable
 {
     /**
      * Graph that includes this vertex
      */
-    private DENOPTIMGraph owner;
+    private DGraph owner;
 
     /**
      * Unique identifier associated with the vertex instance
@@ -134,7 +134,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      * scaffolds, fragments, and capping. 
      * Can be undefined, which is the default.
      */
-    protected BBType buildingBlockType = DENOPTIMVertex.BBType.UNDEFINED;
+    protected BBType buildingBlockType = Vertex.BBType.UNDEFINED;
 
     /*
      * Flag indicating that this as a ring closing vertex
@@ -148,7 +148,7 @@ public abstract class DENOPTIMVertex implements Cloneable
     
     /**
      * List of properties required to make 
-     * {@link DENOPTIMVertex#sameAs(DENOPTIMVertex, StringBuilder)} method
+     * {@link Vertex#sameAs(Vertex, StringBuilder)} method
      * return <code>false</code> when property values differ.
      */
     protected Set<String> uniquefyingPropertyKeys = new HashSet<String>();
@@ -160,7 +160,7 @@ public abstract class DENOPTIMVertex implements Cloneable
             new ArrayList<MutationType>(Arrays.asList(MutationType.values()));
     
     /**
-     * Field distinguishing subclasses of {@link DENOPTIMVertex} when 
+     * Field distinguishing subclasses of {@link Vertex} when 
      * deserializing JSON representations.
      */
     protected final VertexType vertexType;
@@ -186,7 +186,7 @@ public abstract class DENOPTIMVertex implements Cloneable
     /**
      * Constructor for an empty vertex.
      */
-    public DENOPTIMVertex(VertexType vertexType)
+    public Vertex(VertexType vertexType)
     {
         this.vertexType = vertexType;
         vertexId = GraphUtils.getUniqueVertexIndex();
@@ -202,7 +202,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      * {@link GraphUtils#getUniqueVertexIndex()} or use constructor
      * {@link DENOPTIMVertex()}.
      */
-    public DENOPTIMVertex(VertexType vertexType, int id)
+    public Vertex(VertexType vertexType, int id)
     {
         this(vertexType);
         vertexId = id;
@@ -217,8 +217,8 @@ public abstract class DENOPTIMVertex implements Cloneable
      * 2:capping group
      * @throws DENOPTIMException 
      */
-    public static DENOPTIMVertex newVertexFromLibrary(int bbId, 
-            DENOPTIMVertex.BBType bbt, FragmentSpace fragSpace) 
+    public static Vertex newVertexFromLibrary(int bbId, 
+            Vertex.BBType bbt, FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {
         return newVertexFromLibrary(GraphUtils.getUniqueVertexIndex(), bbId, bbt,
@@ -234,14 +234,14 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @param bbt the type of building block
      * @throws DENOPTIMException 
      */
-    public static DENOPTIMVertex newVertexFromLibrary(int vertexId, int bbId, 
-            DENOPTIMVertex.BBType bbt, FragmentSpace fragSpace) 
+    public static Vertex newVertexFromLibrary(int vertexId, int bbId, 
+            Vertex.BBType bbt, FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {   
         // The actual type of vertex
         // returned by this method depends on the what we get from the
         // FragmentSpace.getVertexFromLibrary call
-        DENOPTIMVertex v = fragSpace.getVertexFromLibrary(bbt,bbId);
+        Vertex v = fragSpace.getVertexFromLibrary(bbt,bbId);
         v.setVertexId(vertexId);
         
         v.setAsRCV(v.getNumberOfAPs() == 1
@@ -253,7 +253,7 @@ public abstract class DENOPTIMVertex implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public abstract ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints();
+    public abstract ArrayList<AttachmentPoint> getAttachmentPoints();
 
 //------------------------------------------------------------------------------
     
@@ -292,14 +292,14 @@ public abstract class DENOPTIMVertex implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMVertex.BBType getBuildingBlockType()
+    public Vertex.BBType getBuildingBlockType()
     {
         return buildingBlockType;
     }
     
 //------------------------------------------------------------------------------
 
-    public void setBuildingBlockType(DENOPTIMVertex.BBType buildingBlockType)
+    public void setBuildingBlockType(Vertex.BBType buildingBlockType)
     {
         this.buildingBlockType = buildingBlockType;
     }
@@ -347,7 +347,7 @@ public abstract class DENOPTIMVertex implements Cloneable
     public int getFreeAPCount()
     {
         int n = 0;
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        for (AttachmentPoint ap : getAttachmentPoints()) 
         {
             if (ap.isAvailable())
                 n++;
@@ -366,17 +366,17 @@ public abstract class DENOPTIMVertex implements Cloneable
      * then projected on the template's surface and used to make an edge that 
      * uses the template as a single vertex. To ignore this possibility and 
      * consider only edges that belong to the graph owning this vertex, use
-     * {@link DENOPTIMVertex#getFreeAPCount()}.
+     * {@link Vertex#getFreeAPCount()}.
      * @return the APs of this vertex that are not used by any edge, 
      * whether within
      * the graph owning this vertex (if any) or within a graph owning the
      * template embedding the graph that owns this vertex.
      */
-    public ArrayList<DENOPTIMAttachmentPoint> getFreeAPThroughout()
+    public ArrayList<AttachmentPoint> getFreeAPThroughout()
     {
-        ArrayList<DENOPTIMAttachmentPoint> lst = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        ArrayList<AttachmentPoint> lst = 
+                new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint ap : getAttachmentPoints()) 
         {
             if (ap.isAvailableThroughout())
                 lst.add(ap);
@@ -395,7 +395,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      * then projected on the template's surface and used to make an edge that 
      * uses the template as a single vertex. To ignore this possibility and 
      * consider only edges that belong to the graph owning this vertex, use
-     * {@link DENOPTIMVertex#getFreeAPCount()}.
+     * {@link Vertex#getFreeAPCount()}.
      * @return the number of APs that are not used by any edge, whether within
      * the graph owning this vertex (if any) or within a graph owning the
      * template embedding the graph that owns this vertex.
@@ -414,19 +414,19 @@ public abstract class DENOPTIMVertex implements Cloneable
      * but if the graph is itself the inner graph of a template, the AP is 
      * then projected on the template's surface and can be used. 
      * To account for this possibility use
-     * {@link DENOPTIMVertex#getCappedAPsThroughout()}.
+     * {@link Vertex#getCappedAPsThroughout()}.
      * @return the APs of this vertex that are used to bind a {@link BBType#CAP} 
      * vertex.
      */
-    public ArrayList<DENOPTIMAttachmentPoint> getCappedAPs()
+    public ArrayList<AttachmentPoint> getCappedAPs()
     {
-        ArrayList<DENOPTIMAttachmentPoint> lst = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        ArrayList<AttachmentPoint> lst = 
+                new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint ap : getAttachmentPoints()) 
         {
             if (!ap.isAvailable())
             {
-                DENOPTIMAttachmentPoint linkedAP = ap.getLinkedAP();
+                AttachmentPoint linkedAP = ap.getLinkedAP();
                 if (linkedAP.getOwner().getBuildingBlockType() == BBType.CAP)
                     lst.add(ap);
             }
@@ -445,22 +445,22 @@ public abstract class DENOPTIMVertex implements Cloneable
      * then projected on the template's surface and used to make an edge that 
      * uses the template as a single vertex. To ignore this possibility and 
      * consider only edges that belong to the graph owning this vertex, use
-     * {@link DENOPTIMVertex#getCappedAPs()}.
+     * {@link Vertex#getCappedAPs()}.
      * @return the APs of this vertex that are used to bind a {@link BBType#CAP} 
      * vertex, 
      * whether within the graph owning this vertex (if any) 
      * or within a graph owning the
      * template embedding the graph that owns this vertex.
      */
-    public ArrayList<DENOPTIMAttachmentPoint> getCappedAPsThroughout()
+    public ArrayList<AttachmentPoint> getCappedAPsThroughout()
     {
-        ArrayList<DENOPTIMAttachmentPoint> lst = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        ArrayList<AttachmentPoint> lst = 
+                new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint ap : getAttachmentPoints()) 
         {
             if (!ap.isAvailableThroughout())
             {
-                DENOPTIMAttachmentPoint linkedAP = ap.getLinkedAPThroughout();
+                AttachmentPoint linkedAP = ap.getLinkedAPThroughout();
                 if (linkedAP.getOwner().getBuildingBlockType() == BBType.CAP)
                     lst.add(ap);
             }
@@ -492,7 +492,7 @@ public abstract class DENOPTIMVertex implements Cloneable
 
     public boolean hasFreeAP()
     {
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints()) 
+        for (AttachmentPoint ap : getAttachmentPoints()) 
         {
             if (ap.isAvailableThroughout())
                 return true;
@@ -565,7 +565,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      */
     
     @Override
-    public abstract DENOPTIMVertex clone();
+    public abstract Vertex clone();
     
 //------------------------------------------------------------------------------
     
@@ -577,20 +577,20 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
-    public boolean sameAs(DENOPTIMVertex other, StringBuilder reason)
+    public boolean sameAs(Vertex other, StringBuilder reason)
     {
         if (this.getClass() == other.getClass())
         {
-            if (this instanceof DENOPTIMFragment)
+            if (this instanceof Fragment)
             {
-                return ((DENOPTIMFragment) this).sameAs(
-                        (DENOPTIMFragment) other, reason);
+                return ((Fragment) this).sameAs(
+                        (Fragment) other, reason);
             } else if (this instanceof EmptyVertex) {
                 return ((EmptyVertex) this).sameAs(
                         (EmptyVertex) other, reason);
-            } else if (this instanceof DENOPTIMTemplate) {
-                return ((DENOPTIMTemplate) this).sameAs(
-                        (DENOPTIMTemplate) other, reason);
+            } else if (this instanceof Template) {
+                return ((Template) this).sameAs(
+                        (Template) other, reason);
             } else {
                 System.err.println("WARNING: Unimplemented sameAs method for "
                         + "vertex subtype '" + this.getClass().getName() + "'");
@@ -609,7 +609,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
-    public boolean sameVertexFeatures(DENOPTIMVertex other, 
+    public boolean sameVertexFeatures(Vertex other, 
             StringBuilder reason)
     {	
         if (this.getBuildingBlockType() != other.getBuildingBlockType())
@@ -646,8 +646,8 @@ public abstract class DENOPTIMVertex implements Cloneable
         // Order of APs must be the same
         for (int i=0; i<this.getNumberOfAPs(); i++)
         {
-            DENOPTIMAttachmentPoint apT = this.getAP(i);
-            DENOPTIMAttachmentPoint apO = other.getAP(i);
+            AttachmentPoint apT = this.getAP(i);
+            AttachmentPoint apO = other.getAP(i);
             if (!apT.sameAs(apO))
             {
                 reason.append("Difference in AP "+i+": "+apT+" vs "+apO);
@@ -704,7 +704,7 @@ public abstract class DENOPTIMVertex implements Cloneable
     public ArrayList<APClass> getAllAPClasses()
     {
         ArrayList<APClass> lst = new ArrayList<APClass>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        for (AttachmentPoint ap : getAttachmentPoints())
         {
             APClass apCls = ap.getAPClass();
             if (!lst.contains(apCls))
@@ -726,7 +726,7 @@ public abstract class DENOPTIMVertex implements Cloneable
     public ArrayList<APClass> getAllAvailableAPClasses()
     {
         ArrayList<APClass> lst = new ArrayList<APClass>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        for (AttachmentPoint ap : getAttachmentPoints())
         {
             if (!ap.isAvailable())
                 continue;
@@ -749,7 +749,7 @@ public abstract class DENOPTIMVertex implements Cloneable
     
 //------------------------------------------------------------------------------
 
-    public void setGraphOwner(DENOPTIMGraph owner)
+    public void setGraphOwner(DGraph owner)
     {
         this.owner = owner;
     }
@@ -760,7 +760,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      * Returns the graph this vertex belongs to or null.
      * @return the graph this vertex belongs to or null.
      */
-    public DENOPTIMGraph getGraphOwner()
+    public DGraph getGraphOwner()
     {
         return owner;
     }
@@ -771,7 +771,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      * A list of mutation sites from within this vertex.
      * @return the list of vertexes that allow any mutation type.
      */
-    public List<DENOPTIMVertex> getMutationSites()
+    public List<Vertex> getMutationSites()
     {
         return getMutationSites(new ArrayList<MutationType>());
     }
@@ -785,7 +785,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      * not be considered mutation sites.
      * @return the list of vertexes that allow any non-ignored mutation type.
      */
-    public abstract List<DENOPTIMVertex> getMutationSites(
+    public abstract List<Vertex> getMutationSites(
             List<MutationType> ignoredTypes);
 
 //------------------------------------------------------------------------------
@@ -898,7 +898,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @param i index of attachment point on this vertex
      * @return attachment point i on this vertex
      */
-    public DENOPTIMAttachmentPoint getAP(int i) {
+    public AttachmentPoint getAP(int i) {
         return getAttachmentPoints().get(i);
     }
     
@@ -910,11 +910,11 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @return the index (0-n) of <code>ap</code> or -1 if that AP does not 
      * belong to this vertex.
      */
-    public int getIndexOfAP(DENOPTIMAttachmentPoint ap)
+    public int getIndexOfAP(AttachmentPoint ap)
     {
         for (int i=0; i<getAttachmentPoints().size(); i++)
         {
-            DENOPTIMAttachmentPoint candAp = getAttachmentPoints().get(i);
+            AttachmentPoint candAp = getAttachmentPoints().get(i);
             if (candAp == ap)
             {
                 return i;
@@ -933,10 +933,10 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @return the edge to the parent.
      */
 
-    public DENOPTIMEdge getEdgeToParent() {
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+    public Edge getEdgeToParent() {
+        for (AttachmentPoint ap : getAttachmentPoints())
         {
-            DENOPTIMEdge user = ap.getEdgeUser();
+            Edge user = ap.getEdgeUser();
             if (user == null)
                 continue;
             
@@ -957,11 +957,11 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @return the vertex parent to this or null.
      */
 
-    public DENOPTIMVertex getParent() 
+    public Vertex getParent() 
     {
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        for (AttachmentPoint ap : getAttachmentPoints())
         {
-            DENOPTIMEdge user = ap.getEdgeUser();
+            Edge user = ap.getEdgeUser();
             if (user == null)
                 continue;
             
@@ -987,13 +987,13 @@ public abstract class DENOPTIMVertex implements Cloneable
      * (can be empty list, but not null)
      */
 
-    public ArrayList<DENOPTIMAttachmentPoint> getAPsFromChildren() 
+    public ArrayList<AttachmentPoint> getAPsFromChildren() 
     {
-        ArrayList<DENOPTIMAttachmentPoint> apsOnChildren = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        ArrayList<AttachmentPoint> apsOnChildren = 
+                new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint ap : getAttachmentPoints())
         {
-            DENOPTIMEdge user = ap.getEdgeUserThroughout();
+            Edge user = ap.getEdgeUserThroughout();
             if (user == null)
                 continue;
             
@@ -1018,12 +1018,12 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @return the list of child vertices (can be empty list, but not null)
      */
 
-    public ArrayList<DENOPTIMVertex> getChildrenThroughout() 
+    public ArrayList<Vertex> getChildrenThroughout() 
     {
-        ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        ArrayList<Vertex> children = new ArrayList<Vertex>();
+        for (AttachmentPoint ap : getAttachmentPoints())
         {
-            DENOPTIMEdge user = ap.getEdgeUserThroughout();
+            Edge user = ap.getEdgeUserThroughout();
             if (user == null)
                 continue;
             
@@ -1046,14 +1046,14 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @return the list of child vertices (can be empty list, but not null)
      */
 
-    public ArrayList<DENOPTIMVertex> getChilddren() 
+    public ArrayList<Vertex> getChilddren() 
     {
-        ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        ArrayList<Vertex> children = new ArrayList<Vertex>();
+        for (AttachmentPoint ap : getAttachmentPoints())
         {
             // NB: this is meant to NOT cross template boundaries, so that all
             // children do belong to the same graph.
-            DENOPTIMEdge user = ap.getEdgeUser();
+            Edge user = ap.getEdgeUser();
             if (user == null)
                 continue;
             
@@ -1070,7 +1070,7 @@ public abstract class DENOPTIMVertex implements Cloneable
     /**
      * Add the given key among the properties that are checked for equality when
      * comparing vertexes with the 
-     * {@link DENOPTIMVertex#sameAs(DENOPTIMVertex, StringBuilder)} method.
+     * {@link Vertex#sameAs(Vertex, StringBuilder)} method.
      * @param key
      */
     public void setUniquefyingProperty(String key)
@@ -1132,7 +1132,7 @@ public abstract class DENOPTIMVertex implements Cloneable
     
     /**
      * Copies all the string-based properties and properties defined in the
-     * {@link DENOPTIMVertex#uniquefyingPropertyKeys} set.
+     * {@link Vertex#uniquefyingPropertyKeys} set.
      * @return the map of cloned properties.
      */
     protected Map<Object, Object> copyStringBasedProperties()
@@ -1163,10 +1163,10 @@ public abstract class DENOPTIMVertex implements Cloneable
     
 //------------------------------------------------------------------------------
     
-    public static DENOPTIMVertex fromJson(String json)
+    public static Vertex fromJson(String json)
     {
         Gson gson = DENOPTIMgson.getReader();
-        return gson.fromJson(json, DENOPTIMVertex.class);
+        return gson.fromJson(json, Vertex.class);
     }
 
 //------------------------------------------------------------------------------
@@ -1185,10 +1185,10 @@ public abstract class DENOPTIMVertex implements Cloneable
 //------------------------------------------------------------------------------
 
     public static class DENOPTIMVertexDeserializer 
-    implements JsonDeserializer<DENOPTIMVertex>
+    implements JsonDeserializer<Vertex>
     {
         @Override
-        public DENOPTIMVertex deserialize(JsonElement json, Type typeOfT,
+        public Vertex deserialize(JsonElement json, Type typeOfT,
                 JsonDeserializationContext context) throws JsonParseException
         {
             JsonObject jsonObject = json.getAsJsonObject();
@@ -1213,14 +1213,14 @@ public abstract class DENOPTIMVertex implements Cloneable
             {
                 case Template:
                 {
-                    DENOPTIMTemplate t = DENOPTIMTemplate.fromJson(
+                    Template t = Template.fromJson(
                             jsonObject.toString());
                     return t;
                 }
                 
                 case MolecularFragment:
                 {
-                    DENOPTIMFragment f = DENOPTIMFragment.fromJson(
+                    Fragment f = Fragment.fromJson(
                             jsonObject.toString());
                     return f;
                 }
@@ -1252,8 +1252,8 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @return a pair of strings that identify the "path" between two given
      * attachment points.
      */
-    public String[] getPathIDs(DENOPTIMAttachmentPoint apA,
-            DENOPTIMAttachmentPoint apB)
+    public String[] getPathIDs(AttachmentPoint apA,
+            AttachmentPoint apB)
     {
         String a2b = this.getBuildingBlockId() + "/" 
                 + this.getBuildingBlockType() + "/ap"
@@ -1268,24 +1268,24 @@ public abstract class DENOPTIMVertex implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Processes an {@link IAtomContainer} and builds a {@link DENOPTIMVertex} 
-     * that is an instance of {@link DENOPTIMFragment}. 
+     * Processes an {@link IAtomContainer} and builds a {@link Vertex} 
+     * that is an instance of {@link Fragment}. 
      * This method does not consider any JSON definition that might be 
      * embedded in the container properties. 
      * This because this method is meant to convert an {@link IAtomContainer} 
-     * with {@link DENOPTIMAttachmentPoint}s defined in the 
+     * with {@link AttachmentPoint}s defined in the 
      * {@link IAtomContainer}'s properties.
      * @param iac the atom containers.
      * @param bbt the type of building block.
      * @return the vertex.
      * @throws DENOPTIMException if the atom container could not be converted 
-     * into a {@link DENOPTIMFragment}.
+     * into a {@link Fragment}.
      */
 
-    public static DENOPTIMVertex convertIACToVertex(IAtomContainer iac, 
-            DENOPTIMVertex.BBType bbt) throws DENOPTIMException
+    public static Vertex convertIACToVertex(IAtomContainer iac, 
+            Vertex.BBType bbt) throws DENOPTIMException
     {
-        DENOPTIMVertex v = new DENOPTIMFragment(iac, bbt);
+        Vertex v = new Fragment(iac, bbt);
         v.setAsRCV(v.getNumberOfAPs() == 1
                 && APClass.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));
@@ -1295,7 +1295,7 @@ public abstract class DENOPTIMVertex implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Created a {@link DENOPTIMVertex} from the SDF representation, i.e., from
+     * Created a {@link Vertex} from the SDF representation, i.e., from
      * an {@link IAtomContainer}. 
      * @param mol the container to parse.
      * @param reader a converted able to deserialize a vertex from a JSON string.
@@ -1303,27 +1303,27 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @return a vertex 
      */
     
-    public static DENOPTIMVertex parseVertexFromSDFFormat(IAtomContainer mol,
+    public static Vertex parseVertexFromSDFFormat(IAtomContainer mol,
             Gson reader, BBType bbt) throws DENOPTIMException
     {
-        DENOPTIMVertex v = null;
+        Vertex v = null;
         try
         {
             Object json = mol.getProperty(DENOPTIMConstants.VERTEXJSONTAG);
             if (json != null) {
-                v = reader.fromJson(json.toString(),DENOPTIMVertex.class);
+                v = reader.fromJson(json.toString(),Vertex.class);
             } else {
                 json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
                 if (json != null)
                 {
-                    DENOPTIMLogger.appLogger.log(Level.WARNING, "Attempt to "
+                    StaticLogger.appLogger.log(Level.WARNING, "Attempt to "
                         + "read a vertex from "
                         + "a SDF file that contains a JSON definition of a "
                         + "graph. This should not be intentional, so we'll "
                         + "read the atom container ignoring the JSON "
                         + "definition of a graph.");
                 }
-                v = DENOPTIMVertex.convertIACToVertex(mol, bbt);
+                v = Vertex.convertIACToVertex(mol, bbt);
             }
         } catch (JsonSyntaxException | DENOPTIMException e)
         {
@@ -1344,7 +1344,7 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @param other 
      * @return <code>true</code>
      */
-    public boolean connectedTo(DENOPTIMVertex other)
+    public boolean connectedTo(Vertex other)
     {
         return this.getParent() == other || this == other.getParent();
     }
@@ -1356,14 +1356,14 @@ public abstract class DENOPTIMVertex implements Cloneable
      * @param other the vertex we expect to be linked to this vertex.
      * @return the edge or null if no connection exists between the two.
      */
-    public DENOPTIMEdge getEdgeWith(DENOPTIMVertex other)
+    public Edge getEdgeWith(Vertex other)
     {
         if (this.owner != null && other.owner !=null
                 && this.owner == other.owner)
         {
-            for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+            for (AttachmentPoint ap : getAttachmentPoints())
             {
-                DENOPTIMAttachmentPoint linkedAp = ap.getLinkedAP();
+                AttachmentPoint linkedAp = ap.getLinkedAP();
                 if (linkedAp == null)
                     continue;
                 if (linkedAp.getOwner()==other)

@@ -16,13 +16,15 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.graph;
+package denoptim.graph.simplified;
 
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Vertex;
 
 /**
  * This class represents a subgraph feature that defined the structure of a 
- * graph. Namely, it represents either a {@link DENOPTIMVertex}
- * of a {@link DENOPTIMAttachmentPoint} that needs to exist for the structure 
+ * graph. Namely, it represents either a {@link Vertex}
+ * of a {@link AttachmentPoint} that needs to exist for the structure 
  * of a subgraph to be retained.
  */
 
@@ -31,7 +33,7 @@ public class Node
     /**
      * Reference to the vertex we might be representing
      */
-    private DENOPTIMVertex vertex = null;
+    private Vertex vertex = null;
     
     /**
      * Invariant representation used to compare
@@ -39,14 +41,14 @@ public class Node
     public String invariant = null;
 
     /**
-     * Property if {@link DENOPTIMVertex} used to store the reference to the
+     * Property if {@link Vertex} used to store the reference to the
      * corresponding {@link Node}.
      */
     public static final String REFTOVERTEXKERNEL = "REFTOVERTEXKERNEL";
     
 //------------------------------------------------------------------------------
     
-    public Node(DENOPTIMVertex v) {
+    public Node(Vertex v) {
         this.vertex = v;
         v.setProperty(REFTOVERTEXKERNEL, this);
         if (v.isRCV())
@@ -57,14 +59,14 @@ public class Node
     
 //------------------------------------------------------------------------------
     
-    public Node(DENOPTIMAttachmentPoint ap) {
+    public Node(AttachmentPoint ap) {
         this.vertex = null;
         this.invariant = ap.getAPClass().toString();
     }
     
 //------------------------------------------------------------------------------
     
-    public DENOPTIMVertex getDNPVertex()
+    public Vertex getDNPVertex()
     {
         return vertex;
     }

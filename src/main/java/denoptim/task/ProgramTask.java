@@ -28,7 +28,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.utils.TaskUtils;
 
 /**
@@ -137,7 +137,7 @@ public abstract class ProgramTask extends Task
         FileUtils.addToRecentFiles(errFile, FileFormat.TXT);
         
         // NB: the static logger should have been set by the main we called
-        DENOPTIMLogger.appLogger.log(Level.SEVERE, "Error occured.");
+        StaticLogger.appLogger.log(Level.SEVERE, "Error occured.");
     }
     
 //------------------------------------------------------------------------------ 

@@ -19,7 +19,7 @@
 package denoptim.fragspace;
 
 
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Vertex.BBType;
 
 
 /**

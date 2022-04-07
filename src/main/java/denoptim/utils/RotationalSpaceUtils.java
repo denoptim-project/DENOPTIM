@@ -39,7 +39,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 
 
 /**
@@ -107,7 +107,7 @@ public class RotationalSpaceUtils
         } catch (Throwable t) {
             throw new DENOPTIMException(t);
         }
-        DENOPTIMMoleculeUtils.removeRCA(locMol);
+        MoleculeUtils.removeRCA(locMol);
 
         
         if (!defRotBndsFile.equals(""))
@@ -127,7 +127,7 @@ public class RotationalSpaceUtils
                 //TODO-M9
                 msq.getProblem().printStackTrace();
                 
-                DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+                StaticLogger.appLogger.log(Level.WARNING ,msg);
             } else {
                 //Transform list of indeces
                 for (String name : listQueries.keySet())
@@ -147,7 +147,7 @@ public class RotationalSpaceUtils
                         {
                             String msg = "DENOPTIM can only deal with bonds involving "
                                         + "2 atoms. Check bond " + singleMatch;
-                            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+                            StaticLogger.appLogger.log(Level.SEVERE, msg);
                             throw new DENOPTIMException(msg);
                         }
         

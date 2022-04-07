@@ -30,7 +30,7 @@ import com.google.gson.GsonBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.SingletonFileAccess;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
 
 
@@ -152,9 +152,9 @@ public class CEBLUtils
      */
 
     protected static void storeAllGraphsOfLevel(CEBLParameters settings, 
-            ArrayList<DENOPTIMGraph> lstGraphs, int level) throws DENOPTIMException
+            ArrayList<DGraph> lstGraphs, int level) throws DENOPTIMException
     {
-        for (DENOPTIMGraph g : lstGraphs)
+        for (DGraph g : lstGraphs)
               {
       	    //NOTE: the arraylist is supposed to hold the indeces used to 
       	    //      create the next combination of fragments, but this method
@@ -163,7 +163,7 @@ public class CEBLUtils
       	    //      to store and we fed the method with an empty array.
       	    // NOTE2: the root Id is set to zero for the same reason.
             
-            DENOPTIMGraph c = g.clone();
+            DGraph c = g.clone();
             
             storeGraphOfLevel(settings, c,level,0,new ArrayList<Integer>());
         }
@@ -183,7 +183,7 @@ public class CEBLUtils
      */
 
     protected static void storeGraphOfLevel(CEBLParameters settings, 
-            DENOPTIMGraph graph, int level, int rootId, 
+            DGraph graph, int level, int rootId, 
             ArrayList<Integer> nextIds) throws DENOPTIMException
     {
         String outDir = getNameOfStorageDir(settings, level);

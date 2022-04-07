@@ -20,14 +20,14 @@ public class DENOPTIMRingTest {
     @Test
     public void testUndirectedComparison() throws Exception 
     {
-        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         for (int i=0; i<5; i++)
         {
             EmptyVertex v = new EmptyVertex();
             v.setBuildingBlockId(i);
             lst.add(v);
         }
-        DENOPTIMRing r = new DENOPTIMRing(lst);
+        Ring r = new Ring(lst);
         
         EmptyVertex newV = new EmptyVertex();
         r.insertVertex(newV, lst.get(0), lst.get(1));
@@ -43,14 +43,14 @@ public class DENOPTIMRingTest {
     @Test
     public void testGetDistance() throws Exception 
     {
-        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         for (int i=0; i<5; i++)
         {
             EmptyVertex v = new EmptyVertex();
             v.setBuildingBlockId(i);
             lst.add(v);
         }
-        DENOPTIMRing r = new DENOPTIMRing(lst);
+        Ring r = new Ring(lst);
         
         assertEquals(3,r.getDistance(lst.get(0), lst.get(3)));
         assertEquals(3,r.getDistance(lst.get(3), lst.get(0)));
@@ -62,16 +62,16 @@ public class DENOPTIMRingTest {
     @Test
     public void testGetCloserVertex() throws Exception 
     {
-        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         for (int i=0; i<10; i++)
         {
             EmptyVertex v = new EmptyVertex();
             v.setBuildingBlockId(i);
             lst.add(v);
         }
-        DENOPTIMRing r = new DENOPTIMRing(lst);
+        Ring r = new Ring(lst);
         
-        DENOPTIMVertex v = r.getCloserTo(r.getVertexAtPosition(4),
+        Vertex v = r.getCloserTo(r.getVertexAtPosition(4),
                 r.getVertexAtPosition(4), r.getVertexAtPosition(4));
         assertEquals(r.getVertexAtPosition(4), v);
         

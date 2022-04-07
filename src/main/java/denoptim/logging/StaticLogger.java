@@ -38,26 +38,26 @@ import java.util.logging.XMLFormatter;
 // are static objects,
 // so running multiple GS experiments on different threads is not possible.
 
-public class DENOPTIMLogger 
+public class StaticLogger 
 {
     public static final Logger appLogger = Logger.getLogger("DENOPTIMLogger");
-    private static DENOPTIMLogger uniqInstance = null;
+    private static StaticLogger uniqInstance = null;
     private static boolean hasBeenSet = false;
     
 //------------------------------------------------------------------------------
     
-    private DENOPTIMLogger()
+    private StaticLogger()
     {
       // Exists only to defeat instantiation.
     }
 
 //------------------------------------------------------------------------------    
     
-    public static synchronized DENOPTIMLogger getInstance() 
+    public static synchronized StaticLogger getInstance() 
     {  
         if(uniqInstance == null) 
         {  
-            uniqInstance = new DENOPTIMLogger();
+            uniqInstance = new StaticLogger();
         }
         return uniqInstance;
     }

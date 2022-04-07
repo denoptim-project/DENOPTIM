@@ -60,8 +60,8 @@ public class ManySMARTSQuery
                 Pattern sp = SmartsPattern.create(oneSmarts);
 
                 // WARNING: assumptions on implicit H count and bond orders!
-                DENOPTIMMoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
-                DENOPTIMMoleculeUtils.ensureNoUnsetBondOrders(mol);
+                MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+                MoleculeUtils.ensureNoUnsetBondOrders(mol);
                 
                 if (sp.matches(mol))
                 {

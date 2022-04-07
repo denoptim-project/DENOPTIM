@@ -1,6 +1,6 @@
 /*
  *   DENOPTIM
- *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
+ *   Copyright (C) 2019 Marco Foscato <marco.foscato@uib.no>
  * 
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
@@ -16,9 +16,12 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.graph;
+package denoptim.graph.simplified;
 
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.Vertex;
+import denoptim.graph.Edge.BondType;
 import denoptim.utils.GenUtils;
 
 /**
@@ -32,12 +35,12 @@ public class UndirectedEdge
     /**
      * Attachment point A
      */
-    private DENOPTIMAttachmentPoint apA;
+    private AttachmentPoint apA;
 
     /**
      * Attachment point B
      */
-    private DENOPTIMAttachmentPoint apB;
+    private AttachmentPoint apB;
 
     /**
      * The bond type associated with the connection between the fragments
@@ -60,8 +63,8 @@ public class UndirectedEdge
      * converted to when converting a graph into a chemical representation.
      */
     
-    public UndirectedEdge(DENOPTIMAttachmentPoint apA,
-                          DENOPTIMAttachmentPoint apB, BondType bondType) {
+    public UndirectedEdge(AttachmentPoint apA,
+                          AttachmentPoint apB, BondType bondType) {
         this.apA = apA;
         this.apB = apB;
         this.bondType = bondType;
@@ -77,8 +80,8 @@ public class UndirectedEdge
      * @param apB another of the attachment points connected by this edge
      */
     
-    public UndirectedEdge(DENOPTIMAttachmentPoint apA, 
-            DENOPTIMAttachmentPoint apB) {
+    public UndirectedEdge(AttachmentPoint apA, 
+            AttachmentPoint apB) {
         this(apA, apB, apA.getAPClass().getBondType());
     }
     
@@ -86,8 +89,8 @@ public class UndirectedEdge
     
     private void makeInvariant()
     {
-        DENOPTIMVertex tvA = apA.getOwner();
-        DENOPTIMVertex tvB = apB.getOwner();
+        Vertex tvA = apA.getOwner();
+        Vertex tvB = apB.getOwner();
         
         String invariantTA = tvA.getBuildingBlockType().toOldInt() +
                 GenUtils.getPaddedString(6,tvA.getBuildingBlockId()) +
@@ -132,8 +135,8 @@ public class UndirectedEdge
     @Override
     public String toString()
     {
-        DENOPTIMVertex vA = apA.getOwner();
-        DENOPTIMVertex vB = apB.getOwner();
+        Vertex vA = apA.getOwner();
+        Vertex vB = apB.getOwner();
         
         StringBuilder sb = new StringBuilder(64);
         sb.append("v" + vA.getVertexId()).append("_ap")

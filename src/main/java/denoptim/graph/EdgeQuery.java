@@ -18,7 +18,7 @@
 
 package denoptim.graph;
 
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 
 /**
  * A query for edges: a list of properties that target edges should possess in 
@@ -70,15 +70,15 @@ public class EdgeQuery
      * Constructor for an edge from all parameters
      * @param srcVertexId vertex ID of the source vertex
      * @param trgVertexId vertex ID of the target vertex
-     * @param srcAPID index of the {@link DENOPTIMAttachmentPoint} on the source
+     * @param srcAPID index of the {@link AttachmentPoint} on the source
      *  vertex
-     * @param trgAPID index of the {@link DENOPTIMAttachmentPoint} on the target
+     * @param trgAPID index of the {@link AttachmentPoint} on the target
      *  vertex
      * @param btype the bond type
      * @param srcAPC the {@link APClass} on the source 
-     * {@link DENOPTIMAttachmentPoint} .
+     * {@link AttachmentPoint} .
      * @param trgAPC the {@link APClass} on the target 
-     * {@link DENOPTIMAttachmentPoint} .
+     * {@link AttachmentPoint} .
      */
     public EdgeQuery(Integer srcVertexId, Integer trgVertexId, 
             Integer srcAPID, Integer trgAPID, 

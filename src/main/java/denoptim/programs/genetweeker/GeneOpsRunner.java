@@ -29,11 +29,11 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.ga.DENOPTIMGraphOperations;
+import denoptim.ga.GraphOperations;
 import denoptim.ga.XoverSite;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DGraph;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
@@ -112,7 +112,7 @@ public class GeneOpsRunner extends ProgramTask
     
     private void runMutation() throws DENOPTIMException
     {
-        DENOPTIMGraph graph = null;
+        DGraph graph = null;
         try
         {
             graph = DenoptimIO.readDENOPTIMGraphsFromFile(
@@ -140,7 +140,7 @@ public class GeneOpsRunner extends ProgramTask
         
         if (mt != null)
         {
-            DENOPTIMVertex v = getEmbeddedVertex(settings.mutationTarget,
+            Vertex v = getEmbeddedVertex(settings.mutationTarget,
                     graph, "mutation " + mt);
             
             if (v == null)
@@ -160,13 +160,13 @@ public class GeneOpsRunner extends ProgramTask
             }
             
             // NB: last boolean asks to ignore the growth probability
-            DENOPTIMGraphOperations.performMutation(v,mt,true,
+            GraphOperations.performMutation(v,mt,true,
                     settings.idNewVrt, apID, new Monitor(),gaParams);
 
         } else {
             System.out.println("Attempting mutation a random mutation on a "
                     + "random vertex");
-            DENOPTIMGraphOperations.performMutation(graph,new Monitor(),gaParams);
+            GraphOperations.performMutation(graph,new Monitor(),gaParams);
         }
         System.out.println("Result of mutation:");
         System.out.println(graph);
@@ -181,8 +181,8 @@ public class GeneOpsRunner extends ProgramTask
     
     private void runXOver() throws DENOPTIMException
     {
-        DENOPTIMGraph male = null;
-        DENOPTIMGraph female = null;
+        DGraph male = null;
+        DGraph female = null;
         try
         {
             male = DenoptimIO.readDENOPTIMGraphsFromFile(
@@ -200,20 +200,20 @@ public class GeneOpsRunner extends ProgramTask
         System.out.println(" ");
     
         // Identify the crossover operation to perform
-        DENOPTIMVertex vm = getEmbeddedVertex(settings.xoverSrcMale,
+        Vertex vm = getEmbeddedVertex(settings.xoverSrcMale,
                 male, "crossover");
-        DENOPTIMVertex vf = getEmbeddedVertex(settings.xoverSrcFemale,
+        Vertex vf = getEmbeddedVertex(settings.xoverSrcFemale,
                 female, "crossover");
         
         CrossoverType xoverType = CrossoverType.BRANCH;
         if (settings.xoverSubGraphEndMale.size()!=0)
             xoverType = CrossoverType.SUBGRAPH;
         
-        List<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> subGraphA = new ArrayList<Vertex>();
         subGraphA.add(vm);
         male.getChildTreeLimited(vm, subGraphA, getSubGraphEnds(male,
                 settings.xoverSubGraphEndMale, "crossover"));
-        List<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> subGraphB = new ArrayList<Vertex>();
         subGraphB.add(vf);
         female.getChildTreeLimited(vf, subGraphB, getSubGraphEnds(female,
                 settings.xoverSubGraphEndFemale, "crossover"));
@@ -230,7 +230,7 @@ public class GeneOpsRunner extends ProgramTask
         System.out.println("v:" + vf.getVertexId() + " of FEMALE: " + female);
         System.out.println(" ");
         
-        DENOPTIMGraphOperations.performCrossover(xos, fragSpace);
+        GraphOperations.performCrossover(xos, fragSpace);
     
         System.out.println("Result of crossover:");
         System.out.println("MALE: " + male);
@@ -246,10 +246,10 @@ public class GeneOpsRunner extends ProgramTask
     
 //------------------------------------------------------------------------------
     
-    private Set<DENOPTIMVertex> getSubGraphEnds(DENOPTIMGraph graph, 
+    private Set<Vertex> getSubGraphEnds(DGraph graph, 
             List<int[]> embeddingPaths, String operation)
     {
-        Set<DENOPTIMVertex> result = new HashSet<DENOPTIMVertex>();
+        Set<Vertex> result = new HashSet<Vertex>();
         for (int[] embeddingPath : embeddingPaths)
         {
             result.add(getEmbeddedVertex(embeddingPath, graph, operation));
@@ -259,8 +259,8 @@ public class GeneOpsRunner extends ProgramTask
 
 //------------------------------------------------------------------------------
     
-    private DENOPTIMVertex getEmbeddedVertex(int[] embeddingPath, 
-            DENOPTIMGraph graph, String operation)
+    private Vertex getEmbeddedVertex(int[] embeddingPath, 
+            DGraph graph, String operation)
     {
         String str = "";
         if (embeddingPath != null && embeddingPath.length>1)
@@ -276,13 +276,13 @@ public class GeneOpsRunner extends ProgramTask
             }
             System.out.println("Attempting '" + operation + "' on deep "
                     + "vertex " + str);
-            DENOPTIMVertex outerVertex = null;
-            DENOPTIMGraph innerGraph = graph;
+            Vertex outerVertex = null;
+            DGraph innerGraph = graph;
             for (int i=0; i<embeddingPath.length; i++)
             {
-                if (outerVertex != null && outerVertex instanceof DENOPTIMTemplate)
+                if (outerVertex != null && outerVertex instanceof Template)
                 {
-                    innerGraph = ((DENOPTIMTemplate) outerVertex).getInnerGraph();
+                    innerGraph = ((Template) outerVertex).getInnerGraph();
                 }
                 outerVertex = innerGraph.getVertexWithId(embeddingPath[i]);
                 if (outerVertex == null)
@@ -297,7 +297,7 @@ public class GeneOpsRunner extends ProgramTask
             int vid = embeddingPath[0];
             System.out.println("Attempting '" + operation + "' on vertex " 
                     + embeddingPath[0]);
-            DENOPTIMVertex v = graph.getVertexWithId(vid);
+            Vertex v = graph.getVertexWithId(vid);
             if (v == null)
             {
                 System.out.println("VertexID '" +vid +  "' not found in graph " 

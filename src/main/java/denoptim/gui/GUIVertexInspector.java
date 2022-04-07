@@ -63,14 +63,14 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileAndFormat;
 import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Fragment;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 
 
 /**
@@ -96,13 +96,13 @@ public class GUIVertexInspector extends GUICardPanel
 	/**
 	 * The currently loaded list of fragments
 	 */
-	private ArrayList<DENOPTIMVertex> verticesLibrary =
-			new ArrayList<DENOPTIMVertex>();
+	private ArrayList<Vertex> verticesLibrary =
+			new ArrayList<Vertex>();
 	
 	/**
 	 * The currently loaded vertex
 	 */
-	private DENOPTIMVertex vertex;
+	private Vertex vertex;
 	
 	/**
 	 * The index of the currently loaded fragment [0–(n-1)}
@@ -224,7 +224,7 @@ public class GUIVertexInspector extends GUICardPanel
 					return;
 				}
 				
-				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
+				ArrayList<Vertex> vrtxLib = new ArrayList<>();
 				try {
 				    vrtxLib = DenoptimIO.readVertexes(inFile, BBType.FRAGMENT);
 				} catch (Exception e1) {
@@ -284,8 +284,8 @@ public class GUIVertexInspector extends GUICardPanel
 						break;
 						
 					case 1:
-						ArrayList<DENOPTIMVertex> selectedVrtxs = 
-								new ArrayList<DENOPTIMVertex>();
+						ArrayList<Vertex> selectedVrtxs = 
+								new ArrayList<Vertex>();
 					    GUIVertexSelector vrtxSelector = new GUIVertexSelector(
 					            btnAddVrtx,true);
 					    vrtxSelector.setRequireApSelection(false);
@@ -406,7 +406,7 @@ public class GUIVertexInspector extends GUICardPanel
                 {
                     return;
                 }
-                ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>(1);
+                ArrayList<Vertex> lst = new ArrayList<Vertex>(1);
                 lst.add((EmptyVertex) ev);
                 GUIVertexSelector fragSelector = new GUIVertexSelector(
                         btnEmptFrag,false);
@@ -563,7 +563,7 @@ public class GUIVertexInspector extends GUICardPanel
 				{
 					return;
 				}
-				ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
+				ArrayList<Vertex> vrtxLib = new ArrayList<>();
                 try {
                     vrtxLib = DenoptimIO.readVertexes(inFile, BBType.FRAGMENT);
                 } catch (Exception e1) {
@@ -776,7 +776,7 @@ public class GUIVertexInspector extends GUICardPanel
 	{	
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
-		ArrayList<DENOPTIMVertex> vrtxLib = new ArrayList<>();
+		ArrayList<Vertex> vrtxLib = new ArrayList<>();
         try {
             vrtxLib = DenoptimIO.readVertexes(file, BBType.FRAGMENT);
         } catch (Exception e1) {
@@ -812,7 +812,7 @@ public class GUIVertexInspector extends GUICardPanel
      * Imports vertices.
      * @param list the list of vertices to import
      */
-    public void importVertices(ArrayList<DENOPTIMVertex> list)
+    public void importVertices(ArrayList<Vertex> list)
     {   
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         
@@ -821,7 +821,7 @@ public class GUIVertexInspector extends GUICardPanel
         if (verticesLibrary == null)
         {
             libFromScrtch = true;
-            verticesLibrary = new ArrayList<DENOPTIMVertex>();
+            verticesLibrary = new ArrayList<Vertex>();
         }
         else
         {
@@ -884,7 +884,7 @@ public class GUIVertexInspector extends GUICardPanel
 
 		vertex = verticesLibrary.get(currVrtxIdx);
 		vertexViewer.loadVertexToViewer(vertex);
-		if (vertex == null || vertex instanceof DENOPTIMFragment == false)
+		if (vertex == null || vertex instanceof Fragment == false)
 		{
 	        btnDelSel.setEnabled(false);
 	        btnAtmToAP.setEnabled(false);
@@ -925,11 +925,11 @@ public class GUIVertexInspector extends GUICardPanel
      */
     private boolean convertAtomToAP(IAtom trgAtm, String ruleAndSubClass)
     {
-        if (!(vertex instanceof DENOPTIMFragment))
+        if (!(vertex instanceof Fragment))
         {
             return false;
         }
-        DENOPTIMFragment frag = (DENOPTIMFragment) vertex;
+        Fragment frag = (Fragment) vertex;
     	// Accept ONLY if the atom has one and only one connected neighbour
     	if (frag.getConnectedAtomsCount(trgAtm) != 1)
     	{
@@ -957,8 +957,8 @@ public class GUIVertexInspector extends GUICardPanel
     	BondType bt = BondType.valueOf(
     	        srcAtm.getBond(trgAtm).getOrder().toString());
     	
-    	Point3d srcP3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
-    	Point3d trgP3d = DENOPTIMMoleculeUtils.getPoint3d(trgAtm);
+    	Point3d srcP3d = MoleculeUtils.getPoint3d(srcAtm);
+    	Point3d trgP3d = MoleculeUtils.getPoint3d(trgAtm);
     	Point3d vector = new Point3d();
     	vector.x = srcP3d.x + (trgP3d.x - srcP3d.x);
     	vector.y = srcP3d.y + (trgP3d.y - srcP3d.y);
@@ -989,11 +989,11 @@ public class GUIVertexInspector extends GUICardPanel
 
     private void removeAtoms(ArrayList<IAtom> atmsToDels)
     {
-        if (!(vertex instanceof DENOPTIMFragment))
+        if (!(vertex instanceof Fragment))
         {
             return;
         }
-        DENOPTIMFragment frag = (DENOPTIMFragment) vertex;
+        Fragment frag = (Fragment) vertex;
     	ArrayList<IBond> bnsToDel = new ArrayList<IBond>();
     	for (IAtom atm : atmsToDels)
     	{
@@ -1062,7 +1062,7 @@ public class GUIVertexInspector extends GUICardPanel
 		btnOpenVrtxs.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
 		btnOpenMol.setEnabled(true);
-        if (vertex == null || vertex instanceof DENOPTIMFragment == false)
+        if (vertex == null || vertex instanceof Fragment == false)
         {
             btnDelSel.setEnabled(false);
             btnAtmToAP.setEnabled(false);
@@ -1196,7 +1196,7 @@ public class GUIVertexInspector extends GUICardPanel
 					currApClass = "dafaultAPClass:0";
 				}
 	        	
-	        	Map<Integer, DENOPTIMAttachmentPoint> mapAPs = 
+	        	Map<Integer, AttachmentPoint> mapAPs = 
 	        	        vertexViewer.getActiveMapAPs();
 	        	
 	        	if (mapAPs.containsKey(apId))

@@ -48,16 +48,16 @@ import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
 import denoptim.graph.APClass;
 import denoptim.graph.CandidateLW;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Fragment;
 import denoptim.graph.DENOPTIMFragmentTest;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.DGraph;
+import denoptim.graph.Ring;
+import denoptim.graph.Template;
 import denoptim.graph.DENOPTIMTemplateTest;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.SymmetricSet;
 import denoptim.programs.RunTimeParameters.ParametersType;
@@ -92,12 +92,12 @@ public class DenoptimIOTest
         v.addAP(APClass.make("myClass:2"));
         v.addAP(APClass.make("myClass:3"));
         
-        ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> initVrtxs = new ArrayList<Vertex>();
         initVrtxs.add(v);
 
         File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
         DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
-        ArrayList<DENOPTIMVertex> readInVrtxs = 
+        ArrayList<Vertex> readInVrtxs = 
                 DenoptimIO.readVertexes(tmpFile, BBType.UNDEFINED);
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
@@ -120,14 +120,14 @@ public class DenoptimIOTest
     public void testIOMolFragment() throws Exception {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
         
-        DENOPTIMFragment v = DENOPTIMFragmentTest.makeFragment();
+        Fragment v = DENOPTIMFragmentTest.makeFragment();
         
-        ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> initVrtxs = new ArrayList<Vertex>();
         initVrtxs.add(v);
 
         File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
         DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
-        ArrayList<DENOPTIMVertex> readInVrtxs = 
+        ArrayList<Vertex> readInVrtxs = 
                 DenoptimIO.readVertexes(tmpFile, BBType.SCAFFOLD);
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
@@ -150,14 +150,14 @@ public class DenoptimIOTest
     public void testIOTemplate() throws Exception {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
         
-        DENOPTIMTemplate v = DENOPTIMTemplateTest.getTestAmideTemplate();
+        Template v = DENOPTIMTemplateTest.getTestAmideTemplate();
         
-        ArrayList<DENOPTIMVertex> initVrtxs = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> initVrtxs = new ArrayList<Vertex>();
         initVrtxs.add(v);
 
         File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "test.sdf");
         DenoptimIO.writeVertexesToFile(tmpFile, FileFormat.VRTXSDF, initVrtxs);
-        ArrayList<DENOPTIMVertex> readInVrtxs = 
+        ArrayList<Vertex> readInVrtxs = 
                 DenoptimIO.readVertexes(tmpFile, BBType.UNDEFINED);
         assertEquals(1,readInVrtxs.size(),"Number of vertexes");
         StringBuilder sb = new StringBuilder();
@@ -238,42 +238,42 @@ public class DenoptimIOTest
 	    assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
         String jsonFile = tempDir.getAbsolutePath() + SEP + "graph.json";
         
-		DENOPTIMGraph graph = new DENOPTIMGraph();
+		DGraph graph = new DGraph();
 		EmptyVertex v0 = new EmptyVertex(0);
 		buildVertexAndConnectToGraph(v0, 3, graph);
 
 		EmptyVertex v1 = new EmptyVertex(1);
 		buildVertexAndConnectToGraph(v1, 2, graph);
-		graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0),BT));
+		graph.addEdge(new Edge(v0.getAP(0), v1.getAP(0),BT));
 
 		EmptyVertex v2 = new EmptyVertex(2);
 		buildVertexAndConnectToGraph(v2, 2, graph);
-		graph.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0),BT));
+		graph.addEdge(new Edge(v1.getAP(1), v2.getAP(0),BT));
 
 		EmptyVertex v3 = new EmptyVertex(3);
 		buildVertexAndConnectToGraph(v3, 1, graph);
-		graph.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0),BT));
+		graph.addEdge(new Edge(v2.getAP(1), v3.getAP(0),BT));
 
 		EmptyVertex v4 = new EmptyVertex(4);
 		buildVertexAndConnectToGraph(v4, 3, graph);
-		graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v4.getAP(0),BT));
+		graph.addEdge(new Edge(v0.getAP(1), v4.getAP(0),BT));
 
 		EmptyVertex v5 = new EmptyVertex(5);
 		buildVertexAndConnectToGraph(v5, 1, graph);
-		graph.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0),BT));
+		graph.addEdge(new Edge(v4.getAP(1), v5.getAP(0),BT));
 
 		EmptyVertex v6 = new EmptyVertex(6);
 		buildVertexAndConnectToGraph(v6, 1, graph);
-		graph.addEdge(new DENOPTIMEdge(v0.getAP(2), v6.getAP(0),BT));
+		graph.addEdge(new Edge(v0.getAP(2), v6.getAP(0),BT));
 
 		EmptyVertex v7 = new EmptyVertex(7);
 		buildVertexAndConnectToGraph(v7, 1, graph);
-		graph.addEdge(new DENOPTIMEdge(v4.getAP(2), v7.getAP(0),BT));
+		graph.addEdge(new Edge(v4.getAP(2), v7.getAP(0),BT));
 
-		graph.addRing(new DENOPTIMRing(new ArrayList<>(
+		graph.addRing(new Ring(new ArrayList<>(
 				Arrays.asList(v5, v4, v0, v1, v2, v3))));
 
-		graph.addRing(new DENOPTIMRing(new ArrayList<>(
+		graph.addRing(new Ring(new ArrayList<>(
 				Arrays.asList(v6, v0, v4, v7))));
 
 		graph.addSymmetricSetOfVertices(new SymmetricSet(
@@ -283,7 +283,7 @@ public class DenoptimIOTest
 				new ArrayList<>(Arrays.asList(6, 7))));
         
 		DenoptimIO.writeData(jsonFile, graph.toJson(), false);
-		DENOPTIMGraph graphJ = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
+		DGraph graphJ = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
 		        jsonFile).get(0);
 		assertNotNull(graphJ,"Graph read from JSON file is null");
 
@@ -295,7 +295,7 @@ public class DenoptimIOTest
 
 	@Test
 	public void testReadAllAPClasses() throws Exception {
-		DENOPTIMFragment frag = new DENOPTIMFragment();
+		Fragment frag = new Fragment();
 		IAtom atmC = new Atom("C");
 		atmC.setPoint3d(new Point3d(0.0, 0.0, 1.0));
 		IAtom atmH = new Atom("H");
@@ -312,7 +312,7 @@ public class DenoptimIOTest
 		        new Point3d(1.0, 2.0, 2.0));
 		frag.projectAPsToProperties();
 
-		DENOPTIMFragment frag2 = new DENOPTIMFragment();
+		Fragment frag2 = new Fragment();
 		IAtom atmO = new Atom("O");
 		atmO.setPoint3d(new Point3d(0.0, 0.0, 1.0));
 		IAtom atmH2 = new Atom("N");
@@ -329,7 +329,7 @@ public class DenoptimIOTest
 		        new Point3d(1.0, 2.0, 2.0));
 		frag2.projectAPsToProperties();
 
-		ArrayList<DENOPTIMVertex> frags = new ArrayList<DENOPTIMVertex>();
+		ArrayList<Vertex> frags = new ArrayList<Vertex>();
 		frags.add(frag);
 		frags.add(frag2);
 
@@ -349,7 +349,7 @@ public class DenoptimIOTest
 //------------------------------------------------------------------------------
 
 	private void buildVertexAndConnectToGraph(EmptyVertex v, int apCount,
-											  DENOPTIMGraph graph) 
+											  DGraph graph) 
 											          throws DENOPTIMException {
 		for (int atomPos = 0; atomPos < apCount; atomPos++) {
 			v.addAP();

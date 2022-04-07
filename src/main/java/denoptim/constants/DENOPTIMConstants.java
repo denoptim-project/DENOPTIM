@@ -31,8 +31,8 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Vertex;
 
 
 /**
@@ -385,25 +385,25 @@ public final class DENOPTIMConstants
 
     /**
      * Key for {@link IAtomContainer} property containing the map of 
-     * {@link DENOPTIMAttachmentPoint}s per vertex ID. 
+     * {@link AttachmentPoint}s per vertex ID. 
      */
     public static final Object MOLPROPAPxVID = "APsPerVertexID";
 
     /**
      * Key for {@link IAtomContainer} property containing the map of 
-     * {@link DENOPTIMAttachmentPoint}s per edge. 
+     * {@link AttachmentPoint}s per edge. 
      */
     public static final Object MOLPROPAPxEDGE = "APsPerEdge";
     
     /**
      * Key for {@link IAtomContainer} property containing the map of 
-     * {@link DENOPTIMAttachmentPoint}s per vertex ID. 
+     * {@link AttachmentPoint}s per vertex ID. 
      */
     public static final Object MOLPROPAPxATOM = "APsPerAtom";
     
     /**
      * Key for {@link IAtomContainer} property containing the map of 
-     * {@link DENOPTIMAttachmentPoint}s per atom. 
+     * {@link AttachmentPoint}s per atom. 
      */
     public static final Object MOLPROPAPxBOND = "APsPerBond";
 
@@ -428,7 +428,7 @@ public final class DENOPTIMConstants
     
 
     /**
-     * Property of {@link DENOPTIMVertex} used to keep mark symmetric vertexes
+     * Property of {@link Vertex} used to keep mark symmetric vertexes
      * during graph operations and before defining the actual set of symmetric 
      * vertexes.
      */

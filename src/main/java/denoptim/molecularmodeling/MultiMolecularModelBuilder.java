@@ -27,7 +27,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.integration.tinker.TinkerMolecule;
@@ -49,13 +49,13 @@ import denoptim.utils.RotationalSpaceUtils;
 public class MultiMolecularModelBuilder
 {
     private String molName;
-    private DENOPTIMGraph molGraph;
+    private DGraph molGraph;
     
     private MMBuilderParameters settings;
 
 //------------------------------------------------------------------------------
 
-    public MultiMolecularModelBuilder(String molName, DENOPTIMGraph molGraph,
+    public MultiMolecularModelBuilder(String molName, DGraph molGraph,
             MMBuilderParameters settings)
     {
         this.settings = settings;

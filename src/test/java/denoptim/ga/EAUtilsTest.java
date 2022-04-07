@@ -21,14 +21,14 @@ import denoptim.ga.Population;
 import denoptim.ga.EAUtils.CandidateSource;
 import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.DGraph;
 import denoptim.graph.DENOPTIMGraphTest;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMTemplate.ContractLevel;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Template;
+import denoptim.graph.Template.ContractLevel;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.PathSubGraph;
 import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
@@ -87,9 +87,9 @@ public class EAUtilsTest
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
         FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(), 
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(), 
                 cpMap, capMap, forbEnds, cpMap);
         fs.setAPclassBasedApproach(true);
         
@@ -111,28 +111,28 @@ public class EAUtilsTest
         rcv.setAsRCV(true);
         fs.appendVertexToLibrary(rcv, BBType.FRAGMENT, fs.getFragmentLibrary());
         
-        DENOPTIMGraph graphForTemplate = new DENOPTIMGraph();
-        DENOPTIMVertex vg1 = DENOPTIMVertex.newVertexFromLibrary(0,
+        DGraph graphForTemplate = new DGraph();
+        Vertex vg1 = Vertex.newVertexFromLibrary(0,
                         BBType.FRAGMENT, fs);
         graphForTemplate.addVertex(vg1);
         for (int i=1; i<6; i++)
         {
-            DENOPTIMVertex vgi = DENOPTIMVertex.newVertexFromLibrary(0,
+            Vertex vgi = Vertex.newVertexFromLibrary(0,
                     BBType.FRAGMENT, fs);
-            DENOPTIMVertex vgi_1 = graphForTemplate.getVertexAtPosition(i-1);
+            Vertex vgi_1 = graphForTemplate.getVertexAtPosition(i-1);
             graphForTemplate.appendVertexOnAP(vgi_1.getAP(1), vgi.getAP(0));
         }
-        DENOPTIMVertex rcv1 = DENOPTIMVertex.newVertexFromLibrary(2,
+        Vertex rcv1 = Vertex.newVertexFromLibrary(2,
                 BBType.FRAGMENT, fs);
         graphForTemplate.appendVertexOnAP(
                 graphForTemplate.getVertexAtPosition(5).getAP(1),rcv1.getAP(0));
-        DENOPTIMVertex rcv2 = DENOPTIMVertex.newVertexFromLibrary(2,
+        Vertex rcv2 = Vertex.newVertexFromLibrary(2,
                 BBType.FRAGMENT, fs);
         graphForTemplate.appendVertexOnAP(
                 graphForTemplate.getVertexAtPosition(0).getAP(0),rcv2.getAP(0));
         graphForTemplate.addRing(rcv1, rcv2);
         
-        DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.SCAFFOLD);
+        Template template = new Template(BBType.SCAFFOLD);
         template.setInnerGraph(graphForTemplate);
         template.setContractLevel(ContractLevel.FIXED_STRUCT);
         fs.appendVertexToLibrary(template, BBType.SCAFFOLD,
@@ -149,12 +149,12 @@ public class EAUtilsTest
         FragmentSpaceParameters fsp = prepare();
         GAParameters gaParams = new GAParameters();
         gaParams.setParameters(fsp);
-        DENOPTIMGraph g = EAUtils.buildGraph(gaParams);
+        DGraph g = EAUtils.buildGraph(gaParams);
         
         if (g == null)
             assertTrue(false,"faild construction of graph");
         
-        DENOPTIMTemplate t = (DENOPTIMTemplate) g.getVertexAtPosition(0);
+        Template t = (Template) g.getVertexAtPosition(0);
         
         //NB: we want to not allow access to the inner graph from outside the 
         // template, but this means we cannot easily explore the inner graph.
@@ -163,7 +163,7 @@ public class EAUtilsTest
         // content of the template can change).
         
         boolean foundChange = false;
-        for (DENOPTIMVertex v : t.getMutationSites())
+        for (Vertex v : t.getMutationSites())
         {
             if (v.getBuildingBlockId() != 0)
                 foundChange = true;
@@ -176,7 +176,7 @@ public class EAUtilsTest
     @Test
     public void testAvoidRedundantXOver() throws Exception
     {   
-        DENOPTIMGraph g1 = new DENOPTIMGraph();
+        DGraph g1 = new DGraph();
         EmptyVertex s = new EmptyVertex();
         s.addAP();
         s.addAP();
@@ -191,7 +191,7 @@ public class EAUtilsTest
         
         Candidate c1 = new Candidate(g1); 
         
-        DENOPTIMGraph g2 = g1.clone();
+        DGraph g2 = g1.clone();
         Candidate c2 = new Candidate(g2);
         
         FragmentSpaceParameters fsp = prepare();
@@ -223,7 +223,7 @@ public class EAUtilsTest
         /*
          * -(A)v0(A)-(A)v1(A)-(A)v2(A)-(A)v3(B)-(B)v4(B)-(B)v5(B)-
          */
-        DENOPTIMGraph gA = PopulationTest.makeGraphA();
+        DGraph gA = PopulationTest.makeGraphA();
         Candidate cA = new Candidate("CA",gA);
         cA.setFitness(1.23);
         population.add(cA);
@@ -231,7 +231,7 @@ public class EAUtilsTest
         /*
          * v0(B)-(B)v1(A)-(A)v2(B)-(B)v3(A)-(A)v4(B)-(B)v5
          */
-        DENOPTIMGraph gE = PopulationTest.makeGraphE();
+        DGraph gE = PopulationTest.makeGraphE();
         Candidate cE = new Candidate("CE",gE);
         cE.setFitness(2.34);
         population.add(cE);
@@ -248,13 +248,13 @@ public class EAUtilsTest
         Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
                 population, mnt, new int[]{0,1}, 3, 1, gaparams);
     
-        DENOPTIMGraph g0 = offspring0.getGraph();
+        DGraph g0 = offspring0.getGraph();
         assertEquals(4,g0.getVertexCount());
         assertEquals(3,g0.getEdgeCount());
         int maxLength = -1;
-        for (DENOPTIMVertex v : g0.getVertexList())
+        for (Vertex v : g0.getVertexList())
         {
-            ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+            ArrayList<Vertex> childTree = new ArrayList<Vertex>();
             g0.getChildrenTree(v, childTree);
             if (childTree.size()>maxLength)
             {
@@ -263,13 +263,13 @@ public class EAUtilsTest
         }
         assertEquals(3,maxLength);
 
-        DENOPTIMGraph g1 = offspring1.getGraph();
+        DGraph g1 = offspring1.getGraph();
         assertEquals(8,g1.getVertexCount());
         assertEquals(7,g1.getEdgeCount());
         maxLength = -1;
-        for (DENOPTIMVertex v : g1.getVertexList())
+        for (Vertex v : g1.getVertexList())
         {
-            ArrayList<DENOPTIMVertex> childTree = new ArrayList<DENOPTIMVertex>();
+            ArrayList<Vertex> childTree = new ArrayList<Vertex>();
             g1.getChildrenTree(v, childTree);
             if (childTree.size()>maxLength)
             {
@@ -297,12 +297,12 @@ public class EAUtilsTest
         GAParameters gaparams = PopulationTest.prepare();
         Population population = new Population(gaparams);
 
-        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
-        DENOPTIMGraph gA = pair[0];
-        DENOPTIMGraph gB = pair[1];
-        ((DENOPTIMTemplate)gA.getVertexAtPosition(1)).setContractLevel(
+        DGraph[] pair = PopulationTest.getPairOfTestGraphsB();
+        DGraph gA = pair[0];
+        DGraph gB = pair[1];
+        ((Template)gA.getVertexAtPosition(1)).setContractLevel(
                 ContractLevel.FREE);
-        ((DENOPTIMTemplate)gB.getVertexAtPosition(1)).setContractLevel(
+        ((Template)gB.getVertexAtPosition(1)).setContractLevel(
                 ContractLevel.FREE);
         
         Candidate cA = new Candidate("CA",gA);
@@ -323,15 +323,15 @@ public class EAUtilsTest
         Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
                 population, mnt, new int[]{0,1}, 8, 1, gaparams);
         
-        DENOPTIMGraph g0xo = offspring0.getGraph();
-        DENOPTIMGraph g1xo = offspring1.getGraph();
+        DGraph g0xo = offspring0.getGraph();
+        DGraph g1xo = offspring1.getGraph();
         
-        DENOPTIMGraph[] expectedPair = PopulationTest.getPairOfTestGraphsBxo();
-        DENOPTIMGraph expected0 = expectedPair[0];
-        DENOPTIMGraph expected1 = expectedPair[1];
-        ((DENOPTIMTemplate)expected0.getVertexAtPosition(1)).setContractLevel(
+        DGraph[] expectedPair = PopulationTest.getPairOfTestGraphsBxo();
+        DGraph expected0 = expectedPair[0];
+        DGraph expected1 = expectedPair[1];
+        ((Template)expected0.getVertexAtPosition(1)).setContractLevel(
                 ContractLevel.FREE);
-        ((DENOPTIMTemplate)expected1.getVertexAtPosition(1)).setContractLevel(
+        ((Template)expected1.getVertexAtPosition(1)).setContractLevel(
                 ContractLevel.FREE);
         
         assertTrue(expected0.sameAs(g0xo, new StringBuilder()));
@@ -356,12 +356,12 @@ public class EAUtilsTest
         GAParameters gaparams = PopulationTest.prepare();
         Population population = new Population(gaparams);
 
-        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsBxo();
-        DENOPTIMGraph gA = pair[0];
-        DENOPTIMGraph gB = pair[1];
-        ((DENOPTIMTemplate)gA.getVertexAtPosition(1)).setContractLevel(
+        DGraph[] pair = PopulationTest.getPairOfTestGraphsBxo();
+        DGraph gA = pair[0];
+        DGraph gB = pair[1];
+        ((Template)gA.getVertexAtPosition(1)).setContractLevel(
                 ContractLevel.FREE);
-        ((DENOPTIMTemplate)gB.getVertexAtPosition(1)).setContractLevel(
+        ((Template)gB.getVertexAtPosition(1)).setContractLevel(
                 ContractLevel.FREE);
         
         Candidate cA = new Candidate("CA",gA);
@@ -382,15 +382,15 @@ public class EAUtilsTest
         Candidate offspring1 = EAUtils.buildCandidateByXOver(eligibleParents, 
                 population, mnt, new int[]{0,1}, 17, 1, gaparams);
         
-        DENOPTIMGraph g0xo = offspring0.getGraph();
-        DENOPTIMGraph g1xo = offspring1.getGraph();
+        DGraph g0xo = offspring0.getGraph();
+        DGraph g1xo = offspring1.getGraph();
         
-        DENOPTIMGraph[] expectedPair = PopulationTest.getPairOfTestGraphsBxoxo();
-        DENOPTIMGraph expected0 = expectedPair[0];
-        DENOPTIMGraph expected1 = expectedPair[1];
-        ((DENOPTIMTemplate)expected0.getVertexAtPosition(1)).setContractLevel(
+        DGraph[] expectedPair = PopulationTest.getPairOfTestGraphsBxoxo();
+        DGraph expected0 = expectedPair[0];
+        DGraph expected1 = expectedPair[1];
+        ((Template)expected0.getVertexAtPosition(1)).setContractLevel(
                 ContractLevel.FREE);
-        ((DENOPTIMTemplate)expected1.getVertexAtPosition(1)).setContractLevel(
+        ((Template)expected1.getVertexAtPosition(1)).setContractLevel(
                 ContractLevel.FREE);
         
         assertTrue(expected0.sameAs(g0xo, new StringBuilder()));
@@ -405,21 +405,21 @@ public class EAUtilsTest
         GAParameters gaparams = PopulationTest.prepare();
         Population population = new Population(gaparams);
 
-        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
-        DENOPTIMGraph gA = pair[0];
-        DENOPTIMGraph gB = pair[1];
-        DENOPTIMTemplate embeddedTmplA = (DENOPTIMTemplate) gA.getVertexAtPosition(1);
+        DGraph[] pair = PopulationTest.getPairOfTestGraphsB();
+        DGraph gA = pair[0];
+        DGraph gB = pair[1];
+        Template embeddedTmplA = (Template) gA.getVertexAtPosition(1);
         embeddedTmplA.setContractLevel(ContractLevel.FIXED_STRUCT);
-        DENOPTIMGraph embeddedGraphA = embeddedTmplA.getInnerGraph();
-        DENOPTIMTemplate embeddedTmplB = (DENOPTIMTemplate) gB.getVertexAtPosition(1);
+        DGraph embeddedGraphA = embeddedTmplA.getInnerGraph();
+        Template embeddedTmplB = (Template) gB.getVertexAtPosition(1);
         embeddedTmplB.setContractLevel(ContractLevel.FIXED_STRUCT);
-        DENOPTIMGraph embeddedGraphB = embeddedTmplB.getInnerGraph();
+        DGraph embeddedGraphB = embeddedTmplB.getInnerGraph();
         
         // Make vertexes unique so, even though they are empty, they will be 
         // seen as non equal and crossover will be seen as non-redundant.
         String propName = "uniquefier";
         int i=0;
-        for (DENOPTIMVertex v : embeddedGraphA.getVertexList())
+        for (Vertex v : embeddedGraphA.getVertexList())
         {
             v.setUniquefyingProperty(propName);
             v.setProperty(propName, i);
@@ -458,31 +458,31 @@ public class EAUtilsTest
                 throw e;
             }
             
-            DENOPTIMGraph g0xo = offspring0.getGraph();
-            DENOPTIMGraph g1xo = offspring1.getGraph();
-            DENOPTIMTemplate t0 = null;
-            DENOPTIMTemplate t1 = null;
-            for (DENOPTIMVertex v : g0xo.getVertexList())
+            DGraph g0xo = offspring0.getGraph();
+            DGraph g1xo = offspring1.getGraph();
+            Template t0 = null;
+            Template t1 = null;
+            for (Vertex v : g0xo.getVertexList())
             {
-                if (v instanceof DENOPTIMTemplate)
+                if (v instanceof Template)
                 {
-                    t0 = (DENOPTIMTemplate) v;
+                    t0 = (Template) v;
                     break;
                 }
             }
-            for (DENOPTIMVertex v : g1xo.getVertexList())
+            for (Vertex v : g1xo.getVertexList())
             {
-                if (v instanceof DENOPTIMTemplate)
+                if (v instanceof Template)
                 {
-                    t1 = (DENOPTIMTemplate) v;
+                    t1 = (Template) v;
                     break;
                 }
             }
             assertNotNull(t0);
             assertNotNull(t1);
             
-            DENOPTIMGraph embeddedGraph0 = t0.getInnerGraph();
-            DENOPTIMGraph embeddedGraph1 = t1.getInnerGraph();
+            DGraph embeddedGraph0 = t0.getInnerGraph();
+            DGraph embeddedGraph1 = t1.getInnerGraph();
             
             // Ensure there has been a change
             if (!embeddedGraphA.isIsomorphicTo(embeddedGraph0) 
@@ -594,16 +594,16 @@ public class EAUtilsTest
     @Test
     public void testCrowdingProbability() throws Exception
     {
-        DENOPTIMGraph g = DENOPTIMGraphTest.makeTestGraphA();
+        DGraph g = DENOPTIMGraphTest.makeTestGraphA();
         double t = 0.001;
         double p = 0.0;
-        for (DENOPTIMAttachmentPoint ap : g.getAttachmentPoints())
+        for (AttachmentPoint ap : g.getAttachmentPoints())
         {
             p = EAUtils.getCrowdingProbability(ap,3,1.0,1.0,1.0);
             assertTrue(Math.abs(1.0 - p)<t,
                     "Scheme 3 should return always 1.0 but was "+p);
         }
-        DENOPTIMAttachmentPoint ap3 = g.getVertexAtPosition(0).getAP(3);
+        AttachmentPoint ap3 = g.getVertexAtPosition(0).getAP(3);
         p = EAUtils.getCrowdingProbability(ap3,0,1.0,10,1.0);
         assertTrue(Math.abs(1.0 - p)<t, "Scheme 0 on ap3: 1.0 != "+p);
         p = EAUtils.getCrowdingProbability(ap3,1,1.0,10,1.0);
@@ -611,7 +611,7 @@ public class EAUtilsTest
         p = EAUtils.getCrowdingProbability(ap3,2,1.0,10,1.0);
         assertTrue(Math.abs(1.0 - p)<t, "Scheme 2 on ap3: 1.0 != "+p);
         
-        DENOPTIMAttachmentPoint ap2 = g.getVertexAtPosition(0).getAP(2);
+        AttachmentPoint ap2 = g.getVertexAtPosition(0).getAP(2);
         p = EAUtils.getCrowdingProbability(ap2,2,1.0,10,1.0);
         assertTrue(Math.abs(0.5 - p)<t, "Scheme 2 on ap2");
     }
@@ -621,7 +621,7 @@ public class EAUtilsTest
     @Test
     public void testSelectNonScaffoldNonCapVertex() throws Exception
     {
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         EmptyVertex s = new EmptyVertex();
         s.addAP();
         s.addAP();
@@ -657,10 +657,10 @@ public class EAUtilsTest
         g.appendVertexOnAP(v.getAP(2), c3.getAP(0));
         g.appendVertexOnAP(v.getAP(3), c4.getAP(0));
         
-        DENOPTIMVertex expected = v;
+        Vertex expected = v;
         for (int i=0; i<5; i++)
         {
-            DENOPTIMVertex chosen = EAUtils.selectNonScaffoldNonCapVertex(g);
+            Vertex chosen = EAUtils.selectNonScaffoldNonCapVertex(g);
             assertEquals(expected, chosen, "Index of the only choosable " +
                     "vertex");
         }

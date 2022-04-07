@@ -19,7 +19,7 @@ import denoptim.exception.DENOPTIMException;
  *
  */
 
-public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint>
+public class APMapping extends LinkedHashMap<AttachmentPoint, AttachmentPoint>
     implements Cloneable
 {
     /**
@@ -43,7 +43,7 @@ public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAt
      * Produced an index-based version of this mapping where each index
      * represents the attachment point as its index in the owner vertex
      * (i.e., the integer is the result of 
-     * {@link DENOPTIMVertex#getIndexInOwner()}. 
+     * {@link Vertex#getIndexInOwner()}. 
      * For the indexes to work properly, all the 1st/2nd APs in the mapping 
      * pairs, must consistently belong to the same vertex. 
      * @return an index-based analogue of this mapping.
@@ -57,10 +57,10 @@ public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAt
         if (this.isEmpty())
             return apMap;
         
-        DENOPTIMVertex ownerKey = null;
-        DENOPTIMVertex ownerVal = null;
+        Vertex ownerKey = null;
+        Vertex ownerVal = null;
         
-        for (DENOPTIMAttachmentPoint key : this.keySet())
+        for (AttachmentPoint key : this.keySet())
         {
             if (ownerKey != null && key.getOwner() != ownerKey)
             {
@@ -69,7 +69,7 @@ public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAt
                         + ownerKey.getVertexId() + ". APMapping cannot be "
                         + "converted to int-mapping.");
             }
-            DENOPTIMAttachmentPoint val = this.get(key);
+            AttachmentPoint val = this.get(key);
             if (ownerVal != null && val.getOwner() != ownerVal)
             {
                 throw new IllegalStateException("Owner of AP " 
@@ -94,7 +94,7 @@ public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAt
      * @return <code>true</code> if this mapping contains all the APs
      * and they are all in the 1st position of their pair.
      */
-    public boolean containsAllKeys(List<DENOPTIMAttachmentPoint> keys)
+    public boolean containsAllKeys(List<AttachmentPoint> keys)
     {
         return this.keySet().containsAll(keys);
     }
@@ -108,7 +108,7 @@ public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAt
      * @return <code>true</code> if this mapping contains all the APs
      * and they are all in the 2nd position of their pair.
      */
-    public boolean containsAllValues(List<DENOPTIMAttachmentPoint> keys)
+    public boolean containsAllValues(List<AttachmentPoint> keys)
     {
         return this.values().containsAll(keys);
     }
@@ -122,7 +122,7 @@ public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAt
     public APMapping clone()
     {
         APMapping c = new APMapping();
-        for (DENOPTIMAttachmentPoint key : this.keySet())
+        for (AttachmentPoint key : this.keySet())
         {
             c.put(key, this.get(key));
         }
@@ -138,7 +138,7 @@ public class APMapping extends LinkedHashMap<DENOPTIMAttachmentPoint, DENOPTIMAt
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        for (DENOPTIMAttachmentPoint key : this.keySet())
+        for (AttachmentPoint key : this.keySet())
         {
             sb.append(key.getID()+"-"+this.get(key).getID()+" ");
         }

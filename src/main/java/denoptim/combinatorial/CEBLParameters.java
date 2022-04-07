@@ -29,9 +29,9 @@ import java.util.logging.Level;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
 
 
@@ -58,7 +58,7 @@ public class CEBLParameters extends RunTimeParameters
     /**
      * User defined list of root graphs
      */
-    private ArrayList<DENOPTIMGraph> rootGraphs;
+    private ArrayList<DGraph> rootGraphs;
 
     /**
      * Unique identifier file
@@ -139,7 +139,7 @@ public class CEBLParameters extends RunTimeParameters
 
 //-----------------------------------------------------------------------------
 
-    public ArrayList<DENOPTIMGraph> getRootGraphs()
+    public ArrayList<DGraph> getRootGraphs()
     {
         return rootGraphs;
     }
@@ -387,7 +387,7 @@ public class CEBLParameters extends RunTimeParameters
     	    msg = "Number of processors (" + numCPU + ") is not valid. "
     		  + "Setting its value to 1.";
     	    numCPU = 1;
-    	    DENOPTIMLogger.appLogger.info(msg);
+    	    StaticLogger.appLogger.info(msg);
     	}
 
         if (maxLevel < 0)
@@ -441,7 +441,7 @@ public class CEBLParameters extends RunTimeParameters
 
         try
         {
-            DENOPTIMLogger.getInstance().setupLogger(logFile);
+            StaticLogger.getInstance().setupLogger(logFile);
         }
         catch (IOException ioe)
         {
@@ -465,7 +465,7 @@ public class CEBLParameters extends RunTimeParameters
             catch (Throwable t)
             {
                 String msg = "Cannot read root graphs from " + rootGraphsFile;
-                DENOPTIMLogger.appLogger.log(Level.INFO,msg);
+                StaticLogger.appLogger.log(Level.INFO,msg);
                 throw new DENOPTIMException(msg,t);
             }
 		}

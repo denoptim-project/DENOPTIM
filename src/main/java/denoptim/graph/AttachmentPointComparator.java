@@ -23,15 +23,15 @@ import java.util.Comparator;
 /**
  * Comparator for DENOPTIMAttachmentPoints. APs are sorted by creation time,
  * effectively. This is the standard behaviour of 
- * {@link DENOPTIMAttachmentPoint#compareTo(DENOPTIMAttachmentPoint)}.
+ * {@link AttachmentPoint#compareTo(AttachmentPoint)}.
  * 
  * @author Marco Foscato
  */
 
-public class DENOPTIMAttachmentPointComparator implements Comparator<DENOPTIMAttachmentPoint>
+public class AttachmentPointComparator implements Comparator<AttachmentPoint>
 {
     @Override
-    public int compare(DENOPTIMAttachmentPoint ap1, DENOPTIMAttachmentPoint ap2)
+    public int compare(AttachmentPoint ap1, AttachmentPoint ap2)
     {
         return ap1.compareTo(ap2);
     }

@@ -30,7 +30,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 import denoptim.json.DENOPTIMgson;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 
 public class FileUtils
 {
@@ -81,7 +81,7 @@ public class FileUtils
                     false);
         } catch (DENOPTIMException e)
         {
-            DENOPTIMLogger.appLogger.log(Level.WARNING, "WARNING: unable to "
+            StaticLogger.appLogger.log(Level.WARNING, "WARNING: unable to "
                     + "write list of recent files.", e);
         }
     }

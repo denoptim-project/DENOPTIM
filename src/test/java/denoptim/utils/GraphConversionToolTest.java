@@ -40,17 +40,17 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.PopulationTest;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
 import denoptim.graph.DENOPTIMGraphTest;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.NodeConnection;
-import denoptim.graph.Node;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Vertex.BBType;
+import denoptim.graph.simplified.Node;
+import denoptim.graph.simplified.NodeConnection;
 
 /**
  * Unit test for GraphConversionTool
@@ -80,7 +80,7 @@ public class GraphConversionToolTest
         HashSet<APClass> forbEnds = new HashSet<APClass>();
         forbEnds.add(b0);
         
-    	DENOPTIMFragment frg1 = new DENOPTIMFragment();
+    	Fragment frg1 = new Fragment();
     	IAtom a1 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	IAtom a2 = new Atom("C", new Point3d(new double[]{1.0, 0.0, 0.0}));
     	frg1.addAtom(a1);
@@ -90,40 +90,40 @@ public class GraphConversionToolTest
     	frg1.addAP(1, a0, new Point3d(new double[]{1.0, 1.0, 1.0}));
     	frg1.projectAPsToProperties(); 
     	
-    	DENOPTIMFragment frg2 = new DENOPTIMFragment();
+    	Fragment frg2 = new Fragment();
     	IAtom a3 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	frg2.addAtom(a3);
     	frg2.addAP(0, a0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	frg2.addAP(0, b0, new Point3d(new double[]{0.0, 1.0, -1.0}));   
     	frg2.projectAPsToProperties(); 
 
-    	DENOPTIMFragment rca1 = new DENOPTIMFragment();
+    	Fragment rca1 = new Fragment();
     	IAtom a4 = new PseudoAtom("ATP", new Point3d(
     	        new double[]{0.0, 0.0, 0.0}));
     	rca1.addAtom(a4);
     	rca1.addAP(0, ap0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	rca1.projectAPsToProperties(); 
     	
-    	DENOPTIMFragment rca2 = new DENOPTIMFragment();
+    	Fragment rca2 = new Fragment();
     	IAtom a5 = new PseudoAtom("ATM", new Point3d(
     	        new double[]{1.0, 0.0, 0.0}));
     	rca2.addAtom(a5);
     	rca2.addAP(0, am0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	rca2.projectAPsToProperties(); 
     	
-    	DENOPTIMFragment cap = new DENOPTIMFragment();
+    	Fragment cap = new Fragment();
     	IAtom a6 = new Atom("H", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	cap.addAtom(a6);
     	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	cap.projectAPsToProperties(); 
     	
-    	ArrayList<DENOPTIMVertex> scaff = new ArrayList<DENOPTIMVertex>();
+    	ArrayList<Vertex> scaff = new ArrayList<Vertex>();
     	scaff.add(frg1);
-    	ArrayList<DENOPTIMVertex> frags = new ArrayList<DENOPTIMVertex>();
+    	ArrayList<Vertex> frags = new ArrayList<Vertex>();
     	frags.add(frg2);
     	frags.add(rca1);
     	frags.add(rca2);
-    	ArrayList<DENOPTIMVertex> caps = new ArrayList<DENOPTIMVertex>();
+    	ArrayList<Vertex> caps = new ArrayList<Vertex>();
     	caps.add(cap);
     	
     	FragmentSpaceParameters fsp = new FragmentSpaceParameters();
@@ -131,25 +131,25 @@ public class GraphConversionToolTest
                 cpMap, capMap, forbEnds, cpMap);
         fs.setAPclassBasedApproach(true);
     	
-    	DENOPTIMGraph dg = new DENOPTIMGraph();
-    	DENOPTIMVertex v1 = DENOPTIMVertex.newVertexFromLibrary(1, 0, 
+    	DGraph dg = new DGraph();
+    	Vertex v1 = Vertex.newVertexFromLibrary(1, 0, 
     	        BBType.SCAFFOLD, fs);
-    	DENOPTIMVertex v2 = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
+    	Vertex v2 = Vertex.newVertexFromLibrary(2, 0, 
                 BBType.FRAGMENT, fs);
-    	DENOPTIMVertex v3 = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
+    	Vertex v3 = Vertex.newVertexFromLibrary(3, 2, 
                 BBType.FRAGMENT, fs);
-    	DENOPTIMVertex v4 = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
+    	Vertex v4 = Vertex.newVertexFromLibrary(4, 1, 
                 BBType.FRAGMENT, fs);
         dg.addVertex(v1);
         dg.addVertex(v2);
         dg.addVertex(v3);
         dg.addVertex(v4);
         
-        DENOPTIMEdge e1 = new DENOPTIMEdge(v1.getAP(1), v2.getAP(0), 
+        Edge e1 = new Edge(v1.getAP(1), v2.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e2 = new DENOPTIMEdge(v2.getAP(1), v3.getAP(0), 
+        Edge e2 = new Edge(v2.getAP(1), v3.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e3 = new DENOPTIMEdge(v1.getAP(0), v4.getAP(0), 
+        Edge e3 = new Edge(v1.getAP(0), v4.getAP(0), 
                 BondType.SINGLE);
         dg.addEdge(e1);
         dg.addEdge(e2);
@@ -165,25 +165,25 @@ public class GraphConversionToolTest
         assertEquals(3, dg.getEdgeCount(), "Number of edges after "
                 + "removal of 0 unused RCVs.");
     	
-        DENOPTIMGraph acyclicGraph = new DENOPTIMGraph();
-        DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1, 0, 
+        DGraph acyclicGraph = new DGraph();
+        Vertex v1b = Vertex.newVertexFromLibrary(1, 0, 
                 BBType.SCAFFOLD, fs);
-        DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
+        Vertex v2b = Vertex.newVertexFromLibrary(2, 0, 
                 BBType.FRAGMENT, fs);
-        DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
+        Vertex v3b = Vertex.newVertexFromLibrary(3, 2, 
                 BBType.FRAGMENT, fs);
-        DENOPTIMVertex v4b = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
+        Vertex v4b = Vertex.newVertexFromLibrary(4, 1, 
                 BBType.FRAGMENT, fs);
         acyclicGraph.addVertex(v1b);
         acyclicGraph.addVertex(v2b);
         acyclicGraph.addVertex(v3b);
         acyclicGraph.addVertex(v4b);
         
-        DENOPTIMEdge e1b = new DENOPTIMEdge(v1b.getAP(1), v2b.getAP(0), 
+        Edge e1b = new Edge(v1b.getAP(1), v2b.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e2b = new DENOPTIMEdge(v2b.getAP(1), v3b.getAP(0), 
+        Edge e2b = new Edge(v2b.getAP(1), v3b.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e3b = new DENOPTIMEdge(v1b.getAP(0), v4b.getAP(0), 
+        Edge e3b = new Edge(v1b.getAP(0), v4b.getAP(0), 
                 BondType.SINGLE);
         acyclicGraph.addEdge(e1b);
         acyclicGraph.addEdge(e2b);
@@ -206,12 +206,12 @@ public class GraphConversionToolTest
     public void testGetJGraphKernelFromGraph() throws Exception
     {
         PopulationTest.prepare();
-        DENOPTIMGraph[] pair = PopulationTest.getPairOfTestGraphsB();
-        DENOPTIMGraph gA = pair[0];
-        DENOPTIMGraph gB = pair[1];
-        DENOPTIMGraph gC = ((DENOPTIMTemplate) gA.getVertexAtPosition(1))
+        DGraph[] pair = PopulationTest.getPairOfTestGraphsB();
+        DGraph gA = pair[0];
+        DGraph gB = pair[1];
+        DGraph gC = ((Template) gA.getVertexAtPosition(1))
                 .getInnerGraph();
-        DENOPTIMGraph gD = ((DENOPTIMTemplate) gB.getVertexAtPosition(1))
+        DGraph gD = ((Template) gB.getVertexAtPosition(1))
                 .getInnerGraph();
         
         DefaultUndirectedGraph<Node, NodeConnection> gkA = 

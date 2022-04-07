@@ -6,7 +6,7 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 
 /**
  * A light-weight atom representation to facilitate json serialization of 
@@ -49,7 +49,7 @@ public class LWAtom
     public IAtom toIAtom()
     {
         IAtom atm = null;
-        if (DENOPTIMMoleculeUtils.isElement(elSymbol))
+        if (MoleculeUtils.isElement(elSymbol))
         {
             atm = new Atom(elSymbol);
         } else {

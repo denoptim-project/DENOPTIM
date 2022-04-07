@@ -39,7 +39,7 @@ import denoptim.utils.MutationType;
  * attachment points, but has no atoms.
  *
  */
-public class EmptyVertex extends DENOPTIMVertex
+public class EmptyVertex extends Vertex
 {
     /**
      * Version UID
@@ -49,7 +49,7 @@ public class EmptyVertex extends DENOPTIMVertex
     /**
      * Attachment points on this vertex
      */
-    private ArrayList<DENOPTIMAttachmentPoint> lstAPs;
+    private ArrayList<AttachmentPoint> lstAPs;
 
     /**
      * List of AP sets that are related to each other, so that we
@@ -65,7 +65,7 @@ public class EmptyVertex extends DENOPTIMVertex
     public EmptyVertex()
     {
         super(VertexType.EmptyVertex, GraphUtils.getUniqueVertexIndex());
-        lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        lstAPs = new ArrayList<AttachmentPoint>();
         lstSymAPs = new ArrayList<SymmetricSet>();
     }
 
@@ -81,7 +81,7 @@ public class EmptyVertex extends DENOPTIMVertex
       public EmptyVertex(BBType type)
       {
           super(VertexType.EmptyVertex);
-          lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+          lstAPs = new ArrayList<AttachmentPoint>();
           lstSymAPs = new ArrayList<SymmetricSet>();
           buildingBlockType = type;
       }
@@ -98,7 +98,7 @@ public class EmptyVertex extends DENOPTIMVertex
     public EmptyVertex(int id)
     {
         super(VertexType.EmptyVertex, id);
-        lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        lstAPs = new ArrayList<AttachmentPoint>();
         lstSymAPs = new ArrayList<SymmetricSet>();
     }
 
@@ -113,7 +113,7 @@ public class EmptyVertex extends DENOPTIMVertex
      * @param isRCV set <code>true</code> to mark this vertex as a 
      * ring-closing vertex.
      */
-    public EmptyVertex(int id, ArrayList<DENOPTIMAttachmentPoint> lstAPs,
+    public EmptyVertex(int id, ArrayList<AttachmentPoint> lstAPs,
             ArrayList<SymmetricSet> lstSymAPs, boolean isRCV)
     {
         super(VertexType.EmptyVertex, id);
@@ -124,7 +124,7 @@ public class EmptyVertex extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
+    public ArrayList<AttachmentPoint> getAttachmentPoints()
     {
         return lstAPs;
     }
@@ -197,7 +197,7 @@ public class EmptyVertex extends DENOPTIMVertex
     public int getFreeAPCount()
     {
         int n = 0;
-        for (DENOPTIMAttachmentPoint denoptimAttachmentPoint : lstAPs) {
+        for (AttachmentPoint denoptimAttachmentPoint : lstAPs) {
             if (denoptimAttachmentPoint.isAvailable())
                 n++;
         }
@@ -208,7 +208,7 @@ public class EmptyVertex extends DENOPTIMVertex
 
     public boolean hasFreeAP()
     {
-        for (DENOPTIMAttachmentPoint denoptimAttachmentPoint : lstAPs) {
+        for (AttachmentPoint denoptimAttachmentPoint : lstAPs) {
             if (denoptimAttachmentPoint.isAvailable())
                 return true;
         }
@@ -265,7 +265,7 @@ public class EmptyVertex extends DENOPTIMVertex
         
         c.setMutationTypes(this.getUnfilteredMutationTypes());
         
-        for (DENOPTIMAttachmentPoint ap : lstAPs)
+        for (AttachmentPoint ap : lstAPs)
         {
             c.addAP(ap.getAPClass());
         }
@@ -289,7 +289,7 @@ public class EmptyVertex extends DENOPTIMVertex
      * This is used only for testing purposes.
      */
     public void addAP() {
-        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this);
+        AttachmentPoint ap = new AttachmentPoint(this);
         getAttachmentPoints().add(ap);
     }
       
@@ -300,7 +300,7 @@ public class EmptyVertex extends DENOPTIMVertex
        * @param apClass the APClass
        */
       public void addAP(APClass apClass) {
-          DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
+          AttachmentPoint ap = new AttachmentPoint(this,
                   -1, null, apClass);
           getAttachmentPoints().add(ap);
       }
@@ -395,7 +395,7 @@ public class EmptyVertex extends DENOPTIMVertex
     {   
         Gson gson = DENOPTIMgson.getReader();
         EmptyVertex ev = gson.fromJson(json, EmptyVertex.class);
-        for (DENOPTIMAttachmentPoint ap : ev.getAttachmentPoints())
+        for (AttachmentPoint ap : ev.getAttachmentPoints())
         {
             ap.setOwner(ev);
         }
@@ -412,7 +412,7 @@ public class EmptyVertex extends DENOPTIMVertex
     public ArrayList<APClass> getAllAPClasses()
     {
         ArrayList<APClass> lst = new ArrayList<APClass>();
-        for (DENOPTIMAttachmentPoint ap : lstAPs)
+        for (AttachmentPoint ap : lstAPs)
         {
             APClass apCls = ap.getAPClass();
             if (!lst.contains(apCls))
@@ -450,9 +450,9 @@ public class EmptyVertex extends DENOPTIMVertex
      */
     
     @Override
-    public List<DENOPTIMVertex> getMutationSites(List<MutationType> ignoredTypes)
+    public List<Vertex> getMutationSites(List<MutationType> ignoredTypes)
     {
-        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         switch (getBuildingBlockType())
         {
             case CAP:

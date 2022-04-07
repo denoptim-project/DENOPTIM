@@ -25,8 +25,8 @@ import java.util.List;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.Ring;
+import denoptim.graph.Vertex;
 import denoptim.graph.rings.RingClosingAttractor;
 
 
@@ -76,8 +76,8 @@ public class RingClosingUtils
      * Compares two combinations of <code>DENOPTIMRings</code>s and evaluates
      * whether these correspond to the same combination
      */
-    public static boolean areSameRingsSet(List<DENOPTIMRing> oldCmb,
-							   List<DENOPTIMRing> ringsComb)
+    public static boolean areSameRingsSet(List<Ring> oldCmb,
+							   List<Ring> ringsComb)
     {
 	// Compare size
 	if (oldCmb.size() != ringsComb.size())
@@ -87,11 +87,11 @@ public class RingClosingUtils
 
 	// Compare individual rings
 	int checkedRings = 0;
-	for (DENOPTIMRing rA : oldCmb)
+	for (Ring rA : oldCmb)
 	{
-	    DENOPTIMVertex headA = rA.getHeadVertex();
-	    DENOPTIMVertex tailA = rA.getTailVertex();
-	    for (DENOPTIMRing rB : ringsComb)
+	    Vertex headA = rA.getHeadVertex();
+	    Vertex tailA = rA.getTailVertex();
+	    for (Ring rB : ringsComb)
 	    {
 		if (rA.getSize() != rB.getSize())
 		{
@@ -99,8 +99,8 @@ public class RingClosingUtils
 		}
 		if (rB.contains(headA))
 		{
-                    DENOPTIMVertex headB = rB.getHeadVertex();
-                    DENOPTIMVertex tailB = rB.getTailVertex();
+                    Vertex headB = rB.getHeadVertex();
+                    Vertex tailB = rB.getTailVertex();
 		    if ((headA == headB && tailA != tailB) ||
 			(headA == tailB && tailA != headB))
 		    {

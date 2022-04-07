@@ -28,20 +28,20 @@ import org.jgrapht.graph.DefaultUndirectedGraph;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Ring;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
+import denoptim.graph.simplified.Node;
+import denoptim.graph.simplified.NodeConnection;
+import denoptim.graph.simplified.UndirectedEdge;
 import denoptim.graph.EmptyVertex;
-import denoptim.graph.Node;
-import denoptim.graph.NodeConnection;
 import denoptim.graph.SymmetricSet;
-import denoptim.graph.UndirectedEdge;
 
 
 /**
@@ -64,15 +64,15 @@ public class GraphConversionTool
      * @throws DENOPTIMException 
      */
     //TODO-gg move to graph
-    public static void replaceUnusedRCVsWithCapps(DENOPTIMGraph g, 
+    public static void replaceUnusedRCVsWithCapps(DGraph g, 
             FragmentSpace fragSpace) throws DENOPTIMException
     {
-        for (DENOPTIMVertex v : g.getRCVertices())
+        for (Vertex v : g.getRCVertices())
         {
             if (g.getRingsInvolvingVertex(v).size()==0 
                     && v.getEdgeToParent()!=null)
             {
-                DENOPTIMAttachmentPoint apOnG = v.getEdgeToParent().getSrcAP();
+                AttachmentPoint apOnG = v.getEdgeToParent().getSrcAP();
                 g.removeVertex(v);
                 
                 APClass cappAPClass = fragSpace.getAPClassOfCappingVertex(
@@ -82,7 +82,7 @@ public class GraphConversionTool
                 {
                     int capId = fragSpace.getCappingGroupsWithAPClass(
                             cappAPClass).get(0);
-                    DENOPTIMVertex capVrt = DENOPTIMVertex.newVertexFromLibrary(
+                    Vertex capVrt = Vertex.newVertexFromLibrary(
                             capId,BBType.CAP, fragSpace);
                     capVrt.setVertexId(v.getVertexId());
                     g.appendVertexOnAP(apOnG, capVrt.getAP(0));
@@ -101,13 +101,13 @@ public class GraphConversionTool
      * @param strGraph the string representation in DENOPTIM format. NOTE: this
      * is not the serialized representation of a <code>DENOPTIMGraph</code>, but
      * the string obtained by the
-     * {@link denoptim.graph.DENOPTIMGraph#toString() toString} method the
+     * {@link denoptim.graph.DGraph#toString() toString} method the
      * <code>DENOPTIMGraph</code>.
      * @return the Graph representation that can be used by DENOPTIM
      * @throws denoptim.exception.DENOPTIMException
      */
 
-    public static DENOPTIMGraph getGraphFromString(String strGraph,
+    public static DGraph getGraphFromString(String strGraph,
             FragmentSpace fragSpace) throws DENOPTIMException
     {
     	return getGraphFromString(strGraph, true, fragSpace);
@@ -121,7 +121,7 @@ public class GraphConversionTool
      * @param strGraph the string representation in DENOPTIM format. NOTE: this
      * is not the serialized representation of a <code>DENOPTIMGraph</code>, but
      * the string obtained by the 
-     * {@link denoptim.graph.DENOPTIMGraph#toString() toString} method the
+     * {@link denoptim.graph.DGraph#toString() toString} method the
      * <code>DENOPTIMGraph</code>.
      * @param useMolInfo set to <code>true</code> when molecular information 
      * is available for all fragments. That is, the libraries of fragments 
@@ -130,12 +130,12 @@ public class GraphConversionTool
      * @return the Graph representation that can be used by DENOPTIM
      * @throws denoptim.exception.DENOPTIMException
      * @deprecated this method reads the old string representation, which cannot
-     * represent all possible states of a {@link DENOPTIMTemplate}. 
+     * represent all possible states of a {@link Template}. 
      * Use JSON string instead.
      */
 
     @Deprecated
-    public static DENOPTIMGraph getGraphFromString(String strGraph, 
+    public static DGraph getGraphFromString(String strGraph, 
             boolean useMolInfo, FragmentSpace fragSpace) throws DENOPTIMException
     {  
     	// get the main blocks to parse: graphID, vertices, edges, rings, symSet
@@ -168,7 +168,7 @@ public class GraphConversionTool
         // split vertices on the comma
         String[] s2 = vStr.split(",");
 
-        ArrayList<DENOPTIMVertex> vertices = new ArrayList<>();
+        ArrayList<Vertex> vertices = new ArrayList<>();
 
         // for each vertex
         for (int i=0; i<s2.length; i++)
@@ -180,13 +180,13 @@ public class GraphConversionTool
             // molid
             int molid = Integer.parseInt(s3[1]) - 1;
             // fragment/scaffold
-            DENOPTIMVertex.BBType fragtype = DENOPTIMVertex.BBType.parseInt(
+            Vertex.BBType fragtype = Vertex.BBType.parseInt(
                     Integer.parseInt(s3[2]));
 	            
-            DENOPTIMVertex dv;
+            Vertex dv;
             if (fragSpace.isDefined())
             {
-                dv = DENOPTIMVertex.newVertexFromLibrary(vid, molid, fragtype,
+                dv = Vertex.newVertexFromLibrary(vid, molid, fragtype,
                         fragSpace);
             } else {
                 // WARNING: in this case we cannot know the exact number of
@@ -197,7 +197,7 @@ public class GraphConversionTool
             vertices.add(dv);
         }
         
-        ArrayList<DENOPTIMEdge> edges = new ArrayList<>();
+        ArrayList<Edge> edges = new ArrayList<>();
 
         // split edges on the comma
         if (eStr.contains(","))
@@ -220,12 +220,12 @@ public class GraphConversionTool
                 EmptyVertex dummy = new EmptyVertex();
                 dummy.addAP();
                 dummy.addAP();
-                DENOPTIMAttachmentPoint srcAP = dummy.getAP(0);
-                DENOPTIMAttachmentPoint trgAP = dummy.getAP(1);
+                AttachmentPoint srcAP = dummy.getAP(0);
+                AttachmentPoint trgAP = dummy.getAP(1);
                 
                 try {
                     for (int j = 0, apsFound = 0; apsFound < 2; j++) {
-                        DENOPTIMVertex vertex = vertices.get(j);
+                        Vertex vertex = vertices.get(j);
                         if (vertex.getVertexId() == srcVrtxID) {
                             // WARNING!
                             // When we import graphs without a definition of the
@@ -239,8 +239,8 @@ public class GraphConversionTool
                             {
                                 if (vertex instanceof EmptyVertex)
                                     ((EmptyVertex)vertex).addAP();
-                                if (vertex instanceof DENOPTIMFragment)
-                                    ((DENOPTIMFragment)vertex).addAP(0);
+                                if (vertex instanceof Fragment)
+                                    ((Fragment)vertex).addAP(0);
                             }
 
                             srcAP = vertex.getAP(srcAPID);
@@ -261,8 +261,8 @@ public class GraphConversionTool
                             {
                                 if (vertex instanceof EmptyVertex)
                                     ((EmptyVertex)vertex).addAP();
-                                if (vertex instanceof DENOPTIMFragment)
-                                    ((DENOPTIMFragment)vertex).addAP(0);
+                                if (vertex instanceof Fragment)
+                                    ((Fragment)vertex).addAP(0);
                             }
 
                             trgAP = vertex.getAP(trgAPID);
@@ -282,13 +282,13 @@ public class GraphConversionTool
                             " vertex. "+strGraph, e);
                 }
     
-                DENOPTIMEdge ne = new DENOPTIMEdge(srcAP, trgAP, btype);
+                Edge ne = new Edge(srcAP, trgAP, btype);
                 edges.add(ne);
             }
         }
     
         // collect Rings
-        ArrayList<DENOPTIMRing> rings = new ArrayList<>();
+        ArrayList<Ring> rings = new ArrayList<>();
         String[] sr2 = rStr.split("DENOPTIMRing ");
         for (int i=1; i<sr2.length; i++)
         {
@@ -296,8 +296,8 @@ public class GraphConversionTool
             String sr5 = sr4.substring(sr4.indexOf("=") + 1).trim();
             sr5 = sr5.substring(1,sr5.length()-2);
             String[] sr6 = sr5.split(",\\s");
-            ArrayList<DENOPTIMVertex> lstVerteces =
-                    new ArrayList<DENOPTIMVertex>();
+            ArrayList<Vertex> lstVerteces =
+                    new ArrayList<Vertex>();
             for (int j=0; j<sr6.length; j++)
             {
                 String sr7[] = sr6[j].split("_");
@@ -305,7 +305,7 @@ public class GraphConversionTool
                 // vertex id
                 int vid = Integer.parseInt(sr7[0]);
 
-                for (DENOPTIMVertex v : vertices)
+                for (Vertex v : vertices)
                 {
                     if (v.getVertexId() == vid)
                     {
@@ -315,7 +315,7 @@ public class GraphConversionTool
                 }
             }
 
-            DENOPTIMRing r = new DENOPTIMRing(lstVerteces);
+            Ring r = new Ring(lstVerteces);
             rings.add(r);
         }
 
@@ -338,13 +338,13 @@ public class GraphConversionTool
             symSets.add(ss);
         }
 	
-        DENOPTIMGraph g = new DENOPTIMGraph(vertices, edges, rings, symSets);
+        DGraph g = new DGraph(vertices, edges, rings, symSets);
 
         // update bond type of chords
-        for (DENOPTIMRing r : rings)
+        for (Ring r : rings)
         {
             int vid = r.getHeadVertex().getVertexId();
-            for (DENOPTIMEdge e : edges)
+            for (Edge e : edges)
             {
                 if (e.getTrgVertex() == vid || e.getSrcVertex() == vid)
                 {
@@ -362,10 +362,10 @@ public class GraphConversionTool
 //------------------------------------------------------------------------------
     
     /**
-     * Converts a {@link DENOPTIMGraph} into a simplified JGraphT 
+     * Converts a {@link DGraph} into a simplified JGraphT 
      * {@link DefaultUndirectedGraph}. 
      * The simplification consist of not producing a 1:1 list of vertexes and 
-     * edges compared to the {@link DENOPTIMGraph}. 
+     * edges compared to the {@link DGraph}. 
      * Instead,
      * <ul>
      * <li>pairs of used RCVs are removed and the attachment points to
@@ -375,14 +375,14 @@ public class GraphConversionTool
      * @param dg the graph to convert.
      * @return the simplified graph.
      */
-    public static DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdge>
-        getJGraphFromGraph(DENOPTIMGraph dg)
+    public static DefaultUndirectedGraph<Vertex, UndirectedEdge>
+        getJGraphFromGraph(DGraph dg)
     {
-        DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdge> g = 
+        DefaultUndirectedGraph<Vertex, UndirectedEdge> g = 
                         new DefaultUndirectedGraph<>(UndirectedEdge.class);
-        Map<DENOPTIMVertex,Integer> vis = new HashMap<DENOPTIMVertex,Integer>();
+        Map<Vertex,Integer> vis = new HashMap<Vertex,Integer>();
         int i = 0;
-        for (DENOPTIMVertex v : dg.getVertexList())
+        for (Vertex v : dg.getVertexList())
         {
             vis.put(v, i);
             i += 1;
@@ -397,10 +397,10 @@ public class GraphConversionTool
             }
         }
 
-        for (DENOPTIMEdge e : dg.getEdgeList())
+        for (Edge e : dg.getEdgeList())
         {
-            DENOPTIMVertex vA = e.getSrcAP().getOwner();
-            DENOPTIMVertex vB = e.getTrgAP().getOwner();
+            Vertex vA = e.getSrcAP().getOwner();
+            Vertex vB = e.getTrgAP().getOwner();
             if (!vA.isRCV() && !vB.isRCV())
             {
                 g.addEdge(vA, vB, new UndirectedEdge(e.getSrcAP(), 
@@ -408,12 +408,12 @@ public class GraphConversionTool
             }
         }
         
-        for (DENOPTIMRing r : dg.getRings())
+        for (Ring r : dg.getRings())
         {
-            DENOPTIMVertex vA = r.getHeadVertex();
-            DENOPTIMVertex vB = r.getTailVertex();
-            DENOPTIMVertex pA = vA.getParent();
-            DENOPTIMVertex pB = vB.getParent();
+            Vertex vA = r.getHeadVertex();
+            Vertex vB = r.getTailVertex();
+            Vertex pA = vA.getParent();
+            Vertex pB = vB.getParent();
 
             g.addEdge(pA, pB, new UndirectedEdge(
                     vA.getEdgeToParent().getSrcAP(), 
@@ -425,24 +425,24 @@ public class GraphConversionTool
 //------------------------------------------------------------------------------
     
     /**
-     * Converts a {@link DENOPTIMGraph} into a simplified JGraphT 
+     * Converts a {@link DGraph} into a simplified JGraphT 
      * {@link DefaultUndirectedGraph}. The simplification is even greater
      * than for graphs produced by  
-     * {@link #getJGraphFromGraph(DENOPTIMGraph)} in that the content of each 
+     * {@link #getJGraphFromGraph(DGraph)} in that the content of each 
      * vertex and the identify of the attachment points are both ignored.
-     * However, in this method any free {@link DENOPTIMAttachmentPoint} on the 
+     * However, in this method any free {@link AttachmentPoint} on the 
      * given graph will be converted into a node of the JGraphT, so that the
-     * location of {@link DENOPTIMAttachmentPoint}s relative to the structure of
+     * location of {@link AttachmentPoint}s relative to the structure of
      * the graph can be detected.
      * @param dg the graph to convert.
      * @return the simplified graph.
      */
     public static DefaultUndirectedGraph<Node, NodeConnection>
-        getJGraphKernelFromGraph(DENOPTIMGraph dg)
+        getJGraphKernelFromGraph(DGraph dg)
     {
         DefaultUndirectedGraph<Node, NodeConnection> g = 
                         new DefaultUndirectedGraph<>(NodeConnection.class);
-        for (DENOPTIMVertex v : dg.getVertexList())
+        for (Vertex v : dg.getVertexList())
         {
             if (v.isRCV())
             {
@@ -455,10 +455,10 @@ public class GraphConversionTool
             }
         }
 
-        for (DENOPTIMEdge e : dg.getEdgeList())
+        for (Edge e : dg.getEdgeList())
         {
-            DENOPTIMVertex vA = e.getSrcAP().getOwner();
-            DENOPTIMVertex vB = e.getTrgAP().getOwner();
+            Vertex vA = e.getSrcAP().getOwner();
+            Vertex vB = e.getTrgAP().getOwner();
             if (!vA.isRCV() && !vB.isRCV())
             {
                 Node vkA = (Node) vA.getProperty(
@@ -469,12 +469,12 @@ public class GraphConversionTool
             }
         }
         
-        for (DENOPTIMRing r : dg.getRings())
+        for (Ring r : dg.getRings())
         {
-            DENOPTIMVertex vA = r.getHeadVertex();
-            DENOPTIMVertex vB = r.getTailVertex();
-            DENOPTIMVertex pA = vA.getParent();
-            DENOPTIMVertex pB = vB.getParent();
+            Vertex vA = r.getHeadVertex();
+            Vertex vB = r.getTailVertex();
+            Vertex pA = vA.getParent();
+            Vertex pB = vB.getParent();
             Node pvkA = (Node) pA.getProperty(
                     Node.REFTOVERTEXKERNEL);
             Node pvkB = (Node) pB.getProperty(
@@ -482,10 +482,10 @@ public class GraphConversionTool
             g.addEdge(pvkA, pvkB, new NodeConnection(r.getBondType()));
         }
         
-        for (DENOPTIMAttachmentPoint ap : dg.getAvailableAPs())
+        for (AttachmentPoint ap : dg.getAvailableAPs())
         {
             Node vap = new Node(ap);
-            DENOPTIMVertex srcVrtx = ap.getOwner();
+            Vertex srcVrtx = ap.getOwner();
             Node pSrcVrtx = (Node) srcVrtx.getProperty(
                     Node.REFTOVERTEXKERNEL);
             g.addVertex(vap);
@@ -493,7 +493,7 @@ public class GraphConversionTool
         }
         
         // Cleanup
-        for (DENOPTIMVertex v : dg.getVertexList())
+        for (Vertex v : dg.getVertexList())
         {
             v.removeProperty(Node.REFTOVERTEXKERNEL);
         }

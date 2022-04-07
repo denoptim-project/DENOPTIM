@@ -50,19 +50,19 @@ import org.openscience.cdk.silent.Bond;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Ring;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.SymmetricSet;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -128,8 +128,8 @@ public class FragmentSpaceTest
 
         String rootName = tempDir.getAbsolutePath() + SEP;
 
-    	ArrayList<DENOPTIMVertex> fragLib = new ArrayList<DENOPTIMVertex>();
-    	DENOPTIMFragment frg1 = new DENOPTIMFragment();
+    	ArrayList<Vertex> fragLib = new ArrayList<Vertex>();
+    	Fragment frg1 = new Fragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
     	Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
@@ -145,7 +145,7 @@ public class FragmentSpaceTest
     	frg1.projectAPsToProperties();
     	fragLib.add(frg1);
     	
-        DENOPTIMFragment frg2 = new DENOPTIMFragment();
+        Fragment frg2 = new Fragment();
         Atom a21 = new Atom("N", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a22 = new Atom("H", new Point3d(new double[]{1.0, 1.1, 2.2}));
         frg2.addAtom(a21);
@@ -156,7 +156,7 @@ public class FragmentSpaceTest
         frg2.projectAPsToProperties();
         fragLib.add(frg2);
         
-        DENOPTIMFragment frg3 = new DENOPTIMFragment();
+        Fragment frg3 = new Fragment();
         Atom a31 = new Atom("P", new Point3d(new double[]{0.0, 1.1, 2.2}));
         frg3.addAtom(a31);
         frg3.addAPOnAtom(a31, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
@@ -165,7 +165,7 @@ public class FragmentSpaceTest
         frg3.projectAPsToProperties();
         fragLib.add(frg3);
         
-        DENOPTIMFragment frg8 = new DENOPTIMFragment();
+        Fragment frg8 = new Fragment();
         Atom a81 = new Atom("C", new Point3d(new double[]{0.0, 1.1, -2.2}));
         Atom a82 = new Atom("C", new Point3d(new double[]{1.0, 1.1, -2.2}));
         Atom a83 = new Atom("C", new Point3d(new double[]{2.0, 1.1, -2.2}));
@@ -187,8 +187,8 @@ public class FragmentSpaceTest
         String fragLibFile = rootName + "frags.sdf";
         DenoptimIO.writeVertexesToSDF(new File(fragLibFile), fragLib, false);
         
-    	ArrayList<DENOPTIMVertex> scaffLib = new ArrayList<DENOPTIMVertex>();
-        DENOPTIMFragment scaf0 = new DENOPTIMFragment();
+    	ArrayList<Vertex> scaffLib = new ArrayList<Vertex>();
+        Fragment scaf0 = new Fragment();
         Atom a41 = new Atom("O", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a42 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
         Atom a43 = new Atom("Ru", new Point3d(new double[]{2.0, 1.1, 2.2}));
@@ -204,7 +204,7 @@ public class FragmentSpaceTest
         scaf0.projectAPsToProperties();
         scaffLib.add(scaf0);
         
-        DENOPTIMFragment scaf1 = new DENOPTIMFragment();
+        Fragment scaf1 = new Fragment();
         Atom a51 = new Atom("Zn", new Point3d(new double[]{5.0, 1.1, 2.2}));
         scaf1.addAtom(a51);
         scaf1.addAPOnAtom(a51, APCS, new Point3d(new double[]{5.0, 2.2, 3.3}));
@@ -216,15 +216,15 @@ public class FragmentSpaceTest
         String scaffLibFile = rootName + "scaff.sdf";
         DenoptimIO.writeVertexesToSDF(new File(scaffLibFile), scaffLib, false);
         
-        ArrayList<DENOPTIMVertex> cappLib = new ArrayList<DENOPTIMVertex>();
-        DENOPTIMFragment cap1 = new DENOPTIMFragment();
+        ArrayList<Vertex> cappLib = new ArrayList<Vertex>();
+        Fragment cap1 = new Fragment();
         Atom a61 = new Atom("H", new Point3d(new double[]{10.0, 1.1, 2.2}));
         cap1.addAtom(a61);
         cap1.addAPOnAtom(a61, APCC1, new Point3d(new double[]{13.0, 0.0, 3.3}));
         cap1.projectAPsToProperties();
         cappLib.add(cap1);
         
-        DENOPTIMFragment cap2 = new DENOPTIMFragment();
+        Fragment cap2 = new Fragment();
         Atom a71 = new Atom("Cl", new Point3d(new double[]{10.0, 1.1, 2.2}));
         cap2.addAtom(a71);
         cap2.addAPOnAtom(a71, APCC2, new Point3d(new double[]{13.0, 0.0, 3.3}));
@@ -278,7 +278,7 @@ public class FragmentSpaceTest
     {
         FragmentSpaceParameters fsp = buildFragmentSpace();
         assertTrue(fsp.getFragmentSpace().isDefined(),"FragmentSpace is defined");
-        DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(
+        Vertex v = Vertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(),3,BBType.FRAGMENT,
                 fsp.getFragmentSpace());
         
@@ -311,7 +311,7 @@ public class FragmentSpaceTest
     	for (IdFragmentAndAP id : l)
     	{
     	    i++;
-    	    DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
+    	    Vertex v = Vertex.newVertexFromLibrary(-1,
     	            id.getVertexMolId(), id.getVertexMolType(), fs);
     	    assertEquals(APC2, v.getAP(id.getApId()).getAPClass(),
     	            "APClass of "+i);
@@ -335,9 +335,9 @@ public class FragmentSpaceTest
         for (IdFragmentAndAP id : lst)
         {
             i++;
-            DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
+            Vertex v = Vertex.newVertexFromLibrary(-1,
                     id.getVertexMolId(), id.getVertexMolType(), fs);
-            DENOPTIMAttachmentPoint ap = v.getAP(id.getApId());
+            AttachmentPoint ap = v.getAP(id.getApId());
             assertTrue(APC1.isCPMapCompatibleWith(ap.getAPClass(), fs), 
                     "Incompatible choice at "+i);
         }
@@ -356,10 +356,10 @@ public class FragmentSpaceTest
     	ArrayList<IdFragmentAndAP> srcAPs = new ArrayList<IdFragmentAndAP>();
     	srcAPs.add(src1);
     	srcAPs.add(src2);
-    	DENOPTIMVertex src1V = DENOPTIMVertex.newVertexFromLibrary(-1,
+    	Vertex src1V = Vertex.newVertexFromLibrary(-1,
     	        src1.getVertexMolId(), src1.getVertexMolType(), fs);
     	APClass src1APC = src1V.getAP(src1.getApId()).getAPClass();
-        DENOPTIMVertex src2V = DENOPTIMVertex.newVertexFromLibrary(-1,
+        Vertex src2V = Vertex.newVertexFromLibrary(-1,
                 src2.getVertexMolId(), src2.getVertexMolType(), fs);
         APClass src2APC = src2V.getAP(src2.getApId()).getAPClass();
     	
@@ -384,9 +384,9 @@ public class FragmentSpaceTest
         for (IdFragmentAndAP id : lst)
         {
             i++;
-            DENOPTIMVertex v = DENOPTIMVertex.newVertexFromLibrary(-1,
+            Vertex v = Vertex.newVertexFromLibrary(-1,
                     id.getVertexMolId(), id.getVertexMolType(), fs);
-            DENOPTIMAttachmentPoint ap = v.getAP(id.getApId());
+            AttachmentPoint ap = v.getAP(id.getApId());
             assertTrue(src1APC.isCPMapCompatibleWith(ap.getAPClass(), fs)
                     || src2APC.isCPMapCompatibleWith(ap.getAPClass(), fs), 
                     "Incompatible choice at "+i);
@@ -407,7 +407,7 @@ public class FragmentSpaceTest
     	srcAPs.add(src1);
     	srcAPs.add(src2);
     	
-    	ArrayList<DENOPTIMVertex> lst = fs.getFragmentsCompatibleWithTheseAPs(
+    	ArrayList<Vertex> lst = fs.getFragmentsCompatibleWithTheseAPs(
     	        srcAPs);
     	
     	assertEquals(3,lst.size(),"Wrong number of compatible fragments.");	
@@ -435,7 +435,7 @@ public class FragmentSpaceTest
         
         TestCase testCase = getTestCase();
 
-        List<DENOPTIMVertex> fragLib = fs.getFragmentLibrary();
+        List<Vertex> fragLib = fs.getFragmentLibrary();
         fragLib.clear();
 
         fs.addFusedRingsToFragmentLibrary(testCase.graph);
@@ -445,7 +445,7 @@ public class FragmentSpaceTest
         FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
         
         assertEquals(1, fragLib.size());
-        DENOPTIMVertex actual = fragLib.get(0);
+        Vertex actual = fragLib.get(0);
         StringBuilder sb = new StringBuilder();
         assertTrue(testCase.expected.sameAs(actual, sb),
                 "Problem is "+sb.toString());
@@ -472,7 +472,7 @@ public class FragmentSpaceTest
         testCase.expected.getInnerGraph().getVertexList().get(0)
                 .setBuildingBlockType(BBType.SCAFFOLD);
 
-        List<DENOPTIMVertex> scaffLib = fs.getScaffoldLibrary();
+        List<Vertex> scaffLib = fs.getScaffoldLibrary();
         scaffLib.clear();
 
         fs.addFusedRingsToFragmentLibrary(testCase.graph);
@@ -482,7 +482,7 @@ public class FragmentSpaceTest
         FileUtils.deleteFile(fsp.getPathnameToAppendedScaffolds());
 
         assertEquals(1, scaffLib.size());
-        DENOPTIMVertex actual = scaffLib.get(0);
+        Vertex actual = scaffLib.get(0);
         assertTrue(testCase.expected.sameAs(actual, new StringBuilder()));
     }
 
@@ -497,7 +497,7 @@ public class FragmentSpaceTest
         FragmentSpace fs = fsp.getFragmentSpace();
         TestCase testCase = getTestCase();
         final int TRY_ADDING = 10;
-        List<DENOPTIMGraph> sameGraphs = IntStream
+        List<DGraph> sameGraphs = IntStream
                 .range(0, TRY_ADDING)
                 .mapToObj(i -> testCase.graph.clone())
                 .peek(t -> {
@@ -511,10 +511,10 @@ public class FragmentSpaceTest
                 })
                 .collect(Collectors.toList());
 
-        List<DENOPTIMVertex> fragLib = fs.getFragmentLibrary();
+        List<Vertex> fragLib = fs.getFragmentLibrary();
         fragLib.clear();
         
-        for (DENOPTIMGraph g : sameGraphs) {
+        for (DGraph g : sameGraphs) {
             fs.addFusedRingsToFragmentLibrary(g);
         }
 
@@ -538,12 +538,12 @@ public class FragmentSpaceTest
      */
     private TestCase getTestCase() throws DENOPTIMException 
     {
-        DENOPTIMGraph g = new DENOPTIMGraph();
-        DENOPTIMVertex c1 = getCarbonVertex(), c2 = getCarbonVertex(),
+        DGraph g = new DGraph();
+        Vertex c1 = getCarbonVertex(), c2 = getCarbonVertex(),
                 c3 = getCarbonVertex(), c4 = getCarbonVertex(),
                 c5 = getCarbonVertex();
 
-        DENOPTIMVertex rcv14 = getRCV(), rcv41 = getRCV(), rcv45 = getRCV(),
+        Vertex rcv14 = getRCV(), rcv41 = getRCV(), rcv45 = getRCV(),
                 rcv54 = getRCV();
 
         g.addVertex(c1);
@@ -556,31 +556,31 @@ public class FragmentSpaceTest
         g.appendVertexOnAP(c4.getAP(2), rcv45.getAP(0));
         g.appendVertexOnAP(c5.getAP(1), rcv54.getAP(0));
 
-        DENOPTIMRing r124 = new DENOPTIMRing(Arrays.asList(rcv14, c1, c2, c4,
+        Ring r124 = new Ring(Arrays.asList(rcv14, c1, c2, c4,
                 rcv41));
-        DENOPTIMRing r425 = new DENOPTIMRing(Arrays.asList(rcv45, c4, c2, c5,
+        Ring r425 = new Ring(Arrays.asList(rcv45, c4, c2, c5,
                 rcv54));
         g.addRing(r124);
         g.addRing(r425);
 
         g.renumberGraphVertices();
 
-        DENOPTIMTemplate t = getExpectedTemplate(g, c3);
+        Template t = getExpectedTemplate(g, c3);
 
         return new TestCase(g, t);
     }
 
 //------------------------------------------------------------------------------
 
-    private DENOPTIMTemplate getExpectedTemplate(DENOPTIMGraph g,
-            DENOPTIMVertex c3) throws DENOPTIMException {
-        DENOPTIMGraph innerGraph = g.clone();
+    private Template getExpectedTemplate(DGraph g,
+            Vertex c3) throws DENOPTIMException {
+        DGraph innerGraph = g.clone();
         innerGraph.renumberGraphVertices();
-        DENOPTIMVertex c3Inner = innerGraph.getVertexAtPosition(g
+        Vertex c3Inner = innerGraph.getVertexAtPosition(g
                 .indexOfVertexWithID(c3.getVertexId()));
         innerGraph.removeVertex(c3Inner);
 
-        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+        Template t = new Template(BBType.FRAGMENT);
         t.setInnerGraph(innerGraph);
         t.setBuildingBlockId(0);
         return t;
@@ -588,14 +588,14 @@ public class FragmentSpaceTest
 
 //------------------------------------------------------------------------------
 
-    private DENOPTIMFragment getCarbonVertex() throws DENOPTIMException
+    private Fragment getCarbonVertex() throws DENOPTIMException
     {
         IChemObjectBuilder builder = DefaultChemObjectBuilder.getInstance();
         IAtom carbon = builder.newAtom();
         carbon.setSymbol("C");
         IAtomContainer mol = builder.newAtomContainer();
         mol.addAtom(carbon);
-        DENOPTIMFragment v = new DENOPTIMFragment(
+        Fragment v = new Fragment(
                 GraphUtils.getUniqueVertexIndex(), 
                 mol,
                 BBType.FRAGMENT);
@@ -607,14 +607,14 @@ public class FragmentSpaceTest
 
 //------------------------------------------------------------------------------
 
-    private DENOPTIMVertex getRCV() throws DENOPTIMException 
+    private Vertex getRCV() throws DENOPTIMException 
     {
         IChemObjectBuilder builder = DefaultChemObjectBuilder
                 .getInstance();
         IAtomContainer dummyMol = builder.newAtomContainer();
         IAtom dummyAtom = builder.newAtom();
         dummyMol.addAtom(dummyAtom);
-        DENOPTIMFragment rcv = new DENOPTIMFragment(
+        Fragment rcv = new Fragment(
                 GraphUtils.getUniqueVertexIndex(),
                 dummyMol, 
                 BBType.FRAGMENT,
@@ -639,10 +639,10 @@ public class FragmentSpaceTest
 //------------------------------------------------------------------------------
 
     private static final class TestCase {
-        final DENOPTIMGraph graph;
-        final DENOPTIMTemplate expected;
+        final DGraph graph;
+        final Template expected;
 
-        TestCase(DENOPTIMGraph g, DENOPTIMTemplate expected) {
+        TestCase(DGraph g, Template expected) {
             this.graph = g;
             this.expected = expected;
         }
@@ -679,7 +679,7 @@ public class FragmentSpaceTest
         fsp.fragmentLibFile = "dummyFilename_DenoptimTest_Frag";
         fsp.scaffoldLibFile = "dummyFilename_DenoptimTest_Scaff";
         FragmentSpace fs = fsp.getFragmentSpace();
-        DENOPTIMFragment scaf = new DENOPTIMFragment();
+        Fragment scaf = new Fragment();
         IAtom s1 = new Atom("C", new Point3d(0,0,0));
         scaf.addAtom(s1);
         scaf.addAPOnAtom(s1, APC2, new Point3d(1,1,0));
@@ -690,7 +690,7 @@ public class FragmentSpaceTest
         fs.appendVertexToLibrary(scaf, BBType.SCAFFOLD, fs.getScaffoldLibrary());
         int sId = fs.getScaffoldLibrary().size() - 1;
         
-        DENOPTIMFragment frg = new DENOPTIMFragment();
+        Fragment frg = new Fragment();
         IAtom a1 = new Atom("C", new Point3d(0,0,0));
         IAtom a2 = new Atom("C", new Point3d(0,0,1));
         IAtom a3 = new Atom("C", new Point3d(0,0,2));
@@ -707,7 +707,7 @@ public class FragmentSpaceTest
         fs.appendVertexToLibrary(frg, BBTFRAG, fs.getFragmentLibrary());
         int bbId = fs.getFragmentLibrary().size() - 1;
         
-        DENOPTIMFragment rcv = new DENOPTIMFragment();
+        Fragment rcv = new Fragment();
         IAtom a4 = new PseudoAtom("ATN", new Point3d(0,0,0));
         rcv.addAtom(a4);
         rcv.addAPOnAtom(a4, APClass.make("ATneutral",0), new Point3d(1,0,0));
@@ -717,24 +717,24 @@ public class FragmentSpaceTest
         fs.appendVertexToLibrary(rcv, BBTFRAG, fs.getFragmentLibrary());
         int rcvId = fs.getFragmentLibrary().size() - 1;
         
-        DENOPTIMGraph wholeGraph = new DENOPTIMGraph();
-        DENOPTIMVertex v1 = fs.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v2 = fs.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v3 = fs.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v4 = fs.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v5 = fs.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v6 = fs.getVertexFromLibrary(BBType.SCAFFOLD,sId);
-        DENOPTIMVertex v7 = fs.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v8 = fs.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v9 = fs.getVertexFromLibrary(BBTFRAG, bbId);
-        DENOPTIMVertex v10 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
-        DENOPTIMVertex v11 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
-        DENOPTIMVertex v12 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
-        DENOPTIMVertex v13 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
-        DENOPTIMVertex c1 = fs.getVertexFromLibrary(BBType.CAP, 0);
-        DENOPTIMVertex c2 = fs.getVertexFromLibrary(BBType.CAP, 0);
-        DENOPTIMVertex c3 = fs.getVertexFromLibrary(BBType.CAP, 0);
-        DENOPTIMVertex c4 = fs.getVertexFromLibrary(BBType.CAP, 0);
+        DGraph wholeGraph = new DGraph();
+        Vertex v1 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        Vertex v2 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        Vertex v3 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        Vertex v4 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        Vertex v5 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        Vertex v6 = fs.getVertexFromLibrary(BBType.SCAFFOLD,sId);
+        Vertex v7 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        Vertex v8 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        Vertex v9 = fs.getVertexFromLibrary(BBTFRAG, bbId);
+        Vertex v10 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
+        Vertex v11 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
+        Vertex v12 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
+        Vertex v13 = fs.getVertexFromLibrary(BBTFRAG, rcvId);
+        Vertex c1 = fs.getVertexFromLibrary(BBType.CAP, 0);
+        Vertex c2 = fs.getVertexFromLibrary(BBType.CAP, 0);
+        Vertex c3 = fs.getVertexFromLibrary(BBType.CAP, 0);
+        Vertex c4 = fs.getVertexFromLibrary(BBType.CAP, 0);
         
         // Disordered... just for the fun of it. Still, do not change it further
         // as we need to wholeMol to be created consistently
@@ -755,22 +755,22 @@ public class FragmentSpaceTest
         wholeGraph.addVertex(c2);
         wholeGraph.addVertex(c3);
         wholeGraph.addVertex(c4);
-        wholeGraph.addEdge(new DENOPTIMEdge(v6.getAP(0),v4.getAP(1),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v6.getAP(1),v10.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v4.getAP(0),v2.getAP(1),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v2.getAP(0),v3.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v3.getAP(1),v11.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v2.getAP(2),v1.getAP(2),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v6.getAP(2),v9.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v9.getAP(1),v5.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v5.getAP(1),v7.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v5.getAP(2),v8.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v7.getAP(1),v12.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v8.getAP(2),v13.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v3.getAP(2),c1.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v4.getAP(2),c2.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v7.getAP(2),c3.getAP(0),BondType.SINGLE));
-        wholeGraph.addEdge(new DENOPTIMEdge(v8.getAP(1),c4.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v6.getAP(0),v4.getAP(1),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v6.getAP(1),v10.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v4.getAP(0),v2.getAP(1),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v2.getAP(0),v3.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v3.getAP(1),v11.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v2.getAP(2),v1.getAP(2),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v6.getAP(2),v9.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v9.getAP(1),v5.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v5.getAP(1),v7.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v5.getAP(2),v8.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v7.getAP(1),v12.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v8.getAP(2),v13.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v3.getAP(2),c1.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v4.getAP(2),c2.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v7.getAP(2),c3.getAP(0),BondType.SINGLE));
+        wholeGraph.addEdge(new Edge(v8.getAP(1),c4.getAP(0),BondType.SINGLE));
         
         wholeGraph.addRing(v10, v11, BondType.DOUBLE);
         wholeGraph.addRing(v12, v13, BondType.DOUBLE);
@@ -807,26 +807,26 @@ public class FragmentSpaceTest
         assertEquals(szFragLibPre+1,fs.getFragmentLibrary().size(),
                 "Size fragments library");
         
-        DENOPTIMVertex newScaff = fs.getVertexFromLibrary(
+        Vertex newScaff = fs.getVertexFromLibrary(
                 BBType.SCAFFOLD,szScafLibPre); // szScafLibPre+1-1
         assertEquals(4,newScaff.getAttachmentPoints().size(), 
                 "#APs on new scaffold");
         int nP = 0;
         for (IAtom a : newScaff.getIAtomContainer().atoms())
         {
-            if ("P".equals(DENOPTIMMoleculeUtils.getSymbolOrLabel(a)))
+            if ("P".equals(MoleculeUtils.getSymbolOrLabel(a)))
                 nP++;
         }
         assertEquals(10,nP,"#P in new scaffold");
         
-        DENOPTIMVertex newFrag = fs.getVertexFromLibrary(
+        Vertex newFrag = fs.getVertexFromLibrary(
                 BBType.FRAGMENT,szFragLibPre); // szFragLibPre+1-1
         assertEquals(3,newFrag.getAttachmentPoints().size(), 
                 "#APs on new fragment");
         nP = 0;
         for (IAtom a : newFrag.getIAtomContainer().atoms())
         {
-            if ("P".equals(DENOPTIMMoleculeUtils.getSymbolOrLabel(a)))
+            if ("P".equals(MoleculeUtils.getSymbolOrLabel(a)))
                 nP++;
         }
         assertEquals(9,nP,"#P in new fragment");

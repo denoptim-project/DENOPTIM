@@ -64,7 +64,7 @@ import javax.swing.table.DefaultTableModel;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 import denoptim.io.DenoptimIO;
 
 public class CompatibilityMatrixForm extends JPanel {

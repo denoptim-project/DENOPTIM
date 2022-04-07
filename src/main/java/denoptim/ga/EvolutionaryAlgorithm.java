@@ -38,7 +38,7 @@ import denoptim.fitness.FitnessParameters;
 import denoptim.ga.EAUtils.CandidateSource;
 import denoptim.graph.Candidate;
 import denoptim.logging.CounterID;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
@@ -260,7 +260,7 @@ public class EvolutionaryAlgorithm
             String msg = "Fitness values have negligible standard deviation "
                     + "(STDDEV=" + String.format("%.6f", sdev) + "). "
                     + "Abbandoning evolutionary algorithm.";
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            StaticLogger.appLogger.log(Level.SEVERE, msg);
             population.trim(0);
             return;
         }
@@ -269,7 +269,7 @@ public class EvolutionaryAlgorithm
         int numStag = 0, genId = 1;
         while (genId <= settings.getNumberOfGenerations())
         {
-            DENOPTIMLogger.appLogger.log(Level.INFO,"Starting Generation {0}"
+            StaticLogger.appLogger.log(Level.INFO,"Starting Generation {0}"
                     + NL, genId);
 
             String txt = "No change";
@@ -283,7 +283,7 @@ public class EvolutionaryAlgorithm
                 txt = "New members introduced";
             }
             
-            DENOPTIMLogger.appLogger.log(Level.INFO,txt + " in Generation {0}" 
+            StaticLogger.appLogger.log(Level.INFO,txt + " in Generation {0}" 
                     + NL, genId);
             EAUtils.outputPopulationDetails(population, 
                     EAUtils.getPathNameToGenerationDetailsFile(genId, settings),
@@ -291,13 +291,13 @@ public class EvolutionaryAlgorithm
             
             if (stopped)
             {
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, 
+                StaticLogger.appLogger.log(Level.SEVERE, 
                         "EA stopped while working on generation {0}. " + NL
                         + "Reporting data for incomplete generation {0}."
                         + NL,genId);
                 break;
             } else {
-                DENOPTIMLogger.appLogger.log(Level.INFO,
+                StaticLogger.appLogger.log(Level.INFO,
                         "Generation {0}" + " completed" + NL
                         + "----------------------------------------"
                         + "----------------------------------------" 
@@ -306,7 +306,7 @@ public class EvolutionaryAlgorithm
 
             if (numStag >= settings.getNumberOfConvergenceGenerations())
             {
-                DENOPTIMLogger.appLogger.log(Level.WARNING, 
+                StaticLogger.appLogger.log(Level.WARNING, 
                         "No change in population over {0} iterations. "
                         + "Stopping EA." + NL, numStag);
                 break;
@@ -346,14 +346,14 @@ public class EvolutionaryAlgorithm
         // Termination
         population.trim(0);
         watch.stop();
-        DENOPTIMLogger.appLogger.log(Level.INFO, "Overall time: {0}." + NL,
+        StaticLogger.appLogger.log(Level.INFO, "Overall time: {0}." + NL,
                 watch.toString());
         
         if (stopped)
         {
-            DENOPTIMLogger.appLogger.info("DENOPTIM EA run stopped." + NL);
+            StaticLogger.appLogger.info("DENOPTIM EA run stopped." + NL);
         } else {
-            DENOPTIMLogger.appLogger.info("DENOPTIM EA run completed." + NL);
+            StaticLogger.appLogger.info("DENOPTIM EA run completed." + NL);
         }
     }
 
@@ -514,7 +514,7 @@ public class EvolutionaryAlgorithm
                 cleanupCompleted(tpe, futures, submitted);
                 stopRun();
             }
-            DENOPTIMLogger.appLogger.log(Level.SEVERE,
+            StaticLogger.appLogger.log(Level.SEVERE,
                     "Unable to initialize molecules in {0} attempts."+NL, i);
 
             throw new DENOPTIMException("Unable to initialize population in " 
@@ -749,7 +749,7 @@ public class EvolutionaryAlgorithm
                 cleanupCompleted(tpe, futures, submitted);
                 stopRun();
             }
-            DENOPTIMLogger.appLogger.log(Level.WARNING,
+            StaticLogger.appLogger.log(Level.WARNING,
                     "Reached maximum number of attempts (" + i + ") to "
                     + "generate new candidates in generation " + genId + "." 
                             + NL);
@@ -850,7 +850,7 @@ public class EvolutionaryAlgorithm
                     if (tsk.foundException())
                     {
                         foundExceptions = true;
-                        DENOPTIMLogger.appLogger.log(Level.SEVERE, "problems in " 
+                        StaticLogger.appLogger.log(Level.SEVERE, "problems in " 
                           + tsk.toString() + ". ErrorMessage: '" 
                           + tsk.getErrorMessage() + "'. ExceptionInTask: "
                           + tsk.getException());

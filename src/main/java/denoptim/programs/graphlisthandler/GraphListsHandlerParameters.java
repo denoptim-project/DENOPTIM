@@ -9,9 +9,9 @@ import java.util.logging.Level;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
 
 
@@ -32,14 +32,14 @@ public class GraphListsHandlerParameters extends RunTimeParameters
     /**
      * Input graphs: first list
      */
-    protected ArrayList<DENOPTIMGraph> inGraphsA =
-                             new ArrayList<DENOPTIMGraph>();
+    protected ArrayList<DGraph> inGraphsA =
+                             new ArrayList<DGraph>();
     
     /**
      * Input graphs: second list
      */
-    protected ArrayList<DENOPTIMGraph> inGraphsB =
-                             new ArrayList<DENOPTIMGraph>();
+    protected ArrayList<DGraph> inGraphsB =
+                             new ArrayList<DGraph>();
 
     /**
      * File with output graphs
@@ -231,13 +231,13 @@ public class GraphListsHandlerParameters extends RunTimeParameters
         {
             String msg = "Cannot read in graphs from " + inGraphsFileA +" or " 
                     + inGraphsFileB;
-            DENOPTIMLogger.appLogger.log(Level.INFO,msg);
+            StaticLogger.appLogger.log(Level.INFO,msg);
             throw new DENOPTIMException(msg,t);
         }
 
         try
         {
-            DENOPTIMLogger.getInstance().setupLogger(logFile);
+            StaticLogger.getInstance().setupLogger(logFile);
         }
         catch (IOException ioe)
         {

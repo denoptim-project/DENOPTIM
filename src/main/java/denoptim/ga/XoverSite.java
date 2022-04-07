@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
 import denoptim.utils.CrossoverType;
 
 /**
@@ -19,7 +19,7 @@ public class XoverSite implements Cloneable
     /**
      * One of the two subgraphs.
      */
-    private List<DENOPTIMVertex> subGraphA = null;
+    private List<Vertex> subGraphA = null;
     
     /**
      * List of attachment points on subgraph B and that need to be replaced by 
@@ -29,12 +29,12 @@ public class XoverSite implements Cloneable
      * an outer level, i.e., projected onto an embedding template and used from
      * there.
      */
-    private List<DENOPTIMAttachmentPoint> needyAPsOnA = null;
+    private List<AttachmentPoint> needyAPsOnA = null;
 
     /**
      * The other of the two subgraphs.
      */
-    private List<DENOPTIMVertex> subGraphB = null;
+    private List<Vertex> subGraphB = null;
     
     /**
      * List of attachment points on subgraph A and that need to be replaced by 
@@ -44,7 +44,7 @@ public class XoverSite implements Cloneable
      * an outer level, i.e., projected onto an embedding template and used from
      * there.
      */
-    private List<DENOPTIMAttachmentPoint> needyAPsOnB = null;
+    private List<AttachmentPoint> needyAPsOnB = null;
     
     /**
      * Type of crossover
@@ -58,10 +58,10 @@ public class XoverSite implements Cloneable
      */
     public XoverSite()
     {
-        subGraphA = new ArrayList<DENOPTIMVertex>();
-        subGraphB = new ArrayList<DENOPTIMVertex>();
-        needyAPsOnA = new ArrayList<DENOPTIMAttachmentPoint>();
-        needyAPsOnB = new ArrayList<DENOPTIMAttachmentPoint>();
+        subGraphA = new ArrayList<Vertex>();
+        subGraphB = new ArrayList<Vertex>();
+        needyAPsOnA = new ArrayList<AttachmentPoint>();
+        needyAPsOnB = new ArrayList<AttachmentPoint>();
     }
 
 //------------------------------------------------------------------------------
@@ -78,15 +78,15 @@ public class XoverSite implements Cloneable
      * tree.
      * @param xoverType the type of crossover.
      */
-    public XoverSite(List<DENOPTIMVertex> subGraphA, 
-            List<DENOPTIMVertex> subGraphB,
+    public XoverSite(List<Vertex> subGraphA, 
+            List<Vertex> subGraphB,
             CrossoverType xoverType)
     {
-        this.subGraphA = new ArrayList<DENOPTIMVertex>(subGraphA);
-        this.subGraphB = new ArrayList<DENOPTIMVertex>(subGraphB);
-        DENOPTIMGraph gA = subGraphA.get(0).getGraphOwner();
+        this.subGraphA = new ArrayList<Vertex>(subGraphA);
+        this.subGraphB = new ArrayList<Vertex>(subGraphB);
+        DGraph gA = subGraphA.get(0).getGraphOwner();
         this.needyAPsOnA = gA.getInterfaceAPs(subGraphA);
-        DENOPTIMGraph gB = subGraphB.get(0).getGraphOwner();
+        DGraph gB = subGraphB.get(0).getGraphOwner();
         this.needyAPsOnB = gB.getInterfaceAPs(subGraphB);
         this.xoverType = xoverType;
     }
@@ -109,16 +109,16 @@ public class XoverSite implements Cloneable
      * subgraph that are required to have an AP mapping in the first subgraph.
      * @param xoverType the type of crossover.
      */
-    public XoverSite(List<DENOPTIMVertex> subGraphA, 
-            List<DENOPTIMAttachmentPoint> needyAPsOnA,
-            List<DENOPTIMVertex> subGraphB, 
-            List<DENOPTIMAttachmentPoint> needyAPsOnB,
+    public XoverSite(List<Vertex> subGraphA, 
+            List<AttachmentPoint> needyAPsOnA,
+            List<Vertex> subGraphB, 
+            List<AttachmentPoint> needyAPsOnB,
             CrossoverType xoverType)
     {
-        this.subGraphA = new ArrayList<DENOPTIMVertex>(subGraphA);
-        this.subGraphB = new ArrayList<DENOPTIMVertex>(subGraphB);
-        this.needyAPsOnA = new ArrayList<DENOPTIMAttachmentPoint>(needyAPsOnA);
-        this.needyAPsOnB = new ArrayList<DENOPTIMAttachmentPoint>(needyAPsOnB);
+        this.subGraphA = new ArrayList<Vertex>(subGraphA);
+        this.subGraphB = new ArrayList<Vertex>(subGraphB);
+        this.needyAPsOnA = new ArrayList<AttachmentPoint>(needyAPsOnA);
+        this.needyAPsOnB = new ArrayList<AttachmentPoint>(needyAPsOnB);
         this.xoverType = xoverType;
     }
 
@@ -131,11 +131,11 @@ public class XoverSite implements Cloneable
     public XoverSite createMirror()
     {
         XoverSite mirror = new XoverSite();
-        mirror.subGraphA = new ArrayList<DENOPTIMVertex>(this.subGraphB);
-        mirror.subGraphB = new ArrayList<DENOPTIMVertex>(this.subGraphA);
-        mirror.needyAPsOnA = new ArrayList<DENOPTIMAttachmentPoint>(
+        mirror.subGraphA = new ArrayList<Vertex>(this.subGraphB);
+        mirror.subGraphB = new ArrayList<Vertex>(this.subGraphA);
+        mirror.needyAPsOnA = new ArrayList<AttachmentPoint>(
                 this.needyAPsOnB);
-        mirror.needyAPsOnB = new ArrayList<DENOPTIMAttachmentPoint>(
+        mirror.needyAPsOnB = new ArrayList<AttachmentPoint>(
                 this.needyAPsOnA);
         mirror.xoverType = xoverType;
         return mirror;
@@ -150,11 +150,11 @@ public class XoverSite implements Cloneable
     public XoverSite clone()
     {
         XoverSite clone = new XoverSite();
-        clone.subGraphA = new ArrayList<DENOPTIMVertex>(this.subGraphA);
-        clone.subGraphB = new ArrayList<DENOPTIMVertex>(this.subGraphB);
-        clone.needyAPsOnA = new ArrayList<DENOPTIMAttachmentPoint>(
+        clone.subGraphA = new ArrayList<Vertex>(this.subGraphA);
+        clone.subGraphB = new ArrayList<Vertex>(this.subGraphB);
+        clone.needyAPsOnA = new ArrayList<AttachmentPoint>(
                 this.needyAPsOnA);
-        clone.needyAPsOnB = new ArrayList<DENOPTIMAttachmentPoint>(
+        clone.needyAPsOnB = new ArrayList<AttachmentPoint>(
                 this.needyAPsOnB);
         clone.xoverType = xoverType;
         return clone;
@@ -166,7 +166,7 @@ public class XoverSite implements Cloneable
      * Returns the collection of vertexes belonging to the first subgraph.
      * @return the collection of vertexes belonging to the first subgraph.
      */
-    public List<DENOPTIMVertex> getA()
+    public List<Vertex> getA()
     {
         return subGraphA;
     }
@@ -177,7 +177,7 @@ public class XoverSite implements Cloneable
      * Returns the collection of vertexes belonging to the second subgraph.
      * @return the collection of vertexes belonging to the second subgraph.
      */
-    public List<DENOPTIMVertex> getB()
+    public List<Vertex> getB()
     {
         return subGraphB;
     }
@@ -191,7 +191,7 @@ public class XoverSite implements Cloneable
      * @return the collection of "needy" attachment points belonging to the 
      * first subgraph.
      */
-    public List<DENOPTIMAttachmentPoint> getAPsNeedingMappingA()
+    public List<AttachmentPoint> getAPsNeedingMappingA()
     {
         return needyAPsOnA;
     }
@@ -205,7 +205,7 @@ public class XoverSite implements Cloneable
      * @return the collection of "needy" attachment points belonging to the 
      * second subgraph.
      */
-    public List<DENOPTIMAttachmentPoint> getAPsNeedingMappingB()
+    public List<AttachmentPoint> getAPsNeedingMappingB()
     {
         return needyAPsOnB;
     }
@@ -256,13 +256,13 @@ public class XoverSite implements Cloneable
      */
     public XoverSite projectToClonedGraphs() throws DENOPTIMException
     {
-        DENOPTIMGraph gA = subGraphA.get(0).getGraphOwner(); 
-        DENOPTIMGraph gB = subGraphB.get(0).getGraphOwner();
-        List<DENOPTIMTemplate> embeddingPathA = gA.getEmbeddingPath();
-        List<DENOPTIMTemplate> embeddingPathB = gB.getEmbeddingPath();
+        DGraph gA = subGraphA.get(0).getGraphOwner(); 
+        DGraph gB = subGraphB.get(0).getGraphOwner();
+        List<Template> embeddingPathA = gA.getEmbeddingPath();
+        List<Template> embeddingPathB = gB.getEmbeddingPath();
         
-        DENOPTIMGraph cloneOutermostGraphA, cloneA;
-        DENOPTIMGraph cloneOutermostGraphB, cloneB;
+        DGraph cloneOutermostGraphA, cloneA;
+        DGraph cloneOutermostGraphB, cloneB;
         if (embeddingPathA.size()==0) 
         {
             cloneOutermostGraphA = gA.clone();
@@ -270,7 +270,7 @@ public class XoverSite implements Cloneable
         } else {
             cloneOutermostGraphA = embeddingPathA.get(0)
                     .getGraphOwner().clone();
-            cloneA = DENOPTIMGraph.getEmbeddedGraphInClone(cloneOutermostGraphA, 
+            cloneA = DGraph.getEmbeddedGraphInClone(cloneOutermostGraphA, 
                     embeddingPathA.get(0).getGraphOwner(), embeddingPathA);
         }
         if (embeddingPathB.size()==0) 
@@ -280,21 +280,21 @@ public class XoverSite implements Cloneable
         } else {
             cloneOutermostGraphB = embeddingPathB.get(0)
                     .getGraphOwner().clone();
-            cloneB = DENOPTIMGraph.getEmbeddedGraphInClone(cloneOutermostGraphB, 
+            cloneB = DGraph.getEmbeddedGraphInClone(cloneOutermostGraphB, 
                     embeddingPathB.get(0).getGraphOwner(), embeddingPathB);
         }
         
         cloneA.renumberGraphVertices();
         cloneB.renumberGraphVertices();
-        List<DENOPTIMVertex> refsOnCloneA = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMAttachmentPoint> needyOnCloneA = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMVertex vA : subGraphA)
+        List<Vertex> refsOnCloneA = new ArrayList<Vertex>();
+        List<AttachmentPoint> needyOnCloneA = 
+                new ArrayList<AttachmentPoint>();
+        for (Vertex vA : subGraphA)
         {
-            DENOPTIMVertex vCloneA = cloneA.getVertexAtPosition(
+            Vertex vCloneA = cloneA.getVertexAtPosition(
                     vA.getGraphOwner().indexOf(vA));
             refsOnCloneA.add(vCloneA);
-            for (DENOPTIMAttachmentPoint ap : vA.getAttachmentPoints())
+            for (AttachmentPoint ap : vA.getAttachmentPoints())
             {
                 if (needyAPsOnA.contains(ap))
                 {
@@ -302,15 +302,15 @@ public class XoverSite implements Cloneable
                 }
             }
         }
-        List<DENOPTIMVertex> refsOnCloneB = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMAttachmentPoint> needyOnCloneB = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMVertex vB : subGraphB)
+        List<Vertex> refsOnCloneB = new ArrayList<Vertex>();
+        List<AttachmentPoint> needyOnCloneB = 
+                new ArrayList<AttachmentPoint>();
+        for (Vertex vB : subGraphB)
         {
-            DENOPTIMVertex vCloneB = cloneB.getVertexAtPosition(
+            Vertex vCloneB = cloneB.getVertexAtPosition(
                     vB.getGraphOwner().indexOf(vB));
             refsOnCloneB.add(vCloneB);
-            for (DENOPTIMAttachmentPoint ap : vB.getAttachmentPoints())
+            for (AttachmentPoint ap : vB.getAttachmentPoints())
             {
                 if (needyAPsOnB.contains(ap))
                 {

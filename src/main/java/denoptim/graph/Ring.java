@@ -29,19 +29,19 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 
 /**
  * This class represents the closure of a ring in a spanning tree
  *
  * @author Marco Foscato
  */
-public class DENOPTIMRing
+public class Ring
 {
     /**
      * List of <code>DENOPTIMVertex</code> involved in the ring. 
      */
-    private List<DENOPTIMVertex> vertices;
+    private List<Vertex> vertices;
 
     /**
      * Bond type (i.e., bond order) to be used between head and tail vertices
@@ -50,14 +50,14 @@ public class DENOPTIMRing
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMRing()
+    public Ring()
     {
         vertices = new ArrayList<>();
     }
     
 //------------------------------------------------------------------------------
     
-    public DENOPTIMRing(List<DENOPTIMVertex> vertices)
+    public Ring(List<Vertex> vertices)
     {
         this.vertices = vertices;
     }
@@ -68,7 +68,7 @@ public class DENOPTIMRing
      * Append a <code>DENOPTIMVertex</code> to the list
      */
 
-    public void addVertex(DENOPTIMVertex v)
+    public void addVertex(Vertex v)
     {
         vertices.add(v);
     }
@@ -80,7 +80,7 @@ public class DENOPTIMRing
      * of <code>DENOPTIMVertex</code>s involved in this ring
      */
 
-    public DENOPTIMVertex getHeadVertex()
+    public Vertex getHeadVertex()
     {
         return vertices.get(0);
     }
@@ -92,7 +92,7 @@ public class DENOPTIMRing
      * of <code>DENOPTIMVertex</code>s involved in this ring
      */
 
-    public DENOPTIMVertex getTailVertex()
+    public Vertex getTailVertex()
     {
         return vertices.get(vertices.size() - 1);
     }
@@ -104,7 +104,7 @@ public class DENOPTIMRing
      * of <code>DENOPTIMVertex</code>s involved in this ring
      */
 
-    public DENOPTIMVertex getVertexAtPosition(int i)
+    public Vertex getVertexAtPosition(int i)
     {
 	if (i>= vertices.size() || i<0)
 	{
@@ -119,7 +119,7 @@ public class DENOPTIMRing
      * Returns the index of the first occurrence of the specified element in 
      * this ring, or -1 if this list does not contain the element.
      */
-    public int indexOf(DENOPTIMVertex v)
+    public int indexOf(Vertex v)
     {
         return vertices.indexOf(v);
     }
@@ -169,7 +169,7 @@ public class DENOPTIMRing
      * of <code>DENOPTIMVertex</code>s involved in this ring
      */
 
-    public boolean contains(DENOPTIMVertex v)
+    public boolean contains(Vertex v)
     {
         return vertices.contains(v);
     }
@@ -187,7 +187,7 @@ public class DENOPTIMRing
     public boolean containsID(int vid)
     {
 	boolean result = false;
-	for (DENOPTIMVertex v : vertices)
+	for (Vertex v : vertices)
 	{
 	    if (v.getVertexId() == vid)
 	    {
@@ -211,24 +211,24 @@ public class DENOPTIMRing
 
 //------------------------------------------------------------------------------
 
-    public List<DENOPTIMVertex> getVertices() {
+    public List<Vertex> getVertices() {
         return Collections.unmodifiableList(vertices);
     }
 
 //------------------------------------------------------------------------------
 
     public static class DENOPTIMRingSerializer
-    implements JsonSerializer<DENOPTIMRing>
+    implements JsonSerializer<Ring>
     {
         @Override
-        public JsonElement serialize(DENOPTIMRing ring, Type typeOfSrc,
+        public JsonElement serialize(Ring ring, Type typeOfSrc,
               JsonSerializationContext context)
         {
             JsonObject jsonObject = new JsonObject();
             ArrayList<Integer> vertexIDs = new ArrayList<Integer>();
             for (int i=0; i<ring.getSize(); i++)
             {
-                DENOPTIMVertex v = ring.getVertexAtPosition(i);
+                Vertex v = ring.getVertexAtPosition(i);
                 vertexIDs.add(v.getVertexId());
             }
             jsonObject.add("vertices",context.serialize(vertexIDs));
@@ -239,7 +239,7 @@ public class DENOPTIMRing
     
 //------------------------------------------------------------------------------
     
-    public void removeVertex(DENOPTIMVertex oldVrtx)
+    public void removeVertex(Vertex oldVrtx)
     {
         int idx = vertices.indexOf(oldVrtx);
         vertices.remove(idx);
@@ -252,7 +252,7 @@ public class DENOPTIMRing
      * @param oldVrtx the vertex to be replaced.
      * @param newVrtx the vertex the replace the old one with.
      */
-    public void replaceVertex(DENOPTIMVertex oldVrtx, DENOPTIMVertex newVrtx)
+    public void replaceVertex(Vertex oldVrtx, Vertex newVrtx)
     {
         int idx = vertices.indexOf(oldVrtx);
         vertices.set(idx, newVrtx);
@@ -272,7 +272,7 @@ public class DENOPTIMRing
      * <code>false</code> if the operation cannot be performed for any reason,
      * e.g., the vertex is already contained in this ring.
      */
-    public boolean insertVertex(int position, DENOPTIMVertex newLink)
+    public boolean insertVertex(int position, Vertex newLink)
     {
         if (this.contains(newLink) || position>=vertices.size())
             return false;
@@ -295,8 +295,8 @@ public class DENOPTIMRing
      * e.g., the vertex is already contained in this ring, or either of the two
      * reference vertexes are not themselves contained here.
      */
-    public boolean insertVertex(DENOPTIMVertex newLink, DENOPTIMVertex vA,
-            DENOPTIMVertex vB)
+    public boolean insertVertex(Vertex newLink, Vertex vA,
+            Vertex vB)
     {
         if (this.contains(newLink) || !this.contains(vA) || !this.contains(vB))
             return false;
@@ -322,7 +322,7 @@ public class DENOPTIMRing
      * @return the distance between the vertexes (i.e., number of edges).
      * @throws DENOPTIMException if either vertex is not part of this ring.
      */
-    public int getDistance(DENOPTIMVertex v1, DENOPTIMVertex v2) throws DENOPTIMException
+    public int getDistance(Vertex v1, Vertex v2) throws DENOPTIMException
     {
         if (!contains(v1))
             throw new DENOPTIMException("Cannot measure distance along ring "
@@ -346,7 +346,7 @@ public class DENOPTIMRing
      * @param vB second candidate
      * @return the vertex closer to the head.
      */
-    public DENOPTIMVertex getCloserToHead(DENOPTIMVertex vA, DENOPTIMVertex vB)
+    public Vertex getCloserToHead(Vertex vA, Vertex vB)
     {
         return getCloserTo(vA, vB, vertices.get(0));
     }
@@ -360,7 +360,7 @@ public class DENOPTIMRing
      * @param vB second candidate
      * @return the vertex closer to the tail.
      */
-    public DENOPTIMVertex getCloserToTail(DENOPTIMVertex vA, DENOPTIMVertex vB)
+    public Vertex getCloserToTail(Vertex vA, Vertex vB)
     {
         return getCloserTo(vA, vB, vertices.get(vertices.size() - 1));
     }
@@ -375,8 +375,8 @@ public class DENOPTIMRing
      * @param vT the target vertex.
      * @return the vertex closer to the target vertex.
      */
-    public DENOPTIMVertex getCloserTo(DENOPTIMVertex vA, DENOPTIMVertex vB,
-            DENOPTIMVertex vT)
+    public Vertex getCloserTo(Vertex vA, Vertex vB,
+            Vertex vT)
     {
         int dA = -1, dB = -1;
         try
@@ -412,7 +412,7 @@ public class DENOPTIMRing
      * @return the index of that vertex (first instance), or -1 if that vertex 
      * is not part of the ring.
      */
-    public int getPositionOf(DENOPTIMVertex v)
+    public int getPositionOf(Vertex v)
     {
         return vertices.indexOf(v);
     }

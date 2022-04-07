@@ -18,7 +18,7 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.denovo.GAParameters;
 
 /**
@@ -48,7 +48,7 @@ public class ExternalCmdsListener implements Runnable
     	this.pathname = pathname;
         this.watcher = FileSystems.getDefault().newWatchService();
         this.key = pathname.register(watcher, ENTRY_CREATE);
-        DENOPTIMLogger.appLogger.log(Level.INFO, "Watching pathname '" +  
+        StaticLogger.appLogger.log(Level.INFO, "Watching pathname '" +  
         		pathname + "' for live instructions.");
     }
     
@@ -112,7 +112,7 @@ public class ExternalCmdsListener implements Runnable
 		try {
 			lines = DenoptimIO.readList(file.getAbsolutePath(), true);
 		} catch (DENOPTIMException e) {
-			DENOPTIMLogger.appLogger.log(Level.WARNING, "Unable to read file '"  
+			StaticLogger.appLogger.log(Level.WARNING, "Unable to read file '"  
 	        		+ file.getAbsolutePath() + "'. Any instruction contained "
 	        		        + "in that file is ignored. "
 	        		        + "Hint: " + e.getMessage() + NL);
@@ -123,7 +123,7 @@ public class ExternalCmdsListener implements Runnable
 		if (lines.size() == 0)
 		{
 			// Empty file is probably a sign that the file is being written
-			DENOPTIMLogger.appLogger.log(Level.WARNING, "Empty instructions in '"  
+			StaticLogger.appLogger.log(Level.WARNING, "Empty instructions in '"  
 	        		+ file.getAbsolutePath() + "'.");
 		}
 		
@@ -131,7 +131,7 @@ public class ExternalCmdsListener implements Runnable
 		{
 			if (line.startsWith("STOP_GA"))
 			{
-				DENOPTIMLogger.appLogger.log(Level.SEVERE, "GA run will be "
+				StaticLogger.appLogger.log(Level.SEVERE, "GA run will be "
 						+ "stopped upon external request from '"  
 		        		+ file.getAbsolutePath() + "'." + NL);
 				if (ea != null)
@@ -144,7 +144,7 @@ public class ExternalCmdsListener implements Runnable
             {
 	            String candIDs = line.substring(
 	                    "REMOVE_CANDIDATE".length()).trim();
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, "Removing '"
+                StaticLogger.appLogger.log(Level.SEVERE, "Removing '"
                         + candIDs + "' upon external request from '"  
                         + file.getAbsolutePath() + "'." + NL);
                 String[] parts = candIDs.split("\\s+");
@@ -160,7 +160,7 @@ public class ExternalCmdsListener implements Runnable
             {
                 String fileNamesLst = line.substring(
                         "ADD_CANDIDATE".length()).trim();
-                DENOPTIMLogger.appLogger.log(Level.SEVERE, "Adding c"
+                StaticLogger.appLogger.log(Level.SEVERE, "Adding c"
                         + "andidates from '"
                         + fileNamesLst + "' upon external request from '"  
                         + file.getAbsolutePath() + "'." + NL);

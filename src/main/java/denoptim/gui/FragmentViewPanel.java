@@ -57,12 +57,12 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Fragment;
+import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
-import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MathUtils;
+import denoptim.utils.MoleculeUtils;
 
 
 /**
@@ -81,12 +81,12 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	/**
 	 * The currently loaded fragment
 	 */
-	private DENOPTIMFragment fragment;
+	private Fragment fragment;
 	
 	/**
 	 * Temporary list of attachment points of the current fragment
 	 */
-	protected Map<Integer,DENOPTIMAttachmentPoint> mapAPs = null;
+	protected Map<Integer,AttachmentPoint> mapAPs = null;
 	
 	/**
 	 * Flag signalling that data about APs has been changed in the GUI
@@ -496,8 +496,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		    // from the GUI we are only saving an SDF file. The latter is later
 		    // imported as part of the library of scaffolds/fragments/capping
 		    // groups, and in that moment the BBType is re-assigned.
-		    fragment = new DENOPTIMFragment(getStructureFromJmolViewer(),
-		            DENOPTIMVertex.BBType.FRAGMENT);
+		    fragment = new Fragment(getStructureFromJmolViewer(),
+		            Vertex.BBType.FRAGMENT);
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this,
@@ -585,12 +585,12 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 * @return the chemical representation of what is currently visualised.
 	 * Can be empty and null.
 	 */
-	public DENOPTIMFragment getLoadedStructure()
+	public Fragment getLoadedStructure()
 	{
-		DENOPTIMFragment fromViewer = new DENOPTIMFragment();
+		Fragment fromViewer = new Fragment();
 		try {
-			fromViewer = new DENOPTIMFragment(getStructureFromJmolViewer(),
-			        DENOPTIMVertex.BBType.FRAGMENT);
+			fromViewer = new Fragment(getStructureFromJmolViewer(),
+			        Vertex.BBType.FRAGMENT);
 			putAPsFromTableIntoIAtomContainer(fromViewer);
 		} catch (DENOPTIMException e) {
 			//e.printStackTrace();
@@ -607,9 +607,9 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		
 		boolean sameSMILES = false;
 		try {
-			sameSMILES = DENOPTIMMoleculeUtils.getSMILESForMolecule(
+			sameSMILES = MoleculeUtils.getSMILESForMolecule(
 					fromViewer.getIAtomContainer())
-					.equals(DENOPTIMMoleculeUtils.getSMILESForMolecule(
+					.equals(MoleculeUtils.getSMILESForMolecule(
 							fragment.getIAtomContainer()));
 		} catch (DENOPTIMException e) {
 			// we get false
@@ -624,9 +624,9 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		double thrld = 0.0001;
 		for (int i=0; i<fragment.getAtomCount(); i++)
 		{
-			Point3d pA = DENOPTIMMoleculeUtils.getPoint3d(
+			Point3d pA = MoleculeUtils.getPoint3d(
 			        fromViewer.getAtom(i));
-			Point3d pB = DENOPTIMMoleculeUtils.getPoint3d(
+			Point3d pB = MoleculeUtils.getPoint3d(
 			        fragment.getAtom(i));
 			if (pA.distance(pB)>thrld)
 			{
@@ -642,7 +642,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	
 //-----------------------------------------------------------------------------
 	
-	private void putAPsFromTableIntoIAtomContainer(DENOPTIMFragment mol) 
+	private void putAPsFromTableIntoIAtomContainer(Fragment mol) 
 			throws DENOPTIMException 
 	{
 		if (mapAPs == null || mapAPs.isEmpty())
@@ -657,7 +657,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		
         for (int apId : mapAPs.keySet())
         {
-        	DENOPTIMAttachmentPoint ap = mapAPs.get(apId);
+        	AttachmentPoint ap = mapAPs.get(apId);
         	int srcAtmId = ap.getAtomPositionNumber();
         	
         	//NB here the inequity considers two completely disjoint indexes
@@ -690,7 +690,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	public void loadPlainStructure(IAtomContainer mol)
 	{
 		try {
-			fragment = new DENOPTIMFragment(mol, DENOPTIMVertex.BBType.UNDEFINED);
+			fragment = new Fragment(mol, Vertex.BBType.UNDEFINED);
 	        loadStructure();
 		} catch (DENOPTIMException e) {
 			//Should never happen
@@ -746,7 +746,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 * the generation of the graphical objects representing the APs.
 	 * @param frag the fragment to visualize
 	 */
-	public void loadFragmentToViewer(DENOPTIMFragment frag)
+	public void loadFragmentToViewer(Fragment frag)
 	{	
 		this.fragment = frag;			
 		loadStructure();		
@@ -758,15 +758,15 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Uses the AP of the {@link DENOPTIMFragment} to create a new map and 
+	 * Uses the AP of the {@link Fragment} to create a new map and 
 	 * table of APs.
 	 */
 	private void updateAPsMapAndTable()
 	{
 		clearAPTable();
-		mapAPs = new HashMap<Integer,DENOPTIMAttachmentPoint>();
+		mapAPs = new HashMap<Integer,AttachmentPoint>();
 		
-		ArrayList<DENOPTIMAttachmentPoint> lstAPs = fragment.getCurrentAPs();		
+		ArrayList<AttachmentPoint> lstAPs = fragment.getCurrentAPs();		
         if (lstAPs.size() == 0)
         {
 			return;
@@ -774,7 +774,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
         
         activateTabEditsListener(false);
         int arrId = 0;
-	    for (DENOPTIMAttachmentPoint ap : lstAPs)
+	    for (AttachmentPoint ap : lstAPs)
 	    {
 	    	arrId++;
 	    	apTabModel.addRow(new Object[]{arrId, ap.getAPClass()});
@@ -858,9 +858,9 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		StringBuilder sb = new StringBuilder();
         for (int arrId : mapAPs.keySet())
         {
-        	DENOPTIMAttachmentPoint ap = mapAPs.get(arrId);
+        	AttachmentPoint ap = mapAPs.get(arrId);
         	int srcAtmId = ap.getAtomPositionNumber();
-        	Point3d srcAtmPlace = DENOPTIMMoleculeUtils.getPoint3d(
+        	Point3d srcAtmPlace = MoleculeUtils.getPoint3d(
         			fragment.getAtom(srcAtmId));
         	double[] startArrow = new double[]{
         			srcAtmPlace.x,
@@ -876,9 +876,9 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
         	    continue;
         	}
         	
-        	double[] offSet = DENOPTIMMathUtils.scale(
-        			DENOPTIMMathUtils.subtract(endArrow,startArrow), 0.2);
-        	double[] positionLabel = DENOPTIMMathUtils.add(endArrow,offSet); 
+        	double[] offSet = MathUtils.scale(
+        			MathUtils.subtract(endArrow,startArrow), 0.2);
+        	double[] positionLabel = MathUtils.add(endArrow,offSet); 
         	sb.append("draw arrow").append(arrId).append(" arrow ");
         	sb.append(getJmolPositionStr(startArrow));
         	sb.append(getJmolPositionStr(endArrow));
@@ -922,10 +922,10 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 * Identifies which attachment points are selected in the visualized table
 	 * @return the list of attachment points
 	 */
-	public ArrayList<DENOPTIMAttachmentPoint> getSelectedAPs()
+	public ArrayList<AttachmentPoint> getSelectedAPs()
 	{
-		ArrayList<DENOPTIMAttachmentPoint> selected = 
-				new ArrayList<DENOPTIMAttachmentPoint>();
+		ArrayList<AttachmentPoint> selected = 
+				new ArrayList<AttachmentPoint>();
 		
 		for (int rowId : apTable.getSelectedRows())
 		{
@@ -1037,7 +1037,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 //-----------------------------------------------------------------------------
     
     @Override
-    public Map<Integer, DENOPTIMAttachmentPoint> getMapOfAPsInTable()
+    public Map<Integer, AttachmentPoint> getMapOfAPsInTable()
     {
         return mapAPs;
     }

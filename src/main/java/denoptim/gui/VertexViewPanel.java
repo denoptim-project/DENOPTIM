@@ -38,10 +38,10 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Fragment;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
 import denoptim.graph.EmptyVertex;
 
 
@@ -62,7 +62,7 @@ public class VertexViewPanel extends JPanel
 	/**
 	 * The currently loaded vertex
 	 */
-	private DENOPTIMVertex vertex;
+	private Vertex vertex;
 	
 	/**
 	 * Flag signalling that data about APs has been changed in the GUI
@@ -296,10 +296,10 @@ public class VertexViewPanel extends JPanel
 	 * @return the chemical representation of what is currently visualised.
 	 * Can be empty and null.
 	 */
-	public DENOPTIMVertex getLoadedStructure()
+	public Vertex getLoadedStructure()
 	{
-	    DENOPTIMVertex v = null;
-	    if (vertex == null || vertex instanceof DENOPTIMFragment)
+	    Vertex v = null;
+	    if (vertex == null || vertex instanceof Fragment)
 	    {
 	        v = fragViewer.getLoadedStructure();
 	        switchToMolecularViewer();
@@ -331,20 +331,20 @@ public class VertexViewPanel extends JPanel
      * the generation of the graphical objects representing the APs.
      * @param frag the fragment to visualize
      */
-    public void loadVertexToViewer(DENOPTIMVertex v)
+    public void loadVertexToViewer(Vertex v)
     {
         vertex = v;
-        if (v instanceof DENOPTIMFragment) {
+        if (v instanceof Fragment) {
             labTitle.setText("Fragment");
-            DENOPTIMFragment frag = (DENOPTIMFragment) v;
+            Fragment frag = (Fragment) v;
             loadFragmentToViewer(frag);
         } else if (v instanceof EmptyVertex) {
             labTitle.setText("EmptyVertex");
             EmptyVertex ev = (EmptyVertex) v;
             loadEmptyVertexToViewer(ev);
-        } else if (v instanceof DENOPTIMTemplate) {
+        } else if (v instanceof Template) {
             labTitle.setText("Template");
-            DENOPTIMTemplate tmpl = (DENOPTIMTemplate) v;
+            Template tmpl = (Template) v;
             loadTemplateToViewer(tmpl);
         } else {
             System.err.println("Loading empty card as a result of vertex with " 
@@ -380,7 +380,7 @@ public class VertexViewPanel extends JPanel
 	 * the generation of the graphical objects representing the APs.
 	 * @param frag the fragment to visualize
 	 */
-	private void loadFragmentToViewer(DENOPTIMFragment frag)
+	private void loadFragmentToViewer(Fragment frag)
 	{		
 		fragViewer.loadFragmentToViewer(frag);
         btnSwitchToMolViewer.setEnabled(true);
@@ -396,14 +396,14 @@ public class VertexViewPanel extends JPanel
      * Loads the given template to this viewer.
      * @param tmpl the template to visualise
      */
-    private void loadTemplateToViewer(DENOPTIMTemplate tmpl)
+    private void loadTemplateToViewer(Template tmpl)
     {       
         if (tmpl.containsAtoms())
         {
-            DENOPTIMFragment frag;
+            Fragment frag;
             try
             {
-                frag = new DENOPTIMFragment(tmpl.getVertexId(), 
+                frag = new Fragment(tmpl.getVertexId(), 
                         tmpl.getIAtomContainer(), tmpl.getBuildingBlockType());
 
                 loadFragmentToViewer(frag);
@@ -458,7 +458,7 @@ public class VertexViewPanel extends JPanel
      * Returns the map of attachment points in the currently active viewer.
      * @return the map of attachment points in the currently active viewer.
      */
-    public Map<Integer,DENOPTIMAttachmentPoint> getActiveMapAPs()
+    public Map<Integer,AttachmentPoint> getActiveMapAPs()
     {
         return activeViewer.getMapOfAPsInTable();
     }

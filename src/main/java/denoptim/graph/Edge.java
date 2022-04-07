@@ -34,17 +34,17 @@ import denoptim.utils.GenUtils;
  * This class represents the edge between two vertices.
  */
 
-public class DENOPTIMEdge
+public class Edge
 {
     /**
      * Attachment point at source end
      */
-    private DENOPTIMAttachmentPoint srcAP;
+    private AttachmentPoint srcAP;
 
     /**
      * Attachment point at target end
      */
-    private DENOPTIMAttachmentPoint trgAP;
+    private AttachmentPoint trgAP;
 
     /**
      * The bond type associated with the connection between the fragments
@@ -64,8 +64,8 @@ public class DENOPTIMEdge
      * converted to when converting a graph into a chemical representation.
      */
     
-    public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
-                          DENOPTIMAttachmentPoint trgAP, BondType bondType) {
+    public Edge(AttachmentPoint srcAP,
+                          AttachmentPoint trgAP, BondType bondType) {
         this.srcAP = srcAP;
         this.trgAP = trgAP;
         this.bondType = bondType;
@@ -84,35 +84,35 @@ public class DENOPTIMEdge
      * @param trgAP attachment point at target end
      */
     
-    public DENOPTIMEdge(DENOPTIMAttachmentPoint srcAP,
-                          DENOPTIMAttachmentPoint trgAP) {
+    public Edge(AttachmentPoint srcAP,
+                          AttachmentPoint trgAP) {
         this(srcAP, trgAP, BondType.UNDEFINED);
     }
      
 //------------------------------------------------------------------------------
 
-    public DENOPTIMAttachmentPoint getSrcAP()
+    public AttachmentPoint getSrcAP()
     {
         return srcAP;
     }
     
 //------------------------------------------------------------------------------
 
-    public DENOPTIMAttachmentPoint getSrcAPThroughout()
+    public AttachmentPoint getSrcAPThroughout()
     {
         return srcAP.getEmbeddedAP();
     }
     
 //------------------------------------------------------------------------------
 
-    public DENOPTIMAttachmentPoint getTrgAPThroughout()
+    public AttachmentPoint getTrgAPThroughout()
     {
         return trgAP.getEmbeddedAP();
     }
     
 //------------------------------------------------------------------------------
 
-    public DENOPTIMAttachmentPoint getTrgAP()
+    public AttachmentPoint getTrgAP()
     {
         return trgAP;
     }
@@ -177,7 +177,7 @@ public class DENOPTIMEdge
      * even if the vertex IDs are different.
      */
     
-    public boolean sameAs(DENOPTIMEdge other, StringBuilder reason)
+    public boolean sameAs(Edge other, StringBuilder reason)
     {
         if (!this.getSrcAP().sameAs(other.getSrcAP(), reason))
         {
@@ -218,12 +218,12 @@ public class DENOPTIMEdge
      * @return a negative integer, zero, or a positive integer as this object is
      * less than, equal to, or greater than the specified object.
      */
-    public int compareAsUndirected(DENOPTIMEdge other)
+    public int compareAsUndirected(Edge other)
     {
-        DENOPTIMVertex tvA = srcAP.getOwner();
-        DENOPTIMVertex tvB = trgAP.getOwner();
-        DENOPTIMVertex ovA = other.srcAP.getOwner();
-        DENOPTIMVertex ovB = other.trgAP.getOwner();
+        Vertex tvA = srcAP.getOwner();
+        Vertex tvB = trgAP.getOwner();
+        Vertex ovA = other.srcAP.getOwner();
+        Vertex ovB = other.trgAP.getOwner();
         
         String invariantTA = tvA.getBuildingBlockType().toOldInt() +
                 GenUtils.getPaddedString(6,tvA.getBuildingBlockId()) +
@@ -264,9 +264,9 @@ public class DENOPTIMEdge
     @Override
     public String toString()
     {
-        DENOPTIMVertex srcVertex = srcAP.getOwner();
+        Vertex srcVertex = srcAP.getOwner();
         int srcAPID = this.getSrcAPID();
-        DENOPTIMVertex trgVertex = trgAP.getOwner();
+        Vertex trgVertex = trgAP.getOwner();
         int trgAPID = this.getTrgAPID();
         
         StringBuilder sb = new StringBuilder(64);
@@ -290,7 +290,7 @@ public class DENOPTIMEdge
      * Exchanges source and target vertices and respective APs of this edge.
      */
     public void flipEdge() {
-        DENOPTIMAttachmentPoint newTrgAP = getSrcAP();
+        AttachmentPoint newTrgAP = getSrcAP();
         srcAP = getTrgAP();
         trgAP = newTrgAP;
     }
@@ -402,10 +402,10 @@ public class DENOPTIMEdge
 //------------------------------------------------------------------------------
 
     public static class DENOPTIMEdgeSerializer 
-    implements JsonSerializer<DENOPTIMEdge>
+    implements JsonSerializer<Edge>
     {
         @Override
-        public JsonElement serialize(DENOPTIMEdge edge, Type typeOfSrc,
+        public JsonElement serialize(Edge edge, Type typeOfSrc,
               JsonSerializationContext context)
         {
             JsonObject jsonObject = new JsonObject();

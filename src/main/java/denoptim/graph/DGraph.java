@@ -61,23 +61,26 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass.APClassDeserializer;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.graph.DENOPTIMVertex.DENOPTIMVertexDeserializer;
-import denoptim.graph.DENOPTIMVertex.VertexType;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Vertex.BBType;
+import denoptim.graph.Vertex.DENOPTIMVertexDeserializer;
+import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.ClosableChain;
 import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.PathSubGraph;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.graph.simplified.Node;
+import denoptim.graph.simplified.NodeConnection;
+import denoptim.graph.simplified.UndirectedEdge;
 import denoptim.io.DenoptimIO;
 import denoptim.json.DENOPTIMgson;
 import denoptim.json.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters;
 import denoptim.programs.RunTimeParameters.ParametersType;
-import denoptim.utils.DENOPTIMGraphEdit;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.GraphEdit;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
@@ -91,22 +94,22 @@ import denoptim.utils.RotationalSpaceUtils;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public class DENOPTIMGraph implements Cloneable
+public class DGraph implements Cloneable
 {
     /**
      * The vertices belonging to this graph.
      */
-    ArrayList<DENOPTIMVertex> gVertices;
+    ArrayList<Vertex> gVertices;
 
     /**
      * The edges belonging to this graph.
      */
-    ArrayList<DENOPTIMEdge> gEdges;
+    ArrayList<Edge> gEdges;
 
     /**
      * The rings defined in this graph.
      */
-    ArrayList<DENOPTIMRing> gRings;
+    ArrayList<Ring> gRings;
 
     /**
      * The potentially closable chains of vertices.
@@ -137,14 +140,14 @@ public class DENOPTIMGraph implements Cloneable
     Candidate candidate;
     
     /**
-     * Reference to the {@link DENOPTIMTemplate} embedding this graph
+     * Reference to the {@link Template} embedding this graph
      */
-    DENOPTIMTemplate templateJacket;
+    Template templateJacket;
     
     /**
      * JGraph representation used to detect DENOPTIM-isomorphism
      */
-    private DefaultUndirectedGraph<DENOPTIMVertex, UndirectedEdge> 
+    private DefaultUndirectedGraph<Vertex, UndirectedEdge> 
         jGraph = null;
     
     /**
@@ -161,11 +164,11 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> gVertices,
-                            ArrayList<DENOPTIMEdge> gEdges)
+    public DGraph(ArrayList<Vertex> gVertices,
+                            ArrayList<Edge> gEdges)
     {
         this.gVertices = gVertices;
-        for (DENOPTIMVertex v : this.gVertices)
+        for (Vertex v : this.gVertices)
             v.setGraphOwner(this);
         this.gEdges = gEdges;
         gRings = new ArrayList<>();
@@ -176,9 +179,9 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> gVertices,
-                            ArrayList<DENOPTIMEdge> gEdges,
-                            ArrayList<DENOPTIMRing> gRings)
+    public DGraph(ArrayList<Vertex> gVertices,
+                            ArrayList<Edge> gEdges,
+                            ArrayList<Ring> gRings)
     {
         this(gVertices, gEdges);
         this.gRings = gRings;
@@ -189,9 +192,9 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> gVertices,
-                            ArrayList<DENOPTIMEdge> gEdges,
-                            ArrayList<DENOPTIMRing> gRings,
+    public DGraph(ArrayList<Vertex> gVertices,
+                            ArrayList<Edge> gEdges,
+                            ArrayList<Ring> gRings,
                             ArrayList<SymmetricSet> symVertices)
     {
         this(gVertices, gEdges, gRings);
@@ -202,9 +205,9 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph(ArrayList<DENOPTIMVertex> gVertices,
-                            ArrayList<DENOPTIMEdge> gEdges,
-                            ArrayList<DENOPTIMRing> gRings,
+    public DGraph(ArrayList<Vertex> gVertices,
+                            ArrayList<Edge> gEdges,
+                            ArrayList<Ring> gRings,
                             ArrayList<ClosableChain> closableChains,
                             ArrayList<SymmetricSet> symVertices)
     {
@@ -215,7 +218,7 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph()
+    public DGraph()
     {
         gVertices = new ArrayList<>();
         gEdges = new ArrayList<>();
@@ -285,7 +288,7 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public boolean hasSymmetryInvolvingVertex(DENOPTIMVertex v)
+    public boolean hasSymmetryInvolvingVertex(Vertex v)
     {
         boolean res = false;
         for (SymmetricSet ss : symVertices)
@@ -327,9 +330,9 @@ public class DENOPTIMGraph implements Cloneable
      * @param v the vertex for which we want the list of symmetric vertexes.
      * @return a list that includes v but can be empty.
      */
-    public ArrayList<DENOPTIMVertex> getSymVertexesForVertex(DENOPTIMVertex v)
+    public ArrayList<Vertex> getSymVertexesForVertex(Vertex v)
     {
-        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> lst = new ArrayList<Vertex>();
         for (SymmetricSet ss : symVertices)
         {
             if (ss.contains(v.getVertexId()))
@@ -356,7 +359,7 @@ public class DENOPTIMGraph implements Cloneable
     
 //------------------------------------------------------------------------------
 
-    public SymmetricSet getSymSetForVertex(DENOPTIMVertex v)
+    public SymmetricSet getSymSetForVertex(Vertex v)
     {
         for (SymmetricSet ss : symVertices)
         {
@@ -418,7 +421,7 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setVertexList(ArrayList<DENOPTIMVertex> vertices)
+    public void setVertexList(ArrayList<Vertex> vertices)
     {
         gVertices = vertices;
         jGraph = null;
@@ -427,7 +430,7 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setEdgeList(ArrayList<DENOPTIMEdge> edges)
+    public void setEdgeList(ArrayList<Edge> edges)
     {
         gEdges = edges;
         jGraph = null;
@@ -436,7 +439,7 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setRings(ArrayList<DENOPTIMRing> rings)
+    public void setRings(ArrayList<Ring> rings)
     {
         gRings = rings;
         jGraph = null;
@@ -459,7 +462,7 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<DENOPTIMVertex> getVertexList()
+    public ArrayList<Vertex> getVertexList()
     {
         return gVertices;
     }
@@ -480,7 +483,7 @@ public class DENOPTIMGraph implements Cloneable
      * 
      * @return the seed/root of the spanning tree
      */
-    public DENOPTIMVertex getSourceVertex()
+    public Vertex getSourceVertex()
     {
         switch (gVertices.size())
         {
@@ -489,12 +492,12 @@ public class DENOPTIMGraph implements Cloneable
             case 1:
                 return getVertexAtPosition(0);
         }
-        DENOPTIMVertex v0 = getVertexAtPosition(0);
-        for (DENOPTIMEdge e : this.getEdgeList())
+        Vertex v0 = getVertexAtPosition(0);
+        for (Edge e : this.getEdgeList())
         {
             if (e.getTrgAP().getOwner() == v0)
             {
-                ArrayList<DENOPTIMVertex> parentTree = new ArrayList<>();
+                ArrayList<Vertex> parentTree = new ArrayList<>();
                 getParentTree(v0,parentTree);
                 return parentTree.get(parentTree.size()-1);
             }
@@ -504,14 +507,14 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<DENOPTIMEdge> getEdgeList()
+    public ArrayList<Edge> getEdgeList()
     {
         return gEdges;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<DENOPTIMRing> getRings()
+    public ArrayList<Ring> getRings()
     {
         return gRings;
     }
@@ -524,10 +527,10 @@ public class DENOPTIMGraph implements Cloneable
      * @param v the given vertex.
      * @return the list of edges departing from the given vertex.
      */
-    public ArrayList<DENOPTIMEdge> getEdgesWithSrc(DENOPTIMVertex v)
+    public ArrayList<Edge> getEdgesWithSrc(Vertex v)
     {
-    	ArrayList<DENOPTIMEdge> edges = new ArrayList<DENOPTIMEdge>();
-    	for (DENOPTIMEdge e : this.getEdgeList())
+    	ArrayList<Edge> edges = new ArrayList<Edge>();
+    	for (Edge e : this.getEdgeList())
     	{
     		if (e.getSrcAP().getOwner() == v)
     		{
@@ -545,10 +548,10 @@ public class DENOPTIMGraph implements Cloneable
      * @param v the vertex to search for.
      * @return the list of rings of an empty list.
      */
-    public ArrayList<DENOPTIMRing> getRingsInvolvingVertex(DENOPTIMVertex v)
+    public ArrayList<Ring> getRingsInvolvingVertex(Vertex v)
     {
-        ArrayList<DENOPTIMRing> rings = new ArrayList<DENOPTIMRing>();
-        for (DENOPTIMRing r : gRings)
+        ArrayList<Ring> rings = new ArrayList<Ring>();
+        for (Ring r : gRings)
         {
             if (r.contains(v))
             {
@@ -566,10 +569,10 @@ public class DENOPTIMGraph implements Cloneable
      * @param vs the collection of vertexes to search for.
      * @return the list of rings of an empty list.
      */
-    public ArrayList<DENOPTIMRing> getRingsInvolvingVertex(DENOPTIMVertex[] vs)
+    public ArrayList<Ring> getRingsInvolvingVertex(Vertex[] vs)
     {
-        ArrayList<DENOPTIMRing> rings = new ArrayList<DENOPTIMRing>();
-        for (DENOPTIMRing r : gRings)
+        ArrayList<Ring> rings = new ArrayList<Ring>();
+        for (Ring r : gRings)
         {
             boolean matchesAll = true;
             for (int i=0; i<vs.length; i++)
@@ -590,10 +593,10 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<DENOPTIMRing> getRingsInvolvingVertexID(int vid)
+    public ArrayList<Ring> getRingsInvolvingVertexID(int vid)
     {
-        ArrayList<DENOPTIMRing> rings = new ArrayList<DENOPTIMRing>();
-        for (DENOPTIMRing r : gRings)
+        ArrayList<Ring> rings = new ArrayList<Ring>();
+        for (Ring r : gRings)
         {
             if (r.containsID(vid))
             {
@@ -615,7 +618,7 @@ public class DENOPTIMGraph implements Cloneable
     public boolean isVertexIDInRing(int vid)
     {
         boolean result = false;
-        for (DENOPTIMRing  r : gRings)
+        for (Ring  r : gRings)
         {
             if (r.containsID(vid))
             {
@@ -628,10 +631,10 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public boolean isVertexInRing(DENOPTIMVertex v)
+    public boolean isVertexInRing(Vertex v)
     {
         boolean result = false;
-        for (DENOPTIMRing  r : gRings)
+        for (Ring  r : gRings)
         {
             if (r.contains(v))
             {
@@ -650,10 +653,10 @@ public class DENOPTIMGraph implements Cloneable
      * @return the list of ring closing vertices
      */
 
-    public ArrayList<DENOPTIMVertex> getRCVertices()
+    public ArrayList<Vertex> getRCVertices()
     {
-        ArrayList<DENOPTIMVertex> rcvLst = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : gVertices)
+        ArrayList<Vertex> rcvLst = new ArrayList<Vertex>();
+        for (Vertex v : gVertices)
         {
             if (v.isRCV())
             {
@@ -672,11 +675,11 @@ public class DENOPTIMGraph implements Cloneable
      * @return the list of unused ring closing vertices
      */
 
-    public ArrayList<DENOPTIMVertex> getFreeRCVertices()
+    public ArrayList<Vertex> getFreeRCVertices()
     {
-        ArrayList<DENOPTIMVertex> rcvLst = getRCVertices();
-        ArrayList<DENOPTIMVertex> free = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : rcvLst)
+        ArrayList<Vertex> rcvLst = getRCVertices();
+        ArrayList<Vertex> free = new ArrayList<Vertex>();
+        for (Vertex v : rcvLst)
         {
             if (!isVertexInRing(v))
             {
@@ -695,9 +698,9 @@ public class DENOPTIMGraph implements Cloneable
      * @return the list of ring closing vertices
      */
 
-    public ArrayList<DENOPTIMVertex> getUsedRCVertices()
+    public ArrayList<Vertex> getUsedRCVertices()
     {
-        ArrayList<DENOPTIMVertex> used = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> used = new ArrayList<Vertex>();
         used.addAll(getRCVertices());
         used.removeAll(getFreeRCVertices());
         return used;
@@ -709,7 +712,7 @@ public class DENOPTIMGraph implements Cloneable
      * Adds the edge to the list of edges belonging to this graph.
      * @param edge to be included in the list of edges
      */
-    public void addEdge(DENOPTIMEdge edge)
+    public void addEdge(Edge edge)
     {
         gEdges.add(edge);
         jGraph = null;
@@ -718,7 +721,7 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void addRing(DENOPTIMRing ring)
+    public void addRing(Ring ring)
     {
         gRings.add(ring);
         jGraph = null;
@@ -735,7 +738,7 @@ public class DENOPTIMGraph implements Cloneable
      * types to their parents and, therefore, we cannot infer the bond type of
      * the chord.
      */
-    public void addRing(DENOPTIMVertex vI, DENOPTIMVertex vJ) 
+    public void addRing(Vertex vI, Vertex vJ) 
             throws DENOPTIMException
     {
         BondType bndTypI = vI.getEdgeToParent().getBondType();
@@ -763,13 +766,13 @@ public class DENOPTIMGraph implements Cloneable
      * @param vJ the other of the ring-closing vertices.
      * @param bndTyp the bond type the chord corresponds to.
      */
-    public void addRing(DENOPTIMVertex vI, DENOPTIMVertex vJ, 
+    public void addRing(Vertex vI, Vertex vJ, 
             BondType bndTyp)
     {
         PathSubGraph path = new PathSubGraph(vI,vJ,this);
-        ArrayList<DENOPTIMVertex> arrLst = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> arrLst = new ArrayList<Vertex>();
         arrLst.addAll(path.getVertecesPath());                    
-        DENOPTIMRing ring = new DENOPTIMRing(arrLst);
+        Ring ring = new Ring(arrLst);
         ring.setBondType(bndTyp);
         this.addRing(ring);
         jGraph = null;
@@ -786,7 +789,7 @@ public class DENOPTIMGraph implements Cloneable
      * @throws DENOPTIMException in the vertex has an ID that is already 
      * present in the current list of vertices of this graph, if any.
      */
-    public void addVertex(DENOPTIMVertex vertex) throws DENOPTIMException
+    public void addVertex(Vertex vertex) throws DENOPTIMException
     {
         if (containsVertexID(vertex.getVertexId()))
             throw new DENOPTIMException("Vertex must have a VertexID that is "
@@ -808,7 +811,7 @@ public class DENOPTIMGraph implements Cloneable
      * the set, or purged from the vertex being removed.
      * @param vertex the vertex to remove.
      */
-    public void removeVertex(DENOPTIMVertex vertex)
+    public void removeVertex(Vertex vertex)
     {
         if (!gVertices.contains(vertex))
         {
@@ -821,18 +824,18 @@ public class DENOPTIMGraph implements Cloneable
         // delete also any ring involving the removed vertex
         if (isVertexInRing(vertex))
         {
-            ArrayList<DENOPTIMRing> rToRm = getRingsInvolvingVertex(vertex);
-            for (DENOPTIMRing r : rToRm)
+            ArrayList<Ring> rToRm = getRingsInvolvingVertex(vertex);
+            for (Ring r : rToRm)
             {
                 removeRing(r);
             }
         }
 
         // remove edges involving the removed vertex
-        ArrayList<DENOPTIMEdge> eToDel = new ArrayList<>();
+        ArrayList<Edge> eToDel = new ArrayList<>();
         for (int i=0; i<gEdges.size(); i++)
         {
-            DENOPTIMEdge edge = gEdges.get(i);
+            Edge edge = gEdges.get(i);
             if (vid == edge.getTrgVertex())
             {
                 eToDel.add(edge);
@@ -843,7 +846,7 @@ public class DENOPTIMGraph implements Cloneable
                 eToDel.add(edge);
             }
         }
-        for (DENOPTIMEdge e : eToDel)
+        for (Edge e : eToDel)
         {
             this.removeEdge(e);
         }
@@ -886,7 +889,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return <code>true</code> if the operation is successful.
      * @throws DENOPTIMException
      */
-    public boolean removeVertexAndWeld(DENOPTIMVertex vertex,
+    public boolean removeVertexAndWeld(Vertex vertex,
             FragmentSpace fragSpace) throws DENOPTIMException
     {
         if (!gVertices.contains(vertex))
@@ -894,14 +897,14 @@ public class DENOPTIMGraph implements Cloneable
             return false;
         }
         
-        ArrayList<DENOPTIMVertex> symSites = getSymVertexesForVertex(vertex);
+        ArrayList<Vertex> symSites = getSymVertexesForVertex(vertex);
         if (symSites.size() == 0)
         {
             symSites.add(vertex);
         } else {
             //TODO-V3 flip coin to decide if this should be a symmetric operation or not
         }
-        for (DENOPTIMVertex oldLink : symSites)
+        for (Vertex oldLink : symSites)
         {
             GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
             if (!removeSingleVertexAndWeld(oldLink, fragSpace))
@@ -911,15 +914,15 @@ public class DENOPTIMGraph implements Cloneable
         }
         // Reject deletions that cause the collapse of a 3-atom ring into a
         // loop (i.e., 1-atom ring) or multiple connection (i.e., a 3-atom ring)
-        for (DENOPTIMRing r : gRings)
+        for (Ring r : gRings)
         {
             // 3 = 1 actual vertex + 2 RCVs
             if (r.getSize()!=3)
                 continue;
             
-            DENOPTIMAttachmentPoint apH = r.getHeadVertex().getEdgeToParent()
+            AttachmentPoint apH = r.getHeadVertex().getEdgeToParent()
                     .getSrcAPThroughout();
-            DENOPTIMAttachmentPoint apT = r.getTailVertex().getEdgeToParent()
+            AttachmentPoint apT = r.getTailVertex().getEdgeToParent()
                     .getSrcAPThroughout();
             
             if (apH.hasSameSrcAtom(apT) || apH.hasConnectedSrcAtom(apT))
@@ -938,7 +941,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return <code>true</code> if the operation is successful.
      * @throws DENOPTIMException
      */
-    public boolean removeSingleVertexAndWeld(DENOPTIMVertex vertex, 
+    public boolean removeSingleVertexAndWeld(Vertex vertex, 
             FragmentSpace fragSpace) throws DENOPTIMException
     {
         if (!gVertices.contains(vertex))
@@ -952,7 +955,7 @@ public class DENOPTIMGraph implements Cloneable
             // parents in this graph and the APs of which are only user as 
             // source APs)
             boolean foundLinkToParent = false;
-            for (DENOPTIMAttachmentPoint ap : vertex.getAttachmentPoints())
+            for (AttachmentPoint ap : vertex.getAttachmentPoints())
             {
                 if (ap.isAvailable() && !ap.isAvailableThroughout())
                 {
@@ -973,29 +976,29 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         // Get all APs that we'll try to weld into the parent
-        ArrayList<DENOPTIMAttachmentPoint> needyAPsOnChildren = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
+        ArrayList<AttachmentPoint> needyAPsOnChildren = 
+                new ArrayList<AttachmentPoint>();
         // And all APs where we could weld onto
-        ArrayList<DENOPTIMAttachmentPoint> freeAPsOnParent = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
+        ArrayList<AttachmentPoint> freeAPsOnParent = 
+                new ArrayList<AttachmentPoint>();
         //        vertex.getAPsFromChilddren(); //No, because it enter templates
-        Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apOnOldToNeedyAP = 
-                new HashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
-        for (DENOPTIMAttachmentPoint apOnOld : vertex.getAttachmentPoints())
+        Map<AttachmentPoint,AttachmentPoint> apOnOldToNeedyAP = 
+                new HashMap<AttachmentPoint,AttachmentPoint>();
+        for (AttachmentPoint apOnOld : vertex.getAttachmentPoints())
         {
             if (!apOnOld.isAvailableThroughout())
             {
                 if (apOnOld.isSrcInUserThroughout())
                 {
                     // Links that depart from vertex
-                    DENOPTIMAttachmentPoint needyAP = 
+                    AttachmentPoint needyAP = 
                             apOnOld.getLinkedAPThroughout();
                     // NB: here do not use getSrcThroughout because it would 
                     // enter trg templates rather than staying on their surface.
                     needyAPsOnChildren.add(needyAP);
                     apOnOldToNeedyAP.put(apOnOld, needyAP);
                 } else {
-                    DENOPTIMAttachmentPoint apOnParent = 
+                    AttachmentPoint apOnParent = 
                             apOnOld.getLinkedAPThroughout();
                     // NB: here do not use getSrcThroughout because it would 
                     // enter src templates rather than staying on their surface.
@@ -1022,15 +1025,15 @@ public class DENOPTIMGraph implements Cloneable
         // Score rings in this level's graph
         for (int i=0; i<needyAPsOnChildren.size(); i++)
         {
-            DENOPTIMAttachmentPoint needyAP = needyAPsOnChildren.get(i);
+            AttachmentPoint needyAP = needyAPsOnChildren.get(i);
             preferences.add(0);
             
-            DENOPTIMVertex ownerOfNeedy = needyAP.getOwner();
-            for (DENOPTIMRing r : ownerOfNeedy.getGraphOwner()
+            Vertex ownerOfNeedy = needyAP.getOwner();
+            for (Ring r : ownerOfNeedy.getGraphOwner()
                     .getRingsInvolvingVertex(ownerOfNeedy))
             {
                 // NB: here we stay at the level of the graph owning ownerOfNeedy
-                DENOPTIMVertex lastBeforeOwnerOfNeedy = 
+                Vertex lastBeforeOwnerOfNeedy = 
                         needyAP.getLinkedAP().getOwner();
                 if (r.contains(lastBeforeOwnerOfNeedy))
                 {
@@ -1045,7 +1048,7 @@ public class DENOPTIMGraph implements Cloneable
         for (APMapping apm : mappings)
         {
             int score = 0;
-            for (DENOPTIMAttachmentPoint ap : apm.values())
+            for (AttachmentPoint ap : apm.values())
             {
                 score = score + preferences.get(needyAPsOnChildren.indexOf(ap));
             }
@@ -1057,33 +1060,33 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         APMapping bestScoringMappingReverse = new APMapping();
-        for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e : 
+        for (Entry<AttachmentPoint, AttachmentPoint> e : 
             bestScoringMapping.entrySet())
         {
             bestScoringMappingReverse.put(e.getValue(), e.getKey());
         }
         
         // Update rings involving vertex directly (i.e., in this graph)
-        ArrayList<DENOPTIMRing> rToEdit = getRingsInvolvingVertex(vertex);
-        ArrayList<DENOPTIMRing> ringsToRemove = new ArrayList<DENOPTIMRing>();
-        for (DENOPTIMRing r : rToEdit)
+        ArrayList<Ring> rToEdit = getRingsInvolvingVertex(vertex);
+        ArrayList<Ring> ringsToRemove = new ArrayList<Ring>();
+        for (Ring r : rToEdit)
         {
             r.removeVertex(vertex);
             if (r.getSize() < 3)
                 ringsToRemove.add(r);
         }
-        for (DENOPTIMRing r : ringsToRemove)
+        for (Ring r : ringsToRemove)
         {
             removeRing(r);
         }
         
         // Remove edges to/from old vertex, while keeping track of edits to do
         // in a hypothetical jacket template (if such template exists)
-        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> newInReplaceOldInInTmpl = 
-                new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
-        List<DENOPTIMAttachmentPoint> oldAPToRemoveFromTmpl = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMAttachmentPoint oldAP : vertex.getAttachmentPoints())
+        LinkedHashMap<AttachmentPoint,AttachmentPoint> newInReplaceOldInInTmpl = 
+                new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+        List<AttachmentPoint> oldAPToRemoveFromTmpl = 
+                new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint oldAP : vertex.getAttachmentPoints())
         {
             if (oldAP.isAvailable())
             {
@@ -1095,7 +1098,7 @@ public class DENOPTIMGraph implements Cloneable
                 {
                     if (!oldAP.isAvailableThroughout())
                     {
-                        DENOPTIMAttachmentPoint lAP = 
+                        AttachmentPoint lAP = 
                                 oldAP.getLinkedAPThroughout();
                         if (bestScoringMapping.keySet().contains(lAP))
                         {
@@ -1141,17 +1144,17 @@ public class DENOPTIMGraph implements Cloneable
         vertex.resetGraphOwner();
         
         // Add new edges (within the graph owning the removed vertex) 
-        List<DENOPTIMAttachmentPoint> reconnettedApsOnChilds = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (Entry<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> e : 
+        List<AttachmentPoint> reconnettedApsOnChilds = 
+                new ArrayList<AttachmentPoint>();
+        for (Entry<AttachmentPoint,AttachmentPoint> e : 
             bestScoringMapping.entrySet())
         {
-            DENOPTIMAttachmentPoint apOnParent = e.getKey();
-            DENOPTIMAttachmentPoint apOnChild = e.getValue();
+            AttachmentPoint apOnParent = e.getKey();
+            AttachmentPoint apOnChild = e.getValue();
             if (containsVertex(apOnChild.getOwner()) 
                     && containsVertex(apOnParent.getOwner()))
             {
-                DENOPTIMEdge edge = new DENOPTIMEdge(apOnParent,apOnChild,
+                Edge edge = new Edge(apOnParent,apOnChild,
                         apOnParent.getAPClass().getBondType());
                 addEdge(edge);
                 reconnettedApsOnChilds.add(apOnChild);
@@ -1188,14 +1191,14 @@ public class DENOPTIMGraph implements Cloneable
         if (templateJacket!=null)
         {   
             // Remove all APs that existed only in the old vertex
-            for (DENOPTIMAttachmentPoint apOnOld : oldAPToRemoveFromTmpl)
+            for (AttachmentPoint apOnOld : oldAPToRemoveFromTmpl)
             {
                 templateJacket.removeProjectionOfInnerAP(apOnOld);
             }
         }
         
         // Remove branches of child-APs that were not mapped/done
-        for (DENOPTIMAttachmentPoint apOnChild : needyAPsOnChildren)
+        for (AttachmentPoint apOnChild : needyAPsOnChildren)
         {
             if (!reconnettedApsOnChilds.contains(apOnChild))
             {
@@ -1221,7 +1224,7 @@ public class DENOPTIMGraph implements Cloneable
     protected void reassignSymmetricLabels()
     {
         //Remove previous labeling
-        for (DENOPTIMVertex v : gVertices)
+        for (Vertex v : gVertices)
             v.removeProperty(DENOPTIMConstants.VRTSYMMSETID);
         
         Iterator<SymmetricSet> ssIter = getSymSetsIterator();
@@ -1237,7 +1240,7 @@ public class DENOPTIMGraph implements Cloneable
             }
             i++;
         }
-        for (DENOPTIMVertex v : gVertices)
+        for (Vertex v : gVertices)
         {
             i++;
             if (!v.hasProperty(DENOPTIMConstants.VRTSYMMSETID))
@@ -1253,8 +1256,8 @@ public class DENOPTIMGraph implements Cloneable
      */
     protected void convertSymmetricLabelsToSymmetricSets()
     {
-        Map<String,List<DENOPTIMVertex>> collectedLabels = new HashMap<>();
-        for (DENOPTIMVertex v : gVertices)
+        Map<String,List<Vertex>> collectedLabels = new HashMap<>();
+        for (Vertex v : gVertices)
         {
             if (v.hasProperty(DENOPTIMConstants.VRTSYMMSETID))
             {
@@ -1264,7 +1267,7 @@ public class DENOPTIMGraph implements Cloneable
                 {
                     collectedLabels.get(label).add(v);
                 } else {
-                    List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+                    List<Vertex> lst = new ArrayList<Vertex>();
                     lst.add(v);
                     collectedLabels.put(label, lst);
                 }
@@ -1274,12 +1277,12 @@ public class DENOPTIMGraph implements Cloneable
         
         for (String label : collectedLabels.keySet())
         {
-            List<DENOPTIMVertex> symmVertexes = collectedLabels.get(label);
+            List<Vertex> symmVertexes = collectedLabels.get(label);
             
             if (symmVertexes.size()>1)
             {
                 SymmetricSet ss = null;
-                for (DENOPTIMVertex v : symmVertexes)
+                for (Vertex v : symmVertexes)
                 {
                     if (hasSymmetryInvolvingVertex(v))
                     {
@@ -1290,12 +1293,12 @@ public class DENOPTIMGraph implements Cloneable
                 
                 if (ss != null)
                 {
-                    for (DENOPTIMVertex v : symmVertexes)
+                    for (Vertex v : symmVertexes)
                         ss.add(v.getVertexId());
                     
                 } else {
                     ss = new SymmetricSet();
-                    for (DENOPTIMVertex v : symmVertexes)
+                    for (Vertex v : symmVertexes)
                         ss.add(v.getVertexId());
                     try
                     {
@@ -1331,12 +1334,12 @@ public class DENOPTIMGraph implements Cloneable
      * @throws DENOPTIMException is capping groups are the only vertexes in the
      * subgraph.
      */
-    public boolean replaceSubGraph(List<DENOPTIMVertex> subGrpVrtxs, 
-            DENOPTIMGraph incomingGraph, 
-            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap,
+    public boolean replaceSubGraph(List<Vertex> subGrpVrtxs, 
+            DGraph incomingGraph, 
+            LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap,
             FragmentSpace fragSpace) throws DENOPTIMException
     {
-        for (DENOPTIMVertex vToRemove : subGrpVrtxs)
+        for (Vertex vToRemove : subGrpVrtxs)
         {
             if (!gVertices.contains(vToRemove))
             {
@@ -1360,32 +1363,32 @@ public class DENOPTIMGraph implements Cloneable
         
         GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
         
-        for (List<DENOPTIMVertex> vertexesToRemove : getSymmetricSubGraphs(
+        for (List<Vertex> vertexesToRemove : getSymmetricSubGraphs(
                 subGrpVrtxs))
         {
-            DENOPTIMGraph graphToAdd = incomingGraph.clone();
+            DGraph graphToAdd = incomingGraph.clone();
             graphToAdd.renumberGraphVertices();
             
             removeCappingGroupsFromChilds(vertexesToRemove);
             
-            List<DENOPTIMVertex> vertexAddedToThis = 
-                    new ArrayList<DENOPTIMVertex>(graphToAdd.gVertices);
-            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
-                localApMap = new LinkedHashMap<DENOPTIMAttachmentPoint,
-                DENOPTIMAttachmentPoint>();
-            for (Map.Entry<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>  e 
+            List<Vertex> vertexAddedToThis = 
+                    new ArrayList<Vertex>(graphToAdd.gVertices);
+            LinkedHashMap<AttachmentPoint,AttachmentPoint> 
+                localApMap = new LinkedHashMap<AttachmentPoint,
+                AttachmentPoint>();
+            for (Map.Entry<AttachmentPoint,AttachmentPoint>  e 
                     : apMap.entrySet())
             {
                 // WARNING! Assumption that subGrpVrtxs and vertexesToRemove
                 // are sorted accordingly to symmetry, which should be the case.
                 int vrtPosOnOld = subGrpVrtxs.indexOf(e.getKey().getOwner());
                 int apPosOnOld = e.getKey().getIndexInOwner();
-                DENOPTIMAttachmentPoint apOnOld = vertexesToRemove.get(
+                AttachmentPoint apOnOld = vertexesToRemove.get(
                         vrtPosOnOld).getAP(apPosOnOld); 
                 
                 int vrtPosOnNew = incomingGraph.indexOf(e.getValue().getOwner());
                 int apPosOnNew = e.getValue().getIndexInOwner();
-                DENOPTIMAttachmentPoint apOnNew = graphToAdd.getVertexAtPosition(
+                AttachmentPoint apOnNew = graphToAdd.getVertexAtPosition(
                         vrtPosOnNew).getAP(apPosOnNew); 
                 localApMap.put(apOnOld,apOnNew);
             }
@@ -1414,20 +1417,20 @@ public class DENOPTIMGraph implements Cloneable
      * belonging to it.
      * @throws DENOPTIMException if capping groups are present in the list.
      */
-    public List<List<DENOPTIMVertex>> getSymmetricSubGraphs(
-            List<DENOPTIMVertex> subGrpVrtxs) throws DENOPTIMException
+    public List<List<Vertex>> getSymmetricSubGraphs(
+            List<Vertex> subGrpVrtxs) throws DENOPTIMException
     {
         if (subGrpVrtxs.stream().anyMatch(v -> v.getBuildingBlockType()==BBType.CAP))
             throw new DENOPTIMException("Capping groups must not be part of "
                     + "symmetric subgraphs");
 
-        List<List<DENOPTIMVertex>> symSites = new ArrayList<List<DENOPTIMVertex>>();
+        List<List<Vertex>> symSites = new ArrayList<List<Vertex>>();
         
         if (subGrpVrtxs.size()==1)
         {
-            for (DENOPTIMVertex sv : getSymVertexesForVertex(subGrpVrtxs.get(0)))
+            for (Vertex sv : getSymVertexesForVertex(subGrpVrtxs.get(0)))
             {
-                ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+                ArrayList<Vertex> lst = new ArrayList<Vertex>();
                 lst.add(sv);
                 symSites.add(lst);
             }
@@ -1439,8 +1442,8 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         // Identify the (sole) grand parent.
-        List<DENOPTIMVertex> thoseWithoutParent = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : subGrpVrtxs)
+        List<Vertex> thoseWithoutParent = new ArrayList<Vertex>();
+        for (Vertex v : subGrpVrtxs)
         {
             if (!subGrpVrtxs.contains(v.getParent()))
                 thoseWithoutParent.add(v);
@@ -1450,7 +1453,7 @@ public class DENOPTIMGraph implements Cloneable
             throw new DENOPTIMException("SubGraph has more than one grand "
                     + "parent.");
         }
-        DENOPTIMVertex sourceOfSubGraph = thoseWithoutParent.get(0);
+        Vertex sourceOfSubGraph = thoseWithoutParent.get(0);
         int numSymmetricSubGraphs = getSymVertexesForVertex(sourceOfSubGraph).size();
         if (numSymmetricSubGraphs==0)
         {
@@ -1459,8 +1462,8 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         // Identify the ends of the subgraph's spanning tree
-        List<DENOPTIMVertex> thoseWithoutChildren = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : subGrpVrtxs)
+        List<Vertex> thoseWithoutChildren = new ArrayList<Vertex>();
+        for (Vertex v : subGrpVrtxs)
         {
             if (Collections.disjoint(v.getChilddren(),subGrpVrtxs))
                 thoseWithoutChildren.add(v);
@@ -1471,9 +1474,9 @@ public class DENOPTIMGraph implements Cloneable
         // all ends that are outside the subgraph and are symmetric to any of
         // the ends belonging to the subgraph. The first, in fact, are the ends
         // of the symmetric subgraphs.
-        Set<DENOPTIMVertex> upperLimits = new HashSet<DENOPTIMVertex>();
-        Set<DENOPTIMVertex> doneBySymmetry = new HashSet<DENOPTIMVertex>();
-        for (DENOPTIMVertex upperLimit : thoseWithoutChildren)
+        Set<Vertex> upperLimits = new HashSet<Vertex>();
+        Set<Vertex> doneBySymmetry = new HashSet<Vertex>();
+        for (Vertex upperLimit : thoseWithoutChildren)
         {
             // We need to understand how many symmetric vertexes are already
             // within the subgraph
@@ -1483,7 +1486,7 @@ public class DENOPTIMGraph implements Cloneable
                 continue;
             
             // These are symmetric vertexes that do belong to the subgraph
-            Set<DENOPTIMVertex> symmSitesOnBranch = new HashSet<DENOPTIMVertex>(
+            Set<Vertex> symmSitesOnBranch = new HashSet<Vertex>(
                     getSymVertexesForVertex(upperLimit));
             symmSitesOnBranch.retainAll(subGrpVrtxs);
             if (symmSitesOnBranch.size()>0)
@@ -1492,7 +1495,7 @@ public class DENOPTIMGraph implements Cloneable
                 doneBySymmetry.addAll(symmSitesOnBranch);
             }
             
-            List<DENOPTIMVertex> lst = getSymVertexesForVertex(upperLimit);
+            List<Vertex> lst = getSymVertexesForVertex(upperLimit);
             if (lst.size() != numInSubGraphReplicas*numSymmetricSubGraphs)
             {
                 // The subgraph is not symmetrically reproduced.
@@ -1502,9 +1505,9 @@ public class DENOPTIMGraph implements Cloneable
             upperLimits.addAll(lst);
         }
         
-        for (DENOPTIMVertex symSources : getSymVertexesForVertex(sourceOfSubGraph))
+        for (Vertex symSources : getSymVertexesForVertex(sourceOfSubGraph))
         {
-            List<DENOPTIMVertex> symSubGraph = new ArrayList<DENOPTIMVertex>();
+            List<Vertex> symSubGraph = new ArrayList<Vertex>();
             // The source of the symmetric subgraph is always the first!
             symSubGraph.add(symSources);
             getChildTreeLimited(symSources, symSubGraph, upperLimits);
@@ -1512,7 +1515,7 @@ public class DENOPTIMGraph implements Cloneable
             symSubGraph.removeIf(v -> v.getBuildingBlockType()==BBType.CAP);
             if (symSubGraph.size()!=subGrpVrtxs.size())
             {
-                symSites = new ArrayList<List<DENOPTIMVertex>>();
+                symSites = new ArrayList<List<Vertex>>();
                 symSites.add(subGrpVrtxs);
                 return symSites;
             }
@@ -1530,9 +1533,9 @@ public class DENOPTIMGraph implements Cloneable
      * This method does not project the 
      * change of vertex on symmetric sites, and does not alter the symmetric 
      * sets. To properly manage symmetry, you should run 
-     * {@link DENOPTIMGraph#reassignSymmetricLabels()} on <code>newSubGraph</code>
+     * {@link DGraph#reassignSymmetricLabels()} on <code>newSubGraph</code>
      * prior to calling this method, and, after running this method, call
-     * {@link DENOPTIMGraph#convertSymmetricLabelsToSymmetricSets()} on this
+     * {@link DGraph#convertSymmetricLabelsToSymmetricSets()} on this
      * graph.
      * This strategy reflects the fact that multiple sub-graph replacements can
      * introduce vertexes that are symmetric throughout these newly inserted
@@ -1552,9 +1555,9 @@ public class DENOPTIMGraph implements Cloneable
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException
      */
-    public boolean replaceSingleSubGraph(List<DENOPTIMVertex> subGrpVrtxs, 
-            DENOPTIMGraph newSubGraph, 
-            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
+    public boolean replaceSingleSubGraph(List<Vertex> subGrpVrtxs, 
+            DGraph newSubGraph, 
+            LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap) 
                     throws DENOPTIMException
     {
         if (!gVertices.containsAll(subGrpVrtxs) 
@@ -1564,24 +1567,24 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         // Identify vertex that will be added
-        ArrayList<DENOPTIMVertex> newVertexes = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> newVertexes = new ArrayList<Vertex>();
         newVertexes.addAll(newSubGraph.getVertexList());
         
         // Collect APs from the vertexes that will be removed, and that might
         // be reflected onto the jacket template or used to make links to the 
         // rest of the graph.
-        List<DENOPTIMAttachmentPoint> interfaceApsOnOldBranch = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMVertex vToDel : subGrpVrtxs)
+        List<AttachmentPoint> interfaceApsOnOldBranch = 
+                new ArrayList<AttachmentPoint>();
+        for (Vertex vToDel : subGrpVrtxs)
         {
-            for (DENOPTIMAttachmentPoint ap : vToDel.getAttachmentPoints())
+            for (AttachmentPoint ap : vToDel.getAttachmentPoints())
             {
                 if (ap.isAvailable())
                 {
                     // being available, this AP might be reflected onto jacket template
                     interfaceApsOnOldBranch.add(ap);
                 } else {
-                    DENOPTIMVertex user = ap.getLinkedAP().getOwner();
+                    Vertex user = ap.getLinkedAP().getOwner();
                     if (!subGrpVrtxs.contains(user))
                     {
                         interfaceApsOnOldBranch.add(ap);
@@ -1589,11 +1592,11 @@ public class DENOPTIMGraph implements Cloneable
                 }
             }
         }
-        List<DENOPTIMAttachmentPoint> interfaceApsOnNewBranch = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMVertex v : newSubGraph.getVertexList())
+        List<AttachmentPoint> interfaceApsOnNewBranch = 
+                new ArrayList<AttachmentPoint>();
+        for (Vertex v : newSubGraph.getVertexList())
         {
-            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            for (AttachmentPoint ap : v.getAttachmentPoints())
             {
                 if (ap.isAvailable())
                 {
@@ -1606,15 +1609,15 @@ public class DENOPTIMGraph implements Cloneable
         // Keep track of the links that will be broken and re-created,
         // and also of the relation free APs may have with a possible template
         // that embeds this graph.
-        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
+        LinkedHashMap<AttachmentPoint,AttachmentPoint> 
             linksToRecreate = new LinkedHashMap<>();
-        LinkedHashMap<DENOPTIMAttachmentPoint,BondType> 
+        LinkedHashMap<AttachmentPoint,BondType> 
             linkTypesToRecreate = new LinkedHashMap<>();
-        LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
+        LinkedHashMap<AttachmentPoint,AttachmentPoint> 
             inToOutAPForTemplate = new LinkedHashMap<>();
-        List<DENOPTIMAttachmentPoint> oldAPToRemoveFromTmpl = new ArrayList<>();
-        DENOPTIMAttachmentPoint trgAPOnNewLink = null;
-        for (DENOPTIMAttachmentPoint oldAP : interfaceApsOnOldBranch)
+        List<AttachmentPoint> oldAPToRemoveFromTmpl = new ArrayList<>();
+        AttachmentPoint trgAPOnNewLink = null;
+        for (AttachmentPoint oldAP : interfaceApsOnOldBranch)
         {
             if (oldAP.isAvailable())
             {
@@ -1655,7 +1658,7 @@ public class DENOPTIMGraph implements Cloneable
                 throw new DENOPTIMException("Cannot replace subgraph if a used "
                         + "AP has no mapping.");
             }
-            DENOPTIMAttachmentPoint newAP = apMap.get(oldAP);
+            AttachmentPoint newAP = apMap.get(oldAP);
             linksToRecreate.put(newAP, oldAP.getLinkedAP());
             linkTypesToRecreate.put(newAP, oldAP.getEdgeUser().getBondType());
             
@@ -1667,30 +1670,30 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         // Identify rings that are affected by the change of vertexes
-        Map<DENOPTIMRing,List<DENOPTIMVertex>> ringsOverSubGraph = 
-                new HashMap<DENOPTIMRing,List<DENOPTIMVertex>>();
+        Map<Ring,List<Vertex>> ringsOverSubGraph = 
+                new HashMap<Ring,List<Vertex>>();
         for (int iA=0; iA<interfaceApsOnOldBranch.size(); iA++)
         {
-            DENOPTIMAttachmentPoint apA = interfaceApsOnOldBranch.get(iA);
+            AttachmentPoint apA = interfaceApsOnOldBranch.get(iA);
         
             if (apA.isAvailable())
                 continue;
             
             for (int iB=(iA+1); iB<interfaceApsOnOldBranch.size(); iB++)
             {
-                DENOPTIMAttachmentPoint apB = interfaceApsOnOldBranch.get(iB);
+                AttachmentPoint apB = interfaceApsOnOldBranch.get(iB);
             
                 if (apB.isAvailable())
                     continue;
                 
-                DENOPTIMVertex vLinkedOnA = apA.getLinkedAP().getOwner();
-                DENOPTIMVertex vLinkedOnB = apB.getLinkedAP().getOwner();
-                for (DENOPTIMRing r : getRingsInvolvingVertex(
-                        new DENOPTIMVertex[] {
+                Vertex vLinkedOnA = apA.getLinkedAP().getOwner();
+                Vertex vLinkedOnB = apB.getLinkedAP().getOwner();
+                for (Ring r : getRingsInvolvingVertex(
+                        new Vertex[] {
                                 apA.getOwner(), vLinkedOnA,
                                 apB.getOwner(), vLinkedOnB}))
                 {
-                    List<DENOPTIMVertex> vPair = new ArrayList<DENOPTIMVertex>();
+                    List<Vertex> vPair = new ArrayList<Vertex>();
                     vPair.add(r.getCloserToHead(vLinkedOnA, vLinkedOnB));
                     vPair.add(r.getCloserToTail(vLinkedOnA, vLinkedOnB));
                     ringsOverSubGraph.put(r, vPair);
@@ -1699,11 +1702,11 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         // remove the vertex-to-delete from the rings where they participate
-        for (DENOPTIMRing r : ringsOverSubGraph.keySet())
+        for (Ring r : ringsOverSubGraph.keySet())
         {
-            List<DENOPTIMVertex> vPair = ringsOverSubGraph.get(r);
+            List<Vertex> vPair = ringsOverSubGraph.get(r);
             PathSubGraph path = new PathSubGraph(vPair.get(0),vPair.get(1),this);
-            List<DENOPTIMVertex> vertexesInPath = path.getVertecesPath();
+            List<Vertex> vertexesInPath = path.getVertecesPath();
             for (int i=1; i<(vertexesInPath.size()-1); i++)
             {
                 r.removeVertex(vertexesInPath.get(i));
@@ -1711,33 +1714,33 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         // remove edges with old vertex
-        for (DENOPTIMAttachmentPoint oldAP : interfaceApsOnOldBranch)
+        for (AttachmentPoint oldAP : interfaceApsOnOldBranch)
         {
             if (!oldAP.isAvailable())
                 removeEdge(oldAP.getEdgeUser());
         }
 
         // remove the vertex from the graph
-        for (DENOPTIMVertex vToDel : subGrpVrtxs)
+        for (Vertex vToDel : subGrpVrtxs)
         {
             // WARNING! This removes rings involving these vertexes. 
             removeVertex(vToDel);
         }
         
         // finally introduce the new vertexes from incoming graph into this graph
-        for (DENOPTIMVertex incomingVrtx : newSubGraph.getVertexList())
+        for (Vertex incomingVrtx : newSubGraph.getVertexList())
         {
             addVertex(incomingVrtx);
         }
         
         // import edges from incoming graph 
-        for (DENOPTIMEdge incomingEdge : newSubGraph.getEdgeList())
+        for (Edge incomingEdge : newSubGraph.getEdgeList())
         {
             addEdge(incomingEdge);
         }
         
         // import rings from incoming graph
-        for (DENOPTIMRing incomingRing : newSubGraph.getRings())
+        for (Ring incomingRing : newSubGraph.getRings())
         {
             addRing(incomingRing);
         }
@@ -1749,15 +1752,15 @@ public class DENOPTIMGraph implements Cloneable
         // more than one of the subgraphs that were added.
         
         // We keep track of the APs on the new link that have been dealt with
-        List<DENOPTIMAttachmentPoint> doneApsOnNew = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
+        List<AttachmentPoint> doneApsOnNew = 
+                new ArrayList<AttachmentPoint>();
         
         // Connect the incoming subgraph to the rest of the graph
         if (trgAPOnNewLink != null)
         {
             // the incoming graph has a parent vertex, and the edge should be  
             // directed accordingly
-            DENOPTIMEdge edge = new DENOPTIMEdge(
+            Edge edge = new Edge(
                     linksToRecreate.get(trgAPOnNewLink),
                     trgAPOnNewLink, 
                     linkTypesToRecreate.get(trgAPOnNewLink));
@@ -1768,26 +1771,26 @@ public class DENOPTIMGraph implements Cloneable
             // edges see newLink as target vertex. Such links are dealt with
             // in the loop below. So, there is nothing special to do, here.
         }
-        for (DENOPTIMAttachmentPoint apOnNew : linksToRecreate.keySet())
+        for (AttachmentPoint apOnNew : linksToRecreate.keySet())
         {
             if (apOnNew == trgAPOnNewLink)
             {
                 continue; //done just before this loop
             }
-            DENOPTIMAttachmentPoint trgOnChild = linksToRecreate.get(apOnNew);
-            DENOPTIMEdge edge = new DENOPTIMEdge(apOnNew,trgOnChild, 
+            AttachmentPoint trgOnChild = linksToRecreate.get(apOnNew);
+            Edge edge = new Edge(apOnNew,trgOnChild, 
                     linkTypesToRecreate.get(apOnNew));
             addEdge(edge);
             doneApsOnNew.add(apOnNew);
         }
         
         // redefine rings that spanned over the removed subgraph
-        for (DENOPTIMRing r : ringsOverSubGraph.keySet())
+        for (Ring r : ringsOverSubGraph.keySet())
         {
-            List<DENOPTIMVertex> vPair = ringsOverSubGraph.get(r);
+            List<Vertex> vPair = ringsOverSubGraph.get(r);
             PathSubGraph path = new PathSubGraph(vPair.get(0),vPair.get(1),this);
             int initialInsertPoint = r.getPositionOf(vPair.get(0));
-            List<DENOPTIMVertex> vertexesInPath = path.getVertecesPath();
+            List<Vertex> vertexesInPath = path.getVertecesPath();
             for (int i=1; i<(vertexesInPath.size()-1); i++)
             {
                 r.insertVertex(initialInsertPoint+i, vertexesInPath.get(i));
@@ -1797,7 +1800,7 @@ public class DENOPTIMGraph implements Cloneable
         // update the mapping of this vertexes' APs in the jacket template
         if (templateJacket != null)
         {   
-            for (DENOPTIMAttachmentPoint apOnNew : inToOutAPForTemplate.keySet())
+            for (AttachmentPoint apOnNew : inToOutAPForTemplate.keySet())
             {
                 templateJacket.updateInnerApID(
                         inToOutAPForTemplate.get(apOnNew),apOnNew);
@@ -1805,7 +1808,7 @@ public class DENOPTIMGraph implements Cloneable
             }
             
             // Project all remaining APs of new branch on the surface of template
-            for (DENOPTIMAttachmentPoint apOnNew : interfaceApsOnNewBranch)
+            for (AttachmentPoint apOnNew : interfaceApsOnNewBranch)
             {
                 if (!doneApsOnNew.contains(apOnNew))
                 {
@@ -1814,7 +1817,7 @@ public class DENOPTIMGraph implements Cloneable
             }
             
             // Remove all APs that existed only in the old branch
-            for (DENOPTIMAttachmentPoint apOnOld : oldAPToRemoveFromTmpl)
+            for (AttachmentPoint apOnOld : oldAPToRemoveFromTmpl)
             {
                 templateJacket.removeProjectionOfInnerAP(apOnOld);
             }
@@ -1823,10 +1826,10 @@ public class DENOPTIMGraph implements Cloneable
         jGraph = null;
         jGraphKernel = null;
         
-        for (DENOPTIMVertex vOld : subGrpVrtxs)
+        for (Vertex vOld : subGrpVrtxs)
             if (this.containsVertex(vOld))
                 return false;
-        for (DENOPTIMVertex vNew : newVertexes)
+        for (Vertex vNew : newVertexes)
             if (!this.containsVertex(vNew))
                 return false;
         return true;
@@ -1850,7 +1853,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException
      */
-    public boolean replaceVertex(DENOPTIMVertex vertex, int bbId, BBType bbt,
+    public boolean replaceVertex(Vertex vertex, int bbId, BBType bbt,
             LinkedHashMap<Integer, Integer> apIdMap, FragmentSpace fragSpace)
                     throws DENOPTIMException
     {
@@ -1859,30 +1862,30 @@ public class DENOPTIMGraph implements Cloneable
             return false;
         }
         
-        ArrayList<DENOPTIMVertex> symSites = getSymVertexesForVertex(vertex);
+        ArrayList<Vertex> symSites = getSymVertexesForVertex(vertex);
         if (symSites.size() == 0)
         {
             symSites.add(vertex);
         }
         
         GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
-        DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
+        Vertex newLink = Vertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), bbId, bbt, fragSpace);
-        DENOPTIMGraph incomingGraph = new DENOPTIMGraph();
+        DGraph incomingGraph = new DGraph();
         incomingGraph.addVertex(newLink);
         incomingGraph.reassignSymmetricLabels();
         
-        for (DENOPTIMVertex oldLink : symSites)
+        for (Vertex oldLink : symSites)
         {
-            DENOPTIMGraph graphAdded = incomingGraph.clone();
+            DGraph graphAdded = incomingGraph.clone();
             graphAdded.getVertexAtPosition(0).setMutationTypes(
                     oldLink.getUnfilteredMutationTypes());
             graphAdded.renumberGraphVertices();
             
-            ArrayList<DENOPTIMVertex> oldVertex = new ArrayList<DENOPTIMVertex>();
+            ArrayList<Vertex> oldVertex = new ArrayList<Vertex>();
             oldVertex.add(oldLink);
-            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap =
-                    new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
+            LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap =
+                    new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
             for (Map.Entry<Integer,Integer> e : apIdMap.entrySet())
             {
                 apMap.put(oldLink.getAP(e.getKey()), 
@@ -1923,8 +1926,8 @@ public class DENOPTIMGraph implements Cloneable
     
     //NB: LinkedHashMap is used to retain reproducibility between runs.
     
-    public boolean insertVertex(DENOPTIMEdge edge, int bbId, BBType bbt,
-            LinkedHashMap<DENOPTIMAttachmentPoint,Integer> apMap, 
+    public boolean insertVertex(Edge edge, int bbId, BBType bbt,
+            LinkedHashMap<AttachmentPoint,Integer> apMap, 
             FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {
@@ -1933,23 +1936,23 @@ public class DENOPTIMGraph implements Cloneable
             return false;
         }
         
-        ArrayList<DENOPTIMEdge> symSites = new ArrayList<DENOPTIMEdge> ();
-        ArrayList<LinkedHashMap<DENOPTIMAttachmentPoint,Integer>> symApMaps = 
-                new ArrayList<LinkedHashMap<DENOPTIMAttachmentPoint,Integer>>();
-        ArrayList<DENOPTIMVertex> symTrgVertexes = getSymVertexesForVertex(
+        ArrayList<Edge> symSites = new ArrayList<Edge> ();
+        ArrayList<LinkedHashMap<AttachmentPoint,Integer>> symApMaps = 
+                new ArrayList<LinkedHashMap<AttachmentPoint,Integer>>();
+        ArrayList<Vertex> symTrgVertexes = getSymVertexesForVertex(
                 edge.getTrgAP().getOwner());
         if (symTrgVertexes.size() == 0)
         {
             symSites.add(edge);
             symApMaps.add(apMap);
         } else {
-            for (DENOPTIMVertex trgVrtx : symTrgVertexes)
+            for (Vertex trgVrtx : symTrgVertexes)
             {
-                DENOPTIMEdge symEdge = trgVrtx.getEdgeToParent();
+                Edge symEdge = trgVrtx.getEdgeToParent();
                 symSites.add(symEdge);
                 
-                LinkedHashMap<DENOPTIMAttachmentPoint,Integer> locApMap = new
-                        LinkedHashMap<DENOPTIMAttachmentPoint,Integer>();
+                LinkedHashMap<AttachmentPoint,Integer> locApMap = new
+                        LinkedHashMap<AttachmentPoint,Integer>();
                 locApMap.put(symEdge.getSrcAP(), apMap.get(edge.getSrcAP()));
                 locApMap.put(symEdge.getTrgAP(), apMap.get(edge.getTrgAP()));
                 symApMaps.add(locApMap);
@@ -1959,16 +1962,16 @@ public class DENOPTIMGraph implements Cloneable
         SymmetricSet newSS = new SymmetricSet();
         for (int i=0; i<symSites.size(); i++)
         {
-            DENOPTIMEdge symEdge = symSites.get(i);
-            LinkedHashMap<DENOPTIMAttachmentPoint,Integer> locApMap = symApMaps.get(i);
+            Edge symEdge = symSites.get(i);
+            LinkedHashMap<AttachmentPoint,Integer> locApMap = symApMaps.get(i);
             
             GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
-            DENOPTIMVertex newLink = DENOPTIMVertex.newVertexFromLibrary(
+            Vertex newLink = Vertex.newVertexFromLibrary(
                     GraphUtils.getUniqueVertexIndex(), bbId, bbt, fragSpace);
             newSS.add(newLink.getVertexId());
-            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apToApMap =
-                    new LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint>();
-            for (DENOPTIMAttachmentPoint apOnGraph : locApMap.keySet())
+            LinkedHashMap<AttachmentPoint,AttachmentPoint> apToApMap =
+                    new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+            for (AttachmentPoint apOnGraph : locApMap.keySet())
             {
                 apToApMap.put(apOnGraph, newLink.getAP(locApMap.get(apOnGraph)));
             }
@@ -2003,8 +2006,8 @@ public class DENOPTIMGraph implements Cloneable
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException
      */
-    public boolean insertSingleVertex(DENOPTIMEdge edge, DENOPTIMVertex newLink,
-            LinkedHashMap<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> apMap) 
+    public boolean insertSingleVertex(Edge edge, Vertex newLink,
+            LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap) 
                     throws DENOPTIMException
     {
         //TODO: for reproducibility the AP mapping should become an optional
@@ -2019,10 +2022,10 @@ public class DENOPTIMGraph implements Cloneable
         // First keep track of the links that will be broken and re-created,
         // and also of the relation free APs may have with a possible template
         // that embeds this graph.
-        DENOPTIMAttachmentPoint orisEdgeSrc = edge.getSrcAP();
-        DENOPTIMAttachmentPoint orisEdgeTrg = edge.getTrgAP();
-        DENOPTIMVertex srcVrtx = orisEdgeSrc.getOwner();
-        DENOPTIMVertex trgVrtx = orisEdgeTrg.getOwner();
+        AttachmentPoint orisEdgeSrc = edge.getSrcAP();
+        AttachmentPoint orisEdgeTrg = edge.getTrgAP();
+        Vertex srcVrtx = orisEdgeSrc.getOwner();
+        Vertex trgVrtx = orisEdgeTrg.getOwner();
         
         removeEdge(edge);
         
@@ -2030,20 +2033,20 @@ public class DENOPTIMGraph implements Cloneable
         addVertex(newLink);
         
         // Connect the new vertex to the graph
-        DENOPTIMEdge eSrcToLink = new DENOPTIMEdge(orisEdgeSrc,
+        Edge eSrcToLink = new Edge(orisEdgeSrc,
                 apMap.get(orisEdgeSrc), edge.getBondType());
         addEdge(eSrcToLink);
-        DENOPTIMEdge eLinkToTrg = new DENOPTIMEdge(apMap.get(orisEdgeTrg),
+        Edge eLinkToTrg = new Edge(apMap.get(orisEdgeTrg),
                 orisEdgeTrg, edge.getBondType());
         addEdge(eLinkToTrg);
         
         // update any affected ring
         if (isVertexInRing(srcVrtx) && isVertexInRing(trgVrtx))
         {
-            ArrayList<DENOPTIMRing> rToEdit = new ArrayList<DENOPTIMRing>();
+            ArrayList<Ring> rToEdit = new ArrayList<Ring>();
             rToEdit.addAll(getRingsInvolvingVertex(srcVrtx));
             rToEdit.retainAll(getRingsInvolvingVertex(trgVrtx));
-            for (DENOPTIMRing r : rToEdit)
+            for (Ring r : rToEdit)
             {
                 r.insertVertex(newLink,srcVrtx,trgVrtx);
             }
@@ -2054,7 +2057,7 @@ public class DENOPTIMGraph implements Cloneable
         // the template
         if (templateJacket != null)
         {
-            for (DENOPTIMAttachmentPoint ap : newLink.getAttachmentPoints())
+            for (AttachmentPoint ap : newLink.getAttachmentPoints())
             {
                 if (ap.isAvailable())
                 {
@@ -2077,7 +2080,7 @@ public class DENOPTIMGraph implements Cloneable
      * @param pos the position in the list.
      * @return the vertex in the given position.
      */
-    public DENOPTIMVertex getVertexAtPosition(int pos)
+    public Vertex getVertexAtPosition(int pos)
     {
         return ((pos >= gVertices.size()) || pos < 0) ? null :
                 gVertices.get(pos);
@@ -2087,22 +2090,22 @@ public class DENOPTIMGraph implements Cloneable
     
     /**
      * Check if the specified vertex is contained in this graph as a node or
-     * in any inner graphs that may be embedded in {@link DENOPTIMTemplate}-kind
+     * in any inner graphs that may be embedded in {@link Template}-kind
      * vertex belonging to this graph. 
      * @param v the vertex.
      * @return <code>true</code> if the vertex belongs to this graph or is 
      * anyhow embedded in it.
      */
-    public boolean containsOrEmbedsVertex(DENOPTIMVertex v)
+    public boolean containsOrEmbedsVertex(Vertex v)
     {
         if (gVertices.contains(v))
             return true;
            
-        for (DENOPTIMVertex vrt : gVertices)
+        for (Vertex vrt : gVertices)
         {
-            if (vrt instanceof DENOPTIMTemplate)
+            if (vrt instanceof Template)
             {
-                DENOPTIMTemplate t = (DENOPTIMTemplate) vrt;
+                Template t = (Template) vrt;
                 if (t.getInnerGraph().containsOrEmbedsVertex(v))
                     return true;
             }
@@ -2115,12 +2118,12 @@ public class DENOPTIMGraph implements Cloneable
 
     /**
      * Check if this graph contains the specified vertex. Does not consider 
-     * inner graphs that may be embedded in {@link DENOPTIMTemplate}-kind
+     * inner graphs that may be embedded in {@link Template}-kind
      * vertex belonging to this graph. 
      * @param v the vertex.
      * @return <code>true</code> if the vertex belongs to this graph.
      */
-    public boolean containsVertex(DENOPTIMVertex v)
+    public boolean containsVertex(Vertex v)
     {
         return gVertices.contains(v);
     }
@@ -2132,16 +2135,16 @@ public class DENOPTIMGraph implements Cloneable
      * @param v the vertex to search
      * @return the index of the vertex in the list of vertices.
      */
-    public int indexOf(DENOPTIMVertex v)
+    public int indexOf(Vertex v)
     {
         return gVertices.indexOf(v);
     }
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMVertex getVertexWithId(int vid)
+    public Vertex getVertexWithId(int vid)
     {
-        DENOPTIMVertex v = null;
+        Vertex v = null;
         int idx = indexOfVertexWithID(vid);
         if (idx != -1)
             v = gVertices.get(idx);
@@ -2160,7 +2163,7 @@ public class DENOPTIMGraph implements Cloneable
         int idx = -1;
         for (int i=0; i<gVertices.size(); i++)
         {
-            DENOPTIMVertex v = gVertices.get(i);
+            Vertex v = gVertices.get(i);
             if (v.getVertexId() == vid)
             {
                 idx = i;
@@ -2177,12 +2180,12 @@ public class DENOPTIMGraph implements Cloneable
      * that were originally involved in this edge
      * @param edge
      */
-    public void removeEdge(DENOPTIMEdge edge)
+    public void removeEdge(Edge edge)
     {
         if (gEdges.contains(edge))
         {
-            DENOPTIMAttachmentPoint srcAP = edge.getSrcAP();
-            DENOPTIMAttachmentPoint trgAP = edge.getTrgAP();
+            AttachmentPoint srcAP = edge.getSrcAP();
+            AttachmentPoint trgAP = edge.getTrgAP();
             srcAP.setUser(null);
             trgAP.setUser(null);
 
@@ -2194,7 +2197,7 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void removeRing(DENOPTIMRing ring)
+    public void removeRing(Ring ring)
     {
         if (gRings.contains(ring))
         {
@@ -2206,7 +2209,7 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMEdge getEdgeAtPosition(int pos)
+    public Edge getEdgeAtPosition(int pos)
     {
         if ((pos >= gEdges.size()) || pos < 0)
             return null;
@@ -2282,13 +2285,13 @@ public class DENOPTIMGraph implements Cloneable
      */
 
     @Deprecated
-    public int getBondingAPIndex(DENOPTIMVertex srcVert, int dapidx,
-                                    DENOPTIMVertex dstVert)
+    public int getBondingAPIndex(Vertex srcVert, int dapidx,
+                                    Vertex dstVert)
     {
         int n = getEdgeCount();
         for (int i = 0; i < n; i++)
         {
-            DENOPTIMEdge edge = getEdgeList().get(i);
+            Edge edge = getEdgeList().get(i);
 
             // get the vertex ids
             int v1_id = edge.getSrcVertex();
@@ -2314,7 +2317,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return list of child vertices.
      */
 
-    public ArrayList<DENOPTIMVertex> getChildVertices(DENOPTIMVertex vertex)
+    public ArrayList<Vertex> getChildVertices(Vertex vertex)
     {
         return vertex.getChilddren();
     }
@@ -2328,15 +2331,15 @@ public class DENOPTIMGraph implements Cloneable
      * @param vertex the vertex whose children are to be located
      * @param children list containing the references to all the children
      */
-    public void getChildrenTree(DENOPTIMVertex vertex,
-            List<DENOPTIMVertex> children) 
+    public void getChildrenTree(Vertex vertex,
+            List<Vertex> children) 
     {
-        List<DENOPTIMVertex> lst = getChildVertices(vertex);
+        List<Vertex> lst = getChildVertices(vertex);
         if (lst.isEmpty()) 
         {
             return;
         }
-        for (DENOPTIMVertex child : lst) 
+        for (Vertex child : lst) 
         {
             if (!children.contains(child)) 
             {
@@ -2360,19 +2363,19 @@ public class DENOPTIMGraph implements Cloneable
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
      */
-    public void getChildrenTree(DENOPTIMVertex vertex,
-            List<DENOPTIMVertex> children, int numLayers, boolean stopBeforeRCVs) 
+    public void getChildrenTree(Vertex vertex,
+            List<Vertex> children, int numLayers, boolean stopBeforeRCVs) 
     {
         if (numLayers==0)
         {
             return;
         }
-        List<DENOPTIMVertex> lst = getChildVertices(vertex);
+        List<Vertex> lst = getChildVertices(vertex);
         if (lst.isEmpty()) 
         {
             return;
         }
-        for (DENOPTIMVertex child : lst) 
+        for (Vertex child : lst) 
         {
             if (children.contains(child)) 
                 continue;
@@ -2397,15 +2400,15 @@ public class DENOPTIMGraph implements Cloneable
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
      */
-    public void getChildTreeLimited(DENOPTIMVertex vertex,
-            List<DENOPTIMVertex> children, boolean stopBeforeRCVs) 
+    public void getChildTreeLimited(Vertex vertex,
+            List<Vertex> children, boolean stopBeforeRCVs) 
     {
-        List<DENOPTIMVertex> lst = getChildVertices(vertex);
+        List<Vertex> lst = getChildVertices(vertex);
         if (lst.isEmpty()) 
         {
             return;
         }
-        for (DENOPTIMVertex child : lst) 
+        for (Vertex child : lst) 
         {   
             if (children.contains(child)) 
                 continue;
@@ -2429,15 +2432,15 @@ public class DENOPTIMGraph implements Cloneable
      * @param children list containing the references to all the children
      * @param limits the list of vertexes where exploration should stop.
      */
-    public void getChildTreeLimited(DENOPTIMVertex vertex,
-            List<DENOPTIMVertex> children, Set<DENOPTIMVertex> limits)
+    public void getChildTreeLimited(Vertex vertex,
+            List<Vertex> children, Set<Vertex> limits)
     {
-        List<DENOPTIMVertex> lst = getChildVertices(vertex);
+        List<Vertex> lst = getChildVertices(vertex);
         if (lst.isEmpty()) 
         {
             return;
         }
-        for (DENOPTIMVertex child : lst) 
+        for (Vertex child : lst) 
         {
             if (!children.contains(child)) 
             {
@@ -2461,16 +2464,16 @@ public class DENOPTIMGraph implements Cloneable
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
      * each branch stop before including ring closing vertexes.
      */
-    public void getChildTreeLimited(DENOPTIMVertex vertex,
-            List<DENOPTIMVertex> children, List<DENOPTIMVertex> limitsInClone, 
+    public void getChildTreeLimited(Vertex vertex,
+            List<Vertex> children, List<Vertex> limitsInClone, 
             boolean stopBeforeRCVs) 
     {
-        List<DENOPTIMVertex> lst = getChildVertices(vertex);
+        List<Vertex> lst = getChildVertices(vertex);
         if (lst.isEmpty()) 
         {
             return;
         }
-        for (DENOPTIMVertex child : lst) 
+        for (Vertex child : lst) 
         {   
             if (children.contains(child)) 
                 continue;
@@ -2492,13 +2495,13 @@ public class DENOPTIMGraph implements Cloneable
      * the first.
      * @return the vertex that has the shortest path to the source.
      */
-    public DENOPTIMVertex getDeepestAmongThese(List<DENOPTIMVertex> list)
+    public Vertex getDeepestAmongThese(List<Vertex> list)
     {
-        DENOPTIMVertex deepest = null;
+        Vertex deepest = null;
         int shortest = Integer.MAX_VALUE;
-        for (DENOPTIMVertex vertex : list)
+        for (Vertex vertex : list)
         {
-            List<DENOPTIMVertex> parentTree = new ArrayList<DENOPTIMVertex>();
+            List<Vertex> parentTree = new ArrayList<Vertex>();
             getParentTree(vertex, parentTree);
             if (parentTree.size()<shortest)
             {
@@ -2518,10 +2521,10 @@ public class DENOPTIMGraph implements Cloneable
      * @param parentTree list containing the references to all the parents
      * recursively visited so far.
      */
-    public void getParentTree(DENOPTIMVertex vertex,
-            List<DENOPTIMVertex> parentTree) 
+    public void getParentTree(Vertex vertex,
+            List<Vertex> parentTree) 
     {
-        DENOPTIMVertex parent = getParent(vertex);
+        Vertex parent = getParent(vertex);
         if (parent == null) 
         {
             return;
@@ -2537,9 +2540,9 @@ public class DENOPTIMGraph implements Cloneable
     
 //------------------------------------------------------------------------------
 
-    public DENOPTIMVertex getParent(DENOPTIMVertex v)
+    public Vertex getParent(Vertex v)
     {
-        DENOPTIMEdge edge = v.getEdgeToParent();
+        Edge edge = v.getEdgeToParent();
         if (edge != null)
         {
             return edge.getSrcAP().getOwner();
@@ -2559,10 +2562,10 @@ public class DENOPTIMGraph implements Cloneable
     public ArrayList<Integer> getChildVertices(int vid)
     {
         ArrayList<Integer> lst = new ArrayList<>();
-        DENOPTIMVertex v = getVertexWithId(vid);
-        for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+        Vertex v = getVertexWithId(vid);
+        for (AttachmentPoint ap : v.getAttachmentPoints())
         {
-            DENOPTIMEdge e = ap.getEdgeUser();
+            Edge e = ap.getEdgeUser();
             if (e != null && e.getTrgVertex()!=vid)
             {
                 lst.add(e.getTrgVertex());
@@ -2579,22 +2582,22 @@ public class DENOPTIMGraph implements Cloneable
      * The vertex IDs are not changed, so you might want to renumber the graph.
      */
     @Override
-    public DENOPTIMGraph clone()
+    public DGraph clone()
     {   
         // When cloning, the VertexID remains the same so we'll have two
         // deep-copies of the same vertex having the same VertexID
-        ArrayList<DENOPTIMVertex> cListVrtx = new ArrayList<>();
-        Map<Integer,DENOPTIMVertex> vidsInClone =
-                new HashMap<Integer,DENOPTIMVertex>();
-        for (DENOPTIMVertex vOrig : gVertices)
+        ArrayList<Vertex> cListVrtx = new ArrayList<>();
+        Map<Integer,Vertex> vidsInClone =
+                new HashMap<Integer,Vertex>();
+        for (Vertex vOrig : gVertices)
         {
-            DENOPTIMVertex vClone = vOrig.clone();
+            Vertex vClone = vOrig.clone();
             cListVrtx.add(vClone);
             vidsInClone.put(vClone.getVertexId(),vClone);
         }
 
-        ArrayList<DENOPTIMEdge> cListEdges = new ArrayList<>();
-        for (DENOPTIMEdge e : gEdges)
+        ArrayList<Edge> cListEdges = new ArrayList<>();
+        for (Edge e : gEdges)
         {
             int srcVrtxId = e.getSrcVertex();
             int srcApId = this.getVertexWithId(srcVrtxId).getIndexOfAP(
@@ -2604,25 +2607,25 @@ public class DENOPTIMGraph implements Cloneable
             int trgApId = this.getVertexWithId(trgVrtxId).getIndexOfAP(
                     e.getTrgAP());
 
-            DENOPTIMAttachmentPoint srcAPClone = vidsInClone.get(
+            AttachmentPoint srcAPClone = vidsInClone.get(
                     srcVrtxId).getAP(srcApId);
-            DENOPTIMAttachmentPoint trgAPClone = vidsInClone.get(
+            AttachmentPoint trgAPClone = vidsInClone.get(
                     trgVrtxId).getAP(trgApId);
 
-            cListEdges.add(new DENOPTIMEdge(srcAPClone, trgAPClone,
+            cListEdges.add(new Edge(srcAPClone, trgAPClone,
                     e.getBondType()));
         }
 
-        DENOPTIMGraph clone = new DENOPTIMGraph(cListVrtx, cListEdges);
+        DGraph clone = new DGraph(cListVrtx, cListEdges);
 
         // Copy the list but using the references to the cloned vertices
-        ArrayList<DENOPTIMRing> cListRings = new ArrayList<>();
-        for (DENOPTIMRing ring : gRings)
+        ArrayList<Ring> cListRings = new ArrayList<>();
+        for (Ring ring : gRings)
         {
-            DENOPTIMRing cRing = new DENOPTIMRing();
+            Ring cRing = new Ring();
             for (int iv=0; iv<ring.getSize(); iv++)
             {
-                DENOPTIMVertex origVrtx = ring.getVertexAtPosition(iv);
+                Vertex origVrtx = ring.getVertexAtPosition(iv);
                 cRing.addVertex(
                         clone.getVertexWithId(origVrtx.getVertexId()));
             }
@@ -2662,9 +2665,9 @@ public class DENOPTIMGraph implements Cloneable
      * @return the edge whose target vertex has ID same as vid, or null
      */
 
-    public DENOPTIMEdge getEdgeWithParent(int vid)
+    public Edge getEdgeWithParent(int vid)
     {
-        DENOPTIMVertex v = getVertexWithId(vid);
+        Vertex v = getVertexWithId(vid);
         if (v == null)
         {
             return null;
@@ -2685,7 +2688,7 @@ public class DENOPTIMGraph implements Cloneable
         ArrayList<Integer> lstEdges = new ArrayList<>();
         for (int j=0; j<getEdgeCount(); j++)
         {
-            DENOPTIMEdge edge = getEdgeAtPosition(j);
+            Edge edge = getEdgeAtPosition(j);
 
             if (edge.getSrcVertex() == vid)
             {
@@ -2703,12 +2706,12 @@ public class DENOPTIMGraph implements Cloneable
      * @return the edge whose source vertex is same as vid
      */
 
-    public ArrayList<DENOPTIMEdge> getEdgesWithChild(int vid)
+    public ArrayList<Edge> getEdgesWithChild(int vid)
     {
-        ArrayList<DENOPTIMEdge> lstEdges = new ArrayList<>();
+        ArrayList<Edge> lstEdges = new ArrayList<>();
         for (int j=0; j<getEdgeCount(); j++)
         {
-            DENOPTIMEdge edge = getEdgeAtPosition(j);
+            Edge edge = getEdgeAtPosition(j);
 
             if (edge.getSrcVertex() == vid)
             {
@@ -2726,7 +2729,7 @@ public class DENOPTIMGraph implements Cloneable
     public int getMaxVertexId()
     {
         int mval = Integer.MIN_VALUE;
-        for (DENOPTIMVertex v : gVertices) {
+        for (Vertex v : gVertices) {
             mval = Math.max(mval, v.getVertexId());
         }
         return mval;
@@ -2741,7 +2744,7 @@ public class DENOPTIMGraph implements Cloneable
     public boolean containsVertexID(int id)
     {
         boolean result = false;
-        for (DENOPTIMVertex v : gVertices) 
+        for (Vertex v : gVertices) 
         {
             if (id == v.getVertexId())
             {
@@ -2805,11 +2808,11 @@ public class DENOPTIMGraph implements Cloneable
      * is given by the common graph theory isomorphism between 
      * two undirected graphs U1 and U2 build respectively from G1 and G2 
      * with the convention defined in 
-     * {@link GraphConversionTool#getJGraphFromGraph(DENOPTIMGraph)}.
+     * {@link GraphConversionTool#getJGraphFromGraph(DGraph)}.
      * Finally,
      * <ul>
      * <li>vertexes are compared excluding their vertex ID, i.e., 
-     * {@link DENOPTIMVertex#sameAs()}</li>
+     * {@link Vertex#sameAs()}</li>
      * <li>edges are considered undirected and compared considering the 
      * {@link BondType} and the 
      * identity of the attachment points connected thereby. This latter point
@@ -2836,7 +2839,7 @@ public class DENOPTIMGraph implements Cloneable
      * @param other the graph to be compared with this.
      * @return <code>true</code> is this graph is isomorphic to the other.
      */
-    public boolean isIsomorphicTo(DENOPTIMGraph other) {
+    public boolean isIsomorphicTo(DGraph other) {
         if (this.jGraph == null)
         {
             this.jGraph = GraphConversionTool.getJGraphFromGraph(this);
@@ -2863,13 +2866,13 @@ public class DENOPTIMGraph implements Cloneable
         };
         */
         
-        Comparator<DENOPTIMVertex> vComp = new Comparator<DENOPTIMVertex>() {
+        Comparator<Vertex> vComp = new Comparator<Vertex>() {
             
-            Map<DENOPTIMVertex,Set<DENOPTIMVertex>> symmetryShortCuts = 
-                    new HashMap<DENOPTIMVertex,Set<DENOPTIMVertex>>();
+            Map<Vertex,Set<Vertex>> symmetryShortCuts = 
+                    new HashMap<Vertex,Set<Vertex>>();
             
             @Override
-            public int compare(DENOPTIMVertex v1, DENOPTIMVertex v2) {
+            public int compare(Vertex v1, Vertex v2) {
                 
                 // exploit symmetric relations between vertexes
                 if (symmetryShortCuts.containsKey(v1) 
@@ -2883,21 +2886,21 @@ public class DENOPTIMGraph implements Cloneable
                 StringBuilder sb = new StringBuilder();
                 if (v1.sameAs(v2, sb)) 
                 {
-                    Set<DENOPTIMVertex> symToV2 = new HashSet<DENOPTIMVertex>();
+                    Set<Vertex> symToV2 = new HashSet<Vertex>();
                     SymmetricSet ssV2 = v2.getGraphOwner().getSymSetForVertex(v2);
                     for (Integer sVrtId : ssV2.getList())
                     {
                         symToV2.add(v2.getGraphOwner().getVertexWithId(sVrtId));
                     }
                     
-                    Set<DENOPTIMVertex> symToV1 = new HashSet<DENOPTIMVertex>();
+                    Set<Vertex> symToV1 = new HashSet<Vertex>();
                     SymmetricSet ssV1 = v1.getGraphOwner().getSymSetForVertex(v1);
                     for (Integer sVrtId : ssV1.getList())
                     {
                         symToV1.add(v1.getGraphOwner().getVertexWithId(sVrtId));
                     }
                     
-                    for (DENOPTIMVertex v1s : symToV1)
+                    for (Vertex v1s : symToV1)
                     {
                         if (symmetryShortCuts.containsKey(v1s))
                         {
@@ -2949,7 +2952,7 @@ public class DENOPTIMGraph implements Cloneable
         };
         */
         
-        VF2GraphIsomorphismInspector<DENOPTIMVertex, UndirectedEdge> vf2 =
+        VF2GraphIsomorphismInspector<Vertex, UndirectedEdge> vf2 =
                 new VF2GraphIsomorphismInspector<>(this.jGraph, other.jGraph, 
                         vComp, eComp);
 
@@ -2963,17 +2966,17 @@ public class DENOPTIMGraph implements Cloneable
      * "DENOPTIM-isostructural" means that the two graphs are isomorfic when:
      * <ul>
      * <li>the comparison of the vertexes considers any implementation of 
-     * {@link DENOPTIMVertex} equals to itself unless two vertexes differ by the
-     * return value of {@link DENOPTIMVertex#isRCV()},</li>
+     * {@link Vertex} equals to itself unless two vertexes differ by the
+     * return value of {@link Vertex#isRCV()},</li>
      * <li>the comparison of the vertexes considers only the type of bond the 
      * edge corresponds to (if any),</li>
-     * <li>free {@link DENOPTIMAttachmentPoint}s that are marked as required
+     * <li>free {@link AttachmentPoint}s that are marked as required
      * in either graph are reflected in the other.</li>
      * </ul>
      * @param other
      * @return
      */
-    public boolean isIsostructuralTo(DENOPTIMGraph other) {
+    public boolean isIsostructuralTo(DGraph other) {
         if (this.jGraphKernel == null)
         {
             this.jGraphKernel = GraphConversionTool.getJGraphKernelFromGraph(this);
@@ -3001,8 +3004,8 @@ public class DENOPTIMGraph implements Cloneable
                 int result = v1.compare(v2);
                 if (result==0) 
                 {
-                    DENOPTIMVertex dv1 = v1.getDNPVertex();
-                    DENOPTIMVertex dv2 = v2.getDNPVertex();
+                    Vertex dv1 = v1.getDNPVertex();
+                    Vertex dv2 = v2.getDNPVertex();
                     if (dv1==null && dv2==null)
                     {
                         return result;
@@ -3013,7 +3016,7 @@ public class DENOPTIMGraph implements Cloneable
                             .getSymSetForVertex(dv2);
                     for (Integer sVrtId : ssV2.getList())
                     {
-                        DENOPTIMVertex sv = dv2.getGraphOwner()
+                        Vertex sv = dv2.getGraphOwner()
                                 .getVertexWithId(sVrtId);
                         symToV2.add((Node) sv.getProperty(
                                 Node.REFTOVERTEXKERNEL));
@@ -3024,7 +3027,7 @@ public class DENOPTIMGraph implements Cloneable
                             .getSymSetForVertex(dv1);
                     for (Integer sVrtId : ssV1.getList())
                     {
-                        DENOPTIMVertex sv = dv1.getGraphOwner()
+                        Vertex sv = dv1.getGraphOwner()
                                 .getVertexWithId(sVrtId);
                         symToV1.add((Node) sv.getProperty(
                                 Node.REFTOVERTEXKERNEL));
@@ -3066,7 +3069,7 @@ public class DENOPTIMGraph implements Cloneable
      * @param other the other graph to be compared with this graph
      * @return <code>true</code> if the two graphs represent the same system
      */
-    public boolean sameAs(DENOPTIMGraph other, StringBuilder reason)
+    public boolean sameAs(DGraph other, StringBuilder reason)
     {
     	if (this.getEdgeCount() != other.getEdgeCount())
     	{
@@ -3098,8 +3101,8 @@ public class DENOPTIMGraph implements Cloneable
     	}
 
     	//Pairwise correspondence of vertices
-    	Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap =
-    			new HashMap<DENOPTIMVertex,DENOPTIMVertex>();
+    	Map<Vertex,Vertex> vertexMap =
+    			new HashMap<Vertex,Vertex>();
 
     	vertexMap.put(this.getVertexAtPosition(0),other.getVertexAtPosition(0));
 
@@ -3158,10 +3161,10 @@ public class DENOPTIMGraph implements Cloneable
     	}
 
     	//Check Rings
-    	for (DENOPTIMRing rT : this.getRings())
+    	for (Ring rT : this.getRings())
     	{
-    		DENOPTIMVertex vhT = rT.getHeadVertex();
-    		DENOPTIMVertex vtT = rT.getTailVertex();
+    		Vertex vhT = rT.getHeadVertex();
+    		Vertex vtT = rT.getTailVertex();
     		boolean hasRing = other
                     .getRingsInvolvingVertex(vertexMap.get(vhT))
                     .stream()
@@ -3177,9 +3180,9 @@ public class DENOPTIMGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    private boolean sameAsRings(StringBuilder reason, Map<DENOPTIMVertex,
-            DENOPTIMVertex> vertexMap, DENOPTIMRing rT, DENOPTIMVertex vhT,
-                                DENOPTIMVertex vtT, DENOPTIMRing rO) {
+    private boolean sameAsRings(StringBuilder reason, Map<Vertex,
+            Vertex> vertexMap, Ring rT, Vertex vhT,
+                                Vertex vtT, Ring rO) {
         if (rT.getSize() != rO.getSize()) {
             reason.append("Different ring size (").append(rT.getSize())
                     .append(":").append(rO.getSize()).append(")");
@@ -3227,12 +3230,12 @@ public class DENOPTIMGraph implements Cloneable
      * @return <code>true</code> if the graphs are same at this node
      * @throws DENOPTIMException
      */
-    public static boolean compareGraphNodes(DENOPTIMVertex thisV,
-                                            DENOPTIMGraph thisG,
-                                            DENOPTIMVertex otherV,
-                                            DENOPTIMGraph otherG) throws DENOPTIMException
+    public static boolean compareGraphNodes(Vertex thisV,
+                                            DGraph thisG,
+                                            Vertex otherV,
+                                            DGraph otherG) throws DENOPTIMException
     {
-        Map<DENOPTIMVertex, DENOPTIMVertex> map = new HashMap<>();
+        Map<Vertex, Vertex> map = new HashMap<>();
         map.put(thisV, otherV);
         return compareGraphNodes(thisV, thisG, otherV, otherG, map,
                 new StringBuilder());
@@ -3251,9 +3254,9 @@ public class DENOPTIMGraph implements Cloneable
      * @return <code>true</code> if the graphs are same at this node.
      * @throws DENOPTIMException
      */
-    private static boolean compareGraphNodes(DENOPTIMVertex seedOnA,
-    		DENOPTIMGraph gA, DENOPTIMVertex seedOnB, DENOPTIMGraph gB, 
-    		Map<DENOPTIMVertex,DENOPTIMVertex> vertexMap, StringBuilder reason) 
+    private static boolean compareGraphNodes(Vertex seedOnA,
+    		DGraph gA, Vertex seedOnB, DGraph gB, 
+    		Map<Vertex,Vertex> vertexMap, StringBuilder reason) 
     		        throws DENOPTIMException
     {
     	if (!seedOnA.sameAs(seedOnB, reason))
@@ -3262,8 +3265,8 @@ public class DENOPTIMGraph implements Cloneable
     		return false;
     	}
 
-    	ArrayList<DENOPTIMEdge> edgesFromThis = gA.getEdgesWithSrc(seedOnA);
-    	ArrayList<DENOPTIMEdge> edgesFromOther = gB.getEdgesWithSrc(seedOnB);
+    	ArrayList<Edge> edgesFromThis = gA.getEdgesWithSrc(seedOnA);
+    	ArrayList<Edge> edgesFromOther = gB.getEdgesWithSrc(seedOnB);
     	if (edgesFromThis.size() != edgesFromOther.size())
     	{
     		reason.append("Different number of edges from vertex "+seedOnA+" ("
@@ -3273,15 +3276,15 @@ public class DENOPTIMGraph implements Cloneable
     	}
 
     	// pairwise correspondence between child vertices
-    	ArrayList<DENOPTIMVertex[]> pairs = new ArrayList<DENOPTIMVertex[]>();
+    	ArrayList<Vertex[]> pairs = new ArrayList<Vertex[]>();
 
-    	for (DENOPTIMEdge et : edgesFromThis)
+    	for (Edge et : edgesFromThis)
     	{
     		boolean found = false;
-    		DENOPTIMEdge eo = null;
+    		Edge eo = null;
     		StringBuilder innerSb = new StringBuilder();
     		int otherEdgeI = 0;
-    		for (DENOPTIMEdge e : edgesFromOther)
+    		for (Edge e : edgesFromOther)
     		{
     		    innerSb.append(" Edge"+otherEdgeI+":");
     		    if (et.sameAs(e,innerSb))
@@ -3307,17 +3310,17 @@ public class DENOPTIMGraph implements Cloneable
     		vertexMap.put(gA.getVertexWithId(et.getTrgVertex()),
     				gB.getVertexWithId(eo.getTrgVertex()));
 
-    		DENOPTIMVertex[] pair = new DENOPTIMVertex[]{
+    		Vertex[] pair = new Vertex[]{
     				gA.getVertexWithId(et.getTrgVertex()),
     				gB.getVertexWithId(eo.getTrgVertex())};
     		pairs.add(pair);
     	}
 
     	//Recursion on child vertices
-    	for (DENOPTIMVertex[] pair : pairs)
+    	for (Vertex[] pair : pairs)
     	{
-    		DENOPTIMVertex v = pair[0];
-    		DENOPTIMVertex o = pair[1];
+    		Vertex v = pair[0];
+    		Vertex o = pair[1];
     		boolean localRes = compareGraphNodes(v, gA, o, gB,vertexMap,
     				reason);
     		if (!localRes)
@@ -3339,7 +3342,7 @@ public class DENOPTIMGraph implements Cloneable
      */
     public boolean containsAtoms()
     {
-        for (DENOPTIMVertex v : getVertexList())
+        for (Vertex v : getVertexList())
         {
             if (v.containsAtoms())
             {
@@ -3358,7 +3361,7 @@ public class DENOPTIMGraph implements Cloneable
     public int getHeavyAtomsCount()
     {
         int n = 0;
-        for (DENOPTIMVertex v : getVertexList())
+        for (Vertex v : getVertexList())
         {
             n += v.getHeavyAtomsCount();
         }
@@ -3372,11 +3375,11 @@ public class DENOPTIMGraph implements Cloneable
      * @return list of attachment points.
      */
 
-    public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
+    public ArrayList<AttachmentPoint> getAttachmentPoints()
     {
-        ArrayList<DENOPTIMAttachmentPoint> lstAPs =
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMVertex v : gVertices)
+        ArrayList<AttachmentPoint> lstAPs =
+                new ArrayList<AttachmentPoint>();
+        for (Vertex v : gVertices)
         {
             lstAPs.addAll(v.getAttachmentPoints());
         }
@@ -3390,11 +3393,11 @@ public class DENOPTIMGraph implements Cloneable
      * @return list of attachment points.
      */
 
-    public ArrayList<DENOPTIMAttachmentPoint> getAvailableAPs()
+    public ArrayList<AttachmentPoint> getAvailableAPs()
     {
-        ArrayList<DENOPTIMAttachmentPoint> lstFreeAPs =
-                new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMAttachmentPoint ap : getAttachmentPoints())
+        ArrayList<AttachmentPoint> lstFreeAPs =
+                new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint ap : getAttachmentPoints())
         {
             if (ap.isAvailable())
             {
@@ -3414,10 +3417,10 @@ public class DENOPTIMGraph implements Cloneable
      * AP is found with the given identifier.
      */
 
-    public DENOPTIMAttachmentPoint getAPWithId(int id)
+    public AttachmentPoint getAPWithId(int id)
     {
-        DENOPTIMAttachmentPoint ap = null;
-        for (DENOPTIMAttachmentPoint apCand : getAttachmentPoints())
+        AttachmentPoint ap = null;
+        for (AttachmentPoint apCand : getAttachmentPoints())
         {
             if (apCand.getID() == id)
             {
@@ -3438,8 +3441,8 @@ public class DENOPTIMGraph implements Cloneable
 
     public boolean graphNeedsCappingGroups(FragmentSpace fragSpace)
     {
-        for (DENOPTIMVertex v : getVertexList()) {
-            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints()) {
+        for (Vertex v : getVertexList()) {
+            for (AttachmentPoint ap : v.getAttachmentPoints()) {
                 if (ap.isAvailable()  && fragSpace.getAPClassOfCappingVertex(
                         ap.getAPClass()) !=null
                 ) {
@@ -3456,24 +3459,24 @@ public class DENOPTIMGraph implements Cloneable
      * Remove capping groups on the given vertex of this graph
      */
 
-    public void removeCappingGroupsOn(DENOPTIMVertex vertex)
+    public void removeCappingGroupsOn(Vertex vertex)
     {
-        ArrayList<DENOPTIMVertex> toDel = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex vtx : this.getChildVertices(vertex))
+        ArrayList<Vertex> toDel = new ArrayList<Vertex>();
+        for (Vertex vtx : this.getChildVertices(vertex))
         {
-            if (vtx instanceof DENOPTIMFragment == false)
+            if (vtx instanceof Fragment == false)
             {
                 continue;
             }
             // capping groups have fragment type 2
-            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == BBType.CAP
+            if (((Fragment) vtx).getBuildingBlockType() == BBType.CAP
                     && !isVertexInRing(vtx))
             {
                 toDel.add(vtx);
             }
         }
 
-        for (DENOPTIMVertex v : toDel)
+        for (Vertex v : toDel)
         {
             removeVertex(v);
         }
@@ -3486,18 +3489,18 @@ public class DENOPTIMGraph implements Cloneable
      * @param lstVerts the list of vertexes to analyze.
      */
 
-    public void removeCappingGroups(List<DENOPTIMVertex> lstVerts)
+    public void removeCappingGroups(List<Vertex> lstVerts)
     {
         ArrayList<Integer> rvids = new ArrayList<>();
         for (int i=0; i<lstVerts.size(); i++)
         {
-            DENOPTIMVertex vtx = lstVerts.get(i);
-            if (vtx instanceof DENOPTIMFragment == false)
+            Vertex vtx = lstVerts.get(i);
+            if (vtx instanceof Fragment == false)
             {
                 continue;
             }
             
-            if (((DENOPTIMFragment) vtx).getBuildingBlockType() == BBType.CAP
+            if (((Fragment) vtx).getBuildingBlockType() == BBType.CAP
                     && !isVertexInRing(vtx))
             {
                 rvids.add(vtx.getVertexId());
@@ -3514,9 +3517,9 @@ public class DENOPTIMGraph implements Cloneable
     
 //------------------------------------------------------------------------------
     
-    public void removeCappingGroupsFromChilds(List<DENOPTIMVertex> lstVerts)
+    public void removeCappingGroupsFromChilds(List<Vertex> lstVerts)
     {
-        for (DENOPTIMVertex v : lstVerts)
+        for (Vertex v : lstVerts)
         {
             removeCappingGroups(getChildVertices(v));
         }
@@ -3530,7 +3533,7 @@ public class DENOPTIMGraph implements Cloneable
 
     public void removeCappingGroups()
     {
-        removeCappingGroups(new ArrayList<DENOPTIMVertex>(gVertices));
+        removeCappingGroups(new ArrayList<Vertex>(gVertices));
     }
     
 //------------------------------------------------------------------------------
@@ -3545,7 +3548,7 @@ public class DENOPTIMGraph implements Cloneable
     {
         if (!fragSpace.useAPclassBasedApproach())
             return;
-        addCappingGroups(new ArrayList<DENOPTIMVertex>(gVertices), fragSpace);
+        addCappingGroups(new ArrayList<Vertex>(gVertices), fragSpace);
     }
     
 //------------------------------------------------------------------------------
@@ -3554,7 +3557,7 @@ public class DENOPTIMGraph implements Cloneable
      * Add a capping group on the given vertexes, if needed. The need for such 
      * groups is manifest when an attachment point that is not used in this
      * or any embedding lever (i.e., attachment point is 
-     * {@link DENOPTIMAttachmentPoint#isAvailableThroughout()}) has and 
+     * {@link AttachmentPoint#isAvailableThroughout()}) has and 
      * {@link APClass} that demands to be capped.
      * Addition of Capping groups does not update the symmetry table
      * for a symmetric graph.
@@ -3564,26 +3567,26 @@ public class DENOPTIMGraph implements Cloneable
      * performed.
      */
 
-    public void addCappingGroups(List<DENOPTIMVertex> vertexAddedToThis, 
+    public void addCappingGroups(List<Vertex> vertexAddedToThis, 
             FragmentSpace fragSpace)
                                                     throws DENOPTIMException
     {
         if (!fragSpace.useAPclassBasedApproach())
             return;
 
-        for (DENOPTIMVertex curVertex : vertexAddedToThis)
+        for (Vertex curVertex : vertexAddedToThis)
         {
             // no capping of a capping group. Since capping groups are expected
             // to have only one AP, there should never be a capping group with 
             // a free AP.
-            if (curVertex.getBuildingBlockType() == DENOPTIMVertex.BBType.CAP)
+            if (curVertex.getBuildingBlockType() == Vertex.BBType.CAP)
             {
                 //String msg = "Attempting to cap a capping group. Check your data.";
                 //DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
                 continue;
             }
 
-            for (DENOPTIMAttachmentPoint curDap : curVertex.getAttachmentPoints())
+            for (AttachmentPoint curDap : curVertex.getAttachmentPoints())
             {
                 if (curDap.isAvailableThroughout())
                 {
@@ -3595,11 +3598,11 @@ public class DENOPTIMGraph implements Cloneable
 
                         if (bbIdCap != -1)
                         {
-                            DENOPTIMVertex capVrtx = 
-                                    DENOPTIMVertex.newVertexFromLibrary(
+                            Vertex capVrtx = 
+                                    Vertex.newVertexFromLibrary(
                                         GraphUtils.getUniqueVertexIndex(), 
                                         bbIdCap, BBType.CAP, fragSpace);
-                            DENOPTIMGraph molGraph = curDap.getOwner()
+                            DGraph molGraph = curDap.getOwner()
                                     .getGraphOwner();
                             if (molGraph == null)
                                 throw new DENOPTIMException("Canno add capping "
@@ -3612,7 +3615,7 @@ public class DENOPTIMGraph implements Cloneable
                             String msg = "Capping is required but no proper "
                                     + "capping fragment found with APCalss " 
                                     + apcCap;
-                            DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
+                            StaticLogger.appLogger.log(Level.SEVERE,msg);
                             throw new DENOPTIMException(msg);
                         }
                     }
@@ -3634,7 +3637,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return a new graph that corresponds to the subgraph of this graph.
      */
 
-    public DENOPTIMGraph extractSubgraph(int index)
+    public DGraph extractSubgraph(int index)
             throws DENOPTIMException
     {
         return extractSubgraph(this.getVertexAtPosition(index));
@@ -3653,7 +3656,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return a new graph that corresponds to the subgraph of this graph.
      */
 
-    public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed)
+    public DGraph extractSubgraph(Vertex seed)
             throws DENOPTIMException
     {
         return extractSubgraph(seed, Integer.MAX_VALUE, false);
@@ -3679,7 +3682,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return a new graph that corresponds to the subgraph of this graph.
      */
 
-    public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, int numLayers, 
+    public DGraph extractSubgraph(Vertex seed, int numLayers, 
             boolean stopBeforeRCVs) throws DENOPTIMException
     {
         if (!this.gVertices.contains(seed))
@@ -3687,15 +3690,15 @@ public class DENOPTIMGraph implements Cloneable
             throw new DENOPTIMException("Attempt to extract a subgraph giving "
                     + "a seed vertex that is not contained in this graph.");
         }
-        DENOPTIMGraph subGraph = this.clone();
-        DENOPTIMVertex seedClone = subGraph.getVertexAtPosition(
+        DGraph subGraph = this.clone();
+        Vertex seedClone = subGraph.getVertexAtPosition(
                 this.indexOf(seed));
         
-        ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> subGrpVrtxs = new ArrayList<Vertex>();
         subGrpVrtxs.add(seedClone);
         subGraph.getChildrenTree(seedClone, subGrpVrtxs, numLayers, stopBeforeRCVs);
-        ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : subGraph.gVertices)
+        ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
+        for (Vertex v : subGraph.gVertices)
         {
             if (!subGrpVrtxs.contains(v))
             {
@@ -3703,7 +3706,7 @@ public class DENOPTIMGraph implements Cloneable
             }
         }
         
-        for (DENOPTIMVertex v : toRemove)
+        for (Vertex v : toRemove)
         {
             subGraph.removeVertex(v);
         }
@@ -3730,8 +3733,8 @@ public class DENOPTIMGraph implements Cloneable
      * each branch stop before including ring closing vertexes.
      * @return a new graph that corresponds to the subgraph of this graph.
      */
-    public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, 
-            List<DENOPTIMVertex> limits, boolean stopBeforeRCVs) 
+    public DGraph extractSubgraph(Vertex seed, 
+            List<Vertex> limits, boolean stopBeforeRCVs) 
                     throws DENOPTIMException
     {
         if (!this.gVertices.contains(seed))
@@ -3745,28 +3748,28 @@ public class DENOPTIMGraph implements Cloneable
             return extractSubgraph(seed, stopBeforeRCVs);
         }
         
-        DENOPTIMGraph subGraph = this.clone();
-        DENOPTIMVertex seedClone = subGraph.getVertexAtPosition(
+        DGraph subGraph = this.clone();
+        Vertex seedClone = subGraph.getVertexAtPosition(
                 this.indexOf(seed));
         
-        List<DENOPTIMVertex> limitsInClone =  new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : limits)
+        List<Vertex> limitsInClone =  new ArrayList<Vertex>();
+        for (Vertex v : limits)
             limitsInClone.add(subGraph.getVertexAtPosition(this.indexOf(v)));
         
-        ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> subGrpVrtxs = new ArrayList<Vertex>();
         subGrpVrtxs.add(seedClone);
         subGraph.getChildTreeLimited(seedClone, subGrpVrtxs, limitsInClone, 
                 stopBeforeRCVs);
         
-        ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : subGraph.gVertices)
+        ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
+        for (Vertex v : subGraph.gVertices)
         {
             if (!subGrpVrtxs.contains(v))
             {
                 toRemove.add(v);
             }
         }
-        for (DENOPTIMVertex v : toRemove)
+        for (Vertex v : toRemove)
         {
             subGraph.removeVertex(v);
         }
@@ -3790,7 +3793,7 @@ public class DENOPTIMGraph implements Cloneable
      * each branch stop before including ring closing vertexes.
      * @return a new graph that corresponds to the subgraph of this graph.
      */
-    public DENOPTIMGraph extractSubgraph(DENOPTIMVertex seed, boolean stopBeforeRCVs) 
+    public DGraph extractSubgraph(Vertex seed, boolean stopBeforeRCVs) 
                     throws DENOPTIMException
     {
         if (!this.gVertices.contains(seed))
@@ -3799,23 +3802,23 @@ public class DENOPTIMGraph implements Cloneable
                     + "a seed vertex that is not contained in this graph.");
         }
         
-        DENOPTIMGraph subGraph = this.clone();
-        DENOPTIMVertex seedClone = subGraph.getVertexAtPosition(
+        DGraph subGraph = this.clone();
+        Vertex seedClone = subGraph.getVertexAtPosition(
                 this.indexOf(seed));
         
-        ArrayList<DENOPTIMVertex> subGrpVrtxs = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> subGrpVrtxs = new ArrayList<Vertex>();
         subGrpVrtxs.add(seedClone);
         subGraph.getChildTreeLimited(seedClone, subGrpVrtxs, stopBeforeRCVs);
         
-        ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : subGraph.gVertices)
+        ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
+        for (Vertex v : subGraph.gVertices)
         {
             if (!subGrpVrtxs.contains(v))
             {
                 toRemove.add(v);
             }
         }
-        for (DENOPTIMVertex v : toRemove)
+        for (Vertex v : toRemove)
         {
             subGraph.removeVertex(v);
         }
@@ -3832,28 +3835,28 @@ public class DENOPTIMGraph implements Cloneable
      * @param members the vertexes belonging to the subgraph. 
      * @return a new graph that corresponds to the subgraph of this graph.
      */
-    public DENOPTIMGraph extractSubgraph(List<DENOPTIMVertex> members) 
+    public DGraph extractSubgraph(List<Vertex> members) 
     {
         if (members.size()==0)
             return null;
         
-        DENOPTIMGraph subGraph = this.clone();
+        DGraph subGraph = this.clone();
         
-        List<DENOPTIMVertex> subGrpVrtxs =  new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : members)
+        List<Vertex> subGrpVrtxs =  new ArrayList<Vertex>();
+        for (Vertex v : members)
         {
             subGrpVrtxs.add(subGraph.getVertexAtPosition(this.indexOf(v)));
         }
         
-        ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : subGraph.gVertices)
+        ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
+        for (Vertex v : subGraph.gVertices)
         {
             if (!subGrpVrtxs.contains(v))
             {
                 toRemove.add(v);
             }
         }
-        for (DENOPTIMVertex v : toRemove)
+        for (Vertex v : toRemove)
         {
             subGraph.removeVertex(v);
         }
@@ -3870,7 +3873,7 @@ public class DENOPTIMGraph implements Cloneable
      * @throws DENOPTIMException 
      */
       
-    public List<DENOPTIMGraph> extractPattern(GraphPattern pattern) 
+    public List<DGraph> extractPattern(GraphPattern pattern) 
             throws DENOPTIMException 
     {
         if (pattern != GraphPattern.RING) {
@@ -3878,21 +3881,21 @@ public class DENOPTIMGraph implements Cloneable
                     " not supported.");
         }
 
-        List<Set<DENOPTIMVertex>> disjointMultiCycleVertices = this
+        List<Set<Vertex>> disjointMultiCycleVertices = this
                   .getRings()
                   .stream()
-                  .map(DENOPTIMRing::getVertices)
+                  .map(Ring::getVertices)
                   .map(HashSet::new)
                   .collect(Collectors.toList());
 
         GenUtils.unionOfIntersectingSets(disjointMultiCycleVertices);
 
-        List<DENOPTIMGraph> subgraphs = new ArrayList<>();
-        for (Set<DENOPTIMVertex> fusedRing : disjointMultiCycleVertices) {
+        List<DGraph> subgraphs = new ArrayList<>();
+        for (Set<Vertex> fusedRing : disjointMultiCycleVertices) {
             subgraphs.add(extractSubgraph(fusedRing));
         }
           
-        for (DENOPTIMGraph g : subgraphs) {
+        for (DGraph g : subgraphs) {
             g.storeCurrentVertexIDs();
             g.renumberGraphVertices();
             reorderVertexList(g);
@@ -3911,11 +3914,11 @@ public class DENOPTIMGraph implements Cloneable
      *                  defined on.
      * @return Subgraph of graph defined on set of vertices.
      */
-    private DENOPTIMGraph extractSubgraph(Set<DENOPTIMVertex> definedOn) 
+    private DGraph extractSubgraph(Set<Vertex> definedOn) 
     {
-        DENOPTIMGraph subgraph = this.clone();
+        DGraph subgraph = this.clone();
 
-        Set<DENOPTIMVertex> complement = subgraph
+        Set<Vertex> complement = subgraph
                 .getVertexList()
                 .stream()
                 .filter(u -> definedOn
@@ -3923,7 +3926,7 @@ public class DENOPTIMGraph implements Cloneable
                         .allMatch(v -> v.getVertexId() != u.getVertexId())
                 ).collect(Collectors.toSet());
 
-        for (DENOPTIMVertex v : complement) {
+        for (Vertex v : complement) {
             subgraph.removeVertex(v);
         }
         return subgraph;
@@ -3939,13 +3942,13 @@ public class DENOPTIMGraph implements Cloneable
        * scaffold.
        * @param g Graph to fix.
        */
-      private static void reorderVertexList(DENOPTIMGraph g) 
+      private static void reorderVertexList(DGraph g) 
       {
-          DENOPTIMVertex newScaffold = g.getSourceVertex();
+          Vertex newScaffold = g.getSourceVertex();
           if (newScaffold == null) {
               return;
           }
-          DENOPTIMGraph.setScaffold(newScaffold);
+          DGraph.setScaffold(newScaffold);
           fixEdgeDirections(g);
       }
 
@@ -3955,9 +3958,9 @@ public class DENOPTIMGraph implements Cloneable
      * Flips edges in the graph so that the scaffold is the only source vertex.
      * @param graph to fix edges of.
      */
-    private static void fixEdgeDirections(DENOPTIMGraph graph) 
+    private static void fixEdgeDirections(DGraph graph) 
     {
-        DENOPTIMVertex src = graph.getSourceVertex();
+        Vertex src = graph.getSourceVertex();
         fixEdgeDirections(src, new HashSet<>());
     }
 
@@ -3967,14 +3970,14 @@ public class DENOPTIMGraph implements Cloneable
      * Recursive utility method for fixEdgeDirections(DENOPTIMGraph graph).
      * @param v current vertex
      */
-    private static void fixEdgeDirections(DENOPTIMVertex v, 
+    private static void fixEdgeDirections(Vertex v, 
             Set<Integer> visited) 
     {
         visited.add(v.getVertexId());
         int visitedVertexEncounters = 0;
         for (int i = 0; i < v.getNumberOfAPs(); i++) {
-            DENOPTIMAttachmentPoint ap = v.getAP(i);
-            DENOPTIMEdge edge = ap.getEdgeUser();
+            AttachmentPoint ap = v.getAP(i);
+            Edge edge = ap.getEdgeUser();
             if (edge != null) {
                 int srcVertex = edge.getSrcVertex();
                 boolean srcIsVisited =
@@ -4011,19 +4014,19 @@ public class DENOPTIMGraph implements Cloneable
      * @throws DENOPTIMException
      */
 
-    public boolean removeBranchStartingAt(DENOPTIMVertex v, boolean symmetry)
+    public boolean removeBranchStartingAt(Vertex v, boolean symmetry)
             throws DENOPTIMException
     {
         boolean res = true;
         if (hasSymmetryInvolvingVertex(v) && symmetry)
         {
-            ArrayList<DENOPTIMVertex> toRemove = new ArrayList<DENOPTIMVertex>();
+            ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
             for (int i=0; i<getSymSetForVertexID(v.getVertexId()).size(); i++)
             {
                 int svid = getSymSetForVertexID(v.getVertexId()).getList().get(i);
                 toRemove.add(getVertexWithId(svid));
             }
-            for (DENOPTIMVertex sv : toRemove)
+            for (Vertex sv : toRemove)
             {
                 boolean res2 = removeBranchStartingAt(sv);
                 if (!res2)
@@ -4050,10 +4053,10 @@ public class DENOPTIMGraph implements Cloneable
      * @throws DENOPTIMException
      */
 
-    public boolean removeBranchStartingAt(DENOPTIMVertex v)
+    public boolean removeBranchStartingAt(Vertex v)
             throws DENOPTIMException
     {
-        DENOPTIMEdge edgeToParent = v.getEdgeToParent();
+        Edge edgeToParent = v.getEdgeToParent();
         if (edgeToParent != null)
         {
             removeEdge(edgeToParent);
@@ -4076,15 +4079,15 @@ public class DENOPTIMGraph implements Cloneable
      * @throws DENOPTIMException
      */
 
-    public boolean removeOrphanBranchStartingAt(DENOPTIMVertex v)
+    public boolean removeOrphanBranchStartingAt(Vertex v)
             throws DENOPTIMException
     {
         // now get the vertices attached to v
-        ArrayList<DENOPTIMVertex> children = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> children = new ArrayList<Vertex>();
         getChildrenTree(v, children);
 
         // delete the children vertices and associated edges
-        for (DENOPTIMVertex c : children) {
+        for (Vertex c : children) {
             removeVertex(c);
         }
 
@@ -4107,10 +4110,10 @@ public class DENOPTIMGraph implements Cloneable
      * @throws DENOPTIMException is any assumption on the healthy structure of 
      * this graph is not verified.
      */
-    public boolean removeChainUpToBranching(DENOPTIMVertex v, 
+    public boolean removeChainUpToBranching(Vertex v, 
             FragmentSpace fragSpace) throws DENOPTIMException
     {
-        List<DENOPTIMRing> rings = getRingsInvolvingVertex(v);
+        List<Ring> rings = getRingsInvolvingVertex(v);
         if (rings.isEmpty())
         {
             return false;
@@ -4120,11 +4123,11 @@ public class DENOPTIMGraph implements Cloneable
         // The corresponding ring is the "frame" we'll use throughout this 
         // operation, and is the smallest ring that is closest to the appointed
         // vertex.
-        DENOPTIMRing frame = null;
-        DENOPTIMVertex[] replacedByEdge = new DENOPTIMVertex[2];
+        Ring frame = null;
+        Vertex[] replacedByEdge = new Vertex[2];
         int minDist = Integer.MAX_VALUE;
         BondType bt = null;
-        for (DENOPTIMRing r : rings)
+        for (Ring r : rings)
         {
             int dist = Math.min(r.getDistance(r.getHeadVertex(),v),
                     r.getDistance(r.getTailVertex(),v));
@@ -4144,7 +4147,7 @@ public class DENOPTIMGraph implements Cloneable
         int posOfFocusVrtInRing = frame.getPositionOf(v);
         for (int i=0; i<frame.getSize(); i++)
         {
-            DENOPTIMVertex vi = frame.getVertexAtPosition(i);
+            Vertex vi = frame.getVertexAtPosition(i);
             // We consider the scaffold as a branching point, i.e., it will never be removed
             if (vi.getBuildingBlockType() == BBType.SCAFFOLD)
             {
@@ -4198,7 +4201,7 @@ public class DENOPTIMGraph implements Cloneable
         // Now, collect the vertexes along the ring based on whether they
         // will be removed or remain (possible with a change of edge direction
         // and replacement of an RCV pair by edge)
-        List<DENOPTIMVertex> remainingChain = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> remainingChain = new ArrayList<Vertex>();
         for (int i=0; i<frame.getSize(); i++)
         {
             int iTranslated = i + branchingDownstreamId;
@@ -4210,7 +4213,7 @@ public class DENOPTIMGraph implements Cloneable
                 break;
             }
         }
-        List<DENOPTIMVertex> toRemoveChain = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> toRemoveChain = new ArrayList<Vertex>();
         for (int i=0; i<frame.getSize(); i++)
         {
             int iTranslated = i + branchingUpstreamId + 1; //exclude branch point
@@ -4230,7 +4233,7 @@ public class DENOPTIMGraph implements Cloneable
         if (toRemoveChain.size() == 2)
         {
             int countOrRCVs = 0;
-            for (DENOPTIMVertex vtr : toRemoveChain)
+            for (Vertex vtr : toRemoveChain)
             {
                 if (vtr.isRCV())
                     countOrRCVs++;
@@ -4244,8 +4247,8 @@ public class DENOPTIMGraph implements Cloneable
         // To understand if we need to reverse some edges, we identify the
         // deepest vertex level-wise. It may or may not be a scaffold!!!
         int deepestLevel = Integer.MAX_VALUE;
-        DENOPTIMVertex deepestVrtRemainingChain = null;
-        for (DENOPTIMVertex vint : remainingChain)
+        Vertex deepestVrtRemainingChain = null;
+        for (Vertex vint : remainingChain)
         {
             int lvl = getLevel(vint);
             if (lvl < deepestLevel)
@@ -4261,9 +4264,9 @@ public class DENOPTIMGraph implements Cloneable
         // RCVs, so I assume that if one RCV is there, then the other is too.
         if (remainingChain.contains(replacedByEdge[0]))
         {
-            DENOPTIMAttachmentPoint apSrcOfNewEdge = replacedByEdge[0]
+            AttachmentPoint apSrcOfNewEdge = replacedByEdge[0]
                     .getEdgeToParent().getSrcAP();
-            DENOPTIMAttachmentPoint apTrgOfNewEdge = replacedByEdge[1]
+            AttachmentPoint apTrgOfNewEdge = replacedByEdge[1]
                     .getEdgeToParent().getSrcAP();
             
             // Remove the RCVs that will be replaced by an edge
@@ -4278,7 +4281,7 @@ public class DENOPTIMGraph implements Cloneable
             // previous existence of the chord. so no need to check 
             // apSrcOfNewEdge.getAPClass().isCPMapCompatibleWith(
             //        apTrgOfNewEdge.getAPClass()))
-            addEdge(new DENOPTIMEdge(apSrcOfNewEdge, apTrgOfNewEdge, bt));
+            addEdge(new Edge(apSrcOfNewEdge, apTrgOfNewEdge, bt));
         } else {
             // We remove the frame already, otherwise we will try to recreate 
             // such ring from RCVs and waste time with it.
@@ -4287,13 +4290,13 @@ public class DENOPTIMGraph implements Cloneable
         
         // Now, inspect the paths from the deepest vertex and outwards, to
         // find out where to start reversing edges.
-        List<DENOPTIMVertex> chainToReverseA = new ArrayList<DENOPTIMVertex>();
-        List<DENOPTIMVertex> chainToReverseB = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> chainToReverseA = new ArrayList<Vertex>();
+        List<Vertex> chainToReverseB = new ArrayList<Vertex>();
         for (int i=(remainingChain.indexOf(deepestVrtRemainingChain)+1); 
                 i<remainingChain.size(); i++)
         {
-            DENOPTIMVertex vPrev = remainingChain.get(i-1);
-            DENOPTIMVertex vHere = remainingChain.get(i);
+            Vertex vPrev = remainingChain.get(i-1);
+            Vertex vHere = remainingChain.get(i);
             if (!vPrev.getChilddren().contains(vHere))
             {
                 // in an healthy spanning tree, once we find the first reversed
@@ -4305,8 +4308,8 @@ public class DENOPTIMGraph implements Cloneable
         }
         for (int i=(remainingChain.indexOf(deepestVrtRemainingChain)-1);i>-1;i--)
         {
-            DENOPTIMVertex vPrev = remainingChain.get(i+1);
-            DENOPTIMVertex vHere = remainingChain.get(i);
+            Vertex vPrev = remainingChain.get(i+1);
+            Vertex vHere = remainingChain.get(i);
             if (!vPrev.getChilddren().contains(vHere))
             {
                 if (chainToReverseB.size()==0)
@@ -4316,16 +4319,16 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         // These are to remember all chords that will have to be recreated
-        LinkedHashMap<DENOPTIMVertex,DENOPTIMVertex> chordsToRecreate = 
-                new LinkedHashMap<DENOPTIMVertex,DENOPTIMVertex>();
-        LinkedHashMap<DENOPTIMVertex,BondType> chordsToRecreateBB = 
-                new LinkedHashMap<DENOPTIMVertex,BondType>();
+        LinkedHashMap<Vertex,Vertex> chordsToRecreate = 
+                new LinkedHashMap<Vertex,Vertex>();
+        LinkedHashMap<Vertex,BondType> chordsToRecreateBB = 
+                new LinkedHashMap<Vertex,BondType>();
         
         // Change direction of those edges that have to be reversed as a 
         // consequence of the change in the spanning tree.
         if (chainToReverseA.size()+chainToReverseB.size() > 1)
         {
-            List<DENOPTIMVertex> chainToWorkOn = null;
+            List<Vertex> chainToWorkOn = null;
             for (int ic=0; ic<2; ic++)
             {
                 if (ic == 1)
@@ -4335,10 +4338,10 @@ public class DENOPTIMGraph implements Cloneable
             
                 for (int i=1; i<chainToWorkOn.size(); i++)
                 {
-                    DENOPTIMVertex vHere = chainToWorkOn.get(i);
-                    DENOPTIMVertex vPrev = chainToWorkOn.get(i-1);
-                    List<DENOPTIMRing> ringsToRecreate = new ArrayList<>();
-                    for (DENOPTIMRing r : getRingsInvolvingVertex(vHere))
+                    Vertex vHere = chainToWorkOn.get(i);
+                    Vertex vPrev = chainToWorkOn.get(i-1);
+                    List<Ring> ringsToRecreate = new ArrayList<>();
+                    for (Ring r : getRingsInvolvingVertex(vHere))
                     {
                         ringsToRecreate.add(r);
                         chordsToRecreate.put(r.getHeadVertex(), 
@@ -4346,12 +4349,12 @@ public class DENOPTIMGraph implements Cloneable
                         chordsToRecreateBB.put(r.getHeadVertex(), 
                                 r.getBondType());
                     }
-                    for (DENOPTIMRing r : ringsToRecreate)
+                    for (Ring r : ringsToRecreate)
                     {
                         removeRing(r);
                     }
                     
-                    DENOPTIMEdge edgeToPrevious = vHere.getEdgeWith(vPrev);
+                    Edge edgeToPrevious = vHere.getEdgeWith(vPrev);
                     if (edgeToPrevious == null) 
                     {
                         // Since we have already made the new edge this should 
@@ -4368,16 +4371,16 @@ public class DENOPTIMGraph implements Cloneable
                         if (edgeToPrevious.getSrcAP().getOwner() == vHere) 
                         {
                             // This is an edge that has to be reversed.
-                            DENOPTIMAttachmentPoint newSrcAP = 
+                            AttachmentPoint newSrcAP = 
                                     edgeToPrevious.getTrgAP();
-                            DENOPTIMAttachmentPoint newTrgAP = 
+                            AttachmentPoint newTrgAP = 
                                     edgeToPrevious.getSrcAP();
                             if (newSrcAP.getAPClass().isCPMapCompatibleWith(
                                     newTrgAP.getAPClass(), fragSpace))
                             {
                                 BondType oldBt = edgeToPrevious.getBondType();
                                 removeEdge(edgeToPrevious);
-                                addEdge(new DENOPTIMEdge(newSrcAP, newTrgAP, 
+                                addEdge(new Edge(newSrcAP, newTrgAP, 
                                         oldBt));
                             } else {
                                 // There is a non-reversible connection along 
@@ -4392,39 +4395,39 @@ public class DENOPTIMGraph implements Cloneable
         }
            
         // Delete the chain to be removed
-        for (DENOPTIMVertex vtr : toRemoveChain) 
+        for (Vertex vtr : toRemoveChain) 
         {
             // This works across template boundaries!
-            for (DENOPTIMVertex child : vtr.getChildrenThroughout())
+            for (Vertex child : vtr.getChildrenThroughout())
             {
                 if (remainingChain.contains(child)
                         || toRemoveChain.contains(child))
                     continue;
-                DENOPTIMGraph ownerOfChild = child.getGraphOwner();
+                DGraph ownerOfChild = child.getGraphOwner();
                 ownerOfChild.removeVertex(child);
             }
             if (templateJacket!= null)
             {
-                List<DENOPTIMAttachmentPoint> apProjectionsToRemove = 
-                        new ArrayList<DENOPTIMAttachmentPoint>();
-                for (DENOPTIMAttachmentPoint outerAP : 
+                List<AttachmentPoint> apProjectionsToRemove = 
+                        new ArrayList<AttachmentPoint>();
+                for (AttachmentPoint outerAP : 
                     templateJacket.getAttachmentPoints())
                 {
-                    DENOPTIMAttachmentPoint innerAP = 
+                    AttachmentPoint innerAP = 
                             templateJacket.getInnerAPFromOuterAP(outerAP);
                     if (innerAP.getOwner() == vtr)
                     {
                         apProjectionsToRemove.add(innerAP);
                     }
                 }
-                for (DENOPTIMAttachmentPoint apToRemove : apProjectionsToRemove)
+                for (AttachmentPoint apToRemove : apProjectionsToRemove)
                     templateJacket.removeProjectionOfInnerAP(apToRemove);
             }
             removeVertex(vtr);
         }
         
         // Regenerate the rings that have been affected
-        for (DENOPTIMVertex h : chordsToRecreate.keySet())
+        for (Vertex h : chordsToRecreate.keySet())
         {
             addRing(h, chordsToRecreate.get(h), chordsToRecreateBB.get(h));
         }
@@ -4464,7 +4467,7 @@ public class DENOPTIMGraph implements Cloneable
         // The free-ed up APs need to be projected to template's surface
         if (templateJacket!= null)
         {
-            for (DENOPTIMAttachmentPoint innerAP : getAvailableAPs())
+            for (AttachmentPoint innerAP : getAvailableAPs())
             {
                 templateJacket.addInnerToOuterAPMapping(innerAP);
             }
@@ -4494,7 +4497,7 @@ public class DENOPTIMGraph implements Cloneable
 
             for (int j=0; j<getEdgeCount(); j++)
             {
-                DENOPTIMEdge e = getEdgeList().get(j);
+                Edge e = getEdgeList().get(j);
                 if (e.getSrcVertex() == vid) {
                     e.getSrcAP().getOwner().setVertexId(nvid);
                 }
@@ -4545,7 +4548,7 @@ public class DENOPTIMGraph implements Cloneable
         // for the vertices in the graph, get new vertex ids
         for (int i=0; i<getVertexCount(); i++)
         {
-            DENOPTIMVertex v = getVertexList().get(i);
+            Vertex v = getVertexList().get(i);
             int vid = v.getVertexId();
             int nvid = GraphUtils.getUniqueVertexIndex();
 
@@ -4587,9 +4590,9 @@ public class DENOPTIMGraph implements Cloneable
      * traversed to reach the vertex given as argument via a direct path.
      */
     
-    public int getLevel(DENOPTIMVertex v)
+    public int getLevel(Vertex v)
     {
-        ArrayList<DENOPTIMVertex> parentTree = new ArrayList<>();
+        ArrayList<Vertex> parentTree = new ArrayList<>();
         getParentTree(v,parentTree);
         return parentTree.size() - 1;
     }
@@ -4638,7 +4641,7 @@ public class DENOPTIMGraph implements Cloneable
         {
             String msg ="Evaluation of graph: graph-to-mol returned null!"
                     + toString();
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             return null;
         }
 
@@ -4648,25 +4651,25 @@ public class DENOPTIMGraph implements Cloneable
         {
             String msg = "Evaluation of graph: Not all connected"
                     + toString();
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             return null;
         }
 
         // SMILES
         String smiles = null;
-        smiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
+        smiles = MoleculeUtils.getSMILESForMolecule(mol);
         if (smiles == null)
         {
             String msg = "Evaluation of graph: SMILES is null! "
                     + toString();
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             smiles = "FAIL: NO SMILES GENERATED";
         }
         // if by chance the smiles indicates a disconnected molecule
         if (smiles.contains("."))
         {
             String msg = "Evaluation of graph: SMILES contains \".\"" + smiles;
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             return null;
         }
 
@@ -4674,39 +4677,39 @@ public class DENOPTIMGraph implements Cloneable
         // 1A) number of heavy atoms
         if (fsSettings.getMaxHeavyAtom() > 0)
         {
-            if (DENOPTIMMoleculeUtils.getHeavyAtomCount(mol) >
+            if (MoleculeUtils.getHeavyAtomCount(mol) >
                 fsSettings.getMaxHeavyAtom())
             {
                 String msg = "Evaluation of graph: Max atoms constraint "
                         + " violated: " + smiles;
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 return null;
             }
         }
 
         // 1B) molecular weight
-        double mw = DENOPTIMMoleculeUtils.getMolecularWeight(mol);
+        double mw = MoleculeUtils.getMolecularWeight(mol);
         if (fsSettings.getMaxMW() > 0)
         {
             if (mw > fsSettings.getMaxMW())
             {
                 String msg = "Evaluation of graph: Molecular weight "
                         + "constraint violated: " + smiles + " | MW: " + mw;
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 return null;
             }
         }
         mol.setProperty("MOL_WT", mw);
 
         // 1C) number of rotatable bonds
-        int nrot = DENOPTIMMoleculeUtils.getNumberOfRotatableBonds(mol);
+        int nrot = MoleculeUtils.getNumberOfRotatableBonds(mol);
         if (fsSettings.getMaxRotatableBond() > 0)
         {
             if (nrot > fsSettings.getMaxRotatableBond())
             {
                 String msg = "Evaluation of graph: Max rotatable bonds "
                         + "constraint violated: "+ smiles;
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 return null;
             }
         }
@@ -4718,7 +4721,7 @@ public class DENOPTIMGraph implements Cloneable
             if (hasForbiddenEnd(fsSettings.getFragmentSpace()))
             {
                 String msg = "Evaluation of graph: forbidden end in graph!";
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 return null;
             }
         }
@@ -4758,7 +4761,7 @@ public class DENOPTIMGraph implements Cloneable
                     String msg = "Evaluation of graph: too many RCAs! "
                             + rcaTyp + ":" + nThisType + " "
                             + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                    StaticLogger.appLogger.log(Level.INFO, msg);
                     return null;
                 }
                 if (nThisType < rcSettings.getMinRcaPerType() ||
@@ -4767,7 +4770,7 @@ public class DENOPTIMGraph implements Cloneable
                     String msg = "Evaluation of graph: too few RCAs! "
                             + rcaTyp + ":" + nThisType + " "
                             + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                    StaticLogger.appLogger.log(Level.INFO, msg);
                     return null;
                 }
 
@@ -4778,17 +4781,17 @@ public class DENOPTIMGraph implements Cloneable
             if (nPossRings < rcSettings.getMinRingClosures())
             {
                 String msg = "Evaluation of graph: too few ring candidates";
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 return null;
             }
         }
 
         // get the smiles/Inchi representation
-        ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
+        ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol);
         if (pr.getFirst() == null)
         {
             String msg = "Evaluation of graph: INCHI is null!";
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             pr.setFirst("UNDEFINED_INCHI");
         }
 
@@ -4809,7 +4812,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return <code>true</code> unless no ring can be set up even if required
      * @throws denoptim.exception.DENOPTIMException
      */
-    public ArrayList<DENOPTIMGraph> makeAllGraphsWithDifferentRingSets(
+    public ArrayList<DGraph> makeAllGraphsWithDifferentRingSets(
             RunTimeParameters settings)
             throws DENOPTIMException 
     {
@@ -4825,7 +4828,7 @@ public class DENOPTIMGraph implements Cloneable
             fsSettings = (FragmentSpaceParameters)settings.getParameters(
                     ParametersType.FS_PARAMS);
         }
-        ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<>();
+        ArrayList<DGraph> lstGraphs = new ArrayList<>();
 
         boolean rcnEnabled = fsSettings.getFragmentSpace()
                 .useAPclassBasedApproach();
@@ -4848,14 +4851,14 @@ public class DENOPTIMGraph implements Cloneable
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler(rcSettings,
                 fsSettings.getFragmentSpace());
-        ArrayList<List<DENOPTIMRing>> allCombsOfRings =
+        ArrayList<List<Ring>> allCombsOfRings =
                 cgh.getPossibleCombinationOfRings(mol, this);
 
         // Keep closable chains that are relevant for chelate formation
         if (rcSettings.buildChelatesMode())
         {
-            ArrayList<List<DENOPTIMRing>> toRemove = new ArrayList<>();
-            for (List<DENOPTIMRing> setRings : allCombsOfRings)
+            ArrayList<List<Ring>> toRemove = new ArrayList<>();
+            for (List<Ring> setRings : allCombsOfRings)
             {
                 if (!cgh.checkChelatesGraph(this,setRings))
                 {
@@ -4866,18 +4869,18 @@ public class DENOPTIMGraph implements Cloneable
         }
 
         // prepare output graphs
-        for (List<DENOPTIMRing> ringSet : allCombsOfRings)
+        for (List<Ring> ringSet : allCombsOfRings)
         {
             // clone root graph
-            DENOPTIMGraph newGraph = this.clone();
+            DGraph newGraph = this.clone();
 
             Map<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
             newGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
             // add rings
-            for (DENOPTIMRing oldRing : ringSet)
+            for (Ring oldRing : ringSet)
             {
-                DENOPTIMRing newRing = new DENOPTIMRing();
+                Ring newRing = new Ring();
                 for (int i=0; i<oldRing.getSize(); i++)
                 {
                     int oldVId = oldRing.getVertexAtPosition(i).getVertexId();
@@ -4906,13 +4909,13 @@ public class DENOPTIMGraph implements Cloneable
 
     public boolean hasForbiddenEnd(FragmentSpace fragSpace)
     {
-        ArrayList<DENOPTIMVertex> vertices = getVertexList();
+        ArrayList<Vertex> vertices = getVertexList();
         Set<APClass> classOfForbEnds = fragSpace.getForbiddenEndList();
         boolean found = false;
-        for (DENOPTIMVertex vtx : vertices)
+        for (Vertex vtx : vertices)
         {
-            ArrayList<DENOPTIMAttachmentPoint> daps = vtx.getAttachmentPoints();
-            for (DENOPTIMAttachmentPoint dp : daps)
+            ArrayList<AttachmentPoint> daps = vtx.getAttachmentPoints();
+            for (AttachmentPoint dp : daps)
             {
                 if (dp.isAvailable())
                 {
@@ -4925,7 +4928,7 @@ public class DENOPTIMGraph implements Cloneable
                                 + vtx.toString()
                                 + "\n"+ this +" \n "
                                 + " AP class: " + apClass;
-                        DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+                        StaticLogger.appLogger.log(Level.WARNING, msg);
                         break;
                     }
                 }
@@ -4960,10 +4963,10 @@ public class DENOPTIMGraph implements Cloneable
      * the AP indicated in the list.
      */
 
-    public void appendGraphOnGraph(ArrayList<DENOPTIMVertex> parentVertices,
+    public void appendGraphOnGraph(ArrayList<Vertex> parentVertices,
                                    ArrayList<Integer> parentAPIdx,
-                                   DENOPTIMGraph subGraph,
-                                   DENOPTIMVertex childVertex, int childAPIdx,
+                                   DGraph subGraph,
+                                   Vertex childVertex, int childAPIdx,
                                    BondType bndType, boolean onAllSymmAPs) 
                                            throws DENOPTIMException
     {
@@ -4993,8 +4996,8 @@ public class DENOPTIMGraph implements Cloneable
      * @throws DENOPTIMException 
      */
 
-    public void appendVertexOnAP(DENOPTIMAttachmentPoint srcAP, 
-            DENOPTIMAttachmentPoint trgAP) throws DENOPTIMException 
+    public void appendVertexOnAP(AttachmentPoint srcAP, 
+            AttachmentPoint trgAP) throws DENOPTIMException 
     {
         if (!srcAP.isAvailable())
         {
@@ -5028,7 +5031,7 @@ public class DENOPTIMGraph implements Cloneable
         }
 
         this.addVertex(trgAP.getOwner());
-        DENOPTIMEdge edge = new DENOPTIMEdge(srcAP,trgAP, bndTyp);
+        Edge edge = new Edge(srcAP,trgAP, bndTyp);
         addEdge(edge);
     }
     
@@ -5043,31 +5046,31 @@ public class DENOPTIMGraph implements Cloneable
      * @throws DENOPTIMException
      */
 
-    public void appendGraphOnAP(DENOPTIMAttachmentPoint apOnThisGraph,
-            DENOPTIMAttachmentPoint apOnIncomingGraph, BondType bndType)
+    public void appendGraphOnAP(AttachmentPoint apOnThisGraph,
+            AttachmentPoint apOnIncomingGraph, BondType bndType)
                                         throws DENOPTIMException
     {
-        DENOPTIMGraph incomingGraph = apOnIncomingGraph.getOwner().getGraphOwner();
+        DGraph incomingGraph = apOnIncomingGraph.getOwner().getGraphOwner();
         incomingGraph.renumberGraphVertices();
 
-        DENOPTIMEdge edge = new DENOPTIMEdge(apOnThisGraph, apOnIncomingGraph, 
+        Edge edge = new Edge(apOnThisGraph, apOnIncomingGraph, 
                 bndType);
         addEdge(edge);
         
         //Import vertexes
-        for (DENOPTIMVertex incomingVrtx : incomingGraph.getVertexList())
+        for (Vertex incomingVrtx : incomingGraph.getVertexList())
         {
             addVertex(incomingVrtx);
         }
         
         //Import edges
-        for (DENOPTIMEdge incomingEdge : incomingGraph.getEdgeList())
+        for (Edge incomingEdge : incomingGraph.getEdgeList())
         {
             addEdge(incomingEdge);
         }
         
         //Import rings
-        for (DENOPTIMRing incomingRing : incomingGraph.getRings())
+        for (Ring incomingRing : incomingGraph.getRings())
         {
             addRing(incomingRing);
         }
@@ -5097,29 +5100,29 @@ public class DENOPTIMGraph implements Cloneable
      * structure.
      */
 
-    public void appendGraphOnAP(DENOPTIMVertex parentVertex, int parentAPIdx,
-                                DENOPTIMGraph subGraph,
-                                DENOPTIMVertex childVertex, int childAPIdx,
+    public void appendGraphOnAP(Vertex parentVertex, int parentAPIdx,
+                                DGraph subGraph,
+                                Vertex childVertex, int childAPIdx,
                                 BondType bndType,
                                 Map<Integer,SymmetricSet> newSymSets)
                                         throws DENOPTIMException
     {
         // Clone and renumber the subgraph to ensure uniqueness
-        DENOPTIMGraph sgClone = subGraph.clone();
+        DGraph sgClone = subGraph.clone();
         // The clones have the same vertex IDs before renumbering vertices
-        DENOPTIMVertex cvClone = sgClone.getVertexWithId(
+        Vertex cvClone = sgClone.getVertexWithId(
                 childVertex.getVertexId());
         sgClone.renumberGraphVertices();
 
-        DENOPTIMEdge edge = new DENOPTIMEdge(parentVertex.getAP(parentAPIdx),
+        Edge edge = new Edge(parentVertex.getAP(parentAPIdx),
                 cvClone.getAP(childAPIdx), bndType);
         addEdge(edge);
 
         // Import all vertices from cloned subgraph, i.e., sgClone
         for (int i=0; i<sgClone.getVertexList().size(); i++)
         {
-            DENOPTIMVertex clonV = sgClone.getVertexList().get(i);
-            DENOPTIMVertex origV = subGraph.getVertexList().get(i);
+            Vertex clonV = sgClone.getVertexList().get(i);
+            Vertex origV = subGraph.getVertexList().get(i);
 
             addVertex(sgClone.getVertexList().get(i));
 
@@ -5234,9 +5237,9 @@ public class DENOPTIMGraph implements Cloneable
      * the AP indicated in the list.
      */
 
-    public void appendGraphOnGraph(DENOPTIMVertex parentVertex,
-                                   int parentAPIdx, DENOPTIMGraph subGraph,
-                                   DENOPTIMVertex childVertex, int childAPIdx,
+    public void appendGraphOnGraph(Vertex parentVertex,
+                                   int parentAPIdx, DGraph subGraph,
+                                   Vertex childVertex, int childAPIdx,
                                    BondType bndType,
                                    Map<Integer,SymmetricSet> newSymSets,
                                    boolean onAllSymmAPs)
@@ -5276,7 +5279,7 @@ public class DENOPTIMGraph implements Cloneable
             int verbosity)
     {
         ArrayList<Integer> matches = new ArrayList<>();
-        for (DENOPTIMVertex v : findVertices(query, verbosity))
+        for (Vertex v : findVertices(query, verbosity))
         {
             matches.add(v.getVertexId());
         }
@@ -5293,11 +5296,11 @@ public class DENOPTIMGraph implements Cloneable
      * @return the list of vertexes that match the query.
      */
 
-    public ArrayList<DENOPTIMVertex> findVertices(
+    public ArrayList<Vertex> findVertices(
             VertexQuery vrtxQuery,
             int verbosity)
     {
-        ArrayList<DENOPTIMVertex> matches = new ArrayList<>(getVertexList());
+        ArrayList<Vertex> matches = new ArrayList<>(getVertexList());
 
         if (verbosity > 1)
         {
@@ -5308,8 +5311,8 @@ public class DENOPTIMGraph implements Cloneable
         Integer vidQuery = vrtxQuery.getVertexIDQuery();
         if (vidQuery != null)
         {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-            for (DENOPTIMVertex v : matches)
+            ArrayList<Vertex> newLst = new ArrayList<>();
+            for (Vertex v : matches)
             {
                 if (v.getVertexId() == vidQuery.intValue())
                 {
@@ -5327,8 +5330,8 @@ public class DENOPTIMGraph implements Cloneable
         VertexType vtQuery = vrtxQuery.getVertexTypeQuery();
         if (vtQuery != null)
         {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-            for (DENOPTIMVertex v : matches)
+            ArrayList<Vertex> newLst = new ArrayList<>();
+            for (Vertex v : matches)
             {
                 if (v.getVertexType() == vtQuery)
                 {
@@ -5347,8 +5350,8 @@ public class DENOPTIMGraph implements Cloneable
         BBType bbtQuery = vrtxQuery.getVertexBBTypeQuery();
         if (bbtQuery != null)
         {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-            for (DENOPTIMVertex v : matches)
+            ArrayList<Vertex> newLst = new ArrayList<>();
+            for (Vertex v : matches)
             {
                 if (v.getBuildingBlockType() == bbtQuery)
                 {
@@ -5367,8 +5370,8 @@ public class DENOPTIMGraph implements Cloneable
         Integer bbID = vrtxQuery.getVertexBBIDQuery();
         if (bbID != null)
         {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-            for (DENOPTIMVertex v : matches)
+            ArrayList<Vertex> newLst = new ArrayList<>();
+            for (Vertex v : matches)
             {   
                 if (v.getBuildingBlockId() == bbID.intValue())
                 {
@@ -5387,8 +5390,8 @@ public class DENOPTIMGraph implements Cloneable
         Integer levelQuery = vrtxQuery.getVertexLevelQuery();
         if (levelQuery != null)
         {
-            ArrayList<DENOPTIMVertex> newLst = new ArrayList<DENOPTIMVertex>();
-            for (DENOPTIMVertex v : matches)
+            ArrayList<Vertex> newLst = new ArrayList<Vertex>();
+            for (Vertex v : matches)
             {
                 if (getLevel(v) == levelQuery)
                 {
@@ -5429,10 +5432,10 @@ public class DENOPTIMGraph implements Cloneable
             Integer eTrgApIDx = edgeQuery.getTargetAPIdx();
             if (eTrgApIDx != null)
             {
-                ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-                for (DENOPTIMVertex v : matches)
+                ArrayList<Vertex> newLst = new ArrayList<>();
+                for (Vertex v : matches)
                 {
-                    for (DENOPTIMEdge e : edgeFinder.apply(v))
+                    for (Edge e : edgeFinder.apply(v))
                     {
                         if (e.getTrgAPID() == eTrgApIDx)
                         {
@@ -5452,10 +5455,10 @@ public class DENOPTIMGraph implements Cloneable
             Integer eInSrcApIDx = edgeQuery.getSourceAPIdx();
             if (eInSrcApIDx != null)
             {
-                ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-                for (DENOPTIMVertex v : matches)
+                ArrayList<Vertex> newLst = new ArrayList<>();
+                for (Vertex v : matches)
                 {
-                    for (DENOPTIMEdge e : edgeFinder.apply(v))
+                    for (Edge e : edgeFinder.apply(v))
                     {
                         if (e != null && e.getSrcAPID() == eInSrcApIDx)
                         {
@@ -5477,10 +5480,10 @@ public class DENOPTIMGraph implements Cloneable
                 Integer eSrcVrtID = edgeQuery.getSourceVertexId();
                 if (eSrcVrtID != null)
                 {
-                    ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-                    for (DENOPTIMVertex v : matches)
+                    ArrayList<Vertex> newLst = new ArrayList<>();
+                    for (Vertex v : matches)
                     {
-                        for (DENOPTIMEdge e : edgeFinder.apply(v))
+                        for (Edge e : edgeFinder.apply(v))
                         {
                             if(e.getSrcAP().getOwner().getVertexId()==eSrcVrtID)
                             {
@@ -5500,10 +5503,10 @@ public class DENOPTIMGraph implements Cloneable
                 Integer eTrgVrtID = edgeQuery.getTargetVertexId();
                 if (eTrgVrtID != null)
                 {
-                    ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-                    for (DENOPTIMVertex v : matches)
+                    ArrayList<Vertex> newLst = new ArrayList<>();
+                    for (Vertex v : matches)
                     {
-                        for (DENOPTIMEdge e : edgeFinder.apply(v))
+                        for (Edge e : edgeFinder.apply(v))
                         {
                             if(e.getTrgAP().getOwner().getVertexId()==eTrgVrtID)
                             {
@@ -5524,10 +5527,10 @@ public class DENOPTIMGraph implements Cloneable
             BondType btQuery = edgeQuery.getBondType();
             if (btQuery != null)
             {
-                ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-                for (DENOPTIMVertex v : matches)
+                ArrayList<Vertex> newLst = new ArrayList<>();
+                for (Vertex v : matches)
                 {
-                    for (DENOPTIMEdge e : edgeFinder.apply(v))
+                    for (Edge e : edgeFinder.apply(v))
                     {
                         if (e.getBondType() == btQuery)
                         {
@@ -5547,10 +5550,10 @@ public class DENOPTIMGraph implements Cloneable
             APClass srcAPC = edgeQuery.getSourceAPClass();
             if (srcAPC != null)
             {
-                ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-                for (DENOPTIMVertex v : matches)
+                ArrayList<Vertex> newLst = new ArrayList<>();
+                for (Vertex v : matches)
                 {
-                    for (DENOPTIMEdge e : edgeFinder.apply(v))
+                    for (Edge e : edgeFinder.apply(v))
                     {
                         if (e.getSrcAPClass().equals(srcAPC))
                         {
@@ -5565,10 +5568,10 @@ public class DENOPTIMGraph implements Cloneable
             APClass trgAPC = edgeQuery.getTargetAPClass();
             if (trgAPC != null)
             {
-                ArrayList<DENOPTIMVertex> newLst = new ArrayList<>();
-                for (DENOPTIMVertex v : matches)
+                ArrayList<Vertex> newLst = new ArrayList<>();
+                for (Vertex v : matches)
                 {
-                    for (DENOPTIMEdge e : edgeFinder.apply(v))
+                    for (Edge e : edgeFinder.apply(v))
                     {
                         if (e.getTrgAPClass().equals(trgAPC))
                         {
@@ -5606,7 +5609,7 @@ public class DENOPTIMGraph implements Cloneable
      * incoming or the outgoing edges of a vertex that is given as the argument
      * of this function.
      */
-    private class EdgeFinder implements Function<DENOPTIMVertex,List<DENOPTIMEdge>> 
+    private class EdgeFinder implements Function<Vertex,List<Edge>> 
     {
         private int mode = 0;
         
@@ -5620,16 +5623,16 @@ public class DENOPTIMGraph implements Cloneable
         }
         
         @Override
-        public List<DENOPTIMEdge> apply(DENOPTIMVertex v)
+        public List<Edge> apply(Vertex v)
         {
-            List<DENOPTIMEdge> edges = new ArrayList<DENOPTIMEdge>();
+            List<Edge> edges = new ArrayList<Edge>();
             if (mode < 0)
             {
-                DENOPTIMEdge eToParent = v.getEdgeToParent();
+                Edge eToParent = v.getEdgeToParent();
                 if (eToParent != null)
                     edges.add(eToParent);
             } else {
-                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                for (AttachmentPoint ap : v.getAttachmentPoints())
                 {
                     if (!ap.isAvailable() && ap.isSrcInUser())
                     {
@@ -5649,13 +5652,13 @@ public class DENOPTIMGraph implements Cloneable
      * @param list vertices to be purged.
      */
 
-    public void removeSymmetryRedundance(ArrayList<DENOPTIMVertex> list) {
-        ArrayList<DENOPTIMVertex> symRedundant = new ArrayList<>();
+    public void removeSymmetryRedundance(ArrayList<Vertex> list) {
+        ArrayList<Vertex> symRedundant = new ArrayList<>();
         Iterator<SymmetricSet> itSymm = getSymSetsIterator();
         while (itSymm.hasNext())
         {
             SymmetricSet ss = itSymm.next();
-            for (DENOPTIMVertex v : list)
+            for (Vertex v : list)
             {
                 int vid = v.getVertexId();
                 if (symRedundant.contains(v))
@@ -5674,7 +5677,7 @@ public class DENOPTIMGraph implements Cloneable
                 }
             }
         }
-        for (DENOPTIMVertex v : symRedundant)
+        for (Vertex v : symRedundant)
         {
             list.remove(v);
         }
@@ -5689,13 +5692,13 @@ public class DENOPTIMGraph implements Cloneable
      */
 
     public void removeSymmetryRedundantIds(ArrayList<Integer> list) {
-        ArrayList<DENOPTIMVertex> vList = new ArrayList<>();
+        ArrayList<Vertex> vList = new ArrayList<>();
         for (int vid : list) {
             vList.add(getVertexWithId(vid));
         }
         removeSymmetryRedundance(vList);
         list.clear();
-        for (DENOPTIMVertex v : vList) {
+        for (Vertex v : vList) {
             list.add(v.getVertexId());
         }
     }
@@ -5711,7 +5714,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return the modified graph.
      */
 
-    public DENOPTIMGraph editGraph(ArrayList<DENOPTIMGraphEdit> edits,
+    public DGraph editGraph(ArrayList<GraphEdit> edits,
             boolean symmetry, int verbosity) throws DENOPTIMException
     {
 
@@ -5723,9 +5726,9 @@ public class DENOPTIMGraph implements Cloneable
         GraphUtils.ensureVertexIDConsistency(maxId);
         */
 
-        DENOPTIMGraph modGraph = this.clone();
+        DGraph modGraph = this.clone();
 
-        for (DENOPTIMGraphEdit edit : edits)
+        for (GraphEdit edit : edits)
         {
             if (verbosity > 1)
             {
@@ -5737,26 +5740,26 @@ public class DENOPTIMGraph implements Cloneable
             {
                 case REPLACECHILD:
                 {
-                    DENOPTIMGraph inGraph = edit.getIncomingGraph();
+                    DGraph inGraph = edit.getIncomingGraph();
                     VertexQuery query = edit.getVertexQuery();
                     int idAPOnInGraph = -1; // Initialisation to invalid value
-                    DENOPTIMVertex rootOfInGraph = null;
+                    Vertex rootOfInGraph = null;
                     if (edit.getIncomingAPId() != null)
                     {
-                        DENOPTIMAttachmentPoint ap = inGraph.getAPWithId(
+                        AttachmentPoint ap = inGraph.getAPWithId(
                                 edit.getIncomingAPId().intValue());
                         idAPOnInGraph = ap.getIndexInOwner();
                         rootOfInGraph = ap.getOwner();
                     } else {
-                        ArrayList<DENOPTIMAttachmentPoint> freeAPs = 
+                        ArrayList<AttachmentPoint> freeAPs = 
                                 inGraph.getAvailableAPs();
                         if (freeAPs.size()==1)
                         {
-                            DENOPTIMAttachmentPoint ap = freeAPs.get(0);
+                            AttachmentPoint ap = freeAPs.get(0);
                             idAPOnInGraph = ap.getIndexInOwner();
                             rootOfInGraph = ap.getOwner();
                         } else {
-                            String geClsName = DENOPTIMGraphEdit.class.getSimpleName();
+                            String geClsName = GraphEdit.class.getSimpleName();
                             String msg = "Skipping " + edit.getType() + "on "
                                     + "graph " + getGraphId() + ". The incoming"
                                     + " graph has more than one free AP and "
@@ -5769,15 +5772,15 @@ public class DENOPTIMGraph implements Cloneable
                         }
                     }
                     
-                    ArrayList<DENOPTIMVertex> matches = modGraph.findVertices(
+                    ArrayList<Vertex> matches = modGraph.findVertices(
                             query,verbosity);
                     if (symmetry)
                     {
                         modGraph.removeSymmetryRedundance(matches);
                     }
-                    for (DENOPTIMVertex vertexToReplace : matches)
+                    for (Vertex vertexToReplace : matches)
                     {
-                        DENOPTIMEdge edgeToParent = 
+                        Edge edgeToParent = 
                                 vertexToReplace.getEdgeToParent();
                         if (edgeToParent == null)
                         {
@@ -5787,7 +5790,7 @@ public class DENOPTIMGraph implements Cloneable
                             //so we do not do anything.
                             continue;
                         }
-                        DENOPTIMVertex parent = vertexToReplace.getParent();
+                        Vertex parent = vertexToReplace.getParent();
                         int srcApId = edgeToParent.getSrcAPID();
                         
                         BondType bondType = edgeToParent.getBondType();
@@ -5802,9 +5805,9 @@ public class DENOPTIMGraph implements Cloneable
                 }
                 case DELETEVERTEX:
                 {
-                    ArrayList<DENOPTIMVertex> matches = modGraph.findVertices(
+                    ArrayList<Vertex> matches = modGraph.findVertices(
                             edit.getVertexQuery(), verbosity);
-                    for (DENOPTIMVertex vertexToRemove : matches)
+                    for (Vertex vertexToRemove : matches)
                     {
                         modGraph.removeBranchStartingAt(vertexToRemove,symmetry);
                     }
@@ -5821,10 +5824,10 @@ public class DENOPTIMGraph implements Cloneable
      * A list of mutation sites from within this graph.
      * @return the list of vertexes that allow any mutation type.
      */
-    public List<DENOPTIMVertex> getMutableSites()
+    public List<Vertex> getMutableSites()
     {
-        List<DENOPTIMVertex> mutableSites = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : gVertices)
+        List<Vertex> mutableSites = new ArrayList<Vertex>();
+        for (Vertex v : gVertices)
         {
             mutableSites.addAll(v.getMutationSites(
                     new ArrayList<MutationType>()));
@@ -5841,10 +5844,10 @@ public class DENOPTIMGraph implements Cloneable
      * not be considered mutation sites.
      * @return the list of vertexes that allow any non-ignored mutation type.
      */
-    public List<DENOPTIMVertex> getMutableSites(List<MutationType> ignoredTypes)
+    public List<Vertex> getMutableSites(List<MutationType> ignoredTypes)
     {
-        List<DENOPTIMVertex> mutableSites = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex v : gVertices)
+        List<Vertex> mutableSites = new ArrayList<Vertex>();
+        for (Vertex v : gVertices)
         {
             mutableSites.addAll(v.getMutationSites(ignoredTypes));
         }
@@ -5874,7 +5877,7 @@ public class DENOPTIMGraph implements Cloneable
         boolean regenerateAP = false;
         Set<Integer> unqVrtxIDs = new HashSet<Integer>();
         Set<Integer> unqApIDs = new HashSet<Integer>();
-        for (DENOPTIMVertex v : gVertices)
+        for (Vertex v : gVertices)
         {
             if (!unqVrtxIDs.add(v.getVertexId()))
             {
@@ -5885,7 +5888,7 @@ public class DENOPTIMGraph implements Cloneable
                         + "'. Cannot generate JSON string for graph: " + this);
                         */
             }
-            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            for (AttachmentPoint ap : v.getAttachmentPoints())
             {
                 if (!unqApIDs.add(ap.getID()))
                 {
@@ -5905,9 +5908,9 @@ public class DENOPTIMGraph implements Cloneable
         }
         if (regenerateAP)
         {
-            for (DENOPTIMVertex v : gVertices)
+            for (Vertex v : gVertices)
             {
-                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                for (AttachmentPoint ap : v.getAttachmentPoints())
                 {
                     ap.setID(GraphUtils.getUniqueAPIndex());
                 }
@@ -5927,10 +5930,10 @@ public class DENOPTIMGraph implements Cloneable
      * @return a new instance of this class.
      */
 
-    public static DENOPTIMGraph fromJson(String json)
+    public static DGraph fromJson(String json)
     {
         Gson gson = DENOPTIMgson.getReader();
-        DENOPTIMGraph graph = gson.fromJson(json, DENOPTIMGraph.class);
+        DGraph graph = gson.fromJson(json, DGraph.class);
         return graph;
     }
 
@@ -5942,10 +5945,10 @@ public class DENOPTIMGraph implements Cloneable
      * @return a new instance of this class.
      */
 
-    public static DENOPTIMGraph fromJson(Reader reader)
+    public static DGraph fromJson(Reader reader)
     {
         Gson gson = DENOPTIMgson.getReader();
-        DENOPTIMGraph graph = gson.fromJson(reader, DENOPTIMGraph.class);
+        DGraph graph = gson.fromJson(reader, DGraph.class);
         return graph;
     }
 
@@ -5955,10 +5958,10 @@ public class DENOPTIMGraph implements Cloneable
      * We expect unique IDs for vertices and attachment points.
      */
     public static class DENOPTIMGraphSerializer
-    implements JsonSerializer<DENOPTIMGraph>
+    implements JsonSerializer<DGraph>
     {
         @Override
-        public JsonElement serialize(DENOPTIMGraph g, Type typeOfSrc,
+        public JsonElement serialize(DGraph g, Type typeOfSrc,
                 JsonSerializationContext context) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("graphId", g.graphId);
@@ -5974,10 +5977,10 @@ public class DENOPTIMGraph implements Cloneable
     //------------------------------------------------------------------------------
 
     public static class DENOPTIMGraphDeserializer
-    implements JsonDeserializer<DENOPTIMGraph>
+    implements JsonDeserializer<DGraph>
     {
         @Override
-        public DENOPTIMGraph deserialize(JsonElement json, Type typeOfT,
+        public DGraph deserialize(JsonElement json, Type typeOfT,
                 JsonDeserializationContext context) throws JsonParseException
         {
             JsonObject jsonObject = json.getAsJsonObject();
@@ -5993,22 +5996,22 @@ public class DENOPTIMGraph implements Cloneable
 
             Gson gson = new GsonBuilder()
                 .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
-                .registerTypeAdapter(DENOPTIMVertex.class,
+                .registerTypeAdapter(Vertex.class,
                       new DENOPTIMVertexDeserializer())
                 .registerTypeAdapter(APClass.class, new APClassDeserializer())
                 .setPrettyPrinting()
                 .create();
 
-            DENOPTIMGraph graph = gson.fromJson(partialJsonObj,
-                    DENOPTIMGraph.class);
+            DGraph graph = gson.fromJson(partialJsonObj,
+                    DGraph.class);
 
             // Refresh APs
-            for (DENOPTIMVertex v : graph.getVertexList())
+            for (Vertex v : graph.getVertexList())
             {
                 // Regenerate reference to fragment owner
                 v.setGraphOwner(graph);
 
-                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+                for (AttachmentPoint ap : v.getAttachmentPoints())
                 {
                     // Regenerate reference to AP owner
                     ap.setOwner(v);
@@ -6021,12 +6024,12 @@ public class DENOPTIMGraph implements Cloneable
             for (JsonElement e : edgeArr)
             {
                 JsonObject o = e.getAsJsonObject();
-                DENOPTIMAttachmentPoint srcAP = graph.getAPWithId(
+                AttachmentPoint srcAP = graph.getAPWithId(
                         o.get("srcAPID").getAsInt());
-                DENOPTIMAttachmentPoint trgAP = graph.getAPWithId(
+                AttachmentPoint trgAP = graph.getAPWithId(
                         o.get("trgAPID").getAsInt());
 
-                DENOPTIMEdge edge = new DENOPTIMEdge(srcAP, trgAP,
+                Edge edge = new Edge(srcAP, trgAP,
                         context.deserialize(o.get("bondType"),BondType.class));
                 graph.addEdge(edge);
             }
@@ -6036,7 +6039,7 @@ public class DENOPTIMGraph implements Cloneable
             for (JsonElement e : ringArr)
             {
                 JsonObject o = e.getAsJsonObject();
-                DENOPTIMRing ring = new DENOPTIMRing();
+                Ring ring = new Ring();
                 for (JsonElement re : o.get("vertices").getAsJsonArray())
                 {
                     ring.addVertex(graph.getVertexWithId(re.getAsInt()));
@@ -6059,16 +6062,16 @@ public class DENOPTIMGraph implements Cloneable
      *
      * @param v vertex to set as scaffold
      */
-    public static void setScaffold(DENOPTIMVertex v) {
-        ArrayList<DENOPTIMVertex> newVertexList = new ArrayList<>();
+    public static void setScaffold(Vertex v) {
+        ArrayList<Vertex> newVertexList = new ArrayList<>();
 
         Set<Integer> visited = new HashSet<>();
-        Queue<DENOPTIMVertex> currLevel = new ArrayDeque<>();
-        Queue<DENOPTIMVertex> nextLevel = new ArrayDeque<>();
+        Queue<Vertex> currLevel = new ArrayDeque<>();
+        Queue<Vertex> nextLevel = new ArrayDeque<>();
         currLevel.add(v);
 
         while (!currLevel.isEmpty()) {
-            DENOPTIMVertex currVertex = currLevel.poll();
+            Vertex currVertex = currLevel.poll();
 
             int currId = currVertex.getVertexId();
             if (!visited.contains(currId)) {
@@ -6076,16 +6079,16 @@ public class DENOPTIMGraph implements Cloneable
 
                 newVertexList.add(currVertex);
 
-                Iterable<DENOPTIMVertex> neighbors = currVertex
+                Iterable<Vertex> neighbors = currVertex
                         .getAttachmentPoints()
                         .stream()
-                        .map(DENOPTIMAttachmentPoint::getEdgeUser)
+                        .map(AttachmentPoint::getEdgeUser)
                         .filter(e -> e != null)
                         .map(e -> e.getSrcVertex() == currId ?
                                 e.getTrgAP() : e.getSrcAP())
-                        .map(DENOPTIMAttachmentPoint::getOwner)
+                        .map(AttachmentPoint::getOwner)
                         .collect(Collectors.toList());
-                for (DENOPTIMVertex adj : neighbors) {
+                for (Vertex adj : neighbors) {
                     nextLevel.add(adj);
                 }
             }
@@ -6118,7 +6121,7 @@ public class DENOPTIMGraph implements Cloneable
      * graph's "jacket" template.
      * @param denoptimTemplate the jacket template
      */
-    public void setTemplateJacket(DENOPTIMTemplate template)
+    public void setTemplateJacket(Template template)
     {
         this.templateJacket = template;
     }
@@ -6128,7 +6131,7 @@ public class DENOPTIMGraph implements Cloneable
     /**
      * @return the template that contains this graph or null.
      */
-    public DENOPTIMTemplate getTemplateJacket()
+    public Template getTemplateJacket()
     {
         return templateJacket;
     }
@@ -6139,7 +6142,7 @@ public class DENOPTIMGraph implements Cloneable
      * @return the outermost graph object that can be reached from this 
      * possibly embedded graph.
      */
-    public DENOPTIMGraph getOutermostGraphOwner()
+    public DGraph getOutermostGraphOwner()
     {
         if (templateJacket == null)
             return this;
@@ -6161,9 +6164,9 @@ public class DENOPTIMGraph implements Cloneable
      * @return the path of references that allow to reach this graph from the
      * outermost level of embedding.
      */
-    public List<DENOPTIMTemplate> getEmbeddingPath()
+    public List<Template> getEmbeddingPath()
     {
-        List<DENOPTIMTemplate> path = new ArrayList<DENOPTIMTemplate>();
+        List<Template> path = new ArrayList<Template>();
         if (templateJacket==null)
             return path;
         if (templateJacket.getGraphOwner()!=null)
@@ -6180,7 +6183,7 @@ public class DENOPTIMGraph implements Cloneable
      */
     public void storeCurrentVertexIDs()
     {
-        for (DENOPTIMVertex v : gVertices)
+        for (Vertex v : gVertices)
         {
             v.setProperty(DENOPTIMConstants.STOREDVID, v.getVertexId());
         }
@@ -6198,13 +6201,13 @@ public class DENOPTIMGraph implements Cloneable
      * vertex on the left with that on the right.
      * @param vid1 vertex ID of one vertex.
      * @param vid2 vertex ID of another vertex.
-     * @return the {@link DENOPTIMAttachmentPoint} or null is the two vertex IDs
+     * @return the {@link AttachmentPoint} or null is the two vertex IDs
      * are not connected in this graph.
      */
-    public DENOPTIMAttachmentPoint getAPOnLeftVertexID(int vid1, int vid2)
+    public AttachmentPoint getAPOnLeftVertexID(int vid1, int vid2)
     {
-        DENOPTIMVertex v1 = getVertexWithId(vid1);
-        DENOPTIMVertex v2 = getVertexWithId(vid2);
+        Vertex v1 = getVertexWithId(vid1);
+        Vertex v2 = getVertexWithId(vid2);
         if ( v1== null || v2 == null)
             return null;
         
@@ -6252,7 +6255,7 @@ public class DENOPTIMGraph implements Cloneable
      */
     public boolean isReversible(FragmentSpace fragSpace)
     {
-        for (DENOPTIMEdge e : gEdges)
+        for (Edge e : gEdges)
         {
             if (!e.getTrgAPClass().isCPMapCompatibleWith(e.getSrcAPClass(),
                     fragSpace))
@@ -6281,17 +6284,17 @@ public class DENOPTIMGraph implements Cloneable
      * @return the graph embedded in <code>graphY</code>, i.e., 
      * <code>graphX</code>.
      */
-    public static DENOPTIMGraph getEmbeddedGraphInClone(DENOPTIMGraph graphY, 
-            DENOPTIMGraph graphB, List<DENOPTIMTemplate> path) 
+    public static DGraph getEmbeddedGraphInClone(DGraph graphY, 
+            DGraph graphB, List<Template> path) 
     {
         if (path.isEmpty())
             return graphY;
-        DENOPTIMTemplate currentLevelVertex = null;
-        DENOPTIMGraph currentLevelGraphEmdInB = graphB;
-        DENOPTIMGraph currentLevelGraphEmbInY = graphY;
-        for (DENOPTIMTemplate t : path)
+        Template currentLevelVertex = null;
+        DGraph currentLevelGraphEmdInB = graphB;
+        DGraph currentLevelGraphEmbInY = graphY;
+        for (Template t : path)
         {
-            currentLevelVertex = (DENOPTIMTemplate) currentLevelGraphEmbInY
+            currentLevelVertex = (Template) currentLevelGraphEmbInY
                     .getVertexAtPosition(currentLevelGraphEmdInB.indexOf(t));
             currentLevelGraphEmdInB = t.getInnerGraph();
             currentLevelGraphEmbInY = currentLevelVertex.getInnerGraph();
@@ -6302,20 +6305,20 @@ public class DENOPTIMGraph implements Cloneable
 //------------------------------------------------------------------------------    
 
     /**
-     * Searches for all {@link DENOPTIMAttachmentPoint}s that represent the
+     * Searches for all {@link AttachmentPoint}s that represent the
      * interface between a subgraph, identified by the given list of vertexes,
      * and any other vertex, i.e., either belonging to the same graph but
      * not to the same <i>sub</i>graph, or belonging to an outer embedding level.
      * @param subGraphB list of vertexes belonging to the subgraph.
      * @return the list of attachment points at the interface of the subgraph.
      */
-    public List<DENOPTIMAttachmentPoint> getInterfaceAPs(
-            List<DENOPTIMVertex> subGraphB)
+    public List<AttachmentPoint> getInterfaceAPs(
+            List<Vertex> subGraphB)
     {
-        List<DENOPTIMAttachmentPoint> interfaceAPs = new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMVertex v : subGraphB)
+        List<AttachmentPoint> interfaceAPs = new ArrayList<AttachmentPoint>();
+        for (Vertex v : subGraphB)
         {
-            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            for (AttachmentPoint ap : v.getAttachmentPoints())
             {
                 if (ap.isAvailableThroughout())
                     continue;
@@ -6324,7 +6327,7 @@ public class DENOPTIMGraph implements Cloneable
                     // This AP is used across the template boundary
                     interfaceAPs.add(ap);
                 } else {
-                    DENOPTIMVertex user = ap.getLinkedAP().getOwner();
+                    Vertex user = ap.getLinkedAP().getOwner();
                     if (!subGraphB.contains(user))
                     {
                         // AP used to make a connection to outside subgraph
@@ -6339,26 +6342,26 @@ public class DENOPTIMGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Searches for all {@link DENOPTIMAttachmentPoint}s that are owned by 
+     * Searches for all {@link AttachmentPoint}s that are owned by 
      * vertexes in a subgraph but either available or used by vertexes that do 
      * not belong to the subgraph.
      * @param subGraphB list of vertexes belonging to the subgraph.
      * @return the list of attachment points originating from the subgraph.
      */
-    public List<DENOPTIMAttachmentPoint> getSubgraphAPs(
-            List<DENOPTIMVertex> subGraphB)
+    public List<AttachmentPoint> getSubgraphAPs(
+            List<Vertex> subGraphB)
     {
-        List<DENOPTIMAttachmentPoint> aps = new ArrayList<DENOPTIMAttachmentPoint>();
-        for (DENOPTIMVertex v : subGraphB)
+        List<AttachmentPoint> aps = new ArrayList<AttachmentPoint>();
+        for (Vertex v : subGraphB)
         {
-            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            for (AttachmentPoint ap : v.getAttachmentPoints())
             {
                 if (ap.isAvailable())
                 {
                     aps.add(ap);
                     continue;
                 } 
-                DENOPTIMVertex user = ap.getLinkedAP().getOwner();
+                Vertex user = ap.getLinkedAP().getOwner();
                 if (!subGraphB.contains(user))
                 {
                     // AP used to make a connection to outside subgraph

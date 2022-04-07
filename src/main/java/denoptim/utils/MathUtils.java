@@ -33,7 +33,7 @@ import denoptim.constants.DENOPTIMConstants;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public class DENOPTIMMathUtils
+public class MathUtils
 {
 
 //------------------------------------------------------------------------------

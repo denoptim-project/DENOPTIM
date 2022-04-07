@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
 
-import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.AttachmentPoint;
 
 /**
  * Interface for all vertex viewers that intend to allow selection of attachment
@@ -17,7 +17,7 @@ public interface IVertexAPSelection
     
     public ArrayList<Integer> getSelectedAPIDs();
 
-    public Map<Integer,DENOPTIMAttachmentPoint> getMapOfAPsInTable();
+    public Map<Integer,AttachmentPoint> getMapOfAPsInTable();
 
     public DefaultTableModel getAPTableModel();
     

@@ -16,11 +16,11 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.PathSubGraph;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 
@@ -46,11 +46,11 @@ public class PathSubGraphTest {
      * @return a new instance of the test graph.
      * @throws DENOPTIMException 
      */
-    public static DENOPTIMGraph makeTestGraphA() throws DENOPTIMException 
+    public static DGraph makeTestGraphA() throws DENOPTIMException 
     {
         APClass apc = APClass.make("A",0);
         
-        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DGraph graph = new DGraph();
 
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 
@@ -60,7 +60,7 @@ public class PathSubGraphTest {
         iacA.addAtom(iaA1);
         iacA.addAtom(iaA2);
         iacA.addBond(new Bond(iaA1, iaA2, IBond.Order.SINGLE));
-        DENOPTIMFragment vA = new DENOPTIMFragment(0,iacA,BBType.FRAGMENT);
+        Fragment vA = new Fragment(0,iacA,BBType.FRAGMENT);
         vA.addAP(0,new Point3d(0,-1,0),apc);
         vA.addAP(1,new Point3d(2,0,0),apc);
         
@@ -86,7 +86,7 @@ public class PathSubGraphTest {
         iacB.addBond(new Bond(iaB5, iaB6, IBond.Order.SINGLE));
         iacB.addBond(new Bond(iaB6, iaB7, IBond.Order.SINGLE));
         iacB.addBond(new Bond(iaB1, iaB7, IBond.Order.SINGLE));
-        DENOPTIMFragment vB = new DENOPTIMFragment(1,iacB,BBType.FRAGMENT);
+        Fragment vB = new Fragment(1,iacB,BBType.FRAGMENT);
         vB.addAP(0,new Point3d(-1,0,0),apc);
         vB.addAP(5,new Point3d(-1,-1,0),apc);
         vB.addAP(6,new Point3d(1,1,0),apc);
@@ -101,7 +101,7 @@ public class PathSubGraphTest {
         iacC.addBond(new Bond(iaC1, iaC2, IBond.Order.SINGLE));
         iacC.addBond(new Bond(iaC2, iaC3, IBond.Order.SINGLE));
         iacC.addBond(new Bond(iaC1, iaC3, IBond.Order.SINGLE));
-        DENOPTIMFragment vC = new DENOPTIMFragment(2,iacC,BBType.FRAGMENT);
+        Fragment vC = new Fragment(2,iacC,BBType.FRAGMENT);
         vC.addAP(0,new Point3d(1,0,0),apc);
         vC.addAP(1,new Point3d(-1,1,0),apc);
         vC.addAP(2,new Point3d(-1,-1,0),apc);
@@ -115,19 +115,19 @@ public class PathSubGraphTest {
         iacG.addAtom(iaG3);
         iacG.addBond(new Bond(iaG1, iaG2, IBond.Order.SINGLE));
         iacG.addBond(new Bond(iaG2, iaG3, IBond.Order.SINGLE));
-        DENOPTIMFragment vG = new DENOPTIMFragment(5,iacG,BBType.FRAGMENT);
+        Fragment vG = new Fragment(5,iacG,BBType.FRAGMENT);
         vG.addAP(0,new Point3d(1,0,0),apc);
         
     
         IAtomContainer iacD = builder.newAtomContainer();
         iacD.addAtom(new PseudoAtom("ATN",new Point3d(0,0,0)));
-        DENOPTIMFragment vD = new DENOPTIMFragment(3,iacD,BBType.FRAGMENT);
+        Fragment vD = new Fragment(3,iacD,BBType.FRAGMENT);
         vD.addAP(0,new Point3d(-1,0,0),APClass.make("ATneutral",0));
         vD.setAsRCV(true);
         
         IAtomContainer iacE = builder.newAtomContainer();
         iacE.addAtom(new PseudoAtom("ATN",new Point3d(0,0,0)));
-        DENOPTIMFragment vE = new DENOPTIMFragment(4,iacE,BBType.FRAGMENT);
+        Fragment vE = new Fragment(4,iacE,BBType.FRAGMENT);
         vE.addAP(0, new Point3d(-1,0,0),APClass.make("ATneutral",0));
         vE.setAsRCV(true);
     
@@ -137,11 +137,11 @@ public class PathSubGraphTest {
         graph.addVertex(vC);
         graph.addVertex(vG);
         graph.addVertex(vE);
-        graph.addEdge(new DENOPTIMEdge(vA.getAP(0), vD.getAP(0), BondType.SINGLE));
-        graph.addEdge(new DENOPTIMEdge(vA.getAP(1), vB.getAP(0), BondType.SINGLE));
-        graph.addEdge(new DENOPTIMEdge(vB.getAP(1), vC.getAP(0), BondType.SINGLE));
-        graph.addEdge(new DENOPTIMEdge(vC.getAP(2), vG.getAP(0), BondType.SINGLE));
-        graph.addEdge(new DENOPTIMEdge(vC.getAP(1), vE.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vA.getAP(0), vD.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vA.getAP(1), vB.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vB.getAP(1), vC.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vC.getAP(2), vG.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vC.getAP(1), vE.getAP(0), BondType.SINGLE));
        
         return graph;
     }
@@ -158,51 +158,51 @@ public class PathSubGraphTest {
      * @return a new instance of the test graph.
      * @throws DENOPTIMException 
      */
-    public static DENOPTIMGraph makeTestGraphB() throws DENOPTIMException 
+    public static DGraph makeTestGraphB() throws DENOPTIMException 
     {
         APClass apc = APClass.make("A",0,BondType.SINGLE);
         
-        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DGraph graph = new DGraph();
 
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 
         IAtomContainer iacA = builder.newAtomContainer();
         IAtom iaA1 = new Atom("O",new Point3d(0,0,0));
         iacA.addAtom(iaA1);
-        DENOPTIMFragment vA = new DENOPTIMFragment(0,iacA,BBType.FRAGMENT);
+        Fragment vA = new Fragment(0,iacA,BBType.FRAGMENT);
         vA.addAP(0,new Point3d(0,-1,0),apc);
         vA.addAP(0,new Point3d(1,-1,0),apc);
         
         IAtomContainer iacB = builder.newAtomContainer();
         IAtom iaB1 = new Atom("C",new Point3d(0,0,0));
         iacB.addAtom(iaB1);
-        DENOPTIMFragment vB = new DENOPTIMFragment(1,iacB,BBType.FRAGMENT);
+        Fragment vB = new Fragment(1,iacB,BBType.FRAGMENT);
         vB.addAP(0,new Point3d(-1,0,0),apc);
         vB.addAP(0,new Point3d(-1,-1,0),apc);
         
         IAtomContainer iacC = builder.newAtomContainer();
         IAtom iaC1 = new Atom("N",new Point3d(0,0,0));
         iacC.addAtom(iaC1);
-        DENOPTIMFragment vC = new DENOPTIMFragment(2,iacC,BBType.FRAGMENT);
+        Fragment vC = new Fragment(2,iacC,BBType.FRAGMENT);
         vC.addAP(0,new Point3d(1,0,0),apc);
         vC.addAP(0,new Point3d(1,1,0),apc);
         
         IAtomContainer iacG = builder.newAtomContainer();
         IAtom iaG1 = new Atom("P",new Point3d(0,0,0));
         iacG.addAtom(iaG1);
-        DENOPTIMFragment vG = new DENOPTIMFragment(5,iacG,BBType.FRAGMENT);
+        Fragment vG = new Fragment(5,iacG,BBType.FRAGMENT);
         vG.addAP(0,new Point3d(1,0,0),apc);
         vG.addAP(0,new Point3d(-1,1,0),apc);
     
         IAtomContainer iacD = builder.newAtomContainer();
         iacD.addAtom(new PseudoAtom("ATN",new Point3d(0,0,0)));
-        DENOPTIMFragment vD = new DENOPTIMFragment(3,iacD,BBType.FRAGMENT);
+        Fragment vD = new Fragment(3,iacD,BBType.FRAGMENT);
         vD.addAP(0,new Point3d(-1,0,0),APClass.make("ATneutral",0));
         vD.setAsRCV(true);
         
         IAtomContainer iacE = builder.newAtomContainer();
         iacE.addAtom(new PseudoAtom("ATN",new Point3d(0,0,0)));
-        DENOPTIMFragment vE = new DENOPTIMFragment(4,iacE,BBType.FRAGMENT);
+        Fragment vE = new Fragment(4,iacE,BBType.FRAGMENT);
         vE.addAP(0, new Point3d(-1,0,0),APClass.make("ATneutral",0));
         vE.setAsRCV(true);
     
@@ -212,11 +212,11 @@ public class PathSubGraphTest {
         graph.addVertex(vC);
         graph.addVertex(vG);
         graph.addVertex(vE);
-        graph.addEdge(new DENOPTIMEdge(vA.getAP(0), vD.getAP(0), BondType.SINGLE));
-        graph.addEdge(new DENOPTIMEdge(vA.getAP(1), vB.getAP(0), BondType.SINGLE));
-        graph.addEdge(new DENOPTIMEdge(vB.getAP(1), vC.getAP(0), BondType.SINGLE));
-        graph.addEdge(new DENOPTIMEdge(vC.getAP(1), vG.getAP(0), BondType.SINGLE));
-        graph.addEdge(new DENOPTIMEdge(vG.getAP(1), vE.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vA.getAP(0), vD.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vA.getAP(1), vB.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vB.getAP(1), vC.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vC.getAP(1), vG.getAP(0), BondType.SINGLE));
+        graph.addEdge(new Edge(vG.getAP(1), vE.getAP(0), BondType.SINGLE));
         
         // Use this just to verify identify of the graph
         /*
@@ -240,8 +240,8 @@ public class PathSubGraphTest {
     @Test
     public void testMakePathSubGraph() throws Exception 
     {
-        DENOPTIMGraph gA = makeTestGraphA();
-        DENOPTIMGraph gB = makeTestGraphB();
+        DGraph gA = makeTestGraphA();
+        DGraph gB = makeTestGraphB();
         
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         t3d.setAlidnBBsIn3D(false); //£D not needed

@@ -20,9 +20,9 @@ package denoptim.graph.rings;
 
 import java.util.ArrayList;
 
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Fragment;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 
 /**
  * ClosableChain represents a chain of fragments (chain links) that
@@ -165,13 +165,13 @@ public class ClosableChain implements Cloneable
      * not part of this chain.
      */
 
-    public int involvesVertex(DENOPTIMVertex vert)
+    public int involvesVertex(Vertex vert)
     {
         int result = -1;
-        if (vert instanceof DENOPTIMFragment)
+        if (vert instanceof Fragment)
         {
-            int vertMolID = ((DENOPTIMFragment)vert).getBuildingBlockId();
-            DENOPTIMVertex.BBType vertFrgTyp = ((DENOPTIMFragment)vert).getBuildingBlockType();
+            int vertMolID = ((Fragment)vert).getBuildingBlockId();
+            Vertex.BBType vertFrgTyp = ((Fragment)vert).getBuildingBlockType();
             for (int i=0; i<links.size(); i++)
             {
                 ChainLink cl = links.get(i);
@@ -200,13 +200,13 @@ public class ClosableChain implements Cloneable
      * not part of this chain.
      */
 
-    public int involvesVertexAndAP(DENOPTIMVertex vert, int apIDA, int apIDB)
+    public int involvesVertexAndAP(Vertex vert, int apIDA, int apIDB)
     {
     	int result = -1;
-        if (vert instanceof DENOPTIMFragment)
+        if (vert instanceof Fragment)
         {
-            int vertMolID = ((DENOPTIMFragment)vert).getBuildingBlockId();
-            DENOPTIMVertex.BBType vertFrgTyp = ((DENOPTIMFragment)vert).getBuildingBlockType();
+            int vertMolID = ((Fragment)vert).getBuildingBlockId();
+            Vertex.BBType vertFrgTyp = ((Fragment)vert).getBuildingBlockType();
         	for (int i=0; i<links.size(); i++)
         	{
         	    ChainLink cl = links.get(i);

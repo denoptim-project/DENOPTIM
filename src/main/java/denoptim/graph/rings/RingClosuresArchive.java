@@ -35,7 +35,7 @@ import java.util.HashMap;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 
 
 /**
@@ -411,7 +411,7 @@ public class RingClosuresArchive
             if (settings.getVerbosity() > 1)
             {
                 String msg = "Path is closable (from DB)";
-                DENOPTIMLogger.appLogger.info(msg);
+                StaticLogger.appLogger.info(msg);
             }
         }
         else
@@ -419,7 +419,7 @@ public class RingClosuresArchive
             if (settings.getVerbosity() > 1)
             {
                 String msg = "Path is NOT closable (from DB)";
-                DENOPTIMLogger.appLogger.info(msg);
+                StaticLogger.appLogger.info(msg);
             }
         }
         return rcc;

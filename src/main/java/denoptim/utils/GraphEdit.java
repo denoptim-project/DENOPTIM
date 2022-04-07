@@ -18,8 +18,8 @@
 
 package denoptim.utils;
 
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
 import denoptim.graph.EdgeQuery;
 import denoptim.graph.VertexQuery;
 
@@ -30,7 +30,8 @@ import denoptim.graph.VertexQuery;
  * @author Marco Foscato
  */
 
-public class DENOPTIMGraphEdit {
+public class GraphEdit 
+{
     /**
      * Type of editing task
      */
@@ -56,11 +57,11 @@ public class DENOPTIMGraphEdit {
      * The incoming graph for tasks that involve appending a subgraph onto
      * another graph.
      */
-    private DENOPTIMGraph incomingGraph = null;
+    private DGraph incomingGraph = null;
     
     /**
-     * The identifier of the {@link DENOPTIMAttachmentPoint} (AP) of the 
-     * {@link DENOPTIMGraphEdit#incomingGraph} when attaching such graph to the
+     * The identifier of the {@link AttachmentPoint} (AP) of the 
+     * {@link GraphEdit#incomingGraph} when attaching such graph to the
      * graph to edit. NB: this is the unique identifier, not any index on a 
      * list.
      */
@@ -85,21 +86,21 @@ public class DENOPTIMGraphEdit {
 
 //------------------------------------------------------------------------------
 
-    public void setIncomingGraph(DENOPTIMGraph incomingGraph)
+    public void setIncomingGraph(DGraph incomingGraph)
     {
         this.incomingGraph = incomingGraph;
     }
     
 //------------------------------------------------------------------------------
     
-    public DENOPTIMGraph getIncomingGraph()
+    public DGraph getIncomingGraph()
     {
         return incomingGraph;
     }
     
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraphEdit(EditTask task)
+    public GraphEdit(EditTask task)
     {
         this.task = task;
     }

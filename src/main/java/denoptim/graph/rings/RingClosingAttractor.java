@@ -26,7 +26,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.graph.APClass;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 
 
 /**
@@ -183,7 +183,7 @@ public class RingClosingAttractor
         this.src = mol.getConnectedAtomsList(atm).get(0);
         for (String atyp : DENOPTIMConstants.RCATYPEMAP.keySet())
         {
-            if (DENOPTIMMoleculeUtils.getSymbolOrLabel(atm).equals(atyp))
+            if (MoleculeUtils.getSymbolOrLabel(atm).equals(atyp))
             {
                 this.attType = atyp;
                 this.attA11 = paramAR11.get(atyp);
@@ -389,8 +389,8 @@ public class RingClosingAttractor
 	}
 	else
 	{
-	    s = s + "Atm: " + DENOPTIMMoleculeUtils.getSymbolOrLabel(this.atm) 
-		  + " SrcAtm: " + DENOPTIMMoleculeUtils.getSymbolOrLabel(this.src);
+	    s = s + "Atm: " + MoleculeUtils.getSymbolOrLabel(this.atm) 
+		  + " SrcAtm: " + MoleculeUtils.getSymbolOrLabel(this.src);
 	}
 	s = s + ")";
 

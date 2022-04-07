@@ -36,10 +36,10 @@ import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 
@@ -59,7 +59,7 @@ public class PathSubGraph
      * <code>DENOPTIMVertex</code> nor <code>DENOPTIMEdge</code>
      * belong to the original <code>DENOPTIMGraph</code>.
      */
-    private DENOPTIMGraph graph;
+    private DGraph graph;
 
     /**
      * The string identifier of this path
@@ -71,28 +71,28 @@ public class PathSubGraph
     /**
      * The vertex representing the first RCA: head of the path
      */
-    private DENOPTIMVertex vA;
+    private Vertex vA;
 
     /**
      * The vertex representing the second RCA: the tail of the path
      */
-    private DENOPTIMVertex vB;
+    private Vertex vB;
 
     /**
      * The turning point in the graph: after this point the direction of 
      * <code>DENOPTIMEdge</code>s becomes opposite than before.
      */
-    private DENOPTIMVertex turningPointVert;
+    private Vertex turningPointVert;
 
     /**
      * The list of vertices of the original graph and involved in the path.
      */
-    private List<DENOPTIMVertex> vertPathVAVB;
+    private List<Vertex> vertPathVAVB;
 
     /**
      * The list of edges of the original graph and involved in the path.
      */
-    private List<DENOPTIMEdge> edgesPathVAVB;
+    private List<Edge> edgesPathVAVB;
 
     /**
      * The molecular representation of the fragment in the path
@@ -142,30 +142,30 @@ public class PathSubGraph
      * the path
      */
 
-    public PathSubGraph(DENOPTIMVertex vA, DENOPTIMVertex vB, 
-            DENOPTIMGraph molGraph)
+    public PathSubGraph(Vertex vA, Vertex vB, 
+            DGraph molGraph)
     {
         this.vA = vA;
         this.vB = vB;
         
         // Identify the path between vA/vB and the seed of the spanning tree
-        List<DENOPTIMVertex> vAToSeed = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> vAToSeed = new ArrayList<Vertex>();
         molGraph.getParentTree(vA, vAToSeed);
         vAToSeed.add(0, vA);
-        List<DENOPTIMVertex> vBToSeed = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> vBToSeed = new ArrayList<Vertex>();
         molGraph.getParentTree(vB, vBToSeed);
         vBToSeed.add(0, vB);
         
         if (Collections.disjoint(vAToSeed, vBToSeed))
         {
-            vertPathVAVB = new ArrayList<DENOPTIMVertex>();
-            edgesPathVAVB = new ArrayList<DENOPTIMEdge>();
+            vertPathVAVB = new ArrayList<Vertex>();
+            edgesPathVAVB = new ArrayList<Edge>();
             return;
         }
         
         // find XOR plus junction vertex (turning point)
-        vertPathVAVB = new ArrayList<DENOPTIMVertex>();
-        edgesPathVAVB = new ArrayList<DENOPTIMEdge>();
+        vertPathVAVB = new ArrayList<Vertex>();
+        edgesPathVAVB = new ArrayList<Edge>();
         turningPointVert = null;
         for (int i=0; i<vAToSeed.size(); i++)
         {
@@ -199,19 +199,19 @@ public class PathSubGraph
         revChainID = "";
         int tpId = -1;
         int tpIdRev = -1;
-        DENOPTIMVertex vertBack;
-        DENOPTIMVertex vertHere;
-        DENOPTIMVertex vertFrnt;
+        Vertex vertBack;
+        Vertex vertHere;
+        Vertex vertFrnt;
         boolean insideOut = false;
-        ArrayList<DENOPTIMVertex> gVertices = new ArrayList<DENOPTIMVertex>();
-        ArrayList<DENOPTIMEdge> gEdges = new ArrayList<DENOPTIMEdge>();
+        ArrayList<Vertex> gVertices = new ArrayList<Vertex>();
+        ArrayList<Edge> gEdges = new ArrayList<Edge>();
         for (int i=1; i < vertPathVAVB.size()-1; i++)
         {
             vertBack = vertPathVAVB.get(i-1);
             vertHere = vertPathVAVB.get(i);
             vertFrnt = vertPathVAVB.get(i+1);
-            DENOPTIMEdge edgeToBack = edgesPathVAVB.get(i-1);
-            DENOPTIMEdge edgeToFrnt = edgesPathVAVB.get(i);
+            Edge edgeToBack = edgesPathVAVB.get(i-1);
+            Edge edgeToFrnt = edgesPathVAVB.get(i);
             
             // Avoid assumption that all paths need to go via scaffold
             if (edgeToBack.getSrcAP().getOwner()==vertBack)
@@ -255,9 +255,9 @@ public class PathSubGraph
             revChainID = ids[1] + revChainID;
             
             // We must work with clones of the actual vertices/edges
-            DENOPTIMVertex cloneVertBack = vertBack.clone();
-            DENOPTIMVertex cloneVertHere = vertHere.clone();
-            DENOPTIMVertex cloneVertFrnt = vertFrnt.clone();
+            Vertex cloneVertBack = vertBack.clone();
+            Vertex cloneVertHere = vertHere.clone();
+            Vertex cloneVertFrnt = vertFrnt.clone();
             
             // Collect vertices and make edges to build a graph from A to B
             if (i == 1) {
@@ -269,20 +269,20 @@ public class PathSubGraph
                 cloneVertBack = gVertices.get(gVertices.size()-1);
             }
             gVertices.add(cloneVertHere);
-            gEdges.add(new DENOPTIMEdge(cloneVertBack.getAP(apIdBack2Here),
+            gEdges.add(new Edge(cloneVertBack.getAP(apIdBack2Here),
                     cloneVertHere.getAP(apIdHere2Back),
                     edgeToBack.getBondType()));
             if (i == vertPathVAVB.size()-2)
             {
                 gVertices.add(cloneVertFrnt);
-                gEdges.add(new DENOPTIMEdge(cloneVertHere.getAP(apIdHere2Frnt),
+                gEdges.add(new Edge(cloneVertHere.getAP(apIdHere2Frnt),
                         cloneVertFrnt.getAP(apIdFrnt2Here),
                         edgeToFrnt.getBondType()));
             }
         }
 
         // Build the DENOPTIMGraph with edges directed from VA to VB
-        this.graph = new DENOPTIMGraph(gVertices,gEdges);
+        this.graph = new DGraph(gVertices,gEdges);
 
     	// prepare alternative chain IDs
     	String[] pA = chainID.split("_");
@@ -326,29 +326,29 @@ public class PathSubGraph
      * @param to end of path.
      * @throws IllegalArgumentException if from cannot reach to.
      */
-    public static DENOPTIMGraph findPath(DENOPTIMVertex from,
-                                         DENOPTIMVertex to) {
-        DENOPTIMGraph g = new DENOPTIMGraph();
+    public static DGraph findPath(Vertex from,
+                                         Vertex to) {
+        DGraph g = new DGraph();
         try {
             if (from == to) {
                 return g;
             }
 
-            Iterator<DENOPTIMAttachmentPoint> path = findPath(from, to,
+            Iterator<AttachmentPoint> path = findPath(from, to,
                     new HashSet<>()).iterator();
 
             if (!path.hasNext()) {
                 return g;
             }
 
-            DENOPTIMAttachmentPoint srcAP = path.next().clone();
-            DENOPTIMVertex srcVertex = srcAP.getOwner().clone();
+            AttachmentPoint srcAP = path.next().clone();
+            Vertex srcVertex = srcAP.getOwner().clone();
             srcAP.setOwner(srcVertex);
 
             g.addVertex(srcVertex);
 
-            DENOPTIMAttachmentPoint trgAP = path.next().clone();
-            DENOPTIMVertex trgVertex = trgAP.getOwner().clone();
+            AttachmentPoint trgAP = path.next().clone();
+            Vertex trgVertex = trgAP.getOwner().clone();
             trgAP.setOwner(trgVertex);
 
             g.appendVertexOnAP(srcAP, trgAP);
@@ -381,8 +381,8 @@ public class PathSubGraph
      * @param visited vertices already visited.
      * @return the path of APs from vertex from to vertex to.
      */
-    private static Iterable<DENOPTIMAttachmentPoint> findPath(
-            DENOPTIMVertex from, DENOPTIMVertex to, Set<Integer> visited) {
+    private static Iterable<AttachmentPoint> findPath(
+            Vertex from, Vertex to, Set<Integer> visited) {
 
         int fromId = from.getVertexId();
         if (visited.contains(fromId)) {
@@ -390,21 +390,21 @@ public class PathSubGraph
         }
         visited.add(fromId);
 
-        for (DENOPTIMAttachmentPoint fromAP : from.getAttachmentPoints()) {
-            DENOPTIMEdge e = fromAP.getEdgeUser();
-            DENOPTIMAttachmentPoint adjAP = e.getSrcVertex() == fromId ?
+        for (AttachmentPoint fromAP : from.getAttachmentPoints()) {
+            Edge e = fromAP.getEdgeUser();
+            AttachmentPoint adjAP = e.getSrcVertex() == fromId ?
                     e.getTrgAP() : e.getSrcAP();
-            DENOPTIMVertex adj = adjAP.getOwner();
+            Vertex adj = adjAP.getOwner();
 
             if (adj == to) {
                 return Arrays.asList(fromAP, adjAP);
             }
 
-            Iterable<DENOPTIMAttachmentPoint> path = findPath(adj, to, visited);
+            Iterable<AttachmentPoint> path = findPath(adj, to, visited);
             // Non-empty if there exists a path
             if (path.iterator().hasNext()) {
-                List<DENOPTIMAttachmentPoint> extendedPath =
-                        new ArrayList<DENOPTIMAttachmentPoint>(Arrays.asList(
+                List<AttachmentPoint> extendedPath =
+                        new ArrayList<AttachmentPoint>(Arrays.asList(
                                 fromAP, adjAP));
                 path.iterator().forEachRemaining(extendedPath::add);
                 return extendedPath;
@@ -432,9 +432,9 @@ public class PathSubGraph
         // Build molecular representation 
         ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
         iacPathVAVB = tb.convertGraphTo3DAtomContainer(graph);
-        Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom = 
+        Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom = 
                 iacPathVAVB.getProperty(DENOPTIMConstants.MOLPROPAPxATOM);
-        Map<IBond,ArrayList<DENOPTIMAttachmentPoint>> apsPerBond =
+        Map<IBond,ArrayList<AttachmentPoint>> apsPerBond =
                 iacPathVAVB.getProperty(DENOPTIMConstants.MOLPROPAPxBOND);
 
         if (debug)
@@ -633,7 +633,7 @@ public class PathSubGraph
                 // use the point identified by the ap on atom a1 that 
                 // has the lowest index in the list of aps on a1, 
                 // but is not the AP used to bind a1 and a2
-                for (DENOPTIMAttachmentPoint ap : apsPerAtom.get(a1))
+                for (AttachmentPoint ap : apsPerAtom.get(a1))
                 {
                     if (apsPerBond.keySet().contains(bndA1A2))
                     {
@@ -673,7 +673,7 @@ public class PathSubGraph
                 // use the point identified by the ap on atom a2 that 
                 // has the lowest index in the list of aps on a2, 
                 // but is not the AP used to bind a1 and a1
-                for (DENOPTIMAttachmentPoint ap : apsPerAtom.get(a2))
+                for (AttachmentPoint ap : apsPerAtom.get(a2))
                 {
                     if (apsPerBond.keySet().contains(bndA1A2))
                     {
@@ -769,7 +769,7 @@ public class PathSubGraph
      * Returns the vertex representing the head of the chain
      */
 
-    public DENOPTIMVertex getHeadVertex()
+    public Vertex getHeadVertex()
     {
         return vA;
     }
@@ -780,7 +780,7 @@ public class PathSubGraph
      * Returns the vertex representing the tail of the chain
      */
 
-    public DENOPTIMVertex getTailVertex()
+    public Vertex getTailVertex()
     {
         return vB;
     }
@@ -801,7 +801,7 @@ public class PathSubGraph
      * Returns the list of verteces involved
      */
 
-    public List<DENOPTIMVertex> getVertecesPath()
+    public List<Vertex> getVertecesPath()
     {
         return vertPathVAVB;
     }
@@ -812,7 +812,7 @@ public class PathSubGraph
      * Returns the list of edges involved
      */
 
-    public List<DENOPTIMEdge> getEdgesPath()
+    public List<Edge> getEdgesPath()
     {
         return edgesPathVAVB;
     }
@@ -920,7 +920,7 @@ public class PathSubGraph
     {
        StringBuilder sb = new StringBuilder();
        boolean first = true;
-       for (DENOPTIMVertex v : vertPathVAVB)
+       for (Vertex v : vertPathVAVB)
        {
            if (!first)
            {
@@ -932,7 +932,7 @@ public class PathSubGraph
        return sb.toString();
     }
 
-    public DENOPTIMGraph getGraph() {
+    public DGraph getGraph() {
         return graph;
     }
 

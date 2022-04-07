@@ -18,11 +18,11 @@ import org.junit.jupiter.api.Test;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
 
 /**
@@ -91,9 +91,9 @@ public class GraphLinkFinderTest
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
         FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(), 
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(), 
                 cpMap, capMap, forbEnds, cpMap);
         fs.setAPclassBasedApproach(true);
         
@@ -209,18 +209,18 @@ public class GraphLinkFinderTest
      * @throws DENOPTIMException 
      *  
      */
-    private DENOPTIMGraph makeTestGraphA() throws DENOPTIMException
+    private DGraph makeTestGraphA() throws DENOPTIMException
     {
         FragmentSpace fs = prepare();
-        DENOPTIMGraph graph = new DENOPTIMGraph();
-        DENOPTIMVertex s = fs.getVertexFromLibrary(BBType.SCAFFOLD,0);
+        DGraph graph = new DGraph();
+        Vertex s = fs.getVertexFromLibrary(BBType.SCAFFOLD,0);
         graph.addVertex(s);
-        DENOPTIMVertex v0 = fs.getVertexFromLibrary(BBType.FRAGMENT,0);
+        Vertex v0 = fs.getVertexFromLibrary(BBType.FRAGMENT,0);
         graph.addVertex(v0);
-        DENOPTIMVertex v1 = fs.getVertexFromLibrary(BBType.FRAGMENT,1);
+        Vertex v1 = fs.getVertexFromLibrary(BBType.FRAGMENT,1);
         graph.addVertex(v1);
-        graph.addEdge(new DENOPTIMEdge(s.getAP(0), v0.getAP(0)));
-        graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(0)));
+        graph.addEdge(new Edge(s.getAP(0), v0.getAP(0)));
+        graph.addEdge(new Edge(v0.getAP(1), v1.getAP(0)));
         graph.renumberGraphVertices();
         return graph;
     }
@@ -232,15 +232,15 @@ public class GraphLinkFinderTest
      * @throws DENOPTIMException 
      *  
      */
-    private DENOPTIMGraph makeTestGraphE() throws DENOPTIMException
+    private DGraph makeTestGraphE() throws DENOPTIMException
     {
         FragmentSpace fs = prepare();
-        DENOPTIMGraph graph = new DENOPTIMGraph();
-        DENOPTIMVertex v0 = fs.getVertexFromLibrary(BBType.FRAGMENT,12);
+        DGraph graph = new DGraph();
+        Vertex v0 = fs.getVertexFromLibrary(BBType.FRAGMENT,12);
         graph.addVertex(v0);
-        DENOPTIMVertex v1 = fs.getVertexFromLibrary(BBType.FRAGMENT,12);
+        Vertex v1 = fs.getVertexFromLibrary(BBType.FRAGMENT,12);
         graph.addVertex(v1);
-        graph.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(1)));
+        graph.addEdge(new Edge(v0.getAP(1), v1.getAP(1)));
         graph.renumberGraphVertices();
         return graph;
     }
@@ -252,15 +252,15 @@ public class GraphLinkFinderTest
      * @throws DENOPTIMException 
      *  
      */
-    private DENOPTIMGraph makeTestGraphF() throws DENOPTIMException
+    private DGraph makeTestGraphF() throws DENOPTIMException
     {
         FragmentSpace fs = prepare();
-        DENOPTIMGraph graph = new DENOPTIMGraph();
-        DENOPTIMVertex v0 = fs.getVertexFromLibrary(BBType.FRAGMENT,13);
+        DGraph graph = new DGraph();
+        Vertex v0 = fs.getVertexFromLibrary(BBType.FRAGMENT,13);
         graph.addVertex(v0);
-        DENOPTIMVertex v1 = fs.getVertexFromLibrary(BBType.FRAGMENT,13);
+        Vertex v1 = fs.getVertexFromLibrary(BBType.FRAGMENT,13);
         graph.addVertex(v1);
-        graph.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
+        graph.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
         graph.renumberGraphVertices();
         return graph;
     }
@@ -271,7 +271,7 @@ public class GraphLinkFinderTest
     public void testLinkFromVertex() throws Exception
     {
         FragmentSpace fs = prepare();
-        DENOPTIMGraph graph = makeTestGraphA();
+        DGraph graph = makeTestGraphA();
         GraphLinkFinder glf = new GraphLinkFinder(fs,
                 graph.getVertexAtPosition(1), -1, true); 
         // NB: the boolean makes the search complete (within the limits that
@@ -288,10 +288,10 @@ public class GraphLinkFinderTest
         expected.put(11, 84);
         expected.put(13, 2);
         
-        LinkedHashMap<DENOPTIMVertex, List<APMapping>> allAltLinks = 
+        LinkedHashMap<Vertex, List<APMapping>> allAltLinks = 
                 glf.getAllAlternativesFound();
-        Set<DENOPTIMVertex> keys = allAltLinks.keySet();
-        for (DENOPTIMVertex k : keys)
+        Set<Vertex> keys = allAltLinks.keySet();
+        for (Vertex k : keys)
         {
             int bbId = k.getBuildingBlockId();          
             assertTrue(expected.containsKey(bbId), "Vertex with building block "
@@ -307,8 +307,8 @@ public class GraphLinkFinderTest
     public void testLinkFromEdge() throws Exception
     {
         FragmentSpace fs = prepare();
-        DENOPTIMGraph graph = makeTestGraphA();
-        DENOPTIMEdge targetEdge = graph.getEdgeAtPosition(1);
+        DGraph graph = makeTestGraphA();
+        Edge targetEdge = graph.getEdgeAtPosition(1);
         GraphLinkFinder glf = new GraphLinkFinder(fs, targetEdge, -1, true); 
         // NB: the boolean makes the search complete (within the limits the 
         // prevent combinatorial explosion)
@@ -353,8 +353,8 @@ public class GraphLinkFinderTest
     public void testLinkFromEdgeOneMatch() throws Exception
     {
         FragmentSpace fs = prepare();
-        DENOPTIMGraph graph = makeTestGraphE();
-        DENOPTIMEdge targetEdge = graph.getEdgeAtPosition(0);
+        DGraph graph = makeTestGraphE();
+        Edge targetEdge = graph.getEdgeAtPosition(0);
         GraphLinkFinder glf = new GraphLinkFinder(fs, targetEdge, -1, true); 
         // NB: the boolean makes the search complete (within the limits the 
         // prevent combinatorial explosion)
@@ -378,8 +378,8 @@ public class GraphLinkFinderTest
     public void testLinkFromEdgeNoMatch() throws Exception
     {
         FragmentSpace fs = prepare();
-        DENOPTIMGraph graph = makeTestGraphF();
-        DENOPTIMEdge targetEdge = graph.getEdgeAtPosition(0);
+        DGraph graph = makeTestGraphF();
+        Edge targetEdge = graph.getEdgeAtPosition(0);
         GraphLinkFinder glf = new GraphLinkFinder(fs, targetEdge, -1, true); 
         // NB: the boolean makes the search complete (within the limits the 
         // prevent combinatorial explosion)
@@ -397,12 +397,12 @@ public class GraphLinkFinderTest
     
     private void ensureConsistencyWithExpectations(
             Map<Integer,List<APClass>> expected,
-            Map<DENOPTIMVertex, List<APMapping>> actual)
+            Map<Vertex, List<APMapping>> actual)
     {
         // Set this to true to print the mappings on stdout
         boolean debug = false;
         
-        for (DENOPTIMVertex k : actual.keySet())
+        for (Vertex k : actual.keySet())
         {
             int bbId = k.getBuildingBlockId();
             
@@ -426,7 +426,7 @@ public class GraphLinkFinderTest
                 {
                     System.out.println("    -> "+apm.toString());
                 }
-                for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> e 
+                for (Entry<AttachmentPoint, AttachmentPoint> e 
                         : apm.entrySet())
                 {
                     if (debug)

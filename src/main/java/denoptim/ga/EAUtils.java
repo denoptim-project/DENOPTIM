@@ -46,26 +46,26 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Ring;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.graph.rings.RingClosuresArchive;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
-import denoptim.utils.DENOPTIMMoleculeUtils;
-import denoptim.utils.DENOPTIMStatUtils;
+import denoptim.utils.MoleculeUtils;
+import denoptim.utils.StatUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.ObjectPair;
@@ -150,7 +150,7 @@ public class EAUtils
             {
                 uniqueIDsSet.addNewUniqueEntry(uid);
             }
-            DENOPTIMLogger.appLogger.log(Level.INFO, "Read " + lstUID.size() 
+            StaticLogger.appLogger.log(Level.INFO, "Read " + lstUID.size() 
                 + " known UIDs from " + settings.getUIDFileIn());
         }
         String inifile = settings.getInitialPopulationFile();
@@ -158,7 +158,7 @@ public class EAUtils
         {
             EAUtils.getPopulationFromFile(inifile, population, uniqueIDsSet, 
                     EAUtils.getPathNameToGenerationFolder(0, settings));
-            DENOPTIMLogger.appLogger.log(Level.INFO, "Read " + population.size() 
+            StaticLogger.appLogger.log(Level.INFO, "Read " + population.size() 
                 + " molecules from " + inifile);
         }
         return population;
@@ -331,13 +331,13 @@ public class EAUtils
                     continue;
                 }
                 //NB: this does not go into templates!
-                DENOPTIMGraph gpA = parents[0].getGraph();
-                List<DENOPTIMVertex> subGraphA = new ArrayList<DENOPTIMVertex>();
+                DGraph gpA = parents[0].getGraph();
+                List<Vertex> subGraphA = new ArrayList<Vertex>();
                 gpA.getChildrenTree(EAUtils.selectNonScaffoldNonCapVertex(
                         gpA),subGraphA);
 
-                DENOPTIMGraph gpB = parents[1].getGraph();
-                List<DENOPTIMVertex> subGraphB = new ArrayList<DENOPTIMVertex>();
+                DGraph gpB = parents[1].getGraph();
+                List<Vertex> subGraphB = new ArrayList<Vertex>();
                 gpB.getChildrenTree(EAUtils.selectNonScaffoldNonCapVertex(
                         gpB),subGraphB);
             }
@@ -354,12 +354,12 @@ public class EAUtils
         }
         
         Candidate cA = null, cB = null;
-        DENOPTIMVertex vA = null, vB = null;
+        Vertex vA = null, vB = null;
         vA = xos.getA().get(0);
         vB = xos.getB().get(0);
-        DENOPTIMGraph gA = vA.getGraphOwner();
+        DGraph gA = vA.getGraphOwner();
         cA = gA.getOutermostGraphOwner().getCandidateOwner();
-        DENOPTIMGraph gB = vB.getGraphOwner();
+        DGraph gB = vB.getGraphOwner();
         cB = gB.getOutermostGraphOwner().getCandidateOwner();
         
         String candIdA = cA.getName();
@@ -369,11 +369,11 @@ public class EAUtils
         
         // Start building the offspring
         XoverSite xosOnClones = xos.projectToClonedGraphs();
-        DENOPTIMGraph gAClone = xosOnClones.getA().get(0).getGraphOwner();
-        DENOPTIMGraph gBClone = xosOnClones.getB().get(0).getGraphOwner();
+        DGraph gAClone = xosOnClones.getA().get(0).getGraphOwner();
+        DGraph gBClone = xosOnClones.getB().get(0).getGraphOwner();
         try
         {
-            if (!DENOPTIMGraphOperations.performCrossover(xosOnClones,fragSpace))
+            if (!GraphOperations.performCrossover(xosOnClones,fragSpace))
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
@@ -381,7 +381,7 @@ public class EAUtils
             }
         } catch (Throwable t) {
             t.printStackTrace();
-            ArrayList<DENOPTIMGraph> parents = new ArrayList<DENOPTIMGraph>();
+            ArrayList<DGraph> parents = new ArrayList<DGraph>();
             parents.add(xos.getA().get(0).getGraphOwner());
             parents.add(xos.getB().get(0).getGraphOwner());
             DenoptimIO.writeGraphsToSDF(new File(settings.getDataDirectory()
@@ -392,10 +392,10 @@ public class EAUtils
         gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         String lstIdVA = "";
-        for (DENOPTIMVertex v : xos.getA())
+        for (Vertex v : xos.getA())
             lstIdVA = lstIdVA + "_" + v.getVertexId();
         String lstIdVB = "";
-        for (DENOPTIMVertex v : xos.getB())
+        for (Vertex v : xos.getB())
             lstIdVB = lstIdVB + "_" + v.getVertexId();
         String[] msgs = new String[2];
         msgs[0] = "Xover: " + candIdA + "|" + gid1 + "|" + lstIdVA + "="
@@ -403,14 +403,14 @@ public class EAUtils
         msgs[1] = "Xover: " + candIdB + "|" + gid2 + "|" + lstIdVB + "="
                 + candIdA + "|" + gid1 + "|" + lstIdVA;
         
-        DENOPTIMGraph[] graphsAffectedByXover = new DENOPTIMGraph[2];
+        DGraph[] graphsAffectedByXover = new DGraph[2];
         graphsAffectedByXover[0] = gAClone;
         graphsAffectedByXover[1] = gBClone;
         
         List<Candidate> validOffspring = new Population(settings);
         for (int ig=0; ig<graphsAffectedByXover.length; ig++)
         {
-            DENOPTIMGraph g = graphsAffectedByXover[ig];
+            DGraph g = graphsAffectedByXover[ig];
 
             // It makes sense to do this on the possibly embedded graph and not
             // on their embedding owners because there cannot be any new cycle
@@ -422,7 +422,7 @@ public class EAUtils
             }
 
             // Finalize the graph that is at the outermost level
-            DENOPTIMGraph gOutermost = g.getOutermostGraphOwner();
+            DGraph gOutermost = g.getOutermostGraphOwner();
             gOutermost.addCappingGroups(fragSpace);
             gOutermost.renumberGraphVertices();
             gOutermost.setLocalMsg(msgs[ig]);
@@ -441,7 +441,7 @@ public class EAUtils
             }
             
             // Check if the chosen combination gives rise to forbidden ends
-            for (DENOPTIMVertex rcv : gOutermost.getFreeRCVertices())
+            for (Vertex rcv : gOutermost.getFreeRCVertices())
             {
                 APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
                 if (fragSpace.getCappingMap().get(apc)==null 
@@ -522,14 +522,14 @@ public class EAUtils
             return null;
         }
         
-        DENOPTIMGraph graph = parent.getGraph().clone();
+        DGraph graph = parent.getGraph().clone();
         graph.renumberGraphVertices();
         
         String parentMolName = FilenameUtils.getBaseName(parent.getSDFFile());
         int parentGraphId = parent.getGraph().getGraphId();
         graph.setLocalMsg("Mutation: " + parentMolName + "|" + parentGraphId);
         
-        if (!DENOPTIMGraphOperations.performMutation(graph,mnt,settings))
+        if (!GraphOperations.performMutation(graph,mnt,settings))
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
             mnt.increase(CounterID.FAILEDMUTATTEMTS);
@@ -569,7 +569,7 @@ public class EAUtils
         // Check if the chosen combination gives rise to forbidden ends
         //TODO this should be considered already when making the list of
         // possible combination of rings
-        for (DENOPTIMVertex rcv : graph.getFreeRCVertices())
+        for (Vertex rcv : graph.getFreeRCVertices())
         {
             APClass apc = rcv.getEdgeToParent().getSrcAP().getAPClass();
             if (fragSpace.getCappingMap().get(apc)==null 
@@ -608,7 +608,7 @@ public class EAUtils
         mnt.increase(CounterID.MANUALADDATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
-        ArrayList<DENOPTIMGraph> graphs;
+        ArrayList<DGraph> graphs;
         try
         {
             graphs = DenoptimIO.readDENOPTIMGraphsFromFile(srcFile);
@@ -618,7 +618,7 @@ public class EAUtils
             mnt.increase(CounterID.FAILEDMANUALADDATTEMPTS);
             String msg = "Could not read graphs from file " + srcFile
                     + ". No candidate generated!";
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            StaticLogger.appLogger.log(Level.SEVERE, msg);
             return null;
         }
         if (graphs.size() == 0 || graphs.size() > 1)
@@ -627,18 +627,18 @@ public class EAUtils
             String msg = "Found " + graphs.size() + " graphs in file " + srcFile
                     + ". I expect one and only one graph. "
                     + "No candidate generated!";
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            StaticLogger.appLogger.log(Level.SEVERE, msg);
             return null;
         }
 
-        DENOPTIMGraph graph = graphs.get(0);
+        DGraph graph = graphs.get(0);
         if (graph == null)
         {
             mnt.increase(CounterID.FAILEDMANUALADDATTEMPTS);
             String msg = "Null graph from file " + srcFile
                     + ". Expected one and only one graph. "
                     + "No candidate generated!";
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            StaticLogger.appLogger.log(Level.SEVERE, msg);
             return null;
         }
         graph.setLocalMsg("MANUAL_ADD");
@@ -668,7 +668,7 @@ public class EAUtils
         
         String msg = "Candidate " + candidate.getName() + " is imported from " 
                 + srcFile;
-        DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+        StaticLogger.appLogger.log(Level.INFO, msg);
         
         return candidate;
     }
@@ -690,7 +690,7 @@ public class EAUtils
         mnt.increase(CounterID.BUILDANEWATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
-        DENOPTIMGraph graph = EAUtils.buildGraph(settings);
+        DGraph graph = EAUtils.buildGraph(settings);
         if (graph == null)
         {
             mnt.increase(CounterID.FAILEDBUILDATTEMPTS_GRAPHBUILD);
@@ -720,7 +720,7 @@ public class EAUtils
         // Check if the chosen combination gives rise to forbidden ends
         //TODO: this should be considered already when making the list of
         // possible combination of rings
-        for (DENOPTIMVertex rcv : graph.getFreeRCVertices())
+        for (Vertex rcv : graph.getFreeRCVertices())
         {
             // Also exclude any RCV that is not bound to anything?
             if (rcv.getEdgeToParent() == null)
@@ -832,7 +832,7 @@ public class EAUtils
         FragmentSpace fragSpace = fsParams.getFragmentSpace();
         
         double[] fitness = getFitnesses(popln);
-        double sdev = DENOPTIMStatUtils.stddev(fitness, true);
+        double sdev = StatUtils.stddev(fitness, true);
         String res = "";
         df.setMaximumFractionDigits(settings.getPrecisionLevel());
 
@@ -843,24 +843,24 @@ public class EAUtils
         sb.append(String.format("%12s", n));
         sb.append(NL);
         double f;
-        f = DENOPTIMStatUtils.max(fitness);
+        f = StatUtils.max(fitness);
         sb.append(String.format("%-30s", "MAX:")).append(df.format(f));
         sb.append(NL);
-        f = DENOPTIMStatUtils.min(fitness);
+        f = StatUtils.min(fitness);
         sb.append(String.format("%-30s", "MIN:")).append(df.format(f));
         sb.append(NL);
-        f = DENOPTIMStatUtils.mean(fitness);
+        f = StatUtils.mean(fitness);
         sb.append(String.format("%-30s", "MEAN:")).append(df.format(f));
         sb.append(NL);
-        f = DENOPTIMStatUtils.median(fitness);
+        f = StatUtils.median(fitness);
         sb.append(String.format("%-30s", "MEDIAN:")).append(df.format(f));
         sb.append(NL);
-        f = DENOPTIMStatUtils.stddev(fitness, true);
+        f = StatUtils.stddev(fitness, true);
         sb.append(String.format("%-30s", "STDDEV:")).append(df.format(f));
         sb.append(NL);
         if (sdev > 0.0001)
         {
-            f = DENOPTIMStatUtils.skewness(fitness, true);
+            f = StatUtils.skewness(fitness, true);
             sb.append(String.format("%-30s", "SKEW:")).append(df.format(f));
             sb.append(NL);
         } else {
@@ -872,7 +872,7 @@ public class EAUtils
         for (int i=0; i<popln.size(); i++)
         {
             Candidate mol = popln.get(i);
-            DENOPTIMGraph g = mol.getGraph();
+            DGraph g = mol.getGraph();
             int scafIdx = g.getSourceVertex().getBuildingBlockId() + 1;
             if (scf_cntr.containsKey(scafIdx)) {
                 scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
@@ -938,9 +938,9 @@ public class EAUtils
     /**
      * Chose randomly a vertex that is neither scaffold or capping group.
      */
-    protected static DENOPTIMVertex selectNonScaffoldNonCapVertex(DENOPTIMGraph g)
+    protected static Vertex selectNonScaffoldNonCapVertex(DGraph g)
     {
-        List<DENOPTIMVertex> candidates = new ArrayList<DENOPTIMVertex>(
+        List<Vertex> candidates = new ArrayList<Vertex>(
                 g.getVertexList());
         candidates.removeIf(v ->
                 v.getBuildingBlockType() == BBType.SCAFFOLD
@@ -1174,7 +1174,7 @@ public class EAUtils
         if (candidates.size() == 0)
         {
         	String msg = "Found 0 candidates in file " + filename;
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            StaticLogger.appLogger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
 
@@ -1206,7 +1206,7 @@ public class EAUtils
         {
         	String msg = "Population is still empty after having processes "
         			+ candidates.size() + " candidates from file " + filename;
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            StaticLogger.appLogger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
 
@@ -1254,7 +1254,7 @@ public class EAUtils
         int val = Integer.MIN_VALUE;
         for (Candidate popln1 : population)
         {
-            DENOPTIMGraph g = popln1.getGraph();
+            DGraph g = popln1.getGraph();
             val = Math.max(val, g.getMaxVertexId());
         }
         GraphUtils.ensureVertexIDConsistency(val);
@@ -1303,7 +1303,7 @@ public class EAUtils
      * @throws DENOPTIMException
      */
 
-    protected static DENOPTIMGraph buildGraph(GAParameters settings) 
+    protected static DGraph buildGraph(GAParameters settings) 
             throws DENOPTIMException
     {
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
@@ -1314,13 +1314,13 @@ public class EAUtils
         }
         FragmentSpace fragSpace = fsParams.getFragmentSpace();
         
-        DENOPTIMGraph graph = new DENOPTIMGraph();
+        DGraph graph = new DGraph();
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
         
         // building a molecule starts by selecting a random scaffold
         int scafIdx = selectRandomScaffold(fragSpace);
 
-        DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
+        Vertex scafVertex = Vertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), scafIdx, BBType.SCAFFOLD, 
                 fragSpace);
         
@@ -1329,20 +1329,20 @@ public class EAUtils
         graph.setLocalMsg("NEW");
         
         if (graph.getAvailableAPs().size()==0
-                && scafVertex instanceof DENOPTIMTemplate)
+                && scafVertex instanceof Template)
         {
             Monitor mnt = new Monitor();
             mnt.name = "IntraTemplateBuild";
-            List<DENOPTIMVertex> initialMutableSites = graph.getMutableSites(
+            List<Vertex> initialMutableSites = graph.getMutableSites(
                     settings.getExcludedMutationTypes());
-            for (DENOPTIMVertex mutableSite : initialMutableSites)
+            for (Vertex mutableSite : initialMutableSites)
             {
                 // This accounts for the possibility that a mutation changes a 
                 // branch of the initial graph or deletes vertexes.
                 if (!graph.containsOrEmbedsVertex(mutableSite))
                     continue;
                 
-                if (!DENOPTIMGraphOperations.performMutation(mutableSite, mnt,
+                if (!GraphOperations.performMutation(mutableSite, mnt,
                         settings))
                 {
                     mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
@@ -1367,10 +1367,10 @@ public class EAUtils
 
         if (scafVertex.hasFreeAP())
         {
-            DENOPTIMGraphOperations.extendGraph(scafVertex, true, false, settings);
+            GraphOperations.extendGraph(scafVertex, true, false, settings);
         }
         
-        if (!(scafVertex instanceof DENOPTIMTemplate) 
+        if (!(scafVertex instanceof Template) 
                 && graph.getVertexCount() == 0)
         {
             return null;
@@ -1394,7 +1394,7 @@ public class EAUtils
      * @return <code>true</code> unless no ring can be set up even if required
      */
 
-    protected static boolean setupRings(Object[] res, DENOPTIMGraph molGraph, 
+    protected static boolean setupRings(Object[] res, DGraph molGraph, 
             GAParameters settings) throws DENOPTIMException
     {
         // get settings //TODO: this should happen inside RunTimeParameters
@@ -1441,11 +1441,11 @@ public class EAUtils
         
         if (onlyRandomCombOfRings)
         {
-            List<DENOPTIMRing> combsOfRings = cgh.getRandomCombinationOfRings(
+            List<Ring> combsOfRings = cgh.getRandomCombinationOfRings(
                     mol, molGraph, rcParams.getMaxRingClosures());
             if (combsOfRings.size() > 0)
             {
-                for (DENOPTIMRing ring : combsOfRings)
+                for (Ring ring : combsOfRings)
                 {
                     // Consider the crowding probability
                     double shot = RandomUtils.nextDouble();
@@ -1469,14 +1469,14 @@ public class EAUtils
         }
         else
         {
-            ArrayList<List<DENOPTIMRing>> allCombsOfRings = 
+            ArrayList<List<Ring>> allCombsOfRings = 
                             cgh.getPossibleCombinationOfRings(mol, molGraph);
         
             // Keep closable chains that are relevant for chelate formation
             if (rcParams.buildChelatesMode())
             {
-                ArrayList<List<DENOPTIMRing>> toRemove = new ArrayList<>();
-                for (List<DENOPTIMRing> setRings : allCombsOfRings)
+                ArrayList<List<Ring>> toRemove = new ArrayList<>();
+                for (List<Ring> setRings : allCombsOfRings)
                 {
                     if (!cgh.checkChelatesGraph(molGraph,setRings))
                     {
@@ -1488,7 +1488,7 @@ public class EAUtils
                 if (allCombsOfRings.isEmpty())
                 {
                     String msg = "Setup Rings: no combination of rings.";
-                    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                    StaticLogger.appLogger.log(Level.INFO, msg);
                     return false;
                 }
             }
@@ -1497,7 +1497,7 @@ public class EAUtils
             int sz = allCombsOfRings.size();
             if (sz > 0)
             {
-                List<DENOPTIMRing> selected = new ArrayList<>();
+                List<Ring> selected = new ArrayList<>();
                 if (sz == 1)
                 {
                     selected = allCombsOfRings.get(0);
@@ -1509,7 +1509,7 @@ public class EAUtils
                 }
 
                 // append new rings to existing list of rings in graph
-                for (DENOPTIMRing ring : selected)
+                for (Ring ring : selected)
                 {
                     molGraph.addRing(ring);
                 }
@@ -1526,12 +1526,12 @@ public class EAUtils
         // Update the SMILES representation
         if (res!=null)
         {
-            String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
+            String molsmiles = MoleculeUtils.getSMILESForMolecule(mol);
             if (molsmiles == null)
             {
                 String msg = "Evaluation of graph: SMILES is null! "
                                                             + molGraph.toString();
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 molsmiles = "FAIL: NO SMILES GENERATED";
             }
             res[1] = molsmiles;
@@ -1540,11 +1540,11 @@ public class EAUtils
         // Update the INCHI key representation
         if (res!=null)
         {
-            ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
+            ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol);
             if (pr.getFirst() == null)
             {
                 String msg = "Evaluation of graph: INCHI is null!";
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 pr.setFirst("UNDEFINED");
             }
             res[0] = pr.getFirst();
@@ -1609,7 +1609,7 @@ public class EAUtils
     protected static double getPopulationSD(Population molPopulation)
     {
         double[] fitvals = getFitnesses(molPopulation);
-        return DENOPTIMStatUtils.stddev(fitvals, true);
+        return StatUtils.stddev(fitvals, true);
     }
     
 //------------------------------------------------------------------------------
@@ -1623,7 +1623,7 @@ public class EAUtils
      * An additional check is the number of atoms in the graph
      */
 
-    protected static Object[] evaluateGraph(DENOPTIMGraph molGraph, 
+    protected static Object[] evaluateGraph(DGraph molGraph, 
             GAParameters settings) 
             throws DENOPTIMException
     {
@@ -1647,7 +1647,7 @@ public class EAUtils
      * An additional check is the number of atoms in the graph
      */
 
-    protected static Object[] evaluateGraph(DENOPTIMGraph molGraph, 
+    protected static Object[] evaluateGraph(DGraph molGraph, 
             boolean permissive, GAParameters settings) throws DENOPTIMException
     {
         // get settings //TODO: this should happen inside RunTimeParameters
@@ -1668,7 +1668,7 @@ public class EAUtils
         if (molGraph == null)
         {
             String msg = "Evaluation of graph: graph is null!";
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             return null;
         }
 
@@ -1682,7 +1682,7 @@ public class EAUtils
         { 
             String msg ="Evaluation of graph: graph-to-mol returned null! " 
                                                         + molGraph.toString();
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             molGraph.cleanup();
             return null;
         }
@@ -1694,17 +1694,17 @@ public class EAUtils
             String msg = "Evaluation of graph: molecular representation has "
                     + "multiple components. See graph " 
                                                         + molGraph.toString();
-            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+            StaticLogger.appLogger.log(Level.WARNING, msg);
         }
 
         // hopefully the null shouldn't happen if all goes well
         boolean smilesIsAvailable = true;
-        String molsmiles = DENOPTIMMoleculeUtils.getSMILESForMolecule(mol);
+        String molsmiles = MoleculeUtils.getSMILESForMolecule(mol);
         if (molsmiles == null)
         {
             String msg = "Evaluation of graph: SMILES is null! " 
                                                         + molGraph.toString();
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             molsmiles = "FAIL: NO SMILES GENERATED";
             smilesIsAvailable = false;
         }
@@ -1714,7 +1714,7 @@ public class EAUtils
         {
             String msg = "Evaluation of graph: SMILES contains \".\"" 
                                                                   + molsmiles;
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             molGraph.cleanup();
             mol.removeAllElements();
             return null;
@@ -1722,20 +1722,20 @@ public class EAUtils
 
         if (fsParams.getMaxHeavyAtom() > 0 && !permissive)
         {
-            if (DENOPTIMMoleculeUtils.getHeavyAtomCount(mol) >
+            if (MoleculeUtils.getHeavyAtomCount(mol) >
                 fsParams.getMaxHeavyAtom())
             {
                 //System.err.println("Max atoms constraint violated");
                 String msg = "Evaluation of graph: Max atoms constraint "
                                                   + " violated: " + molsmiles;
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 molGraph.cleanup();
                 mol.removeAllElements();
                 return null;
             }
         }
 
-        double mw = DENOPTIMMoleculeUtils.getMolecularWeight(mol);
+        double mw = MoleculeUtils.getMolecularWeight(mol);
 
         if (fsParams.getMaxMW() > 0 && !permissive)
         {
@@ -1744,7 +1744,7 @@ public class EAUtils
                 //System.err.println("Max weight constraint violated");
                 String msg = "Evaluation of graph: Molecular weight "
                        + "constraint violated: " + molsmiles + " | MW: " + mw;
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 molGraph.cleanup();
                 mol.removeAllElements();
                 return null;
@@ -1752,14 +1752,14 @@ public class EAUtils
         }
         mol.setProperty("MOL_WT", mw);
 
-        int nrot = DENOPTIMMoleculeUtils.getNumberOfRotatableBonds(mol);
+        int nrot = MoleculeUtils.getNumberOfRotatableBonds(mol);
         if (fsParams.getMaxRotatableBond() > 0 && !permissive)
         {
             if (nrot > fsParams.getMaxRotatableBond())
             {
                 String msg = "Evaluation of graph: Max rotatable bonds "
                                          + "constraint violated: "+ molsmiles;
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 molGraph.cleanup();
                 mol.removeAllElements();
                 return null;
@@ -1773,7 +1773,7 @@ public class EAUtils
             if (foundForbiddenEnd(molGraph, fragSpace))
             {
                 String msg = "Evaluation of graph: forbidden end in graph!";
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 molGraph.cleanup();
                 mol.removeAllElements();
                 return null;
@@ -1814,7 +1814,7 @@ public class EAUtils
                     String msg = "Evaluation of graph: too many RCAs! "
                                   + rcaTyp + ":" + nThisType + " "
                                   + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                    StaticLogger.appLogger.log(Level.INFO, msg);
                     return null;
                 }
                 if (nThisType < rcParams.getMinRcaPerType() ||
@@ -1823,7 +1823,7 @@ public class EAUtils
                     String msg = "Evaluation of graph: too few RCAs! "
                                   + rcaTyp + ":" + nThisType + " "
                                   + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                    StaticLogger.appLogger.log(Level.INFO, msg);
                     return null;
                 }
 
@@ -1835,17 +1835,17 @@ public class EAUtils
             if (nPossRings < rcParams.getMinRingClosures())
             {
                 String msg = "Evaluation of graph: too few ring candidates";
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
                 return null;
             }
         }
 
         // get the smiles/Inchi representation
-        ObjectPair pr = DENOPTIMMoleculeUtils.getInChIForMolecule(mol);
+        ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol);
         if (pr.getFirst() == null)
         {
             String msg = "Evaluation of graph: INCHI is null!";
-            DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+            StaticLogger.appLogger.log(Level.INFO, msg);
             if (smilesIsAvailable)
                 pr.setFirst("UNDEFINED-INCHI_"+molsmiles);
             else
@@ -1895,7 +1895,7 @@ public class EAUtils
      * @param sigmaTwo parameter used by scheme 2 (middle point)
      * @return the crowding probability.
      */
-    public static double getMolSizeProbability(DENOPTIMGraph graph, 
+    public static double getMolSizeProbability(DGraph graph, 
             GAParameters settings)
     {
         if (!settings.useMolSizeBasedProb())
@@ -1921,7 +1921,7 @@ public class EAUtils
      * @param sigmaTwo parameter used by scheme 2 (middle point)
      * @return the crowding probability.
      */
-    public static double getMolSizeProbability(DENOPTIMGraph graph,
+    public static double getMolSizeProbability(DGraph graph,
             int scheme, double lambda, double sigmaOne, double sigmaTwo)
     {
         return getProbability(graph.getHeavyAtomsCount(), scheme, lambda, 
@@ -1995,7 +1995,7 @@ public class EAUtils
      * @return probability of adding a new building block on the given 
      * attachment point.
      */
-    public static double getCrowdingProbability(DENOPTIMAttachmentPoint ap,
+    public static double getCrowdingProbability(AttachmentPoint ap,
             GAParameters settings)
     {
         int scheme = settings.getCrowdingProbabilityScheme();
@@ -2012,9 +2012,9 @@ public class EAUtils
      * an atom that is holding other attachment points which have already been
      * used. This method does not use the actual information on attachment point
      * usage, but relies on a externally calculated values of the crowdedness.
-     * Use {@link EAUtils#getCrowdingProbability(DENOPTIMAttachmentPoint)} to
+     * Use {@link EAUtils#getCrowdingProbability(AttachmentPoint)} to
      * get the crowding probability for an actual attachment point.
-     * Use {@link EAUtils#getCrowdedness(DENOPTIMAttachmentPoint)} to calculate
+     * Use {@link EAUtils#getCrowdedness(AttachmentPoint)} to calculate
      * the crowdedness for an attachment point.
      * @param crowdedness the level of crowdedness
      * @return probability of adding a new building block on an attachment point
@@ -2040,7 +2040,7 @@ public class EAUtils
      * holds the given attachment point are used by non-capping group building 
      * blocks.
      */
-    public static int getCrowdedness(DENOPTIMAttachmentPoint ap)
+    public static int getCrowdedness(AttachmentPoint ap)
     {
         return getCrowdedness(ap,false);
     }
@@ -2056,7 +2056,7 @@ public class EAUtils
      * holds the given attachment point are used by non-capping group building 
      * blocks. Returns zero for APs belonging to {@link EmptyVertex}s.
      */
-    public static int getCrowdedness(DENOPTIMAttachmentPoint ap, 
+    public static int getCrowdedness(AttachmentPoint ap, 
             boolean ignoreFreeRCVs)
     {
         if (ap.getOwner() instanceof EmptyVertex)
@@ -2064,8 +2064,8 @@ public class EAUtils
             return 0;
         }
         int crowdness = 0;
-        DENOPTIMGraph g = ap.getOwner().getGraphOwner();
-        for (DENOPTIMAttachmentPoint oap : ap.getOwner().getAttachmentPoints())
+        DGraph g = ap.getOwner().getGraphOwner();
+        for (AttachmentPoint oap : ap.getOwner().getAttachmentPoints())
         {
             if (oap.getAtomPositionNumber() == ap.getAtomPositionNumber()
                     && !oap.isAvailableThroughout() 
@@ -2098,12 +2098,12 @@ public class EAUtils
      * @return probability of adding a new building block on the given 
      * attachment point.
      */
-    public static double getCrowdingProbability(DENOPTIMAttachmentPoint ap, 
+    public static double getCrowdingProbability(AttachmentPoint ap, 
             int scheme,
             double lambda, double sigmaOne, double sigmaTwo)
     {   
         //Applies only to molecular fragments
-        if (ap.getOwner() instanceof DENOPTIMFragment == false)
+        if (ap.getOwner() instanceof Fragment == false)
         {
             return 1.0;
         }
@@ -2140,15 +2140,15 @@ public class EAUtils
      * @return <code>true</code> if a forbidden end is found
      */
 
-    protected static boolean foundForbiddenEnd(DENOPTIMGraph molGraph,
+    protected static boolean foundForbiddenEnd(DGraph molGraph,
             FragmentSpace fragSpace)
     {
-        ArrayList<DENOPTIMVertex> vertices = molGraph.getVertexList();
+        ArrayList<Vertex> vertices = molGraph.getVertexList();
         Set<APClass> classOfForbEnds = fragSpace.getForbiddenEndList();
-        for (DENOPTIMVertex vtx : vertices)
+        for (Vertex vtx : vertices)
         {
-            ArrayList<DENOPTIMAttachmentPoint> daps = vtx.getAttachmentPoints();
-            for (DENOPTIMAttachmentPoint dp : daps)
+            ArrayList<AttachmentPoint> daps = vtx.getAttachmentPoints();
+            for (AttachmentPoint dp : daps)
             {
                 if (dp.isAvailable())
                 {
@@ -2161,7 +2161,7 @@ public class EAUtils
                             + " Ftype: " + vtx.getBuildingBlockType()
                             + "\n"+ molGraph+" \n "
                             + " AP class: " + apClass;
-                        DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+                        StaticLogger.appLogger.log(Level.WARNING, msg);
                         return true;
                     }
                 }

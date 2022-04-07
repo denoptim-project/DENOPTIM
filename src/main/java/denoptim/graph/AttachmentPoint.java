@@ -32,14 +32,14 @@ import org.openscience.cdk.interfaces.IAtom;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 import denoptim.utils.GraphUtils;
 
 /**
- * An attachment point (AP) is a possibility to attach a {@link DENOPTIMVertex} 
+ * An attachment point (AP) is a possibility to attach a {@link Vertex} 
  * onto the vertex
  * holding the AP (i.e., the owner of the AP), this way forming a new 
- * {@link DENOPTIMEdge} (i.e., the user of the AP).
+ * {@link Edge} (i.e., the user of the AP).
  * It can be annotated with the index (position) of an atom
  * in the molecule, which is called the attachment point's source atom,
  * three-dimensional information in the form of Cartesian coordinates,
@@ -50,8 +50,8 @@ import denoptim.utils.GraphUtils;
  */
 
 
-public class DENOPTIMAttachmentPoint implements Cloneable, 
-    Comparable<DENOPTIMAttachmentPoint>
+public class AttachmentPoint implements Cloneable, 
+    Comparable<AttachmentPoint>
 {
     /**
      * Index used to keep the order in a list of attachment points
@@ -82,12 +82,12 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
     /**
      * The vertex to which this AP is attached to.
      */
-    private DENOPTIMVertex owner;
+    private Vertex owner;
     
     /**
      * The edge that is using this AP, if any
      */
-    private DENOPTIMEdge user;
+    private Edge user;
     
     /**
      * Map of customisable properties
@@ -107,7 +107,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
     // The DENOPTIMFragment should thus be charged with keeping the reference to
     // the atom that holds the AP.
     
-    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner) 
+    public AttachmentPoint(Vertex owner) 
     {
         this.owner = owner;
         id = GraphUtils.getUniqueAPIndex();
@@ -120,7 +120,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * @param owner the vertex that holds the attachment point under creation.
      * @param atomPositionNumber the index of the source atom (0-based)
      */
-    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber) 
+    public AttachmentPoint(Vertex owner, int atomPositionNumber) 
     {
         this(owner);
         this.atomPositionNumber = atomPositionNumber;
@@ -135,7 +135,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * @param dirVec the AP direction vector end (the beginning are the
      * coords of the source atom). This array must have 3 entries.
      */
-    private DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPositionNumber,
+    private AttachmentPoint(Vertex owner, int atomPositionNumber,
             Point3d dirVec) 
     {
         this(owner, atomPositionNumber);
@@ -153,7 +153,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * @param atomPosNum the index of the source atom (0-based)
      * @param apClass the APClass
      */
-    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum,
+    public AttachmentPoint(Vertex owner, int atomPosNum,
                                    APClass apClass) {
         this(owner, atomPosNum, null, apClass);
     }
@@ -169,7 +169,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * coordinates of the source atom). This must array have 3 entries.
      * @param apClass the APClass
      */
-    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, int atomPosNum, 
+    public AttachmentPoint(Vertex owner, int atomPosNum, 
             Point3d dirVec, APClass apClass) 
     {
         this(owner, atomPosNum, dirVec);
@@ -185,7 +185,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * @param str the formatted string.
      * @throws DENOPTIMException
      */
-    public DENOPTIMAttachmentPoint(DENOPTIMVertex owner, String str)
+    public AttachmentPoint(Vertex owner, String str)
             throws DENOPTIMException
     {
         this(owner);
@@ -439,7 +439,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * itself the inner graph of a template, the AP might be projected on the
      * template's surface and used to make an edge at that level. To account for
      * such possibility use 
-     * {@link DENOPTIMAttachmentPoint#isAvailableThroughout()}
+     * {@link AttachmentPoint#isAvailableThroughout()}
      * @return <code>true</code> if the attachment point has no user.
      */
 
@@ -460,7 +460,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * template's surface and used to make an edge that uses the template as a 
      * single vertex. To ignore this possibility and consider only edges
      * that belong to the graph owning the AP's vertex, use 
-     * {@link DENOPTIMAttachmentPoint#isAvailable()}.
+     * {@link AttachmentPoint#isAvailable()}.
      * @return <code>true</code> if the attachment point has no user.
      */
 
@@ -471,7 +471,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
             if (owner != null && owner.getGraphOwner() != null 
                     && owner.getGraphOwner().templateJacket != null)
             {
-                DENOPTIMAttachmentPoint apProjOnTemplateSurface =
+                AttachmentPoint apProjOnTemplateSurface =
                         owner.getGraphOwner().templateJacket
                         .getOuterAPFromInnerAP(this);
                 if (apProjOnTemplateSurface != null)
@@ -513,7 +513,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * @return an integer that can be used by a comparator
      */
     @Override
-    public int compareTo(DENOPTIMAttachmentPoint other)
+    public int compareTo(AttachmentPoint other)
     {
         return Integer.compare(this.getID(), other.getID());
     }
@@ -527,7 +527,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * @param other
      * @return an integer that can be used by a comparator.
      */
-    public int comparePropertiesTo(DENOPTIMAttachmentPoint other)
+    public int comparePropertiesTo(AttachmentPoint other)
     {
         final int BEFORE = -1;
         final int EQUAL = 0;
@@ -610,7 +610,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * @param other AP to compare with this AP.
      * @return <code>true</code> is the two APs have the same features.
      */
-    public boolean sameAs(DENOPTIMAttachmentPoint other)
+    public boolean sameAs(AttachmentPoint other)
     {
         return sameAs(other, new StringBuilder());
     }
@@ -626,7 +626,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * reason for returning <code>false</code>.
      * @return <code>true</code> if the two APs have the same features.
      */
-    public boolean sameAs(DENOPTIMAttachmentPoint other, StringBuilder reason)
+    public boolean sameAs(AttachmentPoint other, StringBuilder reason)
     {
         if (this.getAtomPositionNumber() != other.getAtomPositionNumber())
         {
@@ -665,18 +665,18 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * @return a deep clone
      */
     
-    public DENOPTIMAttachmentPoint clone()
+    public AttachmentPoint clone()
     {   
         if (apClass == null)
         {
             if (dirVec == null)
             {
-                return new DENOPTIMAttachmentPoint(
+                return new AttachmentPoint(
                         getOwner(),
                         atomPositionNumber
                 );
             } else {
-                return new DENOPTIMAttachmentPoint(
+                return new AttachmentPoint(
                         getOwner(),
                         atomPositionNumber,
                         dirVec
@@ -684,13 +684,13 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
             }
         } else {
             if (dirVec == null) {
-                return new DENOPTIMAttachmentPoint(
+                return new AttachmentPoint(
                         getOwner(),
                         atomPositionNumber,
                         apClass.clone()
                 );
             }
-            return new DENOPTIMAttachmentPoint(
+            return new AttachmentPoint(
                     getOwner(),
                     atomPositionNumber,
                     dirVec,
@@ -821,13 +821,13 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * altering graphs!
      * @param owner the vertex that own this attachment point.
      */
-    public void setOwner(DENOPTIMVertex owner) {
+    public void setOwner(Vertex owner) {
         this.owner = owner;
     }
     
 //-----------------------------------------------------------------------------
 
-    public DENOPTIMVertex getOwner() {
+    public Vertex getOwner() {
         return owner;
     }
 
@@ -837,7 +837,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * Sets the reference to the edge that is using this attachment point.
      * @param edge the user
      */
-    public void setUser(DENOPTIMEdge edge) {
+    public void setUser(Edge edge) {
         this.user = edge;
     }
 
@@ -852,11 +852,11 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * template's surface and might be used to make an edge that uses the 
      * template as a single vertex. This method considers only any edge user
      * that belongs to the graph owning the vertex that own this AP, if any such
-     * owners exist. See {@link DENOPTIMAttachmentPoint#getEdgeUserThroughout()}
+     * owners exist. See {@link AttachmentPoint#getEdgeUserThroughout()}
      * to crossing the template boundary.
      * @return the edge that is using this AP.
      */
-    public DENOPTIMEdge getEdgeUser() {
+    public Edge getEdgeUser() {
         return user;
     }
     
@@ -870,12 +870,12 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * itself the inner graph of a template, the AP is then projected on the
      * template's surface and might be used to make an edge that uses the 
      * template as a single vertex. This method considers any level of template
-     * embedding. See {@link DENOPTIMAttachmentPoint#getEdgeUser()}
+     * embedding. See {@link AttachmentPoint#getEdgeUser()}
      * to remain within the template boundary.
      * @return the edge that is using this AP.
      */
 
-    public DENOPTIMEdge getEdgeUserThroughout()
+    public Edge getEdgeUserThroughout()
     {
         if (user == null)
         {
@@ -902,12 +902,12 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * @return this attachment point (for vertexes that are no templates) or
      * the original attachment point this is a projection of (for templates).
      */
-    public DENOPTIMAttachmentPoint getEmbeddedAP()
+    public AttachmentPoint getEmbeddedAP()
     {
-        if (owner != null && owner instanceof DENOPTIMTemplate)
+        if (owner != null && owner instanceof Template)
         {
-            DENOPTIMAttachmentPoint embeddedAP = 
-                    ((DENOPTIMTemplate)owner).getInnerAPFromOuterAP(this);
+            AttachmentPoint embeddedAP = 
+                    ((Template)owner).getInnerAPFromOuterAP(this);
             //NB: if embeddedAP has no further embedding it returns itself
             return embeddedAP.getEmbeddedAP();
         } else {
@@ -922,7 +922,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * user.
      * @return the AP linked with this AP, or null;
      */
-    public DENOPTIMAttachmentPoint getLinkedAP() 
+    public AttachmentPoint getLinkedAP() 
     {
         if (user == null)
             return null;
@@ -946,12 +946,12 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * reachable. Note that the AP that is used in the edge might not be the 
      * deepest image of that AP, i.e., the AP returned by this method might be
      * a projection of a more deeply embedded AP, which you can get by using the
-     * {@link DENOPTIMAttachmentPoint#getEmbeddedAP()} method.
+     * {@link AttachmentPoint#getEmbeddedAP()} method.
      * @return the AP linked with this AP, or null;
      */
-    public DENOPTIMAttachmentPoint getLinkedAPThroughout() 
+    public AttachmentPoint getLinkedAPThroughout() 
     {
-        DENOPTIMEdge user = getEdgeUserThroughout();
+        Edge user = getEdgeUserThroughout();
         if (user == null)
         {
             return null;
@@ -981,7 +981,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      */
     public boolean isSrcInUserThroughout()
     {
-        DENOPTIMEdge user = getEdgeUserThroughout();
+        Edge user = getEdgeUserThroughout();
         if (user == null)
         {
             return false;
@@ -1020,19 +1020,19 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
     
 //------------------------------------------------------------------------------
     
-    public boolean hasSameSrcAtom(DENOPTIMAttachmentPoint other)
+    public boolean hasSameSrcAtom(AttachmentPoint other)
     {
-        DENOPTIMAttachmentPoint deepThis = getEmbeddedAP();
-        DENOPTIMAttachmentPoint deepOther = other.getEmbeddedAP();
-        DENOPTIMVertex deepOwnerT = deepThis.getOwner();
-        DENOPTIMVertex deepOwnerO = deepOther.getOwner();
+        AttachmentPoint deepThis = getEmbeddedAP();
+        AttachmentPoint deepOther = other.getEmbeddedAP();
+        Vertex deepOwnerT = deepThis.getOwner();
+        Vertex deepOwnerO = deepOther.getOwner();
         
-        if (deepOwnerT instanceof DENOPTIMFragment
-                && deepOwnerO instanceof DENOPTIMFragment)
+        if (deepOwnerT instanceof Fragment
+                && deepOwnerO instanceof Fragment)
         {
-            IAtom srcThis = ((DENOPTIMFragment) deepOwnerT).getAtomHoldingAP(
+            IAtom srcThis = ((Fragment) deepOwnerT).getAtomHoldingAP(
                     deepThis);
-            IAtom srcOther = ((DENOPTIMFragment) deepOwnerO).getAtomHoldingAP(
+            IAtom srcOther = ((Fragment) deepOwnerO).getAtomHoldingAP(
                     deepOther);
             
             if (srcThis == srcOther)
@@ -1055,19 +1055,19 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
      * participate in a bond either within a molecular fragment or across
      * a graph edge.
      */
-    public boolean hasConnectedSrcAtom(DENOPTIMAttachmentPoint other)
+    public boolean hasConnectedSrcAtom(AttachmentPoint other)
     {
-        DENOPTIMAttachmentPoint deepThis = getEmbeddedAP();
-        DENOPTIMAttachmentPoint deepOther = other.getEmbeddedAP();
-        DENOPTIMVertex deepOwnerT = deepThis.getOwner();
-        DENOPTIMVertex deepOwnerO = deepOther.getOwner();
+        AttachmentPoint deepThis = getEmbeddedAP();
+        AttachmentPoint deepOther = other.getEmbeddedAP();
+        Vertex deepOwnerT = deepThis.getOwner();
+        Vertex deepOwnerO = deepOther.getOwner();
         
-        if (deepOwnerT instanceof DENOPTIMFragment
-                && deepOwnerO instanceof DENOPTIMFragment)
+        if (deepOwnerT instanceof Fragment
+                && deepOwnerO instanceof Fragment)
         {
-            IAtom srcThis = ((DENOPTIMFragment) deepOwnerT).getAtomHoldingAP(
+            IAtom srcThis = ((Fragment) deepOwnerT).getAtomHoldingAP(
                     deepThis);
-            IAtom srcOther = ((DENOPTIMFragment) deepOwnerO).getAtomHoldingAP(
+            IAtom srcOther = ((Fragment) deepOwnerO).getAtomHoldingAP(
                     deepOther);
             
             if (srcThis.getContainer() == srcOther.getContainer())
@@ -1080,20 +1080,20 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
             } else {
                 // If the two atoms are not directly connected, they
                 // might be connected via an edge in the graph.
-                List<DENOPTIMAttachmentPoint> apsOnSrcThis = 
-                        ((DENOPTIMFragment)deepOwnerT).getAPsFromAtom(srcThis);
-                List<DENOPTIMAttachmentPoint> apsOnSrcOther = 
-                        ((DENOPTIMFragment)deepOwnerT).getAPsFromAtom(srcOther);
-                for (DENOPTIMAttachmentPoint apOnSrcThis : apsOnSrcThis)
+                List<AttachmentPoint> apsOnSrcThis = 
+                        ((Fragment)deepOwnerT).getAPsFromAtom(srcThis);
+                List<AttachmentPoint> apsOnSrcOther = 
+                        ((Fragment)deepOwnerT).getAPsFromAtom(srcOther);
+                for (AttachmentPoint apOnSrcThis : apsOnSrcThis)
                 {
                     // We ignore the connection deepThis-to-deepOther
                     if (apOnSrcThis.isAvailableThroughout() 
                             || apOnSrcThis==deepThis)
                         continue;
                     
-                    DENOPTIMAttachmentPoint linkedAP = 
+                    AttachmentPoint linkedAP = 
                             apOnSrcThis.getLinkedAPThroughout().getEmbeddedAP();
-                    for (DENOPTIMAttachmentPoint apOnSrcOther : apsOnSrcOther)
+                    for (AttachmentPoint apOnSrcOther : apsOnSrcOther)
                     {
                         if (apOnSrcOther.isAvailableThroughout() 
                                 || apOnSrcOther==deepOther)
@@ -1136,8 +1136,8 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
     
     /**
      * Prepares the two strings that can be used to define 
-     * {@link DENOPTIMAttachmentPoint}s in SDF files.
-     * @param apsPerIndex a map of {@link DENOPTIMAttachmentPoint}s grouped by 
+     * {@link AttachmentPoint}s in SDF files.
+     * @param apsPerIndex a map of {@link AttachmentPoint}s grouped by 
      * index. The index may or may not be an index of an existing atom (i.e.,
      * we do not use it as such, but we just place if in the text-representation
      * of the AP. This index is supposed to be 0-based (i.e., in this method it 
@@ -1156,7 +1156,7 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
     // "1#firstAP 1#second-AP"
     
     public static String getAPDefinitionsForSDF(
-            LinkedHashMap<Integer, List<DENOPTIMAttachmentPoint>> apsPerIndex)
+            LinkedHashMap<Integer, List<AttachmentPoint>> apsPerIndex)
     {   
         String s = "";
         for (Integer ii : apsPerIndex.keySet())
@@ -1165,12 +1165,12 @@ public class DENOPTIMAttachmentPoint implements Cloneable,
             // fake atom IDs!
             int atmID = ii+1;
     
-            List<DENOPTIMAttachmentPoint> apsOnAtm = apsPerIndex.get(ii);
+            List<AttachmentPoint> apsOnAtm = apsPerIndex.get(ii);
             
             boolean firstCL = true;
             for (int i = 0; i<apsOnAtm.size(); i++)
             {
-                DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
+                AttachmentPoint ap = apsOnAtm.get(i);
                 
                 //Build SDF property DENOPTIMConstants.APCVTAG
                 String stingAPP = ""; //String Attachment Point Property

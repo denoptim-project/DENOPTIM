@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import denoptim.graph.APMapping;
-import denoptim.graph.DENOPTIMAttachmentPoint;
+import denoptim.graph.AttachmentPoint;
 
 
 /**
@@ -50,21 +50,21 @@ public class FragmentSpaceUtils
      * number is reached then we stop searching for more.
      * @return a flag indicating whether execution was stopper or not.
      */
-    public static boolean recursiveCombiner(List<DENOPTIMAttachmentPoint> keys,
-            int currentKey, Map<DENOPTIMAttachmentPoint,
-                List<DENOPTIMAttachmentPoint>> possibilities,
+    public static boolean recursiveCombiner(List<AttachmentPoint> keys,
+            int currentKey, Map<AttachmentPoint,
+                List<AttachmentPoint>> possibilities,
             APMapping combination, List<APMapping> completeCombinations, 
             boolean screenAll, int maxCombs)
     {
         boolean stopped = false;
-        DENOPTIMAttachmentPoint apA = keys.get(currentKey);
+        AttachmentPoint apA = keys.get(currentKey);
         for (int i=0; i<possibilities.get(apA).size(); i++)
         {
             // Prevent combinatorial explosion.
             if (stopped)
                 break;
             
-            DENOPTIMAttachmentPoint apB = possibilities.get(apA).get(i);
+            AttachmentPoint apB = possibilities.get(apA).get(i);
             
             // Move on if apB is already used by another pairing
             if (combination.containsValue(apB))

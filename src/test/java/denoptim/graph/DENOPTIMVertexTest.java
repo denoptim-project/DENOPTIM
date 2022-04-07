@@ -16,8 +16,8 @@ import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.graph.DENOPTIMVertex.VertexType;
+import denoptim.graph.Vertex.BBType;
+import denoptim.graph.Vertex.VertexType;
 import denoptim.utils.MutationType;
 
 /**
@@ -38,20 +38,20 @@ public class DENOPTIMVertexTest
         EmptyVertex ev = new EmptyVertex();
         assertEquals(VertexType.EmptyVertex,ev.vertexType);
         String evStr = ev.toJson();
-        DENOPTIMVertex ev2 = DENOPTIMVertex.fromJson(evStr);
+        Vertex ev2 = Vertex.fromJson(evStr);
         assertTrue(ev2 instanceof EmptyVertex);
         
-        DENOPTIMFragment f = new DENOPTIMFragment();
+        Fragment f = new Fragment();
         assertEquals(VertexType.MolecularFragment,f.vertexType);
         String fStr = f.toJson();
-        DENOPTIMVertex f2 = DENOPTIMVertex.fromJson(fStr);
-        assertTrue(f2 instanceof DENOPTIMFragment);
+        Vertex f2 = Vertex.fromJson(fStr);
+        assertTrue(f2 instanceof Fragment);
         
-        DENOPTIMTemplate t = new DENOPTIMTemplate(BBType.FRAGMENT);
+        Template t = new Template(BBType.FRAGMENT);
         assertEquals(VertexType.Template,t.vertexType);
         String tStr = t.toJson();
-        DENOPTIMVertex t2 = DENOPTIMVertex.fromJson(tStr);
-        assertTrue(t2 instanceof DENOPTIMTemplate);
+        Vertex t2 = Vertex.fromJson(tStr);
+        assertTrue(t2 instanceof Template);
     }
 	
 //------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ public class DENOPTIMVertexTest
         v.addAP();
         v.setProperty("PROPNAME","PROVALUE");
         
-        DENOPTIMVertex c = v.clone();
+        Vertex c = v.clone();
         
         assertEquals(v.getVertexId(), c.getVertexId(), "Vertex ID");
         assertEquals(v.getNumberOfAPs(), c.getNumberOfAPs(), "Number of APS");
@@ -129,7 +129,7 @@ public class DENOPTIMVertexTest
         assertEquals("PROVALUE",c.getProperty("PROPNAME"));
         
         
-        DENOPTIMFragment v2 = new DENOPTIMFragment();
+        Fragment v2 = new Fragment();
         Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
         Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
@@ -148,7 +148,7 @@ public class DENOPTIMVertexTest
         v2.addAPOnAtom(a1, APClass.make(APCLASS), new Point3d(
                 new double[]{3.0, 0.0, 3.3}));
         
-        DENOPTIMVertex c2 = v2.clone();
+        Vertex c2 = v2.clone();
         
         assertEquals(v2.getVertexId(), c2.getVertexId(), "Vertex ID");
         assertEquals(v2.getNumberOfAPs(), c2.getNumberOfAPs(), "Number of APS");
@@ -166,19 +166,19 @@ public class DENOPTIMVertexTest
     @Test
     public void testGetMutationSites() throws Exception
     {
-        DENOPTIMVertex v = new EmptyVertex(DENOPTIMVertex.BBType.FRAGMENT);
+        Vertex v = new EmptyVertex(Vertex.BBType.FRAGMENT);
         assertEquals(1,v.getMutationSites().size(),
                 "Fragments return themselves as mutable sites.");
-        v = new EmptyVertex(DENOPTIMVertex.BBType.SCAFFOLD);
+        v = new EmptyVertex(Vertex.BBType.SCAFFOLD);
         assertEquals(0,v.getMutationSites().size(),
                 "Scaffolds so not return any mutable site.");
-        v = new EmptyVertex(DENOPTIMVertex.BBType.CAP);
+        v = new EmptyVertex(Vertex.BBType.CAP);
         assertEquals(0,v.getMutationSites().size(),
                 "Capping groups so not return any mutable site.");
-        v = new EmptyVertex(DENOPTIMVertex.BBType.UNDEFINED);
+        v = new EmptyVertex(Vertex.BBType.UNDEFINED);
         assertEquals(1,v.getMutationSites().size(),
                 "Undefined building block return themselves as mutable sites.");
-        v = new EmptyVertex(DENOPTIMVertex.BBType.NONE);
+        v = new EmptyVertex(Vertex.BBType.NONE);
         assertEquals(1,v.getMutationSites().size(),
                 "'None' building block return themselves as mutable sites.");
         

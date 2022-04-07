@@ -40,11 +40,11 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragsCombinationIterator;
 import denoptim.fragspace.IdFragmentAndAP;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.GraphUtils;
 
@@ -188,7 +188,7 @@ public class CombinatorialExplorerByLayer
                     {
                         ex.printStackTrace();
                         String msg = "EXCEPTION in rejectedExecution.";
-                        DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+                        StaticLogger.appLogger.log(Level.WARNING,msg);
                     }
                 }
             }
@@ -360,7 +360,7 @@ public class CombinatorialExplorerByLayer
                   + "Now reading '" + DENOPTIMConstants.SERGFILENAMEEXT + "' "
                   + "files from '" 
                   + CEBLUtils.getNameOfStorageDir(settings, level) + "'.";
-            DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+            StaticLogger.appLogger.log(Level.WARNING,msg);
             
             if (!denoptim.files.FileUtils.checkExists(
                     CEBLUtils.getNameOfStorageDir(settings, level)))
@@ -370,7 +370,7 @@ public class CombinatorialExplorerByLayer
             			+ "' does not exist! Use 'FSE-DBROOTFOLDER' to "
             			+ "provide the pathname to the existing folder where "
             			+ "the previously generated graphs are located.";
-                DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
+                StaticLogger.appLogger.log(Level.SEVERE,msg);
             	throw new DENOPTIMException(msg);
             }
 
@@ -389,7 +389,7 @@ public class CombinatorialExplorerByLayer
                 if (serGrphID > chk.getLatestSafelyCompletedGraphId())
                 {
                     msg = "Removing non-safely completed graph '" + fName + "'";
-                    DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+                    StaticLogger.appLogger.log(Level.WARNING,msg);
                     serFromChkRestart--;
                     denoptim.files.FileUtils.deleteFile(
                             CEBLUtils.getNameOfStorageDir(settings, level)
@@ -402,7 +402,7 @@ public class CombinatorialExplorerByLayer
         while (level <= settings.getMaxLevel())
         {
             msg = "Starting exploration of level " + level; 
-            DENOPTIMLogger.appLogger.log(Level.INFO,msg);
+            StaticLogger.appLogger.log(Level.INFO,msg);
 
             int numSubTasks = exploreCombinationsAtGivenLevel(level);
 
@@ -430,7 +430,7 @@ public class CombinatorialExplorerByLayer
                                   + "listed in " 
                                   + CEBLUtils.getNameOfStorageDir(settings, level)
                                   + "(" + outCount + ")";
-                            DENOPTIMLogger.appLogger.log(Level.SEVERE,msg);
+                            StaticLogger.appLogger.log(Level.SEVERE,msg);
                             throw new DENOPTIMException(msg);
                         }
                         break;
@@ -453,14 +453,14 @@ public class CombinatorialExplorerByLayer
                                          TimeUnit.MILLISECONDS.toSeconds(millis)
                                                    - TimeUnit.MINUTES.toSeconds(
                                       TimeUnit.MILLISECONDS.toMinutes(millis)));
-                        DENOPTIMLogger.appLogger.log(Level.INFO,msg);
+                        StaticLogger.appLogger.log(Level.INFO,msg);
                     }
     
                     if (millis > settings.getMaxWait())
                     {
                         stopRun();
                         msg = "Timeout reached: stopping all subtasks.";
-                        DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+                        StaticLogger.appLogger.log(Level.SEVERE, msg);
                         interrupted = true;
                         break;
                     }
@@ -491,7 +491,7 @@ public class CombinatorialExplorerByLayer
                     + "----------------------------------------"
                     + "----------------------------------------" 
                     + DENOPTIMConstants.EOL;
-                DENOPTIMLogger.appLogger.log(Level.INFO,msg);
+                StaticLogger.appLogger.log(Level.INFO,msg);
             }
 
             // Increment level index
@@ -526,7 +526,7 @@ public class CombinatorialExplorerByLayer
                     + "----------------------------------------"
                     + "----------------------------------------" 
                     + DENOPTIMConstants.EOL;
-                DENOPTIMLogger.appLogger.log(Level.INFO,msg);
+                StaticLogger.appLogger.log(Level.INFO,msg);
                 break;
             }
 
@@ -544,7 +544,7 @@ public class CombinatorialExplorerByLayer
         msg = "Overall time: " + watch.toString() + ". " 
             + DENOPTIMConstants.EOL
             + "FragSpaceExplorer run completed." + DENOPTIMConstants.EOL;
-        DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+        StaticLogger.appLogger.log(Level.INFO, msg);
     }
 
 //------------------------------------------------------------------------------
@@ -564,7 +564,7 @@ public class CombinatorialExplorerByLayer
         // The very first level only has the scaffold or the user defined roots
         if (level == -1)
         {
-            ArrayList<DENOPTIMGraph> scafLevel = new ArrayList<DENOPTIMGraph>();
+            ArrayList<DGraph> scafLevel = new ArrayList<DGraph>();
             if (settings.useGivenRoots())
             {
                 // User defined root graphs
@@ -576,9 +576,9 @@ public class CombinatorialExplorerByLayer
                            + "points is considered to be '-1' "
                            + "no matter what is the actual level of such APs "
                            + "in the root graph.";
-                    DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+                    StaticLogger.appLogger.log(Level.WARNING, msg);
                 }
-                for (DENOPTIMGraph rootGraph : settings.getRootGraphs())
+                for (DGraph rootGraph : settings.getRootGraphs())
                 {
                     // Vertex ID in root can be whatever and we ignore them
                     // when setting new vertex IDs. To do this, we change sign
@@ -632,7 +632,7 @@ public class CombinatorialExplorerByLayer
                 continue;
             }
 
-            DENOPTIMGraph rootGraph = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
+            DGraph rootGraph = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
                     file.getAbsolutePath()).get(0);
                     
             // Get combination factory
@@ -678,7 +678,7 @@ public class CombinatorialExplorerByLayer
                 	}
                 }
                 msg = sb.toString() + DENOPTIMConstants.EOL;
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
             }
 
             // Iterate over all combinations 
@@ -813,14 +813,14 @@ public class CombinatorialExplorerByLayer
                 {
                     msg = msg  + " => " + rootGraph;
                 }
-                DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+                StaticLogger.appLogger.log(Level.INFO, msg);
             }
             total = total + fcf.getNumGeneratedCombs();
         }
 
         msg = "Total number of combination of fragments generated "
               + "for level " + level + " = " + total;
-        DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+        StaticLogger.appLogger.log(Level.INFO, msg);
 
 /*
         // Code meant only to generate checkpoint file at the end of a level
@@ -848,13 +848,13 @@ public class CombinatorialExplorerByLayer
      * of scaffolds)
      * @return a graph containing only the scaffold of which the molID is given
      */
-    private DENOPTIMGraph startNewGraphFromScaffold(int scafIdx) 
+    private DGraph startNewGraphFromScaffold(int scafIdx) 
                                                         throws DENOPTIMException
     {
-        DENOPTIMGraph molGraph = new DENOPTIMGraph();
+        DGraph molGraph = new DGraph();
         molGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
-        DENOPTIMVertex scafVertex = DENOPTIMVertex.newVertexFromLibrary(
+        Vertex scafVertex = Vertex.newVertexFromLibrary(
                 GraphUtils.getUniqueVertexIndex(), scafIdx, BBType.SCAFFOLD,
                 fsSettings.getFragmentSpace());
 

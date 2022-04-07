@@ -29,11 +29,11 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
-import denoptim.utils.DENOPTIMGraphEdit;
+import denoptim.utils.GraphEdit;
 
 
 /**
@@ -52,8 +52,8 @@ public class GraphEdParameters extends RunTimeParameters
     /**
      * Input graphs
      */
-    private ArrayList<DENOPTIMGraph> inGraphs = 
-					         new ArrayList<DENOPTIMGraph>();
+    private ArrayList<DGraph> inGraphs = 
+					         new ArrayList<DGraph>();
 
     /**
      * Input molecular objects
@@ -68,7 +68,7 @@ public class GraphEdParameters extends RunTimeParameters
     /**
      * Graph's editing tasks
      */
-    private ArrayList<DENOPTIMGraphEdit> graphEdits;
+    private ArrayList<GraphEdit> graphEdits;
 
     /**
      * File with output graphs
@@ -93,14 +93,14 @@ public class GraphEdParameters extends RunTimeParameters
 
 //-----------------------------------------------------------------------------
 
-    public ArrayList<DENOPTIMGraphEdit> getGraphEditTasks()
+    public ArrayList<GraphEdit> getGraphEditTasks()
     {
         return graphEdits;
     }
     
 //-----------------------------------------------------------------------------
 
-    public ArrayList<DENOPTIMGraph> getInputGraphs()
+    public ArrayList<DGraph> getInputGraphs()
     {
         return inGraphs;
     }
@@ -310,14 +310,14 @@ public class GraphEdParameters extends RunTimeParameters
             {
                 String msg = "Cannot read in graph editing tasks from " 
                                                               + graphEditsFile;
-                DENOPTIMLogger.appLogger.log(Level.INFO,msg);
+                StaticLogger.appLogger.log(Level.INFO,msg);
                 throw new DENOPTIMException(msg,t);
             }
         }
 
         try
         {
-            DENOPTIMLogger.getInstance().setupLogger(logFile);
+            StaticLogger.getInstance().setupLogger(logFile);
         }
         catch (IOException ioe)
         {
@@ -337,7 +337,7 @@ public class GraphEdParameters extends RunTimeParameters
         catch (Throwable t)
         {
             String msg = "Cannot read in graphs from " + inGraphsFile;
-            DENOPTIMLogger.appLogger.log(Level.INFO,msg);
+            StaticLogger.appLogger.log(Level.INFO,msg);
             throw new DENOPTIMException(msg,t);
         }
     }

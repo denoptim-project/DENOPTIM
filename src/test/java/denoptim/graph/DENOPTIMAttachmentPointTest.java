@@ -35,7 +35,7 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Vertex.BBType;
 
 /**
  * Unit test for DENOPTIMAttachmentPoint
@@ -66,35 +66,35 @@ public class DENOPTIMAttachmentPointTest
         vA1.addAP();
         vA1.addAP();
         vA1.addAP();
-        ArrayList<DENOPTIMAttachmentPoint> deepAPs1 = vA1.getAttachmentPoints();
+        ArrayList<AttachmentPoint> deepAPs1 = vA1.getAttachmentPoints();
         EmptyVertex vB1 = new EmptyVertex(1);
         vB1.addAP();
         
-        DENOPTIMGraph gL01 = new DENOPTIMGraph();
+        DGraph gL01 = new DGraph();
         gL01.addVertex(vA1);
         gL01.appendVertexOnAP(vA1.getAP(0), vB1.getAP(0));
         
-        DENOPTIMTemplate tL01 = new DENOPTIMTemplate(BBType.NONE);
+        Template tL01 = new Template(BBType.NONE);
         tL01.setInnerGraph(gL01);
 
-        DENOPTIMVertex old1 = tL01;
+        Vertex old1 = tL01;
         
         int[] expected1 = {6,5,4,3,2,1};
         
-        DENOPTIMEdge e1 = gL01.getEdgeAtPosition(0); //there is only 1 edge
-        DENOPTIMAttachmentPoint srcAP1 = e1.getSrcAPThroughout();
-        DENOPTIMAttachmentPoint trgAP1 = e1.getTrgAPThroughout();
+        Edge e1 = gL01.getEdgeAtPosition(0); //there is only 1 edge
+        AttachmentPoint srcAP1 = e1.getSrcAPThroughout();
+        AttachmentPoint trgAP1 = e1.getTrgAPThroughout();
         assertTrue(deepAPs1.contains(srcAP1),"srcAP is deep");
         assertTrue(trgAP1==vB1.getAP(0),"trgAP is on surface");
         checkIdentityOfEmbeddedAP(expected1[0],deepAPs1,old1);
         
-        List<DENOPTIMVertex> addedVertexes1 = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> addedVertexes1 = new ArrayList<Vertex>();
         addedVertexes1.add(vB1);
         for (int i=1; i<6; i++)
         {
             EmptyVertex vNew = new EmptyVertex(1);
             vNew.addAP();
-            DENOPTIMGraph gNew = new DENOPTIMGraph();
+            DGraph gNew = new DGraph();
             gNew.addVertex(old1);
             gNew.appendVertexOnAP(old1.getAP(0), vNew.getAP(0));
             addedVertexes1.add(vNew);
@@ -105,7 +105,7 @@ public class DENOPTIMAttachmentPointTest
             assertTrue(deepAPs1.contains(srcAP1),"srcAP is deep");
             assertTrue(trgAP1==vNew.getAP(0),"trgAP is on surface");
             
-            DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+            Template template = new Template(BBType.NONE);
             template.setInnerGraph(gNew);
             old1 = template;
 
@@ -114,13 +114,13 @@ public class DENOPTIMAttachmentPointTest
         
         int nTotAvailAPs1 = 0;
         int correntLinks1 = 0;
-        for (DENOPTIMAttachmentPoint deepAP : vA1.getAttachmentPoints())
+        for (AttachmentPoint deepAP : vA1.getAttachmentPoints())
         {
             if (deepAP.isAvailableThroughout())
             {
                 nTotAvailAPs1++;
             } else {
-                DENOPTIMVertex linkedOwner = deepAP.getLinkedAPThroughout().getOwner();
+                Vertex linkedOwner = deepAP.getLinkedAPThroughout().getOwner();
                 if (addedVertexes1.contains(linkedOwner))
                     correntLinks1++;
             }
@@ -140,11 +140,11 @@ public class DENOPTIMAttachmentPointTest
         vA2.addAP();
         vA2.addAP();
         vA2.addAP();
-        ArrayList<DENOPTIMAttachmentPoint> deepAPs2 = vA2.getAttachmentPoints();
+        ArrayList<AttachmentPoint> deepAPs2 = vA2.getAttachmentPoints();
         EmptyVertex vB2 = new EmptyVertex(1);
         vB2.addAP();
         
-        DENOPTIMGraph gL02 = new DENOPTIMGraph();
+        DGraph gL02 = new DGraph();
         
         //NB: here we pick the other vertex as source (w.r.t. gL01)
         gL02.addVertex(vB2);
@@ -152,27 +152,27 @@ public class DENOPTIMAttachmentPointTest
         //NB: here is the different direction
         gL02.appendVertexOnAP(vB2.getAP(0),vA2.getAP(0));
         
-        DENOPTIMTemplate tL02 = new DENOPTIMTemplate(BBType.NONE);
+        Template tL02 = new Template(BBType.NONE);
         tL02.setInnerGraph(gL02);
 
-        DENOPTIMVertex old2 = tL02;
+        Vertex old2 = tL02;
         
         int[] expected2 = {6,5,4,3,2,1};
         
-        DENOPTIMEdge e2 = gL02.getEdgeAtPosition(0); //there is only 1 edge
-        DENOPTIMAttachmentPoint srcAP2 = e2.getSrcAPThroughout();
-        DENOPTIMAttachmentPoint trgAP2 = e2.getTrgAPThroughout();
+        Edge e2 = gL02.getEdgeAtPosition(0); //there is only 1 edge
+        AttachmentPoint srcAP2 = e2.getSrcAPThroughout();
+        AttachmentPoint trgAP2 = e2.getTrgAPThroughout();
         assertTrue(deepAPs2.contains(trgAP2),"trgAP is deep");
         assertTrue(srcAP2==vB2.getAP(0),"srcAP is on surface");
         checkIdentityOfEmbeddedAP(expected2[0],deepAPs2,old2);
         
-        List<DENOPTIMVertex> addedVertexes2 = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> addedVertexes2 = new ArrayList<Vertex>();
         addedVertexes2.add(vB2);
         for (int i=1; i<6; i++)
         {
             EmptyVertex vNew = new EmptyVertex(1);
             vNew.addAP();
-            DENOPTIMGraph gNew = new DENOPTIMGraph();
+            DGraph gNew = new DGraph();
             
             //NB: here we pick the other vertex as source
             gNew.addVertex(vNew);
@@ -187,7 +187,7 @@ public class DENOPTIMAttachmentPointTest
             assertTrue(deepAPs2.contains(trgAP2),"trgAP is deep");
             assertTrue(srcAP2==vNew.getAP(0),"srcAP is on surface");
             
-            DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+            Template template = new Template(BBType.NONE);
             template.setInnerGraph(gNew);
             old2 = template;
 
@@ -196,13 +196,13 @@ public class DENOPTIMAttachmentPointTest
         
         int nTotAvailAPs = 0;
         int correntLinks = 0;
-        for (DENOPTIMAttachmentPoint deepAP : vA2.getAttachmentPoints())
+        for (AttachmentPoint deepAP : vA2.getAttachmentPoints())
         {
             if (deepAP.isAvailableThroughout())
             {
                 nTotAvailAPs++;
             } else {
-                DENOPTIMVertex linkedOwner = deepAP.getLinkedAPThroughout().getOwner();
+                Vertex linkedOwner = deepAP.getLinkedAPThroughout().getOwner();
                 if (addedVertexes2.contains(linkedOwner))
                     correntLinks++;
             }
@@ -214,12 +214,12 @@ public class DENOPTIMAttachmentPointTest
 //-----------------------------------------------------------------------------
     
     private void checkIdentityOfEmbeddedAP(int expectedMAtches,
-            ArrayList<DENOPTIMAttachmentPoint> deepAPs, DENOPTIMVertex v)
+            ArrayList<AttachmentPoint> deepAPs, Vertex v)
     {
         int nfound=0;
-        for (DENOPTIMAttachmentPoint outAP : v.getAttachmentPoints())
+        for (AttachmentPoint outAP : v.getAttachmentPoints())
         {
-            DENOPTIMAttachmentPoint ap = outAP.getEmbeddedAP();
+            AttachmentPoint ap = outAP.getEmbeddedAP();
             if (deepAPs.contains(ap))
             {
                 nfound++;
@@ -246,11 +246,11 @@ public class DENOPTIMAttachmentPointTest
         vB.addAP();
         vB.addAP();
         
-        DENOPTIMGraph gL0 = new DENOPTIMGraph();
+        DGraph gL0 = new DGraph();
         gL0.addVertex(vA);
         gL0.appendVertexOnAP(vA.getAP(0), vB.getAP(1));
         
-        DENOPTIMTemplate tL0 = new DENOPTIMTemplate(BBType.NONE);
+        Template tL0 = new Template(BBType.NONE);
         tL0.setInnerGraph(gL0);
         
         int[] expectedN = {6,6,6,6};
@@ -258,15 +258,15 @@ public class DENOPTIMAttachmentPointTest
         
         checkAvailNT(expectedN[0], expectedNThroughout[0], 0, vA);
 
-        DENOPTIMVertex old = tL0;
+        Vertex old = tL0;
         for (int i=1; i<4; i++)
         {
             EmptyVertex vNew = new EmptyVertex(1);
             vNew.addAP();
-            DENOPTIMGraph gNew = new DENOPTIMGraph();
+            DGraph gNew = new DGraph();
             gNew.addVertex(old);
             gNew.appendVertexOnAP(old.getAP(0), vNew.getAP(0));
-            DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+            Template template = new Template(BBType.NONE);
             template.setInnerGraph(gNew);
             checkAvailNT(expectedN[i], expectedNThroughout[i], i, vA);
             old = template;
@@ -275,11 +275,11 @@ public class DENOPTIMAttachmentPointTest
 	
 //-----------------------------------------------------------------------------
 	
-    private void checkAvailNT(int expN, int expNTm, int level, DENOPTIMVertex v)
+    private void checkAvailNT(int expN, int expNTm, int level, Vertex v)
     {
         int n = 0;
         int nThroughout = 0;
-        for (DENOPTIMAttachmentPoint apA : v.getAttachmentPoints())
+        for (AttachmentPoint apA : v.getAttachmentPoints())
         {
             if (apA.isAvailable())
                 n++;
@@ -302,23 +302,23 @@ public class DENOPTIMAttachmentPointTest
         vA.addAP();
         vA.addAP();
         
-        DENOPTIMGraph gL0 = new DENOPTIMGraph();
+        DGraph gL0 = new DGraph();
         gL0.addVertex(vA);
-        DENOPTIMTemplate tL0 = new DENOPTIMTemplate(BBType.NONE);
+        Template tL0 = new Template(BBType.NONE);
         tL0.setInnerGraph(gL0);
         
-        List<DENOPTIMVertex> newVrtxs = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> newVrtxs = new ArrayList<Vertex>();
         
-        DENOPTIMVertex old = tL0;
+        Vertex old = tL0;
         for (int i=0; i<5; i++)
         {
             EmptyVertex vNew = new EmptyVertex(1);
             vNew.addAP();
             newVrtxs.add(vNew);
-            DENOPTIMGraph gNew = new DENOPTIMGraph();
+            DGraph gNew = new DGraph();
             gNew.addVertex(old);
             gNew.appendVertexOnAP(old.getAP(0), vNew.getAP(0));
-            DENOPTIMTemplate template = new DENOPTIMTemplate(BBType.NONE);
+            Template template = new Template(BBType.NONE);
             template.setInnerGraph(gNew);
             checkGetEdgeUserThroughput(vA, newVrtxs);
             old = template;
@@ -327,25 +327,25 @@ public class DENOPTIMAttachmentPointTest
     
 //-----------------------------------------------------------------------------
     
-    private void checkGetEdgeUserThroughput(DENOPTIMVertex v,
-            List<DENOPTIMVertex> onion)
+    private void checkGetEdgeUserThroughput(Vertex v,
+            List<Vertex> onion)
     {
         int i = -1;
-        for (DENOPTIMAttachmentPoint apA : v.getAttachmentPoints())
+        for (AttachmentPoint apA : v.getAttachmentPoints())
         {
             i++;
             assertTrue(apA.isAvailable(), "APs of vA are all free within the "
                     + "graph owning vA.");
-            DENOPTIMEdge e = apA.getEdgeUserThroughout();
+            Edge e = apA.getEdgeUserThroughout();
             if (e != null)
             {
-                DENOPTIMAttachmentPoint inAP = e.getSrcAP();
+                AttachmentPoint inAP = e.getSrcAP();
                 while (true)
                 {
-                    DENOPTIMVertex src = inAP.getOwner();
-                    if (src instanceof DENOPTIMTemplate)
+                    Vertex src = inAP.getOwner();
+                    if (src instanceof Template)
                     {
-                        inAP = ((DENOPTIMTemplate) src).getInnerAPFromOuterAP(
+                        inAP = ((Template) src).getInnerAPFromOuterAP(
                                 inAP);
                     } else {
                         break;
@@ -362,17 +362,17 @@ public class DENOPTIMAttachmentPointTest
 	@Test
 	public void testIsSrcInUser() throws Exception
 	{
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         EmptyVertex v1 = new EmptyVertex();
         v1.addAP(APClass.make(APCLASS));
         v1.addAP(APClass.make(APCLASS));
-        DENOPTIMAttachmentPoint ap1A = v1.getAP(0);
-        DENOPTIMAttachmentPoint ap1B = v1.getAP(1);
+        AttachmentPoint ap1A = v1.getAP(0);
+        AttachmentPoint ap1B = v1.getAP(1);
         EmptyVertex v2 = new EmptyVertex();
         v2.addAP(APClass.make(APCLASS));
         v2.addAP(APClass.make(APCLASS));
-        DENOPTIMAttachmentPoint ap2A = v2.getAP(0);
-        DENOPTIMAttachmentPoint ap2B = v2.getAP(1);
+        AttachmentPoint ap2A = v2.getAP(0);
+        AttachmentPoint ap2B = v2.getAP(1);
         g.addVertex(v1);
         g.appendVertexOnAP(ap1A, ap2B);
         
@@ -387,17 +387,17 @@ public class DENOPTIMAttachmentPointTest
 	@Test
 	public void testGetLinkedAP() throws Exception
 	{
-	    DENOPTIMGraph g = new DENOPTIMGraph();
+	    DGraph g = new DGraph();
 	    EmptyVertex v1 = new EmptyVertex();
         v1.addAP(APClass.make(APCLASS));
         v1.addAP(APClass.make(APCLASS));
-        DENOPTIMAttachmentPoint ap1A = v1.getAP(0);
-        DENOPTIMAttachmentPoint ap1B = v1.getAP(1);
+        AttachmentPoint ap1A = v1.getAP(0);
+        AttachmentPoint ap1B = v1.getAP(1);
         EmptyVertex v2 = new EmptyVertex();
         v2.addAP(APClass.make(APCLASS));
         v2.addAP(APClass.make(APCLASS));
-        DENOPTIMAttachmentPoint ap2A = v2.getAP(0);
-        DENOPTIMAttachmentPoint ap2B = v2.getAP(1);
+        AttachmentPoint ap2A = v2.getAP(0);
+        AttachmentPoint ap2B = v2.getAP(1);
         g.addVertex(v1);
         g.appendVertexOnAP(ap1A, ap2B);
         
@@ -412,13 +412,13 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testConstructorsAndSDFString() throws Exception
     {
-        DENOPTIMFragment dummyVertex = new DENOPTIMFragment();
+        Fragment dummyVertex = new Fragment();
         dummyVertex.addAtom(new Atom("C"));
 		dummyVertex.addAP(0, DIRVEC, APClass.make(APCLASS));
-		DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
+		AttachmentPoint ap = dummyVertex.getAP(0);
     	
     	String str2 = ap.getSingleAPStringSDF(true);
-    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(dummyVertex
+    	AttachmentPoint ap2 = new AttachmentPoint(dummyVertex
 				, str2);
     	
     	assertEquals(ap.getSingleAPStringSDF(true),
@@ -430,18 +430,18 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testConstructorsAndSDFStringNoDirVec() throws Exception
     {
-        DENOPTIMFragment dummyVertex = new DENOPTIMFragment();
+        Fragment dummyVertex = new Fragment();
         dummyVertex.addAtom(new Atom("C"));
 		dummyVertex.addAP(0, DIRVEC, APClass.make(APCLASS));
-		DENOPTIMAttachmentPoint ap = dummyVertex.getAP(0);
+		AttachmentPoint ap = dummyVertex.getAP(0);
 
     	String str2 = ap.getSingleAPStringSDF(true);
-    	DENOPTIMAttachmentPoint ap2 = new DENOPTIMAttachmentPoint(dummyVertex
+    	AttachmentPoint ap2 = new AttachmentPoint(dummyVertex
 				, str2);
     	
     	String str3 = (0+1) + DENOPTIMConstants.SEPARATORAPPROPAAP
     			+ ap.getSingleAPStringSDF(false);
-    	DENOPTIMAttachmentPoint ap3 = new DENOPTIMAttachmentPoint(dummyVertex
+    	AttachmentPoint ap3 = new AttachmentPoint(dummyVertex
 				, str3);
     	
     	assertEquals(ap.getSingleAPStringSDF(true),
@@ -454,7 +454,7 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testSortAPs() throws Exception
     {
-        DENOPTIMFragment dummyVertex = new DENOPTIMFragment();
+        Fragment dummyVertex = new Fragment();
         dummyVertex.addAtom(new Atom("C"));
         dummyVertex.addAtom(new Atom("C"));
         dummyVertex.addAtom(new Atom("C"));
@@ -464,27 +464,27 @@ public class DENOPTIMAttachmentPointTest
         dummyVertex.addAtom(new Atom("C"));
     	dummyVertex.addAP(0);
     	dummyVertex.addAP(0);
-		DENOPTIMAttachmentPoint ap1 = dummyVertex.getAP(0);
-		DENOPTIMAttachmentPoint ap2 = dummyVertex.getAP(1);
+		AttachmentPoint ap1 = dummyVertex.getAP(0);
+		AttachmentPoint ap2 = dummyVertex.getAP(1);
 
 		dummyVertex.addAP(4, DIRVEC, APClass.make("AA:0"));
-		DENOPTIMAttachmentPoint ap3 = dummyVertex.getAP(2);
+		AttachmentPoint ap3 = dummyVertex.getAP(2);
 
 		dummyVertex.addAP(4, DIRVEC, APClass.make("AA:1"));
-		DENOPTIMAttachmentPoint ap4 = dummyVertex.getAP(3);
+		AttachmentPoint ap4 = dummyVertex.getAP(3);
 
 		dummyVertex.addAP(5, new Point3d(1.1, 2.2, 3.3),
 				APClass.make(APCLASS));
-		DENOPTIMAttachmentPoint ap5 = dummyVertex.getAP(4);
+		AttachmentPoint ap5 = dummyVertex.getAP(4);
 
 		dummyVertex.addAP(5, new Point3d(2.2, 2.2, 3.3),
 				APClass.make(APCLASS));
-		DENOPTIMAttachmentPoint ap6 = dummyVertex.getAP(5);
+		AttachmentPoint ap6 = dummyVertex.getAP(5);
 
-    	ArrayList<DENOPTIMAttachmentPoint> list =
+    	ArrayList<AttachmentPoint> list =
 				dummyVertex.getAttachmentPoints();
     	
-    	list.sort(new DENOPTIMAttachmentPointComparator());
+    	list.sort(new AttachmentPointComparator());
     	
     	assertEquals(list.get(0),ap1);
     	assertEquals(list.get(1),ap2);
@@ -502,12 +502,12 @@ public class DENOPTIMAttachmentPointTest
         EmptyVertex dummyVertex = new EmptyVertex();
 		dummyVertex.addAP();
 		dummyVertex.addAP();
-		DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
-		DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
+		AttachmentPoint apA = dummyVertex.getAP(0);
+		AttachmentPoint apB = dummyVertex.getAP(1);
 		
-		DENOPTIMVertex clone = dummyVertex.clone();
-        DENOPTIMAttachmentPoint apAc = clone.getAP(0);
-        DENOPTIMAttachmentPoint apBc = clone.getAP(1);
+		Vertex clone = dummyVertex.clone();
+        AttachmentPoint apAc = clone.getAP(0);
+        AttachmentPoint apBc = clone.getAP(1);
 
     	assertEquals(-1,apA.compareTo(apB),"Comparison driven by ID.");
     	assertTrue(apA.sameAs(apAc),"SameAs ignores ID.");
@@ -522,8 +522,8 @@ public class DENOPTIMAttachmentPointTest
         EmptyVertex dummyVertex = new EmptyVertex();
 		dummyVertex.addAP();
 		dummyVertex.addAP();
-    	DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);
-    	DENOPTIMAttachmentPoint apB = dummyVertex.getAP(1);
+    	AttachmentPoint apA = dummyVertex.getAP(0);
+    	AttachmentPoint apB = dummyVertex.getAP(1);
 
     	assertFalse(apA.sameAs(apB));
     }
@@ -535,10 +535,10 @@ public class DENOPTIMAttachmentPointTest
     {
         EmptyVertex dummyVertex = new EmptyVertex();
     	dummyVertex.addAP(APClass.make("classA:0"));
-        DENOPTIMAttachmentPoint apA = dummyVertex.getAP(0);    	
+        AttachmentPoint apA = dummyVertex.getAP(0);    	
 
-        DENOPTIMVertex clone = dummyVertex.clone();
-        DENOPTIMAttachmentPoint apAc = clone.getAP(0);
+        Vertex clone = dummyVertex.clone();
+        AttachmentPoint apAc = clone.getAP(0);
         apAc.setAPClass(APClass.make("classB:0"));
 
 		assertFalse(apA.sameAs(apAc));
@@ -555,15 +555,15 @@ public class DENOPTIMAttachmentPointTest
         
         EmptyVertex ev2 = new EmptyVertex();
         ev2.addAP(APClass.make(APCLASS));
-        DENOPTIMAttachmentPoint ev2Ap = ev2.getAP(0);
+        AttachmentPoint ev2Ap = ev2.getAP(0);
         
-        DENOPTIMAttachmentPoint orig = ev.getAP(0);
+        AttachmentPoint orig = ev.getAP(0);
         Point3d p3d = new Point3d(0.1, 0.2, -0.3);
         orig.setDirectionVector(p3d);
         
-        DENOPTIMEdge e = new DENOPTIMEdge(ev2Ap, orig);
+        Edge e = new Edge(ev2Ap, orig);
         
-        DENOPTIMAttachmentPoint clone = orig.clone();
+        AttachmentPoint clone = orig.clone();
 
         assertEquals(orig.getAPClass(),clone.getAPClass(),"APClass");
         assertEquals(orig.getAtomPositionNumber(),
@@ -583,7 +583,7 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testHasSameSrcAtom() throws Exception
     {
-        DENOPTIMFragment v1 = new DENOPTIMFragment();
+        Fragment v1 = new Fragment();
         Atom a1 = new Atom("C");
         Atom a2 = new Atom("C");
         Atom a3 = new Atom("C");
@@ -597,10 +597,10 @@ public class DENOPTIMAttachmentPointTest
         v1.addAPOnAtom(a2, APClass.make(APCLASS), new Point3d());
         v1.addAPOnAtom(a3, APClass.make(APCLASS), new Point3d());
         
-        DENOPTIMAttachmentPoint ap0 = v1.getAP(0);
-        DENOPTIMAttachmentPoint ap1 = v1.getAP(1);
-        DENOPTIMAttachmentPoint ap2 = v1.getAP(2);
-        DENOPTIMAttachmentPoint ap3 = v1.getAP(3);
+        AttachmentPoint ap0 = v1.getAP(0);
+        AttachmentPoint ap1 = v1.getAP(1);
+        AttachmentPoint ap2 = v1.getAP(2);
+        AttachmentPoint ap3 = v1.getAP(3);
         
         /*
          *  ap0 
@@ -615,10 +615,10 @@ public class DENOPTIMAttachmentPointTest
         assertFalse(ap0.hasSameSrcAtom(ap2),"Intra-fragment (C)");
         assertFalse(ap2.hasSameSrcAtom(ap0),"Intra-fragment (D)");
         
-        DENOPTIMFragment v2 = v1.clone();
-        DENOPTIMGraph g2 = new DENOPTIMGraph();  
+        Fragment v2 = v1.clone();
+        DGraph g2 = new DGraph();  
         g2.addVertex(v2);
-        DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.FRAGMENT);
+        Template t2 = new Template(BBType.FRAGMENT);
         t2.setInnerGraph(g2);
         
         ap0 = t2.getAP(0);
@@ -637,7 +637,7 @@ public class DENOPTIMAttachmentPointTest
     @Test
     public void testHasConnectedSrcAtom() throws Exception
     {
-        DENOPTIMFragment v1 = new DENOPTIMFragment();
+        Fragment v1 = new Fragment();
         Atom a1 = new Atom("C");
         Atom a2 = new Atom("C");
         Atom a3 = new Atom("C");
@@ -651,10 +651,10 @@ public class DENOPTIMAttachmentPointTest
         v1.addAPOnAtom(a2, APClass.make(APCLASS), new Point3d());
         v1.addAPOnAtom(a3, APClass.make(APCLASS), new Point3d());
         
-        DENOPTIMAttachmentPoint ap0 = v1.getAP(0);
-        DENOPTIMAttachmentPoint ap1 = v1.getAP(1);
-        DENOPTIMAttachmentPoint ap2 = v1.getAP(2);
-        DENOPTIMAttachmentPoint ap3 = v1.getAP(3);
+        AttachmentPoint ap0 = v1.getAP(0);
+        AttachmentPoint ap1 = v1.getAP(1);
+        AttachmentPoint ap2 = v1.getAP(2);
+        AttachmentPoint ap3 = v1.getAP(3);
         
         /*
          *  ap0 
@@ -669,10 +669,10 @@ public class DENOPTIMAttachmentPointTest
         assertFalse(ap1.hasConnectedSrcAtom(ap3),"Intra-fragment (G)");
         assertFalse(ap3.hasConnectedSrcAtom(ap1),"Intra-fragment (H)");
         
-        DENOPTIMFragment v2 = v1.clone();
-        DENOPTIMGraph g2 = new DENOPTIMGraph();  
+        Fragment v2 = v1.clone();
+        DGraph g2 = new DGraph();  
         g2.addVertex(v2);
-        DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.FRAGMENT);
+        Template t2 = new Template(BBType.FRAGMENT);
         t2.setInnerGraph(g2);
         
         ap0 = t2.getAP(0);
@@ -685,13 +685,13 @@ public class DENOPTIMAttachmentPointTest
         assertFalse(ap1.hasConnectedSrcAtom(ap3),"Intra-Template (G)");
         assertFalse(ap3.hasConnectedSrcAtom(ap1),"Intra-Template (H)");
         
-        DENOPTIMFragment v3a = v1.clone();
-        DENOPTIMFragment v3b = v1.clone();
+        Fragment v3a = v1.clone();
+        Fragment v3b = v1.clone();
         v3b.setVertexId(v3a.getVertexId()+1);
-        DENOPTIMGraph g3 = new DENOPTIMGraph();  
+        DGraph g3 = new DGraph();  
         g3.addVertex(v3a);
         g3.addVertex(v3b);
-        g3.addEdge(new DENOPTIMEdge(v3a.getAP(1), v3b.getAP(0)));
+        g3.addEdge(new Edge(v3a.getAP(1), v3b.getAP(0)));
         
         /*
          *  ap0 
@@ -713,7 +713,7 @@ public class DENOPTIMAttachmentPointTest
         assertFalse(v3a.getAP(1).hasConnectedSrcAtom(v3b.getAP(0)), 
                 "Through edge (B)"); //The two APs are those making the edge
         
-        DENOPTIMTemplate t3 = new DENOPTIMTemplate(BBType.FRAGMENT);
+        Template t3 = new Template(BBType.FRAGMENT);
         t3.setInnerGraph(g3);
         
         assertTrue(t3.getAP(0).hasConnectedSrcAtom(t3.getAP(3)), 
@@ -725,12 +725,12 @@ public class DENOPTIMAttachmentPointTest
         assertFalse(t3.getAP(0).hasConnectedSrcAtom(t3.getAP(4)), 
                 "Through edge intra-template (D)");
         
-        DENOPTIMTemplate t4 = t2.clone();
+        Template t4 = t2.clone();
         t4.setVertexId(t2.getVertexId()+1);
-        DENOPTIMGraph g5 = new DENOPTIMGraph();
+        DGraph g5 = new DGraph();
         g5.addVertex(t2);
         g5.addVertex(t4);
-        g5.addEdge(new DENOPTIMEdge(t2.getAP(1), t4.getAP(0)));
+        g5.addEdge(new Edge(t2.getAP(1), t4.getAP(0)));
         
         /*
          * {

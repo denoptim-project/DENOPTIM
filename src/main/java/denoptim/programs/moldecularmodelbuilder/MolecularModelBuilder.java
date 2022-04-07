@@ -27,7 +27,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.graph.Candidate;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.MultiMolecularModelBuilder;
@@ -74,7 +74,7 @@ public class MolecularModelBuilder extends ProgramTask
         // read the input molecule
         Candidate candidate = DenoptimIO.readCandidates(
                 new File(mmbParams.getInputSDFFile()), true).get(0);
-        DENOPTIMGraph grph = candidate.getGraph();
+        DGraph grph = candidate.getGraph();
         String mname = candidate.getName();
         Map<Object,Object> properties = candidate.getChemicalRepresentation()
                 .getProperties();

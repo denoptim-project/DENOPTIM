@@ -7,10 +7,10 @@ import java.util.List;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.utils.RandomUtils;
 
 /**
@@ -33,7 +33,7 @@ public class GraphLinkFinder
      * no compatible link was found. In case of multiple possibilities, the
      * result reported here is chosen randomly among the possible ones.
      */
-    private DENOPTIMVertex chosenNewLink;
+    private Vertex chosenNewLink;
 
     /**
      * The mapping of attachment points between the original vertex/es and the
@@ -50,8 +50,8 @@ public class GraphLinkFinder
      * field is null in case the constructor was asked to work on an
      * edge rather than a vertex.
      */
-    private LinkedHashMap<DENOPTIMVertex,List<APMapping>> allCompatLinks = 
-            new LinkedHashMap<DENOPTIMVertex,List<APMapping>>();
+    private LinkedHashMap<Vertex,List<APMapping>> allCompatLinks = 
+            new LinkedHashMap<Vertex,List<APMapping>>();
     
     /**
      * Maximum number of combinations. This prevents combinatorial explosion, 
@@ -82,7 +82,7 @@ public class GraphLinkFinder
      * be used.
      */
     public GraphLinkFinder(FragmentSpace fragSpace, 
-            DENOPTIMVertex originalLink) throws DENOPTIMException
+            Vertex originalLink) throws DENOPTIMException
     {  
         this(fragSpace, originalLink, -1, false);
     }
@@ -100,7 +100,7 @@ public class GraphLinkFinder
      * be used.
      */
     public GraphLinkFinder(FragmentSpace fragSpace,
-            DENOPTIMVertex originalLink, int newBuildingBlockID) 
+            Vertex originalLink, int newBuildingBlockID) 
             throws DENOPTIMException
     {  
         this(fragSpace, originalLink, newBuildingBlockID, false);
@@ -122,12 +122,12 @@ public class GraphLinkFinder
      * be used.
      */
     public GraphLinkFinder(FragmentSpace fragSpace,
-            DENOPTIMVertex originalLink, int newBuildingBlockID,
+            Vertex originalLink, int newBuildingBlockID,
             boolean screenAll) throws DENOPTIMException 
     {   
         this.fragmentSpace = fragSpace;
         
-        ArrayList<DENOPTIMVertex> candidates = getCandidateBBs(
+        ArrayList<Vertex> candidates = getCandidateBBs(
                 originalLink.getBuildingBlockType(), newBuildingBlockID);
         
         int candidatesOrigSize = candidates.size();
@@ -136,7 +136,7 @@ public class GraphLinkFinder
             if (foundNewLink && !screenAll)
                 break;
             
-            DENOPTIMVertex originalBB = RandomUtils.randomlyChooseOne(
+            Vertex originalBB = RandomUtils.randomlyChooseOne(
                     candidates);
             candidates.remove(originalBB);
             try
@@ -186,10 +186,10 @@ public class GraphLinkFinder
     
 //------------------------------------------------------------------------------
     
-    private ArrayList<DENOPTIMVertex> getCandidateBBs(BBType bbt, int bbId) 
+    private ArrayList<Vertex> getCandidateBBs(BBType bbt, int bbId) 
             throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMVertex> candidates = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> candidates = new ArrayList<Vertex>();
         if (bbId<0)
         {
             switch (bbt)
@@ -205,7 +205,7 @@ public class GraphLinkFinder
                     break;
             }
         } else {
-            DENOPTIMVertex chosenOne =  fragmentSpace.getVertexFromLibrary(bbt, bbId);
+            Vertex chosenOne =  fragmentSpace.getVertexFromLibrary(bbt, bbId);
             candidates.add(chosenOne);
         }
         return candidates;
@@ -225,7 +225,7 @@ public class GraphLinkFinder
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
-    public GraphLinkFinder(FragmentSpace fragSpace, DENOPTIMEdge originalEdge) 
+    public GraphLinkFinder(FragmentSpace fragSpace, Edge originalEdge) 
             throws DENOPTIMException
     {  
         this(fragSpace, originalEdge,-1,false);
@@ -245,7 +245,7 @@ public class GraphLinkFinder
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
-    public GraphLinkFinder(FragmentSpace fragSpace, DENOPTIMEdge originalEdge, 
+    public GraphLinkFinder(FragmentSpace fragSpace, Edge originalEdge, 
             int newBuildingBlockID) throws DENOPTIMException
     {  
         this(fragSpace, originalEdge,newBuildingBlockID,false);
@@ -269,11 +269,11 @@ public class GraphLinkFinder
      * be used.
      */
     public GraphLinkFinder(FragmentSpace fragSpace,
-            DENOPTIMEdge originalEdge, int newBuildingBlockID,
+            Edge originalEdge, int newBuildingBlockID,
             boolean screenAll) throws DENOPTIMException 
     {
         this.fragmentSpace = fragSpace;
-        ArrayList<DENOPTIMVertex> candidates = getCandidateBBs(
+        ArrayList<Vertex> candidates = getCandidateBBs(
                 originalEdge.getTrgAP().getOwner().getBuildingBlockType(), 
                 newBuildingBlockID);
 
@@ -283,7 +283,7 @@ public class GraphLinkFinder
             if (foundNewLink && !screenAll)
                 break;
             
-            DENOPTIMVertex originalBB = RandomUtils.randomlyChooseOne(
+            Vertex originalBB = RandomUtils.randomlyChooseOne(
                     candidates);
             candidates.remove(originalBB);
             try
@@ -303,17 +303,17 @@ public class GraphLinkFinder
             }
             
             // We map all the compatibilities before choosing a specific mapping
-            LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> apCompatilities =
-                    new LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>>();
+            LinkedHashMap<AttachmentPoint,List<AttachmentPoint>> apCompatilities =
+                    new LinkedHashMap<AttachmentPoint,List<AttachmentPoint>>();
             
-            List<DENOPTIMAttachmentPoint> needeAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+            List<AttachmentPoint> needeAPs = new ArrayList<AttachmentPoint>();
             needeAPs.add(originalEdge.getSrcAP());
             needeAPs.add(originalEdge.getTrgAP());
             for (int j=0; j<2;j++)
             {
-                DENOPTIMAttachmentPoint oAP = needeAPs.get(j);
+                AttachmentPoint oAP = needeAPs.get(j);
                 APClass oriAPC = oAP.getAPClass();
-                for (DENOPTIMAttachmentPoint cAP : chosenNewLink.getAttachmentPoints())
+                for (AttachmentPoint cAP : chosenNewLink.getAttachmentPoints())
                 {  
                     boolean compatible = false;
                     if (fragmentSpace.useAPclassBasedApproach())
@@ -336,8 +336,8 @@ public class GraphLinkFinder
                         {
                             apCompatilities.get(oAP).add(cAP);
                         } else {
-                            List<DENOPTIMAttachmentPoint> lst = 
-                                    new ArrayList<DENOPTIMAttachmentPoint>();
+                            List<AttachmentPoint> lst = 
+                                    new ArrayList<AttachmentPoint>();
                             lst.add(cAP);
                             apCompatilities.put(oAP,lst);
                         }
@@ -346,8 +346,8 @@ public class GraphLinkFinder
             }
             // keys is used just to keep the map keys sorted in a separate list
             // so that the order is randomized only once, then it is retained.
-            List<DENOPTIMAttachmentPoint> keys = 
-                    new ArrayList<DENOPTIMAttachmentPoint>(
+            List<AttachmentPoint> keys = 
+                    new ArrayList<AttachmentPoint>(
                             apCompatilities.keySet());
             if (keys.size() < 2)
             {
@@ -389,7 +389,7 @@ public class GraphLinkFinder
      * {@link GraphLinkFinder#getChosenAPMapping()} is guaranteed.
      * @return the chosen alternative or null is none was found.
      */
-    public DENOPTIMVertex getChosenAlternativeLink()
+    public Vertex getChosenAlternativeLink()
     {
         return chosenNewLink;
     }
@@ -402,7 +402,7 @@ public class GraphLinkFinder
      * original vertex, or to be inserted in between two vertexes. The meaning 
      * of the mapping depends on how this {@link GraphLinkFinder} was 
      * constructed. In particular, when this instance is constructed from an 
-     * {@link DENOPTIMVertex}, the syntax of the AP mapping is:
+     * {@link Vertex}, the syntax of the AP mapping is:
      * <ul>
      * <li>keys: the APs of the original vertex from which we seek replacement.
      * </li>
@@ -410,7 +410,7 @@ public class GraphLinkFinder
      * {@link GraphLinkFinder#getChosenAlternativeLink()}.</li>
      * </ul>
      * Otherwise, when this instance if constructed from an 
-     * {@link DENOPTIMEdge}, the AP mapping's syntax is:
+     * {@link Edge}, the AP mapping's syntax is:
      * <ul>
      * <li>keys: the APs originally involved in making that edge,</li>
      * <li>values: the APs that belong on the new vertex returned by 
@@ -439,7 +439,7 @@ public class GraphLinkFinder
      * constructed. 
      * @return map of all AP mappings for each alternative vertex. 
      */
-    public LinkedHashMap<DENOPTIMVertex, List<APMapping>> getAllAlternativesFound()
+    public LinkedHashMap<Vertex, List<APMapping>> getAllAlternativesFound()
     {
         return allCompatLinks;
     }

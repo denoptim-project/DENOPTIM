@@ -22,13 +22,13 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import com.google.gson.Gson;
 
 import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.DENOPTIMFragment;
+import denoptim.graph.Fragment;
 import denoptim.graph.DENOPTIMFragmentTest;
-import denoptim.graph.DENOPTIMTemplate;
+import denoptim.graph.Template;
 import denoptim.graph.DENOPTIMTemplateTest;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
 
 /**
@@ -75,11 +75,11 @@ public class DENOPTIMgsonTest
         {
             IAtom atmOri = iac.getAtom(i);
             IAtom atmJsn = iacFromJSON.getAtom(i);
-            assertEquals(DENOPTIMMoleculeUtils.getSymbolOrLabel(atmOri),
-                    DENOPTIMMoleculeUtils.getSymbolOrLabel(atmJsn), 
+            assertEquals(MoleculeUtils.getSymbolOrLabel(atmOri),
+                    MoleculeUtils.getSymbolOrLabel(atmJsn), 
                     "Symbol atom "+i);
-            double distance = DENOPTIMMoleculeUtils.getPoint3d(atmOri).distance(
-                    DENOPTIMMoleculeUtils.getPoint3d(atmJsn));
+            double distance = MoleculeUtils.getPoint3d(atmOri).distance(
+                    MoleculeUtils.getPoint3d(atmJsn));
             assertTrue(areCloseEnough(0.0,distance), "Coordinates atom "+i);
         }
         for (int i=0; i<iac.getBondCount(); i++)
@@ -102,7 +102,7 @@ public class DENOPTIMgsonTest
     @Test
     public void testTemplateSerialization() throws Exception
     {
-        DENOPTIMTemplate tmpl = DENOPTIMTemplateTest.getTestAmideTemplate();
+        Template tmpl = DENOPTIMTemplateTest.getTestAmideTemplate();
         tmpl.setBuildingBlockId(-206); //just any number
         tmpl.setBuildingBlockType(BBType.CAP); //just a type easy to spot
         tmpl.removeMutationType(MutationType.CHANGEBRANCH);
@@ -114,8 +114,8 @@ public class DENOPTIMgsonTest
         //System.out.println("JSON of template: "+jsonString);
         
         Gson jsonReader = DENOPTIMgson.getReader();
-        DENOPTIMVertex tmplFromJSON = jsonReader.fromJson(jsonString,
-                DENOPTIMVertex.class);
+        Vertex tmplFromJSON = jsonReader.fromJson(jsonString,
+                Vertex.class);
 
         assertEquals(tmpl.getNumberOfAPs(), tmplFromJSON.getNumberOfAPs(),
                 "Number of APs");
@@ -143,11 +143,11 @@ public class DENOPTIMgsonTest
         {
             IAtom atmOri = iac.getAtom(i);
             IAtom atmJsn = iacFromJSON.getAtom(i);
-            assertEquals(DENOPTIMMoleculeUtils.getSymbolOrLabel(atmOri),
-                    DENOPTIMMoleculeUtils.getSymbolOrLabel(atmJsn), 
+            assertEquals(MoleculeUtils.getSymbolOrLabel(atmOri),
+                    MoleculeUtils.getSymbolOrLabel(atmJsn), 
                     "Symbol atom "+i);
-            double distance = DENOPTIMMoleculeUtils.getPoint3d(atmOri).distance(
-                    DENOPTIMMoleculeUtils.getPoint3d(atmJsn));
+            double distance = MoleculeUtils.getPoint3d(atmOri).distance(
+                    MoleculeUtils.getPoint3d(atmJsn));
             assertTrue(areCloseEnough(0.0,distance), "Coordinates atom "+i);
         }
         for (int i=0; i<iac.getBondCount(); i++)
@@ -170,7 +170,7 @@ public class DENOPTIMgsonTest
     @Test
     public void testMolecularFragmentSerialization() throws Exception
     {
-        DENOPTIMFragment frag = DENOPTIMFragmentTest.makeFragment();
+        Fragment frag = DENOPTIMFragmentTest.makeFragment();
         frag.setBuildingBlockId(-206); //just any number
         frag.setBuildingBlockType(BBType.CAP); //just a type easy to spot
         frag.removeMutationType(MutationType.CHANGEBRANCH);
@@ -182,16 +182,16 @@ public class DENOPTIMgsonTest
         //System.out.println("JSON of DENOPTIMFragment: "+jsonString);
         
         Gson jsonReader = DENOPTIMgson.getReader();
-        DENOPTIMVertex fragFromJSON = jsonReader.fromJson(jsonString,
-                DENOPTIMVertex.class);
+        Vertex fragFromJSON = jsonReader.fromJson(jsonString,
+                Vertex.class);
         
         assertEquals(frag.getNumberOfAPs(), fragFromJSON.getNumberOfAPs(),
                 "Number of APs");
         assertEquals(frag.getAPCountOnAtom(0),
-                ((DENOPTIMFragment) fragFromJSON).getAPCountOnAtom(0),
+                ((Fragment) fragFromJSON).getAPCountOnAtom(0),
                 "Size APs on atm0");
         assertEquals(frag.getAPCountOnAtom(2),
-                ((DENOPTIMFragment) fragFromJSON).getAPCountOnAtom(2),
+                ((Fragment) fragFromJSON).getAPCountOnAtom(2),
                 "Size APs on atm2");
         assertEquals(frag.getAttachmentPoints().size(),
                 fragFromJSON.getAttachmentPoints().size(),
@@ -220,11 +220,11 @@ public class DENOPTIMgsonTest
         {
             IAtom atmOri = iac.getAtom(i);
             IAtom atmJsn = iacFromJSON.getAtom(i);
-            assertEquals(DENOPTIMMoleculeUtils.getSymbolOrLabel(atmOri),
-                    DENOPTIMMoleculeUtils.getSymbolOrLabel(atmJsn), 
+            assertEquals(MoleculeUtils.getSymbolOrLabel(atmOri),
+                    MoleculeUtils.getSymbolOrLabel(atmJsn), 
                     "Symbol atom "+i);
-            double distance = DENOPTIMMoleculeUtils.getPoint3d(atmOri).distance(
-                    DENOPTIMMoleculeUtils.getPoint3d(atmJsn));
+            double distance = MoleculeUtils.getPoint3d(atmOri).distance(
+                    MoleculeUtils.getPoint3d(atmJsn));
             assertTrue(areCloseEnough(0.0,distance), "Coordinates atom "+i);
         }
         for (int i=0; i<iac.getBondCount(); i++)

@@ -28,7 +28,7 @@ import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Candidate;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.FitnessTask;
@@ -59,7 +59,7 @@ public class FitnessEvaluationTask extends FitnessTask
      * @param outFileName filename of the output file.
      */
     public FitnessEvaluationTask(FRParameters settings, 
-            DENOPTIMGraph molGraph, IAtomContainer iac, 
+            DGraph molGraph, IAtomContainer iac, 
             String workDir, String outFileName)
     {
     	super((FitnessParameters) settings.getParameters(
@@ -90,7 +90,7 @@ public class FitnessEvaluationTask extends FitnessTask
             ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
             
             try {
-                DENOPTIMGraph gWithNoRCVs = dGraph.clone();
+                DGraph gWithNoRCVs = dGraph.clone();
                 
                 //NB: this replaces unused RCVs with capping groups
                 GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs,

@@ -215,7 +215,7 @@ public class AtomOrganizer
         for (int i = 0; i < original.getAtomCount(); i++) 
         {
             IAtom originalAtom = original.getAtom(newToOldOrder.get(i));
-            IAtom atm = DENOPTIMMoleculeUtils.makeSameAtomAs(originalAtom,true,true);
+            IAtom atm = MoleculeUtils.makeSameAtomAs(originalAtom,true,true);
             String atmPropVID = " none";
             Object p = originalAtom.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
             if (p != null)

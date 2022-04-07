@@ -68,15 +68,15 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Ring;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import io.github.dan2097.jnainchi.InchiFlag;
 import io.github.dan2097.jnainchi.InchiOptions;
 import net.sf.jniinchi.INCHI_RET;
@@ -87,7 +87,7 @@ import net.sf.jniinchi.INCHI_RET;
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
-public class DENOPTIMMoleculeUtils
+public class MoleculeUtils
 {
     private static final StructureDiagramGenerator SDG = 
             new StructureDiagramGenerator();
@@ -180,7 +180,7 @@ public class DENOPTIMMoleculeUtils
             Set<String> rcaElSymbols = DENOPTIMConstants.RCATYPEMAP.keySet();
             for (String rcaEl : rcaElSymbols)
             {
-                if (DENOPTIMMoleculeUtils.getSymbolOrLabel(a).equals(rcaEl))
+                if (MoleculeUtils.getSymbolOrLabel(a).equals(rcaEl))
                 {
                     isRca = true;
                     break;
@@ -198,20 +198,20 @@ public class DENOPTIMMoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Replace used RCAs (i.e., those involved in {@link DENOPTIMRing}s)
+     * Replace used RCAs (i.e., those involved in {@link Ring}s)
      * while adding the ring closing bonds. Does not alter the graph.
      * @param mol the molecular representation to be updated
      * @param graph the corresponding graph representation 
      * @throws DENOPTIMException
      */
 
-    public static void removeUsedRCA(IAtomContainer mol, DENOPTIMGraph graph)
+    public static void removeUsedRCA(IAtomContainer mol, DGraph graph)
             throws DENOPTIMException {
 
         // add ring-closing bonds
-        ArrayList<DENOPTIMVertex> usedRcvs = graph.getUsedRCVertices();
-        Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId =
-                DENOPTIMMoleculeUtils.getVertexToAtomIdMap(usedRcvs,mol);
+        ArrayList<Vertex> usedRcvs = graph.getUsedRCVertices();
+        Map<Vertex,ArrayList<Integer>> vIdToAtmId =
+                MoleculeUtils.getVertexToAtomIdMap(usedRcvs,mol);
         if (vIdToAtmId.size() == 0)
         {
             // No used RCV to remove.
@@ -221,13 +221,13 @@ public class DENOPTIMMoleculeUtils
         ArrayList<Boolean> doneVertices =
                 new ArrayList<>(Collections.nCopies(usedRcvs.size(),false));
 
-        for (DENOPTIMVertex v : usedRcvs)
+        for (Vertex v : usedRcvs)
         {
             if (doneVertices.get(usedRcvs.indexOf(v)))
             {
                 continue;
             }
-            ArrayList<DENOPTIMRing> rings = graph.getRingsInvolvingVertex(v);
+            ArrayList<Ring> rings = graph.getRingsInvolvingVertex(v);
             if (rings.size() != 1)
             {
                 String s = "Unexpected inconsistency between used RCV list "
@@ -236,8 +236,8 @@ public class DENOPTIMMoleculeUtils
                        + "{" + rings + "}. Check Code!";
                 throw new DENOPTIMException(s);
             }
-            DENOPTIMVertex vH = rings.get(0).getHeadVertex();
-            DENOPTIMVertex vT = rings.get(0).getTailVertex();
+            Vertex vH = rings.get(0).getHeadVertex();
+            Vertex vT = rings.get(0).getTailVertex();
             IAtom aH = mol.getAtom(vIdToAtmId.get(vH).get(0));
             IAtom aT = mol.getAtom(vIdToAtmId.get(vT).get(0));
             if (mol.getConnectedAtomsList(aH).size() == 0
@@ -272,9 +272,9 @@ public class DENOPTIMMoleculeUtils
             removedIds.add(mol.indexOf(a));
         }
         Collections.sort(removedIds);
-        for (DENOPTIMVertex v : graph.getVertexList())
+        for (Vertex v : graph.getVertexList())
         {
-            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            for (AttachmentPoint ap : v.getAttachmentPoints())
             {
                 int apSrcId = ap.getAtomPositionNumberInMol();
                 int countOfAtmsBEforeSrc = 0;
@@ -329,8 +329,8 @@ public class DENOPTIMMoleculeUtils
         removeRCA(fmol);
         
         // WARNING: assumptions on implicit H count and bond orders!
-        DENOPTIMMoleculeUtils.setZeroImplicitHydrogensToAllAtoms(fmol);
-        DENOPTIMMoleculeUtils.ensureNoUnsetBondOrders(fmol);
+        MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(fmol);
+        MoleculeUtils.ensureNoUnsetBondOrders(fmol);
 
         String smiles = "";
         try
@@ -529,8 +529,8 @@ public class DENOPTIMMoleculeUtils
         int n = 0;
         for (IAtom atm : mol.atoms())
         {
-            if (DENOPTIMMoleculeUtils.isElement(atm)
-                    && !DENOPTIMMoleculeUtils.getSymbolOrLabel(atm).equals("H"))
+            if (MoleculeUtils.isElement(atm)
+                    && !MoleculeUtils.getSymbolOrLabel(atm).equals("H"))
                 n++;
         }
         return n;
@@ -569,24 +569,24 @@ public class DENOPTIMMoleculeUtils
      * @return the map of atom indexes per each <code>DENOPTIMVertex</code> ID
      */
 
-    public static Map<DENOPTIMVertex,ArrayList<Integer>> getVertexToAtomIdMap(
-            ArrayList<DENOPTIMVertex> vertLst,
+    public static Map<Vertex,ArrayList<Integer>> getVertexToAtomIdMap(
+            ArrayList<Vertex> vertLst,
             IAtomContainer mol
     ) {
 
         ArrayList<Integer> vertIDs = new ArrayList<>();
-        for (DENOPTIMVertex v : vertLst) {
+        for (Vertex v : vertLst) {
             vertIDs.add(v.getVertexId());
         }
 
-        Map<DENOPTIMVertex,ArrayList<Integer>> map = new HashMap<>();
+        Map<Vertex,ArrayList<Integer>> map = new HashMap<>();
         for (IAtom atm : mol.atoms())
         {
             int vID = Integer.parseInt(atm.getProperty(
                                  DENOPTIMConstants.ATMPROPVERTEXID).toString());
             if (vertIDs.contains(vID))
             {
-                DENOPTIMVertex v = vertLst.get(vertIDs.indexOf(vID));
+                Vertex v = vertLst.get(vertIDs.indexOf(vID));
                 int atmID = mol.indexOf(atm);
                 if (map.containsKey(v))
                 {
@@ -690,7 +690,7 @@ public class DENOPTIMMoleculeUtils
         try {
             Kekulization.kekulize(iac);
         } catch (CDKException e) {
-            DENOPTIMLogger.appLogger.log(Level.WARNING, "Kekulization failed. "
+            StaticLogger.appLogger.log(Level.WARNING, "Kekulization failed. "
                     + "Bond orders will be unreliable.");
         }
         
@@ -721,7 +721,7 @@ public class DENOPTIMMoleculeUtils
         
         for (IAtom oAtm : mol.atoms())
         {
-            IAtom nAtm = DENOPTIMMoleculeUtils.makeSameAtomAs(oAtm,true,true);
+            IAtom nAtm = MoleculeUtils.makeSameAtomAs(oAtm,true,true);
             iac.addAtom(nAtm);
         }
         
@@ -778,7 +778,7 @@ public class DENOPTIMMoleculeUtils
     {
         IAtom nAtm = null;
         String s = getSymbolOrLabel(oAtm);
-        if (DENOPTIMMoleculeUtils.isElement(oAtm))
+        if (MoleculeUtils.isElement(oAtm))
         {
             nAtm = new Atom(s);
         } else {
@@ -838,7 +838,7 @@ public class DENOPTIMMoleculeUtils
     public static String getSymbolOrLabel(IAtom atm)
     {
         String s = "none";
-        if (DENOPTIMMoleculeUtils.isElement(atm))
+        if (MoleculeUtils.isElement(atm))
         {
             s = atm.getSymbol();
         } else {
@@ -906,13 +906,13 @@ public class DENOPTIMMoleculeUtils
      * @throws DENOPTIMException 
      */
     public static IAtomContainer extractIACForSubgraph(IAtomContainer wholeIAC, 
-            DENOPTIMGraph subGraph, DENOPTIMGraph wholeGraph) throws DENOPTIMException
+            DGraph subGraph, DGraph wholeGraph) throws DENOPTIMException
     {
         IAtomContainer iac = makeSameAs(wholeIAC);
         
         Set<Integer> wantedVIDs = new HashSet<Integer>();
-        Map<Integer,DENOPTIMVertex> wantedVertexesMap = new HashMap<>();
-        for (DENOPTIMVertex v : subGraph.getVertexList())
+        Map<Integer,Vertex> wantedVertexesMap = new HashMap<>();
+        for (Vertex v : subGraph.getVertexList())
         {
             Object o = v.getProperty(DENOPTIMConstants.STOREDVID);
             if (o == null)
@@ -929,8 +929,8 @@ public class DENOPTIMMoleculeUtils
         // Identify the destiny of each atom: keep, remove, or make AP from it.
         IAtomContainer toRemove = new AtomContainer();
         Map<IAtom,IAtom> toAP = new HashMap<IAtom,IAtom>();
-        Map<IAtom,DENOPTIMAttachmentPoint> mapAtmToAPInG = 
-                new HashMap<IAtom,DENOPTIMAttachmentPoint>();
+        Map<IAtom,AttachmentPoint> mapAtmToAPInG = 
+                new HashMap<IAtom,AttachmentPoint>();
         Map<IAtom,APClass> apcMap = new HashMap<IAtom,APClass>();
         for (int i=0; i<wholeIAC.getAtomCount(); i++)
         {
@@ -970,7 +970,7 @@ public class DENOPTIMMoleculeUtils
                     // become an AP. Note that the connection may go through
                     // a chord in the graph, i.e., a pairs of RCVs!
                     toAP.put(cpAtm,iac.getAtom(wholeIAC.indexOf(nbr)));
-                    DENOPTIMAttachmentPoint apInWholeGraph = 
+                    AttachmentPoint apInWholeGraph = 
                             wholeGraph.getAPOnLeftVertexID(nbrVid,vid);
                     if (apInWholeGraph == null)
                     {
@@ -981,7 +981,7 @@ public class DENOPTIMMoleculeUtils
                                 + nbrVid + " " + vid +" on " + wholeGraph 
                                 + " See " + debugFile);
                     }
-                    DENOPTIMAttachmentPoint apInSubGraph = 
+                    AttachmentPoint apInSubGraph = 
                             wantedVertexesMap.get(nbrVid).getAP(apInWholeGraph.getIndexInOwner());
                     mapAtmToAPInG.put(cpAtm, apInSubGraph);
                     APClass apc = apInWholeGraph.getAPClass();
@@ -997,7 +997,7 @@ public class DENOPTIMMoleculeUtils
         iac.remove(toRemove);
         
         // NB: the molecular representation in frag is NOT iac! It's a clone of it
-        DENOPTIMFragment frag = new DENOPTIMFragment(iac,BBType.FRAGMENT);
+        Fragment frag = new Fragment(iac,BBType.FRAGMENT);
         
         List<IAtom> atmosToRemove = new ArrayList<>();
         List<IBond> bondsToRemove = new ArrayList<>();
@@ -1007,11 +1007,11 @@ public class DENOPTIMMoleculeUtils
             IAtom srcAtmInISC = toAP.get(trgAtmInIAC);
             IAtom srcAtm = frag.getAtom(iac.indexOf(srcAtmInISC));
             
-            DENOPTIMAttachmentPoint apInG = mapAtmToAPInG.get(trgAtmInIAC);
+            AttachmentPoint apInG = mapAtmToAPInG.get(trgAtmInIAC);
             
             // Make Attachment point
-            Point3d srcP3d = DENOPTIMMoleculeUtils.getPoint3d(srcAtm);
-            Point3d trgP3d = DENOPTIMMoleculeUtils.getPoint3d(trgAtm);
+            Point3d srcP3d = MoleculeUtils.getPoint3d(srcAtm);
+            Point3d trgP3d = MoleculeUtils.getPoint3d(trgAtm);
             double currentLength = srcP3d.distance(trgP3d);
             //TODO-V3+? change hard-coded value with property of AP, when such
             // property will be available, i. e., one refactoring of AP and 
@@ -1026,7 +1026,7 @@ public class DENOPTIMMoleculeUtils
             vector.y = srcP3d.y + (trgP3d.y - srcP3d.y)*(idealLength/currentLength);
             vector.z = srcP3d.z + (trgP3d.z - srcP3d.z)*(idealLength/currentLength);
             
-            DENOPTIMAttachmentPoint createdAP = frag.addAPOnAtom(srcAtm, 
+            AttachmentPoint createdAP = frag.addAPOnAtom(srcAtm, 
                     apcMap.get(trgAtmInIAC), vector);
             createdAP.setProperty(DENOPTIMConstants.LINKAPS, apInG);
             

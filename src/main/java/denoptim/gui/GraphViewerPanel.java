@@ -50,13 +50,12 @@ import javax.swing.JSeparator;
 import com.google.common.base.Function;
 
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
-import edu.uci.ics.jung.graph.Graph;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.DGraph;
+import denoptim.graph.Ring;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.visualization.Layer;
@@ -83,7 +82,7 @@ public class GraphViewerPanel extends JPanel
 	 */
 	private static final long serialVersionUID = 2L;
 	
-	Graph<JVertex, JEdge> loadedGraph;
+	edu.uci.ics.jung.graph.Graph<JVertex, JEdge> loadedGraph;
 	DNPSpringLayout<JVertex, JEdge> layout;
 	private double scaling = 1.0;
 	VisualizationViewer<JVertex, JEdge>  viewer;
@@ -101,20 +100,20 @@ public class GraphViewerPanel extends JPanel
     
     /**
      * a vertex in the JUNG Graph. It represents any kind of 
-     * {@link DENOPTIMVertex} or an {@link DENOPTIMAttachmentPoint}.
+     * {@link Vertex} or an {@link AttachmentPoint}.
      */
     public class JVertex 
     {
         /**
-         * The reference to the corresponding {@link DENOPTIMVertex} or null.
+         * The reference to the corresponding {@link Vertex} or null.
          */
-        DENOPTIMVertex dnpVertex;
+        Vertex dnpVertex;
         
         /**
-         * The reference to the corresponding {@link DENOPTIMAttachmentPoint}
+         * The reference to the corresponding {@link AttachmentPoint}
          * or null.
          */
-        DENOPTIMAttachmentPoint ap;
+        AttachmentPoint ap;
         
         /**
          * A shortcut to record which type of DENOPTIM object this vertex 
@@ -152,12 +151,12 @@ public class GraphViewerPanel extends JPanel
         
         /**
          * Constructor for vertex that represents a given 
-         * {@link DENOPTIMAttachmentPoint}. Note that the reference to the JEdge
+         * {@link AttachmentPoint}. Note that the reference to the JEdge
          * linking this JVertex to its parent is set when creating the JEdge
-         * {@link GraphViewerPanel#convertDnGraphToGSGraph(DENOPTIMGraph, DENOPTIMTemplate)}
-         * @param ap the {@link DENOPTIMAttachmentPoint}.
+         * {@link GraphViewerPanel#convertDnGraphToGSGraph(DGraph, Template)}
+         * @param ap the {@link AttachmentPoint}.
          */
-        public JVertex(DENOPTIMAttachmentPoint ap) {
+        public JVertex(AttachmentPoint ap) {
             this.ap = ap;
             idStr = Integer.toString(ap.getOwner().getVertexId()) 
                     + Integer.toString(ap.getID());
@@ -167,10 +166,10 @@ public class GraphViewerPanel extends JPanel
         }
         
         /**
-         * Constructor for vertex that represents a given {@link DENOPTIMVertex}.
-         * @param ap the {@link DENOPTIMVertex}.
+         * Constructor for vertex that represents a given {@link Vertex}.
+         * @param ap the {@link Vertex}.
          */
-        public JVertex(DENOPTIMVertex v) {
+        public JVertex(Vertex v) {
             this.dnpVertex = v;
             this.expandable = true;
             idStr = Integer.toString(v.getVertexId());
@@ -199,8 +198,8 @@ public class GraphViewerPanel extends JPanel
     
     /**
      * An edge in the JUNG Graph. It represents any kind of 
-     * {@link DENOPTIMEdge}, a chord that closes a {@link DENOPTIMRing},
-     * or a free {@link DENOPTIMAttachmentPoint}.
+     * {@link Edge}, a chord that closes a {@link Ring},
+     * or a free {@link AttachmentPoint}.
      */
     public class JEdge 
     {
@@ -239,14 +238,14 @@ public class GraphViewerPanel extends JPanel
         
         /**
          * The bond type for edges that correspond to connections between 
-         * {@link DENOPTIMVertex}s or <code>"none"</code> when for edges
-         * representing {@link DENOPTIMAttachmentPoint}s.
+         * {@link Vertex}s or <code>"none"</code> when for edges
+         * representing {@link AttachmentPoint}s.
          */
         String bt = "none";
         
         /**
          * Flag defining whether this edge is representing a
-         * {@link DENOPTIMAttachmentPoint}.
+         * {@link AttachmentPoint}.
          */
         boolean toAp = false;
         
@@ -267,11 +266,11 @@ public class GraphViewerPanel extends JPanel
    
         /**
          * Constructor for a JUNG edge representing a 
-         * {@link DENOPTIMAttachmentPoint}.
+         * {@link AttachmentPoint}.
          * @param srcAPC the string representation of the {@link APClass} of the
          * AP.
          */
-        public JEdge(DENOPTIMAttachmentPoint srcAP) 
+        public JEdge(AttachmentPoint srcAP) 
         {
             this.id = srcAP.getOwner().getVertexId()+"_"+srcAP.getIndexInOwner();
             if (srcAP.getAPClass() != null)
@@ -283,17 +282,17 @@ public class GraphViewerPanel extends JPanel
         }
         
         /**
-         * Constructor for a JUNG edge representing a {@link DENOPTIMEdge} or
-         * a chord that closes a {@link DENOPTIMRing}.
+         * Constructor for a JUNG edge representing a {@link Edge} or
+         * a chord that closes a {@link Ring}.
          * @param srcAPC the string representation of the {@link APClass} of the
-         * source AP of directed {@link DENOPTIMEdge}s.
+         * source AP of directed {@link Edge}s.
          * @param trgAPC the string representation of the {@link APClass} of the
-         * target AP of directed {@link DENOPTIMEdge}s.
+         * target AP of directed {@link Edge}s.
          * @param bt the string representation of the bond type in the 
-         * {@link DENOPTIMEdge} represented by this JUNG edge.
+         * {@link Edge} represented by this JUNG edge.
          */
-        public JEdge(DENOPTIMAttachmentPoint srcAP, 
-                DENOPTIMAttachmentPoint trgAP, String bt) 
+        public JEdge(AttachmentPoint srcAP, 
+                AttachmentPoint trgAP, String bt) 
         {
             this.id = srcAP.getOwner().getVertexId() 
                     + "-" 
@@ -358,10 +357,10 @@ public class GraphViewerPanel extends JPanel
 //-----------------------------------------------------------------------------
 
     /**
-     * Load the given {@link DENOPTIMGraph} to this graph viewer.
+     * Load the given {@link DGraph} to this graph viewer.
      * @param dnGraph the graph to load.
      */
-    public void loadGraphToViewer(DENOPTIMGraph dnGraph)
+    public void loadGraphToViewer(DGraph dnGraph)
     {
         loadGraphToViewer(convertDnGraphToGSGraph(dnGraph),null);
     }
@@ -369,13 +368,13 @@ public class GraphViewerPanel extends JPanel
 //-----------------------------------------------------------------------------
 
     /**
-     * Load the {@link DENOPTIMGraph} contained in a {@link DENOPTIMTemplate}
+     * Load the {@link DGraph} contained in a {@link Template}
      * into the graph viewer. 
      * @param tmpl the template containing the graph to visualise.
      */
-    public void loadGraphToViewer(DENOPTIMTemplate tmpl)
+    public void loadGraphToViewer(Template tmpl)
     {
-        Graph<JVertex, JEdge> graph = convertDnGraphToGSGraph(
+        edu.uci.ics.jung.graph.Graph<JVertex, JEdge> graph = convertDnGraphToGSGraph(
                 tmpl.getInnerGraph(), tmpl);
         loadGraphToViewer(graph,null);
     }
@@ -383,13 +382,13 @@ public class GraphViewerPanel extends JPanel
 //-----------------------------------------------------------------------------
     
     /**
-     * Load the given {@link DENOPTIMGraph} to the graph viewer.
+     * Load the given {@link DGraph} to the graph viewer.
      * @param dnGraph the graph to load.
      * @param prevStatus the snapshot of the previous status. We use this to 
      * remember previously chosen settings, such as the labels to be 
      * displayed, or the position of nodes.
      */
-    public void loadGraphToViewer(DENOPTIMGraph dnGraph, 
+    public void loadGraphToViewer(DGraph dnGraph, 
             JUNGGraphSnapshot prevStatus)
     {
         loadGraphToViewer(convertDnGraphToGSGraph(dnGraph),prevStatus);
@@ -398,12 +397,13 @@ public class GraphViewerPanel extends JPanel
 //-----------------------------------------------------------------------------
     
     /**
-     * Created a JUNG graph object that represents a {@link DENOPTIMGraph}, and 
+     * Created a JUNG graph object that represents a {@link DGraph}, and 
      * allows to load a graphical representation into the viewer.
-     * @param dnG the {@link DENOPTIMGraph} to be converted.
+     * @param dnG the {@link DGraph} to be converted.
      * @return the JUNG object
      */
-    public Graph<JVertex, JEdge> convertDnGraphToGSGraph(DENOPTIMGraph dnG) 
+    public edu.uci.ics.jung.graph.Graph<JVertex, JEdge> convertDnGraphToGSGraph(
+            DGraph dnG) 
     {
         return convertDnGraphToGSGraph(dnG, null);
     }
@@ -411,29 +411,29 @@ public class GraphViewerPanel extends JPanel
 //-----------------------------------------------------------------------------
     
     /**
-     * Created a JUNG graph object that represents a {@link DENOPTIMGraph}, and 
+     * Created a JUNG graph object that represents a {@link DGraph}, and 
      * allows to load a graphical representation into the viewer.
-     * @param dnG the {@link DENOPTIMGraph} to be converted.
-     * @param tmpl null, or the {@link DENOPTIMTemplate} that contains the 
-     * {@link DENOPTIMGraph}. If this is
+     * @param dnG the {@link DGraph} to be converted.
+     * @param tmpl null, or the {@link Template} that contains the 
+     * {@link DGraph}. If this is
      * not null the numbering of the AP nodes will be based on the list of APs 
-     * of the {@link DENOPTIMTemplate}, otherwise 
+     * of the {@link Template}, otherwise 
      * (if tmpl is null) the numbering refers to the
      * AP list of the vertex that is part of the dnG graph.
      * @return the JUNG object
      */
-    public Graph<JVertex, JEdge> convertDnGraphToGSGraph(
-            DENOPTIMGraph dnpGraph, DENOPTIMTemplate tmpl) 
+    public edu.uci.ics.jung.graph.Graph<JVertex, JEdge> convertDnGraphToGSGraph(
+            DGraph dnpGraph, Template tmpl) 
     {
-        Graph<JVertex, JEdge> g = new SparseMultigraph<>();
-        Map<DENOPTIMVertex, JVertex> vMap = new HashMap<DENOPTIMVertex,JVertex>();
-        for (DENOPTIMVertex v : dnpGraph.getVertexList())
+        edu.uci.ics.jung.graph.Graph<JVertex, JEdge> g = new SparseMultigraph<>();
+        Map<Vertex, JVertex> vMap = new HashMap<Vertex,JVertex>();
+        for (Vertex v : dnpGraph.getVertexList())
         {
             JVertex jv = new JVertex(v);
             vMap.put(v, jv);
             g.addVertex(jv);
             
-            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            for (AttachmentPoint ap : v.getAttachmentPoints())
             {
                 if (ap.isAvailableThroughout())
                 {
@@ -446,7 +446,7 @@ public class GraphViewerPanel extends JPanel
                 }
             }
         }
-        for (DENOPTIMEdge e : dnpGraph.getEdgeList())
+        for (Edge e : dnpGraph.getEdgeList())
         {
             g.addEdge(new JEdge(e.getSrcAP(),
                     e.getTrgAP(), 
@@ -454,7 +454,7 @@ public class GraphViewerPanel extends JPanel
                     vMap.get(e.getSrcAP().getOwner()), 
                     vMap.get(e.getTrgAP().getOwner()), EdgeType.DIRECTED);
         }
-        for (DENOPTIMRing r : dnpGraph.getRings())
+        for (Ring r : dnpGraph.getRings())
         {   
             g.addEdge(new JEdge(
                         r.getHeadVertex().getEdgeToParent().getSrcAP(),
@@ -475,13 +475,13 @@ public class GraphViewerPanel extends JPanel
     
 //-----------------------------------------------------------------------------    
 
-    private static void renumberAPs(DENOPTIMTemplate tmpl, 
-            Graph<JVertex, JEdge> graph)
+    private static void renumberAPs(Template tmpl, 
+            edu.uci.ics.jung.graph.Graph<JVertex, JEdge> graph)
     {
         for (int i=0; i<tmpl.getAttachmentPoints().size(); i++)
         {
-            DENOPTIMAttachmentPoint outAP = tmpl.getAttachmentPoints().get(i);
-            DENOPTIMAttachmentPoint inAP = tmpl.getInnerAPFromOuterAP(outAP);
+            AttachmentPoint outAP = tmpl.getAttachmentPoints().get(i);
+            AttachmentPoint inAP = tmpl.getInnerAPFromOuterAP(outAP);
             for (JVertex v : graph.getVertices())
             {
                 if (v.vtype == JVertexType.AP)
@@ -502,7 +502,7 @@ public class GraphViewerPanel extends JPanel
 	 * Load the given graph to the graph viewer.
 	 * @param g the graph to load
 	 */
-	public void loadGraphToViewer(Graph<JVertex, JEdge>  g)
+	public void loadGraphToViewer(edu.uci.ics.jung.graph.Graph<JVertex, JEdge> g)
 	{
 		loadGraphToViewer(g,null);
 	}
@@ -516,7 +516,7 @@ public class GraphViewerPanel extends JPanel
      * remember previously chosen settings, such as the labels to be 
      * displayed, or the position of nodes.
      */
-    public void loadGraphToViewer(Graph<JVertex, JEdge>  g, 
+    public void loadGraphToViewer(edu.uci.ics.jung.graph.Graph<JVertex, JEdge> g, 
             JUNGGraphSnapshot prevStatus)
     {
         loadGraphToViewer(g, prevStatus, true);
@@ -532,7 +532,7 @@ public class GraphViewerPanel extends JPanel
      * displayed, or the position of nodes.
      * @param lock decides whether we lock the initial position of nodes or not.
      */
-    public void loadGraphToViewer(Graph<JVertex, JEdge>  g, 
+    public void loadGraphToViewer(edu.uci.ics.jung.graph.Graph<JVertex, JEdge> g, 
             JUNGGraphSnapshot prevStatus, boolean lock)
     {
         loadGraphToViewer(g, prevStatus, lock, 1.0);
@@ -550,7 +550,7 @@ public class GraphViewerPanel extends JPanel
 	 * the graph layout size. This allows to
 	 * reduce/enlarge the space considered for plotting the graph.
 	 */
-	public void loadGraphToViewer(Graph<JVertex, JEdge>  g, 
+	public void loadGraphToViewer(edu.uci.ics.jung.graph.Graph<JVertex, JEdge> g, 
 	        JUNGGraphSnapshot prevStatus, boolean lock, double reScaling)
 	{
 	    loadedGraph = g;

@@ -13,7 +13,7 @@ import com.google.gson.JsonSerializer;
  */
 
 public class APTreeMap
-        extends TreeMap<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint>
+        extends TreeMap<AttachmentPoint, AttachmentPoint>
 {
 
   public static class APMapSerializer
@@ -23,8 +23,8 @@ public class APTreeMap
       public JsonElement serialize(APTreeMap apmap, Type typeOfSrc,
               JsonSerializationContext context)
       {
-          TreeMap<Integer,DENOPTIMAttachmentPoint> jsonableMap = new TreeMap<>();
-          for (Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> entry
+          TreeMap<Integer,AttachmentPoint> jsonableMap = new TreeMap<>();
+          for (Entry<AttachmentPoint, AttachmentPoint> entry
                   : apmap.entrySet())
           {
               jsonableMap.put(entry.getKey().getID(), entry.getValue());

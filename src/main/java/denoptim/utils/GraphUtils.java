@@ -25,8 +25,8 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
 
 
 /**
@@ -189,7 +189,7 @@ public class GraphUtils
   
 //------------------------------------------------------------------------------
 
-    public static void writeSDFFields(IAtomContainer iac, DENOPTIMGraph g)
+    public static void writeSDFFields(IAtomContainer iac, DGraph g)
             throws DENOPTIMException
     {
         iac.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
@@ -204,7 +204,7 @@ public class GraphUtils
     
 //------------------------------------------------------------------------------
 
-    public static String getLabel(DENOPTIMVertex v)
+    public static String getLabel(Vertex v)
     {
         if (!v.hasProperty("Label"))
             return "";
@@ -214,7 +214,7 @@ public class GraphUtils
     
 //------------------------------------------------------------------------------
     
-    public static String getLabel(DENOPTIMGraph g, int vIdx)
+    public static String getLabel(DGraph g, int vIdx)
     {
         if (!g.getVertexAtPosition(vIdx).hasProperty("Label"))
             return "";

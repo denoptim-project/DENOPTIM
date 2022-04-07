@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.task.ProgramTask;
 
 
@@ -40,15 +40,15 @@ public class GraphListsHandler extends ProgramTask
         glhParams.processParameters();
         glhParams.printParameters();
 
-        Set<DENOPTIMGraph> matchedA = new HashSet<DENOPTIMGraph>();
-        Set<DENOPTIMGraph> matchedB = new HashSet<DENOPTIMGraph>();
+        Set<DGraph> matchedA = new HashSet<DGraph>();
+        Set<DGraph> matchedB = new HashSet<DGraph>();
         
         int i = -1;
-        for (DENOPTIMGraph gA :  glhParams.inGraphsA)
+        for (DGraph gA :  glhParams.inGraphsA)
         {
             i++;
             int j = -1;
-            for (DENOPTIMGraph gB :  glhParams.inGraphsB)
+            for (DGraph gB :  glhParams.inGraphsB)
             {
                 j++;
                 System.out.println(" ");
@@ -74,7 +74,7 @@ public class GraphListsHandler extends ProgramTask
         System.out.println(" ");
         System.out.println(" ===> Un-matches in list A");
         int ii = -1;
-        for (DENOPTIMGraph gA : glhParams.inGraphsA)
+        for (DGraph gA : glhParams.inGraphsA)
         {
             ii++;
             if (matchedA.contains(gA))
@@ -89,7 +89,7 @@ public class GraphListsHandler extends ProgramTask
         System.out.println(" ");
         System.out.println(" ===> Un-matches in list B");
         int jj = -1;
-        for (DENOPTIMGraph gB : glhParams.inGraphsB)
+        for (DGraph gB : glhParams.inGraphsB)
         {
             jj++;
             if (matchedB.contains(gB))

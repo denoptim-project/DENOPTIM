@@ -34,9 +34,9 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.combinatorial.FragSpaceExplorer;
 import denoptim.programs.denovo.GARunner;
 import denoptim.task.FitnessTask;
@@ -137,7 +137,7 @@ public class FPRunner
                 {
                     ex.printStackTrace();
                     String msg = "EXCEPTION in rejectedExecution.";
-                    DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+                    StaticLogger.appLogger.log(Level.WARNING,msg);
                 }
             }
         });
@@ -168,7 +168,7 @@ public class FPRunner
         StopWatch watch = new StopWatch();
         watch.start();
         
-        List<DENOPTIMGraph> graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
+        List<DGraph> graphs = DenoptimIO.readDENOPTIMGraphsFromFile(
                 settings.getInputFile());
         List<IAtomContainer> iacs = DenoptimIO.readSDFFile(
                 settings.getInputFile().getAbsolutePath());
@@ -183,7 +183,7 @@ public class FPRunner
         int evaluationCount = 0;
         for (int i=0; i<graphs.size(); i++)
         {
-            DENOPTIMGraph graph = graphs.get(i);
+            DGraph graph = graphs.get(i);
             IAtomContainer iac = iacs.get(i);
   
             FitnessEvaluationTask task = new FitnessEvaluationTask(settings,
@@ -219,7 +219,7 @@ public class FPRunner
                 + "Run " + evaluationCount + " evaluation" + plural 
                 + " of fitness." + DENOPTIMConstants.EOL
                 + "FitnessRunner run completed." + DENOPTIMConstants.EOL;
-        DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+        StaticLogger.appLogger.log(Level.INFO, msg);
     }
 
 //------------------------------------------------------------------------------

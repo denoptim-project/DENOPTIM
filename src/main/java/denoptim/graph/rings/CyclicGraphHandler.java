@@ -42,17 +42,17 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Ring;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.logging.StaticLogger;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RandomUtils;
@@ -123,8 +123,8 @@ public class CyclicGraphHandler
      * @return the selected combination of closable paths 
      */
 
-    public List<DENOPTIMRing> getRandomCombinationOfRings(IAtomContainer inMol,
-            DENOPTIMGraph molGraph, int maxRingClosures) throws DENOPTIMException
+    public List<Ring> getRandomCombinationOfRings(IAtomContainer inMol,
+            DGraph molGraph, int maxRingClosures) throws DENOPTIMException
     {
         // Prepare molecular representation with no dummy atoms
         // NOTE: the connectivity of this molecule is going to be edited 
@@ -146,11 +146,11 @@ public class CyclicGraphHandler
         rsm.initialize(mol, molGraph);
 
         // Get weighted list of RCVs
-        ArrayList<DENOPTIMVertex> wLstVrtI = rsm.getRSBiasedListOfCandidates();
+        ArrayList<Vertex> wLstVrtI = rsm.getRSBiasedListOfCandidates();
         
         // Randomly choose the compatible combinations of RCAs and store them
         // as DENOPTIMRings. 
-        List<DENOPTIMRing> combOfRings = new ArrayList<DENOPTIMRing>();
+        List<Ring> combOfRings = new ArrayList<Ring>();
         while (wLstVrtI.size() > 0)
         {
             // Termination criterion based on maximum number of rings per graph
@@ -158,7 +158,7 @@ public class CyclicGraphHandler
                 break;
             
             int vIdI = RandomUtils.nextInt(wLstVrtI.size());
-            DENOPTIMVertex vI = wLstVrtI.get(vIdI);
+            Vertex vI = wLstVrtI.get(vIdI);
 
             if (verbosity > 1)
             {
@@ -167,12 +167,12 @@ public class CyclicGraphHandler
             wLstVrtI.removeAll(Collections.singleton(vI));
 
             // Create vector of possible choices for second RCV
-            ArrayList<DENOPTIMVertex> wLstVrtJ = 
+            ArrayList<Vertex> wLstVrtJ = 
                                           rsm.getRSBiasedListOfCandidates(vI); 
             while (wLstVrtJ.size() > 0)
             {
                 int vIdJ = RandomUtils.nextInt(wLstVrtJ.size());
-                DENOPTIMVertex vJ = wLstVrtJ.get(vIdJ);
+                Vertex vJ = wLstVrtJ.get(vIdJ);
                 wLstVrtJ.removeAll(Collections.singleton(vJ));
 
                 if (verbosity > 1)
@@ -184,10 +184,10 @@ public class CyclicGraphHandler
                 PathSubGraph path = new PathSubGraph(vI,vJ,molGraph);
                 if (evaluatePathClosability(path, inMol))
                 {
-                    ArrayList<DENOPTIMVertex> arrLst = 
-                                              new ArrayList<DENOPTIMVertex>();
+                    ArrayList<Vertex> arrLst = 
+                                              new ArrayList<Vertex>();
                     arrLst.addAll(path.getVertecesPath());                    
-                    DENOPTIMRing ring = new DENOPTIMRing(arrLst);
+                    Ring ring = new Ring(arrLst);
 
                     BondType bndTypI = vI.getEdgeToParent().getBondType();
                     BondType bndTypJ = vJ.getEdgeToParent().getBondType();
@@ -207,8 +207,8 @@ public class CyclicGraphHandler
                     wLstVrtI.removeAll(Collections.singleton(vJ));
 
                     // Update ring sizes according to the newly added bond
-                    if (vI instanceof DENOPTIMFragment 
-                            && vJ instanceof DENOPTIMFragment)
+                    if (vI instanceof Fragment 
+                            && vJ instanceof Fragment)
                     {
                         rsm.addRingClosingBond(vI,vJ);
                     }
@@ -244,28 +244,28 @@ public class CyclicGraphHandler
      * @return the candidate closable paths in the given graph
      */
 
-    public ArrayList<List<DENOPTIMRing>> getPossibleCombinationOfRings(
-            IAtomContainer mol, DENOPTIMGraph molGraph)
+    public ArrayList<List<Ring>> getPossibleCombinationOfRings(
+            IAtomContainer mol, DGraph molGraph)
                     throws DENOPTIMException
     {
         // All the candidate paths 
         Map<ObjectPair,PathSubGraph> allGoodPaths = 
                                         new HashMap<ObjectPair,PathSubGraph>();
-        ArrayList<DENOPTIMVertex> rcaVertLst = molGraph.getFreeRCVertices();
+        ArrayList<Vertex> rcaVertLst = molGraph.getFreeRCVertices();
         
         // Get manager of ring size problems
         RingSizeManager rsm = new RingSizeManager(fragSpace);
         rsm.initialize(mol, molGraph);
 
         // identify compatible pairs of RCA vertices
-        Map<DENOPTIMVertex,ArrayList<DENOPTIMVertex>> compatMap =
-                       new HashMap<DENOPTIMVertex,ArrayList<DENOPTIMVertex>>();
+        Map<Vertex,ArrayList<Vertex>> compatMap =
+                       new HashMap<Vertex,ArrayList<Vertex>>();
         for (int i=0; i<rcaVertLst.size(); i++)
         {
-            DENOPTIMVertex vI = rcaVertLst.get(i);
+            Vertex vI = rcaVertLst.get(i);
             for (int j=i+1; j<rcaVertLst.size(); j++)
             {
-                DENOPTIMVertex vJ = rcaVertLst.get(j);
+                Vertex vJ = rcaVertLst.get(j);
                 if (!rsm.getCompatibilityOfPair(vI,vJ))
                 {
                     if (verbosity > 1)
@@ -309,8 +309,8 @@ public class CyclicGraphHandler
                 }
                 else
                 {
-                    ArrayList<DENOPTIMVertex> lst =
-                                            new ArrayList<DENOPTIMVertex>();
+                    ArrayList<Vertex> lst =
+                                            new ArrayList<Vertex>();
                     lst.add(vJ);
                     compatMap.put(vI,lst);
                 }
@@ -320,8 +320,8 @@ public class CyclicGraphHandler
                 }
                 else
                 {
-                    ArrayList<DENOPTIMVertex> lst =
-                                            new ArrayList<DENOPTIMVertex>();
+                    ArrayList<Vertex> lst =
+                                            new ArrayList<Vertex>();
                     lst.add(vI);
                     compatMap.put(vJ,lst);
                 }
@@ -360,10 +360,10 @@ public class CyclicGraphHandler
                         continue;
                     }
     
-                    DENOPTIMVertex hA = rpA.getHeadVertex();
-                    DENOPTIMVertex tA = rpA.getTailVertex();
-                    DENOPTIMVertex hB = rpB.getHeadVertex();
-                    DENOPTIMVertex tB = rpB.getTailVertex();
+                    Vertex hA = rpA.getHeadVertex();
+                    Vertex tA = rpA.getTailVertex();
+                    Vertex hB = rpB.getHeadVertex();
+                    Vertex tB = rpB.getTailVertex();
     
                     if ((hA == hB || hA == tB) || (tA == hB || tA == tB))
                     {
@@ -419,15 +419,15 @@ public class CyclicGraphHandler
         // Generate all combinations of compatible, closable paths
         ArrayList<ObjectPair> lstPairs = new ArrayList<ObjectPair>();
         ArrayList<Integer> usedId = new ArrayList<Integer>();
-        ArrayList<DENOPTIMVertex> sortedKeys = new ArrayList<DENOPTIMVertex>();
-        for (DENOPTIMVertex keyVert : compatMap.keySet())
+        ArrayList<Vertex> sortedKeys = new ArrayList<Vertex>();
+        for (Vertex keyVert : compatMap.keySet())
         {
             sortedKeys.add(keyVert);
         }
 
         // All possible ring closing paths will be stored here
-        ArrayList<List<DENOPTIMRing>> allCombsOfRings =
-                                     new ArrayList<List<DENOPTIMRing>>();
+        ArrayList<List<Ring>> allCombsOfRings =
+                                     new ArrayList<List<Ring>>();
         
         combineCompatPathSubGraphs(0,
                 sortedKeys,
@@ -454,13 +454,13 @@ public class CyclicGraphHandler
      */
 
     private boolean combineCompatPathSubGraphs(int ii0,
-                       ArrayList<DENOPTIMVertex> sortedKeys,
-                       Map<DENOPTIMVertex,ArrayList<DENOPTIMVertex>> compatMap,
+                       ArrayList<Vertex> sortedKeys,
+                       Map<Vertex,ArrayList<Vertex>> compatMap,
                        ArrayList<ObjectPair> lstPairs,
                        ArrayList<Integer> usedId,
                        Map<ObjectPair,PathSubGraph> allGoodPaths,
                        Map<IBond,List<PathSubGraph>> interdepPaths,
-                       ArrayList<List<DENOPTIMRing>> allCombsOfRings)
+                       ArrayList<List<Ring>> allCombsOfRings)
                                                       throws DENOPTIMException
     {
         int objId = this.hashCode();
@@ -477,7 +477,7 @@ public class CyclicGraphHandler
             System.out.println(objId+"-"+recLab+"> lstPairs= "+lstPairs);
             System.out.println(objId+"-"+recLab+"> compatMap= "+compatMap);
             System.out.println(objId+"-"+recLab+"> allCombsOfRings");
-            for (List<DENOPTIMRing> ringSet : allCombsOfRings)
+            for (List<Ring> ringSet : allCombsOfRings)
             {
                 System.out.println("        "+ringSet);
             }
@@ -487,7 +487,7 @@ public class CyclicGraphHandler
         boolean addedNew = false;
         for (int ii=ii0; ii<sortedKeys.size(); ii++)
         {
-            DENOPTIMVertex vi = sortedKeys.get(ii);
+            Vertex vi = sortedKeys.get(ii);
             int vIdI = vi.getVertexId();
 
             if (debug)
@@ -498,7 +498,7 @@ public class CyclicGraphHandler
                 continue;
             }
 
-            for (DENOPTIMVertex vj : compatMap.get(vi))
+            for (Vertex vj : compatMap.get(vi))
             {
                 int vIdJ = vj.getVertexId();
 
@@ -560,17 +560,17 @@ public class CyclicGraphHandler
                         if (debug)
                             System.out.println(objId+"-"+recLab+"> in B");
 
-                        List<DENOPTIMRing> ringsComb = new ArrayList<DENOPTIMRing>();
+                        List<Ring> ringsComb = new ArrayList<Ring>();
                         for (ObjectPair opFinal : lstPairs)
                         {
                             PathSubGraph path = allGoodPaths.get(opFinal);
-                            ArrayList<DENOPTIMVertex> arrLst = 
-                                               new ArrayList<DENOPTIMVertex>();
+                            ArrayList<Vertex> arrLst = 
+                                               new ArrayList<Vertex>();
                             arrLst.addAll(path.getVertecesPath());
 
-                            DENOPTIMRing ring = new DENOPTIMRing(arrLst);
+                            Ring ring = new Ring(arrLst);
 
-                            List<DENOPTIMEdge> es = path.getEdgesPath();
+                            List<Edge> es = path.getEdgesPath();
                             BondType btH = es.get(0).getBondType();
                             BondType btT = es.get(es.size()-1).getBondType();
                             if (btH != btT)
@@ -592,7 +592,7 @@ public class CyclicGraphHandler
                         }
 
                         boolean notNewCmb = false;
-                        for(List<DENOPTIMRing> oldCmb : allCombsOfRings)
+                        for(List<Ring> oldCmb : allCombsOfRings)
                         {
                             if (debug)
                             {
@@ -632,9 +632,9 @@ public class CyclicGraphHandler
                     for (int ir = recCount; ir<lstPairs.size(); ir++)
                     {
                         ObjectPair opToRemove = lstPairs.get(ir);
-                        DENOPTIMVertex delVA = (DENOPTIMVertex) 
+                        Vertex delVA = (Vertex) 
                                                         opToRemove.getFirst();
-                        DENOPTIMVertex delVB = (DENOPTIMVertex) 
+                        Vertex delVB = (Vertex) 
                                                         opToRemove.getSecond();
                         usedId.remove(usedId.indexOf(delVA.getVertexId()));
                         usedId.remove(usedId.indexOf(delVB.getVertexId()));
@@ -690,13 +690,13 @@ public class CyclicGraphHandler
             List<PathSubGraph> psgSet = interdepPaths.get(bnd);
             for (PathSubGraph psg : psgSet)
             {
-                DENOPTIMVertex va1 = psg.getHeadVertex();
-                DENOPTIMVertex va2 = psg.getTailVertex();
+                Vertex va1 = psg.getHeadVertex();
+                Vertex va2 = psg.getTailVertex();
 
                 for (ObjectPair op : lstPairs)
                 {
-                    DENOPTIMVertex vb1 = (DENOPTIMVertex) op.getFirst();
-                    DENOPTIMVertex vb2 = (DENOPTIMVertex) op.getSecond();
+                    Vertex vb1 = (Vertex) op.getFirst();
+                    Vertex vb2 = (Vertex) op.getSecond();
                 
                     if ((va1 == vb1 && va2 == vb2) ||
                         (va1 == vb2 && va2 == vb1))
@@ -736,13 +736,13 @@ public class CyclicGraphHandler
             List<PathSubGraph> psgSet = interdepPaths.get(bnd);
             for (PathSubGraph psg : psgSet)
             {
-                DENOPTIMVertex va1 = psg.getHeadVertex();
-                DENOPTIMVertex va2 = psg.getTailVertex();
+                Vertex va1 = psg.getHeadVertex();
+                Vertex va2 = psg.getTailVertex();
 
                 for (ObjectPair op : lstPairs)
                 {
-                    DENOPTIMVertex vb1 = (DENOPTIMVertex) op.getFirst();
-                    DENOPTIMVertex vb2 = (DENOPTIMVertex) op.getSecond();
+                    Vertex vb1 = (Vertex) op.getFirst();
+                    Vertex vb2 = (Vertex) op.getSecond();
 
                     if ((va1 == vb1 && va2 == vb2) ||
                         (va1 == vb2 && va2 == vb1))
@@ -900,7 +900,7 @@ public class CyclicGraphHandler
         // As we select candidate pairs of RCAs and define candidate 
         // DENOPTIMRings this DENOPTIMGraph will keep representing the 
         // initial system
-        private DENOPTIMGraph graph;
+        private DGraph graph;
 
         // Molecular representation of the current system
         private IAtomContainer mol;
@@ -911,7 +911,7 @@ public class CyclicGraphHandler
         
         // List of Ring Closing Vertices (RCV as DENOPTIMVerex) each containing
         // an available Ring Closing Attractor (RCA)
-        private ArrayList<DENOPTIMVertex> lstVert;
+        private ArrayList<Vertex> lstVert;
         
         /**
          * Size of the list of available RCAs
@@ -935,7 +935,7 @@ public class CyclicGraphHandler
         private ArrayList<Boolean> done;
 
         // Map linking the list of vertices and atoms
-        private Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId;
+        private Map<Vertex,ArrayList<Integer>> vIdToAtmId;
 
         // Parameters setting the bias for selecting rings of given size
         private ArrayList<Integer> ringSizeBias = settings.getRingSizeBias();
@@ -954,7 +954,7 @@ public class CyclicGraphHandler
 
         //---------------------------------------------------------------------
 
-        public void initialize(IAtomContainer origMol, DENOPTIMGraph graph)
+        public void initialize(IAtomContainer origMol, DGraph graph)
                                                       throws DENOPTIMException
         {
             // Store current system
@@ -973,7 +973,7 @@ public class CyclicGraphHandler
             sz = lstVert.size();
 
             // Define link between list of vertices and list of atoms
-            vIdToAtmId = DENOPTIMMoleculeUtils.getVertexToAtomIdMap(lstVert,mol);
+            vIdToAtmId = MoleculeUtils.getVertexToAtomIdMap(lstVert,mol);
 
             // Build topological matrix
             fillTopologicalMatrix(); 
@@ -1030,10 +1030,10 @@ public class CyclicGraphHandler
             compatibilityOfPairs = new boolean[sz][sz];
             for (int i=0; i<sz; i++)
             {
-                DENOPTIMVertex vI = lstVert.get(i);
+                Vertex vI = lstVert.get(i);
                 IAtom atmI = null;
                 RingClosingAttractor rcaI = null;
-                boolean isAtmI = vI instanceof DENOPTIMFragment;
+                boolean isAtmI = vI instanceof Fragment;
                 if (isAtmI)
                 {
                     atmI = mol.getAtom(vIdToAtmId.get(vI).get(0));
@@ -1053,10 +1053,10 @@ public class CyclicGraphHandler
                 
                 for (int j=i+1; j<sz; j++)
                 {
-                    DENOPTIMVertex vJ = lstVert.get(j);
+                    Vertex vJ = lstVert.get(j);
                     IAtom atmJ = null;
                     RingClosingAttractor rcaJ = null;
-                    boolean isAtmJ = vJ instanceof DENOPTIMFragment;
+                    boolean isAtmJ = vJ instanceof Fragment;
                     if (isAtmJ)
                     {
                         atmJ = mol.getAtom(vIdToAtmId.get(vJ).get(0));
@@ -1133,16 +1133,16 @@ public class CyclicGraphHandler
 
         //---------------------------------------------------------------------
 
-        public ArrayList<DENOPTIMVertex> getRSBiasedListOfCandidates()
+        public ArrayList<Vertex> getRSBiasedListOfCandidates()
         {
-            ArrayList<DENOPTIMVertex> wLst = new ArrayList<DENOPTIMVertex>();
+            ArrayList<Vertex> wLst = new ArrayList<Vertex>();
             for (int i=0; i<sz; i++)
             {
                 if (done.get(i))
                 {
                     continue;
                 }
-                DENOPTIMVertex v = lstVert.get(i);
+                Vertex v = lstVert.get(i);
                 for (int j=0; j<weigths.get(i); j++)
                 {
                     wLst.add(v);
@@ -1159,11 +1159,11 @@ public class CyclicGraphHandler
 
         //---------------------------------------------------------------------
 
-        public ArrayList<DENOPTIMVertex> getRSBiasedListOfCandidates(
-                                                             DENOPTIMVertex vI)
+        public ArrayList<Vertex> getRSBiasedListOfCandidates(
+                                                             Vertex vI)
         {
             int i = lstVert.indexOf(vI);
-            ArrayList<DENOPTIMVertex> wLst = new ArrayList<DENOPTIMVertex>();
+            ArrayList<Vertex> wLst = new ArrayList<Vertex>();
             for (int j=0; j<sz; j++)
             {
                 if (done.get(j) || !compatibilityOfPairs[i][j])
@@ -1171,7 +1171,7 @@ public class CyclicGraphHandler
                     continue;
                 }
 
-                DENOPTIMVertex vJ = lstVert.get(j);
+                Vertex vJ = lstVert.get(j);
                 
                 if (vI instanceof EmptyVertex && vJ instanceof EmptyVertex)
                 {
@@ -1215,7 +1215,7 @@ public class CyclicGraphHandler
 
         //---------------------------------------------------------------------
 
-        public void addRingClosingBond(DENOPTIMVertex vI, DENOPTIMVertex vJ)
+        public void addRingClosingBond(Vertex vI, Vertex vJ)
                                                        throws DENOPTIMException
         {
             // Check validity of assumption: RCV contain only one IAtom
@@ -1261,15 +1261,15 @@ public class CyclicGraphHandler
 
         //---------------------------------------------------------------------
 
-        public void setVertexAsDone(DENOPTIMVertex v)
+        public void setVertexAsDone(Vertex v)
         {
             done.set(lstVert.indexOf(v),true);
         }
 
         //---------------------------------------------------------------------
 
-        public boolean getCompatibilityOfPair(DENOPTIMVertex vI, 
-                                                             DENOPTIMVertex vJ)
+        public boolean getCompatibilityOfPair(Vertex vI, 
+                                                             Vertex vJ)
         {
             int i = lstVert.indexOf(vI); 
             int j = lstVert.indexOf(vJ);
@@ -1375,28 +1375,28 @@ public class CyclicGraphHandler
      * @return <code>true</code> is the path satisfies the criteria
      */
 
-    private boolean evaluateRCVPair(DENOPTIMVertex vI, DENOPTIMVertex vJ,
-            DENOPTIMGraph molGraph, FragmentSpace fragSpace)
+    private boolean evaluateRCVPair(Vertex vI, Vertex vJ,
+            DGraph molGraph, FragmentSpace fragSpace)
                     throws DENOPTIMException
     {
         String s = "Evaluation of RCV pair " + vI + " " + vJ + ": ";
 
         // Get details on the first vertex (head)
         int vIdI = vI.getVertexId();
-        DENOPTIMEdge edgeI = molGraph.getEdgeWithParent(vIdI);
+        Edge edgeI = molGraph.getEdgeWithParent(vIdI);
         int srcApIdI = edgeI.getSrcAPID();
-        DENOPTIMVertex pvI = molGraph.getParent(vI);
-        DENOPTIMAttachmentPoint srcApI = pvI.getAttachmentPoints().get(
+        Vertex pvI = molGraph.getParent(vI);
+        AttachmentPoint srcApI = pvI.getAttachmentPoints().get(
                                                                     srcApIdI);
         int srcAtmIdI = srcApI.getAtomPositionNumber();
         APClass parentAPClsI = edgeI.getSrcAPClass();
 
         // Get details on the second vertex (tail)
         int vIdJ = vJ.getVertexId();
-        DENOPTIMEdge edgeJ = molGraph.getEdgeWithParent(vIdJ);
+        Edge edgeJ = molGraph.getEdgeWithParent(vIdJ);
         int srcApIdJ = edgeJ.getSrcAPID();
-        DENOPTIMVertex pvJ = molGraph.getParent(vJ);
-        DENOPTIMAttachmentPoint srcApJ =pvJ.getAttachmentPoints().get(srcApIdJ);
+        Vertex pvJ = molGraph.getParent(vJ);
+        AttachmentPoint srcApJ =pvJ.getAttachmentPoints().get(srcApIdJ);
         int srcAtmIdJ = srcApJ.getAtomPositionNumber();
         APClass parentAPClsJ = edgeJ.getSrcAPClass();
         
@@ -1540,16 +1540,16 @@ public class CyclicGraphHandler
         {
             throw new DENOPTIMException(e);
         }
-        DENOPTIMMoleculeUtils.removeRCA(mol);
+        MoleculeUtils.removeRCA(mol);
         
         // Identify atoms of molecular representation that correspond to
         // this path of vertices
-        Map<DENOPTIMVertex,ArrayList<Integer>> vIdToAtmId =
-                DENOPTIMMoleculeUtils.getVertexToAtomIdMap(
-                        (ArrayList<DENOPTIMVertex>) subGraph.getVertecesPath(),
+        Map<Vertex,ArrayList<Integer>> vIdToAtmId =
+                MoleculeUtils.getVertexToAtomIdMap(
+                        (ArrayList<Vertex>) subGraph.getVertecesPath(),
                         mol);
         List<Integer> atmIdsInVrtxPath = new ArrayList<Integer>();
-        for (DENOPTIMVertex v : subGraph.getVertecesPath())
+        for (Vertex v : subGraph.getVertecesPath())
         {
             atmIdsInVrtxPath.addAll(vIdToAtmId.get(v));
         }
@@ -1673,7 +1673,7 @@ public class CyclicGraphHandler
                 String msg = "Attempt to match SMARTS for "
                              + "constitution-based ring-closability conditions "
                              + "returned an error! " + msq.getMessage();
-                DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+                StaticLogger.appLogger.log(Level.WARNING,msg);
             }
             for (String name : smarts.keySet())
             {
@@ -1817,8 +1817,8 @@ public class CyclicGraphHandler
      * @return <code>true</code> it this system is a good candidate
      */
 
-    public boolean checkChelatesGraph(DENOPTIMGraph molGraph,
-                                      List<DENOPTIMRing> ringsSet)
+    public boolean checkChelatesGraph(DGraph molGraph,
+                                      List<Ring> ringsSet)
     {
 
         if (verbosity > 0)
@@ -1832,13 +1832,13 @@ public class CyclicGraphHandler
 // This is a temporary solution. Need a general approach and tunable by
 // options/parameters
 
-        for (DENOPTIMVertex vert : molGraph.getVertexList())
+        for (Vertex vert : molGraph.getVertexList())
         {
             int vId = vert.getVertexId();
             
-            DENOPTIMFragment vertFrag = null;
-            if (vert instanceof DENOPTIMFragment)
-                vertFrag = (DENOPTIMFragment) vert;
+            Fragment vertFrag = null;
+            if (vert instanceof Fragment)
+                vertFrag = (Fragment) vert;
                 
 
             // check for orphan coordinating atoms:
@@ -1847,7 +1847,7 @@ public class CyclicGraphHandler
             if (levelOfVert == 0 
                     && vertFrag.getBuildingBlockType() == BBType.FRAGMENT)
             {
-                DENOPTIMEdge edgeToParnt = molGraph.getEdgeWithParent(vId);
+                Edge edgeToParnt = molGraph.getEdgeWithParent(vId);
                 APClass apClassToScaffold = edgeToParnt.getTrgAPClass();
                 if (settings.metalCoordinatingAPClasses.contains(
                         apClassToScaffold))
@@ -1856,7 +1856,7 @@ public class CyclicGraphHandler
                 }
                 
                 boolean isOrphan = false;
-                for (DENOPTIMVertex cVrtx : vert.getChilddren())
+                for (Vertex cVrtx : vert.getChilddren())
                 {
                     if (cVrtx.isRCV() && !molGraph.isVertexInRing(cVrtx))
                     {
@@ -1879,13 +1879,13 @@ public class CyclicGraphHandler
 //TODO: make the full-denticity requirement optional for same/all APclasses
             if (levelOfVert > 0)
             {
-                Map<String,ArrayList<DENOPTIMVertex>> rcasOnThisVertex =
-                               new HashMap<String,ArrayList<DENOPTIMVertex>>();
-                for (DENOPTIMVertex cVrtx : vert.getChilddren())
+                Map<String,ArrayList<Vertex>> rcasOnThisVertex =
+                               new HashMap<String,ArrayList<Vertex>>();
+                for (Vertex cVrtx : vert.getChilddren())
                 {
                     if (cVrtx.isRCV())
                     {
-                        DENOPTIMAttachmentPoint ap =
+                        AttachmentPoint ap =
                                         cVrtx.getAttachmentPoints().get(0);
                         String apCls = ap.getAPClass().toString();
                         if (rcasOnThisVertex.keySet().contains(apCls))
@@ -1894,8 +1894,8 @@ public class CyclicGraphHandler
                         }
                         else
                         {
-                            ArrayList<DENOPTIMVertex> sameClsRCA =
-                                               new ArrayList<DENOPTIMVertex>();
+                            ArrayList<Vertex> sameClsRCA =
+                                               new ArrayList<Vertex>();
                             sameClsRCA.add(cVrtx);
                             rcasOnThisVertex.put(apCls,sameClsRCA);
                         }
@@ -1905,7 +1905,7 @@ public class CyclicGraphHandler
                 for (String apCls : rcasOnThisVertex.keySet())
                 {
                     int usedDenticity = 0;
-                    for (DENOPTIMVertex rcaVrtx : rcasOnThisVertex.get(apCls))
+                    for (Vertex rcaVrtx : rcasOnThisVertex.get(apCls))
                     {
                         if (molGraph.isVertexInRing(rcaVrtx))
                         {

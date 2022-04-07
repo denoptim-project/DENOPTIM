@@ -61,13 +61,13 @@ import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMTemplate.ContractLevel;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.DGraph;
+import denoptim.graph.Template;
+import denoptim.graph.Template.ContractLevel;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
@@ -97,8 +97,8 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * The currently loaded list of graphs
 	 */
-	protected ArrayList<DENOPTIMGraph> dnGraphLibrary =
-			new ArrayList<DENOPTIMGraph>();
+	protected ArrayList<DGraph> dnGraphLibrary =
+			new ArrayList<DGraph>();
 	
 	/**
 	 * The currently loaded list of molecular representations 
@@ -110,7 +110,7 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * The unsaved version of the currently loaded graph
 	 */
-	private DENOPTIMGraph dnGraph;
+	private DGraph dnGraph;
 	
 	/**
 	 * Unique identified for graphs built here
@@ -170,7 +170,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 * and are annotate with fragmentID and AP pointers meant to 
 	 * facilitate a quick selection of compatible connections.
 	 */
-	private ArrayList<DENOPTIMVertex> compatVrtxs;
+	private ArrayList<Vertex> compatVrtxs;
 	
 	/**
 	 * Map converting fragIDs in fragment library to fragIDs in subset
@@ -430,7 +430,7 @@ public class GUIGraphHandler extends GUICardPanel
 			                UIManager.getIcon("OptionPane.errorIcon"));
 					return;
 				}
-				ArrayList<DENOPTIMAttachmentPoint> selAps = 
+				ArrayList<AttachmentPoint> selAps = 
 				        visualPanel.getAPsSelectedInViewer();				
 				if (selAps.size() == 0)
 				{
@@ -469,8 +469,8 @@ public class GUIGraphHandler extends GUICardPanel
         btnAddEmptyVrtx.setEnabled(true);
         btnAddEmptyVrtx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ArrayList<DENOPTIMAttachmentPoint> selAps = 
-                        new ArrayList<DENOPTIMAttachmentPoint> ();
+                ArrayList<AttachmentPoint> selAps = 
+                        new ArrayList<AttachmentPoint> ();
                 if (dnGraph != null)
                 {
                     selAps = visualPanel.getAPsSelectedInViewer(); 
@@ -499,7 +499,7 @@ public class GUIGraphHandler extends GUICardPanel
 		btnDelSel.setEnabled(false);
 		btnDelSel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ArrayList<DENOPTIMVertex> selVrtx = 
+				ArrayList<Vertex> selVrtx = 
 				        visualPanel.getSelectedNodesInViewer();
 				if (selVrtx.size() == 0)
 				{
@@ -531,7 +531,7 @@ public class GUIGraphHandler extends GUICardPanel
 				}
 				*/
 				
-				for (DENOPTIMVertex v : selVrtx)
+				for (Vertex v : selVrtx)
 				{
 					dnGraph.removeVertex(v);
 				}
@@ -556,7 +556,7 @@ public class GUIGraphHandler extends GUICardPanel
         btnAddChord.setEnabled(false);
         btnAddChord.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {    
-                ArrayList<DENOPTIMVertex> selVrtxs = 
+                ArrayList<Vertex> selVrtxs = 
                         visualPanel.getSelectedNodesInViewer();               
                 if (selVrtxs.size() != 2)
                 {
@@ -733,11 +733,11 @@ public class GUIGraphHandler extends GUICardPanel
 		        @SuppressWarnings("unchecked")
                 Map<String,List<Object>> configs = (Map<String,List<Object>>) o;
 		        
-		        ArrayList<DENOPTIMVertex> templates = 
-		                new ArrayList<DENOPTIMVertex>();
+		        ArrayList<Vertex> templates = 
+		                new ArrayList<Vertex>();
 		        for (int i=0; i<dnGraphLibrary.size(); i++)
 		        {
-		            DENOPTIMTemplate t = new DENOPTIMTemplate(
+		            Template t = new Template(
 		                    (BBType) configs.get(BBTYPEKEY).get(i));
 		            t.setInnerGraph(dnGraphLibrary.get(i));
 		            t.setContractLevel((ContractLevel) 
@@ -901,7 +901,7 @@ public class GUIGraphHandler extends GUICardPanel
 //-----------------------------------------------------------------------------
 	
 	private void startGraphFromCreationOfEmptyVertex(
-	        ArrayList<DENOPTIMAttachmentPoint> selAps)
+	        ArrayList<AttachmentPoint> selAps)
 	{   
         GUIEmptyVertexMaker makeEmptyVertexDialog = 
                 new GUIEmptyVertexMaker(this);
@@ -911,8 +911,8 @@ public class GUIGraphHandler extends GUICardPanel
         {
             return;
         }
-        DENOPTIMVertex ev = (EmptyVertex) evObj;
-        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>(1);
+        Vertex ev = (EmptyVertex) evObj;
+        ArrayList<Vertex> lst = new ArrayList<Vertex>(1);
         lst.add(ev);
         GUIVertexSelector fragSelector = new GUIVertexSelector(this, false);
         fragSelector.ctrlPane.setVisible(false);
@@ -1008,12 +1008,12 @@ public class GUIGraphHandler extends GUICardPanel
             res = res + 10;
         }
         
-        ArrayList<DENOPTIMVertex> vrtxLib = new  ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> vrtxLib = new  ArrayList<Vertex>();
         switch (res)
         {
             case 0:
                 rootType = BBType.SCAFFOLD;
-                for (DENOPTIMVertex bb : fragSpace.getScaffoldLibrary())
+                for (Vertex bb : fragSpace.getScaffoldLibrary())
                 {
                     vrtxLib.add(bb.clone());
                 }
@@ -1021,7 +1021,7 @@ public class GUIGraphHandler extends GUICardPanel
                 
             case 1:
                 rootType = BBType.FRAGMENT;
-                for (DENOPTIMVertex bb : fragSpace.getFragmentLibrary())
+                for (Vertex bb : fragSpace.getFragmentLibrary())
                 {
                     vrtxLib.add(bb.clone());
                 }
@@ -1033,7 +1033,7 @@ public class GUIGraphHandler extends GUICardPanel
                 // index-based operations on the fragment space that are done 
                 // after this 'switch' block make no sense. Instead, we use the 
                 // same method called by the "Add Empty Vertex" button.
-                ArrayList<DENOPTIMAttachmentPoint> selectedAPs = new ArrayList<>();
+                ArrayList<AttachmentPoint> selectedAPs = new ArrayList<>();
                 startGraphFromCreationOfEmptyVertex(selectedAPs);
                 return;
             
@@ -1072,10 +1072,10 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		// Create the node
 		int firstBBId = 1;
-		DENOPTIMVertex firstVertex = null;
+		Vertex firstVertex = null;
         try
         {
-            firstVertex = DENOPTIMVertex.newVertexFromLibrary(
+            firstVertex = Vertex.newVertexFromLibrary(
                     firstBBId, scaffFragId, rootType, fragSpace);
         } catch (DENOPTIMException e)
         {
@@ -1101,7 +1101,7 @@ public class GUIGraphHandler extends GUICardPanel
 	
 	private void initializeCurrentGraph()
 	{
-        dnGraph = new DENOPTIMGraph();
+        dnGraph = new DGraph();
         dnGraph.setGraphId(graphUID.getAndIncrement());
         // Add new graph and corresponding mol representation (must exist)
         dnGraphLibrary.add(dnGraph);
@@ -1119,7 +1119,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 * selected vertices.
 	 * @param rcvs the selected vertices. Must be two vertices.
 	 */
-	private void addChordOnGraph(ArrayList<DENOPTIMVertex> rcvs)
+	private void addChordOnGraph(ArrayList<Vertex> rcvs)
 	{
         if (rcvs.size() != 2)
         {
@@ -1154,7 +1154,7 @@ public class GUIGraphHandler extends GUICardPanel
 	 * @param selAps attachment points on the growing graph.
 	 */
 	private void extendGraphFromFragSpace(
-	        ArrayList<DENOPTIMAttachmentPoint> selAps)
+	        ArrayList<AttachmentPoint> selAps)
 	{
 		// For extensions of existing graphs we need to know where to extend
 		if (selAps.size() == 0)
@@ -1170,8 +1170,8 @@ public class GUIGraphHandler extends GUICardPanel
 		// Create clones of fragments and put the into 'compatFrags'
 		collectFragAndAPsCompatibleWithSelectedAPs(selAps);
 		
-		DENOPTIMVertex.BBType trgFrgType = DENOPTIMVertex.BBType.UNDEFINED;
-		ArrayList<DENOPTIMVertex> vertxLib = new ArrayList<DENOPTIMVertex>();		
+		Vertex.BBType trgFrgType = Vertex.BBType.UNDEFINED;
+		ArrayList<Vertex> vertxLib = new ArrayList<Vertex>();		
 		String[] options = new String[]{"Any Vertex",
 				"Compatible Vertices ("+compatVrtxs.size()+")",
 				"Capping group"};
@@ -1187,27 +1187,27 @@ public class GUIGraphHandler extends GUICardPanel
 		switch (res)
 		{
 			case 0:
-			    ArrayList<DENOPTIMVertex> tmp = fragSpace.getFragmentLibrary();
-				vertxLib = new  ArrayList<DENOPTIMVertex>();
-		        for (DENOPTIMVertex bb : fragSpace.getFragmentLibrary())
+			    ArrayList<Vertex> tmp = fragSpace.getFragmentLibrary();
+				vertxLib = new  ArrayList<Vertex>();
+		        for (Vertex bb : fragSpace.getFragmentLibrary())
 		        {
 		        	vertxLib.add(bb.clone());
 		        }
-				trgFrgType = DENOPTIMVertex.BBType.FRAGMENT;
+				trgFrgType = Vertex.BBType.FRAGMENT;
 				break;
 				
 			case 1:
 				vertxLib = compatVrtxs;
-				trgFrgType = DENOPTIMVertex.BBType.FRAGMENT;
+				trgFrgType = Vertex.BBType.FRAGMENT;
 				break;
 				
 			case 2:
-				vertxLib = new ArrayList<DENOPTIMVertex>();
-		        for (DENOPTIMVertex bb : fragSpace.getCappingLibrary())
+				vertxLib = new ArrayList<Vertex>();
+		        for (Vertex bb : fragSpace.getCappingLibrary())
 		        {
 		            vertxLib.add(bb.clone());
 		        }
-				trgFrgType = DENOPTIMVertex.BBType.CAP;
+				trgFrgType = Vertex.BBType.CAP;
 				break;
 			default:
 				return;
@@ -1234,17 +1234,17 @@ public class GUIGraphHandler extends GUICardPanel
 		}
 		ArrayList<Integer> trgFragApId = 
 		        ((ArrayList<ArrayList<Integer>>)selected).get(0);
-		DENOPTIMVertex chosenVrtx = vertxLib.get(trgFragApId.get(0));
+		Vertex chosenVrtx = vertxLib.get(trgFragApId.get(0));
 		
 		extendCurrentGraph(chosenVrtx.getAP(trgFragApId.get(1)),selAps);
 	}
 	
 //-----------------------------------------------------------------------------
 	
-	private void extendCurrentGraph(DENOPTIMAttachmentPoint apOnIncomingVrtx,
-            ArrayList<DENOPTIMAttachmentPoint> selAps)
+	private void extendCurrentGraph(AttachmentPoint apOnIncomingVrtx,
+            ArrayList<AttachmentPoint> selAps)
 	{   
-        DENOPTIMVertex chosenVrtx = apOnIncomingVrtx.getOwner();
+        Vertex chosenVrtx = apOnIncomingVrtx.getOwner();
         if (chosenVrtx == null)
             return;
         
@@ -1252,10 +1252,10 @@ public class GUIGraphHandler extends GUICardPanel
        
         for (int i=0; i<selAps.size(); i++)
         {
-            DENOPTIMAttachmentPoint srcAp = selAps.get(i);
-            DENOPTIMVertex trgVertex = chosenVrtx.clone();
+            AttachmentPoint srcAp = selAps.get(i);
+            Vertex trgVertex = chosenVrtx.clone();
             trgVertex.setVertexId(dnGraph.getMaxVertexId()+1);
-            DENOPTIMAttachmentPoint trgAp = trgVertex.getAP(apIdOnIncVrtx);
+            AttachmentPoint trgAp = trgVertex.getAP(apIdOnIncVrtx);
             try
             {
                 dnGraph.appendVertexOnAP(srcAp, trgAp);
@@ -1273,9 +1273,9 @@ public class GUIGraphHandler extends GUICardPanel
 //-----------------------------------------------------------------------------
 	
 	private void collectFragAndAPsCompatibleWithSelectedAPs(
-			ArrayList<DENOPTIMAttachmentPoint> srcAPs) 
+			ArrayList<AttachmentPoint> srcAPs) 
 	{
-		compatVrtxs = new ArrayList<DENOPTIMVertex>();
+		compatVrtxs = new ArrayList<Vertex>();
 		
 		// WARNING: here I re-do most of what is already done in
 		// FragmentSpace.getFragmentsCompatibleWithTheseAPs.
@@ -1284,7 +1284,7 @@ public class GUIGraphHandler extends GUICardPanel
 		// the selection GUI.
 		
     	// First we get all possible APs on any fragment
-    	ArrayList<DENOPTIMAttachmentPoint> compatAps = 
+    	ArrayList<AttachmentPoint> compatAps = 
     	        fragSpace.getAPsCompatibleWithThese(srcAPs);
     	
     	// then keep unique fragment identifiers, and store unique
@@ -1293,19 +1293,19 @@ public class GUIGraphHandler extends GUICardPanel
 		String PRESELPROP = GUIVertexSelector.PRESELECTEDAPSFIELD;
 		String PRESELPROPSEP = GUIVertexSelector.PRESELECTEDAPSFIELDSEP;
 		
-		for (DENOPTIMAttachmentPoint ap : compatAps)
+		for (AttachmentPoint ap : compatAps)
 		{
 		    int vId = ap.getOwner().hashCode();
 			int apId = ap.getOwner().getIndexOfAP(ap);
 			if (genToLocIDMap.keySet().contains(vId))
 			{
-				DENOPTIMVertex vrtx = compatVrtxs.get(genToLocIDMap.get(vId));
+				Vertex vrtx = compatVrtxs.get(genToLocIDMap.get(vId));
 				String prop = vrtx.getProperty(PRESELPROP).toString();
 				vrtx.setProperty(PRESELPROP,prop+PRESELPROPSEP+apId);
 			}
 			else
 			{
-			    DENOPTIMVertex bb = ap.getOwner().clone();
+			    Vertex bb = ap.getOwner().clone();
 				bb.setProperty(PRESELPROP,apId);
 				genToLocIDMap.put(vId,compatVrtxs.size());
 				compatVrtxs.add(bb);
@@ -1345,7 +1345,7 @@ public class GUIGraphHandler extends GUICardPanel
 	private void appendGraphsFromFile(File file)
 	{
 	    // Reading graphs is format-agnostic
-		ArrayList<DENOPTIMGraph> graphs = readGraphsFromFile(file);
+		ArrayList<DGraph> graphs = readGraphsFromFile(file);
 		
 		// Try to read or make molecular representations
 		ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
@@ -1398,9 +1398,9 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 
-	private ArrayList<DENOPTIMGraph> readGraphsFromFile(File file)
+	private ArrayList<DGraph> readGraphsFromFile(File file)
 	{
-		ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
+		ArrayList<DGraph> graphs = new ArrayList<DGraph>();
 		try
 		{
     		try 
@@ -1429,7 +1429,7 @@ public class GUIGraphHandler extends GUICardPanel
                 switch (res)
                 {
                     case 0:
-                        graphs = new ArrayList<DENOPTIMGraph>();
+                        graphs = new ArrayList<DGraph>();
                         break;
                         
                     case 1:

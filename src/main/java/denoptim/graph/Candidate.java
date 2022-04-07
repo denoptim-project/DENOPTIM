@@ -26,7 +26,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 
 
 /**
@@ -44,7 +44,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
 	/**
      * Graph representation
      */
-    private DENOPTIMGraph graph;
+    private DGraph graph;
     
     /**
      * Chemical object representation
@@ -114,7 +114,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
 
 //------------------------------------------------------------------------------
     
-    public Candidate(DENOPTIMGraph graph)
+    public Candidate(DGraph graph)
     {
         this();
         this.graph = graph;
@@ -126,7 +126,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
     
 //------------------------------------------------------------------------------
     
-    public Candidate(String name, DENOPTIMGraph graph)
+    public Candidate(String name, DGraph graph)
     {
         this();
         this.name = name;
@@ -139,7 +139,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
     
 //------------------------------------------------------------------------------
     
-    public Candidate(String name, DENOPTIMGraph graph, double fitness,
+    public Candidate(String name, DGraph graph, double fitness,
             String uid, String smiles)
     {
         this();
@@ -154,7 +154,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
 
 //------------------------------------------------------------------------------
 
-    private Candidate(String name, DENOPTIMGraph graph,
+    private Candidate(String name, DGraph graph,
             String uid, String smiles, String molFile, String imgFile,
             String comment, int generationId, int level)
     {
@@ -218,7 +218,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
         this.smiles = "UNDEFINED";
         this.hasFitness = false;
         
-        this.iac = DENOPTIMMoleculeUtils.makeSameAs(iac);
+        this.iac = MoleculeUtils.makeSameAs(iac);
 		
 		if (iac.getProperty(CDKConstants.TITLE) != null)
 		{
@@ -300,7 +300,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
     {
         Candidate cand = new Candidate();
         
-        cand.iac = DENOPTIMMoleculeUtils.makeSameAs(iac);
+        cand.iac = MoleculeUtils.makeSameAs(iac);
         
         if (iac.getProperty(CDKConstants.TITLE) != null)
         {
@@ -448,7 +448,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public void setGraph(DENOPTIMGraph graph)
+    public void setGraph(DGraph graph)
     {
         this.graph = graph;
     }
@@ -533,7 +533,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMGraph getGraph()
+    public DGraph getGraph()
     {
         return graph;
     }
@@ -675,7 +675,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
         {
             try
             {
-                c.setChemicalRepresentation(DENOPTIMMoleculeUtils.makeSameAs(
+                c.setChemicalRepresentation(MoleculeUtils.makeSameAs(
                         this.iac));
             } catch (DENOPTIMException e)
             {

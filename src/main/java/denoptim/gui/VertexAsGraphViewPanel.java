@@ -35,11 +35,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
 import denoptim.graph.EmptyVertex;
 
 
@@ -60,12 +60,12 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	/**
 	 * The currently loaded fragment
 	 */
-	private DENOPTIMVertex vertex;
+	private Vertex vertex;
 	
 	/**
 	 * Temporary list of attachment points of the current fragment
 	 */
-	protected Map<Integer,DENOPTIMAttachmentPoint> mapAPs = null;
+	protected Map<Integer,AttachmentPoint> mapAPs = null;
 	
 	/**
 	 * Flag signalling that data about APs has been changed in the GUI
@@ -182,7 +182,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	
 //-----------------------------------------------------------------------------
     
-    public void loadVertexToViewer(DENOPTIMVertex v)
+    public void loadVertexToViewer(Vertex v)
     {
         setVertexSpecificEditableAPTable(true);
         clearAPTable();
@@ -200,10 +200,10 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
     private void loadVertexStructure()
     {
         if ((vertex instanceof EmptyVertex) 
-                || (vertex instanceof DENOPTIMFragment))
+                || (vertex instanceof Fragment))
         {
             //We plot the empty vertex as a single-node graph
-            DENOPTIMGraph dnGraph = new DENOPTIMGraph();
+            DGraph dnGraph = new DGraph();
             try
             {
                 dnGraph.addVertex(vertex.clone()); //Clone avoids setting owner
@@ -214,7 +214,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
             graphViewer.cleanup();
             graphViewer.loadGraphToViewer(dnGraph);
         } else {
-            DENOPTIMTemplate tmpl = ((DENOPTIMTemplate) vertex);
+            Template tmpl = ((Template) vertex);
             graphViewer.cleanup();
             graphViewer.loadGraphToViewer(tmpl);
         }
@@ -245,15 +245,15 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Uses the AP of the {@link DENOPTIMFragment} to create a new map and 
+	 * Uses the AP of the {@link Fragment} to create a new map and 
 	 * table of APs.
 	 */
 	private void updateAPsMapAndTable()
 	{
 		clearAPTable();
-		mapAPs = new HashMap<Integer,DENOPTIMAttachmentPoint>();
+		mapAPs = new HashMap<Integer,AttachmentPoint>();
 		
-		ArrayList<DENOPTIMAttachmentPoint> lstAPs = 
+		ArrayList<AttachmentPoint> lstAPs = 
 		        vertex.getAttachmentPoints();		
         if (lstAPs.size() == 0)
         {
@@ -262,7 +262,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
         
         activateTabEditsListener(false);
         int arrId = 0;
-	    for (DENOPTIMAttachmentPoint ap : lstAPs)
+	    for (AttachmentPoint ap : lstAPs)
 	    {
 	    	arrId++;
 	    	apTabModel.addRow(new Object[]{arrId, ap.getAPClass()});
@@ -328,10 +328,10 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	 * Identifies which attachment points are selected in the visualized table
 	 * @return the list of attachment points
 	 */
-	public ArrayList<DENOPTIMAttachmentPoint> getSelectedAPs()
+	public ArrayList<AttachmentPoint> getSelectedAPs()
 	{
-		ArrayList<DENOPTIMAttachmentPoint> selected = 
-				new ArrayList<DENOPTIMAttachmentPoint>();
+		ArrayList<AttachmentPoint> selected = 
+				new ArrayList<AttachmentPoint>();
 		
 		for (int rowId : apTable.getSelectedRows())
 		{
@@ -414,7 +414,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 //-----------------------------------------------------------------------------
 	   
     @Override
-    public Map<Integer, DENOPTIMAttachmentPoint> getMapOfAPsInTable()
+    public Map<Integer, AttachmentPoint> getMapOfAPsInTable()
     {
         return mapAPs;
     }

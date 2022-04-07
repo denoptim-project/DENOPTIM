@@ -8,14 +8,14 @@ import java.util.Set;
 
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
 import denoptim.utils.RandomUtils;
 
 /**
  * An utility class to encapsulate the search for an 
- * {@link DENOPTIMAttachmentPoint}-{@link DENOPTIMAttachmentPoint} mapping.
+ * {@link AttachmentPoint}-{@link AttachmentPoint} mapping.
  * Ignores symmetry, which is a potential thing to improve.
  * @author Marco Foscato
  */
@@ -23,7 +23,7 @@ import denoptim.utils.RandomUtils;
 public class APMapFinder
 {   
     /**
-     * The chosen {@link DENOPTIMAttachmentPoint}-{@link DENOPTIMAttachmentPoint}
+     * The chosen {@link AttachmentPoint}-{@link AttachmentPoint}
      * mapping. 
      * In case of multiple possible AP mappings, the
      * result reported here is a randomly chosen one among the possible ones. 
@@ -32,7 +32,7 @@ public class APMapFinder
     
     /**
      * The collection of all 
-     * {@link DENOPTIMAttachmentPoint}-{@link DENOPTIMAttachmentPoint} mappings
+     * {@link AttachmentPoint}-{@link AttachmentPoint} mappings
      * that have been found.
      */
     private List<APMapping> allAPMappings = new ArrayList<APMapping>();
@@ -55,7 +55,7 @@ public class APMapFinder
 
     /**
      * Constructor that launches the search for a mapping between the
-     * {@link DENOPTIMAttachmentPoint}s on the first vertex to those of the
+     * {@link AttachmentPoint}s on the first vertex to those of the
      * second. Note that if APs are available throughout any template barrier
      * we consider only the existence of an AP to be a reason for a compatible 
      * AP-AP mapping, irrespectively of the {@link APClass}. All APs that are
@@ -64,7 +64,7 @@ public class APMapFinder
      * APClass compatibility rules or bond types.
      * The present status of the APs on each vertex (i.e., whether they are used
      * or available as defined by the 
-     * {@link DENOPTIMGraph#getInterfaceAPs(List)} method when considering a
+     * {@link DGraph#getInterfaceAPs(List)} method when considering a
      * single-vertex subgraph) 
      * determines which APs will be required to have a mapping.
      * @param vA the first vertex. 
@@ -73,7 +73,7 @@ public class APMapFinder
      * compatible combinations.
      */
     public APMapFinder(FragmentSpace fragSpace, 
-            DENOPTIMVertex vA, DENOPTIMVertex vB, boolean screenAll)
+            Vertex vA, Vertex vB, boolean screenAll)
     {
         this(fragSpace, vA, vB, null, screenAll, false, true);
     }
@@ -82,13 +82,13 @@ public class APMapFinder
 
     /**
      * Constructor that launches the search for a mapping between the
-     * {@link DENOPTIMAttachmentPoint}s on the first vertex to those of the
+     * {@link AttachmentPoint}s on the first vertex to those of the
      * second. Note that if APs are available throughout any template barrier
      * we consider only the existence of an AP to be a reason for a compatible 
      * AP-AP mapping, irrespectively of the {@link APClass}.
      * The present status of the APs on each vertex (i.e., whether they are used
      * or available as defined by the 
-     * {@link DENOPTIMGraph#getInterfaceAPs(List)} method when considering a
+     * {@link DGraph#getInterfaceAPs(List)} method when considering a
      * single-vertex subgraph) 
      * determines which APs will be required to have a mapping.
      * @param vA the first vertex.
@@ -103,24 +103,24 @@ public class APMapFinder
      * available (i.e., available throughout the template barriers) be compatible.
      */
     public APMapFinder(FragmentSpace fragSpace,
-            DENOPTIMVertex vA, DENOPTIMVertex vB, 
+            Vertex vA, Vertex vB, 
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
         this.fragSpace = fragSpace;
-        List<DENOPTIMAttachmentPoint> needyAPsA = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
+        List<AttachmentPoint> needyAPsA = 
+                new ArrayList<AttachmentPoint>();
         if (vA.getGraphOwner()!=null)
         {
-            List<DENOPTIMVertex> subgraph = new ArrayList<DENOPTIMVertex>();
+            List<Vertex> subgraph = new ArrayList<Vertex>();
             subgraph.add(vA);
             needyAPsA = vA.getGraphOwner().getInterfaceAPs(subgraph);
         }
-        List<DENOPTIMAttachmentPoint> needyAPsB = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
+        List<AttachmentPoint> needyAPsB = 
+                new ArrayList<AttachmentPoint>();
         if (vB.getGraphOwner()!=null)
         {
-            List<DENOPTIMVertex> subgraph = new ArrayList<DENOPTIMVertex>();
+            List<Vertex> subgraph = new ArrayList<Vertex>();
             subgraph.add(vB);
             needyAPsB = vB.getGraphOwner().getInterfaceAPs(subgraph);
         }
@@ -133,7 +133,7 @@ public class APMapFinder
 
     /**
      * Constructor that launches the search for a mapping between the
-     * {@link DENOPTIMAttachmentPoint}s on two lists. 
+     * {@link AttachmentPoint}s on two lists. 
      * Note that if APs are available throughout any template barrier
      * we consider only the existence of an AP to be a reason for a compatible 
      * AP-AP mapping, irrespectively of the {@link APClass}.
@@ -153,10 +153,10 @@ public class APMapFinder
      * available (i.e., available throughout the template barriers) be compatible.
      */
     public APMapFinder(FragmentSpace fragSpace,
-            List<DENOPTIMAttachmentPoint> lstA, 
-            List<DENOPTIMAttachmentPoint> needyAPsA,
-            List<DENOPTIMAttachmentPoint> lstB, 
-            List<DENOPTIMAttachmentPoint> needyAPsB,
+            List<AttachmentPoint> lstA, 
+            List<AttachmentPoint> needyAPsA,
+            List<AttachmentPoint> lstB, 
+            List<AttachmentPoint> needyAPsB,
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
@@ -169,7 +169,7 @@ public class APMapFinder
 
     /**
      * Searches for mappings between the
-     * {@link DENOPTIMAttachmentPoint}s on the two lists. 
+     * {@link AttachmentPoint}s on the two lists. 
      * Note that is APs are available throughout any template barrier
      * we consider only the existence of an AP to be a reason for a compatible 
      * AP-AP mapping, irrespectively of the {@link APClass}.
@@ -184,36 +184,36 @@ public class APMapFinder
      * @param compatibleIfFree use <code>true</code> to make APs that are 
      * available (i.e., available throughout the template barriers) be compatible.
      */
-    private void findAllMappings(List<DENOPTIMAttachmentPoint> lstA, 
-            List<DENOPTIMAttachmentPoint> needyAPsA,
-            List<DENOPTIMAttachmentPoint> lstB, 
-            List<DENOPTIMAttachmentPoint> needyAPsB,
+    private void findAllMappings(List<AttachmentPoint> lstA, 
+            List<AttachmentPoint> needyAPsA,
+            List<AttachmentPoint> lstB, 
+            List<AttachmentPoint> needyAPsB,
             APMapping fixedRootAPs, boolean screenAll, 
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
         // Remove from the lists those APs that have already a mapping
-        List<DENOPTIMAttachmentPoint> purgedLstA = 
-                new ArrayList<DENOPTIMAttachmentPoint>(lstA);
+        List<AttachmentPoint> purgedLstA = 
+                new ArrayList<AttachmentPoint>(lstA);
         if (fixedRootAPs!=null)
         {
             purgedLstA.removeAll(fixedRootAPs.keySet());
         }
-        List<DENOPTIMAttachmentPoint> purgedLstB = 
-                new ArrayList<DENOPTIMAttachmentPoint>(lstB);
+        List<AttachmentPoint> purgedLstB = 
+                new ArrayList<AttachmentPoint>(lstB);
         if (fixedRootAPs!=null)
         {
             purgedLstB.removeAll(fixedRootAPs.values());
         }
         
         // Map all the compatibilities before choosing a specific mapping
-        LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
+        LinkedHashMap<AttachmentPoint,List<AttachmentPoint>> 
             apCompatilities = findMappingCompatibileAPs(purgedLstA, purgedLstB, 
                     compatibleIfFree, fragSpace);
         
         // The 'keys' is used just to keep the map keys sorted in a separate list
         // so that the order is randomized only once, then it is retained.
-        List<DENOPTIMAttachmentPoint> keys = 
-                new ArrayList<DENOPTIMAttachmentPoint>(
+        List<AttachmentPoint> keys = 
+                new ArrayList<AttachmentPoint>(
                         apCompatilities.keySet());
         if (fixedRootAPs!=null)
         {
@@ -223,30 +223,30 @@ public class APMapFinder
         }
         
         // Test if we have enough AP compatibilities to satisfy the constraints
-        Set<DENOPTIMAttachmentPoint> doableAPsA = 
-                new HashSet<DENOPTIMAttachmentPoint>(keys);
+        Set<AttachmentPoint> doableAPsA = 
+                new HashSet<AttachmentPoint>(keys);
         if (fixedRootAPs!=null)
             doableAPsA.addAll(fixedRootAPs.keySet());
-        Set<DENOPTIMAttachmentPoint> doableAPsB = 
-                new HashSet<DENOPTIMAttachmentPoint>();
+        Set<AttachmentPoint> doableAPsB = 
+                new HashSet<AttachmentPoint>();
         apCompatilities.values().stream().forEach(l -> doableAPsB.addAll(l));
         if (onlyCompleteMappings)
         {
-            for (DENOPTIMAttachmentPoint oldAp : lstA)
+            for (AttachmentPoint oldAp : lstA)
             {
                 if (!needyAPsA.contains(oldAp))
                     needyAPsA.add(oldAp);
             }
-            for (DENOPTIMAttachmentPoint oldAp : lstB)
+            for (AttachmentPoint oldAp : lstB)
             {
                 if (!needyAPsB.contains(oldAp))
                     needyAPsB.add(oldAp);
             }
         }
-        Set<DENOPTIMAttachmentPoint> mustBeDoableA = 
-                new HashSet<DENOPTIMAttachmentPoint>(needyAPsA);
-        Set<DENOPTIMAttachmentPoint> mustBeDoableB = 
-                new HashSet<DENOPTIMAttachmentPoint>(needyAPsB);
+        Set<AttachmentPoint> mustBeDoableA = 
+                new HashSet<AttachmentPoint>(needyAPsA);
+        Set<AttachmentPoint> mustBeDoableB = 
+                new HashSet<AttachmentPoint>(needyAPsB);
         if (fixedRootAPs!=null)
         {
             mustBeDoableA.removeAll(fixedRootAPs.keySet());
@@ -260,7 +260,7 @@ public class APMapFinder
         
         if (!onlyCompleteMappings)
         {
-            for (DENOPTIMAttachmentPoint oldAp : lstA)
+            for (AttachmentPoint oldAp : lstA)
             {
                 if (oldAp.isAvailableThroughout())
                 {
@@ -319,24 +319,24 @@ public class APMapFinder
             for (int iTry = 0; iTry < maxCombs; iTry++)
             {
                 APMapping apMap = new APMapping();
-                List<DENOPTIMAttachmentPoint> used = 
-                        new ArrayList<DENOPTIMAttachmentPoint>();
-                List<DENOPTIMAttachmentPoint> availKeys = 
-                        new ArrayList<DENOPTIMAttachmentPoint>();
+                List<AttachmentPoint> used = 
+                        new ArrayList<AttachmentPoint>();
+                List<AttachmentPoint> availKeys = 
+                        new ArrayList<AttachmentPoint>();
                 availKeys.addAll(needyAPsA);
                 boolean abandon = false;
                 for (int jj=0; jj<needyAPsA.size(); jj++)
                 {
-                    DENOPTIMAttachmentPoint ap =
+                    AttachmentPoint ap =
                             RandomUtils.randomlyChooseOne(availKeys);
                     availKeys.remove(ap);
-                    List<DENOPTIMAttachmentPoint> availPartners = 
-                            new ArrayList<DENOPTIMAttachmentPoint>();
+                    List<AttachmentPoint> availPartners = 
+                            new ArrayList<AttachmentPoint>();
                     availPartners.addAll(apCompatilities.get(ap));
                     boolean done = false;
                     for (int j=0; j<apCompatilities.get(ap).size(); j++)
                     {
-                        DENOPTIMAttachmentPoint chosenAvail = 
+                        AttachmentPoint chosenAvail = 
                                 RandomUtils.randomlyChooseOne(availPartners);
                         availPartners.remove(chosenAvail);
                         if (used.contains(chosenAvail))
@@ -369,7 +369,7 @@ public class APMapFinder
 //------------------------------------------------------------------------------
     
     /**
-     * Compares the {@link DENOPTIMAttachmentPoint} of two lists searching for
+     * Compares the {@link AttachmentPoint} of two lists searching for
      * all the APs of the second list that are "compatible" with each of the APs
      * of the first list. Note that "compatible" does not mean {@link APClass}-
      * compatible to form connection, but that can be interchanges, i.e., one
@@ -383,18 +383,18 @@ public class APMapFinder
      * @return the map between the APs in the first list (keys) and the list 
      * (value) of all those from the second list that are "compatible" with it.
      */
-    public static LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
-        findMappingCompatibileAPs(List<DENOPTIMAttachmentPoint> lstA, 
-            List<DENOPTIMAttachmentPoint> lstB, boolean compatibleIfFree,
+    public static LinkedHashMap<AttachmentPoint,List<AttachmentPoint>> 
+        findMappingCompatibileAPs(List<AttachmentPoint> lstA, 
+            List<AttachmentPoint> lstB, boolean compatibleIfFree,
             FragmentSpace fragSpace)
     {
-        LinkedHashMap<DENOPTIMAttachmentPoint,List<DENOPTIMAttachmentPoint>> 
-        apCompatilities = new LinkedHashMap<DENOPTIMAttachmentPoint,
-        List<DENOPTIMAttachmentPoint>>();
+        LinkedHashMap<AttachmentPoint,List<AttachmentPoint>> 
+        apCompatilities = new LinkedHashMap<AttachmentPoint,
+        List<AttachmentPoint>>();
     
-        for (DENOPTIMAttachmentPoint oAP : lstA)
+        for (AttachmentPoint oAP : lstA)
         {
-            for (DENOPTIMAttachmentPoint cAP : lstB)
+            for (AttachmentPoint cAP : lstB)
             {  
                 boolean compatible = false;
                 if (fragSpace.useAPclassBasedApproach())
@@ -413,7 +413,7 @@ public class APMapFinder
                             compatible = true;
                         }
                     } else {
-                        DENOPTIMAttachmentPoint lAP = 
+                        AttachmentPoint lAP = 
                                 oAP.getLinkedAPThroughout();
                         if (oAP.isSrcInUserThroughout())
                         {
@@ -441,8 +441,8 @@ public class APMapFinder
                     {
                         apCompatilities.get(oAP).add(cAP);
                     } else {
-                        List<DENOPTIMAttachmentPoint> lst = 
-                                new ArrayList<DENOPTIMAttachmentPoint>();
+                        List<AttachmentPoint> lst = 
+                                new ArrayList<AttachmentPoint>();
                         lst.add(cAP);
                         apCompatilities.put(oAP,lst);
                     }
@@ -467,7 +467,7 @@ public class APMapFinder
     
     /**
      * Returns the 
-     * {@link DENOPTIMAttachmentPoint}-{@link DENOPTIMAttachmentPoint} mapping 
+     * {@link AttachmentPoint}-{@link AttachmentPoint} mapping 
      * chosen among the possible mappings.
      * If more than one possible mapping exist, then this will return a randomly 
      * chosen one.
@@ -482,7 +482,7 @@ public class APMapFinder
     
     /**
      * Returns all 
-     * {@link DENOPTIMAttachmentPoint}-{@link DENOPTIMAttachmentPoint} mapping 
+     * {@link AttachmentPoint}-{@link AttachmentPoint} mapping 
      * found.
      * @return the collection of all AP mappings (can be empty, but not null)
      * found. This is either the total amount of possible mappings or the 

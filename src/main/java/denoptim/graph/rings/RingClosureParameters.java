@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
 
 
@@ -724,7 +724,7 @@ public class RingClosureParameters extends RunTimeParameters
         {
             msg = "Index of the RCC archive: " + rccIndex
                   + " not found: making a new index file.";
-            DENOPTIMLogger.appLogger.info(msg);
+            StaticLogger.appLogger.info(msg);
         }
 
         if (rceMode > 2)
@@ -742,7 +742,7 @@ public class RingClosureParameters extends RunTimeParameters
         {
             msg = "Root folder for serialized RingClosingConformation"
 		  + " not found. Creating new archive at " + rccFolder;
-            DENOPTIMLogger.appLogger.info(msg);
+            StaticLogger.appLogger.info(msg);
 
     	    File folder = new File(rccFolder);
     	    try
@@ -786,7 +786,7 @@ public class RingClosureParameters extends RunTimeParameters
                 msg = "Evaluation of the simultaneus ring closability "
     		  + "condition requires exhaustive conformational search. "
     		  + "Setting exhaustiveConfSrch=true.";
-                DENOPTIMLogger.appLogger.info(msg);
+                StaticLogger.appLogger.info(msg);
     	    exhaustiveConfSrch = true;
     	}
     
@@ -795,7 +795,7 @@ public class RingClosureParameters extends RunTimeParameters
     	    msg = "Exhaustive conformational search has been turned ON. "
     		  + "This is a time consuming task! Make sure it's what "
     		  + "you want to do.";
-                DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+                StaticLogger.appLogger.log(Level.WARNING,msg);
     	}
     
     	if (selectFragsFromCC)
@@ -805,7 +805,7 @@ public class RingClosureParameters extends RunTimeParameters
     		  + "functionality is currently under development "
     		  + "and is fully operative only for rings "
     		  + "involving the scaffolds. ";
-                DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+                StaticLogger.appLogger.log(Level.WARNING,msg);
     	}
     	checkOtherParameters();
     }

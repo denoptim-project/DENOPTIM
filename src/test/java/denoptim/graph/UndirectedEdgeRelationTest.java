@@ -5,8 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Vertex.BBType;
+import denoptim.graph.simplified.UndirectedEdge;
 
 /**
  * Unit test for UndirectedEdge
@@ -23,8 +24,8 @@ public class UndirectedEdgeRelationTest {
         vA.setBuildingBlockType(BBType.FRAGMENT);
         vA.addAP();
         vA.addAP();
-        DENOPTIMAttachmentPoint apA1 = vA.getAP(0);
-        DENOPTIMAttachmentPoint apA2 = vA.getAP(1);
+        AttachmentPoint apA1 = vA.getAP(0);
+        AttachmentPoint apA2 = vA.getAP(1);
         
         EmptyVertex vB = new EmptyVertex();
         vB.setBuildingBlockId(2);
@@ -32,22 +33,22 @@ public class UndirectedEdgeRelationTest {
         vB.addAP();
         vB.addAP();
         vB.addAP();
-        DENOPTIMAttachmentPoint apB1 = vB.getAP(1);
-        DENOPTIMAttachmentPoint apB2 = vB.getAP(2);
+        AttachmentPoint apB1 = vB.getAP(1);
+        AttachmentPoint apB2 = vB.getAP(2);
         
         EmptyVertex vS = new EmptyVertex();
         vS.setBuildingBlockId(0);
         vS.setBuildingBlockType(BBType.SCAFFOLD);
         vS.addAP();
         vS.addAP();
-        DENOPTIMAttachmentPoint apS = vS.getAP(0);
+        AttachmentPoint apS = vS.getAP(0);
         
         EmptyVertex vC = new EmptyVertex();
         vC.setBuildingBlockId(0);
         vC.setBuildingBlockType(BBType.CAP);
         vC.addAP();
         vC.addAP();
-        DENOPTIMAttachmentPoint apC = vC.getAP(0);
+        AttachmentPoint apC = vC.getAP(0);
         
 
         UndirectedEdge ue1 = new UndirectedEdge(apA1, apB2, BondType.UNDEFINED);

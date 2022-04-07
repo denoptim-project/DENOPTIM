@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 
 /**
  * Unit test for APClass

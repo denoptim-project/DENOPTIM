@@ -22,13 +22,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.task.ProgramTask;
 
 
 /**
- * Tool for editing {@link DENOPTIMGraph}s.
+ * Tool for editing {@link DGraph}s.
  *
  * @author Marco Foscato
  */
@@ -63,12 +63,12 @@ public class GraphEditor extends ProgramTask
         // string-based encoding. Therefore, we read the graph after.
         geParams.readInputGraphs();
 
-        List<DENOPTIMGraph> modGraphs = new ArrayList<DENOPTIMGraph>();
+        List<DGraph> modGraphs = new ArrayList<DGraph>();
         int i = -1;
-        for (DENOPTIMGraph graph : geParams.getInputGraphs())
+        for (DGraph graph : geParams.getInputGraphs())
         {
             i++;
-            DENOPTIMGraph modGraph = graph.editGraph(
+            DGraph modGraph = graph.editGraph(
                     geParams.getGraphEditTasks(),
                     geParams.symmetryFlag(),
                     geParams.getVerbosity());

@@ -34,9 +34,9 @@ import com.google.gson.Gson;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 import denoptim.json.DENOPTIMgson;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
 
 /**
@@ -46,17 +46,12 @@ import denoptim.utils.MutationType;
  * @author Marco Foscato
  */
 
-public class DENOPTIMFragment extends DENOPTIMVertex
+public class Fragment extends Vertex
 {
-    /**
-	 * Version UID
-	 */
-	private static final long serialVersionUID = 1L;
-
     /**
      * attachment points on this vertex
      */
-    private ArrayList<DENOPTIMAttachmentPoint> lstAPs;
+    private ArrayList<AttachmentPoint> lstAPs;
 
     /**
      * List of AP sets that are related to each other, so that we
@@ -76,10 +71,10 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * Constructor of an empty fragment
      */
     
-    public DENOPTIMFragment()
+    public Fragment()
     {
         super(VertexType.MolecularFragment);
-        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstAPs = new ArrayList<AttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
         this.mol = builder.newAtomContainer();
@@ -92,10 +87,10 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @param vertexId unique identified of the vertex
      */
 
-    public DENOPTIMFragment(int vertexId)
+    public Fragment(int vertexId)
     {
         super(VertexType.MolecularFragment, vertexId);
-        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstAPs = new ArrayList<AttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
         this.mol = builder.newAtomContainer();
@@ -112,17 +107,17 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     
-    public DENOPTIMFragment(int vertexId, IAtomContainer mol, BBType bbt)
+    public Fragment(int vertexId, IAtomContainer mol, BBType bbt)
             throws DENOPTIMException
     {     
         super (VertexType.MolecularFragment, vertexId);
         
         this.setBuildingBlockType(bbt);
         
-        this.lstAPs = new ArrayList<DENOPTIMAttachmentPoint>();
+        this.lstAPs = new ArrayList<AttachmentPoint>();
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         
-        this.mol = DENOPTIMMoleculeUtils.makeSameAs(mol);
+        this.mol = MoleculeUtils.makeSameAs(mol);
 
         Object prop = mol.getProperty(DENOPTIMConstants.APSTAG);
         if (prop != null)
@@ -141,7 +136,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
-    public DENOPTIMFragment(int vertexId, IAtomContainer mol, BBType bbt,
+    public Fragment(int vertexId, IAtomContainer mol, BBType bbt,
                             boolean isRCV)
             throws DENOPTIMException {
         this(vertexId, mol, bbt);
@@ -158,7 +153,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     
-    public DENOPTIMFragment(IAtomContainer mol, BBType bbt)
+    public Fragment(IAtomContainer mol, BBType bbt)
             throws DENOPTIMException
     {    	
     	this(-1,mol,bbt);
@@ -176,7 +171,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     
     private static ArrayList<SymmetricSet> identifySymmetryRelatedAPSets(
             IAtomContainer mol,
-            ArrayList<DENOPTIMAttachmentPoint> daps)
+            ArrayList<AttachmentPoint> daps)
     {
         ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
         for (int i=0; i<daps.size()-1; i++)
@@ -199,10 +194,10 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 continue;
             }
         
-            DENOPTIMAttachmentPoint d1 = daps.get(i);
+            AttachmentPoint d1 = daps.get(i);
             for (int j=i+1; j<daps.size(); j++)
             {
-                DENOPTIMAttachmentPoint d2 = daps.get(j);
+                AttachmentPoint d2 = daps.get(j);
                 if (atomsAreCompatible(mol, d1.getAtomPositionNumber(),
                                     d2.getAtomPositionNumber()))
                 {
@@ -307,16 +302,16 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @param apClass the APClass
      * @return the reference to the created AP.
      */
-    public DENOPTIMAttachmentPoint addAP(int atomPositionNumber, Point3d dirVec, 
+    public AttachmentPoint addAP(int atomPositionNumber, Point3d dirVec, 
             APClass apClass) 
     {
-        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this,
+        AttachmentPoint ap = new AttachmentPoint(this,
                 atomPositionNumber, dirVec, apClass);
         getAttachmentPoints().add(ap);
         
         IAtom srcAtm = mol.getAtom(atomPositionNumber);
         
-        ArrayList<DENOPTIMAttachmentPoint> apList = new ArrayList<>();
+        ArrayList<AttachmentPoint> apList = new ArrayList<>();
         if (getAPCountOnAtom(srcAtm) > 0) {
             apList = getAPsFromAtom(srcAtm);
         }
@@ -365,7 +360,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
 
-    public DENOPTIMAttachmentPoint addAPOnAtom(IAtom srcAtm, APClass apc, 
+    public AttachmentPoint addAPOnAtom(IAtom srcAtm, APClass apc, 
             Point3d vector) throws DENOPTIMException
     {
         int atmId = mol.indexOf(srcAtm);
@@ -374,11 +369,11 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    ArrayList<DENOPTIMAttachmentPoint> getAPsFromAtom(IAtom srcAtm)
+    ArrayList<AttachmentPoint> getAPsFromAtom(IAtom srcAtm)
     {
         @SuppressWarnings("unchecked")
-		ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
-        		(ArrayList<DENOPTIMAttachmentPoint>) srcAtm.getProperty(
+		ArrayList<AttachmentPoint> apsOnAtm = 
+        		(ArrayList<AttachmentPoint>) srcAtm.getProperty(
         				DENOPTIMConstants.ATMPROPAPS);
         return apsOnAtm;
     }
@@ -412,7 +407,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     	int num = 0;
     	if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
     	{
-			ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
+			ArrayList<AttachmentPoint> apsOnAtm = 
 					getAPsFromAtom(srcAtm);
         	num = apsOnAtm.size();
     	}
@@ -435,11 +430,11 @@ public class DENOPTIMFragment extends DENOPTIMVertex
             IAtom srcAtm = mol.getAtom(atmId);
             if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-            	ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
+            	ArrayList<AttachmentPoint> apsOnAtm = 
             			getAPsFromAtom(srcAtm);
 	            for (int i = 0; i < apsOnAtm.size(); i++)
 	            {
-	                DENOPTIMAttachmentPoint ap = apsOnAtm.get(i);
+	                AttachmentPoint ap = apsOnAtm.get(i);
 	                ap.setAtomPositionNumber(atmId);
 	            }
             }
@@ -459,7 +454,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * in the atom list!
      */
     
-    public ArrayList<DENOPTIMAttachmentPoint> getCurrentAPs()
+    public ArrayList<AttachmentPoint> getCurrentAPs()
     {
     	updateAPs();
     	
@@ -469,14 +464,14 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         {
         	if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-        		ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
+        		ArrayList<AttachmentPoint> apsOnAtm = 
         				getAPsFromAtom(srcAtm);
         		lstAPs.addAll(apsOnAtm);
             }
         }
 
         //Reorder according to DENOPTIMAttachmentPoint priority
-        lstAPs.sort(new DENOPTIMAttachmentPointComparator());
+        lstAPs.sort(new AttachmentPointComparator());
         
         return lstAPs;
     }
@@ -542,8 +537,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    String[] moreAPonThisAtm = onThisAtm.split(
 			    		DENOPTIMConstants.SEPARATORAPPROPAPS);
 			    
-			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(this, moreAPonThisAtm[0]);
+			    AttachmentPoint ap = 
+			    		new AttachmentPoint(this, moreAPonThisAtm[0]);
 			    
 			    int atmID = ap.getAtomPositionNumber();
 			    //WARNING the atmID is already 0-based
@@ -552,8 +547,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			    {
 			    	//WARNING here we have to switch to 1-based enumeration
 			    	// because we import from SDF string
-					DENOPTIMAttachmentPoint apMany = 
-							new DENOPTIMAttachmentPoint(this, atmID+1
+					AttachmentPoint apMany = 
+							new AttachmentPoint(this, atmID+1
 									+ DENOPTIMConstants.SEPARATORAPPROPAAP
 									+ moreAPonThisAtm[j]);
 					lstAPs.add(apMany);
@@ -561,8 +556,8 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 			} 
 			else 
 			{
-			    DENOPTIMAttachmentPoint ap = 
-			    		new DENOPTIMAttachmentPoint(this, onThisAtm);
+			    AttachmentPoint ap = 
+			    		new AttachmentPoint(this, onThisAtm);
 			    lstAPs.add(ap);
 			}
 	    }
@@ -586,21 +581,21 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         // Write attachment points in the atoms
         for (int i = 0; i < lstAPs.size(); i++)
         {
-            DENOPTIMAttachmentPoint ap = lstAPs.get(i);
+            AttachmentPoint ap = lstAPs.get(i);
             int atmID = ap.getAtomPositionNumber();
             
             IAtom atm = mol.getAtom(atmID);
             if (atm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-                ArrayList<DENOPTIMAttachmentPoint> oldAPs = 
+                ArrayList<AttachmentPoint> oldAPs = 
                         getAPsFromAtom(atm);
                 oldAPs.add(ap);
                 atm.setProperty(DENOPTIMConstants.ATMPROPAPS,oldAPs);
             } 
             else
             {
-                ArrayList<DENOPTIMAttachmentPoint> aps = 
-                        new ArrayList<DENOPTIMAttachmentPoint>();
+                ArrayList<AttachmentPoint> aps = 
+                        new ArrayList<AttachmentPoint>();
                 aps.add(ap);
                 
                 atm.setProperty(DENOPTIMConstants.ATMPROPAPS,aps);
@@ -619,7 +614,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
     {
         
         // Prepare the string-representation of unused APs on this graph
-        LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom =
+        LinkedHashMap<Integer,List<AttachmentPoint>> apsPerAtom =
                 new LinkedHashMap<>();
         for (IAtom atm : mol.atoms())
         {   
@@ -628,16 +623,16 @@ public class DENOPTIMFragment extends DENOPTIMVertex
                 continue;
             }
             int atmID = mol.indexOf(atm);
-            ArrayList<DENOPTIMAttachmentPoint> apsOnAtm = 
+            ArrayList<AttachmentPoint> apsOnAtm = 
                     getAPsFromAtom(atm);
-            for (DENOPTIMAttachmentPoint ap : apsOnAtm)
+            for (AttachmentPoint ap : apsOnAtm)
             {
                 if (apsPerAtom.containsKey(atmID))
                 {
                     apsPerAtom.get(atmID).add(ap);
                 } else {
-                    List<DENOPTIMAttachmentPoint> lst = 
-                            new ArrayList<DENOPTIMAttachmentPoint>();
+                    List<AttachmentPoint> lst = 
+                            new ArrayList<AttachmentPoint>();
                     lst.add(ap);
                     apsPerAtom.put(atmID,lst);
                 }
@@ -645,7 +640,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
         }
         //WARNING! In the mol.property we use 1-to-n+1 instead of 0-to-n
         setProperty(DENOPTIMConstants.APSTAG, 
-                DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
+                AttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
     }
 
 //-----------------------------------------------------------------------------
@@ -656,22 +651,22 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     
     @Override
-    public DENOPTIMFragment clone()
+    public Fragment clone()
     {   
-    	DENOPTIMFragment clone = new DENOPTIMFragment();
+    	Fragment clone = new Fragment();
     	clone.setVertexId(this.getVertexId());
     	try
         {
-            clone.mol = DENOPTIMMoleculeUtils.makeSameAs(mol);
+            clone.mol = MoleculeUtils.makeSameAs(mol);
         } catch (DENOPTIMException e1)
         {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
     	
-        for (DENOPTIMAttachmentPoint ap : lstAPs)
+        for (AttachmentPoint ap : lstAPs)
         {
-            DENOPTIMAttachmentPoint cAp = new DENOPTIMAttachmentPoint(clone,
+            AttachmentPoint cAp = new AttachmentPoint(clone,
                     ap.getAtomPositionNumber(),
                     ap.getDirectionVector(),
                     ap.getAPClass());
@@ -816,7 +811,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
-    public boolean sameAs(DENOPTIMFragment other, StringBuilder reason)
+    public boolean sameAs(Fragment other, StringBuilder reason)
     {
         if (this.containsAtoms() && other.containsAtoms())
         {
@@ -838,7 +833,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 
     public int getHeavyAtomsCount()
     {
-        return DENOPTIMMoleculeUtils.getHeavyAtomCount(mol);
+        return MoleculeUtils.getHeavyAtomCount(mol);
     }
 
 //------------------------------------------------------------------------------
@@ -863,7 +858,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
 //------------------------------------------------------------------------------
 
     @Override
-    public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
+    public ArrayList<AttachmentPoint> getAttachmentPoints()
     {
         return lstAPs;
     }
@@ -895,9 +890,9 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      */
     
     @Override
-    public List<DENOPTIMVertex> getMutationSites(List<MutationType> ignoredTypes)
+    public List<Vertex> getMutationSites(List<MutationType> ignoredTypes)
     {
-        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         switch (getBuildingBlockType())
         {
             case CAP:
@@ -938,13 +933,13 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @return a new instance of this class.
      */
     
-    public static DENOPTIMFragment fromJson(String json)
+    public static Fragment fromJson(String json)
     {
         Gson gson = DENOPTIMgson.getReader();
-        DENOPTIMFragment returnedFrag = gson.fromJson(json, 
-                DENOPTIMFragment.class);
+        Fragment returnedFrag = gson.fromJson(json, 
+                Fragment.class);
         
-        for (DENOPTIMAttachmentPoint ap : returnedFrag.getAttachmentPoints())
+        for (AttachmentPoint ap : returnedFrag.getAttachmentPoints())
         {
             ap.setOwner(returnedFrag);
         }
@@ -965,7 +960,7 @@ public class DENOPTIMFragment extends DENOPTIMVertex
      * @return the source atom of the attachment point, or null is the 
      * attachment point does not belong to this vertex.
      */
-    public IAtom getAtomHoldingAP(DENOPTIMAttachmentPoint ap)
+    public IAtom getAtomHoldingAP(AttachmentPoint ap)
     {
         if (ap.getOwner() != this)
             return null;

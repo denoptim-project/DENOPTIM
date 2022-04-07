@@ -42,16 +42,16 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.DGraph;
+import denoptim.graph.Ring;
+import denoptim.graph.Vertex;
 import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosure;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.MathUtils;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ObjectPair;
 
@@ -67,7 +67,7 @@ public class Molecule3DBuilder
     /**
      * DENOPTIM representation
      */
-    private DENOPTIMGraph molGraph;
+    private DGraph molGraph;
 
     /**
      * CDK representation
@@ -103,7 +103,7 @@ public class Molecule3DBuilder
     /**
      * Relation between pairs of RingClosingAttractors and DENOPTIMRings
      */
-    private Map<ObjectPair,DENOPTIMRing> mapDRingsRCACombs;
+    private Map<ObjectPair,Ring> mapDRingsRCACombs;
 
     /**
      * List of rotatable bonds
@@ -142,14 +142,14 @@ public class Molecule3DBuilder
 
     public Molecule3DBuilder()
     {
-        this.molGraph = new DENOPTIMGraph();
+        this.molGraph = new DGraph();
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
         this.fmol = builder.newAtomContainer();
         this.tmol = new TinkerMolecule();
         this.attractors = new ArrayList<RingClosingAttractor>();
         this.attToAtmID = new HashMap<RingClosingAttractor,Integer>();
         this.allRCACombs = new ArrayList<Set<ObjectPair>>();
-        this.mapDRingsRCACombs = new HashMap<ObjectPair,DENOPTIMRing>();
+        this.mapDRingsRCACombs = new HashMap<ObjectPair,Ring>();
         this.rotatableBnds = new ArrayList<ObjectPair>();
         this.newRingClosures = new ArrayList<RingClosure>();
         this.molName = "none";
@@ -173,7 +173,7 @@ public class Molecule3DBuilder
      * @param ringClosures the list of closed multifragment rings
      */
 
-    public Molecule3DBuilder(DENOPTIMGraph molGraph, 
+    public Molecule3DBuilder(DGraph molGraph, 
                                 IAtomContainer fmol, 
                                 TinkerMolecule tmol, 
                                      String molName, 
@@ -196,7 +196,7 @@ public class Molecule3DBuilder
         this.newRingClosures = ringClosures;
         this.overalRCScore = Double.NaN;
         this.atmOveralScore = Double.NaN;
-        this.mapDRingsRCACombs = new HashMap<ObjectPair,DENOPTIMRing>();
+        this.mapDRingsRCACombs = new HashMap<ObjectPair,Ring>();
         if (this.attractors.size() != 0)
         {
             if (molGraph.hasRings())
@@ -221,7 +221,7 @@ public class Molecule3DBuilder
      * indeces)
      */
 
-    public Molecule3DBuilder(DENOPTIMGraph molGraph,
+    public Molecule3DBuilder(DGraph molGraph,
                                 IAtomContainer fmol, 
                                 TinkerMolecule tmol, 
                                      String molName, 
@@ -240,7 +240,7 @@ public class Molecule3DBuilder
         this.attToAtmID = new HashMap<RingClosingAttractor,Integer>();
         findAttractors();
         this.allRCACombs = new ArrayList<Set<ObjectPair>>();
-        this.mapDRingsRCACombs = new HashMap<ObjectPair,DENOPTIMRing>();
+        this.mapDRingsRCACombs = new HashMap<ObjectPair,Ring>();
         if (this.attractors.size() != 0)
         {
             if (molGraph.hasRings())
@@ -315,10 +315,10 @@ public class Molecule3DBuilder
     private void convertDENOPTIMRingIntoRcaCombinationns()
     {
         Set<ObjectPair> singleRCAcomb = new HashSet<ObjectPair>();
-        for (DENOPTIMRing dr : molGraph.getRings())
+        for (Ring dr : molGraph.getRings())
         {
-            DENOPTIMVertex headVtx = dr.getHeadVertex();
-            DENOPTIMVertex tailVtx = dr.getTailVertex();
+            Vertex headVtx = dr.getHeadVertex();
+            Vertex tailVtx = dr.getTailVertex();
 
             int iH = -1;
             int iT = -1;
@@ -370,7 +370,7 @@ public class Molecule3DBuilder
         int i = fmol.getAtomNumber(atm) + 1;
         TinkerAtom tatm = tmol.getAtom(i);
         int vtxId = tatm.getVertexId();
-        DENOPTIMEdge edge = molGraph.getEdgeWithParent(vtxId);
+        Edge edge = molGraph.getEdgeWithParent(vtxId);
         cls = edge.getSrcAPClass();
         return cls;
     }
@@ -420,18 +420,18 @@ public class Molecule3DBuilder
             }
             else if (ic == 0)
             {
-                Vector3d nab = DENOPTIMMathUtils.normDist(
+                Vector3d nab = MathUtils.normDist(
                                        newCoords.get(ia-1),newCoords.get(ib-1));
-                double rab = DENOPTIMMathUtils.distance(
+                double rab = MathUtils.distance(
                                        newCoords.get(ia-1),newCoords.get(ib-1));
                 newXYZ[0] = bond * s1;
                 newXYZ[2] = newCoords.get(ib-1).z + (rab - bond*c1)*nab.z;
             }
             else if (angleFlag == 0)
             {
-                Vector3d nab = DENOPTIMMathUtils.normDist(
+                Vector3d nab = MathUtils.normDist(
                                        newCoords.get(ia-1),newCoords.get(ib-1));
-                Vector3d nbc = DENOPTIMMathUtils.normDist(
+                Vector3d nbc = MathUtils.normDist(
                                        newCoords.get(ib-1),newCoords.get(ic-1));
                 Vector3d t = new Vector3d();
                 t.cross(nbc,nab);
@@ -457,9 +457,9 @@ public class Molecule3DBuilder
             }
             else if (Math.abs(angleFlag) == 1)
             {
-                Vector3d nba = DENOPTIMMathUtils.normDist(
+                Vector3d nba = MathUtils.normDist(
                                        newCoords.get(ib-1),newCoords.get(ia-1));
-                Vector3d nac = DENOPTIMMathUtils.normDist(
+                Vector3d nac = MathUtils.normDist(
                                        newCoords.get(ia-1),newCoords.get(ic-1));
                 Vector3d t = new Vector3d();
                 t.cross(nac,nba);
@@ -525,7 +525,7 @@ public class Molecule3DBuilder
      * generated by DEOPTIM. No change is expected after ring-closing step
      */
 
-    public DENOPTIMGraph getGraph()
+    public DGraph getGraph()
     {
         return molGraph;
     }
@@ -621,7 +621,7 @@ public class Molecule3DBuilder
      * @return the correspondence bewteen RCAs and DENOPTIMRings
      */
 
-    public DENOPTIMRing getDRingFromRCAPair(ObjectPair pairRCAs)
+    public Ring getDRingFromRCAPair(ObjectPair pairRCAs)
     {
         return mapDRingsRCACombs.get(pairRCAs);
     }
@@ -832,7 +832,7 @@ public class Molecule3DBuilder
     public Molecule3DBuilder deepcopy() throws DENOPTIMException
     {
         String nMolName = this.molName;
-        DENOPTIMGraph nMolGraph = this.molGraph.clone();
+        DGraph nMolGraph = this.molGraph.clone();
         IAtomContainer nFMol;
         TinkerMolecule nTMol;
         ArrayList<ObjectPair> nRotBnds;
@@ -860,7 +860,7 @@ public class Molecule3DBuilder
             RingClosingAttractor nRca = new RingClosingAttractor(atm,nFMol);
             TinkerAtom nTa = nTMol.getAtom(ioatm+1);
             int vtxId = nTa.getVertexId();
-            DENOPTIMEdge edge = nMolGraph.getEdgeWithParent(vtxId);
+            Edge edge = nMolGraph.getEdgeWithParent(vtxId);
             APClass cls = edge.getSrcAPClass();
             nRca.setApClass(cls);
             nAttractors.add(nRca);

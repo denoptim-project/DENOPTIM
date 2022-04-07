@@ -20,12 +20,12 @@ package denoptim.programs.isomorphism;
 
 import java.io.File;
 
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.task.ProgramTask;
 
 /**
- * Tool to perform isomorphism analysis on {@link DENOPTIMGraph}s.
+ * Tool to perform isomorphism analysis on {@link DGraph}s.
  *
  * @author Marco Foscato
  */
@@ -55,8 +55,8 @@ public class Isomorphism extends ProgramTask
         isomParams.checkParameters();
         isomParams.processParameters();
 
-        DENOPTIMGraph graphA = null;
-        DENOPTIMGraph graphB = null;
+        DGraph graphA = null;
+        DGraph graphB = null;
         try
         {
             graphA = DenoptimIO.readDENOPTIMGraphsFromFile(

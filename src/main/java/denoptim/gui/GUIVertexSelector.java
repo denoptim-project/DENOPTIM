@@ -33,7 +33,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.Vertex;
 
 
 /**
@@ -54,13 +54,13 @@ public class GUIVertexSelector extends GUIModalDialog
 	/**
 	 * The currently loaded list of vertices
 	 */
-	private ArrayList<DENOPTIMVertex> vertexLibrary =
-			new ArrayList<DENOPTIMVertex>();
+	private ArrayList<Vertex> vertexLibrary =
+			new ArrayList<Vertex>();
 	
 	/**
 	 * The currently loaded vertex
 	 */
-	private DENOPTIMVertex vertex;
+	private Vertex vertex;
 	
 	/**
 	 * The index of the currently loaded vertex [0–(n-1)}
@@ -233,7 +233,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	 * @param initialId the index of the one vertex that should be displayed 
 	 * when showing the dialog.
 	 */
-	public void load(ArrayList<DENOPTIMVertex> vrtxLib, int initialId) 
+	public void load(ArrayList<Vertex> vrtxLib, int initialId) 
 	{
 //        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         vertexLibrary = vrtxLib;

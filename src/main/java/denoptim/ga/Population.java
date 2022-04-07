@@ -29,7 +29,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Candidate;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 
@@ -360,7 +360,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     public ArrayList<Candidate> getXoverPartners(Candidate memberA,
             ArrayList<Candidate> eligibleParents, FragmentSpace fragSpace)
     {   
-        DENOPTIMGraph gA = memberA.getGraph();
+        DGraph gA = memberA.getGraph();
         
         // Update to make sure we cover any combination of members that has not 
         // been considered before
@@ -376,14 +376,14 @@ public class Population extends ArrayList<Candidate> implements Cloneable
                 continue;
             }
     
-            DENOPTIMGraph gB = memberB.getGraph();
+            DGraph gB = memberB.getGraph();
             
             if (gA.sameAs(gB, new StringBuilder()))
                 continue;
                 
             try
             {
-                List<XoverSite> xoverSites = DENOPTIMGraphOperations
+                List<XoverSite> xoverSites = GraphOperations
                         .locateCompatibleXOverPoints(gA, gB, fragSpace);
                 xoverCompatibilities.put(memberA, memberB, xoverSites);
             } catch (DENOPTIMException e)

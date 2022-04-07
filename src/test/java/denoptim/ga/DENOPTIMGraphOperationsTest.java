@@ -32,21 +32,21 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.ga.DENOPTIMGraphOperations;
+import denoptim.ga.GraphOperations;
 import denoptim.ga.XoverSite;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMRing;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMTemplate.ContractLevel;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Ring;
+import denoptim.graph.Template;
+import denoptim.graph.Template.ContractLevel;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.GraphPattern;
 import denoptim.io.DenoptimIO;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -79,19 +79,19 @@ public class DENOPTIMGraphOperationsTest {
     @Test
     public void testExtractPattern_singleRingSystem() throws Throwable
     {
-        DENOPTIMGraph g = getThreeCycle();
+        DGraph g = getThreeCycle();
 
-        List<DENOPTIMGraph> subgraphs = g.extractPattern(GraphPattern.RING);
+        List<DGraph> subgraphs = g.extractPattern(GraphPattern.RING);
 
         assertEquals(1, subgraphs.size());
-        DENOPTIMGraph actual = subgraphs.get(0);
-        DENOPTIMGraph expected = g;
+        DGraph actual = subgraphs.get(0);
+        DGraph expected = g;
 
         assertEquals(expected.getVertexCount(), actual.getVertexCount());
         assertEquals(expected.getEdgeCount(), actual.getEdgeCount());
         assertEquals(1, actual.getRingCount());
 
-        assertTrue(DENOPTIMGraph.compareGraphNodes(expected.getSourceVertex(),
+        assertTrue(DGraph.compareGraphNodes(expected.getSourceVertex(),
                 expected, actual.getSourceVertex(), actual));
     }
 
@@ -101,9 +101,9 @@ public class DENOPTIMGraphOperationsTest {
     public void testExtractPattern_returnsEmptyListIfNoRings() 
             throws Throwable
     {
-        DENOPTIMGraph g = getThreeCycle();
+        DGraph g = getThreeCycle();
         g.removeRing(g.getRings().get(0));
-        List<DENOPTIMGraph> subgraphs = g.extractPattern(GraphPattern.RING);
+        List<DGraph> subgraphs = g.extractPattern(GraphPattern.RING);
 
         assertEquals(0, subgraphs.size());
     }
@@ -115,7 +115,7 @@ public class DENOPTIMGraphOperationsTest {
     {
         ExtractPatternCase testCase = getFusedRings();
 
-        List<DENOPTIMGraph> subgraphs = testCase.g.extractPattern(GraphPattern.RING);
+        List<DGraph> subgraphs = testCase.g.extractPattern(GraphPattern.RING);
 
         assertTrue(testCase.matchesExpected(subgraphs));
     }
@@ -145,7 +145,7 @@ public class DENOPTIMGraphOperationsTest {
      */
     private ExtractPatternCase getFusedRings() throws Throwable
     {
-        BiFunction<String, Boolean, DENOPTIMVertex> vertexSupplier =
+        BiFunction<String, Boolean, Vertex> vertexSupplier =
                 (s, isRCV) -> {
             int apCount = 0;
             switch (s) {
@@ -166,7 +166,7 @@ public class DENOPTIMGraphOperationsTest {
         };
 
         /* We label the vertices in order of top left to bottom right. */
-        List<DENOPTIMVertex> vertices = Stream.of(
+        List<Vertex> vertices = Stream.of(
                 new Pair<>("O", true), new Pair<>("C", false),
                 new Pair<>("Cl", false), new Pair<>("N",false),
                 new Pair<>("C", true), new Pair<>("N", true),
@@ -194,7 +194,7 @@ public class DENOPTIMGraphOperationsTest {
                 Arrays.asList(12)
         );
 
-        DENOPTIMGraph g = null;
+        DGraph g = null;
         try
         {
             g = buildGraph(vertices, edges);
@@ -203,31 +203,31 @@ public class DENOPTIMGraphOperationsTest {
             e.printStackTrace();
         }
         g.renumberGraphVertices();
-        DENOPTIMGraph.setScaffold(vertices.get(0));
+        DGraph.setScaffold(vertices.get(0));
         addRings(vertices, g);
-        Set<DENOPTIMGraph> expectedSubgraphs = getExpectedSubgraphs(g);
+        Set<DGraph> expectedSubgraphs = getExpectedSubgraphs(g);
         return new ExtractPatternCase(g, 2, expectedSubgraphs);
     }
 
 //------------------------------------------------------------------------------
 
-    private DENOPTIMGraph buildGraph(List<DENOPTIMVertex> vertices,
+    private DGraph buildGraph(List<Vertex> vertices,
                                      List<List<Integer>> edges) 
                                              throws DENOPTIMException {
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         g.addVertex(vertices.get(0));
         for (int i = 0; i < edges.size(); i++) {
-            DENOPTIMVertex srcVertex = vertices.get(i);
+            Vertex srcVertex = vertices.get(i);
             for (Integer adj : edges.get(i)) {
-                DENOPTIMVertex trgVertex = vertices.get(adj);
+                Vertex trgVertex = vertices.get(adj);
 
-                DENOPTIMAttachmentPoint srcAP = srcVertex
+                AttachmentPoint srcAP = srcVertex
                         .getAttachmentPoints()
                         .stream()
                         .filter(ap -> ap.getEdgeUser() == null)
                         .findFirst()
                         .get();
-                DENOPTIMAttachmentPoint trgAP = trgVertex
+                AttachmentPoint trgAP = trgVertex
                         .getAttachmentPoints()
                         .stream()
                         .filter(ap -> ap.getEdgeUser() == null)
@@ -247,8 +247,8 @@ public class DENOPTIMGraphOperationsTest {
 
 //------------------------------------------------------------------------------
 
-    private void addRings(List<DENOPTIMVertex> vertices, DENOPTIMGraph g) {
-        List<List<DENOPTIMVertex>> ringVertices = Stream.of(
+    private void addRings(List<Vertex> vertices, DGraph g) {
+        List<List<Vertex>> ringVertices = Stream.of(
                 Arrays.asList(0, 1, 3, 5),
                 Arrays.asList(4, 1, 3, 6),
                 Arrays.asList(6, 3, 5),
@@ -261,9 +261,9 @@ public class DENOPTIMGraphOperationsTest {
                 )
                 .collect(Collectors.toList());
 
-        for (List<DENOPTIMVertex> vs : ringVertices) {
-            DENOPTIMRing r = new DENOPTIMRing();
-            for (DENOPTIMVertex v : vs) {
+        for (List<Vertex> vs : ringVertices) {
+            Ring r = new Ring();
+            for (Vertex v : vs) {
                 r.addVertex(v);
             }
             g.addRing(r);
@@ -272,24 +272,24 @@ public class DENOPTIMGraphOperationsTest {
 
 //------------------------------------------------------------------------------
 
-    private Set<DENOPTIMGraph> getExpectedSubgraphs(DENOPTIMGraph graph) {
+    private Set<DGraph> getExpectedSubgraphs(DGraph graph) {
         List<Set<Integer>> keepVertices = Stream.of(
                 Stream.of(0, 1, 3, 4, 5, 6),
                 Stream.of(8, 9, 10, 11, 12))
                 .map(indices -> indices.collect(Collectors.toSet()))
                 .collect(Collectors.toList());
 
-        List<DENOPTIMGraph> expectedSubgraphs = new ArrayList<>(2);
+        List<DGraph> expectedSubgraphs = new ArrayList<>(2);
         for (Set<Integer> keepVertex : keepVertices) {
-            DENOPTIMGraph expSubgraph = graph.clone();
-            List<DENOPTIMVertex> vertices = expSubgraph.getVertexList();
-            Set<DENOPTIMVertex> removeVertices = IntStream
+            DGraph expSubgraph = graph.clone();
+            List<Vertex> vertices = expSubgraph.getVertexList();
+            Set<Vertex> removeVertices = IntStream
                     .range(0, vertices.size())
                     .filter(i -> !keepVertex.contains(i))
                     .mapToObj(vertices::get)
                     .collect(Collectors.toSet());
 
-            for (DENOPTIMVertex removeVertex : removeVertices) {
+            for (Vertex removeVertex : removeVertices) {
                 expSubgraph.removeVertex(removeVertex);
             }
             expectedSubgraphs.add(expSubgraph);
@@ -300,7 +300,7 @@ public class DENOPTIMGraphOperationsTest {
 
 //------------------------------------------------------------------------------
 
-    private DENOPTIMVertex buildFragment(String elementSymbol, int apCount,
+    private Vertex buildFragment(String elementSymbol, int apCount,
             boolean isRCV)
     {
         try
@@ -310,7 +310,7 @@ public class DENOPTIMGraphOperationsTest {
             oxygen.setSymbol(elementSymbol);
             atomContainer.addAtom(oxygen);
     
-            DENOPTIMFragment v = new DENOPTIMFragment(
+            Fragment v = new Fragment(
                     GraphUtils.getUniqueVertexIndex(), atomContainer,
                     BBType.FRAGMENT, isRCV);
             for (int i = 0; i < apCount; i++) 
@@ -344,7 +344,7 @@ public class DENOPTIMGraphOperationsTest {
      *   /           \
      * RCV -(chord)- RCV
      */
-    private DENOPTIMGraph getThreeCycle() throws DENOPTIMException 
+    private DGraph getThreeCycle() throws DENOPTIMException 
     {
         EmptyVertex v1 = new EmptyVertex(0);
         EmptyVertex rcv1 = new EmptyVertex(1, new ArrayList<>(),
@@ -360,12 +360,12 @@ public class DENOPTIMGraphOperationsTest {
         // Need an additional AP on v1
         v1.addAP();
 
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         g.addVertex(v1);
         g.appendVertexOnAP(v1.getAP(0), rcv1.getAP(0));
         g.appendVertexOnAP(v1.getAP(1), rcv2.getAP(0));
 
-        DENOPTIMRing r = new DENOPTIMRing(new ArrayList<>(
+        Ring r = new Ring(new ArrayList<>(
                 Arrays.asList(rcv1, v1, rcv2)));
         g.addRing(r);
 
@@ -377,26 +377,26 @@ public class DENOPTIMGraphOperationsTest {
 
     private static final class ExtractPatternCase 
     {
-        final DENOPTIMGraph g;
+        final DGraph g;
         final int expectedSize;
-        final Set<DENOPTIMGraph> expectedGraphs;
-        final Comparator<DENOPTIMGraph> graphComparator = (gA, gB) ->
+        final Set<DGraph> expectedGraphs;
+        final Comparator<DGraph> graphComparator = (gA, gB) ->
                 gA.sameAs(gB, new StringBuilder()) ? 0 : -1;
 
-        private ExtractPatternCase(DENOPTIMGraph g, int expectedSize,
-                                         Set<DENOPTIMGraph> expectedGraphs) {
+        private ExtractPatternCase(DGraph g, int expectedSize,
+                                         Set<DGraph> expectedGraphs) {
             this.g = g;
             this.expectedSize = expectedSize;
             this.expectedGraphs = expectedGraphs;
         }
 
-        private boolean matchesExpected(Collection<DENOPTIMGraph> actuals) {
+        private boolean matchesExpected(Collection<DGraph> actuals) {
             if (actuals.size() != expectedSize) {
                 return false;
             }
                 
-            Set<DENOPTIMGraph> unmatchedGraphs = new HashSet<>(expectedGraphs);
-            for (DENOPTIMGraph g : actuals) 
+            Set<DGraph> unmatchedGraphs = new HashSet<>(expectedGraphs);
+            for (DGraph g : actuals) 
             {
                 boolean hasMatch = expectedGraphs
                         .stream()
@@ -422,18 +422,18 @@ public class DENOPTIMGraphOperationsTest {
     public void testLocateCompatibleXOverPoints() throws Exception
     {
         FragmentSpace fragSpace = prepare();
-        DENOPTIMGraph[] pair = getPairOfTestGraphs();
-        DENOPTIMGraph graphA = pair[0];
-        DENOPTIMGraph graphB = pair[1];
-        DENOPTIMTemplate t1 = (DENOPTIMTemplate) graphA.getVertexAtPosition(1);
-        DENOPTIMTemplate t2 = (DENOPTIMTemplate) graphB.getVertexAtPosition(1);
+        DGraph[] pair = getPairOfTestGraphs();
+        DGraph graphA = pair[0];
+        DGraph graphB = pair[1];
+        Template t1 = (Template) graphA.getVertexAtPosition(1);
+        Template t2 = (Template) graphB.getVertexAtPosition(1);
         // Making some empty vertexes unique to enable swapping (otherwise they
         // are seen as the same node and excluded from xover sites list)
-        DENOPTIMVertex v5A = t1.getInnerGraph().getVertexAtPosition(5);
+        Vertex v5A = t1.getInnerGraph().getVertexAtPosition(5);
         String k = "Uniquefier";
         v5A.setUniquefyingProperty(k);
         v5A.setProperty(k, "123");
-        DENOPTIMVertex v3B = t2.getInnerGraph().getVertexAtPosition(3);
+        Vertex v3B = t2.getInnerGraph().getVertexAtPosition(3);
         v3B.setUniquefyingProperty(k);
         v3B.setProperty(k, "789");
         
@@ -502,7 +502,7 @@ public class DENOPTIMGraphOperationsTest {
             t2.setContractLevel(contracts.get(i));
             
             List<XoverSite> xoverSites = 
-                    DENOPTIMGraphOperations.locateCompatibleXOverPoints(graphA, 
+                    GraphOperations.locateCompatibleXOverPoints(graphA, 
                             graphB, fragSpace);
             
             assertEquals(expectedNumberOfSites.get(i), xoverSites.size());
@@ -521,7 +521,7 @@ public class DENOPTIMGraphOperationsTest {
                 for (XoverSite x : xoverSites)
                 {
                     String s = "\"\"";
-                    for (DENOPTIMVertex v : x.getA())
+                    for (Vertex v : x.getA())
                     {
                         String g = "";
                         if (v.getGraphOwner()==graphA)
@@ -538,7 +538,7 @@ public class DENOPTIMGraphOperationsTest {
                         s = s + "+GraphUtils.getLabel("+g+","+v.getGraphOwner().indexOf(v)+")+\"_\"";
                     }
                     s = s + "+\"@@@_\"";
-                    for (DENOPTIMVertex v : x.getB())
+                    for (Vertex v : x.getB())
                     {
                         String g = "";
                         if (v.getGraphOwner()==graphA)
@@ -562,13 +562,13 @@ public class DENOPTIMGraphOperationsTest {
             for (XoverSite site : xoverSites)
             {
                 String label = "";
-                for (DENOPTIMVertex v : site.getA())
+                for (Vertex v : site.getA())
                 {
                     label = label + GraphUtils.getLabel(v.getGraphOwner(),
                             v.getGraphOwner().indexOf(v)) + "_";
                 }
                 label = label + "@@@_";
-                for (DENOPTIMVertex v : site.getB())
+                for (Vertex v : site.getB())
                 {
                     label = label + GraphUtils.getLabel(v.getGraphOwner(),
                             v.getGraphOwner().indexOf(v)) + "_";
@@ -614,7 +614,7 @@ public class DENOPTIMGraphOperationsTest {
      *  -(A)-tw1-(B)--(C)-tw2-(B)--(B)-tw3-(A)-(A)-tw4-(A)
      * </pre>
      */
-    private DENOPTIMGraph[] getPairOfTestGraphs() throws Exception
+    private DGraph[] getPairOfTestGraphs() throws Exception
     {
         prepare();
         
@@ -651,7 +651,7 @@ public class DENOPTIMGraphOperationsTest {
         v5.addAP(APCA);
         v5.setProperty("Label", "tv5");
         
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         g.addVertex(v0);
         g.setGraphId(-1);
         g.appendVertexOnAP(v0.getAP(0), v1.getAP(0));
@@ -660,7 +660,7 @@ public class DENOPTIMGraphOperationsTest {
         g.appendVertexOnAP(v1.getAP(1), v4.getAP(1));
         g.appendVertexOnAP(v4.getAP(0), v5.getAP(1));
         
-        DENOPTIMTemplate t1 = new DENOPTIMTemplate(BBType.NONE);
+        Template t1 = new Template(BBType.NONE);
         t1.setInnerGraph(g);
         t1.setProperty("Label", "t1");
         t1.setContractLevel(ContractLevel.FREE);
@@ -688,7 +688,7 @@ public class DENOPTIMGraphOperationsTest {
         m5.addAP(APCA);
         m5.setProperty("Label", "m105");
         
-        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        DGraph graphA = new DGraph();
         graphA.addVertex(m1);
         graphA.appendVertexOnAP(m1.getAP(0), t1.getAP(0));
         graphA.appendVertexOnAP(t1.getAP(2), m2.getAP(0));
@@ -720,14 +720,14 @@ public class DENOPTIMGraphOperationsTest {
         w4.addAP(APCA);
         w4.setProperty("Label", "tw14");
         
-        DENOPTIMGraph g2 = new DENOPTIMGraph();
+        DGraph g2 = new DGraph();
         g2.addVertex(w1);
         g2.appendVertexOnAP(w1.getAP(1), w2.getAP(1));
         g2.appendVertexOnAP(w2.getAP(0), w3.getAP(1));
         g2.appendVertexOnAP(w3.getAP(0), w4.getAP(0));
         g2.setGraphId(-2);
         
-        DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.NONE);
+        Template t2 = new Template(BBType.NONE);
         t2.setInnerGraph(g2);
         t2.setProperty("Label", "t2");
         t2.setContractLevel(ContractLevel.FREE);
@@ -756,7 +756,7 @@ public class DENOPTIMGraphOperationsTest {
         f5.addAP(APCC);
         f5.setProperty("Label", "f1005");
         
-        DENOPTIMGraph graphB = new DENOPTIMGraph();
+        DGraph graphB = new DGraph();
         graphB.addVertex(f1);
         graphB.appendVertexOnAP(f1.getAP(0), t2.getAP(0));
         graphB.appendVertexOnAP(t2.getAP(2), f2.getAP(0));
@@ -765,7 +765,7 @@ public class DENOPTIMGraphOperationsTest {
         graphB.appendVertexOnAP(t2.getAP(1), f5.getAP(0));
         graphB.setGraphId(22222);
         
-        DENOPTIMGraph[] pair = new DENOPTIMGraph[2];
+        DGraph[] pair = new DGraph[2];
         pair[0] = graphA;
         pair[1] = graphB;
         
@@ -818,9 +818,9 @@ public class DENOPTIMGraphOperationsTest {
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
         FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(), 
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(), 
                 cpMap, capMap, forbEnds, cpMap);
         fs.setAPclassBasedApproach(true);
         

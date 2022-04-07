@@ -39,14 +39,14 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
-import denoptim.utils.DENOPTIMMathUtils;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MathUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.RandomUtils;
@@ -131,7 +131,7 @@ public class ThreeDimTreeBuilder
      * 
      * This method does not remove ring-closing attractors. You can remove them
      * by calling {@link ThreeDimTreeBuilder#convertGraphTo3DAtomContainer(
-     * DENOPTIMGraph, boolean)} (with a <code>true</code> 2nd argument)
+     * DGraph, boolean)} (with a <code>true</code> 2nd argument)
      * instead of this method.
      * 
      * @param graph the DENOPTIMGraph to be transformed into a 3D molecule
@@ -140,7 +140,7 @@ public class ThreeDimTreeBuilder
      * @throws DENOPTIMException
      */
 
-    public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph graph)
+    public IAtomContainer convertGraphTo3DAtomContainer(DGraph graph)
                                                         throws DENOPTIMException
     {
     	return convertGraphTo3DAtomContainer(graph,false);
@@ -170,13 +170,13 @@ public class ThreeDimTreeBuilder
      * Does not change unused RCVs. Unused RCVs should have been already 
      * replaced by capping groups (or removed, if no capping needed), 
      * with the 
-     * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DENOPTIMGraph)}
+     * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DGraph)}
      * method.
      * @return the <code>AtomContainer</code> representation
      * @throws DENOPTIMException
      */
 
-    public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph graph,
+    public IAtomContainer convertGraphTo3DAtomContainer(DGraph graph,
             boolean removeUsedRCAs) 
                     throws DENOPTIMException
     {
@@ -207,7 +207,7 @@ public class ThreeDimTreeBuilder
      * Does not change unused RCVs. Unused RCVs should have been already 
      * replaced by capping groups (or removed, if no capping needed), 
      * with the 
-     * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DENOPTIMGraph)}
+     * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DGraph)}
      * method.
      * @param setCDKRequirements when <code>true</code> this method will ensure
      * that the CDK requirements for IAtomContainers are all met. Namely,
@@ -217,7 +217,7 @@ public class ThreeDimTreeBuilder
      * @throws DENOPTIMException
      */
 
-    public IAtomContainer convertGraphTo3DAtomContainer(DENOPTIMGraph graph,
+    public IAtomContainer convertGraphTo3DAtomContainer(DGraph graph,
             boolean removeUsedRCAs, boolean setCDKRequirements) 
                     throws DENOPTIMException
     {
@@ -225,7 +225,7 @@ public class ThreeDimTreeBuilder
         
         // WARNING: assumption that the graph is an healthy spanning tree, as
         // it should always be in DENOPTIM.
-        DENOPTIMVertex rootVrtx = graph.getSourceVertex();
+        Vertex rootVrtx = graph.getSourceVertex();
         int idRootVrtx = rootVrtx.getVertexId();
         
         IAtomContainer iacRootVrtx = null;
@@ -249,16 +249,16 @@ public class ThreeDimTreeBuilder
         }
         
         // Store APs in maps
-        Map<Integer,ArrayList<DENOPTIMAttachmentPoint>> apsPerVertexId =
+        Map<Integer,ArrayList<AttachmentPoint>> apsPerVertexId =
                 new HashMap<>();
-        Map<DENOPTIMEdge,ArrayList<DENOPTIMAttachmentPoint>> apsPerEdge =
+        Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge =
                 new HashMap<>();
-        Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom =
+        Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom =
                 new HashMap<>();
-        Map<IBond,ArrayList<DENOPTIMAttachmentPoint>> apsPerBond =
+        Map<IBond,ArrayList<AttachmentPoint>> apsPerBond =
                 new HashMap<>();
-        ArrayList<DENOPTIMAttachmentPoint> apsOnThisFrag = new ArrayList<>();
-        for (DENOPTIMAttachmentPoint ap : rootVrtx.getAttachmentPoints())
+        ArrayList<AttachmentPoint> apsOnThisFrag = new ArrayList<>();
+        for (AttachmentPoint ap : rootVrtx.getAttachmentPoints())
         {
             // For first vertex the atomPositionNumber remains the same
             ap.setAtomPositionNumberInMol(ap.getAtomPositionNumber());
@@ -272,7 +272,7 @@ public class ThreeDimTreeBuilder
                 }
                 else
                 {
-                    ArrayList<DENOPTIMAttachmentPoint> apsOnThisAtm =
+                    ArrayList<AttachmentPoint> apsOnThisAtm =
                             new ArrayList<>();
                     apsOnThisAtm.add(ap);
                     apsPerAtom.put(srcAtm,apsOnThisAtm);
@@ -282,14 +282,14 @@ public class ThreeDimTreeBuilder
         apsPerVertexId.put(idRootVrtx,apsOnThisFrag);
         
         // Recursion on all branches of the tree (i.e., all incident edges)
-        for (DENOPTIMEdge edge : graph.getEdgesWithSrc(rootVrtx))
+        for (Edge edge : graph.getEdgesWithSrc(rootVrtx))
         {
             // Get the AP from the current vertex to the next
-            DENOPTIMAttachmentPoint apSrc = edge.getSrcAP();
+            AttachmentPoint apSrc = edge.getSrcAP();
 
             // Add APs to the map of APs per Edges
-            ArrayList<DENOPTIMAttachmentPoint> apOnThisEdge =
-                                      new ArrayList<DENOPTIMAttachmentPoint>();
+            ArrayList<AttachmentPoint> apOnThisEdge =
+                                      new ArrayList<AttachmentPoint>();
             apOnThisEdge.add(apSrc);
             apOnThisEdge.add(edge.getTrgAP());
             apsPerEdge.put(edge,apOnThisEdge);
@@ -298,7 +298,7 @@ public class ThreeDimTreeBuilder
             {
                 Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
                 Point3d srcPtApSrc = new Point3d(
-                        DENOPTIMMoleculeUtils.getPoint3d(iacRootVrtx.getAtom(
+                        MoleculeUtils.getPoint3d(iacRootVrtx.getAtom(
                         apSrc.getAtomPositionNumber())));
                 
                 // Append next building block on AP-vector - start recursion
@@ -327,13 +327,13 @@ public class ThreeDimTreeBuilder
             // sure we retail consistency between the changing atom list of
             // the atom indexes stored in the APs, and in particular, the 
             // index returned by getAtomPositionNumberInMol.
-        	DENOPTIMMoleculeUtils.removeUsedRCA(mol, graph);
+        	MoleculeUtils.removeUsedRCA(mol, graph);
         }
         
         if (setCDKRequirements)
         {
-            DENOPTIMMoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
-            DENOPTIMMoleculeUtils.ensureNoUnsetBondOrders(mol);
+            MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+            MoleculeUtils.ensureNoUnsetBondOrders(mol);
         }
         
         if (debug)
@@ -353,8 +353,8 @@ public class ThreeDimTreeBuilder
             int i=0;
             for (int v : apsPerVertexId.keySet())
             {
-                ArrayList<DENOPTIMAttachmentPoint> aps = apsPerVertexId.get(v);
-                for (DENOPTIMAttachmentPoint ap : aps)
+                ArrayList<AttachmentPoint> aps = apsPerVertexId.get(v);
+                for (AttachmentPoint ap : aps)
                 {
                     i++;
                     IAtom atm = new PseudoAtom(String.valueOf(i), 
@@ -371,10 +371,10 @@ public class ThreeDimTreeBuilder
             DenoptimIO.writeSDFFile(file, mol, false);
             DenoptimIO.writeSDFFile(file, cmol, true);
             System.out.println("AP-per-Edge");
-            for (DENOPTIMEdge e : apsPerEdge.keySet())
+            for (Edge e : apsPerEdge.keySet())
             {
-                ArrayList<DENOPTIMAttachmentPoint> aps = apsPerEdge.get(e);
-                for (DENOPTIMAttachmentPoint ap : aps)
+                ArrayList<AttachmentPoint> aps = apsPerEdge.get(e);
+                for (AttachmentPoint ap : aps)
                 {
                     System.out.println("Edge: "+e+" AP = "+ap);
                 }
@@ -382,8 +382,8 @@ public class ThreeDimTreeBuilder
             System.out.println("AP-per-Atom");
             for (IAtom a : apsPerAtom.keySet())
             {
-                ArrayList<DENOPTIMAttachmentPoint> aps = apsPerAtom.get(a);
-                for (DENOPTIMAttachmentPoint ap : aps)
+                ArrayList<AttachmentPoint> aps = apsPerAtom.get(a);
+                for (AttachmentPoint ap : aps)
                 {
                     System.out.println("Atom: "+mol.indexOf(a) +" AP = "+ap);
                 }
@@ -391,8 +391,8 @@ public class ThreeDimTreeBuilder
             System.out.println("AP-per-Bond");
             for (IBond b : apsPerBond.keySet())
             {
-                ArrayList<DENOPTIMAttachmentPoint> aps = apsPerBond.get(b);
-                for (DENOPTIMAttachmentPoint ap : aps)
+                ArrayList<AttachmentPoint> aps = apsPerBond.get(b);
+                for (AttachmentPoint ap : aps)
                 {
                     System.out.println("Bond: "+mol.indexOf(b.getAtom(0))
                              +"-"+mol.indexOf(b.getAtom(1))+" AP = "+ap);
@@ -401,13 +401,13 @@ public class ThreeDimTreeBuilder
         }
         
         // Prepare the string-representation of unused APs on this graph
-        LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> freeAPPerAtm =
+        LinkedHashMap<Integer,List<AttachmentPoint>> freeAPPerAtm =
                 new LinkedHashMap<>();
         for (IAtom a : apsPerAtom.keySet())
         {
             int atmID = mol.indexOf(a);
-            ArrayList<DENOPTIMAttachmentPoint> aps = apsPerAtom.get(a);
-            for (DENOPTIMAttachmentPoint ap : aps)
+            ArrayList<AttachmentPoint> aps = apsPerAtom.get(a);
+            for (AttachmentPoint ap : aps)
             {
                 if (ap.isAvailableThroughout())
                 {
@@ -415,8 +415,8 @@ public class ThreeDimTreeBuilder
                     {
                         freeAPPerAtm.get(atmID).add(ap);
                     } else {
-                        List<DENOPTIMAttachmentPoint> lst = 
-                                new ArrayList<DENOPTIMAttachmentPoint>();
+                        List<AttachmentPoint> lst = 
+                                new ArrayList<AttachmentPoint>();
                         lst.add(ap);
                         freeAPPerAtm.put(atmID,lst);
                     }
@@ -424,7 +424,7 @@ public class ThreeDimTreeBuilder
             }
         }
         mol.setProperty(DENOPTIMConstants.APSTAG, 
-                DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(freeAPPerAtm));
+                AttachmentPoint.getAPDefinitionsForSDF(freeAPPerAtm));
         
         // Add usual graph-related string-based data to SDF properties
         GraphUtils.writeSDFFields(mol, graph);
@@ -467,18 +467,18 @@ public class ThreeDimTreeBuilder
      * Does not change unused RCVs.  Unused RCVs should have been already 
      * replaced by capping groups (or removed, if no capping needed), 
      * with the 
-     * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DENOPTIMGraph)}
+     * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DGraph)}
      * method.
      * @throws DENOPTIMException
      */
 
-    private void append3DFragmentsViaEdges(IAtomContainer mol, DENOPTIMGraph graph,
-            int idSrcAtmA, Point3d srcApA, Point3d trgApA, DENOPTIMEdge edge, 
+    private void append3DFragmentsViaEdges(IAtomContainer mol, DGraph graph,
+            int idSrcAtmA, Point3d srcApA, Point3d trgApA, Edge edge, 
             boolean removeUsedRCAs,
-            Map<Integer,ArrayList<DENOPTIMAttachmentPoint>> apsPerVertexId,
-            Map<DENOPTIMEdge,ArrayList<DENOPTIMAttachmentPoint>> apsPerEdge,
-            Map<IAtom,ArrayList<DENOPTIMAttachmentPoint>> apsPerAtom,
-            Map<IBond,ArrayList<DENOPTIMAttachmentPoint>> apsPerBond) 
+            Map<Integer,ArrayList<AttachmentPoint>> apsPerVertexId,
+            Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge,
+            Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom,
+            Map<IBond,ArrayList<AttachmentPoint>> apsPerBond) 
                     throws DENOPTIMException
     {   
         if (debug)
@@ -488,8 +488,8 @@ public class ThreeDimTreeBuilder
         }
         
         // Get the incoming fragment and its AP
-        DENOPTIMVertex inVtx = edge.getTrgAP().getOwner();
-        DENOPTIMAttachmentPoint apB = edge.getTrgAP();
+        Vertex inVtx = edge.getTrgAP().getOwner();
+        AttachmentPoint apB = edge.getTrgAP();
         
         //Used to keep track of which atom comes from which vertex
         int idInVrx = inVtx.getVertexId();
@@ -533,7 +533,7 @@ public class ThreeDimTreeBuilder
                 // parent vertex, which is the growing molecule (i.e., ApA)
                 // and that on the incoming building block (i.e., ApB).
                 Point3d trgApB = new Point3d(apB.getDirectionVector());
-                Point3d srcApB = new Point3d(DENOPTIMMoleculeUtils.getPoint3d(
+                Point3d srcApB = new Point3d(MoleculeUtils.getPoint3d(
                         inFrag.getAtom(apB.getAtomPositionNumber())));
         
                 // Translate atoms and APs of incoming building block so that 
@@ -542,17 +542,17 @@ public class ThreeDimTreeBuilder
                 tr1.sub(trgApB,srcApA);
                 for (IAtom atm : inFrag.atoms())
                 {
-                	atm.setPoint3d(DENOPTIMMoleculeUtils.getPoint3d(atm));
+                	atm.setPoint3d(MoleculeUtils.getPoint3d(atm));
                     atm.getPoint3d().sub(tr1);
                 }
-                for (DENOPTIMAttachmentPoint ap : inVtx.getAttachmentPoints())
+                for (AttachmentPoint ap : inVtx.getAttachmentPoints())
                 {
                     Point3d pt = new Point3d(ap.getDirectionVector());
                     pt.sub(tr1);
                     ap.setDirectionVector(pt);
                 }
                 trgApB = new Point3d(apB.getDirectionVector());
-                srcApB = new Point3d(DENOPTIMMoleculeUtils.getPoint3d(
+                srcApB = new Point3d(MoleculeUtils.getPoint3d(
                         inFrag.getAtom(apB.getAtomPositionNumber())));
         
                 //Get Vectors ApA and ApB (NOTE: inverse versus of ApB!!!)
@@ -587,7 +587,7 @@ public class ThreeDimTreeBuilder
                     }
                     else
                     {
-                        rotAxis = DENOPTIMMathUtils.getNormalDirection(vectApA);
+                        rotAxis = MathUtils.getNormalDirection(vectApA);
                     }
                     Matrix3d rotMat = new Matrix3d();
         	        rotAxis.normalize();
@@ -609,7 +609,7 @@ public class ThreeDimTreeBuilder
                         atm.getPoint3d().add(srcApA);
                     }
                     // Rotate APs of incoming building block
-                    for (DENOPTIMAttachmentPoint ap : 
+                    for (AttachmentPoint ap : 
                         inVtx.getAttachmentPoints())
                     {
                         Point3d pt = new Point3d(ap.getDirectionVector());
@@ -701,7 +701,7 @@ public class ThreeDimTreeBuilder
                         throw new DENOPTIMException(str);
                     }
                 }
-                for (DENOPTIMAttachmentPoint ap : inVtx.getAttachmentPoints())
+                for (AttachmentPoint ap : inVtx.getAttachmentPoints())
                 {
                     Point3d pt = new Point3d(ap.getDirectionVector());
                     pt.add(tr2);
@@ -736,15 +736,15 @@ public class ThreeDimTreeBuilder
             mol.addBond(bnd);
             
             // Store the APs related to the new bond
-            ArrayList<DENOPTIMAttachmentPoint> apsOnBond = new ArrayList<>();
+            ArrayList<AttachmentPoint> apsOnBond = new ArrayList<>();
             apsOnBond.add(edge.getSrcAP());
             apsOnBond.add(edge.getTrgAP());
             apsPerBond.put(bnd,apsOnBond);
         }
         
         // Store APs per building block and per atom (if atom exists)
-        ArrayList<DENOPTIMAttachmentPoint> apsOnThisFrag = new ArrayList<>();
-        for (DENOPTIMAttachmentPoint ap : inVtx.getAttachmentPoints())
+        ArrayList<AttachmentPoint> apsOnThisFrag = new ArrayList<>();
+        for (AttachmentPoint ap : inVtx.getAttachmentPoints())
         {
             // For vertices other than the first, we adjust the pointer to the
             // AP source atom according to the atom list of the entire molecule
@@ -761,7 +761,7 @@ public class ThreeDimTreeBuilder
                 }
                 else
                 {
-                    ArrayList<DENOPTIMAttachmentPoint> apsOnThisAtm =
+                    ArrayList<AttachmentPoint> apsOnThisAtm =
                             new ArrayList<>();
                     apsOnThisAtm.add(ap);
                     apsPerAtom.put(srcAtm,apsOnThisAtm);
@@ -771,11 +771,11 @@ public class ThreeDimTreeBuilder
         apsPerVertexId.put(idInVrx, apsOnThisFrag);
         
         // Recursion on all the edges leaving from this fragment
-        for (DENOPTIMEdge nextEdge : graph.getEdgesWithSrc(inVtx))
+        for (Edge nextEdge : graph.getEdgesWithSrc(inVtx))
         {
             // Add APs to the map of APs per Edges
-            ArrayList<DENOPTIMAttachmentPoint> apOnThisEdge =
-                                      new ArrayList<DENOPTIMAttachmentPoint>();
+            ArrayList<AttachmentPoint> apOnThisEdge =
+                                      new ArrayList<AttachmentPoint>();
             apOnThisEdge.add(nextEdge.getSrcAP());
             apOnThisEdge.add(nextEdge.getTrgAP());
             apsPerEdge.put(nextEdge,apOnThisEdge);
@@ -814,7 +814,7 @@ public class ThreeDimTreeBuilder
         Point3d c = new Point3d(0,0,0);
         if (mol.getAtomCount() > 0)
         {
-            c = DENOPTIMMoleculeUtils.calculateCentroid(mol);
+            c = MoleculeUtils.calculateCentroid(mol);
         }
         return new Point3d(maxCoord*vx+c.x, maxCoord*vy+c.y, maxCoord*vz+c.z);
     }

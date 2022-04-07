@@ -34,7 +34,7 @@ import javax.swing.SwingConstants;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 
 public class GUIAPClassDefinitionDialog extends GUIModalDialog
 {

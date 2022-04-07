@@ -34,7 +34,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosure;
 import denoptim.graph.rings.RingClosureParameters;

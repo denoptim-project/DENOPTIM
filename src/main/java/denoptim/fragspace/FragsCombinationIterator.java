@@ -26,9 +26,9 @@ import java.util.NoSuchElementException;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
 import denoptim.graph.SymmetricSet;
 import denoptim.utils.GraphUtils;
 
@@ -53,7 +53,7 @@ public class FragsCombinationIterator
     /**
      * The root graph (may be a single fragment or an extended graph)
      */
-    private DENOPTIMGraph rootGraph;
+    private DGraph rootGraph;
 
     /**
      * List of all attachment points on the root graph (source APs)
@@ -116,7 +116,7 @@ public class FragsCombinationIterator
      */
 
     public FragsCombinationIterator(FragmentSpaceParameters settings,
-            DENOPTIMGraph rootGraph) throws DENOPTIMException
+            DGraph rootGraph) throws DENOPTIMException
     {
         this.rootGraph = rootGraph;
         this.settings = settings;
@@ -125,12 +125,12 @@ public class FragsCombinationIterator
         // In case of symmetry, store only the first among the symmetric 
         // vertices in the graph, and the first AP among the symmetric APs
         // in a vertex
-        for (DENOPTIMVertex v : this.rootGraph.getVertexList())
+        for (Vertex v : this.rootGraph.getVertexList())
         {
             int vIdx = v.getVertexId();
 
             int vMolId = v.getBuildingBlockId();
-            DENOPTIMVertex.BBType vMolTyp = v.getBuildingBlockType();
+            Vertex.BBType vMolTyp = v.getBuildingBlockType();
            
             // deal with symmetric sets of vertices
             boolean keepThisVertex = true;
@@ -163,7 +163,7 @@ public class FragsCombinationIterator
                 continue;
             }
 
-            for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints())
+            for (AttachmentPoint ap : v.getAttachmentPoints())
             {
                 if (!ap.isAvailable())
                     continue;
@@ -216,10 +216,10 @@ public class FragsCombinationIterator
         // Collect all possibilities (frags, caps, entry) for each free AP
         for (IdFragmentAndAP candSrcAp : allSrcAps)
         {
-            DENOPTIMVertex.BBType fTyp = candSrcAp.getVertexMolType();
+            Vertex.BBType fTyp = candSrcAp.getVertexMolType();
             int fIdx = candSrcAp.getVertexMolId();
             int apId = candSrcAp.getApId();
-            DENOPTIMVertex frag = settings.getFragmentSpace()
+            Vertex frag = settings.getFragmentSpace()
                     .getVertexFromLibrary(fTyp, fIdx); 
             APClass srcApCls = frag.getAttachmentPoints().get(apId).getAPClass();
 
@@ -237,7 +237,7 @@ public class FragsCombinationIterator
                 int vid = GraphUtils.getUniqueVertexIndex();
                 IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid, //vertexId
                 		            compatApId.getVertexMolId(), //MolId,
-                                    DENOPTIMVertex.BBType.FRAGMENT,
+                                    Vertex.BBType.FRAGMENT,
                                     compatApId.getApId(), //ApId
 							        -1, //noVSym
 							        -1);//noAPSym
@@ -263,7 +263,7 @@ public class FragsCombinationIterator
                     int vid = GraphUtils.getUniqueVertexIndex();
                     IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid,//vertxId
                                                                     i,//MolId,
-                                                                    DENOPTIMVertex.BBType.CAP,
+                                                                    Vertex.BBType.CAP,
                                                                     0,//ApId
                                 								   -1,//noVSym
                                 								   -1);//noAPSym
@@ -560,7 +560,7 @@ public class FragsCombinationIterator
             {
                 int srcVrtId = srcFrgAp.getVertexId();
                 int srcApId = srcFrgAp.getApId();
-                DENOPTIMVertex v = this.rootGraph.getVertexWithId(srcVrtId);
+                Vertex v = this.rootGraph.getVertexWithId(srcVrtId);
                 if (!v.hasSymmetricAP())
                 {
                     continue;
@@ -636,7 +636,7 @@ public class FragsCombinationIterator
                             for (int i=1; i<ss.getList().size(); i++)
                             {
                                 int symSrcVrtID = ss.getList().get(i);
-                                DENOPTIMVertex symVertex = 
+                                Vertex symVertex = 
                                     this.rootGraph.getVertexWithId(symSrcVrtID);
                                     
                                 IdFragmentAndAP symSrcFrgAp = 

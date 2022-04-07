@@ -34,7 +34,7 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.io.DenoptimIO;
-import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.MathUtils;
 import denoptim.utils.GenUtils;
 
 /**
@@ -123,7 +123,7 @@ public class RingClosureFinder
         int nn = 0;
         for (int i=2; i<ptsChain.size(); i++)
         {
-            double a = DENOPTIMMathUtils.angle(ptsChain.get(i-2),
+            double a = MathUtils.angle(ptsChain.get(i-2),
                                                ptsChain.get(i-1),
                                                ptsChain.get(i));
             if (a >= settings.getLinearityLimit())
@@ -145,7 +145,7 @@ public class RingClosureFinder
             else
             {
                 ArrayList<Point3d> refPoints = dihRefs.get(i-3);
-                dihedrals.add(DENOPTIMMathUtils.computeDihedralAngle(
+                dihedrals.add(MathUtils.computeDihedralAngle(
                                                         refPoints.get(0), 
                                                         refPoints.get(1), 
                                                         refPoints.get(2),

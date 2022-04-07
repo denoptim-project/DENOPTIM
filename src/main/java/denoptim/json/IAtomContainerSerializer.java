@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 
 
 /**
@@ -46,8 +46,8 @@ public class IAtomContainerSerializer implements JsonSerializer<IAtomContainer>
         List<LWAtom> atoms = new ArrayList<LWAtom>();
         for (IAtom atm : iac.atoms())
         {
-            atoms.add(new LWAtom(DENOPTIMMoleculeUtils.getSymbolOrLabel(atm),
-                    DENOPTIMMoleculeUtils.getPoint3d(atm)));
+            atoms.add(new LWAtom(MoleculeUtils.getSymbolOrLabel(atm),
+                    MoleculeUtils.getPoint3d(atm)));
         }
         List<LWBond> bonds = new ArrayList<LWBond>();
         for (IBond bnd : iac.bonds())

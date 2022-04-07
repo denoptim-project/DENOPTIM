@@ -31,9 +31,9 @@ import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Candidate;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.logging.CounterID;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
@@ -113,7 +113,7 @@ public class OffspringEvaluationTask extends FitnessTask
         	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
         	
             try {
-                DENOPTIMGraph gWithNoRCVs = dGraph.clone();
+                DGraph gWithNoRCVs = dGraph.clone();
                 
                 //NB: this replaces unused RCVs with capping groups
                 GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs, 
@@ -184,7 +184,7 @@ public class OffspringEvaluationTask extends FitnessTask
         	{
 	            synchronized (population)
 	            {
-	            	DENOPTIMLogger.appLogger.log(Level.INFO, 
+	            	StaticLogger.appLogger.log(Level.INFO, 
 	            			"Adding {0} to population", molName);
 	                population.add(result);
 	                isWithinBestPrcentile = population.isWithinPercentile(

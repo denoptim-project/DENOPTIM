@@ -27,8 +27,8 @@ import org.openscience.cdk.qsar.result.IntegerResult;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.logging.StaticLogger;
+import denoptim.utils.MathUtils;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ManySMARTSQuery;
 import jakarta.el.ELContext;
@@ -239,7 +239,7 @@ public class FitnessProvider
         			{
         				String msg = "No hits for SMARTS of " + varName + ": "
         						+ "setting variable value to 0.0";
-        				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+        				StaticLogger.appLogger.log(Level.WARNING ,msg);
         				variable.value = 0.0;
         				continue;
         			}
@@ -249,7 +249,7 @@ public class FitnessProvider
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
         						+ varName + ". Taking average of all values.";
-        				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+        				StaticLogger.appLogger.log(Level.WARNING ,msg);
         			}
         			int valCounter = -1;
         			List<Double> vals = new ArrayList<Double>();
@@ -260,7 +260,7 @@ public class FitnessProvider
                     		String msg = "Multiple entries in a single hit "
                     				+ "with SMARTS identifier for "
             						+ varName + ". Taking average of values.";
-            				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+            				StaticLogger.appLogger.log(Level.WARNING ,msg);
                     	}
                     	for (Integer atmId : singleMatch)
                     	{
@@ -275,7 +275,7 @@ public class FitnessProvider
                     }
                     if (debug) System.out.println("-Values contributing to " 
                             + varName + ": " + vals);
-                    double overallValue = DENOPTIMMathUtils.mean(vals);
+                    double overallValue = MathUtils.mean(vals);
                     variable.value = overallValue;
                     iac.setProperty(varName,overallValue);
         		}
@@ -288,7 +288,7 @@ public class FitnessProvider
         			{
         				String msg = "No hits for SMARTS of " + varName + ": "
         						+ "setting variable value to 0.0";
-        				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+        				StaticLogger.appLogger.log(Level.WARNING ,msg);
         				variable.value = 0.0;
         				continue;
         			}
@@ -298,7 +298,7 @@ public class FitnessProvider
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
         						+ varName + ". Taking average of all values.";
-        				DENOPTIMLogger.appLogger.log(Level.WARNING ,msg);
+        				StaticLogger.appLogger.log(Level.WARNING ,msg);
         			}
         			int valCounter = -1;
         			List<Double> vals = new ArrayList<Double>();
@@ -323,7 +323,7 @@ public class FitnessProvider
                     }
                     if (debug) System.out.println("-Values contributing to " 
                             + varName + ": "+vals);
-                    double overallValue = DENOPTIMMathUtils.mean(vals);
+                    double overallValue = MathUtils.mean(vals);
                     variable.value = overallValue;
                     iac.setProperty(varName,overallValue);
         		}

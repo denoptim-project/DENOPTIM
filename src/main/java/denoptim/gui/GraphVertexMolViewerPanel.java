@@ -34,17 +34,17 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
 import denoptim.graph.EmptyVertex;
 import denoptim.gui.GraphViewerPanel.JVertex;
 import denoptim.gui.GraphViewerPanel.JVertexType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 
@@ -69,7 +69,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	/**
 	 * The unsaved version of the currently loaded graph
 	 */
-	private DENOPTIMGraph dnGraph;
+	private DGraph dnGraph;
 	
 	/**
 	 * The snapshot of the old (removed) visualized GraphStrem system. 
@@ -240,7 +240,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      * the same graph.
      * @param keepSprites if <code>true</code> we'll keep track of old labels.
      */
-    public void loadDnGraphToViewer(DENOPTIMGraph dnGraph, IAtomContainer mol, 
+    public void loadDnGraphToViewer(DGraph dnGraph, IAtomContainer mol, 
             boolean keepSprites)
     {
         loadDnGraphToViewer(dnGraph,keepSprites);
@@ -263,7 +263,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	 * @param keepLabels if <code>true</code> we'll keep track of old labels.
 	 * loaded.
 	 */
-	public void loadDnGraphToViewer(DENOPTIMGraph dnGraph, boolean keepLabels)
+	public void loadDnGraphToViewer(DGraph dnGraph, boolean keepLabels)
 	{
 	    this.dnGraph = dnGraph;
 	    resetFragViewerCardDeck();
@@ -317,7 +317,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
         try {
             mol = tb.convertGraphTo3DAtomContainer(
                     dnGraph);
-            DENOPTIMMoleculeUtils.removeUsedRCA(mol,dnGraph);
+            MoleculeUtils.removeUsedRCA(mol,dnGraph);
         } catch (Throwable t) {
             t.printStackTrace();
             System.out.println("Couldn't make 3D-tree representation: "
@@ -428,15 +428,15 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 			
 			JVertex jv = (JVertex) evt.getNewValue();
 
-		    DENOPTIMVertex bb = jv.dnpVertex.clone();
-			if (bb instanceof DENOPTIMFragment)
+		    Vertex bb = jv.dnpVertex.clone();
+			if (bb instanceof Fragment)
 			{
 			    removeNestedGraphViewer(); //Just is case we still have it
-			    DENOPTIMFragment frag = (DENOPTIMFragment) bb;
+			    Fragment frag = (Fragment) bb;
 			    fragViewer.loadFragmentToViewer(frag);
 	            bringCardToTopOfVertexViewer(FRAGVIEWERCARDNAME);
-			} else if (bb instanceof DENOPTIMTemplate) {
-			    DENOPTIMTemplate t = (DENOPTIMTemplate) bb;
+			} else if (bb instanceof Template) {
+			    Template t = (Template) bb;
                 fragViewer.clearAll();
                 fragViewerTmplViewerCard = 
                         new GraphVertexMolViewerPanel();
@@ -539,10 +539,10 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      * @return the list selected attachment points.
      */
     
-    public ArrayList<DENOPTIMAttachmentPoint> getAPsSelectedInViewer()
+    public ArrayList<AttachmentPoint> getAPsSelectedInViewer()
     {
-        ArrayList<DENOPTIMAttachmentPoint> aps = 
-                new ArrayList<DENOPTIMAttachmentPoint>();
+        ArrayList<AttachmentPoint> aps = 
+                new ArrayList<AttachmentPoint>();
         for (JVertex jv : graphViewer.getSelectedNodes())
         {
             if (jv.vtype == JVertexType.AP)
@@ -559,9 +559,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      * Identifies which vertices are selected in the graph viewer.
      * @return the list of identifiers
      */
-    public ArrayList<DENOPTIMVertex> getSelectedNodesInViewer()
+    public ArrayList<Vertex> getSelectedNodesInViewer()
     {
-        ArrayList<DENOPTIMVertex> selected = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> selected = new ArrayList<Vertex>();
         for (JVertex jv : graphViewer.getSelectedNodes())
         {
             if (jv.vtype == JVertexType.AP)

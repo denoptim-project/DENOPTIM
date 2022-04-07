@@ -18,8 +18,8 @@
 
 package denoptim.graph;
 
-import denoptim.graph.DENOPTIMVertex.BBType;
-import denoptim.graph.DENOPTIMVertex.VertexType;
+import denoptim.graph.Vertex.BBType;
+import denoptim.graph.Vertex.VertexType;
 
 /**
  * Query for searching vertexes.
@@ -69,7 +69,7 @@ public class VertexQuery
      * Constructor from vertex and edge queries
      * @param vID the query on vertex's unique identifier, or null.
      * @param vType the query on vertex's type (i.e., {@link EmptyVertex}, 
-     * {@link DENOPTIMFragment}, or {@link DENOPTIMTemplate}), or null.
+     * {@link Fragment}, or {@link Template}), or null.
      * @param bbType the query on vertex's building block type, or null,
      * @param bbID  the query on vertex's building block ID in the library of 
      * hit type, or null.
@@ -101,7 +101,7 @@ public class VertexQuery
      * the candidate vertex if the target.
      * @param vID the query on vertex's unique identifier, or null.
      * @param vType the query on vertex's type (i.e., {@link EmptyVertex}, 
-     * {@link DENOPTIMFragment}, or {@link DENOPTIMTemplate}), or null.
+     * {@link Fragment}, or {@link Template}), or null.
      * @param bbType the query on vertex's building block type, or null,
      * @param bbID  the query on vertex's building block ID in the library of 
      * hit type, or null.

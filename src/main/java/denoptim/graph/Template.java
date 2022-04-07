@@ -24,10 +24,10 @@ import com.google.gson.stream.JsonReader;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
 
 /**
@@ -45,17 +45,12 @@ import denoptim.utils.MutationType;
 //  provided upon instantiation.
 //
 
-public class DENOPTIMTemplate extends DENOPTIMVertex
+public class Template extends Vertex
 {
-    /**
-     * Version UID
-     */
-    private static final long serialVersionUID = 1L;
-    
     /**
      * Graph that is embedded in this vertex.
      */
-    private DENOPTIMGraph innerGraph;
+    private DGraph innerGraph;
     
     /**
      * Molecular representation of the content of this template. This filed is
@@ -97,14 +92,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         FIXED_STRUCT
     }
 
-    private List<DENOPTIMAttachmentPoint> requiredAPs = new ArrayList<>();
+    private List<AttachmentPoint> requiredAPs = new ArrayList<>();
 
     private APTreeMap innerToOuterAPs;
 
     
 //------------------------------------------------------------------------------
 
-    public DENOPTIMTemplate(DENOPTIMVertex.BBType bbType)
+    public Template(Vertex.BBType bbType)
     {
         super(VertexType.Template);
         setBuildingBlockType(bbType);
@@ -124,8 +119,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     
     @Override
-    public String[] getPathIDs(DENOPTIMAttachmentPoint apA,
-            DENOPTIMAttachmentPoint apB)
+    public String[] getPathIDs(AttachmentPoint apA,
+            AttachmentPoint apB)
     {
         String a2b = this.getBuildingBlockId() + "/" + this.getBuildingBlockType() + "/ap"
                 + getIndexOfAP(apA) + "ap" + getIndexOfAP(apB) + "_";
@@ -142,11 +137,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * @throws DENOPTIMException 
      */
     
-    public static DENOPTIMTemplate getTestTemplate(ContractLevel contractLevel) 
+    public static Template getTestTemplate(ContractLevel contractLevel) 
             throws DENOPTIMException 
     {
-        DENOPTIMTemplate template = new DENOPTIMTemplate(
-                DENOPTIMVertex.BBType.UNDEFINED);
+        Template template = new Template(
+                Vertex.BBType.UNDEFINED);
         EmptyVertex vrtx = new EmptyVertex(0);
         EmptyVertex vrtx2 = new EmptyVertex(1);
     
@@ -155,10 +150,10 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
         vrtx2.addAP();
         vrtx2.addAP();
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         g.addVertex(vrtx);
         g.addVertex(vrtx2);
-        g.addEdge(new DENOPTIMEdge(vrtx.getAP(0),
+        g.addEdge(new Edge(vrtx.getAP(0),
             vrtx2.getAP(1), BondType.SINGLE));
         template.setInnerGraph(g);
 
@@ -213,16 +208,16 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * Returns a deep copy of this template
      * @return the deep copy
      */
-    public DENOPTIMTemplate clone()
+    public Template clone()
     {
-        DENOPTIMTemplate c = new DENOPTIMTemplate(this.getBuildingBlockType());
+        Template c = new Template(this.getBuildingBlockType());
         
         c.setVertexId(this.getVertexId());
         c.setBuildingBlockId(this.getBuildingBlockId());
         c.contractLevel = this.contractLevel;
         c.setMutationTypes(this.getUnfilteredMutationTypes());
 
-        for (DENOPTIMAttachmentPoint ap : this.requiredAPs)
+        for (AttachmentPoint ap : this.requiredAPs)
         {
             c.addRequiredAP(ap.getDirectionVector(), ap.getAPClass());
         }
@@ -234,12 +229,12 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             // are broken.
             try
             {
-                c.mol = DENOPTIMMoleculeUtils.makeSameAs(mol);
+                c.mol = MoleculeUtils.makeSameAs(mol);
                 for (int i=0; i<this.getAttachmentPoints().size(); i++)
                 {
-                    DENOPTIMAttachmentPoint thisOutAP = 
+                    AttachmentPoint thisOutAP = 
                             this.getAttachmentPoints().get(i);
-                    DENOPTIMAttachmentPoint cloneOutAP = 
+                    AttachmentPoint cloneOutAP = 
                             c.getAttachmentPoints().get(i);
                     cloneOutAP.setDirectionVector(new Point3d(
                             thisOutAP.getDirectionVector()));
@@ -261,14 +256,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
 //-----------------------------------------------------------------------------
     
-    public DENOPTIMGraph getInnerGraph()
+    public DGraph getInnerGraph()
     {
         return innerGraph;
     }
 
 //-----------------------------------------------------------------------------
 
-    public void setInnerGraph(DENOPTIMGraph innerGraph) 
+    public void setInnerGraph(DGraph innerGraph) 
             throws IllegalArgumentException 
     {
         // NB: if you change anything here, remember that we can modify the
@@ -288,21 +283,21 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         //TODO: we might need to remove unused RCVs from inner graph.
         // Such RCVs cannot be used outside the template.
         
-        for (DENOPTIMAttachmentPoint innerAP : innerGraph.getAvailableAPs()) {
+        for (AttachmentPoint innerAP : innerGraph.getAvailableAPs()) {
             addInnerToOuterAPMapping(innerAP);
         }
     }
 
 //-----------------------------------------------------------------------------
     
-    private void updateInnerToOuter(TreeMap<Integer,DENOPTIMAttachmentPoint> map)
+    private void updateInnerToOuter(TreeMap<Integer,AttachmentPoint> map)
     {
         clearIAtomContainer();
         this.innerToOuterAPs = new APTreeMap();
-        for (Entry<Integer, DENOPTIMAttachmentPoint> e : map.entrySet())
+        for (Entry<Integer, AttachmentPoint> e : map.entrySet())
         {
-            DENOPTIMAttachmentPoint innerAP = innerGraph.getAPWithId(e.getKey());
-            DENOPTIMAttachmentPoint outerAP = e.getValue();
+            AttachmentPoint innerAP = innerGraph.getAPWithId(e.getKey());
+            AttachmentPoint outerAP = e.getValue();
             outerAP.setOwner(this);
             this.innerToOuterAPs.put(innerAP, outerAP);
         }
@@ -318,13 +313,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * happens.
      * @param newInnerAP the inner AP to project on template's surface.
      */
-    public void addInnerToOuterAPMapping(DENOPTIMAttachmentPoint newInnerAP)
+    public void addInnerToOuterAPMapping(AttachmentPoint newInnerAP)
     {
         if (innerToOuterAPs.containsKey(newInnerAP))
         {
             return;
         }
-        DENOPTIMAttachmentPoint outerAP = newInnerAP.clone();
+        AttachmentPoint outerAP = newInnerAP.clone();
         outerAP.setOwner(this);
         innerToOuterAPs.put(newInnerAP, outerAP);
         // Recursion on nesting templates to add projections of the AP
@@ -347,14 +342,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * @param oldInnerAP the inner AP to be changed
      * @param newInnerAP the inner AP to change the old one with.
      */
-    public void updateInnerApID(DENOPTIMAttachmentPoint oldInnerAP, 
-            DENOPTIMAttachmentPoint newInnerAP)
+    public void updateInnerApID(AttachmentPoint oldInnerAP, 
+            AttachmentPoint newInnerAP)
     {   
         if (!innerToOuterAPs.containsKey(oldInnerAP))
         {
             return;
         }
-        DENOPTIMAttachmentPoint outerAP = innerToOuterAPs.get(oldInnerAP);
+        AttachmentPoint outerAP = innerToOuterAPs.get(oldInnerAP);
         outerAP.setAPClass(newInnerAP.getAPClass());
         
         innerToOuterAPs.remove(oldInnerAP);
@@ -369,17 +364,17 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * used, then the edge user and any vertex reachable from it are removed.
      * @param oldInnerAP the inner AP of the mapping to remove.
      */
-    public void removeProjectionOfInnerAP(DENOPTIMAttachmentPoint oldInnerAP) 
+    public void removeProjectionOfInnerAP(AttachmentPoint oldInnerAP) 
             throws DENOPTIMException
     {
         if (!innerToOuterAPs.containsKey(oldInnerAP))
         {
             return;
         }
-        DENOPTIMAttachmentPoint outer = innerToOuterAPs.get(oldInnerAP);
+        AttachmentPoint outer = innerToOuterAPs.get(oldInnerAP);
         if (!outer.isAvailable())
         {
-            DENOPTIMAttachmentPoint linkedAP = outer.getLinkedAP();
+            AttachmentPoint linkedAP = outer.getLinkedAP();
             getGraphOwner().removeBranchStartingAt(linkedAP.getOwner());
         }
         // Recursion on nesting templates to remove all projections of the AP
@@ -392,20 +387,20 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
 //-----------------------------------------------------------------------------
     
-    private boolean isValidInnerGraph(DENOPTIMGraph g) 
+    private boolean isValidInnerGraph(DGraph g) 
     {
         if (requiredAPs.size()==0)
             return true;
         
-        List<DENOPTIMAttachmentPoint> innerAPs = g.getAvailableAPs();
+        List<AttachmentPoint> innerAPs = g.getAvailableAPs();
         if (innerAPs.size() < getRequiredAPs().size()) {
             return false;
         }
-        Comparator<DENOPTIMAttachmentPoint> apClassComparator
-                = Comparator.comparing(DENOPTIMAttachmentPoint::getAPClass,
+        Comparator<AttachmentPoint> apClassComparator
+                = Comparator.comparing(AttachmentPoint::getAPClass,
                         Comparator.nullsLast(Comparator.naturalOrder()));
         innerAPs.sort(apClassComparator);
-        List<DENOPTIMAttachmentPoint> reqAPs = getRequiredAPs();
+        List<AttachmentPoint> reqAPs = getRequiredAPs();
         reqAPs.sort(apClassComparator);
         int matchesLeft = reqAPs.size();
         for (int i = 0, j = 0; matchesLeft > 0 && i < innerAPs.size(); i++) 
@@ -428,7 +423,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * @return the list of outer AP
      */
     @Override
-    public ArrayList<DENOPTIMAttachmentPoint> getAttachmentPoints()
+    public ArrayList<AttachmentPoint> getAttachmentPoints()
     {
         if (innerToOuterAPs == null)
             return new ArrayList<>();
@@ -518,7 +513,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             boolean updateAPsAccordingToIAC) throws DENOPTIMException
     { 
         //Collects all the links to APs
-        Map<DENOPTIMAttachmentPoint,DENOPTIMAttachmentPoint> 
+        Map<AttachmentPoint,AttachmentPoint> 
             apInnerGraphToApOnMol = new HashMap<>();
         if (updateAPsAccordingToIAC)
         {
@@ -529,17 +524,17 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 {
                     continue;
                 }
-                ArrayList<DENOPTIMAttachmentPoint> apLst = 
-                        (ArrayList<DENOPTIMAttachmentPoint>) p;
-                for (DENOPTIMAttachmentPoint apOnMol : apLst)
+                ArrayList<AttachmentPoint> apLst = 
+                        (ArrayList<AttachmentPoint>) p;
+                for (AttachmentPoint apOnMol : apLst)
                 {
                     Object o = apOnMol.getProperty(DENOPTIMConstants.LINKAPS);
                     if (o==null)
                     {
                         throw new DENOPTIMException("Unexpected null link to AP.");
                     }
-                    DENOPTIMAttachmentPoint linkedAPOnGraph = 
-                            (DENOPTIMAttachmentPoint) o;
+                    AttachmentPoint linkedAPOnGraph = 
+                            (AttachmentPoint) o;
                     apInnerGraphToApOnMol.put(linkedAPOnGraph, apOnMol);
                 }
             }
@@ -549,16 +544,16 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         // the atom list of the entire molecular representation of the 
         // templates.
         // And we collects the outer APs per atom at the same time
-        LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = 
+        LinkedHashMap<Integer,List<AttachmentPoint>> apsPerAtom = 
                 new LinkedHashMap<>();
-        for (DENOPTIMAttachmentPoint outAP : getAttachmentPoints()) 
+        for (AttachmentPoint outAP : getAttachmentPoints()) 
         {
-            DENOPTIMAttachmentPoint inAPOnGraph = getInnerAPFromOuterAP(outAP);
+            AttachmentPoint inAPOnGraph = getInnerAPFromOuterAP(outAP);
             int atmIndexInMol = outAP.getAtomPositionNumber();
             if (updateAPsAccordingToIAC 
                     && apInnerGraphToApOnMol.containsKey(inAPOnGraph))
             {
-                DENOPTIMAttachmentPoint apOnMol = apInnerGraphToApOnMol.get(inAPOnGraph);
+                AttachmentPoint apOnMol = apInnerGraphToApOnMol.get(inAPOnGraph);
                 outAP.setDirectionVector(apOnMol.getDirectionVector());
                 atmIndexInMol = apOnMol.getAtomPositionNumber(); //yes, not InMol!
             }
@@ -567,8 +562,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             {
                 apsPerAtom.get(atmIndexInMol).add(outAP);
             } else {
-                List<DENOPTIMAttachmentPoint> list = 
-                        new ArrayList<DENOPTIMAttachmentPoint>();
+                List<AttachmentPoint> list = 
+                        new ArrayList<AttachmentPoint>();
                 list.add(outAP);
                 apsPerAtom.put(atmIndexInMol, list);
             }
@@ -584,7 +579,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         // Prepare SDF-like string for atom container. 0-based to 1-based
         // index conversion done in here
         mol.setProperty(DENOPTIMConstants.APSTAG, 
-                DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
+                AttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
         
         mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         
@@ -623,11 +618,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             // the atom list of the entire molecular representation of the 
             // templates.
             // And we collects the outer APs per atom at the same time
-            LinkedHashMap<Integer,List<DENOPTIMAttachmentPoint>> apsPerAtom = 
+            LinkedHashMap<Integer,List<AttachmentPoint>> apsPerAtom = 
                     new LinkedHashMap<>();
-            for (DENOPTIMAttachmentPoint outAP : getAttachmentPoints()) 
+            for (AttachmentPoint outAP : getAttachmentPoints()) 
             {
-                DENOPTIMAttachmentPoint inAP = getInnerAPFromOuterAP(outAP);
+                AttachmentPoint inAP = getInnerAPFromOuterAP(outAP);
                 if (inAP.getDirectionVector()==null)
                 {
                     outAP.setDirectionVector(null);
@@ -640,8 +635,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 {
                     apsPerAtom.get(atmIndexInMol).add(outAP);
                 } else {
-                    List<DENOPTIMAttachmentPoint> list = 
-                            new ArrayList<DENOPTIMAttachmentPoint>();
+                    List<AttachmentPoint> list = 
+                            new ArrayList<AttachmentPoint>();
                     list.add(outAP);
                     apsPerAtom.put(atmIndexInMol, list);
                 }
@@ -657,7 +652,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             // Prepare SDF-like string for atom container. 0-based to 1-based
             // index conversion done in here
             iac.setProperty(DENOPTIMConstants.APSTAG, 
-                    DENOPTIMAttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
+                    AttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
             
             iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
             
@@ -680,14 +675,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //-----------------------------------------------------------------------------
     
-    public DENOPTIMAttachmentPoint getInnerAPFromOuterAP(
-            DENOPTIMAttachmentPoint outerAP) {
+    public AttachmentPoint getInnerAPFromOuterAP(
+            AttachmentPoint outerAP) {
         
         // TODO: Check if another solution exists that can remove nested
         //  for-loop. Suggestion: make an outerToInnerAPMap.
         
         // Very inefficient solution
-        for (Map.Entry<DENOPTIMAttachmentPoint, DENOPTIMAttachmentPoint> entry
+        for (Map.Entry<AttachmentPoint, AttachmentPoint> entry
                 : innerToOuterAPs.entrySet()) 
         {
             if (outerAP == entry.getValue()) 
@@ -700,8 +695,8 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     
 //-----------------------------------------------------------------------------
     
-    public DENOPTIMAttachmentPoint getOuterAPFromInnerAP(
-            DENOPTIMAttachmentPoint innerAP) 
+    public AttachmentPoint getOuterAPFromInnerAP(
+            AttachmentPoint innerAP) 
     {
         return innerToOuterAPs.get(innerAP);
     }
@@ -711,7 +706,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     @Override
     public List<MutationType> getMutationTypes(List<MutationType> ignoredTypes)
     {   
-        if (getBuildingBlockType() == DENOPTIMVertex.BBType.SCAFFOLD)
+        if (getBuildingBlockType() == Vertex.BBType.SCAFFOLD)
         {
             List<MutationType> scaffCompatTypes = new ArrayList<MutationType>();
             if (getNumberOfAPs() != 0)
@@ -735,7 +730,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
     /**
      * A list of mutation sites from within this vertex. This method sets the 
      * mutation sites of the embedded vertexes according to the 
-     * {@link DENOPTIMTemplate#contractLevel} of
+     * {@link Template#contractLevel} of
      * this template.
      * @param ignoredTypes a collection of mutation types to ignore. Vertexes
      * that allow only ignored types of mutation will
@@ -744,11 +739,11 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      */
     
     @Override
-    public List<DENOPTIMVertex> getMutationSites(List<MutationType> ignoredTypes)
+    public List<Vertex> getMutationSites(List<MutationType> ignoredTypes)
     {
-        List<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         // capping groups are not considered mutable sites
-        if (getBuildingBlockType() == DENOPTIMVertex.BBType.CAP)
+        if (getBuildingBlockType() == Vertex.BBType.CAP)
         {
             return lst;
         }
@@ -762,14 +757,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
                 
             case FIXED_STRUCT:
                 updateMutTypeToFixedSTructure();
-                for (DENOPTIMVertex v : innerGraph.gVertices) 
+                for (Vertex v : innerGraph.gVertices) 
                 {
                     lst.addAll(v.getMutationSites(ignoredTypes));
                 }
                 break;
                 
             case FREE:
-                for (DENOPTIMVertex v : innerGraph.gVertices) 
+                for (Vertex v : innerGraph.gVertices) 
                 {
                     lst.addAll(v.getMutationSites(ignoredTypes));
                 }
@@ -789,13 +784,13 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         toBeRemoved.add(MutationType.ADDLINK);
         toBeRemoved.add(MutationType.DELETELINK);
         toBeRemoved.add(MutationType.EXTEND);
-        for (DENOPTIMVertex v : innerGraph.gVertices) 
+        for (Vertex v : innerGraph.gVertices) 
         {
             for (MutationType mt : toBeRemoved)
                 v.removeMutationType(mt);
             
-            if (v instanceof DENOPTIMTemplate)
-                ((DENOPTIMTemplate) v).setContractLevel(
+            if (v instanceof Template)
+                ((Template) v).setContractLevel(
                         ContractLevel.FIXED_STRUCT);
         }
     }
@@ -813,7 +808,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
             throw new IllegalArgumentException("cannot add more required APs " +
                     "after setting the inner graph");
         }
-        DENOPTIMAttachmentPoint ap = new DENOPTIMAttachmentPoint(this, -1, pt, 
+        AttachmentPoint ap = new AttachmentPoint(this, -1, pt, 
                 apClass);
         requiredAPs.add(ap);
     }
@@ -828,7 +823,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * @return <code>true</code> if the two templates have the same content 
      * even if the vertex IDs are different.
      */
-    public boolean sameAs(DENOPTIMTemplate other, StringBuilder reason)
+    public boolean sameAs(Template other, StringBuilder reason)
     {   
         if (this.contractLevel != other.contractLevel)
         {
@@ -840,9 +835,9 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
         if (this.requiredAPs.size() == other.requiredAPs.size()) 
         {
-            for (DENOPTIMAttachmentPoint tAP : this.requiredAPs)
+            for (AttachmentPoint tAP : this.requiredAPs)
             {
-                for (DENOPTIMAttachmentPoint oAP : other.requiredAPs)
+                for (AttachmentPoint oAP : other.requiredAPs)
                 {
                     if (!tAP.sameAs(oAP)) 
                     {
@@ -868,7 +863,7 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
 
 //------------------------------------------------------------------------------
 
-    private List<DENOPTIMAttachmentPoint> getRequiredAPs() {
+    private List<AttachmentPoint> getRequiredAPs() {
         return requiredAPs;
     }
     
@@ -895,14 +890,14 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
      * @return a new instance of this class.
      */
     
-    public static DENOPTIMTemplate fromJson(String json)
+    public static Template fromJson(String json)
     {
         Gson gson = DENOPTIMgson.getReader();
         
         // This deserializes many "easy" fields, but not the embedded graph
         // which is not "easy" as it need its own deserializer to 
         // recreate all the references to APs/edges/vertexes.
-        DENOPTIMTemplate t = gson.fromJson(json, DENOPTIMTemplate.class);
+        Template t = gson.fromJson(json, Template.class);
         
         // Now, recover the missing bits (if present) from the original string
         JsonObject jsonObject = (JsonObject) Streams.parse(new JsonReader(
@@ -912,22 +907,22 @@ public class DENOPTIMTemplate extends DENOPTIMVertex
         {
             JsonObject innerGraphJson = jsonObject.getAsJsonObject(
                     "innerGraph");
-            DENOPTIMGraph innerGraph = DENOPTIMGraph.fromJson(
+            DGraph innerGraph = DGraph.fromJson(
                     innerGraphJson.toString());
             t.setInnerGraph(innerGraph);
 
             if (jsonObject.has("innerToOuterAPs"))
             {
                 Type type = new TypeToken<TreeMap<Integer,
-                        DENOPTIMAttachmentPoint>>(){}.getType();
-                TreeMap<Integer,DENOPTIMAttachmentPoint> map =
+                        AttachmentPoint>>(){}.getType();
+                TreeMap<Integer,AttachmentPoint> map =
                         gson.fromJson(jsonObject.getAsJsonObject(
                                 "innerToOuterAPs"), type);
                 t.updateInnerToOuter(map);
             }
         }
         
-        for (DENOPTIMAttachmentPoint ap : t.getAttachmentPoints())
+        for (AttachmentPoint ap : t.getAttachmentPoints())
         {
             ap.setOwner(t);
         }

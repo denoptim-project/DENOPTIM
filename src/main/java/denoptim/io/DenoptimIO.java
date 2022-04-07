@@ -94,16 +94,16 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
 import denoptim.graph.CandidateLW;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.json.DENOPTIMgson;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.utils.DENOPTIMGraphEdit;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.GraphEdit;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 
@@ -195,7 +195,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeVertexesToFile(File file, FileFormat format,
-            ArrayList<DENOPTIMVertex> vertexes) throws DENOPTIMException 
+            ArrayList<Vertex> vertexes) throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {
@@ -228,7 +228,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeVertexesToJSON(File file,
-            ArrayList<DENOPTIMVertex> vertexes) throws DENOPTIMException
+            ArrayList<Vertex> vertexes) throws DENOPTIMException
     {
         Gson writer = DENOPTIMgson.getWriter();
         writeData(file.getAbsolutePath(), writer.toJson(vertexes), false);
@@ -244,10 +244,10 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     
-    public static void writeVertexToSDF(String pathName, DENOPTIMVertex vertex) 
+    public static void writeVertexToSDF(String pathName, Vertex vertex) 
             throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMVertex> lst = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> lst = new ArrayList<Vertex>();
         lst.add(vertex);
         writeVertexesToSDF(new File(pathName), lst, false);
     }
@@ -263,11 +263,11 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeVertexesToSDF(File file, 
-            ArrayList<DENOPTIMVertex> vertexes, boolean append) 
+            ArrayList<Vertex> vertexes, boolean append) 
                     throws DENOPTIMException 
     {
         ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
-        for (DENOPTIMVertex v : vertexes) 
+        for (Vertex v : vertexes) 
         {
             lst.add(v.getIAtomContainer());
         }
@@ -775,10 +775,10 @@ public class DenoptimIO
     public static Set<APClass> readAllAPClasses(File fragLib) {
         Set<APClass> allCLasses = new HashSet<APClass>();
         try {
-            for (DENOPTIMVertex v : DenoptimIO.readVertexes(fragLib, 
+            for (Vertex v : DenoptimIO.readVertexes(fragLib, 
                     BBType.UNDEFINED)) 
             {
-                for (DENOPTIMAttachmentPoint ap : v.getAttachmentPoints()) {
+                for (AttachmentPoint ap : v.getAttachmentPoints()) {
                     allCLasses.add(ap.getAPClass());
                 }
             }
@@ -1131,7 +1131,7 @@ public class DenoptimIO
             throws DENOPTIMException {
         IAtomContainer iac = null;
         if (!GeometryTools.has2DCoordinates(mol)) {
-            iac = DENOPTIMMoleculeUtils.generate2DCoordinates(mol);
+            iac = MoleculeUtils.generate2DCoordinates(mol);
         } else {
             iac = mol;
         }
@@ -1324,10 +1324,10 @@ public class DenoptimIO
      * @return the list of editing tasks
      * @throws DENOPTIMException
      */
-    public static ArrayList<DENOPTIMGraphEdit> readDENOPTIMGraphEditFromFile(
+    public static ArrayList<GraphEdit> readDENOPTIMGraphEditFromFile(
             String fileName) throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMGraphEdit> graphEditTasks = new ArrayList<>();
+        ArrayList<GraphEdit> graphEditTasks = new ArrayList<>();
         Gson reader = DENOPTIMgson.getReader();
 
         BufferedReader br = null;
@@ -1335,7 +1335,7 @@ public class DenoptimIO
         {
             br = new BufferedReader(new FileReader(fileName));
             graphEditTasks = reader.fromJson(br, 
-                    new TypeToken<ArrayList<DENOPTIMGraphEdit>>(){}.getType());
+                    new TypeToken<ArrayList<GraphEdit>>(){}.getType());
         }
         catch (FileNotFoundException fnfe)
         {
@@ -1360,8 +1360,8 @@ public class DenoptimIO
                 {
                     throw new DENOPTIMException(ioe);
                 }
-                DENOPTIMGraphEdit graphEditTask = reader.fromJson(br,
-                        DENOPTIMGraphEdit.class);
+                GraphEdit graphEditTask = reader.fromJson(br,
+                        GraphEdit.class);
                 graphEditTasks.add(graphEditTask);
             }
         }
@@ -1390,7 +1390,7 @@ public class DenoptimIO
      * @throws Exception 
      */
     
-    public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromFile(
+    public static ArrayList<DGraph> readDENOPTIMGraphsFromFile(
             File inFile) throws Exception 
     {
         FileFormat ff = FileUtils.detectFileFormat(inFile);
@@ -1414,14 +1414,14 @@ public class DenoptimIO
                     inFile.getAbsolutePath());
                 
             case VRTXSDF:
-                ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
-                ArrayList<DENOPTIMVertex> vertexes = 
+                ArrayList<DGraph> graphs = new ArrayList<DGraph>();
+                ArrayList<Vertex> vertexes = 
                         readVertexes(inFile, BBType.UNDEFINED);
-                for (DENOPTIMVertex v : vertexes)
+                for (Vertex v : vertexes)
                 {
-                    if (v instanceof DENOPTIMTemplate)
+                    if (v instanceof Template)
                     {
-                        graphs.add(((DENOPTIMTemplate)v).getInnerGraph());
+                        graphs.add(((Template)v).getInnerGraph());
                     }
                 }
                 System.out.println("WARNING: Reading graphs from " 
@@ -1446,16 +1446,16 @@ public class DenoptimIO
      * @return the list of graphs
      * @throws DENOPTIMException
      */
-    public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromSDFile(
+    public static ArrayList<DGraph> readDENOPTIMGraphsFromSDFile(
             String fileName) throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
+        ArrayList<DGraph> lstGraphs = new ArrayList<DGraph>();
         ArrayList<IAtomContainer> mols = DenoptimIO.readSDFFile(fileName);
         int i = 0;
         for (IAtomContainer mol : mols) 
         {
             i++;
-            DENOPTIMGraph g = readGraphFromSDFileIAC(mol,i,fileName);
+            DGraph g = readGraphFromSDFileIAC(mol,i,fileName);
             lstGraphs.add(g);
         }
         return lstGraphs;
@@ -1472,7 +1472,7 @@ public class DenoptimIO
      * @throws DENOPTIMException is the atom container cannot be converted due
      * to lack of the proper SDF tags, or failure in the conversion.
      */
-    public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol) 
+    public static DGraph readGraphFromSDFileIAC(IAtomContainer mol) 
             throws DENOPTIMException
     {
         return readGraphFromSDFileIAC(mol, -1, "");
@@ -1489,7 +1489,7 @@ public class DenoptimIO
      * @throws DENOPTIMException is the atom container cannot be converted due
      * to lack of the proper SDF tags, or failure in the conversion.
      */
-    public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol, 
+    public static DGraph readGraphFromSDFileIAC(IAtomContainer mol, 
             int molId) throws DENOPTIMException
     {
         return readGraphFromSDFileIAC(mol, molId, "");
@@ -1510,11 +1510,11 @@ public class DenoptimIO
      * @throws DENOPTIMException is the atom container cannot be converted due
      * to lack of the proper SDF tags, or failure in the conversion.
      */
-    public static DENOPTIMGraph readGraphFromSDFileIAC(IAtomContainer mol, 
+    public static DGraph readGraphFromSDFileIAC(IAtomContainer mol, 
             int molId, String fileName) throws DENOPTIMException
     {
         // Something very similar is done also in Candidate
-        DENOPTIMGraph g = null;
+        DGraph g = null;
         Object json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
         if (json == null) {
             Object graphEnc = mol.getProperty(DENOPTIMConstants.GRAPHTAG);
@@ -1543,7 +1543,7 @@ public class DenoptimIO
             String js = json.toString();
             try
             {
-                g = DENOPTIMGraph.fromJson(js);
+                g = DGraph.fromJson(js);
             } catch (Exception e)
             {
                 String msg = e.getMessage();
@@ -1572,10 +1572,10 @@ public class DenoptimIO
      * @return the list of graphs.
      * @throws DENOPTIMException
      */
-    public static ArrayList<DENOPTIMGraph> readDENOPTIMGraphsFromTxtFile(
+    public static ArrayList<DGraph> readDENOPTIMGraphsFromTxtFile(
             String fileName, FragmentSpace fragSpace) throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMGraph> lstGraphs = new ArrayList<DENOPTIMGraph>();
+        ArrayList<DGraph> lstGraphs = new ArrayList<DGraph>();
         BufferedReader br = null;
         String line = null;
         try {
@@ -1589,21 +1589,21 @@ public class DenoptimIO
                     continue;
                 }
 
-                DENOPTIMGraph g;
+                DGraph g;
                 try {
                     g = GraphConversionTool.getGraphFromString(line.trim(), 
                             fragSpace);
                 } catch (Throwable t) {
                     String msg = "Cannot convert string to DENOPTIMGraph. "
                             + "Check line '" + line.trim() + "'";
-                    DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+                    StaticLogger.appLogger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg, t);
                 }
                 lstGraphs.add(g);
             }
         } catch (IOException ioe) {
             String msg = "Cannot read file " + fileName;
-            DENOPTIMLogger.appLogger.log(Level.SEVERE, msg);
+            StaticLogger.appLogger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg, ioe);
         } finally {
             try {
@@ -1623,15 +1623,15 @@ public class DenoptimIO
     // It should be possible to have one method do both tasks.
     
     /**
-     * Reads a list of {@link DENOPTIMVertex}es from a JSON file.
+     * Reads a list of {@link Vertex}es from a JSON file.
      * @param fileName the pathname of the file to read.
      * @return the list of vertexes.
      * @throws DENOPTIMException
      */
-    public static ArrayList<DENOPTIMVertex>  readDENOPTIMVertexesFromJSONFile(
+    public static ArrayList<Vertex>  readDENOPTIMVertexesFromJSONFile(
             String fileName) throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMVertex> result = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> result = new ArrayList<Vertex>();
         Gson reader = DENOPTIMgson.getReader();
 
         BufferedReader br = null;
@@ -1639,7 +1639,7 @@ public class DenoptimIO
         {
             br = new BufferedReader(new FileReader(fileName));
             result = reader.fromJson(br, 
-                    new TypeToken<ArrayList<DENOPTIMVertex>>(){}.getType());
+                    new TypeToken<ArrayList<Vertex>>(){}.getType());
         }
         catch (FileNotFoundException fnfe)
         {
@@ -1664,7 +1664,7 @@ public class DenoptimIO
                 {
                     throw new DENOPTIMException(ioe);
                 }
-                DENOPTIMVertex v = reader.fromJson(br,DENOPTIMVertex.class);
+                Vertex v = reader.fromJson(br,Vertex.class);
                 result.add(v);
             }
         }
@@ -1691,10 +1691,10 @@ public class DenoptimIO
      * @return the list of graphs
      * @throws DENOPTIMException
      */
-    public static ArrayList<DENOPTIMGraph>  readDENOPTIMGraphsFromJSONFile(
+    public static ArrayList<DGraph>  readDENOPTIMGraphsFromJSONFile(
             String fileName) throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMGraph> list_of_graphs = new ArrayList<DENOPTIMGraph>();
+        ArrayList<DGraph> list_of_graphs = new ArrayList<DGraph>();
         Gson reader = DENOPTIMgson.getReader();
 
         BufferedReader br = null;
@@ -1702,7 +1702,7 @@ public class DenoptimIO
         {
             br = new BufferedReader(new FileReader(fileName));
             list_of_graphs = reader.fromJson(br, 
-                    new TypeToken<ArrayList<DENOPTIMGraph>>(){}.getType());
+                    new TypeToken<ArrayList<DGraph>>(){}.getType());
         }
         catch (FileNotFoundException fnfe)
         {
@@ -1727,7 +1727,7 @@ public class DenoptimIO
                 {
                     throw new DENOPTIMException(ioe);
                 }
-                DENOPTIMGraph g = reader.fromJson(br,DENOPTIMGraph.class);
+                DGraph g = reader.fromJson(br,DGraph.class);
                 list_of_graphs.add(g);
             }
         }
@@ -1757,7 +1757,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeGraphToFile(File file, FileFormat format,
-            DENOPTIMGraph graph) throws DENOPTIMException 
+            DGraph graph) throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {
@@ -1791,7 +1791,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeGraphsToFile(File file, FileFormat format,
-            List<DENOPTIMGraph> modGraphs) throws DENOPTIMException 
+            List<DGraph> modGraphs) throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {
@@ -1824,7 +1824,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            ArrayList<DENOPTIMGraph> graphs) throws DENOPTIMException
+            ArrayList<DGraph> graphs) throws DENOPTIMException
     {
         writeGraphsToSDF(file, graphs, false);
     }
@@ -1840,10 +1840,10 @@ public class DenoptimIO
      * @param make3D use <code>true</code> to convert graph to 3d. 
      * @throws DENOPTIMException
      */
-    public static void writeGraphToSDF(File file, DENOPTIMGraph graph,
+    public static void writeGraphToSDF(File file, DGraph graph,
             boolean append, boolean make3D) throws DENOPTIMException
     {
-        ArrayList<DENOPTIMGraph> lst = new ArrayList<>(1);
+        ArrayList<DGraph> lst = new ArrayList<>(1);
         lst.add(graph);
         writeGraphsToSDF(file, lst, append, make3D);
     }
@@ -1858,10 +1858,10 @@ public class DenoptimIO
      * @param append use <code>true</code> to append to the file
      * @throws DENOPTIMException
      */
-    public static void writeGraphToSDF(File file, DENOPTIMGraph graph,
+    public static void writeGraphToSDF(File file, DGraph graph,
             boolean append) throws DENOPTIMException
     {
-        ArrayList<DENOPTIMGraph> lst = new ArrayList<>(1);
+        ArrayList<DGraph> lst = new ArrayList<>(1);
         lst.add(graph);
         writeGraphsToSDF(file, lst, append);
     }
@@ -1877,7 +1877,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            ArrayList<DENOPTIMGraph> graphs, boolean append) throws DENOPTIMException
+            ArrayList<DGraph> graphs, boolean append) throws DENOPTIMException
     {
         writeGraphsToSDF(file, graphs, append, false);
     }
@@ -1895,11 +1895,11 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            List<DENOPTIMGraph> modGraphs, boolean append, boolean make3D) 
+            List<DGraph> modGraphs, boolean append, boolean make3D) 
                     throws DENOPTIMException
     {
         ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
-        for (DENOPTIMGraph g : modGraphs) 
+        for (DGraph g : modGraphs) 
         {
             ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
             IAtomContainer iac = builder.newAtomContainer();
@@ -1929,10 +1929,10 @@ public class DenoptimIO
      * @param graph the graphs to print
      * @throws DENOPTIMException
      */
-    public static void writeGraphToJSON(File file, DENOPTIMGraph graph) 
+    public static void writeGraphToJSON(File file, DGraph graph) 
             throws DENOPTIMException
     {
-        ArrayList<DENOPTIMGraph> graphs = new ArrayList<DENOPTIMGraph>();
+        ArrayList<DGraph> graphs = new ArrayList<DGraph>();
         graphs.add(graph);
         writeGraphsToJSON(file,graphs);
     }
@@ -1947,7 +1947,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToJSON(File file,
-            List<DENOPTIMGraph> modGraphs) throws DENOPTIMException
+            List<DGraph> modGraphs) throws DENOPTIMException
     {
         Gson writer = DENOPTIMgson.getWriter();
         writeData(file.getAbsolutePath(), writer.toJson(modGraphs), false);
@@ -1964,7 +1964,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToJSON(File file,
-            List<DENOPTIMGraph> graphs, boolean append) throws DENOPTIMException
+            List<DGraph> graphs, boolean append) throws DENOPTIMException
     {
         Gson writer = DENOPTIMgson.getWriter();
         writeData(file.getAbsolutePath(), writer.toJson(graphs), append);
@@ -1980,7 +1980,7 @@ public class DenoptimIO
      * @param append   use <code>true</code> to append
      * @throws DENOPTIMException
      */
-    public static void writeGraphToFile(String fileName, DENOPTIMGraph graph, 
+    public static void writeGraphToFile(String fileName, DGraph graph, 
             boolean append) throws DENOPTIMException 
     {
         writeData(fileName, graph.toString(), append);
@@ -2027,7 +2027,7 @@ public class DenoptimIO
             }
         } catch (DENOPTIMException e)
         {
-            DENOPTIMLogger.appLogger.log(Level.WARNING, "WARNING: unable to "
+            StaticLogger.appLogger.log(Level.WARNING, "WARNING: unable to "
                     + "fetch list of recent files.", e);
             map = new HashMap<File, FileFormat>();
         }
@@ -2037,23 +2037,23 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
     
     /**
-     * Reads {@link DENOPTIMVertex}es from any file that can contain such items.
+     * Reads {@link Vertex}es from any file that can contain such items.
      *  
      * @param file the file we want to read.
      * @param bbt the type of building blocks assigned to each new vertex, if
      * not already specified by the content of the file, i.e., this method does
-     * not overwrite the {@link DENOPTIMVertex.BBType} defined in the file.
+     * not overwrite the {@link Vertex.BBType} defined in the file.
      * @throws IOException 
      * @throws UndetectedFileFormatException 
      * @throws DENOPTIMException 
      * @throws IllegalArgumentException 
      * @throws Exception
      */
-    public static ArrayList<DENOPTIMVertex> readVertexes(File file,
-            DENOPTIMVertex.BBType bbt) throws UndetectedFileFormatException, 
+    public static ArrayList<Vertex> readVertexes(File file,
+            Vertex.BBType bbt) throws UndetectedFileFormatException, 
     IOException, IllegalArgumentException, DENOPTIMException
     {
-        ArrayList<DENOPTIMVertex> vertexes = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> vertexes = new ArrayList<Vertex>();
         FileFormat ff = FileUtils.detectFileFormat(file);
         switch (ff)
         {
@@ -2068,22 +2068,22 @@ public class DenoptimIO
                 break;
                     
             case GRAPHSDF:
-                ArrayList<DENOPTIMGraph> lstGraphs = 
+                ArrayList<DGraph> lstGraphs = 
                     readDENOPTIMGraphsFromSDFile(file.getAbsolutePath());
-                for (DENOPTIMGraph g : lstGraphs)
+                for (DGraph g : lstGraphs)
                 {
-                    DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+                    Template t = new Template(bbt);
                     t.setInnerGraph(g);
                     vertexes.add(t);
                 }
                 break;
                     
             case GRAPHJSON:
-                ArrayList<DENOPTIMGraph> lstGraphs2 = 
+                ArrayList<DGraph> lstGraphs2 = 
                 readDENOPTIMGraphsFromJSONFile(file.getAbsolutePath());
-                for (DENOPTIMGraph g : lstGraphs2)
+                for (DGraph g : lstGraphs2)
                 {
-                    DENOPTIMTemplate t = new DENOPTIMTemplate(bbt);
+                    Template t = new Template(bbt);
                     t.setInnerGraph(g);
                     vertexes.add(t);
                 }
@@ -2100,25 +2100,25 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of  {@link DENOPTIMVertex}es from a SDF file.
+     * Reads a list of  {@link Vertex}es from a SDF file.
      *
      * @param fileName the pathname of the file to read.
      * @return the list of vertexes.
      * @throws DENOPTIMException
      */
-    public static ArrayList<DENOPTIMVertex> readDENOPTIMVertexesFromSDFile(
-            String fileName, DENOPTIMVertex.BBType bbt) throws DENOPTIMException 
+    public static ArrayList<Vertex> readDENOPTIMVertexesFromSDFile(
+            String fileName, Vertex.BBType bbt) throws DENOPTIMException 
     {
-        ArrayList<DENOPTIMVertex> vertexes = new ArrayList<DENOPTIMVertex>();
+        ArrayList<Vertex> vertexes = new ArrayList<Vertex>();
         int i=0;
         Gson reader = DENOPTIMgson.getReader();
         for (IAtomContainer mol : readSDFFile(fileName)) 
         {
             i++;
-            DENOPTIMVertex v = null;
+            Vertex v = null;
             try
             {
-                v = DENOPTIMVertex.parseVertexFromSDFFormat(mol, reader, bbt);
+                v = Vertex.parseVertexFromSDFFormat(mol, reader, bbt);
             } catch (DENOPTIMException e)
             {
                 throw new DENOPTIMException("Unable to read vertex " + i 

@@ -29,7 +29,7 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters;
 import denoptim.utils.MutationType;
@@ -1178,7 +1178,7 @@ public class GAParameters extends RunTimeParameters
 
         try
         {
-            DENOPTIMLogger.getInstance().setupLogger(logFile);
+            StaticLogger.getInstance().setupLogger(logFile);
         }
         catch (IOException ioe)
         {
@@ -1217,7 +1217,7 @@ public class GAParameters extends RunTimeParameters
         if (populationSize < 10)
         {
             String msg = "Small population size is allowed only for testing.";
-            DENOPTIMLogger.appLogger.log(Level.WARNING,msg);
+            StaticLogger.appLogger.log(Level.WARNING,msg);
         }
         if (numOfChildren <= 0)
         {

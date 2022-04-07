@@ -55,7 +55,7 @@ public class DENOPTIMFragmentTest
     @Test
     public void testHandlingAPsAsObjOrProperty() throws Exception
     {
-    	DENOPTIMFragment frg1 = new DENOPTIMFragment();
+    	Fragment frg1 = new Fragment();
     	Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
     	Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
@@ -76,7 +76,7 @@ public class DENOPTIMFragmentTest
     	frg1.projectAPsToProperties(); 
     	String clsStr = frg1.getProperty(DENOPTIMConstants.APSTAG).toString();
     	
-    	DENOPTIMFragment frg2 = new DENOPTIMFragment();
+    	Fragment frg2 = new Fragment();
     	Atom a4 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
     	Atom a5 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
     	Atom a6 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
@@ -103,7 +103,7 @@ public class DENOPTIMFragmentTest
     	// molecular properties. So the APs do not appear in the mol properties
         // unless we project the APs to properties (see projectAPsToProperties)
 
-        DENOPTIMFragment frg1 = new DENOPTIMFragment();
+        Fragment frg1 = new Fragment();
         Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a2 = new Atom("O", new Point3d(new double[]{1.0, 1.1, 2.2}));
         Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
@@ -130,8 +130,8 @@ public class DENOPTIMFragmentTest
         
         IAtomContainer iac = frg1.getIAtomContainer();
         
-        DENOPTIMFragment frg2 = new DENOPTIMFragment(iac, 
-                DENOPTIMVertex.BBType.UNDEFINED);
+        Fragment frg2 = new Fragment(iac, 
+                Vertex.BBType.UNDEFINED);
         
         assertEquals(7,frg1.getNumberOfAPs(),"#APs in frg1");
         assertEquals(7,frg2.getNumberOfAPs(),"#APs in frg2");
@@ -149,9 +149,9 @@ public class DENOPTIMFragmentTest
     
 //------------------------------------------------------------------------------
     
-    public static DENOPTIMFragment makeFragment() throws DENOPTIMException
+    public static Fragment makeFragment() throws DENOPTIMException
     {
-        DENOPTIMFragment v = new DENOPTIMFragment();
+        Fragment v = new Fragment();
         Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
         Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
         Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
@@ -181,7 +181,7 @@ public class DENOPTIMFragmentTest
         v.setVertexId(18);
         v.setAsRCV(true);
         //NB thy bond type is check by other methods: do not change it.
-        v.setBuildingBlockType(DENOPTIMVertex.BBType.SCAFFOLD);
+        v.setBuildingBlockType(Vertex.BBType.SCAFFOLD);
         
         return v;
     }
@@ -191,16 +191,16 @@ public class DENOPTIMFragmentTest
     @Test
     public void testClone() throws Exception
     {   
-        DENOPTIMFragment v = makeFragment();
+        Fragment v = makeFragment();
         v.setProperty("PROPNAME","PROVALUE");
         
-        DENOPTIMVertex c = v.clone();
+        Vertex c = v.clone();
         
-        assertEquals(4,((DENOPTIMFragment) c).getNumberOfAPs(),
+        assertEquals(4,((Fragment) c).getNumberOfAPs(),
                 "Number of APs");
-        assertEquals(1,((DENOPTIMFragment) c).getAPCountOnAtom(0),
+        assertEquals(1,((Fragment) c).getAPCountOnAtom(0),
                 "Size APs on atm0");
-        assertEquals(3,((DENOPTIMFragment) c).getAPCountOnAtom(2),
+        assertEquals(3,((Fragment) c).getAPCountOnAtom(2),
                 "Size APs on atm2");
         assertEquals(4,c.getAttachmentPoints().size(),
                 "Number of APs (B)");
@@ -220,7 +220,7 @@ public class DENOPTIMFragmentTest
         assertNotEquals(v.hashCode(), c.hashCode(), 
                 "Hash code");  
         assertEquals(v.getBuildingBlockType(),
-                ((DENOPTIMFragment)c).getBuildingBlockType(), 
+                ((Fragment)c).getBuildingBlockType(), 
                 "Building bloc ktype");
         assertEquals("PROVALUE",c.getProperty("PROPNAME"));
     }

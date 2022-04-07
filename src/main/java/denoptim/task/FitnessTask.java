@@ -35,11 +35,11 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fitness.FitnessProvider;
 import denoptim.graph.Candidate;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.utils.DENOPTIMMoleculeUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.TaskUtils;
 
 /**
@@ -51,7 +51,7 @@ public abstract class FitnessTask extends Task
 	/**
 	 * The graph representation of the entity to evaluate.
 	 */
-    protected final DENOPTIMGraph dGraph;
+    protected final DGraph dGraph;
     
 	/**
 	 * The chemical representation of the entity to evaluate. We do not check 
@@ -164,13 +164,13 @@ public abstract class FitnessTask extends Task
         {
             try
             {
-                DENOPTIMMoleculeUtils.moleculeToPNG(fitProvMol,fitProvPNGFile);
+                MoleculeUtils.moleculeToPNG(fitProvMol,fitProvPNGFile);
                 result.setImageFile(fitProvPNGFile);
             }
             catch (Exception ex)
             {
                 result.setImageFile(null);
-                DENOPTIMLogger.appLogger.log(Level.WARNING, 
+                StaticLogger.appLogger.log(Level.WARNING, 
                     "Unable to create image. {0}", ex.getMessage());
             }
         }
@@ -204,7 +204,7 @@ public abstract class FitnessTask extends Task
         }
         
         String msg = "Calling external fitness provider: => " + sb + NL;
-        DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+        StaticLogger.appLogger.log(Level.INFO, msg);
 
         // run the process
         processHandler = new ProcessHandler(sb.toString(), 
@@ -218,8 +218,8 @@ public abstract class FitnessTask extends Task
                     .toString()
 		        + " command '" + fitnessSettings.getExternalFitnessProvider()
 		        + "' on " + fitProvInputFile;
-            DENOPTIMLogger.appLogger.severe(msg);
-            DENOPTIMLogger.appLogger.severe(
+            StaticLogger.appLogger.severe(msg);
+            StaticLogger.appLogger.severe(
             		processHandler.getErrorOutput());
             throw new DENOPTIMException(msg);
         }
@@ -269,7 +269,7 @@ public abstract class FitnessTask extends Task
         	
             msg = "Unreadable file from fitness provider run (Task " + id 
             		+ "). Check " + result.getName() + ".";
-            DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
+            StaticLogger.appLogger.log(Level.WARNING, msg);
             
             String fileBkp = fitProvOutFile 
                     + DENOPTIMConstants.UNREADABLEFILEPOSTFIX;
@@ -304,7 +304,7 @@ public abstract class FitnessTask extends Task
         	String err = processedMol.getProperty(
         			DENOPTIMConstants.MOLERRORTAG).toString();
             msg = result.getName() + " has an error ("+err+")";
-            DENOPTIMLogger.appLogger.info(msg);
+            StaticLogger.appLogger.info(msg);
 
             result.setChemicalRepresentation(processedMol);
             result.setError(err);
@@ -331,7 +331,7 @@ public abstract class FitnessTask extends Task
                     errMsg = msg;
                     thrownExc = t;
                 }
-                DENOPTIMLogger.appLogger.severe(msg);
+                StaticLogger.appLogger.severe(msg);
                 dGraph.cleanup();
                 throw new DENOPTIMException(msg);
             }
@@ -344,7 +344,7 @@ public abstract class FitnessTask extends Task
                     msg = "Fitness value is NaN for " + result.getName();
                     errMsg = msg;
                 }
-                DENOPTIMLogger.appLogger.severe(msg);
+                StaticLogger.appLogger.severe(msg);
                 dGraph.cleanup();
                 throw new DENOPTIMException(msg);
             }
@@ -375,7 +375,7 @@ public abstract class FitnessTask extends Task
                     		+ "' tag in: " + fitProvOutFile;
                     errMsg = msg;
                 }
-                DENOPTIMLogger.appLogger.severe(msg);
+                StaticLogger.appLogger.severe(msg);
                 throw new DENOPTIMException(msg);
         	}
         }
@@ -394,7 +394,7 @@ public abstract class FitnessTask extends Task
 	private boolean runInternalFitness() throws DENOPTIMException 
 	{
 		String msg = "Calling internal fitness provider. "+ NL;
-	    DENOPTIMLogger.appLogger.log(Level.INFO, msg);
+	    StaticLogger.appLogger.log(Level.INFO, msg);
 
 	    double fitVal = Double.NaN;
 		try {
@@ -416,7 +416,7 @@ public abstract class FitnessTask extends Task
                 msg = "Fitness value is NaN for " + result.getName();
                 errMsg = msg;
             //}
-            DENOPTIMLogger.appLogger.severe(msg);
+            StaticLogger.appLogger.severe(msg);
             
             fitProvMol.removeProperty(DENOPTIMConstants.FITNESSTAG);
             fitProvMol.setProperty(DENOPTIMConstants.MOLERRORTAG, 

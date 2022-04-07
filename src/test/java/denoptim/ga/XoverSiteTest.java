@@ -9,11 +9,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import denoptim.ga.XoverSite;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMGraph;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
 import denoptim.graph.DENOPTIMGraphTest;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
 import denoptim.utils.CrossoverType;
 
 /**
@@ -31,50 +31,50 @@ public class XoverSiteTest
     public void testProjectToClonedGraphs() throws Exception
     {
         DENOPTIMGraphTest.prepare();
-        DENOPTIMGraph gA = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
-        DENOPTIMGraph gB = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
+        DGraph gA = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
+        DGraph gB = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
         
         // This works only because we know that the graphs  have only one
         // template per level
-        List<DENOPTIMTemplate> pathA = new ArrayList<DENOPTIMTemplate>();
-        List<DENOPTIMTemplate> pathB = new ArrayList<DENOPTIMTemplate>();
-        DENOPTIMGraph refToThisLayerGraphB = gB;
-        DENOPTIMTemplate refToThisLayerVrtxB = null;
-        DENOPTIMGraph refToThisLayerGraphA = gA;
-        DENOPTIMTemplate refToThisLayerVrtxA = null;
+        List<Template> pathA = new ArrayList<Template>();
+        List<Template> pathB = new ArrayList<Template>();
+        DGraph refToThisLayerGraphB = gB;
+        Template refToThisLayerVrtxB = null;
+        DGraph refToThisLayerGraphA = gA;
+        Template refToThisLayerVrtxA = null;
         for (int embeddingLevel=0; embeddingLevel<9; embeddingLevel++)
         {
-            refToThisLayerVrtxA = (DENOPTIMTemplate) refToThisLayerGraphA
+            refToThisLayerVrtxA = (Template) refToThisLayerGraphA
                     .getVertexList().stream()
-                        .filter(v -> v instanceof DENOPTIMTemplate)
+                        .filter(v -> v instanceof Template)
                         .findAny()
                         .orElse(null);
             pathA.add(refToThisLayerVrtxA);
             refToThisLayerGraphA = refToThisLayerVrtxA.getInnerGraph();
             
-            refToThisLayerVrtxB = (DENOPTIMTemplate) refToThisLayerGraphB
+            refToThisLayerVrtxB = (Template) refToThisLayerGraphB
                     .getVertexList().stream()
-                        .filter(v -> v instanceof DENOPTIMTemplate)
+                        .filter(v -> v instanceof Template)
                         .findAny()
                         .orElse(null);
             pathB.add(refToThisLayerVrtxB);
             refToThisLayerGraphB = refToThisLayerVrtxB.getInnerGraph();
         }
         
-        DENOPTIMGraph gEmeddedA = pathA.get(8).getInnerGraph();
-        DENOPTIMGraph gEmeddedB = pathB.get(8).getInnerGraph();
+        DGraph gEmeddedA = pathA.get(8).getInnerGraph();
+        DGraph gEmeddedB = pathB.get(8).getInnerGraph();
 
-        List<DENOPTIMVertex> lstA = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> lstA = new ArrayList<Vertex>();
         lstA.add(gEmeddedA.getVertexAtPosition(1));
         lstA.add(gEmeddedA.getVertexAtPosition(2));
-        List<DENOPTIMAttachmentPoint> lstNeedyAPsA =
-                new ArrayList<DENOPTIMAttachmentPoint>();
+        List<AttachmentPoint> lstNeedyAPsA =
+                new ArrayList<AttachmentPoint>();
         lstNeedyAPsA.add(lstA.get(0).getAP(2));
-        List<DENOPTIMVertex> lstB = new ArrayList<DENOPTIMVertex>();
+        List<Vertex> lstB = new ArrayList<Vertex>();
         lstB.add(gEmeddedB.getVertexAtPosition(1));
         lstB.add(gEmeddedB.getVertexAtPosition(2));
-        List<DENOPTIMAttachmentPoint> lstNeedyAPsB =
-                new ArrayList<DENOPTIMAttachmentPoint>();
+        List<AttachmentPoint> lstNeedyAPsB =
+                new ArrayList<AttachmentPoint>();
         lstNeedyAPsB.add(lstB.get(0).getAP(2));
         
         XoverSite xos = new XoverSite(lstA, lstNeedyAPsA, lstB, lstNeedyAPsB, 
@@ -85,14 +85,14 @@ public class XoverSiteTest
         assertFalse(xos.getA().get(0)==xosOnClone.getA().get(0));
         assertFalse(xos.getB().get(0)==xosOnClone.getB().get(0));
         
-        List<DENOPTIMTemplate> pathSiteA = xos.getA().get(0).getGraphOwner()
+        List<Template> pathSiteA = xos.getA().get(0).getGraphOwner()
                 .getEmbeddingPath();
-        List<DENOPTIMTemplate> pathClonedSiteA = xosOnClone.getA().get(0)
+        List<Template> pathClonedSiteA = xosOnClone.getA().get(0)
                 .getGraphOwner().getEmbeddingPath();
         assertEquals(pathSiteA.size(),pathClonedSiteA.size());
-        List<DENOPTIMTemplate> pathSiteB = xos.getB().get(0).getGraphOwner()
+        List<Template> pathSiteB = xos.getB().get(0).getGraphOwner()
                 .getEmbeddingPath();
-        List<DENOPTIMTemplate> pathClonedSiteB = xosOnClone.getB().get(0)
+        List<Template> pathClonedSiteB = xosOnClone.getB().get(0)
                 .getGraphOwner().getEmbeddingPath();
         assertEquals(pathSiteB.size(),pathClonedSiteB.size());
         

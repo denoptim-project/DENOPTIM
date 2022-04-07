@@ -23,13 +23,13 @@ import denoptim.ga.Population;
 import denoptim.ga.XoverSite;
 import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMTemplate.ContractLevel;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMTemplate;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Template.ContractLevel;
+import denoptim.graph.DGraph;
+import denoptim.graph.Template;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters.ParametersType;
@@ -93,9 +93,9 @@ public class PopulationTest
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
         FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(), 
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(), 
                 cpMap, capMap, forbEnds, cpMap);
         fs.setAPclassBasedApproach(true);
         
@@ -118,14 +118,14 @@ public class PopulationTest
         
         Population pop = new Population(gaparams);
         
-        DENOPTIMGraph g1 = makeGraphA();
+        DGraph g1 = makeGraphA();
         // We give uniquefying properties to the vertexes so that they
         // are not seen as v.sameAs(o).
         String k = "Uniquefying";
         int counter = 0;
         for (int i=0; i<g1.getVertexCount(); i++)
         {
-            DENOPTIMVertex v = g1.getVertexAtPosition(i);
+            Vertex v = g1.getVertexAtPosition(i);
             v.setUniquefyingProperty(k);
             v.setProperty(k, counter);
             counter++;
@@ -133,10 +133,10 @@ public class PopulationTest
         Candidate c1 = new Candidate("C1",g1);
         pop.add(c1);
         
-        DENOPTIMGraph g2 = makeGraphB();
+        DGraph g2 = makeGraphB();
         for (int i=0; i<g2.getVertexCount(); i++)
         {
-            DENOPTIMVertex v = g2.getVertexAtPosition(i);
+            Vertex v = g2.getVertexAtPosition(i);
             v.setUniquefyingProperty(k);
             v.setProperty(k, counter);
             counter++;
@@ -144,10 +144,10 @@ public class PopulationTest
         Candidate c2 = new Candidate("C2",g2);
         pop.add(c2);
         
-        DENOPTIMGraph g3 = makeGraphB();
+        DGraph g3 = makeGraphB();
         for (int i=0; i<g3.getVertexCount(); i++)
         {
-            DENOPTIMVertex v = g3.getVertexAtPosition(i);
+            Vertex v = g3.getVertexAtPosition(i);
             v.setUniquefyingProperty(k);
             v.setProperty(k, counter);
             counter++;
@@ -155,10 +155,10 @@ public class PopulationTest
         Candidate c3 = new Candidate("C3",g3);
         pop.add(c3);
         
-        DENOPTIMGraph g4 = makeGraphC();
+        DGraph g4 = makeGraphC();
         for (int i=0; i<g4.getVertexCount(); i++)
         {
-            DENOPTIMVertex v = g4.getVertexAtPosition(i);
+            Vertex v = g4.getVertexAtPosition(i);
             v.setUniquefyingProperty(k);
             v.setProperty(k, counter);
             counter++;
@@ -166,10 +166,10 @@ public class PopulationTest
         Candidate c4 = new Candidate("C4",g4);
         pop.add(c4);
         
-        DENOPTIMGraph g5 = makeGraphD();
+        DGraph g5 = makeGraphD();
         for (int i=0; i<g5.getVertexCount(); i++)
         {
-            DENOPTIMVertex v = g5.getVertexAtPosition(i);
+            Vertex v = g5.getVertexAtPosition(i);
             v.setUniquefyingProperty(k);
             v.setProperty(k, counter);
             counter++;
@@ -230,11 +230,11 @@ public class PopulationTest
         
         Population pop = new Population(gaparams);
         
-        DENOPTIMGraph g1 = makeGraphA();
+        DGraph g1 = makeGraphA();
         Candidate c1 = new Candidate("C1",g1);
         pop.add(c1);
         
-        DENOPTIMGraph g2 = makeGraphB();
+        DGraph g2 = makeGraphB();
         Candidate c2 = new Candidate("C2",g2);
         pop.add(c2);
         
@@ -310,9 +310,9 @@ public class PopulationTest
      * 
      * You must run {@link #prepare()} before asking this class for any graph.
      */
-    static DENOPTIMGraph makeGraphA() throws DENOPTIMException
+    static DGraph makeGraphA() throws DENOPTIMException
     {
-        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        DGraph graphA = new DGraph();
         EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
         v0.addAP(APCA);
@@ -339,11 +339,11 @@ public class PopulationTest
         v5.addAP(APCB);
         graphA.addVertex(v5);
 
-        graphA.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v3.getAP(1), v4.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0)));
+        graphA.addEdge(new Edge(v0.getAP(1), v1.getAP(0)));
+        graphA.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+        graphA.addEdge(new Edge(v2.getAP(1), v3.getAP(0)));
+        graphA.addEdge(new Edge(v3.getAP(1), v4.getAP(0)));
+        graphA.addEdge(new Edge(v4.getAP(1), v5.getAP(0)));
         
         graphA.renumberGraphVertices();
         
@@ -359,9 +359,9 @@ public class PopulationTest
      * </pre>
      * You must run {@link #prepare()} before asking this class for any graph.
      */
-    static DENOPTIMGraph makeGraphB() throws DENOPTIMException
+    static DGraph makeGraphB() throws DENOPTIMException
     {
-        DENOPTIMGraph graphB = new DENOPTIMGraph();
+        DGraph graphB = new DGraph();
         EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
         v0.addAP(APCA);
@@ -374,8 +374,8 @@ public class PopulationTest
         v2.addAP(APCA);
         graphB.addVertex(v2);       
 
-        graphB.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
-        graphB.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
+        graphB.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        graphB.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
 
         graphB.renumberGraphVertices();
         
@@ -391,9 +391,9 @@ public class PopulationTest
      * </pre>
      * You must run {@link #prepare()} before asking this class for any graph.
      */
-    static DENOPTIMGraph makeGraphC() throws DENOPTIMException
+    static DGraph makeGraphC() throws DENOPTIMException
     {
-        DENOPTIMGraph graphC = new DENOPTIMGraph();
+        DGraph graphC = new DGraph();
         EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
         v0.addAP(APCC);
@@ -407,8 +407,8 @@ public class PopulationTest
         v2.addAP(APCA);
         graphC.addVertex(v2);       
 
-        graphC.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(0)));
-        graphC.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
+        graphC.addEdge(new Edge(v0.getAP(1), v1.getAP(0)));
+        graphC.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
 
         graphC.renumberGraphVertices();
         
@@ -424,9 +424,9 @@ public class PopulationTest
      * </pre>
      * You must run {@link #prepare()} before asking this class for any graph.
      */
-    static DENOPTIMGraph makeGraphD() throws DENOPTIMException
+    static DGraph makeGraphD() throws DENOPTIMException
     {
-        DENOPTIMGraph graphD = new DENOPTIMGraph();
+        DGraph graphD = new DGraph();
         EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
         v0.addAP(APCD);
@@ -434,7 +434,7 @@ public class PopulationTest
         EmptyVertex v1 = new EmptyVertex(1);
         v1.addAP(APCD);  
 
-        graphD.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
+        graphD.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
 
         graphD.renumberGraphVertices();
         
@@ -450,9 +450,9 @@ public class PopulationTest
      * </pre>
      * You must run {@link #prepare()} before asking this class for any graph.
      */
-    static DENOPTIMGraph makeGraphE() throws DENOPTIMException
+    static DGraph makeGraphE() throws DENOPTIMException
     {
-        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        DGraph graphA = new DGraph();
         EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
         v0.addAP(APCB);
@@ -477,11 +477,11 @@ public class PopulationTest
         v5.addAP(APCB);
         graphA.addVertex(v5);
 
-        graphA.addEdge(new DENOPTIMEdge(v0.getAP(0), v1.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v3.getAP(1), v4.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0)));
+        graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        graphA.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+        graphA.addEdge(new Edge(v2.getAP(1), v3.getAP(0)));
+        graphA.addEdge(new Edge(v3.getAP(1), v4.getAP(0)));
+        graphA.addEdge(new Edge(v4.getAP(1), v5.getAP(0)));
         
         return graphA;
     }
@@ -496,9 +496,9 @@ public class PopulationTest
      * 
      * You must run {@link #prepare()} before asking this class for any graph.
      */
-    static DENOPTIMGraph makeGraphF() throws DENOPTIMException
+    static DGraph makeGraphF() throws DENOPTIMException
     {
-        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        DGraph graphA = new DGraph();
         EmptyVertex v0 = new EmptyVertex(0);
         v0.setBuildingBlockType(BBType.SCAFFOLD);
         v0.addAP(APCA);
@@ -533,13 +533,13 @@ public class PopulationTest
         v7.addAP(APCA);
         graphA.addVertex(v7);
 
-        graphA.addEdge(new DENOPTIMEdge(v0.getAP(1), v1.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v1.getAP(1), v2.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v2.getAP(1), v3.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v3.getAP(1), v4.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v4.getAP(1), v5.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v5.getAP(1), v6.getAP(0)));
-        graphA.addEdge(new DENOPTIMEdge(v6.getAP(1), v7.getAP(0)));
+        graphA.addEdge(new Edge(v0.getAP(1), v1.getAP(0)));
+        graphA.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+        graphA.addEdge(new Edge(v2.getAP(1), v3.getAP(0)));
+        graphA.addEdge(new Edge(v3.getAP(1), v4.getAP(0)));
+        graphA.addEdge(new Edge(v4.getAP(1), v5.getAP(0)));
+        graphA.addEdge(new Edge(v5.getAP(1), v6.getAP(0)));
+        graphA.addEdge(new Edge(v6.getAP(1), v7.getAP(0)));
         
         graphA.renumberGraphVertices();
         
@@ -554,27 +554,27 @@ public class PopulationTest
         GAParameters gaparams = prepare();
         Population pop = new Population(gaparams);
         
-        DENOPTIMGraph g1 = makeGraphA();
+        DGraph g1 = makeGraphA();
         Candidate c1 = new Candidate("C1",g1);
         c1.setFitness(-1.0);
         pop.add(c1);
         
-        DENOPTIMGraph g2 = makeGraphB();
+        DGraph g2 = makeGraphB();
         Candidate c2 = new Candidate("C2",g2);
         c2.setFitness(0.02);
         pop.add(c2);
         
-        DENOPTIMGraph g3 = makeGraphB();
+        DGraph g3 = makeGraphB();
         Candidate c3 = new Candidate("C3",g3);
         c3.setFitness(2.0);
         pop.add(c3);
         
-        DENOPTIMGraph g4 = makeGraphC();
+        DGraph g4 = makeGraphC();
         Candidate c4 = new Candidate("C4",g4);
         c4.setFitness(0.5);
         pop.add(c4);
         
-        DENOPTIMGraph g5 = makeGraphD();
+        DGraph g5 = makeGraphD();
         Candidate c5 = new Candidate("C5",g5);
         c5.setFitness(-0.5);
         pop.add(c5);
@@ -594,12 +594,12 @@ public class PopulationTest
         GAParameters gaparams = prepare();
         Population pop = new Population(gaparams);
         
-        DENOPTIMGraph g1 = makeGraphA();
+        DGraph g1 = makeGraphA();
         Candidate c1 = new Candidate("C1",g1);
         c1.setFitness(20.0);
         pop.add(c1);
         
-        DENOPTIMGraph g2 = makeGraphB();
+        DGraph g2 = makeGraphB();
         Candidate c2 = new Candidate("C2",g2);
         c2.setFitness(120);
         pop.add(c2);
@@ -611,12 +611,12 @@ public class PopulationTest
         
         pop = new Population(gaparams);
         
-        DENOPTIMGraph g1b = makeGraphA();
+        DGraph g1b = makeGraphA();
         Candidate c1b = new Candidate("C1",g1b);
         c1b.setFitness(-20.0);
         pop.add(c1b);
         
-        DENOPTIMGraph g2b = makeGraphB();
+        DGraph g2b = makeGraphB();
         Candidate c2b = new Candidate("C2",g2b);
         c2b.setFitness(80);
         pop.add(c2b);
@@ -636,19 +636,19 @@ public class PopulationTest
         Population pop = new Population(gaparams);
         int v0 = pop.getVersionID();
         
-        DENOPTIMGraph g1 = makeGraphA();
+        DGraph g1 = makeGraphA();
         Candidate c1 = new Candidate("C1",g1);
         pop.add(c1);
         int v1 = pop.getVersionID();
         assertTrue(v1>v0,"Version change 1");
         
-        DENOPTIMGraph g2 = makeGraphB();
+        DGraph g2 = makeGraphB();
         Candidate c2 = new Candidate("C2",g2);
         pop.add(c2);
         int v2 = pop.getVersionID();
         assertTrue(v2>v1,"Version change 2");
         
-        DENOPTIMGraph g3 = makeGraphB();
+        DGraph g3 = makeGraphB();
         Candidate c3 = new Candidate("C3",g3);
         pop.add(c3);
         int v3 = pop.getVersionID();
@@ -658,13 +658,13 @@ public class PopulationTest
         int v4 = pop.getVersionID();
         assertTrue(v4>v3,"Version change 4");
         
-        DENOPTIMGraph g4 = makeGraphB();
+        DGraph g4 = makeGraphB();
         Candidate c4 = new Candidate("C4",g4);
         pop.add(0,c4);
         int v5 = pop.getVersionID();
         assertTrue(v5>v4,"Version change 5");
         
-        DENOPTIMGraph g5 = makeGraphC();
+        DGraph g5 = makeGraphC();
         Candidate c5 = new Candidate("C5",g5);
         pop.set(1,c5);
         int v6 = pop.getVersionID();
@@ -722,7 +722,7 @@ public class PopulationTest
      * produce the graphs from {@link #getPairOfTestGraphsB()}, but
      * those from {@link #getPairOfTestGraphsBxoxo()}.
      */
-    public static DENOPTIMGraph[] getPairOfTestGraphsB() throws Exception
+    public static DGraph[] getPairOfTestGraphsB() throws Exception
     {   
         // Prepare special building block: template T1
         EmptyVertex v0 = new EmptyVertex(0);
@@ -763,7 +763,7 @@ public class PopulationTest
         v6.setProperty("Label", "tv6");
         v6.setAsRCV(true);
         
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         g.addVertex(v0);
         g.setGraphId(-1);
         g.appendVertexOnAP(v0.getAP(1), v1.getAP(0));
@@ -774,7 +774,7 @@ public class PopulationTest
         g.appendVertexOnAP(v1.getAP(1), v5.getAP(0));
         g.addRing(v5, v6, BondType.SINGLE);
         
-        DENOPTIMTemplate t1 = new DENOPTIMTemplate(BBType.NONE);
+        Template t1 = new Template(BBType.NONE);
         t1.setInnerGraph(g);
         t1.setProperty("Label", "t1");
         t1.setContractLevel(ContractLevel.FREE);
@@ -797,7 +797,7 @@ public class PopulationTest
         m3.addAP(APCC);
         m3.setProperty("Label", "m103");
         
-        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        DGraph graphA = new DGraph();
         graphA.addVertex(m0);
         graphA.appendVertexOnAP(m0.getAP(0), t1.getAP(0)); // A on T1
         graphA.appendVertexOnAP(t1.getAP(1), m1.getAP(0)); // C on T1
@@ -838,7 +838,7 @@ public class PopulationTest
         w5.addAP(APCA);
         w5.setProperty("Label", "tw5");
         
-        DENOPTIMGraph g2 = new DENOPTIMGraph();
+        DGraph g2 = new DGraph();
         g2.addVertex(w0);
         g2.setGraphId(-1);
         g2.appendVertexOnAP(w0.getAP(1), w1.getAP(0));
@@ -847,7 +847,7 @@ public class PopulationTest
         g2.appendVertexOnAP(w3.getAP(1), w4.getAP(0));
         g2.appendVertexOnAP(w4.getAP(2), w5.getAP(0));
 
-        DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.NONE);
+        Template t2 = new Template(BBType.NONE);
         t2.setInnerGraph(g2);
         t2.setProperty("Label", "t2");
         t2.setContractLevel(ContractLevel.FREE);
@@ -866,7 +866,7 @@ public class PopulationTest
         n3.addAP(APCC);
         n3.setProperty("Label", "m203");
         
-        DENOPTIMGraph graphB = new DENOPTIMGraph();
+        DGraph graphB = new DGraph();
         graphB.addVertex(n0);
         graphB.appendVertexOnAP(n0.getAP(0), t2.getAP(0)); // A on T2
         graphB.appendVertexOnAP(t2.getAP(1), n2.getAP(0)); // B on T2
@@ -875,7 +875,7 @@ public class PopulationTest
         
         // Done with GraphB!
         
-        DENOPTIMGraph[] pair = new DENOPTIMGraph[2];
+        DGraph[] pair = new DGraph[2];
         pair[0] = graphA;
         pair[1] = graphB;
         
@@ -931,7 +931,7 @@ public class PopulationTest
      * produce the graphs from {@link #getPairOfTestGraphsB()}, but
      * those from {@link #getPairOfTestGraphsBxoxo()}.
      */
-    public static DENOPTIMGraph[] getPairOfTestGraphsBxo() throws Exception
+    public static DGraph[] getPairOfTestGraphsBxo() throws Exception
     {   
         // Prepare special building block: template T1
         EmptyVertex v0 = new EmptyVertex(0);
@@ -966,7 +966,7 @@ public class PopulationTest
         v5.addAP(APCA);
         v5.setProperty("Label", "tv5");
         
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         g.addVertex(v0);
         g.setGraphId(-1);
         g.appendVertexOnAP(v0.getAP(0), v1.getAP(0));
@@ -975,7 +975,7 @@ public class PopulationTest
         g.appendVertexOnAP(v0.getAP(1), v4.getAP(0));
         g.appendVertexOnAP(v4.getAP(2), v5.getAP(0));
         
-        DENOPTIMTemplate t1 = new DENOPTIMTemplate(BBType.NONE);
+        Template t1 = new Template(BBType.NONE);
         t1.setInnerGraph(g);
         t1.setProperty("Label", "t1");
         t1.setContractLevel(ContractLevel.FREE);
@@ -998,7 +998,7 @@ public class PopulationTest
         m3.addAP(APCC);
         m3.setProperty("Label", "m103");
         
-        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        DGraph graphA = new DGraph();
         graphA.addVertex(m0);
         graphA.appendVertexOnAP(m0.getAP(0), t1.getAP(0)); // A on T1
         graphA.appendVertexOnAP(t1.getAP(1), m1.getAP(0)); // B on T1
@@ -1045,7 +1045,7 @@ public class PopulationTest
         w6.addAP(APCC);
         w6.setProperty("Label", "tw6");
         
-        DENOPTIMGraph g2 = new DENOPTIMGraph();
+        DGraph g2 = new DGraph();
         g2.addVertex(w0);
         g2.setGraphId(-1);
         g2.appendVertexOnAP(w0.getAP(1), w1.getAP(0));
@@ -1055,7 +1055,7 @@ public class PopulationTest
         g2.appendVertexOnAP(w4.getAP(1), w5.getAP(0));
         g2.appendVertexOnAP(w4.getAP(2), w6.getAP(0));
 
-        DENOPTIMTemplate t2 = new DENOPTIMTemplate(BBType.NONE);
+        Template t2 = new Template(BBType.NONE);
         t2.setInnerGraph(g2);
         t2.setProperty("Label", "tw2");
         t2.setContractLevel(ContractLevel.FREE);
@@ -1074,7 +1074,7 @@ public class PopulationTest
         n3.addAP(APCC);
         n3.setProperty("Label", "m403");
         
-        DENOPTIMGraph graphB = new DENOPTIMGraph();
+        DGraph graphB = new DGraph();
         graphB.addVertex(n0);
         graphB.appendVertexOnAP(n0.getAP(0), t2.getAP(0)); // A on T2
         graphB.appendVertexOnAP(t2.getAP(1), n2.getAP(0)); // B on T2
@@ -1083,7 +1083,7 @@ public class PopulationTest
         
         // Done with GraphB!
         
-        DENOPTIMGraph[] pair = new DENOPTIMGraph[2];
+        DGraph[] pair = new DGraph[2];
         pair[0] = graphA;
         pair[1] = graphB;
         
@@ -1145,7 +1145,7 @@ public class PopulationTest
      * graph returned here is the same as the second returned by 
      * {@link #getPairOfTestGraphsB()}
      */
-    public static DENOPTIMGraph[] getPairOfTestGraphsBxoxo() throws Exception
+    public static DGraph[] getPairOfTestGraphsBxoxo() throws Exception
     {   
         // Prepare special building block: template T1
 
@@ -1190,7 +1190,7 @@ public class PopulationTest
         v6.setProperty("Label", "tv6");
         v6.setAsRCV(true);
         
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         g.addVertex(v0);
         g.setGraphId(-1);
         g.appendVertexOnAP(v0.getAP(1), v1.getAP(0));
@@ -1201,7 +1201,7 @@ public class PopulationTest
         g.appendVertexOnAP(v4.getAP(2), v6.getAP(0));
         g.addRing(v5, v6, BondType.SINGLE);
         
-        DENOPTIMTemplate t1 = new DENOPTIMTemplate(BBType.NONE);
+        Template t1 = new Template(BBType.NONE);
         t1.setInnerGraph(g);
         t1.setProperty("Label", "t1");
         t1.setContractLevel(ContractLevel.FREE);
@@ -1224,7 +1224,7 @@ public class PopulationTest
         m3.addAP(APCC);
         m3.setProperty("Label", "m103");
         
-        DENOPTIMGraph graphA = new DENOPTIMGraph();
+        DGraph graphA = new DGraph();
         graphA.addVertex(m0);
         graphA.appendVertexOnAP(m0.getAP(0), t1.getAP(0)); // A on T1
         graphA.appendVertexOnAP(t1.getAP(1), m1.getAP(0)); // B on T1
@@ -1235,13 +1235,13 @@ public class PopulationTest
         // Done with GraphA!
         
         // GraphB is the same as from getPairOfTestGraphsB()
-        DENOPTIMGraph[] initialGraphs = getPairOfTestGraphsB();
-        DENOPTIMGraph graphB = initialGraphs[1];
+        DGraph[] initialGraphs = getPairOfTestGraphsB();
+        DGraph graphB = initialGraphs[1];
         graphB.setGraphId(66666);
         
         // Done with GraphB!
         
-        DENOPTIMGraph[] pair = new DENOPTIMGraph[2];
+        DGraph[] pair = new DGraph[2];
         pair[0] = graphA;
         pair[1] = graphB;
         

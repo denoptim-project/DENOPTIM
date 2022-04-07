@@ -16,7 +16,7 @@ import com.google.gson.JsonParseException;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.DENOPTIMEdge.BondType;
+import denoptim.graph.Edge.BondType;
 
 public class APClass implements Cloneable,Comparable<APClass>
 {   

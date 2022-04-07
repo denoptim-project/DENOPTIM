@@ -130,7 +130,7 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
                 printSnapshot(dump);
             } catch (DENOPTIMException e)
             {
-                DENOPTIMLogger.appLogger.log(Level.WARNING,
+                StaticLogger.appLogger.log(Level.WARNING,
                         "Unable to print monitor report: "+e.getMessage() + NL
                         + "Monitor report: " + NL + dump);
             }

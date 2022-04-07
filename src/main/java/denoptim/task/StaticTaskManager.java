@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JProgressBar;
 
 import denoptim.fragspace.FragmentSpace;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 
 /**
  * Manager for tasks submitted by the GUI. The main purpose is to launch and
@@ -42,7 +42,7 @@ public class StaticTaskManager
 	
 	/**
 	 * Number of threads. Only one for now and as long as the 
-	 * {@link FragmentSpace} and {@link DENOPTIMLogger} will be static objects.
+	 * {@link FragmentSpace} and {@link StaticLogger} will be static objects.
 	 */
 	private static final int maxthreads = 1;
 	

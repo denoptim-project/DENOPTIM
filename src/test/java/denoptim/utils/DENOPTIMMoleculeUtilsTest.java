@@ -18,7 +18,7 @@ package denoptim.utils;
  *   You should have received a copy of the GNU Affero General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import static denoptim.utils.DENOPTIMMoleculeUtils.getPoint3d;
+import static denoptim.utils.MoleculeUtils.getPoint3d;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -83,7 +83,7 @@ public class DENOPTIMMoleculeUtilsTest
         mol.addAtom(new Atom("H", new Point3d(2.3,-4.8,4.2)));
         mol.addAtom(new Atom("H", new Point3d(4.5,2.6,-5.4)));
         
-        Point3d c = DENOPTIMMoleculeUtils.calculateCentroid(mol);
+        Point3d c = MoleculeUtils.calculateCentroid(mol);
         assertTrue(areCloseEnough(2.6666666,c.x), "Wrong value in X");
         assertTrue(areCloseEnough(-1.7,c.y), "Wrong value in Y");
         assertTrue(areCloseEnough(0.4333333,c.z), "Wrong value in Z");

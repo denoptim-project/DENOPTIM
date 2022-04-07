@@ -18,11 +18,11 @@ import org.junit.jupiter.api.Test;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
-import denoptim.graph.DENOPTIMAttachmentPoint;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
 
 /**
@@ -90,9 +90,9 @@ public class APMapFinderTest
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
         FragmentSpace fs = new FragmentSpace(fsp,
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(),
-                new ArrayList<DENOPTIMVertex>(), 
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(), 
                 cpMap, capMap, forbEnds, cpMap);
         fs.setAPclassBasedApproach(true);
         
@@ -215,15 +215,15 @@ public class APMapFinderTest
         vD.addAP(APCA);
         vD.addAP(APCD);
         
-        DENOPTIMGraph g = new DENOPTIMGraph();
+        DGraph g = new DGraph();
         g.addVertex(vA);
         g.addVertex(vB);
         g.addVertex(vC);
         g.addVertex(vD);
-        g.addEdge(new DENOPTIMEdge(vA.getAP(0), vC.getAP(0)));
-        g.addEdge(new DENOPTIMEdge(vA.getAP(1), vD.getAP(1)));
-        g.addEdge(new DENOPTIMEdge(vB.getAP(1), vC.getAP(1)));
-        g.addEdge(new DENOPTIMEdge(vB.getAP(0), vD.getAP(0)));
+        g.addEdge(new Edge(vA.getAP(0), vC.getAP(0)));
+        g.addEdge(new Edge(vA.getAP(1), vD.getAP(1)));
+        g.addEdge(new Edge(vB.getAP(1), vC.getAP(1)));
+        g.addEdge(new Edge(vB.getAP(0), vD.getAP(0)));
         
         // NB: when APs are used the mapping is much more restrictive,
         // because it is forced to respect the APClass compatibility rules.
@@ -250,10 +250,10 @@ public class APMapFinderTest
         vG.setBuildingBlockType(BBType.FRAGMENT);
         vG.addAP(APCC);
         
-        DENOPTIMGraph g2 = new DENOPTIMGraph();
+        DGraph g2 = new DGraph();
         g2.addVertex(vF);
         g2.addVertex(vG);
-        g2.addEdge(new DENOPTIMEdge(vF.getAP(0), vG.getAP(0)));
+        g2.addEdge(new Edge(vF.getAP(0), vG.getAP(0)));
         
         apmf = new APMapFinder(fs, vF, vG, true);
         

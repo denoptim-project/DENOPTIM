@@ -38,12 +38,12 @@ import org.openscience.cdk.silent.Bond;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
-import denoptim.graph.DENOPTIMEdge;
-import denoptim.graph.DENOPTIMEdge.BondType;
-import denoptim.graph.DENOPTIMFragment;
-import denoptim.graph.DENOPTIMGraph;
-import denoptim.graph.DENOPTIMVertex;
-import denoptim.graph.DENOPTIMVertex.BBType;
+import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Fragment;
+import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.graph.EmptyVertex;
 
@@ -76,7 +76,7 @@ public class ThreeDimTreeBuilderTest
         forbEnds.add(b0);
         
         
-    	DENOPTIMFragment frg1 = new DENOPTIMFragment();
+    	Fragment frg1 = new Fragment();
     	IAtom a1 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	IAtom a2 = new Atom("C", new Point3d(new double[]{1.0, 0.0, 0.0}));
     	frg1.addAtom(a1);
@@ -86,14 +86,14 @@ public class ThreeDimTreeBuilderTest
     	frg1.addAP(1, a0, new Point3d(new double[]{1.0, 1.0, 1.0}));
     	frg1.projectAPsToProperties(); 
     	
-    	DENOPTIMFragment frg2 = new DENOPTIMFragment();
+    	Fragment frg2 = new Fragment();
     	IAtom a3 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	frg2.addAtom(a3);
     	frg2.addAP(0, a0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	frg2.addAP(0, b0, new Point3d(new double[]{0.0, 1.0, -1.0}));   
     	frg2.projectAPsToProperties(); 
     	
-        DENOPTIMFragment frg3 = new DENOPTIMFragment();
+        Fragment frg3 = new Fragment();
         IAtom a7 = new Atom("C", new Point3d(new double[]{2.0, 0.0, 0.0}));
         IAtom a8 = new Atom("O", new Point3d(new double[]{3.0, 0.0, 0.0}));
         frg3.addAtom(a7);
@@ -104,34 +104,34 @@ public class ThreeDimTreeBuilderTest
         frg3.addAP(0, b0, new Point3d(new double[]{3.0, 1.0, -1.0})); 
         frg3.projectAPsToProperties(); 
 
-    	DENOPTIMFragment rca1 = new DENOPTIMFragment();
+    	Fragment rca1 = new Fragment();
     	IAtom a4 = new PseudoAtom("ATP", new Point3d(
     	        new double[]{0.0, 0.0, 0.0}));
     	rca1.addAtom(a4);
     	rca1.addAP(0, ap0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	rca1.projectAPsToProperties(); 
     	
-    	DENOPTIMFragment rca2 = new DENOPTIMFragment();
+    	Fragment rca2 = new Fragment();
     	IAtom a5 = new PseudoAtom("ATM", new Point3d(
     	        new double[]{1.0, 0.0, 0.0}));
     	rca2.addAtom(a5);
     	rca2.addAP(0, am0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	rca2.projectAPsToProperties(); 
     	
-    	DENOPTIMFragment cap = new DENOPTIMFragment();
+    	Fragment cap = new Fragment();
     	IAtom a6 = new Atom("H", new Point3d(new double[]{0.0, 0.0, 0.0}));
     	cap.addAtom(a6);
     	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}));
     	cap.projectAPsToProperties(); 
     	
-    	ArrayList<DENOPTIMVertex> scaff = new ArrayList<DENOPTIMVertex>();
+    	ArrayList<Vertex> scaff = new ArrayList<Vertex>();
     	scaff.add(frg1);
-    	ArrayList<DENOPTIMVertex> frags = new ArrayList<DENOPTIMVertex>();
+    	ArrayList<Vertex> frags = new ArrayList<Vertex>();
     	frags.add(frg2);
     	frags.add(rca1);
     	frags.add(rca2);
     	frags.add(frg3);
-    	ArrayList<DENOPTIMVertex> caps = new ArrayList<DENOPTIMVertex>();
+    	ArrayList<Vertex> caps = new ArrayList<Vertex>();
     	caps.add(cap);
     	
     	FragmentSpaceParameters fsp = new FragmentSpaceParameters();
@@ -139,25 +139,25 @@ public class ThreeDimTreeBuilderTest
                 cpMap, capMap, forbEnds, cpMap);
         fs.setAPclassBasedApproach(true);
     	
-    	DENOPTIMGraph g1 = new DENOPTIMGraph();
-    	DENOPTIMVertex v1 = DENOPTIMVertex.newVertexFromLibrary(1, 0, 
+    	DGraph g1 = new DGraph();
+    	Vertex v1 = Vertex.newVertexFromLibrary(1, 0, 
     	        BBType.SCAFFOLD, fs);
-    	DENOPTIMVertex v2 = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
+    	Vertex v2 = Vertex.newVertexFromLibrary(2, 0, 
                 BBType.FRAGMENT, fs);
-    	DENOPTIMVertex v3 = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
+    	Vertex v3 = Vertex.newVertexFromLibrary(3, 2, 
                 BBType.FRAGMENT, fs);
-    	DENOPTIMVertex v4 = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
+    	Vertex v4 = Vertex.newVertexFromLibrary(4, 1, 
                 BBType.FRAGMENT, fs);
         g1.addVertex(v1);
         g1.addVertex(v2);
         g1.addVertex(v3);
         g1.addVertex(v4);
         
-        DENOPTIMEdge e1 = new DENOPTIMEdge(v1.getAP(1), v2.getAP(0), 
+        Edge e1 = new Edge(v1.getAP(1), v2.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e2 = new DENOPTIMEdge(v2.getAP(1), v3.getAP(0), 
+        Edge e2 = new Edge(v2.getAP(1), v3.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e3 = new DENOPTIMEdge(v1.getAP(0), v4.getAP(0), 
+        Edge e3 = new Edge(v1.getAP(0), v4.getAP(0), 
                 BondType.SINGLE);
         g1.addEdge(e1);
         g1.addEdge(e2);
@@ -184,25 +184,25 @@ public class ThreeDimTreeBuilderTest
     			+ "molecule after removal of RCAs");
     	
     	
-        DENOPTIMGraph g2 = new DENOPTIMGraph();
-        DENOPTIMVertex v1b = DENOPTIMVertex.newVertexFromLibrary(1, 0, 
+        DGraph g2 = new DGraph();
+        Vertex v1b = Vertex.newVertexFromLibrary(1, 0, 
                 BBType.SCAFFOLD, fs);
-        DENOPTIMVertex v2b = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
+        Vertex v2b = Vertex.newVertexFromLibrary(2, 0, 
                 BBType.FRAGMENT, fs);
-        DENOPTIMVertex v3b = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
+        Vertex v3b = Vertex.newVertexFromLibrary(3, 2, 
                 BBType.FRAGMENT, fs);
-        DENOPTIMVertex v4b = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
+        Vertex v4b = Vertex.newVertexFromLibrary(4, 1, 
                 BBType.FRAGMENT, fs);
         g2.addVertex(v1b);
         g2.addVertex(v2b);
         g2.addVertex(v3b);
         g2.addVertex(v4b);
         
-        DENOPTIMEdge e1b = new DENOPTIMEdge(v1b.getAP(1), v2b.getAP(0), 
+        Edge e1b = new Edge(v1b.getAP(1), v2b.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e2b = new DENOPTIMEdge(v2b.getAP(1), v3b.getAP(0), 
+        Edge e2b = new Edge(v2b.getAP(1), v3b.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e3b = new DENOPTIMEdge(v1b.getAP(0), v4b.getAP(0), 
+        Edge e3b = new Edge(v1b.getAP(0), v4b.getAP(0), 
                 BondType.SINGLE);
         g2.addEdge(e1b);
         g2.addEdge(e2b);
@@ -216,26 +216,26 @@ public class ThreeDimTreeBuilderTest
     			+ "molecule before forming ring");
     	
     	
-        DENOPTIMGraph g3 = new DENOPTIMGraph();
+        DGraph g3 = new DGraph();
         EmptyVertex v1c = new EmptyVertex(1);
         v1c.addAP(a0);
         v1c.addAP(a0);
-        DENOPTIMVertex v2c = DENOPTIMVertex.newVertexFromLibrary(2, 0, 
+        Vertex v2c = Vertex.newVertexFromLibrary(2, 0, 
                 BBType.FRAGMENT, fs);
-        DENOPTIMVertex v3c = DENOPTIMVertex.newVertexFromLibrary(3, 2, 
+        Vertex v3c = Vertex.newVertexFromLibrary(3, 2, 
                 BBType.FRAGMENT, fs);
-        DENOPTIMVertex v4c = DENOPTIMVertex.newVertexFromLibrary(4, 1, 
+        Vertex v4c = Vertex.newVertexFromLibrary(4, 1, 
                 BBType.FRAGMENT, fs);
         g3.addVertex(v1c);
         g3.addVertex(v2c);
         g3.addVertex(v3c);
         g3.addVertex(v4c);
         
-        DENOPTIMEdge e1c = new DENOPTIMEdge(v1c.getAP(1), v2c.getAP(0), 
+        Edge e1c = new Edge(v1c.getAP(1), v2c.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e2c = new DENOPTIMEdge(v2c.getAP(1), v3c.getAP(0), 
+        Edge e2c = new Edge(v2c.getAP(1), v3c.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e3c = new DENOPTIMEdge(v1c.getAP(0), v4c.getAP(0), 
+        Edge e3c = new Edge(v1c.getAP(0), v4c.getAP(0), 
                 BondType.SINGLE);
         g3.addEdge(e1c);
         g3.addEdge(e2c);
@@ -249,23 +249,23 @@ public class ThreeDimTreeBuilderTest
                 + "mol with empty scaffold");
         
         
-        DENOPTIMGraph g4 = new DENOPTIMGraph();
+        DGraph g4 = new DGraph();
         EmptyVertex v1d = new EmptyVertex(1);
         v1d.addAP(a0);
         v1d.addAP(a0);
         EmptyVertex v2d = new EmptyVertex(2);
         v2d.addAP(a0);
         v2d.addAP(b0);
-        DENOPTIMVertex v3d = DENOPTIMVertex.newVertexFromLibrary(3, 3, 
+        Vertex v3d = Vertex.newVertexFromLibrary(3, 3, 
                 BBType.FRAGMENT, fs);
-        DENOPTIMVertex v4d = DENOPTIMVertex.newVertexFromLibrary(4, 0, 
+        Vertex v4d = Vertex.newVertexFromLibrary(4, 0, 
                 BBType.FRAGMENT, fs);
         EmptyVertex v5d = new EmptyVertex(5);
         v5d.addAP(b0);
         v5d.addAP(b0);
-        DENOPTIMVertex v6d = DENOPTIMVertex.newVertexFromLibrary(6, 0, 
+        Vertex v6d = Vertex.newVertexFromLibrary(6, 0, 
                 BBType.FRAGMENT, fs);
-        DENOPTIMVertex v7d = DENOPTIMVertex.newVertexFromLibrary(7, 0, 
+        Vertex v7d = Vertex.newVertexFromLibrary(7, 0, 
                 BBType.FRAGMENT, fs);
         g4.addVertex(v1d);
         g4.addVertex(v2d);
@@ -275,17 +275,17 @@ public class ThreeDimTreeBuilderTest
         g4.addVertex(v6d);
         g4.addVertex(v7d);
         
-        DENOPTIMEdge e1d = new DENOPTIMEdge(v1d.getAP(1), v2d.getAP(0), 
+        Edge e1d = new Edge(v1d.getAP(1), v2d.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e2d = new DENOPTIMEdge(v2d.getAP(1), v7d.getAP(1), 
+        Edge e2d = new Edge(v2d.getAP(1), v7d.getAP(1), 
                 BondType.SINGLE);
-        DENOPTIMEdge e3d = new DENOPTIMEdge(v1d.getAP(0), v3d.getAP(0), 
+        Edge e3d = new Edge(v1d.getAP(0), v3d.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e4d = new DENOPTIMEdge(v3d.getAP(1), v4d.getAP(0), 
+        Edge e4d = new Edge(v3d.getAP(1), v4d.getAP(0), 
                 BondType.SINGLE);
-        DENOPTIMEdge e5d = new DENOPTIMEdge(v3d.getAP(2), v5d.getAP(1), 
+        Edge e5d = new Edge(v3d.getAP(2), v5d.getAP(1), 
                 BondType.SINGLE);
-        DENOPTIMEdge e6d = new DENOPTIMEdge(v5d.getAP(0), v6d.getAP(1), 
+        Edge e6d = new Edge(v5d.getAP(0), v6d.getAP(1), 
                 BondType.SINGLE);
         g4.addEdge(e1d);
         g4.addEdge(e2d);

@@ -18,7 +18,7 @@
 
 package denoptim.graph.rings;
 
-import denoptim.graph.DENOPTIMVertex;
+import denoptim.graph.Vertex;
 
 /**
  * ChainLink represents a vertex in a closable chain.
@@ -39,7 +39,7 @@ public class ChainLink implements Cloneable
     /**
      * Fragment type
      */
-    private DENOPTIMVertex.BBType ftype;
+    private Vertex.BBType ftype;
 
     /**
      * Index of AP towards left
@@ -68,7 +68,7 @@ public class ChainLink implements Cloneable
      *  Constructs a ChainLink from the involved points
      */
 
-    public ChainLink(int molID, DENOPTIMVertex.BBType ftype, int apLeft, int apRight)
+    public ChainLink(int molID, Vertex.BBType ftype, int apLeft, int apRight)
     {
         this.molID = molID;
         this.ftype = ftype;
@@ -93,7 +93,7 @@ public class ChainLink implements Cloneable
      * @return the type of fragment library
      */
 
-    public DENOPTIMVertex.BBType getFragType()
+    public Vertex.BBType getFragType()
     {
         return ftype;
     }

@@ -22,7 +22,7 @@ package denoptim.utils;
  * Utilities for calculating basic statistics
  * @author Vishwesh Venkatraman
  */
-public final class DENOPTIMStatUtils
+public final class StatUtils
 {
 
 //------------------------------------------------------------------------------

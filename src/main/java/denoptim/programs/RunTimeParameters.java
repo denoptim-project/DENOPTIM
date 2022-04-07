@@ -31,7 +31,7 @@ import denoptim.files.FileUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.rings.RingClosureParameters;
-import denoptim.logging.DENOPTIMLogger;
+import denoptim.logging.StaticLogger;
 import denoptim.main.Main.RunType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fitnessevaluator.FRParameters;
@@ -594,7 +594,7 @@ public abstract class RunTimeParameters
         sb.append(getPrintedList()).append(NL);
         sb.append("-------------------------------------------"
                 + "----------------------").append(NL);
-        DENOPTIMLogger.appLogger.info(sb.toString());
+        StaticLogger.appLogger.info(sb.toString());
     }
     
 //------------------------------------------------------------------------------

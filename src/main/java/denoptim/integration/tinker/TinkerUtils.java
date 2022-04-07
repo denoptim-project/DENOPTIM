@@ -38,7 +38,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.utils.ConnectedLigand;
 import denoptim.utils.ConnectedLigandComparator;
-import denoptim.utils.DENOPTIMMathUtils;
+import denoptim.utils.MathUtils;
 import denoptim.utils.ObjectPair;
 
 
@@ -761,7 +761,7 @@ public class TinkerUtils
             if (i>1)
             {
                 i3 = getSecondRefAtomId(i,i2,mol);
-                a = DENOPTIMMathUtils.angle(atmI.getPoint3d(),
+                a = MathUtils.angle(atmI.getPoint3d(),
                                             mol.getAtom(i2).getPoint3d(),
                                             mol.getAtom(i3).getPoint3d());
                 if (debug)
@@ -780,10 +780,10 @@ public class TinkerUtils
                 i5 = (int) op.getSecond();
                 if (i5==1)
                 {
-                    t = DENOPTIMMathUtils.angle(atmI.getPoint3d(),
+                    t = MathUtils.angle(atmI.getPoint3d(),
                                                 mol.getAtom(i2).getPoint3d(),
                                                 mol.getAtom(i4).getPoint3d());
-                    double sign = DENOPTIMMathUtils.torsion(
+                    double sign = MathUtils.torsion(
                                                 atmI.getPoint3d(),
                                                 mol.getAtom(i2).getPoint3d(),
                                                 mol.getAtom(i3).getPoint3d(),
@@ -795,7 +795,7 @@ public class TinkerUtils
                 }
                 else
                 {
-                    t = DENOPTIMMathUtils.torsion(atmI.getPoint3d(),
+                    t = MathUtils.torsion(atmI.getPoint3d(),
                                                 mol.getAtom(i2).getPoint3d(),
                                                 mol.getAtom(i3).getPoint3d(),
                                                 mol.getAtom(i4).getPoint3d());
@@ -919,7 +919,7 @@ public class TinkerUtils
                 if ((mol.indexOf(nbr) < i1) && (nbr != atmI1) && 
                                                         (nbr != atmI3))
                 {
-                    double dbcAng = DENOPTIMMathUtils.angle(nbr.getPoint3d(),
+                    double dbcAng = MathUtils.angle(nbr.getPoint3d(),
                                                           atmI2.getPoint3d(),
                                                           atmI3.getPoint3d());
                     if(dbcAng > 1.0)
