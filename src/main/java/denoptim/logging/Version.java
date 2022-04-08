@@ -36,11 +36,12 @@ import denoptim.constants.DENOPTIMConstants;
 public class Version
 {
     public static final String NAME = "DENOPTIM";
-    public static final String COPYRIGHT = "2020";
     public static final String AUTHORS = "Vishwesh Venkatraman, Marco Foscato";
-    public static final String CONTRIBUTORS = "";
+    public static final String CONTRIBUTORS = "David Grellscheid​, "
+            + "Einar Kjellback, "
+            + "Marcello Costamagna";
     public static final String CONTACT = "see https://github.com/denoptim-project";
-    public static final String DATE = "Nov 30, 2020";
+    public static final String DATE = "Apr 10, 2022";
     public static final String MINIMUMJAVAVERSION = "1.8";
     
     //NB: Remember the version has to be consistent with the pom.xml file
