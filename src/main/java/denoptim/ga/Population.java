@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -45,7 +46,6 @@ import denoptim.programs.denovo.GAParameters;
 
 public class Population extends ArrayList<Candidate> implements Cloneable
 {
-
     /**
      * Version UID
      */
@@ -388,10 +388,10 @@ public class Population extends ArrayList<Candidate> implements Cloneable
                 xoverCompatibilities.put(memberA, memberB, xoverSites);
             } catch (DENOPTIMException e)
             {
-                System.err.println("Could not identify crossover sites between "
-                        + memberA.getName() + " and " + memberB.getName() + ".");
+                settings.getLogger().log(Level.FINE, "Could not identify "
+                        + "crossover sites between " + memberA.getName() 
+                        + " and " + memberB.getName() + ".");
                 e.printStackTrace();
-                
             }
         }
         

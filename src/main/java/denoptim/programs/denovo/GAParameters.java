@@ -19,18 +19,18 @@
 
 package denoptim.programs.denovo;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
-import denoptim.logging.StaticLogger;
 import denoptim.logging.Monitor;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
 import denoptim.utils.MutationType;
 import denoptim.utils.RandomUtils;
@@ -1176,15 +1176,6 @@ public class GAParameters extends RunTimeParameters
     {
         createWorkingDirectory();
 
-        try
-        {
-            StaticLogger.getInstance().setupLogger(logFile);
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
-        }
-
         // set random number generator
         if (seed == 0)
         {
@@ -1204,9 +1195,9 @@ public class GAParameters extends RunTimeParameters
         
         processOtherParameters();
         
-        System.err.println("Program log file: " + logFile);
-        System.err.println("Output files associated with the current run are " +
-                                "located in " + dataDir);
+        StaticLogger.appLogger.log(Level.INFO, "Program log file: " + logFile);
+        StaticLogger.appLogger.log(Level.INFO, "Output files associated with "
+                + "the current run are located in " + dataDir);
     }
 
 //------------------------------------------------------------------------------
@@ -1214,11 +1205,8 @@ public class GAParameters extends RunTimeParameters
     public void checkParameters() throws DENOPTIMException
     {
         String error = "";
-        if (populationSize < 10)
-        {
-            String msg = "Small population size is allowed only for testing.";
-            StaticLogger.appLogger.log(Level.WARNING,msg);
-        }
+        //TODO-gg comment out (test of novel approach)
+        //ensureIsPositive("GA-NUMOFFSPRING", numOfChildren, "blabla");
         if (numOfChildren <= 0)
         {
             error = "Number of children must be a positive number.";

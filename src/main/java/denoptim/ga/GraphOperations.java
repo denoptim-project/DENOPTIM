@@ -720,7 +720,7 @@ public class GraphOperations
         {
             String msg = "Program Bug in substituteFragment: Unable to locate "
                     + "parent edge for vertex "+vertex+" in graph "+g;
-            StaticLogger.appLogger.log(Level.SEVERE, msg);
+            settings.getLogger().log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
 
@@ -1354,7 +1354,7 @@ public class GraphOperations
                 else
                 {
                     String msg = "BUG: Incorrect vertex num. Contact author.";
-                    StaticLogger.appLogger.log(Level.SEVERE, msg);
+                    settings.getLogger().log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
             }
@@ -1815,7 +1815,7 @@ public class GraphOperations
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOMUTSITE);
             String msg = "Graph has no mutable site. Mutation aborted.";
-            StaticLogger.appLogger.info(msg);
+            settings.getLogger().info(msg);
             return false;
         }
         boolean doneMutation = true;
@@ -1894,7 +1894,7 @@ public class GraphOperations
                     + "_" + vertex.getVertexId() + "(" + pos + ")_"
                     + settings.timeStamp + ".sdf";
             DenoptimIO.writeGraphToSDF(new File(debugFile), c, false);
-            StaticLogger.appLogger.warning("Fatal exception while performing "
+            settings.getLogger().warning("Fatal exception while performing "
                     + "mutation. See file '" + debugFile + "' to reproduce the "
                     + "problem.");
             throw e;
@@ -1944,7 +1944,7 @@ public class GraphOperations
         if (graph == null)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOOWNER);
-            StaticLogger.appLogger.info("Vertex has no owner - "
+            settings.getLogger().info("Vertex has no owner - "
                     + "Mutation aborted");
             return false;
         }
@@ -1952,7 +1952,7 @@ public class GraphOperations
                 .contains(mType))
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE);
-            StaticLogger.appLogger.info("Vertex does not allow mutation type "
+            settings.getLogger().info("Vertex does not allow mutation type "
                     + "'" + mType + "' - Mutation aborted");
             return false;
         }
@@ -2054,7 +2054,7 @@ public class GraphOperations
         } else {
             msg = msg + "unsuccessful";
         }
-        StaticLogger.appLogger.info(msg);
+        settings.getLogger().info(msg);
 
         return done;
     }

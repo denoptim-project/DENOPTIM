@@ -24,6 +24,12 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.XMLFormatter;
 
 import denoptim.combinatorial.CEBLParameters;
 import denoptim.exception.DENOPTIMException;
@@ -31,6 +37,7 @@ import denoptim.files.FileUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.logging.HTMLLogFormatter;
 import denoptim.logging.StaticLogger;
 import denoptim.main.Main.RunType;
 import denoptim.programs.denovo.GAParameters;
@@ -67,8 +74,14 @@ public abstract class RunTimeParameters
     /**
      * Log file
      */
-    protected String logFile = "denoptim.log";
-
+    protected String logFile = "unset";
+    
+    /**
+     * Program-specific logger. Note that initialization errors in input 
+     * parameters are detected prior to starting the logger.
+     */
+    private Logger logger = null;
+    
     /**
      * Verbosity level
      */
@@ -272,7 +285,7 @@ public abstract class RunTimeParameters
      * Gets the pathname to the log file.
      * @return
      */
-    public String getLogFileName()
+    public String getLogFilePathname()
     {
         return logFile;
     }
@@ -286,6 +299,65 @@ public abstract class RunTimeParameters
     public void setLogFilePathname(String pathname)
     {
         this.workDir = pathname;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Get the name of the program specific logger.
+     */
+    public Logger getLogger()
+    {
+        return logger;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Set the name of the program specific logger.
+     * @param loggerIdentifier the name to save.
+     */
+    public void setLogger(Logger logger)
+    {
+        this.logger = logger;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Starts a logger with the given name. 
+     * The name is saved among the parameters and the logger can be obtained 
+     * from static {@link Logger#getLogger(String)} method using the value of 
+     * <code>loggerIdentifier</code> or by {@link RunTimeParameters#getLogger()}.
+     * All parameter collectors embedded in this one will inherit the logger.
+     * @throws IOException 
+     * @throws SecurityException 
+     */
+    public Logger startProgramSpecificLogger(String loggerIdentifier) 
+            throws SecurityException, IOException
+    {   
+        logger = Logger.getLogger(loggerIdentifier);
+        
+        int n = logger.getHandlers().length;
+        for (int i=0; i<n; i++)
+        {
+            logger.removeHandler(logger.getHandlers()[0]);
+        }
+
+        FileHandler fileHdlr = new FileHandler(logFile);
+        SimpleFormatter formatterTxt = new SimpleFormatter();
+        fileHdlr.setFormatter(formatterTxt);
+        logger.setUseParentHandlers(false);
+        logger.addHandler(fileHdlr);
+        //TODO-gg take from verbosity level
+        logger.setLevel(Level.FINEST);
+
+        for (RunTimeParameters innerParams : otherParameters.values())
+        {
+            innerParams.setLogger(logger);
+        }
+        
+        return logger;
     }
 
 //-----------------------------------------------------------------------------
@@ -367,8 +439,7 @@ public abstract class RunTimeParameters
                     if (!otherParameters.containsKey(parType))
                     {
                         otherParameters.put(parType, 
-                                RunTimeParameters.getInstanceFor(
-                                        parType));
+                                RunTimeParameters.getInstanceFor(parType));
                     }
                     otherParameters.get(parType).interpretKeyword(line);
                 }
@@ -394,7 +465,7 @@ public abstract class RunTimeParameters
             instance = (RunTimeParameters) c.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
-            //This should never happen
+            // This should never happen because the constructor has to be there.
         }
         return instance;
     }
@@ -594,38 +665,79 @@ public abstract class RunTimeParameters
         sb.append(getPrintedList()).append(NL);
         sb.append("-------------------------------------------"
                 + "----------------------").append(NL);
-        StaticLogger.appLogger.info(sb.toString());
+        logger.info(sb.toString());
     }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Ensures a pathname does lead to an existing file or stops with error
+     * Ensures a pathname does lead to an existing file or triggers an error.
+     * This is meant for checking initialization settings and does not print in
+     * the program specific log file.
      */
-
-    protected void checkFileExists(String pathname)
+    protected void ensureFileExists(String pathname)
     {
         if (!FileUtils.checkExists(pathname))
         {
-            System.out.println("ERROR! File '" + pathname + "' not found!");
-            System.exit(-1);
+            String msg = "ERROR! File '" + pathname + "' not found!";
+            throw new Error(msg);
         }
     }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Ensures that a parameter is not null or stops with error message.
+     * Ensures that a parameter is not null or triggers an error.
+     * This is meant for checking initialization settings and does not print in
+     * the program specific log file.
      */
-
-    protected void checkNotNull(String paramName, String param, String paramKey)
+    protected void ensureNotNull(String paramName, String param, String paramKey)
     {
         if (param == null)
         {
-            System.out.println("ERROR! Parameter '" + paramName + "' is null! "
+            String msg = "ERROR! Parameter '" + paramName + "' is null! "
                 + "Please, add '" + paramType.keywordRoot + paramKey 
-                + "' to the input parameters.");
-            System.exit(-1);
+                + "' to the input parameters.";
+            throw new Error(msg);
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Ensures that a parameter is a positive number (x>=0) or triggers an error.
+     * This is meant for checking initialization settings and does not print in
+     * the program specific log file.
+     */
+    protected void ensureIsPositive(String paramName, int value, String paramKey)
+    {
+        if (value <= 0)
+        {
+            String msg = "ERROR! Parameter '" + paramName + "' is negative ("
+                + value + "). "
+                + "Please, use a positive value for '" + paramType.keywordRoot 
+                + paramKey + "'.";
+            throw new Error(msg);
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Ensures that a parameter is within a range or triggers an error.
+     * This is meant for checking initialization settings and does not print in
+     * the program specific log file.
+     */
+    protected void ensureInRange(String paramName, int value, int min, int max, 
+            String paramKey)
+    {
+        if (max < value || min > value)
+        {
+            String msg = "ERROR! Parameter '" + paramName + "' is not in range"
+                + min + " < x < " + max + " (value: " + value + "). "
+                + "Please, correct the value of '" + paramType.keywordRoot 
+                + paramKey + "'.";
+            throw new Error(msg);
         }
     }
 

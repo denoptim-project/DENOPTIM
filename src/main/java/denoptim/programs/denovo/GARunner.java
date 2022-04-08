@@ -85,10 +85,11 @@ public class GARunner extends ProgramTask
         settings.readParameterFile(configFilePathName.getAbsolutePath());
         settings.checkParameters();
         settings.processParameters();
+        settings.startProgramSpecificLogger(loggerIdentifier);
         settings.printParameters();
         
-        ecl = new ExternalCmdsListener(
-        		Paths.get(settings.getInterfaceDir()));
+        ecl = new ExternalCmdsListener(Paths.get(settings.getInterfaceDir()),
+                settings.getLogger());
         executor = Executors.newSingleThreadExecutor();
         futureWatchers = executor.submit(ecl);
         executor.shutdown();
@@ -97,6 +98,7 @@ public class GARunner extends ProgramTask
         ea.run();
 
         stopExternalCmdListener();
+        stopLogger();
     }
 
 //------------------------------------------------------------------------------

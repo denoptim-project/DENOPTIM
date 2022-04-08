@@ -30,6 +30,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -141,12 +142,17 @@ public class EvolutionaryAlgorithm
      */
     private Throwable ex;
     
-    private final String NL = System.getProperty("line.separator");
-    
     /**
      * Parameters controlling the execution of this evolutionary algorithm.
      */
     private GAParameters settings;
+
+    /**
+     * Program-specific logger
+     */
+    private Logger logger = null;
+    
+    private final String NL = System.getProperty("line.separator");
 
 //------------------------------------------------------------------------------
 
@@ -154,6 +160,7 @@ public class EvolutionaryAlgorithm
             ExternalCmdsListener cmdListener)
     {
         this.settings = settings;
+        this.logger = settings.getLogger();
         this.cmdListener = cmdListener;
         // There is currently nothing to initialize for the synchronous scheme
         if (settings.getParallelizationScheme() == 1)
@@ -260,7 +267,7 @@ public class EvolutionaryAlgorithm
             String msg = "Fitness values have negligible standard deviation "
                     + "(STDDEV=" + String.format("%.6f", sdev) + "). "
                     + "Abbandoning evolutionary algorithm.";
-            StaticLogger.appLogger.log(Level.SEVERE, msg);
+            logger.log(Level.SEVERE, msg);
             population.trim(0);
             return;
         }
@@ -269,7 +276,7 @@ public class EvolutionaryAlgorithm
         int numStag = 0, genId = 1;
         while (genId <= settings.getNumberOfGenerations())
         {
-            StaticLogger.appLogger.log(Level.INFO,"Starting Generation {0}"
+            logger.log(Level.INFO,"Starting Generation {0}"
                     + NL, genId);
 
             String txt = "No change";
@@ -283,7 +290,7 @@ public class EvolutionaryAlgorithm
                 txt = "New members introduced";
             }
             
-            StaticLogger.appLogger.log(Level.INFO,txt + " in Generation {0}" 
+            logger.log(Level.INFO,txt + " in Generation {0}" 
                     + NL, genId);
             EAUtils.outputPopulationDetails(population, 
                     EAUtils.getPathNameToGenerationDetailsFile(genId, settings),
@@ -291,13 +298,13 @@ public class EvolutionaryAlgorithm
             
             if (stopped)
             {
-                StaticLogger.appLogger.log(Level.SEVERE, 
+                logger.log(Level.SEVERE, 
                         "EA stopped while working on generation {0}. " + NL
                         + "Reporting data for incomplete generation {0}."
                         + NL,genId);
                 break;
             } else {
-                StaticLogger.appLogger.log(Level.INFO,
+                logger.log(Level.INFO,
                         "Generation {0}" + " completed" + NL
                         + "----------------------------------------"
                         + "----------------------------------------" 
@@ -306,7 +313,7 @@ public class EvolutionaryAlgorithm
 
             if (numStag >= settings.getNumberOfConvergenceGenerations())
             {
-                StaticLogger.appLogger.log(Level.WARNING, 
+                logger.log(Level.WARNING, 
                         "No change in population over {0} iterations. "
                         + "Stopping EA." + NL, numStag);
                 break;
@@ -346,14 +353,14 @@ public class EvolutionaryAlgorithm
         // Termination
         population.trim(0);
         watch.stop();
-        StaticLogger.appLogger.log(Level.INFO, "Overall time: {0}." + NL,
+        logger.log(Level.INFO, "Overall time: {0}." + NL,
                 watch.toString());
         
         if (stopped)
         {
-            StaticLogger.appLogger.info("DENOPTIM EA run stopped." + NL);
+            logger.info("DENOPTIM EA run stopped." + NL);
         } else {
-            StaticLogger.appLogger.info("DENOPTIM EA run completed." + NL);
+            logger.info("DENOPTIM EA run completed." + NL);
         }
     }
 
@@ -514,7 +521,7 @@ public class EvolutionaryAlgorithm
                 cleanupCompleted(tpe, futures, submitted);
                 stopRun();
             }
-            StaticLogger.appLogger.log(Level.SEVERE,
+            logger.log(Level.SEVERE,
                     "Unable to initialize molecules in {0} attempts."+NL, i);
 
             throw new DENOPTIMException("Unable to initialize population in " 
@@ -749,7 +756,7 @@ public class EvolutionaryAlgorithm
                 cleanupCompleted(tpe, futures, submitted);
                 stopRun();
             }
-            StaticLogger.appLogger.log(Level.WARNING,
+            logger.log(Level.WARNING,
                     "Reached maximum number of attempts (" + i + ") to "
                     + "generate new candidates in generation " + genId + "." 
                             + NL);
@@ -787,7 +794,6 @@ public class EvolutionaryAlgorithm
             cleanupAsync(tpe, futures, submitted);
             tpe.shutdown();
         }
-        
         stopped = true;
     }
     
@@ -850,7 +856,7 @@ public class EvolutionaryAlgorithm
                     if (tsk.foundException())
                     {
                         foundExceptions = true;
-                        StaticLogger.appLogger.log(Level.SEVERE, "problems in " 
+                        logger.log(Level.SEVERE, "problems in " 
                           + tsk.toString() + ". ErrorMessage: '" 
                           + tsk.getErrorMessage() + "'. ExceptionInTask: "
                           + tsk.getException());

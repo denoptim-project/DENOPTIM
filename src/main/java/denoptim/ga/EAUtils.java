@@ -150,15 +150,16 @@ public class EAUtils
             {
                 uniqueIDsSet.addNewUniqueEntry(uid);
             }
-            StaticLogger.appLogger.log(Level.INFO, "Read " + lstUID.size() 
+            settings.getLogger().log(Level.INFO, "Read " + lstUID.size() 
                 + " known UIDs from " + settings.getUIDFileIn());
         }
         String inifile = settings.getInitialPopulationFile();
         if (inifile.length() > 0)
         {
             EAUtils.getPopulationFromFile(inifile, population, uniqueIDsSet, 
-                    EAUtils.getPathNameToGenerationFolder(0, settings));
-            StaticLogger.appLogger.log(Level.INFO, "Read " + population.size() 
+                    EAUtils.getPathNameToGenerationFolder(0, settings),
+                    settings);
+            settings.getLogger().log(Level.INFO, "Read " + population.size() 
                 + " molecules from " + inifile);
         }
         return population;
@@ -546,11 +547,11 @@ public class EAUtils
             res = EAUtils.evaluateGraph(graph,settings);
         } catch (NullPointerException|IllegalArgumentException e)
         {
-            //TODO: make crossplatform
-            System.out.println("WRITING DEBUG FILE for "+graph.getLocalMsg());
-            DenoptimIO.writeGraphToSDF(new File("/tmp/debug_evalGrp_parent.sdf"),
+            settings.getLogger().log(Level.INFO, "WRITING DEBUG FILE for " 
+                    + graph.getLocalMsg());
+            DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_parent.sdf"),
                     parent.getGraph(),false);
-            DenoptimIO.writeGraphToSDF(new File("/tmp/debug_evalGrp_curr.sdf"), 
+            DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_curr.sdf"), 
                     graph,false);
             throw e;
         }
@@ -618,7 +619,7 @@ public class EAUtils
             mnt.increase(CounterID.FAILEDMANUALADDATTEMPTS);
             String msg = "Could not read graphs from file " + srcFile
                     + ". No candidate generated!";
-            StaticLogger.appLogger.log(Level.SEVERE, msg);
+            settings.getLogger().log(Level.SEVERE, msg);
             return null;
         }
         if (graphs.size() == 0 || graphs.size() > 1)
@@ -627,7 +628,7 @@ public class EAUtils
             String msg = "Found " + graphs.size() + " graphs in file " + srcFile
                     + ". I expect one and only one graph. "
                     + "No candidate generated!";
-            StaticLogger.appLogger.log(Level.SEVERE, msg);
+            settings.getLogger().log(Level.SEVERE, msg);
             return null;
         }
 
@@ -638,7 +639,7 @@ public class EAUtils
             String msg = "Null graph from file " + srcFile
                     + ". Expected one and only one graph. "
                     + "No candidate generated!";
-            StaticLogger.appLogger.log(Level.SEVERE, msg);
+            settings.getLogger().log(Level.SEVERE, msg);
             return null;
         }
         graph.setLocalMsg("MANUAL_ADD");
@@ -668,7 +669,7 @@ public class EAUtils
         
         String msg = "Candidate " + candidate.getName() + " is imported from " 
                 + srcFile;
-        StaticLogger.appLogger.log(Level.INFO, msg);
+        settings.getLogger().log(Level.INFO, msg);
         
         return candidate;
     }
@@ -1167,14 +1168,15 @@ public class EAUtils
      */
     protected static void getPopulationFromFile(String filename,
             Population population, SizeControlledSet uniqueIDsSet,
-            String genDir) throws DENOPTIMException, IOException
+            String genDir, GAParameters settings) 
+                    throws DENOPTIMException, IOException
     {
         ArrayList<Candidate> candidates = DenoptimIO.readCandidates(
                 new File(filename), true);
         if (candidates.size() == 0)
         {
         	String msg = "Found 0 candidates in file " + filename;
-            StaticLogger.appLogger.log(Level.SEVERE, msg);
+            settings.getLogger().log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
 
@@ -1206,7 +1208,7 @@ public class EAUtils
         {
         	String msg = "Population is still empty after having processes "
         			+ candidates.size() + " candidates from file " + filename;
-            StaticLogger.appLogger.log(Level.SEVERE, msg);
+            settings.getLogger().log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg);
         }
 
@@ -1488,7 +1490,7 @@ public class EAUtils
                 if (allCombsOfRings.isEmpty())
                 {
                     String msg = "Setup Rings: no combination of rings.";
-                    StaticLogger.appLogger.log(Level.INFO, msg);
+                    settings.getLogger().log(Level.INFO, msg);
                     return false;
                 }
             }
@@ -1531,7 +1533,7 @@ public class EAUtils
             {
                 String msg = "Evaluation of graph: SMILES is null! "
                                                             + molGraph.toString();
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.INFO, msg);
                 molsmiles = "FAIL: NO SMILES GENERATED";
             }
             res[1] = molsmiles;
@@ -1544,7 +1546,7 @@ public class EAUtils
             if (pr.getFirst() == null)
             {
                 String msg = "Evaluation of graph: INCHI is null!";
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.INFO, msg);
                 pr.setFirst("UNDEFINED");
             }
             res[0] = pr.getFirst();
@@ -1668,7 +1670,7 @@ public class EAUtils
         if (molGraph == null)
         {
             String msg = "Evaluation of graph: graph is null!";
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             return null;
         }
 
@@ -1682,7 +1684,7 @@ public class EAUtils
         { 
             String msg ="Evaluation of graph: graph-to-mol returned null! " 
                                                         + molGraph.toString();
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             molGraph.cleanup();
             return null;
         }
@@ -1694,7 +1696,7 @@ public class EAUtils
             String msg = "Evaluation of graph: molecular representation has "
                     + "multiple components. See graph " 
                                                         + molGraph.toString();
-            StaticLogger.appLogger.log(Level.WARNING, msg);
+            settings.getLogger().log(Level.WARNING, msg);
         }
 
         // hopefully the null shouldn't happen if all goes well
@@ -1704,7 +1706,7 @@ public class EAUtils
         {
             String msg = "Evaluation of graph: SMILES is null! " 
                                                         + molGraph.toString();
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             molsmiles = "FAIL: NO SMILES GENERATED";
             smilesIsAvailable = false;
         }
@@ -1714,7 +1716,7 @@ public class EAUtils
         {
             String msg = "Evaluation of graph: SMILES contains \".\"" 
                                                                   + molsmiles;
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             molGraph.cleanup();
             mol.removeAllElements();
             return null;
@@ -1728,7 +1730,7 @@ public class EAUtils
                 //System.err.println("Max atoms constraint violated");
                 String msg = "Evaluation of graph: Max atoms constraint "
                                                   + " violated: " + molsmiles;
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 molGraph.cleanup();
                 mol.removeAllElements();
                 return null;
@@ -1744,7 +1746,7 @@ public class EAUtils
                 //System.err.println("Max weight constraint violated");
                 String msg = "Evaluation of graph: Molecular weight "
                        + "constraint violated: " + molsmiles + " | MW: " + mw;
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 molGraph.cleanup();
                 mol.removeAllElements();
                 return null;
@@ -1759,7 +1761,7 @@ public class EAUtils
             {
                 String msg = "Evaluation of graph: Max rotatable bonds "
                                          + "constraint violated: "+ molsmiles;
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 molGraph.cleanup();
                 mol.removeAllElements();
                 return null;
@@ -1770,10 +1772,10 @@ public class EAUtils
         //Detect free AP that are not permitted
         if (fragSpace.useAPclassBasedApproach())
         {
-            if (foundForbiddenEnd(molGraph, fragSpace))
+            if (foundForbiddenEnd(molGraph, fsParams))
             {
                 String msg = "Evaluation of graph: forbidden end in graph!";
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 molGraph.cleanup();
                 mol.removeAllElements();
                 return null;
@@ -1814,7 +1816,7 @@ public class EAUtils
                     String msg = "Evaluation of graph: too many RCAs! "
                                   + rcaTyp + ":" + nThisType + " "
                                   + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    StaticLogger.appLogger.log(Level.INFO, msg);
+                    settings.getLogger().log(Level.FINE, msg);
                     return null;
                 }
                 if (nThisType < rcParams.getMinRcaPerType() ||
@@ -1823,7 +1825,7 @@ public class EAUtils
                     String msg = "Evaluation of graph: too few RCAs! "
                                   + rcaTyp + ":" + nThisType + " "
                                   + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    StaticLogger.appLogger.log(Level.INFO, msg);
+                    settings.getLogger().log(Level.FINE, msg);
                     return null;
                 }
 
@@ -1835,7 +1837,7 @@ public class EAUtils
             if (nPossRings < rcParams.getMinRingClosures())
             {
                 String msg = "Evaluation of graph: too few ring candidates";
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 return null;
             }
         }
@@ -1845,7 +1847,7 @@ public class EAUtils
         if (pr.getFirst() == null)
         {
             String msg = "Evaluation of graph: INCHI is null!";
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             if (smilesIsAvailable)
                 pr.setFirst("UNDEFINED-INCHI_"+molsmiles);
             else
@@ -2141,10 +2143,11 @@ public class EAUtils
      */
 
     protected static boolean foundForbiddenEnd(DGraph molGraph,
-            FragmentSpace fragSpace)
+            FragmentSpaceParameters fsParams)
     {
         ArrayList<Vertex> vertices = molGraph.getVertexList();
-        Set<APClass> classOfForbEnds = fragSpace.getForbiddenEndList();
+        Set<APClass> classOfForbEnds = fsParams.getFragmentSpace()
+                .getForbiddenEndList();
         for (Vertex vtx : vertices)
         {
             ArrayList<AttachmentPoint> daps = vtx.getAttachmentPoints();
@@ -2161,7 +2164,7 @@ public class EAUtils
                             + " Ftype: " + vtx.getBuildingBlockType()
                             + "\n"+ molGraph+" \n "
                             + " AP class: " + apClass;
-                        StaticLogger.appLogger.log(Level.WARNING, msg);
+                        fsParams.getLogger().log(Level.WARNING, msg);
                         return true;
                     }
                 }

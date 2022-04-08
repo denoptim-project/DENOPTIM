@@ -32,7 +32,7 @@ public abstract class Task implements Callable<Object>
 	 * Flag controlling whether this task is expected to notify the static task
 	 * manager
 	 */
-	protected boolean notify = false;
+	protected boolean notifyGlobalTaskManager = false;
 	
     /**
      * Flag about completion. Should be set to <code>true</code> only by the
@@ -46,7 +46,7 @@ public abstract class Task implements Callable<Object>
     protected boolean hasException = false;
     
     /**
-     * Lock for addressing synchronisation issues.
+     * Lock for addressing synchronization issues.
      */
     public Object lock = new Object();
     
@@ -62,7 +62,7 @@ public abstract class Task implements Callable<Object>
 
     /**
      * A user-assigned id for this task.<br>
-     * This id is used as a task identifier when cancelling or restarting a task
+     * This id is used as a task identifier when canceling or restarting a task
      * using the remote management functionalities.
      */
     protected int id;
@@ -185,7 +185,7 @@ public abstract class Task implements Callable<Object>
             		+ this.getClass().getName() + " " + id);
             processHandler.stopProcess();
         } else {
-        	if (notify)
+        	if (notifyGlobalTaskManager)
         	{
         		StaticTaskManager.subtractDoneTask();
         	}
@@ -215,7 +215,7 @@ public abstract class Task implements Callable<Object>
 
 	public void setNotify(boolean notify) 
 	{
-		this.notify = notify;
+		this.notifyGlobalTaskManager = notify;
 	}
     
 //------------------------------------------------------------------------------    

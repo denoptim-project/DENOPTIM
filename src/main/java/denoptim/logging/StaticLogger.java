@@ -32,17 +32,10 @@ import java.util.logging.XMLFormatter;
  * @author Vishwesh Venkatraman
  */
 
-//TODO: this singleton by design. It will have to be changed into a 
-// thread-specific class. However, this change makes sense only is the fragment 
-// space becomes thread-specific as well. Now, both logger and fragment space 
-// are static objects,
-// so running multiple GS experiments on different threads is not possible.
-
 public class StaticLogger 
 {
     public static final Logger appLogger = Logger.getLogger("DENOPTIMLogger");
     private static StaticLogger uniqInstance = null;
-    private static boolean hasBeenSet = false;
     
 //------------------------------------------------------------------------------
     
@@ -100,7 +93,7 @@ public class StaticLogger
                 appLogger.addHandler(fileHdlr);
             }
             appLogger.setLevel(Level.FINEST);
-            hasBeenSet = true;
+            //hasBeenSet = true;
         //}
     }
 

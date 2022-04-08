@@ -13,11 +13,14 @@ import javax.swing.JProgressBar;
 
 import denoptim.fragspace.FragmentSpace;
 import denoptim.logging.StaticLogger;
+import denoptim.programs.combinatorial.FragSpaceExplorer;
+import denoptim.programs.denovo.GARunner;
 
 /**
  * Manager for tasks submitted by the GUI. The main purpose is to launch and
  * manage calls placed upon requests coming from the GUI and aimed at
- * running DENOPTIM's main classes in DenoptimGA and FragSpaceExplorer.
+ * running DENOPTIM's main classes in {@link GARunner} and 
+ * {@link FragSpaceExplorer}.
  * 
  * @author Marco Foscato
  */
@@ -41,10 +44,10 @@ public class StaticTaskManager
 			new HashMap<Task,Future<?>>();
 	
 	/**
-	 * Number of threads. Only one for now and as long as the 
-	 * {@link FragmentSpace} and {@link StaticLogger} will be static objects.
+	 * Maximum number of denoptim {@link ProgramTask}s that can be run in 
+	 * parallel.
 	 */
-	private static final int maxthreads = 1;
+	private static final int maxParallelPrograms = 4;
 	
 	/**
 	 * Queue size
@@ -80,7 +83,8 @@ public class StaticTaskManager
     
     private StaticTaskManager()
     {
-    	tpe = new ThreadPoolExecutor(maxthreads, maxthreads, Long.MAX_VALUE, 
+    	tpe = new ThreadPoolExecutor(maxParallelPrograms, maxParallelPrograms, 
+    	        Long.MAX_VALUE, 
     			TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(queueSize));
     	
     	// What to do in case of filled-up resources and queue rejecting tasks

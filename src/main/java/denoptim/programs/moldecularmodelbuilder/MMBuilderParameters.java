@@ -384,31 +384,31 @@ public class MMBuilderParameters extends RunTimeParameters
 
     public void checkParameters() throws DENOPTIMException
     {
-		checkNotNull("wrkDir",workDir,"WORKDIR");
-		checkFileExists(workDir);
+		ensureNotNull("wrkDir",workDir,"WORKDIR");
+		ensureFileExists(workDir);
 
-        checkNotNull("inpSDFFile",inpSDFFile,"INPSDF");
-        checkFileExists(inpSDFFile);
+        ensureNotNull("inpSDFFile",inpSDFFile,"INPSDF");
+        ensureFileExists(inpSDFFile);
 
-        checkNotNull("outSDFFile",outSDFFile,"OUTSDF");
+        ensureNotNull("outSDFFile",outSDFFile,"OUTSDF");
 
-        checkNotNull("toolPSSROT",toolPSSROT,"TOOLPSSROT");
-        checkFileExists(toolPSSROT);
+        ensureNotNull("toolPSSROT",toolPSSROT,"TOOLPSSROT");
+        ensureFileExists(toolPSSROT);
 
-        checkNotNull("toolXYZINT",toolXYZINT,"TOOLXYZINT");
-        checkFileExists(toolXYZINT);
+        ensureNotNull("toolXYZINT",toolXYZINT,"TOOLXYZINT");
+        ensureFileExists(toolXYZINT);
 
-        checkNotNull("toolINTXYZ",toolINTXYZ,"TOOLINTXYZ");
-        checkFileExists(toolINTXYZ);
+        ensureNotNull("toolINTXYZ",toolINTXYZ,"TOOLINTXYZ");
+        ensureFileExists(toolINTXYZ);
 
-        checkNotNull("forceFieldFile",forceFieldFile,"FORCEFIELDFILE");
-        checkFileExists(forceFieldFile);
+        ensureNotNull("forceFieldFile",forceFieldFile,"FORCEFIELDFILE");
+        ensureFileExists(forceFieldFile);
 
-        checkNotNull("keyFile",keyFile,"KEYFILE");
-        checkFileExists(keyFile);
+        ensureNotNull("keyFile",keyFile,"KEYFILE");
+        ensureFileExists(keyFile);
 
-        checkNotNull("pssrotFile",pssrotFile,"PSSROTPARAMS");
-        checkFileExists(pssrotFile);
+        ensureNotNull("pssrotFile",pssrotFile,"PSSROTPARAMS");
+        ensureFileExists(pssrotFile);
 
 
         if (atomOrderingScheme < 1 || atomOrderingScheme > 2)
@@ -426,11 +426,11 @@ public class MMBuilderParameters extends RunTimeParameters
             RingClosureParameters.checkParameters();
             if (RingClosureParameters.allowRingClosures())
             {
-        	checkNotNull("rsPssrotFile",rsPssrotFile,"RCPSSROTPARAMS");
-        	checkFileExists(rsPssrotFile);
+        	ensureNotNull("rsPssrotFile",rsPssrotFile,"RCPSSROTPARAMS");
+        	ensureFileExists(rsPssrotFile);
 
-        	checkNotNull("rsKeyFile",rsKeyFile,"RCKEYFILE");
-        	checkFileExists(rsKeyFile);
+        	ensureNotNull("rsKeyFile",rsKeyFile,"RCKEYFILE");
+        	ensureFileExists(rsKeyFile);
             }
         }
         */

@@ -184,7 +184,7 @@ public class OffspringEvaluationTask extends FitnessTask
         	{
 	            synchronized (population)
 	            {
-	            	StaticLogger.appLogger.log(Level.INFO, 
+	                gaSettings.getLogger().log(Level.INFO, 
 	            			"Adding {0} to population", molName);
 	                population.add(result);
 	                isWithinBestPrcentile = population.isWithinPercentile(

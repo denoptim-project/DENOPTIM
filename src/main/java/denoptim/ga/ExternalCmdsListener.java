@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -39,16 +40,19 @@ public class ExternalCmdsListener implements Runnable
     
     private final String NL = System.getProperty("line.separator");
     
-    
+    /**
+     * Program-specific logger
+     */
+    private Logger logger = null;
     
 //------------------------------------------------------------------------------
 
-    public ExternalCmdsListener(Path pathname) throws IOException 
+    public ExternalCmdsListener(Path pathname, Logger logger) throws IOException 
     {
     	this.pathname = pathname;
         this.watcher = FileSystems.getDefault().newWatchService();
         this.key = pathname.register(watcher, ENTRY_CREATE);
-        StaticLogger.appLogger.log(Level.INFO, "Watching pathname '" +  
+        logger.log(Level.INFO, "Watching pathname '" +  
         		pathname + "' for live instructions.");
     }
     
@@ -112,7 +116,7 @@ public class ExternalCmdsListener implements Runnable
 		try {
 			lines = DenoptimIO.readList(file.getAbsolutePath(), true);
 		} catch (DENOPTIMException e) {
-			StaticLogger.appLogger.log(Level.WARNING, "Unable to read file '"  
+			logger.log(Level.WARNING, "Unable to read file '"  
 	        		+ file.getAbsolutePath() + "'. Any instruction contained "
 	        		        + "in that file is ignored. "
 	        		        + "Hint: " + e.getMessage() + NL);
@@ -123,7 +127,7 @@ public class ExternalCmdsListener implements Runnable
 		if (lines.size() == 0)
 		{
 			// Empty file is probably a sign that the file is being written
-			StaticLogger.appLogger.log(Level.WARNING, "Empty instructions in '"  
+			logger.log(Level.WARNING, "Empty instructions in '"  
 	        		+ file.getAbsolutePath() + "'.");
 		}
 		
@@ -131,7 +135,7 @@ public class ExternalCmdsListener implements Runnable
 		{
 			if (line.startsWith("STOP_GA"))
 			{
-				StaticLogger.appLogger.log(Level.SEVERE, "GA run will be "
+			    logger.log(Level.SEVERE, "GA run will be "
 						+ "stopped upon external request from '"  
 		        		+ file.getAbsolutePath() + "'." + NL);
 				if (ea != null)
@@ -144,7 +148,7 @@ public class ExternalCmdsListener implements Runnable
             {
 	            String candIDs = line.substring(
 	                    "REMOVE_CANDIDATE".length()).trim();
-                StaticLogger.appLogger.log(Level.SEVERE, "Removing '"
+	            logger.log(Level.SEVERE, "Removing '"
                         + candIDs + "' upon external request from '"  
                         + file.getAbsolutePath() + "'." + NL);
                 String[] parts = candIDs.split("\\s+");
@@ -160,7 +164,7 @@ public class ExternalCmdsListener implements Runnable
             {
                 String fileNamesLst = line.substring(
                         "ADD_CANDIDATE".length()).trim();
-                StaticLogger.appLogger.log(Level.SEVERE, "Adding c"
+                logger.log(Level.SEVERE, "Adding c"
                         + "andidates from '"
                         + fileNamesLst + "' upon external request from '"  
                         + file.getAbsolutePath() + "'." + NL);

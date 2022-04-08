@@ -26,7 +26,7 @@ import denoptim.utils.RandomUtils;
 
 
 /**
- *
+ * Class that offers methods to performs fitness-driven selection of candidates.
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
