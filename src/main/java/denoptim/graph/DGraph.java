@@ -1364,21 +1364,74 @@ public class DGraph implements Cloneable
         
         GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
         
-        for (List<Vertex> vertexesToRemove : getSymmetricSubGraphs(
-                subGrpVrtxs))
+        // Verify that also the surrounding of vertexes in the lists is 
+        // consistent between subGrpVrtxs and vertexesToRemove. Even if the
+        // two are consistent, there can still be differences in the childs.
+        List<List<Vertex>> compatibleSymSubGrps = new ArrayList<List<Vertex>>();
+        for (List<Vertex> symmetricSubGrpVrtx : getSymmetricSubGraphs(subGrpVrtxs))
         {
+            boolean skip = false;
+            for (int iv=0; iv<subGrpVrtxs.size(); iv++)
+            {
+                if (skip)
+                    break;
+                Vertex oriVs = subGrpVrtxs.get(iv);
+                Vertex symVs = symmetricSubGrpVrtx.get(iv);
+                List<Vertex> oriVsChildren = oriVs.getChilddren();
+                List<Vertex> symVsChildren = symVs.getChilddren();
+                
+                // NB: oriVsChildren does not include CAPs from the 
+                // initial subgraph, while symVsChildren does include the 
+                // corresponding CAPs.
+                oriVsChildren.removeIf(v -> v.getBuildingBlockType()==BBType.CAP);
+                symVsChildren.removeIf(v -> v.getBuildingBlockType()==BBType.CAP);
+                if (oriVsChildren.size()!=symVsChildren.size())
+                {
+                    // we continue in the outer loop
+                    skip = true;
+                    continue;
+                }
+                for (int ic=0; ic<oriVsChildren.size(); ic++)
+                {
+                    if (skip)
+                        break;
+                    // We have already checked those in the subgraph
+                    if (subGrpVrtxs.contains(oriVsChildren.get(ic)))
+                        continue;
+                    // We do allow the two child to be different vertexes, but
+                    // we avoid having one CAP and one not. this because it will
+                    // lead to having free APs on the parent of the first and
+                    // busy APs on the parent of the second. This prevents 
+                    // finding a mapping of the free APs.
+                    if (oriVsChildren.get(ic).getBuildingBlockType()
+                            != symVsChildren.get(ic).getBuildingBlockType())
+                    {
+                        skip = true;
+                        continue;
+                    }
+                }
+            }
+            if (!skip)
+                compatibleSymSubGrps.add(symmetricSubGrpVrtx);
+        }
+        if (compatibleSymSubGrps.size()==0)
+            throw new DENOPTIMException("Failed to detect autosymmetry.");
+        
+        for (List<Vertex> vertexesToRemove : compatibleSymSubGrps)
+        {
+            // Prepare incoming graph
             DGraph graphToAdd = incomingGraph.clone();
             graphToAdd.renumberGraphVertices();
+            List<Vertex> vertexAddedToThis = new ArrayList<Vertex>(
+                    graphToAdd.gVertices);
             
+            // Prepare subgraph (it already does not contain caps)
             removeCappingGroupsFromChilds(vertexesToRemove);
             
-            List<Vertex> vertexAddedToThis = 
-                    new ArrayList<Vertex>(graphToAdd.gVertices);
-            LinkedHashMap<AttachmentPoint,AttachmentPoint> 
-                localApMap = new LinkedHashMap<AttachmentPoint,
-                AttachmentPoint>();
-            for (Map.Entry<AttachmentPoint,AttachmentPoint>  e 
-                    : apMap.entrySet())
+            // Prepare AP mapping projecting the one for subGrpVrtxs
+            LinkedHashMap<AttachmentPoint,AttachmentPoint> localApMap = 
+                    new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+            for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMap.entrySet())
             {
                 // WARNING! Assumption that subGrpVrtxs and vertexesToRemove
                 // are sorted accordingly to symmetry, which should be the case.
@@ -1657,7 +1710,9 @@ public class DGraph implements Cloneable
             if (!apMap.containsKey(oldAP))
             {
                 throw new DENOPTIMException("Cannot replace subgraph if a used "
-                        + "AP has no mapping.");
+                        + "AP has no mapping. Missing mapping for AP "
+                        + oldAP.getIndexInOwner() + " in " 
+                        + oldAP.getOwner().getVertexId());
             }
             AttachmentPoint newAP = apMap.get(oldAP);
             linksToRecreate.put(newAP, oldAP.getLinkedAP());

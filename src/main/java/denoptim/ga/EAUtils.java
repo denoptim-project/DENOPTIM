@@ -81,7 +81,6 @@ import denoptim.utils.SizeControlledSet;
  */
 public class EAUtils
 {
-
     // cluster the fragments based on their #APs
     protected static HashMap<Integer, ArrayList<Integer>> fragmentPool;
     
@@ -383,13 +382,15 @@ public class EAUtils
         } catch (Throwable t) {
             t.printStackTrace();
             ArrayList<DGraph> parents = new ArrayList<DGraph>();
-            parents.add(xos.getA().get(0).getGraphOwner());
-            parents.add(xos.getB().get(0).getGraphOwner());
+            parents.add(gA);
+            parents.add(gB);
             DenoptimIO.writeGraphsToSDF(new File(settings.getDataDirectory()
-                    + "failed_xover.sdf"), parents, true,
+                    + "_failed_xover.sdf"), parents, true,
                     settings.getLogger());
-            throw new DENOPTIMException("Error while performing crossover. "
-                    + "Please, report this to the authors ",t);
+            throw new DENOPTIMException("Error while performing crossover! "+NL
+                    + "XOverSite:    " + xos.toString() + NL
+                    + "XOverSite(C): " + xosOnClones.toString() + NL
+                    + " Please, report this to the authors ",t);
         }
         gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
