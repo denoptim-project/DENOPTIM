@@ -55,7 +55,7 @@ import denoptim.utils.GraphUtils;
  * @author Marco Foscato
  */
 
-public class DENOPTIMGraphOperationsTest {
+public class GraphOperationsTest {
 
     private static APClass APCA, APCB, APCC, APCD;
     

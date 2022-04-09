@@ -43,7 +43,7 @@ import denoptim.graph.Vertex.BBType;
  * @author Marco Foscato
  */
 
-public class DENOPTIMAttachmentPointTest
+public class AttachmentPointTest
 {
 	private final int ATMID = 6;
 	private final int APCONN = 3;

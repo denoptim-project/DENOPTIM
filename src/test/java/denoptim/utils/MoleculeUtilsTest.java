@@ -38,7 +38,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
  * @author Marco Foscato
  */
 
-public class DENOPTIMMoleculeUtilsTest
+public class MoleculeUtilsTest
 {
     private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
     

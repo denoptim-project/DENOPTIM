@@ -19,6 +19,7 @@
 package denoptim.molecularmodeling;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -50,6 +51,8 @@ public class ConformationalSearchPSSROT
      * Settings controlling the execution of this task
      */
     private MMBuilderParameters settings;
+    
+    private final static String NL = DENOPTIMConstants.EOL;
 
 //------------------------------------------------------------------------------
 
@@ -91,31 +94,26 @@ public class ConformationalSearchPSSROT
      * @throws TinkerException if tinker fails.
      */
 
-    public ArrayList<Molecule3DBuilder> performPSSROT(
-		     ArrayList<Molecule3DBuilder> mols) throws DENOPTIMException, TinkerException
+    public ArrayList<ChemicalObjectModel> performPSSROT(
+		     ArrayList<ChemicalObjectModel> mols) 
+		             throws DENOPTIMException, TinkerException
     {
-        ArrayList<Molecule3DBuilder> nMols = new ArrayList<Molecule3DBuilder>();
+        ArrayList<ChemicalObjectModel> nMols = new ArrayList<ChemicalObjectModel>();
         for (int i=0; i<mols.size(); i++)
         {
     	    Object molErroProp = mols.get(i).getIAtomContainer().getProperty(
     								   DENOPTIMConstants.MOLERRORTAG);
     	    if (molErroProp == null)
     	    {
-        		if (settings.getVerbosity() > 1)
-        		{
-        		    System.out.println("Field MOL_ERROR is null: proceeding "
-        				   + "with conformational search.");
-        		}
-                Molecule3DBuilder csMol = performPSSROT(mols.get(i), i);
+    	        settings.getLogger().log(Level.INFO, "Field MOL_ERROR is "
+        		            + "null: proceeding with conformational search.");
+        		ChemicalObjectModel csMol = performPSSROT(mols.get(i), i);
                 nMols.add(csMol);
     	    } else {
-        		if (settings.getVerbosity() > 1)
-        		{
-        		    System.out.println("Field MOL_ERROR is NOT null: skiping "
-        				   + "conformational search. Reason: "
-        				   + molErroProp);
-        		}
-                nMols.add(mols.get(i).deepcopy());
+        		settings.getLogger().log(Level.INFO, "Field MOL_ERROR is "
+        		            + "NOT null: skiping conformational search. "
+        		            + "Reason: " + molErroProp);
+        		nMols.add(mols.get(i).deepcopy());
     	    }
         }
 
@@ -133,25 +131,20 @@ public class ConformationalSearchPSSROT
      * @throws TinkerException 
      */
 
-    public Molecule3DBuilder performPSSROT(Molecule3DBuilder mol, int idm)
+    public ChemicalObjectModel performPSSROT(ChemicalObjectModel mol, int idm)
 						throws DENOPTIMException, TinkerException
     {
-        if (settings.getVerbosity() > 1)
-        {
-            System.out.println("Start conformational search on mol: " + idm);
-        }
+        settings.getLogger().log(Level.INFO, 
+                "Start conformational search on mol: " + idm);
 
-        Molecule3DBuilder csMol3d = mol.deepcopy();
+        ChemicalObjectModel csMol3d = mol.deepcopy();
 
         // Is there any rotatable bond?
         int sz = csMol3d.getNumberRotatableBonds();
     	if (sz == 0)
     	{
-    	    if (settings.getVerbosity() > 1)
-    	    {
-    	        System.out.println("No rotatable bond: skip PSSROT "
-    				+ "conformational search.");
-    	    }
+    	    settings.getLogger().log(Level.FINE, "No rotatable bond: skiping "
+    	            + " PSSROT conformational search.");
     	    return csMol3d;
     	}
 
@@ -167,8 +160,7 @@ public class ConformationalSearchPSSROT
         String csKeyFile = workDir + fsep + molName + "_cs" + idm + ".key";
         StringBuilder csSbKey = new StringBuilder(512);
         // Molecule-independent keywords
-        csSbKey.append("parameters    ").append(
-				    settings.getParamFile()).append("\n");
+        csSbKey.append("parameters    ").append(settings.getParamFile()).append(NL);
         boolean isFirstLine = true;
         for (String line : settings.getKeyFileParams())
         {
@@ -177,27 +169,27 @@ public class ConformationalSearchPSSROT
                 isFirstLine = false;
                 continue;
     	    }
-            csSbKey.append(line).append("\n");
+            csSbKey.append(line).append(NL);
         }
         DenoptimIO.writeData(csKeyFile, csSbKey.toString(), false);
 
         // Prepare Tinker Submit file (PSSROT parameters)
         String csSubFile = workDir + fsep + molName + "_cs" + idm + ".sub";
         StringBuilder csSbSub = new StringBuilder(512);
-        csSbSub.append(csIntFile).append("\n");
+        csSbSub.append(csIntFile).append(NL);
         // Molecule-independent section of SUB file
         for (String line : settings.getInitPSSROTParams())
         {
-            csSbSub.append(line).append("\n");
+            csSbSub.append(line).append(NL);
         }
         // Rotatable bonds section of SUB file
         for (ObjectPair rotBndOp : csMol3d.getRotatableBonds())
         {
             int t1 = ((Integer)rotBndOp.getFirst()).intValue() + 1;
             int t2 = ((Integer)rotBndOp.getSecond()).intValue() + 1;
-            csSbSub.append(t1).append(" ").append(t2).append("\n");
+            csSbSub.append(t1).append(" ").append(t2).append(NL);
         }
-        csSbSub.append("\n");
+        csSbSub.append(NL);
         // Linear search section of SUB file
         if (sz > 1)
         {
@@ -210,15 +202,15 @@ public class ConformationalSearchPSSROT
         		    int maxDirs = Integer.parseInt(txt.get(ir));
         		    if (sz < maxDirs)
         		    {
-        		        csSbSub.append(sz).append("\n");
+        		        csSbSub.append(sz).append(NL);
         		    }
         		    else
         		    {
-                        csSbSub.append(maxDirs).append("\n");
+                        csSbSub.append(maxDirs).append(NL);
         		    }
         		} else {
         		    String row = txt.get(ir);
-                    csSbSub.append(row).append("\n");
+                    csSbSub.append(row).append(NL);
         		}
             }
         } else {
@@ -228,36 +220,31 @@ public class ConformationalSearchPSSROT
                 String firstLine = settings.getRestPSSROTParams().get(0);
                 String lastLine = settings.getRestPSSROTParams().get(
                                  settings.getRestPSSROTParams().size()-1);
-                csSbSub.append(firstLine).append("\n");
-                csSbSub.append("N").append("\n"); // no local search                
-                csSbSub.append(lastLine).append("\n");
+                csSbSub.append(firstLine).append(NL);
+                csSbSub.append("N").append(NL); // no local search                
+                csSbSub.append(lastLine).append(NL);
             }
         }
         DenoptimIO.writeData(csSubFile, csSbSub.toString(), false);
 
-        if (settings.getVerbosity() > 0)
-            System.err.println("Submitting PSSTOR Conformational Search");
+        settings.getLogger().log(Level.INFO, 
+                "Submitting PSSTOR Conformational Search");
 
         // Perform Ring Search with Tinker's PSSROT
         String csLogFile = workDir + fsep + molName + "_cs" + idm + ".log";
         String csCmdStr = settings.getPSSROTTool() +
                           " < " + csSubFile + " > " + csLogFile;
         String csID = "" + settings.getTaskID();
-        if (settings.getVerbosity() > 1)
-        {
-            System.err.println("CMD: " + csCmdStr + " TskID: " + csID);
-        }
+        settings.getLogger().log(Level.FINE, "CMD: "+csCmdStr+" TskID: "+csID);
         ProcessHandler csPh = new ProcessHandler(csCmdStr, csID);
         try
         {
             csPh.runProcess();
-
             if (csPh.getExitCode() != 0)
             {
                 String msg = "PSSROT Conformational Search failed for ";
                 msg = msg + molName;
-                throw new DENOPTIMException(msg + "\n"
-                                            + csPh.getErrorOutput());
+                throw new DENOPTIMException(msg + NL + csPh.getErrorOutput());
             }
         }
         catch (Exception ex)
@@ -285,10 +272,7 @@ public class ConformationalSearchPSSROT
                         + ocsIntfile + " "
                         + " T " //set use of template 
                         + " > " + newTnkICLog;
-        if (settings.getVerbosity() > 1)
-        {
-            System.err.println("CMD: " + ocsCmd + " TskID: " + ocsID);
-        }
+        settings.getLogger().log(Level.INFO, "CMD: " + ocsCmd+" TskID: "+ocsID);
         ProcessHandler ocsPh = new ProcessHandler(ocsCmd, ocsID);
         try
         {
@@ -296,8 +280,7 @@ public class ConformationalSearchPSSROT
             if (ocsPh.getExitCode() != 0)
             {
                 String msg = "XYZINT (post conf.search) failed for " + molName;
-                throw new DENOPTIMException(msg + "\n"
-                                            + ocsPh.getErrorOutput());
+                throw new DENOPTIMException(msg + NL + ocsPh.getErrorOutput());
             }
         }
         catch (Exception ex)
@@ -323,20 +306,8 @@ public class ConformationalSearchPSSROT
         csMol3d.updateXYZFromINT();
 
         // Cleanup
-        if (settings.getVerbosity() < 2)
-        {
-            FileUtils.deleteFilesContaining(workDir,molName + "_cs" + idm);
-        }
-
-//Useful code only for debug
-/*
-TinkerUtils.writeIC("tmol_afterCS.int", csMol3d.getTinkerMolecule());
-TinkerUtils.writeIC("tmol_afterCS_fM.int", mol.getTinkerMolecule());
-DenoptimIO.writeMolecule("fmol_afterCS.sdf", csMol3d.getIAtomContainer(),true);
-DenoptimIO.writeMolecule("fmol_afterCS_fM.sdf", mol.getIAtomContainer(),true);
-System.out.println("STOP at end of conf search");
-GenUtils.pause();
-*/
+        FileUtils.deleteFilesContaining(workDir,molName + "_cs" + idm);
+        
         return csMol3d;
     }
 

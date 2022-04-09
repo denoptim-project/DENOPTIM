@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
@@ -93,8 +94,6 @@ public class MoleculeUtils
             new StructureDiagramGenerator();
     private static final SmilesGenerator SMGEN = new SmilesGenerator(
             SmiFlavor.Generic);
-    private static final DummyAtomHandler DATMHDLR = new DummyAtomHandler(
-					      DENOPTIMConstants.DUMMYATMSYMBOL);
     private static final  IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
 
@@ -156,9 +155,8 @@ public class MoleculeUtils
                 res = true;
             }
         } catch (Throwable t) {
-            System.out.println("ERROR! Unable to create IsotopeFactory "
+            throw new Error("ERROR! Unable to create IsotopeFactory "
                                         + " (in AtomUtils.getAtomicNumber)");
-            System.exit(-1);;
         }
         return res;
     }
@@ -205,8 +203,8 @@ public class MoleculeUtils
      * @throws DENOPTIMException
      */
 
-    public static void removeUsedRCA(IAtomContainer mol, DGraph graph)
-            throws DENOPTIMException {
+    public static void removeUsedRCA(IAtomContainer mol, DGraph graph, 
+            Logger logger) throws DENOPTIMException {
 
         // add ring-closing bonds
         ArrayList<Vertex> usedRcvs = graph.getUsedRCVertices();
@@ -256,7 +254,8 @@ public class MoleculeUtils
             {
                 mol.addBond(iSrcH, iSrcT, bndTyp.getCDKOrder());
             } else {
-                System.out.println("WARNING! Attempt to add ring closing bond "
+                logger.log(Level.WARNING, "WARNING! "
+                        + "Attempt to add ring closing bond "
                         + "did not add any actual chemical bond because the "
                         + "bond type of the chord is '" + bndTyp +"'.");
             }
@@ -305,11 +304,12 @@ public class MoleculeUtils
      * Returns the SMILES representation of the molecule. All atoms are expected 
      * to be explicit, as we set the count of implicit H to zero for all atoms.
      * @param mol the molecule
+     * @param logger program.specific logger.
      * @return smiles string
      * @throws DENOPTIMException
      */
 
-    public static String getSMILESForMolecule(IAtomContainer mol)
+    public static String getSMILESForMolecule(IAtomContainer mol, Logger logger)
             throws DENOPTIMException {
         IAtomContainer fmol = builder.newAtomContainer();
         try 
@@ -322,8 +322,10 @@ public class MoleculeUtils
         }
 
         // remove Dummy atoms
-        fmol = DATMHDLR.removeDummyInHapto(fmol);
-        fmol = DATMHDLR.removeDummy(fmol);
+        DummyAtomHandler dan = new DummyAtomHandler(
+                DENOPTIMConstants.DUMMYATMSYMBOL, logger);
+        fmol = dan.removeDummyInHapto(fmol);
+        fmol = dan.removeDummy(fmol);
 
         // convert PseudoAtoms to H
         removeRCA(fmol);
@@ -341,8 +343,8 @@ public class MoleculeUtils
         {
             t.printStackTrace();
         	String fileName = "failed_generation_of_SMILES.sdf";
-        	System.out.println("WARNING: Skipping calculation of SMILES. See "
-        			+ "file '" + fileName + "'");
+        	logger.log(Level.WARNING, "WARNING: Skipping calculation of SMILES. "
+        	        + "See file '" + fileName + "'");
         	DenoptimIO.writeSDFFile(fileName,fmol,false);
         	smiles = "calculation_or_SMILES_crashed";
         }
@@ -355,13 +357,14 @@ public class MoleculeUtils
       * Generates 2D coordinates for the molecule
       *
       * @param ac the molecule to layout.
+      * @param logger program-specific logger.
       * @return A new molecule laid out in 2D.  If the molecule already has 2D
       *         coordinates then it is returned unchanged.  If layout fails then
       *         null is returned.
      * @throws denoptim.exception.DENOPTIMException
       */
-    public static IAtomContainer generate2DCoordinates(IAtomContainer ac)
-                                                    throws DENOPTIMException
+    public static IAtomContainer generate2DCoordinates(IAtomContainer ac, 
+            Logger logger) throws DENOPTIMException
     {
         IAtomContainer fmol = builder.newAtomContainer();
         try 
@@ -374,7 +377,9 @@ public class MoleculeUtils
         }
 
         // remove Dummy atoms
-        fmol = DATMHDLR.removeDummyInHapto(fmol);
+        DummyAtomHandler dan = new DummyAtomHandler(
+                DENOPTIMConstants.DUMMYATMSYMBOL, logger);
+        fmol = dan.removeDummyInHapto(fmol);
 
         // remove ring-closing attractors
         removeRCA(fmol);
@@ -416,18 +421,19 @@ public class MoleculeUtils
      * {@link InchiFlag#RecMet}, and {@link InchiFlag#SUU}.
      * 
      * @param mol the molecule
+     * @param logger program-specific logger.
      * @return the InchiKey. <code>null</code> if error
      * @throws denoptim.exception.DENOPTIMException
      */
 
-    public static ObjectPair getInChIForMolecule(IAtomContainer mol)
-            throws DENOPTIMException {
+    public static ObjectPair getInChIForMolecule(IAtomContainer mol, 
+            Logger logger) throws DENOPTIMException {
         InchiOptions options = new InchiOptions.InchiOptionsBuilder()
                 .withFlag(InchiFlag.AuxNone)
                 .withFlag(InchiFlag.RecMet)
                 .withFlag(InchiFlag.SUU)
                 .build();
-        return getInChIForMolecule(mol, options);
+        return getInChIForMolecule(mol, options, logger);
     }
     
 //------------------------------------------------------------------------------
@@ -435,12 +441,13 @@ public class MoleculeUtils
     /**
      * Generates the INCHI key for the molecule
      * @param mol the molecule
+     * @param logger program-specific logger.
      * @return the InchiKey. <code>null</code> if error
      * @throws denoptim.exception.DENOPTIMException
      */
 
     public static ObjectPair getInChIForMolecule(IAtomContainer mol, 
-            InchiOptions options) throws DENOPTIMException {
+            InchiOptions options, Logger logger) throws DENOPTIMException {
         IAtomContainer fmol = builder.newAtomContainer();
         try 
         { 
@@ -452,7 +459,9 @@ public class MoleculeUtils
         }
 
         // remove Dummy atoms before generating the inchi
-        fmol = DATMHDLR.removeDummyInHapto(fmol);
+        DummyAtomHandler dan = new DummyAtomHandler(
+                DENOPTIMConstants.DUMMYATMSYMBOL, logger);
+        fmol = dan.removeDummyInHapto(fmol);
 
         // remove PseudoAtoms
         removeRCA(fmol);
@@ -609,17 +618,18 @@ public class MoleculeUtils
      * Generate a PNG image from molecule <code>mol</code>
      * @param mol generate molecule PNG from
      * @param filename name of file to store generated PNG as
+     * @param logger program-specific logger.
      * @throws DENOPTIMException
      */
     
-    public static void moleculeToPNG(IAtomContainer mol, String filename)
-            throws DENOPTIMException
+    public static void moleculeToPNG(IAtomContainer mol, String filename, 
+            Logger logger) throws DENOPTIMException
     {
         IAtomContainer iac = mol;
 
         if (!GeometryUtil.has2DCoordinates(mol))
         {
-            iac = generate2DCoordinates(mol);
+            iac = generate2DCoordinates(mol, logger);
         }
         
         if (iac == null)
@@ -656,9 +666,7 @@ public class MoleculeUtils
             if (p2d == null)
             {
                 p = new Point3d(0.0, 0.0, 0.0);
-            }
-            else
-            {
+            } else {
                 p = new Point3d(p2d.x, p2d.y, 0.0);
             }
         }
@@ -906,7 +914,7 @@ public class MoleculeUtils
      * @throws DENOPTIMException 
      */
     public static IAtomContainer extractIACForSubgraph(IAtomContainer wholeIAC, 
-            DGraph subGraph, DGraph wholeGraph) throws DENOPTIMException
+            DGraph subGraph, DGraph wholeGraph, Logger logger) throws DENOPTIMException
     {
         IAtomContainer iac = makeSameAs(wholeIAC);
         
@@ -976,7 +984,8 @@ public class MoleculeUtils
                     {
                         String debugFile = "failedAPIdentificationIACSubGraph" 
                                 + wholeGraph.getGraphId() + ".sdf";
-                        DenoptimIO.writeGraphToSDF(new File(debugFile), wholeGraph, willBecomeAP);
+                        DenoptimIO.writeGraphToSDF(new File(debugFile), 
+                                wholeGraph, willBecomeAP, logger);
                         throw new DENOPTIMException("Unmexpected null AP from "
                                 + nbrVid + " " + vid +" on " + wholeGraph 
                                 + " See " + debugFile);

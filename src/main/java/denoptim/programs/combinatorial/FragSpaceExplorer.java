@@ -20,7 +20,6 @@ package denoptim.programs.combinatorial;
 
 import java.io.File;
 
-import denoptim.combinatorial.CEBLParameters;
 import denoptim.combinatorial.CombinatorialExplorerByLayer;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.task.ProgramTask;
@@ -79,6 +78,7 @@ public class FragSpaceExplorer  extends ProgramTask
         settings.readParameterFile(configFilePathName.getAbsolutePath());
         settings.checkParameters();
         settings.processParameters();
+        settings.startProgramSpecificLogger(loggerIdentifier);
         settings.printParameters();
         
         combinatorialAlgorithm = new CombinatorialExplorerByLayer(settings);

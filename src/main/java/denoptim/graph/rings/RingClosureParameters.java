@@ -720,13 +720,6 @@ public class RingClosureParameters extends RunTimeParameters
             throw new DENOPTIMException(msg);
 	    }
 
-        if (!FileUtils.checkExists(rccIndex))
-        {
-            msg = "Index of the RCC archive: " + rccIndex
-                  + " not found: making a new index file.";
-            StaticLogger.appLogger.info(msg);
-        }
-
         if (rceMode > 2)
         {
             msg = "Unknown ring-closure evaluation mode '" + rceMode + "' "
@@ -740,10 +733,6 @@ public class RingClosureParameters extends RunTimeParameters
 
         if (rccFolder!="" && !FileUtils.checkExists(rccFolder))
         {
-            msg = "Root folder for serialized RingClosingConformation"
-		  + " not found. Creating new archive at " + rccFolder;
-            StaticLogger.appLogger.info(msg);
-
     	    File folder = new File(rccFolder);
     	    try
             {
@@ -783,29 +772,24 @@ public class RingClosureParameters extends RunTimeParameters
 
     	if (checkInterdepPaths && !exhaustiveConfSrch)
     	{
-                msg = "Evaluation of the simultaneus ring closability "
-    		  + "condition requires exhaustive conformational search. "
-    		  + "Setting exhaustiveConfSrch=true.";
-                StaticLogger.appLogger.info(msg);
     	    exhaustiveConfSrch = true;
     	}
     
     	if (exhaustiveConfSrch)
     	{
     	    msg = "Exhaustive conformational search has been turned ON. "
-    		  + "This is a time consuming task! Make sure it's what "
-    		  + "you want to do.";
-                StaticLogger.appLogger.log(Level.WARNING,msg);
+    		  + "This is a very time consuming task!";
+            StaticLogger.appLogger.log(Level.WARNING,msg);
     	}
     
     	if (selectFragsFromCC)
     	{
-                msg = "DENOPTIM can guide the selection of fragments to " 
+            msg = "DENOPTIM can guide the selection of fragments to " 
     		  + "those leading to known closable chains. This "
     		  + "functionality is currently under development "
     		  + "and is fully operative only for rings "
     		  + "involving the scaffolds. ";
-                StaticLogger.appLogger.log(Level.WARNING,msg);
+            StaticLogger.appLogger.log(Level.WARNING,msg);
     	}
     	checkOtherParameters();
     }

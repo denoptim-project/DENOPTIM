@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
  * @author Marco Foscato
  */
 
-public class DENOPTIMRingTest {
+public class RingTest {
 	
 //------------------------------------------------------------------------------
 

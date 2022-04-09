@@ -45,9 +45,8 @@ import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 
 
 /**
- * This object represents a path in a <code>DENOPTIMGraph</code>. The path 
- * involving more than one <code>DENOPTIMVertex</code> and 
- * <code>DENOPTIMEdge</code>.
+ * This object represents a path in a {@link DGraph}. The path 
+ * involving more than one {@link Vertex} and {@link Edge}.
  *
  * @author Marco Foscato 
  */
@@ -55,9 +54,8 @@ import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 public class PathSubGraph
 {
     /**
-     * The graph representation of this path. Neither
-     * <code>DENOPTIMVertex</code> nor <code>DENOPTIMEdge</code>
-     * belong to the original <code>DENOPTIMGraph</code>.
+     * The graph representation of this path. Neither vertexes nor edges
+     * belong to the original graph.
      */
     private DGraph graph;
 
@@ -80,7 +78,7 @@ public class PathSubGraph
 
     /**
      * The turning point in the graph: after this point the direction of 
-     * <code>DENOPTIMEdge</code>s becomes opposite than before.
+     * edges becomes opposite than before.
      */
     private Vertex turningPointVert;
 
@@ -107,7 +105,7 @@ public class PathSubGraph
     /**
      * The list of bonds in the shortest path.
      * Note that the <code>IBond</code>s are those of the entire molecule
-     * not of the <code>IAtomContainer</code> representing only this path.
+     * not of the container representing only this path.
      */
     private List<IBond> bondsPathVAVB;
 
@@ -131,8 +129,8 @@ public class PathSubGraph
      * The list of closable conformations, if any is found
      */
     private RingClosingConformations rcc;
-
-    // Set to true to print useful debug information
+    
+    // Set to true to write useful debug data to file and log
     private boolean debug = false;
 
 //-----------------------------------------------------------------------------
@@ -142,8 +140,7 @@ public class PathSubGraph
      * the path
      */
 
-    public PathSubGraph(Vertex vA, Vertex vB, 
-            DGraph molGraph)
+    public PathSubGraph(Vertex vA, Vertex vB, DGraph molGraph)
     {
         this.vA = vA;
         this.vB = vB;
@@ -736,8 +733,8 @@ public class PathSubGraph
     
     private int getVertexIdInPath(IAtom a)
     {
-        return a.getProperty(DENOPTIMConstants.ATMPROPVERTEXID,
-                Integer.class).intValue();
+        return a.getProperty(DENOPTIMConstants.ATMPROPVERTEXID,Integer.class)
+                .intValue();
     }
 
 //-----------------------------------------------------------------------------

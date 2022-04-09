@@ -19,12 +19,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Edge.BondType;
 
 public class APClass implements Cloneable,Comparable<APClass>
-{   
-    /**
-     * Version UID
-     */
-    private static final long serialVersionUID = 3L;
-
+{
     /**
      * The main feature of the APClass. This would usually correspond to the
      * cutting rule that generated APs belonging to this class.
@@ -49,7 +44,7 @@ public class APClass implements Cloneable,Comparable<APClass>
     private final static Object uniqueAPClassesLock = new Object();
 
     /**
-     * Recognised attachment point classes of RingClosingAttractor
+     * Recognized attachment point classes of RingClosingAttractor
      */
     public static final Set<APClass> RCAAPCLASSSET = 
     	    new HashSet<APClass>(){{
@@ -237,11 +232,12 @@ public class APClass implements Cloneable,Comparable<APClass>
                 newApc.setSubClass(subClass);
                 newApc.setBondType(bt);
             } else {
-                // NB: the default bond type for RCAs is different, so we do
-                // not overwrite it.
+                // NB: the default bond type for RCAs must not be changed, but
+                // For non-RCA APClasses we do update the bond type.
+                // TODO: trigger error instead
                 if (bt != newApc.bndTyp && !RCAAPCLASSSET.contains(newApc))
                 {
-                    System.out.println("WARNING! Changing bond order of "
+                    System.err.println("WARNING! Changing bond order of "
                             + "APClass " + newApc + ": " + newApc.bndTyp 
                             + " -> " + bt);
                     newApc.setBondType(bt);
@@ -465,7 +461,6 @@ public class APClass implements Cloneable,Comparable<APClass>
         if (!(o instanceof APClass)) {
             return false;
         }
-        APClass c = (APClass) o;
         return this.hashCode() == o.hashCode();
     }
     

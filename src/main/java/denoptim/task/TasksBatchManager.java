@@ -51,10 +51,8 @@ public class TasksBatchManager
      * @return if successful return the list of molecules with fitness
      * @throws DENOPTIMException
      */
-
-    public static ArrayList<Candidate>
-            executeTasks(ArrayList<Task> tasks, int numOfProcessors)
-                                                        throws DENOPTIMException
+    public static ArrayList<Candidate> executeTasks(ArrayList<Task> tasks, 
+            int numOfProcessors) throws DENOPTIMException
     {
         taskList = tasks;
         int numOfJobs = tasks.size();

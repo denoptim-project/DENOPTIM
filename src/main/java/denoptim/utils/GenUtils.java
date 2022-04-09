@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import denoptim.constants.DENOPTIMConstants;
+
 
 /**
  * General utilities
@@ -33,6 +35,7 @@ import java.util.Set;
 public class GenUtils
 {
     private static Runtime RUNTIME = Runtime.getRuntime();
+    private final static String NL = DENOPTIMConstants.EOL;
     
 //------------------------------------------------------------------------------
     
@@ -81,6 +84,9 @@ public class GenUtils
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Print an analysis of the current memory usage.
+     */
     public static void printMemoryDetails()
     {
         NumberFormat format = NumberFormat.getInstance();
@@ -90,17 +96,17 @@ public class GenUtils
         long freeMemory = RUNTIME.freeMemory();
         sb.append("Free memory: ");
         sb.append(format.format(freeMemory / 1024));
-        sb.append("\n");
+        sb.append(NL);
         sb.append("Allocated memory: ");
         sb.append(format.format(allocatedMemory / 1024));
-        sb.append("\n");
+        sb.append(NL);
         sb.append("Max memory: ");
         sb.append(format.format(maxMemory / 1024));
-        sb.append("\n");
+        sb.append(NL);
         sb.append("Total free memory: ");
         sb.append(format.format((freeMemory + (maxMemory - allocatedMemory)) 
                 / 1024));
-        sb.append("\n");
+        sb.append(NL);
         
         System.out.println(sb.toString());
     }

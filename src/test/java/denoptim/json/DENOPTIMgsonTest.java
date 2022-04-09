@@ -23,9 +23,9 @@ import com.google.gson.Gson;
 
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Fragment;
-import denoptim.graph.DENOPTIMFragmentTest;
+import denoptim.graph.FragmentTest;
 import denoptim.graph.Template;
-import denoptim.graph.DENOPTIMTemplateTest;
+import denoptim.graph.TemplateTest;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.utils.MoleculeUtils;
@@ -102,7 +102,7 @@ public class DENOPTIMgsonTest
     @Test
     public void testTemplateSerialization() throws Exception
     {
-        Template tmpl = DENOPTIMTemplateTest.getTestAmideTemplate();
+        Template tmpl = TemplateTest.getTestAmideTemplate();
         tmpl.setBuildingBlockId(-206); //just any number
         tmpl.setBuildingBlockType(BBType.CAP); //just a type easy to spot
         tmpl.removeMutationType(MutationType.CHANGEBRANCH);
@@ -170,7 +170,7 @@ public class DENOPTIMgsonTest
     @Test
     public void testMolecularFragmentSerialization() throws Exception
     {
-        Fragment frag = DENOPTIMFragmentTest.makeFragment();
+        Fragment frag = FragmentTest.makeFragment();
         frag.setBuildingBlockId(-206); //just any number
         frag.setBuildingBlockType(BBType.CAP); //just a type easy to spot
         frag.removeMutationType(MutationType.CHANGEBRANCH);

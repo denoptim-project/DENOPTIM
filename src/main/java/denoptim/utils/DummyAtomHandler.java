@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
@@ -38,7 +40,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 
 /**
- *
+ * Toll to remove dummy atoms from linearities of multi-hapto sites.
+ * 
  * @author Marco Foscato
  * @author Vishwesh Venkatraman
  */
@@ -47,16 +50,22 @@ public class DummyAtomHandler
     private String elm = "";
     
     //Recursion flag for reporting infos
-     int recNum = 1;
+    int recNum = 1;
 
-    //Amount of debug details printed on screen
-    private int debugLevel = 0;
+    /**
+     * Program-specific logger
+     */
+    private Logger logger;
+    
+    private final static String NL = DENOPTIMConstants.EOL;
+     
     
 //------------------------------------------------------------------------------
     
-    public DummyAtomHandler(String elm)
+    public DummyAtomHandler(String elm, Logger logger)
     {
         this.elm = elm;
+        this.logger = logger;
     }    
 
 //------------------------------------------------------------------------------
@@ -100,29 +109,31 @@ public class DummyAtomHandler
             }
         }
 
-        if (debugLevel > 0)
-            System.err.println("Found "+dummiesList.size()+" dummy atoms(2)");
-
-        if (debugLevel > 2)
+        if (logger.isLoggable(Level.FINEST))
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Found "+dummiesList.size()+" dummy atoms:");
             for (IAtom du : dummiesList)
-                System.err.println("DU LIST: " + getSDFAtomNumber(mol,du)+" size: "
-                                                + dummiesList.size());
-
+            {
+                sb.append(" " + getSDFAtomNumber(mol,du)+" size: "
+                        + dummiesList.size() + NL);
+            }
+            logger.log(Level.FINEST,sb.toString());
+        }
+        
         //Delete dummy atoms and change connectivity
         for (IAtom du : dummiesList)
         {
             //Remove Du-[*] Bonds
             List<IAtom> nbrOfDu = mol.getConnectedAtomsList(du);
-            int numOfTerms = nbrOfDu.size();
             for (IAtom nbr : nbrOfDu)
                 mol.removeBond(du,nbr);
 
             //Remove Du atom
             mol.removeAtom(du);
-            if (debugLevel > 2)
-                System.err.println("NOTE! Atom Numbers change: dummy atom deleted");
-        } //end loop over Du
-
+            logger.log(Level.FINEST, "NOTE! Atom Numbers change: "
+                    + "dummy atom deleted");
+        }
         return mol;
     }    
     
@@ -152,17 +163,17 @@ public class DummyAtomHandler
                 }
             }
         }
-
-        if (debugLevel > 0)
-            System.err.println("Found "+dummiesList.size()+" dummy atoms");
-
-        if (debugLevel > 2)
+        
+        if (logger.isLoggable(Level.FINEST))
         {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Found "+dummiesList.size()+" dummy atoms:");
             for (IAtom du : dummiesList)
             {
-                System.err.println("DU LIST: " + getSDFAtomNumber(mol,du) 
-                                   + " size: " + dummiesList.size());
+                sb.append(" " + getSDFAtomNumber(mol,du)+" size: "
+                        + dummiesList.size() + NL);
             }
+            logger.log(Level.FINEST,sb.toString());
         }
 
         //Delete dummy atoms and change connectivity
@@ -173,13 +184,6 @@ public class DummyAtomHandler
             int numOfTerms = nbrOfDu.size();
             for (IAtom nbr : nbrOfDu)
                 mol.removeBond(du,nbr);
-
-            //Identify atoms of ligand in mupltihapto system
-            if (debugLevel > 2)
-            {
-                System.err.println(" DU: " + getSDFAtomNumber(mol,du) 
-                                   + " size: "+nbrOfDu.size());
-            }
 
             List<Boolean> found = getFlagsVector(numOfTerms);
             List<Set<IAtom>> goupsOfTerms = new ArrayList<>();
@@ -202,20 +206,23 @@ public class DummyAtomHandler
 
             } //end of loop over neighbours of Dummy
 
-            if (debugLevel > 2)
+            if (logger.isLoggable(Level.FINEST))
             {
-                System.err.println("There are "+goupsOfTerms.size()+" groups of terms");
+                StringBuilder sb = new StringBuilder();
+                sb.append("There are "+goupsOfTerms.size()+" groups of terms");
                 for (int i=0; i<goupsOfTerms.size(); i++)
                 {
                     Set<IAtom> s = goupsOfTerms.get(i);
-                    System.err.print(" Group "+i+" - Hapticity: "+hapticity.get(i)+" => ");
+                    sb.append(" Group "+i+" - Hapticity: "+hapticity.get(i)
+                        +" => "+NL);
                     for (IAtom sa : s)
                     {
-                        System.err.print((mol.getAtomNumber(sa)+1)+
+                        sb.append((mol.indexOf(sa)+1)+
                                 MoleculeUtils.getSymbolOrLabel(sa)+" ");
                     }
-                    System.err.println(" ");
+                    sb.append(NL);
                 }
+                logger.log(Level.FINEST, sb.toString());
             }
 
             // If Du is in between groups, connectivity has to be fixed
@@ -287,7 +294,7 @@ public class DummyAtomHandler
                     }
                 }
 
-                //In case of no mathcing return the error
+                //In case of no matching return the error
                 if (!ligandFound)
                 {
                     String msg = "Dummy atom does not seem to be placed at the "
@@ -313,16 +320,13 @@ public class DummyAtomHandler
                     {
                         for (IAtom ligandAtm : ligand)
                         {
-                            if (debugLevel > 2)
-                            {
-                                System.err.println("Making a bond between: " + 
-                                    mol.getAtomNumber(ligandAtm) + 
-                                    MoleculeUtils.getSymbolOrLabel(
-                                            ligandAtm) + " - " + 
-                                    mol.getAtomNumber(centralAtm) + 
-                                    MoleculeUtils.getSymbolOrLabel(
+                            logger.log(Level.FINEST, "Making a bond between: "
+                                    + mol.indexOf(ligandAtm)  
+                                    + MoleculeUtils.getSymbolOrLabel(
+                                            ligandAtm) + " - " 
+                                    + mol.indexOf(centralAtm)  
+                                    + MoleculeUtils.getSymbolOrLabel(
                                             centralAtm));
-                            }
                             IBond bnd = new Bond(ligandAtm,centralAtm);
                             mol.addBond(bnd);
                         }
@@ -332,8 +336,8 @@ public class DummyAtomHandler
 
             //Remove Du atom
             mol.removeAtom(du);
-            if (debugLevel > 2)
-                System.err.println("NOTE! Atom Numbers change: dummy atom deleted");
+            logger.log(Level.FINEST, "NOTE! Atom Numbers change: "
+                    + "dummy atom deleted");
         } //end loop over Du
         
         return mol;
@@ -402,7 +406,7 @@ public class DummyAtomHandler
 
     private static int getSDFAtomNumber(IAtomContainer mol, IAtom atm)
     {
-        return mol.getAtomNumber(atm) + 1;
+        return mol.indexOf(atm) + 1;
     }
     
 //------------------------------------------------------------------------------    

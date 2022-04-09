@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.combinatorial;
+package denoptim.programs.combinatorial;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 
+import denoptim.combinatorial.CEBLUtils;
+import denoptim.combinatorial.CheckPoint;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
@@ -422,32 +424,9 @@ public class CEBLParameters extends RunTimeParameters
 
     public void processParameters() throws DENOPTIMException
     {
-		String curDir = workDir;
-        String fileSep = System.getProperty("file.separator");
-        boolean success = false;
-        while (!success)
-        {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
-            String str = "FSE" + sdf.format(new Date());
-            workDir = curDir + fileSep + str;
-            success = FileUtils.createDirectory(workDir);
-        }
-        FileUtils.addToRecentFiles(workDir, FileFormat.FSE_RUN);
-		if (dbRootDir.equals(".") || dbRootDir.equals(""))
-		{
-		    dbRootDir = workDir;
-		}
-		logFile = workDir + ".log";
-
-        try
-        {
-            StaticLogger.getInstance().setupLogger(logFile);
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
-        }
-        
+        if (isMaster)
+            createWorkingDirectory();
+		
         processOtherParameters();
         
         if (otherParameters.containsKey(ParametersType.FIT_PARAMS))
@@ -465,8 +444,7 @@ public class CEBLParameters extends RunTimeParameters
             catch (Throwable t)
             {
                 String msg = "Cannot read root graphs from " + rootGraphsFile;
-                StaticLogger.appLogger.log(Level.INFO,msg);
-                throw new DENOPTIMException(msg,t);
+                throw new Error(msg,t);
             }
 		}
 	
@@ -476,15 +454,40 @@ public class CEBLParameters extends RunTimeParameters
 		}
         else
         {
-	    chkpt = new CheckPoint();
+            chkpt = new CheckPoint();
             chkptFile = workDir + ".chk";
         }
 
-        System.err.println("Program log file: " + logFile);
-        System.err.println("Output files associated with the current run are " +
-                                "located in " + workDir);
+		if (isMaster)
+		{
+    		StaticLogger.appLogger.log(Level.INFO, "Program log file: " + logFile);
+    		StaticLogger.appLogger.log(Level.INFO, "Output files associated with "
+    		        + "the current run are located in " + workDir);
+		}
     }
     
+//------------------------------------------------------------------------------
+    
+    private void createWorkingDirectory()
+    {
+        String curDir = workDir;
+        String fileSep = System.getProperty("file.separator");
+        boolean success = false;
+        while (!success)
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
+            String str = "FSE" + sdf.format(new Date());
+            workDir = curDir + fileSep + str;
+            success = FileUtils.createDirectory(workDir);
+        }
+        FileUtils.addToRecentFiles(workDir, FileFormat.FSE_RUN);
+        if (dbRootDir.equals(".") || dbRootDir.equals(""))
+        {
+            dbRootDir = workDir;
+        }
+        logFile = workDir + ".log";
+    }
+
 //------------------------------------------------------------------------------
 
     /**

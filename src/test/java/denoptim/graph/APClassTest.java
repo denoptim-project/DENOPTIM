@@ -112,7 +112,7 @@ public class APClassTest
     @Test
     public void testListContains() throws Exception
     {
-        APClass a = APClass.make("a",1, BondType.UNDEFINED);
+        APClass a = APClass.make("a",1, APClass.DEFAULTBT);
         APClass b = APClass.make("a:1");
         APClass c = APClass.make("a",1);
         APClass d = a;

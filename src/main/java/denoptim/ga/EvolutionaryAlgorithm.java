@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.time.StopWatch;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.exception.ExceptionUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.ga.EAUtils.CandidateSource;
 import denoptim.graph.Candidate;
@@ -162,6 +163,7 @@ public class EvolutionaryAlgorithm
         this.settings = settings;
         this.logger = settings.getLogger();
         this.cmdListener = cmdListener;
+        
         // There is currently nothing to initialize for the synchronous scheme
         if (settings.getParallelizationScheme() == 1)
         {
@@ -280,14 +282,23 @@ public class EvolutionaryAlgorithm
                     + NL, genId);
 
             String txt = "No change";
-            if (!evolvePopulation(population, genId))
+            try
             {
-                numStag++;
-            }
-            else
+                if (!evolvePopulation(population, genId))
+                {
+                    numStag++;
+                }
+                else
+                {
+                    numStag = 0;
+                    txt = "New members introduced";
+                }
+            } catch (DENOPTIMException e)
             {
-                numStag = 0;
-                txt = "New members introduced";
+                logger.log(Level.SEVERE, "Exception while running evolutionary"
+                        + "algorithm. Details: " + NL 
+                        + ExceptionUtils.getStackTraceAsString(e));
+                throw e;
             }
             
             logger.log(Level.INFO,txt + " in Generation {0}" 
@@ -403,7 +414,8 @@ public class EvolutionaryAlgorithm
         }
         
         Monitor mnt = new Monitor("MonitorGen",0,settings.getMonitorFile(),
-                settings.getMonitorDumpStep(), settings.dumpMonitor());
+                settings.getMonitorDumpStep(), settings.dumpMonitor(),
+                settings.getLogger());
         
         // Loop creation of candidates until we have created enough new valid 
         // candidates or we have reached the max number of attempts.
@@ -572,7 +584,7 @@ public class EvolutionaryAlgorithm
         ArrayList<Task> syncronisedTasks = new ArrayList<>();
         Monitor mnt = new Monitor("MonitorGen", genId, 
                 settings.getMonitorFile(),settings.getMonitorDumpStep(), 
-                settings.dumpMonitor());
+                settings.dumpMonitor(), settings.getLogger());
         try
         {
             while (i < settings.getPopulationSize() *

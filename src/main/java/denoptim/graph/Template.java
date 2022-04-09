@@ -31,19 +31,30 @@ import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
 
 /**
- * A template is a contract that defines subgraph features that can go from
- * a list of attachment points, via a partially defined subgraph structure, to
- * a fully defined subgraph (i.e., graph structure + identify of each vertex).
+ * <p>A template is a {@link Vertex} that contains a {@link DGraph}. The
+ * content of the template, i.e., the embedded {@link DGraph}, 
+ * is subject to constraints that are defined by
+ * the {@link ContractLevel} of the template and may or may not allow changes
+ * on the embedded {@link DGraph}.</p>
+ * <p>The embedded {@link DGraph} projects a reflection of
+ * any available {@link AttachmentPoint} to the surface of the template. The 
+ * inner {@link AttachmentPoint}s, i.e., those owned by the embedded 
+ * {@link DGraph}, are not the same instances as the outer ones, i.e., those 
+ * on the surface of the template. However, this class keeps a one-to-one 
+ * mapping that is made available by the {@link #innerToOuterAPs} method. 
+ * The distinction of inner and outer {@link AttachmentPoint}s determines the
+ * existence of a barrier between the inside and the outside of a template.
+ * Methods mark with the word "Throughout" are used for operations that
+ * go across such barrier. </p>
+ * <p>For example, consider an {@link AttachmentPoint} in the 
+ * embedded {@link DGraph} (i.e., the inner {@link AttachmentPoint}.
+ * The {@link AttachmentPoint#isAvailable()} method
+ * returns <code>true</code> even if its extra-template reflection (i.e., the 
+ * outer {@link AttachmentPoint}) is used to make an edge to the template.
+ * Instead, the {@link AttachmentPoint#isAvailableThroughout()} returns 
+ * <code>false</code> because it is capable of crossing the template barrier.
+ * </p>
  */
-
-// TODO: remove, later.
-//  Template are variation on fragments that has a number of attachment points and an interior graph. The attachment
-//  points are constant and always available (i.e. uncapped), but the interior graph can vary.
-//  The constant attachment points makes it easy to control the chemical environment in which the Template is embedded
-//  while the interior graph provides the flexibility to change the content between these attachment points.
-//  The degree to which the interior graph can vary is dependent on the contract level of the Template, which can be
-//  provided upon instantiation.
-//
 
 public class Template extends Vertex
 {
@@ -54,7 +65,7 @@ public class Template extends Vertex
     
     /**
      * Molecular representation of the content of this template. This filed is
-     * meant to speed up handling of template's molecular analogue. 
+     * meant to speed up handling of template's molecular analog. 
      * In particular, rather than recalculating the molecular representation
      * multiple times, we make it once 
      * (upon calling {@link #getIAtomContainer()}) and we store the result until

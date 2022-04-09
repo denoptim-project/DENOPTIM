@@ -37,6 +37,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
@@ -3568,8 +3569,7 @@ public class DGraph implements Cloneable
      */
 
     public void addCappingGroups(List<Vertex> vertexAddedToThis, 
-            FragmentSpace fragSpace)
-                                                    throws DENOPTIMException
+            FragmentSpace fragSpace) throws DENOPTIMException
     {
         if (!fragSpace.useAPclassBasedApproach())
             return;
@@ -3581,8 +3581,6 @@ public class DGraph implements Cloneable
             // a free AP.
             if (curVertex.getBuildingBlockType() == Vertex.BBType.CAP)
             {
-                //String msg = "Attempting to cap a capping group. Check your data.";
-                //DENOPTIMLogger.appLogger.log(Level.WARNING, msg);
                 continue;
             }
 
@@ -3598,14 +3596,13 @@ public class DGraph implements Cloneable
 
                         if (bbIdCap != -1)
                         {
-                            Vertex capVrtx = 
-                                    Vertex.newVertexFromLibrary(
+                            Vertex capVrtx = Vertex.newVertexFromLibrary(
                                         GraphUtils.getUniqueVertexIndex(), 
                                         bbIdCap, BBType.CAP, fragSpace);
                             DGraph molGraph = curDap.getOwner()
                                     .getGraphOwner();
                             if (molGraph == null)
-                                throw new DENOPTIMException("Canno add capping "
+                                throw new Error("Cannot add capping "
                                         + "groups to a vertex that does not "
                                         + "belong to a graph.");
                             molGraph.appendVertexOnAP(curDap, capVrtx.getAP(0));
@@ -3615,8 +3612,7 @@ public class DGraph implements Cloneable
                             String msg = "Capping is required but no proper "
                                     + "capping fragment found with APCalss " 
                                     + apcCap;
-                            StaticLogger.appLogger.log(Level.SEVERE,msg);
-                            throw new DENOPTIMException(msg);
+                            throw new Error(msg);
                         }
                     }
                 }
@@ -4641,7 +4637,7 @@ public class DGraph implements Cloneable
         {
             String msg ="Evaluation of graph: graph-to-mol returned null!"
                     + toString();
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             return null;
         }
 
@@ -4651,25 +4647,25 @@ public class DGraph implements Cloneable
         {
             String msg = "Evaluation of graph: Not all connected"
                     + toString();
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             return null;
         }
 
         // SMILES
         String smiles = null;
-        smiles = MoleculeUtils.getSMILESForMolecule(mol);
+        smiles = MoleculeUtils.getSMILESForMolecule(mol,settings.getLogger());
         if (smiles == null)
         {
             String msg = "Evaluation of graph: SMILES is null! "
                     + toString();
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             smiles = "FAIL: NO SMILES GENERATED";
         }
         // if by chance the smiles indicates a disconnected molecule
         if (smiles.contains("."))
         {
             String msg = "Evaluation of graph: SMILES contains \".\"" + smiles;
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             return null;
         }
 
@@ -4682,7 +4678,7 @@ public class DGraph implements Cloneable
             {
                 String msg = "Evaluation of graph: Max atoms constraint "
                         + " violated: " + smiles;
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 return null;
             }
         }
@@ -4695,7 +4691,7 @@ public class DGraph implements Cloneable
             {
                 String msg = "Evaluation of graph: Molecular weight "
                         + "constraint violated: " + smiles + " | MW: " + mw;
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 return null;
             }
         }
@@ -4709,7 +4705,7 @@ public class DGraph implements Cloneable
             {
                 String msg = "Evaluation of graph: Max rotatable bonds "
                         + "constraint violated: "+ smiles;
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 return null;
             }
         }
@@ -4718,10 +4714,10 @@ public class DGraph implements Cloneable
         // 1D) unacceptable free APs
         if (fsSettings.getFragmentSpace().useAPclassBasedApproach())
         {
-            if (hasForbiddenEnd(fsSettings.getFragmentSpace()))
+            if (hasForbiddenEnd(fsSettings))
             {
                 String msg = "Evaluation of graph: forbidden end in graph!";
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 return null;
             }
         }
@@ -4761,7 +4757,7 @@ public class DGraph implements Cloneable
                     String msg = "Evaluation of graph: too many RCAs! "
                             + rcaTyp + ":" + nThisType + " "
                             + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    StaticLogger.appLogger.log(Level.INFO, msg);
+                    settings.getLogger().log(Level.FINE, msg);
                     return null;
                 }
                 if (nThisType < rcSettings.getMinRcaPerType() ||
@@ -4770,7 +4766,7 @@ public class DGraph implements Cloneable
                     String msg = "Evaluation of graph: too few RCAs! "
                             + rcaTyp + ":" + nThisType + " "
                             + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    StaticLogger.appLogger.log(Level.INFO, msg);
+                    settings.getLogger().log(Level.FINE, msg);
                     return null;
                 }
 
@@ -4781,17 +4777,18 @@ public class DGraph implements Cloneable
             if (nPossRings < rcSettings.getMinRingClosures())
             {
                 String msg = "Evaluation of graph: too few ring candidates";
-                StaticLogger.appLogger.log(Level.INFO, msg);
+                settings.getLogger().log(Level.FINE, msg);
                 return null;
             }
         }
 
         // get the smiles/Inchi representation
-        ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol);
+        ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol, 
+                settings.getLogger());
         if (pr.getFirst() == null)
         {
             String msg = "Evaluation of graph: INCHI is null!";
-            StaticLogger.appLogger.log(Level.INFO, msg);
+            settings.getLogger().log(Level.FINE, msg);
             pr.setFirst("UNDEFINED_INCHI");
         }
 
@@ -4846,7 +4843,8 @@ public class DGraph implements Cloneable
 
         // Set rotatable property as property of IBond
         RotationalSpaceUtils.defineRotatableBonds(mol,
-                fsSettings.getRotSpaceDefFile(), true, true);
+                fsSettings.getRotSpaceDefFile(), true, true,
+                settings.getLogger());
 
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler(rcSettings,
@@ -4907,10 +4905,11 @@ public class DGraph implements Cloneable
      * @return <code>true</code> if a forbidden end is found
      */
 
-    public boolean hasForbiddenEnd(FragmentSpace fragSpace)
+    public boolean hasForbiddenEnd(FragmentSpaceParameters fsSettings)
     {
         ArrayList<Vertex> vertices = getVertexList();
-        Set<APClass> classOfForbEnds = fragSpace.getForbiddenEndList();
+        Set<APClass> classOfForbEnds = 
+                fsSettings.getFragmentSpace().getForbiddenEndList();
         boolean found = false;
         for (Vertex vtx : vertices)
         {
@@ -4928,7 +4927,7 @@ public class DGraph implements Cloneable
                                 + vtx.toString()
                                 + "\n"+ this +" \n "
                                 + " AP class: " + apClass;
-                        StaticLogger.appLogger.log(Level.WARNING, msg);
+                        fsSettings.getLogger().log(Level.WARNING, msg);
                         break;
                     }
                 }
@@ -5271,15 +5270,13 @@ public class DGraph implements Cloneable
      * Search a graph for vertices that match the criteria defined in a query
      * vertex.
      * @param query the query
-     * @param verbosity the verbosity level
+     * @param logger manager of log
      * @return the list of matches
      */
-    public ArrayList<Integer> findVerticesIds(
-            VertexQuery query,
-            int verbosity)
+    public ArrayList<Integer> findVerticesIds(VertexQuery query, Logger logger)
     {
         ArrayList<Integer> matches = new ArrayList<>();
-        for (Vertex v : findVertices(query, verbosity))
+        for (Vertex v : findVertices(query, logger))
         {
             matches.add(v.getVertexId());
         }
@@ -5292,20 +5289,15 @@ public class DGraph implements Cloneable
      * Filters a list of vertices according to a query.
      * vertex.
      * @param vrtxQuery the query defining what is that we want to find.
-     * @param verbosity the verbosity level.
+     * @param logger manager of log
      * @return the list of vertexes that match the query.
      */
 
-    public ArrayList<Vertex> findVertices(
-            VertexQuery vrtxQuery,
-            int verbosity)
+    public ArrayList<Vertex> findVertices(VertexQuery vrtxQuery, Logger logger)
     {
         ArrayList<Vertex> matches = new ArrayList<>(getVertexList());
 
-        if (verbosity > 1)
-        {
-            System.out.println("Candidates: " + matches);
-        }
+        logger.log(Level.FINE, "Candidates: " + matches);
 
         //Check condition vertex ID
         Integer vidQuery = vrtxQuery.getVertexIDQuery();
@@ -5321,10 +5313,7 @@ public class DGraph implements Cloneable
             }
             matches = newLst;
         }
-        if (verbosity > 1)
-        {
-            System.out.println("  After filtering by vertex ID: " + matches);
-        }
+        logger.log(Level.FINE,"  After filtering by vertex ID: " + matches);
         
         //Check condition vertex type (NB: essentially the vertex implementation
         VertexType vtQuery = vrtxQuery.getVertexTypeQuery();
@@ -5339,11 +5328,8 @@ public class DGraph implements Cloneable
                 }
             }
             matches = newLst;
-            if (verbosity > 2)
-            {
-                System.out.println("  After filtering by vertex type: "
-                        + matches);
-            }
+            logger.log(Level.FINER, "  After filtering by vertex type: "
+                    + matches);
         }
         
         //Check condition building block Type
@@ -5359,11 +5345,8 @@ public class DGraph implements Cloneable
                 }
             }
             matches = newLst;
-            if (verbosity > 2)
-            {
-                System.out.println("  After filtering by building block "
+            logger.log(Level.FINER, "  After filtering by building block "
                         + "type: " + matches);
-            }
         }
         
         //Check condition building block ID
@@ -5379,11 +5362,8 @@ public class DGraph implements Cloneable
                 }
             }
             matches = newLst;
-            if (verbosity > 2)
-            {
-                System.out.println("  After filtering by building block ID: " 
+            logger.log(Level.FINER, "  After filtering by building block ID: " 
                         + matches);
-            }
         } 
 
         //Check condition: level of vertex
@@ -5399,17 +5379,11 @@ public class DGraph implements Cloneable
                 }
             }
             matches = newLst;
-            if (verbosity > 2)
-            {
-                System.out.println("  After filtering by level: " + matches);
-            }
+            logger.log(Level.FINER, "  After filtering by level: " + matches);
         }
         
-        if (verbosity > 1)
-        {
-            System.out.println("After all vertex-based filters: " + matches);
-        }
-
+        logger.log(Level.FINE, "After all vertex-based filters: " + matches);
+        
         List<EdgeQuery> inAndOutEdgeQueries = new ArrayList<>();
         inAndOutEdgeQueries.add(vrtxQuery.getInEdgeQuery());
         inAndOutEdgeQueries.add(vrtxQuery.getOutEdgeQuery());
@@ -5445,11 +5419,8 @@ public class DGraph implements Cloneable
                     }
                 }
                 matches = newLst;
-                if (verbosity > 2)
-                {
-                    System.out.println("  After " + inOrOut 
+                logger.log(Level.FINER, "  After " + inOrOut 
                             + " edge trgAPID filter: " + matches);
-                }
             }
             
             Integer eInSrcApIDx = edgeQuery.getSourceAPIdx();
@@ -5468,11 +5439,8 @@ public class DGraph implements Cloneable
                     }
                 }
                 matches = newLst;
-                if (verbosity > 2)
-                {
-                    System.out.println("  After " + inOrOut 
+                logger.log(Level.FINER, "  After " + inOrOut 
                             + " edge srcAPID filter: " + matches);
-                }
             }
             
             if (i==0)
@@ -5493,11 +5461,8 @@ public class DGraph implements Cloneable
                         }
                     }
                     matches = newLst;
-                    if (verbosity > 2)
-                    {
-                        System.out.println("  After " + inOrOut 
+                    logger.log(Level.FINER, "  After " + inOrOut 
                                 + " edge src VertexID filter: " + matches);
-                    }
                 }
             } else if (i==1) {
                 Integer eTrgVrtID = edgeQuery.getTargetVertexId();
@@ -5516,11 +5481,8 @@ public class DGraph implements Cloneable
                         }
                     }
                     matches = newLst;
-                    if (verbosity > 2)
-                    {
-                        System.out.println("  After " + inOrOut 
+                    logger.log(Level.FINER, "  After " + inOrOut 
                                 + " edge trg VertexID filter: " + matches);
-                    }
                 }
             }
 
@@ -5540,11 +5502,8 @@ public class DGraph implements Cloneable
                     }
                 }
                 matches = newLst;
-                if (verbosity > 2)
-                {
-                    System.out.println("  After " + inOrOut 
+                logger.log(Level.FINER, "  After " + inOrOut 
                             + " edge bond type filter: " + matches);
-                }
             }
 
             APClass srcAPC = edgeQuery.getSourceAPClass();
@@ -5582,21 +5541,14 @@ public class DGraph implements Cloneable
                 }
                 matches = newLst;
             }
-        
-            if (verbosity > 1)
-            {
-                System.out.println("After all " + inOrOut 
+            logger.log(Level.FINER, "After all " + inOrOut 
                         + " edge-based filters: " + matches);
-            }
         }
     
         // Identify symmetric sets and keep only one member
         removeSymmetryRedundance(matches);
 
-        if (verbosity > 1)
-        {
-            System.out.println("Final Matches (after symmetry): " + matches);
-        }
+        logger.log(Level.FINE, "Final Matches (after symmetry): " + matches);
 
         return matches;
     }
@@ -5706,35 +5658,23 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Edit this graph according to a given list of edit tasks.
+     * Edit this graph according to a given list of edit tasks. This method 
+     * assumes the vertex IDs are unique.
      * @param edits the list of edit tasks.
      * @param symmetry if <code>true</code> the same operation is performed on
      * vertexes related by symmetry.
-     * @param verbosity the verbosity level.
+     * @param logger the logger to use
      * @return the modified graph.
      */
 
     public DGraph editGraph(ArrayList<GraphEdit> edits,
-            boolean symmetry, int verbosity) throws DENOPTIMException
+            boolean symmetry, Logger logger) throws DENOPTIMException
     {
-
-        //Make sure there is no clash with vertex IDs? This changes vertex IDs
-        // and makes querying by vertex ID impossible. So, we don't do it,
-        // and we must therefore assume the vertex IDs are good in the graph.
-        /*
-        int maxId = getMaxVertexId();
-        GraphUtils.ensureVertexIDConsistency(maxId);
-        */
-
         DGraph modGraph = this.clone();
 
         for (GraphEdit edit : edits)
         {
-            if (verbosity > 1)
-            {
-                System.out.println(" ");
-                System.out.println("Graph edit task: " + edit.getType());
-            }
+            logger.log(Level.FINE, "Graph edit task: " + edit.getType());
 
             switch (edit.getType())
             {
@@ -5768,12 +5708,12 @@ public class DGraph implements Cloneable
                                     + "to unambiguously choose one AP. "
                                     + "Please, add 'idAPOnIncomingGraph' in "
                                     + "the definition of " + geClsName + ".";
-                            System.out.println(msg);
+                            logger.log(Level.WARNING, msg);
                         }
                     }
                     
-                    ArrayList<Vertex> matches = modGraph.findVertices(
-                            query,verbosity);
+                    ArrayList<Vertex> matches = modGraph.findVertices(query, 
+                            logger);
                     if (symmetry)
                     {
                         modGraph.removeSymmetryRedundance(matches);
@@ -5806,7 +5746,7 @@ public class DGraph implements Cloneable
                 case DELETEVERTEX:
                 {
                     ArrayList<Vertex> matches = modGraph.findVertices(
-                            edit.getVertexQuery(), verbosity);
+                            edit.getVertexQuery(), logger);
                     for (Vertex vertexToRemove : matches)
                     {
                         modGraph.removeBranchStartingAt(vertexToRemove,symmetry);

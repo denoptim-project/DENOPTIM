@@ -39,12 +39,6 @@ import denoptim.graph.rings.RingClosingAttractor;
 public class RingClosingUtils
 {
 
-    /**
-     * Verbosity level
-     */
-
-    private static int verbosity = 0;
-
 //------------------------------------------------------------------------------    
 
     /** 

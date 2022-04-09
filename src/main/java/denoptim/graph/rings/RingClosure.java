@@ -19,9 +19,13 @@
 package denoptim.graph.rings;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
+
+import denoptim.constants.DENOPTIMConstants;
 
 /**
  * RingClosure represents the arrangement of atoms and 
@@ -141,12 +145,13 @@ public class RingClosure
     /**
      * Evaluate closability by comparing the distances and the dot product
      * with the given critera.
-     * @param clsablConds the closability conditions
+     * @param clsablConds the closability conditions.
+     * @param logger the program-specific logger.
      * @return <code>true</code> is the arrangement of points respect the
      * closability condition
      */
 
-    public boolean isClosable(ArrayList<Double> clsablConds, boolean debug)
+    public boolean isClosable(ArrayList<Double> clsablConds,Logger logger)
     {
         return isClosable(clsablConds.get(0), 
                           clsablConds.get(1),
@@ -155,7 +160,7 @@ public class RingClosure
                           clsablConds.get(4),
                           clsablConds.get(5),
                           clsablConds.get(6),
-                          debug);
+                          logger);
     }
 
 //-----------------------------------------------------------------------------
@@ -171,36 +176,41 @@ public class RingClosure
      * @param minDH2T2 minimum threshold value for distance h2-t2
      * @param maxDH2T2 maximum threshold value for distance h2-t2
      * @param maxDotHT maximum value for the dot product
-     * @param debug this flag makes me printing a lot of info
+     * @param logger for debugging
      * @return <code>true</code> is the arrangement of points respect the
      * closability condition
      */
 
-    public boolean isClosable  (double minDH1T2, double maxDH1T2,
+    public boolean isClosable (double minDH1T2, double maxDH1T2,
                                 double minDH2T1, double maxDH2T1,
                                 double minDH2T2, double maxDH2T2,
-                                double maxDotHT, boolean debug)
+                                double maxDotHT, Logger logger)
     {
         boolean res = false;
         this.distH1T2 = h1.distance(t2);
         this.distH2T1 = h2.distance(t1);
         this.distH2T2 = h2.distance(t2);
-        if (debug)
+        if (logger.isLoggable(Level.FINEST))
         {
-
-            System.out.println("Values for evaluation of closability:");
-            System.out.printf("  distH1T2: %8.4f min: %8.4f max: %8.4f%n",
-						distH1T2, minDH1T2, maxDH1T2);
-            System.out.printf("  distH2T1: %8.4f min: %8.4f max: %8.4f%n",
-                                                distH2T1, minDH2T1, maxDH2T1);
-            System.out.printf("  distH2T2: %8.4f min: %8.4f max: %8.4f%n",
-                                                distH2T2, minDH2T2, maxDH2T2);
+            StringBuilder sb = new StringBuilder();
+            String NL = DENOPTIMConstants.EOL;
+            sb.append("Values for evaluation of closability:");
+            sb.append("  distH1T2: " + String.format("%8.4f",distH1T2));
+            sb.append("  min: " + String.format("%8.4f",minDH1T2));
+            sb.append("  max: " + String.format("%8.4f",maxDH1T2) + NL);
+            sb.append("  distH2T1: " + String.format("%8.4f",distH2T1));
+            sb.append("  min: " + String.format("%8.4f",minDH2T1));
+            sb.append("  max: " + String.format("%8.4f",maxDH2T1) + NL);
+            sb.append("  distH2T2: " + String.format("%8.4f",distH2T2));
+            sb.append("  min: " + String.format("%8.4f",minDH2T2));
+            sb.append("  max: " + String.format("%8.4f",maxDH2T2) + NL);
             h = new Vector3d(h2.x-h1.x, h2.y-h1.y, h2.z-h1.z);
             t = new Vector3d(t2.x-t1.x, t2.y-t1.y, t2.z-t1.z);
             h.normalize();
             t.normalize();
-            System.out.printf("  dot:      %8.4f max: %8.4f%n",
-                                                h.dot(t), maxDotHT);
+            sb.append("  dot:      " + String.format("%8.4f", h.dot(t)));
+            sb.append("  max: " + String.format("%8.4f%n", maxDotHT));
+            logger.log(Level.FINEST,sb.toString());
         }
 
         if (distH1T2 < maxDH1T2 && distH1T2 > minDH1T2 &&
@@ -214,8 +224,7 @@ public class RingClosure
 
             if (h.dot(t) <= maxDotHT)
             {
-                if (debug)
-                    System.out.println("  CLOSABLE!");
+                logger.log(Level.FINEST,"  CLOSABLE!");
                 res = true;
             }
         }
@@ -283,7 +292,7 @@ public class RingClosure
 
     /**
      * Returns the list of min/max values defining the closability conditions.
-     * This method is made available to garantee that only one set of 
+     * This method is made available to guarantee that only one set of 
      * closability conditions is used by whichever tool needs to evaluate 
      * ring closability.
      * @param etrxTol additional factor that multiplies dist. tolerance

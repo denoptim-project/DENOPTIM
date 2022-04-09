@@ -75,11 +75,10 @@ public final class DENOPTIMConstants
         } catch (Throwable t)
         {
             t.printStackTrace();
-            System.out.println("ERROR: unable to make configuration folder '"  
-                    + configFolder.getAbsolutePath() + "'");
-            System.err.println("ERROR: unable to make configuration folder '"  
-                    + configFolder.getAbsolutePath() + "'");
-            System.exit(-1);
+            String msg = "ERROR: unable to make configuration folder '"  
+                    + configFolder.getAbsolutePath() + "'";
+            System.err.println(msg);
+            throw new Error(msg);
         }
         return configFolder;
     }

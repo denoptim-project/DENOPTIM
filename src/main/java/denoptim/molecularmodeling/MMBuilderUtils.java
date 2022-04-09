@@ -28,14 +28,13 @@ import denoptim.exception.DENOPTIMException;
 
 
 /**
- *
+ * Utilities for molecular models builder.
+ * 
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
 public class MMBuilderUtils 
-{
-    private static String lsep = System.getProperty("line.separator");
-    
+{   
     
 //------------------------------------------------------------------------------
 

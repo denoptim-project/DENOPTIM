@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
@@ -49,21 +51,16 @@ import denoptim.utils.GenUtils;
 import denoptim.utils.ObjectPair;
 
 /**
- * Toolkit to perform ring closure with 3D fragments
+ * Toolkit to perform ring closing conformational search. 
+ * This tool makes use of Tinker's PSSROT engine.
  *
  * @author Marco Foscato 
  */
 
 public class RingClosureTool
 {
-
     /**
-     * Verbosity level
-     */
-    private int verbosity = 0;
-
-    /**
-     * Iteration counter (for future use)
+     * Iteration counter for making unique filenames.
      */
     private int itn = 0;
 
@@ -73,9 +70,19 @@ public class RingClosureTool
     final String fsep = System.getProperty("file.separator");
     
     /**
-     * Settings controllign the calculation
+     * New line character
+     */
+    private static final String NL = DENOPTIMConstants.EOL;
+    
+    /**
+     * Settings controlling the calculation
      */
     private MMBuilderParameters settings;
+    
+    /**
+     * Program.specific logger
+     */
+    private Logger logger;
 
 //------------------------------------------------------------------------------
 
@@ -85,7 +92,7 @@ public class RingClosureTool
     public RingClosureTool(MMBuilderParameters settings)
     {
         this.settings = settings;
-        this.verbosity = settings.getVerbosity();
+        this.logger = settings.getLogger();
     }
 
 //------------------------------------------------------------------------------
@@ -120,8 +127,7 @@ public class RingClosureTool
             if (val != null)
             {
                 tatom.setAtomType(val.intValue());
-                if (verbosity > 3)
-                    System.err.println("Set parameter for " + st);
+                logger.log(Level.FINEST, "Set parameter for " + st);
             } 
             else
             {
@@ -144,23 +150,23 @@ public class RingClosureTool
                                                         throws DENOPTIMException
     {
         int lastIdx = MMBuilderUtils.countLinesWKeywordInFile(tinkerresfile,
-                                " Final Function Value and Deformation");
+                " Final Function Value and Deformation");
         String workDir = settings.getWorkingDirectory();
-        String xyzfile = workDir + fsep + fname + "." +
-                                 GenUtils.getPaddedString(3, lastIdx - 1);
+        String xyzfile = workDir + fsep + fname + "." 
+                + GenUtils.getPaddedString(3, lastIdx - 1);
         return xyzfile;
     }
 
 //------------------------------------------------------------------------------    
     /**
      *
-     * TODO: this method (from DENOPTIM3DMoleculeBuilder.java) should be made 
+     * TODO: this method should be made 
      * public and moved to a more sensible location (i.e., a class of utilities
      * for tinker methods)
      */
-
-    private ArrayList<double[]> getTinkerLastCycleFile(String fname, String tinkerresfile)
-                                                        throws DENOPTIMException
+//TODO-gg del
+    private ArrayList<double[]> getTinkerLastCycleFile(String fname, 
+            String tinkerresfile)  throws DENOPTIMException
     {
         int lastIdx = MMBuilderUtils.countLinesWKeywordInFile(tinkerresfile,
                                 " Final Function Value and Deformation");
@@ -227,27 +233,27 @@ public class RingClosureTool
      * @throws DENOPTIMException
      */
 
-    public ArrayList<Molecule3DBuilder> attemptAllRingClosures(
-                                 Molecule3DBuilder mol) throws DENOPTIMException
+    public ArrayList<ChemicalObjectModel> attemptAllRingClosures(
+                                 ChemicalObjectModel mol) throws DENOPTIMException
     {
-        ArrayList<Molecule3DBuilder> rcMols = new ArrayList<Molecule3DBuilder>();
+        ArrayList<ChemicalObjectModel> rcMols = new ArrayList<ChemicalObjectModel>();
         int i = 0;
         for (Set<ObjectPair> rcaComb : mol.getRCACombinations())
         {
             i++;
-            if (verbosity > 1)
+            if (logger.isLoggable(Level.FINE))
             {
                 String s = "";
                 for (ObjectPair p : rcaComb)
                 {
                     s = s + p.getFirst() + ":" + p.getSecond() + " ";
                 }
-                System.out.println("Attempting Ring Closure with RCA "
-                                        + "Combination (" + i + "): " + s);
+                logger.log(Level.FINE,"Attempting Ring Closure with RCA "
+                        + "Combination (" + i + "): " + s);
             }
 
             // Try to create new molecule
-            Molecule3DBuilder rcMol = attemptRingClosure(mol,rcaComb);
+            ChemicalObjectModel rcMol = attemptRingClosure(mol,rcaComb);
 
     	    // If some ring remains open, report in the MOL_ERROR field
     	    int newRingClosed = rcMol.getNewRingClosures().size();
@@ -277,41 +283,41 @@ public class RingClosureTool
      * Note that this comparator sorts in DESCENDING order.
      */
 
-    private class RingClosedMolComparator implements Comparator<Molecule3DBuilder>
+    private class RingClosedMolComparator implements Comparator<ChemicalObjectModel>
     {
-	public int compare(Molecule3DBuilder mA, Molecule3DBuilder mB)
-	{
+    	public int compare(ChemicalObjectModel mA, ChemicalObjectModel mB)
+    	{
             final int FIRST = 1;
             final int EQUAL = 0;
             final int LAST = -1;
-
-	    // First criterion is the number of RingClosures
-	    int nRcA = mA.getNewRingClosures().size();
-	    int nRcB = mB.getNewRingClosures().size();
-	    if (nRcA < nRcB) // The HIGHER the number, the BETTER
-	    {
-		return FIRST;
-	    }
-	    else if (nRcA > nRcB)
-	    {
-		return LAST;
-	    }
-
-	    // Second, the quality (closeness to perfection) of RingClosures
-	    double scoreA = mA.getNewRingClosuresQuality();
+    
+    	    // First criterion is the number of RingClosures
+    	    int nRcA = mA.getNewRingClosures().size();
+    	    int nRcB = mB.getNewRingClosures().size();
+    	    if (nRcA < nRcB) // The HIGHER the number, the BETTER
+    	    {
+    	        return FIRST;
+    	    }
+    	    else if (nRcA > nRcB)
+    	    {
+    	        return LAST;
+    	    }
+    
+    	    // Second, the quality (closeness to perfection) of RingClosures
+    	    double scoreA = mA.getNewRingClosuresQuality();
             double scoreB = mB.getNewRingClosuresQuality();
-	    double dist = scoreA - scoreB;
-	    double trsh = Math.min(scoreA,scoreB) * 0.05;
-	    if (dist > 0.0 && dist > trsh) // The LOWER the score, the BETTER
+    	    double dist = scoreA - scoreB;
+    	    double trsh = Math.min(scoreA,scoreB) * 0.05;
+    	    if (dist > 0.0 && dist > trsh) // The LOWER the score, the BETTER
             {
                 return FIRST;
             }
-	    if (dist < 0.0 && Math.abs(dist) > trsh)
+    	    if (dist < 0.0 && Math.abs(dist) > trsh)
             {
                 return LAST;
             }
-
-	    // Third, atom proximity
+    
+    	    // Third, atom proximity
             double proxScoreA = mA.getAtomOverlapScore();
             double proxScoreB = mB.getAtomOverlapScore();
             if (proxScoreA < proxScoreB)  // The HIGHER the proxScore, the BETTER
@@ -322,9 +328,9 @@ public class RingClosureTool
             {
                 return LAST;
             }
-
-	    return EQUAL;
-	}
+    
+    	    return EQUAL;
+    	}
     }
 
 //------------------------------------------------------------------------------
@@ -346,10 +352,10 @@ public class RingClosureTool
      * @throws DENOPTIMException
      */
 
-    public Molecule3DBuilder attemptRingClosure(Molecule3DBuilder molIn,
+    public ChemicalObjectModel attemptRingClosure(ChemicalObjectModel molIn,
                       Set<ObjectPair> rcaCombination) throws DENOPTIMException
     {
-        Molecule3DBuilder rcMol3d = molIn.deepcopy();
+        ChemicalObjectModel rcMol3d = molIn.deepcopy();
         IAtomContainer fmol = rcMol3d.getIAtomContainer();
         TinkerMolecule tmol = rcMol3d.getTinkerMolecule();
         String workDir = settings.getWorkingDirectory();
@@ -358,15 +364,11 @@ public class RingClosureTool
         // Increment iteration number (to make unique file names)
         itn++;
 
-        if (verbosity > 0)
-        {
-            System.err.println("Attempting Ring Closure via conformational"
+        logger.log(Level.INFO, "Attempting Ring Closure via conformational"
                                 + " adaptation for " + molName
                                 + " (PSSROT - Iteration: " + itn + ")");
-        }
 
         // Prepare dummy space for text and coordinates
-        ArrayList<double[]> coords = new ArrayList<>();
         for (int i=0; i<fmol.getAtomCount(); i++)
         {
             double[] f = new double[3];
@@ -411,13 +413,11 @@ public class RingClosureTool
         // Definition of RingClosingPotential
         String rcStrategy = rcParams.getRCStrategy();
 
-        if (rcStrategy.equals("BONDOVERLAP"))
-        {
-            if (verbosity > 1)
-                System.out.println("Using BONDOVERLAP RC-strategy.");
-
+        //TODO-gg remove BONDCOMPLEMENTARITY
+        //if (rcStrategy.equals("BONDOVERLAP"))
+        //{
             rsSbKey.append("RC11BNDTERM\n");
-            rsSbKey.append("RC12BNDTERM NONE\n");
+            rsSbKey.append("RC12BNDTERM NONE"+NL);
             for (ObjectPair op : rcaCombination)
             {
                 int iRcaA = ((Integer) op.getFirst()).intValue();
@@ -440,6 +440,7 @@ public class RingClosureTool
                 rsSbKey.append("RC-11-PAIRS " + s0t + " " + i1t + " "
                                + parA + " " + parB + "\n");
             }
+        /*    
         }
         else if (rcStrategy.equals("BONDCOMPLEMENTARITY"))
         {
@@ -476,13 +477,8 @@ public class RingClosureTool
                            + parA + " " + parB + "\n");
             }
         }
-        else
-        {
-            System.err.println("Ring Closing Strategy '" + rcStrategy
-                + "' not recognized. Plese choose between "
-                + " 'BONDOVERLAP' and 'BONDCOMPLEMENTARITY'.");
-            System.exit(-1);
-        }
+        */
+            
         //Finally write the keywords into the KEY file
         DenoptimIO.writeData(rsKeyFile, rsSbKey.toString(), false);
 
@@ -545,28 +541,22 @@ public class RingClosureTool
         }
         DenoptimIO.writeData(rsSubFile, rsSbSub.toString(), false);
 
-        if (verbosity > 0)
-            System.err.println("Submitting Ring-Closing PSSTOR");
+        logger.log(Level.INFO, "Submitting Ring-Closing PSSTOR");
 
         // Perform Ring Search with Tinker's PSSROT
         String rsOutFile = workDir + fsep + molName + "_rs" + itn + ".log";
         String rsCmdStr = settings.getPSSROTTool() +
                           " < " + rsSubFile + " > " + rsOutFile;
         String rsID = "" + settings.getTaskID();
-        if (verbosity > 1)
-        {
-            System.err.println("CMD: " + rsCmdStr + " TskID: " + rsID);
-        }
+        logger.log(Level.FINE, "CMD: " + rsCmdStr + " TskID: " + rsID);
         ProcessHandler rsPh = new ProcessHandler(rsCmdStr, rsID);
         try
         {
             rsPh.runProcess();
-
             if (rsPh.getExitCode() != 0)
             {
                 String msg = "PSSROT RingSearch failed for " + molName;
-                throw new DENOPTIMException(msg + "\n"
-                                            + rsPh.getErrorOutput());
+                throw new DENOPTIMException(msg + NL + rsPh.getErrorOutput());
             }
         }
         catch (Exception ex)
@@ -578,16 +568,11 @@ public class RingClosureTool
         // Here we assume the file *.int with same basename exists
         // (was used it as input for PSSROT-RingSearch) and that file works as
         // template of the z-matrix
-        String orsIntfile = getNameLastCycleFile(molName + "_rs" + itn, 
-								     rsOutFile);
+        String orsIntfile = getNameLastCycleFile(molName + "_rs" + itn, rsOutFile);
         String orsID = "" + settings.getTaskID();
-        String orsCmd = settings.getXYZINTTool() + " "
-                        + orsIntfile + " "
-                        + " T"; //set use of template 
-        if (verbosity > 1)
-        {
-            System.err.println("CMD: " + orsCmd + " TskID: " + orsID);
-        }
+        String orsCmd = settings.getXYZINTTool() + " " + orsIntfile + " "
+                        + " T"; //set use of template (in Tinker)
+        logger.log(Level.FINE, "CMD: " + orsCmd + " TskID: " + orsID);
         ProcessHandler orsPh = new ProcessHandler(orsCmd, orsID);
         try
         {
@@ -615,8 +600,7 @@ public class RingClosureTool
         }
         rcMol3d.updateXYZFromINT();
 
-        if (verbosity > 0)
-            System.err.println("RC-PSSROT done. Now, post-processing.");
+        logger.log(Level.INFO, "RC-PSSROT done. Now, post-processing.");
 
         // Evaluate proximity of RingClosingAttractor and close rings
         closeRings(rcMol3d,rcaCombination);
@@ -628,11 +612,8 @@ public class RingClosureTool
         saturateRingClosingAttractor(rcMol3d);
         
         // Cleanup
-        if (verbosity < 2)
-        {
-            FileUtils.deleteFilesContaining(workDir,molName + "_rs" + itn);
-        }
-
+        FileUtils.deleteFilesContaining(workDir,molName + "_rs" + itn);
+        
         return rcMol3d;
     }
 
@@ -649,7 +630,7 @@ public class RingClosureTool
      * in this attempt.
      */
 
-    public void closeRings(Molecule3DBuilder mol, 
+    public void closeRings(ChemicalObjectModel mol, 
 						 Set<ObjectPair> rcaCombination)
     {
         // get settings //TODO: this should happen inside RunTimeParameters
@@ -664,8 +645,7 @@ public class RingClosureTool
         List<RingClosure> candidatesClosures = new ArrayList<RingClosure>();
         for (ObjectPair op : rcaCombination)
         {
-    	    if (verbosity > 2)
-    	        System.out.println("closeRings: evaluating closure of "+op);
+            logger.log(Level.FINEST, "closeRings: evaluating closure of "+op);
 
             int iRcaA = ((Integer) op.getFirst()).intValue();
             int iRcaB = ((Integer) op.getSecond()).intValue();
@@ -694,12 +674,13 @@ public class RingClosureTool
 //TODO may want to use different set criteria
             double maxDotProdHT = rcParams.getRCDotPrTolerance();
 
-            if (rcParams.getRCStrategy().equals("BONDOVERLAP"))
-            {
+            //TODO-gg remove complementarity
+            //if (rcParams.getRCStrategy().equals("BONDOVERLAP"))
+            //{
                 maxDistH1T2 = distTolerance;
                 maxDistH2T1 = distTolerance;
                 maxDistH2T2 = lenH + lenT;
-            }
+            /*}
             else if (rcParams.getRCStrategy().equals("BONDCOMPLEMENTARITY"))
             {
                 distTolerance = distTolerance / 2.0;
@@ -710,22 +691,14 @@ public class RingClosureTool
 //TODO may want to use different set criteria
                 maxDistH2T2 = distTolerance * rcParams.getRCDistTolerance();
             }
+            */
 
-    	    boolean closeThisBnd = false;
-    	    if (verbosity > 2)
-    	    {
-    	        closeThisBnd = rc.isClosable(minDistH1T2,maxDistH1T2,
-    					     minDistH2T1,maxDistH2T1,
-    					     minDistH2T2,maxDistH2T2,
-    					     maxDotProdHT,true);
-    	    }
-    	    else
-    	    {
-                closeThisBnd = rc.isClosable(minDistH1T2,maxDistH1T2,
-                                                 minDistH2T1,maxDistH2T1,
-                                                 minDistH2T2,maxDistH2T2,
-                                                 maxDotProdHT,true);
-    	    }
+    	    boolean closeThisBnd = rc.isClosable(minDistH1T2, maxDistH1T2,
+    	            minDistH2T1, maxDistH2T1, 
+    	            minDistH2T2, maxDistH2T2,
+    	            maxDotProdHT, 
+    	            logger);
+                
     	    if (closeThisBnd)
             {
     	        BondType bndTyp =  mol.getDRingFromRCAPair(op).getBondType();
@@ -733,7 +706,8 @@ public class RingClosureTool
     	        {
     	            mol.addBond(rcaA.getSrcAtom(),rcaB.getSrcAtom(),rc, bndTyp);
     	        } else {
-    	            System.out.println("WARNING! Attempt to add ring closing bond "
+    	            logger.log(Level.WARNING, "WARNING! "
+    	                    + "Attempt to add ring closing bond "
     	                    + "did not add any actual chemical bond because the "
     	                    + "bond type of the chord is '" + bndTyp +"'.");
     	        }
@@ -759,7 +733,7 @@ public class RingClosureTool
      * @param mol the molecule
      */
 
-    public void saturateRingClosingAttractor(Molecule3DBuilder mol)
+    public void saturateRingClosingAttractor(ChemicalObjectModel mol)
                                                        throws DENOPTIMException
     {
     	IAtomContainer fmol = mol.getIAtomContainer();

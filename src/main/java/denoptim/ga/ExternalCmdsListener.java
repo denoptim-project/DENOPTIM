@@ -17,7 +17,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.exception.ExceptionUtils;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.denovo.GAParameters;
@@ -38,6 +40,11 @@ public class ExternalCmdsListener implements Runnable
     private final WatchKey key;
     private EvolutionaryAlgorithm ea;
     
+    /**
+     * Flag signaling that we are intentionally interrupting the service.
+     */
+    private boolean intendedStop = false; 
+    
     private final String NL = System.getProperty("line.separator");
     
     /**
@@ -50,10 +57,11 @@ public class ExternalCmdsListener implements Runnable
     public ExternalCmdsListener(Path pathname, Logger logger) throws IOException 
     {
     	this.pathname = pathname;
+    	this.logger = logger;
+        logger.log(Level.INFO, "Watching pathname '" + pathname + "' "
+                + "for live instructions.");
         this.watcher = FileSystems.getDefault().newWatchService();
         this.key = pathname.register(watcher, ENTRY_CREATE);
-        logger.log(Level.INFO, "Watching pathname '" +  
-        		pathname + "' for live instructions.");
     }
     
 //------------------------------------------------------------------------------
@@ -73,7 +81,6 @@ public class ExternalCmdsListener implements Runnable
 			    	// The event is something else than what expected
 			    	continue;
 			    }
-
 			    for (WatchEvent<?> event : key.pollEvents()) 
 			    {
 			        WatchEvent.Kind kind = event.kind();
@@ -91,7 +98,6 @@ public class ExternalCmdsListener implements Runnable
 						// The event is something else than what expected
 				    	continue;
 					}
-			    
 			        Path name = ev.context();
 			        Path child = pathname.resolve(name);
 			        processExternalCmdFile(child.toFile());
@@ -105,6 +111,21 @@ public class ExternalCmdsListener implements Runnable
 			}
 		} catch (InterruptedException e) {
 			return;
+		} catch (Throwable t) {
+		    if (!intendedStop)
+		    {
+    		    String msg = this.getClass().getSimpleName() + " stopped! From "
+    		            + "now on, we cannot listen to commands from the "
+    		            + "interface." + DENOPTIMConstants.EOL + " Cause: " 
+    		            + ExceptionUtils.getStackTraceAsString(t);
+    		    if (logger!=null)
+    		    {
+    		        logger.log(Level.SEVERE, msg);
+    		        t.printStackTrace();
+    		    } else {
+    		        StaticLogger.appLogger.log(Level.SEVERE, msg);
+    		    }
+		    }
 		}
     }
     
@@ -116,10 +137,9 @@ public class ExternalCmdsListener implements Runnable
 		try {
 			lines = DenoptimIO.readList(file.getAbsolutePath(), true);
 		} catch (DENOPTIMException e) {
-			logger.log(Level.WARNING, "Unable to read file '"  
+		    logger.log(Level.WARNING, "Unable to read file '"  
 	        		+ file.getAbsolutePath() + "'. Any instruction contained "
-	        		        + "in that file is ignored. "
-	        		        + "Hint: " + e.getMessage() + NL);
+    		        + "in that file is ignored. Hint: " + e.getMessage() + NL);
 			e.printStackTrace();
 			return;
 		}
@@ -128,7 +148,7 @@ public class ExternalCmdsListener implements Runnable
 		{
 			// Empty file is probably a sign that the file is being written
 			logger.log(Level.WARNING, "Empty instructions in '"  
-	        		+ file.getAbsolutePath() + "'.");
+		    		+ file.getAbsolutePath() + "'.");
 		}
 		
 		for (String line : lines)
@@ -136,7 +156,7 @@ public class ExternalCmdsListener implements Runnable
 			if (line.startsWith("STOP_GA"))
 			{
 			    logger.log(Level.SEVERE, "GA run will be "
-						+ "stopped upon external request from '"  
+			    		+ "stopped upon external request from '"  
 		        		+ file.getAbsolutePath() + "'." + NL);
 				if (ea != null)
 				{
@@ -149,7 +169,7 @@ public class ExternalCmdsListener implements Runnable
 	            String candIDs = line.substring(
 	                    "REMOVE_CANDIDATE".length()).trim();
 	            logger.log(Level.SEVERE, "Removing '"
-                        + candIDs + "' upon external request from '"  
+	                    + candIDs + "' upon external request from '"  
                         + file.getAbsolutePath() + "'." + NL);
                 String[] parts = candIDs.split("\\s+");
                 Set<String> candNames = new HashSet<String>(
@@ -164,8 +184,7 @@ public class ExternalCmdsListener implements Runnable
             {
                 String fileNamesLst = line.substring(
                         "ADD_CANDIDATE".length()).trim();
-                logger.log(Level.SEVERE, "Adding c"
-                        + "andidates from '"
+                logger.log(Level.SEVERE, "Adding candidates from '"
                         + fileNamesLst + "' upon external request from '"  
                         + file.getAbsolutePath() + "'." + NL);
                 String[] parts = fileNamesLst.split("\\s+");
@@ -182,6 +201,7 @@ public class ExternalCmdsListener implements Runnable
     
     public void closeWatcher() throws IOException
     {
+        intendedStop = true;
     	this.watcher.close();
     }
     

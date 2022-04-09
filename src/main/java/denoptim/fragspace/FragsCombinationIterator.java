@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
@@ -94,11 +96,8 @@ public class FragsCombinationIterator
      * Current number of generated combinations
      */
     private int numbGenCombs = 0;
-
-    /**
-     * Verbosity lvel
-     */
-    private int verbosity = 0;
+    
+    private String EOL = DENOPTIMConstants.EOL;
     
     /**
      * Parameters defining the fragment space
@@ -300,18 +299,17 @@ public class FragsCombinationIterator
             }
         }
 
-        if (verbosity > 1)
+        StringBuilder sb = new StringBuilder();
+        sb.append("Initializing iterator over combs of frags:"+EOL);
+        for (IdFragmentAndAP candSrcAp : allSrcAps)
         {
-            System.out.println("Initializing iterator over combs of frags:");
-            for (IdFragmentAndAP candSrcAp : allSrcAps)
+            sb.append(" -> Possibilities for "+candSrcAp+EOL);
+            for (IdFragmentAndAP i : candFragsPerAP.get(candSrcAp))
             {
-                System.out.println(" -> Possibilities for "+candSrcAp);
-                for (IdFragmentAndAP i : candFragsPerAP.get(candSrcAp))
-                {
-                    System.out.println(" ---> " + i);
-                }
+                sb.append(" ---> " + i+EOL);
             }
         }
+        settings.getLogger().log(Level.FINE, sb.toString());
 
         // Calculate to total number of combinations
         boolean emptySets = true;
@@ -397,12 +395,9 @@ public class FragsCombinationIterator
             throw new NoSuchElementException();
         }
 
-        if (verbosity > 1)
-        {
-            System.out.println("Calculating next frag combination (id:"
-                               + nextIds + ", size:" + totCandsPerAP + ")"); 
-        }
-
+        settings.getLogger().log(Level.FINE, "Calculating next frag combination "
+                + "(id:" + nextIds + ", size:" + totCandsPerAP + ")"); 
+        
 		// While defining the combination of fragments we also keep track
 		// of which incoming fragments are related by symmetry (i.e., we
 		// set the symmetric set ID for each incoming vertex) to allow
@@ -423,12 +418,9 @@ public class FragsCombinationIterator
             int locTotCands = candFragsPerAP.get(src).size();
             int locCurCandId = nextIds.get(curSrcApIdx);
 
-            if (verbosity > 2)
-            {
-                msg = "Setting frag for AP " + curSrcApIdx + " (" + src + ")";
-                System.out.println(msg);
-            }
-
+            msg = "Setting frag for AP " + curSrcApIdx + " (" + src + ")";
+            settings.getLogger().log(Level.FINER, msg);
+            
             // Decide whether the candidate for the current position 
             // has to be changed
             boolean changeCurIdx = true;
@@ -446,11 +438,8 @@ public class FragsCombinationIterator
             {
                 if (!changeCurIdx)
                 {
-                    if (verbosity > 2)
-                    {
-                        msg = "Non-last src AP; fixed on " + locCurCandId;
-                        System.out.println(msg);
-                    }
+                    msg = "Non-last src AP; fixed on " + locCurCandId;
+                    settings.getLogger().log(Level.FINER, msg);
                     currentIds.add(locCurCandId);
                     currentComb.put(src,locCandsList.get(locCurCandId));
                 }
@@ -462,22 +451,17 @@ public class FragsCombinationIterator
                         locCurCandId++;
                         nextIds.set(curSrcApIdx,locCurCandId);
                         // and restart all the idx on all srcAP that follow
+                        StringBuilder sb = new StringBuilder();
                         for (int futureSrcAp=curSrcApIdx+1; 
                                    futureSrcAp<actvSrcAps.size(); futureSrcAp++)
                         {
-                            if (verbosity > 2)
-                            {
-                                msg = "Restart idx on src AP " + futureSrcAp; 
-                                System.out.println(msg);
-                            }
+                            sb.append("Restart idx on src AP " + futureSrcAp + EOL);
                             nextIds.set(futureSrcAp,0);
                         }
 
-                        if (verbosity > 2)
-                        {
-                            msg = "Non-last src AP; new idx = " + locCurCandId; 
-                            System.out.println(msg);
-                        }
+                        sb.append("Non-last src AP; new idx = " + locCurCandId); 
+                        settings.getLogger().log(Level.FINER, sb.toString());
+                        
                         currentIds.add(locCurCandId);
                         currentComb.put(src,locCandsList.get(locCurCandId));
                     }
@@ -490,11 +474,8 @@ public class FragsCombinationIterator
                         locCurCandId++;
                         nextIds.set(curSrcApIdx,locCurCandId);
                         // ...and rerun the previous iteration on srcAPs 
-                        if (verbosity > 2)
-                        {
-                            msg = "Step BACK from src AP " + curSrcApIdx; 
-                            System.out.println(msg);
-                        }
+                        msg = "Step BACK from src AP " + curSrcApIdx; 
+                        settings.getLogger().log(Level.FINER,msg);
                         currentIds.remove(currentIds.size()-1);
                         curSrcApIdx = curSrcApIdx - 2; //it get +1 from loop
                     }
@@ -503,11 +484,9 @@ public class FragsCombinationIterator
             // last srcAP; always try to change the candidate for this AP
             else if ((curSrcApIdx+1) == actvSrcAps.size())
             {
-                if (verbosity > 2)
-                {
-                    msg = "Last src AP; new idx = " + locCurCandId; 
-                    System.out.println(msg);
-                }
+                msg = "Last src AP; new idx = " + locCurCandId; 
+                settings.getLogger().log(Level.FINER,msg);
+                
                 currentIds.add(locCurCandId);
                 currentComb.put(src,locCandsList.get(locCurCandId));
                 locCurCandId++;
@@ -528,25 +507,20 @@ public class FragsCombinationIterator
                         break;
                     }
                 }
-                if(verbosity > 2)
-                {
-                    msg = "Check completion on " + nextIds + ": " + finished;
-                    System.out.println(msg);
-                }
+                msg = "Check completion on " + nextIds + ": " + finished;
+                settings.getLogger().log(Level.FINER,msg);
             }
         }
 
         numbGenCombs++;
 
-        if (verbosity > 2)
+        StringBuilder sb = new StringBuilder();
+        sb.append("Combination before applying symmetry: ");
+        for (Map.Entry<IdFragmentAndAP,IdFragmentAndAP> entry : currentComb.entrySet())
         {
-            System.out.println("Combination before applying symmetry: ");
-            for (Map.Entry<IdFragmentAndAP,IdFragmentAndAP> entry : 
-                                                         currentComb.entrySet())
-            {
-                System.out.println("  "+entry);
-            }
+            sb.append("  "+entry);
         }
+        settings.getLogger().log(Level.FINER,sb.toString());
 
         // Project selection onto symmetric positions
         if (settings.enforceSymmetry() 
@@ -674,17 +648,14 @@ public class FragsCombinationIterator
             }
         }
 
-        if (verbosity > 2)
+        StringBuilder sb2 = new StringBuilder();
+        sb2.append("Final combination of frags/APs: ");
+        for (Map.Entry<IdFragmentAndAP,IdFragmentAndAP> entry :  currentComb.entrySet())
         {
-            System.out.println("Final combination of frags/APs: ");
-            for (Map.Entry<IdFragmentAndAP,IdFragmentAndAP> entry : 
-                                                         currentComb.entrySet())
-            {
-                System.out.println("  "+entry);
-            }
-//            System.out.println("very last currentIds: "+currentIds+" Next: "+nextIds+" "+numbGenCombs);
-}
-
+            sb2.append("  "+entry);
+        }
+        settings.getLogger().log(Level.FINER, sb2.toString());
+        
         return currentComb;
     }
 

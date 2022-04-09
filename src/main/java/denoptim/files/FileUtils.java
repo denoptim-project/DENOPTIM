@@ -235,18 +235,15 @@ public class FileUtils
         File f = new File(fileName);
         // Make sure the file or directory exists and isn't write protected
         if (!f.exists()) {
-            //System.err.println("Delete: no such file or directory: " + fileName);
             return;
         }
     
         if (!f.canWrite()) {
-            //System.err.println("Delete: write protected: " + fileName);
             return;
         }
     
         // If it is a directory, make sure it is empty
         if (f.isDirectory()) {
-            //System.err.println("Delete operation on directory not supported");
             return;
         }
     

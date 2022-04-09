@@ -229,19 +229,8 @@ public class GraphListsHandlerParameters extends RunTimeParameters
         }
         catch (Throwable t)
         {
-            String msg = "Cannot read in graphs from " + inGraphsFileA +" or " 
-                    + inGraphsFileB;
-            StaticLogger.appLogger.log(Level.INFO,msg);
-            throw new DENOPTIMException(msg,t);
-        }
-
-        try
-        {
-            StaticLogger.getInstance().setupLogger(logFile);
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
+            throw new Error("Cannot read in graphs from " + inGraphsFileA +" or " 
+                    + inGraphsFileB);
         }
     }
 

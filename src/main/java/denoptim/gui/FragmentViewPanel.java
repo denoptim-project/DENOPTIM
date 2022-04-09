@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -61,6 +62,7 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.StaticLogger;
 import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
 
@@ -607,10 +609,11 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		
 		boolean sameSMILES = false;
 		try {
+		    Logger logger = Logger.getLogger(GUI.GUILOGGER);
 			sameSMILES = MoleculeUtils.getSMILESForMolecule(
-					fromViewer.getIAtomContainer())
+					fromViewer.getIAtomContainer(),logger)
 					.equals(MoleculeUtils.getSMILESForMolecule(
-							fragment.getIAtomContainer()));
+							fragment.getIAtomContainer(), logger));
 		} catch (DENOPTIMException e) {
 			// we get false
 		}

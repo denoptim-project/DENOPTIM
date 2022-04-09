@@ -50,8 +50,7 @@ import denoptim.utils.GraphUtils;
  */
 
 
-public class AttachmentPoint implements Cloneable, 
-    Comparable<AttachmentPoint>
+public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
 {
     /**
      * Index used to keep the order in a list of attachment points
@@ -522,9 +521,9 @@ public class AttachmentPoint implements Cloneable,
     
     /**
      * Compares this and given attachment point. This method defines how
-     * DENOPTIMAttachmentPoint are sorted not by natural order, but by 
+     * {@link AttachmentPoint}s are sorted not by natural order, but by 
      * consistency of properties.
-     * @param other
+     * @param other.
      * @return an integer that can be used by a comparator.
      */
     public int comparePropertiesTo(AttachmentPoint other)

@@ -99,8 +99,7 @@ public class RandomUtils
                 }
             }
         }
-       
-        System.out.println(sss);
+        
         try
         {
             DenoptimIO.writeData("/tmp/rng_debug_log",sss,true);

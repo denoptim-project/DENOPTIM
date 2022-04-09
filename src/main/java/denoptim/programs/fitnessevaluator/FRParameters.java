@@ -20,10 +20,12 @@ package denoptim.programs.fitnessevaluator;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
 
 
@@ -165,8 +167,8 @@ public class FRParameters extends RunTimeParameters
         FileUtils.addToRecentFiles(outFile, FileFormat.GRAPHSDF);
         processOtherParameters();
         
-        System.err.println("Output files associated with the current run are " 
-        + "located in " + workDir);
+        StaticLogger.appLogger.log(Level.INFO, "Output files associated with "
+                + "the current run are located in " + workDir);
     }
     
 //------------------------------------------------------------------------------

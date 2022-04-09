@@ -57,6 +57,7 @@ public class GraphEditor extends ProgramTask
         geParams.readParameterFile(configFilePathName.getAbsolutePath());
         geParams.checkParameters();
         geParams.processParameters();
+        geParams.startProgramSpecificLogger(loggerIdentifier, false); //to STDOUT
         geParams.printParameters();
         
         // We might need the fragment space to read the input graphs with 
@@ -71,11 +72,11 @@ public class GraphEditor extends ProgramTask
             DGraph modGraph = graph.editGraph(
                     geParams.getGraphEditTasks(),
                     geParams.symmetryFlag(),
-                    geParams.getVerbosity());
+                    geParams.getLogger());
             modGraphs.add(modGraph);
         }
         DenoptimIO.writeGraphsToFile(new File(geParams.getOutFile()), 
-                geParams.getOutFormat(), modGraphs);
+                geParams.getOutFormat(), modGraphs, geParams.getLogger());
     }
     
 //-----------------------------------------------------------------------------

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
@@ -61,7 +62,7 @@ import denoptim.utils.RingClosingUtils;
 
 /**
  * This is a tool to identify and manage vertices' connections not included
- * in the DENOPTIMGraph, which is a spanning tree, thus connections that 
+ * in the {@link DGraph}, which is a spanning tree, thus connections that 
  * identify cyclic paths in the graph.
  * The three dimensional features of the vertices can be taken into account
  * while defining the closability of a candidate chain.
@@ -79,11 +80,6 @@ public class CyclicGraphHandler
      */
     private int recCount = 0;
     private int maxLng = 0;
-
-    /**
-     * Verbosity level
-     */
-    private int verbosity = 0;
     
     /**
      * Parameters 
@@ -94,6 +90,16 @@ public class CyclicGraphHandler
      * Fragment space definition
      */
     private FragmentSpace fragSpace;
+    
+    /**
+     * Logger to use
+     */
+    private Logger logger;
+    
+    /**
+     * New line character
+     */
+    private static final String NL = DENOPTIMConstants.EOL; 
     
 //-----------------------------------------------------------------------------
 
@@ -108,7 +114,7 @@ public class CyclicGraphHandler
             FragmentSpace fragSpace) 
     {
         this.settings = settings;
-        this.verbosity = settings.getVerbosity();
+        this.logger = settings.getLogger();
         this.fragSpace = fragSpace;
     }
     
@@ -159,27 +165,15 @@ public class CyclicGraphHandler
             
             int vIdI = RandomUtils.nextInt(wLstVrtI.size());
             Vertex vI = wLstVrtI.get(vIdI);
-
-            if (verbosity > 1)
-            {
-                System.out.println("Pick I: "+vIdI+" "+vI);
-            }
             wLstVrtI.removeAll(Collections.singleton(vI));
 
             // Create vector of possible choices for second RCV
-            ArrayList<Vertex> wLstVrtJ = 
-                                          rsm.getRSBiasedListOfCandidates(vI); 
+            ArrayList<Vertex> wLstVrtJ = rsm.getRSBiasedListOfCandidates(vI); 
             while (wLstVrtJ.size() > 0)
             {
                 int vIdJ = RandomUtils.nextInt(wLstVrtJ.size());
                 Vertex vJ = wLstVrtJ.get(vIdJ);
                 wLstVrtJ.removeAll(Collections.singleton(vJ));
-
-                if (verbosity > 1)
-                {
-                    System.out.println("Pick J: "+vIdJ+" "+vJ);
-                    System.out.println("vI-vJ: "+vI+" "+vJ);
-                }
 
                 PathSubGraph path = new PathSubGraph(vI,vJ,molGraph);
                 if (evaluatePathClosability(path, inMol))
@@ -215,22 +209,12 @@ public class CyclicGraphHandler
                     rsm.setVertexAsDone(vJ);
                     break;
                 }
-                else
-                {
-                    if (verbosity > 1)
-                    {
-                        System.out.println("Not suitable for ring closure.");
-                    }
-                }
             }
             rsm.setVertexAsDone(vI);
         }
 
-        if (verbosity > 0)
-        {
-            System.out.println("Random combOfRings: "+combOfRings);
-        }
-
+        logger.log(Level.FINE,"Random combOfRings: "+combOfRings);
+        
         return combOfRings;
     }
 
@@ -268,39 +252,25 @@ public class CyclicGraphHandler
                 Vertex vJ = rcaVertLst.get(j);
                 if (!rsm.getCompatibilityOfPair(vI,vJ))
                 {
-                    if (verbosity > 1)
-                    {
-                        System.out.println("Rejecting RC-incompatible pair " 
+                    logger.log(Level.FINE, "Rejecting RC-incompatible pair " 
                                 + vI + " "+ vJ);
-                    }
                     continue;
                 }
                 
                 // make the new candidate RCA pair
                 PathSubGraph subGraph = new PathSubGraph(vI,vJ,molGraph);
-                
-                if (verbosity > 1)
-                {
-                    System.out.println("Evaluating closability of path " 
-                            + subGraph);
-                }
+                logger.log(Level.FINE, "Evaluating closability of path "+subGraph);
                 boolean keepRcaPair = evaluatePathClosability(subGraph, mol);
 
                 if (!keepRcaPair)
                 {
-                    if (verbosity > 1)
-                    {
-                        System.out.println("Rejecting RCA pair");
-                    }
+                    logger.log(Level.FINE, "Rejecting RCA pair");
                     continue;
                 }
 
                 // finally store this pair as a compatible pair
-                if (verbosity > 1)
-                {
-                    System.out.println("All compatibility criteria satisfied");
-                    System.out.println("Storing verified RCA pair");
-                }
+                logger.log(Level.FINE, "All compatibility criteria satisfied: "
+                        + "Storing verified RCA pair");
 
                 // Store the information that the two vertex are compatible
                 if (compatMap.containsKey(vI))
@@ -340,11 +310,7 @@ public class CyclicGraphHandler
             }
         }
 
-        if (verbosity > 1)
-        {
-            System.out.println("Compatibility Map for RCAs: ");
-            System.out.println(compatMap);
-        }
+        logger.log(Level.FINE, "Compatibility Map for RCAs: "+NL+compatMap);
 
         // Identify paths that share bonds (interdependent paths)
         Map<IBond,List<PathSubGraph>> interdepPaths =
@@ -401,19 +367,18 @@ public class CyclicGraphHandler
                     }
                 }
             }
-            if (verbosity > 1)
+            StringBuilder sb = new StringBuilder();
+            for (IBond bnd : interdepPaths.keySet())
             {
-                for (IBond bnd : interdepPaths.keySet())
+                sb.append("Interdependent paths for bond " + bnd);
+                List<PathSubGraph> sop = interdepPaths.get(bnd);
+                for (PathSubGraph p : sop)
                 {
-                    System.out.println("Interdependent paths for bond " + bnd);
-                    List<PathSubGraph> sop = interdepPaths.get(bnd);
-                    for (PathSubGraph p : sop)
-                    {
-                        System.out.println(" vA: "+p.getHeadVertex()
-                                          +" vB: "+p.getTailVertex());
-                    }
+                    sb.append(NL + "  ->  vA: "+p.getHeadVertex()
+                                      +" vB: "+p.getTailVertex());
                 }
             }
+            logger.log(Level.FINE, sb.toString());
         }
 
         // Generate all combinations of compatible, closable paths
@@ -428,7 +393,6 @@ public class CyclicGraphHandler
         // All possible ring closing paths will be stored here
         ArrayList<List<Ring>> allCombsOfRings =
                                      new ArrayList<List<Ring>>();
-        
         combineCompatPathSubGraphs(0,
                 sortedKeys,
                 compatMap,
@@ -437,13 +401,8 @@ public class CyclicGraphHandler
                 allGoodPaths,
                 interdepPaths,
                 allCombsOfRings);
-
-        if (verbosity > 0)
-        {
-            System.out.println("All possible combination of rings: " + 
+        logger.log(Level.FINE, "All possible combination of rings: " + 
                                                              allCombsOfRings);
-        }
-
         return allCombsOfRings;
     }
 
@@ -466,22 +425,19 @@ public class CyclicGraphHandler
         int objId = this.hashCode();
         String recLab = new String(new char[recCount]).replace("\0", "-");
         
-        boolean debug = false;
-        
-        if (debug)
+        StringBuilder sb = new StringBuilder();
+        sb.append(objId+"-"+recLab+"> Begin of new recursion: "+recCount+NL);
+        sb.append(objId+"-"+recLab+"> sortedKeys= "+sortedKeys+NL);
+        sb.append(objId+"-"+recLab+"> usedId= "+usedId+NL);
+        sb.append(objId+"-"+recLab+"> ii0= "+ii0+NL);
+        sb.append(objId+"-"+recLab+"> lstPairs= "+lstPairs+NL);
+        sb.append(objId+"-"+recLab+"> compatMap= "+compatMap+NL);
+        sb.append(objId+"-"+recLab+"> allCombsOfRings"+NL);
+        for (List<Ring> ringSet : allCombsOfRings)
         {
-            System.out.println(objId+"-"+recLab+"> Begin of new recursion: "+recCount);
-            System.out.println(objId+"-"+recLab+"> sortedKeys= "+sortedKeys);
-            System.out.println(objId+"-"+recLab+"> usedId= "+usedId);
-            System.out.println(objId+"-"+recLab+"> ii0= "+ii0);
-            System.out.println(objId+"-"+recLab+"> lstPairs= "+lstPairs);
-            System.out.println(objId+"-"+recLab+"> compatMap= "+compatMap);
-            System.out.println(objId+"-"+recLab+"> allCombsOfRings");
-            for (List<Ring> ringSet : allCombsOfRings)
-            {
-                System.out.println("        "+ringSet);
-            }
+            sb.append("        "+ringSet+NL);
         }
+        logger.log(Level.FINEST, sb.toString()); 
 
         boolean inFound = false;
         boolean addedNew = false;
@@ -490,8 +446,7 @@ public class CyclicGraphHandler
             Vertex vi = sortedKeys.get(ii);
             int vIdI = vi.getVertexId();
 
-            if (debug)
-                System.out.println(objId+"-"+recLab+"> vIdI= "+vIdI);
+            logger.log(Level.FINEST, objId+"-"+recLab+"> vIdI= "+vIdI);
 
             if (usedId.contains(vIdI))
             {
@@ -502,8 +457,7 @@ public class CyclicGraphHandler
             {
                 int vIdJ = vj.getVertexId();
 
-                if (debug)
-                    System.out.println(objId+"-"+recLab+"> vIdJ= "+vIdJ);
+                logger.log(Level.FINEST, objId+"-"+recLab+"> vIdJ= "+vIdJ);
 
                 if (usedId.contains(vIdJ) || usedId.contains(vIdI))
                 {
@@ -538,13 +492,12 @@ public class CyclicGraphHandler
                                         allCombsOfRings);
                 recCount--;
 
-                if (debug)
-                    System.out.println(objId+"-"+recLab+"> lstPairs.size() & maxLng= "+lstPairs.size() +" " +maxLng); 
+                logger.log(Level.FINEST, objId+"-"+recLab+"> lstPairs.size() "
+                        + "& maxLng= "+lstPairs.size() +" " +maxLng); 
 
                 if (!inFound && lstPairs.size() == maxLng)
                 {
-                    if (debug)
-                        System.out.println(objId+"-"+recLab+"> in A");
+                    logger.log(Level.FINEST, objId+"-"+recLab+"> in A");
 
                     boolean closable = true;
                     if (settings.checkInterdependentChains() &&
@@ -557,8 +510,7 @@ public class CyclicGraphHandler
                     }
                     if (closable)
                     {
-                        if (debug)
-                            System.out.println(objId+"-"+recLab+"> in B");
+                        logger.log(Level.FINEST, objId+"-"+recLab+"> in B");
 
                         List<Ring> ringsComb = new ArrayList<Ring>();
                         for (ObjectPair opFinal : lstPairs)
@@ -587,25 +539,24 @@ public class CyclicGraphHandler
 
                             ringsComb.add(ring);
 
-                            if (debug)
-                                System.out.println(objId+"-"+recLab+"> added ringComb: "+ring);
+                            logger.log(Level.FINEST, objId+"-"+recLab
+                                    +"> added ringComb: "+ring);
                         }
 
                         boolean notNewCmb = false;
                         for(List<Ring> oldCmb : allCombsOfRings)
                         {
-                            if (debug)
-                            {
-                                System.out.println(objId+"-"+recLab+"> Comparing ring sets: ");
-                                System.out.println("o> old: "+oldCmb);
-                                System.out.println("o> new: "+ringsComb);
-                            }
+                            StringBuilder sb2 = new StringBuilder();
+                            sb2.append(objId+"-"+recLab
+                                    +"> Comparing ring sets: ");
+                            sb2.append("o> old: "+oldCmb);
+                            sb2.append("o> new: "+ringsComb);
+                            logger.log(Level.FINEST, sb2.toString());
 
                             notNewCmb = RingClosingUtils.areSameRingsSet(oldCmb,
                                                                      ringsComb);
                             
-                            if (debug)
-                                System.out.println("o> result: "+notNewCmb);
+                            logger.log(Level.FINEST,"o> result: "+notNewCmb);
 
                             if (notNewCmb)
                             {
@@ -615,9 +566,8 @@ public class CyclicGraphHandler
 
                         if (!notNewCmb)
                         {
-                            if (debug)
-                                System.out.println(objId+"-"+recLab+"> adding to all combs of ring.");
-
+                            logger.log(Level.FINEST, objId+"-"+recLab
+                                    +"> adding to all combs of ring.");
                             allCombsOfRings.add(ringsComb);
                             addedNew = true;
                         }
@@ -625,50 +575,43 @@ public class CyclicGraphHandler
                 }
                 if (!inFound)
                 {
-                    if (debug)
-                        System.out.println(objId+"-"+recLab+"> in C");
+                    logger.log(Level.FINEST, objId+"-"+recLab+"> in C");
 
                     ArrayList<ObjectPair> toDel = new ArrayList<ObjectPair>();
                     for (int ir = recCount; ir<lstPairs.size(); ir++)
                     {
                         ObjectPair opToRemove = lstPairs.get(ir);
-                        Vertex delVA = (Vertex) 
-                                                        opToRemove.getFirst();
-                        Vertex delVB = (Vertex) 
-                                                        opToRemove.getSecond();
+                        Vertex delVA = (Vertex) opToRemove.getFirst();
+                        Vertex delVB = (Vertex) opToRemove.getSecond();
                         usedId.remove(usedId.indexOf(delVA.getVertexId()));
                         usedId.remove(usedId.indexOf(delVB.getVertexId()));
                         toDel.add(opToRemove);
                     }
                     lstPairs.removeAll(toDel);
 
-                    if (debug)
-                    {
-                        System.out.println(objId+"-"+recLab+"> in C: after removal usedId: "+usedId);
-                        System.out.println(objId+"-"+recLab+"> in C: after removal lstPairs: "+lstPairs);
-                    }
+                    logger.log(Level.FINEST, objId+"-"+recLab
+                            +"> in C: after removal usedId: "+usedId+NL
+                            +objId+"-"+recLab
+                            +"> in C: after removal lstPairs: "+lstPairs);
                 }
 
                 if (lstPairs.contains(op))
                 {
-                    if (debug)
-                        System.out.println(objId+"-"+recLab+"> in D");
+                    logger.log(Level.FINEST, objId+"-"+recLab+"> in D");
 
                     lstPairs.remove(op);
                     usedId.remove(usedId.indexOf(vIdI));
                     usedId.remove(usedId.indexOf(vIdJ));
 
-                    if (debug)
-                    {
-                        System.out.println(objId+"-"+recLab+"> in D: after removal usedId: "+usedId);
-                        System.out.println(objId+"-"+recLab+"> in D: after removal lstPairs: "+lstPairs);
-                    }
+                    logger.log(Level.FINEST, objId+"-"+recLab
+                            +"> in D: after removal usedId: "+usedId
+                            +objId+"-"+recLab
+                            +"> in D: after removal lstPairs: "+lstPairs);
                 }
             }
         }
         
-        if (debug)
-            System.out.println(objId+"-"+recLab+"> returning= "+addedNew);
+        logger.log(Level.FINEST, objId+"-"+recLab+"> returning= "+addedNew);
 
         return addedNew;
     }
@@ -1001,12 +944,13 @@ public class CyclicGraphHandler
             long endTime = System.nanoTime();
             long duration = (- startTime + endTime) / (long) 1000.0;
 
-            if (verbosity > 1)
+            if (logger.isLoggable(Level.FINE))
             {
-                System.out.println("TopoMat N: " + mol.getAtomCount() + " " 
-                                                   + duration + " microsec.");
+                StringBuilder sb = new StringBuilder();
+                sb.append("TopoMat N: " + mol.getAtomCount() + " " + duration 
+                        + " microsec." + NL);
                 int n = mol.getAtomCount();
-                System.out.println("Topological matrix (n=" + n + ")");
+                sb.append("Topological matrix (n=" + n + ")"+NL);
                 for (int i=0; i<n; i++)
                 {
                     String l = " ";
@@ -1014,8 +958,9 @@ public class CyclicGraphHandler
                     {
                         l = l + " " + topoMat[i][j];
                     }
-                    System.out.println(l);
+                    sb.append(l+NL);
                 }
+                logger.log(Level.FINE, sb.toString());
             }
         }
 
@@ -1103,19 +1048,16 @@ public class CyclicGraphHandler
                             weigths.set(j, weigths.get(j) + szFct);
                         }
 
-                        if (verbosity > 1)
-                        {
-                            System.out.println(" i:" + i + " j:" + j  
-                                     + " size:" + ringSize + " factors:" + weigths);
-                        }
+                        logger.log(Level.FINE, " i:" + i + " j:" + j + " size:" 
+                                + ringSize + " factors:" + weigths);
                     }
                 }
             }
             
-            if (verbosity > 1)
+            if (logger.isLoggable(Level.FINE))
             {
-                String s = "RCV pairs compatibility (ring size-biased):";
-                System.out.println(s);
+                StringBuilder sb = new StringBuilder();
+                sb.append("RCV pairs compatibility (ring size-biased):"+NL);
                 for (int i=0; i<sz;i++)
                 {
                     String l = " ";
@@ -1126,8 +1068,9 @@ public class CyclicGraphHandler
                             p = "1";
                         l = l + " " + p;
                     }
-                    System.out.println(l);
+                    sb.append(l+NL);
                 }
+                logger.log(Level.FINE, sb.toString());
             }
         }
 
@@ -1149,10 +1092,7 @@ public class CyclicGraphHandler
                 }
             }
 
-            if (verbosity > 1)
-            {
-                System.out.println("Ring size-biased list of RCVs:" + wLst);
-            }
+            logger.log(Level.FINE, "Ring size-biased list of RCVs:" + wLst);
             
             return wLst;
         }
@@ -1204,11 +1144,8 @@ public class CyclicGraphHandler
                 }
             }
 
-            if (verbosity > 1)
-            {
-                System.out.println("Ring size-biased list of RCVs for " + vI 
+            logger.log(Level.FINE, "Ring size-biased list of RCVs for " + vI 
                                                                + ": " + wLst);
-            }
 
             return wLst;
         }
@@ -1244,15 +1181,12 @@ public class CyclicGraphHandler
                 bnd.setOrder(bndTyp.getCDKOrder());
                 mol.addBond(bnd);
             } else {
-                System.out.println("WARNING! Attempt to add ring closing bond "
+                logger.log(Level.FINE,"WARNING! Attempt to add ring closing bond "
                         + "did not add any actual chemical bond because the "
                         + "bond type of the chord is '" + bndTyp +"'.");
             }
             
-            if (verbosity > 1)
-            {
-                System.out.println(" ==> UPDATING RingSizeManager <==");
-            }
+            logger.log(Level.FINEST, " ==> UPDATING RingSizeManager <==");
 
             // Update this RingSizeManager
             fillTopologicalMatrix();
@@ -1403,11 +1337,8 @@ public class CyclicGraphHandler
         // exclude if no entry in RC-Compatibility map
         if (!fragSpace.getRCCompatibilityMatrix().containsKey(parentAPClsI))
         {
-            if (verbosity > 1)
-            {
-                System.out.println(s + "RC-CPMap does not contain class (I) "
+            logger.log(Level.FINE, s + "RC-CPMap does not contain class (I) "
                         + parentAPClsI + " " + parentAPClsI.hashCode());
-            }
             return false;
         }
         ArrayList<APClass> compatClassesI = fragSpace.getRCCompatibilityMatrix()
@@ -1416,11 +1347,8 @@ public class CyclicGraphHandler
         // exclude if no entry in RC-Compatibility map
         if (!fragSpace.getRCCompatibilityMatrix().containsKey(parentAPClsJ))
         {
-            if (verbosity > 1)
-            {
-                System.out.println(s + "RC-CPMap does not contain class (J) "
+            logger.log(Level.FINE, s + "RC-CPMap does not contain class (J) "
                         + parentAPClsJ + " " + parentAPClsJ.hashCode());
-            }
             return false;
         }
         ArrayList<APClass> compatClassesJ = fragSpace.getRCCompatibilityMatrix()
@@ -1429,21 +1357,15 @@ public class CyclicGraphHandler
         // exclude loops included within a single vertex 
         if (vI == vJ)
         {
-            if (verbosity > 1)
-            {
-                System.out.println(s + "vI same as vJ: loop not allowed!");
-            }
+            logger.log(Level.FINE, s + "vI same as vJ: loop not allowed!");
             return false;
         }
 
         // exclude pairs of RCA-vertices having same src atom
         if (pvI == pvJ && srcAtmIdI == srcAtmIdJ)
         {
-            if (verbosity > 1)
-            {
-                System.out.println(s + "Same src: " + pvI + " " + pvJ
+            logger.log(Level.FINE, s + "Same src: " + pvI + " " + pvJ
                                   + " " + srcAtmIdI + " " + srcAtmIdJ);
-            }
             return false;
         }
 
@@ -1454,19 +1376,13 @@ public class CyclicGraphHandler
         if (!(compatClassesI.contains(parentAPClsJ) ||
               compatClassesJ.contains(parentAPClsI)))
         {
-            if (verbosity > 1)
-            {
-                System.out.println(s + "APClass not compatible "
+            logger.log(Level.FINE,s + "APClass not compatible "
                                 + parentAPClsJ);
-            }
             return false;
         }
 
-        if (verbosity > 1)
-        {
-            System.out.println(s + "all criteria satisfied.");
-        }
-
+        logger.log(Level.FINE, s + "all criteria satisfied.");
+        
         return true;
     }
 
@@ -1522,12 +1438,8 @@ public class CyclicGraphHandler
     private boolean evaluateConstitutionalClosability(PathSubGraph subGraph,
                                   IAtomContainer inMol) throws DENOPTIMException
     {
-        if (verbosity > 0)
-        {
-            System.out.println(" ");
-            System.out.println("Evaluating constitutional closability of "
-                               + "path: " + subGraph.getVertecesPath());
-        }
+        settings.getLogger().log(Level.FINE, "Evaluating constitutional "
+                + "closability of path: " + subGraph.getVertecesPath());
 
         // Get a working copy of the molecular container
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
@@ -1579,10 +1491,8 @@ public class CyclicGraphHandler
             }
         }
         // Deal with RCAs: head and tail vertices
-        IAtom atmH = mol.getAtom(
-                             vIdToAtmId.get(subGraph.getHeadVertex()).get(0));
-        IAtom atmT = mol.getAtom(
-                             vIdToAtmId.get(subGraph.getTailVertex()).get(0));
+        IAtom atmH = mol.getAtom(vIdToAtmId.get(subGraph.getHeadVertex()).get(0));
+        IAtom atmT = mol.getAtom(vIdToAtmId.get(subGraph.getTailVertex()).get(0));
         IAtom srcH = mol.getConnectedAtomsList(atmH).get(0);
         IAtom srcT = mol.getConnectedAtomsList(atmT).get(0);
         int iSrcH = mol.indexOf(srcH);
@@ -1595,7 +1505,8 @@ public class CyclicGraphHandler
         {
             mol.addBond(iSrcH, iSrcT, bndTyp.getCDKOrder());
         } else {
-            System.out.println("WARNING! Attempt to add ring closing bond "
+            settings.getLogger().log(Level.WARNING, 
+                    "WARNING! Attempt to add ring closing bond "
                     + "did not add any actual chemical bond because the "
                     + "bond type of the chord is '" + bndTyp +"'.");
         }
@@ -1606,15 +1517,14 @@ public class CyclicGraphHandler
             mol.removeAtom(a);
         }
 
-         if (verbosity > 2)
+        StringBuilder sb = new StringBuilder();
+        sb.append("Molecular representation of path includes:");
+        for (IAtom a : mol.atoms())
         {
-            System.out.println("Molecular representation of path includes:");
-                for (IAtom a : mol.atoms())
-            {
-                System.out.println("  " + a.getSymbol() 
-                            + mol.indexOf(a) + " " + a.getProperties());
-            }
+            sb.append("  " + a.getSymbol() + mol.indexOf(a) + " " 
+                    + a.getProperties());
         }
+        settings.getLogger().log(Level.FINEST, sb.toString());
 
         boolean closable = false;
 
@@ -1652,11 +1562,8 @@ public class CyclicGraphHandler
             }
             if (!spanRequiredEls)
             {
-                if (verbosity  > 1)
-                {
-                   System.out.println("Candidate ring doesn't involve "
-                                                                   + missingEl);
-                }
+                settings.getLogger().log(Level.FINER, 
+                        "Candidate ring doesn't involve " + missingEl);
                 return false;
             }
             closable = true;
@@ -1672,29 +1579,24 @@ public class CyclicGraphHandler
             {
                 String msg = "Attempt to match SMARTS for "
                              + "constitution-based ring-closability conditions "
-                             + "returned an error! " + msq.getMessage();
-                StaticLogger.appLogger.log(Level.WARNING,msg);
+                             + "returned an error! Ignoring " + msq.getMessage();
+                settings.getLogger().log(Level.WARNING,msg);
             }
             for (String name : smarts.keySet())
             {
                 if (msq.getNumMatchesOfQuery(name) > 0)
                 {
-                    if (verbosity > 1)
-                    {
-                        System.out.println("Candidate closable path matches "
-                                           + "constitutional closability "
-                                           + "criterion: " + smarts.get(name));
-                    }
+                    settings.getLogger().log(Level.FINER,
+                            "Candidate closable path matches constitutional "
+                            + "closability criterion: " + smarts.get(name));
                     closable = true;
                     break;
                 }
             }
         }
 
-        if (verbosity > 0)
-        {
-            System.out.println("Contitutional closability: "+closable);
-        }
+        settings.getLogger().log(Level.FINE, 
+                "Contitutional closability: " + closable);
         return closable;
     }
 
@@ -1716,13 +1618,9 @@ public class CyclicGraphHandler
             IAtomContainer mol) throws DENOPTIMException
     {
         String chainId = subGraph.getChainID();
-        if (verbosity > 0)
-        {
-            System.out.println(" ");
-            System.out.println("Evaluating 3D closability of path: " 
+        logger.log(Level.FINE, "Evaluating 3D closability of path: " 
                             + subGraph.getVertecesPath()+" ChainID: "+chainId);
-        }
-
+        
         RingClosuresArchive rca = settings.getRingClosuresArchive();
         
         RingClosingConformations rcc;
@@ -1764,11 +1662,8 @@ public class CyclicGraphHandler
                     rotatability.add(true);
                 }
             }
-            if (verbosity > 0)
-            {
-                System.out.println("Rotatability: "+rotatability); 
-            }
-    
+            logger.log(Level.FINE, "Rotatability: "+rotatability); 
+            
             // Define initial values of dihedrals
             // NOTE: these angles are not calculated on the atoms of the chain,
             //       but on the reference points that are unique for each bond
@@ -1800,11 +1695,8 @@ public class CyclicGraphHandler
             rca.storeEntry(chainId,closable,rcc);
         }
 
-        if (verbosity > 0)
-        {
-            System.out.println("Path closablility: "+closable);
-        }
-
+        logger.log(Level.FINE, "Path closablility: "+closable);
+        
         return closable;
     }
     
@@ -1820,11 +1712,7 @@ public class CyclicGraphHandler
     public boolean checkChelatesGraph(DGraph molGraph,
                                       List<Ring> ringsSet)
     {
-
-        if (verbosity > 0)
-        {
-            System.out.println("Checking conditions for chelates");
-        }
+        logger.log(Level.FINE, "Checking conditions for chelates");
 
 //TODO: here we assume that the scaffold is a metal and the first layer of
 // vertices (level = 0) are the coordinating atoms.
@@ -1866,11 +1754,8 @@ public class CyclicGraphHandler
                 }
                 if (isOrphan)
                 {
-                    if (verbosity > 0)
-                    {
-                        System.out.println("Found orphan: " + vert 
+                    logger.log(Level.FINE, "Found orphan: " + vert 
                                                     + " RingSet: " + ringsSet);
-                    }
                     return false;
                 }
             }
@@ -1915,14 +1800,11 @@ public class CyclicGraphHandler
 
                     if (usedDenticity < rcasOnThisVertex.get(apCls).size())
                     {
-                        if (verbosity > 0)
-                        {
-                            System.out.println("Full-denticity is not "
+                        logger.log(Level.FINE, "Full-denticity is not "
                                   + "satisfied for apclas: " + apCls
                                   + "in vertex " + vert 
                                   + " with set of rings " + ringsSet
                                   + "check graph: " + molGraph);
-                        }
                         return false;
                     }
                 }

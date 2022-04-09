@@ -51,11 +51,11 @@ import denoptim.graph.CandidateLW;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Fragment;
-import denoptim.graph.DENOPTIMFragmentTest;
+import denoptim.graph.FragmentTest;
 import denoptim.graph.DGraph;
 import denoptim.graph.Ring;
 import denoptim.graph.Template;
-import denoptim.graph.DENOPTIMTemplateTest;
+import denoptim.graph.TemplateTest;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
@@ -120,7 +120,7 @@ public class DenoptimIOTest
     public void testIOMolFragment() throws Exception {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
         
-        Fragment v = DENOPTIMFragmentTest.makeFragment();
+        Fragment v = FragmentTest.makeFragment();
         
         ArrayList<Vertex> initVrtxs = new ArrayList<Vertex>();
         initVrtxs.add(v);
@@ -150,7 +150,7 @@ public class DenoptimIOTest
     public void testIOTemplate() throws Exception {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
         
-        Template v = DENOPTIMTemplateTest.getTestAmideTemplate();
+        Template v = TemplateTest.getTestAmideTemplate();
         
         ArrayList<Vertex> initVrtxs = new ArrayList<Vertex>();
         initVrtxs.add(v);

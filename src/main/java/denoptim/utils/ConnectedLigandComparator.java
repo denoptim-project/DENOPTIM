@@ -49,9 +49,7 @@ public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
             {
                 cnnA = 100;
             }
-    	}
-    	else
-    	{
+    	} else {
             massA = a.getAtom().getAtomicNumber();
         }
 
@@ -61,9 +59,7 @@ public class ConnectedLigandComparator implements Comparator<ConnectedLigand>
             {
                 cnnB = 100;
             }
-        }
-        else
-        {
+        } else {
             massB = b.getAtom().getAtomicNumber();
         }
 

@@ -44,7 +44,7 @@ import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Fragment;
 import denoptim.graph.DGraph;
-import denoptim.graph.DENOPTIMGraphTest;
+import denoptim.graph.DGraphTest;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;

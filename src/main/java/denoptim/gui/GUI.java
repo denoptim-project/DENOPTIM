@@ -25,6 +25,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -83,6 +84,11 @@ public class GUI implements Runnable
 	 */
 	private CommandLine cmd;
 	
+	/**
+	 * Name of logger for the GUI
+	 */
+	static final String GUILOGGER = "GUILogger";
+	
 //------------------------------------------------------------------------------
 	
 	/**
@@ -94,6 +100,7 @@ public class GUI implements Runnable
 		ToolTipManager.sharedInstance().setDismissDelay(6000);
 		ToolTipManager.sharedInstance().setInitialDelay(1000);
 		ToolTipManager.sharedInstance().setReshowDelay(100);
+		Logger.getLogger(GUILOGGER);
 	}
 	
 //------------------------------------------------------------------------------

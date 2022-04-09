@@ -33,7 +33,7 @@ import denoptim.utils.MutationType;
 
 
 /**
- * An empty vertex has the behaviours of a vertex, but has no molecular 
+ * An empty vertex has the behaviors of a vertex, but has no molecular 
  * structure. 
  * It has attachment points, as well as relations between those
  * attachment points, but has no atoms.
@@ -41,11 +41,6 @@ import denoptim.utils.MutationType;
  */
 public class EmptyVertex extends Vertex
 {
-    /**
-     * Version UID
-     */
-    private static final long serialVersionUID = 1L;
-
     /**
      * Attachment points on this vertex
      */

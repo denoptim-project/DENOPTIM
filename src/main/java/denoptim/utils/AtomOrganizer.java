@@ -37,7 +37,7 @@ import denoptim.exception.DENOPTIMException;
 
 
 /**
- * Tool for reorganising the list of atoms of an <code>IAtomContainer</code>
+ * Tool for re-organizing the list of atoms of an <code>IAtomContainer</code>
  *
  * @author Marco Foscato
  */
@@ -49,8 +49,6 @@ public class AtomOrganizer
 
     //Flags per atoms
     private ArrayList<ArrayList<Boolean>> flags;
-    //Recursion flag for reporting info
-    private int recNum;
     //Alternative atom order
     private Map<Integer, ArrayList<Integer>> atomOrders;
     private Map<Integer, ArrayList<Integer>> oldToNewOrder;
@@ -69,7 +67,6 @@ public class AtomOrganizer
         flags = new ArrayList<>();
         atomOrders = new HashMap<>();
         oldToNewOrder = new HashMap<>();
-        recNum = 1;
         lidx = 0;
         layers = new HashMap<>();
     }
@@ -152,7 +149,6 @@ public class AtomOrganizer
             for (int i = 0; i < mol.getAtomCount(); i++) {
                 oldToNewOrder.get(seed).add(i, -1);
             }
-            recNum = 1;
 
             //add atoms to new other
             switch (scheme) {
@@ -244,11 +240,8 @@ public class AtomOrganizer
             try {
                 IBond oldBnd = original.getBond(i);
                 if (oldBnd.getAtomCount() != 2) {
-                    System.err.println("Multicenter bond!!!");
-                    String msg = "Multicenter bond not supported yet.";
+                    String msg = "Multicenter bond not supported.";
                     throw new DENOPTIMException(msg);
-                    //TODO in case of multicenter
-                    //        IAtoms[] = ... ...
                 }
                 int atm1 = original.indexOf(oldBnd.getAtom(0));
                 int atm2 = original.indexOf(oldBnd.getAtom(1));
@@ -260,7 +253,7 @@ public class AtomOrganizer
                         iac.getAtom(newatm2), order, stereo);
                 iac.addBond(bnd);
             } catch (Throwable t) {
-                String msg = "ERROR in making new BOND";
+                String msg = "ERROR in making new bond";
                 throw new DENOPTIMException(msg);
             }
         }
@@ -345,9 +338,7 @@ public class AtomOrganizer
 
             // move to the next shell of atoms
             if (mol.getConnectedAtomsCount(connectedAtom) > 1) {
-                recNum++;
                 exploreMolecule(atmidx, flag, mol, ap);
-                recNum--;
             }
         }
     }

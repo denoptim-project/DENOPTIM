@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,11 +60,15 @@ public class FitnessProviderTest
     @TempDir 
     static File tempDir;
     
+    private Logger logger;
+    
     @BeforeEach
     private void setUp()
     {
         assertTrue(tempDir.isDirectory(),"Should be a directory ");
         sp = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        logger = Logger.getLogger("DummyLogger");
+        logger.setLevel(Level.SEVERE);
     }
     
 //------------------------------------------------------------------------------
@@ -88,8 +94,9 @@ public class FitnessProviderTest
     				classNames.get(i), iDesc, 0);
     		descriptors.add(dv);
     	}
-    	    	
-    	FitnessProvider fp = new FitnessProvider(descriptors,"no eq needed");
+    	
+    	FitnessProvider fp = new FitnessProvider(descriptors, "no eq needed", 
+    	        logger);
     	
     	assertEquals(2, fp.engine.getDescriptorInstances().size(),
     			"Number of descriptors from custom list");
@@ -104,7 +111,7 @@ public class FitnessProviderTest
     	try {
     	     mol  = sp.parseSmiles("C(C)CO");
     	 } catch (InvalidSmilesException e) {
-    	     System.err.println(e.getMessage());
+    	     // This cannot happen
     	 }
     	
     	List<String> classNames = new ArrayList<String>();
@@ -130,7 +137,8 @@ public class FitnessProviderTest
     	
     	String expression = "${" + varNames[0] + " + " + varNames[1] + "}";
     	
-    	FitnessProvider fp = new FitnessProvider(descriptors,expression);
+    	FitnessProvider fp = new FitnessProvider(descriptors, expression, 
+    	        logger);
     	double fitness = fp.getFitness(mol);
         
         // The descriptors values must be already in the mol properties map
@@ -190,7 +198,8 @@ public class FitnessProviderTest
                 new ArrayList<DescriptorForFitness>();
         descriptors.add(dff);
         String expression = "${" + myVarName + "}";
-        FitnessProvider fp = new FitnessProvider(descriptors,expression);
+        FitnessProvider fp = new FitnessProvider(descriptors, expression, 
+                logger);
         
         //Construct a molecule to be evaluated by the fitness provider
         IAtomContainer mol =  sp.parseSmiles("COc1ccccc1");
@@ -244,7 +253,8 @@ public class FitnessProviderTest
         
         FitnessProvider fp = new FitnessProvider(
                 fitPar.getDescriptors(),
-                fitPar.getFitnessExpression());
+                fitPar.getFitnessExpression(),
+                logger);
         
         IAtomContainer mol = sp.parseSmiles("COc1ccccc1");
         
@@ -281,7 +291,8 @@ public class FitnessProviderTest
         
         FitnessProvider fp = new FitnessProvider(
                 fitPar.getDescriptors(),
-                fitPar.getFitnessExpression());
+                fitPar.getFitnessExpression(),
+                logger);
         
         IAtomContainer mol = sp.parseSmiles("COc1ccccc1");
         

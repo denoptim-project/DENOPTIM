@@ -21,6 +21,7 @@ package denoptim.logging;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
@@ -70,6 +71,11 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
      */
     private int dumpsId = 0;
     
+    /**
+     * Logger to use
+     */
+    private Logger logger;
+    
     private final String NL = System.getProperty("line.separator");
 
 //------------------------------------------------------------------------------
@@ -95,7 +101,7 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
      * @param monitorFile the pathname of the file where to print monitor dumps.
      */
     public Monitor(String identifier, int genId, String monitorFile, 
-            int dumpStep, boolean dumpData)
+            int dumpStep, boolean dumpData, Logger logger)
     {
         this();
         name = identifier;
@@ -103,6 +109,7 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
         this.monitorFile = monitorFile;
         this.dumpStep = dumpStep;
         this.dumpData = dumpData;
+        this.logger = logger;
     }
     
 //------------------------------------------------------------------------------
@@ -130,7 +137,7 @@ public class Monitor extends HashMap<CounterID,AtomicInteger>
                 printSnapshot(dump);
             } catch (DENOPTIMException e)
             {
-                StaticLogger.appLogger.log(Level.WARNING,
+                logger.log(Level.WARNING,
                         "Unable to print monitor report: "+e.getMessage() + NL
                         + "Monitor report: " + NL + dump);
             }

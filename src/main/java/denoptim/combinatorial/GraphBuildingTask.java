@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -41,6 +42,7 @@ import denoptim.graph.SymmetricSet;
 import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.task.FitnessTask;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GenUtils;
@@ -222,23 +224,15 @@ public class GraphBuildingTask extends FitnessTask
         try
         {
             String msg = "Call GraphBuildingTask " + id 
-                         + " (Lev:" + level + ", comb:" + nextIds + ")";
-            
-            if (verbosity > 1)
+                    + " (Lev:" + level + ", comb:" + nextIds + ")"
+                    + DENOPTIMConstants.EOL + " - Fragsments to add: ";
+            for (IdFragmentAndAP src : fragsToAdd.keySet())
             {
-                msg = msg + DENOPTIMConstants.EOL + " - Fragsments to add: ";
-                for (IdFragmentAndAP src : fragsToAdd.keySet())
-                {
-                    msg = msg + DENOPTIMConstants.EOL 
-                          + "   "+src+" - "+fragsToAdd.get(src);
-                }
-                msg = msg + DENOPTIMConstants.EOL + " - RootGraph: " + dGraph;
+                msg = msg + DENOPTIMConstants.EOL 
+                      + "   "+src+" - "+fragsToAdd.get(src);
             }
-            if (verbosity > 0)
-            {
-                msg = msg + NL;
-                StaticLogger.appLogger.info(msg);
-            }
+            msg = msg + DENOPTIMConstants.EOL + " - RootGraph: " + dGraph;
+            fitnessSettings.getLogger().log(Level.FINE, msg);
             
             // Initialize the 3d model builder
             tb3d = new ThreeDimTreeBuilder();
@@ -308,15 +302,7 @@ public class GraphBuildingTask extends FitnessTask
             Object[] res = dGraph.evaluateGraph(ceblSettings);
             if (res == null) // null is used to indicate an unacceptable graph
             {
-                if (verbosity > 1)
-                {
-                    msg = "Graph task "+id+" got null from evaluation.";
-                    StaticLogger.appLogger.info(msg);
-                }
-
                 nSubTasks = 1;
-
-                // Store graph
                 CEBLUtils.storeGraphOfLevel(ceblSettings, dGraph.clone(), level,
                         rootId, nextIds);
             }
@@ -348,10 +334,9 @@ public class GraphBuildingTask extends FitnessTask
 
                     if (verbosity > 0)
                     {
-                        msg = "Graph " + dGraph.getGraphId() 
-                              + " is replaced by " + sz
-                              + " cyclic alternatives.";
-                        StaticLogger.appLogger.info(msg); 
+                        msg = "Graph " + dGraph.getGraphId() + " is replaced by " 
+                                + sz + " cyclic alternatives.";
+                        fitnessSettings.getLogger().log(Level.INFO, msg);
                     }
 
                     // WARNING! If cyclic versions of dGraph are available,
@@ -379,7 +364,7 @@ public class GraphBuildingTask extends FitnessTask
                                   + " is cyclic alternative "
                                   + (ig+1) + "/" + altCyclicGraphs.size()
                                   + " " + lst;
-                            StaticLogger.appLogger.info(msg);
+                            fitnessSettings.getLogger().log(Level.INFO, msg);
                         }
 
                         // Prepare vector of results
@@ -407,8 +392,8 @@ public class GraphBuildingTask extends FitnessTask
                             altRes[2] = mol;
         
                             // Prepare SMILES
-                            String smiles = 
-                                MoleculeUtils.getSMILESForMolecule(mol);
+                            String smiles = MoleculeUtils.getSMILESForMolecule(
+                                    mol, ceblSettings.getLogger());
                             if (smiles == null)
                             {
                                 smiles = "FAIL: NO SMILES GENERATED";
@@ -416,8 +401,8 @@ public class GraphBuildingTask extends FitnessTask
                             altRes[1] = smiles;
         
                             // Prepare INCHI                    
-                            ObjectPair pr = 
-                                 MoleculeUtils.getInChIForMolecule(mol);
+                            ObjectPair pr = MoleculeUtils.getInChIForMolecule(
+                                    mol, ceblSettings.getLogger());
                             if (pr.getFirst() == null)
                             {
                                 pr.setFirst("UNDEFINED_INCHI");

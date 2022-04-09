@@ -42,7 +42,7 @@ import denoptim.exception.DENOPTIMException;
  * @author Marco Foscato
  */
 
-public class DENOPTIMFragmentTest
+public class FragmentTest
 {
 	private static final String APRULE = "MyRule";
 	private static final String APSUBRULE = "1";

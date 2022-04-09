@@ -25,7 +25,6 @@ import denoptim.exception.DENOPTIMException;
 public class DescriptorUtils
 {	
 	private static final String FS = System.getProperty("file.separator");
-	private static final String NL = System.getProperty("line.separator");
 	
 	/**
 	 * List of descriptor names that are excluded from default import because

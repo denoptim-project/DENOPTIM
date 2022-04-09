@@ -18,7 +18,6 @@
 
 package denoptim.graph.simplified;
 
-import denoptim.graph.Edge;
 import denoptim.graph.Vertex;
 import denoptim.graph.Edge.BondType;
 

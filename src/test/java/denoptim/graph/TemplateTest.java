@@ -57,7 +57,7 @@ import denoptim.utils.GraphUtils;
  * Unit test for DENOPTIMTemplate
  */
 
-public class DENOPTIMTemplateTest
+public class TemplateTest
 {
     final long SEED = 13;
     Random rng = new Random(SEED);
@@ -454,7 +454,7 @@ public class DENOPTIMTemplateTest
      * 
      * </pre>
      * Before calling this method from outside its class, you should call
-     * {@link DENOPTIMTemplateTest#setUp()} to prepare the fragment space.
+     * {@link TemplateTest#setUp()} to prepare the fragment space.
      * 
      * @return
      * @throws DENOPTIMException

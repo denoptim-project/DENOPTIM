@@ -24,7 +24,7 @@ import denoptim.graph.Candidate;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.DGraph;
-import denoptim.graph.DENOPTIMGraphTest;
+import denoptim.graph.DGraphTest;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -594,7 +594,7 @@ public class EAUtilsTest
     @Test
     public void testCrowdingProbability() throws Exception
     {
-        DGraph g = DENOPTIMGraphTest.makeTestGraphA();
+        DGraph g = DGraphTest.makeTestGraphA();
         double t = 0.001;
         double p = 0.0;
         for (AttachmentPoint ap : g.getAttachmentPoints())

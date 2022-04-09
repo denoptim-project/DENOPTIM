@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import denoptim.constants.DENOPTIMConstants;
+
 /**
  * See http://www.javaworld.com/jw-12-2000/jw-1229-traps.html?page=4
  * @author Vishwesh Venkatraman
@@ -60,7 +62,8 @@ class StreamGobbler extends Thread
             BufferedReader br = new BufferedReader(isr);
             String line;
             while ((line = br.readLine()) != null)
-                sb.append(type).append("> ").append(line).append("\n");
+                sb.append(type).append("> ").append(line).append(
+                        DENOPTIMConstants.EOL);
 
             br.close();
         }

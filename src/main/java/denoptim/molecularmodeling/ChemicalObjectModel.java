@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
@@ -57,12 +59,12 @@ import denoptim.utils.ObjectPair;
 
 /**
  * Collector of molecular information, related to a single chemical object,
- * that is deployed within the 3DBuilder
+ * that is deployed within the 3D builder.
  *
  * @author Marco Foscato
  */
 
-public class Molecule3DBuilder
+public class ChemicalObjectModel
 {
     /**
      * DENOPTIM representation
@@ -85,7 +87,7 @@ public class Molecule3DBuilder
     private String molName;
 
     /**
-     * List of Ring Closing Attractors (for closing new rings)
+     * List of Ring Closing Attractors.
      */
     private ArrayList<RingClosingAttractor> attractors;
 
@@ -130,6 +132,10 @@ public class Molecule3DBuilder
      */
     private double atmOveralScore = Double.NaN;
 
+    /**
+     * Program-specific logger
+     */
+    private Logger logger;
     
     private ArrayList<Integer> oldToNewOrder;
     private ArrayList<Integer> newToOldOrder;
@@ -137,10 +143,10 @@ public class Molecule3DBuilder
 //------------------------------------------------------------------------------
 
     /**
-     * Constructs an empty <code>Molecule3DBuilder</code>
+     * Constructs an empty item.
      */
 
-    public Molecule3DBuilder()
+    public ChemicalObjectModel()
     {
         this.molGraph = new DGraph();
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
@@ -160,7 +166,7 @@ public class Molecule3DBuilder
 //------------------------------------------------------------------------------
 
     /**
-     * Constructs a <code>Molecule3DBuilder</code> specifying all its features
+     * Constructs an item specifying all its features
      * @param molGraph the graph representation
      * @param fmol the CDK molecular representation
      * @param tmol the internal coordinates representation
@@ -171,19 +177,21 @@ public class Molecule3DBuilder
      * @param attToAtmID the correspondence between RCA and atom index
      * @param allRCACombs all combinations of compatible pairs of RCAs
      * @param ringClosures the list of closed multifragment rings
+     * @param logger the tool to use for logging.
      */
 
-    public Molecule3DBuilder(DGraph molGraph, 
-                                IAtomContainer fmol, 
-                                TinkerMolecule tmol, 
-                                     String molName, 
-                ArrayList<ObjectPair> rotatableBnds,
-         ArrayList<RingClosingAttractor> attractors,
-       Map<RingClosingAttractor,Integer> attToAtmID,
-             ArrayList<Set<ObjectPair>> allRCACombs,
-             ArrayList<RingClosure> ringClosures,
-             ArrayList<Integer> oldToNewOrder,
-             ArrayList<Integer> newToOldOrder)
+    public ChemicalObjectModel(DGraph molGraph, 
+            IAtomContainer fmol, 
+            TinkerMolecule tmol, 
+            String molName, 
+            ArrayList<ObjectPair> rotatableBnds,
+            ArrayList<RingClosingAttractor> attractors,
+            Map<RingClosingAttractor,Integer> attToAtmID,
+            ArrayList<Set<ObjectPair>> allRCACombs,
+            ArrayList<RingClosure> ringClosures,
+            ArrayList<Integer> oldToNewOrder,
+            ArrayList<Integer> newToOldOrder,
+            Logger logger)
     {
         this.molGraph = molGraph;
         this.fmol = fmol;
@@ -207,6 +215,7 @@ public class Molecule3DBuilder
         }
         this.oldToNewOrder = oldToNewOrder;
         this.newToOldOrder = newToOldOrder;
+        this.logger = logger;
     }
 
 //------------------------------------------------------------------------------
@@ -221,7 +230,7 @@ public class Molecule3DBuilder
      * indeces)
      */
 
-    public Molecule3DBuilder(DGraph molGraph,
+    public ChemicalObjectModel(DGraph molGraph,
                                 IAtomContainer fmol, 
                                 TinkerMolecule tmol, 
                                      String molName, 
@@ -297,16 +306,6 @@ public class Molecule3DBuilder
         {
             APClass apclass = getClassFromAttractor(rca);
             rca.setApClass(apclass);
-        }
-
-        // Report
-        if (verbosity > 1)
-        {
-            System.out.println(" RingClosingAttractors on Molecule3DBuilder:");
-            for (int i=0; i<attractors.size(); i++)
-            {
-                  System.out.println(" RCA: "+i+" "+attractors.get(i));
-            }
         }
     }
 
@@ -464,9 +463,9 @@ public class Molecule3DBuilder
                 Vector3d t = new Vector3d();
                 t.cross(nac,nba);
                 double c = nba.x*nac.x + nba.y*nac.y + nba.z*nac.z;
-                if (Math.abs(c) > (1.0 - smallDble) && verbosity > 2)
+                if (Math.abs(c) > (1.0 - smallDble))
                 {
-                    System.out.println("WARNING! close-to-linear system "
+                    logger.log(Level.WARNING, "WARNING! close-to-linear system "
                         + "in the definition of atom " + i + " " + tAtm + ". "
                         + "You better use dummy atoms to avoid linearities.");
                 }
@@ -486,12 +485,9 @@ public class Molecule3DBuilder
                     a = a / ci;
                     b = b / ci;
                     ci = 0.0;
-                    if (verbosity > 2)
-                    {
-                        System.out.println("WARNING! close-to-linear system "
+                    logger.log(Level.WARNING, "WARNING! close-to-linear system "
                         + "in the definition of atom " + i + " " + tAtm + ". "
                         + "You better use dummy atoms to avoid linearities.");
-                    }
                 }
                 else 
                 {
@@ -756,10 +752,9 @@ public class Molecule3DBuilder
         if (bndTyp.hasCDKAnalogue())
         {
             this.fmol.addBond(iA, iB, bndTyp.getCDKOrder());
-            if (verbosity > 2)
-                System.out.println("ADDING BOND: "+iA+" "+iB);
+            logger.log(Level.FINE, "ADDING BOND: "+iA+" "+iB);
         } else {
-            System.out.println("WARNING! Attempt to add ring closing bond "
+            logger.log(Level.FINE, "WARNING! Attempt to add ring closing bond "
                     + "did not add any actual chemical bond because the "
                     + "bond type of the chord is '" + bndTyp +"'.");
         }
@@ -804,12 +799,8 @@ public class Molecule3DBuilder
             if (!rs.isEmpty())
             {
                 toRemove.add(op);
-                if (verbosity > 2)
-                {
-                    System.out.println("Bond " + i1 + "-" + i2 + " (TnkID:"
-                                        + (i1+1) + "-" + (i2+1)
-                                        + ") is not rotatable anymore");
-                }
+                logger.log(Level.FINE, "Bond " + i1 + "-" + i2 + " (TnkID:"
+                    + (i1+1) + "-" + (i2+1) + ") is not rotatable anymore");
             }
         }
 
@@ -829,7 +820,7 @@ public class Molecule3DBuilder
      * @throws DENOPTIMException
      */ 
 
-    public Molecule3DBuilder deepcopy() throws DENOPTIMException
+    public ChemicalObjectModel deepcopy() throws DENOPTIMException
     {
         String nMolName = this.molName;
         DGraph nMolGraph = this.molGraph.clone();
@@ -897,18 +888,17 @@ public class Molecule3DBuilder
         for (Integer i : newToOldOrder)
             newNewToOldOrder.add(i.intValue());
         
-
-        Molecule3DBuilder molClone = new Molecule3DBuilder(nMolGraph,
-                                                    nFMol,
-                                                    nTMol,
-                                                    nMolName,
-                                                    nRotBnds,
-                                                    nAttractors,
-                                                    nAttToAtmID,
-                                                    nAllRCACombs,
-                                                    nNewRingClosures,
-                                                    newOldToNewOrder,
-                                                    newNewToOldOrder);
+        ChemicalObjectModel molClone = new ChemicalObjectModel(nMolGraph,
+                nFMol,
+                nTMol,
+                nMolName,
+                nRotBnds,
+                nAttractors,
+                nAttToAtmID,
+                nAllRCACombs,
+                nNewRingClosures,
+                newOldToNewOrder,
+                newNewToOldOrder, logger);
 
         return molClone;
     }

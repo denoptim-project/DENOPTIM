@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Matrix3d;
@@ -54,7 +56,7 @@ import denoptim.utils.RandomUtils;
 
 /**
  * Tool to build build three-dimensional (3D) tree-like molecular structures 
- * from DENOPTIMGraphs. The molecular structure is assembled from the
+ * from {@link DGraph}. The molecular structure is assembled from the
  * building blocks by attaching any set of atoms/pseudoatoms contained in the
  * building block, and (optionally) aligning each incoming building block by 
  * using the geometric parameters defined in their attachment points.
@@ -86,11 +88,13 @@ public class ThreeDimTreeBuilder
      * Private builder of atom containers
      */
     private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
-
+    
     /**
-     * Debug flag
+     * Program-specific logger
      */
-    private boolean debug = false;
+    private Logger logger = Logger.getLogger("3dTreeBuilderLogger");
+    
+    private static final String NL = DENOPTIMConstants.EOL;
 
 //------------------------------------------------------------------------------
 
@@ -98,7 +102,22 @@ public class ThreeDimTreeBuilder
      * Constructs a new ThreeDimTreeBuilder.
      */
 
-    public ThreeDimTreeBuilder(){}
+    public ThreeDimTreeBuilder(){
+        this(Level.INFO);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructs a new ThreeDimTreeBuilder specifying the logging level.
+     * @param logLevel value specifying how much log we produce. Levels more
+     * detailed than {@link Level#INFO} cause also the creation of temporary 
+     * files with debug data.
+     */
+
+    public ThreeDimTreeBuilder(Level logLevel){
+        logger.setLevel(logLevel);
+    }
 
 //------------------------------------------------------------------------------
     
@@ -117,7 +136,7 @@ public class ThreeDimTreeBuilder
 
     /**
      * Created a three-dimensional molecular representation from a given 
-     * DENOPTIMGraph. The conversion creates also two maps to retrace the 
+     * {@link DGraph}. The conversion creates also two maps to retrace the 
      * attachment points within the final 3D structure both based on 
      * the ID of the source DENOPTIMVertex and correspondence to DENOPTIMEdge.
      * To retrieve this information see properties
@@ -134,9 +153,9 @@ public class ThreeDimTreeBuilder
      * DGraph, boolean)} (with a <code>true</code> 2nd argument)
      * instead of this method.
      * 
-     * @param graph the DENOPTIMGraph to be transformed into a 3D molecule
+     * @param graph the {@link DGraph} to be transformed into a 3D molecule
      * @return the <code>IAtomContainer</code> representation of the molecular
-     * system represented by the DENOPTIMGraph.
+     * system represented by the {@link DGraph}.
      * @throws DENOPTIMException
      */
 
@@ -150,7 +169,7 @@ public class ThreeDimTreeBuilder
 
     /**
      * Created a three-dimensional molecular representation from a given 
-     * DENOPTIMGraph. The conversion creates also two maps to retrace the 
+     * {@link DGraph}. The conversion creates also two maps to retrace the 
      * attachment points within the final 3D structure both based on 
      * the ID of the source DENOPTIMVertex and correspondence to DENOPTIMEdge.
      * To retrieve this information see properties
@@ -162,7 +181,7 @@ public class ThreeDimTreeBuilder
      * of the DENOPTIMVertex corresponding to the molecular fragment to which
      * the atom belongs.
      * 
-     * @param graph the DENOPTIMGraph to be transformed into a 3D molecule
+     * @param graph the {@link DGraph} to be transformed into a 3D molecule
      * @param removeUsedRCAs when <code>true</code> this method will remove 
      * used RCAs (the content of ring-closing vertexes, RCVs) 
      * and add bonds to close the rings
@@ -187,7 +206,7 @@ public class ThreeDimTreeBuilder
 
     /**
      * Created a three-dimensional molecular representation from a given 
-     * DENOPTIMGraph. The conversion creates also two maps to retrace the 
+     * {@link DGraph}. The conversion creates also two maps to retrace the 
      * attachment points within the final 3D structure both based on 
      * the ID of the source DENOPTIMVertex and correspondence to DENOPTIMEdge.
      * To retrieve this information see properties
@@ -199,7 +218,7 @@ public class ThreeDimTreeBuilder
      * of the DENOPTIMVertex corresponding to the molecular fragment to which
      * the atom belongs.
      * 
-     * @param graph the DENOPTIMGraph to be transformed into a 3D molecule
+     * @param graph the {@link DGraph} to be transformed into a 3D molecule
      * @param removeUsedRCAs when <code>true</code> this method will remove 
      * used RCAs (the content of ring-closing vertexes, RCVs) 
      * and add bonds to close the rings
@@ -327,7 +346,7 @@ public class ThreeDimTreeBuilder
             // sure we retail consistency between the changing atom list of
             // the atom indexes stored in the APs, and in particular, the 
             // index returned by getAtomPositionNumberInMol.
-        	MoleculeUtils.removeUsedRCA(mol, graph);
+        	MoleculeUtils.removeUsedRCA(mol, graph, logger);
         }
         
         if (setCDKRequirements)
@@ -336,10 +355,11 @@ public class ThreeDimTreeBuilder
             MoleculeUtils.ensureNoUnsetBondOrders(mol);
         }
         
-        if (debug)
+        if (logger.isLoggable(Level.FINE))
         {
+            StringBuilder sb = new StringBuilder();
             String file = "/tmp/iacTree.sdf";
-            System.out.println("Writing tree-like IAtomContainer to " + file);
+            sb.append("Writing tree-like IAtomContainer to " + file+NL);
             IAtomContainer cmol = builder.newAtomContainer();
             try
             {
@@ -349,7 +369,8 @@ public class ThreeDimTreeBuilder
             {
                 throw new DENOPTIMException(t);
             }
-            System.out.println("AP-per-VertexID");
+            
+            sb.append("AP-per-VertexID"+NL);
             int i=0;
             for (int v : apsPerVertexId.keySet())
             {
@@ -359,7 +380,7 @@ public class ThreeDimTreeBuilder
                     i++;
                     IAtom atm = new PseudoAtom(String.valueOf(i), 
                                           new Point3d(ap.getDirectionVector()));
-                    System.out.println("Vertex: "+v+" AP-"+i+" = "+ap);
+                    sb.append("Vertex: "+v+" AP-"+i+" = "+ap+NL);
                     cmol.addAtom(atm);
                     IBond bnd = new Bond(cmol.getAtom(
                     		ap.getAtomPositionNumber()),
@@ -370,34 +391,35 @@ public class ThreeDimTreeBuilder
             }
             DenoptimIO.writeSDFFile(file, mol, false);
             DenoptimIO.writeSDFFile(file, cmol, true);
-            System.out.println("AP-per-Edge");
+            sb.append("AP-per-Edge"+NL);
             for (Edge e : apsPerEdge.keySet())
             {
                 ArrayList<AttachmentPoint> aps = apsPerEdge.get(e);
                 for (AttachmentPoint ap : aps)
                 {
-                    System.out.println("Edge: "+e+" AP = "+ap);
+                    sb.append("Edge: "+e+" AP = "+ap+NL);
                 }
             }
-            System.out.println("AP-per-Atom");
+            sb.append("AP-per-Atom"+NL);
             for (IAtom a : apsPerAtom.keySet())
             {
                 ArrayList<AttachmentPoint> aps = apsPerAtom.get(a);
                 for (AttachmentPoint ap : aps)
                 {
-                    System.out.println("Atom: "+mol.indexOf(a) +" AP = "+ap);
+                    sb.append("Atom: "+mol.indexOf(a) +" AP = "+ap+NL);
                 }
             }
-            System.out.println("AP-per-Bond");
+            sb.append("AP-per-Bond"+NL);
             for (IBond b : apsPerBond.keySet())
             {
                 ArrayList<AttachmentPoint> aps = apsPerBond.get(b);
                 for (AttachmentPoint ap : aps)
                 {
-                    System.out.println("Bond: "+mol.indexOf(b.getAtom(0))
-                             +"-"+mol.indexOf(b.getAtom(1))+" AP = "+ap);
+                    sb.append("Bond: "+mol.indexOf(b.getAtom(0))
+                             +"-"+mol.indexOf(b.getAtom(1))+" AP = "+ap+NL);
                 }
             }
+            logger.log(Level.FINE,sb.toString());
         }
         
         // Prepare the string-representation of unused APs on this graph
@@ -481,11 +503,8 @@ public class ThreeDimTreeBuilder
             Map<IBond,ArrayList<AttachmentPoint>> apsPerBond) 
                     throws DENOPTIMException
     {   
-        if (debug)
-        {
-            System.err.println("Appending 3D fragment via edge: "+edge);
-            System.err.println("#Atoms on growing mol: "+mol.getAtomCount());
-        }
+        logger.log(Level.FINE, "Appending 3D fragment via edge: "+edge + NL 
+                +"#Atoms on growing mol: "+mol.getAtomCount());
         
         // Get the incoming fragment and its AP
         Vertex inVtx = edge.getTrgAP().getOwner();
@@ -494,17 +513,13 @@ public class ThreeDimTreeBuilder
         //Used to keep track of which atom comes from which vertex
         int idInVrx = inVtx.getVertexId();
         
-        if (debug)
-        {
-            System.err.println("Incoming vertex : "+inVtx);
-        }
+        logger.log(Level.FINE, "Incoming vertex : "+inVtx);
         
         int preNumAtms = mol.getAtomCount();
         IAtomContainer inFrag = null;
         if (inVtx.containsAtoms())
         {
             inFrag = inVtx.getIAtomContainer();
-            
             if (inFrag == null)
             {
                 String msg = "ThreeDimTreeBuilder found a building block "
@@ -517,11 +532,8 @@ public class ThreeDimTreeBuilder
                 throw new IllegalArgumentException(msg);
             }
             
-            if (debug)
-            {
-                System.err.println("Incoming IAC #atoms: " + 
-                        inFrag.getAtomCount());
-            }
+            logger.log(Level.FINE, "Incoming IAC #atoms: " + 
+                    inFrag.getAtomCount());
 
             if (alignIn3D)
             {
@@ -563,17 +575,14 @@ public class ThreeDimTreeBuilder
                 vectApA.normalize();
                 vectApB.normalize();
         
-                if (debug)
-                {
-                    System.err.println("After 1st translation and before "
-                            + "rotation");
-                    System.err.println("srcApA "+srcApA);
-                    System.err.println("trgApA "+trgApA);
-                    System.err.println("vectApA "+vectApA);
-                    System.err.println("srcApB "+srcApB);
-                    System.err.println("trgApB "+trgApB);
-                    System.err.println("vectApB "+vectApB);
-                }
+                logger.log(Level.FINE, 
+                        "After 1st translation and before rotation" + NL
+                        + "srcApA "+srcApA+NL
+                        + "trgApA "+trgApA+NL
+                        + "vectApA "+vectApA+NL
+                        + "srcApB "+srcApB+NL
+                        + "trgApB "+trgApB+NL
+                        + "vectApB "+vectApB);
         
                 // Get rotation matrix that aligns ApB to ApA
                 double rotAng = vectApA.angle(vectApB);
@@ -593,12 +602,9 @@ public class ThreeDimTreeBuilder
         	        rotAxis.normalize();
                     rotMat.set(new AxisAngle4d(rotAxis,rotAng));
         
-                    if (debug)
-                    {
-                        System.err.println("rotAng "+rotAng);
-                        System.err.println("rotAxis "+rotAxis);
-                        System.err.println("rotMat "+rotMat);
-                    }
+                    logger.log(Level.FINE,"rotAng "+rotAng+NL
+                            +"rotAxis "+rotAxis
+                            +"rotMat "+rotMat);
         
                     // Rotate atoms of incoming building block
                     for (IAtom atm : inFrag.atoms())
@@ -626,23 +632,17 @@ public class ThreeDimTreeBuilder
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        System.err.println("RotAng below threshold. "
-                                + "No rotation.");
-                    }
+                    logger.log(Level.FINE,"RotAng below threshold. No rotation.");
                 }
         
-                if (debug)
-                {
-                    System.err.println("After rotation before 2nd translation");
-                    System.err.println("srcApA "+srcApA);
-                    System.err.println("trgApA "+trgApA);
-                    System.err.println("vectApA "+vectApA);
-                    System.err.println("srcApB "+srcApB);
-                    System.err.println("trgApB "+trgApB);
-                    System.err.println("vectApB "+vectApB);
-                }
+                logger.log(Level.FINE, 
+                        "After rotation before 2nd translation"+NL
+                        + "srcApA "+srcApA+NL
+                        + "trgApA "+trgApA+NL
+                        + "vectApA "+vectApA+NL
+                        + "srcApB "+srcApB+NL
+                        + "trgApB "+trgApB+NL
+                        + "vectApB "+vectApB);
             
                 // Check whether this edge involves a Ring Closing Attractors
                 //TODO-gg remove nonOVERLAP case

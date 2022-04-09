@@ -413,9 +413,8 @@ public class MMBuilderParameters extends RunTimeParameters
 
         if (atomOrderingScheme < 1 || atomOrderingScheme > 2)
         {
-            System.out.println("ERROR! Parameter 'atomOrderingScheme' can only "
+            throw new Error("ERROR! Parameter 'atomOrderingScheme' can only "
 				+ "be 1 or 2");
-            System.exit(-1);
         }
 
         checkOtherParameters();

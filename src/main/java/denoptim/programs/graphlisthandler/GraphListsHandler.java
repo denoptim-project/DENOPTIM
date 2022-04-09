@@ -3,6 +3,7 @@ package  denoptim.programs.graphlisthandler;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 
 import denoptim.graph.DGraph;
 import denoptim.task.ProgramTask;
@@ -38,6 +39,7 @@ public class GraphListsHandler extends ProgramTask
         glhParams.readParameterFile(configFilePathName.getAbsolutePath());
         glhParams.checkParameters();
         glhParams.processParameters();
+        glhParams.startProgramSpecificLogger(loggerIdentifier,false); //to STDOUT
         glhParams.printParameters();
 
         Set<DGraph> matchedA = new HashSet<DGraph>();
@@ -51,28 +53,28 @@ public class GraphListsHandler extends ProgramTask
             for (DGraph gB :  glhParams.inGraphsB)
             {
                 j++;
-                System.out.println(" ");
-                System.out.println("-> Comparing "+i+" and "+j);
+                glhParams.getLogger().log(Level.INFO, NL + "-> Comparing " + i 
+                        + " and "+j);
                 if (gA.isIsomorphicTo(gB))
                 {
-                    System.out.println(" SAME!");
+                    glhParams.getLogger().log(Level.INFO, " SAME!");
                     matchedA.add(gA);
                     matchedB.add(gB);
                     break;
                 } else {
-                    System.out.println(" Different");
+                    glhParams.getLogger().log(Level.INFO, " Different");
                 }
             }
         }
         
-        System.out.println(" ");
-        System.out.println(" #Matches in list A: "+matchedA.size()+"/"
+        glhParams.getLogger().log(Level.INFO, NL + " #Matches in list A: " 
+                + matchedA.size()+"/"
                 + glhParams.inGraphsA.size());
-        System.out.println(" #Matches in list B: "+matchedB.size()+"/"
+        glhParams.getLogger().log(Level.INFO, " #Matches in list B: " 
+                + matchedB.size()+"/"
                 + glhParams.inGraphsB.size());
         
-        System.out.println(" ");
-        System.out.println(" ===> Un-matches in list A");
+        glhParams.getLogger().log(Level.INFO, NL + " ===> Un-matches in list A");
         int ii = -1;
         for (DGraph gA : glhParams.inGraphsA)
         {
@@ -81,13 +83,12 @@ public class GraphListsHandler extends ProgramTask
             {
                 continue;
             }
-            System.out.println(" ");
-            System.out.println("Entry in original list #"+ii);
-            System.out.println(gA);
+            glhParams.getLogger().log(Level.INFO, NL + "Entry in original list "
+                    + "#" + ii);
+            glhParams.getLogger().log(Level.INFO, gA.toString());
         }
         
-        System.out.println(" ");
-        System.out.println(" ===> Un-matches in list B");
+        glhParams.getLogger().log(Level.INFO, NL + " ===> Un-matches in list B");
         int jj = -1;
         for (DGraph gB : glhParams.inGraphsB)
         {
@@ -96,9 +97,9 @@ public class GraphListsHandler extends ProgramTask
             {
                 continue;
             }
-            System.out.println(" ");
-            System.out.println("Entry in original list #"+jj);
-            System.out.println(gB);
+            glhParams.getLogger().log(Level.INFO, NL + "Entry in original list"
+                    + " #" + jj);
+            glhParams.getLogger().log(Level.INFO, gB.toString());
         }
     }
     

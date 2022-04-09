@@ -17,7 +17,7 @@ import denoptim.graph.Vertex.BBType;
  * @author Marco Foscato
  */
 
-public class DENOPTIMEdgeTest {
+public class EdgeTest {
     private EmptyVertex dummyVertexA;
     private EmptyVertex dummyVertexB;
 	private StringBuilder reason = new StringBuilder();

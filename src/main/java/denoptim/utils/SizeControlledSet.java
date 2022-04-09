@@ -20,12 +20,6 @@ import denoptim.io.DenoptimIO;
 
 public class SizeControlledSet
 {
-
-    /**
-     * Version ID
-     */
-    private static final long serialVersionUID = 3L;
-
     /**
      * Maximum size of the set. If there is need to use more entries, the 
      * entries that do not fit are stored on disk.

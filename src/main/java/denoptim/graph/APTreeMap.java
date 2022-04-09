@@ -12,12 +12,10 @@ import com.google.gson.JsonSerializer;
  * Attachment point mapping where keys are sorted by natural ordering.
  */
 
-public class APTreeMap
-        extends TreeMap<AttachmentPoint, AttachmentPoint>
+public class APTreeMap extends TreeMap<AttachmentPoint, AttachmentPoint>
 {
 
-  public static class APMapSerializer
-  implements JsonSerializer<APTreeMap>
+  public static class APMapSerializer implements JsonSerializer<APTreeMap>
   {
       @Override
       public JsonElement serialize(APTreeMap apmap, Type typeOfSrc,
@@ -33,6 +31,4 @@ public class APTreeMap
           return context.serialize(jsonableMap);
       }
   }
-
-
 }

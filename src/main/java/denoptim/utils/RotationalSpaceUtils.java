@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.openscience.cdk.graph.SpanningTree;
 import org.openscience.cdk.interfaces.IAtom;
@@ -54,12 +55,6 @@ public class RotationalSpaceUtils
     private static final  IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
 
-    /**
-     * Verbosity level
-     */
-
-    private static int verbosity = 0;
-
 //------------------------------------------------------------------------------    
 
     /**
@@ -82,15 +77,15 @@ public class RotationalSpaceUtils
      */
 
     public static ArrayList<ObjectPair> defineRotatableBonds(IAtomContainer mol,
-          String defRotBndsFile, boolean addIterfragBonds, boolean excludeRings)
-                                                        throws DENOPTIMException
+          String defRotBndsFile, boolean addIterfragBonds, boolean excludeRings,
+          Logger logger) throws DENOPTIMException
     {
         ArrayList<ObjectPair> rotatableBonds = new ArrayList<ObjectPair>();
 
     	// Set all bond flags
     	for (IBond b : mol.bonds())
     	{
-                 b.setProperty(DENOPTIMConstants.BONDPROPROTATABLE,"false");
+    	    b.setProperty(DENOPTIMConstants.BONDPROPROTATABLE,"false");
     	}
 
         // Deal with interfragment bonds
@@ -122,12 +117,8 @@ public class RotationalSpaceUtils
             {
                 String msg = "WARNING! Attempt to match rotatable bonds returned "
                              + "an error! Selecting only fragment-fragment "
-    			 + "bonds. Details: " + msq.getMessage();
-                
-                //TODO-M9
-                msq.getProblem().printStackTrace();
-                
-                StaticLogger.appLogger.log(Level.WARNING ,msg);
+                             + "bonds. Details: " + msq.getMessage();
+                logger.log(Level.WARNING, msg);
             } else {
                 //Transform list of indeces
                 for (String name : listQueries.keySet())
@@ -145,10 +136,9 @@ public class RotationalSpaceUtils
                         //Check assumption on number of atoms involved in each bond
                         if (singleMatch.length != 2)
                         {
-                            String msg = "DENOPTIM can only deal with bonds involving "
-                                        + "2 atoms. Check bond " + singleMatch;
-                            StaticLogger.appLogger.log(Level.SEVERE, msg);
-                            throw new DENOPTIMException(msg);
+                            throw new Error("DENOPTIM can only deal with bonds "
+                                    + "involving 2 atoms. Check bond " 
+                                    + singleMatch);
                         }
         
         		//NOTE the index refers to the IAtomContainer locMol that is a
@@ -173,8 +163,9 @@ public class RotationalSpaceUtils
                         }
                         if (!alreadyThere)
                         {
-                            ObjectPair newRotBnd = new ObjectPair(new Integer(idAtmA),
-                                                                  new Integer(idAtmB));
+                            ObjectPair newRotBnd = new ObjectPair(
+                                    Integer.valueOf(idAtmA),
+                                    Integer.valueOf(idAtmB));
                             rotatableBonds.add(newRotBnd);
                         }
                     }
@@ -208,10 +199,7 @@ public class RotationalSpaceUtils
                 IRingSet rs = allRings.getRings(bnd);
                 if (!rs.isEmpty())
                 {
-				    if (verbosity > 0)
-				    {
-                       System.out.println("Ignoring cyclic bond: "+bnd);
-				    }
+				    logger.log(Level.FINE, "Ignoring cyclic bond: "+bnd);
                     toRemove.add(op);
                     continue;
                 }
@@ -264,13 +252,13 @@ public class RotationalSpaceUtils
                     int idAtmB = mol.indexOf(atmB);
                     if (idAtmA < idAtmB)
                     {
-                        newRotBnd = new ObjectPair(new Integer(idAtmA),
-                                                   new Integer(idAtmB));
+                        newRotBnd = new ObjectPair(Integer.valueOf(idAtmA),
+                                Integer.valueOf(idAtmB));
                     }
                     else
                     {
-                        newRotBnd = new ObjectPair(new Integer(idAtmB),
-                                                   new Integer(idAtmA));
+                        newRotBnd = new ObjectPair(Integer.valueOf(idAtmB),
+                                Integer.valueOf(idAtmA));
                     }
                     interfragBonds.add(newRotBnd);
                 }
@@ -371,59 +359,6 @@ public class RotationalSpaceUtils
 
         return mapOfSMARTS;
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Remove the cyclic bonds from the list of rotatable bonds. This method
-     * edits the pre-existing list of rotatable bonds found in the input data
-     * structure (<code>Molecule3DBuilder</code>). This methos
-     * is only allowed to remove bonds from the list of rotatable bonds.
-     *
-     * @throws DENOPTIMException
-     */
-/*
-    public static void purgeListRotatableBonds(Molecule3DBuilder mol) 
-                                                       throws DENOPTIMException
-    {
-        //Get all rings
-        IAtomContainer fmol = mol.getIAtomContainer();
-        SpanningTree st = new SpanningTree(fmol);
-        IRingSet allRings = new RingSet();
-        try {
-            allRings = st.getAllRings();
-        } catch (Exception ex) {
-            throw new DENOPTIMException(ex);
-        }
-
-        //Identify bonds to remove (cyclic bonds) from list of rotatable bonds
-        ArrayList<ObjectPair> toRemove = new ArrayList<ObjectPair>();
-        for (ObjectPair op : mol.getRotatableBonds())
-        {
-            int i1 = ((Integer)op.getFirst()).intValue();
-            int i2 = ((Integer)op.getSecond()).intValue();
-
-            IBond bnd = fmol.getBond(fmol.getAtom(i1), fmol.getAtom(i2));
-            IRingSet rs = allRings.getRings(bnd);
-            if (!rs.isEmpty())
-            {
-                toRemove.add(op);
-                if (verbosity > 2)
-                {
-                    System.out.println("Bond " + i1 + "-" + i2 + " (TnkID:"
-                                        + (i1+1) + "-" + (i2+1)
-                                        + ") is not rotatable anymore");
-                }
-            }
-        }
-
-        //Remove bonds
-        for (ObjectPair op : toRemove)
-        {
-            mol.getRotatableBonds().remove(op);
-        }
-    }
-*/
 
 //------------------------------------------------------------------------------
 }

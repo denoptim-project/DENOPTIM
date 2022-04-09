@@ -46,6 +46,7 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.utils.GraphUtils;
 
 
@@ -144,7 +145,6 @@ public class CombinatorialExplorerByLayer
             @Override
             public void run()
             {
-                //System.err.println("Calling shutdown.");
                 tpe.shutdown(); // Disable new tasks from being submitted
                 try
                 {
@@ -188,7 +188,7 @@ public class CombinatorialExplorerByLayer
                     {
                         ex.printStackTrace();
                         String msg = "EXCEPTION in rejectedExecution.";
-                        StaticLogger.appLogger.log(Level.WARNING,msg);
+                        settings.getLogger().log(Level.WARNING,msg);
                     }
                 }
             }
@@ -360,7 +360,7 @@ public class CombinatorialExplorerByLayer
                   + "Now reading '" + DENOPTIMConstants.SERGFILENAMEEXT + "' "
                   + "files from '" 
                   + CEBLUtils.getNameOfStorageDir(settings, level) + "'.";
-            StaticLogger.appLogger.log(Level.WARNING,msg);
+            settings.getLogger().log(Level.WARNING,msg);
             
             if (!denoptim.files.FileUtils.checkExists(
                     CEBLUtils.getNameOfStorageDir(settings, level)))
@@ -370,7 +370,7 @@ public class CombinatorialExplorerByLayer
             			+ "' does not exist! Use 'FSE-DBROOTFOLDER' to "
             			+ "provide the pathname to the existing folder where "
             			+ "the previously generated graphs are located.";
-                StaticLogger.appLogger.log(Level.SEVERE,msg);
+                settings.getLogger().log(Level.SEVERE,msg);
             	throw new DENOPTIMException(msg);
             }
 
@@ -389,7 +389,7 @@ public class CombinatorialExplorerByLayer
                 if (serGrphID > chk.getLatestSafelyCompletedGraphId())
                 {
                     msg = "Removing non-safely completed graph '" + fName + "'";
-                    StaticLogger.appLogger.log(Level.WARNING,msg);
+                    settings.getLogger().log(Level.WARNING,msg);
                     serFromChkRestart--;
                     denoptim.files.FileUtils.deleteFile(
                             CEBLUtils.getNameOfStorageDir(settings, level)
@@ -402,7 +402,7 @@ public class CombinatorialExplorerByLayer
         while (level <= settings.getMaxLevel())
         {
             msg = "Starting exploration of level " + level; 
-            StaticLogger.appLogger.log(Level.INFO,msg);
+            settings.getLogger().log(Level.INFO,msg);
 
             int numSubTasks = exploreCombinationsAtGivenLevel(level);
 
@@ -430,7 +430,7 @@ public class CombinatorialExplorerByLayer
                                   + "listed in " 
                                   + CEBLUtils.getNameOfStorageDir(settings, level)
                                   + "(" + outCount + ")";
-                            StaticLogger.appLogger.log(Level.SEVERE,msg);
+                            settings.getLogger().log(Level.SEVERE,msg);
                             throw new DENOPTIMException(msg);
                         }
                         break;
@@ -453,14 +453,14 @@ public class CombinatorialExplorerByLayer
                                          TimeUnit.MILLISECONDS.toSeconds(millis)
                                                    - TimeUnit.MINUTES.toSeconds(
                                       TimeUnit.MILLISECONDS.toMinutes(millis)));
-                        StaticLogger.appLogger.log(Level.INFO,msg);
+                        settings.getLogger().log(Level.INFO,msg);
                     }
     
                     if (millis > settings.getMaxWait())
                     {
                         stopRun();
                         msg = "Timeout reached: stopping all subtasks.";
-                        StaticLogger.appLogger.log(Level.SEVERE, msg);
+                        settings.getLogger().log(Level.SEVERE, msg);
                         interrupted = true;
                         break;
                     }
@@ -491,7 +491,7 @@ public class CombinatorialExplorerByLayer
                     + "----------------------------------------"
                     + "----------------------------------------" 
                     + DENOPTIMConstants.EOL;
-                StaticLogger.appLogger.log(Level.INFO,msg);
+                settings.getLogger().log(Level.INFO,msg);
             }
 
             // Increment level index
@@ -526,7 +526,7 @@ public class CombinatorialExplorerByLayer
                     + "----------------------------------------"
                     + "----------------------------------------" 
                     + DENOPTIMConstants.EOL;
-                StaticLogger.appLogger.log(Level.INFO,msg);
+                settings.getLogger().log(Level.INFO,msg);
                 break;
             }
 
@@ -544,7 +544,7 @@ public class CombinatorialExplorerByLayer
         msg = "Overall time: " + watch.toString() + ". " 
             + DENOPTIMConstants.EOL
             + "FragSpaceExplorer run completed." + DENOPTIMConstants.EOL;
-        StaticLogger.appLogger.log(Level.INFO, msg);
+        settings.getLogger().log(Level.INFO, msg);
     }
 
 //------------------------------------------------------------------------------
@@ -576,7 +576,7 @@ public class CombinatorialExplorerByLayer
                            + "points is considered to be '-1' "
                            + "no matter what is the actual level of such APs "
                            + "in the root graph.";
-                    StaticLogger.appLogger.log(Level.WARNING, msg);
+                    settings.getLogger().log(Level.WARNING, msg);
                 }
                 for (DGraph rootGraph : settings.getRootGraphs())
                 {
@@ -647,39 +647,33 @@ public class CombinatorialExplorerByLayer
             }
 
             // Print summary
-            if (verbosity > 0)
+            StringBuilder sb = new StringBuilder(512);
+            sb.append("Root: " + file.getName() + DENOPTIMConstants.EOL);
+            sb.append(" - #Usable APs on root = "); 
+            sb.append(fcf.getNumRootAPs() + DENOPTIMConstants.EOL);
+            sb.append(" - Size of candidates sets = "); 
+            sb.append(fcf.getSizesOfCandidateSets()+DENOPTIMConstants.EOL);
+            sb.append(" - Total #Combinations = ");
+            sb.append(fcf.getTotNumbCombs() + DENOPTIMConstants.EOL);
+            sb.append(" - Root graph: " + DENOPTIMConstants.EOL+rootGraph);
+            sb.append(DENOPTIMConstants.EOL);
+            sb.append(" - Details for root APs:");
+            sb.append(DENOPTIMConstants.EOL);
+            Map<IdFragmentAndAP, ArrayList<IdFragmentAndAP>> m = 
+                    fcf.getCandidatesMap();
+            for (IdFragmentAndAP srcAP : m.keySet())
             {
-                StringBuilder sb = new StringBuilder(512);
-                sb.append("Root: " + file.getName() + DENOPTIMConstants.EOL);
-                sb.append(" - #Usable APs on root = "); 
-                sb.append(fcf.getNumRootAPs() + DENOPTIMConstants.EOL);
-                sb.append(" - Size of candidates sets = "); 
-                sb.append(fcf.getSizesOfCandidateSets()+DENOPTIMConstants.EOL);
-                sb.append(" - Total #Combinations = ");
-                sb.append(fcf.getTotNumbCombs() + DENOPTIMConstants.EOL);
-                sb.append(" - Root graph: " + DENOPTIMConstants.EOL+rootGraph);
-                if (verbosity > 1)
+                sb.append("   -> "+srcAP).append(DENOPTIMConstants.EOL);
+                int iTrgAP = 0;
+                for (IdFragmentAndAP trgAP : m.get(srcAP))
                 {
-                	sb.append(DENOPTIMConstants.EOL);
-                	sb.append(" - Details for root APs:");
-                	sb.append(DENOPTIMConstants.EOL);
-                	Map<IdFragmentAndAP, ArrayList<IdFragmentAndAP>> m = 
-                			fcf.getCandidatesMap();
-                	for (IdFragmentAndAP srcAP : m.keySet())
-                	{
-                		sb.append("   -> "+srcAP).append(DENOPTIMConstants.EOL);
-                		int iTrgAP = 0;
-                		for (IdFragmentAndAP trgAP : m.get(srcAP))
-                		{
-                			iTrgAP++;
-                			sb.append("      " + iTrgAP + " -> "+trgAP);
-                			sb.append(DENOPTIMConstants.EOL);
-                		}
-                	}
+                    iTrgAP++;
+                    sb.append("      " + iTrgAP + " -> "+trgAP);
+                    sb.append(DENOPTIMConstants.EOL);
                 }
-                msg = sb.toString() + DENOPTIMConstants.EOL;
-                StaticLogger.appLogger.log(Level.INFO, msg);
             }
+            settings.getLogger().log(Level.FINE, sb.toString() 
+                    + DENOPTIMConstants.EOL);
 
             // Iterate over all combinations 
             try
@@ -734,8 +728,7 @@ public class CombinatorialExplorerByLayer
                             ArrayList<Integer> oldIds =new ArrayList<Integer>();
                             ArrayList<Integer> nowIds =new ArrayList<Integer>();
                             makeCheckPoint();
-                            oldIds.addAll(
-                                    settings.getCheckPoint().getNextIds());
+                            oldIds.addAll(settings.getCheckPoint().getNextIds());
                             while (true)
                             {
                                 iWait++;
@@ -804,23 +797,16 @@ public class CombinatorialExplorerByLayer
                 throw new DENOPTIMException(ex);
             }
 
-            if (verbosity > 0)
-            {
-                msg = fcf.getNumGeneratedCombs() + "/"
-                      + fcf.getTotNumbCombs() + " combination generated "
-                      + "for level " + level + " of graph " + cntRoot;
-                if (verbosity > 1)
-                {
-                    msg = msg  + " => " + rootGraph;
-                }
-                StaticLogger.appLogger.log(Level.INFO, msg);
-            }
+            msg = fcf.getNumGeneratedCombs() + "/"
+                  + fcf.getTotNumbCombs() + " combination generated "
+                  + "for level " + level + " of graph " + cntRoot;
+            settings.getLogger().log(Level.FINE, msg);
             total = total + fcf.getNumGeneratedCombs();
         }
 
         msg = "Total number of combination of fragments generated "
               + "for level " + level + " = " + total;
-        StaticLogger.appLogger.log(Level.INFO, msg);
+        settings.getLogger().log(Level.INFO, msg);
 
 /*
         // Code meant only to generate checkpoint file at the end of a level

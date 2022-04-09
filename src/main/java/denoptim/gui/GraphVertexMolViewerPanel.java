@@ -25,6 +25,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -317,7 +318,8 @@ public class GraphVertexMolViewerPanel extends JSplitPane
         try {
             mol = tb.convertGraphTo3DAtomContainer(
                     dnGraph);
-            MoleculeUtils.removeUsedRCA(mol,dnGraph);
+            Logger logger = Logger.getLogger(GUI.GUILOGGER);
+            MoleculeUtils.removeUsedRCA(mol,dnGraph, logger);
         } catch (Throwable t) {
             t.printStackTrace();
             System.out.println("Couldn't make 3D-tree representation: "

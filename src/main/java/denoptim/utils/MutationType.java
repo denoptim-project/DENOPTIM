@@ -42,7 +42,7 @@ public enum MutationType {
     DELETELINK, 
     
     /**
-     * Removes a vertex and all its neighbours recursively until a branching 
+     * Removes a vertex and all its neighbors recursively until a branching 
      * point, i.e., until a vertex that is connected to more than two 
      * non-capping vertexes.
      */

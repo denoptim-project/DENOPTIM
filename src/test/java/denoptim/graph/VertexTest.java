@@ -26,7 +26,7 @@ import denoptim.utils.MutationType;
  * @author Marco Foscato
  */
 
-public class DENOPTIMVertexTest
+public class VertexTest
 {
 	private StringBuilder reason = new StringBuilder();
 	

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.openscience.cdk.IImplementationSpecification;
 import org.openscience.cdk.exception.CDKException;
@@ -64,6 +65,11 @@ public class FitnessProvider
 	 */
 	private String expression;
 	
+	/**
+	 * Program-specific logger
+	 */
+	private Logger logger = null;
+	
 	
 //------------------------------------------------------------------------------
 
@@ -82,8 +88,9 @@ public class FitnessProvider
 	 */
 	
 	public FitnessProvider(List<DescriptorForFitness> descriptors, 
-	        String expression)
+	        String expression, Logger logger)
 	{
+	    this.logger = logger;
 		this.expression = expression;
 	
 		// We cannot use the list<DescriptorsForFitness> parameter directly
@@ -153,7 +160,7 @@ public class FitnessProvider
 		
 		// Cleanup: remove dummy atoms
 		DummyAtomHandler dah = new DummyAtomHandler(
-				DENOPTIMConstants.DUMMYATMSYMBOL);
+				DENOPTIMConstants.DUMMYATMSYMBOL, logger);
 		iac = dah.removeDummyInHapto(iac);
 		iac = dah.removeDummy(iac);
 		
@@ -164,8 +171,8 @@ public class FitnessProvider
 		// plain human readable strings.
 		engine.process(iac);
 		
-		if (debug) System.out.println("Descriptor instances: " 
-		        + engine.getDescriptorInstances().size());
+		logger.log(Level.FINE, "Descriptor instances: " 
+                + engine.getDescriptorInstances().size());
 		
 		// Collect numerical values needed to calculate the fitness
 		for (int i=0; i<engine.getDescriptorInstances().size(); i++)
@@ -174,7 +181,7 @@ public class FitnessProvider
         	IDescriptor desc = engine.getDescriptorInstances().get(i);
         	
         	String descName = descriptor.shortName;
-        	if (debug) System.out.println("Working on descriptor '" 
+        	logger.log(Level.FINE, "Working on descriptor '" 
         	        + descName + "'");
         	
         	IImplementationSpecification descSpec = 
@@ -184,7 +191,7 @@ public class FitnessProvider
         	Map<String, String> smarts = new HashMap<String, String>();
         	for (Variable variable : descriptor.getVariables())
         	{
-        		if (debug) System.out.println("-Processing varName = '" 
+        		logger.log(Level.FINE, "-Processing varName = '" 
         		        + variable.getName() + "'");
         		if (variable.smarts != null)
         		{
@@ -214,7 +221,7 @@ public class FitnessProvider
 	            allMatches = msq.getAllMatches();
         	}
         	
-        	if (debug) System.out.println("Collecting value of variables "
+        	logger.log(Level.FINE, "Collecting value of variables "
         	        + "derived from descriptor #" + i + ": " + descName);
         	
         	//Molecular/Atomic/bond descriptors are stored accordingly
@@ -239,17 +246,17 @@ public class FitnessProvider
         			{
         				String msg = "No hits for SMARTS of " + varName + ": "
         						+ "setting variable value to 0.0";
-        				StaticLogger.appLogger.log(Level.WARNING ,msg);
+        				logger.log(Level.WARNING ,msg);
         				variable.value = 0.0;
         				continue;
         			}
-        			if (debug) System.out.println("-AtomIDs contributing to " 
+        			logger.log(Level.FINE, "-AtomIDs contributing to " 
         			        + varName + ":" + hits);
         			if (hits.count() > 1)
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
         						+ varName + ". Taking average of all values.";
-        				StaticLogger.appLogger.log(Level.WARNING ,msg);
+        				logger.log(Level.WARNING ,msg);
         			}
         			int valCounter = -1;
         			List<Double> vals = new ArrayList<Double>();
@@ -260,7 +267,7 @@ public class FitnessProvider
                     		String msg = "Multiple entries in a single hit "
                     				+ "with SMARTS identifier for "
             						+ varName + ". Taking average of values.";
-            				StaticLogger.appLogger.log(Level.WARNING ,msg);
+            				logger.log(Level.WARNING ,msg);
                     	}
                     	for (Integer atmId : singleMatch)
                     	{
@@ -273,7 +280,7 @@ public class FitnessProvider
 		                    iac.setProperty(varName+"_"+valCounter,val);
                     	}
                     }
-                    if (debug) System.out.println("-Values contributing to " 
+                    logger.log(Level.FINE, "-Values contributing to " 
                             + varName + ": " + vals);
                     double overallValue = MathUtils.mean(vals);
                     variable.value = overallValue;
@@ -288,17 +295,17 @@ public class FitnessProvider
         			{
         				String msg = "No hits for SMARTS of " + varName + ": "
         						+ "setting variable value to 0.0";
-        				StaticLogger.appLogger.log(Level.WARNING ,msg);
+        				logger.log(Level.WARNING, msg);
         				variable.value = 0.0;
         				continue;
         			}
-        			if (debug) System.out.println("-AtomIDs contributing to " 
+        			logger.log(Level.FINE, "-AtomIDs contributing to " 
         			        + varName + ":" + hits);
         			if (hits.count() > 1)
         			{
         				String msg = "Multiple hits with SMARTS identifier for "
         						+ varName + ". Taking average of all values.";
-        				StaticLogger.appLogger.log(Level.WARNING ,msg);
+        				logger.log(Level.WARNING, msg);
         			}
         			int valCounter = -1;
         			List<Double> vals = new ArrayList<Double>();
@@ -321,7 +328,7 @@ public class FitnessProvider
 		        		valCounter++;
 	                    iac.setProperty(varName+"_"+valCounter,val);
                     }
-                    if (debug) System.out.println("-Values contributing to " 
+                    logger.log(Level.FINE, "-Values contributing to " 
                             + varName + ": "+vals);
                     double overallValue = MathUtils.mean(vals);
                     variable.value = overallValue;
@@ -347,7 +354,7 @@ public class FitnessProvider
                 valuesMap.put(v.getName(), v.value);
             }
         }
-        if (debug) System.out.println("VARIABLES: "+valuesMap);
+        logger.log(Level.FINE, "VARIABLES: "+valuesMap);
     
 
         // Calculate the fitness from the expression and descriptor values

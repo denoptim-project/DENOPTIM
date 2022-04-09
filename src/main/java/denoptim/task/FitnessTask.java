@@ -164,7 +164,8 @@ public abstract class FitnessTask extends Task
         {
             try
             {
-                MoleculeUtils.moleculeToPNG(fitProvMol,fitProvPNGFile);
+                MoleculeUtils.moleculeToPNG(fitProvMol,fitProvPNGFile,
+                        fitnessSettings.getLogger());
                 result.setImageFile(fitProvPNGFile);
             }
             catch (Exception ex)
@@ -207,8 +208,7 @@ public abstract class FitnessTask extends Task
         fitnessSettings.getLogger().log(Level.INFO, msg);
 
         // run the process
-        processHandler = new ProcessHandler(sb.toString(), 
-        		Integer.toString(id));
+        processHandler = new ProcessHandler(sb.toString(),Integer.toString(id));
 
         processHandler.runProcess();
         if (processHandler.getExitCode() != 0)
@@ -400,7 +400,8 @@ public abstract class FitnessTask extends Task
 		try {
 			FitnessProvider fp = new FitnessProvider(
 					fitnessSettings.getDescriptors(),
-					fitnessSettings.getFitnessExpression());
+					fitnessSettings.getFitnessExpression(),
+					fitnessSettings.getLogger());
 			// NB: here we remove dummy atoms!
 			fitVal = fp.getFitness(fitProvMol);
 		} catch (Exception e) {

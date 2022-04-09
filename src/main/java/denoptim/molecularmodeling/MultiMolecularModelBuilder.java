@@ -20,6 +20,8 @@
 package denoptim.molecularmodeling;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -52,6 +54,11 @@ public class MultiMolecularModelBuilder
     private DGraph molGraph;
     
     private MMBuilderParameters settings;
+    
+    /**
+     * Program.specific logger
+     */
+    private Logger logger;
 
 //------------------------------------------------------------------------------
 
@@ -59,6 +66,7 @@ public class MultiMolecularModelBuilder
             MMBuilderParameters settings)
     {
         this.settings = settings;
+        this.logger = settings.getLogger();
         this.molName = molName;
         this.molGraph = molGraph;
     }
@@ -79,22 +87,17 @@ public class MultiMolecularModelBuilder
     public ArrayList<IAtomContainer> buildMulti3DStructure() 
             throws DENOPTIMException, TinkerException
     {
-        String msg = "Building Multiple 3D representations for "
-                 + "graph = " + molGraph.toString();
-        System.out.println(msg);
+        logger.log(Level.INFO, "Building Multiple 3D representations for "
+                 + "graph = " + molGraph.toString());
 
         // Generate XYZ and INT representations
         long startTime = System.nanoTime();
-        Molecule3DBuilder mol = build3DTree();
+        ChemicalObjectModel mol = build3DTree();
         long endTime = System.nanoTime();
         long time = (endTime - startTime);
-        if (settings.getVerbosity() > 0)
-        {
-            msg = "TIME (build 3D model): " + time/1000000 + " ms"
+        logger.log(Level.FINE, "TIME (build 3D model): " + time/1000000 + " ms"
                   + " #frags: " + mol.getGraph().getVertexList().size() 
-                  + " #atoms: " + mol.getIAtomContainer().getAtomCount();
-            System.out.println(msg);
-        }
+                  + " #atoms: " + mol.getIAtomContainer().getAtomCount());
         
         // get settings //TODO: this should happen inside RunTimeParameters
         RingClosureParameters rcParams = new RingClosureParameters();
@@ -107,7 +110,7 @@ public class MultiMolecularModelBuilder
         // Evaluate source of isomerism
         // 1: Attempt Ring Closures 
         RingClosureTool rct = new RingClosureTool(settings);
-        ArrayList<Molecule3DBuilder> rcMols =new ArrayList<Molecule3DBuilder>();
+        ArrayList<ChemicalObjectModel> rcMols =new ArrayList<ChemicalObjectModel>();
         boolean skipConfSearch = false;
         if (rcParams.allowRingClosures() && 
             mol.getGraph().getRings().size() != 0)
@@ -117,42 +120,35 @@ public class MultiMolecularModelBuilder
             endTime = System.nanoTime();
             time = (endTime - startTime);
             int numAllClosedCombs = 0;
-            for (Molecule3DBuilder rcMol : rcMols)
+            for (ChemicalObjectModel rcMol : rcMols)
             {
                 Object o = rcMol.getIAtomContainer().getProperty(
                         DENOPTIMConstants.MOLERRORTAG);
                 if (o == null)
                     numAllClosedCombs++;
             }
-            if (settings.getVerbosity() > 0)
-            {
-                msg = "TIME (close ring): "+time/1000000+" ms"
+            logger.log(Level.FINE, "TIME (close ring): "+time/1000000+" ms"
                       + " #frags: " + mol.getGraph().getVertexList().size()
                       + " #atoms: " + mol.getIAtomContainer().getAtomCount()
                       + " #rings: " + mol.getGraph().getRings().size()
                       + " #rcaCombs: " + mol.getRCACombinations().size()
-                      + " #allClosedRCSCombs: " + numAllClosedCombs;
-                System.out.println(msg);
-            }
+                      + " #allClosedRCSCombs: " + numAllClosedCombs);
             if (rcParams.requireCompleteRingclosure && numAllClosedCombs<1)
             {
-                msg = "No fully closed RCS combinaton. Nothing to send to "
-                        + "conformational search.";
-                System.out.println(msg);
+                logger.log(Level.INFO, "No fully closed RCS combinaton. "
+                        + "Nothing to send to conformational search.");
                 skipConfSearch = true;
             }
-        }
-        else
-        {
-            Molecule3DBuilder nMol = mol.deepcopy();
+        } else {
+            ChemicalObjectModel nMol = mol.deepcopy();
             rct.saturateRingClosingAttractor(nMol);
-            rcMols = new ArrayList<Molecule3DBuilder>();
+            rcMols = new ArrayList<ChemicalObjectModel>();
             rcMols.add(nMol);
         }
 
 
         // 2: Conformational search (if possible)
-        ArrayList<Molecule3DBuilder> csMols = new ArrayList<Molecule3DBuilder>();
+        ArrayList<ChemicalObjectModel> csMols = new ArrayList<ChemicalObjectModel>();
         if (skipConfSearch)
         {
             csMols.addAll(rcMols);
@@ -163,21 +159,17 @@ public class MultiMolecularModelBuilder
             csMols = csPssRot.performPSSROT(rcMols);
             endTime = System.nanoTime();
             time = (endTime - startTime);
-            if (settings.getVerbosity() > 0)
-            {
-                msg = "TIME (conf. search): "+time/1000000+" ms"
+            logger.log(Level.FINE, "TIME (conf. search): "+time/1000000+" ms"
                       + " #frags: " + mol.getGraph().getVertexList().size()
                       + " #atoms: " + mol.getIAtomContainer().getAtomCount()
-                      + " #rotBnds: " + mol.getRotatableBonds().size();
-                System.out.println(msg);
-            }
+                      + " #rotBnds: " + mol.getRotatableBonds().size());
         }
 
         // Convert and return results
         ArrayList<IAtomContainer> results = new ArrayList<IAtomContainer>();
         DummyAtomHandler dah = new DummyAtomHandler(
-                DENOPTIMConstants.DUMMYATMSYMBOL);
-        for (Molecule3DBuilder mol3db : csMols)
+                DENOPTIMConstants.DUMMYATMSYMBOL, logger);
+        for (ChemicalObjectModel mol3db : csMols)
         {
             IAtomContainer iac = mol3db.getIAtomContainer();
             
@@ -186,7 +178,6 @@ public class MultiMolecularModelBuilder
             IAtomContainer originalOrderMol = AtomOrganizer.makeReorderedCopy(
                     iac, mol3db.getOldToNewOrder(), mol3db.getNewToOldOrder());
             iac = originalOrderMol;
-            
             
             if (!settings.getKeepDummyFlag())
             {
@@ -226,7 +217,7 @@ public class MultiMolecularModelBuilder
      * @throws DENOPTIMException
      */
 
-    public Molecule3DBuilder build3DTree() throws DENOPTIMException
+    public ChemicalObjectModel build3DTree() throws DENOPTIMException
     {
         // Create 3D tree-like structure
         ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
@@ -239,26 +230,20 @@ public class MultiMolecularModelBuilder
         IAtomContainer reorderedMol = oa.reorderStartingFrom(seedAtm, initMol);
         ArrayList<Integer> newToOldMap = oa.getNewToOldOrder(seedAtm);
         ArrayList<Integer> oldToNewMap = oa.getOldToNewOrder(seedAtm);
-        if (settings.debug())
-        {
-            System.out.println("oldToNewMap: "+oldToNewMap);
-        }
+        logger.log(Level.FINEST, "oldToNewMap: "+oldToNewMap);
         
         // Collect rotatable bonds defined by fragment-fragment connections
         ArrayList<ObjectPair> rotBonds = RotationalSpaceUtils
                 .defineRotatableBonds(reorderedMol,
                         ((FragmentSpaceParameters) settings.getParameters(
                                 ParametersType.FS_PARAMS)).getRotSpaceDefFile(),
-                        true,true);
-        if  (settings.getVerbosity() > 0)
+                        true, true, settings.getLogger());
+        
+        logger.log(Level.FINE, "Rotatable bonds: "+rotBonds);
+        if (logger.isLoggable(Level.FINEST))
         {
-            System.out.println("Rotatable bonds: "+rotBonds);
-            if (settings.debug())
-            {
-                System.out.println("Reordered IAtomContainer: 'iacToIC.sdf'");
-                DenoptimIO.writeSDFFile("iacToIC.sdf",reorderedMol,false);
-                GenUtils.pause();
-            }
+            logger.log(Level.FINEST, "Reordered IAtomContainer: 'iacToIC.sdf'");
+            DenoptimIO.writeSDFFile("iacToIC.sdf",reorderedMol,false);
         }
 
         // Generate Internal Coordinates
@@ -267,7 +252,7 @@ public class MultiMolecularModelBuilder
         TinkerUtils.setTinkerTypes(tmol, settings.getTinkerMap());
 
         // Generate combined molecular representations (both XYZ and INT)
-        return new Molecule3DBuilder(
+        return new ChemicalObjectModel(
                 molGraph,
                 reorderedMol,
                 tmol,

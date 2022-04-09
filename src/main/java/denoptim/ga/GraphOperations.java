@@ -1893,7 +1893,8 @@ public class GraphOperations
             String debugFile = "failedMutation_" + mType 
                     + "_" + vertex.getVertexId() + "(" + pos + ")_"
                     + settings.timeStamp + ".sdf";
-            DenoptimIO.writeGraphToSDF(new File(debugFile), c, false);
+            DenoptimIO.writeGraphToSDF(new File(debugFile), c, false,
+                    settings.getLogger());
             settings.getLogger().warning("Fatal exception while performing "
                     + "mutation. See file '" + debugFile + "' to reproduce the "
                     + "problem.");

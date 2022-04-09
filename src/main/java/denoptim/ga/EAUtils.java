@@ -386,7 +386,8 @@ public class EAUtils
             parents.add(xos.getA().get(0).getGraphOwner());
             parents.add(xos.getB().get(0).getGraphOwner());
             DenoptimIO.writeGraphsToSDF(new File(settings.getDataDirectory()
-                    + "failed_xover.sdf"), parents, true);
+                    + "failed_xover.sdf"), parents, true,
+                    settings.getLogger());
             throw new DENOPTIMException("Error while performing crossover. "
                     + "Please, report this to the authors ",t);
         }
@@ -550,9 +551,9 @@ public class EAUtils
             settings.getLogger().log(Level.INFO, "WRITING DEBUG FILE for " 
                     + graph.getLocalMsg());
             DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_parent.sdf"),
-                    parent.getGraph(),false);
+                    parent.getGraph(),false, settings.getLogger());
             DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_curr.sdf"), 
-                    graph,false);
+                    graph,false, settings.getLogger());
             throw e;
         }
         
@@ -1432,7 +1433,8 @@ public class EAUtils
             rotoSpaceFile = ((FragmentSpaceParameters) settings.getParameters(
                     ParametersType.FS_PARAMS)).getRotSpaceDefFile();
         }
-        RotationalSpaceUtils.defineRotatableBonds(mol, rotoSpaceFile, true, true);
+        RotationalSpaceUtils.defineRotatableBonds(mol, rotoSpaceFile, true,
+                true, settings.getLogger());
         
         // get the set of possible RCA combinations = ring closures
         CyclicGraphHandler cgh = new CyclicGraphHandler(rcParams,fragSpace);
@@ -1528,7 +1530,8 @@ public class EAUtils
         // Update the SMILES representation
         if (res!=null)
         {
-            String molsmiles = MoleculeUtils.getSMILESForMolecule(mol);
+            String molsmiles = MoleculeUtils.getSMILESForMolecule(mol,
+                    settings.getLogger());
             if (molsmiles == null)
             {
                 String msg = "Evaluation of graph: SMILES is null! "
@@ -1542,7 +1545,8 @@ public class EAUtils
         // Update the INCHI key representation
         if (res!=null)
         {
-            ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol);
+            ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol, 
+                    settings.getLogger());
             if (pr.getFirst() == null)
             {
                 String msg = "Evaluation of graph: INCHI is null!";
@@ -1649,6 +1653,7 @@ public class EAUtils
      * An additional check is the number of atoms in the graph
      */
 
+    //TODO-gg if this a duplicate of DGraph.evaluateGraph()?
     protected static Object[] evaluateGraph(DGraph molGraph, 
             boolean permissive, GAParameters settings) throws DENOPTIMException
     {
@@ -1701,7 +1706,8 @@ public class EAUtils
 
         // hopefully the null shouldn't happen if all goes well
         boolean smilesIsAvailable = true;
-        String molsmiles = MoleculeUtils.getSMILESForMolecule(mol);
+        String molsmiles = MoleculeUtils.getSMILESForMolecule(mol,
+                settings.getLogger());
         if (molsmiles == null)
         {
             String msg = "Evaluation of graph: SMILES is null! " 
@@ -1843,7 +1849,8 @@ public class EAUtils
         }
 
         // get the smiles/Inchi representation
-        ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol);
+        ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol, 
+                settings.getLogger());
         if (pr.getFirst() == null)
         {
             String msg = "Evaluation of graph: INCHI is null!";

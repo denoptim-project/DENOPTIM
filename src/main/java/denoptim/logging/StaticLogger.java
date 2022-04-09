@@ -57,6 +57,8 @@ public class StaticLogger
     
 //------------------------------------------------------------------------------
     
+    //TODO-gg del
+    /*
     public void setupLogger(String logFile) throws IOException
     {
     	int n = appLogger.getHandlers().length;
@@ -96,6 +98,7 @@ public class StaticLogger
             //hasBeenSet = true;
         //}
     }
+    */
 
 //------------------------------------------------------------------------------
 

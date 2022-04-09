@@ -38,7 +38,7 @@ public class FragsCombination extends HashMap<IdFragmentAndAP, IdFragmentAndAP>
 
     public FragsCombination()
     {
-	super();
+        super();
     }
 
 //------------------------------------------------------------------------------

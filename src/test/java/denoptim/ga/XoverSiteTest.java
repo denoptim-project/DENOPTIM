@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import denoptim.ga.XoverSite;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
-import denoptim.graph.DENOPTIMGraphTest;
+import denoptim.graph.DGraphTest;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.utils.CrossoverType;
@@ -30,9 +30,9 @@ public class XoverSiteTest
     @Test
     public void testProjectToClonedGraphs() throws Exception
     {
-        DENOPTIMGraphTest.prepare();
-        DGraph gA = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
-        DGraph gB = DENOPTIMGraphTest.makeDeeplyEmbeddedGraph();
+        DGraphTest.prepare();
+        DGraph gA = DGraphTest.makeDeeplyEmbeddedGraph();
+        DGraph gB = DGraphTest.makeDeeplyEmbeddedGraph();
         
         // This works only because we know that the graphs  have only one
         // template per level

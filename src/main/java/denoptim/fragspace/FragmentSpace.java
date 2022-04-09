@@ -484,7 +484,7 @@ public class FragmentSpace
                     msg = "Mismatch between scaffold bbIdx (" + bbIdx 
                             + ") and size of the library (" + scaffoldLib.size()
                             + "). FragType: " + bbType;
-                    StaticLogger.appLogger.log(Level.SEVERE, msg);
+                    settings.getLogger().log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
                 break;
@@ -499,7 +499,7 @@ public class FragmentSpace
                     msg = "Mismatch between fragment bbIdx (" + bbIdx 
                             + ") and size of the library (" + fragmentLib.size()
                             + "). FragType: " + bbType;
-                    StaticLogger.appLogger.log(Level.SEVERE, msg);
+                    settings.getLogger().log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
                 break;
@@ -514,7 +514,7 @@ public class FragmentSpace
                     msg = "Mismatch between capping group bbIdx " + bbIdx 
                             + ") and size of the library (" + cappingLib.size()
                             + "). FragType: " + bbType;
-                    StaticLogger.appLogger.log(Level.SEVERE, msg);
+                    settings.getLogger().log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
                 break;
@@ -522,7 +522,7 @@ public class FragmentSpace
             case UNDEFINED:
                 msg = "Attempting to take UNDEFINED type of building block from "
                         + "fragment library.";
-                StaticLogger.appLogger.log(Level.WARNING, msg);
+                settings.getLogger().log(Level.WARNING, msg);
                 if (bbIdx < fragmentLib.size())
                 {
                     originalVrtx = fragmentLib.get(bbIdx);
@@ -532,14 +532,14 @@ public class FragmentSpace
                     msg = "Mismatch between fragment bbIdx (" + bbIdx 
                             + ") and size of the library (" + fragmentLib.size()
                             + "). FragType: " + bbType;
-                    StaticLogger.appLogger.log(Level.SEVERE, msg);
+                    settings.getLogger().log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg);
                 }
                 break;
     
             default:
                 msg = "Unknown type of fragment '" + bbType + "'.";
-                StaticLogger.appLogger.log(Level.SEVERE, msg);
+                settings.getLogger().log(Level.SEVERE, msg);
                 throw new DENOPTIMException(msg);
         }
         Vertex clone = originalVrtx.clone();
@@ -549,7 +549,8 @@ public class FragmentSpace
         clone.setBuildingBlockId(bbIdx);
         if (originalVrtx.getBuildingBlockId() != bbIdx)
         {
-            System.err.println("WARNING! Mismatch between building block ID ("
+            settings.getLogger().log(Level.WARNING, "Mismatch between building "
+                    + "block ID ("
                     + originalVrtx.getBuildingBlockId() + ") and position in "
                     + "the list of building blocks (" + bbIdx + ") for type "
                     + bbType + ".");
@@ -911,11 +912,10 @@ public class FragmentSpace
         for (Integer fid : compatFragIds)
         {
             try {
-                compatFrags.add(getVertexFromLibrary(
-                        Vertex.BBType.FRAGMENT, fid));
+                compatFrags.add(getVertexFromLibrary(BBType.FRAGMENT, fid));
             } catch (DENOPTIMException e) {
-                System.err.println("Exception while trying to get fragment '" 
-                        + fid + "'!");
+                settings.getLogger().log(Level.WARNING, "Exception while trying "
+                        + "to get fragment '" + fid + "'!");
                 e.printStackTrace();
             }
         }
@@ -1066,7 +1066,7 @@ public class FragmentSpace
         
         if (compatAps.size()==0)
         {
-            StaticLogger.appLogger.log(Level.WARNING,"No compatible "
+            settings.getLogger().log(Level.WARNING,"No compatible "
                     + "AP found in the fragment space for APClass '" 
                     + aPC1 + "'.");
         }
@@ -1394,7 +1394,7 @@ public class FragmentSpace
             subgraphs = graph.extractPattern(GraphPattern.RING);
         } catch (DENOPTIMException e1)
         {
-            StaticLogger.appLogger.log(Level.WARNING, "Failed to extract "
+            settings.getLogger().log(Level.WARNING,"Failed to extract "
                     + "fused ring patters.");
             e1.printStackTrace();
         }
@@ -1435,8 +1435,8 @@ public class FragmentSpace
                     {
                         try
                         {
-                            subIAC = MoleculeUtils
-                                    .extractIACForSubgraph(wholeMol, g, graph);
+                            subIAC = MoleculeUtils.extractIACForSubgraph(
+                                    wholeMol, g, graph, settings.getLogger());
                             t.setIAtomContainer(subIAC,true);
                             has3Dgeometry = true;
                         } catch (DENOPTIMException e1)
@@ -1451,16 +1451,17 @@ public class FragmentSpace
                             {
                                 DenoptimIO.writeGraphsToJSON(
                                         new File(forDebugFile), lst);
-                                System.out.println("WARNING: failed to extract "
+                                settings.getLogger().log(Level.WARNING, 
+                                        "WARNING: failed to extract "
                                         + "molecular representation of graph. "
                                         + "See file '" + forDebugFile + "'.");
                             } catch (DENOPTIMException e)
                             {
-                                System.out.println("WARNING: failed to extract "
+                                settings.getLogger().log(Level.WARNING,
+                                        "WARNING: failed to extract "
                                         + "molecular representation of graph, "
                                         + "and failed to write graph to file.");
                             }
-                            
                         }
                     }
     
@@ -1473,7 +1474,7 @@ public class FragmentSpace
                         msg = msg + " candidate " + source.getName();
                     else
                         msg = msg + ".";
-                    StaticLogger.appLogger.log(Level.INFO, msg);
+                    settings.getLogger().log(Level.INFO, msg);
                     
                     appendVertexToLibrary(t, type, library);
                     if (type == BBType.FRAGMENT)
@@ -1491,12 +1492,13 @@ public class FragmentSpace
                             DenoptimIO.writeSDFFile(destFileName,subIAC,true);
                         } else {
                             DenoptimIO.writeGraphToSDF(new File(destFileName), 
-                                    g, true, false);
+                                    g, true, false, settings.getLogger());
                         }
                     } catch (DENOPTIMException e)
                     {
                         e.printStackTrace();
-                        System.out.println("WARNING: failed to write newly "
+                        settings.getLogger().log(Level.WARNING, "WARNING: "
+                                + "failed to write newly "
                                 + "generated " + type + " to file '" 
                                 + destFileName + "'.");
                     }

@@ -66,6 +66,7 @@ public class FitnessRunner extends ProgramTask
         frParams.readParameterFile(configFilePathName.getAbsolutePath());
         frParams.checkParameters();
         frParams.processParameters();
+        frParams.startProgramSpecificLogger(loggerIdentifier, false); //toSTDOUT
         frParams.printParameters();
         
         runner = new FPRunner(frParams);

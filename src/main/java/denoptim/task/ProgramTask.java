@@ -42,7 +42,6 @@ import denoptim.utils.TaskUtils;
 
 public abstract class ProgramTask extends Task
 {
-    
     /**
      * File containing configuration parameters for the program task.
      */

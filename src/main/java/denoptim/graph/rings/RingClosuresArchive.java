@@ -32,6 +32,7 @@ import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
@@ -247,13 +248,10 @@ public class RingClosuresArchive
                 catch (OverlappingFileLockException e)
                 {
                     nTry++;
-                    if (settings.getVerbosity() > 1)
-                    {
-                       System.out.println("Attempt " + nTry
+                    settings.getLogger().log(Level.WARNING,"Attempt " + nTry
                              + " to get lock " + "for '"
                              + settings.getRCCLibraryIndexFile()
                              + "' failed. ");
-                    }
                 }
             }
         
@@ -285,11 +283,8 @@ public class RingClosuresArchive
                         oos = new ObjectOutputStream(fos);
                         oos.writeObject(rcc);
                         oos.close();
-                        if (settings.getVerbosity() > 1)
-                        {
-                            System.out.println("Serialization to file "
-                                                               + rccFileName);
-                        }
+                        settings.getLogger().log(Level.FINE,
+                                "Serialization to file " + rccFileName);
                     }
                     catch (Throwable t2)
                     {
@@ -410,16 +405,16 @@ public class RingClosuresArchive
             rcc = getRCCsFromArchive(rccId);
             if (settings.getVerbosity() > 1)
             {
-                String msg = "Path is closable (from DB)";
-                StaticLogger.appLogger.info(msg);
+                settings.getLogger().log(Level.FINE, 
+                        "Path is closable (from DB)");
             }
         }
         else
         {
             if (settings.getVerbosity() > 1)
             {
-                String msg = "Path is NOT closable (from DB)";
-                StaticLogger.appLogger.info(msg);
+                settings.getLogger().log(Level.FINE, 
+                        "Path is NOT closable (from DB)");
             }
         }
         return rcc;
@@ -449,10 +444,8 @@ public class RingClosuresArchive
             ois = new ObjectInputStream(fis);
             rcc = (RingClosingConformations) ois.readObject();
             ois.close();
-            if (settings.getVerbosity() > 1)
-            {
-                System.out.println("Got serialized RCC from " + rccFileName1);
-            }
+            settings.getLogger().log(Level.FINE, 
+                    "Got serialized RCC from " + rccFileName1);
             recoveringDone = true;
         }
         catch (Throwable t2)
@@ -464,11 +457,6 @@ public class RingClosuresArchive
             try
             {
                 fis.close();
-// This is only needed to fix bug in FileOutputStream.
-// It seems that FileInputStream does not have the same problem and works
-// just fine without theese lines
-//                      fis = null;
-//                      System.gc();
             }
             catch (Throwable t)
             {

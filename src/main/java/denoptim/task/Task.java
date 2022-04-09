@@ -143,7 +143,6 @@ public abstract class Task implements Callable<Object>
      * subtask, which also includes the scenario where the executed external
      * script returned a non-zero exit status.
      */
-  
     public boolean foundException()
     {
         return hasException;
@@ -152,9 +151,8 @@ public abstract class Task implements Callable<Object>
 //------------------------------------------------------------------------------
 
     /**
-     * @return the exception thrown within this task
+     * @return the exception thrown within this task.
      */
-
     public Throwable getException()
     {
         return thrownExc;
@@ -162,6 +160,9 @@ public abstract class Task implements Callable<Object>
     
 //------------------------------------------------------------------------------
 
+    /**
+     * @return the error message from this task.
+     */
     public String getErrorMessage()
     {
         return errMsg;

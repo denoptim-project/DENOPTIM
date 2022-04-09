@@ -19,6 +19,7 @@
 package denoptim.programs.isomorphism;
 
 import java.io.File;
+import java.util.logging.Level;
 
 import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
@@ -54,6 +55,7 @@ public class Isomorphism extends ProgramTask
         isomParams.readParameterFile(configFilePathName.getAbsolutePath());
         isomParams.checkParameters();
         isomParams.processParameters();
+        isomParams.startProgramSpecificLogger(loggerIdentifier, false); //to STDOUT
 
         DGraph graphA = null;
         DGraph graphB = null;
@@ -68,15 +70,18 @@ public class Isomorphism extends ProgramTask
             e.printStackTrace();
         }
 
-        System.out.println("Checking for isomorphism between ");
-        System.out.println(" -> GraphA: "+graphA);
-        System.out.println(" -> GraphB: "+graphB);
+        isomParams.getLogger().log(Level.INFO, 
+                "Checking for isomorphism between ");
+        isomParams.getLogger().log(Level.INFO, " -> GraphA: " + graphA);
+        isomParams.getLogger().log(Level.INFO, " -> GraphB: " + graphB);
     
         if (graphA.isIsomorphicTo(graphB))
         {
-            System.out.println("Graphs are DENOPTIM-isomorphic!");
+            isomParams.getLogger().log(Level.INFO, 
+                    "Graphs are DENOPTIM-isomorphic!");
         } else {
-            System.out.println("No DENOPTIM-isomorphism found.");
+            isomParams.getLogger().log(Level.INFO, 
+                    "No DENOPTIM-isomorphism found.");
         }
     }
 

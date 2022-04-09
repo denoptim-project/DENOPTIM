@@ -491,9 +491,6 @@ public class Fragment extends Vertex
 	    String allAtomsProp = "";    
 	    if (getProperty(DENOPTIMConstants.APSTAG) == null)
 	    {
-	    	System.out.println("WARNING: no tag " 
-	    			+ DENOPTIMConstants.APSTAG + "found in fragment."
-	    			+ " No AP created.");
 	    	return;
         }
 	    allAtomsProp = getProperty(DENOPTIMConstants.APSTAG).toString();

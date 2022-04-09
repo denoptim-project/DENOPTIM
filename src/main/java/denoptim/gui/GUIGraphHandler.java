@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -697,7 +698,8 @@ public class GUIGraphHandler extends GUICardPanel
                 try
                 {
                     outFile = DenoptimIO.writeGraphsToFile(outFile,
-                            fileAndFormat.format, dnGraphLibrary);
+                            fileAndFormat.format, dnGraphLibrary,
+                            Logger.getLogger("GUILogger"));
                 }
                 catch (Exception ex)
                 {

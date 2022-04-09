@@ -49,6 +49,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -775,8 +776,7 @@ public class DenoptimIO
     public static Set<APClass> readAllAPClasses(File fragLib) {
         Set<APClass> allCLasses = new HashSet<APClass>();
         try {
-            for (Vertex v : DenoptimIO.readVertexes(fragLib, 
-                    BBType.UNDEFINED)) 
+            for (Vertex v : DenoptimIO.readVertexes(fragLib, BBType.UNDEFINED)) 
             {
                 for (AttachmentPoint ap : v.getAttachmentPoints()) {
                     allCLasses.add(ap.getAPClass());
@@ -1124,14 +1124,16 @@ public class DenoptimIO
      *
      * @param mol      the molecule
      * @param fileName output file
+     * @param logger program-specific logger.
      * @throws DENOPTIMException
      */
 
-    public static void moleculeToPNG(IAtomContainer mol, String fileName)
+    public static void moleculeToPNG(IAtomContainer mol, String fileName, 
+            Logger logger)
             throws DENOPTIMException {
         IAtomContainer iac = null;
         if (!GeometryTools.has2DCoordinates(mol)) {
-            iac = MoleculeUtils.generate2DCoordinates(mol);
+            iac = MoleculeUtils.generate2DCoordinates(mol, logger);
         } else {
             iac = mol;
         }
@@ -1299,14 +1301,9 @@ public class DenoptimIO
                 }
             }
         }
-
-
         sb.append("$$$$\n");
 
-        //System.err.println(sb.toString());
-
         try {
-
             FileWriter fw = new FileWriter(outfile);
             fw.write(sb.toString());
             fw.close();
@@ -1390,8 +1387,8 @@ public class DenoptimIO
      * @throws Exception 
      */
     
-    public static ArrayList<DGraph> readDENOPTIMGraphsFromFile(
-            File inFile) throws Exception 
+    public static ArrayList<DGraph> readDENOPTIMGraphsFromFile(File inFile) 
+            throws Exception 
     {
         FileFormat ff = FileUtils.detectFileFormat(inFile);
         switch (ff) 
@@ -1415,8 +1412,8 @@ public class DenoptimIO
                 
             case VRTXSDF:
                 ArrayList<DGraph> graphs = new ArrayList<DGraph>();
-                ArrayList<Vertex> vertexes = 
-                        readVertexes(inFile, BBType.UNDEFINED);
+                ArrayList<Vertex> vertexes = readVertexes(inFile, 
+                        BBType.UNDEFINED);
                 for (Vertex v : vertexes)
                 {
                     if (v instanceof Template)
@@ -1573,7 +1570,8 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static ArrayList<DGraph> readDENOPTIMGraphsFromTxtFile(
-            String fileName, FragmentSpace fragSpace) throws DENOPTIMException 
+            String fileName, FragmentSpace fragSpace, Logger logger)
+                    throws DENOPTIMException 
     {
         ArrayList<DGraph> lstGraphs = new ArrayList<DGraph>();
         BufferedReader br = null;
@@ -1596,14 +1594,14 @@ public class DenoptimIO
                 } catch (Throwable t) {
                     String msg = "Cannot convert string to DENOPTIMGraph. "
                             + "Check line '" + line.trim() + "'";
-                    StaticLogger.appLogger.log(Level.SEVERE, msg);
+                    logger.log(Level.SEVERE, msg);
                     throw new DENOPTIMException(msg, t);
                 }
                 lstGraphs.add(g);
             }
         } catch (IOException ioe) {
             String msg = "Cannot read file " + fileName;
-            StaticLogger.appLogger.log(Level.SEVERE, msg);
+            logger.log(Level.SEVERE, msg);
             throw new DENOPTIMException(msg, ioe);
         } finally {
             try {
@@ -1757,7 +1755,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeGraphToFile(File file, FileFormat format,
-            DGraph graph) throws DENOPTIMException 
+            DGraph graph, Logger logger) throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {
@@ -1770,7 +1768,7 @@ public class DenoptimIO
                 break;
                 
             case GRAPHSDF:
-                writeGraphToSDF(file, graph, false, true);
+                writeGraphToSDF(file, graph, false, true, logger);
                 break;
                 
             default:
@@ -1791,7 +1789,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeGraphsToFile(File file, FileFormat format,
-            List<DGraph> modGraphs) throws DENOPTIMException 
+            List<DGraph> modGraphs, Logger logger) throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {
@@ -1804,7 +1802,7 @@ public class DenoptimIO
                 break;
                 
             case GRAPHSDF:
-                writeGraphsToSDF(file, modGraphs, false, true);
+                writeGraphsToSDF(file, modGraphs, false, true, logger);
                 break;
                 
             default:
@@ -1824,9 +1822,9 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            ArrayList<DGraph> graphs) throws DENOPTIMException
+            ArrayList<DGraph> graphs, Logger logger) throws DENOPTIMException
     {
-        writeGraphsToSDF(file, graphs, false);
+        writeGraphsToSDF(file, graphs, false, logger);
     }
 
 //------------------------------------------------------------------------------
@@ -1841,11 +1839,12 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphToSDF(File file, DGraph graph,
-            boolean append, boolean make3D) throws DENOPTIMException
+            boolean append, boolean make3D, Logger logger)
+                    throws DENOPTIMException
     {
         ArrayList<DGraph> lst = new ArrayList<>(1);
         lst.add(graph);
-        writeGraphsToSDF(file, lst, append, make3D);
+        writeGraphsToSDF(file, lst, append, make3D, logger);
     }
     
 //------------------------------------------------------------------------------
@@ -1859,11 +1858,11 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphToSDF(File file, DGraph graph,
-            boolean append) throws DENOPTIMException
+            boolean append, Logger logger) throws DENOPTIMException
     {
         ArrayList<DGraph> lst = new ArrayList<>(1);
         lst.add(graph);
-        writeGraphsToSDF(file, lst, append);
+        writeGraphsToSDF(file, lst, append, logger);
     }
     
 //------------------------------------------------------------------------------
@@ -1877,9 +1876,10 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            ArrayList<DGraph> graphs, boolean append) throws DENOPTIMException
+            ArrayList<DGraph> graphs, boolean append,
+            Logger logger) throws DENOPTIMException
     {
-        writeGraphsToSDF(file, graphs, append, false);
+        writeGraphsToSDF(file, graphs, append, false, logger);
     }
     
 //------------------------------------------------------------------------------
@@ -1895,8 +1895,8 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            List<DGraph> modGraphs, boolean append, boolean make3D) 
-                    throws DENOPTIMException
+            List<DGraph> modGraphs, boolean append, boolean make3D, 
+            Logger logger) throws DENOPTIMException
     {
         ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (DGraph g : modGraphs) 
@@ -1906,14 +1906,14 @@ public class DenoptimIO
             if (make3D)
             {
                 try {
-                    iac = tb.convertGraphTo3DAtomContainer(g,true);
+                    iac = tb.convertGraphTo3DAtomContainer(g, true);
                 } catch (Throwable t) {
                     t.printStackTrace();
-                    System.out.println("Couldn't make 3D-tree representation: "
-                            + t.getMessage());
+                    logger.log(Level.WARNING,"Couldn't make 3D-tree "
+                            + "representation: " + t.getMessage());
                 }
             } else {
-                GraphUtils.writeSDFFields(iac,g);
+                GraphUtils.writeSDFFields(iac, g);
             }
             lst.add(iac);
         }

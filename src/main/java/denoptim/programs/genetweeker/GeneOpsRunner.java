@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -62,6 +64,11 @@ public class GeneOpsRunner extends ProgramTask
      * Fragment space in use
      */
     private FragmentSpace fragSpace;
+    
+    /**
+     * Program-specific logger
+     */
+    private Logger logger = null;
 
 //------------------------------------------------------------------------------
   
@@ -84,7 +91,9 @@ public class GeneOpsRunner extends ProgramTask
         goParams.readParameterFile(configFilePathName.getAbsolutePath());
         goParams.checkParameters();
         goParams.processParameters();
-
+        goParams.startProgramSpecificLogger(loggerIdentifier, false); //to STDOUT
+        
+        this.logger = goParams.getLogger();
         this.settings = goParams;       
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
@@ -122,9 +131,9 @@ public class GeneOpsRunner extends ProgramTask
             e.printStackTrace();
         }
     
-        System.out.println("Initial graphs: ");
-        System.out.println(graph);
-        System.out.println(" ");
+        logger.log(Level.INFO, "Initial graphs: ");
+        logger.log(Level.INFO, graph.toString());
+        logger.log(Level.INFO, " ");
         MutationType mt = settings.mutationType;
         
         //Just in case we used some keyword to set something that affects 
@@ -164,13 +173,13 @@ public class GeneOpsRunner extends ProgramTask
                     settings.idNewVrt, apID, new Monitor(),gaParams);
 
         } else {
-            System.out.println("Attempting mutation a random mutation on a "
+            logger.log(Level.INFO, "Attempting mutation a random mutation on a "
                     + "random vertex");
             GraphOperations.performMutation(graph,new Monitor(),gaParams);
         }
-        System.out.println("Result of mutation:");
-        System.out.println(graph);
-        System.out.println(" ");
+        logger.log(Level.INFO, "Result of mutation:");
+        logger.log(Level.INFO, graph.toString());
+        logger.log(Level.INFO, " ");
         
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(graph, true);
@@ -194,10 +203,10 @@ public class GeneOpsRunner extends ProgramTask
             e.printStackTrace();
         }
 
-        System.out.println("Initial graphs: ");
-        System.out.println("MALE: "+male);
-        System.out.println("FEMALE: "+female);
-        System.out.println(" ");
+        logger.log(Level.INFO, "Initial graphs: ");
+        logger.log(Level.INFO, "MALE: "+male);
+        logger.log(Level.INFO, "FEMALE: "+female);
+        logger.log(Level.INFO, " ");
     
         // Identify the crossover operation to perform
         Vertex vm = getEmbeddedVertex(settings.xoverSrcMale,
@@ -224,18 +233,18 @@ public class GeneOpsRunner extends ProgramTask
         male.renumberGraphVertices();
         female.renumberGraphVertices();
     
-        System.out.println(" ");
-        System.out.println("Initial graphs now with unique vertexID: ");
-        System.out.println("v: "+ vm.getVertexId() + " of MALE: " + male);
-        System.out.println("v:" + vf.getVertexId() + " of FEMALE: " + female);
-        System.out.println(" ");
+        logger.log(Level.INFO, " ");
+        logger.log(Level.INFO, "Initial graphs now with unique vertexID: ");
+        logger.log(Level.INFO, "v: "+ vm.getVertexId() + " of MALE: " + male);
+        logger.log(Level.INFO, "v:" + vf.getVertexId() + " of FEMALE: " + female);
+        logger.log(Level.INFO, " ");
         
         GraphOperations.performCrossover(xos, fragSpace);
     
-        System.out.println("Result of crossover:");
-        System.out.println("MALE: " + male);
-        System.out.println("FEMALE: " + female);
-        System.out.println(" ");
+        logger.log(Level.INFO, "Result of crossover:");
+        logger.log(Level.INFO, "MALE: " + male);
+        logger.log(Level.INFO, "FEMALE: " + female);
+        logger.log(Level.INFO, " ");
     
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
         IAtomContainer iacM = t3d.convertGraphTo3DAtomContainer(male, true);
@@ -274,7 +283,7 @@ public class GeneOpsRunner extends ProgramTask
                     str = "[" + str + " " + embeddingPath[i] + "] ";
                 }
             }
-            System.out.println("Attempting '" + operation + "' on deep "
+            logger.log(Level.INFO, "Attempting '" + operation + "' on deep "
                     + "vertex " + str);
             Vertex outerVertex = null;
             DGraph innerGraph = graph;
@@ -287,7 +296,7 @@ public class GeneOpsRunner extends ProgramTask
                 outerVertex = innerGraph.getVertexWithId(embeddingPath[i]);
                 if (outerVertex == null)
                 {
-                    System.out.println("VertexID '" + embeddingPath[i] +  
+                    logger.log(Level.INFO, "VertexID '" + embeddingPath[i] +  
                             "' not found in graph " + innerGraph);
                     return null;
                 }
@@ -295,13 +304,13 @@ public class GeneOpsRunner extends ProgramTask
             return outerVertex;
         } else {
             int vid = embeddingPath[0];
-            System.out.println("Attempting '" + operation + "' on vertex " 
+            logger.log(Level.INFO, "Attempting '" + operation + "' on vertex " 
                     + embeddingPath[0]);
             Vertex v = graph.getVertexWithId(vid);
             if (v == null)
             {
-                System.out.println("VertexID '" +vid +  "' not found in graph " 
-                        + graph);
+                logger.log(Level.INFO, "VertexID '" + vid +  "' not found in "
+                        + "graph " + graph);
                 return null;
             }
             return v;

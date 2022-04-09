@@ -20,6 +20,8 @@ package denoptim.graph.rings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Matrix3d;
@@ -33,6 +35,7 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.MathUtils;
 import denoptim.utils.GenUtils;
@@ -47,6 +50,7 @@ import denoptim.utils.GenUtils;
 public class RingClosureFinder
 {
 
+    private final static String NL = DENOPTIMConstants.EOL;
 //----------------------------------------------------------------------------
 
     /**
@@ -71,24 +75,19 @@ public class RingClosureFinder
         int sz = path.size();
         if (rotatability.size() != sz-1)
         {
-            System.out.println("ERROR! Cannot evaluate closability of path: "
+           throw new Error("ERROR! Cannot evaluate closability of path: "
                                 + "path and list of bonds are not compatible!"
                                 + "(" + sz + ", " + rotatability.size() + ")"
                                 + " Please, Report this bug to the author.");
-            System.exit(1);
         }
         //NB: the '+2' comes from the 'bonds' to RCAs: 2 per fundamental ring
         if (sz > settings.getMaxNumberRotatableBonds()+2)
         {
-            if (settings.getVerbosity() > 0)
-            {
-                System.out.println("Too many rotatable bonds for systematic "
-                        + "search. We assume the path is closable.");
-            }
+            settings.getLogger().log(Level.WARNING, "Too many rotatable bonds "
+                    + "for systematic search. We assume the path is closable.");
             return true;
         }
         
-
         // Create the chain of points to work with
         List<Point3d> ptsChain = new ArrayList<Point3d>();
         for (int i=0; i<path.size(); i++)
@@ -110,12 +109,9 @@ public class RingClosureFinder
                                          path.get(t2).getPoint3d());
         ArrayList<Double> clsablConds = rc.getClosabilityConditions(
                 settings.getConfPathExtraTolerance());
-        if (settings.getVerbosity() > 1)
-        {
-            System.out.println("RingClosability conditions vector:");
-            System.out.println(clsablConds);
-        }
-
+        settings.getLogger().log(Level.FINE, "RingClosability conditions "
+                + "vector:" + clsablConds);
+        
         // Make work vector of dihedrals (angles around rotatable bonds)
         // avoiding linearities
         ArrayList<Double> dihedrals = new ArrayList<Double>();
@@ -128,8 +124,8 @@ public class RingClosureFinder
                                                ptsChain.get(i));
             if (a >= settings.getLinearityLimit())
             {
-                if (settings.getVerbosity() > 0)
-                    System.out.println("Skipping linearity in point "+i);
+                settings.getLogger().log(Level.FINE, "Skipping linearity in "
+                        + "point "+i);
                 rotatability.set(i-1,false);
             }
             else
@@ -157,11 +153,8 @@ public class RingClosureFinder
         dihedrals.add(0.0);
         dihIncement.add(0.0);
 
-        if (settings.getVerbosity() > 0)
-        {
-            System.out.println("Exploring torsional space... (dim:"
+        settings.getLogger().log(Level.FINE, "Exploring torsional space... (dim:"
                     + nn + " - complete:" + settings.doExhaustiveConfSrch()+")");
-        }
 
         long startTime = System.nanoTime();
         hasClosableRotamer(ptsChain,
@@ -175,16 +168,13 @@ public class RingClosureFinder
                                 closableConfs,
                                 settings.doExhaustiveConfSrch(),
                                 false, //true for debug only!
-                                settings.getVerbosity(),
+                                settings.getLogger(),
                                 0);
         long endTime = System.nanoTime();
         long time = (endTime - startTime) / (long) 1000.0;
 
-        if (settings.getVerbosity() > 0)
-        {
-            String s = "TIME (microsec) for exploration of torsional space: ";
-            System.out.println(s + time);
-        }
+        settings.getLogger().log(Level.FINE, "TIME (microsec) for exploration "
+                + "of torsional space: "+ time);
 
         if (closableConfs.size() > 0)
             res = true;
@@ -223,24 +213,21 @@ public class RingClosureFinder
                                 ArrayList<ArrayList<Double>> closableConfs,
                                 boolean doExhaustiveSearch,
                                 boolean writeAllConfs,
-                                int verbosity,
+                                Logger logger,
                                 int rec)
     {
 
         boolean res = false;
-        if (verbosity > 2)
-            System.out.println(rec+"-Rec: "+activeRot);
+        logger.log(Level.FINEST,"-Rec: "+activeRot);
         int totStp = (int) (360.0 / step);
         if (!rotatability.get(activeRot))
         {
-            if (verbosity > 2)
-                System.out.println(rec+"-Rec: not active");
+            logger.log(Level.FINEST, rec+"-Rec: not active");
             totStp = 1;
         }
         for (int i=0; i<totStp; i++)
         {
-            if (verbosity > 2)
-                System.out.println(rec+"-RecLop: "+activeRot+" I:"+i);
+            logger.log(Level.FINEST,rec+"-RecLop: "+activeRot+" I:"+i);
             if (i != 0)
             {
                 dihIncement.set(activeRot,dihIncement.get(activeRot) + step);
@@ -256,13 +243,10 @@ public class RingClosureFinder
 
                 rotMat.set(new AxisAngle4d(rotAxis,Math.toRadians(step)));
 
-                if (verbosity > 2)
-                {
-                    System.out.println(" srcRotBnd: " + srcRotBnd);
-                    System.out.println(" endRotBnd: " + endRotBnd);
-                    System.out.println(" rotAxis:   " + rotAxis);
-                    System.out.println(" rotMat:    " + rotMat);
-                }
+                logger.log(Level.FINEST," srcRotBnd: " + srcRotBnd+NL
+                        +" endRotBnd: " + endRotBnd+NL
+                        +" rotAxis:   " + rotAxis+NL
+                        +" rotMat:    " + rotMat);
 
                 for (int ip = activeRot+2; ip<chain.size(); ip++)
                 {
@@ -297,7 +281,7 @@ public class RingClosureFinder
                                 closableConfs,
                                 doExhaustiveSearch,
                                 writeAllConfs,
-                                verbosity,
+                                logger,
                                 rec);
                 rec--;
             }
@@ -309,7 +293,7 @@ public class RingClosureFinder
                 Point3d pT1 = chain.get(t1);
                 Point3d pT2 = chain.get(t2);
                 RingClosure rc = new RingClosure(pH1,pH2,pT1,pT2);
-                res = rc.isClosable(clsablConds,false);
+                res = rc.isClosable(clsablConds, logger);
                 if (res)
                 {
                     // Store vector of dihedrals
@@ -325,33 +309,32 @@ public class RingClosureFinder
                     }
                     closableConfs.add(conf);
 
-                    if (verbosity > 0)
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Found closable path conformation!");
+                    if (writeAllConfs)
                     {
-                        System.out.println("Found closable path conformation!");
-                        if (verbosity > 1 && writeAllConfs)
-                        {
-                            reportForDebug("closable.sdf",chain);
-                            System.out.println(" Dihedrals:  " + dihedrals);
-                            System.out.println(" Increments: " + dihIncement);
-                            System.out.println(" Conf.:      " + conf);
-                            System.out.println(" See 'closable.sdf'");
-//			    GenUtils.pause();
-                        }
+                        reportForDebug("closable.sdf",chain);
+                        sb.append(" Dihedrals:  " + dihedrals+NL);
+                        sb.append(" Increments: " + dihIncement+NL);
+                        sb.append(" Conf.:      " + conf+NL);
+                        sb.append(" See 'closable.sdf'"+NL);
                     }
+                    logger.log(Level.FINE, sb.toString());
                 }
                 else
                 {
-                    if (verbosity > 1 && writeAllConfs)
+                    if (writeAllConfs)
                     {
+                        StringBuilder sb = new StringBuilder();
                         reportForDebug("not_closable.sdf",chain);
-                        System.out.println("Conformation of path is NOT "
+                        sb.append("Conformation of path is NOT "
                                         +"closable! See 'not_closable.sdf'");
-                        System.out.println(" Dihedrals:  " + dihedrals);
-                        System.out.println(" Increments: " + dihIncement);
-                        System.out.println(" Chain:      ");
+                        sb.append(" Dihedrals:  " + dihedrals+NL);
+                        sb.append(" Increments: " + dihIncement+NL);
+                        sb.append(" Chain:"+NL);
                         for (int ii=0; ii<chain.size(); ii++)
-                            System.out.println("   " + chain.get(ii));
-//                        GenUtils.pause();
+                            sb.append("   " + chain.get(ii)+NL);
+                        logger.log(Level.FINE, sb.toString());
                     }
                 }
             }
@@ -359,11 +342,8 @@ public class RingClosureFinder
     	    {
                 if (res)
                 {
-            	    if (verbosity > 1)
-            	    {
-            		System.out.println("Stop recursive conf. search."
+                    logger.log(Level.FINE, "Stop recursive conf. search."
             				   + " (rec.: " + rec + ")");
-            	    }
                     break;
                 }
             }
@@ -372,8 +352,7 @@ public class RingClosureFinder
         // reset
         if (rotatability.get(activeRot))
         {
-            dihIncement.set(activeRot,dihIncement.get(activeRot) 
-                                                          - step*(totStp-1));
+            dihIncement.set(activeRot,dihIncement.get(activeRot)-step*(totStp-1));
 
             // Move back the whole branch of points that lie after the rotbond
             Point3d srcRotBnd = chain.get(activeRot);

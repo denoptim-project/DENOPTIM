@@ -22,6 +22,7 @@ package denoptim.programs.moldecularmodelbuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -69,6 +70,7 @@ public class MolecularModelBuilder extends ProgramTask
         mmbParams.readParameterFile(configFilePathName.getAbsolutePath());
         mmbParams.checkParameters();
         mmbParams.processParameters();
+        mmbParams.startProgramSpecificLogger(loggerIdentifier, false);
         mmbParams.printParameters();
         
         // read the input molecule
@@ -112,7 +114,7 @@ public class MolecularModelBuilder extends ProgramTask
             {
                 msg = msg + NL + te.solution;
             }
-            System.out.println(msg);
+            mmbParams.getLogger().log(Level.SEVERE, msg);
         } 
         catch (Exception de)
         {
@@ -120,7 +122,8 @@ public class MolecularModelBuilder extends ProgramTask
         } 
         if (normalTerm)
         {
-            System.out.println("MolecularModelBuilder terminated normally!");
+            mmbParams.getLogger().log(Level.INFO, "MolecularModelBuilder "
+                    + "terminated normally!");
         }
     }
 }

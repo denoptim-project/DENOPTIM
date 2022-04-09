@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
@@ -44,7 +45,7 @@ import denoptim.utils.MutationType;
  * @author Marco Foscato
  */
 
-public class DENOPTIMGraphTest {
+public class DGraphTest {
     
     private static APClass APCA, APCB, APCC, APCD, CAPP;
     private static String a="A", b="B", c="C", d="D", cap="cap";
@@ -1123,7 +1124,7 @@ public class DENOPTIMGraphTest {
     /**
      * Returns a graph that contains a 10-layered recursive structure.
      * Before running this you must run 
-     * {@link DENOPTIMGraphTest#prepare()}
+     * {@link DGraphTest#prepare()}
      */
     public static DGraph makeDeeplyEmbeddedGraph() throws DENOPTIMException
     {
@@ -2986,7 +2987,8 @@ public class DENOPTIMGraphTest {
 	    
 	    for (int i=0; i<allQueries.size(); i++)
 	    {
-	        List<Vertex> matches = g.findVertices(allQueries.get(i),0);
+	        List<Vertex> matches = g.findVertices(allQueries.get(i),
+	                Logger.getLogger("DummyLogger"));
 	        assertEquals(allExpected.get(i).size(),matches.size(),
 	                "Different number of matched vertexes ("+i+")");
     	    assertTrue(allExpected.get(i).containsAll(matches),

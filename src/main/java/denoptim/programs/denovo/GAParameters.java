@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
@@ -709,6 +708,12 @@ public class GAParameters extends RunTimeParameters
         String msg = "";
         switch (key.toUpperCase())
         {
+            case "VERBOSITY=":
+            {
+                verbosity = Integer.parseInt(value);
+                break;
+            }
+            
             case "NUMPARALLELTASKS=":
             {
                 if (value.length() > 0)
@@ -1174,7 +1179,8 @@ public class GAParameters extends RunTimeParameters
 
     public void processParameters() throws DENOPTIMException
     {
-        createWorkingDirectory();
+        if (isMaster)
+            createWorkingDirectory();
 
         // set random number generator
         if (seed == 0)
@@ -1195,9 +1201,12 @@ public class GAParameters extends RunTimeParameters
         
         processOtherParameters();
         
-        StaticLogger.appLogger.log(Level.INFO, "Program log file: " + logFile);
-        StaticLogger.appLogger.log(Level.INFO, "Output files associated with "
+        if (isMaster)
+        {    
+            StaticLogger.appLogger.log(Level.INFO, "Program log file: " + logFile);
+            StaticLogger.appLogger.log(Level.INFO, "Output files associated with "
                 + "the current run are located in " + dataDir);
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -1205,7 +1214,7 @@ public class GAParameters extends RunTimeParameters
     public void checkParameters() throws DENOPTIMException
     {
         String error = "";
-        //TODO-gg comment out (test of novel approach)
+        //TODO: use somethign like the following for checking the parameters:
         //ensureIsPositive("GA-NUMOFFSPRING", numOfChildren, "blabla");
         if (numOfChildren <= 0)
         {

@@ -50,9 +50,7 @@ import denoptim.utils.MutationType;
 
 /**
  * A vertex is a data structure that has an identity and holds a 
- * list of attachment points. The attachment points can be related by
- * an here-undefined relation. Also, the attributes that each 
- * attachment point needs upon construction depend on the instance of vertex. 
+ * list of {@link AttachmentPoint}s.
  * 
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
@@ -577,6 +575,7 @@ public abstract class Vertex implements Cloneable
      * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
+    //TODO-gg make abstract
     public boolean sameAs(Vertex other, StringBuilder reason)
     {
         if (this.getClass() == other.getClass())
@@ -1316,6 +1315,7 @@ public abstract class Vertex implements Cloneable
                 json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
                 if (json != null)
                 {
+                    //TODO-gg get rid of this
                     StaticLogger.appLogger.log(Level.WARNING, "Attempt to "
                         + "read a vertex from "
                         + "a SDF file that contains a JSON definition of a "

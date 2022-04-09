@@ -32,6 +32,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.SingletonFileAccess;
 import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
+import denoptim.programs.combinatorial.CEBLParameters;
 
 
 /**
@@ -69,14 +70,15 @@ public class CEBLUtils
                                                         throws DENOPTIMException
     {
         String msg ="";
-        if (fileName.contains(Pattern.quote(DENOPTIMConstants.SERGFILENAMEROOT)) && 
-            fileName.contains(Pattern.quote(".")))
+        if (fileName.contains(Pattern.quote(DENOPTIMConstants.SERGFILENAMEROOT)) 
+                && fileName.contains(Pattern.quote(".")))
         {
              msg = "Failed attempt to extract a graphId from String '" 
                          + fileName + "'";
             throw new DENOPTIMException(msg);
         }
-        String[] p1 = fileName.split(Pattern.quote(DENOPTIMConstants.SERGFILENAMEROOT));
+        String[] p1 = fileName.split(Pattern.quote(
+                DENOPTIMConstants.SERGFILENAMEROOT));
         String[] p2 = p1[1].split(Pattern.quote("."));
         int graphId = -1;
         try

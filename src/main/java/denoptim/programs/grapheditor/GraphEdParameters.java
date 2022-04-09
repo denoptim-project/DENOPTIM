@@ -308,20 +308,9 @@ public class GraphEdParameters extends RunTimeParameters
             }
             catch (Throwable t)
             {
-                String msg = "Cannot read in graph editing tasks from " 
-                                                              + graphEditsFile;
-                StaticLogger.appLogger.log(Level.INFO,msg);
-                throw new DENOPTIMException(msg,t);
+                throw new Error("Cannot read in graph editing tasks from " 
+            + graphEditsFile);
             }
-        }
-
-        try
-        {
-            StaticLogger.getInstance().setupLogger(logFile);
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
         }
     }
     

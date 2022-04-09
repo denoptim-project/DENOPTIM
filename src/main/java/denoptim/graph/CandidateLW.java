@@ -29,11 +29,6 @@ package denoptim.graph;
 public class CandidateLW
 {
     /**
-	 * Version UID
-	 */
-	private static final long serialVersionUID = 1L;
-
-    /**
      * Unique identifier of this candidate.
      */
     private String uid;

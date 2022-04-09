@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
 
-import denoptim.combinatorial.CEBLParameters;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.fitness.FitnessParameters;
@@ -40,6 +39,7 @@ import denoptim.graph.rings.RingClosureParameters;
 import denoptim.logging.HTMLLogFormatter;
 import denoptim.logging.StaticLogger;
 import denoptim.main.Main.RunType;
+import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fitnessevaluator.FRParameters;
 import denoptim.programs.genetweeker.GeneOpsRunnerParameters;
@@ -67,6 +67,15 @@ import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 public abstract class RunTimeParameters
 {
     /**
+     * Flag signaling this is the master collection of parameters. 
+     * The master collection is the one with the type that corresponds to the 
+     * type of program task. A parameters collection is master
+     * if it may contain other collections without being itself contained in
+     * any other collection.
+     */
+    protected boolean isMaster = true;
+    
+    /**
      * Working directory
      */
     protected String workDir = System.getProperty("user.dir");
@@ -78,9 +87,12 @@ public abstract class RunTimeParameters
     
     /**
      * Program-specific logger. Note that initialization errors in input 
-     * parameters are detected prior to starting the logger.
+     * parameters are detected prior to starting the logger. Also, the logger is
+     * initialized to avoid null during unit tests. In any proper run, this
+     * logger should be overwritten by a call to 
+     * {@link #startProgramSpecificLogger(String)}.
      */
-    private Logger logger = null;
+    private Logger logger = Logger.getLogger("DummyLogger");
     
     /**
      * Verbosity level
@@ -244,6 +256,12 @@ public abstract class RunTimeParameters
     public RunTimeParameters(ParametersType paramType)
     {
         this.paramType = paramType;
+        
+        /*
+         * This is the default logger "DummyLogger". It should be overwritten
+         * by a call to startProgramSpecificLogger
+         */
+        this.logger.setLevel(Level.SEVERE); 
     }
     
 //-----------------------------------------------------------------------------
@@ -314,10 +332,12 @@ public abstract class RunTimeParameters
 //-----------------------------------------------------------------------------
     
     /**
-     * Set the name of the program specific logger.
+     * Set the name of the program specific logger. This method should only be 
+     * used by subclasses that need to set the logger for embedded parameters 
+     * collections.
      * @param loggerIdentifier the name to save.
      */
-    public void setLogger(Logger logger)
+    private void setLogger(Logger logger)
     {
         this.logger = logger;
     }
@@ -330,12 +350,39 @@ public abstract class RunTimeParameters
      * from static {@link Logger#getLogger(String)} method using the value of 
      * <code>loggerIdentifier</code> or by {@link RunTimeParameters#getLogger()}.
      * All parameter collectors embedded in this one will inherit the logger.
+     * By default the logger that is created does dump its log into the 
+     * pathname identified by the {@link RunTimeParameters#logFile} field of
+     * this instance.
+     * @param loggerIdentifier the string identifying the program-specific logger.
      * @throws IOException 
      * @throws SecurityException 
      */
     public Logger startProgramSpecificLogger(String loggerIdentifier) 
             throws SecurityException, IOException
-    {   
+    { 
+        return startProgramSpecificLogger(loggerIdentifier, true);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Starts a logger with the given name. 
+     * The name is saved among the parameters and the logger can be obtained 
+     * from static {@link Logger#getLogger(String)} method using the value of 
+     * <code>loggerIdentifier</code> or by {@link RunTimeParameters#getLogger()}.
+     * All parameter collectors embedded in this one will inherit the logger.
+     * @param loggerIdentifier the string identifying the program-specific logger.
+     * @param toLogFile with <code>true</code> we dump the log to a file. The
+     * pathname of such file must have been configured in this collection of
+     * parameters as the {@link RunTimeParameters#logFile} field. With 
+     * <code>false</code> we log on standard output.
+     * @throws IOException 
+     * @throws SecurityException 
+     */
+    public Logger startProgramSpecificLogger(String loggerIdentifier, 
+            boolean toLogFile) 
+            throws SecurityException, IOException
+    {
         logger = Logger.getLogger(loggerIdentifier);
         
         int n = logger.getHandlers().length;
@@ -344,20 +391,59 @@ public abstract class RunTimeParameters
             logger.removeHandler(logger.getHandlers()[0]);
         }
 
-        FileHandler fileHdlr = new FileHandler(logFile);
-        SimpleFormatter formatterTxt = new SimpleFormatter();
-        fileHdlr.setFormatter(formatterTxt);
-        logger.setUseParentHandlers(false);
-        logger.addHandler(fileHdlr);
-        //TODO-gg take from verbosity level
-        logger.setLevel(Level.FINEST);
-
+        if (toLogFile)
+        {
+            FileHandler fileHdlr = new FileHandler(logFile);
+            SimpleFormatter formatterTxt = new SimpleFormatter();
+            fileHdlr.setFormatter(formatterTxt);
+            logger.setUseParentHandlers(false);
+            logger.addHandler(fileHdlr);
+            logger.setLevel(Level.INFO);
+            String header = "Started logging for " + loggerIdentifier;
+            logger.log(Level.INFO,header);
+        }
+        
+        if (verbosity!=0)
+        {
+            logger.setLevel(verbosityTologLevel());
+        }
+        
         for (RunTimeParameters innerParams : otherParameters.values())
         {
             innerParams.setLogger(logger);
         }
         
         return logger;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    private Level verbosityTologLevel()
+    {
+        int rebased = verbosity+3;
+        switch (rebased)
+        {
+            case 0:
+                return Level.OFF;
+            case 1:
+                return Level.SEVERE;
+            case 2:
+                return Level.WARNING;
+            case 3:
+                return Level.INFO;
+            case 4:
+                return Level.FINE;
+            case 5:
+                return Level.FINER;
+            case 6:
+                return Level.FINEST;
+            default:
+                // NB: Level.ALL does not actually allow all log. Don't use it.
+                if (rebased>6)
+                    return Level.FINEST;
+                else
+                    return Level.OFF;
+        }
     }
 
 //-----------------------------------------------------------------------------
@@ -438,8 +524,10 @@ public abstract class RunTimeParameters
                 {
                     if (!otherParameters.containsKey(parType))
                     {
-                        otherParameters.put(parType, 
-                                RunTimeParameters.getInstanceFor(parType));
+                        RunTimeParameters otherParams = 
+                                RunTimeParameters.getInstanceFor(parType);
+                        otherParams.isMaster = false;
+                        otherParameters.put(parType, otherParams);
                     }
                     otherParameters.get(parType).interpretKeyword(line);
                 }
@@ -500,6 +588,7 @@ public abstract class RunTimeParameters
      */
     public void setParameters(RunTimeParameters otherParams)
     {
+        otherParams.isMaster = false;
         otherParameters.put(otherParams.paramType, otherParams);
     }
     
@@ -516,7 +605,10 @@ public abstract class RunTimeParameters
 //            String parName)
 //    {
 //        if (!containsParameters(type))
-//            otherParameters.put(type, getInstanceFor(type));
+//        {
+//            otherParams.isMaster = false;
+//            otherParameters.put(type, getInstanceFor(type)); 
+//        }
 //
 //        return otherParameters.get(type).get(parName);
 //    }
@@ -665,7 +757,7 @@ public abstract class RunTimeParameters
         sb.append(getPrintedList()).append(NL);
         sb.append("-------------------------------------------"
                 + "----------------------").append(NL);
-        logger.info(sb.toString());
+        logger.log(Level.INFO,sb.toString());
     }
     
 //------------------------------------------------------------------------------
