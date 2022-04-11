@@ -1395,7 +1395,7 @@ public class EAUtils
 
         // get a atoms/bonds molecular representation (no 3D needed)
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
-        t3d.setAlidnBBsIn3D(false);
+        t3d.setAlignBBsIn3D(false);
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
         
         // Set rotatability property as property of IBond

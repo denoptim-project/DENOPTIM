@@ -158,20 +158,14 @@ public abstract class Vertex implements Cloneable
             new ArrayList<MutationType>(Arrays.asList(MutationType.values()));
     
     /**
-     * Field distinguishing subclasses of {@link Vertex} when 
-     * deserializing JSON representations.
+     * Field distinguishing implementations of {@link Vertex} when 
+     * deserializing JSON representations. See {@link DENOPTIMgson}.
      */
     protected final VertexType vertexType;
-    // NB: Don't make static or Gson will ignore it!
-
-    /**
-     * Unique identified for vertices
-     */
-    //TODO-gg keep or trash?
-    public AtomicInteger vrtxID = new AtomicInteger(0);
     
     /**
-     * 
+     * Flag declaring the type of {@link Vertex} implementation. This is needed
+     * to deserialize JSON. See {@link DENOPTIMgson}.
      */
     public enum VertexType {
         MolecularFragment,
@@ -584,7 +578,6 @@ public abstract class Vertex implements Cloneable
      * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
-    //TODO-gg make abstract
     public boolean sameAs(Vertex other, StringBuilder reason)
     {
         if (this.getClass() == other.getClass())

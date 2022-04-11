@@ -53,43 +53,6 @@ import denoptim.graph.SymmetricSet;
 
 public class GraphConversionTool
 {
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Removes unused ring-closing vertexes. 
-     * If the resulting free AP needs to be capped, then the proper
-     * capping group is places where a ring-closing vertex once stood.
-     * @param g the graph to modify.
-     * @throws DENOPTIMException 
-     */
-    //TODO-gg move to graph
-    public static void replaceUnusedRCVsWithCapps(DGraph g, 
-            FragmentSpace fragSpace) throws DENOPTIMException
-    {
-        for (Vertex v : g.getRCVertices())
-        {
-            if (g.getRingsInvolvingVertex(v).size()==0 
-                    && v.getEdgeToParent()!=null)
-            {
-                AttachmentPoint apOnG = v.getEdgeToParent().getSrcAP();
-                g.removeVertex(v);
-                
-                APClass cappAPClass = fragSpace.getAPClassOfCappingVertex(
-                        apOnG.getAPClass());
-                
-                if (cappAPClass != null)
-                {
-                    int capId = fragSpace.getCappingGroupsWithAPClass(
-                            cappAPClass).get(0);
-                    Vertex capVrt = Vertex.newVertexFromLibrary(
-                            capId,BBType.CAP, fragSpace);
-                    capVrt.setVertexId(v.getVertexId());
-                    g.appendVertexOnAP(apOnG, capVrt.getAP(0));
-                }
-            }
-        }
-    }
 
 //------------------------------------------------------------------------------
 

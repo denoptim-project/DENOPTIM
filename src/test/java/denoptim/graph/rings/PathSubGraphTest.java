@@ -244,7 +244,7 @@ public class PathSubGraphTest {
         DGraph gB = makeTestGraphB();
         
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
-        t3d.setAlidnBBsIn3D(false); //£D not needed
+        t3d.setAlignBBsIn3D(false); //£D not needed
         IAtomContainer molA = t3d.convertGraphTo3DAtomContainer(gA,true);
         IAtomContainer molB = t3d.convertGraphTo3DAtomContainer(gB,true);
         

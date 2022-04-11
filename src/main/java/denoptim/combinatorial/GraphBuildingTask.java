@@ -38,6 +38,7 @@ import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
+import denoptim.io.DenoptimIO;
 import denoptim.graph.SymmetricSet;
 import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
@@ -238,7 +239,7 @@ public class GraphBuildingTask extends FitnessTask
             tb3d = new ThreeDimTreeBuilder(fitnessSettings);
             if (!fitnessSettings.make3dTree())
             {
-            	tb3d.setAlidnBBsIn3D(false);
+            	tb3d.setAlignBBsIn3D(false);
             }
 
             // Extend graph as requested
@@ -375,9 +376,7 @@ public class GraphBuildingTask extends FitnessTask
                         {
                             // Prepare molecular representation
                         	DGraph gWithNoRCVs = g.clone();
-                        	//NB: this replaces unused RCVs with capping groups
-                        	GraphConversionTool.replaceUnusedRCVsWithCapps(
-                        	        gWithNoRCVs, fragSpace);
+                        	gWithNoRCVs.replaceUnusedRCVsWithCapps(fragSpace);
                         	IAtomContainer mol = 
                         	        tb3d.convertGraphTo3DAtomContainer(
 	                                    gWithNoRCVs,true);
@@ -440,11 +439,8 @@ public class GraphBuildingTask extends FitnessTask
                     // blocks (not aligned, nor roto-translated)
                 	if (fitnessSettings.make3dTree())
                 	{
-                	    //NB: this replaces unused RCVs with capping groups
-                        GraphConversionTool.replaceUnusedRCVsWithCapps(
-                                gClone, fragSpace);
-                        IAtomContainer mol = 
-                                tb3d.convertGraphTo3DAtomContainer(
+                	    gClone.replaceUnusedRCVsWithCapps(fragSpace);
+                	    IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(
                                         gClone,true);
                         res[2] = mol;
                 	}

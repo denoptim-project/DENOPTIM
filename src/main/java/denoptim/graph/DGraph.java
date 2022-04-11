@@ -1216,6 +1216,48 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
+     * Removes unused ring-closing vertexes. 
+     * If the resulting free AP needs to be capped, then the proper
+     * capping group is places where a ring-closing vertex once stood.
+     * @param fragSpace the fragment space defining how capping is configured.
+     * @throws DENOPTIMException 
+     */
+    public void replaceUnusedRCVsWithCapps(FragmentSpace fragSpace) 
+            throws DENOPTIMException 
+    {
+        List<Vertex> rcvToReplace = new ArrayList<Vertex>();
+        List<AttachmentPoint> apToCap = new ArrayList<AttachmentPoint>();
+        for (Vertex v : getRCVertices())
+        {
+            if (getRingsInvolvingVertex(v).size()==0 
+                    && v.getEdgeToParent()!=null)
+            {
+                rcvToReplace.add(v);
+                apToCap.add(v.getEdgeToParent().getSrcAP());
+            }
+        }
+        for (int i=0; i<rcvToReplace.size(); i++)
+        {
+            Vertex v = rcvToReplace.get(i);
+            removeVertex(v);
+            
+            AttachmentPoint apOnParent = apToCap.get(i);
+            APClass cappAPClass = fragSpace.getAPClassOfCappingVertex(
+                    apOnParent.getAPClass());
+            
+            if (cappAPClass != null)
+            {
+                Vertex capVrt = fragSpace.getCappingVertexWithAPClass(
+                        cappAPClass);
+                capVrt.setVertexId(v.getVertexId());
+                appendVertexOnAP(apOnParent, capVrt.getAP(0));
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
      * Marks the vertexes of this graph with a string that is consistent for all
      * vertexes that belong to symmetric sets. All vertexes will get a label,
      * whether they belong to a symmetric set or not. The label is places in the
@@ -4717,7 +4759,7 @@ public class DGraph implements Cloneable
         
         // calculate the molecule representation
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
-        t3d.setAlidnBBsIn3D(false);
+        t3d.setAlignBBsIn3D(false);
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(this,true);
         if (mol == null)
         {
@@ -4924,7 +4966,7 @@ public class DGraph implements Cloneable
 
         // get a atoms/bonds molecular representation (no 3D needed)
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
-        t3d.setAlidnBBsIn3D(false);
+        t3d.setAlignBBsIn3D(false);
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(this,false);
 
         // Set rotatable property as property of IBond

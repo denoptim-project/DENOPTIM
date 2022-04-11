@@ -54,52 +54,7 @@ public class StaticLogger
         }
         return uniqInstance;
     }
-    
-//------------------------------------------------------------------------------
-    
-    //TODO-gg del
-    /*
-    public void setupLogger(String logFile) throws IOException
-    {
-    	int n = appLogger.getHandlers().length;
-    	for (int i=0; i<n; i++)
-    	{
-    	    appLogger.removeHandler(appLogger.getHandlers()[0]);
-    	}
-    	//this commenting is still part of the hack
-    	//if (!hasBeenSet)
-        //{
-            boolean toFile = false;
-            FileHandler fileHdlr = new FileHandler(logFile);
-            if (logFile.endsWith(".html"))
-            {
-                Formatter formatterHTML = new HTMLLogFormatter();
-                fileHdlr.setFormatter(formatterHTML);
-                toFile = true;
-            }
-            else if(logFile.endsWith(".log") || logFile.endsWith(".txt"))
-            {
-                SimpleFormatter formatterTxt = new SimpleFormatter();
-                fileHdlr.setFormatter(formatterTxt);
-                toFile = true;
-            }
-            else if(logFile.endsWith(".xml"))
-            {
-                XMLFormatter formatterXML = new XMLFormatter();
-                fileHdlr.setFormatter(formatterXML);
-                toFile = true;
-            }
-            if (toFile)
-            {
-                appLogger.setUseParentHandlers(false);
-                appLogger.addHandler(fileHdlr);
-            }
-            appLogger.setLevel(Level.FINEST);
-            //hasBeenSet = true;
-        //}
-    }
-    */
-
+ 
 //------------------------------------------------------------------------------
 
     /**

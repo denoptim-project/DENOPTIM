@@ -418,21 +418,6 @@ public class MMBuilderParameters extends RunTimeParameters
         }
 
         checkOtherParameters();
-        /*
-//TODO-gg 
-        if (RingClosureParameters.rcParamsInUse())
-        {
-            RingClosureParameters.checkParameters();
-            if (RingClosureParameters.allowRingClosures())
-            {
-        	ensureNotNull("rsPssrotFile",rsPssrotFile,"RCPSSROTPARAMS");
-        	ensureFileExists(rsPssrotFile);
-
-        	ensureNotNull("rsKeyFile",rsKeyFile,"RCKEYFILE");
-        	ensureFileExists(rsKeyFile);
-            }
-        }
-        */
     }
     
 //------------------------------------------------------------------------------

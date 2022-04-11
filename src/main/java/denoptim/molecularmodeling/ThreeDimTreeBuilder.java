@@ -62,7 +62,7 @@ import denoptim.utils.Randomizer;
  * building block, and (optionally) aligning each incoming building block by 
  * using the geometric parameters defined in their attachment points.
  * By default, this builder does align building blocks, but method 
- * {@link ThreeDimTreeBuilder#setAlidnBBsIn3D(boolean)} allows to configure this
+ * {@link ThreeDimTreeBuilder#setAlignBBsIn3D(boolean)} allows to configure this
  * builder so that building blocks are not aligned during their assembly. In the 
  * latter configuration, the coordinates of atom in the resulting molecular 
  * structure will be the same as those found in the building block stored in the
@@ -156,7 +156,7 @@ public class ThreeDimTreeBuilder
      * @param align the new value. Use <code>true</code> to align building 
      * blocks (default), or <code>false</code> to prevent alignment.
      */
-    public void setAlidnBBsIn3D(boolean align)
+    public void setAlignBBsIn3D(boolean align)
     {
         this.alignIn3D = align;
     }
@@ -673,8 +673,6 @@ public class ThreeDimTreeBuilder
                         + "vectApB "+vectApB);
             
                 // Check whether this edge involves a Ring Closing Attractors
-                //TODO-gg remove nonOVERLAP case
-               
                 boolean edgeToRCA = false; 
                 //if (rcParams.getRCStrategy().equals("BONDOVERLAP"))
                 if (true)

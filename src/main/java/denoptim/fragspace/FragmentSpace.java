@@ -726,31 +726,50 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * @param capApCls the APClass of the attachment point on the capping group
-     * @return all the capping groups which have the given APclass
+     * @param capApCls the {@link APClass} of the attachment point on the capping group
+     * @return all the capping groups which have the given {@link APClass}.
      */
 
-    public ArrayList<Integer> getCappingGroupsWithAPClass(
-            APClass capApCls)
+    public ArrayList<Integer> getCappingGroupsWithAPClass(APClass capApCls)
     {
         ArrayList<Integer> selected = new ArrayList<>();
         for (int i = 0; i < cappingLib.size(); i++)
         {
-            APClass apc = null;
-            try
+            APClass apc = cappingLib.get(i).getAP(0).getAPClass();
+            if (apc.equals(capApCls))
             {
-                apc = getVertexFromLibrary(Vertex.BBType.CAP, i)
-                        .getAttachmentPoints().get(0).getAPClass();
-                if (apc.equals(capApCls))
-                {
-                    selected.add(i);
-                }
-            } catch (DENOPTIMException de)
-            {
-                // nothing
+                selected.add(i);
             }
         }
         return selected;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @param capApCls the {@link APClass} of the attachment point on the 
+     * capping group.
+     * @return a clone of the first 'capping group' having the given 
+     * {@link APClass}, or <code>null</code> if none was found.
+     */
+
+    public Vertex getCappingVertexWithAPClass(APClass capApCls)
+    {
+        for (int i = 0; i < cappingLib.size(); i++)
+        {
+            APClass apc = cappingLib.get(i).getAP(0).getAPClass();
+            if (apc.equals(capApCls))
+            {
+                try
+                {
+                    return getVertexFromLibrary(Vertex.BBType.CAP, i);
+                } catch (DENOPTIMException e)
+                {
+                    //This cannot happen
+                }
+            }
+        }
+        return null;
     }
 
 //------------------------------------------------------------------------------

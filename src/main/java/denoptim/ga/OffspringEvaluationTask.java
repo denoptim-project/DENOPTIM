@@ -114,10 +114,7 @@ public class OffspringEvaluationTask extends FitnessTask
         	
             try {
                 DGraph gWithNoRCVs = dGraph.clone();
-                
-                //NB: this replaces unused RCVs with capping groups
-                GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs, 
-                        fragSpace);
+                gWithNoRCVs.replaceUnusedRCVsWithCapps(fragSpace);
                 
             	// To get a proper molecular representation we need
             	// 1) build a 3d tree

@@ -90,10 +90,7 @@ public class FitnessEvaluationTask extends FitnessTask
             ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder(frSettings);
             try {
                 DGraph gWithNoRCVs = dGraph.clone();
-                
-                //NB: this replaces unused RCVs with capping groups
-                GraphConversionTool.replaceUnusedRCVsWithCapps(gWithNoRCVs,
-                        fragSpace);
+                gWithNoRCVs.replaceUnusedRCVsWithCapps(fragSpace);
                 
                 // To get a proper molecular representation we need
                 // 1) build a 3d tree
