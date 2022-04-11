@@ -1275,42 +1275,6 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Select randomly a base fragment
-     * @return index of a seed fragment
-     */
-//TODO-gg move to FragmentSpace
-    protected static int selectRandomScaffold(FragmentSpace fragSpace)
-    {
-        if (fragSpace.getScaffoldLibrary().size() == 1)
-            return 0;
-        else
-        {
-            return fragSpace.getRandomizer().nextInt(
-                    fragSpace.getScaffoldLibrary().size());
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Select randomly a fragment from the available list
-     * @return the fragment index
-     */
-  //TODO-gg move to FragmentSpace
-    protected static int selectRandomFragment(FragmentSpace fragSpace)
-    {
-        if (fragSpace.getFragmentLibrary().size() == 1)
-            return 0;
-        else
-        {
-            return fragSpace.getRandomizer().nextInt(
-                    fragSpace.getFragmentLibrary().size());
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Graph construction starts with selecting a random core/scaffold.
      *
      * @return the molecular graph representation
@@ -1332,11 +1296,7 @@ public class EAUtils
         graph.setGraphId(GraphUtils.getUniqueGraphIndex());
         
         // building a molecule starts by selecting a random scaffold
-        int scafIdx = selectRandomScaffold(fragSpace);
-
-        Vertex scafVertex = Vertex.newVertexFromLibrary(
-                GraphUtils.getUniqueVertexIndex(), scafIdx, BBType.SCAFFOLD, 
-                fragSpace);
+        Vertex scafVertex = fragSpace.makeRandomScaffold();
         
         // add the scaffold as a vertex
         graph.addVertex(scafVertex);
@@ -1377,7 +1337,8 @@ public class EAUtils
 // fragments that lead to known closable chains operate also when fragments are
 // the "turning point".
         RingClosuresArchive rca = rcParams.getRingClosuresArchive();
-        graph.setCandidateClosableChains(rca.getCCFromTurningPointId(scafIdx));
+        graph.setCandidateClosableChains(rca.getCCFromTurningPointId(
+                scafVertex.getBuildingBlockId()));
 
         if (scafVertex.hasFreeAP())
         {

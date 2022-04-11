@@ -1207,8 +1207,7 @@ public class GraphOperations
             int dapidx, int chosenVrtxIdx, int chosenApId, 
             FragmentSpace fragSpace) throws DENOPTIMException
     {
-        ArrayList<AttachmentPoint> lstDaps =
-                                              curVertex.getAttachmentPoints();
+        ArrayList<AttachmentPoint> lstDaps = curVertex.getAttachmentPoints();
         AttachmentPoint curDap = lstDaps.get(dapidx);
 
         // Initialize with an empty pointer
@@ -1216,7 +1215,8 @@ public class GraphOperations
                 -1, -1);
         if (!fragSpace.useAPclassBasedApproach())
         {
-            int fid = EAUtils.selectRandomFragment(fragSpace);
+            int fid = fragSpace.getRandomizer().nextInt(
+                    fragSpace.getFragmentLibrary().size());
             res = new IdFragmentAndAP(-1,fid,BBType.FRAGMENT,-1,-1,-1);
         }
         else
@@ -1463,7 +1463,7 @@ public class GraphOperations
                     {
                         // cLink is NOT the rightmost chain link
                         ChainLink nextChainLink = cc.getLink(posInCc+1);
-                        nfid = nextChainLink.getMolID();
+                        nfid = nextChainLink.getIdx();
                         nfty = nextChainLink.getFragType();
                         nfap = nextChainLink.getApIdToLeft();
                     }
@@ -1479,7 +1479,7 @@ public class GraphOperations
                     {
                         // cLink is NOT the leftmost chain link
                         ChainLink nextChainLink = cc.getLink(posInCc-1);
-                        nfid = nextChainLink.getMolID();
+                        nfid = nextChainLink.getIdx();
                         nfty = nextChainLink.getFragType();
                         nfap = nextChainLink.getApIdToRight();
                     }
@@ -1561,7 +1561,7 @@ public class GraphOperations
                 for (int altDir : altertnativeDirections)
                 {
                     ChainLink parentLink = cc.getLink(posInCc + altDir);
-                    int pLnkId = parentLink.getMolID();
+                    int pLnkId = parentLink.getIdx();
                     BBType pLnkTyp = parentLink.getFragType();
                     
                     int pLnkAp = -1;
@@ -1581,7 +1581,7 @@ public class GraphOperations
                                 && (posInCc+altDir) >= 0)
                         {
                             ChainLink nextChainLink = cc.getLink(posInCc + altDir);
-                            nfid = nextChainLink.getMolID();
+                            nfid = nextChainLink.getIdx();
                             nfty = nextChainLink.getFragType();
                             nfap = nextChainLink.getApIdToLeft();
                         }

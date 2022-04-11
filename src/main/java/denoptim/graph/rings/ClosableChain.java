@@ -151,9 +151,9 @@ public class ClosableChain implements Cloneable
      * turning point.
      */
 
-    public int getTurningPointMolID()
+    public int getTurningPointIdx()
     {
-        return getLink(tuningPoint).getMolID();
+        return getLink(tuningPoint).getIdx();
     }
 
 //-----------------------------------------------------------------------------
@@ -170,12 +170,12 @@ public class ClosableChain implements Cloneable
         int result = -1;
         if (vert instanceof Fragment)
         {
-            int vertMolID = ((Fragment)vert).getBuildingBlockId();
+            int vertIdx = ((Fragment)vert).getBuildingBlockId();
             Vertex.BBType vertFrgTyp = ((Fragment)vert).getBuildingBlockType();
             for (int i=0; i<links.size(); i++)
             {
                 ChainLink cl = links.get(i);
-                if (cl.getMolID() == vertMolID &&
+                if (cl.getIdx() == vertIdx &&
                     cl.getFragType() == vertFrgTyp)
                 {
                     result = i;
@@ -210,7 +210,7 @@ public class ClosableChain implements Cloneable
         	for (int i=0; i<links.size(); i++)
         	{
         	    ChainLink cl = links.get(i);
-        	    if (cl.getMolID() == vertMolID && 
+        	    if (cl.getIdx() == vertMolID && 
         		cl.getFragType() == vertFrgTyp &&
         		((cl.getApIdToLeft()==apIDA && cl.getApIdToRight()==apIDB) || 
         		 (cl.getApIdToLeft()==apIDB && cl.getApIdToRight()==apIDA)))

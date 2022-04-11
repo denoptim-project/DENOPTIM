@@ -34,7 +34,7 @@ public class ChainLink implements Cloneable
     /**
      * Fragment ID in library
      */
-    private int molID; 
+    private int idx; 
 
     /**
      * Fragment type
@@ -70,7 +70,7 @@ public class ChainLink implements Cloneable
 
     public ChainLink(int molID, Vertex.BBType ftype, int apLeft, int apRight)
     {
-        this.molID = molID;
+        this.idx = molID;
         this.ftype = ftype;
         this.apLeft = apLeft;
         this.apRight = apRight;
@@ -79,12 +79,12 @@ public class ChainLink implements Cloneable
 //-----------------------------------------------------------------------------
 
     /**
-     * @return the index of the molecule in the fragment library
+     * @return the index of the fragment in the fragment library
      */
 
-    public int getMolID()
+    public int getIdx()
     {
-        return molID;
+        return idx;
     }
 
 //-----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ public class ChainLink implements Cloneable
      */
     public ChainLink clone()
     {
-        ChainLink c = new ChainLink(molID, ftype, apLeft, apRight);
+        ChainLink c = new ChainLink(idx, ftype, apLeft, apRight);
         return c;
     }
     
@@ -142,7 +142,7 @@ public class ChainLink implements Cloneable
 
     public String toString()
     {
-        String str = " ChainLink[molID: " + molID + ", ftype: " + ftype
+        String str = " ChainLink[molID: " + idx + ", ftype: " + ftype
 		      + ", apLeft: " + apLeft + ", apRight: " + apRight + "]";
         return str;
     }

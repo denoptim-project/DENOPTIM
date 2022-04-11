@@ -106,8 +106,7 @@ public class FragmentSpaceParameters extends RunTimeParameters
     /**
      * List of constitutional symmetry constraints.
      */
-    //TODO-gg this will go one Fragment space is in place
-    protected HashMap<APClass, Double> symmConstraintsMap = 
+    private HashMap<APClass, Double> symmConstraintsMap = 
             new HashMap<APClass, Double>();
     
     private FragmentSpace buildingBlocksSpace = null;

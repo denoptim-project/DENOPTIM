@@ -73,7 +73,7 @@ public class RingClosuresArchive
      * identified by the molecular fragment Id in the proper library of
      * fragments.
      */
-    private HashMap<Integer,ArrayList<ClosableChain>> libCCxTPMolId =
+    private HashMap<Integer,ArrayList<ClosableChain>> libCCxTPIdx =
                                                              new HashMap<>();
     
     /**
@@ -189,16 +189,16 @@ public class RingClosuresArchive
 // not a new one. Might need to store the number of APs as a property of
 // the ChainLinks, that is, change to format of the chainId string to include also that info
             ClosableChain cc = new ClosableChain(chainId);
-            int tpId = cc.getTurningPointMolID();
-            if (libCCxTPMolId.containsKey(tpId))
+            int tpId = cc.getTurningPointIdx();
+            if (libCCxTPIdx.containsKey(tpId))
             {
-                libCCxTPMolId.get(tpId).add(cc);
+                libCCxTPIdx.get(tpId).add(cc);
             }
             else
             {
                 ArrayList<ClosableChain> lstCC = new ArrayList<ClosableChain>();
                 lstCC.add(cc);
-                libCCxTPMolId.put(tpId,lstCC);
+                libCCxTPIdx.put(tpId,lstCC);
             }
         }
 
@@ -342,9 +342,9 @@ public class RingClosuresArchive
 
     public ArrayList<ClosableChain> getCCFromTurningPointId(int tpId)
     {
-        if (libCCxTPMolId.containsKey(tpId))
+        if (libCCxTPIdx.containsKey(tpId))
         {
-            return libCCxTPMolId.get(tpId);
+            return libCCxTPIdx.get(tpId);
         }
         return new ArrayList<ClosableChain>();
     }

@@ -230,7 +230,7 @@ public abstract class Vertex implements Cloneable
      * @param vertexId unique identified of the vertex
      * @param bbId 0-based index of building block in the library
      * @param bbt the type of building block
-     * @throws DENOPTIMException 
+     * @throws DENOPTIMException when index is not within the range.
      */
     public static Vertex newVertexFromLibrary(int vertexId, int bbId, 
             Vertex.BBType bbt, FragmentSpace fragSpace) 
@@ -276,6 +276,15 @@ public abstract class Vertex implements Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns the index of the building block that should correspond to the
+     * position of the building block in the library of building blocks of its 
+     * kind. Since the index is saved and disconnected from the library, changes
+     * to the library my make this value inconsistent with the actual
+     * position of this building block in the library.
+     * @return the presumed index of this building block in the library of 
+     * building blocks
+     */
     public int getBuildingBlockId()
     {
         return buildingBlockId;

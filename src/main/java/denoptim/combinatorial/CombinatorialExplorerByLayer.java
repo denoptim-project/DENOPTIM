@@ -647,33 +647,36 @@ public class CombinatorialExplorerByLayer
             }
 
             // Print summary
-            StringBuilder sb = new StringBuilder(512);
-            sb.append("Root: " + file.getName() + DENOPTIMConstants.EOL);
-            sb.append(" - #Usable APs on root = "); 
-            sb.append(fcf.getNumRootAPs() + DENOPTIMConstants.EOL);
-            sb.append(" - Size of candidates sets = "); 
-            sb.append(fcf.getSizesOfCandidateSets()+DENOPTIMConstants.EOL);
-            sb.append(" - Total #Combinations = ");
-            sb.append(fcf.getTotNumbCombs() + DENOPTIMConstants.EOL);
-            sb.append(" - Root graph: " + DENOPTIMConstants.EOL+rootGraph);
-            sb.append(DENOPTIMConstants.EOL);
-            sb.append(" - Details for root APs:");
-            sb.append(DENOPTIMConstants.EOL);
-            Map<IdFragmentAndAP, ArrayList<IdFragmentAndAP>> m = 
-                    fcf.getCandidatesMap();
-            for (IdFragmentAndAP srcAP : m.keySet())
+            if (settings.getLogger().isLoggable(Level.FINE))
             {
-                sb.append("   -> "+srcAP).append(DENOPTIMConstants.EOL);
-                int iTrgAP = 0;
-                for (IdFragmentAndAP trgAP : m.get(srcAP))
+                StringBuilder sb = new StringBuilder(512);
+                sb.append("Root: " + file.getName() + DENOPTIMConstants.EOL);
+                sb.append(" - #Usable APs on root = "); 
+                sb.append(fcf.getNumRootAPs() + DENOPTIMConstants.EOL);
+                sb.append(" - Size of candidates sets = "); 
+                sb.append(fcf.getSizesOfCandidateSets()+DENOPTIMConstants.EOL);
+                sb.append(" - Total #Combinations = ");
+                sb.append(fcf.getTotNumbCombs() + DENOPTIMConstants.EOL);
+                sb.append(" - Root graph: " + DENOPTIMConstants.EOL+rootGraph);
+                sb.append(DENOPTIMConstants.EOL);
+                sb.append(" - Details for root APs:");
+                sb.append(DENOPTIMConstants.EOL);
+                Map<IdFragmentAndAP, ArrayList<IdFragmentAndAP>> m = 
+                        fcf.getCandidatesMap();
+                for (IdFragmentAndAP srcAP : m.keySet())
                 {
-                    iTrgAP++;
-                    sb.append("      " + iTrgAP + " -> "+trgAP);
-                    sb.append(DENOPTIMConstants.EOL);
+                    sb.append("   -> "+srcAP).append(DENOPTIMConstants.EOL);
+                    int iTrgAP = 0;
+                    for (IdFragmentAndAP trgAP : m.get(srcAP))
+                    {
+                        iTrgAP++;
+                        sb.append("      " + iTrgAP + " -> "+trgAP);
+                        sb.append(DENOPTIMConstants.EOL);
+                    }
                 }
+                settings.getLogger().log(Level.FINE, sb.toString() 
+                        + DENOPTIMConstants.EOL);
             }
-            settings.getLogger().log(Level.FINE, sb.toString() 
-                    + DENOPTIMConstants.EOL);
 
             // Iterate over all combinations 
             try

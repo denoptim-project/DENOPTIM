@@ -142,7 +142,7 @@ public class FragmentSpace
     private boolean apClassBasedApproch = false;
 
     /**
-     * Flag signalling that this fragment space was built and validated
+     * Flag signaling that this fragment space was built and validated
      */
     private boolean isValid = false;
 
@@ -155,7 +155,7 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
     
     /**
-     * Creates an empty fragment space, which is marked as invalid. Such 
+     * Creates an empty fragment space, which is marked as <i>invalid</i>. Such 
      * fragment space has very limited functionality, but can be used to 
      * manipulate information related to fragment spaces, such as, handling
      * compatibility rules even without having any defined vertex in it.
@@ -192,7 +192,7 @@ public class FragmentSpace
         this(settings, scaffFile, fragFile, capFile, cpmFile, "", 
                 new HashMap<APClass, Double>());
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -226,21 +226,47 @@ public class FragmentSpace
             HashMap<APClass, ArrayList<APClass>> rcCpMap)
             throws DENOPTIMException
     {
-        this.settings = settings;
-        settings.setFragmentSpace(this);
-        
-        setScaffoldLibrary(scaffLib);
-        setFragmentLibrary(fragLib);
-        setCappingLibrary(cappLib);
-        setCompatibilityMatrix(cpMap);
-        apClassBasedApproch = true;
-        setCappingMap(capMap);
-        setForbiddenEndList(forbEnds);
-        setRCCompatibilityMatrix(rcCpMap);
+        define(settings, scaffLib, fragLib, cappLib, cpMap, capMap, forbEnds, 
+                rcCpMap, null);
+    }
 
-        groupAndClassifyFragments(apClassBasedApproch);
+//------------------------------------------------------------------------------
 
-        isValid = true;
+    /**
+     * Define all components of a fragment space that implements the attachment
+     * point class-approach.
+     * 
+     * @param scaffLib library of fragments used to start the construction of
+     *                 any new graph (i.e., seed or root fragments, a.k.a.
+     *                 scaffolds).
+     * @param fragLib  library of fragments for general purpose.
+     * @param cappLib  library of single-AP fragments used to cap free
+     *                 attachment points (i.e., the capping groups).
+     * @param cpMap    the APClass compatibility map. This data structure is a
+     *                 map of the APClass-on-growing-graph (key) to list of
+     *                 permitted APClasses on incoming fragment (values).
+     * @param capMap   the capping rules. This data structure is a map of
+     *                 APClass-to-cap (keys) to APClass-of-capping-group
+     *                 (values).
+     * @param forbEnds the list of forbidden ends, i.e., APClasses that cannot
+     *                 be left unused neither capped.
+     * @param rcCpMap  the APClass compatibility matrix for ring closures.
+     * @param symCntrMap map of symmetry probability constraints.
+     * @throws DENOPTIMException
+     */
+    public FragmentSpace(FragmentSpaceParameters settings,
+            ArrayList<Vertex> scaffLib,
+            ArrayList<Vertex> fragLib,
+            ArrayList<Vertex> cappLib,
+            HashMap<APClass, ArrayList<APClass>> cpMap,
+            HashMap<APClass, APClass> capMap,
+            HashSet<APClass> forbEnds,
+            HashMap<APClass, ArrayList<APClass>> rcCpMap,
+            HashMap<APClass, Double> symCntrMap)
+            throws DENOPTIMException
+    {
+        define(settings, scaffLib, fragLib, cappLib, cpMap, capMap, forbEnds, 
+                rcCpMap, symCntrMap);
     }
 
 //------------------------------------------------------------------------------
@@ -259,19 +285,13 @@ public class FragmentSpace
      * @param cpmFile    pathname to the compatibility matrix, capping, and 
      * forbidden ends rules.
      * @param rcpmFile   the APClass compatibility matrix for ring closures.
-     * @param symCntrMap the map of symmetry constraints
+     * @param symCntrMap map of symmetry probability constraints.
      * @throws DENOPTIMException
      */
     public FragmentSpace(FragmentSpaceParameters settings, String scaffFile, 
-            String fragFile,
-            String capFile, String cpmFile, String rcpmFile,
+            String fragFile, String capFile, String cpmFile, String rcpmFile,
             HashMap<APClass, Double> symCntrMap) throws DENOPTIMException
-    {
-        //TODO-gg make this call the the constructor using arrays
-        
-        this.settings = settings;
-        settings.setFragmentSpace(this);
-        
+    {   
         HashMap<APClass, ArrayList<APClass>> cpMap = 
                 new HashMap<APClass, ArrayList<APClass>>();
         HashMap<APClass, APClass> capMap = new HashMap<APClass, APClass>();
@@ -280,32 +300,25 @@ public class FragmentSpace
         {
             DenoptimIO.readCompatibilityMatrix(cpmFile, cpMap, capMap,
                     forbEnds);
-            apClassBasedApproch = true;
         }
-        setCompatibilityMatrix(cpMap);
-        setCappingMap(capMap);
-        setForbiddenEndList(forbEnds);
 
-        setSymmConstraints(symCntrMap);
-
+        HashMap<APClass, ArrayList<APClass>> rcCpMap = 
+                new HashMap<APClass, ArrayList<APClass>>();
         if (rcpmFile != null && rcpmFile.length() > 0)
         {
-            HashMap<APClass, ArrayList<APClass>> rcCpMap = 
-                    new HashMap<APClass, ArrayList<APClass>>();
             DenoptimIO.readRCCompatibilityMatrix(rcpmFile, rcCpMap);
-            setRCCompatibilityMatrix(rcCpMap);
         }
         
+        ArrayList<Vertex> cappLib = new ArrayList<Vertex>();
         if (capFile.length() > 0)
         {
-            cappingLib = new ArrayList<Vertex>();
             try
             {
-                cappingLib = DenoptimIO.readVertexes(new File(capFile),
+                cappLib = DenoptimIO.readVertexes(new File(capFile),
                         BBType.CAP);
-                for (int i=0; i<cappingLib.size(); i++)
+                for (int i=0; i<cappLib.size(); i++)
                 {
-                    cappingLib.get(i).setBuildingBlockId(i);
+                    cappLib.get(i).setBuildingBlockId(i);
                 }
             } catch (IllegalArgumentException | UndetectedFileFormatException
                     | IOException | DENOPTIMException e)
@@ -315,14 +328,14 @@ public class FragmentSpace
             }
         }
         
-        fragmentLib = new ArrayList<Vertex>();
+        ArrayList<Vertex> fragLib = new ArrayList<Vertex>();
         try
         {
-            fragmentLib = DenoptimIO.readVertexes(new File(fragFile),
+            fragLib = DenoptimIO.readVertexes(new File(fragFile),
                     BBType.FRAGMENT);
-            for (int i=0; i<fragmentLib.size(); i++)
+            for (int i=0; i<fragLib.size(); i++)
             {
-                fragmentLib.get(i).setBuildingBlockId(i);
+                fragLib.get(i).setBuildingBlockId(i);
             }
         } catch (IllegalArgumentException | UndetectedFileFormatException
                 | IOException | DENOPTIMException e)
@@ -331,14 +344,14 @@ public class FragmentSpace
                     + "from file '" + fragFile + "'.", e);
         }
         
-        scaffoldLib = new ArrayList<Vertex>();
+        ArrayList<Vertex> scaffLib = new ArrayList<Vertex>();
         try
         {
-            scaffoldLib = DenoptimIO.readVertexes(new File(scaffFile),
+            scaffLib = DenoptimIO.readVertexes(new File(scaffFile),
                     BBType.SCAFFOLD);
-            for (int i=0; i<scaffoldLib.size(); i++)
+            for (int i=0; i<scaffLib.size(); i++)
             {
-                scaffoldLib.get(i).setBuildingBlockId(i);
+                scaffLib.get(i).setBuildingBlockId(i);
             }
         } catch (IllegalArgumentException | UndetectedFileFormatException
                 | IOException | DENOPTIMException e)
@@ -347,9 +360,60 @@ public class FragmentSpace
                     + "from file '" + fragFile + "'.", e);
         }
 
-        isValid = true;
+        define(settings, scaffLib, fragLib, cappLib, cpMap, capMap, forbEnds, 
+                rcCpMap, symCntrMap);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Define all components of this fragment space.
+     * 
+     * @param scaffLib library of fragments used to start the construction of
+     *                 any new graph (i.e., seed or root fragments, a.k.a.
+     *                 scaffolds).
+     * @param fragLib  library of fragments for general purpose.
+     * @param cappLib  library of single-AP fragments used to cap free
+     *                 attachment points (i.e., the capping groups).
+     * @param cpMap    the APClass compatibility map. This data structure is a
+     *                 map of the APClass-on-growing-graph (key) to list of
+     *                 permitted APClasses on incoming fragment (values).
+     * @param capMap   the capping rules. This data structure is a map of
+     *                 APClass-to-cap (keys) to APClass-of-capping-group
+     *                 (values).
+     * @param forbEnds the list of forbidden ends, i.e., APClasses that cannot
+     *                 be left unused neither capped.
+     * @param rcCpMap  the APClass compatibility matrix for ring closures.
+     * @param symCntrMap map of symmetry probability constraints.
+     * @throws DENOPTIMException
+     */
+    private void define(FragmentSpaceParameters settings,
+            ArrayList<Vertex> scaffLib,
+            ArrayList<Vertex> fragLib,
+            ArrayList<Vertex> cappLib,
+            HashMap<APClass, ArrayList<APClass>> cpMap,
+            HashMap<APClass, APClass> capMap,
+            HashSet<APClass> forbEnds,
+            HashMap<APClass, ArrayList<APClass>> rcCpMap,
+            HashMap<APClass, Double> symCntrMap)
+            throws DENOPTIMException
+    {
+        this.settings = settings;
+        settings.setFragmentSpace(this);
         
-        groupAndClassifyFragments(useAPclassBasedApproach());
+        setScaffoldLibrary(scaffLib);
+        setFragmentLibrary(fragLib);
+        setCappingLibrary(cappLib);
+        setCompatibilityMatrix(cpMap);
+        apClassBasedApproch = cpMap.size()>0;
+        setCappingMap(capMap);
+        setForbiddenEndList(forbEnds);
+        setRCCompatibilityMatrix(rcCpMap);
+        setSymmConstraints(symCntrMap);
+
+        groupAndClassifyFragments(apClassBasedApproch);
+
+        isValid = true;
     }
 
 //------------------------------------------------------------------------------
@@ -613,6 +677,29 @@ public class FragmentSpace
                 lstFragIdx.add(i);
         }
         return lstFragIdx;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Randomly select a scaffold and return a fully configured clone of it
+     * @return a scaffold-type building block ready to be used in a new graph.
+     * @throws DENOPTIMException 
+     */
+    public Vertex makeRandomScaffold()
+    {
+        int chosenIdx = settings.getRandomizer().nextInt(scaffoldLib.size());
+        Vertex scaffold = null;
+        try
+        {
+            scaffold = Vertex.newVertexFromLibrary(
+                    GraphUtils.getUniqueVertexIndex(),chosenIdx, 
+                    BBType.SCAFFOLD, this);
+        } catch (DENOPTIMException e)
+        {
+            //This cannot happen!
+        }
+        return scaffold;
     }
 
 //------------------------------------------------------------------------------
@@ -884,7 +971,6 @@ public class FragmentSpace
         
         if (fragsApsPerApClass.containsKey(apc))
         {
-            //TODO-gg use references
             for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
             {
                 Vertex v = fragmentLib.get(idxs.get(0));
@@ -1704,13 +1790,13 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Performs grouping and classification operations on the fragment library
+     * Performs grouping and classification operations on the library of
+     * building blocks of {@link BBType#FRAGMENT}.
      * @param apClassBasedApproch <code>true</code> if you are using class based
      * approach
      */
-    //TODO-gg consider making private (as well as other method in this class)
     public void groupAndClassifyFragments(boolean apClassBasedApproch)
-     throws DENOPTIMException
+            throws DENOPTIMException
     {	
     	setFragPoolPerNumAP(new HashMap<Integer,ArrayList<Integer>>());
     	if (apClassBasedApproch)

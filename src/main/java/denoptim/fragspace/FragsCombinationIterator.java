@@ -46,7 +46,6 @@ import denoptim.utils.GraphUtils;
 
 public class FragsCombinationIterator 
 {
-
     /**
      * Flag defining whether at list one more combination can be produced
      */
