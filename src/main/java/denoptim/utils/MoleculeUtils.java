@@ -426,14 +426,14 @@ public class MoleculeUtils
      * @throws denoptim.exception.DENOPTIMException
      */
 
-    public static ObjectPair getInChIForMolecule(IAtomContainer mol, 
+    public static String getInChIKeyForMolecule(IAtomContainer mol, 
             Logger logger) throws DENOPTIMException {
         InchiOptions options = new InchiOptions.InchiOptionsBuilder()
                 .withFlag(InchiFlag.AuxNone)
                 .withFlag(InchiFlag.RecMet)
                 .withFlag(InchiFlag.SUU)
                 .build();
-        return getInChIForMolecule(mol, options, logger);
+        return getInChIKeyForMolecule(mol, options, logger);
     }
     
 //------------------------------------------------------------------------------
@@ -446,7 +446,7 @@ public class MoleculeUtils
      * @throws denoptim.exception.DENOPTIMException
      */
 
-    public static ObjectPair getInChIForMolecule(IAtomContainer mol, 
+    public static String getInChIKeyForMolecule(IAtomContainer mol, 
             InchiOptions options, Logger logger) throws DENOPTIMException {
         IAtomContainer fmol = builder.newAtomContainer();
         try 
@@ -466,7 +466,7 @@ public class MoleculeUtils
         // remove PseudoAtoms
         removeRCA(fmol);
 
-        String inchi;
+        String inchikey;
         try
         {
             InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();
@@ -480,23 +480,19 @@ public class MoleculeUtils
             }
             else if (ret != INCHI_RET.OKAY)
             {
-                // InChI generation failed
-                String error = "Failed to create INCHI" + ret.toString()
-                + " [" + gen.getMessage() + "]";
-                return new ObjectPair(null, error);
+                return null;
             }
-            inchi = gen.getInchiKey();
+            inchikey = gen.getInchiKey();
         }
         catch (CDKException cdke)
         {
             throw new DENOPTIMException(cdke);
         }
-        if (inchi.length() > 0)
-            return new ObjectPair(inchi, null);
+        if (inchikey.length() > 0)
+            return inchikey;
         else
-            return new ObjectPair(null, "No InChi key generated");
+            return null;
     }
-
 
 //------------------------------------------------------------------------------
 

@@ -434,7 +434,7 @@ public class EAUtils
             gOutermost.setLocalMsg(msgs[ig]);
             
             // Consider if the result can be used to define a new candidate
-            Object[] res = EAUtils.evaluateGraph(gOutermost, settings);
+            Object[] res = gOutermost.checkConsistency(settings);
             if (res != null)
             {
                 if (!EAUtils.setupRings(res, gOutermost, settings))
@@ -550,7 +550,7 @@ public class EAUtils
         Object[] res = null;
         try
         {
-            res = EAUtils.evaluateGraph(graph,settings);
+            res = graph.checkConsistency(settings);
         } catch (NullPointerException|IllegalArgumentException e)
         {
             settings.getLogger().log(Level.INFO, "WRITING DEBUG FILE for " 
@@ -656,7 +656,7 @@ public class EAUtils
         // evaluate the graph, but in a permissive manner, meaning that 
         // several filters are disabled to permit the introduction of graphs 
         // that cannot be generated automatically.
-        Object[] res = EAUtils.evaluateGraph(graph, true, settings);
+        Object[] res = graph.checkConsistency(settings, true);
         
         if (res == null)
         {
@@ -708,7 +708,7 @@ public class EAUtils
         }
         graph.setLocalMsg("NEW");
         
-        Object[] res = EAUtils.evaluateGraph(graph, settings);
+        Object[] res = graph.checkConsistency(settings);
         
         if (res != null)
         {
@@ -1517,15 +1517,15 @@ public class EAUtils
         // Update the INCHI key representation
         if (res!=null)
         {
-            ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol, 
+            String inchikey = MoleculeUtils.getInChIKeyForMolecule(mol, 
                     settings.getLogger());
-            if (pr.getFirst() == null)
+            if (inchikey == null)
             {
                 String msg = "Evaluation of graph: INCHI is null!";
                 settings.getLogger().log(Level.INFO, msg);
-                pr.setFirst("UNDEFINED");
+                inchikey = "UNDEFINED";
             }
-            res[0] = pr.getFirst();
+            res[0] = inchikey;
         }
 
         return true;
@@ -1593,261 +1593,6 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * check conversion of the graph to molecule translation
-     * @param molGraph the molecular graph representation
-     * @return an object array containing the inchi code, the molecular
-     * representation of the candidate, and additional attributes. Or 
-     * <code>null</code> is returned if inchi/smiles/2D conversion fails
-     * An additional check is the number of atoms in the graph
-     */
-
-    protected static Object[] evaluateGraph(DGraph molGraph, 
-            GAParameters settings) 
-            throws DENOPTIMException
-    {
-        return evaluateGraph(molGraph, false, settings);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * check conversion of the graph to molecule translation
-     * @param molGraph the molecular graph representation
-     * @param permissive use <code>true</code> to by-pass some of the filters 
-     * that prevent graphs from violating constrains on 
-     * fully connected molecules (<code>true</code> enables disconnected systems),
-     * molecular weight,
-     * max number of rotatable bonds, 
-     * and number of ring closures.
-     * @return an object array containing the inchi code, the molecular
-     * representation of the candidate, and additional attributes. Or 
-     * <code>null</code> is returned if inchi/smiles/2D conversion fails
-     * An additional check is the number of atoms in the graph
-     */
-
-    //TODO-gg if this a duplicate of DGraph.evaluateGraph()?
-    protected static Object[] evaluateGraph(DGraph molGraph, 
-            boolean permissive, GAParameters settings) throws DENOPTIMException
-    {
-        // get settings //TODO: this should happen inside RunTimeParameters
-        RingClosureParameters rcParams = new RingClosureParameters();
-        if (settings.containsParameters(ParametersType.RC_PARAMS))
-        {
-            rcParams = (RingClosureParameters)settings.getParameters(
-                    ParametersType.RC_PARAMS);
-        }
-        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
-        if (settings.containsParameters(ParametersType.FS_PARAMS))
-        {
-            fsParams = (FragmentSpaceParameters)settings.getParameters(
-                    ParametersType.FS_PARAMS);
-        }
-        FragmentSpace fragSpace = fsParams.getFragmentSpace();
-        
-        if (molGraph == null)
-        {
-            String msg = "Evaluation of graph: graph is null!";
-            settings.getLogger().log(Level.FINE, msg);
-            return null;
-        }
-
-        // calculate the molecule representation
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
-        t3d.setAlidnBBsIn3D(false);
-        IAtomContainer mol = null;
-        mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
-
-        if (mol == null)
-        { 
-            String msg ="Evaluation of graph: graph-to-mol returned null! " 
-                                                        + molGraph.toString();
-            settings.getLogger().log(Level.FINE, msg);
-            molGraph.cleanup();
-            return null;
-        }
-
-        // check if the molecule is connected
-        boolean isConnected = ConnectivityChecker.isConnected(mol);
-        if (!isConnected)
-        {
-            String msg = "Evaluation of graph: molecular representation has "
-                    + "multiple components. See graph " 
-                                                        + molGraph.toString();
-            settings.getLogger().log(Level.WARNING, msg);
-        }
-
-        // hopefully the null shouldn't happen if all goes well
-        boolean smilesIsAvailable = true;
-        String molsmiles = MoleculeUtils.getSMILESForMolecule(mol,
-                settings.getLogger());
-        if (molsmiles == null)
-        {
-            String msg = "Evaluation of graph: SMILES is null! " 
-                                                        + molGraph.toString();
-            settings.getLogger().log(Level.FINE, msg);
-            molsmiles = "FAIL: NO SMILES GENERATED";
-            smilesIsAvailable = false;
-        }
-
-        // if by chance the molecule is disconnected
-        if (molsmiles.contains(".") && !permissive)
-        {
-            String msg = "Evaluation of graph: SMILES contains \".\"" 
-                                                                  + molsmiles;
-            settings.getLogger().log(Level.FINE, msg);
-            molGraph.cleanup();
-            mol.removeAllElements();
-            return null;
-        }
-
-        if (fsParams.getMaxHeavyAtom() > 0 && !permissive)
-        {
-            if (MoleculeUtils.getHeavyAtomCount(mol) >
-                fsParams.getMaxHeavyAtom())
-            {
-                //System.err.println("Max atoms constraint violated");
-                String msg = "Evaluation of graph: Max atoms constraint "
-                                                  + " violated: " + molsmiles;
-                settings.getLogger().log(Level.FINE, msg);
-                molGraph.cleanup();
-                mol.removeAllElements();
-                return null;
-            }
-        }
-
-        double mw = MoleculeUtils.getMolecularWeight(mol);
-
-        if (fsParams.getMaxMW() > 0 && !permissive)
-        {
-            if (mw > fsParams.getMaxMW())
-            {
-                //System.err.println("Max weight constraint violated");
-                String msg = "Evaluation of graph: Molecular weight "
-                       + "constraint violated: " + molsmiles + " | MW: " + mw;
-                settings.getLogger().log(Level.FINE, msg);
-                molGraph.cleanup();
-                mol.removeAllElements();
-                return null;
-            }
-        }
-        mol.setProperty("MOL_WT", mw);
-
-        int nrot = MoleculeUtils.getNumberOfRotatableBonds(mol);
-        if (fsParams.getMaxRotatableBond() > 0 && !permissive)
-        {
-            if (nrot > fsParams.getMaxRotatableBond())
-            {
-                String msg = "Evaluation of graph: Max rotatable bonds "
-                                         + "constraint violated: "+ molsmiles;
-                settings.getLogger().log(Level.FINE, msg);
-                molGraph.cleanup();
-                mol.removeAllElements();
-                return null;
-            }
-        }
-        mol.setProperty("ROT_BND", nrot);
-
-        //Detect free AP that are not permitted
-        if (fragSpace.useAPclassBasedApproach())
-        {
-            if (foundForbiddenEnd(molGraph, fsParams))
-            {
-                String msg = "Evaluation of graph: forbidden end in graph!";
-                settings.getLogger().log(Level.FINE, msg);
-                molGraph.cleanup();
-                mol.removeAllElements();
-                return null;
-            }
-        }
-        
-        if (rcParams.allowRingClosures() && !permissive)
-        {
-            // Count rings and RCAs
-            int nPossRings = 0;
-            Set<String> doneType = new HashSet<String>();
-            Map<String,String> rcaTypes = DENOPTIMConstants.RCATYPEMAP;
-            for (String rcaTyp : rcaTypes.keySet())
-            {
-                if (doneType.contains(rcaTyp))
-                {
-                    continue;
-                }
-
-                int nThisType = 0;
-                int nCompType = 0;
-                for (IAtom atm : mol.atoms())
-                {
-                    if (atm.getSymbol().equals(rcaTyp))
-                    {
-                        nThisType++;
-                    }
-                    else if (atm.getSymbol().equals(rcaTypes.get(rcaTyp)))
-                    {
-                        nCompType++;
-                    }
-                }
-
-                // check number of rca per type
-                if (nThisType > rcParams.getMaxRcaPerType() || 
-                         nCompType > rcParams.getMaxRcaPerType())
-                {
-                    String msg = "Evaluation of graph: too many RCAs! "
-                                  + rcaTyp + ":" + nThisType + " "
-                                  + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    settings.getLogger().log(Level.FINE, msg);
-                    return null;
-                }
-                if (nThisType < rcParams.getMinRcaPerType() ||
-                         nCompType < rcParams.getMinRcaPerType())
-                {
-                    String msg = "Evaluation of graph: too few RCAs! "
-                                  + rcaTyp + ":" + nThisType + " "
-                                  + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    settings.getLogger().log(Level.FINE, msg);
-                    return null;
-                }
-
-                nPossRings = nPossRings + Math.min(nThisType, nCompType);
-                doneType.add(rcaTyp);
-                doneType.add(rcaTypes.get(rcaTyp));
-            }
-
-            if (nPossRings < rcParams.getMinRingClosures())
-            {
-                String msg = "Evaluation of graph: too few ring candidates";
-                settings.getLogger().log(Level.FINE, msg);
-                return null;
-            }
-        }
-
-        // get the smiles/Inchi representation
-        ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol, 
-                settings.getLogger());
-        if (pr.getFirst() == null)
-        {
-            String msg = "Evaluation of graph: INCHI is null!";
-            settings.getLogger().log(Level.FINE, msg);
-            if (smilesIsAvailable)
-            {
-                pr.setFirst("UNDEFINED-INCHI_"+ molsmiles);
-            } else {
-                pr.setFirst("UNDEFINED-INCHI_"+ 
-                        settings.getRandomizer().nextInt(Integer.MAX_VALUE));
-            }
-        }
-
-        Object[] res = new Object[3];
-        res[0] = pr.getFirst(); // inchi
-        res[1] = molsmiles; // smiles
-        //res[2] = mol2D; // 2d coordinates
-        res[2] = mol;
-        
-        return res;
-    }
-
-  //------------------------------------------------------------------------------
-
-    /**
      * Calculates the probability of adding a fragment to the given level.
      * This will require a coin toss with the calculated probability. If a newly
      * drawn random number is less than this value, a new fragment may be added.
@@ -1865,7 +1610,7 @@ public class EAUtils
         return getProbability(level, scheme, lambda, sigmaOne, sigmaTwo);
     }
     
-  //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Calculated the probability of extending a graph based on the current

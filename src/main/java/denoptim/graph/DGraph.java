@@ -4651,24 +4651,55 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Finalizes a candidate chemical entity by evaluating its
-     * <code>DENOPTIMGraph</code> and assigning preliminary molecular,
-     * SMILES and INCHI representations.
+     * Peeks into this graph to derive a preliminary chemical representation 
+     * with SMILES and InChIKey.
      * The chemical entity is evaluated also against the
-     * criteria defined by <code>FragmentSpaceParameters</code> and
-     * <code>RingClosureParameters</code>.
+     * criteria defined by the given settings
      * <b>WARNING</b> Although Cartesian coordinates are assigned to each atom
      * and pseudo-atom in the molecular representation,
      * such coordinates do <b>NOT</b> represent a valid 3D model.
      * As a consequence stereochemical descriptors in the INCHI representation
      * are not consistent with the actual arrangement of fragments.
-     * @return an object array containing the inchi code, the SMILES string
+     * @param settings the collection of settings defining the criteria with
+     * which we evaluate the graph.
+     * @return an object array containing the InChI key, the SMILES string
      *         and the 2D representation of the molecule.
      *         <code>null</code> is returned if any check or conversion fails.
      * @throws DENOPTIMException
      */
     
-    public Object[] evaluateGraph(RunTimeParameters settings)
+    public Object[] checkConsistency(RunTimeParameters settings)
+            throws DENOPTIMException
+    {
+        return checkConsistency(settings, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Peeks into this graph to derive a preliminary chemical representation 
+     * with SMILES and InChIKey.
+     * The chemical entity is evaluated also against the
+     * criteria defined by the given settings
+     * <b>WARNING</b> Although Cartesian coordinates are assigned to each atom
+     * and pseudo-atom in the molecular representation,
+     * such coordinates do <b>NOT</b> represent a valid 3D model.
+     * As a consequence stereochemical descriptors in the INCHI representation
+     * are not consistent with the actual arrangement of fragments.
+     * @param settings the collection of settings defining the criteria with
+     * which we evaluate the graph.
+     * @param permissive use <code>true</code> to ignore some of the
+     * most strict filtering criteria. This is typically done only when reading 
+     * graphs from the user, thus assuming the user does intend to by-pass some
+     * filters when inspecting a 
+     * graph that might not be possible to generate from the given settings, 
+     * @return an object array containing the InChI key, the SMILES string
+     *         and the 2D representation of the molecule.
+     *         <code>null</code> is returned if any check or conversion fails.
+     * @throws DENOPTIMException
+     */
+    
+    public Object[] checkConsistency(RunTimeParameters settings, boolean permissive)
             throws DENOPTIMException
     {
         RingClosureParameters rcSettings = new RingClosureParameters();
@@ -4717,7 +4748,7 @@ public class DGraph implements Cloneable
             smiles = "FAIL: NO SMILES GENERATED";
         }
         // if by chance the smiles indicates a disconnected molecule
-        if (smiles.contains("."))
+        if (smiles.contains(".") && !permissive)
         {
             String msg = "Evaluation of graph: SMILES contains \".\"" + smiles;
             settings.getLogger().log(Level.FINE, msg);
@@ -4726,7 +4757,7 @@ public class DGraph implements Cloneable
 
         // criteria from definition of Fragment space
         // 1A) number of heavy atoms
-        if (fsSettings.getMaxHeavyAtom() > 0)
+        if (fsSettings.getMaxHeavyAtom()>0 && !permissive)
         {
             if (MoleculeUtils.getHeavyAtomCount(mol) >
                 fsSettings.getMaxHeavyAtom())
@@ -4740,7 +4771,7 @@ public class DGraph implements Cloneable
 
         // 1B) molecular weight
         double mw = MoleculeUtils.getMolecularWeight(mol);
-        if (fsSettings.getMaxMW() > 0)
+        if (fsSettings.getMaxMW()>0 && !permissive)
         {
             if (mw > fsSettings.getMaxMW())
             {
@@ -4754,7 +4785,7 @@ public class DGraph implements Cloneable
 
         // 1C) number of rotatable bonds
         int nrot = MoleculeUtils.getNumberOfRotatableBonds(mol);
-        if (fsSettings.getMaxRotatableBond() > 0)
+        if (fsSettings.getMaxRotatableBond()>0 && !permissive)
         {
             if (nrot > fsSettings.getMaxRotatableBond())
             {
@@ -4778,7 +4809,7 @@ public class DGraph implements Cloneable
         }
 
         // criteria from settings of ring closures
-        if (rcSettings.allowRingClosures())
+        if (rcSettings.allowRingClosures() && !permissive)
         {
             // Count rings and RCAs
             int nPossRings = 0;
@@ -4838,18 +4869,18 @@ public class DGraph implements Cloneable
         }
 
         // get the smiles/Inchi representation
-        ObjectPair pr = MoleculeUtils.getInChIForMolecule(mol, 
+        String inchiKey = MoleculeUtils.getInChIKeyForMolecule(mol, 
                 settings.getLogger());
-        if (pr.getFirst() == null)
+        if (inchiKey == null)
         {
-            String msg = "Evaluation of graph: INCHI is null!";
-            settings.getLogger().log(Level.FINE, msg);
-            pr.setFirst("UNDEFINED_INCHI");
+            String msg = "Evaluation of graph: InChI Key is null!";
+            settings.getLogger().log(Level.WARNING, msg);
+            inchiKey = "UNDEFINED_INCHI";
         }
 
         Object[] res = new Object[3];
-        res[0] = pr.getFirst(); // inchi
-        res[1] = smiles; // smiles
+        res[0] = inchiKey; 
+        res[1] = smiles; 
         res[2] = mol;
 
         return res;

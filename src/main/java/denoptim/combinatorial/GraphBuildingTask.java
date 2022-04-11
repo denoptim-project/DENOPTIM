@@ -298,8 +298,7 @@ public class GraphBuildingTask extends FitnessTask
                 }
             }
 
-            // Evaluate graph
-            Object[] res = dGraph.evaluateGraph(ceblSettings);
+            Object[] res = dGraph.checkConsistency(ceblSettings);
             if (res == null) // null is used to indicate an unacceptable graph
             {
                 nSubTasks = 1;
@@ -400,14 +399,14 @@ public class GraphBuildingTask extends FitnessTask
                             }
                             altRes[1] = smiles;
         
-                            // Prepare INCHI                    
-                            ObjectPair pr = MoleculeUtils.getInChIForMolecule(
+                            // Prepare INCHI-Key                    
+                            String inchiKey = MoleculeUtils.getInChIKeyForMolecule(
                                     mol, ceblSettings.getLogger());
-                            if (pr.getFirst() == null)
+                            if (inchiKey == null)
                             {
-                                pr.setFirst("UNDEFINED_INCHI");
+                                inchiKey = "UNDEFINED_INCHI";
                             }
-                            altRes[0] = pr.getFirst();
+                            altRes[0] = inchiKey;
                             
                             // Store graph
                             CEBLUtils.storeGraphOfLevel(ceblSettings, g.clone(), 
