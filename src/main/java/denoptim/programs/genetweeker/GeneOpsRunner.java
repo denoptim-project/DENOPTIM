@@ -181,7 +181,7 @@ public class GeneOpsRunner extends ProgramTask
         logger.log(Level.INFO, graph.toString());
         logger.log(Level.INFO, " ");
         
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
         IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(graph, true);
         DenoptimIO.writeSDFFile(settings.outFileM, iac, false);
     }
@@ -246,7 +246,7 @@ public class GeneOpsRunner extends ProgramTask
         logger.log(Level.INFO, "FEMALE: " + female);
         logger.log(Level.INFO, " ");
     
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
         IAtomContainer iacM = t3d.convertGraphTo3DAtomContainer(male, true);
         IAtomContainer iacF = t3d.convertGraphTo3DAtomContainer(female, true);
         DenoptimIO.writeSDFFile(settings.outFileM, iacM, false);

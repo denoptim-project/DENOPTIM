@@ -220,7 +220,8 @@ public class MultiMolecularModelBuilder
     public ChemicalObjectModel build3DTree() throws DENOPTIMException
     {
         // Create 3D tree-like structure
-        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
+        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, 
+                settings.getRandomizer());
         IAtomContainer initMol = tb.convertGraphTo3DAtomContainer(molGraph);
        
         // Reorder atoms and clone molecule.

@@ -28,32 +28,75 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 
 /**
- * Toolbox for random number generation.
+ * Tool to generate random numbers and random decisions.
  */
 
-public class RandomUtils
+public class Randomizer
 {
-    private static long rndSeed = 0L;
-    private static MersenneTwister mt = null;
-    private static final boolean debug = false;
+    /**
+     * Seed used to control the generation of random numbers and decisions. 
+     * This allows to make these random numbers/decisions reproducible.
+     */
+    private long rndSeed = 0L;
+    
+    /**
+     * The implementation of the pseudo-random number generation.
+     */
+    private MersenneTwister mt = null;
+    
+    /**
+     * local flag used only to enable highly detailed logging.
+     */
+    private final boolean debug = false;
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor
+     */
+    public Randomizer()
+    {
+        initialiseRNG();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor that specifies the random seed
+     */
+    public Randomizer(long seed)
+    {
+        initialiseRNG(seed);
+    }
 
 //------------------------------------------------------------------------------
 
-    private static void setSeed(long value)
+    /**
+     * Sets the random seed
+     * @param value the new value
+     */
+    private void setSeed(long value)
     {
         rndSeed = value;
     }
 
 //------------------------------------------------------------------------------
 
-    public static long getSeed()
+    /**
+     * @return the current random seed.
+     */
+    public long getSeed()
     {
         return rndSeed;
     }
     
 //------------------------------------------------------------------------------
 
-    public static void initialiseRNG()
+    /**
+     * Initializes this random number generator (RNG) using a random seed that 
+     * is generated on-the-fly randomly.
+     */
+    public void initialiseRNG()
     {
         initialiseSeed();
         mt = new MersenneTwister(rndSeed);
@@ -61,7 +104,11 @@ public class RandomUtils
     
 //------------------------------------------------------------------------------
 
-    public static void initialiseRNG(long seed)
+    /**
+     * Initialized this random number generator using the given seed.
+     * @param seed the seed to be used.
+     */
+    public void initialiseRNG(long seed)
     {
         setSeed(seed);
         mt = new MersenneTwister(rndSeed);
@@ -69,7 +116,11 @@ public class RandomUtils
     
 //------------------------------------------------------------------------------
 
-    public static MersenneTwister getRNG()
+    /**
+     * Returns the random number generator. Ensures there is an initialized one.
+     * @return the random number generator
+     */
+    private MersenneTwister getRNG()
     {
         if (mt == null)
         {
@@ -83,7 +134,7 @@ public class RandomUtils
     /**
      * Utility to debug: writes some log in file '/tmp/rng_debug_log'
      */
-    private static void print(Object val, String type)
+    private void print(Object val, String type)
     {
         String sss = "asked for "+ type + " "+val.toString();
         if (true)
@@ -112,11 +163,11 @@ public class RandomUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the next pseudorandom, uniformly distributed double value between
+     * Returns the next pseudo-random, uniformly distributed double value between
      * 0.0 and 1.0 from this random number generator's sequence.
      * @return the next double between 0.0 and 1.0;
      */
-    public static double nextDouble()
+    public double nextDouble()
     {
         double d = getRNG().nextDouble();
         if (debug)
@@ -127,13 +178,13 @@ public class RandomUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Returns a pseudorandom, uniformly distributed int value between 0 
+     * Returns a pseudo-random, uniformly distributed int value between 0 
      * (inclusive) and the specified value (exclusive), drawn from this random 
      * number generator's sequence.
      * @param i the bound on the random number to be returned. Must be positive.
      * @return the next integer between 0 and the specified value.
      */
-    public static int nextInt(int i)
+    public int nextInt(int i)
     {
         int r = getRNG().nextInt(i);
         if (debug)
@@ -144,11 +195,11 @@ public class RandomUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the next pseudorandom, uniformly distributed boolean value from 
+     * Returns the next pseudo-random, uniformly distributed boolean value from 
      * this random number generator's sequence.
      * @return the next boolean.
      */
-    public static boolean nextBoolean()
+    public boolean nextBoolean()
     {
         boolean r = getRNG().nextBoolean();
         if (debug)
@@ -159,13 +210,13 @@ public class RandomUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Returns whether the next pseudorandom, uniformly distributed double 
+     * Returns whether the next pseudo-random, uniformly distributed double 
      * is lower than the specified value.
      * @param prob the bound on the random double.
      * @return <code>true</code> is the next double is lower than the specified 
      * value.
      */
-    public static boolean nextBoolean(double prob)
+    public boolean nextBoolean(double prob)
     {
         return nextDouble() < prob;
     }
@@ -183,7 +234,7 @@ public class RandomUtils
      * compatible with the reproducibility requirement.
      */
     
-    public static <T> T randomlyChooseOne(Collection<T> c)
+    public <T> T randomlyChooseOne(Collection<T> c)
     {
         int chosen = nextInt(c.size());
         int i=0;
@@ -201,7 +252,7 @@ public class RandomUtils
 
 //------------------------------------------------------------------------------
 
-    private static void initialiseSeed()
+    private void initialiseSeed()
     {
         SecureRandom sec = new SecureRandom();
         byte[] sbuf = sec.generateSeed(8);

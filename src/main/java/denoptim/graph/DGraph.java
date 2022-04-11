@@ -4685,7 +4685,7 @@ public class DGraph implements Cloneable
         }
         
         // calculate the molecule representation
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
         t3d.setAlidnBBsIn3D(false);
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(this,true);
         if (mol == null)
@@ -4892,7 +4892,7 @@ public class DGraph implements Cloneable
             return lstGraphs;
 
         // get a atoms/bonds molecular representation (no 3D needed)
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
         t3d.setAlidnBBsIn3D(false);
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(this,false);
 

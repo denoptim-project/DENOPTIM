@@ -11,7 +11,7 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 
 /**
  * An utility class to encapsulate the search for an 
@@ -47,7 +47,7 @@ public class APMapFinder
     private static int maxCombs = 250;
     
     /**
-     * Reference to the fragment space
+     * Program-specific fragment space
      */
     private FragmentSpace fragSpace = null;
     
@@ -67,12 +67,13 @@ public class APMapFinder
      * {@link DGraph#getInterfaceAPs(List)} method when considering a
      * single-vertex subgraph) 
      * determines which APs will be required to have a mapping.
+     * @param fragSpace the fragment space to use.
      * @param vA the first vertex. 
      * @param vB the second vertex.
      * @param screenAll use <code>true</code> to NOT stop at the first 
      * compatible combinations.
      */
-    public APMapFinder(FragmentSpace fragSpace, 
+    public APMapFinder(FragmentSpace fragSpace,
             Vertex vA, Vertex vB, boolean screenAll)
     {
         this(fragSpace, vA, vB, null, screenAll, false, true);
@@ -91,6 +92,7 @@ public class APMapFinder
      * {@link DGraph#getInterfaceAPs(List)} method when considering a
      * single-vertex subgraph) 
      * determines which APs will be required to have a mapping.
+     * @param fragSpace the fragment space to use.
      * @param vA the first vertex.
      * @param vB the second vertex.
      * @param fixedRootAPs if not <code>null</code>, sets a required mapping 
@@ -102,7 +104,7 @@ public class APMapFinder
      * @param compatibleIfFree use <code>true</code> to make APs that are 
      * available (i.e., available throughout the template barriers) be compatible.
      */
-    public APMapFinder(FragmentSpace fragSpace,
+    public APMapFinder(FragmentSpace fragSpace, 
             Vertex vA, Vertex vB, 
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
@@ -192,28 +194,25 @@ public class APMapFinder
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
         // Remove from the lists those APs that have already a mapping
-        List<AttachmentPoint> purgedLstA = 
-                new ArrayList<AttachmentPoint>(lstA);
+        List<AttachmentPoint> purgedLstA = new ArrayList<AttachmentPoint>(lstA);
         if (fixedRootAPs!=null)
         {
             purgedLstA.removeAll(fixedRootAPs.keySet());
         }
-        List<AttachmentPoint> purgedLstB = 
-                new ArrayList<AttachmentPoint>(lstB);
+        List<AttachmentPoint> purgedLstB = new ArrayList<AttachmentPoint>(lstB);
         if (fixedRootAPs!=null)
         {
             purgedLstB.removeAll(fixedRootAPs.values());
         }
         
         // Map all the compatibilities before choosing a specific mapping
-        LinkedHashMap<AttachmentPoint,List<AttachmentPoint>> 
-            apCompatilities = findMappingCompatibileAPs(purgedLstA, purgedLstB, 
+        LinkedHashMap<AttachmentPoint,List<AttachmentPoint>> apCompatilities = 
+                findMappingCompatibileAPs(purgedLstA, purgedLstB, 
                     compatibleIfFree, fragSpace);
         
         // The 'keys' is used just to keep the map keys sorted in a separate list
         // so that the order is randomized only once, then it is retained.
-        List<AttachmentPoint> keys = 
-                new ArrayList<AttachmentPoint>(
+        List<AttachmentPoint> keys = new ArrayList<AttachmentPoint>(
                         apCompatilities.keySet());
         if (fixedRootAPs!=null)
         {
@@ -223,12 +222,10 @@ public class APMapFinder
         }
         
         // Test if we have enough AP compatibilities to satisfy the constraints
-        Set<AttachmentPoint> doableAPsA = 
-                new HashSet<AttachmentPoint>(keys);
+        Set<AttachmentPoint> doableAPsA = new HashSet<AttachmentPoint>(keys);
         if (fixedRootAPs!=null)
             doableAPsA.addAll(fixedRootAPs.keySet());
-        Set<AttachmentPoint> doableAPsB = 
-                new HashSet<AttachmentPoint>();
+        Set<AttachmentPoint> doableAPsB = new HashSet<AttachmentPoint>();
         apCompatilities.values().stream().forEach(l -> doableAPsB.addAll(l));
         if (onlyCompleteMappings)
         {
@@ -243,10 +240,10 @@ public class APMapFinder
                     needyAPsB.add(oldAp);
             }
         }
-        Set<AttachmentPoint> mustBeDoableA = 
-                new HashSet<AttachmentPoint>(needyAPsA);
-        Set<AttachmentPoint> mustBeDoableB = 
-                new HashSet<AttachmentPoint>(needyAPsB);
+        Set<AttachmentPoint> mustBeDoableA = new HashSet<AttachmentPoint>(
+                needyAPsA);
+        Set<AttachmentPoint> mustBeDoableB = new HashSet<AttachmentPoint>(
+                needyAPsB);
         if (fixedRootAPs!=null)
         {
             mustBeDoableA.removeAll(fixedRootAPs.keySet());
@@ -327,8 +324,9 @@ public class APMapFinder
                 boolean abandon = false;
                 for (int jj=0; jj<needyAPsA.size(); jj++)
                 {
-                    AttachmentPoint ap =
-                            RandomUtils.randomlyChooseOne(availKeys);
+                    AttachmentPoint ap = 
+                            fragSpace.getRandomizer().randomlyChooseOne(
+                                    availKeys);
                     availKeys.remove(ap);
                     List<AttachmentPoint> availPartners = 
                             new ArrayList<AttachmentPoint>();
@@ -337,7 +335,8 @@ public class APMapFinder
                     for (int j=0; j<apCompatilities.get(ap).size(); j++)
                     {
                         AttachmentPoint chosenAvail = 
-                                RandomUtils.randomlyChooseOne(availPartners);
+                                fragSpace.getRandomizer().randomlyChooseOne(
+                                        availPartners);
                         availPartners.remove(chosenAvail);
                         if (used.contains(chosenAvail))
                         {
@@ -363,7 +362,8 @@ public class APMapFinder
             }
         }
         if (allAPMappings.size() > 0)
-            chosenAPMap = RandomUtils.randomlyChooseOne(allAPMappings);
+            chosenAPMap = fragSpace.getRandomizer().randomlyChooseOne(
+                    allAPMappings);
     }
     
 //------------------------------------------------------------------------------

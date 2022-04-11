@@ -129,7 +129,9 @@ public abstract class FitnessTask extends Task
         result.setSDFFile(fitProvOutFile);
         if (fitProvMol == null)
     	{
-            ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+            ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(
+                    fitnessSettings.getLogger(),
+                    fitnessSettings.getRandomizer());
             fitProvMol = t3d.convertGraphTo3DAtomContainer(dGraph,true);
     	}
         

@@ -47,11 +47,12 @@ import denoptim.graph.Edge.BondType;
 import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
+import denoptim.programs.RunTimeParameters;
 import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 
 
 /**
@@ -94,6 +95,11 @@ public class ThreeDimTreeBuilder
      */
     private Logger logger = Logger.getLogger("3dTreeBuilderLogger");
     
+    /**
+     * Program-specific randomizer
+     */
+    private Randomizer randomizer = new Randomizer();
+    
     private static final String NL = DENOPTIMConstants.EOL;
 
 //------------------------------------------------------------------------------
@@ -103,9 +109,9 @@ public class ThreeDimTreeBuilder
      */
 
     public ThreeDimTreeBuilder(){
-        this(Level.INFO);
+        this(Level.WARNING);
     }
-    
+   
 //------------------------------------------------------------------------------
 
     /**
@@ -117,6 +123,29 @@ public class ThreeDimTreeBuilder
 
     public ThreeDimTreeBuilder(Level logLevel){
         logger.setLevel(logLevel);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor providing the program-specific settings
+     * @param settings program-specific settings
+     */
+    public ThreeDimTreeBuilder(RunTimeParameters settings)
+    {
+        this(settings.getLogger(), settings.getRandomizer());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor providing the program-specific logger and randomizer.
+     * @param 
+     */
+    public ThreeDimTreeBuilder(Logger logger, Randomizer randomizer)
+    {
+        this.logger = logger;
+        this.randomizer = randomizer;
     }
 
 //------------------------------------------------------------------------------
@@ -196,8 +225,7 @@ public class ThreeDimTreeBuilder
      */
 
     public IAtomContainer convertGraphTo3DAtomContainer(DGraph graph,
-            boolean removeUsedRCAs) 
-                    throws DENOPTIMException
+            boolean removeUsedRCAs) throws DENOPTIMException
     {
         return convertGraphTo3DAtomContainer(graph,removeUsedRCAs,true);
     }
@@ -761,8 +789,8 @@ public class ThreeDimTreeBuilder
                 }
                 else
                 {
-                    ArrayList<AttachmentPoint> apsOnThisAtm =
-                            new ArrayList<>();
+                    ArrayList<AttachmentPoint> apsOnThisAtm = 
+                            new ArrayList<AttachmentPoint>();
                     apsOnThisAtm.add(ap);
                     apsPerAtom.put(srcAtm,apsOnThisAtm);
                 }
@@ -808,9 +836,9 @@ public class ThreeDimTreeBuilder
     
     private Point3d getRandomPoint(IAtomContainer mol)
     {
-        double vx = ((double) RandomUtils.nextInt(100)) / 100.0;
-        double vy = ((double) RandomUtils.nextInt(100)) / 100.0;
-        double vz = ((double) RandomUtils.nextInt(100)) / 100.0;
+        double vx = ((double) randomizer.nextInt(100)) / 100.0;
+        double vy = ((double) randomizer.nextInt(100)) / 100.0;
+        double vz = ((double) randomizer.nextInt(100)) / 100.0;
         Point3d c = new Point3d(0,0,0);
         if (mol.getAtomCount() > 0)
         {

@@ -775,7 +775,7 @@ public class FragmentSpaceTest
         wholeGraph.addRing(v10, v11, BondType.DOUBLE);
         wholeGraph.addRing(v12, v13, BondType.DOUBLE);
         
-        ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
+        ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder(fsp);
         IAtomContainer wholeMol = tb3d.convertGraphTo3DAtomContainer(
                 wholeGraph.clone(), true);
         

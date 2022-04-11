@@ -59,7 +59,7 @@ import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 
 /**
  * Collection of operators meant to alter graphs and associated utilities.
@@ -931,8 +931,8 @@ public class GraphOperations
             // in the vertex's list of APs! So 'i' is just the i-th attempt on
             // the curVertex.
             
-            AttachmentPoint ap = 
-                    RandomUtils.randomlyChooseOne(toDoAPs);
+            AttachmentPoint ap = settings.getRandomizer().randomlyChooseOne(
+                    toDoAPs);
             toDoAPs.remove(ap);
             int apId = ap.getIndexInOwner();
             
@@ -958,11 +958,13 @@ public class GraphOperations
                 double crowdingProb = EAUtils.getCrowdingProbability(ap,
                         settings);
                 double extendGraphProb = molSizeProb * byLevelProb * crowdingProb;
-                boolean fgrow = RandomUtils.nextBoolean(extendGraphProb);
+                boolean fgrow = settings.getRandomizer().nextBoolean(
+                        extendGraphProb);
                 if (!fgrow)
                 {
                     if (rcParams.allowRingClosures() 
-                            && RandomUtils.nextBoolean(byLevelProb * crowdingProb))
+                            && settings.getRandomizer().nextBoolean(byLevelProb 
+                                    * crowdingProb))
                     {
                         allowOnlyRingClosure = true;
                     } else {
@@ -1001,8 +1003,7 @@ public class GraphOperations
             }
             
             // Stop if graph is already too big
-            Vertex incomingVertex = 
-                    Vertex.newVertexFromLibrary(-1, 
+            Vertex incomingVertex = Vertex.newVertexFromLibrary(-1, 
                             chosenFrgAndAp.getVertexMolId(), 
                             BBType.FRAGMENT, 
                             fsParams.getFragmentSpace());
@@ -1016,7 +1017,8 @@ public class GraphOperations
             boolean cpOnSymAPs = applySymmetry(
                     fsParams.getFragmentSpace().imposeSymmetryOnAPsOfClass(
                             ap.getAPClass()),
-                    settings.getSymmetryProbability());
+                    settings.getSymmetryProbability(),
+                    fsParams.getRandomizer());
             SymmetricSet symAPs = new SymmetricSet();
             if (curVrtx.hasSymmetricAP() 
                     && (cpOnSymAPs || symmetryOnAps)
@@ -1047,14 +1049,13 @@ public class GraphOperations
                         
                         SymmetricSet toKeep = new SymmetricSet();
                         
-                        
                         // Start by keeping "ap"
                         toKeep.add(apId);
                         crowdedness = crowdedness + 1;
                         
                         // Pick the accepted value once (used to decide how much
                         // crowdedness we accept)
-                        double shot = RandomUtils.nextDouble();
+                        double shot = settings.getRandomizer().nextDouble();
                         
                         // Keep as many as allowed by the crowdedness decision
                         for (Integer symApId : symAPs.getList())
@@ -1126,8 +1127,7 @@ public class GraphOperations
 
                     // Finally add the fragment on a symmetric AP
                     int newVrtId = GraphUtils.getUniqueVertexIndex();
-                    Vertex fragVertex = 
-                            Vertex.newVertexFromLibrary(newVrtId, 
+                    Vertex fragVertex = Vertex.newVertexFromLibrary(newVrtId, 
                                     chosenFrgAndAp.getVertexMolId(), 
                                     BBType.FRAGMENT,
                                     fsParams.getFragmentSpace());
@@ -1232,7 +1232,7 @@ public class GraphOperations
                     res = new IdFragmentAndAP(-1,chosenVrtxIdx,BBType.FRAGMENT,
                             chosenApId,-1,-1);
                 } else {
-                    res = RandomUtils.randomlyChooseOne(candidates);
+                    res = fragSpace.getRandomizer().randomlyChooseOne(candidates);
                 }
             }
         }
@@ -1264,13 +1264,14 @@ public class GraphOperations
         Vertex chosen = null;
         if (!fragSpace.useAPclassBasedApproach())
         {
-            chosen = RandomUtils.randomlyChooseOne(rcvs);
+            chosen = fragSpace.getRandomizer().randomlyChooseOne(rcvs);
             res = new IdFragmentAndAP(-1,chosen.getBuildingBlockId(),
                     chosen.getBuildingBlockType(),0,-1,-1);
         }
         else
         {
-            ArrayList<IdFragmentAndAP> candidates = new ArrayList<IdFragmentAndAP>();
+            ArrayList<IdFragmentAndAP> candidates = 
+                    new ArrayList<IdFragmentAndAP>();
             for (Vertex v : rcvs)
             {
                 if (curDap.getAPClass().isCPMapCompatibleWith(
@@ -1282,7 +1283,7 @@ public class GraphOperations
             }
             if (candidates.size() > 0)
             {
-                res = RandomUtils.randomlyChooseOne(candidates);
+                res = fragSpace.getRandomizer().randomlyChooseOne(candidates);
             }
         }
         return res;
@@ -1319,7 +1320,7 @@ public class GraphOperations
         int numCands = lscFfCc.size();
         if (numCands > 0)
         {
-            int chosenId = RandomUtils.nextInt(numCands);
+            int chosenId = settings.getRandomizer().nextInt(numCands);
             FragForClosabChains chosenFfCc = lscFfCc.get(chosenId);
             ArrayList<Integer> newFragIds = chosenFfCc.getFragIDs();
             int molIdNewFrag = newFragIds.get(0);
@@ -1345,7 +1346,8 @@ public class GraphOperations
                             dapidx).getAPClass();
                     if (applySymmetry(
                             fsParams.getFragmentSpace().imposeSymmetryOnAPsOfClass(apc),
-                            settings.getSymmetryProbability()))
+                            settings.getSymmetryProbability(),
+                            fsParams.getRandomizer()))
                     {
 //TODO: implement symmetric substitution with closability bias
                     }
@@ -1776,7 +1778,7 @@ public class GraphOperations
      * @return <code>true</code> if symmetry is to be applied
      */
     protected static boolean applySymmetry(boolean apclassImposed, 
-            double symmetryProbability)
+            double symmetryProbability, Randomizer randomizer)
     {
         boolean r = false;
         if (apclassImposed)
@@ -1785,7 +1787,7 @@ public class GraphOperations
         }
         else
         {
-            r = RandomUtils.nextBoolean(symmetryProbability);
+            r = randomizer.nextBoolean(symmetryProbability);
         }
         return r;
     }
@@ -1821,7 +1823,7 @@ public class GraphOperations
         boolean doneMutation = true;
         int numberOfMutations = EAUtils.chooseNumberOfSitesToMutate(
                 settings.getMultiSiteMutationWeights(), 
-                RandomUtils.nextDouble());
+                settings.getRandomizer().nextDouble());
         for (int i=0; i<numberOfMutations; i++)
         {
             if (i>0)
@@ -1830,7 +1832,7 @@ public class GraphOperations
                         settings.getExcludedMutationTypes());
                 break;
             }
-            Vertex v = RandomUtils.randomlyChooseOne(mutable);
+            Vertex v = settings.getRandomizer().randomlyChooseOne(mutable);
             doneMutation = performMutation(v,mnt,settings);
             if(!doneMutation)
                 break;
@@ -1862,7 +1864,7 @@ public class GraphOperations
         {
             return false;
         }
-        MutationType mType = RandomUtils.randomlyChooseOne(mTypes);
+        MutationType mType = settings.getRandomizer().randomlyChooseOne(mTypes);
         return performMutation(vertex, mType, mnt, settings);
     }
     
@@ -1894,7 +1896,7 @@ public class GraphOperations
                     + "_" + vertex.getVertexId() + "(" + pos + ")_"
                     + settings.timeStamp + ".sdf";
             DenoptimIO.writeGraphToSDF(new File(debugFile), c, false,
-                    settings.getLogger());
+                    settings.getLogger(), settings.getRandomizer());
             settings.getLogger().warning("Fatal exception while performing "
                     + "mutation. See file '" + debugFile + "' to reproduce the "
                     + "problem.");
@@ -2015,7 +2017,8 @@ public class GraphOperations
                                 CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
                     break;
                     }   
-                    chosenApId = RandomUtils.randomlyChooseOne(candidates);
+                    chosenApId = settings.getRandomizer().randomlyChooseOne(
+                            candidates);
                 }
                 done = extendLink(vertex, chosenApId, chosenVrtxIdx, mnt,
                         fsParams.getFragmentSpace());

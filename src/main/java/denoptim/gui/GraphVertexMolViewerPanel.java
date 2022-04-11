@@ -46,6 +46,7 @@ import denoptim.gui.GraphViewerPanel.JVertexType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.MoleculeUtils;
+import denoptim.utils.Randomizer;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 
@@ -314,17 +315,16 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	        return mol;
 	    }
 	    
-        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
+        Logger logger = Logger.getLogger(GUI.GUILOGGER);
+        Randomizer randomizer = new Randomizer();
+        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
         try {
-            mol = tb.convertGraphTo3DAtomContainer(
-                    dnGraph);
-            Logger logger = Logger.getLogger(GUI.GUILOGGER);
+            mol = tb.convertGraphTo3DAtomContainer(dnGraph);
             MoleculeUtils.removeUsedRCA(mol,dnGraph, logger);
         } catch (Throwable t) {
             t.printStackTrace();
             System.out.println("Couldn't make 3D-tree representation: "
                     + t.getMessage());
-            //molLibrary.set(currGrphIdx, builder.newAtomContainer());
         }
 
         if (mol.getAtomCount() > 0)

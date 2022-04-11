@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import denoptim.graph.Candidate;
-import denoptim.utils.RandomUtils;
+import denoptim.programs.RunTimeParameters;
+import denoptim.utils.Randomizer;
 
 
 /**
@@ -44,23 +45,23 @@ public class SelectionHelper
      * http://watchmaker.uncommons.org/
      * @param population the ensemble of individuals to choose from
      * @param sz number of individuals to select
+     * @param settings the program-specific settings.
      * @return list of selected individuals 
      */
 
     protected static Candidate[] performTournamentSelection(
-                                    ArrayList<Candidate> population,
-                                    int sz)
+            ArrayList<Candidate> population, int sz, RunTimeParameters settings)
     {
         Candidate[] selection = new Candidate[sz];
         for (int i=0; i<sz; i++)
         {
             // Pick two candidates at random.
-            Candidate p1 = RandomUtils.randomlyChooseOne(population);
-            Candidate p2 = RandomUtils.randomlyChooseOne(population);
+            Candidate p1 = settings.getRandomizer().randomlyChooseOne(population);
+            Candidate p2 = settings.getRandomizer().randomlyChooseOne(population);
 
             // Use a random value to decide weather to select the fitter individual
             // or the weaker one.
-            boolean selectFitter = RandomUtils.nextBoolean();
+            boolean selectFitter = settings.getRandomizer().nextBoolean();
             
             if (selectFitter)
             {
@@ -79,18 +80,18 @@ public class SelectionHelper
 //------------------------------------------------------------------------------
 
     /**
-     * Randomly select k individuals from the population
-     * @param population the ensemble of individuals to choose from
-     * @param sz number of individuals to select
-     * @return list of indices of individuals in the population
+     * Randomly select k individuals from the population.
+     * @param population the ensemble of individuals to choose from.
+     * @param sz number of individuals to select.
+     * @param settings the program-specific settings.
+     * @return list of indices of individuals in the population.
      */
     protected static Candidate[] performRandomSelection(
-                                    ArrayList<Candidate> population,
-                                    int sz)
+            ArrayList<Candidate> population, int sz, RunTimeParameters settings)
     {
         Candidate[] selection = new Candidate[sz];
         for (int i=0; i<sz; i++)
-            selection[i] = RandomUtils.randomlyChooseOne(population);
+            selection[i] = settings.getRandomizer().randomlyChooseOne(population);
 
         return selection;
     }
@@ -101,12 +102,13 @@ public class SelectionHelper
      * Stochastic Uniform Sampling
      * Note: this implementation is based on the WATCHMAKER framework
      * http://watchmaker.uncommons.org/
-     * @param population the ensemble of individuals to choose from
-     * @param sz number of individuals to select
-     * @return list of indices of individuals in the population
+     * @param population the ensemble of individuals to choose from.
+     * @param sz number of individuals to select.
+     * @param settings the program-specific settings.
+     * @return list of indices of individuals in the population.
      */
     protected static Candidate[] performSUS(ArrayList<Candidate> population, 
-            int sz)
+            int sz, RunTimeParameters settings)
     {
         int k = population.size();
         Candidate[] selection = new Candidate[sz];
@@ -120,7 +122,7 @@ public class SelectionHelper
 
 
         // Pick a random offset between 0 and 1 as the starting point for selection.
-        double startOffset = RandomUtils.nextDouble();
+        double startOffset = settings.getRandomizer().nextDouble();
         double cumulativeExpectation = 0;
         int index = 0;
         int c = 0;
@@ -156,13 +158,14 @@ public class SelectionHelper
      *    population members is greater than or equal to r.
      * Note: this implementation is based on the WATCHMAKER framework
      * http://watchmaker.uncommons.org/
-     * @param population the ensemble of individuals to choose from
-     * @param sz number of individuals to select
-     * @return list of indices of individuals in the population
+     * @param population the ensemble of individuals to choose from.
+     * @param sz number of individuals to select.
+     * @param settings the program-specific settings.
+     * @return list of indices of individuals in the population.
      */
 
     protected static Candidate[] performRWS(ArrayList<Candidate> population,
-                                    int sz)
+            int sz, RunTimeParameters settings)
     {
         int k = population.size();
         Candidate[] selection = new Candidate[sz];
@@ -179,7 +182,7 @@ public class SelectionHelper
 
         for (int i=0; i<sz; i++)
         {
-            double randomFitness = RandomUtils.nextDouble() *
+            double randomFitness = settings.getRandomizer().nextDouble() *
                         cumulativeFitnesses[cumulativeFitnesses.length-1];
             int index = Arrays.binarySearch(cumulativeFitnesses, randomFitness);
             if (index < 0)

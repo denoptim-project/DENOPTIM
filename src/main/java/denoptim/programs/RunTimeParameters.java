@@ -47,6 +47,7 @@ import denoptim.programs.grapheditor.GraphEdParameters;
 import denoptim.programs.graphlisthandler.GraphListsHandlerParameters;
 import denoptim.programs.isomorphism.IsomorphismParameters;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
+import denoptim.utils.Randomizer;
 
 
 /**
@@ -95,7 +96,14 @@ public abstract class RunTimeParameters
     private Logger logger = Logger.getLogger("DummyLogger");
     
     /**
-     * Verbosity level
+     * Program-specific random numbers and random decisions generator.
+     */
+    private Randomizer rng = null;
+    
+    /**
+     * Verbosity level for logger. This is used to help the user
+     * setting the {@link Level} of the {@link Logger} without knowing the
+     * names of the logging levels.
      */
     protected int verbosity = 0;
     
@@ -335,11 +343,15 @@ public abstract class RunTimeParameters
      * Set the name of the program specific logger. This method should only be 
      * used by subclasses that need to set the logger for embedded parameters 
      * collections.
-     * @param loggerIdentifier the name to save.
+     * @param logger the new logger.
      */
     private void setLogger(Logger logger)
     {
         this.logger = logger;
+        for (RunTimeParameters innerParams : otherParameters.values())
+        {
+            innerParams.setLogger(logger);
+        }
     }
     
 //-----------------------------------------------------------------------------
@@ -458,6 +470,89 @@ public abstract class RunTimeParameters
 	    return verbosity;
     }
 
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Returns the current program-specific randomizer. If no such tool has been 
+     * configured, then it creates one using a new and uncontrollable random
+     * seed.
+     * @return the current and program-specific tool for random number and 
+     * random decision generation.
+     */
+    public Randomizer getRandomizer()
+    {
+        if (rng==null)
+        {
+            rng = new Randomizer();
+            for (RunTimeParameters innerParams : otherParameters.values())
+            {
+                innerParams.setRandomizer(rng);
+            }
+        }
+        return rng;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Returns the seed 
+     * @return
+     */
+    public long getRandomSeed()
+    {
+        return rng.getSeed();
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Sets the randomizer. This method should only be 
+     * used by subclasses that need to set the randomizer in embedded parameters 
+     * collections.
+     */
+    public void setRandomizer(Randomizer rng)
+    {
+        this.rng = rng;
+        for (RunTimeParameters innerParams : otherParameters.values())
+        {
+            innerParams.setRandomizer(rng);
+        }
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Starts a program specific randomizer, i.e., a tool for generating
+     * random numbers and taking random decisions. 
+     * @param seed the random seed.
+     */
+    public Randomizer startRandomizer()
+    {
+        rng = new Randomizer();
+        for (RunTimeParameters innerParams : otherParameters.values())
+        {
+            innerParams.setRandomizer(rng);
+        }
+        return rng;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Starts a program specific randomizer, i.e., a tool for generating
+     * random numbers and taking random decisions. 
+     * @param seed the random seed.
+     */
+    public Randomizer startRandomizer(long seed)
+    {
+        rng = new Randomizer(seed);
+        for (RunTimeParameters innerParams : otherParameters.values())
+        {
+            innerParams.setRandomizer(rng);
+        }
+        return rng;
+    }
+    
 //-----------------------------------------------------------------------------
 
     /**

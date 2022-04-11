@@ -62,6 +62,7 @@ import denoptim.logging.CounterID;
 import denoptim.logging.StaticLogger;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.MoleculeUtils;
@@ -69,7 +70,7 @@ import denoptim.utils.StatUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.ObjectPair;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.SizeControlledSet;
 
@@ -176,7 +177,8 @@ public class EAUtils
         return pickNewCandidateGenerationMode(
                 settings.getConstructionWeight(), 
                 settings.getMutationWeight(),
-                settings.getConstructionWeight());
+                settings.getConstructionWeight(),
+                settings.getRandomizer());
     }
     
 //------------------------------------------------------------------------------
@@ -226,9 +228,10 @@ public class EAUtils
      * @return
      */
     public static CandidateSource pickNewCandidateGenerationMode(
-            double xoverWeight, double mutWeight, double newWeight)
+            double xoverWeight, double mutWeight, double newWeight,
+            Randomizer randomizer)
     {
-        double hit = RandomUtils.nextDouble() 
+        double hit = randomizer.nextDouble() 
                 * (xoverWeight + mutWeight + newWeight);
         if (hit <= xoverWeight)
         {
@@ -334,12 +337,12 @@ public class EAUtils
                 DGraph gpA = parents[0].getGraph();
                 List<Vertex> subGraphA = new ArrayList<Vertex>();
                 gpA.getChildrenTree(EAUtils.selectNonScaffoldNonCapVertex(
-                        gpA),subGraphA);
+                        gpA, settings.getRandomizer()),subGraphA);
 
                 DGraph gpB = parents[1].getGraph();
                 List<Vertex> subGraphB = new ArrayList<Vertex>();
                 gpB.getChildrenTree(EAUtils.selectNonScaffoldNonCapVertex(
-                        gpB),subGraphB);
+                        gpB, settings.getRandomizer()),subGraphB);
             }
             foundPars = true;
             break;
@@ -386,7 +389,7 @@ public class EAUtils
             parents.add(gB);
             DenoptimIO.writeGraphsToSDF(new File(settings.getDataDirectory()
                     + "_failed_xover.sdf"), parents, true,
-                    settings.getLogger());
+                    settings.getLogger(), settings.getRandomizer());
             throw new DENOPTIMException("Error while performing crossover! "+NL
                     + "XOverSite:    " + xos.toString() + NL
                     + "XOverSite(C): " + xosOnClones.toString() + NL
@@ -479,7 +482,8 @@ public class EAUtils
         Candidate chosenOffspring = null;
         if (choiceOfOffstring<0)
         {
-            chosenOffspring = RandomUtils.randomlyChooseOne(validOffspring);
+            chosenOffspring = settings.getRandomizer().randomlyChooseOne(
+                    validOffspring);
             chosenOffspring.setName("M" + GenUtils.getPaddedString(
                     DENOPTIMConstants.MOLDIGITS,
                     GraphUtils.getUniqueMoleculeIndex()));
@@ -552,9 +556,11 @@ public class EAUtils
             settings.getLogger().log(Level.INFO, "WRITING DEBUG FILE for " 
                     + graph.getLocalMsg());
             DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_parent.sdf"),
-                    parent.getGraph(),false, settings.getLogger());
+                    parent.getGraph(),false, settings.getLogger(),
+                    settings.getRandomizer());
             DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_curr.sdf"), 
-                    graph,false, settings.getLogger());
+                    graph,false, settings.getLogger(),
+                    settings.getRandomizer());
             throw e;
         }
         
@@ -921,16 +927,17 @@ public class EAUtils
         {
         case 1:
             mates = SelectionHelper.performTournamentSelection(candidates, 
-                    number);
+                    number, settings);
             break;
         case 2:
-            mates = SelectionHelper.performRWS(candidates, number);
+            mates = SelectionHelper.performRWS(candidates, number, settings);
             break;
         case 3:
-            mates = SelectionHelper.performSUS(candidates, number);
+            mates = SelectionHelper.performSUS(candidates, number, settings);
             break;
         case 4:
-            mates = SelectionHelper.performRandomSelection(candidates, number);
+            mates = SelectionHelper.performRandomSelection(candidates, number, 
+                    settings);
             break;
         }
         return mates;
@@ -941,14 +948,15 @@ public class EAUtils
     /**
      * Chose randomly a vertex that is neither scaffold or capping group.
      */
-    protected static Vertex selectNonScaffoldNonCapVertex(DGraph g)
+    protected static Vertex selectNonScaffoldNonCapVertex(DGraph g, 
+            Randomizer randomizer)
     {
         List<Vertex> candidates = new ArrayList<Vertex>(
                 g.getVertexList());
         candidates.removeIf(v ->
                 v.getBuildingBlockType() == BBType.SCAFFOLD
                 || v.getBuildingBlockType() == BBType.CAP);
-        return RandomUtils.randomlyChooseOne(candidates);
+        return randomizer.randomlyChooseOne(candidates);
     }
               
 //------------------------------------------------------------------------------
@@ -1007,8 +1015,8 @@ public class EAUtils
         XoverSite result = null;
         if (choiceOfXOverSites<0)
         {
-            result = RandomUtils.randomlyChooseOne(population.getXoverSites(
-                    parentA, parentB));
+            result = settings.getRandomizer().randomlyChooseOne(
+                    population.getXoverSites(parentA, parentB));
         } else {
             result = population.getXoverSites(parentA, parentB).get(
                     choiceOfXOverSites);
@@ -1270,14 +1278,15 @@ public class EAUtils
      * Select randomly a base fragment
      * @return index of a seed fragment
      */
-
+//TODO-gg move to FragmentSpace
     protected static int selectRandomScaffold(FragmentSpace fragSpace)
     {
         if (fragSpace.getScaffoldLibrary().size() == 1)
             return 0;
         else
         {
-            return RandomUtils.nextInt(fragSpace.getScaffoldLibrary().size());
+            return fragSpace.getRandomizer().nextInt(
+                    fragSpace.getScaffoldLibrary().size());
         }
     }
 
@@ -1287,14 +1296,15 @@ public class EAUtils
      * Select randomly a fragment from the available list
      * @return the fragment index
      */
-
+  //TODO-gg move to FragmentSpace
     protected static int selectRandomFragment(FragmentSpace fragSpace)
     {
         if (fragSpace.getFragmentLibrary().size() == 1)
             return 0;
         else
         {
-            return RandomUtils.nextInt(fragSpace.getFragmentLibrary().size());
+            return fragSpace.getRandomizer().nextInt(
+                    fragSpace.getFragmentLibrary().size());
         }
     }
 
@@ -1423,7 +1433,7 @@ public class EAUtils
             return true;
 
         // get a atoms/bonds molecular representation (no 3D needed)
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
         t3d.setAlidnBBsIn3D(false);
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
         
@@ -1453,7 +1463,7 @@ public class EAUtils
                 for (Ring ring : combsOfRings)
                 {
                     // Consider the crowding probability
-                    double shot = RandomUtils.nextDouble();
+                    double shot = settings.getRandomizer().nextDouble();
                     int crowdOnH = EAUtils.getCrowdedness(
                             ring.getHeadVertex().getEdgeToParent().getSrcAP(),
                             true);
@@ -1509,7 +1519,7 @@ public class EAUtils
                 }
                 else
                 {
-                    int selId = RandomUtils.nextInt(sz);
+                    int selId = settings.getRandomizer().nextInt(sz);
                     selected = allCombsOfRings.get(selId);
                 }
 
@@ -1681,7 +1691,7 @@ public class EAUtils
         }
 
         // calculate the molecule representation
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
         t3d.setAlidnBBsIn3D(false);
         IAtomContainer mol = null;
         mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
@@ -1857,9 +1867,12 @@ public class EAUtils
             String msg = "Evaluation of graph: INCHI is null!";
             settings.getLogger().log(Level.FINE, msg);
             if (smilesIsAvailable)
-                pr.setFirst("UNDEFINED-INCHI_"+molsmiles);
-            else
-                pr.setFirst("UNDEFINED-INCHI_"+RandomUtils.nextInt(100000));
+            {
+                pr.setFirst("UNDEFINED-INCHI_"+ molsmiles);
+            } else {
+                pr.setFirst("UNDEFINED-INCHI_"+ 
+                        settings.getRandomizer().nextInt(Integer.MAX_VALUE));
+            }
         }
 
         Object[] res = new Object[3];

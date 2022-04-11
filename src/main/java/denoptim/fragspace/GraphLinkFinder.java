@@ -11,7 +11,7 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 
 /**
  * An utility class to encapsulate the search for vertexes that satisfy 
@@ -56,7 +56,7 @@ public class GraphLinkFinder
     /**
      * Maximum number of combinations. This prevents combinatorial explosion, 
      * but it is ignored if the constructor is required to screen all.
-     * Remember that the combinations are anyway randomised, so even with the 
+     * Remember that the combinations are anyway randomized, so even with the 
      * maximum limit on the number of combination to consider, there is no
      * systematic exclusion of specific combinations.
      */
@@ -81,8 +81,8 @@ public class GraphLinkFinder
      * @throws DENOPTIMException if the required new building block ID cannot
      * be used.
      */
-    public GraphLinkFinder(FragmentSpace fragSpace, 
-            Vertex originalLink) throws DENOPTIMException
+    public GraphLinkFinder(FragmentSpace fragSpace, Vertex originalLink) 
+            throws DENOPTIMException
     {  
         this(fragSpace, originalLink, -1, false);
     }
@@ -136,7 +136,7 @@ public class GraphLinkFinder
             if (foundNewLink && !screenAll)
                 break;
             
-            Vertex originalBB = RandomUtils.randomlyChooseOne(
+            Vertex originalBB = fragSpace.getRandomizer().randomlyChooseOne(
                     candidates);
             candidates.remove(originalBB);
             try
@@ -283,7 +283,7 @@ public class GraphLinkFinder
             if (foundNewLink && !screenAll)
                 break;
             
-            Vertex originalBB = RandomUtils.randomlyChooseOne(
+            Vertex originalBB = fragSpace.getRandomizer().randomlyChooseOne(
                     candidates);
             candidates.remove(originalBB);
             try
@@ -372,7 +372,8 @@ public class GraphLinkFinder
                 this.foundNewLink = true;
             }
             
-            this.chosenAPMap = RandomUtils.randomlyChooseOne(apMappings);
+            this.chosenAPMap = fragSpace.getRandomizer().randomlyChooseOne(
+                    apMappings);
             if (screenAll)
             {
                 allCompatLinks.put(chosenNewLink, apMappings);

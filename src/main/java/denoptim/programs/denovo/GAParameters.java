@@ -32,7 +32,7 @@ import denoptim.logging.Monitor;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
 import denoptim.utils.MutationType;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 
 
 /**
@@ -1182,15 +1182,12 @@ public class GAParameters extends RunTimeParameters
         if (isMaster)
             createWorkingDirectory();
 
-        // set random number generator
         if (seed == 0)
         {
-            RandomUtils.initialiseRNG();
-            seed = RandomUtils.getSeed();
-        }
-        else
-        {
-            RandomUtils.initialiseRNG(seed);
+            startRandomizer();
+            seed = getRandomSeed();
+        } else {
+            startRandomizer(seed);
         }
 
         int nproc = Runtime.getRuntime().availableProcessors();

@@ -76,7 +76,8 @@ public class GraphEditor extends ProgramTask
             modGraphs.add(modGraph);
         }
         DenoptimIO.writeGraphsToFile(new File(geParams.getOutFile()), 
-                geParams.getOutFormat(), modGraphs, geParams.getLogger());
+                geParams.getOutFormat(), modGraphs, geParams.getLogger(),
+                geParams.getRandomizer());
     }
     
 //-----------------------------------------------------------------------------

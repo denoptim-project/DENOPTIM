@@ -235,7 +235,7 @@ public class GraphBuildingTask extends FitnessTask
             fitnessSettings.getLogger().log(Level.FINE, msg);
             
             // Initialize the 3d model builder
-            tb3d = new ThreeDimTreeBuilder();
+            tb3d = new ThreeDimTreeBuilder(fitnessSettings);
             if (!fitnessSettings.make3dTree())
             {
             	tb3d.setAlidnBBsIn3D(false);

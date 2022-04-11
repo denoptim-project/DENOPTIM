@@ -44,10 +44,9 @@ import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.GraphPattern;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.StaticLogger;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 
 /**
  * Class defining a space of building blocks. The space comprises of the lists 
@@ -363,6 +362,18 @@ public class FragmentSpace
     {
         return isValid;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the program-specific randomizer that is associated with this 
+     * program-specific fragment space.
+     * @return the program-specific randomizer.
+     */
+    public Randomizer getRandomizer()
+    {
+        return settings.getRandomizer();
+    }
 
 //------------------------------------------------------------------------------
     
@@ -576,7 +587,7 @@ public class FragmentSpace
         int fapidx = -1;
         if (reacFrags.size() > 0)
         {
-            fapidx = RandomUtils.randomlyChooseOne(reacFrags);
+            fapidx = settings.getRandomizer().randomlyChooseOne(reacFrags);
         }
 
         return fapidx;
@@ -1436,7 +1447,8 @@ public class FragmentSpace
                         try
                         {
                             subIAC = MoleculeUtils.extractIACForSubgraph(
-                                    wholeMol, g, graph, settings.getLogger());
+                                    wholeMol, g, graph, settings.getLogger(),
+                                    settings.getRandomizer());
                             t.setIAtomContainer(subIAC,true);
                             has3Dgeometry = true;
                         } catch (DENOPTIMException e1)
@@ -1492,7 +1504,8 @@ public class FragmentSpace
                             DenoptimIO.writeSDFFile(destFileName,subIAC,true);
                         } else {
                             DenoptimIO.writeGraphToSDF(new File(destFileName), 
-                                    g, true, false, settings.getLogger());
+                                    g, true, false, settings.getLogger(),
+                                    settings.getRandomizer());
                         }
                     } catch (DENOPTIMException e)
                     {

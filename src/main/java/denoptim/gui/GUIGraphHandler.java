@@ -72,6 +72,7 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.graph.EmptyVertex;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
+import denoptim.utils.Randomizer;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 
@@ -699,7 +700,8 @@ public class GUIGraphHandler extends GUICardPanel
                 {
                     outFile = DenoptimIO.writeGraphsToFile(outFile,
                             fileAndFormat.format, dnGraphLibrary,
-                            Logger.getLogger("GUILogger"));
+                            Logger.getLogger("GUILogger"),
+                            new Randomizer());
                 }
                 catch (Exception ex)
                 {

@@ -34,7 +34,7 @@ import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.programs.denovo.GAParameters;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 
 /**
  * Unit test
@@ -516,7 +516,8 @@ public class EAUtilsTest
         double wtot = wx + wm + wc;
         for (int i=0; i<tot; i++)
         {
-            switch (EAUtils.pickNewCandidateGenerationMode(wx,wm,wc))
+            switch (EAUtils.pickNewCandidateGenerationMode(wx, wm, wc, 
+                    new Randomizer()))
             {
                 case CROSSOVER:
                     ix++;
@@ -543,32 +544,32 @@ public class EAUtilsTest
 //------------------------------------------------------------------------------
 
     @Test
-    public void testCandidateGenerationMethod2() throws Exception
+    public void testCandidateGenerationMethodReproducibility() throws Exception
     {
         int tot = 100000;
         long seed = 1234567;
         long otherSeed = 987654321;
         double wx = 2, wm = 0.6, wc=0.05;
         
-        RandomUtils.initialiseRNG(seed);
+        Randomizer rng = new Randomizer(seed);
         List<CandidateSource> resultsA = new ArrayList<CandidateSource>();
         for (int i=0; i<tot; i++)
         {
-            resultsA.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc));
+            resultsA.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc,rng));
         }
         
-        RandomUtils.initialiseRNG(otherSeed);
+        Randomizer rng2 = new Randomizer(otherSeed);
         List<CandidateSource> resultsB = new ArrayList<CandidateSource>();
         for (int i=0; i<tot; i++)
         {
-            resultsB.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc));
+            resultsB.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc,rng2));
         }
         
-        RandomUtils.initialiseRNG(seed);
+        rng = new Randomizer(seed);
         List<CandidateSource> resultsC = new ArrayList<CandidateSource>();
         for (int i=0; i<tot; i++)
         {
-            resultsC.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc));
+            resultsC.add(EAUtils.pickNewCandidateGenerationMode(wx,wm,wc,rng));
         }
         
         boolean different = false;
@@ -657,12 +658,12 @@ public class EAUtilsTest
         g.appendVertexOnAP(v.getAP(2), c3.getAP(0));
         g.appendVertexOnAP(v.getAP(3), c4.getAP(0));
         
+        Randomizer rng = new Randomizer(1234L);
         Vertex expected = v;
         for (int i=0; i<5; i++)
         {
-            Vertex chosen = EAUtils.selectNonScaffoldNonCapVertex(g);
-            assertEquals(expected, chosen, "Index of the only choosable " +
-                    "vertex");
+            Vertex chosen = EAUtils.selectNonScaffoldNonCapVertex(g,rng);
+            assertEquals(expected, chosen, "Index of the only choosable vertex");
         }
     }
     

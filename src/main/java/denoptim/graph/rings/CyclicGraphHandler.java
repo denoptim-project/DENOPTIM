@@ -56,7 +56,7 @@ import denoptim.logging.StaticLogger;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.ObjectPair;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 import denoptim.utils.RingClosingUtils;
 
 
@@ -163,7 +163,7 @@ public class CyclicGraphHandler
             if (combOfRings.size() >= maxRingClosures)
                 break;
             
-            int vIdI = RandomUtils.nextInt(wLstVrtI.size());
+            int vIdI = settings.getRandomizer().nextInt(wLstVrtI.size());
             Vertex vI = wLstVrtI.get(vIdI);
             wLstVrtI.removeAll(Collections.singleton(vI));
 
@@ -171,15 +171,14 @@ public class CyclicGraphHandler
             ArrayList<Vertex> wLstVrtJ = rsm.getRSBiasedListOfCandidates(vI); 
             while (wLstVrtJ.size() > 0)
             {
-                int vIdJ = RandomUtils.nextInt(wLstVrtJ.size());
+                int vIdJ = settings.getRandomizer().nextInt(wLstVrtJ.size());
                 Vertex vJ = wLstVrtJ.get(vIdJ);
                 wLstVrtJ.removeAll(Collections.singleton(vJ));
 
                 PathSubGraph path = new PathSubGraph(vI,vJ,molGraph);
                 if (evaluatePathClosability(path, inMol))
                 {
-                    ArrayList<Vertex> arrLst = 
-                                              new ArrayList<Vertex>();
+                    ArrayList<Vertex> arrLst = new ArrayList<Vertex>();
                     arrLst.addAll(path.getVertecesPath());                    
                     Ring ring = new Ring(arrLst);
 
@@ -201,8 +200,7 @@ public class CyclicGraphHandler
                     wLstVrtI.removeAll(Collections.singleton(vJ));
 
                     // Update ring sizes according to the newly added bond
-                    if (vI instanceof Fragment 
-                            && vJ instanceof Fragment)
+                    if (vI instanceof Fragment && vJ instanceof Fragment)
                     {
                         rsm.addRingClosingBond(vI,vJ);
                     }

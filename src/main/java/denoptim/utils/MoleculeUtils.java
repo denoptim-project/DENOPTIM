@@ -914,7 +914,8 @@ public class MoleculeUtils
      * @throws DENOPTIMException 
      */
     public static IAtomContainer extractIACForSubgraph(IAtomContainer wholeIAC, 
-            DGraph subGraph, DGraph wholeGraph, Logger logger) throws DENOPTIMException
+            DGraph subGraph, DGraph wholeGraph, Logger logger, 
+            Randomizer randomizer) throws DENOPTIMException
     {
         IAtomContainer iac = makeSameAs(wholeIAC);
         
@@ -985,7 +986,7 @@ public class MoleculeUtils
                         String debugFile = "failedAPIdentificationIACSubGraph" 
                                 + wholeGraph.getGraphId() + ".sdf";
                         DenoptimIO.writeGraphToSDF(new File(debugFile), 
-                                wholeGraph, willBecomeAP, logger);
+                                wholeGraph, willBecomeAP, logger, randomizer);
                         throw new DENOPTIMException("Unmexpected null AP from "
                                 + nbrVid + " " + vid +" on " + wholeGraph 
                                 + " See " + debugFile);

@@ -27,7 +27,7 @@ import denoptim.files.FileUtils;
 import denoptim.programs.RunTimeParameters;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.MutationType;
-import denoptim.utils.RandomUtils;
+import denoptim.utils.Randomizer;
 
 
 /**
@@ -42,6 +42,8 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
      * Seed for generation of pseudo-random numbers
      */
     protected long randomSeed = 1234567890L;
+    
+    //TODO-gg make it controllable from input file
     
     /**
      * Testable Operators. {@link #XOVER} is an alias for {@link #CROSSOVER}
@@ -324,7 +326,7 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
 
     public void processParameters() throws DENOPTIMException
     {
-        RandomUtils.initialiseRNG(randomSeed);
+        startRandomizer(randomSeed);
         processOtherParameters();
     }
     

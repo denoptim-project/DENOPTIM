@@ -110,7 +110,7 @@ public class OffspringEvaluationTask extends FitnessTask
         // blocks (not aligned, nor roto-translated)
         if (fitnessSettings.make3dTree())
         {
-        	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder();
+        	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder(fitnessSettings);
         	
             try {
                 DGraph gWithNoRCVs = dGraph.clone();
