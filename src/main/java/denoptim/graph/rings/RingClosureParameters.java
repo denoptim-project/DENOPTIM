@@ -75,11 +75,6 @@ public class RingClosureParameters extends RunTimeParameters
     protected boolean selectFragsFromCC = false;
 
     /**
-     * Controller for type of ring closing potential to be used in Tinker.
-     */
-    protected String rcStrategy = "BONDOVERLAP"; 
-
-    /**
      * The ring closability evaluation mode:
      * -1= only ring rize bias
      * 0 = only constitution of candidate ring,
@@ -246,13 +241,6 @@ public class RingClosureParameters extends RunTimeParameters
     {
         super(ParametersType.RC_PARAMS);
         rcArchive = new RingClosuresArchive();
-    }
-
-//----------------------------------------------------------------------------
-
-    public String getRCStrategy()
-    {
-        return rcStrategy;
     }
 
 //----------------------------------------------------------------------------
@@ -470,19 +458,8 @@ public class RingClosureParameters extends RunTimeParameters
                 metalCoordinatingAPClasses.add(APClass.make(value));
                 break;
             case "SELECTFRAGMENTSFROMCLOSABLECHAINS":
-    	    selectFragsFromCC = true;
-    	    break;
-            case "RCPOTENTIALTYPE=":
-                try
-                {
-                    rcStrategy = value.toUpperCase();
-                }
-                catch (Throwable t)
-                {
-                    msg = "Unable to understand value '" + value + "'";
-                    throw new DENOPTIMException(msg);
-                }
-                break;
+        	    selectFragsFromCC = true;
+        	    break;
             case "EVALUATIONCLOSABILITYMODE=":
             	switch (value.toUpperCase())
             	{

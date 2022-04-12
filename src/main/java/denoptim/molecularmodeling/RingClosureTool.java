@@ -411,73 +411,30 @@ public class RingClosureTool
         }
         
         // Definition of RingClosingPotential
-        String rcStrategy = rcParams.getRCStrategy();
-
-        //TODO-gg remove BONDCOMPLEMENTARITY
-        //if (rcStrategy.equals("BONDOVERLAP"))
-        //{
-            rsSbKey.append("RC11BNDTERM\n");
-            rsSbKey.append("RC12BNDTERM NONE"+NL);
-            for (ObjectPair op : rcaCombination)
-            {
-                int iRcaA = ((Integer) op.getFirst()).intValue();
-                int iRcaB = ((Integer) op.getSecond()).intValue();
-                RingClosingAttractor rca0 = rcMol3d.getAttractor(iRcaA);
-                RingClosingAttractor rca1 = rcMol3d.getAttractor(iRcaB);
-                int s0t = fmol.indexOf(rca0.getSrcAtom()) + 1;
-                int s1t = fmol.indexOf(rca1.getSrcAtom()) + 1;
-                int i0t = rcMol3d.getTnkAtmIdOfRCA(rca0);
-                int i1t = rcMol3d.getTnkAtmIdOfRCA(rca1);
-
-                double parA = 0.0;
-                double parB = 0.0;
-                parA = (rca0.getParamA11() + rca1.getParamA11()) / 2.0;
-                parB = (rca0.getParamB11() + rca1.getParamB11()) / 2.0;
-
-                rsSbKey.append("RC-11-PAIRS " + i0t + " " +s1t + " "
-                               + parA + " " + parB + "\n");
-
-                rsSbKey.append("RC-11-PAIRS " + s0t + " " + i1t + " "
-                               + parA + " " + parB + "\n");
-            }
-        /*    
-        }
-        else if (rcStrategy.equals("BONDCOMPLEMENTARITY"))
+        rsSbKey.append("RC11BNDTERM\n");
+        rsSbKey.append("RC12BNDTERM NONE"+NL);
+        for (ObjectPair op : rcaCombination)
         {
-            if (verbosity > 1)
-                System.out.println("Using BONDCOMPLEMENTARITY RC-strategy.");
+            int iRcaA = ((Integer) op.getFirst()).intValue();
+            int iRcaB = ((Integer) op.getSecond()).intValue();
+            RingClosingAttractor rca0 = rcMol3d.getAttractor(iRcaA);
+            RingClosingAttractor rca1 = rcMol3d.getAttractor(iRcaB);
+            int s0t = fmol.indexOf(rca0.getSrcAtom()) + 1;
+            int s1t = fmol.indexOf(rca1.getSrcAtom()) + 1;
+            int i0t = rcMol3d.getTnkAtmIdOfRCA(rca0);
+            int i1t = rcMol3d.getTnkAtmIdOfRCA(rca1);
 
-            rsSbKey.append("RC11BNDTERM\n");
-            rsSbKey.append("RC12BNDTERM\n");
-            for (ObjectPair op : rcaCombination)
-            {
-                int iRcaA = ((Integer) op.getFirst()).intValue();
-                int iRcaB = ((Integer) op.getSecond()).intValue();
-                RingClosingAttractor rca0 = rcMol3d.getAttractor(iRcaA);
-                RingClosingAttractor rca1 = rcMol3d.getAttractor(iRcaB);
-                int s0t = fmol.indexOf(rca0.getSrcAtom()) + 1;
-                int s1t = fmol.indexOf(rca1.getSrcAtom()) + 1;
-                int i0t = rcMol3d.getTnkAtmIdOfRCA(rca0);
-                int i1t = rcMol3d.getTnkAtmIdOfRCA(rca1);
+            double parA = 0.0;
+            double parB = 0.0;
+            parA = (rca0.getParamA11() + rca1.getParamA11()) / 2.0;
+            parB = (rca0.getParamB11() + rca1.getParamB11()) / 2.0;
 
-                double parA = 0.0;
-                double parB = 0.0;
-                parA = (rca0.getParamA11() + rca1.getParamA11()) / 2.0;
-                parB = (rca0.getParamB11() + rca1.getParamB11()) / 2.0;
-
-                rsSbKey.append("RC-11-PAIRS " + i0t + " " + i1t + " "
-                               + parA + " " + parB + "\n");
-
-                double[] intCoord0 = tmol.getAtom(i0t).getDistAngle();
-                double[] intCoord1 = tmol.getAtom(i1t).getDistAngle();
-                parA = intCoord0[0] + intCoord1[0];
-                parB = (rca0.getParamB12() + rca1.getParamB12()) / 2.0;
-
-                rsSbKey.append("RC-12-PAIRS " + s0t + " " + s1t + " "
+            rsSbKey.append("RC-11-PAIRS " + i0t + " " +s1t + " "
                            + parA + " " + parB + "\n");
-            }
+
+            rsSbKey.append("RC-11-PAIRS " + s0t + " " + i1t + " "
+                           + parA + " " + parB + "\n");
         }
-        */
             
         //Finally write the keywords into the KEY file
         DenoptimIO.writeData(rsKeyFile, rsSbKey.toString(), false);
@@ -662,36 +619,18 @@ public class RingClosureTool
             double lenH = srcA.distance(atmA);
             double lenT = srcB.distance(atmB);
             double distTolerance = (lenH + lenT) / 2.0;
-//TODO may want to use different set criteria
             distTolerance = distTolerance * rcParams.getRCDistTolerance();
-//
             double minDistH1T2 = -1.0;
             double minDistH2T1 = -1.0;
             double minDistH2T2 = -1.0;
             double maxDistH1T2 = 0.0;
             double maxDistH2T1 = 0.0;
             double maxDistH2T2 = 0.0;
-//TODO may want to use different set criteria
             double maxDotProdHT = rcParams.getRCDotPrTolerance();
 
-            //TODO-gg remove complementarity
-            //if (rcParams.getRCStrategy().equals("BONDOVERLAP"))
-            //{
-                maxDistH1T2 = distTolerance;
-                maxDistH2T1 = distTolerance;
-                maxDistH2T2 = lenH + lenT;
-            /*}
-            else if (rcParams.getRCStrategy().equals("BONDCOMPLEMENTARITY"))
-            {
-                distTolerance = distTolerance / 2.0;
-                minDistH1T2 = lenH - distTolerance;
-                minDistH2T1 = lenT - distTolerance;
-                maxDistH1T2 = lenH + distTolerance;
-                maxDistH2T1 = lenT + distTolerance;
-//TODO may want to use different set criteria
-                maxDistH2T2 = distTolerance * rcParams.getRCDistTolerance();
-            }
-            */
+            maxDistH1T2 = distTolerance;
+            maxDistH2T1 = distTolerance;
+            maxDistH2T2 = lenH + lenT;
 
     	    boolean closeThisBnd = rc.isClosable(minDistH1T2, maxDistH1T2,
     	            minDistH2T1, maxDistH2T1, 

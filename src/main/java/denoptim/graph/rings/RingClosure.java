@@ -248,17 +248,8 @@ public class RingClosure
             double optDistH2T1 = 0.0;
             double optDistH1T1 = 0.0;
             double optDistH2T2 = 0.0;
-            if (settings.getRCStrategy().equals("BONDOVERLAP"))
-            {
-                optDistH1T1 = (lenH + lenT) / 2.0;
-                optDistH2T2 = optDistH1T1;
-            }
-            else if (settings.getRCStrategy().equals("BONDCOMPLEMENTARITY"))
-            {
-                optDistH1T2 = lenH;
-                optDistH2T1 = lenT;
-                optDistH1T1 = lenH + lenT;
-            }
+            optDistH1T1 = (lenH + lenT) / 2.0;
+            optDistH2T2 = optDistH1T1;
     
             qscore = Math.abs(h1.distance(t1) - optDistH1T1) +
                      Math.abs(h2.distance(t2) - optDistH2T2) +
@@ -338,22 +329,10 @@ public class RingClosure
         double maxDistH2T1 = 0.0;
         double maxDistH2T2 = 0.0;
         double maxDotProdHT = settings.getRCDotPrTolerance();
-        if (settings.getRCStrategy().equals("BONDOVERLAP"))
-        {
-            maxDistH1T2 = distTolerance;
-            maxDistH2T1 = distTolerance;
-            maxDistH2T2 = lenH + lenT;
-        }
-        else if (settings.getRCStrategy().equals("BONDCOMPLEMENTARITY"))
-        {
-            distTolerance = distTolerance / 2.0;
-            minDistH1T2 = lenH - distTolerance;
-            minDistH2T1 = lenT - distTolerance;
-            maxDistH1T2 = lenH + distTolerance;
-            maxDistH2T1 = lenT + distTolerance;
-            maxDistH2T2 = distTolerance * settings.getRCDistTolerance();
-        }
-
+        maxDistH1T2 = distTolerance;
+        maxDistH2T1 = distTolerance;
+        maxDistH2T2 = lenH + lenT;
+            
         //Collect conditions as a vector
         clsablConds.add(minDistH1T2);
         clsablConds.add(maxDistH1T2);
