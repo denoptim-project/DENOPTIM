@@ -157,34 +157,6 @@ public class RingClosureTool
         return xyzfile;
     }
 
-//------------------------------------------------------------------------------    
-    /**
-     *
-     * TODO: this method should be made 
-     * public and moved to a more sensible location (i.e., a class of utilities
-     * for tinker methods)
-     */
-//TODO-gg del
-    private ArrayList<double[]> getTinkerLastCycleFile(String fname, 
-            String tinkerresfile)  throws DENOPTIMException
-    {
-        int lastIdx = MMBuilderUtils.countLinesWKeywordInFile(tinkerresfile,
-                                " Final Function Value and Deformation");
-        String workDir = settings.getWorkingDirectory();
-        String xyzfile = workDir + fsep + fname + "." +
-                                 GenUtils.getPaddedString(3, lastIdx - 1);
-
-        ArrayList<double[]> coords = TinkerUtils.readTinkerXYZ(xyzfile);
-
-        // remove all the files filename.### (including the last one)
-        for (int i = 0; i < lastIdx; i++)
-        {
-            xyzfile = workDir + fsep + fname + "."
-                    + GenUtils.getPaddedString(3, i);
-        }
-        return coords;
-    }
-
 //------------------------------------------------------------------------------
 
     /*
