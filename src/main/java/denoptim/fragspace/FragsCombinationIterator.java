@@ -30,8 +30,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
-import denoptim.graph.Vertex;
 import denoptim.graph.SymmetricSet;
+import denoptim.graph.Vertex;
 import denoptim.utils.GraphUtils;
 
 

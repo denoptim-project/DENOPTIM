@@ -15,7 +15,6 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 import denoptim.utils.MutationType;

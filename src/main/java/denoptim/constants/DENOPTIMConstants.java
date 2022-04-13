@@ -345,6 +345,11 @@ public final class DENOPTIMConstants
     public static final Map<String,String> RCATYPEMAP =
 		    new HashMap<String,String>() 
     {
+        /**
+         *  Version identifier
+         */
+        private static final long serialVersionUID = 3L;
+
         {
             put("ATP", "ATM");
             put("ATM", "ATP");

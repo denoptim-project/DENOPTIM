@@ -24,9 +24,14 @@ package denoptim.exception;
  */
 public class DENOPTIMException extends Exception
 {
-//------------------------------------------------------------------------------
     /**
-     * Creates a new instance of <code>DENOPTIMException</code> without message.
+     * Version identifier
+     */
+    private static final long serialVersionUID = 3L;
+
+    //------------------------------------------------------------------------------
+    /**
+     * Creates a new instance without message.
      */
     public DENOPTIMException() 
     {
@@ -35,11 +40,11 @@ public class DENOPTIMException extends Exception
 //------------------------------------------------------------------------------    
 
     /**
-     * Constructs a new DENOPTIMException with the given message and the
+     * Constructs a new instance with the given message and the
      * Exception as cause.
      *
-     * @param err for the constructed exception
-     * @param cause the Throwable that triggered the DENOPTIMException
+     * @param err for the constructed exception.
+     * @param cause the cause that triggered this.
      */
     public DENOPTIMException(String err, Throwable cause) 
     {
@@ -49,10 +54,10 @@ public class DENOPTIMException extends Exception
 //------------------------------------------------------------------------------        
 
     /**
-     * Constructs an instance of <code>DENOPTIMException</code> with the 
+     * Constructs an instance with the 
      * specified cause.
      * 
-     * @param cause another exception (throwable).
+     * @param cause another throwable cause.
      */
     public DENOPTIMException(Throwable cause) 
     {
@@ -63,9 +68,9 @@ public class DENOPTIMException extends Exception
     
 
     /**
-     * Constructs a new DENOPTIMException with the given message 
+     * Constructs a new instance with the given message.
      *
-     * @param err for the constructed exception
+     * @param err for the constructed exception.
      */
 
     public DENOPTIMException(String err)

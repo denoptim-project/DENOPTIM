@@ -36,11 +36,11 @@ import javax.swing.table.JTableHeader;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.Fragment;
 import denoptim.graph.DGraph;
+import denoptim.graph.EmptyVertex;
+import denoptim.graph.Fragment;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
-import denoptim.graph.EmptyVertex;
 
 
 /**

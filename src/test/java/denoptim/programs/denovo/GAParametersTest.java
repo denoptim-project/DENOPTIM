@@ -11,11 +11,9 @@ import java.util.logging.Level;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters.ParametersType;
-import denoptim.programs.denovo.GAParameters;
 
 /**
  * Unit test

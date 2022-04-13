@@ -2,7 +2,6 @@ package denoptim.fragspace;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /*
  *   DENOPTIM
@@ -36,7 +35,6 @@ import java.util.stream.IntStream;
 
 import javax.vecmath.Point3d;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
@@ -51,19 +49,19 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Fragment;
-import denoptim.graph.DGraph;
 import denoptim.graph.Ring;
+import denoptim.graph.SymmetricSet;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.SymmetricSet;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MoleculeUtils;
 
 /**
  * Unit test for fragment space

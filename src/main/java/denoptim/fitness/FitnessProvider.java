@@ -28,10 +28,9 @@ import org.openscience.cdk.qsar.result.IntegerResult;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.StaticLogger;
-import denoptim.utils.MathUtils;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ManySMARTSQuery;
+import denoptim.utils.MathUtils;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ELResolver;

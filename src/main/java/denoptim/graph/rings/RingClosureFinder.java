@@ -37,8 +37,8 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.io.DenoptimIO;
-import denoptim.utils.MathUtils;
 import denoptim.utils.GenUtils;
+import denoptim.utils.MathUtils;
 
 /**
  * Tool to explore the conformational space of chains of atoms and 

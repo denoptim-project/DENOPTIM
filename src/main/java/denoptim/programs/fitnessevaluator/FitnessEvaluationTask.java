@@ -32,7 +32,6 @@ import denoptim.graph.DGraph;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.FitnessTask;
-import denoptim.utils.GraphConversionTool;
 
 /**
  * Task that calls the fitness provider

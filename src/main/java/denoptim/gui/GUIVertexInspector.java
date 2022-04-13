@@ -65,10 +65,10 @@ import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.EmptyVertex;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.MoleculeUtils;
 

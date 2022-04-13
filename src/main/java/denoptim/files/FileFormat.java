@@ -197,6 +197,8 @@ public enum FileFormat {
                     case VERTEX:
                         ff = VRTXSDF;
                         break;
+                    default:
+                        break;
                 }
                 break;
             case "JSON":
@@ -208,6 +210,8 @@ public enum FileFormat {
                     case VERTEX:
                         ff = VRTXJSON;
                         break;
+                    default:
+                        break;
                 }
                 break;
                 
@@ -216,6 +220,8 @@ public enum FileFormat {
                 {
                     case GRAPH:
                         ff = GRAPHTXT;
+                        break;
+                    default:
                         break;
                 }
                 break;
@@ -255,6 +261,8 @@ public enum FileFormat {
                         break;
                     case B3D_PARAM:
                         ff = B3D_PARAM;
+                        break;
+                    default:
                         break;
                 }
                 break;

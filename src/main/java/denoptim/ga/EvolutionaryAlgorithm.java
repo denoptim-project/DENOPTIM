@@ -40,7 +40,6 @@ import denoptim.fitness.FitnessParameters;
 import denoptim.ga.EAUtils.CandidateSource;
 import denoptim.graph.Candidate;
 import denoptim.logging.CounterID;
-import denoptim.logging.StaticLogger;
 import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;

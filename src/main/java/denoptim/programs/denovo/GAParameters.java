@@ -26,13 +26,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.logging.Monitor;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
 import denoptim.utils.MutationType;
-import denoptim.utils.Randomizer;
 
 
 /**
@@ -334,8 +334,6 @@ public class GAParameters extends RunTimeParameters
      */
     public String uidMemoryOnDisk = "memory_UIDs.txt";
     
-    
-    private final String FS = System.getProperty("file.separator");
 
 //------------------------------------------------------------------------------
     
@@ -445,13 +443,13 @@ public class GAParameters extends RunTimeParameters
     {
         dataDir = pathName;
         monitorFile = dataDir + ".eaMonitor";
-        interfaceDir = pathName + FS + "interface";
+        interfaceDir = pathName + DENOPTIMConstants.FSEP + "interface";
         
         logFile = dataDir + ".log";
 
         if (uidFileOut.equals(""))
         {
-            uidFileOut = dataDir + FS + DEFUIDFILEOUTNAME;
+            uidFileOut = dataDir + DENOPTIMConstants.FSEP + DEFUIDFILEOUTNAME;
         }
     }
 
@@ -1158,7 +1156,7 @@ public class GAParameters extends RunTimeParameters
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddkkmmss");
             timeStamp = sdf.format(new Date());
             String str = "RUN" + timeStamp;
-            dataDir = cdataDir + FS + str;
+            dataDir = cdataDir + DENOPTIMConstants.FSEP + str;
             success = denoptim.files.FileUtils.createDirectory(dataDir);
         }
         setWorkingDirectory(dataDir);
@@ -1200,9 +1198,10 @@ public class GAParameters extends RunTimeParameters
         
         if (isMaster)
         {    
-            StaticLogger.appLogger.log(Level.INFO, "Program log file: " + logFile);
-            StaticLogger.appLogger.log(Level.INFO, "Output files associated with "
-                + "the current run are located in " + dataDir);
+            StaticLogger.appLogger.log(Level.INFO, "Program log file: " 
+                    + logFile + DENOPTIMConstants.EOL 
+                    + "Output files associated with the current run are "
+                    + "located in " + dataDir);
         }
     }
 
@@ -1211,7 +1210,7 @@ public class GAParameters extends RunTimeParameters
     public void checkParameters() throws DENOPTIMException
     {
         String error = "";
-        //TODO: use somethign like the following for checking the parameters:
+        //TODO: use something like the following for checking the parameters:
         //ensureIsPositive("GA-NUMOFFSPRING", numOfChildren, "blabla");
         if (numOfChildren <= 0)
         {

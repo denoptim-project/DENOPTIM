@@ -42,16 +42,16 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
-import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters;
-import denoptim.utils.MathUtils;
-import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MathUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
 

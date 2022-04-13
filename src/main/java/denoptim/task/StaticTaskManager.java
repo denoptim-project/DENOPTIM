@@ -11,8 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JProgressBar;
 
-import denoptim.fragspace.FragmentSpace;
-import denoptim.logging.StaticLogger;
 import denoptim.programs.combinatorial.FragSpaceExplorer;
 import denoptim.programs.denovo.GARunner;
 

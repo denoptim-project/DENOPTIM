@@ -34,22 +34,17 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.IdFragmentAndAP;
-import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
-import denoptim.graph.Vertex;
-import denoptim.io.DenoptimIO;
 import denoptim.graph.SymmetricSet;
-import denoptim.logging.StaticLogger;
+import denoptim.graph.Vertex;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.task.FitnessTask;
-import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GenUtils;
-import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.ObjectPair;
+import denoptim.utils.MoleculeUtils;
 
 
 /**
@@ -197,20 +192,15 @@ public class GraphBuildingTask extends FitnessTask
 //------------------------------------------------------------------------------
 
     /**
-     * Set the set of indeces that identify the position of the
+     * Set the set of indexes that identify the position of the
      * the (next) combination of fragment in the space of combinations.
      */
 
     public void setNextIds(ArrayList<Integer> nextIds) throws DENOPTIMException
     {
-        try
-        {
-            this.nextIds = (ArrayList<Integer>) nextIds.clone();
-        }
-        catch (Throwable t)
-        {
-            throw new DENOPTIMException(t);
-        }
+        this.nextIds = new ArrayList<Integer>();
+        for (Integer i : nextIds)
+            this.nextIds.add(i);
     }
 
 //------------------------------------------------------------------------------
@@ -248,13 +238,8 @@ public class GraphBuildingTask extends FitnessTask
             for (IdFragmentAndAP srcAp : fragsToAdd.keySet())
             {
                 int sVId = srcAp.getVertexId();
-                int sFId = srcAp.getVertexMolId();
-                Vertex.BBType sFTyp = srcAp.getVertexMolType();
                 int sApId = srcAp.getApId();
                 Vertex srcVrtx = dGraph.getVertexWithId(sVId);
-                
-                APClass sCls = srcVrtx.getAttachmentPoints().get(
-                        sApId).getAPClass();
     
                 IdFragmentAndAP trgAp = fragsToAdd.get(srcAp);
                 int tVId = trgAp.getVertexId();

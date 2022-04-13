@@ -18,8 +18,8 @@
 
 package denoptim.graph.simplified;
 
-import denoptim.graph.Vertex;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.Vertex;
 
 /**
  * This class represents an edge that is undirected and ignores attachment

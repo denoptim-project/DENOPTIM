@@ -33,13 +33,11 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.logging.CounterID;
-import denoptim.logging.StaticLogger;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.task.FitnessTask;
-import denoptim.utils.GraphConversionTool;
 
 /**
  * Task that calls the fitness provider for an offspring that can become a

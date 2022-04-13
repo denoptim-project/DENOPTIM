@@ -11,7 +11,6 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
-import denoptim.utils.Randomizer;
 
 /**
  * An utility class to encapsulate the search for an 

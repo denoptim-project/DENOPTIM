@@ -19,11 +19,11 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
 import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.Edge;
 import denoptim.graph.DGraph;
+import denoptim.graph.Edge;
+import denoptim.graph.EmptyVertex;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.EmptyVertex;
 
 /**
  * Unit test

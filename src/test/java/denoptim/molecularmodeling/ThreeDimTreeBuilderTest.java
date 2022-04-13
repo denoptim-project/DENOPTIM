@@ -38,14 +38,13 @@ import org.openscience.cdk.silent.Bond;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
+import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
-import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.graph.EmptyVertex;
 
 /**
  * Unit test for TreeBuilder3D

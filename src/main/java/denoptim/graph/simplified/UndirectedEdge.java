@@ -19,9 +19,8 @@
 package denoptim.graph.simplified;
 
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.Edge;
-import denoptim.graph.Vertex;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.Vertex;
 import denoptim.utils.GenUtils;
 
 /**

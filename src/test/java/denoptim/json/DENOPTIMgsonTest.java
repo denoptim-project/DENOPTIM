@@ -4,9 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
@@ -21,7 +18,6 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import com.google.gson.Gson;
 
-import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Fragment;
 import denoptim.graph.FragmentTest;
 import denoptim.graph.Template;

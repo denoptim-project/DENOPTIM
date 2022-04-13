@@ -36,11 +36,11 @@ import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.Fragment;
 import denoptim.graph.DGraph;
+import denoptim.graph.EmptyVertex;
+import denoptim.graph.Fragment;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
-import denoptim.graph.EmptyVertex;
 import denoptim.gui.GraphViewerPanel.JVertex;
 import denoptim.gui.GraphViewerPanel.JVertexType;
 import denoptim.gui.GraphViewerPanel.LabelType;

@@ -21,34 +21,12 @@ package denoptim.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-
-import javax.vecmath.Point3d;
-
 import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.junit.jupiter.api.Test;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.PseudoAtom;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.silent.Bond;
 
-import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.PopulationTest;
-import denoptim.graph.APClass;
-import denoptim.graph.Edge;
-import denoptim.graph.Edge.BondType;
-import denoptim.graph.Fragment;
 import denoptim.graph.DGraph;
-import denoptim.graph.DGraphTest;
 import denoptim.graph.Template;
-import denoptim.graph.Vertex;
-import denoptim.io.DenoptimIO;
-import denoptim.graph.Vertex.BBType;
 import denoptim.graph.simplified.Node;
 import denoptim.graph.simplified.NodeConnection;
 

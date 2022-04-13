@@ -36,7 +36,6 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
-import denoptim.logging.StaticLogger;
 
 
 /**

@@ -11,7 +11,6 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.utils.Randomizer;
 
 /**
  * An utility class to encapsulate the search for vertexes that satisfy 

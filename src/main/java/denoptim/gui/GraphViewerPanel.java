@@ -51,8 +51,8 @@ import com.google.common.base.Function;
 
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.Edge;
 import denoptim.graph.DGraph;
+import denoptim.graph.Edge;
 import denoptim.graph.Ring;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;

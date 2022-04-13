@@ -4,38 +4,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.ga.Population;
-import denoptim.ga.XoverSite;
 import denoptim.graph.APClass;
 import denoptim.graph.Candidate;
+import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
-import denoptim.graph.Template.ContractLevel;
-import denoptim.graph.DGraph;
+import denoptim.graph.EmptyVertex;
 import denoptim.graph.Template;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.rings.RingClosureParameters;
-import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
-import denoptim.graph.EmptyVertex;
-import denoptim.io.DenoptimIO;
 
 
 /**

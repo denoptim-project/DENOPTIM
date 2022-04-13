@@ -30,14 +30,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.openscience.cdk.graph.ConnectivityChecker;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -45,34 +42,31 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
-import denoptim.graph.Candidate;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.Fragment;
+import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
+import denoptim.graph.EmptyVertex;
+import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.EmptyVertex;
 import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.graph.rings.RingClosuresArchive;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
-import denoptim.logging.StaticLogger;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.programs.RunTimeParameters;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
-import denoptim.utils.MoleculeUtils;
-import denoptim.utils.StatUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.ObjectPair;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.SizeControlledSet;
+import denoptim.utils.StatUtils;
 
 
 /**

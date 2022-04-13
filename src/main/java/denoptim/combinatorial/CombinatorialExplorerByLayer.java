@@ -44,7 +44,6 @@ import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.utils.GraphUtils;
@@ -584,7 +583,7 @@ public class CombinatorialExplorerByLayer
                     // when setting new vertex IDs. To do this, we change sign
                     // to the old IDs to avoid them clashing with the new ones,
                     rootGraph.changeSignOfVertexID();
-                    // ...and renumber starting from vertex ID = 1.
+                    // ...and re-assign all IDs
                     rootGraph.renumberGraphVertices();
                     rootGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
                     scafLevel.add(rootGraph);
@@ -723,7 +722,6 @@ public class CombinatorialExplorerByLayer
                         if (level>=maxL && 
                             (total+fcf.getNumGeneratedCombs()>=maxI))
                         {
-                            String key = "NONE";
                             System.out.println("Execution stopped: now waiting "
                                  + " for checkpoint file to mature");
                             int iWait=0;

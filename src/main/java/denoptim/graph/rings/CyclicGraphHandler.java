@@ -44,19 +44,17 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
-import denoptim.graph.DGraph;
 import denoptim.graph.Ring;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.EmptyVertex;
-import denoptim.logging.StaticLogger;
-import denoptim.utils.MoleculeUtils;
 import denoptim.utils.ManySMARTSQuery;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.ObjectPair;
-import denoptim.utils.Randomizer;
 import denoptim.utils.RingClosingUtils;
 
 

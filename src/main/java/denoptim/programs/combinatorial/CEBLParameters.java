@@ -19,7 +19,6 @@
 package denoptim.programs.combinatorial;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import java.util.logging.Level;
 
 import denoptim.combinatorial.CEBLUtils;
 import denoptim.combinatorial.CheckPoint;
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
@@ -460,9 +460,10 @@ public class CEBLParameters extends RunTimeParameters
 
 		if (isMaster)
 		{
-    		StaticLogger.appLogger.log(Level.INFO, "Program log file: " + logFile);
-    		StaticLogger.appLogger.log(Level.INFO, "Output files associated with "
-    		        + "the current run are located in " + workDir);
+            StaticLogger.appLogger.log(Level.INFO, "Program log file: " 
+                    + logFile + DENOPTIMConstants.EOL 
+                    + "Output files associated with the current run are "
+                    + "located in " + workDir);
 		}
     }
     

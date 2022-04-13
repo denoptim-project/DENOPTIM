@@ -92,6 +92,7 @@ public class GeneOpsRunner extends ProgramTask
         goParams.checkParameters();
         goParams.processParameters();
         goParams.startProgramSpecificLogger(loggerIdentifier, false); //to STDOUT
+        goParams.printParameters();
         
         this.logger = goParams.getLogger();
         this.settings = goParams;       
@@ -171,7 +172,6 @@ public class GeneOpsRunner extends ProgramTask
             // NB: last boolean asks to ignore the growth probability
             GraphOperations.performMutation(v,mt,true,
                     settings.idNewVrt, apID, new Monitor(),gaParams);
-
         } else {
             logger.log(Level.INFO, "Attempting mutation a random mutation on a "
                     + "random vertex");

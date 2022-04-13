@@ -27,7 +27,6 @@ import denoptim.files.FileUtils;
 import denoptim.programs.RunTimeParameters;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.MutationType;
-import denoptim.utils.Randomizer;
 
 
 /**
@@ -37,14 +36,7 @@ import denoptim.utils.Randomizer;
  */
 
 public class GeneOpsRunnerParameters extends RunTimeParameters
-{
-    /**
-     * Seed for generation of pseudo-random numbers
-     */
-    protected long randomSeed = 1234567890L;
-    
-    //TODO-gg make it controllable from input file
-    
+{   
     /**
      * Testable Operators. {@link #XOVER} is an alias for {@link #CROSSOVER}
      */
@@ -73,7 +65,7 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
     protected MutationType mutationType;
     
     /**
-     * The given vertex index.  Zero-based index.
+     * The given vertex index. Zero-based index.
      * Used whenever a vertex id has to be given. For
      * example, when specifying how to mutate a graph. 
      */
@@ -326,7 +318,6 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
 
     public void processParameters() throws DENOPTIMException
     {
-        startRandomizer(randomSeed);
         processOtherParameters();
     }
     

@@ -16,12 +16,11 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
+import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Fragment;
-import denoptim.graph.DGraph;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.rings.PathSubGraph;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 
 /**

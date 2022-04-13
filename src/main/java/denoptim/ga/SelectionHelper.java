@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 import denoptim.graph.Candidate;
 import denoptim.programs.RunTimeParameters;
-import denoptim.utils.Randomizer;
 
 
 /**

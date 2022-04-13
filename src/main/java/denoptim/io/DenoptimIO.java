@@ -93,9 +93,9 @@ import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
+import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
 import denoptim.graph.CandidateLW;
-import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
@@ -103,11 +103,11 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphEdit;
+import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
-import denoptim.utils.GraphConversionTool;
-import denoptim.utils.GraphUtils;
 
 
 /**

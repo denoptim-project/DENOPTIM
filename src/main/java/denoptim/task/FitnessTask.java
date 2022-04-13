@@ -37,7 +37,6 @@ import denoptim.fitness.FitnessProvider;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.TaskUtils;

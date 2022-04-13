@@ -1,17 +1,14 @@
 package denoptim.programs.graphlisthandler;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
 
 

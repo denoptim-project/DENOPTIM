@@ -76,17 +76,15 @@ import denoptim.graph.simplified.UndirectedEdge;
 import denoptim.io.DenoptimIO;
 import denoptim.json.DENOPTIMgson;
 import denoptim.json.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
-import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters;
 import denoptim.programs.RunTimeParameters.ParametersType;
-import denoptim.utils.GraphEdit;
-import denoptim.utils.MoleculeUtils;
 import denoptim.utils.GenUtils;
 import denoptim.utils.GraphConversionTool;
+import denoptim.utils.GraphEdit;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
-import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
 
 
@@ -4576,7 +4574,6 @@ public class DGraph implements Cloneable
      * if the vertex ID is 12 this method changes it into -12.
      */
 
-    @Deprecated
     public void changeSignOfVertexID()
     {
         HashMap<Integer, Integer> nmap = new HashMap<>();

@@ -62,7 +62,6 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.StaticLogger;
 import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
 

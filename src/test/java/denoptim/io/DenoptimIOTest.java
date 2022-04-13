@@ -48,18 +48,18 @@ import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
 import denoptim.graph.APClass;
 import denoptim.graph.CandidateLW;
+import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.FragmentTest;
-import denoptim.graph.DGraph;
 import denoptim.graph.Ring;
+import denoptim.graph.SymmetricSet;
 import denoptim.graph.Template;
 import denoptim.graph.TemplateTest;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.EmptyVertex;
-import denoptim.graph.SymmetricSet;
 import denoptim.programs.RunTimeParameters.ParametersType;
 
 /**

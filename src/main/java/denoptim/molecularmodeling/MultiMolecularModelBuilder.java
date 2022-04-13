@@ -39,7 +39,6 @@ import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 import denoptim.utils.AtomOrganizer;
 import denoptim.utils.DummyAtomHandler;
-import denoptim.utils.GenUtils;
 import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
 
