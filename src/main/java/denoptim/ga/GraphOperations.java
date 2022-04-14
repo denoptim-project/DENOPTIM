@@ -544,7 +544,7 @@ public class GraphOperations
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND);
             return false;
         }
-
+        
         DGraph graph = vertex.getGraphOwner();
         boolean done = graph.replaceVertex(vertex,
                 glf.getChosenAlternativeLink().getBuildingBlockId(),

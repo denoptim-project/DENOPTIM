@@ -18,3 +18,5 @@ FS-compMatrixFile=CPMap.par
 FS-rcCompMatrixFile=RC-CPMap.par
 FS-RotBondsDefFile=rotatableBonds
 
+# Controlling stockastic events
+GA-RANDOMSEED=-7401353079863413639

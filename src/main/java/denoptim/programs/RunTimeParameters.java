@@ -479,6 +479,15 @@ public abstract class RunTimeParameters
     {
         if (rng==null)
         {
+            for (RunTimeParameters innerParams : otherParameters.values())
+            {
+                if (innerParams.rng!=null)
+                {
+                    rng = innerParams.rng;
+                    return innerParams.rng;
+                }
+            }
+            
             rng = new Randomizer();
             for (RunTimeParameters innerParams : otherParameters.values())
             {
@@ -607,7 +616,6 @@ public abstract class RunTimeParameters
         if (line.toUpperCase().startsWith(paramType.keywordRoot))
         {
             interpretKeyword(line);
-            
         } else {
             for (ParametersType parType : ParametersType.values())
             {

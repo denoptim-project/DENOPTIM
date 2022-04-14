@@ -1675,7 +1675,8 @@ public class DGraph implements Cloneable
             {
                 if (ap.isAvailable())
                 {
-                    // being available, this AP might be reflected onto jacket template
+                    // being available, this AP might be reflected onto 
+                    // jacket template
                     interfaceApsOnOldBranch.add(ap);
                 } else {
                     Vertex user = ap.getLinkedAP().getOwner();
@@ -1686,6 +1687,7 @@ public class DGraph implements Cloneable
                 }
             }
         }
+        
         List<AttachmentPoint> interfaceApsOnNewBranch = 
                 new ArrayList<AttachmentPoint>();
         for (Vertex v : newSubGraph.getVertexList())
@@ -1694,7 +1696,8 @@ public class DGraph implements Cloneable
             {
                 if (ap.isAvailable())
                 {
-                    // being available, this AP will have to be reflected onto jacket template
+                    // being available, this AP will have to be reflected onto 
+                    // jacket template
                     interfaceApsOnNewBranch.add(ap);
                 }
             }
@@ -6377,8 +6380,7 @@ public class DGraph implements Cloneable
      * @param subGraphB list of vertexes belonging to the subgraph.
      * @return the list of attachment points at the interface of the subgraph.
      */
-    public List<AttachmentPoint> getInterfaceAPs(
-            List<Vertex> subGraphB)
+    public List<AttachmentPoint> getInterfaceAPs(List<Vertex> subGraphB)
     {
         List<AttachmentPoint> interfaceAPs = new ArrayList<AttachmentPoint>();
         for (Vertex v : subGraphB)

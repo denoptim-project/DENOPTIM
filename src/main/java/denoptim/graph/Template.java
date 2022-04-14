@@ -470,6 +470,7 @@ public class Template extends Vertex
     @Override
     public ArrayList<SymmetricSet> getSymmetricAPSets()
     {
+        //TODO: implement
         return new ArrayList<SymmetricSet>();
     }
 
@@ -535,8 +536,9 @@ public class Template extends Vertex
                 {
                     continue;
                 }
+                @SuppressWarnings("unchecked")
                 ArrayList<AttachmentPoint> apLst = 
-                        (ArrayList<AttachmentPoint>) p;
+                    (ArrayList<AttachmentPoint>) p;
                 for (AttachmentPoint apOnMol : apLst)
                 {
                     Object o = apOnMol.getProperty(DENOPTIMConstants.LINKAPS);
@@ -918,17 +920,15 @@ public class Template extends Vertex
         {
             JsonObject innerGraphJson = jsonObject.getAsJsonObject(
                     "innerGraph");
-            DGraph innerGraph = DGraph.fromJson(
-                    innerGraphJson.toString());
+            DGraph innerGraph = DGraph.fromJson(innerGraphJson.toString());
             t.setInnerGraph(innerGraph);
 
             if (jsonObject.has("innerToOuterAPs"))
             {
                 Type type = new TypeToken<TreeMap<Integer,
                         AttachmentPoint>>(){}.getType();
-                TreeMap<Integer,AttachmentPoint> map =
-                        gson.fromJson(jsonObject.getAsJsonObject(
-                                "innerToOuterAPs"), type);
+                TreeMap<Integer,AttachmentPoint> map = gson.fromJson(
+                        jsonObject.getAsJsonObject("innerToOuterAPs"), type);
                 t.updateInnerToOuter(map);
             }
         }

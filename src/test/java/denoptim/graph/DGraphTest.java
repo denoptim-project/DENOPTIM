@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.PathSubGraph;
+import denoptim.io.DenoptimIO;
 import denoptim.utils.MutationType;
 
 
@@ -46,7 +48,8 @@ import denoptim.utils.MutationType;
  * @author Marco Foscato
  */
 
-public class DGraphTest {
+public class DGraphTest 
+{
     
     private static APClass APCA, APCB, APCC, APCD, CAPP;
     private static String a="A", b="B", c="C", d="D", cap="cap";
@@ -1645,7 +1648,7 @@ public class DGraphTest {
                 incomingSubGraph.getVertexAtPosition(0).getAP(2)); //A:0
         apMap.put(vrtxsToReplace.get(0).getAP(1), //B:0
                 incomingSubGraph.getVertexAtPosition(0).getAP(3)); //B:0
-
+        
         boolean res = innerGraph.replaceSingleSubGraph(vrtxsToReplace, 
                 incomingSubGraph, apMap);
         assertTrue(res);
@@ -1659,9 +1662,12 @@ public class DGraphTest {
         
         DGraph innerGraphAfter = 
                 ((Template) g.getVertexAtPosition(0)).getInnerGraph();
-        assertEquals(6,innerGraphAfter.getVertexCount(),"Vertex in inner graph");
-        assertEquals(1,innerGraphAfter.getRingCount(),"Rings in inner graph");
-        assertEquals(6,innerGraphAfter.getAvailableAPs().size(),"Free APs inner graph");
+        assertEquals(6,innerGraphAfter.getVertexCount(),
+                "Vertex in inner graph");
+        assertEquals(1,innerGraphAfter.getRingCount(),
+                "Rings in inner graph");
+        assertEquals(6,innerGraphAfter.getAvailableAPs().size(),
+                "Free APs inner graph");
         Ring ri = innerGraphAfter.getRings().get(0);
         assertEquals(5,ri.getDistance(ri.getHeadVertex(),ri.getTailVertex()),
                 "Distance Head-Tail in ring of inner graph");

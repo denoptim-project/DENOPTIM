@@ -176,6 +176,33 @@ public class GraphUtils
     }
     
 //------------------------------------------------------------------------------
+
+    /**
+     * Reset the unique attachment point counter to the given value.
+     *  In order to keep the
+     * uniqueness on the index, this method accepts only reset values
+     * that are higher that the current one. Attempts to reset to lower values 
+     * return an exception.
+     * @param val the new value for the counter. This value will be given to
+     * next call of the getUniqueAPIndex method.
+     * @throws DENOPTIMException if the reset value is lower than the current
+     * value of the index.
+     */
+
+    public static synchronized void resetUniqueAPCounter(int val)
+            throws DENOPTIMException
+    {
+        if (apCounter.get() >= val)
+        {
+            String msg = "Attempt to reset the unique vertex ID using "
+                         + val + " while the current value is "
+                         + apCounter.get();
+            throw new DENOPTIMException(msg);
+        }
+        apCounter = new AtomicInteger(val);
+    }
+    
+//------------------------------------------------------------------------------
     
     /**
      * Unique counter for the number of molecules generated.

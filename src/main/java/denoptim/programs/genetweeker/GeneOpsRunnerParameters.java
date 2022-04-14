@@ -25,6 +25,7 @@ import java.util.List;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.programs.RunTimeParameters;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.MutationType;
 
@@ -318,6 +319,11 @@ public class GeneOpsRunnerParameters extends RunTimeParameters
 
     public void processParameters() throws DENOPTIMException
     {
+        if (!this.containsParameters(ParametersType.GA_PARAMS))
+        {
+            GAParameters gaPars = new GAParameters();
+            setParameters(gaPars);
+        }
         processOtherParameters();
     }
     

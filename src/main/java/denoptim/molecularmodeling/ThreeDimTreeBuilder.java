@@ -18,6 +18,7 @@
 
 package denoptim.molecularmodeling;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -264,6 +265,8 @@ public class ThreeDimTreeBuilder
      * @throws DENOPTIMException
      */
 
+    //NB: there is unused code that could turn out useful in debugging.
+    @SuppressWarnings("unused") 
     public IAtomContainer convertGraphTo3DAtomContainer(DGraph graph,
             boolean removeUsedRCAs, boolean setCDKRequirements) 
                     throws DENOPTIMException
@@ -296,14 +299,10 @@ public class ThreeDimTreeBuilder
         }
         
         // Store APs in maps
-        Map<Integer,ArrayList<AttachmentPoint>> apsPerVertexId =
-                new HashMap<>();
-        Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge =
-                new HashMap<>();
-        Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom =
-                new HashMap<>();
-        Map<IBond,ArrayList<AttachmentPoint>> apsPerBond =
-                new HashMap<>();
+        Map<Integer,ArrayList<AttachmentPoint>> apsPerVertexId = new HashMap<>();
+        Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge = new HashMap<>();
+        Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom = new HashMap<>();
+        Map<IBond,ArrayList<AttachmentPoint>> apsPerBond = new HashMap<>();
         ArrayList<AttachmentPoint> apsOnThisFrag = new ArrayList<>();
         for (AttachmentPoint ap : rootVrtx.getAttachmentPoints())
         {
@@ -383,8 +382,10 @@ public class ThreeDimTreeBuilder
             MoleculeUtils.ensureNoUnsetBondOrders(mol);
         }
         
-        if (logger.isLoggable(Level.FINE))
+        // Code that may turn out useful for deep level debugging
+        if (false)
         {
+            DenoptimIO.writeGraphToJSON(new File("/tmp/graph.json"), graph); 
             StringBuilder sb = new StringBuilder();
             String file = "/tmp/iacTree.sdf";
             sb.append("Writing tree-like IAtomContainer to " + file+NL);
@@ -447,7 +448,7 @@ public class ThreeDimTreeBuilder
                              +"-"+mol.indexOf(b.getAtom(1))+" AP = "+ap+NL);
                 }
             }
-            logger.log(Level.FINE,sb.toString());
+            System.out.println(sb.toString());
         }
         
         // Prepare the string-representation of unused APs on this graph
@@ -456,6 +457,13 @@ public class ThreeDimTreeBuilder
         for (IAtom a : apsPerAtom.keySet())
         {
             int atmID = mol.indexOf(a);
+            if (atmID<0)
+            {
+                // source atom is not anymore there: probably it was RCA and has
+                // been removed
+                continue;
+            }
+            
             ArrayList<AttachmentPoint> aps = apsPerAtom.get(a);
             for (AttachmentPoint ap : aps)
             {

@@ -132,9 +132,7 @@ public class GeneOpsRunner extends ProgramTask
             e.printStackTrace();
         }
     
-        logger.log(Level.INFO, "Initial graphs: ");
-        logger.log(Level.INFO, graph.toString());
-        logger.log(Level.INFO, " ");
+        logger.log(Level.INFO, "Initial graphs: " + NL + graph.toString() + NL);
         MutationType mt = settings.mutationType;
         
         //Just in case we used some keyword to set something that affects 
@@ -145,8 +143,11 @@ public class GeneOpsRunner extends ProgramTask
             gaParams = ((GAParameters) settings.getParameters(
                     ParametersType.GA_PARAMS));
         }
-        gaParams.setParameters(((FragmentSpaceParameters) settings.getParameters(
-                    ParametersType.FS_PARAMS)));
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            gaParams.setParameters(((FragmentSpaceParameters) 
+                    settings.getParameters(ParametersType.FS_PARAMS)));
+        }
         
         if (mt != null)
         {
@@ -171,15 +172,13 @@ public class GeneOpsRunner extends ProgramTask
             
             // NB: last boolean asks to ignore the growth probability
             GraphOperations.performMutation(v,mt,true,
-                    settings.idNewVrt, apID, new Monitor(),gaParams);
+                    settings.idNewVrt, apID, new Monitor(), gaParams);
         } else {
             logger.log(Level.INFO, "Attempting mutation a random mutation on a "
                     + "random vertex");
             GraphOperations.performMutation(graph,new Monitor(),gaParams);
         }
-        logger.log(Level.INFO, "Result of mutation:");
-        logger.log(Level.INFO, graph.toString());
-        logger.log(Level.INFO, " ");
+        logger.log(Level.INFO, "Result of mutation:" + NL + graph.toString()+NL);
         
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
         IAtomContainer iac = t3d.convertGraphTo3DAtomContainer(graph, true);
