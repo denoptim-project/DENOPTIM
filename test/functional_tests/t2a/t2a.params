@@ -7,7 +7,6 @@ FSE-WorkDir=OTF_WDIR
 FSE-UidFile=OTF_WDIR/MOLUID.txt
 FSE-NumOfProcessors=1
 FSE-MAXLEVEL=0
-FSE-VERBOSITY=1
 FSE-ROOTGRAPHS=OTF_WDIR/roots.json
 FP-Source=OTF_WDIR/fitness_provider.sh
 FP-Interpreter=bash

@@ -7,7 +7,6 @@ FSE-WorkDir=OTF_WDIR
 FSE-UidFile=OTF_WDIR/MOLUID.txt
 FSE-NumOfProcessors=1
 FSE-MAXLEVEL=0
-FSE-VERBOSITY=1
 FSE-ROOTGRAPHS=OTF_WDIR/roots.json
 FP-EQUATION=${nHBAcc + effAtomPol_Cl -0.5*MNDiff_a123}
 FP-DESCRIPTORSPECS=${Variable.atomSpecific('aHyb_1','aHyb','[$([C])]')}

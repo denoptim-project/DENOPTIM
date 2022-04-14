@@ -48,7 +48,7 @@ echo "Using DENOPTIM jar: $denoptimJar"
 
 function runTest() {
     testName="$1"
-    echo "Running test '$testName'... (ctrl-z to stop all)"
+    echo "Running test '$testName'... (ctrl-c to stop)"
 
     #generate the directory
     testDir="$wDir/$testName"
