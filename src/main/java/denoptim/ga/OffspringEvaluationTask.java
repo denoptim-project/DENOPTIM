@@ -108,7 +108,9 @@ public class OffspringEvaluationTask extends FitnessTask
         // blocks (not aligned, nor roto-translated)
         if (fitnessSettings.make3dTree())
         {
-        	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder(fitnessSettings);
+        	ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder(
+        	        fitnessSettings.getLogger(),
+        	        fitnessSettings.getRandomizer());
         	
             try {
                 DGraph gWithNoRCVs = dGraph.clone();

@@ -38,6 +38,7 @@ import org.apache.commons.cli.CommandLine;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.task.StaticTaskManager;
+import denoptim.utils.Randomizer;
 
 /**
  * Graphical User Interface of the DENOPTIM package.
@@ -88,6 +89,11 @@ public class GUI implements Runnable
 	 * Name of logger for the GUI
 	 */
 	static final String GUILOGGER = "GUILogger";
+	
+	/**
+	 * Random number generator specific for the GUI, and any of its tasks.
+	 */
+	static final Randomizer PRNG = new Randomizer(System.currentTimeMillis());
 	
 //------------------------------------------------------------------------------
 	

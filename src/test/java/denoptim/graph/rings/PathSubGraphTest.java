@@ -2,6 +2,8 @@ package denoptim.graph.rings;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.logging.Logger;
+
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import denoptim.graph.Edge.BondType;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex.BBType;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.utils.Randomizer;
 
 /**
  * Unit test for PathSubGraph
@@ -117,7 +120,6 @@ public class PathSubGraphTest {
         Fragment vG = new Fragment(5,iacG,BBType.FRAGMENT);
         vG.addAP(0,new Point3d(1,0,0),apc);
         
-    
         IAtomContainer iacD = builder.newAtomContainer();
         iacD.addAtom(new PseudoAtom("ATN",new Point3d(0,0,0)));
         Fragment vD = new Fragment(3,iacD,BBType.FRAGMENT);
@@ -242,17 +244,20 @@ public class PathSubGraphTest {
         DGraph gA = makeTestGraphA();
         DGraph gB = makeTestGraphB();
         
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
-        t3d.setAlignBBsIn3D(false); //£D not needed
+        Logger logger = Logger.getLogger("DummyLogger");
+        Randomizer rng = new Randomizer();
+        
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(logger,rng);
+        t3d.setAlignBBsIn3D(false); //3D not needed
         IAtomContainer molA = t3d.convertGraphTo3DAtomContainer(gA,true);
         IAtomContainer molB = t3d.convertGraphTo3DAtomContainer(gB,true);
         
         PathSubGraph pA = new PathSubGraph(gA.getVertexAtPosition(1),
                 gA.getVertexAtPosition(5),gA);
-        pA.makeMolecularRepresentation(molA, false);
+        pA.makeMolecularRepresentation(molA, false, logger, rng);
         PathSubGraph pB = new PathSubGraph(gB.getVertexAtPosition(1),
                 gB.getVertexAtPosition(5),gB);
-        pB.makeMolecularRepresentation(molB, false);
+        pB.makeMolecularRepresentation(molB, false, logger, rng);
         
         IAtomContainer iacA = pA.getMolecularRepresentation();
         assertEquals(14,iacA.getAtomCount(), "Atom count in the path");

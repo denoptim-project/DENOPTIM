@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import java.util.TreeMap;
 
 import javax.vecmath.Point3d;
@@ -29,6 +30,7 @@ import denoptim.json.DENOPTIMgson;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
+import denoptim.utils.Randomizer;
 
 /**
  * <p>A template is a {@link Vertex} that contains a {@link DGraph}. The
@@ -623,7 +625,11 @@ public class Template extends Vertex
         }
         try
         {   
-            ThreeDimTreeBuilder t3b = new ThreeDimTreeBuilder();
+            //TODO-gg change method to take these
+            Logger logger = Logger.getLogger("DummyLogger");
+            Randomizer rng = new Randomizer();
+            
+            ThreeDimTreeBuilder t3b = new ThreeDimTreeBuilder(logger ,rng);
             IAtomContainer iac = t3b.convertGraphTo3DAtomContainer(
                     innerGraph, true);
             

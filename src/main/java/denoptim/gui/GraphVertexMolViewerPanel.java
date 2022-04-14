@@ -316,8 +316,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	    }
 	    
         Logger logger = Logger.getLogger(GUI.GUILOGGER);
-        Randomizer randomizer = new Randomizer();
-        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
+        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, GUI.PRNG);
         try {
             mol = tb.convertGraphTo3DAtomContainer(dnGraph);
             MoleculeUtils.removeUsedRCA(mol,dnGraph, logger);

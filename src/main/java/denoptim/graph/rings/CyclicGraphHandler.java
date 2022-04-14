@@ -254,8 +254,9 @@ public class CyclicGraphHandler
                 }
                 
                 // make the new candidate RCA pair
-                PathSubGraph subGraph = new PathSubGraph(vI,vJ,molGraph);
-                logger.log(Level.FINE, "Evaluating closability of path "+subGraph);
+                PathSubGraph subGraph = new PathSubGraph(vI, vJ, molGraph);
+                logger.log(Level.FINE, "Evaluating closability of path " 
+                + subGraph);
                 boolean keepRcaPair = evaluatePathClosability(subGraph, mol);
 
                 if (!keepRcaPair)
@@ -1631,14 +1632,16 @@ public class CyclicGraphHandler
             if (settings.checkInterdependentChains() 
                     && settings.doExhaustiveConfSrch())
             {
-                subGraph.makeMolecularRepresentation(mol,false);
+                subGraph.makeMolecularRepresentation(mol, false,
+                        settings.getLogger(), settings.getRandomizer());
                 subGraph.setRCC(rcc);        
             }
         }
         else
         {
             // Need to generate 3D molecular representation
-            subGraph.makeMolecularRepresentation(mol, true);
+            subGraph.makeMolecularRepresentation(mol, true,
+                settings.getLogger(), settings.getRandomizer());
             List<IAtom> atomsPath = subGraph.getAtomPath();
             List<IBond> bondsPath = subGraph.getBondPath();
 

@@ -701,7 +701,7 @@ public class GUIGraphHandler extends GUICardPanel
                     outFile = DenoptimIO.writeGraphsToFile(outFile,
                             fileAndFormat.format, dnGraphLibrary,
                             Logger.getLogger("GUILogger"),
-                            new Randomizer());
+                            GUI.PRNG);
                 }
                 catch (Exception ex)
                 {

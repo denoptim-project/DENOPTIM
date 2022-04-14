@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
@@ -42,6 +43,8 @@ import denoptim.graph.Edge;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters;
+import denoptim.utils.Randomizer;
 
 
 /**
@@ -323,8 +326,7 @@ public class PathSubGraph
      * @param to end of path.
      * @throws IllegalArgumentException if from cannot reach to.
      */
-    public static DGraph findPath(Vertex from,
-                                         Vertex to) {
+    public static DGraph findPath(Vertex from, Vertex to) {
         DGraph g = new DGraph();
         try {
             if (from == to) {
@@ -423,11 +425,12 @@ public class PathSubGraph
      * @throws DENOPTIMException
      */
 
-    public void makeMolecularRepresentation(IAtomContainer mol, boolean make3D)
+    public void makeMolecularRepresentation(IAtomContainer mol, boolean make3D,
+            Logger logger, Randomizer randomizer)
                                                        throws DENOPTIMException
     {
         // Build molecular representation 
-        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder();
+        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
         iacPathVAVB = tb.convertGraphTo3DAtomContainer(graph);
         Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom = 
                 iacPathVAVB.getProperty(DENOPTIMConstants.MOLPROPAPxATOM);

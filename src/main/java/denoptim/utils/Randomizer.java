@@ -254,10 +254,16 @@ public class Randomizer
 
     private void initialiseSeed()
     {
+        // WARNING: The SecureRandom implementation in Linux is usable only
+        // once, then it becomes terribly slow: 1-2 minutes to get a seed!!!
+        
+        /*
         SecureRandom sec = new SecureRandom();
         byte[] sbuf = sec.generateSeed(8);
         ByteBuffer bb = ByteBuffer.wrap(sbuf);
         rndSeed = bb.getLong();
+        */
+        rndSeed = System.currentTimeMillis();
     }
 
 //------------------------------------------------------------------------------

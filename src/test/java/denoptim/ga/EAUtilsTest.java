@@ -508,10 +508,12 @@ public class EAUtilsTest
         int ix = 0, im=0, ic=0, tot=1000;
         double wx = 2, wm = 0.6, wc=0.05;
         double wtot = wx + wm + wc;
+        Randomizer rng = new Randomizer();
         for (int i=0; i<tot; i++)
         {
-            switch (EAUtils.pickNewCandidateGenerationMode(wx, wm, wc, 
-                    new Randomizer()))
+            CandidateSource mode = EAUtils.pickNewCandidateGenerationMode(
+                    wx, wm, wc, rng);
+            switch (mode)
             {
                 case CROSSOVER:
                     ix++;
@@ -521,6 +523,9 @@ public class EAUtilsTest
                     break;
                 case CONSTRUCTION:
                     ic++;
+                    break;
+                default:
+                    assertTrue(false,"Unexpected generation mode "+mode);
                     break;
             }
         }

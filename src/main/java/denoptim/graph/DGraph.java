@@ -765,8 +765,7 @@ public class DGraph implements Cloneable
      * @param vJ the other of the ring-closing vertices.
      * @param bndTyp the bond type the chord corresponds to.
      */
-    public void addRing(Vertex vI, Vertex vJ, 
-            BondType bndTyp)
+    public void addRing(Vertex vI, Vertex vJ, BondType bndTyp)
     {
         PathSubGraph path = new PathSubGraph(vI,vJ,this);
         ArrayList<Vertex> arrLst = new ArrayList<Vertex>();
@@ -4758,7 +4757,8 @@ public class DGraph implements Cloneable
         }
         
         // calculate the molecule representation
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
+                settings.getRandomizer());
         t3d.setAlignBBsIn3D(false);
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(this,true);
         if (mol == null)
@@ -4965,7 +4965,8 @@ public class DGraph implements Cloneable
             return lstGraphs;
 
         // get a atoms/bonds molecular representation (no 3D needed)
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
+                settings.getRandomizer());
         t3d.setAlignBBsIn3D(false);
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(this,false);
 

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
@@ -45,6 +46,7 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.utils.Randomizer;
 
 /**
  * Unit test for TreeBuilder3D
@@ -164,7 +166,9 @@ public class ThreeDimTreeBuilderTest
         
         g1.addRing(v3, v4);
         
-    	ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder();
+        Logger logger = Logger.getLogger("DummyLogger");
+        Randomizer rng = new Randomizer();
+    	ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(logger, rng);
     	
     	IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(g1,false);
     	assertEquals(4, mol.getBondCount(), "Number of bonds without the "

@@ -1388,7 +1388,8 @@ public class EAUtils
             return true;
 
         // get a atoms/bonds molecular representation (no 3D needed)
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings);
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
+                settings.getRandomizer());
         t3d.setAlignBBsIn3D(false);
         IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
         

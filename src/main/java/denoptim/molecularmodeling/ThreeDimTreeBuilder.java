@@ -102,40 +102,6 @@ public class ThreeDimTreeBuilder
     private Randomizer randomizer = new Randomizer();
     
     private static final String NL = DENOPTIMConstants.EOL;
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Constructs a new ThreeDimTreeBuilder.
-     */
-
-    public ThreeDimTreeBuilder(){
-        this(Level.WARNING);
-    }
-   
-//------------------------------------------------------------------------------
-
-    /**
-     * Constructs a new ThreeDimTreeBuilder specifying the logging level.
-     * @param logLevel value specifying how much log we produce. Levels more
-     * detailed than {@link Level#INFO} cause also the creation of temporary 
-     * files with debug data.
-     */
-
-    public ThreeDimTreeBuilder(Level logLevel){
-        logger.setLevel(logLevel);
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Constructor providing the program-specific settings
-     * @param settings program-specific settings
-     */
-    public ThreeDimTreeBuilder(RunTimeParameters settings)
-    {
-        this(settings.getLogger(), settings.getRandomizer());
-    }
     
 //------------------------------------------------------------------------------
     

@@ -86,7 +86,9 @@ public class FitnessEvaluationTask extends FitnessTask
         // blocks (not aligned, nor roto-translated)
         if (fitnessSettings.make3dTree())
         {
-            ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder(frSettings);
+            ThreeDimTreeBuilder tb3d = new ThreeDimTreeBuilder(
+                    fitnessSettings.getLogger(), 
+                    fitnessSettings.getRandomizer());
             try {
                 DGraph gWithNoRCVs = dGraph.clone();
                 gWithNoRCVs.replaceUnusedRCVsWithCapps(fragSpace);
