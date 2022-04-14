@@ -1316,7 +1316,6 @@ public abstract class Vertex implements Cloneable
                 json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
                 if (json != null)
                 {
-                    //TODO-gg get rid of this
                     StaticLogger.appLogger.log(Level.WARNING, "Attempt to "
                         + "read a vertex from "
                         + "a SDF file that contains a JSON definition of a "
@@ -1329,7 +1328,7 @@ public abstract class Vertex implements Cloneable
         } catch (JsonSyntaxException | DENOPTIMException e)
         {
             throw new DENOPTIMException("Unable to parse IAtomContainer to "
-                    + "create vertex .",e);
+                    + "create vertex. ",e);
         }
         v.setBuildingBlockType(bbt);
         return v;
