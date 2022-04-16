@@ -1,6 +1,5 @@
 # Genetic Algorithm - parameters
 GA-RandomSeed=1234567
-GA-PrintLevel=1
 GA-PopulationSize=10
 GA-NumChildren=10
 GA-NumGenerations=100

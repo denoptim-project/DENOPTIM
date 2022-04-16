@@ -1,5 +1,4 @@
 # Genetic Algorithm - parameters
-GA-PrintLevel=1
 GA-PopulationSize=20
 GA-NumChildren=20
 GA-NumGenerations=100

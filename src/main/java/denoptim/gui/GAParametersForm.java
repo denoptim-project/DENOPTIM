@@ -111,7 +111,7 @@ public class GAParametersForm extends ParametersForm
     JLabel lblPar1;
     JTextField txtPar1;
 
-    String keyPar2 = "GA-PrintLevel";
+    String keyPar2 = "GA-Verbosity";
     JPanel linePar2;
     JLabel lblPar2;
     JComboBox<String> cmbPar2;
@@ -1284,8 +1284,10 @@ public class GAParametersForm extends ParametersForm
         lblPar2 = new JLabel("Verbosity of GA modules:", SwingConstants.LEFT);
         lblPar2.setPreferredSize(fileLabelSize);
         lblPar2.setToolTipText(toolTipPar2);
-        cmbPar2 = new JComboBox<String>(new String[] {"0", "1", "2", "3"});
+        //TODO-gg negative add
+        cmbPar2 = new JComboBox<String>(new String[] {"-3", "-2", "-1", "0", "1", "2", "3"});
         cmbPar2.setToolTipText(toolTipPar2);
+        cmbPar2.setSelectedItem("0");
         cmbPar2.addActionListener(cmbFieldChange);
         mapKeyFieldToValueField.put(keyPar2.toUpperCase(),cmbPar2);
         linePar2.add(lblPar2);

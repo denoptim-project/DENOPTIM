@@ -1,6 +1,5 @@
 # Genetic Algorithm - parameters
 GA-RandomSeed=RANDOMSEEDTOSET
-GA-PrintLevel=1
 GA-InitPoplnFile=RUNDIRTOSET/data/initial_population.sdf
 GA-PopulationSize=100
 GA-NumChildren=100

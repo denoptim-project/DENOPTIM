@@ -311,11 +311,6 @@ public class GAParameters extends RunTimeParameters
      * library.
      */
     protected double saveRingSystemsFitnessThreshold = 0.10;
-    
-    /**
-     * Print level
-     */
-    protected int print_level = 0;
 
     /**
      * The weights of multisite mutations
@@ -400,13 +395,6 @@ public class GAParameters extends RunTimeParameters
     public int getPrecisionLevel()
     {
         return precisionLevel;
-    }
-    
-//------------------------------------------------------------------------------
-
-    public int getPrintLevel()
-    {
-        return print_level;
     }
     
 //------------------------------------------------------------------------------
@@ -818,15 +806,6 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     initPoplnFile = value;
-                }
-                break;
-            }
-        
-            case "PRINTLEVEL=":
-            {
-                if (value.length() > 0)
-                {
-                    print_level = Integer.parseInt(value);
                 }
                 break;
             }
