@@ -1,6 +1,7 @@
 package denoptim.programs.denovo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,6 +28,30 @@ public class GAParametersTest
 
     @TempDir
     File tempDir;
+
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testYesNoTrueFalseKeyword() throws Exception
+    {
+        GAParameters gaParams = new GAParameters();
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=F");
+        assertFalse(gaParams.mutatedGraphFailedEvalTolerant);
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=T");
+        assertTrue(gaParams.mutatedGraphFailedEvalTolerant);
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=false");
+        assertFalse(gaParams.mutatedGraphFailedEvalTolerant);
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=true");
+        assertTrue(gaParams.mutatedGraphFailedEvalTolerant);
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=n");
+        assertFalse(gaParams.mutatedGraphFailedEvalTolerant);
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=y");
+        assertTrue(gaParams.mutatedGraphFailedEvalTolerant);
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=no");
+        assertFalse(gaParams.mutatedGraphFailedEvalTolerant);
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=yes");
+        assertTrue(gaParams.mutatedGraphFailedEvalTolerant);
+    } 
     
 //------------------------------------------------------------------------------
     

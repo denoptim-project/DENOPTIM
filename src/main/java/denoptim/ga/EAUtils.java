@@ -547,15 +547,21 @@ public class EAUtils
             res = graph.checkConsistency(settings);
         } catch (NullPointerException|IllegalArgumentException e)
         {
-            settings.getLogger().log(Level.INFO, "WRITING DEBUG FILE for " 
-                    + graph.getLocalMsg());
-            DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_parent.sdf"),
-                    parent.getGraph(),false, settings.getLogger(),
-                    settings.getRandomizer());
-            DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_curr.sdf"), 
-                    graph,false, settings.getLogger(),
-                    settings.getRandomizer());
-            throw e;
+            if (!settings.mutatedGraphFailedEvalTolerant)
+            {
+                settings.getLogger().log(Level.INFO, "WRITING DEBUG FILE for " 
+                        + graph.getLocalMsg());
+                DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_parent.sdf"),
+                        parent.getGraph(),false, settings.getLogger(),
+                        settings.getRandomizer());
+                DenoptimIO.writeGraphToSDF(new File("debug_evalGrp_curr.sdf"), 
+                        graph,false, settings.getLogger(),
+                        settings.getRandomizer());
+                throw e;
+            } else {
+                res = null;
+                mnt.increase(CounterID.FAILEDMUTATTEMTS_EVAL);
+            }
         }
         
         if (res != null)

@@ -334,6 +334,13 @@ public class GAParameters extends RunTimeParameters
      */
     public String uidMemoryOnDisk = "memory_UIDs.txt";
     
+    /**
+     * Flag that enables the ignoring of mutated graphs that lead to a failure 
+     * in the evaluation of graphs that generates SMILES, InChI and molecular
+     * representation.
+     */
+    public boolean mutatedGraphFailedEvalTolerant = true;
+    
 
 //------------------------------------------------------------------------------
     
@@ -1102,6 +1109,24 @@ public class GAParameters extends RunTimeParameters
                         xoverSelectionMode = 4;
                         strXoverSelectionMode = "RANDOM";
                     }
+                }
+                break;
+            }
+            
+            case "MUTATEDGRAPHFAILTOLERANT=":
+            {
+                if (value.toUpperCase().equals("YES") 
+                        || value.toUpperCase().equals("Y")
+                        || value.toUpperCase().equals("T")
+                        || value.toUpperCase().equals("TRUE"))
+                {
+                    mutatedGraphFailedEvalTolerant = true;
+                } else if (value.toUpperCase().equals("NO") 
+                        || value.toUpperCase().equals("N")
+                        || value.toUpperCase().equals("F")
+                        || value.toUpperCase().equals("FALSE"))
+                {
+                    mutatedGraphFailedEvalTolerant = false;   
                 }
                 break;
             }
