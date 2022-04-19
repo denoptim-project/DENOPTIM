@@ -915,14 +915,11 @@ public class GraphOperations
         int curVrtId = curVrtx.getVertexId();
         DGraph molGraph = curVrtx.getGraphOwner();
         int lvl = molGraph.getLevel(curVrtx);
-        int grphId = molGraph.getGraphId();
 
         ArrayList<Integer> addedVertices = new ArrayList<>();
 
-        ArrayList<AttachmentPoint> lstDaps = 
-                                                curVrtx.getAttachmentPoints();
-        List<AttachmentPoint> toDoAPs = 
-                new ArrayList<AttachmentPoint>();
+        ArrayList<AttachmentPoint> lstDaps = curVrtx.getAttachmentPoints();
+        List<AttachmentPoint> toDoAPs = new ArrayList<AttachmentPoint>();
         toDoAPs.addAll(lstDaps);
         for (int i=0; i<lstDaps.size(); i++)
         {
