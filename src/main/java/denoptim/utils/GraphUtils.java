@@ -92,10 +92,15 @@ public class GraphUtils
     /**
      * Unique counter for the number of graph vertices generated.
      * @return the new vertex id (number)
+     * @throws DENOPTIMException 
      */
 
     public static synchronized int getUniqueVertexIndex()
     {
+        if (vertexCounter.get() >= Integer.MAX_VALUE-10)
+            throw new Error("Reached maximum value for "
+                    + "Vertex identifier. Please contact the authors to "
+                    + "request use of 'long' IDs.");
         return vertexCounter.getAndIncrement();
     }
 
@@ -130,10 +135,15 @@ public class GraphUtils
     /**
      * Unique counter for the number of graphs generated.
      * @return a new Graph id (number)
+     * @throws DENOPTIMException 
      */
 
     public static synchronized int getUniqueGraphIndex()
     {
+        if (graphCounter.get() >= Integer.MAX_VALUE-10)
+            throw new Error("Reached maximum value for "
+                    + "Graph identifier. Please contact the authors to "
+                    + "request use of 'long' IDs.");
         return graphCounter.getAndIncrement();
     }
 
@@ -172,6 +182,10 @@ public class GraphUtils
 
     public static synchronized int getUniqueMoleculeIndex()
     {
+        if (molCounter.get() >= Integer.MAX_VALUE-10)
+            throw new Error("Reached maximum value for "
+                    + "Molecule identifier. Please contact the authors to "
+                    + "request use of 'long' IDs.");
         return molCounter.getAndIncrement();
     }
     
@@ -207,10 +221,15 @@ public class GraphUtils
     /**
      * Unique counter for the number of molecules generated.
      * @return the new molecule id (number)
+     * @throws DENOPTIMException 
      */
 
     public static synchronized int getUniqueAPIndex()
     {
+        if (apCounter.get() >= Integer.MAX_VALUE-10)
+            throw new Error("Reached maximum value for "
+                    + "AP identifier. Please contact the authors to "
+                    + "request use of 'long' IDs.");
         return apCounter.getAndIncrement();
     }
   
