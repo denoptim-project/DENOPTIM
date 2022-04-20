@@ -19,10 +19,12 @@
 package denoptim.utils;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -203,6 +205,24 @@ public class GenUtils
             }
             currentSize = list.size();
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Formats a decimal number using the given pattern but with English format
+     * as for separators.
+     * @param pattern the pattern to use. Example "###.###"
+     * @param value the value to format
+     * @return the formatted string
+     */
+    public static String getEnglishFormattedDecimal(String pattern, double value)
+    {
+        NumberFormat nf = NumberFormat.getNumberInstance(Locale.ENGLISH);
+        DecimalFormat df = (DecimalFormat) nf;
+        df.applyPattern(pattern);
+        df.setMinimumFractionDigits(4);
+        return df.format(value);
     }
     
 //------------------------------------------------------------------------------
