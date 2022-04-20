@@ -4,12 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
 import denoptim.files.FileUtils;
@@ -80,6 +82,7 @@ public class GAParametersTest
 //------------------------------------------------------------------------------
     
     @Test
+    @DisabledOnOs(WINDOWS)
     public void testLogging() throws Exception
     {
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
