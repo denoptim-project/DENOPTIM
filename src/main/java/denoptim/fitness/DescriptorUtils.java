@@ -65,7 +65,8 @@ public class DescriptorUtils
                 while (enumeration.hasMoreElements()) {
                     JarEntry jarEntry = enumeration.nextElement();
                     
-                    if (jarEntry.toString().contains(pkgPath))
+                    if (jarEntry.toString().replace("/", FS).replace("\\", FS)
+                            .contains(pkgPath))
                     {
                         jarPathNames.add(pathName);
                         break;
