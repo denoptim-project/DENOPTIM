@@ -46,7 +46,7 @@ public class DescriptorUtils
     public static List<String> getAllClassNamesInPackage(String packageName, 
             String jarFileWildQuery)
     {
-        String pkgPath = packageName.replaceAll("\\.", FS);
+        String pkgPath = packageName.replace(".", FS);
         List<String> jarPathNames = new ArrayList<String>();
         String classPath = System.getProperty("java.class.path");
         String[] jarsAndDirs = classPath.split(File.pathSeparator);
@@ -98,15 +98,12 @@ public class DescriptorUtils
                 File root = new File(url.getPath());
                 for (File f : Files.fileTraverser().breadthFirst(root))
                 {
-                    if (!f.isDirectory() && f.getPath().contains(
-                            pkgPath.replaceAll(FS,File.separator)))
+                    if (!f.isDirectory() && f.getPath().contains(pkgPath))
                     {
                         String tmp = f.getPath()
-                                .substring(f.toString().indexOf(
-                                        pkgPath
-                                        .replaceAll(FS,File.separator)))
-                                .replaceAll(File.separator, ".")
-                                .replaceAll("\\.class", "");
+                                .substring(f.toString().indexOf(pkgPath))
+                                .replace(File.separator, ".")
+                                .replace(".class", "");
                         if (tmp.indexOf('$') != -1) continue;
                         if (tmp.indexOf("Test") != -1) continue;
                         if (!classNames.contains(tmp)) classNames.add(tmp);
