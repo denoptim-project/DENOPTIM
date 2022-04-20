@@ -99,9 +99,29 @@ public class FitnessExpressionParser
         CustomVariableDefiningContext cvdc = new CustomVariableDefiningContext();
         for (String variableDefinition : customVarDescExpressions)
         {
+            // NB the replacement of the Windows separator is a workaround for
+            // the fact that the ELParser sees that separator as a special
+            // character that I could not manage to escape. The result of
+            // such interpretation of \ (or '\\' as it is actually returned
+            // from the System.getProperty("file.separator") method) makes
+            // parsing of pathnames as expression components completely wrong.
+            // Below we re-intriduce Windows separators, if we need to.
+            boolean useWindowsFileSeparator = variableDefinition.contains("\\");
+            String modVarDef = variableDefinition;
+            if (useWindowsFileSeparator)
+                modVarDef = variableDefinition.replace("\\", "/");
+            
             MethodExpression me = expFactory.createMethodExpression(cvdc, 
-                    variableDefinition, Variable.class, null);
+                    modVarDef, Variable.class, null);
             Variable v = (Variable) me.invoke(cvdc, null);
+            
+            if (useWindowsFileSeparator)
+            {
+                for (int ipar=0; ipar<v.params.length; ipar++)
+                {
+                    v.params[ipar] = v.params[ipar].replace("/", "\\");
+                }
+            }
             variables.add(v);
         }
         
