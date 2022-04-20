@@ -90,8 +90,6 @@ public class GAParametersTest
         GAParameters gaParams = new GAParameters();
         String uniqueString = "UNIQUESTRING@LOG";
         int[] expectedCounts = new int[] {0, 0, 1, 2, 3, 4, 5, 6, 6, 6};
-
-        System.err.println("TMPFOLDER: "+tempDir);
         
         for (int i=0; i<10; i++)
         {

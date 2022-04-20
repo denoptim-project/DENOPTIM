@@ -33,6 +33,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
+import denoptim.utils.GenUtils;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -731,14 +732,12 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
         sb.append(apClass.toSDFString());
         if (dirVec != null)
         {
-            DecimalFormat digits = new DecimalFormat("###.####");
-            digits.setMinimumFractionDigits(4);
             sb.append(DENOPTIMConstants.SEPARATORAPPROPSCL);
-            sb.append(digits.format(dirVec.x));
+            sb.append(GenUtils.getEnglishFormattedDecimal("###.####",dirVec.x));
             sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
-            sb.append(digits.format(dirVec.y));
+            sb.append(GenUtils.getEnglishFormattedDecimal("###.####",dirVec.y));
             sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
-            sb.append(digits.format(dirVec.z));
+            sb.append(GenUtils.getEnglishFormattedDecimal("###.####",dirVec.z));
         }
         return sb.toString();
     }
