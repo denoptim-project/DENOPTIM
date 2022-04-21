@@ -7,7 +7,7 @@ paramFile="t21.params"
 wdToDenoptim="$wrkDir/"
 if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
 then
-    wdToDenoptim="$(cd "$wrkDir" ; pwd -W | sed 's/\//\\\\/g')"
+    wdToDenoptim="$(cd "$wrkDir" ; pwd -W | sed 's/\//\\\\/g')\\\\"
 fi
 
 mv data/* "$wrkDir"
@@ -17,7 +17,7 @@ rm -rf data
 filesToModify=$(find . -type f | xargs grep -l "OTF")
 for f in $filesToModify
 do
-    sed "$sedInPlace" "s|OTF_WDIR\/|$wdToDenoptim\\\\|g" "$f"
+    sed "$sedInPlace" "s|OTF_WDIR\/|$wdToDenoptim|g" "$f"
     sed "$sedInPlace" "s|OTF_WDIR|$wdToDenoptim|g" "$f"
     sed "$sedInPlace" "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
 done
