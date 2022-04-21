@@ -258,15 +258,6 @@ public class FitnessParameters extends RunTimeParameters
             msg = "Cannot find the fitness provider: " + externalExe;
             throw new DENOPTIMException(msg);
         }
-
-        if (interpreterExternalExe.length() != 0)
-        {
-            if (!FileUtils.checkExists(interpreterExternalExe))
-            {
-        		msg = "Interpreter '" + interpreterExternalExe + "' not found.";
-                throw new DENOPTIMException(msg);
-        	}
-        }
         checkOtherParameters();
     }
 

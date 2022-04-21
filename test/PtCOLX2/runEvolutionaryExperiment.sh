@@ -67,7 +67,6 @@ then
     sed -i 's/\//\\/g' input_parameters
 fi
 
-
 # Run DENOPTIM	
 echo " "
 echo "Starting DenoptimGA (ctrl+c to kill)"
