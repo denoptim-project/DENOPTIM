@@ -4,6 +4,12 @@ wrkDir=`pwd`
 logFile="t12c.log"
 paramFile="t12c.params"
 
+wdToDenoptim="$wrkDir/"
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    wdToDenoptim="$(cd "$wrkDir" ; pwd -W | sed 's/\//\\\\/g')"
+fi
+
 mv data/* "$wrkDir"
 rm -rf data
 
@@ -11,7 +17,8 @@ rm -rf data
 filesToModify=$(find . -type f | xargs grep -l "OTF")
 for f in $filesToModify
 do
-    sed "$sedInPlace" "s|OTF_WDIR|$wrkDir|g" "$f"
+    sed "$sedInPlace" "s|OTF_WDIR\/|$wdToDenoptim\\\\|g" "$f"
+    sed "$sedInPlace" "s|OTF_WDIR|$wdToDenoptim|g" "$f"
     sed "$sedInPlace" "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
 done
 
@@ -23,8 +30,8 @@ exec 2>&1
 exec 1>&6 6>&- 
 
 #Check outcome
-uidA=$(grep -q 'SPEUIVXLLWOEMJ-UHFFFAOYNA-N' "$wrkDir"/RUN*/MOLUID.txt)
-uidA=$(grep -q 'UID with some text, numberts 1223 456, and symbols *@._-:,%&§' "$wrkDir"/RUN*/MOLUID.txt)
+uidA=$(grep -q 'SPEUIVXLLWOEMJ-UHFFFAOYNA-N' "$wrkDir"/MOLUID.txt)
+uidA=$(grep -q 'UID with some text, numberts 1223 456, and symbols *@._-:,%&§' "$wrkDir"/MOLUID.txt)
 prod=$((uidA * uidB))
 if [[ "$prod" != 0 ]]
 then
@@ -33,9 +40,9 @@ then
     exit 1
 fi
 
-uidA=$(grep -q 'MMMMMMMMMMMMMM-UHFFFAOYSA-N' "$wrkDir"/RUN*/MOLUID.txt)
-uidB=$(grep -q 'This UID is not an InChi key but some text, with numbers 1234, and symbols #@._;' "$wrkDir"/RUN*/MOLUID.txt)
-uidC=$(grep -q 'PPPPPPPPPPPPPP-UHFFFAOYSA-N' "$wrkDir"/RUN*/MOLUID.txt)
+uidA=$(grep -q 'MMMMMMMMMMMMMM-UHFFFAOYSA-N' "$wrkDir"/MOLUID.txt)
+uidB=$(grep -q 'This UID is not an InChi key but some text, with numbers 1234, and symbols #@._;' "$wrkDir"/MOLUID.txt)
+uidC=$(grep -q 'PPPPPPPPPPPPPP-UHFFFAOYSA-N' "$wrkDir"/MOLUID.txt)
 prod=$((uidA * uidB * uidC))
 if [[ "$prod" != 0 ]]
 then

@@ -14,6 +14,12 @@ wrkDir=`pwd`
 logFile="t27.log"
 paramFile="t27.params"
 
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    echo "Test SKIPPED on Windows"
+    exit 0
+fi
+
 mv data/* "$wrkDir"
 rm -rf data
 

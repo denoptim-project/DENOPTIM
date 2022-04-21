@@ -4,6 +4,12 @@ wrkDir=`pwd`
 logFile="t2a.log"
 paramFile="t2a.params"
 
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    echo "Test SKIPPED on Windows"
+    exit 0
+fi
+
 mv data/* "$wrkDir"
 rm -rf data
 

@@ -4,11 +4,18 @@ wrkDir=`pwd`
 logFile="t25.log"
 paramFile="t25.params"
 
+wdToDenoptim="$wrkDir/"
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    wdToDenoptim="$(cd "$wrkDir" ; pwd -W | sed 's/\//\\\\/g')"
+fi
+
 #Adjust path in scripts and parameter files
 filesToModify=$(find . -type f | xargs grep -l "OTF")
 for f in $filesToModify
 do
-    sed "$sedInPlace" "s|OTF_WDIR|$wrkDir|g" "$f"
+    sed "$sedInPlace" "s|OTF_WDIR\/|$wdToDenoptim\\\\|g" "$f"
+    sed "$sedInPlace" "s|OTF_WDIR|$wdToDenoptim|g" "$f"
     sed "$sedInPlace" "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
 done
 
