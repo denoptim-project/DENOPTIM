@@ -110,22 +110,26 @@ public class ProcessHandler
         }
         catch(IllegalArgumentException iae)
         {
-            proc.destroy();
+            if (proc!=null)
+                proc.destroy();
             throw new DENOPTIMException(iae);
         }
         catch(NullPointerException npe)
         {
-            proc.destroy();
+            if (proc!=null)
+                proc.destroy();
             throw  new DENOPTIMException(npe);
         }
         catch(IOException ioe)
         {
-            proc.destroy();
+            if (proc!=null)
+                proc.destroy();
             throw  new DENOPTIMException(ioe);
         }
         catch(Exception e)
         {
-            proc.destroy();
+            if (proc!=null)
+                proc.destroy();
             throw  new DENOPTIMException(e);
         }
         finally
