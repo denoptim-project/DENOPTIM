@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Script lauching an evolutionary experiment aiming to select ligand sets [X,X,L]
-# that weacjen the C-O bond in Pt(CO)(L)(X)_2
+# that weacken the C-O bond in Pt(CO)(L)(X)_2
 #
 #
 # Usage:
@@ -60,6 +60,14 @@ fi
 echo "Copying file to $wDir"
 cp -r * "$wDir"
 cd "$wDir"
+
+# Adapt to Windows OS
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    sed -i 's/data\//data\\/g' fitness_provider_fromDB.sh
+    sed -i 's/\//\\/g' input_parameters
+fi
+
 
 # Run DENOPTIM	
 echo " "

@@ -9,7 +9,7 @@ FP-CheckUidBeforeFitness
 
 # Parameters for the genetic algorithm
 GA-RANDOMSEED=1234567890
-GA-InitPoplnFile=data/initPopulation.sdf
+#GA-InitPoplnFile=data/initPopulation.sdf
 GA-numParallelTasks=5
 #GA-parallelization=ASYNCHRONOUS
 GA-populationSize=25
