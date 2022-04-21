@@ -7,8 +7,10 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 
 /**
  * A modal dialog to define a fragment space and load it.
@@ -91,9 +93,10 @@ class FSParamsDialog extends GUIModalDialog
 	/**
 	 * Reads all the parameters, calls the interpreters, and eventually
 	 * creates the static FragmentSpace object.
+	 * @return 
 	 * @throws Exception
 	 */
-	private void makeFragSpace() throws Exception
+	public FragmentSpace makeFragSpace() throws Exception
 	{
 		if (fsParsForm.txtPar1.getText().trim().equals(""))
 		{
@@ -103,43 +106,18 @@ class FSParamsDialog extends GUIModalDialog
 		StringBuilder sbPars = new StringBuilder();
 		fsParsForm.putParametersToString(sbPars);
 		
-		FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
-		RingClosureParameters rcParams = new RingClosureParameters();
-		
-		boolean foundRC = false;
-		String[] lines = sbPars.toString().split(
-				System.getProperty("line.separator"));
+		String[] lines = sbPars.toString().split(System.getProperty(
+		        "line.separator"));
+
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
 		for (String line : lines)
 		{
-			if ((line.trim()).length() == 0)
-            {
-                continue;
-            }
-			if (line.startsWith("#"))
-            {
-                continue;
-            }
-			if (line.toUpperCase().startsWith("FS-"))
-            {
-			    fsParams.interpretKeyword(line);
-                continue;
-            }
-            if (line.toUpperCase().startsWith("RC-"))
-            {
-                rcParams.interpretKeyword(line);
-                foundRC = true;
-                continue;
-            }
+		    fsParams.readParameterLine(line);
 		}
-		
-		// This creates the static FragmentSpace object
+		// This creates the FragmentSpace object
 	    fsParams.checkParameters();
 	    fsParams.processParameters();
-	    if (foundRC)
-        {
-	        rcParams.checkParameters();
-	        rcParams.processParameters();
-        }
+	    return fsParams.getFragmentSpace();
 	}
 	
 //-----------------------------------------------------------------------------

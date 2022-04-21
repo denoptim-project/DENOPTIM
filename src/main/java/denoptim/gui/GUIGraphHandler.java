@@ -45,6 +45,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -72,7 +73,6 @@ import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
-import denoptim.utils.Randomizer;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 
@@ -137,6 +137,13 @@ public class GUIGraphHandler extends GUICardPanel
 	
 	// The panel hosting buttons for navigation in the list of graphs
 	private JPanel graphNavigPane;
+	
+    // Components managing loading of the fragment space
+    private JButton btnFragSpace;
+    private String loadFSToolTip = "<html>No space of building blocks loaded.<br>"
+                   + "Graphs can be inspected without loading any space.<br>"
+                   + "However, loading a space allows to edit and build"
+                   + "graphs manually.</html>";
 	
 	private JPanel pnlMouseMode;
 	private JButton btnPickMode;
@@ -412,9 +419,32 @@ public class GUIGraphHandler extends GUICardPanel
 		// Controls to alter the presently loaded graph (if any)
 		pnlEditVrtxBtns = new JPanel();
 		JLabel edtVertxsLab = new JLabel("Edit Graph:");
+		
+        btnFragSpace = new JButton("Load Library of Vertexes");
+        btnFragSpace.setToolTipText(loadFSToolTip);
+        btnFragSpace.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try
+                {
+                    loadFragmentSpace();
+                } catch (Exception e1)
+                {
+                    JOptionPane.showMessageDialog(btnAddLibVrtx,
+                            "<html>No fragment spaceFaild to define a space "
+                            + "of building blocks from the given input.</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                btnFragSpace.setText("Change Library of Vertexes");
+            }
+        });
+        
 		btnAddLibVrtx = new JButton("Add Vertex from Library");
-		btnAddLibVrtx.setToolTipText("<html>Choose a vertex from the "
-		        + "loaded fragment space and<br>"
+		btnAddLibVrtx.setToolTipText("<html>Choose a new vertex from the "
+		        + "loaded space of building blocks and<br>"
 		        + "append it to the "
 				+ "attachment point/s selected in the current graph.<html>");
 		btnAddLibVrtx.setEnabled(false);
@@ -423,10 +453,10 @@ public class GUIGraphHandler extends GUICardPanel
 				if (fragSpace==null)
 				{
 					JOptionPane.showMessageDialog(btnAddLibVrtx,
-			                "<html>No fragment space is currently "
+			                "<html>No space of building blocks is currently "
 			                + "loaded!<br>"
-			                + "You must first load a fragment space before "
-			                + "trying to build graphs.</html>",
+			                + "You must first load a space in order to add"
+			                + "vertexes from such space.</html>",
 			                "Error",
 			                JOptionPane.ERROR_MESSAGE,
 			                UIManager.getIcon("OptionPane.errorIcon"));
@@ -596,12 +626,14 @@ public class GUIGraphHandler extends GUICardPanel
 		lyoEditVertxs.setHorizontalGroup(lyoEditVertxs.createParallelGroup(
 				GroupLayout.Alignment.CENTER)
 				.addComponent(edtVertxsLab)
+				.addComponent(btnFragSpace)
 				.addComponent(btnAddLibVrtx)
                 .addComponent(btnAddEmptyVrtx)
 				.addComponent(btnDelSel)
 				.addComponent(btnAddChord));
 		lyoEditVertxs.setVerticalGroup(lyoEditVertxs.createSequentialGroup()
 				.addComponent(edtVertxsLab)
+                .addComponent(btnFragSpace)
 				.addComponent(btnAddLibVrtx)
                 .addComponent(btnAddEmptyVrtx)
 				.addComponent(btnDelSel)
@@ -1569,13 +1601,14 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void loadFragmentSpace()
+	private void loadFragmentSpace() throws Exception
 	{
 		// Define the fragment space via a new dialog
-		FSParamsDialog fsParams = new FSParamsDialog(this);
-        fsParams.pack();
-        fsParams.setVisible(true);
+		FSParamsDialog fsDefinitionDialog = new FSParamsDialog(this);
+        fsDefinitionDialog.pack();
+        fsDefinitionDialog.setVisible(true);
         visualPanel.resetFragViewerCardDeck();
+        fragSpace = fsDefinitionDialog.makeFragSpace();
 	}
 	
 //-----------------------------------------------------------------------------
