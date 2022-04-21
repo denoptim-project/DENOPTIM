@@ -3,8 +3,8 @@
 #
 
 # Fitness provider
-FP-INTERPRETER=bash
-FP-SOURCE=data/fitness_provider_fromDB.sh
+FP-INTERPRETER=python
+FP-SOURCE=data/fitness_provider_fromDB.py
 FP-CheckUidBeforeFitness
 
 # Parameters for the genetic algorithm

@@ -1,16 +1,31 @@
 #
-# Parameters for combinatorial fragment space exploration for the
-# design of ligand set producing long CO bond
+# Parameters for de novo design of ligand set producing long CO bond
 #
 
 # Fitness provider
-FP-INTERPRETER=python
-FP-SOURCE=data/fitness_provider_fromDB.py
+FP-INTERPRETER=bash
+FP-SOURCE=data/fitness_provider_fromDB.sh
 FP-CheckUidBeforeFitness
 
-# Parameters for the fragment space exploration
-FSE-NumOfProcessors=4
-FSE-MAXLEVEL=1
+# Parameters for the genetic algorithm
+GA-RANDOMSEED=1234567890
+#GA-InitPoplnFile=data/initPopulation.sdf
+GA-numParallelTasks=5
+#GA-parallelization=ASYNCHRONOUS
+GA-populationSize=25
+GA-numChildren=5
+GA-numGenerations=20
+GA-numConvGen=5
+GA-replacementStrategy=ELITIST
+GA-XOverSelectionMode=TS
+GA-crossoverWeight=0.50
+GA-mutationWeight=0.50
+GA-ConstructionWeight=0.2
+GA-symmetryProbability=0.0
+GA-LevelGrowthProbScheme=sigma
+GA-LevelGrowthSigmaSteepness=3.0
+GA-LevelGrowthSigmaMiddle=2.5
+GA-PrecisionLevel=5
 
 # Definition of the Fragment Space 
 FS-scaffoldLibFile=data/TCFS-1_scaff.sdf

@@ -4,11 +4,12 @@
 #
 
 # Fitness provider
-FP-INTERPRETER=python
-FP-SOURCE=data/fitness_provider_fromDB.py
+FP-INTERPRETER=bash
+FP-SOURCE=data/fitness_provider_fromDB.sh
 FP-CheckUidBeforeFitness
 
 # Parameters for the fragment space exploration
+FSE-ROOTGRAPHS=data/root.txt
 FSE-NumOfProcessors=4
 FSE-MAXLEVEL=1
 

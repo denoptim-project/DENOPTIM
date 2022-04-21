@@ -24,12 +24,6 @@
 # Settings and Parameters
 ###############################################################################
 
-#Java
-java="$javaDENOPTIM"
-
-#Denoptim home
-pathToDenoptimJars="$DENOPTIMJarFiles"
-
 # Map of unique identifiers to fitness or rejection due to steric hindrance
 uidToAtomClash="data/UIDsToAtomClash"
 uidToFitness="data/UIDsToFitness"
