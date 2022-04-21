@@ -104,17 +104,29 @@ do
 done
 
 # Detect the version of SED
-if man sed | grep -q "BSD"
+if ! command -v sed &> /dev/null
 then
-    export sedInPlace="-i ''"
+    echo "Command |sed| not found. Aborting."
+    exit -1
 else
-    if man sed | grep -q "GNU"
+    if ! command -v man &> /dev/null
     then
+        # We assume we are running bash under Windows
         export sedInPlace="-i"
     else
-        echo " ERROR! Could not detect 'sed' version."
-        echo " Expecting to find BSD or GNU."
-        exit 1
+        if man sed | grep -q "BSD"
+        then
+            export sedInPlace="-i ''"
+        else
+            if man sed | grep -q "GNU"
+            then
+                export sedInPlace="-i"
+            else
+                echo " ERROR! Could not detect 'sed' version."
+                echo " Expecting to find BSD or GNU."
+                exit 1
+            fi
+        fi
     fi
 fi
 
