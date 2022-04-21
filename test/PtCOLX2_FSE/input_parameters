@@ -9,6 +9,7 @@ FP-SOURCE=data/fitness_provider_fromDB.py
 FP-CheckUidBeforeFitness
 
 # Parameters for the fragment space exploration
+FSE-ROOTGRAPHS=data/root.sdf
 FSE-NumOfProcessors=4
 FSE-MAXLEVEL=1
 
