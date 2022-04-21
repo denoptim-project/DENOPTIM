@@ -261,22 +261,10 @@ public class FitnessParameters extends RunTimeParameters
 
         if (interpreterExternalExe.length() != 0)
         {
-        	switch (interpreterExternalExe.toUpperCase())
-        	{
-	        	case "BASH":
-	        		break;
-	        		
-	        	case "PYTHON":
-	        		break;
-/*
-//TODO: add 
-	        	case "JAVA":
-	        		break;
-*/
-	        	default:
-	        		msg = "Interpreter '" + interpreterExternalExe 
-	        										 + "' not available.";
-	                throw new DENOPTIMException(msg);
+            if (!FileUtils.checkExists(interpreterExternalExe))
+            {
+        		msg = "Interpreter '" + interpreterExternalExe + "' not found.";
+                throw new DENOPTIMException(msg);
         	}
         }
         checkOtherParameters();
