@@ -64,7 +64,6 @@ cd "$wDir"
 # Adapt to Windows OS
 if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
 then
-    sed -i 's/data\//data\\/g' fitness_provider_fromDB.sh
     sed -i 's/\//\\/g' input_parameters
 fi
 

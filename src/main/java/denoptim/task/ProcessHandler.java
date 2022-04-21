@@ -19,6 +19,9 @@
 package denoptim.task;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import denoptim.exception.DENOPTIMException;
 
@@ -74,7 +77,12 @@ public class ProcessHandler
     {
         try
         {
-            ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", cmdStr);
+            List<String> command = new ArrayList<String>(Arrays.asList(
+                    cmdStr.split("\\s+")));
+            ProcessBuilder pb = new ProcessBuilder(command);
+            //NB: this leads to an IOException with the following message:
+            // CreateProcess error=2, The system cannot find the file specified
+            //ProcessBuilder pb = new ProcessBuilder(cmdStr);
             proc = pb.start();
 
             Runtime.getRuntime().addShutdownHook(new Thread()

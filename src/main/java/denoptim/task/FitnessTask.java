@@ -194,8 +194,7 @@ public abstract class FitnessTask extends Task
 	{
 		StringBuilder sb = new StringBuilder();
         sb.append(fitnessSettings.getExternalFitnessProviderInterpreter());
-        sb.append(" ").append(
-        		fitnessSettings.getExternalFitnessProvider())
+        sb.append(" ").append(fitnessSettings.getExternalFitnessProvider())
               .append(" ").append(fitProvInputFile)
               .append(" ").append(fitProvOutFile)
               .append(" ").append(workDir)
