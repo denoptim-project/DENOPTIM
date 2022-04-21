@@ -34,14 +34,26 @@ import javax.swing.filechooser.FileSystemView;
 
 public class GUIFileOpener 
 {
-	protected static JFileChooser fileChooser = new JFileChooser(
-			FileSystemView.getFileSystemView().getHomeDirectory()); 
+	protected static JFileChooser fileChooser = new JFileChooser(getSystemRoot()); 
+	
+//-----------------------------------------------------------------------------
+	
+	private static File getSystemRoot()
+	{
+	    File startFile = new File(System.getProperty("user.dir")); 
+	    while (!FileSystemView.getFileSystemView().isFileSystemRoot(startFile))
+        {
+            startFile = startFile.getParentFile();
+        }
+	    return startFile;
+    }
 	
 //-----------------------------------------------------------------------------
 
 	public static File pickFileOrFolder(Component parent)
 	{
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		fileChooser.setFileHidingEnabled(false);
 		File file = null;
 		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
@@ -68,6 +80,7 @@ public class GUIFileOpener
 	public static Set<File> pickManyFiles(Component parent) 
 	{
 		fileChooser.setMultiSelectionEnabled(true);
+        fileChooser.setFileHidingEnabled(false);
 		fileChooser.setDialogTitle("Select one or more files");
 		Set<File> files = null;
 		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
@@ -89,6 +102,7 @@ public class GUIFileOpener
 	public static File pickFile(Component parent) 
 	{
 	    fileChooser.resetChoosableFileFilters();
+        fileChooser.setFileHidingEnabled(false);
         fileChooser.setAcceptAllFileFilterUsed(true);
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		File file = null;
@@ -104,6 +118,7 @@ public class GUIFileOpener
     public static File pickFileWithGraph(Component parent) 
     {
         fileChooser.resetChoosableFileFilters();
+        fileChooser.setFileHidingEnabled(false);
         fileChooser.setAcceptAllFileFilterUsed(true);
         FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter(
                 "JSON", "json");
@@ -126,6 +141,7 @@ public class GUIFileOpener
 	public static File pickFolderForTxtField(JTextField txtField, 
 			Component parent) 
 	{
+        fileChooser.setFileHidingEnabled(false);
 		File file = pickFolder(parent);
 		if (file != null)
 		{
@@ -139,6 +155,7 @@ public class GUIFileOpener
 	public static File pickFolder(Component parent) 
 	{
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setFileHidingEnabled(false);
 		fileChooser.setDialogTitle("Choose Folder to Load");
 		File file = null;
 		if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION)
@@ -155,6 +172,7 @@ public class GUIFileOpener
 	public static File pickFileForSaving(Component parent) 
 	{
 		File file;
+        fileChooser.setFileHidingEnabled(false);
 		if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)
 		{
 			file = fileChooser.getSelectedFile();
