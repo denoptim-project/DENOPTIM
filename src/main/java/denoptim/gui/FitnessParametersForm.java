@@ -123,7 +123,7 @@ public class FitnessParametersForm extends ParametersForm
     String keyFitProviderInterpreter = "FP-Interpreter";
     JPanel lineFitProviderInterpreter;
     JLabel lblFitProviderInterpreter;
-    JComboBox<String> cmbFitProviderInterpreter;
+    JTextField txtFitProviderInterpreter;
 
     String keyEq = "FP-Equation";
     JPanel lineEq;
@@ -369,15 +369,15 @@ public class FitnessParametersForm extends ParametersForm
         		+ "provider", SwingConstants.LEFT);
         lblFitProviderInterpreter.setPreferredSize(fileLabelSize);
         lblFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
-        cmbFitProviderInterpreter = new JComboBox<String>(new String[] {"bash",
-        		"python"});
-        cmbFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
-        cmbFitProviderInterpreter.setEnabled(true);
+        txtFitProviderInterpreter = new JTextField("/bin/bash");
+        txtFitProviderInterpreter.setToolTipText(toolTipFitProviderInterpreter);
+        txtFitProviderInterpreter.setEnabled(true);
+        txtFitProviderInterpreter.setPreferredSize(fileFieldSize);
         
         mapKeyFieldToValueField.put(keyFitProviderInterpreter.toUpperCase(), 
-        		cmbFitProviderInterpreter);
+        		txtFitProviderInterpreter);
         lineFitProviderInterpreter.add(lblFitProviderInterpreter);
-        lineFitProviderInterpreter.add(cmbFitProviderInterpreter);
+        lineFitProviderInterpreter.add(txtFitProviderInterpreter);
         localBlock3.add(lineFitProviderInterpreter);
 
         String toolTipEq = "Define integrated fitness provider expression.";
@@ -1097,10 +1097,8 @@ public class FitnessParametersForm extends ParametersForm
 	        sb.append(getStringIfNotEmpty(keyFitProviderSource,
 	        		txtFitProviderSource));
 	        sb.append(keyFitProviderInterpreter).append("=").append(
-	        		cmbFitProviderInterpreter.getSelectedItem()).append(NL);
-        }
-        else
-        {
+	        		txtFitProviderInterpreter.getText()).append(NL);
+        } else {
         	sb.append(getStringIfNotEmpty(keyEq,txtEq,"${","}"));
         	for (int i=0; i<tabCustomVarsMod.getRowCount(); i++) 
             {
