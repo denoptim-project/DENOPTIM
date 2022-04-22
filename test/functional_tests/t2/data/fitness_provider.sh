@@ -99,7 +99,7 @@ sed "$sedInPlace" "s/ATM/H  /g" "$molNoRCA"
 #
 # Prepare final SDF file
 #
-echo "All done!"
+echo "All done! No fitness is calculated in this test."
 mv "$molNoRCA" "$outSDF"
 
 exit 0

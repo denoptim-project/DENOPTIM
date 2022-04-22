@@ -489,6 +489,9 @@ public class GraphBuildingTask extends FitnessTask
                 + DENOPTIMConstants.CANDIDATE2DEXTENSION;
         fitProvUIDFile = ceblSettings.getUIDFileName();
         
+        result.setName(molName);
+        result.setSmiles(molsmiles);
+        
         runFitnessProvider();
     }
 
