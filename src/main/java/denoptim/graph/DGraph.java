@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -2429,8 +2430,7 @@ public class DGraph implements Cloneable
      * @param vertex the vertex whose children are to be located
      * @param children list containing the references to all the children
      */
-    public void getChildrenTree(Vertex vertex,
-            List<Vertex> children) 
+    public void getChildrenTree(Vertex vertex, List<Vertex> children) 
     {
         List<Vertex> lst = getChildVertices(vertex);
         if (lst.isEmpty()) 
@@ -2443,6 +2443,51 @@ public class DGraph implements Cloneable
             {
                 children.add(child);
                 getChildrenTree(child, children);
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets all the children of the current vertex recursively. All vertexes 
+     * belonging to the children tree are labelled by a property that identifies
+     * which branches they belong to ({@link DENOPTIMConstants.GRAPHBRANCHID}).
+     * This method does not cross template 
+     * boundaries, thus all children belong to the same graph.
+     * @param vertex the vertex whose children are to be located
+     * @param children list containing the references to all the children
+     * @param branchIdGenerator the generator of branch identifiers
+     * @param prevBranchId the identifier of the branch holding the given
+     * <code>vertex</code> belongs.
+     */
+    public void getChildrenTree(Vertex vertex, List<Vertex> children, 
+            AtomicInteger branchIdGenerator, List<Integer> prevBranchId) 
+    {
+        List<Vertex> lst = getChildVertices(vertex);
+        if (lst.isEmpty()) 
+        {
+            return;
+        }
+        for (Vertex child : lst)
+        {
+            if (!children.contains(child)) 
+            {
+                children.add(child);
+                if (lst.size()==1)
+                {
+                    child.setProperty(DENOPTIMConstants.GRAPHBRANCHID, 
+                            prevBranchId);
+                    getChildrenTree(child, children, branchIdGenerator, 
+                            prevBranchId);
+                } else {
+                    List<Integer> newBranchId = new ArrayList<>(prevBranchId);
+                    newBranchId.add(branchIdGenerator.getAndIncrement());
+                    child.setProperty(DENOPTIMConstants.GRAPHBRANCHID, 
+                            newBranchId);
+                    getChildrenTree(child, children, branchIdGenerator, 
+                            newBranchId);
+                }
             }
         }
     }
@@ -2486,6 +2531,71 @@ public class DGraph implements Cloneable
         }
     }
     
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the branch identifier.
+     * @param i the position of the vertex to analyze.
+     * @return the branch identifier or <code>null</code> if such property is
+     * not available. In such case, you should run 
+     * {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} on any of 
+     * the parent vertexes.
+     */
+    @SuppressWarnings("unchecked")
+    public List<Integer> getBranchIdOfVertexAtPosition(int i)
+    {
+        return getBranchIdOfVertex(getVertexAtPosition(i));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the branch identifier.
+     * @param i the position of the vertex to analyze.
+     * @return the branch identifier or <code>null</code> if the vertex does not
+     * belong to this graph or if such property is
+     * not available. In the latter case, you should run 
+     * {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} on any of 
+     * the parent vertexes.
+     */
+    @SuppressWarnings("unchecked")
+    public List<Integer> getBranchIdOfVertex(Vertex v)
+    {
+        if (!gVertices.contains(v))
+            return null;
+        
+        return (List<Integer>) v.getProperty(DENOPTIMConstants.GRAPHBRANCHID);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Uses branch identifiers to define is two vertexes are in such a relation 
+     * that allows the drawing of a directed path from one to the other.
+     * You must run {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} 
+     * on any parent of either graph to generate the bran branch labeling.
+     * 
+     * @param src the "from" in the directed path relation.
+     * @param trg the "to" in the directed path relation.
+     * @return <code>true</code> if the relation exists, <code>false</code> is
+     * if doesn't OR if the branch labeling has not been found. 
+     */
+    public boolean directedPathExists(Vertex src, Vertex trg)
+    {
+        List<Integer> bIdSrc = getBranchIdOfVertex(src);
+        List<Integer> bIdTrg = getBranchIdOfVertex(trg);
+        if (bIdSrc==null || bIdTrg==null)
+            return false;
+        if (bIdSrc.size()>bIdTrg.size())
+            return false;
+        int sharedSubBranches = 0;
+        for (int i=0; i<bIdSrc.size(); i++)
+        {
+            if (bIdSrc.get(i)==bIdTrg.get(i))
+                sharedSubBranches++;
+        }
+        return sharedSubBranches==bIdSrc.size();
+    }
     
 //------------------------------------------------------------------------------
 

@@ -3,6 +3,7 @@ package denoptim.graph;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
@@ -40,6 +42,7 @@ import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.PathSubGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.MutationType;
+import denoptim.utils.Randomizer;
 
 
 /**
@@ -3303,6 +3306,51 @@ public class DGraphTest
         assertTrue(childTree.contains(g.getVertexAtPosition(2)));
         assertTrue(childTree.contains(g.getVertexAtPosition(3)));
         assertTrue(childTree.contains(g.getVertexAtPosition(4)));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetChildrenTreeWithBranchIdentifier() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph g = makeTestGraphD(fs);
+        
+        assertNull(g.getBranchIdOfVertexAtPosition(0));
+        assertNull(g.getBranchIdOfVertexAtPosition(1));
+        assertNull(g.getBranchIdOfVertexAtPosition(3));
+        
+        List<Vertex> childTree = new ArrayList<Vertex>();
+        g.getChildrenTree(g.getVertexAtPosition(0), childTree, 
+                new AtomicInteger(0), new ArrayList<Integer>());
+        
+        assertEquals(g.getBranchIdOfVertexAtPosition(3), 
+                g.getBranchIdOfVertexAtPosition(3));
+        assertEquals(g.getBranchIdOfVertexAtPosition(2),
+                g.getBranchIdOfVertexAtPosition(5));
+        assertEquals(g.getBranchIdOfVertexAtPosition(3),
+                g.getBranchIdOfVertexAtPosition(6));
+        assertEquals(g.getBranchIdOfVertexAtPosition(4),
+                g.getBranchIdOfVertexAtPosition(7));
+        assertNotEquals(g.getBranchIdOfVertexAtPosition(2),
+                g.getBranchIdOfVertexAtPosition(3));
+        assertNotEquals(g.getBranchIdOfVertexAtPosition(2),
+                g.getBranchIdOfVertexAtPosition(4));
+        assertNotEquals(g.getBranchIdOfVertexAtPosition(3),
+                g.getBranchIdOfVertexAtPosition(4));
+        
+        assertTrue(g.directedPathExists(g.getVertexAtPosition(1), 
+                g.getVertexAtPosition(5)));
+        assertTrue(g.directedPathExists(g.getVertexAtPosition(9), 
+                g.getVertexAtPosition(13)));
+        assertFalse(g.directedPathExists(g.getVertexAtPosition(8), 
+                g.getVertexAtPosition(9)));
+        assertFalse(g.directedPathExists(g.getVertexAtPosition(9), 
+                g.getVertexAtPosition(8)));
+        assertFalse(g.directedPathExists(g.getVertexAtPosition(5), 
+                g.getVertexAtPosition(1)));
+        assertFalse(g.directedPathExists(g.getVertexAtPosition(13), 
+                g.getVertexAtPosition(9)));
     }
     
 //------------------------------------------------------------------------------
