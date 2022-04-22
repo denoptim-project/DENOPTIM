@@ -129,6 +129,18 @@ public class GUIInspectFSERun extends GUICardPanel
 	private ChartPanel chartPanelByLevel;
 	private ChartPanel chartPanelSorted;
 	
+    /**
+     * Button offering the possibility to load the graph inspector for a 
+     * selected item.
+     */
+    private JButton openGraph;
+    
+    /**
+     * Storage of pathname to the item selected in the chart. This is used to
+     * enable loading the graph inspector at any time after selection of the
+     * item in the chart.
+     */
+    private String pathToSelectedItem;
 	
 //-----------------------------------------------------------------------------
 	
@@ -187,6 +199,23 @@ public class GUIInspectFSERun extends GUICardPanel
 			}
 		});
 		ctrlPanelLeft.add(cmbPlotType);
+		
+	    openGraph = new JButton("Open Candidate's Graph");
+        openGraph.setEnabled(false); //Enables only upon selection of an item
+        openGraph.setToolTipText("Open a new tab for inspecting the "
+                + "DENOPTIMGraph of the selected candidate.");
+        openGraph.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.setCursor(Cursor.getPredefinedCursor(
+                        Cursor.WAIT_CURSOR));
+                GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
+                mainPanel.add(graphPanel);
+                graphPanel.importGraphsFromFile(new File(pathToSelectedItem));
+                mainPanel.setCursor(Cursor.getPredefinedCursor(
+                        Cursor.DEFAULT_CURSOR));
+            }
+        });
+        ctrlPanelLeft.add(openGraph);
 		
 		ctrlPanelRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		lblTotItems = new JLabel("No item loaded");
@@ -673,6 +702,9 @@ public class GUIInspectFSERun extends GUICardPanel
         datasetSelectedOrd.addSeries("Selected_candidates", selectedCandsDataOrd);
 		chartBySorted.getXYPlot().setDataset(1, datasetSelectedOrd);
 		
+		pathToSelectedItem = item.getPathToFile();
+        openGraph.setEnabled(true);
+		
 		// Update the molecular viewer
 		molViewer.loadChemicalStructureFromFile(item.getPathToFile());
 	}
@@ -684,6 +716,7 @@ public class GUIInspectFSERun extends GUICardPanel
 		datasetSelectedLev.removeSeries("Selected_candidates");
 		datasetSelectedOrd.removeSeries("Selected_candidates");
 		molViewer.clearAll();
+        openGraph.setEnabled(false);
 	}
 
 //-----------------------------------------------------------------------------
