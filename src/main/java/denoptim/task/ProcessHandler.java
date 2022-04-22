@@ -59,6 +59,97 @@ public class ProcessHandler
         this.cmdStr = cmdStr;
         this.id = id;
     }
+    
+  //------------------------------------------------------------------------------
+
+    /**
+     * Run the process associated with the command from BASH
+     * http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4
+     * For any Process, the input and error streams must read even if the data
+     * written to these streams is not used by the application. The generally
+     * accepted solution for this problem is a stream gobbler thread that does
+     * nothing but consume data from an input stream until stopped.
+     * @throws DENOPTIMException 
+     * @throws Exception
+     */
+
+    public void runProcessInBASH() throws DENOPTIMException
+    {
+        try
+        {
+            ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c", cmdStr);
+            proc = pb.start();
+
+            Runtime.getRuntime().addShutdownHook(new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    proc.destroy();
+                }
+            });
+
+            // Any error message?
+            StreamGobbler errorGobbler =
+                    new StreamGobbler(proc.getErrorStream(), "ERR");
+
+            // Any output?
+            StreamGobbler outputGobbler =
+                    new StreamGobbler(proc.getInputStream(), "OUT");
+
+            errorGobbler.start();
+            outputGobbler.start();
+
+            errorGobbler.join();
+            outputGobbler.join();
+
+            exitCode = proc.waitFor();
+
+            standardOutput = outputGobbler.getMessages();
+            outputGobbler.sb.setLength(0);
+            errorOutput = errorGobbler.getMessages();
+            errorGobbler.sb.setLength(0);
+
+        }
+        catch(IllegalArgumentException iae)
+        {
+            if (proc!=null)
+                proc.destroy();
+            throw new DENOPTIMException(iae);
+        }
+        catch(NullPointerException npe)
+        {
+            if (proc!=null)
+                proc.destroy();
+            throw  new DENOPTIMException(npe);
+        }
+        catch(IOException ioe)
+        {
+            if (proc!=null)
+                proc.destroy();
+            throw  new DENOPTIMException(ioe);
+        }
+        catch(Exception e)
+        {
+            if (proc!=null)
+                proc.destroy();
+            throw  new DENOPTIMException(e);
+        }
+        finally
+        {
+            if (proc != null)
+            {
+                try {
+                    proc.getOutputStream().close();
+                    proc.getInputStream().close();
+                    proc.getErrorStream().close();
+                    proc.destroy();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 //------------------------------------------------------------------------------
 

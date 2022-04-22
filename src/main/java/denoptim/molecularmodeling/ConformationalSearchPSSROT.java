@@ -239,7 +239,7 @@ public class ConformationalSearchPSSROT
         ProcessHandler csPh = new ProcessHandler(csCmdStr, csID);
         try
         {
-            csPh.runProcess();
+            csPh.runProcessInBASH();
             if (csPh.getExitCode() != 0)
             {
                 String msg = "PSSROT Conformational Search failed for ";
@@ -276,7 +276,7 @@ public class ConformationalSearchPSSROT
         ProcessHandler ocsPh = new ProcessHandler(ocsCmd, ocsID);
         try
         {
-            ocsPh.runProcess();
+            ocsPh.runProcessInBASH();
             if (ocsPh.getExitCode() != 0)
             {
                 String msg = "XYZINT (post conf.search) failed for " + molName;

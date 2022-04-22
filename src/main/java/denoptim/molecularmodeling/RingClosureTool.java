@@ -481,7 +481,7 @@ public class RingClosureTool
         ProcessHandler rsPh = new ProcessHandler(rsCmdStr, rsID);
         try
         {
-            rsPh.runProcess();
+            rsPh.runProcessInBASH();
             if (rsPh.getExitCode() != 0)
             {
                 String msg = "PSSROT RingSearch failed for " + molName;
@@ -505,7 +505,7 @@ public class RingClosureTool
         ProcessHandler orsPh = new ProcessHandler(orsCmd, orsID);
         try
         {
-            orsPh.runProcess();
+            orsPh.runProcessInBASH();
             if (orsPh.getExitCode() != 0)
             {
                 String msg = "XYZINT (post RS) failed for " + molName;
