@@ -9,6 +9,12 @@
 # in the environment as $tinkerPathDENOPTIM
 #
 
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    echo "Test SKIPPED on Windows"
+    exit 0
+fi
+
 if [ ! -d "$tinkerPathDENOPTIM" ]
 then
     echo " "
