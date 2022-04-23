@@ -688,7 +688,7 @@ public class EvolutionaryAlgorithm
                     continue;
                 
                 candidate.setGeneration(genId);
-                
+                    
                 if (((FitnessParameters)settings.getParameters(
                         ParametersType.FIT_PARAMS)).checkPreFitnessUID())
                 {

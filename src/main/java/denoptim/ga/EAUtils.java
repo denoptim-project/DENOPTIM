@@ -1202,7 +1202,7 @@ public class EAUtils
 
         for (Candidate candidate : candidates)
         {
-            if (!uniqueIDsSet.contains(candidate.getUID()))
+            if (uniqueIDsSet.addNewUniqueEntry(candidate.getUID()))
             {
                 int ctr = GraphUtils.getUniqueMoleculeIndex();
                 int gctr = GraphUtils.getUniqueGraphIndex();
