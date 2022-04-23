@@ -474,6 +474,10 @@ public class GUIInspectFSERun extends GUICardPanel
                     return byGen;
                 if (c1.hasFitness() && c2.hasFitness())
                     return Double.compare(c1.getFitness(), c2.getFitness());
+                else if (c1.hasFitness())
+                    return 1;
+                else if (c2.hasFitness())
+                    return -1;
                 return 0;
             }
         });
