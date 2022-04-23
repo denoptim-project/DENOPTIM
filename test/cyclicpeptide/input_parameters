@@ -1,7 +1,7 @@
 # Genetic Algorithm - parameters
 GA-RandomSeed=123456789
-GA-PopulationSize=50
-GA-NumChildren=25
+GA-PopulationSize=30
+GA-NumChildren=20
 GA-NumGenerations=100
 GA-NumConvGen=100
 
@@ -12,7 +12,7 @@ GA-MOLGROWTHSIGMAMIDDLE=20
 GA-XOverSelectionMode=TS
 GA-CrossoverWeight=1.0
 GA-MutationWeight=0.0
-GA-ConstructionWeight=0.5
+GA-ConstructionWeight=0.0
 GA-SymmetryProbability=0.0
 GA-ReplacementStrategy=ELITIST
 GA-NumParallelTasks=1
