@@ -679,7 +679,8 @@ public class GUIInspectGARun extends GUICardPanel
 		                int nItems = 0;
 		                List<CandidateLW> overlappingItems = 
 		                        new ArrayList<CandidateLW>();
-		                while (nItems<maxItems)
+		                while (nItems<maxItems && 
+		                        (initPos+nItems)<allIndividuals.size())
 		                {
 		                    CandidateLW c = allIndividuals.get(initPos + nItems);
 		                    double delta = Math.abs(item.getFitness() 
@@ -690,8 +691,7 @@ public class GUIInspectGARun extends GUICardPanel
 		                    nItems++;
 		                }
 		                nItems = 1;
-		                int posOfOriginal = 0;
-		                while (nItems<maxItems)
+		                while (nItems<maxItems && (initPos-nItems)>-1)
                         {
                             CandidateLW c = allIndividuals.get(initPos - nItems);
                             double delta = Math.abs(item.getFitness() 
@@ -699,10 +699,8 @@ public class GUIInspectGARun extends GUICardPanel
                             if (delta > tolerance)
                                 break;
                             overlappingItems.add(0,c);
-                            posOfOriginal++;
                             nItems++;
                         }
-		                int sz = overlappingItems.size();
 		                CandidateLW choosenItem = choseAmongPossiblyOverlapping(
 		                        chartPanel, overlappingItems);
 		                if (choosenItem!=null)
@@ -727,6 +725,14 @@ public class GUIInspectGARun extends GUICardPanel
 	private CandidateLW choseAmongPossiblyOverlapping(JComponent parent,
 	        List<CandidateLW> overlappingItems)
     {
+	    switch (overlappingItems.size())
+	    {
+	        case 0:
+	            return null;
+	        case 1:
+	            return overlappingItems.get(0);
+	    }
+	    
         DefaultListModel<String> listModel = new DefaultListModel<String>();
         JList<String> optionsList = new JList<String>(listModel);
         overlappingItems.stream().forEach(c -> listModel.addElement(c.getName()));

@@ -665,7 +665,8 @@ public class GUIInspectFSERun extends GUICardPanel
                         int nItems = 0;
                         List<CandidateLW> overlappingItems = 
                                 new ArrayList<CandidateLW>();
-                        while (nItems<maxItems)
+                        while (nItems<maxItems && 
+                                (initPos+nItems)<allItems.size())
                         {
                             CandidateLW c = allItems.get(initPos + nItems);
                             double delta = Math.abs(item.getFitness() 
@@ -676,8 +677,7 @@ public class GUIInspectFSERun extends GUICardPanel
                             nItems++;
                         }
                         nItems = 1;
-                        int posOfOriginal = 0;
-                        while (nItems<maxItems)
+                        while (nItems<maxItems  && (initPos-nItems)>-1)
                         {
                             CandidateLW c = allItems.get(initPos - nItems);
                             double delta = Math.abs(item.getFitness() 
@@ -685,10 +685,8 @@ public class GUIInspectFSERun extends GUICardPanel
                             if (delta > tolerance)
                                 break;
                             overlappingItems.add(0,c);
-                            posOfOriginal++;
                             nItems++;
                         }
-                        int sz = overlappingItems.size();
                         CandidateLW choosenItem = choseAmongPossiblyOverlapping(
                                 chartPanelByLevel, overlappingItems);
                         if (choosenItem!=null)
@@ -746,6 +744,14 @@ public class GUIInspectFSERun extends GUICardPanel
     private CandidateLW choseAmongPossiblyOverlapping(JComponent parent,
             List<CandidateLW> overlappingItems)
     {
+        switch (overlappingItems.size())
+        {
+            case 0:
+                return null;
+            case 1:
+                return overlappingItems.get(0);
+        }
+        
         DefaultListModel<String> listModel = new DefaultListModel<String>();
         JList<String> optionsList = new JList<String>(listModel);
         overlappingItems.stream().forEach(c -> listModel.addElement(c.getName()));
@@ -769,20 +775,7 @@ public class GUIInspectFSERun extends GUICardPanel
         }
         return overlappingItems.get(optionsList.getSelectedIndex());
     }
-    
-//------------------------------------------------------------------------------
-    
-    private class PlottedCandidatesComparator implements Comparator<CandidateLW>
-    {
-        @Override
-        public int compare(CandidateLW c1, CandidateLW c2)
-        {
-            int byGen = Integer.compare(c1.getGeneration(), c2.getGeneration());
-            if (byGen!=0)
-                return byGen;
-            return Double.compare(c1.getFitness(), c2.getFitness());
-        }
-    }
+
 //-----------------------------------------------------------------------------
 	
 	private void renderViewWithSelectedItem(CandidateLW item)
