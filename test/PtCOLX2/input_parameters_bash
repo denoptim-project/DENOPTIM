@@ -9,7 +9,7 @@ FP-CheckUidBeforeFitness
 
 # Parameters for the genetic algorithm
 GA-RANDOMSEED=1234567890
-#GA-InitPoplnFile=data/initPopulation.sdf
+GA-InitPoplnFile=data/initPopulation.sdf
 GA-numParallelTasks=5
 #GA-parallelization=ASYNCHRONOUS
 GA-populationSize=25
@@ -32,7 +32,6 @@ FS-scaffoldLibFile=data/TCFS-1_scaff.sdf
 FS-fragmentLibFile=data/TCFS-1_frags.sdf
 FS-cappingFragmentLibFile=data/TCFS-1_caps.sdf
 FS-compMatrixFile=data/TCFS-1_CPMap.par
-FS-CONSTRAINSYMMETRY=Xlig:0 1.0
 FS-CONSTRAINSYMMETRY=LBisAminoPhosphineN:0 1.0
 FS-CONSTRAINSYMMETRY=LTrisAminoPhosphineN:0 1.0
 FS-CONSTRAINSYMMETRY=LMonoAminoPhosphineSubR:0 1.0
