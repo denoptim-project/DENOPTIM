@@ -34,16 +34,21 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import org.jmol.awtjs.swing.BorderLayout;
+import org.jmol.awtjs.swing.JPanel;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -126,7 +131,7 @@ public class MoleculeViewPanel extends JSplitPane
 		dataTabModel = new DefaultTableModel() {
 			@Override
 		    public boolean isCellEditable(int row, int column) {
-				return false;
+				return true;
 		    }
 		};
 		dataTabModel.setColumnCount(2);
@@ -134,7 +139,9 @@ public class MoleculeViewPanel extends JSplitPane
 				"<html><b>Value</b></html>"};
 		dataTabModel.setColumnIdentifiers(column_names);
 		dataTable = new JTable(dataTabModel);
+        dataTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		dataTable.getColumnModel().getColumn(0).setMaxWidth(75);
+        dataTable.getColumnModel().getColumn(1).setMinWidth(750);
 		dataTable.setGridColor(Color.LIGHT_GRAY);
 		dataTable.addMouseListener(new MouseListener() {
 			@Override
@@ -170,8 +177,9 @@ public class MoleculeViewPanel extends JSplitPane
 				showPopup(e);
 			}
 		});
-		tabPanel = new JScrollPane(dataTable);
-		tabPanel.setMinimumSize(new Dimension(100,30));
+		tabPanel = new JScrollPane(dataTable, 
+		        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+		        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.setBottomComponent(tabPanel);
 		
 		//Find a proper tmp disk space
