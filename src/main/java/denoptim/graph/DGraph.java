@@ -1898,7 +1898,8 @@ public class DGraph implements Cloneable
         
         // update the mapping of this vertexes' APs in the jacket template
         if (templateJacket != null)
-        {   
+        {
+            templateJacket.clearIAtomContainer();
             for (AttachmentPoint apOnNew : inToOutAPForTemplate.keySet())
             {
                 templateJacket.updateInnerApID(
