@@ -34,18 +34,25 @@ import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -71,6 +78,7 @@ import org.jfree.data.xy.XYDataset;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
+import denoptim.graph.APClass;
 import denoptim.graph.CandidateLW;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.GenUtils;
@@ -113,7 +121,7 @@ public class GUIInspectGARun extends GUICardPanel
 	// locally generated unique 
 	// identifier that has NO RELATION to generation/molId/fitness
 	// The Map 'candsWithFitnessMap' serve specifically to convert
-	// the itemId 'j' into a DENOPTIMMolecule
+	// the itemId 'j' into a reference to the appropriate object.
 	
 	private DefaultXYDataset datasetAllFit = new DefaultXYDataset();;
 	private DefaultXYDataset datasetSelected = new DefaultXYDataset();
@@ -476,6 +484,10 @@ public class GUIInspectGARun extends GUICardPanel
         }
 		datasetAllFit.addSeries("Candidates_with_fitness", candsWithFitnessData);
 		
+		// We sort the list of individuals by fitness and generation so that we 
+		// can quickly identify overlapping items
+		Collections.sort(allIndividuals, new PlottedCandidatesComparator());
+		
 		int numGen = popProperties.keySet().size();
 		double[][] popMin = new double[2][numGen];
 		double[][] popMax = new double[2][numGen];
@@ -498,7 +510,7 @@ public class GUIInspectGARun extends GUICardPanel
 		datasetPopMax.addSeries("Population_max", popMax);
 		datasetPopMean.addSeries("Population_mean", popMean);
 		datasetPopMedian.addSeries("Population_median", popMedian);
-		
+	
 		
 		//TODO: somehow collect and display the candidates that hit a mol error
 		//      Could it be a histogram (#failed x gen) below the evolution plot
@@ -641,7 +653,8 @@ public class GUIInspectGARun extends GUICardPanel
 			public void chartMouseClicked(ChartMouseEvent e) 
 			{   
 				if (e.getEntity() instanceof XYItemEntity)
-				{   
+				{
+				    XYItemEntity i = (XYItemEntity) e.getEntity();
 					XYDataset ds = ((XYItemEntity)e.getEntity()).getDataset();
 					if (!ds.equals(datasetAllFit))
 					{
@@ -652,8 +665,47 @@ public class GUIInspectGARun extends GUICardPanel
 					if (serId == 0)
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
-						CandidateLW mol = candsWithFitnessMap.get(itemId);
-						renderViewWithSelectedItem(mol);
+						CandidateLW item = candsWithFitnessMap.get(itemId);
+						
+						// The even can carry only one item, but there could be 
+						// many items overlapping each other.
+						// Search for overlapping items and ask which one to the
+						// user wants to see.
+						int initPos = allIndividuals.indexOf(item);
+		                double tolerance = Math.abs(plot.getRangeAxis()
+		                        .getRange().getLength() * 0.05);
+		                int maxItems = 25;
+		                int nItems = 0;
+		                List<CandidateLW> overlappingItems = 
+		                        new ArrayList<CandidateLW>();
+		                while (nItems<maxItems)
+		                {
+		                    CandidateLW c = allIndividuals.get(initPos + nItems);
+		                    double delta = Math.abs(item.getFitness() 
+		                            - c.getFitness());
+		                    if (delta > tolerance)
+		                        break;
+		                    overlappingItems.add(c);
+		                    nItems++;
+		                }
+		                nItems = 1;
+		                int posOfOriginal = 0;
+		                while (nItems<maxItems)
+                        {
+                            CandidateLW c = allIndividuals.get(initPos - nItems);
+                            double delta = Math.abs(item.getFitness() 
+                                    - c.getFitness());
+                            if (delta > tolerance)
+                                break;
+                            overlappingItems.add(0,c);
+                            posOfOriginal++;
+                            nItems++;
+                        }
+		                int sz = overlappingItems.size();
+		                CandidateLW choosenItem = choseAmongPossiblyOverlapping(
+		                        chartPanel, overlappingItems);
+		                if (choosenItem!=null)
+		                    renderViewWithSelectedItem(choosenItem);
 					}
 					//do we do anything if we select other series? not now...
 				}
@@ -667,6 +719,51 @@ public class GUIInspectGARun extends GUICardPanel
 		rightPanel.add(chartPanel,BorderLayout.CENTER);
 		
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	}
+
+//------------------------------------------------------------------------------
+	
+	private CandidateLW choseAmongPossiblyOverlapping(JComponent parent,
+	        List<CandidateLW> overlappingItems)
+    {
+        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        JList<String> optionsList = new JList<String>(listModel);
+        overlappingItems.stream().forEach(c -> listModel.addElement(c.getName()));
+        optionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        JPanel chooseItem = new JPanel();
+        JLabel header = new JLabel("Select item to visualize:");
+        JScrollPane scrollPane = new JScrollPane(optionsList);
+        chooseItem.add(header);
+        chooseItem.add(scrollPane);
+      
+        int res = JOptionPane.showConfirmDialog(parent,
+              chooseItem, 
+              "Choose Among Overlapping Items", 
+              JOptionPane.OK_CANCEL_OPTION,
+              JOptionPane.PLAIN_MESSAGE, 
+              null);
+        if (res != JOptionPane.OK_OPTION)
+        {
+          return  null;
+        }
+        return overlappingItems.get(optionsList.getSelectedIndex());
+    }
+	
+//------------------------------------------------------------------------------
+	
+	private class PlottedCandidatesComparator implements Comparator<CandidateLW>
+	{
+        @Override
+        public int compare(CandidateLW c1, CandidateLW c2)
+        {
+            int byGen = Integer.compare(c1.getGeneration(), c2.getGeneration());
+            if (byGen!=0)
+                return byGen;
+            if (c1.hasFitness() && c2.hasFitness())
+                return Double.compare(c1.getFitness(), c2.getFitness());
+            return 0;
+        }
 	}
 	
 //-----------------------------------------------------------------------------

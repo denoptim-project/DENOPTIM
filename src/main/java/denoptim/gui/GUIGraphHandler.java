@@ -270,7 +270,7 @@ public class GUIGraphHandler extends GUICardPanel
 			public void actionPerformed(ActionEvent e) {
 				String[] options = new String[]{"Build", "File", "Cancel"};
 				int res = JOptionPane.showOptionDialog(btnAddGraph,
-		                "<html>Please choose wherther to start creations "
+		                "<html>Please choose whether to start creations "
 		                + "of a new graph (Build), "
 		                + "or import graph from file.</html>",
 		                "Specify source of new graph",

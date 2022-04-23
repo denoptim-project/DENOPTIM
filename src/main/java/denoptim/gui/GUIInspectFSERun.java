@@ -37,17 +37,23 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
@@ -431,6 +437,17 @@ public class GUIInspectFSERun extends GUICardPanel
 						b.getFitness());
 			}
 		});
+        allItems.sort(new Comparator<CandidateLW>() {
+            public int compare(CandidateLW c1, CandidateLW c2) {
+                int byGen = Integer.compare(c1.getLevel(), 
+                        c2.getLevel());
+                if (byGen!=0)
+                    return byGen;
+                if (c1.hasFitness() && c2.hasFitness())
+                    return Double.compare(c1.getFitness(), c2.getFitness());
+                return 0;
+            }
+        });
         
         double[][] itemsWithFitnessDataSorted = new double[2][itemsWithFitness];
         for (int i=0; i<itemsWithFitness; i++)
@@ -492,8 +509,11 @@ public class GUIInspectFSERun extends GUICardPanel
 		XYLineAndShapeRenderer renderer0 = 
 				(XYLineAndShapeRenderer) plotBL.getRenderer();
         renderer0.setSeriesShape(0, shape0);
-        renderer0.setSeriesPaint(0, Color.decode("#848482"));
-        renderer0.setSeriesOutlinePaint(0, Color.gray);
+        renderer0.setSeriesPaint(0, new Color(192, 192, 192, 60));
+        renderer0.setSeriesFillPaint(0, new Color(192, 192, 192, 60));
+        renderer0.setSeriesOutlinePaint(0, Color.GRAY);
+        renderer0.setUseOutlinePaint(true);
+        renderer0.setUseFillPaint(true);
         
         // dataset of selected items
 		Shape shape1 = new Ellipse2D.Double(
@@ -604,7 +624,46 @@ public class GUIInspectFSERun extends GUICardPanel
 					{
 						int itemId = ((XYItemEntity) e.getEntity()).getItem();
 						CandidateLW item = mapItemsInByLevel.get(itemId);
-						renderViewWithSelectedItem(item);
+                        
+                        // The even can carry only one item, but there could be 
+                        // many items overlapping each other.
+                        // Search for overlapping items and ask which one to the
+                        // user wants to see.
+                        int initPos = allItems.indexOf(item);
+                        double tolerance = Math.abs(chartByLevel.getXYPlot()
+                                .getRangeAxis().getRange().getLength() * 0.05);
+                        int maxItems = 25;
+                        int nItems = 0;
+                        List<CandidateLW> overlappingItems = 
+                                new ArrayList<CandidateLW>();
+                        while (nItems<maxItems)
+                        {
+                            CandidateLW c = allItems.get(initPos + nItems);
+                            double delta = Math.abs(item.getFitness() 
+                                    - c.getFitness());
+                            if (delta > tolerance)
+                                break;
+                            overlappingItems.add(c);
+                            nItems++;
+                        }
+                        nItems = 1;
+                        int posOfOriginal = 0;
+                        while (nItems<maxItems)
+                        {
+                            CandidateLW c = allItems.get(initPos - nItems);
+                            double delta = Math.abs(item.getFitness() 
+                                    - c.getFitness());
+                            if (delta > tolerance)
+                                break;
+                            overlappingItems.add(0,c);
+                            posOfOriginal++;
+                            nItems++;
+                        }
+                        int sz = overlappingItems.size();
+                        CandidateLW choosenItem = choseAmongPossiblyOverlapping(
+                                chartPanelByLevel, overlappingItems);
+                        if (choosenItem!=null)
+                            renderViewWithSelectedItem(choosenItem);
 					}
 					//do we do anything if we select other series? not now...
 				}
@@ -652,6 +711,49 @@ public class GUIInspectFSERun extends GUICardPanel
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
+
+//------------------------------------------------------------------------------
+    
+    private CandidateLW choseAmongPossiblyOverlapping(JComponent parent,
+            List<CandidateLW> overlappingItems)
+    {
+        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        JList<String> optionsList = new JList<String>(listModel);
+        overlappingItems.stream().forEach(c -> listModel.addElement(c.getName()));
+        optionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        JPanel chooseItem = new JPanel();
+        JLabel header = new JLabel("Select item to visualize:");
+        JScrollPane scrollPane = new JScrollPane(optionsList);
+        chooseItem.add(header);
+        chooseItem.add(scrollPane);
+      
+        int res = JOptionPane.showConfirmDialog(parent,
+              chooseItem, 
+              "Choose Among Overlapping Items", 
+              JOptionPane.OK_CANCEL_OPTION,
+              JOptionPane.PLAIN_MESSAGE, 
+              null);
+        if (res != JOptionPane.OK_OPTION)
+        {
+          return  null;
+        }
+        return overlappingItems.get(optionsList.getSelectedIndex());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private class PlottedCandidatesComparator implements Comparator<CandidateLW>
+    {
+        @Override
+        public int compare(CandidateLW c1, CandidateLW c2)
+        {
+            int byGen = Integer.compare(c1.getGeneration(), c2.getGeneration());
+            if (byGen!=0)
+                return byGen;
+            return Double.compare(c1.getFitness(), c2.getFitness());
+        }
+    }
 //-----------------------------------------------------------------------------
 	
 	private void renderViewWithSelectedItem(CandidateLW item)

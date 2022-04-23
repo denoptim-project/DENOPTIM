@@ -207,11 +207,9 @@ public class GeneOpsRunner extends ProgramTask
             e.printStackTrace();
         }
 
-        //TODO-gg make compcst using NL
-        logger.log(Level.INFO, "Initial graphs: ");
-        logger.log(Level.INFO, "MALE: "+male);
-        logger.log(Level.INFO, "FEMALE: "+female);
-        logger.log(Level.INFO, " ");
+        logger.log(Level.INFO, "Initial graphs: "+NL
+                +"MALE: "+male+NL
+                +"FEMALE: "+female);
     
         // Identify the crossover operation to perform
         Vertex vm = getEmbeddedVertex(settings.xoverSrcMale,
@@ -238,18 +236,15 @@ public class GeneOpsRunner extends ProgramTask
         male.renumberGraphVertices();
         female.renumberGraphVertices();
     
-        logger.log(Level.INFO, " ");
-        logger.log(Level.INFO, "Initial graphs now with unique vertexID: ");
-        logger.log(Level.INFO, "v: "+ vm.getVertexId() + " of MALE: " + male);
-        logger.log(Level.INFO, "v:" + vf.getVertexId() + " of FEMALE: " + female);
-        logger.log(Level.INFO, " ");
+        logger.log(Level.INFO, NL + "Initial graphs now with unique vertexID: "
+                +NL+ "v: "+ vm.getVertexId() + " of MALE: " + male
+                +NL+ "v:" + vf.getVertexId() + " of FEMALE: " + female);
         
         GraphOperations.performCrossover(xos, fragSpace);
     
-        logger.log(Level.INFO, "Result of crossover:");
-        logger.log(Level.INFO, "MALE: " + male);
-        logger.log(Level.INFO, "FEMALE: " + female);
-        logger.log(Level.INFO, " ");
+        logger.log(Level.INFO, NL + "Result of crossover:"
+                + NL + "MALE: " + male
+                + NL + "FEMALE: " + female);
     
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(
                 settings.getLogger(),
