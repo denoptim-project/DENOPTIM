@@ -253,6 +253,7 @@ public class GUIInspectGARun extends GUICardPanel
 			}
 		});
 		ctrlPanelLeft.add(rstView);
+		
 	    openGraph = new JButton("Open Candidate's Graph");
         openGraph.setEnabled(false); //Enables only upon selection of an item
 	    openGraph.setToolTipText("Open a new tab for inspecting the "

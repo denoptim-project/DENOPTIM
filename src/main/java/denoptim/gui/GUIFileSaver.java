@@ -35,9 +35,19 @@ import denoptim.files.FileFormat.DataKind;
 
 public class GUIFileSaver 
 {
-	private static JFileChooser fileChooser = new JFileChooser(
-			FileSystemView.getFileSystemView().getHomeDirectory()); 
-	
+	private static JFileChooser fileChooser = new JFileChooser(getSystemRoot()); 
+	   
+//-----------------------------------------------------------------------------
+    
+    private static File getSystemRoot()
+    {
+        File startFile = new File(System.getProperty("user.dir")); 
+        while (!FileSystemView.getFileSystemView().isFileSystemRoot(startFile))
+        {
+            startFile = startFile.getParentFile();
+        }
+        return startFile;
+    }
 //-----------------------------------------------------------------------------
 
 	public static FileAndFormat pickFileForSavingGraphs(Component parent) 
