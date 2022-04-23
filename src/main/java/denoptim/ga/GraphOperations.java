@@ -21,11 +21,16 @@ package denoptim.ga;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.paukov.combinatorics3.Generator;
 
@@ -120,10 +125,13 @@ public class GraphOperations
             DGraph gA = vA.getGraphOwner();
             DGraph gB = vB.getGraphOwner();
             
+            // Here we also identify the branch identity of each descendant
             List<Vertex> descendantsA = new ArrayList<Vertex>();
-            gA.getChildrenTree(vA, descendantsA);
+            gA.getChildrenTree(vA, descendantsA, new AtomicInteger(0), 
+                    new ArrayList<Integer>());
             List<Vertex> descendantsB = new ArrayList<Vertex>();
-            gB.getChildrenTree(vB, descendantsB);
+            gB.getChildrenTree(vB, descendantsB, new AtomicInteger(0), 
+                    new ArrayList<Integer>());
             
             // Branches that are isomorphic are not considered for crossover
             DGraph test1 = gA.clone();
@@ -165,7 +173,7 @@ public class GraphOperations
             
             // To limit the number of combination, we first get rid of end-point
             // candidates that cannot be used
-            List<Vertex[]> combinablePairs = new ArrayList<Vertex[]>();
+            List<Vertex[]> usablePairs = new ArrayList<Vertex[]>();
             for (Vertex[] otherPair : compatibleVrtxPairs)
             {
                 // Exclude vertexes that are not downstream to the seed of the subgraph
@@ -195,18 +203,91 @@ public class GraphOperations
                     if (pathA.getPathLength()!=pathB.getPathLength())
                         continue;
                 }
-                if (!combinablePairs.contains(otherPair))
-                    combinablePairs.add(otherPair);
+                if (!usablePairs.contains(otherPair))
+                    usablePairs.add(otherPair);
             }
             
-            // NB: use this combinatorial generator because it retains the 
+            // We classify the pairs by branch ownership
+            TreeMap<String,List<Vertex[]>> sitesByBranchIdA = 
+                    new TreeMap<String,List<Vertex[]>>();
+            TreeMap<String,List<Vertex[]>> sitesByBranchIdB = 
+                    new TreeMap<String,List<Vertex[]>>();
+            for (Vertex[] pp : usablePairs)
+            {
+                String branchIdA = gA.getBranchIdOfVertexAsStr(pp[0]);
+                String branchIdB = gB.getBranchIdOfVertexAsStr(pp[1]);
+                if (sitesByBranchIdA.containsKey(branchIdA))
+                {
+                    sitesByBranchIdA.get(branchIdA).add(pp);
+                } else {
+                    ArrayList<Vertex[]> lst = new ArrayList<Vertex[]>();
+                    lst.add(pp);
+                    sitesByBranchIdA.put(branchIdA, lst);
+                }
+                if (sitesByBranchIdB.containsKey(branchIdB))
+                {
+                    sitesByBranchIdB.get(branchIdB).add(pp);
+                } else {
+                    ArrayList<Vertex[]> lst = new ArrayList<Vertex[]>();
+                    lst.add(pp);
+                    sitesByBranchIdB.put(branchIdB, lst);
+                }
+            }
+            
+            // The side with the smallest set of branches determines the max
+            // number of pairs that can define a subgraph.
+            TreeMap<String,List<Vertex[]>> fewestBranchesSide = null;
+            if (sitesByBranchIdA.size() <= sitesByBranchIdB.size())
+                fewestBranchesSide = sitesByBranchIdA;
+            else
+                fewestBranchesSide = sitesByBranchIdB;
+            
+            // Add the empty, i.e., the branch with empty is not cut short.
+            for (List<Vertex[]> val : fewestBranchesSide.values())
+                val.add(new Vertex[]{null,null});
+            
+            // Generate the combinations: Cartesian product of multiple lists.
+            // NB: this combinatorial generator retains the 
             // sequence of generated subsets (important for reproducibility)
-            Generator.subset(combinablePairs)
-                .simple()
-                .stream()
-                .limit(500) // Prevent explosion!
+            List<List<Vertex[]>> preCombsOfEnds = Generator.cartesianProduct(
+                    fewestBranchesSide.values())
+                    .stream()
+                    .collect(Collectors.<List<Vertex[]>>toList());
+            
+            // Remove the 'null,null' place holders that indicate the use of no
+            // end-point on a specific branch.
+            List<List<Vertex[]>> combsOfEnds = new ArrayList<List<Vertex[]>>();
+            for (List<Vertex[]> comb : preCombsOfEnds)
+            {
+                List<Vertex[]> nullPurgedComb = new ArrayList<Vertex[]>();
+                for (Vertex[] inPair : comb)
+                {
+                    if (inPair[0]!=null && inPair[1]!=null)
+                        nullPurgedComb.add(inPair);
+                }
+                // the case where all entries are null corresponds to use no
+                // end point on any branch, which is already considered above.
+                if (nullPurgedComb.size()>0)
+                    combsOfEnds.add(nullPurgedComb);
+            }
+            
+            // This would be a strategy to parallelize. However, this type of 
+            // parallelization is not compatible with ensuring reproducibility.
+            // Perhaps, we could guarantee reproducibility by acting on the
+            // collector of sites as to ensure the list is sorted
+            // at the end of the generation of all possibilities.
+            /*
+            combsOfEnds
+                .parallelStream()
+                .limit(50) // Prevent explosion!
                 .forEach(c -> processCombinationOfEndPoints(pair, c, sites,
-                        fragSpace));
+                    fragSpace));
+            */
+            
+            combsOfEnds.stream()
+                .limit(50) // Prevent explosion!
+                .forEach(c -> processCombinationOfEndPoints(pair, c, sites,
+                    fragSpace));
         }
         
         // NB: we consider only templates that are at the same level of embedding
@@ -236,7 +317,6 @@ public class GraphOperations
                 }
             }
         }
-        
         return sites;
     }
     
@@ -263,10 +343,28 @@ public class GraphOperations
         if (cominationOfEnds.size()==0)
             return;
         
+        // This would be a strategy to parallelize. However, this type of 
+        // parallelization is not compatible with ensuring reproducibility.
+        // Perhaps, we could guarantee reproducibility by acting on the
+        // collector as to ensure the list of collected results is sorted
+        // at the end of the generation of all possibilities
+        /*
+        List<List<Vertex[]>> permutsOfEnds = new ArrayList<List<Vertex[]>>();
+        Generator.subset(cominationOfEnds)
+            .simple()
+            .stream()
+            .limit(100) // Prevent explosion!
+            .forEach(c -> permutsOfEnds.add(c));
+        permutsOfEnds
+            .parallelStream()
+            .forEach(c -> processPermutationOfEndPoints(pair, c, collector,
+                    fragSpace));
+        */
+        
         Generator.permutation(cominationOfEnds)
             .simple()
             .stream()
-            .limit(500) // Prevent explosion!
+            .limit(100) // Prevent explosion!
             .forEach(c -> processPermutationOfEndPoints(pair, c, collector,
                     fragSpace));
     }
@@ -349,10 +447,16 @@ public class GraphOperations
             gB.getChildTreeLimited(vB, subGraphB, subGraphEndInB, true);
         
         // The two subgraphs must not be isomorfic to prevent unproductive crossover
-        DGraph subGraphCloneA = gA.extractSubgraph(subGraphA);
-        DGraph subGraphCloneB = gB.extractSubgraph(subGraphB);
-        if (subGraphCloneA.isIsomorphicTo(subGraphCloneB))
-            return;
+        if (subGraphA.size()>1 && subGraphB.size()>1)
+        {
+            DGraph subGraphCloneA = gA.extractSubgraph(subGraphA);
+            DGraph subGraphCloneB = gB.extractSubgraph(subGraphB);
+            if (subGraphCloneA.isIsomorphicTo(subGraphCloneB))
+                return;
+        } else {
+            if (subGraphA.get(0).sameAs(subGraphB.get(0), new StringBuilder()))
+                return;
+        }
         
         checkAndAddXoverSites(fragSpace, subGraphA, subGraphB, 
                 CrossoverType.SUBGRAPH, collector);

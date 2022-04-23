@@ -430,12 +430,17 @@ public final class DENOPTIMConstants
      */
     public static final Object APORIGINALLENGTH = "ORIGINALLENGTH";
     
-
     /**
      * Property of {@link Vertex} used to keep mark symmetric vertexes
      * during graph operations and before defining the actual set of symmetric 
      * vertexes.
      */
     public static final Object VRTSYMMSETID = "VRTSYMMSETID";
+
+    /**
+     * Property of {@link Vertex} used to record the identity of the graph 
+     * branch holding that {@link Vertex}.
+     */
+    public static final Object GRAPHBRANCHID = "GRAPHBRANCHID";
     
 }

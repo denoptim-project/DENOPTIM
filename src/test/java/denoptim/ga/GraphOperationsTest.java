@@ -3,6 +3,7 @@ package denoptim.ga;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -41,6 +43,7 @@ import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.io.DenoptimIO;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -419,6 +422,7 @@ public class GraphOperationsTest {
         DGraph[] pair = getPairOfTestGraphs();
         DGraph graphA = pair[0];
         DGraph graphB = pair[1];
+        
         Template t1 = (Template) graphA.getVertexAtPosition(1);
         Template t2 = (Template) graphB.getVertexAtPosition(1);
         // Making some empty vertexes unique to enable swapping (otherwise they
@@ -496,8 +500,8 @@ public class GraphOperationsTest {
             t2.setContractLevel(contracts.get(i));
             
             List<XoverSite> xoverSites = 
-                    GraphOperations.locateCompatibleXOverPoints(graphA, 
-                            graphB, fragSpace);
+                    GraphOperations.locateCompatibleXOverPoints(graphA, graphB, 
+                            fragSpace);
             
             assertEquals(expectedNumberOfSites.get(i), xoverSites.size());
     

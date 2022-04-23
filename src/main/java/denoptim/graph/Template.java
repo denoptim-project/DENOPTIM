@@ -348,7 +348,7 @@ public class Template extends Vertex
      * Replaces a given link between APs on the surface of this template (i.e., 
      * outerAP) and the corresponding APs in the embedded graph 
      * (i.e., innerAPs). This method does change the attributes of the outerAP 
-     * to reflect the change on innferAP, i.e., the {@link APClass} of innerAP 
+     * to reflect the change on innerAP, i.e., the {@link APClass} of innerAP 
      * is assigned to the outerAP.
      * If there is now mapping for the oldInnerAP,
      * then nothing happens.

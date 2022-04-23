@@ -394,7 +394,6 @@ public class Population extends ArrayList<Candidate> implements Cloneable
                 e.printStackTrace();
             }
         }
-        
         return xoverCompatibilities.getMembersCompatibleWith(memberA);
     }
 

@@ -713,9 +713,7 @@ public class EvolutionaryAlgorithm
                     submitted.add(task);
                     futures.add(tpe.submit(task));
                 } else {
-                    
                     syncronisedTasks.add(task);
-
                     if (syncronisedTasks.size() 
                             >= Math.abs(population.size() - newPopSize)
                             ||

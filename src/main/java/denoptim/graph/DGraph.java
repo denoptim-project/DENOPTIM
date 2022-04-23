@@ -2571,6 +2571,27 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
+     * Returns the branch identifier as a literal string.
+     * @param i the position of the vertex to analyze.
+     * @return the branch identifier expressed as a string 
+     * or <code>null</code> if the vertex does not
+     * belong to this graph or if such property is
+     * not available. In the latter case, you should run 
+     * {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} on any of 
+     * the parent vertexes.
+     */
+    public String getBranchIdOfVertexAsStr(Vertex v)
+    {
+        List<Integer> lst = getBranchIdOfVertex(v);
+        String s = "";
+        for (Integer i : lst)
+            s = s + i + "_";
+        return s;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
      * Uses branch identifiers to define is two vertexes are in such a relation 
      * that allows the drawing of a directed path from one to the other.
      * You must run {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} 
