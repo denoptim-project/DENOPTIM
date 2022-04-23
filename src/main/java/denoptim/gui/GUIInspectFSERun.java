@@ -660,7 +660,7 @@ public class GUIInspectFSERun extends GUICardPanel
                         // user wants to see.
                         int initPos = allItems.indexOf(item);
                         double tolerance = Math.abs(chartByLevel.getXYPlot()
-                                .getRangeAxis().getRange().getLength() * 0.05);
+                                .getRangeAxis().getRange().getLength() * 0.02);
                         int maxItems = 25;
                         int nItems = 0;
                         List<CandidateLW> overlappingItems = 
@@ -669,6 +669,11 @@ public class GUIInspectFSERun extends GUICardPanel
                                 (initPos+nItems)<allItems.size())
                         {
                             CandidateLW c = allItems.get(initPos + nItems);
+                            if (!c.hasFitness())
+                            {
+                                nItems++;
+                                continue;
+                            }
                             double delta = Math.abs(item.getFitness() 
                                     - c.getFitness());
                             if (delta > tolerance)
@@ -680,6 +685,11 @@ public class GUIInspectFSERun extends GUICardPanel
                         while (nItems<maxItems  && (initPos-nItems)>-1)
                         {
                             CandidateLW c = allItems.get(initPos - nItems);
+                            if (!c.hasFitness())
+                            {
+                                nItems++;
+                                continue;
+                            }
                             double delta = Math.abs(item.getFitness() 
                                     - c.getFitness());
                             if (delta > tolerance)

@@ -674,7 +674,7 @@ public class GUIInspectGARun extends GUICardPanel
 						// user wants to see.
 						int initPos = allIndividuals.indexOf(item);
 		                double tolerance = Math.abs(plot.getRangeAxis()
-		                        .getRange().getLength() * 0.05);
+		                        .getRange().getLength() * 0.02);
 		                int maxItems = 25;
 		                int nItems = 0;
 		                List<CandidateLW> overlappingItems = 
@@ -683,6 +683,11 @@ public class GUIInspectGARun extends GUICardPanel
 		                        (initPos+nItems)<allIndividuals.size())
 		                {
 		                    CandidateLW c = allIndividuals.get(initPos + nItems);
+		                    if (!c.hasFitness())
+		                    {
+	                            nItems++;
+		                        continue;
+		                    }
 		                    double delta = Math.abs(item.getFitness() 
 		                            - c.getFitness());
 		                    if (delta > tolerance)
@@ -694,6 +699,11 @@ public class GUIInspectGARun extends GUICardPanel
 		                while (nItems<maxItems && (initPos-nItems)>-1)
                         {
                             CandidateLW c = allIndividuals.get(initPos - nItems);
+                            if (!c.hasFitness())
+                            {
+                                nItems++;
+                                continue;
+                            }
                             double delta = Math.abs(item.getFitness() 
                                     - c.getFitness());
                             if (delta > tolerance)
