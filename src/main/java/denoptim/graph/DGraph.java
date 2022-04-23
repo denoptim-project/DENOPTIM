@@ -2452,6 +2452,65 @@ public class DGraph implements Cloneable
 
     /**
      * Gets all the children of the current vertex recursively. All vertexes 
+     * belonging to the children tree can be labelled by a property that 
+     * identifies
+     * which branches they belong to ({@link DENOPTIMConstants.GRAPHBRANCHID}).
+     * This method does not cross template 
+     * boundaries, thus all children belong to the same graph.
+     * @param vertex the vertex whose children are to be located
+     * @param children list containing the references to all the children
+     * @param markBranches <code>true</code> to set the 
+     * {@link DENOPTIMConstants.GRAPHBRANCHID} property to vertexes, including 
+     * the initial one.
+     * <code>vertex</code> belongs.
+     */
+    public void getChildrenTree(Vertex vertex, List<Vertex> children, 
+            boolean markBranches) 
+    {
+        if (!markBranches)
+        {
+            getChildrenTree(vertex, children);
+            return;
+        }
+        
+        AtomicInteger branchIdGenerator = new AtomicInteger(0);
+        List<Integer> thisBranchId = new ArrayList<Integer>();
+        thisBranchId.add(branchIdGenerator.getAndIncrement());
+        
+        vertex.setProperty(DENOPTIMConstants.GRAPHBRANCHID, thisBranchId);
+        
+        List<Vertex> lst = getChildVertices(vertex);
+        if (lst.isEmpty()) 
+        {
+            return;
+        }
+        for (Vertex child : lst)
+        {
+            if (!children.contains(child)) 
+            {
+                children.add(child);
+                if (lst.size()==1)
+                {
+                    child.setProperty(DENOPTIMConstants.GRAPHBRANCHID, 
+                            thisBranchId);
+                    getChildrenTree(child, children, branchIdGenerator, 
+                            thisBranchId);
+                } else {
+                    List<Integer> newBranchId = new ArrayList<>(thisBranchId);
+                    newBranchId.add(branchIdGenerator.getAndIncrement());
+                    child.setProperty(DENOPTIMConstants.GRAPHBRANCHID, 
+                            newBranchId);
+                    getChildrenTree(child, children, branchIdGenerator, 
+                            newBranchId);
+                }
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Gets all the children of the current vertex recursively. All vertexes 
      * belonging to the children tree are labelled by a property that identifies
      * which branches they belong to ({@link DENOPTIMConstants.GRAPHBRANCHID}).
      * This method does not cross template 

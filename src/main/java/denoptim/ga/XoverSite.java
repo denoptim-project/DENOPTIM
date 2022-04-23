@@ -330,7 +330,7 @@ public class XoverSite implements Cloneable
      */
     public String toString()
     {
-        return "[XoverSite: "+subGraphA+", "+subGraphB+"]";
+        return "[XoverSite-" + xoverType + ": "+subGraphA+", "+subGraphB+"]";
     }
     
 //------------------------------------------------------------------------------

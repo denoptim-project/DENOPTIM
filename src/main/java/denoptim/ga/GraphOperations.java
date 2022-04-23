@@ -127,11 +127,9 @@ public class GraphOperations
             
             // Here we also identify the branch identity of each descendant
             List<Vertex> descendantsA = new ArrayList<Vertex>();
-            gA.getChildrenTree(vA, descendantsA, new AtomicInteger(0), 
-                    new ArrayList<Integer>());
+            gA.getChildrenTree(vA, descendantsA, true);
             List<Vertex> descendantsB = new ArrayList<Vertex>();
-            gB.getChildrenTree(vB, descendantsB, new AtomicInteger(0), 
-                    new ArrayList<Integer>());
+            gB.getChildrenTree(vB, descendantsB, true);
             
             // Branches that are isomorphic are not considered for crossover
             DGraph test1 = gA.clone();
@@ -158,35 +156,38 @@ public class GraphOperations
                 e.printStackTrace();
             }
             
+            // To limit the number of combination, we first get rid of end-point
+            // candidates that cannot be used
+            List<Vertex[]> usablePairs = new ArrayList<Vertex[]>();
+            
             // To identify subgraphs smaller than the full branch we need to find
             // where such subgraphs end, i.e., the vertexes at the end of
             // such subgraphs (included in them), a.k.a. the subgraph ends.
             // Since these subgraph ends will need to allow connection with the
-            // rest of the original graph, they are indeed crossover-compatible
+            // rest of the original graph, they are related to the 
+            // already-identified crossover-compatible
             // sites, i.e., they are the parents of the vertexes collected in 
             // compatibleVrtxPairs. Yet, we can combine them
-            // * in any number from 1 to all of them (outer loop)
-            // * in any combination of the chosen number of them (inner loop)
+            // * in any number from 1 to all of them,
+            // * in any combination of the chosen number of them.
             // Also, note that the ends need not to cover all the branches. So,
             // some combinations will have to cut some branches short while
             // taking some other branches completely till their last leaf.
-            
-            // To limit the number of combination, we first get rid of end-point
-            // candidates that cannot be used
-            List<Vertex[]> usablePairs = new ArrayList<Vertex[]>();
             for (Vertex[] otherPair : compatibleVrtxPairs)
             {
-                // Exclude vertexes that are not downstream to the seed of the subgraph
-                Vertex endOnA = otherPair[0];
-                Vertex endOnB = otherPair[1];
-                if (!descendantsA.contains(endOnA)
-                        || !descendantsB.contains(endOnB))
+                // NB: the xover compatible sites are the child vertexes of the
+                // subgraph ends. So we need to get the parent
+                Vertex nextToEndOnA = otherPair[0];
+                Vertex nextToEndOnB = otherPair[1];
+                Vertex endOnA = nextToEndOnA.getParent();
+                Vertex endOnB = nextToEndOnB.getParent();
+                if (endOnA==null || endOnB==null)
                     continue;
                 
-                // This is only the path between the seed and one of the 
-                // possibly many subgraph end-points
-                PathSubGraph pathA = new PathSubGraph(vA, endOnA, gA);
-                PathSubGraph pathB = new PathSubGraph(vB, endOnB, gB);
+                // Exclude vertexes that are not downstream to the seed of the subgraph
+                if (!descendantsA.contains(endOnA) && endOnA!=vA
+                        || !descendantsB.contains(endOnB) && endOnB!=vB)
+                    continue;
                 
                 // If any partner is a fixed-structure templates...
                 if ((gA.getTemplateJacket()!=null 
@@ -199,12 +200,15 @@ public class GraphOperations
                     //...the two paths must have same length. This would be 
                     // checked anyway later when checking for isostructural
                     // subgraphs, but here it helps reducing the size of the 
-                    // combinatorial problem
+                    // combinatorial problem.
+                    PathSubGraph pathA = new PathSubGraph(vA, endOnA, gA);
+                    PathSubGraph pathB = new PathSubGraph(vB, endOnB, gB);
                     if (pathA.getPathLength()!=pathB.getPathLength())
                         continue;
                 }
-                if (!usablePairs.contains(otherPair))
-                    usablePairs.add(otherPair);
+                Vertex[] pairOfEnds = new Vertex[]{endOnA,endOnB};
+                if (!usablePairs.contains(pairOfEnds))
+                    usablePairs.add(pairOfEnds);
             }
             
             // We classify the pairs by branch ownership
@@ -393,6 +397,7 @@ public class GraphOperations
         DGraph gB = vB.getGraphOwner();
         
         // Exclude overlapping combinations
+        //TODO-gg remove should not be needed
         boolean exclude = false;
         for (Vertex[] pairA : chosenSequenceOfEndpoints)
         {
@@ -427,12 +432,10 @@ public class GraphOperations
                     || alreadyIncludedFromB.contains(endOnB))
                 continue;
             
-            PathSubGraph pathA = new PathSubGraph(vA, 
-                    endOnA.getParent(), gA);
-            PathSubGraph pathB = new PathSubGraph(vB, 
-                    endOnB.getParent(), gB);
-            subGraphEndInA.add(endOnA.getParent());
-            subGraphEndInB.add(endOnB.getParent());
+            PathSubGraph pathA = new PathSubGraph(vA, endOnA, gA);
+            PathSubGraph pathB = new PathSubGraph(vB, endOnB, gB);
+            subGraphEndInA.add(endOnA);
+            subGraphEndInB.add(endOnB);
             alreadyIncludedFromA.addAll(pathA.getVertecesPath());
             alreadyIncludedFromB.addAll(pathB.getVertecesPath());
         }
@@ -523,6 +526,15 @@ public class GraphOperations
                 || (jacketTmplB!=null && jacketTmplB.getContractLevel()
                         ==ContractLevel.FIXED_STRUCT))
         {
+            // Avoid to alter cyclicity of inner graphs
+            for (Vertex v : subGraphA)
+                if (v.isRCV() && !gOwnerA.getRingsInvolvingVertex(v).isEmpty())
+                    return;
+            for (Vertex v : subGraphB)
+                if (v.isRCV() && !gOwnerB.getRingsInvolvingVertex(v).isEmpty())
+                    return;
+            
+            // Avoid to change the structure of inner graphs
             DGraph subGraphCloneA = gOwnerA.extractSubgraph(subGraphA);
             DGraph subGraphCloneB = gOwnerB.extractSubgraph(subGraphB);
             if (!subGraphCloneA.isIsostructuralTo(subGraphCloneB))
@@ -562,9 +574,9 @@ public class GraphOperations
      * AP class on source vertex of edge A is compatible with the AP class on 
      * target vertex of edge B, and that AP class on source vertex of edgeB is
      * compatible with the AP class on target vertex of edge A.
-     * @param eA first edge of the pair
-     * @param eB second edge of the pair
-     * @return <code>true</code> if the condition is satisfied
+     * @param eA first edge of the pair.
+     * @param eB second edge of the pair.
+     * @return <code>true</code> if the condition is satisfied.
      */
     private static boolean isCrossoverPossible(Edge eA, Edge eB,
             FragmentSpace fragSpace)
