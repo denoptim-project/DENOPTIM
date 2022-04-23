@@ -2063,10 +2063,12 @@ public class GraphOperations
         int graphId = graph.getGraphId();
         int positionOfVertex = graph.indexOf(vertex);
         //NB: since we have renumbered the vertexes, we use the old vertex ID
-        // when reporting what vertex is being mutated.
-        graph.setLocalMsg(graph.getLocalMsg() + " " + mType + " " 
+        // when reporting what vertex is being mutated. Also, note that the
+        // identity of the candidate is already in the graph's local msg.
+        String mutantOrigin = graph.getLocalMsg() + "|"
                 + vertex.getProperty(DENOPTIMConstants.STOREDVID) 
-                + "(" + positionOfVertex+")");
+                + " (" + positionOfVertex + ")";
+        graph.setLocalMsg(mutantOrigin);
         
         boolean done = false;
         switch (mType) 

@@ -450,7 +450,9 @@ public class EvolutionaryAlgorithm
                   
                 if (candidate == null)
                     continue;
-               
+
+                candidate.setGeneration(0);
+                
                 if (((FitnessParameters)settings.getParameters(
                         ParametersType.FIT_PARAMS)).checkPreFitnessUID())
                 {
@@ -684,6 +686,8 @@ public class EvolutionaryAlgorithm
                 
                 if (candidate == null)
                     continue;
+                
+                candidate.setGeneration(genId);
                 
                 if (((FitnessParameters)settings.getParameters(
                         ParametersType.FIT_PARAMS)).checkPreFitnessUID())

@@ -417,7 +417,7 @@ public final class DENOPTIMConstants
      * vertex.
      */
     public static final Object STOREDVID = "OLDVERTEXID";
-
+    
     /**
      * Key of property used to records references of APs. This is used, for
      * instance, when dealing with templates

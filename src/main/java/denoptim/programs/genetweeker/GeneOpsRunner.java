@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -170,6 +171,8 @@ public class GeneOpsRunner extends ProgramTask
                             + "TESTGENOPS-APIDONTARGETVERTEX.");
             }
             
+            v.setProperty(DENOPTIMConstants.STOREDVID, v.getVertexId());
+            
             // NB: last boolean asks to ignore the growth probability
             GraphOperations.performMutation(v,mt,true,
                     settings.idNewVrt, apID, new Monitor(), gaParams);
@@ -204,6 +207,7 @@ public class GeneOpsRunner extends ProgramTask
             e.printStackTrace();
         }
 
+        //TODO-gg make compcst using NL
         logger.log(Level.INFO, "Initial graphs: ");
         logger.log(Level.INFO, "MALE: "+male);
         logger.log(Level.INFO, "FEMALE: "+female);

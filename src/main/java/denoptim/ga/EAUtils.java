@@ -398,10 +398,18 @@ public class EAUtils
         for (Vertex v : xos.getB())
             lstIdVB = lstIdVB + "_" + v.getVertexId();
         String[] msgs = new String[2];
-        msgs[0] = "Xover: " + candIdA + "|" + gid1 + "|" + lstIdVA + "="
-                + candIdB + "|" + gid2 + "|" + lstIdVB;
-        msgs[1] = "Xover: " + candIdB + "|" + gid2 + "|" + lstIdVB + "="
-                + candIdA + "|" + gid1 + "|" + lstIdVA;
+        msgs[0] = "Xover: "
+                + "Gen:" + cA.getGeneration() + " Cand:" + candIdA 
+                + "|" + gid1 + "|" + lstIdVA 
+                + " X "
+                + "Gen:" + cB.getGeneration() + " Cand:" + candIdB
+                + "|" + gid2 + "|" + lstIdVB;
+        msgs[1] = "Xover: "
+                + "Gen:" + cB.getGeneration() + " Cand:" + candIdB
+                + "|" + gid2 + "|" + lstIdVB 
+                + " X "
+                + "Gen:" + cA.getGeneration() + " Cand:" + candIdA 
+                + "|" + gid1 + "|" + lstIdVA;
         
         DGraph[] graphsAffectedByXover = new DGraph[2];
         graphsAffectedByXover[0] = gAClone;
@@ -528,7 +536,9 @@ public class EAUtils
         
         String parentMolName = FilenameUtils.getBaseName(parent.getSDFFile());
         int parentGraphId = parent.getGraph().getGraphId();
-        graph.setLocalMsg("Mutation: " + parentMolName + "|" + parentGraphId);
+        graph.setLocalMsg("Mutation:"
+                + " Gen:" + parent.getGeneration() + " Cand:" + parentMolName 
+                + "|" + parentGraphId);
         
         if (!GraphOperations.performMutation(graph,mnt,settings))
         {
