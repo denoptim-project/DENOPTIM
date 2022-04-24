@@ -2,12 +2,15 @@
 
 ## From 2.x to 3.0.0
 * Use of Maven to build and test.
+* Command line build and test on Windows.
 * Creation of single Main method to start any DENOPTIM run or GUI, and open files from command line.
 * Introduction of Templates (recursive graphs).
 * Refactoring of genetic algorithm.
 * Introduction of new mutation operators.
-* Growth probability can be controlled by molecular size
+* Introduction of subgraph crossover operation.
+* Growth probability can be controlled by molecular size.
 * Introduction JSON format for vertexes and graphs.
+* Introduction on interface mechanism for interaction with ongoing runs.
 
 ## From 1.1 to 2.0
 * Expanding GUI functionality.
