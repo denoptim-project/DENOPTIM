@@ -104,7 +104,8 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	protected GraphViewerPanel graphViewer;
 	
 	//Default divider location
-	private double defDivLoc = 0.5;
+	private final double DEFDIVLOC = 0.5;
+	private double defDivLoc = DEFDIVLOC;
 	
 	private static final IChemObjectBuilder builder = 
 	            SilentChemObjectBuilder.getInstance();
@@ -270,7 +271,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	    this.dnGraph = dnGraph;
 	    resetFragViewerCardDeck();
 		
-		// Keep a snapshot of the old data visualised
+		// Keep a snapshot of the old data visualized
 		if (keepLabels)
 		{
 			oldGSStatus = graphViewer.getGraphStatusSnapshot();
@@ -279,7 +280,14 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		}
 		
 		graphViewer.cleanup();
-		graphViewer.loadGraphToViewer(dnGraph,oldGSStatus);
+		graphViewer.loadGraphToViewer(dnGraph, oldGSStatus);
+		
+		if (dnGraph.getVertexCount()==1)
+		{
+		    defDivLoc = 0.85; //Rezising occures upon painting.
+		    leftPane.setDividerLocation(1.0); // hide redundant jmol panel
+		    visualizeVertexInNestedViewer(dnGraph.getVertexAtPosition(0));
+		}
 	}
 
 //-----------------------------------------------------------------------------
@@ -436,57 +444,66 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 			    resetFragViewerCardDeck();
 			    return;
 			}
-			
 			JVertex jv = (JVertex) evt.getNewValue();
-
-		    Vertex bb = jv.dnpVertex.clone();
-			if (bb instanceof Fragment)
-			{
-			    removeNestedGraphViewer(); //Just is case we still have it
-			    Fragment frag = (Fragment) bb;
-			    fragViewer.loadFragmentToViewer(frag);
-	            bringCardToTopOfVertexViewer(FRAGVIEWERCARDNAME);
-			} else if (bb instanceof Template) {
-			    Template t = (Template) bb;
-
-		        // We lease data in the viewer to increase speed of execution, but the
-		        // leftover is outdated! This is the meaning of 'true'
-                fragViewer.clearAll(true);
-                fragViewerTmplViewerCard = new GraphVertexMolViewerPanel();
-                
-                //NB: this setting of the size is needed to allow generation
-                // of the graph layout.
-                Dimension d = new Dimension();
-                d.height = (int) fragViewerCardHolder.getSize().height;
-                d.width = (int) (fragViewerCardHolder.getSize().width*0.5);
-                fragViewerTmplViewerCard.graphViewer.setSize(d);
-                
-                fragViewerCardHolder.add(fragViewerTmplViewerCard, 
-                        TMPLVIEWERCARDNAME);
-                fragViewerTmplViewerCard.setSize(
-                        fragViewerCardHolder.getSize());
-
-                fragViewerTmplViewerCard.loadDnGraphToViewer(t.getInnerGraph(), 
-                        t.getIAtomContainer(), false);
-			    
-                bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
-			    fragViewerTmplViewerCard.setDividerLocation(defDivLoc);
-			} else if (bb instanceof EmptyVertex) {
-			    removeNestedGraphViewer(); //Just is case we still have it
-                
-                //TODO
-                System.out.println("WARNING: Visualization of "
-                        + "EmptyVertex is not implemented yet");
-                
-                // We lease data in the viewer to increase speed of execution, but the
-                // leftover is outdated! This is the meaning of 'true'
-                fragViewer.clearAll(true);
-                bringCardToTopOfVertexViewer(NOTDUABLECARDNAME);
-            }
+			visualizeVertexInNestedViewer(jv.dnpVertex);
 		}
 	}
 	
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+	
+	/**
+	 * Makes a clone of the given vertex and loads that clone into the nested 
+	 * visualization frame.
+	 * @param v the original vertex
+	 */
+	private void visualizeVertexInNestedViewer(Vertex v)
+	{
+	    Vertex bb = v.clone();
+        if (bb instanceof Fragment) {
+            removeNestedGraphViewer(); //Just is case we still have it
+            Fragment frag = (Fragment) bb;
+            fragViewer.loadFragmentToViewer(frag);
+            bringCardToTopOfVertexViewer(FRAGVIEWERCARDNAME);
+        } else if (bb instanceof Template) {
+            Template t = (Template) bb;
+
+            // We lease data in the viewer to increase speed of execution, but the
+            // leftover is outdated! This is the meaning of 'true'
+            fragViewer.clearAll(true);
+            fragViewerTmplViewerCard = new GraphVertexMolViewerPanel();
+            
+            //NB: this setting of the size is needed to allow generation
+            // of the graph layout.
+            Dimension d = new Dimension();
+            d.height = (int) fragViewerCardHolder.getSize().height;
+            d.width = (int) (fragViewerCardHolder.getSize().width*0.5);
+            fragViewerTmplViewerCard.graphViewer.setSize(d);
+            
+            fragViewerCardHolder.add(fragViewerTmplViewerCard, 
+                    TMPLVIEWERCARDNAME);
+            fragViewerTmplViewerCard.setSize(
+                    fragViewerCardHolder.getSize());
+
+            fragViewerTmplViewerCard.loadDnGraphToViewer(t.getInnerGraph(), 
+                    t.getIAtomContainer(), false);
+            
+            bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
+            fragViewerTmplViewerCard.setDividerLocation(DEFDIVLOC);
+        } else if (bb instanceof EmptyVertex) {
+            removeNestedGraphViewer(); //Just is case we still have it
+            
+            //TODO
+            System.out.println("WARNING: Visualization of "
+                    + "EmptyVertex is not implemented yet");
+            
+            // We lease data in the viewer to increase speed of execution, but the
+            // leftover is outdated! This is the meaning of 'true'
+            fragViewer.clearAll(true);
+            bringCardToTopOfVertexViewer(NOTDUABLECARDNAME);
+        }
+	}
+	
+//------------------------------------------------------------------------------
     
     /**
      * Listener for identifying the node on which the user has clicked and 
@@ -517,9 +534,10 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Moved the divider to the default location.
+	 * Moved the divider to the location configured by some content-based
+	 * reasoning.
 	 */
-	public void setDefaultDividerLocation()
+	public void moveDividerLocation()
 	{
 	    setDividerLocation(defDivLoc);
 	}

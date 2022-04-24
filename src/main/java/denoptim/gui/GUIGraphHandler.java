@@ -211,7 +211,7 @@ public class GUIGraphHandler extends GUICardPanel
 
 	    if (!painted) {
 	        painted = true;
-	        visualPanel.setDefaultDividerLocation();
+	        visualPanel.moveDividerLocation();
 	    }
 	}
 	
