@@ -394,7 +394,7 @@ public class VertexViewPanel extends JPanel
     
     /**
      * Loads the given template to this viewer.
-     * @param tmpl the template to visualise
+     * @param tmpl the template to visualize
      */
     private void loadTemplateToViewer(Template tmpl)
     {       
@@ -412,11 +412,15 @@ public class VertexViewPanel extends JPanel
                 switchbleByVertexType = true;
             } catch (DENOPTIMException e)
             {
-                fragViewer.clearAll();
+                // We lease data in the viewer to increase speed of execution, but the
+                // leftover is outdated! This is the meaning of 'true'
+                fragViewer.clearAll(true);
                 switchbleByVertexType = false;
             }
         } else {
-            fragViewer.clearAll();
+            // We lease data in the viewer to increase speed of execution, but the
+            // leftover is outdated! This is the meaning of 'true'
+            fragViewer.clearAll(true);
             switchbleByVertexType = false;
         }
         graphNodeViewer.loadVertexToViewer(tmpl);
@@ -444,12 +448,16 @@ public class VertexViewPanel extends JPanel
 //-----------------------------------------------------------------------------
     
     /**
-     * Clears the molecular viewer. This operation is slow! 
-     * It usually a second or two.
+     * Clears the molecular viewer.  <b>WARNING:</b> this is VERY SLOW: do not do
+     * it unless you are sure you really need to clear the data. Typically,
+     * if there is incoming data, you do not need to run this, as the old data 
+     * will be overwritten anyway.
+     * @param dataIsComing set <code>true</code> when there is incoming 
+     * molecular data to visualize.
      */
-    public void clearMolecularViewer()
+    public void clearMolecularViewer(boolean dataIsComing)
     {
-        fragViewer.clearMolecularViewer();
+        fragViewer.clearMolecularViewer(dataIsComing);
     }
     
 //-----------------------------------------------------------------------------

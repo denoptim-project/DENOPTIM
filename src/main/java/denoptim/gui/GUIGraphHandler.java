@@ -158,7 +158,7 @@ public class GUIGraphHandler extends GUICardPanel
 	private JSpinner graphNavigSpinner;
 	private JLabel totalGraphsLabel;
 	private final GraphSpinnerChangeEvent graphSpinnerListener = 
-												new GraphSpinnerChangeEvent();
+	        new GraphSpinnerChangeEvent();
 	
 	private JPanel pnlEditVrtxBtns;
 	private JButton btnAddLibVrtx;
@@ -1536,9 +1536,7 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 		    visualPanel.loadDnGraphToViewer(dnGraphLibrary.get(currGrphIdx), 
 		            molLibrary.get(currGrphIdx), keepSprites);
-		}
-		else
-		{
+		} else {
 		    visualPanel.loadDnGraphToViewer(dnGraphLibrary.get(currGrphIdx),
 		            keepSprites);
 		}

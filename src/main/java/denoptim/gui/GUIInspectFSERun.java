@@ -824,7 +824,8 @@ public class GUIInspectFSERun extends GUICardPanel
 	{
 		datasetSelectedLev.removeSeries("Selected_candidates");
 		datasetSelectedOrd.removeSeries("Selected_candidates");
-		molViewer.clearAll();
+		//TODO: we could avoid 'zap-ping' jmol by covering it with an opaque card
+		molViewer.clearAll(false);
         openGraph.setEnabled(false);
 	}
 

@@ -1025,7 +1025,8 @@ public class GUIInspectGARun extends GUICardPanel
 	private void renderViewWithoutSelectedItems()
 	{
 		datasetSelected.removeSeries("Selected_candidates");
-		molViewer.clearAll();
+        //TODO: we could avoid 'zap-ping' jmol by covering it with an opaque card
+        molViewer.clearAll(false);
 		openSingleGraph.setEnabled(false);
 	}
 	

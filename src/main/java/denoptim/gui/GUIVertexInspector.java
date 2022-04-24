@@ -1152,7 +1152,9 @@ public class GUIVertexInspector extends GUICardPanel
     		
     		if (currVrtxIdx==-1 || verticesLibrary.size()==0)
 			{
-    		    vertexViewer.clearMolecularViewer();
+    		    // The viewer gets hidden so we do not need to clear it
+    		    // with 'zap' (which is a very slow operation)
+    		    vertexViewer.clearMolecularViewer(true);
 				currVrtxIdx = 0;
 				navigSpinner.setModel(new SpinnerNumberModel(0,0,0,1));
 				totalVrtxsLabel.setText(Integer.toString(0));

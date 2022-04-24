@@ -245,8 +245,8 @@ public class GraphVertexMolViewerPanel extends JSplitPane
     public void loadDnGraphToViewer(DGraph dnGraph, IAtomContainer mol, 
             boolean keepSprites)
     {
-        loadDnGraphToViewer(dnGraph,keepSprites);
         try {
+            loadDnGraphToViewer(dnGraph,keepSprites); 
             molViewer.loadChemicalStructure(mol);
             bringCardToTopOfMolViewer(MOLVIEWERCARDNAME);
         } catch (Exception e) {
@@ -291,7 +291,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	
     public void renderMolVieverToNeedUpdate()
     {
-        molViewer.clearAll();
+        // We lease data in the viewer to increase speed of execution, but the
+        // leftover is outdated! This is the meaning of 'true'
+        molViewer.clearAll(true); 
         bringCardToTopOfMolViewer(UPDATETOVIEW);
     }
 	
@@ -299,14 +301,16 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	
 	/**
 	 * Updates the molecular representation of the loaded graph. We rebuild 
-	 * the molecular representation, if we can do so because we have the space
-	 * of building blocks. This method is needed in case of changes to the loaded
+	 * the molecular representation.
+	 * This method is needed in case of changes to the loaded
 	 * graph, to project those changes in the graph into the molecular
 	 * representation.
 	 */
 	public IAtomContainer updateMolevularViewer()
 	{
-	    molViewer.clearAll();
+	    // We lease data in the viewer to increase speed of execution, but the
+        // leftover is outdated! This is the meaning of 'true'
+	    molViewer.clearAll(true);
 
         IAtomContainer mol = builder.newAtomContainer();
 	    if (!dnGraph.containsAtoms())
@@ -354,7 +358,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	{
 	    if (fragViewer != null)
         {
-            fragViewer.clearAll();
+	        // We lease data in the viewer to increase speed of execution, but the
+	        // leftover is outdated! This is the meaning of 'true'
+            fragViewer.clearAll(true);
             bringCardToTopOfVertexViewer(EMPTYCARDNAME);
             removeNestedGraphViewer();
         }
@@ -394,7 +400,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      */
     public void clearVertexViewer()
     {
-        fragViewer.clearAll();
+        // We lease data in the viewer to increase speed of execution, but the
+        // leftover is outdated! This is the meaning of 'true'
+        fragViewer.clearAll(true);
         bringCardToTopOfVertexViewer(EMPTYCARDNAME);
     }
 	
@@ -405,7 +413,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      */
     public void clearMolecularViewer()
     {
-        molViewer.clearAll();
+        // We lease data in the viewer to increase speed of execution, but the
+        // leftover is outdated! This is the meaning of 'true'
+        molViewer.clearAll(true);
         bringCardToTopOfMolViewer(EMPTYCARDNAME);
     }
     
@@ -438,9 +448,11 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	            bringCardToTopOfVertexViewer(FRAGVIEWERCARDNAME);
 			} else if (bb instanceof Template) {
 			    Template t = (Template) bb;
-                fragViewer.clearAll();
-                fragViewerTmplViewerCard = 
-                        new GraphVertexMolViewerPanel();
+
+		        // We lease data in the viewer to increase speed of execution, but the
+		        // leftover is outdated! This is the meaning of 'true'
+                fragViewer.clearAll(true);
+                fragViewerTmplViewerCard = new GraphVertexMolViewerPanel();
                 
                 //NB: this setting of the size is needed to allow generation
                 // of the graph layout.
@@ -466,7 +478,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
                 System.out.println("WARNING: Visualization of "
                         + "EmptyVertex is not implemented yet");
                 
-                fragViewer.clearAll();
+                // We lease data in the viewer to increase speed of execution, but the
+                // leftover is outdated! This is the meaning of 'true'
+                fragViewer.clearAll(true);
                 bringCardToTopOfVertexViewer(NOTDUABLECARDNAME);
             }
 		}

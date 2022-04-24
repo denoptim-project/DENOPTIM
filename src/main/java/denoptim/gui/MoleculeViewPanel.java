@@ -305,7 +305,17 @@ public class MoleculeViewPanel extends JSplitPane
 	 */
 	public void loadChemicalStructureFromFile(File file)
 	{
-		clearAll();
+	    // WARNING! You might be tempted to use 'false' to really clear ('zap') 
+	    // the viewer from outdated content. However, that operation is extremely
+	    // slow (2-3 seconds) and degrades user experience substantially. 
+	    // Instead, we keep outdated data and let the incoming data overwrite
+	    // the old ones.
+	    // In case of timing, note that the 'zap' script is executed in another 
+	    // thread, so the timing of the clear method does not reflect the actual
+	    // time it takes to do the operation. The other thread dealing with the 
+	    // 'zap' command will, however, stop the execution of this thread when
+	    // the latter asks viewer.isScriptExecuting() (see below in this method)
+		clearAll(true);
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		try {
@@ -350,6 +360,7 @@ public class MoleculeViewPanel extends JSplitPane
 		fillDataTable(file);
 
 		int i=0;
+		// This is often needed to wait for the 'zap' script to finish.
         while (jmolPanel.viewer.isScriptExecuting())
         {
             i++;
@@ -358,14 +369,13 @@ public class MoleculeViewPanel extends JSplitPane
                 Thread.sleep(100);
             } catch (InterruptedException e)
             {
-                // TODO Auto-generated catch block
+                // should never happen
                 e.printStackTrace();
             }
         }
 		jmolPanel.viewer.openFile(file.getAbsolutePath());
-
+        
 		setJmolViewer();
-		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 
@@ -473,11 +483,15 @@ public class MoleculeViewPanel extends JSplitPane
 
 	/**
 	 * Removes the currently visualized molecule and AP table
+	 * @param dataIsComing set <code>true</code> when there is incoming 
+	 * molecular data to visualize. In such case we do not run the very slow
+	 * <code>zap</code> script in JMol because the molecular data will be 
+	 * overwritten anyway. 
 	 */
-	public void clearAll()
+	public void clearAll(boolean dataIsComing)
 	{
 		cleardataTable();
-		clearMolecularViewer();
+		clearMolecularViewer(dataIsComing);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -498,11 +512,17 @@ public class MoleculeViewPanel extends JSplitPane
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Clears the molecular viewer
+	 * Clears the molecular viewer. <b>WARNING:</b> this is VERY SLOW: do not do
+	 * it unless you are sure you really need to clear the data. Typically,
+	 * if there is incoming data, you do not need to run this, as the old data 
+	 * will be overwritten anyway.
+	 * @param dataIsComing set <code>true</code> when there is incoming 
+     * molecular data to visualize.
 	 */
-	public void clearMolecularViewer()
+	public void clearMolecularViewer(boolean dataIsComing)
 	{
-		jmolPanel.viewer.evalString("zap");
+	    if (!dataIsComing)
+	        jmolPanel.viewer.evalString("zap");
 	}
 
 //-----------------------------------------------------------------------------

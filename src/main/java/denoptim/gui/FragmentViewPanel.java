@@ -272,7 +272,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 				{
 					System.out.println("Give up waiting");
 					jmolPanel.viewer.haltScriptExecution();
-					clearMolecularViewer();
+					//no data is coming, so we have to 'zap'
+					clearMolecularViewer(false);
 					if (parent!=null)
 					{
 						parent.setCursor(Cursor.getPredefinedCursor(
@@ -357,7 +358,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 			loadPlainStructure(iac);
 		} catch (DENOPTIMException e) {
 			e.printStackTrace();
-			clearMolecularViewer();
+			//no data is coming, so we have to 'zap'
+			clearMolecularViewer(false);
 		}
 	}
 	
@@ -540,14 +542,16 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		String[] lines = strData.split("\\n");
 		if (lines.length < 5)
 		{
-			clearMolecularViewer();
+		    //no data is coming, so we have to 'zap'
+			clearMolecularViewer(false);
 			clearAPTable();
 			throw new DENOPTIMException("Unexpected format in Jmol molecular "
 					+ "data: '" + strData + "'");
 		}
 		if (!lines[3].matches(".*999 V2000.*"))
 		{
-			clearMolecularViewer();
+		    //no data is coming, so we have to 'zap'
+			clearMolecularViewer(false);
 			clearAPTable();
 			throw new DENOPTIMException("Unexpected format in Jmol molecular "
 					+ "data: " + strData);
@@ -813,11 +817,15 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 
 	/**
 	 * Removes the currently visualized molecule and AP table
+	 * @param dataIsComing set <code>true</code> when there is incoming 
+     * molecular data to visualize. In such case we do not run the very slow
+     * <code>zap</code> script in JMol because the molecular data will be 
+     * overwritten anyway.
 	 */
-	public void clearAll()
+	public void clearAll(boolean dataIsComing)
 	{
 		clearAPTable();
-		clearMolecularViewer();
+		clearMolecularViewer(dataIsComing);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -840,12 +848,17 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 //-----------------------------------------------------------------------------
 	
 	/**
-	 * Clears the molecular viewer. This operation is slow! 
-	 * It usually a second or two.
+	 * Clears the molecular viewer. <b>WARNING:</b> this is VERY SLOW: do not do
+     * it unless you are sure you really need to clear the data. Typically,
+     * if there is incoming data, you do not need to run this, as the old data 
+     * will be overwritten anyway.
+     * @param dataIsComing set <code>true</code> when there is incoming 
+     * molecular data to visualize.
 	 */
-	public void clearMolecularViewer()
+	public void clearMolecularViewer(boolean dataIsComing)
 	{
-	    jmolPanel.viewer.evalString("zap");
+	    if (!dataIsComing)
+            jmolPanel.viewer.evalString("zap");
 	}
 
 //-----------------------------------------------------------------------------
