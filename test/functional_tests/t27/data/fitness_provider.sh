@@ -103,16 +103,16 @@ fitness=$((ncl + nf))
 # last enough to give DENOPTIM the time to read-in the instructions from the 
 # interface folder and apply those changes.
 #
-sleep 0.1
+sleep 0.15
 
 # These are the candidates that will have an artificially high fitness:
 candIdTo50="M00000027"
-candIdTo40="M00000028"
+candIdTo40="M00000025"
 # Note that these values are used also in the run.sh script! Make sure there
 # is consistency.
 
 # And this is the moment (i.e., the generation) where we'll ask to remove the 
-#two high-fitness candidates, and  we'll add a brand new candidate that is 
+# two high-fitness candidates, and  we'll add a brand new candidate that is 
 # defined further below (i.e., see $newCandSrc)
 triggerRemovalAndAddition="Gen10"
 # This is the generation where we'll ask denoptim to stop.
