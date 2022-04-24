@@ -33,25 +33,32 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -67,6 +74,7 @@ import org.jfree.chart.editor.ChartEditor;
 import org.jfree.chart.editor.ChartEditorManager;
 import org.jfree.chart.entity.PlotEntity;
 import org.jfree.chart.entity.XYItemEntity;
+import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.SeriesRenderingOrder;
@@ -74,6 +82,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
+
+import com.google.common.io.Files;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -104,8 +114,10 @@ public class GUIInspectGARun extends GUICardPanel
 	public static AtomicInteger evolInspectorTabUID = new AtomicInteger(1);
 	
 	private JPanel ctrlPanel;
-	private JPanel ctrlPanelLeft;
-	private JPanel ctrlPanelRight;
+	private JPanel ctrlPanelRow1;
+	private JPanel ctrlPanelRow1Left;
+	private JPanel ctrlPanelRow1Right;
+    private JPanel ctrlPanelRow2Left;
 	private JSplitPane centralPanel;
 	private JPanel rightPanel;
 	private MoleculeViewPanel molViewer;
@@ -140,7 +152,7 @@ public class GUIInspectGARun extends GUICardPanel
 	 * Button offering the possibility to load the graph inspector for a 
 	 * selected item.
 	 */
-	private JButton openGraph;
+	private JButton openSingleGraph;
 	
 	/**
 	 * Storage of pathname to the item selected in the chart. This is used to
@@ -148,6 +160,20 @@ public class GUIInspectGARun extends GUICardPanel
 	 * item in the chart.
 	 */
     private String pathToSelectedItem;
+    
+    /**
+     * Button offering the possibility to load the graphs of the population
+     * at a given time (i.e., generation).
+     */
+    private JButton openGeneratinGraphs;
+    
+    /**
+     * Pathways of population members collected by generation id. This info
+     * is taken from the generation summary files, so in absence of such file 
+     * for a generation, that generation will not be present here.
+     */
+    private Map<Integer,List<String>> candsPerGeneration;
+    
 	
 //-----------------------------------------------------------------------------
 	
@@ -179,8 +205,8 @@ public class GUIInspectGARun extends GUICardPanel
 		//    |-> plot (RIGHT)
 		
 		// Creating local tool bar
-		ctrlPanelLeft = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		ctrlPanelLeft.add(new JLabel("Plot Features:"));
+		ctrlPanelRow1Left = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		ctrlPanelRow1Left.add(new JLabel("Population Features:"));
 		JCheckBox ctrlMin = new JCheckBox("Minimum");
 		ctrlMin.setToolTipText("The min fitness value in the population.");
 		ctrlMin.setSelected(true);
@@ -240,10 +266,10 @@ public class GUIInspectGARun extends GUICardPanel
 				}
 			}
 		});
-		ctrlPanelLeft.add(ctrlMin);
-		ctrlPanelLeft.add(ctrlMax);
-		ctrlPanelLeft.add(ctrlMean);
-		ctrlPanelLeft.add(ctrlMedian);
+		ctrlPanelRow1Left.add(ctrlMin);
+		ctrlPanelRow1Left.add(ctrlMax);
+		ctrlPanelRow1Left.add(ctrlMean);
+		ctrlPanelRow1Left.add(ctrlMedian);
 		JButton rstView = new JButton("Reset Chart View");
 		rstView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -252,13 +278,22 @@ public class GUIInspectGARun extends GUICardPanel
 				plot.getDomainAxis().setLowerBound(-0.5);			
 			}
 		});
-		ctrlPanelLeft.add(rstView);
+		ctrlPanelRow1Left.add(rstView);
+	
+		ctrlPanelRow1Right = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		lblTotItems = new JLabel("No item loaded");
+		lblTotItems.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblTotItems.setPreferredSize(new Dimension(300,28));
+		ctrlPanelRow1Right.add(lblTotItems);
 		
-	    openGraph = new JButton("Open Candidate's Graph");
-        openGraph.setEnabled(false); //Enables only upon selection of an item
-	    openGraph.setToolTipText("Open a new tab for inspecting the "
-	            + "DENOPTIMGraph of the selected candidate.");
-	    openGraph.addActionListener(new ActionListener() {
+		
+        ctrlPanelRow2Left = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        
+        openSingleGraph = new JButton("Open Candidate's Graph");
+        openSingleGraph.setEnabled(false); //Enables only upon selection of an item
+        openSingleGraph.setToolTipText("Open a new tab for inspecting the "
+                + "graph representation of the selected candidate.");
+        openSingleGraph.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 mainPanel.setCursor(Cursor.getPredefinedCursor(
                         Cursor.WAIT_CURSOR));
@@ -269,26 +304,117 @@ public class GUIInspectGARun extends GUICardPanel
                         Cursor.DEFAULT_CURSOR));
             }
         });
-	    ctrlPanelLeft.add(openGraph);
+        ctrlPanelRow2Left.add(openSingleGraph);
+        
+        openGeneratinGraphs = new JButton("Open Population Graphs");
+        openGeneratinGraphs.setToolTipText(String.format(
+                "<html><body width='%1s'>Open a "
+                + "new tab for inspecting the graph representation of all "
+                + "members of the population. "
+                + "Opens a dialog to specify which generation to consider of "
+                + "the selected candidate.",300));
+        openGeneratinGraphs.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Ask which generation
+                GenerationChoiceDialog dialog = new GenerationChoiceDialog();
+                Object res = dialog.showDialog();
+                if (res==null)
+                {
+                    return;
+                }
+                int genId = -1;
+                try {
+                    genId = Integer.parseInt((String) res);
+                } catch (Throwable t) {
+                    JOptionPane.showMessageDialog(openGeneratinGraphs,
+                            String.format("<html><body width='%1s'>String '" 
+                                    + res+ "' could not be used to identify "
+                                    + "a generation. "
+                                    + "Please, type an integer 0, 1, 2,...", 300),
+                            "Error",
+                            JOptionPane.PLAIN_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                if (!candsPerGeneration.containsKey(genId))
+                {
+                    JOptionPane.showMessageDialog(openGeneratinGraphs,
+                            String.format("<html><body width='%1s'>" 
+                                    + "List of members of generation " + genId 
+                                    + " could not be found. Generation summary "
+                                    + "missing or not properly formatted.",300),
+                            "Error",
+                            JOptionPane.PLAIN_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                
+                // Collect population
+                String pathtoTmpFile = Utils.getTempFile("population_al_gen" 
+                        + genId + ".sdf");
+                mainPanel.setCursor(Cursor.getPredefinedCursor(
+                        Cursor.WAIT_CURSOR));
+                try
+                {
+                    FileUtils.mergeIntoOneFile(pathtoTmpFile,
+                            candsPerGeneration.get(genId));
+                    mainPanel.setCursor(Cursor.getPredefinedCursor(
+                            Cursor.DEFAULT_CURSOR));
+                } catch (IOException e1)
+                {
+                    e1.printStackTrace();
+                    JOptionPane.showMessageDialog(openGeneratinGraphs,
+                            String.format("<html><body width='%1s'>" 
+                                    + "List of members of generation " + genId 
+                                    + " could not be collected. Hint: "
+                                    + e1.getMessage(), 300),
+                            "Error",
+                            JOptionPane.PLAIN_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    mainPanel.setCursor(Cursor.getPredefinedCursor(
+                            Cursor.DEFAULT_CURSOR));
+                    return;
+                }
+                
+                // Launch the GUI component to visualize population
+                GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
+                mainPanel.add(graphPanel);
+                graphPanel.importGraphsFromFile(new File(pathtoTmpFile));
+                
+                //Log
+                System.out.println("File collecting members of the population "
+                        + "at generation " + genId + ": "+ pathtoTmpFile);
+            }
+        });
+        ctrlPanelRow2Left.add(openGeneratinGraphs);
+        
 
-		ctrlPanelRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		lblTotItems = new JLabel("No item loaded");
-		lblTotItems.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblTotItems.setPreferredSize(new Dimension(300,28));
-		ctrlPanelRight.add(lblTotItems);
-		ctrlPanel = new JPanel();
+        ctrlPanelRow1 = new JPanel();
+        GroupLayout lyoCtrlPanelRow1 = new GroupLayout(ctrlPanelRow1);
+        ctrlPanelRow1.setLayout(lyoCtrlPanelRow1);
+        lyoCtrlPanelRow1.setAutoCreateGaps(true);
+        lyoCtrlPanelRow1.setAutoCreateContainerGaps(true);
+        lyoCtrlPanelRow1.setHorizontalGroup(
+                lyoCtrlPanelRow1.createSequentialGroup()
+                    .addComponent(ctrlPanelRow1Left)
+                    .addComponent(ctrlPanelRow1Right));
+        lyoCtrlPanelRow1.setVerticalGroup(lyoCtrlPanelRow1.createParallelGroup()
+                    .addComponent(ctrlPanelRow1Left)
+                    .addComponent(ctrlPanelRow1Right));
+        
+        ctrlPanel =  new JPanel();
         GroupLayout lyoCtrlPanel = new GroupLayout(ctrlPanel);
         ctrlPanel.setLayout(lyoCtrlPanel);
         lyoCtrlPanel.setAutoCreateGaps(true);
         lyoCtrlPanel.setAutoCreateContainerGaps(true);
-        lyoCtrlPanel.setHorizontalGroup(lyoCtrlPanel.createSequentialGroup()
-                    .addComponent(ctrlPanelLeft)
-                    .addComponent(ctrlPanelRight));
-        lyoCtrlPanel.setVerticalGroup(lyoCtrlPanel.createParallelGroup()
-			        .addComponent(ctrlPanelLeft)
-			        .addComponent(ctrlPanelRight));
-		this.add(ctrlPanel,BorderLayout.NORTH);
-		
+        lyoCtrlPanel.setHorizontalGroup(lyoCtrlPanel.createParallelGroup()
+                    .addComponent(ctrlPanelRow1)
+                    .addComponent(ctrlPanelRow2Left));
+        lyoCtrlPanel.setVerticalGroup(lyoCtrlPanel.createSequentialGroup()
+                    .addComponent(ctrlPanelRow1)
+                    .addComponent(ctrlPanelRow2Left));
+        
+        this.add(ctrlPanel,BorderLayout.NORTH);
 		
 		// Setting structure of central panel	
 		centralPanel = new JSplitPane();
@@ -346,6 +472,55 @@ public class GUIInspectGARun extends GUICardPanel
 		
 	}
 	
+//------------------------------------------------------------------------------
+    
+	/**
+	 * Modal dialog that asks the user for a generation number.
+	 */
+    private class GenerationChoiceDialog extends GUIModalDialog
+    {
+        public GenerationChoiceDialog()
+        {
+            super(false);
+            this.setBounds(150, 150, 500, 200);
+            this.setTitle("Choose Generation");
+            
+            Dimension sizeNameFields = new Dimension(200,
+                    (int) (new JTextField()).getPreferredSize().getHeight());
+            
+            JPanel rowOne = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JLabel lblVarName = new JLabel("Generation Number:");
+            JTextField txtVarName = new JTextField();
+            txtVarName.setPreferredSize(sizeNameFields);
+            rowOne.add(lblVarName);
+            rowOne.add(txtVarName);
+            
+            addToCentralPane(rowOne);
+            
+            this.btnDone.addActionListener(new ActionListener() {
+                
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (txtVarName.getText().equals(""))
+                    {
+                        result = null;
+                    } else {
+                        result = txtVarName.getText();
+                    }
+                    close();
+                }
+            });
+            this.btnCanc.addActionListener(new ActionListener() {
+                
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    result = null;
+                    close();
+                }
+            });
+        }
+    }
+	
 //-----------------------------------------------------------------------------
 
 	public void importGARunData(File file, JComponent parent) 
@@ -366,6 +541,7 @@ public class GUIInspectGARun extends GUICardPanel
 		
 		System.out.println("Importing data from '" + srcFolder + "'...");
 		
+		candsPerGeneration = new HashMap<Integer,List<String>>();
 		Map<Integer,double[]> popProperties = new HashMap<Integer,double[]>();
 		allIndividuals = new ArrayList<CandidateLW>();
 		for (File genFolder : file.listFiles(new FileFilter() {
@@ -393,20 +569,11 @@ public class GUIInspectGARun extends GUICardPanel
 					+ "Gen" + zeroedGenId + ".txt");
 			
 			System.out.println("Reading "+genSummary);
-			
-			if (!FileUtils.checkExists(genSummary.getAbsolutePath()))
-			{
-				JOptionPane.showMessageDialog(parent,
-		                "<html>File '" + genSummary + "' not found!<br>"
-		                + "There will be holes in the min/max/mean profile."
-		                + "</html>",
-		                "Error",
-		                JOptionPane.PLAIN_MESSAGE,
-		                UIManager.getIcon("OptionPane.errorIcon"));
-			}
+			boolean readPopMembers = false;
 			try {
 				popProperties.put(genId, DenoptimIO.readPopulationProps(
 						genSummary));
+				readPopMembers = true;
 			} catch (DENOPTIMException e2) {
 				JOptionPane.showMessageDialog(parent,
 		                "<html>File '" + genSummary + "' not found!<br>"
@@ -419,7 +586,7 @@ public class GUIInspectGARun extends GUICardPanel
 						Double.NaN, Double.NaN, Double.NaN, Double.NaN});
 			}
 			
-			// Read DENOPTIMMolecules
+			// Read candidates
 			for (File fitFile : genFolder.listFiles(new FileFilter() {
 				
 				@Override
@@ -453,6 +620,28 @@ public class GUIInspectGARun extends GUICardPanel
 				}
 				one.setGeneration(genId);
 				allIndividuals.add(one);
+			}
+			
+			//Read population members from summary
+			if (readPopMembers)
+			{
+                try
+                {
+                    List<String> membersPathnames = new ArrayList<String>(
+                            DenoptimIO.readPopulationMemberPathnames(genSummary));
+                    candsPerGeneration.put(genId, membersPathnames);
+                } catch (DENOPTIMException e1)
+                {
+                    e1.printStackTrace();
+                    JOptionPane.showMessageDialog(parent,
+                            String.format("<html><body width='%1s'>"
+                                + "File '" + genSummary + "' has been found, "
+                                + "but pathnames to population members could "
+                                + "not be read.</html>", 400),
+                            "Error",
+                            JOptionPane.PLAIN_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                }
 			}
 		}
 		
@@ -632,17 +821,25 @@ public class GUIInspectGARun extends GUICardPanel
 	    });
 		
 		// Setting toolTip when on top of an series item in the chart
-        //TODO deal with superposed points by adding all their names to tip text
 		XYToolTipGenerator ttg = new XYToolTipGenerator() {
 			@Override
 			public String generateToolTip(XYDataset data, int sId, int itemId)
 			{
-				return candsWithFitnessMap.get(itemId).getName();
+			    CandidateLW itemOnTop = candsWithFitnessMap.get(itemId);
+			    // Is there more than one item in the stack?
+			    // One overlapping neighbor is enough to say there
+			    // is more than one item in the tack.
+			    List<CandidateLW> overlappingItems = getOverlappingItems(
+			            itemOnTop, 2);
+			    if (overlappingItems.size()>1)
+			        return "Overlapping Items";
+			    else
+			        return candsWithFitnessMap.get(itemId).getName();
 			}
 		};
-		plot.getRenderer().setSeriesToolTipGenerator(0, ttg);
+		renderer1.setDefaultToolTipGenerator(ttg);
 		
-		// Clock-based selection of item, possibly displaying mol structure
+		// Click-based selection of item, possibly displaying mol structure
 		chartPanel.addChartMouseListener(new ChartMouseListener() {
 			
 			@Override
@@ -672,45 +869,8 @@ public class GUIInspectGARun extends GUICardPanel
 						// many items overlapping each other.
 						// Search for overlapping items and ask which one to the
 						// user wants to see.
-						int initPos = allIndividuals.indexOf(item);
-		                double tolerance = Math.abs(plot.getRangeAxis()
-		                        .getRange().getLength() * 0.02);
-		                int maxItems = 25;
-		                int nItems = 0;
-		                List<CandidateLW> overlappingItems = 
-		                        new ArrayList<CandidateLW>();
-		                while (nItems<maxItems && 
-		                        (initPos+nItems)<allIndividuals.size())
-		                {
-		                    CandidateLW c = allIndividuals.get(initPos + nItems);
-		                    if (!c.hasFitness())
-		                    {
-	                            nItems++;
-		                        continue;
-		                    }
-		                    double delta = Math.abs(item.getFitness() 
-		                            - c.getFitness());
-		                    if (delta > tolerance)
-		                        break;
-		                    overlappingItems.add(c);
-		                    nItems++;
-		                }
-		                nItems = 1;
-		                while (nItems<maxItems && (initPos-nItems)>-1)
-                        {
-                            CandidateLW c = allIndividuals.get(initPos - nItems);
-                            if (!c.hasFitness())
-                            {
-                                nItems++;
-                                continue;
-                            }
-                            double delta = Math.abs(item.getFitness() 
-                                    - c.getFitness());
-                            if (delta > tolerance)
-                                break;
-                            overlappingItems.add(0,c);
-                            nItems++;
-                        }
+		                List<CandidateLW> overlappingItems = getOverlappingItems(
+		                        item,25);
 		                CandidateLW choosenItem = choseAmongPossiblyOverlapping(
 		                        chartPanel, overlappingItems);
 		                if (choosenItem!=null)
@@ -728,6 +888,52 @@ public class GUIInspectGARun extends GUICardPanel
 		rightPanel.add(chartPanel,BorderLayout.CENTER);
 		
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	}
+
+//------------------------------------------------------------------------------
+	
+	private List<CandidateLW> getOverlappingItems(CandidateLW item, 
+	        int maxNeighbours)
+	{
+        int initPos = allIndividuals.indexOf(item);
+        double tolerance = Math.abs(plot.getRangeAxis()
+                .getRange().getLength() * 0.02);
+        int nItems = 0;
+        List<CandidateLW> overlappingItems = 
+                new ArrayList<CandidateLW>();
+        while (nItems<maxNeighbours && 
+                (initPos+nItems)<allIndividuals.size())
+        {
+            CandidateLW c = allIndividuals.get(initPos + nItems);
+            if (!c.hasFitness())
+            {
+                nItems++;
+                continue;
+            }
+            double delta = Math.abs(item.getFitness() 
+                    - c.getFitness());
+            if (delta > tolerance)
+                break;
+            overlappingItems.add(c);
+            nItems++;
+        }
+        nItems = 1;
+        while (nItems<maxNeighbours && (initPos-nItems)>-1)
+        {
+            CandidateLW c = allIndividuals.get(initPos - nItems);
+            if (!c.hasFitness())
+            {
+                nItems++;
+                continue;
+            }
+            double delta = Math.abs(item.getFitness() 
+                    - c.getFitness());
+            if (delta > tolerance)
+                break;
+            overlappingItems.add(0,c);
+            nItems++;
+        }
+        return overlappingItems;
 	}
 
 //------------------------------------------------------------------------------
@@ -809,7 +1015,7 @@ public class GUIInspectGARun extends GUICardPanel
 		// Update the molecular viewer
 		molViewer.loadChemicalStructureFromFile(item.getPathToFile());
 		pathToSelectedItem = item.getPathToFile();
-        openGraph.setEnabled(true);
+        openSingleGraph.setEnabled(true);
 
         mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
@@ -820,7 +1026,7 @@ public class GUIInspectGARun extends GUICardPanel
 	{
 		datasetSelected.removeSeries("Selected_candidates");
 		molViewer.clearAll();
-		openGraph.setEnabled(false);
+		openSingleGraph.setEnabled(false);
 	}
 	
 //-----------------------------------------------------------------------------

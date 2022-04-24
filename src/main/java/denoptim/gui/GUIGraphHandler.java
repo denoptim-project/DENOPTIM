@@ -21,6 +21,7 @@ package denoptim.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -1361,12 +1362,14 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		try {
 			molLibrary = DenoptimIO.readSDFFile(file.getAbsolutePath());
-		} catch (DENOPTIMException e) {
+		} catch (Throwable e) {
 			System.out.println("Could not read molecules from " + file);
 			for (int i=0; i<dnGraphLibrary.size(); i++)
 			{
 				molLibrary.add(builder.newAtomContainer());
 			}
+            mainPanel.setCursor(Cursor.getPredefinedCursor(
+                    Cursor.DEFAULT_CURSOR));
 		}
 			
 		// Display the first

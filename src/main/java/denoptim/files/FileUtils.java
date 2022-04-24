@@ -26,9 +26,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -732,7 +736,31 @@ public class FileUtils
     	}
     	return newName;
     }
-
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Copies the content of all the files specified in the list of sources and
+     * places it into the destination file.
+     * @param destinationPathname the destination of all content.
+     * @param sourcePathnames the pathnames of the files to be copied into the
+     * destination file.
+     * @throws IOException 
+     */
+    public static void mergeIntoOneFile(String destinationPathname, 
+            List<String> sourcePathnames) throws IOException
+    {
+        try(OutputStream out = Files.newOutputStream(
+                Paths.get(destinationPathname), 
+                StandardOpenOption.CREATE, 
+                StandardOpenOption.WRITE)) 
+        {
+            for (String sourcePathname : sourcePathnames) {
+                Files.copy(Paths.get(sourcePathname), out);
+            }
+        }
+    }
+    
 //------------------------------------------------------------------------------
 
 }

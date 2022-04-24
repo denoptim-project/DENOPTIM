@@ -610,6 +610,36 @@ public class DenoptimIO
         }
         return vals;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Read the pathnames to the population members from a population summary
+     * "Gen.*\.txt" file
+     *
+     * @param fileName  the pathname to the file to read.
+     * @return list of data
+     * @throws DENOPTIMException
+     */
+    public static List<String> readPopulationMemberPathnames(File file) 
+            throws DENOPTIMException 
+    {
+        List<String>  vals = new ArrayList<String>();
+        ArrayList<String> txt = readList(file.getAbsolutePath());
+        for (String line : txt) 
+        {
+            if (!line.contains(FS))
+                continue;
+            
+            String[] words = line.trim().split("\\s+");
+            if (words.length < 5)
+                continue;
+            
+            // NB: there is no keyword for population members!
+            vals.add(words[4]);
+        }
+        return vals;
+    }
 
 //------------------------------------------------------------------------------
 
