@@ -212,33 +212,43 @@ public class GeneOpsRunner extends ProgramTask
                 +"FEMALE: "+female);
     
         // Identify the crossover operation to perform
-        Vertex vm = getEmbeddedVertex(settings.xoverSrcMale,
-                male, "crossover");
-        Vertex vf = getEmbeddedVertex(settings.xoverSrcFemale,
-                female, "crossover");
-        
-        CrossoverType xoverType = CrossoverType.BRANCH;
-        if (settings.xoverSubGraphEndMale.size()!=0)
-            xoverType = CrossoverType.SUBGRAPH;
-        
-        List<Vertex> subGraphA = new ArrayList<Vertex>();
-        subGraphA.add(vm);
-        male.getChildTreeLimited(vm, subGraphA, getSubGraphEnds(male,
-                settings.xoverSubGraphEndMale, "crossover"));
-        List<Vertex> subGraphB = new ArrayList<Vertex>();
-        subGraphB.add(vf);
-        female.getChildTreeLimited(vf, subGraphB, getSubGraphEnds(female,
-                settings.xoverSubGraphEndFemale, "crossover"));
-
-        XoverSite xos = new XoverSite(subGraphA, subGraphB, xoverType);
-        
-        // Ensure uniqueness on vertexID
-        male.renumberGraphVertices();
-        female.renumberGraphVertices();
+        XoverSite xos = null;
+        if (settings.xoverSrcMale!=null && settings.xoverSrcFemale!=null)
+        {
+            Vertex vm = getEmbeddedVertex(settings.xoverSrcMale,
+                    male, "crossover");
+            Vertex vf = getEmbeddedVertex(settings.xoverSrcFemale,
+                    female, "crossover");
+            
+            CrossoverType xoverType = CrossoverType.BRANCH;
+            if (settings.xoverSubGraphEndMale.size()!=0)
+                xoverType = CrossoverType.SUBGRAPH;
+            
+            List<Vertex> subGraphA = new ArrayList<Vertex>();
+            subGraphA.add(vm);
+            male.getChildTreeLimited(vm, subGraphA, getSubGraphEnds(male,
+                    settings.xoverSubGraphEndMale, "crossover"));
+            List<Vertex> subGraphB = new ArrayList<Vertex>();
+            subGraphB.add(vf);
+            female.getChildTreeLimited(vf, subGraphB, getSubGraphEnds(female,
+                    settings.xoverSubGraphEndFemale, "crossover"));
     
-        logger.log(Level.INFO, NL + "Initial graphs now with unique vertexID: "
-                +NL+ "v: "+ vm.getVertexId() + " of MALE: " + male
-                +NL+ "v:" + vf.getVertexId() + " of FEMALE: " + female);
+            xos = new XoverSite(subGraphA, subGraphB, xoverType);
+            
+            // Ensure uniqueness on vertexID
+            male.renumberGraphVertices();
+            female.renumberGraphVertices();
+        
+            logger.log(Level.INFO,NL+"Initial graphs now with unique vertexID: "
+                    +NL+ "v: "+ vm.getVertexId() + " of MALE: " + male
+                    +NL+ "v:" + vf.getVertexId() + " of FEMALE: " + female);
+        } else {
+            logger.log(Level.INFO, "Attempting crossover on a site detected "
+                    + "on-the-fly");
+            xos = settings.getRandomizer().randomlyChooseOne(
+                    GraphOperations.locateCompatibleXOverPoints(male, female, 
+                            fragSpace));
+        }
         
         GraphOperations.performCrossover(xos, fragSpace);
     
