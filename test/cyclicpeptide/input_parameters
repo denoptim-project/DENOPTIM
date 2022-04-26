@@ -25,7 +25,6 @@ FS-CompMatrixFile=data/CPMap
 FS-MaxHeavyAtom=1000
 FS-MaxMW=6000
 FS-MaxRotatableBond=500
-FS-RCCompMatrixFile=data/RC-CPMap
 
 # Fitness Provider - parameters
 FP-Equation=${taniToGoal}
