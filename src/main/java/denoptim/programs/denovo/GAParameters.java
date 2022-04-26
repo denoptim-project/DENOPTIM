@@ -336,6 +336,33 @@ public class GAParameters extends RunTimeParameters
      */
     public boolean mutatedGraphFailedEvalTolerant = true;
     
+    /**
+     * Flag that enables the ignoring of crossover-ed graphs that lead to a f
+     * ailure 
+     * in the evaluation of graphs that generates SMILES, InChI and molecular
+     * representation.
+     */
+    public boolean xoverGraphFailedEvalTolerant = true;
+    
+    /**
+     * Flag that enables the ignoring of crossover events triggering exceptions.
+     * Such events will still be recorded in the GA run {@link Monitor}.
+     */
+    public boolean xoverFailureTolerant = true;
+    
+    /**
+     * Flag that enables the ignoring of mutation events triggering exceptions.
+     * Such events will still be recorded in the GA run {@link Monitor}.
+     */
+    public boolean mutationFailureTolerant = true;
+    
+    /**
+     * Flag that enables the ignoring of construction from scratch events 
+     * triggering exceptions.
+     * Such events will still be recorded in the GA run {@link Monitor}.
+     */
+    public boolean buildAnewFailureTolerant = true;
+    
 
 //------------------------------------------------------------------------------
     
@@ -1080,8 +1107,7 @@ public class GAParameters extends RunTimeParameters
                     if (value.compareToIgnoreCase("SUS") == 0)
                     {
                         xoverSelectionMode = 3;
-                        strXoverSelectionMode =
-                            "STOCHASTIC UNIVERSAL SAMPLING";
+                        strXoverSelectionMode = "STOCHASTIC UNIVERSAL SAMPLING";
                     }
                     if (value.compareToIgnoreCase("RANDOM") == 0)
                     {
@@ -1092,23 +1118,36 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
-            case "MUTATEDGRAPHFAILTOLERANT=":
+            case "MUTATEDGRAPHCHECKFAILTOLERANT=":
             {
-                if (value.toUpperCase().equals("YES") 
-                        || value.toUpperCase().equals("Y")
-                        || value.toUpperCase().equals("T")
-                        || value.toUpperCase().equals("TRUE"))
-                {
-                    mutatedGraphFailedEvalTolerant = true;
-                } else if (value.toUpperCase().equals("NO") 
-                        || value.toUpperCase().equals("N")
-                        || value.toUpperCase().equals("F")
-                        || value.toUpperCase().equals("FALSE"))
-                {
-                    mutatedGraphFailedEvalTolerant = false;   
-                }
+                mutatedGraphFailedEvalTolerant = readYesNoTrueFalse(value);
                 break;
             }
+            
+            case "XOVERGRAPHCHECKFAILTOLERANT=":
+            {
+                xoverGraphFailedEvalTolerant = readYesNoTrueFalse(value);
+                break;
+            }
+            
+            case "MUTATIONFAILURETOLERANT=":
+            {
+                mutationFailureTolerant = readYesNoTrueFalse(value);
+                break;
+            }
+            
+            case "XOVERFAILURETOLERANT=":
+            {
+                xoverFailureTolerant = readYesNoTrueFalse(value);
+                break;
+            }
+            
+            case "BUILDFAILURETOLERANT=":
+            {
+                buildAnewFailureTolerant = readYesNoTrueFalse(value);
+                break;
+            }
+            
             
             default:
                 msg = "Keyword " + key + " is not a known GeneticAlgorithm-" 

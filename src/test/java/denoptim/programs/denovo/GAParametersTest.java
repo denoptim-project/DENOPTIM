@@ -55,21 +55,21 @@ public class GAParametersTest
     public void testYesNoTrueFalseKeyword() throws Exception
     {
         GAParameters gaParams = new GAParameters();
-        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=F");
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHCHECKFAILTOLERANT=F");
         assertFalse(gaParams.mutatedGraphFailedEvalTolerant);
-        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=T");
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHCHECKFAILTOLERANT=T");
         assertTrue(gaParams.mutatedGraphFailedEvalTolerant);
-        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=false");
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHCHECKFAILTOLERANT=false");
         assertFalse(gaParams.mutatedGraphFailedEvalTolerant);
-        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=true");
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHCHECKFAILTOLERANT=true");
         assertTrue(gaParams.mutatedGraphFailedEvalTolerant);
-        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=n");
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHCHECKFAILTOLERANT=n");
         assertFalse(gaParams.mutatedGraphFailedEvalTolerant);
-        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=y");
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHCHECKFAILTOLERANT=y");
         assertTrue(gaParams.mutatedGraphFailedEvalTolerant);
-        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=no");
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHCHECKFAILTOLERANT=no");
         assertFalse(gaParams.mutatedGraphFailedEvalTolerant);
-        gaParams.interpretKeyword("GA-MUTATEDGRAPHFAILTOLERANT=yes");
+        gaParams.interpretKeyword("GA-MUTATEDGRAPHCHECKFAILTOLERANT=yes");
         assertTrue(gaParams.mutatedGraphFailedEvalTolerant);
     } 
     

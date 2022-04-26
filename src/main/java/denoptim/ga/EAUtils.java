@@ -281,13 +281,13 @@ public class EAUtils
      * This avoids randomized 
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
-     * @return
+     * @return the candidate
      * @throws DENOPTIMException
      */
     protected static Candidate buildCandidateByXOver(
             ArrayList<Candidate> eligibleParents, Population population, 
             Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
-            int choiceOfOffstring, GAParameters settings) throws DENOPTIMException
+            int choiceOfOffstring, GAParameters settings) throws DENOPTIMException 
     {
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
@@ -377,17 +377,23 @@ public class EAUtils
                 return null;
             }
         } catch (Throwable t) {
-            t.printStackTrace();
-            ArrayList<DGraph> parents = new ArrayList<DGraph>();
-            parents.add(gA);
-            parents.add(gB);
-            DenoptimIO.writeGraphsToSDF(new File(settings.getDataDirectory()
-                    + "_failed_xover.sdf"), parents, true,
-                    settings.getLogger(), settings.getRandomizer());
-            throw new DENOPTIMException("Error while performing crossover! "+NL
-                    + "XOverSite:    " + xos.toString() + NL
-                    + "XOverSite(C): " + xosOnClones.toString() + NL
-                    + " Please, report this to the authors ",t);
+            if (!settings.xoverFailureTolerant)
+            {
+                t.printStackTrace();
+                ArrayList<DGraph> parents = new ArrayList<DGraph>();
+                parents.add(gA);
+                parents.add(gB);
+                DenoptimIO.writeGraphsToSDF(new File(settings.getDataDirectory()
+                        + "_failed_xover.sdf"), parents, true,
+                        settings.getLogger(), settings.getRandomizer());
+                throw new DENOPTIMException("Error while performing crossover! "+NL
+                        + "XOverSite:    " + xos.toString() + NL
+                        + "XOverSite(C): " + xosOnClones.toString() + NL
+                        + " Please, report this to the authors ",t);
+            }
+            mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
+            mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
+            return null;
         }
         gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
@@ -436,7 +442,27 @@ public class EAUtils
             gOutermost.setLocalMsg(msgs[ig]);
             
             // Consider if the result can be used to define a new candidate
-            Object[] res = gOutermost.checkConsistency(settings);
+            Object[] res = null;
+            try
+            {
+                res = gOutermost.checkConsistency(settings);
+            } catch (NullPointerException|IllegalArgumentException e)
+            {
+                if (!settings.xoverGraphFailedEvalTolerant)
+                {
+                    ArrayList<DGraph> parents = new ArrayList<DGraph>();
+                    parents.add(gA);
+                    parents.add(gB);
+                    parents.add(gAClone);
+                    parents.add(gBClone);
+                    DenoptimIO.writeGraphsToSDF(new File(settings.getDataDirectory()
+                            + "_failed_xover-ed_check.sdf"), parents, true,
+                            settings.getLogger(), settings.getRandomizer());
+                    throw e;
+                } else {
+                    res = null;
+                }
+            }
             if (res != null)
             {
                 if (!EAUtils.setupRings(res, gOutermost, settings))

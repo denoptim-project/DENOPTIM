@@ -425,6 +425,35 @@ public abstract class RunTimeParameters
     }
     
 //-----------------------------------------------------------------------------
+
+    /**
+     * Reads a string searching for any common way to say either yes/true 
+     * (including shorthand t/y) or no/false (including shorthand f/n either).
+     * This method is case insensitive, and the string is trimmed.
+     * @param s the string to interpret.
+     * @return <code>true</code> for 'true/yes'.
+     */
+    public boolean readYesNoTrueFalse(String s)
+    {
+        boolean result = false;
+        String value = s.trim().toUpperCase();
+        if (value.equals("YES") 
+                || value.equals("Y")
+                || value.equals("T")
+                || value.equals("TRUE"))
+        {
+            result = true;
+        } else if (value.equals("NO") 
+                || value.equals("N")
+                || value.equals("F")
+                || value.equals("FALSE"))
+        {
+            result = false;   
+        }
+        return result;
+    }
+    
+//-----------------------------------------------------------------------------
     
     private Level verbosityTologLevel()
     {
