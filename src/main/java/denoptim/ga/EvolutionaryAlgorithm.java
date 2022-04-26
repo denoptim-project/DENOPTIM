@@ -119,24 +119,29 @@ public class EvolutionaryAlgorithm
      */
     private boolean isAsync = true;
     
-    /*
+    /**
      * Temporary storage of future results produced by fitness evaluation tasks
      * submitted to asynchronous parallelization scheme.
      */
     private List<Future<Object>> futures;
     
-    /*
+    /**
      * Temporary storage of fitness evaluation tasks just submitted to asynchronous 
      * Parallelization scheme.
      */
     private ArrayList<FitnessTask> submitted;
     
-    /*
+    /**
      * Execution service used in asynchronous parallelization scheme.
      */
     private ThreadPoolExecutor tpe;
+    
+    /**
+     * Task manager for tasks to be executed as batches.
+     */
+    private TasksBatchManager tbm;
 
-    /*
+    /**
      * Issue emerging from a thread submitted by asynchronous parallelization 
      * scheme.
      */
@@ -167,6 +172,8 @@ public class EvolutionaryAlgorithm
         if (settings.getParallelizationScheme() == 1)
         {
             isAsync = false;
+            tbm = new TasksBatchManager();
+            
         } else {
             isAsync = true;
             futures = new ArrayList<>();
@@ -496,8 +503,7 @@ public class EvolutionaryAlgorithm
                         // TasksBatchManager takes the collection of tasks and runs
                         // them in batches of N, where N is given by the
                         // second argument.
-                        TasksBatchManager.executeTasks(tasks,
-                                settings.getNumberOfCPU());
+                        tbm.executeTasks(tasks, settings.getNumberOfCPU());
                         tasks.clear();
                     } else {
                         i = 0;
@@ -731,7 +737,7 @@ public class EvolutionaryAlgorithm
                         // TasksBatchManager takes the collection of tasks and
                         // runs them in batches of N, where N is given by the
                         // second argument.
-                        TasksBatchManager.executeTasks(syncronisedTasks,
+                        tbm.executeTasks(syncronisedTasks,
                                 settings.getNumberOfCPU());
                         syncronisedTasks.clear();
                     }

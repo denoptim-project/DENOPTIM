@@ -38,10 +38,19 @@ import denoptim.graph.Candidate;
  */
 public class TasksBatchManager
 {
-    private static ArrayList<Task> taskList;
-    private static ExecutorService eservice;
-    private static List<Future<Object>> futures;
+    private ArrayList<Task> taskList;
+    private ExecutorService eservice;
+    private List<Future<Object>> futures;
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructs a new task manager meant to run tasks in batches.
+     */
+    public TasksBatchManager()
+    {   
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -51,7 +60,7 @@ public class TasksBatchManager
      * @return if successful return the list of molecules with fitness
      * @throws DENOPTIMException
      */
-    public static ArrayList<Candidate> executeTasks(ArrayList<Task> tasks, 
+    public ArrayList<Candidate> executeTasks(ArrayList<Task> tasks, 
             int numOfProcessors) throws DENOPTIMException
     {
         taskList = tasks;
@@ -158,7 +167,7 @@ public class TasksBatchManager
 
 //------------------------------------------------------------------------------
     
-	public static void stop() 
+	public void stop() 
 	{
          try
          {
