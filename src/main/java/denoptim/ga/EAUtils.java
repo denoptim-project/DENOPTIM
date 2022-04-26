@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -368,6 +369,7 @@ public class EAUtils
         XoverSite xosOnClones = xos.projectToClonedGraphs();
         DGraph gAClone = xosOnClones.getA().get(0).getGraphOwner();
         DGraph gBClone = xosOnClones.getB().get(0).getGraphOwner();
+        
         try
         {
             if (!GraphOperations.performCrossover(xosOnClones,fragSpace))
