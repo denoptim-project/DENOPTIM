@@ -23,10 +23,6 @@
 import os
 import sys
 
-# Pathnames to the sources of data 
-uidToAtomClash=os.path.join("data","UIDsToAtomClash")
-uidToFitness=os.path.join("data","UIDsToFitness")
-
 # Parse command line arguments
 inpSDF=sys.argv[1]
 outSDF=sys.argv[2]
@@ -40,6 +36,14 @@ preliminaryOutput=os.path.join(os.path.dirname(inpSDF), molName + "_preOut.sdf")
 
 sys.stdout = open(log, 'w')
 print("Log of fitness provider task for "+molName)
+os.chdir(wrkDir)
+print("cwd: "+os.getcwd());
+
+# Pathnames to the sources of data
+uidToAtomClash=os.path.join(os.path.dirname(__file__),"UIDsToAtomClash")
+uidToFitness=os.path.join(os.path.dirname(__file__),"UIDsToFitness")
+print("Using map UiD-to-Fitness:     "+uidToFitness);
+print("Using map UiD-to-AtomClashes: "+uidToAtomClash);
 
 if not os.path.isfile(inpSDF):
     print("Cannot find file '%s'" % filename)
@@ -75,7 +79,7 @@ with open(inpSDF, "r") as inputFile:
             foundUid=True
             break
 if (not foundUid):
-    exitWithError("UID not found",0)
+    exitWithError("#UID: not found",0)
 print("Found candidate's UID: "+uid)
 
 # Some candidate led to atom chalshes during molecularm odeling, so do not have a fitness
@@ -98,7 +102,7 @@ with open(uidToFitness, "r") as knownUIDs:
 
 # If no fitness is found this candidate is ignored.
 if (not foundFitness):
-    exitWithError("#UID: not found",0)
+    exitWithError("#FITNESS: not found",0)
 
 print("All done. Returning "+outSDF)
 os.rename(preliminaryOutput, outSDF)
