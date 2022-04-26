@@ -510,6 +510,7 @@ public class GUIInspectGARun extends GUICardPanel
                     close();
                 }
             });
+            this.getRootPane().setDefaultButton(this.btnDone);
             this.btnCanc.addActionListener(new ActionListener() {
                 
                 @Override
