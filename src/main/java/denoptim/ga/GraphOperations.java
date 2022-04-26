@@ -83,7 +83,7 @@ public class GraphOperations
      * @return the list of pairs of crossover sites.
      * @throws DENOPTIMException 
      */
-    protected static List<XoverSite> locateCompatibleXOverPoints(
+    public static List<XoverSite> locateCompatibleXOverPoints(
             DGraph graphA, DGraph graphB, FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {

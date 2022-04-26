@@ -29,6 +29,7 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 
 /**
  * An utility class to encapsulate the search for an 
@@ -430,13 +431,18 @@ public class APMapFinder
                             compatible = true;
                         }
                     } else {
-                        AttachmentPoint lAP = 
-                                oAP.getLinkedAPThroughout();
+                        AttachmentPoint lAP = oAP.getLinkedAPThroughout();
                         if (oAP.isSrcInUserThroughout())
                         {
                             if (lAP!=null && cAP.getAPClass()
                                   .isCPMapCompatibleWith(lAP.getAPClass(), 
                                           fragSpace))
+                            {
+                                compatible = true;
+                            }
+                            if (lAP!=null && lAP.getOwner().getBuildingBlockType()==BBType.CAP
+                                    && fragSpace.getAPClassOfCappingVertex(
+                                            cAP.getAPClass())==lAP.getAPClass())
                             {
                                 compatible = true;
                             }
@@ -447,6 +453,8 @@ public class APMapFinder
                             {
                                 compatible = true;
                             }
+                            // NB lAP cannot be a capping group because it is
+                            // the source of an edge.
                         }
                     }
                 } else {
