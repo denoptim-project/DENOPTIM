@@ -36,12 +36,13 @@ preliminaryOutput=os.path.join(os.path.dirname(inpSDF), molName + "_preOut.sdf")
 
 sys.stdout = open(log, 'w')
 print("Log of fitness provider task for "+molName)
-os.chdir(wrkDir)
-print("cwd: "+os.getcwd());
 
 # Pathnames to the sources of data
-uidToAtomClash=os.path.join(os.path.dirname(__file__),"UIDsToAtomClash")
-uidToFitness=os.path.join(os.path.dirname(__file__),"UIDsToFitness")
+uidToAtomClash=os.path.join(os.path.dirname(os.path.abspath(os.path.realpath(__file__))),"UIDsToAtomClash")
+uidToFitness=os.path.join(os.path.dirname(os.path.abspath(os.path.realpath(__file__))),"UIDsToFitness")
+
+os.chdir(wrkDir)
+print("cwd: "+os.getcwd());
 print("Using map UiD-to-Fitness:     "+uidToFitness);
 print("Using map UiD-to-AtomClashes: "+uidToAtomClash);
 
