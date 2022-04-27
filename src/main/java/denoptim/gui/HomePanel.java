@@ -117,21 +117,21 @@ public class HomePanel extends GUICardPanel
 		
 		//TODO: new fragmentation job with GM3DFragmenter "New Fragmentation"
 		
-		JButton btnNewFragments = new JButton("New Fragments");
+		JButton btnNewFragments = new JButton("Make Fragments");
 		btnNewFragments.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainPanel.add(new GUIVertexInspector(mainPanel));
 			}
 		});
 		
-		JButton btnNewGraph = new JButton("New DENOPTIM Graph");
+		JButton btnNewGraph = new JButton("Make Graphs");
 		btnNewGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainPanel.add(new GUIGraphHandler(mainPanel));
 			}
 		});
 		
-		JButton btnReadGAOutput = new JButton("Inspect Evolutionary run");
+		JButton btnReadGAOutput = new JButton("Inspect Evolutionary Run");
 		btnReadGAOutput.setToolTipText("Analyzes the output folder of an "
 				+ "evolutionary experiment  (i.e., folder named RUN...)");
 		btnReadGAOutput.addActionListener(new ActionListener() {
@@ -147,7 +147,7 @@ public class HomePanel extends GUICardPanel
 		        inspector.importGARunData(file,btnReadGAOutput);
 			}
 		});
-        JButton btnReadFSEOutput = new JButton("Inspect Combinatorial run");
+        JButton btnReadFSEOutput = new JButton("Inspect Combinatorial Run");
         btnReadFSEOutput.setToolTipText("Analyzes the output folder of an "
 				+ "combinatorial experiment  (i.e., folder named FSE...)");
         btnReadFSEOutput.addActionListener(new ActionListener() {
