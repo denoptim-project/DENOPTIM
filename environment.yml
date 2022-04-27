@@ -1,0 +1,7 @@
+name: dnp_env
+channels:
+  - conda-forge
+dependencies:
+  - openjdk=11.0*
+  - maven
+  - python
