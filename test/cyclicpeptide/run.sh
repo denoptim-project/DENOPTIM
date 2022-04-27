@@ -45,7 +45,7 @@ if [ $overwrite -eq 0 ]
         rm -fr "$wDir"
     else
         echo " "
-        echo "ERROR! Old $wDir exists already! Remove it to run a new test."
+        echo "ERROR! Old $wDir exists already! Add '-r' to remove it and run a new test."
         echo " "
         exit
     fi
