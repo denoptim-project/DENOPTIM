@@ -369,7 +369,7 @@ public class Fragment extends Vertex
 
 //-----------------------------------------------------------------------------
     
-    ArrayList<AttachmentPoint> getAPsFromAtom(IAtom srcAtm)
+    public ArrayList<AttachmentPoint> getAPsFromAtom(IAtom srcAtm)
     {
         @SuppressWarnings("unchecked")
 		ArrayList<AttachmentPoint> apsOnAtm = 
@@ -418,7 +418,7 @@ public class Fragment extends Vertex
     
     /**
      * Changes the properties of each APs as to reflect the current atom list.
-     * DENOPTIMAttachmentPoint include the index of their source atom, and this
+     * AttachmentPoint include the index of their source atom, and this
      * method updates such indexes to reflect the current atom list.
      * This method is needed upon reordering of the atom list.
      */
@@ -430,8 +430,7 @@ public class Fragment extends Vertex
             IAtom srcAtm = mol.getAtom(atmId);
             if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-            	ArrayList<AttachmentPoint> apsOnAtm = 
-            			getAPsFromAtom(srcAtm);
+            	ArrayList<AttachmentPoint> apsOnAtm = getAPsFromAtom(srcAtm);
 	            for (int i = 0; i < apsOnAtm.size(); i++)
 	            {
 	                AttachmentPoint ap = apsOnAtm.get(i);
@@ -439,7 +438,6 @@ public class Fragment extends Vertex
 	            }
             }
         }
-        
         updateSymmetryRelations();
     }
 

@@ -586,8 +586,7 @@ public class FileUtils
     public static FileFormat detectKindFile(String fileName, FileFormat[] ffs) 
             throws IOException 
     {
-        Map<String,FileFormat> regexToMatch = 
-                new HashMap<String,FileFormat>();
+        Map<String,FileFormat> regexToMatch = new HashMap<String,FileFormat>();
         Map<String,List<FileFormat>> regexToNotMatch = 
                 new HashMap<String,List<FileFormat>>();
         String endOfSample = null;

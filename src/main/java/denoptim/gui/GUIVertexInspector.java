@@ -1011,6 +1011,11 @@ public class GUIVertexInspector extends GUICardPanel
     	}
     	for (IAtom atm : atmsToDels)
     	{
+    	    if (atm.getProperty(DENOPTIMConstants.ATMPROPAPS)!=null)
+    	    {
+    	        ArrayList<AttachmentPoint> apsOnAtm = frag.getAPsFromAtom(atm);
+    	        frag.getAttachmentPoints().removeAll(apsOnAtm);
+    	    }
     	    frag.removeAtomAndConnectedElectronContainers(atm);
     	}
     	frag.updateAPs();
