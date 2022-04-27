@@ -61,7 +61,7 @@ public class GUIPrepareGARun extends GUIPrepare
 		FSParametersForm fseParsPane = new FSParametersForm(
 		        mainPanel.getSize());
 		super.allParams.add(fseParsPane);
-		super.tabbedPane.addTab("Fragment Space", null, fseParsPane, null);
+		super.tabbedPane.addTab("Space of Building Blocks", null, fseParsPane, null);
 		
 		FitnessParametersForm fitParsPane = new FitnessParametersForm(
 		        mainPanel.getSize());

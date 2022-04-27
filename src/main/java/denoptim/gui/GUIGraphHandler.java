@@ -141,10 +141,11 @@ public class GUIGraphHandler extends GUICardPanel
 	
     // Components managing loading of the fragment space
     private JButton btnFragSpace;
-    private String loadFSToolTip = "<html>No space of building blocks loaded.<br>"
-                   + "Graphs can be inspected without loading any space.<br>"
-                   + "However, loading a space allows to edit and build"
-                   + "graphs manually.</html>";
+    private String loadFSToolTip = "<html>Loads a space of graph building "
+            + "blocks (BB Space).<br>"
+            + "Graphs can be inspected without loading any space.<br>"
+            + "However, loading a space allows to edit and build"
+            + "graphs manually.</html>";
 	
 	private JPanel pnlMouseMode;
 	private JButton btnPickMode;
@@ -286,15 +287,19 @@ public class GUIGraphHandler extends GUICardPanel
 						if (fragSpace==null)
 						{
 							JOptionPane.showMessageDialog(btnAddGraph,
-					                "<html>No fragment space is currently loaded!<br>"
-					                + "You must load a fragment space to build graphs that<br>"
-					                + "contain molecular frgments. <br>"
-					                + "However, without a fragment space, you can still build<br>"
-					                + "graphs made of empty vertexes (i.e., vertexes contain<br>"
-					                + "no atoms, but only attachment points).</html>",
-					                "WARNING",
-					                JOptionPane.WARNING_MESSAGE,
-					                UIManager.getIcon("OptionPane.warningIcon"));
+				                "<html>No space of building blocks (BB Space) "
+				                + "is currently loaded!<br>"
+				                + "You must load a BB Space to build graphs "
+				                + "that<br>"
+				                + "contain molecular frgments. <br>"
+				                + "However, without definign a BB Space, "
+				                + "you can still build<br>"
+				                + "graphs made of empty vertexes (i.e., "
+				                + "vertexes contain<br>"
+				                + "no atoms, but only attachment points).</html>",
+				                "WARNING",
+				                JOptionPane.WARNING_MESSAGE,
+				                UIManager.getIcon("OptionPane.warningIcon"));
 						}
 						try
                         {
@@ -421,7 +426,7 @@ public class GUIGraphHandler extends GUICardPanel
 		pnlEditVrtxBtns = new JPanel();
 		JLabel edtVertxsLab = new JLabel("Edit Graph:");
 		
-        btnFragSpace = new JButton("Load Library of Vertexes");
+        btnFragSpace = new JButton("Load BBSpace");
         btnFragSpace.setToolTipText(loadFSToolTip);
         btnFragSpace.addActionListener(new ActionListener() {
             @Override
@@ -432,7 +437,7 @@ public class GUIGraphHandler extends GUICardPanel
                 } catch (Exception e1)
                 {
                     JOptionPane.showMessageDialog(btnAddLibVrtx,
-                            "<html>No fragment spaceFaild to define a space "
+                            "<html>Failed to define a space "
                             + "of building blocks from the given input.</html>",
                             "Error",
                             JOptionPane.ERROR_MESSAGE,
@@ -443,7 +448,7 @@ public class GUIGraphHandler extends GUICardPanel
             }
         });
         
-		btnAddLibVrtx = new JButton("Add Vertex from Library");
+		btnAddLibVrtx = new JButton("Add Vertex from BB Space");
 		btnAddLibVrtx.setToolTipText("<html>Choose a new vertex from the "
 		        + "loaded space of building blocks and<br>"
 		        + "append it to the "
@@ -850,7 +855,7 @@ public class GUIGraphHandler extends GUICardPanel
 						+ "can be shown in the vertex viewer (top-left panel) "
 						+ "upon selecting (see below) that vertex in the graph "
 						+ "viewer. </p>"
-						+ "<p>A building block space must be loaded to "
+						+ "<p>A space of building blocks must be loaded to "
 						+ "enable inspection of graph vertexes that depend on"
 						+ "a building block space.</p>"
 						+ "<br>"
@@ -1252,7 +1257,7 @@ public class GUIGraphHandler extends GUICardPanel
 
 		if (vertxLib.size() == 0)
 		{
-			JOptionPane.showMessageDialog(this,"No fragments in the library",
+			JOptionPane.showMessageDialog(this,"No vertexes in the library",
 	                "Error",
 	                JOptionPane.PLAIN_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));

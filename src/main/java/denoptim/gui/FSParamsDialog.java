@@ -58,10 +58,11 @@ class FSParamsDialog extends GUIModalDialog
 		fsParsForm = new FSParametersForm(this.getSize());
 		addToCentralPane(fsParsForm);
 		
-		btnDone.setText("Create Fragment Space");
+		btnDone.setText("Create BB Space");
 		btnDone.setToolTipText(String.format("<html><body width='%1s'>"
-		        + "Uses the parameters defined above to build a fragment space "
-		        + "and make it available to the graph handler.</html>",400));
+		        + "Uses the parameters defined above to define a space"
+		        + "of graph building blocks (BB Space) "
+		        + "and makes it available to the graph handler.</html>",400));
 		
 		// NB: Assumption: 1 action listener inherited from superclass.
 		// We want to remove it because we need to acquire full control over
@@ -103,7 +104,7 @@ class FSParamsDialog extends GUIModalDialog
 			}
 		});
 		
-		this.btnCanc.setToolTipText("Exit without creating a fragment space.");
+		this.btnCanc.setToolTipText("Exit without creating any BB Space.");
 	}
 	
 //-----------------------------------------------------------------------------

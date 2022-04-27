@@ -283,7 +283,8 @@ public class FSParametersForm extends ParametersForm
         localBlock5.setVisible(false);
         localBlock5.setLayout(new BoxLayout(localBlock5, SwingConstants.VERTICAL));
 
-        String toolTipSrcOrNew = "Tick here to use a previously defined fragment space.";
+        String toolTipSrcOrNew = "Tick here to use parameters from a previously "
+                + "defined space of building blocks.";
         lineSrcOrNew = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rdbSrcOrNew = new JRadioButton("Use parameters from existing file");
         rdbSrcOrNew.setToolTipText(toolTipSrcOrNew);
@@ -312,7 +313,7 @@ public class FSParametersForm extends ParametersForm
 
         String toolTipFSSource = "<html>Pathname of a DENOPTIM's parameter file with GA settings.</html>";
         lineFSSource = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblFSSource = new JLabel("Fragment space file:", SwingConstants.LEFT);
+        lblFSSource = new JLabel("Previous parameters file:", SwingConstants.LEFT);
         lblFSSource.setToolTipText(toolTipFSSource);
         txtFSSource = new JTextField();
         txtFSSource.setToolTipText(toolTipFSSource);
@@ -551,9 +552,11 @@ public class FSParametersForm extends ParametersForm
         		catch (Throwable t)
         		{
         			JOptionPane.showMessageDialog(btnPar11Insert,
-        					"<html>The current parameters do not create a valid fragment space.<br>"
+        					"<html>The current parameters do not create a valid "
+        					+ "space of building blocks.<br>"
         					+ "It looks like you want to manually insert APClasses.<br>"
-        					+ "If this is not true, you must adjust the parameters defining the fragment space.</html>",
+        					+ "If this is not true, you must adjust the parameters defining the "
+        					+ "space of building blocks.</html>",
         					"No valid FragmentSpace",
         					JOptionPane.WARNING_MESSAGE);
         		}
@@ -1320,8 +1323,9 @@ public class FSParametersForm extends ParametersForm
 	    	if (txtFSSource.getText().equals("") 
 	    			|| txtFSSource.getText() == null)
 	    	{
-	    		throw new Exception("<html>No source specified for fragment "
-	    				+ "space.<br>Please, specify the file name.</html>");
+	    		throw new Exception("<html>No source specified for the "
+	    		        + "parameters defining the space of building blocks."
+	    		        + "<br>Please, specify the file name.</html>");
 	    	}
 	    	importParametersFromDenoptimParamsFile(txtFSSource.getText());
         }
@@ -1334,7 +1338,7 @@ public class FSParametersForm extends ParametersForm
     {
     	possiblyReadParamsFromFSParFile();
     	
-        sb.append("# Fragment Space - parameters").append(NL);
+        sb.append("# Building Blocks Space - parameters").append(NL);
         sb.append(getStringIfNotEmpty(keyPar1,txtPar1));
         sb.append(getStringIfNotEmpty(keyPar2,txtPar2));
         sb.append(getStringIfNotEmpty(keyPar3,txtPar3));

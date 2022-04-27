@@ -255,7 +255,7 @@ public class MainToolBar extends JMenuBar
 			}
 		});
 		newMenu.add(newVS);
-		JMenuItem newFr = new JMenuItem("New Fragments");
+		JMenuItem newFr = new JMenuItem("New Molecular Fragments");
 		newFr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainPanel.add(new GUIVertexInspector(mainPanel));
@@ -269,7 +269,7 @@ public class MainToolBar extends JMenuBar
 			}
 		});
 		newMenu.add(newCPM);
-		JMenuItem newGr = new JMenuItem("New DENOPTIMGraph");
+		JMenuItem newGr = new JMenuItem("New Graphs");
 		newGr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainPanel.add(new GUIGraphHandler(mainPanel));
