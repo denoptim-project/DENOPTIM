@@ -433,7 +433,7 @@ public abstract class RunTimeParameters
      * @param s the string to interpret.
      * @return <code>true</code> for 'true/yes'.
      */
-    public boolean readYesNoTrueFalse(String s)
+    public static boolean readYesNoTrueFalse(String s)
     {
         boolean result = false;
         String value = s.trim().toUpperCase();

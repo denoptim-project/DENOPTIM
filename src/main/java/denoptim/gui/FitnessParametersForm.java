@@ -64,6 +64,7 @@ import org.openscience.cdk.qsar.IDescriptor;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.DescriptorForFitness;
 import denoptim.fitness.DescriptorUtils;
+import denoptim.programs.RunTimeParameters;
 
 /**
  * Form collecting input parameters for a setting-up the fitness provider.
@@ -1052,9 +1053,8 @@ public class FitnessParametersForm extends ParametersForm
  				
  				if (key.toUpperCase().equals(keyPreFitnessUIDCheck.toUpperCase()))
  				{
-                    ((JRadioButton) valueField).setSelected(false);
-                } else {
-                    ((JRadioButton) valueField).setSelected(true);
+ 				   ((JRadioButton) valueField).setSelected(
+ 				           RunTimeParameters.readYesNoTrueFalse(value));
                 }
  				break;
  				
@@ -1112,7 +1112,9 @@ public class FitnessParametersForm extends ParametersForm
         }
         if (rdbPreFitnessUIDCheck.isSelected())
         {
-            sb.append(keyPreFitnessUIDCheck).append(NL);
+            sb.append(keyPreFitnessUIDCheck).append("=YES").append(NL);
+        } else {
+            sb.append(keyPreFitnessUIDCheck).append("=NO").append(NL);
         }
         //HEREGOESPRINT this is only to facilitate automated insertion of code       
     }

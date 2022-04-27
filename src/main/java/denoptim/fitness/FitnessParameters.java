@@ -235,8 +235,8 @@ public class FitnessParameters extends RunTimeParameters
             	make3DTrees = false;
             	break;
             	
-            case "CHECKUIDBEFOREFITNESS":
-                checkPreFitnessUID = true; 
+            case "CHECKUIDBEFOREFITNESS=":
+                checkPreFitnessUID = readYesNoTrueFalse(value);
                 checkPreFitnessUIDFromInput = true;
                 break;
     

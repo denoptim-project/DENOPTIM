@@ -13,7 +13,7 @@ GA-InitPoplnFile=OTF_WDIR/initialPop.sdf
 GA-randomSeed=8572368003836
 FP-Source=OTF_WDIR/fitness_provider.sh
 FP-Interpreter=bash
-FP-CheckUidBeforeFitness
+FP-CheckUidBeforeFitness=yes
 GA-Parallelization=asynchronous
 GA-numParallelTasks=OTF_PROCS
 GA-populationSize=3

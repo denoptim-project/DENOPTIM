@@ -6,7 +6,7 @@
 # Fitness provider
 FP-INTERPRETER=python
 FP-SOURCE=data/fitness_provider_fromDB.py
-FP-CheckUidBeforeFitness
+FP-CheckUidBeforeFitness=yes
 
 # Parameters for the fragment space exploration
 FSE-ROOTGRAPHS=data/root.sdf

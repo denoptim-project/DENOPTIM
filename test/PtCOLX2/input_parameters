@@ -5,7 +5,7 @@
 # Fitness provider
 FP-INTERPRETER=python
 FP-SOURCE=data/fitness_provider_fromDB.py
-FP-CheckUidBeforeFitness
+FP-CheckUidBeforeFitness=yes
 
 # Parameters for the genetic algorithm
 GA-RANDOMSEED=12345

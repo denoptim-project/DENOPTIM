@@ -62,4 +62,4 @@ RC-EvaluationClosabilityMode=Ring_size
 FP-Equation=${taniToSubStructs*taniToSubStructs}
 FP-DescriptorSpecs=${Variable.parametrized('taniToSubStructs','TanimotoSimilarityBySubstructure','FILE:RUNDIRTOSET/data/substructures.smarts, FILE:RUNDIRTOSET/data/goal.sdf')}
 
-FP-CHECKUIDBEFOREFITNESS
+FP-CheckUidBeforeFitness=yes=yes

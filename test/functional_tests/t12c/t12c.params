@@ -12,7 +12,7 @@ FS-ConstrainSymmetry=co:0 1.0
 
 # Use internal fitness provider
 FP-EQUATION=${nHBAcc + 0.2*nAtom + 3*Zagreb}
-FP-CheckUidBeforeFitness
+FP-CheckUidBeforeFitness=yes
 
 # Genetic Algorithm parameters
 GA-UIDFileIn=OTF_WDIR/knownUID.txt

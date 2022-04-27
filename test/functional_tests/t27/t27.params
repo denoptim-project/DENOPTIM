@@ -14,7 +14,7 @@ FS-ConstrainSymmetry=co:0 1.0
 GA-randomSeed=8572368003836
 FP-Source=fitness_provider.sh
 FP-Interpreter=bash
-FP-CheckUidBeforeFitness
+FP-CheckUidBeforeFitness=yes
 GA-Parallelization=synchronous
 GA-numParallelTasks=1
 GA-populationSize=10

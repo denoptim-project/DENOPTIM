@@ -52,4 +52,4 @@ RC-RCCFOLDER=data/rccArchive
 #FP-DescriptorSpecs=${Variable.parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
 FP-Source=data/fitness_provider_w3D.sh
 FP-Interpreter=bash
-FP-CHECKUIDBEFOREFITNESS
+FP-CheckUidBeforeFitness=yes=yes
