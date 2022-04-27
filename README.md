@@ -11,7 +11,7 @@ You can either get latest version of DENOPTIM from the <a href="https://repo.ana
 
 ### Install From Conda (recommended)
 ```
-conda install -c denoptim denoptim
+conda install -c denoptim-project  denoptim
 ```
 
 ### Build From Source
@@ -44,14 +44,20 @@ On Windows Anaconda prompt:
 ```
 java -jar $DENOPTIM_HOME\target\denoptim-${VERSION}-jar-with-dependencies.jar
 ```
-In the rest of this document, we well use `denoptim` to refer to the above command. In practice, you should create an alias so that `denoptim="java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar"`
+In the rest of this document, we well use `denoptim` to refer to the above command. In practice, you should create an alias so that 
+```
+denoptim="java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar"
+```
 
 #### Testing the functionality
 The [test/functional_tests](./test/functional_tests/) folder collects tests with automated checking of the results. There test are meant to verify the retention of specific functionality during development phase (i.e., integration tests), but they also are complete example of how to use denoptim from a the terminal on Linux/Mac or Windows via GitBash. 
 
 This is how to run the tests:
-    cd $DENOPTIM_HOME/test/functional_tests
-    bash runAllTests.sh
+```
+cd $DENOPTIM_HOME/test/functional_tests
+bash runAllTests.sh
+```
+The results will be collected in a temporary folder (typically `/tmp/denoptim_tesy`).
 
 
 ## User Manual
@@ -69,18 +75,23 @@ denoptim -h
 ```
 For example, this command
 ```
-denoptim -r GS input_parameters
+denoptim -r GA input_parameters
 ```
 starts an artificial evolution experiment using the genetic algorithm and parameters specified in the <code>&lt;input_parameters&gt;</code> file, which is a text file containing [parameters and keywords](https://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html#Toc35546_1191730726).
 
 ### Pre-configured Examples
 Complete examples pre-configured to run DENOPTIM experiments on your local client can be found under the [test](./test) folder. Each of these test will run a short experiments and collect the output in a folder that can be inspected with the GUI (see below).
 * [test/PtCOLX2](./test/PtCOLX2): genetic algorithm experiment for the optimization of organometallic ligands sets that weaken the carbonyl bond in Pt(CO)(L)(X)<sub>2</sub> complexes (less then 5 minutes on a regular laptop). To run this example:
-    cd $DENOPTIM_HOME/test/PtCOLX2
-    bash runEvolutionaryExperiment.sh
+```
+cd $DENOPTIM_HOME/test/PtCOLX2
+bash runEvolutionaryExperiment.sh
+```
 * [test/PtCOLX2_FSE](./test/PtCOLX2_FSE): virtual screening of organometallic ligands sets that weaken the carbonyl bond in Pt(CO)(L)(X)<sub>2</sub> complexes (less then 5 minutes on a regular laptop). To run this example:
-    cd $DENOPTIM_HOME/test/PtCOLX2_FSE
-    bash runCombinatorialExperiment.sh
+```
+cd $DENOPTIM_HOME/test/PtCOLX2_FSE
+bash runCombinatorialExperiment.sh
+```
+
 The GUI can be used to inspect the results. To this end, copy the pathname that is printed by DENOPTIM in the terminal after `Output files associated with the current run are located in $path_to_your_output` and use the GUI to open it:
 ```
 denoptim $path_to_your_output
