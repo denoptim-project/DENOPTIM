@@ -141,7 +141,7 @@ then
         rm -fr "$wDir"
     else
         echo " "
-        echo "ERROR! Old $wDir exists already! Remove it to run new tests."
+        echo "ERROR! Old $wDir exists already! Add '-r' to remove it and run new tests."
         echo " "
         exit
     fi
