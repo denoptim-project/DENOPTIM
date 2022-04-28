@@ -149,7 +149,7 @@
 		</ul></li>
 		<li><a href="#Toc40920_1191730726">File Formats</a>
 		<ul>
-			<li><a href="#Toc16847_799972446">Molecular Fragments</a></li>
+			<li><a href="#Toc16847_799972446">Vertexes</a></li>
 			<li><a href="#Toc14763_799972446">Compatibility Matrix file</a></li>
 			<li><a href="#Toc16849_799972446">Ring closures Compatibility Matrix file</a></li>
 			<li><a href="#Toc16851_799972446">Initial Population File</a></li>
@@ -1934,73 +1934,52 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 <hr>
 <h1 class="western"><a name="Toc40920_1191730726"></a>File Formats</h1>
 
-<h3 class="western"><a name="Toc16847_799972446"></a>Molecular Fragments</h3>
-//TODO-V3 update!
+<h3 class="western"><a name="Toc16847_799972446"></a>Vertexes</h3>
+<p>Vertexes can be define in files with two different formats: the <a href="https://en.wikipedia.org/wiki/Chemical_table_file#SDF">SDF</a>, and <a href="https://en.wikipedia.org/wiki/JSON">JSON</a>.</p>
 
-<p>SDF file format is used for
-any type of fragment (i.e., scaffolds, fragments, capping groups).
-The SDF files must include an <code>&lt;ATTACHMENT_POINT&gt;</code>
-tag reported with the following format:</p>
-
+<p>SDF file format are best suited for vertex that contain molecular fragment because they can be opened by any most molecular visualization packages. Still, SDF format can be used any type of vertex.</p>
+<p>The requirement for an the chemical representation contained in an SDF file to be perceived as a vertex is is the presence of associated data (also called tags, fields, or properties) that define the attachment points, i.e., the <code>&lt;ATTACHMENT_POINT&gt;</code> property. The value of this property must reflect the following syntax convention.
+For a single attachment point rooted on an atom (square brackets indicate optional components):
+<pre>
+n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub>[:bt<sub>A</sub>][:x<sub>A</sub>%y<sub>A</sub>%z<sub>A</sub>]
+</pre>
+For multiple attachment points rooted on the same atom (square brackets indicate optional components):
+<pre>
+n<sub>2</sub>#c<sub>B</sub>:sc<sub>B</sub>[:bt<sub>B</sub>][:x<sub>B</sub>%y<sub>B</sub>%z<sub>B</sub>],c<sub>C</sub>:sc<sub>C</sub>[:bt<sub>C</sub>][:x<sub>C</sub>%y<sub>C</sub>%z<sub>C</sub>]</pre>
+where: <ul>
+	<li>n<sub>1</sub> is the 1-based index of the atom/pseudo-atom on which attachment point <i>A</i> is rooted, while n<sub>2</sub> is the 1-based index of the atom/pseudo-atom on which both attachment point <i>B</i> and <i>C</i> are rooted.</li>
+	<li><i>c<sub>i</sub></i> is the first part (i.e., the so-called "rule") of the APClass of attachment point <i>i</i>.</li>
+	<li><i>sc<sub>i</sub></i> is the second part (i.e., the so-called "subclass") of the APClass of attachment point <i>i</i>.</li>
+	<li><i>bt<sub>i</sub></i> defined the bond type of the APClass of attachment point <i>i</i>. Possible values are <code>NONE</code>, <code>SINGLE</code>, <code>DOUBLE</code>, <code>TRIPLE</code>, <code>QUADRUPLE</code>, <code>ANY</code>, and <code>UNDEFINED</code>.</li>
+	<li><i>x<sub>i</sub></i>, <i>y<sub>i</sub></i>, and <i>z<sub>i</sub></i> are Cartesian coordinates defining the "AP vector". For APs rooted on atoms (the source atoms) the AP vector defines the ideal position where the atom that can be connected with the source atom should be placed upon formation of the bond.</li>
+</ul>
+In the SDF file strings pertaining a single source atom are separated by spaces. So the overall result is the following:
 <pre class="file">
 &hellip;
-&gt;&nbsp;&lt;ATTACHMENT_POINT&gt;
-n1:v1 n2:v2
+&gt;&nbsp;&lt;ATTACHMENT_POINTS&gt;
+n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub>:x<sub>A</sub>%y<sub>A</sub>%z<sub>A</sub>&nbsp;n<sub>2</sub>#c<sub>B</sub>:sc<sub>B</sub>:bt<sub>B</sub>:x<sub>B</sub>%y<sub>B</sub>%z<sub>B</sub>,c<sub>C</sub>:sc<sub>C</sub>:bt<sub>C</sub>:x<sub>C</sub>%y<sub>C</sub>%z<sub>C</sub>
 
 &hellip;
 </pre>
 
-<p>where n1, n2,&hellip; are the
-integers (1-to-N) that identify which atoms in the atom list of the
-SDF file hold attachment points, and v1,v2,&hellip; define the number of
-connections available.</p>
-<p>In case of class-based approach also the <code>&lt;CLASS&gt;</code>
-tag must be present in addition to the  <code>&lt;ATTACHMENT_POINT&gt;</code>
-tag. The following syntax is accepted when working with 2D molecular
-representations.</p>
+<p>Considering the optional components, the following alternatives are also recognized and used for APs that do not define bond types (NB: they accept the default bond type, i.e., <code>SINGLE</code>) and/or AP vectors.<ul>
+<li><code>n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub></code></li>
+<li><code>n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub>:x<sub>A</sub>%y<sub>A</sub>%z<sub>A</sub></code></li>
+<li><code>n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub></code> </li>
+</ul>
+</p>
+<p>Additional fields can be present in SDF files saved by DENOPTIM. In particular, DENOPTIM new version always saves the JSON format as one of the properties of the SDF file format.</p>
 
-<pre class="file">
-&hellip;
-&gt;&nbsp;&lt;CLASS&gt;
-n1#c1&nbsp;n2#c2,c3
-
-&gt;&nbsp;&lt;ATTACHMENT_POINT&gt;
-n1:v1&nbsp;n2:v2
-
-&hellip;
-</pre>
-
-<p>Where <i>c1</i>, <i>c2</i>, and <i>c3</i> are
-the attachment point classes of the attachment points located
-respectively on atoms <i>n1</i>, and <i>n2</i>. Note the syntax for the two
-attachment points on atom <i>n2</i>. While the number of open valences
-remains a single number (i.e., <i>v2</i> &gt; 1), multiple AP classes have
-to be reported in the <code>&lt;CLASS&gt;</code> tag.</p>
-
-<p>Instead, when working with 3D molecular representations the syntax includes a set of Cartesian coordinates for each attachment point.</p>
-
-<pre class="file">
-&hellip;
-&gt;&nbsp;&lt;CLASS&gt;
-n1#c1&nbsp;n2#c2:x2%y2%z2,c3:x3%y3%z3
-
-&gt;&nbsp;&lt;ATTACHMENT_POINT&gt;
-n1:v1&nbsp;n2:v2
-
-&hellip;
-</pre>
 
 
 <h3 class="western"><a name="Toc14763_799972446"></a>Compatibility Matrix file</h3>
-<p>The
-compatibility matrix file is a text file that includes blocks of
-information related to the class-based approach:</p>
+<p>The compatibility matrix file is a text file that includes blocks of
+information related to the APClass compatibility rules:</p>
 <ul>
-	<li>the definition of the AP class compatibility matrix (lines
+	<li>the definition of the actual AP class compatibility matrix (lines
 	starting with <code>RCN</code> keyword, comma-separated entries),</li>
-	<li>the AP class-to-bond order conversion key (<code>RBO</code> keyword),</li>
 	<li>the rules to append capping groups (<code>CAP</code> keyword),</li>
-	<li>the rules to discharge a graph if an AP of a specific APclass is not
+	<li>the rules to discharge a graph if an AP of a specific APClass is not
 	used (<code>DEL</code> keyword).</li>
 </ul>
 
@@ -2015,11 +1994,6 @@ RCN&nbsp;apclass2:0&nbsp;apclass2:1
 # capping groups) is attached on APs of a specific class.
 # In this example, no fragment will be attached to APs of class apclass2:1 
 RCN apclass2:1 none
-&hellip;
-# CLASS-to-BondOrder conversion
-RBO&nbsp;apclass1&nbsp;1
-RBO&nbsp;apclass2&nbsp;1
-RBO&nbsp;apclass3&nbsp;2
 &hellip;
 # Capping groups
 CAP&nbsp;apclass1:0&nbsp;cap1:0
@@ -2036,7 +2010,7 @@ DEL&nbsp;apclass1:0
 compatibility matrix file specifies the pairs of AP classes that are
 allowed to form ring-closing bonds. Note that, contrary to the
 standard compatibility matrix, the RC compatibility matrix is
-symmetric. The syntax is the same as for a standard compatibility
+symmetric. The syntax is the same as for a general-purpose compatibility
 matrix.</p>
 
 <pre class="file">
@@ -2050,25 +2024,24 @@ RCN&nbsp;apclass1:1&nbsp;apclass1:0
 <h3 class="western"><a name="Toc16851_799972446"></a>Initial Population File</h3>
 
 <p>SDF format is used to provide an initial set of fully characterized
-molecules (i.e., initial population). To be properly interpreted by
+candidates (i.e., initial population). To be properly interpreted by
 DENOPTIM this SDF file must include the following tags:</p>
 <ul>
 	<li><code>&lt;FITNESS&gt;</code> tag specifying the numerical fitness value.</li>
 	<li><code>&lt;UID&gt;</code> tag specifying the unique identifier of the chemical entity (often the InChiKey).</li>
-	<li><code>&lt;GraphENC&gt;</code> tag specifying the essential part of the graph representation of the chemical entity.</li>
+	<li><code>&lt;GraphJson&gt;</code> tag specifying the essential part of the graph representation of the chemical entity.</li>
 </ul>
 
 
 <h3 class="western"><a name="Toc10339_2456711212"></a>Candidate Chemical Entity Files</h3>
 
 <p>SDF format file used to
-communicate the definition of any candidate chemical entity (e.g., a
-new candidate molecule in a molecular design run) to external fitness
+communicate the definition of a candidate entity to external fitness
 providers (see <a href="#Toc42056_808352928">Fitness evaluation</a>).</p>
 
-<p>DENOPTIM programs output the 2D/3D structure of the molecule (in SDF format) together with its graph representation 
-(tag <code>&lt;GraphENC&gt;</code>) and additional information
-(i.e., SMILES, InChiKey). By default, the Cartesian coordinates reported in these files are those of a three-dimensional tree-like model built by aligning each building block according to the attachment point vectors. The resulting geometry is not refined, and is only meant to facilitate further processing and visual inspection. While such geometry can be used as starting point for further molecular modeling, it should never be used to calculate any property dependent on the molecular geometry. The alignment of the building blocks is skipped when using the <code>FP-No3dTreeModel</code> keyword. In this case, the SDF file will contain Cartesian coordinates of the initial building blocks, and will therefore be characterized by a correct topology but a nonsensically geometric arrangement of the atoms.</p>
+<p>DENOPTIM programs output a non-optimized 3D-structure of the chemical entity in SDF format together with its graph representation 
+(tag <code>&lt;GraphJson&gt;</code>) and additional information
+(i.e., SMILES, InChiKey, unique identifier). By default, the Cartesian coordinates reported in these files are those of a three-dimensional tree-like model built by aligning each building block according to the attachment point vectors. The resulting geometry is not refined, and is only meant to facilitate further processing and visual inspection. While such geometry can be used as starting point for further molecular modeling, it should never be used to calculate any property dependent on the molecular geometry. The alignment of the building blocks is skipped when using the <code>FP-No3dTreeModel</code> keyword. In this case, the SDF file will contain Cartesian coordinates of the initial building blocks, and will therefore be characterized by a correct topology but a non-sense arrangement of the atoms.</p>
 
 <h3 class="western"><a name="Toc16853_799972446"></a>Fitness Files</h3>
 <p>SDF format files used to store the final results for an evaluated chemical entity and to receive the fitness value from any external fitness provider. These files must contain one of these two tags:</p>
@@ -2111,11 +2084,14 @@ M&nbsp;&nbsp;END&nbsp;
 &gt;&nbsp;&lt;cdk:Title&gt;&nbsp;
 Mol_000027&nbsp;
 
-&gt;&nbsp;&lt;GraphENC&gt;&nbsp;
+&gt;&nbsp;&lt;GraphJson&gt;&nbsp;
 &hellip;
 
-&gt;&nbsp;&lt;Descriptors&gt;
-2.322&nbsp;153.726&nbsp;101.605&nbsp;&nbsp;0.686&nbsp;-0.583&nbsp;&nbsp;0.141&nbsp;
+&gt;&nbsp;&lt;Descriptors1&gt;
+2.322&nbsp;
+
+&gt;&nbsp;&lt;Descriptors2&gt;
+3.452&nbsp;
 
 &gt;&nbsp;&lt;FITNESS&gt;
 -10.096
@@ -2142,11 +2118,14 @@ M&nbsp;&nbsp;END&nbsp;
 &gt;&nbsp;&lt;cdk:Title&gt;&nbsp;
 Mol_000027&nbsp;
 
-&gt;&nbsp;&lt;GraphENC&gt;&nbsp;
+&gt;&nbsp;&lt;GraphJson&gt;&nbsp;
 &hellip;
 
-&gt;&nbsp;&lt;Descriptors&gt;
-2.322&nbsp;153.726&nbsp;101.605&nbsp;&nbsp;0.686&nbsp;-0.583&nbsp;&nbsp;0.141&nbsp;
+&gt;&nbsp;&lt;Descriptors1&gt;
+2.322&nbsp;
+
+&gt;&nbsp;&lt;Descriptors2&gt;
+3.452&nbsp;
 
 &gt;&nbsp;&lt;MOL_ERROR&gt;
 #ViolationOfConstraint:  Minimum non-bonded distance threshold violated. 2.766890
