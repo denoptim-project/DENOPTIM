@@ -6,14 +6,6 @@ RCN c2:0 c2:0,ATneutral:0
 RCN n:0 c:0,ATminus:0,ATplus:0
 RCN p:0 c:0,ATminus:0,ATplus:0
 # APClass-to-BondOrder
-RBO c 1
-RBO c2 2
-RBO hyd 1
-RBO n 1
-RBO p 1
-RBO ATminus 1
-RBO ATplus 1
-RBO ATneutral 2
 # Capping rules
 CAP c:0 hyd:1
 CAP n:0 hyd:1
