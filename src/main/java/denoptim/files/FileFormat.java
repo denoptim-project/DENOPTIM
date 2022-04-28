@@ -88,7 +88,8 @@ public enum FileFormat {
         CANDIDATESDF.definingRegex = new HashSet<String>(Arrays.asList(
                 "^> *<" + DENOPTIMConstants.FITNESSTAG + ">.*",
                 "^> *<" + DENOPTIMConstants.MOLERRORTAG + ">.*",
-                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*"
+                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.GRAPHJSONTAG + ">.*"
                 ));
         CANDIDATESDF.endOfSampleRegex = "\\$\\$\\$\\$";
         
