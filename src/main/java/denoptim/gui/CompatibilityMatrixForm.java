@@ -144,15 +144,6 @@ public class CompatibilityMatrixForm extends JPanel {
 	private JTextField txtSearch;
 	private JLabel matchCounter;
 	
-	private JPanel panelAPClsBO;
-	private DefaultTableModel tabModAPClsBO;
-	private JTable tableAPClsBO;
-	private JButton btnAddAPClsBO;
-	private JButton btnAddAllNewAPClsBO;
-	private JButton btnDelAPClsBO;
-	private JButton btnUpdateAPClsBO;
-	private JButton btnHelpAPClsBO;
-	
 	private JPanel panelCapping;
 	private DefaultTableModel tabModCapping;
 	private JTable tableCapping;
