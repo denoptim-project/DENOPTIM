@@ -1,0 +1,15 @@
+#
+TESTGENOPS-OP=MUTATION
+TESTGENOPS-inpFile=graph-23.sdf
+TESTGENOPS-outFile=graph_mut-25.sdf
+TESTGENOPS-MutationTarget=4,1,3
+TESTGENOPS-MutationType=DELETECHAIN
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=lib_scaff.sdf
+FS-fragmentLibFile=lib_frags.sdf
+FS-cappingFragmentLibFile=lib_cap.sdf
+FS-compMatrixFile=CPMap.par
+FS-rcCompMatrixFile=RC-CPMap.par
+FS-RotBondsDefFile=rotatableBonds
+

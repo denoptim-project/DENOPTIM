@@ -1,9 +1,0 @@
--------------------------------------------------------------------------------
-                               General Information
--------------------------------------------------------------------------------
-The directory contains source files and data that may be used in relation to DENOPTIM. Each entry in the contrib may have different licenses. 
-
-
-
-gendenoptimftree: This provides a set of utilities that perform post-processing 
-of DENOPTIM output. For instance, you may wish to trace the ancestry of a given structure or view the evolution in a human readable form. 

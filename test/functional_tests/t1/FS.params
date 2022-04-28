@@ -1,0 +1,5 @@
+FS-ScaffoldLibFile=scaff.sdf
+FS-FragmentLibFile=frags.sdf
+FS-CappingFragmentLibFile=cap.sdf
+FS-CompMatrixFile=CPMap.par
+FS-RotBondsDefFile=rotatableBonds-1.0

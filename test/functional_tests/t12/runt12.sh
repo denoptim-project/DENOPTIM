@@ -4,6 +4,12 @@ wrkDir=`pwd`
 logFile="t12.log"
 paramFile="t12.params"
 
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    echo "Test SKIPPED on Windows"
+    exit 0
+fi
+
 mv data/* "$wrkDir"
 rm -rf data
 
@@ -19,31 +25,15 @@ done
 exec 6>&1
 exec > "$logFile"
 exec 2>&1
-"$javaDENOPTIM" -jar "$DENOPTIMJarFiles/DenoptimGA.jar" "$paramFile"
-exec 1>&6 6>&- 
+"$javaDENOPTIM" -jar "$denoptimJar" -r GA "$paramFile"
+exec 1>&6 6>&-
 
 #Check outcome
-function isInUIDVector() {
-    uid="$1"
-    symUIDSet=("GEGLCBTXYBXOJA-PREDEBANNA-N" "AAIOWJYNAVKNSR-UHFFFAOYNA-N" "ACGNRLPBAWDHSO-UHFFFAOYNA-N" "AHAFJAUUVOYKFU-UHFFFAOYNA-N" "AMOXORAHSJKEGP-UHFFFAOYNA-N" "APGQMGGYMOAPDL-UHFFFAOYNA-N" "ATUOYWHBWRKTHZ-UHFFFAOYNA-N" "AZHSSKPUVBVXLK-UHFFFAOYNA-N" "BECNQKRGALRPCX-UHFFFAOYNA-N" "BNGANSSGBJAGIW-UHFFFAOYNA-N" "BVEQRPPQVRLBQY-UHFFFAOYNA-N" "CIBMHJPPKCXONB-UHFFFAOYNA-N" "CKFGINPQOCXMAZ-UHFFFAOYNA-N" "CTJAKAQLCQKBTC-UHFFFAOYNA-N" "CZIDTSODKOFJNN-UHFFFAOYNA-N" "FDBMVGZOFRWXGW-UHFFFAOYNA-N" "FQYIEXPVXBCYRP-UHFFFAOYNA-N" "GZTYCIXSJQHVNS-UHFFFAOYNA-N" "HEWZVZIVELJPQZ-UHFFFAOYNA-N" "IXFCAQTZQUFQGU-UHFFFAOYNA-N" "JDLOJZBMTBIATO-UHFFFAOYNA-N" "KNYUPEIZCGMVFE-UHFFFAOYNA-N" "LSQZZMZYZPEYGY-UHFFFAOYNA-N" "NEVZTUDIKNCVNE-UHFFFAOYNA-N" "NGVTXINFTCZHGA-UHFFFAOYNA-N" "NKDDWNXOKDWJAK-UHFFFAOYNA-N" "NOSJIHNMTOMLHW-UHFFFAOYNA-N" "NPNPZTNLOVBDOC-UHFFFAOYNA-N" "OTMSDBZUPAUEDD-UHFFFAOYNA-N" "PNYFNXVHMKKELK-UHFFFAOYNA-N" "PRCNTEMWKQXDDM-UHFFFAOYNA-N" "PSZOHVCVJZCXKU-UHFFFAOYNA-N" "PZIGDQQHBLGNHP-UHFFFAOYNA-N" "QEDAGHAELKPMPV-UHFFFAOYNA-N" "RAMPIMNVBQYGOB-UHFFFAOYNA-N" "RDIXDWRSFIEIBW-UHFFFAOYNA-N" "RUUBIFVWPACNLY-UHFFFAOYNA-N" "SCYULBFZEHDVBN-UHFFFAOYNA-N" "SHTNYEVTKAFOPP-UHFFFAOYNA-N" "SIEPAMHQARKLSE-UHFFFAOYNA-N" "SOGYPWICVSCTBV-UHFFFAOYNA-N" "SPEUIVXLLWOEMJ-UHFFFAOYNA-N" "UTCVPSPEEGOCCY-UHFFFAOYNA-N" "UXODXOGFYYUYHJ-UHFFFAOYNA-N" "VNWKTOKETHGBQD-UHFFFAOYNA-N" "VOYLGRBFALRMGT-UHFFFAOYNA-N" "WIHMGGWNMISDNJ-UHFFFAOYNA-N" "WTBXHOLYBWGOJY-UHFFFAOYNA-N" "XDJBBXPTJIFTKO-UHFFFAOYNA-N" "YKFPUCGAXARQPK-UHFFFAOYNA-N" "ZDWMPMOONJIHAL-UHFFFAOYNA-N" "MMMMMMMMMMMMMM-UHFFFAOYSA-N" "PPPPPPPPPPPPPP-UHFFFAOYSA-N" "BFSUQRCCKXZXEX-UHFFFAOYNA-N" "This UID is not an InChi key but some text, with numbers 1234, and symbols #@._;" "This UID is also in the UIDFileIn, 12345, .;-_@*" "UID with some text, numberts 1223 456, and symbols *@._-:,%&§")
-    for symUID in "${symUIDSet[@]}"
-    do
-        if [ "$symUID" == "$uid" ] ; then
-            return 0 #true
-        fi
-    done
-    return 1 #false
-}
-while IFS='' read -r uid || [[ -n "$uid" ]]; do
-    if ! isInUIDVector "$uid" ; then
-        echo " "
-        echo "Test 't12' NOT PASSED (symptom: check unexpected UID '$uid'. If correct add it to the runt12.sh script)"
-        exit 1
-    fi
-done < "$wrkDir"/RUN*/MOLUID.txt
 
-uidA=$(grep -q 'SPEUIVXLLWOEMJ-UHFFFAOYNA-N' "$wrkDir"/RUN*/MOLUID.txt)
-uidA=$(grep -q 'UID with some text, numberts 1223 456, and symbols *@._-:,%&§' "$wrkDir"/RUN*/MOLUID.txt)
+runFolder=$(basename $(ls -lrtd "$wrkDir"/RUN*/ | tail -n 1 | awk '{print $NF}'))
+
+uidA=$(grep -q 'SPEUIVXLLWOEMJ-UHFFFAOYNA-N' "$wrkDir"/$runFolder/MOLUID.txt)
+uidA=$(grep -q 'UID with some text, numberts 1223 456, and symbols *@._-:,%&§' "$wrkDir"/$runFolder/MOLUID.txt)
 prod=$((uidA * uidB))
 if [[ "$prod" != 0 ]]
 then
@@ -52,9 +42,9 @@ then
     exit 1
 fi
 
-uidA=$(grep -q 'MMMMMMMMMMMMMM-UHFFFAOYSA-N' "$wrkDir"/RUN*/MOLUID.txt)
-uidB=$(grep -q 'This UID is not an InChi key but some text, with numbers 1234, and symbols #@._;' "$wrkDir"/RUN*/MOLUID.txt)
-uidC=$(grep -q 'PPPPPPPPPPPPPP-UHFFFAOYSA-N' "$wrkDir"/RUN*/MOLUID.txt)
+uidA=$(grep -q 'MMMMMMMMMMMMMM-UHFFFAOYSA-N' "$wrkDir"/$runFolder/MOLUID.txt)
+uidB=$(grep -q 'This UID is not an InChi key but some text, with numbers 1234, and symbols #@._;' "$wrkDir"/$runFolder/MOLUID.txt)
+uidC=$(grep -q 'PPPPPPPPPPPPPP-UHFFFAOYSA-N' "$wrkDir"/$runFolder/MOLUID.txt)
 prod=$((uidA * uidB * uidC))
 if [[ "$prod" != 0 ]]
 then
@@ -63,7 +53,64 @@ then
     exit 1
 fi
 
-grep -q 'DENOPTIM EA run completed' "$wrkDir"/RUN*.log
+# NB: set this to true in case you have to update the expected results. This
+# is needed in case of changes to the GA algorithms that make the sequence of
+# generated candidates differe from version to version. For example, when
+# introducing new or modifying existing genetic operators.
+prepare_expected=false
+# The lines beginning with M00... should then be processed to remove duplicates 
+# and written into the data/expected_results file
+
+for genFolder in Gen0 Gen1 Gen2 Gen3 Final
+do
+    if [ ! -d "$wrkDir/$runFolder/$genFolder" ]; then
+        echo " "
+        echo "Test 't12' NOT PASSED (Lack of reproducibility - symptom: missing folder $genFolder)"
+        exit 1
+    fi
+
+    find "$wrkDir/$runFolder/$genFolder" -name "*_out.sdf" | while read outSDF 
+    do
+        molName=$(basename "$outSDF" _out.sdf)
+        
+        endMolDef=$(grep -n "M  END" "$outSDF" | awk -F':' '{print $1}')
+        nC=$(head -n "$endMolDef" "$outSDF"  | grep -c "[0-9] C   [0-9]")
+        nH=$(head -n "$endMolDef" "$outSDF"  | grep -c "[0-9] H   [0-9]")
+        nCl=$(head -n "$endMolDef" "$outSDF" | grep -c "[0-9] Cl  [0-9]")
+        nF=$(head -n "$endMolDef" "$outSDF"  | grep -c "[0-9] F   [0-9]")
+        nO=$(head -n "$endMolDef" "$outSDF"  | grep -c "[0-9] O   [0-9]")
+        nAtms=$(head -n 4 "$outSDF" | tail -n 1 | cut -c 1-3 | sed 's/ //g')
+        nBnds=$(head -n 4 "$outSDF" | tail -n 1 | cut -c 4-6 | sed 's/ //g')
+        invariant="C${nC}H${nH}Cl${nCl}F${nF}O${nO}_nAtms${nAtms}_nBnds$nBnds"
+        
+        if $prepare_expected ; then
+            echo "$molName $invariant"
+        else
+            if ! grep -q "$molName" "$wrkDir/expected_results"; then
+                echo " "
+                echo "Test 't12' NOT PASSED (Lack of reproducibility - symptom: could not find mol name '$molName' in expected results)"
+                exit 1
+            fi
+            expected=$(grep "$molName" "$wrkDir/expected_results" | awk '{print $2}')
+            if [[ "$expected" != "$invariant" ]]; then
+                echo " "
+                echo "Test 't12' NOT PASSED (Lack of reproducibility - symptom: inconsistent invariant for $molName)"
+                echo "Found:    _${invariant}_"
+                echo "Expected: _${expected}_"
+                exit 1
+            fi
+        fi
+    done
+done
+
+if $prepare_expected ; then
+    echo " "
+    echo "Test 't12' RUN IN PREPARATION MODE Change value of 'prepare_expected'!"
+    exit 1
+fi
+
+
+grep -q 'DENOPTIM EA run completed' "$wrkDir"/$runFolder.log
 if [[ $? != 0 ]]
 then
     echo " "
@@ -73,4 +120,3 @@ else
     echo "Test 't12' PASSED"
 fi
 exit 0
-

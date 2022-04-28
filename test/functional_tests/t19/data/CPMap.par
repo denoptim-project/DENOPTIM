@@ -1,0 +1,6 @@
+# 
+# CompatibilityMatrix for Class Based Builders
+# 
+RCN c:0 c:0,c:0,ATplus:0,ATminus:0,hyd:1
+# Capping
+CAP c:0 hyd:1

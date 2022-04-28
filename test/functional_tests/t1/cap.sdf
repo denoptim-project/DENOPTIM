@@ -1,31 +1,22 @@
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     7.3766    6.4988    5.8722 Cl  0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#metX:1:5.9995%7.5910%7.4709
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#metX:1:SINGLE:5.9995%7.5910%7.4709 
 
 $$$$
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
  11 15  0  0  0  0  0  0  0  0999 V2000
-    6.1214    0.4256   -4.6118 C   0  0  1  0  0  0  0  0  0  0  0  0
-    7.1946   -0.1772   -3.9492 C   0  0  2  0  0  0  0  0  0  0  0  0
-    6.7335   -1.3005   -3.3357 C   0  0  2  0  0  0  0  0  0  0  0  0
-    5.3778   -1.3986   -3.5877 C   0  0  2  0  0  0  0  0  0  0  0  0
-    4.9908   -0.3508   -4.3647 C   0  0  1  0  0  0  0  0  0  0  0  0
+    6.1214    0.4256   -4.6118 C   0  0  0  0  0  0  0  0  0  0  0  0
+    7.1946   -0.1772   -3.9492 C   0  0  0  0  0  0  0  0  0  0  0  0
+    6.7335   -1.3005   -3.3357 C   0  0  0  0  0  0  0  0  0  0  0  0
+    5.3778   -1.3986   -3.5877 C   0  0  0  0  0  0  0  0  0  0  0  0
+    4.9908   -0.3508   -4.3647 C   0  0  0  0  0  0  0  0  0  0  0  0
     6.1474    1.3414   -5.1852 H   0  0  0  0  0  0  0  0  0  0  0  0
     8.2215    0.1688   -3.9492 H   0  0  0  0  0  0  0  0  0  0  0  0
     7.3197   -1.9890   -2.7486 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -33,37 +24,28 @@ From GM3DFragmenter
     3.9876   -0.1695   -4.7328 H   0  0  0  0  0  0  0  0  0  0  0  0
     6.0836   -0.5603   -3.9698 Du  0  0  0  0  0  0  0  0  0  0  0  0
   1  2  1  0  0  0  0 
-  1  6  1  6  0  0  0 
+  1  6  1  0  0  0  0 
   2  3  1  0  0  0  0 
-  2  7  1  6  0  0  0 
+  2  7  1  0  0  0  0 
   3  4  1  0  0  0  0 
-  3  8  1  1  0  0  0 
+  3  8  1  0  0  0  0 
   4  5  1  0  0  0  0 
-  4  9  1  1  0  0  0 
+  4  9  1  0  0  0  0 
   5  1  1  0  0  0  0 
-  5 10  1  6  0  0  0 
+  5 10  1  0  0  0  0 
  11  1  1  0  0  0  0 
  11  2  1  0  0  0  0 
  11  3  1  0  0  0  0 
  11  4  1  0  0  0  0 
  11  5  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-11#piCP:1:5.7042%0.5982%-2.3184
-
-> <ATTACHMENT_POINT>
-11:1
+> <ATTACHMENT_POINTS>
+11#piCP:1:SINGLE:5.7042%0.5982%-2.3184 
 
 $$$$
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
   3  2  0  0  0  0  0  0  0  0999 V2000
     4.2192    1.8370   -2.3682 C   0  0  0  0  0  0  0  0  0  0  0  0
     3.4143    2.6888   -2.5551 O   0  0  0  0  0  0  0  0  0  0  0  0
@@ -71,25 +53,16 @@ From GM3DFragmenter
   2  1  3  0  0  0  0 
   3  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#metCO:1:5.7038%0.5838%-2.3335
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#metCO:1:SINGLE:5.7038%0.5838%-2.3335 
 
 $$$$
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
   7  7  0  0  0  0  0  0  0  0999 V2000
-    2.8705    5.5129    1.2661 C   0  0  1  0  0  0  0  0  0  0  0  0
-    4.1110    5.9272    0.7561 C   0  0  2  0  0  0  0  0  0  0  0  0
+    2.8705    5.5129    1.2661 C   0  0  0  0  0  0  0  0  0  0  0  0
+    4.1110    5.9272    0.7561 C   0  0  0  0  0  0  0  0  0  0  0  0
     1.9642    5.7770    0.6954 H   0  0  0  0  0  0  0  0  0  0  0  0
     2.6990    5.4421    2.3463 H   0  0  0  0  0  0  0  0  0  0  0  0
     4.1021    6.5483   -0.1375 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -103,77 +76,53 @@ From GM3DFragmenter
   7  1  1  0  0  0  0 
   7  2  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-7#piOlef:1:3.9019%3.7672%0.4879
-
-> <ATTACHMENT_POINT>
-7:1
+> <ATTACHMENT_POINTS>
+7#piOlef:1:SINGLE:3.9019%3.7672%0.4879 
 
 $$$$
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
   9 12  0  0  0  0  0  0  0  0999 V2000
     4.6068    6.1845   12.3309 C   0  0  0  0  0  0  0  0  0  0  0  0
     5.1786    6.4891   13.6571 H   0  0  0  0  0  0  0  0  0  0  0  0
-    5.0586    5.4926   11.1079 C   0  0  2  0  0  0  0  0  0  0  0  0
+    5.0586    5.4926   11.1079 C   0  0  0  0  0  0  0  0  0  0  0  0
     6.3208    4.9249   10.6909 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.6836    5.5170   10.6028 C   0  0  1  0  0  0  0  0  0  0  0  0
+    3.6836    5.5170   10.6028 C   0  0  0  0  0  0  0  0  0  0  0  0
     2.9710    4.8589    9.5031 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.2396    6.1936   11.8291 C   0  0  1  0  0  0  0  0  0  0  0  0
+    3.2396    6.1936   11.8291 C   0  0  0  0  0  0  0  0  0  0  0  0
     1.9476    6.5529   12.4622 H   0  0  0  0  0  0  0  0  0  0  0  0
     4.1472    5.8469   11.4677 Du  0  0  0  0  0  0  0  0  0  0  0  0
-  1  2  1  1  0  0  0 
+  1  2  1  0  0  0  0 
   3  1  1  0  0  0  0 
-  3  4  1  6  0  0  0 
+  3  4  1  0  0  0  0 
   5  3  1  0  0  0  0 
-  5  6  1  6  0  0  0 
+  5  6  1  0  0  0  0 
   5  7  1  0  0  0  0 
   7  1  1  0  0  0  0 
-  7  8  1  1  0  0  0 
+  7  8  1  0  0  0  0 
   9  1  1  0  0  0  0 
   9  7  1  0  0  0  0 
   9  5  1  0  0  0  0 
   9  3  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-9#piButady:1:4.4171%7.3643%10.7658
-
-> <ATTACHMENT_POINT>
-9:1
+> <ATTACHMENT_POINTS>
+9#piButady:1:SINGLE:4.4171%7.3643%10.7658 
 
 $$$$
-hydrogen
-  CDK     0628190038
+
+  CDK     02102218443D
 
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.1961   -2.5039    1.1523 H   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-hydrogen
-
-> <CLASS>
-1#hyd:1:0.4620%-1.7536%0.3834
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#hyd:1:SINGLE:0.4620%-1.7536%0.3834 
 
 $$$$
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
  15 21  0  0  0  0  0  0  0  0999 V2000
     6.2897    6.5657   11.7625 C   0  0  0  0  0  0  0  0  0  0  0  0
     5.9141    7.5426   10.8451 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -190,20 +139,20 @@ From GM3DFragmenter
     4.8267    3.5770   11.2837 H   0  0  0  0  0  0  0  0  0  0  0  0
     6.2883    4.8050   12.7573 H   0  0  0  0  0  0  0  0  0  0  0  0
     5.2892    6.1510   10.6168 Du  0  0  0  0  0  0  0  0  0  0  0  0
-  1  8  1  1  0  0  0 
+  1  8  1  0  0  0  0 
   1  2  1  0  0  0  0 
   1  7  1  0  0  0  0 
-  2  9  1  6  0  0  0 
+  2  9  1  0  0  0  0 
   2  3  1  0  0  0  0 
-  3 10  1  6  0  0  0 
+  3 10  1  0  0  0  0 
   3  4  1  0  0  0  0 
-  4 11  1  6  0  0  0 
+  4 11  1  0  0  0  0 
   4  5  1  0  0  0  0 
-  5 12  1  6  0  0  0 
+  5 12  1  0  0  0  0 
   5  6  1  0  0  0  0 
-  6 13  1  1  0  0  0 
+  6 13  1  0  0  0  0 
   6  7  1  0  0  0  0 
-  7 14  1  1  0  0  0 
+  7 14  1  0  0  0  0 
  15  1  1  0  0  0  0 
  15  2  1  0  0  0  0 
  15  3  1  0  0  0  0 
@@ -212,22 +161,13 @@ From GM3DFragmenter
  15  6  1  0  0  0  0 
  15  7  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-15#piCHTido:1:6.5901%5.6233%9.7998
-
-> <ATTACHMENT_POINT>
-15:1
+> <ATTACHMENT_POINTS>
+15#piCHTido:1:SINGLE:6.5901%5.6233%9.7998 
 
 $$$$
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
  13 18  0  0  0  0  0  0  0  0999 V2000
     1.1182    4.7985   -0.4071 C   0  0  0  0  0  0  0  0  0  0  0  0
     1.2472    3.9273    0.7458 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -261,22 +201,13 @@ From GM3DFragmenter
  13  3  1  0  0  0  0 
  13  8  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-13#piArSndw:1:-0.5622%5.2033%1.0094,piArSndw:1:0.5803%2.7167%-1.0039
-
-> <ATTACHMENT_POINT>
-13:2
+> <ATTACHMENT_POINTS>
+13#piArSndw:1:SINGLE:-0.5622%5.2033%1.0094,piArSndw:1:SINGLE:0.5803%2.7167%-1.0039 
 
 $$$$
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
   4  3  0  0  0  0  0  0  0  0999 V2000
     2.8712    3.0268    1.1194 P   0  0  0  0  0  0  0  0  0  0  0  0
     1.5000    1.8213    1.0618 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -286,41 +217,23 @@ From GM3DFragmenter
   3  1  1  0  0  0  0 
   4  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#Phtre:1:4.3552%2.9513%2.8676
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#Phtre:1:SINGLE:4.3552%2.9513%2.8676 
 
 $$$$
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     4.3469   11.9511    2.8671 N   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#nitryle:1:4.3463%10.3972%2.8637
-
-> <ATTACHMENT_POINT>
-1:3
+> <ATTACHMENT_POINTS>
+1#nitryle:1:TRIPLE:4.3463%10.3972%2.8637 
 
 $$$$
-Fragment
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
   3  2  0  0  0  0  0  0  0  0999 V2000
    -0.0084    0.0003    4.6137 C   0  0  0  0  0  0  0  0  0  0  0  0
     0.0100   -0.0013    5.7180 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -328,22 +241,13 @@ From GM3DFragmenter
   1  2  1  0  0  0  0 
   3  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#CCtriple:0:0.0098%-0.0003%3.0776
-
-> <ATTACHMENT_POINT>
-1:3
+> <ATTACHMENT_POINTS>
+1#CCtriple:0:TRIPLE:0.0098%-0.0003%3.0776 
 
 $$$$
-FeCP_Cap
-  CDK     0628190038
-From GM3DFragmenter
+
+  CDK     02102218443D
+
  11 15  0  0  0  0  0  0  0  0999 V2000
     2.6108    1.2637    8.3543 Fe  0  0  0  0  0  0  0  0  0  0  0  0
     1.9362    0.3823   10.0811 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -372,16 +276,7 @@ From GM3DFragmenter
  10  5  1  0  0  0  0 
  11  6  1  0  0  0  0 
 M  END
-> <cdk:Title>
-FeCP_Cap
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#FeCp:0:2.3691%2.5475%7.3510
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#FeCp:0:SINGLE:2.3691%2.5475%7.3510 
 
 $$$$

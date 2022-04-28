@@ -1,82 +1,46 @@
-AttractorPLUS
-  CDK     0627192255
-Built manually
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0009   -0.0030   -0.0014 Cl  0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-AttractorPLUS
-
-> <cdk:Remark>
-Built manually
-
-> <CLASS>
-1#F:0:0.0068%-0.0033%-0.0083
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#F:0:SINGLE:0.0068%-0.0033%-0.0083 
 
 $$$$
-AttractorPLUS
-  CDK     0627192255
-Built manually
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.0006    0.0065   -0.0002 F   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-AttractorPLUS
-
-> <cdk:Remark>
-Built manually
-
-> <CLASS>
-1#F:0:0.0083%0.0025%-0.0091
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#F:0:SINGLE:0.0083%0.0025%-0.0091 
 
 $$$$
-C_sp3_2H
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0087   -0.0078   -0.0016 C   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-C_sp3_2H
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#cca:0:-0.4838%-1.3031%0.3455,cca:0:-0.4791%0.3532%-1.2997,ch:0:-0.4731%0.9441%0.9541,ch:0:1.4188%0.0012%-0.0084
-
-> <ATTACHMENT_POINT>
-1:4
+> <ATTACHMENT_POINTS>
+1#cca:0:SINGLE:-0.4838%-1.3031%0.3455,cca:0:SINGLE:-0.4791%0.3532%-1.2997,ch:0:SINGLE:-0.4731%0.9441%0.9541,ch:0:SINGLE:1.4188%0.0012%-0.0084 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.0038   -0.0092   -0.0069 O   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#coa:1:-0.4826%-1.2990%0.3455,cob:1:-0.4803%0.3576%-1.2935
-
-> <ATTACHMENT_POINT>
-1:2
+> <ATTACHMENT_POINTS>
+1#coa:1:SINGLE:-0.4826%-1.2990%0.3455,cob:1:SINGLE:-0.4803%0.3576%-1.2935 
 
 $$$$
-oommPh
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102218203D
+
   6  6  0  0  0  0  0  0  0  0999 V2000
     1.2167    0.6946   -0.0088 C   0  0  0  0  0  0  0  0  0  0  0  0
     1.2072   -0.6967   -0.0057 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -91,16 +55,7 @@ From GM3DFragmenter
   5  4  1  0  0  0  0 
   6  5  2  0  0  0  0 
 M  END
-> <cdk:Title>
-oommPh
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#cca:0:2.1461%1.2471%-0.0074 2#cca:0:2.1577%-1.2379%0.0065 3#ccb:0:0.0095%-2.9124%-0.0039 4#cca:0:-2.1573%-1.2319%0.0006 5#cca:0:-2.1463%1.2473%0.0074 6#cca:0:0.0074%2.4890%0.0029
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1 4:1 5:1 6:1
+> <ATTACHMENT_POINTS>
+1#cca:0:SINGLE:2.1461%1.2471%-0.0074 2#cca:0:SINGLE:2.1577%-1.2379%0.0065 3#ccb:0:SINGLE:0.0095%-2.9124%-0.0039 4#cca:0:SINGLE:-2.1573%-1.2319%0.0006 5#cca:0:SINGLE:-2.1463%1.2473%0.0074 6#cca:0:SINGLE:0.0074%2.4890%0.0029 
 
 $$$$

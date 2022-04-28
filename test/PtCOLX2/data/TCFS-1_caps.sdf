@@ -1,22 +1,16 @@
-hydrogen
-  CDK     0627192255
+
+  CDK     02102219043D
 
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.1925   -2.5024    1.1483 H   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-hydrogen
-
-> <CLASS>
-1#hyd:1:0.4589%-1.7510%0.3869
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#hyd:1:SINGLE:0.4589%-1.7510%0.3869 
 
 $$$$
-methyl
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   4  3  0  0  0  0  0  0  0  0999 V2000
     5.1845   -0.3158    7.9034 C   0  0  0  0  0  0  0  0  0  0  0  0
     4.4018    0.0156    7.2277 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -26,22 +20,13 @@ From GM3DFragmenter
   3  1  1  0  0  0  0 
   4  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-methyl
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#me:1:6.4052%0.4666%7.6784
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#me:1:SINGLE:6.4052%0.4666%7.6784 
 
 $$$$
-ph
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  11 11  0  0  0  0  0  0  0  0999 V2000
     7.9548    6.1423    1.5576 C   0  0  0  0  0  0  0  0  0  0  0  0
     7.8692    7.4276    2.0814 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -66,16 +51,7 @@ From GM3DFragmenter
  11 10  1  0  0  0  0 
   8 10  1  0  0  0  0 
 M  END
-> <cdk:Title>
-ph
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#ph:1:8.8664%5.0880%2.2076
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#ph:1:SINGLE:8.8664%5.0880%2.2076 
 
 $$$$

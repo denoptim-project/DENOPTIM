@@ -1,0 +1,14 @@
+#
+# This is the parameter file for test t14
+#
+
+# Parameters for handling the graph lists
+GRAPHLISTS-WORKDIR=OTF_WDIR
+GRAPHLISTS-INPUTGRAPHS-A=OTF_WDIR/male_xo.sdf
+GRAPHLISTS-INPUTGRAPHS-B=OTF_WDIR/male_ok.sdf
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par

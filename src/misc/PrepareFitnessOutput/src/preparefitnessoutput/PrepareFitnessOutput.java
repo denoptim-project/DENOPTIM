@@ -18,9 +18,6 @@
 
 package preparefitnessoutput;
 
-import denoptim.exception.DENOPTIMException;
-import denoptim.io.DenoptimIO;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -38,6 +35,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.openscience.cdk.interfaces.IAtomContainer;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 
 
 /**
@@ -69,7 +69,7 @@ public class PrepareFitnessOutput
             pfd.parseCommandLine(args);
             pfd.checkOptions();
 
-            IAtomContainer mol = DenoptimIO.readSingleSDFFile(pfd.inpSDFFile);
+            IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(pfd.inpSDFFile);
             
             if (pfd.property.length() > 0)
             {
@@ -89,7 +89,7 @@ public class PrepareFitnessOutput
                 }
             }
             
-            DenoptimIO.writeMolecule(pfd.inpSDFFile, mol, false);
+            DenoptimIO.writeSDFFile(pfd.inpSDFFile, mol, false);
         }
         catch (DENOPTIMException ioe)
         {

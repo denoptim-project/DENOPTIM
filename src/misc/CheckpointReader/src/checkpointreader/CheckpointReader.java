@@ -18,11 +18,9 @@
 
 package checkpointreader;
 
-import denoptim.io.DenoptimIO; 
-import denoptim.exception.DENOPTIMException;
-
-import fragspaceexplorer.FSECheckPoint;
-import fragspaceexplorer.FSEUtils;
+import denoptim.files.FileUtils;
+import denoptim.fragspaceexplorer.FSECheckPoint;
+import denoptim.fragspaceexplorer.FSEUtils;
 
 
 /**
@@ -47,7 +45,7 @@ public class CheckpointReader
 	}
 
 	String fileName = args[0];
-	if (DenoptimIO.checkExists(fileName))
+	if (FileUtils.checkExists(fileName))
 	{
 	    try	
 	    {

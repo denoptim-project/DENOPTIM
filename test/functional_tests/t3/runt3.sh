@@ -4,6 +4,12 @@ wrkDir=`pwd`
 logFile="t3.log"
 paramFile="t3.params"
 
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    echo "Test SKIPPED on Windows"
+    exit 0
+fi
+
 mv data/* $wrkDir
 rm -rf data
 
@@ -19,7 +25,7 @@ done
 exec 6>&1
 exec > $logFile
 exec 2>&1
-$javaDENOPTIM -jar $DENOPTIMJarFiles/FragSpaceExplorer.jar $paramFile
+$javaDENOPTIM -jar "$denoptimJar" -r FSE $paramFile
 exec 1>&6 6>&- 
 
 #Check outcome

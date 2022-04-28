@@ -4,6 +4,12 @@ wrkDir=`pwd`
 logFile="t16.log"
 paramFile="t16.params"
 
+wdToDenoptim="$wrkDir/"
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    wdToDenoptim="$(cd "$wrkDir" ; pwd -W | sed 's/\//\\\\/g')\\\\"
+fi
+
 mv data/* "$wrkDir"
 rm -rf data
 
@@ -11,7 +17,8 @@ rm -rf data
 filesToModify=$(find . -type f | xargs grep -l "OTF")
 for f in $filesToModify
 do
-    sed "$sedInPlace" "s|OTF_WDIR|$wrkDir|g" "$f"
+    sed "$sedInPlace" "s|OTF_WDIR\/|$wdToDenoptim|g" "$f"
+    sed "$sedInPlace" "s|OTF_WDIR|$wdToDenoptim|g" "$f"
     sed "$sedInPlace" "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
 done
 
@@ -19,33 +26,33 @@ done
 exec 6>&1
 exec > "$logFile"
 exec 2>&1
-"$javaDENOPTIM" -jar "$DENOPTIMJarFiles"/GraphEditor.jar "$paramFile"
+"$javaDENOPTIM" -jar "$denoptimJar" -r GE "$paramFile"
 exec 1>&6 6>&- 
 
 #Check outcome
-nBr=$(grep Br "$wrkDir"/outGraph.sdf | wc -l | awk '{print $1}')
+nBr=$(grep " Br " "$wrkDir"/outGraph.sdf | wc -l | awk '{print $1}')
 if [[ $nBr != 8 ]]
 then
     echo " "
-    echo "Test 't8' NOT PASSED (symptom: wrong number of Br-fragments, $nBr)"
+    echo "Test 't16' NOT PASSED (symptom: wrong number of Br-fragments, $nBr)"
     exit -1
 fi
 nF=$(grep " F " "$wrkDir"/outGraph.sdf | wc -l | awk '{print $1}')
 if [[ $nF != 1 ]]
 then
     echo " "
-    echo "Test 't8' NOT PASSED (symptom: wrong number of F-fragments, $nF)"
+    echo "Test 't16' NOT PASSED (symptom: wrong number of F-fragments, $nF)"
     exit -1
 fi
-nCl=$(grep Cl "$wrkDir"/outGraph.sdf | wc -l | awk '{print $1}')
+nCl=$(grep " Cl " "$wrkDir"/outGraph.sdf | wc -l | awk '{print $1}')
 if [[ $nCl != 0 ]]
 then
     echo " "
-    echo "Test 't8' NOT PASSED (symptom: wrong number of Cl-fragments, $Cl)"
+    echo "Test 't16' NOT PASSED (symptom: wrong number of Cl-fragments, $Cl)"
     exit -1
 fi
 
-grep -q 'GraphEditor run completed' "$wrkDir"/GraphEd.log
+grep -q 'Completed GraphEditor' "$logFile"
 if [[ $? != 0 ]]
 then
     echo " "

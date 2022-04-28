@@ -1,6 +1,6 @@
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   7  7  0  0  0  0  0  0  0  0999 V2000
     1.8143   10.6855    5.9523 P   0  0  0  0  0  0  0  0  0  0  0  0
     1.6265    9.4144    4.8677 N   0  0  0  0  0  0  0  0  0  0  0  0
@@ -17,25 +17,13 @@ From GM3DFragmenter
   6  5  1  0  0  0  0 
   7  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LBisAminoPhosphineSubR:0:0.3903%10.7729%7.1334,MBisAminoPhosphine:1:3.6116%11.0342%7.1611 2#LCycloBisAminoPhospholeSubN:0:2.2148%8.0833%4.9044 7#LCycloBisAminoPhospholeSubN:0:1.6922%13.2521%4.8571
-
-> <ATTACHMENT_POINT>
-1:2 2:1 7:1
-
-> <ISOMER>
-1_1448648079799-15
+> <ATTACHMENT_POINTS>
+1#LBisAminoPhosphineSubR:0:SINGLE:0.3903%10.7729%7.1334,MBisAminoPhosphine:1:SINGLE:3.6116%11.0342%7.1611 2#LCycloBisAminoPhospholeSubN:0:SINGLE:2.2148%8.0833%4.9044 7#LCycloBisAminoPhospholeSubN:0:SINGLE:1.6922%13.2521%4.8571 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   9  9  0  0  0  0  0  0  0  0999 V2000
     4.9306   16.3362    3.6097 C   0  0  0  0  0  0  0  0  0  0  0  0
     5.4100   15.9229    4.4964 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -56,115 +44,55 @@ From GM3DFragmenter
   8  4  1  0  0  0  0 
   8  9  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-7#LCycloBisAminoPhosphineSubN:0:5.4440%15.1509%1.4318 8#LCycloBisAminoPhosphineSubN:0:6.0759%19.8798%3.3975 9#LBisAminoPhosphineSubR:0:8.3220%17.0114%3.3102,MBisAminoPhosphine:1:7.5392%18.0219%0.2376
-
-> <ATTACHMENT_POINT>
-7:1 8:1 9:2
-
-> <ISOMER>
-5_1448648080106-57
+> <ATTACHMENT_POINTS>
+7#LCycloBisAminoPhosphineSubN:0:SINGLE:5.4440%15.1509%1.4318 8#LCycloBisAminoPhosphineSubN:0:SINGLE:6.0759%19.8798%3.3975 9#LBisAminoPhosphineSubR:0:SINGLE:8.3220%17.0114%3.3102,MBisAminoPhosphine:1:SINGLE:7.5392%18.0219%0.2376 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenterv
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -1.6038   -0.5663    4.0324 P   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenterv
-
-> <CLASS>
-1#LBisAminoPhosphineN:0:-1.9272%-0.2351%5.6045,LBisAminoPhosphineN:0:-1.4136%-2.2231%3.8983,LBisAminoPhosphineSubR:0:-3.1852%-0.3594%3.1924,MBisAminoPhosphine:1:0.1796%0.6567%3.3484
-
-> <ATTACHMENT_POINT>
-1:4
-
-> <ISOMER>
-0
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-10
+> <ATTACHMENT_POINTS>
+1#LBisAminoPhosphineN:0:SINGLE:-1.9272%-0.2351%5.6045,LBisAminoPhosphineN:0:SINGLE:-1.4136%-2.2231%3.8983,LBisAminoPhosphineSubR:0:SINGLE:-3.1852%-0.3594%3.1924,MBisAminoPhosphine:1:SINGLE:0.1796%0.6567%3.3484 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     2.1045    8.7901    6.7495 P   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LMonoAminoPhosphineN:0:3.1471%10.0719%6.8843,LMonoAminoPhosphineSubR:0:0.3842%9.4902%6.7015,LMonoAminoPhosphineSubR:0:2.2197%7.8057%8.2724,MMonoAminoPhosphine:1:2.6023%7.6121%4.8117
-
-> <ATTACHMENT_POINT>
-1:4
-
-> <ISOMER>
-1
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-34
+> <ATTACHMENT_POINTS>
+1#LMonoAminoPhosphineN:0:SINGLE:3.1471%10.0719%6.8843,LMonoAminoPhosphineSubR:0:SINGLE:0.3842%9.4902%6.7015,LMonoAminoPhosphineSubR:0:SINGLE:2.2197%7.8057%8.2724,MMonoAminoPhosphine:1:SINGLE:2.6023%7.6121%4.8117 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   2  1  0  0  0  0  0  0  0  0999 V2000
     5.9053   11.1997   -0.1783 N   0  0  0  0  0  0  0  0  0  0  0  0
     6.5049   12.0079   -0.2127 H   0  0  0  0  0  0  0  0  0  0  0  0
   2  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LAminoPhosphineNH:1:6.5561%10.0497%0.7834,AminoPhosphineSubNL:0:5.3575%10.9907%-1.5461
-
-> <ATTACHMENT_POINT>
-1:2
+> <ATTACHMENT_POINTS>
+1#LAminoPhosphineNH:1:SINGLE:6.5561%10.0497%0.7834,AminoPhosphineSubNL:0:SINGLE:5.3575%10.9907%-1.5461 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     7.9829   10.4428    3.6020 N   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LAminoPhosphineN:1:6.6462%11.4323%3.6382,AminoPhosphineSubN:0:8.2507%9.4804%2.5125,AminoPhosphineSubN:0:8.6520%10.1585%4.8699
-
-> <ATTACHMENT_POINT>
-1:3
+> <ATTACHMENT_POINTS>
+1#LAminoPhosphineN:1:SINGLE:6.6462%11.4323%3.6382,AminoPhosphineSubN:0:SINGLE:8.2507%9.4804%2.5125,AminoPhosphineSubN:0:SINGLE:8.6520%10.1585%4.8699 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  13 13  0  0  0  0  0  0  0  0999 V2000
    -2.0922    2.0012    1.4169 N   0  0  0  0  0  0  0  0  0  0  0  0
    -3.1902    2.8736    0.9976 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -193,25 +121,13 @@ From GM3DFragmenter
  13 11  1  0  0  0  0 
   8 11  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LAminoPhosphineCycloN:1:-1.0842%2.3540%2.6746
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-3_1448279242888-429
+> <ATTACHMENT_POINTS>
+1#LAminoPhosphineCycloN:1:SINGLE:-1.0842%2.3540%2.6746 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  16 16  0  0  0  0  0  0  0  0999 V2000
     2.9381    2.7068   17.7892 N   0  0  0  0  0  0  0  0  0  0  0  0
     2.2822    1.6786   18.5885 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -246,25 +162,13 @@ From GM3DFragmenter
  16 14  1  0  0  0  0 
  11 14  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LAminoPhosphineCycloN:1:4.5550%2.7674%17.4338
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-1_1448279239738-373
+> <ATTACHMENT_POINTS>
+1#LAminoPhosphineCycloN:1:SINGLE:4.5550%2.7674%17.4338 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  14 14  0  0  0  0  0  0  0  0999 V2000
     1.6447    5.1042    4.3264 C   0  0  0  0  0  0  0  0  0  0  0  0
     1.9147    6.0213    4.8479 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -295,25 +199,13 @@ From GM3DFragmenter
   7 14  1  0  0  0  0 
  10 13  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-13#LAminoPhosphineCycloN:1:3.8318%4.4705%2.8673
-
-> <ATTACHMENT_POINT>
-13:1
-
-> <ISOMER>
-0_1448279239737-432
+> <ATTACHMENT_POINTS>
+13#LAminoPhosphineCycloN:1:SINGLE:3.8318%4.4705%2.8673 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   9  9  0  0  0  0  0  0  0  0999 V2000
    -0.1435    5.4101    8.6586 N   0  0  0  0  0  0  0  0  0  0  0  0
     1.0373    6.1488    8.6167 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -334,25 +226,13 @@ From GM3DFragmenter
   9  8  1  0  0  0  0 
   6  8  2  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LAminoPhosphineCycloN:1:-1.3075%5.4354%7.3919
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-3_1448279242888-352
+> <ATTACHMENT_POINTS>
+1#LAminoPhosphineCycloN:1:SINGLE:-1.3075%5.4354%7.3919 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  21 23  0  0  0  0  0  0  0  0999 V2000
     5.8505    8.2355   -3.4594 N   0  0  0  0  0  0  0  0  0  0  0  0
     4.8225    7.2426   -3.5412 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -399,44 +279,23 @@ From GM3DFragmenter
  20 19  1  0  0  0  0 
  21  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LAminoPhosphineCycloN:1:6.1199%9.1336%-2.0435
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-9_1448279242715-718
+> <ATTACHMENT_POINTS>
+1#LAminoPhosphineCycloN:1:SINGLE:6.1199%9.1336%-2.0435 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.3556   -3.4241    2.2389 P   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LTrisAminoPhosphineN:0:-1.3063%-4.7143%1.6233,LTrisAminoPhosphineN:0:-1.2539%-3.0796%3.6155,LTrisAminoPhosphineN:0:1.0273%-4.3159%2.6459,MTrisAminoPhosphine:1:-0.0574%-1.6114%0.9632
-
-> <ATTACHMENT_POINT>
-1:4
+> <ATTACHMENT_POINTS>
+1#LTrisAminoPhosphineN:0:SINGLE:-1.3063%-4.7143%1.6233,LTrisAminoPhosphineN:0:SINGLE:-1.2539%-3.0796%3.6155,LTrisAminoPhosphineN:0:SINGLE:1.0273%-4.3159%2.6459,MTrisAminoPhosphine:1:SINGLE:-0.0574%-1.6114%0.9632 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  12 12  0  0  0  0  0  0  0  0999 V2000
     3.3266   11.1346   13.1445 N   0  0  0  0  0  0  0  0  0  0  0  0
     3.8396   13.0125   14.3399 N   0  0  0  0  0  0  0  0  0  0  0  0
@@ -463,25 +322,13 @@ From GM3DFragmenter
  12 10  1  0  0  0  0 
   7 10  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#L6HPyrimidinylideneSubN:0:3.6986%10.1321%12.1775 2#L6HPyrimidinylideneSubN:0:4.7983%14.0099%14.7771 3#M6HPyrimidinylidene:1:6.0120%12.0516%12.7188
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1
-
-> <ISOMER>
-1_1471286449491-110
+> <ATTACHMENT_POINTS>
+1#L6HPyrimidinylideneSubN:0:SINGLE:3.6986%10.1321%12.1775 2#L6HPyrimidinylideneSubN:0:SINGLE:4.7983%14.0099%14.7771 3#M6HPyrimidinylidene:1:SINGLE:6.0120%12.0516%12.7188 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   7  7  0  0  0  0  0  0  0  0999 V2000
     0.4064    2.6218    5.1898 N   0  0  0  0  0  0  0  0  0  0  0  0
     0.2992    3.4375    4.1309 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -498,22 +345,13 @@ From GM3DFragmenter
   7  4  1  0  0  0  0 
   4  5  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPyrrolidinylideneSubNS:0:1.1368%2.9892%6.3678 2#MPyrrolidinylidene:1:1.1351%5.0475%3.8064 3#LPyrrolidinylideneSubCGammaL:0:-1.6533%3.6844%2.5584,LPyrrolidinylideneSubCGammaS:0:0.2707%2.2373%1.9364 5#LPyrrolidinylideneSubCAlpha:0:-1.0798%0.9610%6.3715,LPyrrolidinylideneSubCAlpha:0:0.6851%0.1558%4.8410
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:2 5:2
+> <ATTACHMENT_POINTS>
+1#LPyrrolidinylideneSubNS:0:SINGLE:1.1368%2.9892%6.3678 2#MPyrrolidinylidene:1:SINGLE:1.1351%5.0475%3.8064 3#LPyrrolidinylideneSubCGammaL:0:SINGLE:-1.6533%3.6844%2.5584,LPyrrolidinylideneSubCGammaS:0:SINGLE:0.2707%2.2373%1.9364 5#LPyrrolidinylideneSubCAlpha:0:SINGLE:-1.0798%0.9610%6.3715,LPyrrolidinylideneSubCAlpha:0:SINGLE:0.6851%0.1558%4.8410 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  13 14  0  0  0  0  0  0  0  0999 V2000
     9.4489   13.1799   18.2942 N   0  0  0  0  0  0  0  0  0  0  0  0
    11.4201   13.7017   17.3025 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -543,25 +381,13 @@ From GM3DFragmenter
   2 13  1  0  0  0  0 
   9 11  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LIsoindolylideneSubNL:0:8.2611%13.2699%19.2517 12#LIsoindolylideneSubCS:0:8.8004%11.8294%16.2112,LIsoindolylideneSubCS:0:9.9911%10.7246%18.2628 13#MIsoindolylidene:1:10.5893%15.7982%19.2952
-
-> <ATTACHMENT_POINT>
-1:1 12:2 13:1
-
-> <ISOMER>
-1_1471286449491-409
+> <ATTACHMENT_POINTS>
+1#LIsoindolylideneSubNL:0:SINGLE:8.2611%13.2699%19.2517 12#LIsoindolylideneSubCS:0:SINGLE:8.8004%11.8294%16.2112,LIsoindolylideneSubCS:0:SINGLE:9.9911%10.7246%18.2628 13#MIsoindolylidene:1:SINGLE:10.5893%15.7982%19.2952 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   7  7  0  0  0  0  0  0  0  0999 V2000
     0.8214   -3.7977   -1.4290 N   0  0  0  0  0  0  0  0  0  0  0  0
     0.3058   -2.5822   -1.6630 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -578,25 +404,13 @@ From GM3DFragmenter
   6  4  1  0  0  0  0 
   7  5  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LImidazolidinylideneSubNL:0:1.1053%-4.2806%-0.0746 2#MImidazolidinylidene:1:0.0066%-1.1634%-0.2139 3#LImidazolidinylideneSubNL:0:-0.4116%-1.1759%-3.5324 4#LImidazolidinylideneSubCL:0:-1.1896%-4.3794%-4.1809 5#LImidazolidinylideneSubCL:0:2.4239%-4.9262%-3.0604
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1 4:1 5:1
-
-> <ISOMER>
-3_1471428984590-72
+> <ATTACHMENT_POINTS>
+1#LImidazolidinylideneSubNL:0:SINGLE:1.1053%-4.2806%-0.0746 2#MImidazolidinylidene:1:SINGLE:0.0066%-1.1634%-0.2139 3#LImidazolidinylideneSubNL:0:SINGLE:-0.4116%-1.1759%-3.5324 4#LImidazolidinylideneSubCL:0:SINGLE:-1.1896%-4.3794%-4.1809 5#LImidazolidinylideneSubCL:0:SINGLE:2.4239%-4.9262%-3.0604 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   7  7  0  0  0  0  0  0  0  0999 V2000
     8.1682    5.9859    3.3103 N   0  0  0  0  0  0  0  0  0  0  0  0
     8.7358    6.6342    1.2983 N   0  0  0  0  0  0  0  0  0  0  0  0
@@ -613,25 +427,13 @@ From GM3DFragmenter
   6  5  1  0  0  0  0 
   7  5  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LImidazolidinylideneSubNL:0:7.7897%6.0821%4.7152 2#LImidazolidinylideneSubNL:0:9.2442%7.4469%0.1412 3#MImidazolidinylidene:1:7.3678%8.8196%2.9474 4#LImidazolidinylideneSubCS:0:8.0114%3.5478%2.7860,LImidazolidinylideneSubCS:0:10.1821%4.5337%3.5842
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1 4:2
-
-> <ISOMER>
-3_1471428984590-90
+> <ATTACHMENT_POINTS>
+1#LImidazolidinylideneSubNL:0:SINGLE:7.7897%6.0821%4.7152 2#LImidazolidinylideneSubNL:0:SINGLE:9.2442%7.4469%0.1412 3#MImidazolidinylidene:1:SINGLE:7.3678%8.8196%2.9474 4#LImidazolidinylideneSubCS:0:SINGLE:8.0114%3.5478%2.7860,LImidazolidinylideneSubCS:0:SINGLE:10.1821%4.5337%3.5842 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   5  5  0  0  0  0  0  0  0  0999 V2000
    11.5933    6.5332   13.4566 N   0  0  0  0  0  0  0  0  0  0  0  0
    12.7509    5.5461   11.8789 N   0  0  0  0  0  0  0  0  0  0  0  0
@@ -644,25 +446,13 @@ From GM3DFragmenter
   4  5  1  0  0  0  0 
   5  2  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LImidazolidinylideneSubNL:0:10.7599%7.5084%14.0952 2#LImidazolidinylideneSubNL:0:13.6782%5.3814%10.7894 3#MImidazolidinylidene:1:11.8020%8.3887%11.2504 4#LImidazolidinylideneSubCS:0:10.0523%4.6083%13.2132,LImidazolidinylideneSubCS:0:11.5095%4.7670%15.2436 5#LImidazolidinylideneSubCS:0:12.2856%3.1070%12.3051,LImidazolidinylideneSubCS:0:13.8972%4.3619%13.7098
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1 4:2 5:2
-
-> <ISOMER>
-6_1471428984612-130
+> <ATTACHMENT_POINTS>
+1#LImidazolidinylideneSubNL:0:SINGLE:10.7599%7.5084%14.0952 2#LImidazolidinylideneSubNL:0:SINGLE:13.6782%5.3814%10.7894 3#MImidazolidinylidene:1:SINGLE:11.8020%8.3887%11.2504 4#LImidazolidinylideneSubCS:0:SINGLE:10.0523%4.6083%13.2132,LImidazolidinylideneSubCS:0:SINGLE:11.5095%4.7670%15.2436 5#LImidazolidinylideneSubCS:0:SINGLE:12.2856%3.1070%12.3051,LImidazolidinylideneSubCS:0:SINGLE:13.8972%4.3619%13.7098 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   5  5  0  0  0  0  0  0  0  0999 V2000
     5.2812    1.2018   13.1656 C   0  0  0  0  0  0  0  0  0  0  0  0
     4.2675    1.9426   12.5989 N   0  0  0  0  0  0  0  0  0  0  0  0
@@ -675,25 +465,13 @@ From GM3DFragmenter
   4  5  1  0  0  0  0 
   5  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#MImidazolylidene:1:6.9056%0.0970%12.1004 2#LImidazolylideneSubNL:0:4.1123%2.1609%11.1322 3#LImidazolylideneSubCS:0:2.2030%3.3086%13.3341 4#LImidazolylideneSubCS:0:3.4334%2.3948%16.1586 5#LImidazolylideneSubNL:0:5.9067%0.5846%15.5163
-
-> <ATTACHMENT_POINT>
-1:1 2:1 3:1 4:1 5:1
-
-> <ISOMER>
-9_1471428984177-111
+> <ATTACHMENT_POINTS>
+1#MImidazolylidene:1:SINGLE:6.9056%0.0970%12.1004 2#LImidazolylideneSubNL:0:SINGLE:4.1123%2.1609%11.1322 3#LImidazolylideneSubCS:0:SINGLE:2.2030%3.3086%13.3341 4#LImidazolylideneSubCS:0:SINGLE:3.4334%2.3948%16.1586 5#LImidazolylideneSubNL:0:SINGLE:5.9067%0.5846%15.5163 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   4  3  0  0  0  0  0  0  0  0999 V2000
    -1.5227    4.6114    1.6409 C   0  0  0  0  0  0  0  0  0  0  0  0
    -1.4627    5.2180    0.7489 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -703,41 +481,23 @@ From GM3DFragmenter
   3  1  1  0  0  0  0 
   4  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LImidazolylideneSubCS:1:-0.1277%4.1125%2.0278
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#LImidazolylideneSubCS:1:SINGLE:-0.1277%4.1125%2.0278 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     6.5936    1.2536    4.5047 Cl  0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LImidazolylideneSubCS:1:5.5071%2.2827%3.7546
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#LImidazolylideneSubCS:1:SINGLE:5.5071%2.2827%3.7546 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  11 11  0  0  0  0  0  0  0  0999 V2000
     0.8656   -5.2062    3.8070 C   0  0  0  0  0  0  0  0  0  0  0  0
     1.0540   -6.2399    2.8975 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -762,22 +522,13 @@ From GM3DFragmenter
  11 10  1  0  0  0  0 
   8 10  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LImidazolylideneSubCS:1:-0.2332%-4.1999%3.5795
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#LImidazolylideneSubCS:1:SINGLE:-0.2332%-4.1999%3.5795 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   4  3  0  0  0  0  0  0  0  0999 V2000
     2.8634    1.6303    1.7249 C   0  0  0  0  0  0  0  0  0  0  0  0
     2.8236    1.7916    0.6345 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -787,25 +538,13 @@ From GM3DFragmenter
   3  1  1  0  0  0  0 
   4  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPyrrolidinylideneSubCGammaS:1:1.4399%1.6623%2.2907
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-1_1471286449491-15
+> <ATTACHMENT_POINTS>
+1#LPyrrolidinylideneSubCGammaS:1:SINGLE:1.4399%1.6623%2.2907 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   7  6  0  0  0  0  0  0  0  0999 V2000
     2.4548   10.2992   14.5411 C   0  0  0  0  0  0  0  0  0  0  0  0
     3.4157   10.5073   14.9810 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -821,25 +560,13 @@ From GM3DFragmenter
   6  4  1  0  0  0  0 
   7  4  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPyrrolidinylideneSubCGammaS:1:2.2209%11.3247%13.4040
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-1_1471286449491-33
+> <ATTACHMENT_POINTS>
+1#LPyrrolidinylideneSubCGammaS:1:SINGLE:2.2209%11.3247%13.4040 
 
 $$$$
-Manual_Fragment
-  CDK     0627192255
-Manual
+
+  CDK     02102219043D
+
  10  9  0  0  0  0  0  0  0  0999 V2000
     6.1515    7.4310    7.8624 C   0  0  0  0  0  0  0  0  0  0  0  0
     5.7659    6.6535    8.5409 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -861,22 +588,13 @@ Manual
   9  7  1  0  0  0  0 
  10  7  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Manual_Fragment
-
-> <cdk:Remark>
-Manual
-
-> <CLASS>
-1#LPyrrolidinylideneSubCGammaL:1:6.4918%8.5782%8.7320
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#LPyrrolidinylideneSubCGammaL:1:SINGLE:6.4918%8.5782%8.7320 
 
 $$$$
-Manual_Fragment
-  CDK     0627192255
-Manual
+
+  CDK     02102219043D
+
  17 17  0  0  0  0  0  0  0  0999 V2000
     7.0469   16.9431    5.7019 C   0  0  0  0  0  0  0  0  0  0  0  0
     6.8366   16.2215    6.4782 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -913,22 +631,13 @@ Manual
  17 15  1  0  0  0  0 
  12 15  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Manual_Fragment
-
-> <cdk:Remark>
-Manual
-
-> <CLASS>
-1#LPyrrolidinylideneSubCGammaL:1:6.0099%16.8324%4.6783
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#LPyrrolidinylideneSubCGammaL:1:SINGLE:6.0099%16.8324%4.6783 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  11 11  0  0  0  0  0  0  0  0999 V2000
     7.9506    6.1283    1.5494 C   0  0  0  0  0  0  0  0  0  0  0  0
     7.8748    7.4195    2.0830 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -953,25 +662,13 @@ From GM3DFragmenter
  11 10  1  0  0  0  0 
   8 10  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPyrrolidinylideneSubCGammaL:1:8.8728%5.0935%2.2174
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-1_1471286449491-82
+> <ATTACHMENT_POINTS>
+1#LPyrrolidinylideneSubCGammaL:1:SINGLE:8.8728%5.0935%2.2174 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   4  3  0  0  0  0  0  0  0  0999 V2000
    11.7977    8.6986   19.2649 C   0  0  0  0  0  0  0  0  0  0  0  0
    11.6263    8.0849   18.3966 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -981,25 +678,13 @@ From GM3DFragmenter
   3  1  1  0  0  0  0 
   4  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPyrrolidinylideneSubCAlpha:1:10.5718%9.5818%19.5273
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-1_1471286449491-1
+> <ATTACHMENT_POINTS>
+1#LPyrrolidinylideneSubCAlpha:1:SINGLE:10.5718%9.5818%19.5273 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   4  3  0  0  0  0  0  0  0  0999 V2000
    -1.0726   17.7752    7.3038 C   0  0  0  0  0  0  0  0  0  0  0  0
    -1.9064   17.1937    6.9026 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1009,25 +694,13 @@ From GM3DFragmenter
   3  1  1  0  0  0  0 
   4  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LIsoindolylideneSubCS:1:-0.0250%17.9977%6.1980
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-1_1471286449491-405
+> <ATTACHMENT_POINTS>
+1#LIsoindolylideneSubCS:1:SINGLE:-0.0250%17.9977%6.1980 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  11 11  0  0  0  0  0  0  0  0999 V2000
     6.4615    7.1721    0.1839 C   0  0  0  0  0  0  0  0  0  0  0  0
     7.0810    7.1629    1.4436 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1052,24 +725,12 @@ From GM3DFragmenter
  11 10  1  0  0  0  0 
   8 10  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LIsoindolylideneSubCS:1:5.5795%5.9633%-0.2390
-
-> <ATTACHMENT_POINT>
-1:1
-
-> <ISOMER>
-1_1471286449491-408
+> <ATTACHMENT_POINTS>
+1#LIsoindolylideneSubCS:1:SINGLE:5.5795%5.9633%-0.2390 
 
 $$$$
-Frag-Me
-  CDK     0627192255
+
+  CDK     02102219043D
 
   4  3  0  0  0  0  0  0  0  0999 V2000
     0.3969   -0.0496    0.8235 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1080,18 +741,12 @@ Frag-Me
   1  3  1  0  0  0  0 
   1  4  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Frag-Me
-
-> <CLASS>
-1#SubRS:1:0.2865%0.3959%-0.6387
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#SubRS:1:SINGLE:0.2865%0.3959%-0.6387 
 
 $$$$
-Frag-Et
-  CDK     0627192255
+
+  CDK     02102219043D
 
   7  6  0  0  0  0  0  0  0  0999 V2000
    -1.0244   -0.2225    1.3991 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1108,18 +763,12 @@ Frag-Et
   2  6  1  0  0  0  0 
   2  7  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Frag-Et
-
-> <CLASS>
-2#SubRS:1:0.2985%0.3840%-0.6258
-
-> <ATTACHMENT_POINT>
-2:1
+> <ATTACHMENT_POINTS>
+2#SubRS:1:SINGLE:0.2985%0.3840%-0.6258 
 
 $$$$
-Frag-iPr
-  CDK     0627192255
+
+  CDK     02102219043D
 
  10  9  0  0  0  0  0  0  0  0999 V2000
     1.1410    1.0262    1.6347 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1142,18 +791,12 @@ Frag-iPr
   1  9  1  0  0  0  0 
   2 10  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Frag-iPr
-
-> <CLASS>
-2#SubRM:1:0.2868%0.3850%-0.6430
-
-> <ATTACHMENT_POINT>
-2:1
+> <ATTACHMENT_POINTS>
+2#SubRM:1:SINGLE:0.2868%0.3850%-0.6430 
 
 $$$$
-Frag-tBu
-  CDK     0627192255
+
+  CDK     02102219043D
 
  13 12  0  0  0  0  0  0  0  0999 V2000
     0.3842   -0.0523    0.8329 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1182,18 +825,12 @@ Frag-tBu
   2 12  1  0  0  0  0 
   3 13  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Frag-tBu
-
-> <CLASS>
-1#SubRL:1:0.2857%0.3900%-0.6426
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#SubRL:1:SINGLE:0.2857%0.3900%-0.6426 
 
 $$$$
-Frag-Cy
-  CDK     0627192255
+
+  CDK     02102219043D
 
  17 17  0  0  0  0  0  0  0  0999 V2000
     1.7002    0.5600   -1.2045 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1231,18 +868,12 @@ Frag-Cy
   6 11  1  0  0  0  0 
   6 17  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Frag-Cy
-
-> <CLASS>
-1#SubRM:1:0.2917%0.3929%-0.6365
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#SubRM:1:SINGLE:0.2917%0.3929%-0.6365 
 
 $$$$
-Frag-Ph
-  CDK     0627192255
+
+  CDK     02102219043D
 
  11 11  0  0  0  0  0  0  0  0999 V2000
     1.6995    0.5593   -1.2083 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1268,18 +899,12 @@ Frag-Ph
   3  7  1  0  0  0  0 
   4  8  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Frag-Ph
-
-> <CLASS>
-1#SubArS:1:0.2973%0.3873%-0.6389
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#SubArS:1:SINGLE:0.2973%0.3873%-0.6389 
 
 $$$$
-Frag-oMePh
-  CDK     0627192255
+
+  CDK     02102219043D
 
  14 14  0  0  0  0  0  0  0  0999 V2000
     1.7096    0.5525   -1.2136 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1311,18 +936,12 @@ Frag-oMePh
  11 14  1  0  0  0  0 
   3 11  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Frag-oMePh
-
-> <CLASS>
-1#SubArM:1:0.3016%0.3831%-0.6449
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#SubArM:1:SINGLE:0.3016%0.3831%-0.6449 
 
 $$$$
-Frag-ooDiMePh
-  CDK     0627192255
+
+  CDK     02102219043D
 
  17 17  0  0  0  0  0  0  0  0999 V2000
     1.7088    0.5510   -1.2192 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1360,18 +979,12 @@ Frag-ooDiMePh
  14 17  1  0  0  0  0 
   4 14  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Frag-ooDiMePh
-
-> <CLASS>
-1#SubArL:1:0.2957%0.3816%-0.6358
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#SubArL:1:SINGLE:0.2957%0.3816%-0.6358 
 
 $$$$
-Frag-naphthyl
-  CDK     0627192255
+
+  CDK     02102219043D
 
  17 18  0  0  0  0  0  0  0  0999 V2000
     1.8079    2.6521   -0.6457 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1410,22 +1023,16 @@ Frag-naphthyl
  15 16  1  0  0  0  0 
  12 14  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Frag-naphthyl
-
-> <CLASS>
-3#SubArM:1:0.2839%0.3907%-0.6271
-
-> <ATTACHMENT_POINT>
-3:1
+> <ATTACHMENT_POINTS>
+3#SubArM:1:SINGLE:0.2839%0.3907%-0.6271 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  23 24  0  0  0  0  0  0  0  0999 V2000
     6.9938   -2.3142    7.9569 P   0  0  0  0  0  0  0  0  0  0  0  0
-    6.4789   -4.0179    8.4779 C   0  0  1  0  0  0  0  0  0  0  0  0
+    6.4789   -4.0179    8.4779 C   0  0  0  0  0  0  0  0  0  0  0  0
     5.6991   -4.3449    7.7903 H   0  0  0  0  0  0  0  0  0  0  0  0
     7.6308   -5.0175    8.3775 C   0  0  0  0  0  0  0  0  0  0  0  0
     7.9355   -5.0968    7.3495 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1436,7 +1043,7 @@ From GM3DFragmenter
     9.3638   -3.1969    9.1272 C   0  0  0  0  0  0  0  0  0  0  0  0
    10.1041   -3.0308    9.9217 H   0  0  0  0  0  0  0  0  0  0  0  0
     9.8840   -3.0664    8.1855 H   0  0  0  0  0  0  0  0  0  0  0  0
-    8.2791   -2.1163    9.2588 C   0  0  2  0  0  0  0  0  0  0  0  0
+    8.2791   -2.1163    9.2588 C   0  0  0  0  0  0  0  0  0  0  0  0
     8.7569   -1.1402    9.1018 H   0  0  0  0  0  0  0  0  0  0  0  0
     7.5764   -2.0735   10.6271 C   0  0  0  0  0  0  0  0  0  0  0  0
     6.9371   -1.1906   10.6604 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1448,7 +1055,7 @@ From GM3DFragmenter
     5.5463   -4.9079   10.1920 H   0  0  0  0  0  0  0  0  0  0  0  0
     4.9376   -3.3154    9.8051 H   0  0  0  0  0  0  0  0  0  0  0  0
   2  1  1  0  0  0  0 
-  2  3  1  6  0  0  0 
+  2  3  1  0  0  0  0 
   4  2  1  0  0  0  0 
   5  4  1  0  0  0  0 
   6  4  1  0  0  0  0 
@@ -1460,7 +1067,7 @@ From GM3DFragmenter
  11 10  1  0  0  0  0 
  12 10  1  0  0  0  0 
  13  1  1  0  0  0  0 
- 13 14  1  6  0  0  0 
+ 13 14  1  0  0  0  0 
  15 13  1  0  0  0  0 
  16 15  1  0  0  0  0 
  17 15  1  0  0  0  0 
@@ -1472,25 +1079,13 @@ From GM3DFragmenter
  22 21  1  0  0  0  0 
  23 21  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphineSubM:0:7.9272%-2.5174%6.3831,MPhosphine:1:5.3681%-0.8345%7.9017
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-0_1448648079813-14
+> <ATTACHMENT_POINTS>
+1#LPhosphineSubM:0:SINGLE:7.9272%-2.5174%6.3831,MPhosphine:1:SINGLE:5.3681%-0.8345%7.9017 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  19 19  0  0  0  0  0  0  0  0999 V2000
    10.8769    4.0494    2.7954 P   0  0  0  0  0  0  0  0  0  0  0  0
    12.1798    4.6169    3.9460 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1531,25 +1126,13 @@ From GM3DFragmenter
  18 17  1  0  0  0  0 
  19 17  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphineSubM:0:10.5741%2.3880%3.5052,MPhosphine:1:9.1744%5.4814%2.7926
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-0_1448648079813-37
+> <ATTACHMENT_POINTS>
+1#LPhosphineSubM:0:SINGLE:10.5741%2.3880%3.5052,MPhosphine:1:SINGLE:9.1744%5.4814%2.7926 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  13 13  0  0  0  0  0  0  0  0999 V2000
     3.2259    1.2767   11.5745 P   0  0  0  0  0  0  0  0  0  0  0  0
     1.6598    0.7995   10.6875 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1578,25 +1161,13 @@ From GM3DFragmenter
  12 11  1  0  0  0  0 
  13 11  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphineSubM:0:2.7230%1.7542%13.2677,MPhosphine:1:4.8307%-0.2673%11.5812
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-3_1448648079851-65
+> <ATTACHMENT_POINTS>
+1#LPhosphineSubM:0:SINGLE:2.7230%1.7542%13.2677,MPhosphine:1:SINGLE:4.8307%-0.2673%11.5812 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  16 16  0  0  0  0  0  0  0  0999 V2000
     0.3777    8.7188   10.3566 P   0  0  0  0  0  0  0  0  0  0  0  0
     0.3703    9.4545    8.6907 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1631,25 +1202,13 @@ From GM3DFragmenter
  15 14  1  0  0  0  0 
  16 14  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphineSubM:0:-1.1846%9.2743%11.0929,MPhosphine:1:0.7356%6.5277%10.7143
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-3_1448648079851-66
+> <ATTACHMENT_POINTS>
+1#LPhosphineSubM:0:SINGLE:-1.1846%9.2743%11.0929,MPhosphine:1:SINGLE:0.7356%6.5277%10.7143 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  32 36  0  0  0  0  0  0  0  0999 V2000
     7.9602   10.8392    8.2268 P   0  0  0  0  0  0  0  0  0  0  0  0
     8.5483    9.0407    6.1703 N   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1720,119 +1279,53 @@ From GM3DFragmenter
  31  3  1  0  0  0  0 
  32  2  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphineSubM:0:9.6921%11.1939%8.6295,MPhosphine:1:6.9761%12.5800%7.2794
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-0_1448648079813-54
+> <ATTACHMENT_POINTS>
+1#LPhosphineSubM:0:SINGLE:9.6921%11.1939%8.6295,MPhosphine:1:SINGLE:6.9761%12.5800%7.2794 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     8.2391   -0.0022    2.8058 P   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphineSubMSym:0:6.6196%0.0015%3.7123,LPhosphineSubMSym:0:9.0993%-1.5317%3.4188,LPhosphineSubMSym:0:9.0967%1.5255%3.4174,MPhosphine:1:7.9590%0.0035%0.5105
-
-> <ATTACHMENT_POINT>
-1:4
-
-> <ISOMER>
-0_9999999999999-111
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-100
+> <ATTACHMENT_POINTS>
+1#LPhosphineSubMSym:0:SINGLE:6.6196%0.0015%3.7123,LPhosphineSubMSym:0:SINGLE:9.0993%-1.5317%3.4188,LPhosphineSubMSym:0:SINGLE:9.0967%1.5255%3.4174,MPhosphine:1:SINGLE:7.9590%0.0035%0.5105 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     8.2404    0.0024    2.8031 P   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphineSubMSym:0:6.6301%-0.0080%3.7073,LPhosphineSubMSym:0:9.0941%-1.5268%3.4114,LPhosphineSubM:0:9.1017%1.5197%3.4174,MPhosphine:1:7.9584%0.0035%0.5116
-
-> <ATTACHMENT_POINT>
-1:4
-
-> <ISOMER>
-0_9999999999999-111
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-100
+> <ATTACHMENT_POINTS>
+1#LPhosphineSubMSym:0:SINGLE:6.6301%-0.0080%3.7073,LPhosphineSubMSym:0:SINGLE:9.0941%-1.5268%3.4114,LPhosphineSubM:0:SINGLE:9.1017%1.5197%3.4174,MPhosphine:1:SINGLE:7.9584%0.0035%0.5116 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
-    6.2956    4.3598    5.4081 P   0  0  2  0  0  0  0  0  0  0  0  0
+    6.2956    4.3598    5.4081 P   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphiniteSubO:0:7.6619%4.8954%6.0599,LPhosphiniteSubR:0:5.2032%3.9742%6.7915,LPhosphiniteSubR:0:5.5408%5.7995%4.6157,MPhosphinite:1:6.7665%2.6840%3.9076
-
-> <ATTACHMENT_POINT>
-1:4
-
-> <ISOMER>
-0
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-37
+> <ATTACHMENT_POINTS>
+1#LPhosphiniteSubO:0:SINGLE:7.6619%4.8954%6.0599,LPhosphiniteSubR:0:SINGLE:5.2032%3.9742%6.7915,LPhosphiniteSubR:0:SINGLE:5.5408%5.7995%4.6157,MPhosphinite:1:SINGLE:6.7665%2.6840%3.9076 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -4.0711    7.1640    3.1009 O   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphiniteSubO:1:-3.8355%7.5392%4.6611,OPhosphiniteSub:1:-3.5459%7.8280%2.0236
-
-> <ATTACHMENT_POINT>
-1:2
+> <ATTACHMENT_POINTS>
+1#LPhosphiniteSubO:1:SINGLE:-3.8355%7.5392%4.6611,OPhosphiniteSub:1:SINGLE:-3.5459%7.8280%2.0236 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  23 25  0  0  0  0  0  0  0  0999 V2000
     8.8680    7.7904   19.5309 C   0  0  0  0  0  0  0  0  0  0  0  0
     8.6758    8.5410   20.6816 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1856,7 +1349,7 @@ From GM3DFragmenter
     9.1581    6.8298   16.6773 C   0  0  0  0  0  0  0  0  0  0  0  0
     7.9608    6.7634   19.2501 O   0  0  0  0  0  0  0  0  0  0  0  0
     7.8839    7.3746   16.8930 O   0  0  0  0  0  0  0  0  0  0  0  0
-    6.9287    6.8843   18.0447 P   0  0  1  0  0  0  0  0  0  0  0  0
+    6.9287    6.8843   18.0447 P   0  0  0  0  0  0  0  0  0  0  0  0
   1  2  2  0  0  0  0 
   2  3  1  0  0  0  0 
   4  2  1  0  0  0  0 
@@ -1883,30 +1376,15 @@ From GM3DFragmenter
  22 20  1  0  0  0  0 
  22 23  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-23#LPhosphiteSubO:0:6.6821%5.3677%17.7965,MPhosphite:1:5.2115%8.2190%18.2686
-
-> <ATTACHMENT_POINT>
-23:2
-
-> <ISOMER>
-29
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-2
+> <ATTACHMENT_POINTS>
+23#LPhosphiteSubO:0:SINGLE:6.6821%5.3677%17.7965,MPhosphite:1:SINGLE:5.2115%8.2190%18.2686 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  35 39  0  0  0  0  0  0  0  0999 V2000
-    7.9084    1.9754    0.5292 P   0  0  1  0  0  0  0  0  0  0  0  0
+    7.9084    1.9754    0.5292 P   0  0  0  0  0  0  0  0  0  0  0  0
     9.0676    0.8826    0.4629 O   0  0  0  0  0  0  0  0  0  0  0  0
     6.6295    1.0833    0.8378 O   0  0  0  0  0  0  0  0  0  0  0  0
     9.1253   -0.1058    1.5323 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1981,78 +1459,33 @@ From GM3DFragmenter
  34 33  1  0  0  0  0 
  35  3  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphiteSubO:0:7.8978%2.2953%-1.0004,MPhosphite:1:8.1055%3.5873%1.9978
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-16
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-3
+> <ATTACHMENT_POINTS>
+1#LPhosphiteSubO:0:SINGLE:7.8978%2.2953%-1.0004,MPhosphite:1:SINGLE:8.1055%3.5873%1.9978 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     5.0092    1.7871    5.1118 P   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphiteSubO:0:4.0345%2.1486%6.3212,LPhosphiteSubO:0:4.3400%0.5256%4.4489,LPhosphiteSubO:0:6.1869%1.2871%6.0121,MPhosphite:1:5.4888%3.3787%3.6078
-
-> <ATTACHMENT_POINT>
-1:4
-
-> <ISOMER>
-1
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-77
+> <ATTACHMENT_POINTS>
+1#LPhosphiteSubO:0:SINGLE:4.0345%2.1486%6.3212,LPhosphiteSubO:0:SINGLE:4.3400%0.5256%4.4489,LPhosphiteSubO:0:SINGLE:6.1869%1.2871%6.0121,MPhosphite:1:SINGLE:5.4888%3.3787%3.6078 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.1418    4.2412    2.9314 O   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphiteSubO:1:0.7035%2.9119%2.8175,OPhosphiteSub:1:0.0564%5.2897%1.9394
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-13
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-60
+> <ATTACHMENT_POINTS>
+1#LPhosphiteSubO:1:SINGLE:0.7035%2.9119%2.8175,OPhosphiteSub:1:SINGLE:0.0564%5.2897%1.9394 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  17 18  0  0  0  0  0  0  0  0999 V2000
     0.2969    4.5574   13.4258 C   0  0  0  0  0  0  0  0  0  0  0  0
     0.8881    3.9044   14.4404 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2090,25 +1523,13 @@ From GM3DFragmenter
  16 17  1  0  0  0  0 
  17  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhospholeSubAlpha:0:-0.8999%5.4204%13.4669 16#LPhospholeSubAlpha:0:3.5623%2.5529%12.0521 17#LPhospholeSubR:0:2.0225%5.5716%11.2441,MPhosphole:1:-0.1011%3.0668%10.3957
-
-> <ATTACHMENT_POINT>
-1:1 16:1 17:2
-
-> <ISOMER>
-4_1448648079864-44
+> <ATTACHMENT_POINTS>
+1#LPhospholeSubAlpha:0:SINGLE:-0.8999%5.4204%13.4669 16#LPhospholeSubAlpha:0:SINGLE:3.5623%2.5529%12.0521 17#LPhospholeSubR:0:SINGLE:2.0225%5.5716%11.2441,MPhosphole:1:SINGLE:-0.1011%3.0668%10.3957 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  14 15  0  0  0  0  0  0  0  0999 V2000
     3.3327    3.1661    5.9169 P   0  0  0  0  0  0  0  0  0  0  0  0
     1.8776    3.4521    4.8835 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2140,27 +1561,15 @@ From GM3DFragmenter
  13 14  2  0  0  0  0 
  14  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhospholeSubR:0:2.8450%3.6959%7.5989,MPhosphole:1:5.4116%3.8914%5.1007 2#LPhospholeSubAlpha:0:1.4479%4.7532%4.2328 14#LPhospholeSubAlpha:0:3.9785%0.2873%6.6145
-
-> <ATTACHMENT_POINT>
-1:2 2:1 14:1
-
-> <ISOMER>
-4_1448648079864-69
+> <ATTACHMENT_POINTS>
+1#LPhospholeSubR:0:SINGLE:2.8450%3.6959%7.5989,MPhosphole:1:SINGLE:5.4116%3.8914%5.1007 2#LPhospholeSubAlpha:0:SINGLE:1.4479%4.7532%4.2328 14#LPhospholeSubAlpha:0:SINGLE:3.9785%0.2873%6.6145 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   7  7  0  0  0  0  0  0  0  0999 V2000
-    3.7869   -5.7373   -4.1775 P   0  0  1  0  0  0  0  0  0  0  0  0
+    3.7869   -5.7373   -4.1775 P   0  0  0  0  0  0  0  0  0  0  0  0
     4.6962   -7.1340   -4.9215 C   0  0  0  0  0  0  0  0  0  0  0  0
     5.7131   -6.6248   -5.5939 C   0  0  0  0  0  0  0  0  0  0  0  0
     5.8290   -5.1544   -5.5761 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2175,25 +1584,13 @@ From GM3DFragmenter
   3  6  1  0  0  0  0 
   4  7  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhospholeSubR:0:4.2100%-5.7776%-2.4063,MPhosphole:1:1.5693%-5.3781%-4.7398 2#LPhospholeSubAlpha:0:4.3472%-8.5987%-4.7607 5#LPhospholeSubAlpha:0:4.7612%-2.9790%-4.8399
-
-> <ATTACHMENT_POINT>
-1:2 2:1 5:1
-
-> <ISOMER>
-5_1448648080106-89
+> <ATTACHMENT_POINTS>
+1#LPhospholeSubR:0:SINGLE:4.2100%-5.7776%-2.4063,MPhosphole:1:SINGLE:1.5693%-5.3781%-4.7398 2#LPhospholeSubAlpha:0:SINGLE:4.3472%-8.5987%-4.7607 5#LPhospholeSubAlpha:0:SINGLE:4.7612%-2.9790%-4.8399 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   5  5  0  0  0  0  0  0  0  0999 V2000
     0.6287   -1.5145   -1.8705 P   0  0  0  0  0  0  0  0  0  0  0  0
     2.4050   -1.8003   -2.0775 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2206,27 +1603,15 @@ From GM3DFragmenter
   5  1  1  0  0  0  0 
   4  5  2  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhospholeSubR:0:-0.1583%-3.1445%-2.0557,MPhosphole:1:-0.0030%-0.0033%0.0013 2#LPhospholeSubAlpha:0:3.2115%-2.5535%-1.0585 3#LPhospholeSubBeta:0:4.2656%-1.1283%-3.6461 4#LPhospholeSubBeta:0:2.0530%0.1072%-5.2957 5#LPhospholeSubAlpha:0:-0.7998%-0.3182%-4.0879
-
-> <ATTACHMENT_POINT>
-1:2 2:1 3:1 4:1 5:1
-
-> <ISOMER>
-5_1448648080106-90
+> <ATTACHMENT_POINTS>
+1#LPhospholeSubR:0:SINGLE:-0.1583%-3.1445%-2.0557,MPhosphole:1:SINGLE:-0.0030%-0.0033%0.0013 2#LPhospholeSubAlpha:0:SINGLE:3.2115%-2.5535%-1.0585 3#LPhospholeSubBeta:0:SINGLE:4.2656%-1.1283%-3.6461 4#LPhospholeSubBeta:0:SINGLE:2.0530%0.1072%-5.2957 5#LPhospholeSubAlpha:0:SINGLE:-0.7998%-0.3182%-4.0879 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  21 23  0  0  0  0  0  0  0  0999 V2000
-    7.3852    3.3353    8.3490 P   0  0  1  0  0  0  0  0  0  0  0  0
+    7.3852    3.3353    8.3490 P   0  0  0  0  0  0  0  0  0  0  0  0
     7.2878    5.0039    7.6394 C   0  0  0  0  0  0  0  0  0  0  0  0
     8.2867    5.7253    7.0209 C   0  0  0  0  0  0  0  0  0  0  0  0
     7.9761    6.9837    6.5025 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2271,28 +1656,13 @@ From GM3DFragmenter
  20 11  1  0  0  0  0 
  21 12  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhospholeSubR:0:8.2979%3.6599%9.9070,MPhosphole:1:8.1114%1.5630%6.7555
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-0_9999999999999-999
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-40
+> <ATTACHMENT_POINTS>
+1#LPhospholeSubR:0:SINGLE:8.2979%3.6599%9.9070,MPhosphole:1:SINGLE:8.1114%1.5630%6.7555 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   9  9  0  0  0  0  0  0  0  0999 V2000
     3.5562    0.8630    2.4507 P   0  0  0  0  0  0  0  0  0  0  0  0
     4.5520   -0.2283    3.0401 O   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2313,25 +1683,13 @@ From GM3DFragmenter
   8  7  1  0  0  0  0 
   9  7  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphoniteSubR:0:4.6565%2.2234%1.9268,MPhosphonite:1:2.1365%0.0940%0.9533
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-1_1448648079799-81
+> <ATTACHMENT_POINTS>
+1#LPhosphoniteSubR:0:SINGLE:4.6565%2.2234%1.9268,MPhosphonite:1:SINGLE:2.1365%0.0940%0.9533 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  12 12  0  0  0  0  0  0  0  0999 V2000
     0.7537    3.7450    0.8399 C   0  0  0  0  0  0  0  0  0  0  0  0
     0.5695    4.7704    1.1332 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2358,25 +1716,13 @@ From GM3DFragmenter
  11  7  1  0  0  0  0 
  11 12  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-12#LPhosphoniteSubR:0:2.7128%1.5224%3.4841,MPhosphonite:1:2.5476%4.7880%4.3969
-
-> <ATTACHMENT_POINT>
-12:2
-
-> <ISOMER>
-4_1448648079864-14
+> <ATTACHMENT_POINTS>
+12#LPhosphoniteSubR:0:SINGLE:2.7128%1.5224%3.4841,MPhosphonite:1:SINGLE:2.5476%4.7880%4.3969 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
  22 23  0  0  0  0  0  0  0  0999 V2000
     9.4136    0.5115   14.3923 P   0  0  0  0  0  0  0  0  0  0  0  0
     8.2442    1.2619   15.1868 O   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2424,25 +1770,13 @@ From GM3DFragmenter
  21  9  1  0  0  0  0 
  22 10  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphoniteSubR:0:8.5833%-0.8556%13.5393,MPhosphonite:1:10.4864%1.7322%12.8008
-
-> <ATTACHMENT_POINT>
-1:2
-
-> <ISOMER>
-4_1448648079864-54
+> <ATTACHMENT_POINTS>
+1#LPhosphoniteSubR:0:SINGLE:8.5833%-0.8556%13.5393,MPhosphonite:1:SINGLE:10.4864%1.7322%12.8008 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   9 10  0  0  0  0  0  0  0  0999 V2000
     2.6785    7.6971    2.9618 P   0  0  0  0  0  0  0  0  0  0  0  0
     1.8393    7.1782    4.3370 O   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2464,69 +1798,33 @@ From GM3DFragmenter
   8  9  2  0  0  0  0 
   9  4  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphoniteSubR:0:4.4068%7.1514%3.2250,MPhosphonite:1:2.0992%9.8558%2.0523 6#sArCl:1:0.6858%4.2250%0.5361 7#sArCl:1:-1.3527%2.6941%2.4126 8#sArCl:1:-1.5783%3.4734%5.4078 9#sArCl:1:0.1066%5.8434%6.5380
-
-> <ATTACHMENT_POINT>
-1:2 6:1 7:1 8:1 9:1
-
-> <ISOMER>
-5_1448648080106-44
+> <ATTACHMENT_POINTS>
+1#LPhosphoniteSubR:0:SINGLE:4.4068%7.1514%3.2250,MPhosphonite:1:SINGLE:2.0992%9.8558%2.0523 6#sArCl:1:SINGLE:0.6858%4.2250%0.5361 7#sArCl:1:SINGLE:-1.3527%2.6941%2.4126 8#sArCl:1:SINGLE:-1.5783%3.4734%5.4078 9#sArCl:1:SINGLE:0.1066%5.8434%6.5380 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     5.1256    2.3373    6.5981 P   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphoniteSubO:0:5.2814%0.8415%6.1068,LPhosphoniteSubO:0:6.5560%2.7336%7.2122,LPhosphoniteSubR:0:4.1217%2.3132%8.1013,MPhosphonite:1:4.3681%3.7510%5.0597
-
-> <ATTACHMENT_POINT>
-1:4
-
-> <ISOMER>
-0
-
-> <CONFORMATIONS_SAMPLE_SIZE>
-14
+> <ATTACHMENT_POINTS>
+1#LPhosphoniteSubO:0:SINGLE:5.2814%0.8415%6.1068,LPhosphoniteSubO:0:SINGLE:6.5560%2.7336%7.2122,LPhosphoniteSubR:0:SINGLE:4.1217%2.3132%8.1013,MPhosphonite:1:SINGLE:4.3681%3.7510%5.0597 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     6.5544    2.7286    7.2144 O   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#LPhosphoniteSubO:1:5.1317%2.3382%6.5862,OPhosphoniteSub:1:7.6537%3.0103%6.3233
-
-> <ATTACHMENT_POINT>
-1:2
+> <ATTACHMENT_POINTS>
+1#LPhosphoniteSubO:1:SINGLE:5.1317%2.3382%6.5862,OPhosphoniteSub:1:SINGLE:7.6537%3.0103%6.3233 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   5  4  0  0  0  0  0  0  0  0999 V2000
    -0.3267    2.3403   -1.0022 S   0  0  0  0  0  0  0  0  0  0  0  0
    -0.6260    2.4866    0.7805 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2538,22 +1836,13 @@ From GM3DFragmenter
   2  5  1  0  0  0  0 
   1  2  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#Xlig:1:-0.1020%0.0185%-1.0265
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#Xlig:1:SINGLE:-0.1020%0.0185%-1.0265 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   5  4  0  0  0  0  0  0  0  0999 V2000
    -0.3534    2.1044   -0.7339 O   0  0  0  0  0  0  0  0  0  0  0  0
    -0.5345    2.7646    0.4801 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2565,22 +1854,13 @@ From GM3DFragmenter
   2  5  1  0  0  0  0 
   1  2  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#Xlig:1:-0.1753%0.0948%-0.4464
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#Xlig:1:SINGLE:-0.1753%0.0948%-0.4464 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   3  2  0  0  0  0  0  0  0  0999 V2000
    -1.9670   -0.0075   -0.4937 C   0  0  0  0  0  0  0  0  0  0  0  0
    -3.1263   -0.0054   -0.4354 N   0  0  0  0  0  0  0  0  0  0  0  0
@@ -2588,35 +1868,17 @@ From GM3DFragmenter
   1  2  3  0  0  0  0 
   3  1  1  0  0  0  0 
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#Xlig:1:0.0192%-0.0048%-0.5645
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#Xlig:1:SINGLE:0.0192%-0.0048%-0.5645 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102219043D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     2.3243   -0.0063    0.8189 Cl  0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#Xlig:1:-0.0053%-0.0027%0.6300
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#Xlig:1:SINGLE:-0.0053%-0.0027%0.6300 
 
 $$$$

@@ -80,7 +80,7 @@
 <p align="center" style="font-size: 44pt">DENOPTIM</p>
 <p align="center" style="font-size: 32pt"><i>De novo</i> Optimization of In/organic Molecules</p>
 <p><br/></p>
-<p align="center" style="font-size: 20pt"><i>Version 2.2.0, November 2020</i></p>
+<p align="center" style="font-size: 20pt"><i>Version 3.0.2, April 2022</i></p>
 <p align="center" style="font-size: 20pt">User Manual</p>
 <p><br/></p>
 
@@ -90,33 +90,35 @@
 	<p style="font-size: 14pt; "><b>Table of Contents</b></p>
 	<ul>
 		<li><a href="#Toc40894_1191730726">About DENOPTIM</a></li>
-		<li><a href="#Toc14757_7999724461">Compiling DENOPTIM</a></li>
+		<li><a href="#Toc14757_7999724461">Installation</a></li>
+		<ul>
+			<li><a href="#Toc14757_7999724222">Install From Conda (recommended)</a></li>
+			<li><a href="#Toc14757_7999724223">Build From Source</a></li>
+		</ul>
 		<li><a href="#Toc14757_7999724462">Introduction to DENOPTIM</a>
 		<ul>
 			<li><a href="#Toc14747_799972446">Representation of Chemical Entities in DENOPTIM</a>
 			<ul>
 				<li><a href="#Toc43997_808352928">Graphs</a></li>
-				<li><a href="#Toc14749_799972446">Fragments</a>
-				<ul>
-					<li><a href="#Toc14751_799972446">Valence-based approach</a></li>
-					<li><a href="#Toc14753_799972446">Class-based approach</a></li>
-					<li><a href="#Toc40904_11917307261">Capping procedure</a></li>
-					<li><a href="#Toc43999_808352928">Symmetry</a></li>
-				</ul></li>
+				<li><a href="#Toc14749_799972446">Vertexes</a></li>
+				<li><a href="#Toc14749_799972987">Edges</a></li>
+				<li><a href="#Toc14753_799972446">Attachment Points and Attachment Point Class</a></li>
+				<li><a href="#Toc43999_808352928">Symmetry</a></li>
 			</ul></li>
 			<li><a href="#Toc42056_808352928">Fitness evaluation</a></li>
 		</ul></li>
-		<li><a href="#Toc14759_799972446">Main programs of the DENOPTIM package</a>
+		<li><a href="#Toc14759_799972446">Programs of the DENOPTIM package</a>
 		<ul>
-			<li><a href="#Toc13237_799972445">DENOPTIM-GUI: the graphical user interface</a></li>
-			<li><a href="#Toc13237_799972446">DenoptimGA</a>
+			<li><a href="#Toc13237_799972445">GUI: the Graphical User Interface</a></li>
+			<li><a href="#Toc13237_799972446">Genetic Algorithm Runner</a>
 			<ul>
 				<li><a href="#Toc40898_1191730726">Genetic Operations</a></li>
 				<li><a href="#Toc44001_808352928">Substitution Probability</a></li>
-				<li><a href="#Toc40900_1191730726">GA Selection Strategies</a></li>
+				<li><a href="#Toc40900_1191730726">Parent Selection Strategies</a></li>
 				<li><a href="#Toc14761_799972446">GA Parallelization Schemes</a></li>
-				<li><a href="#Toc17842_799972446">DenoptimGA Input</a></li>
-				<li><a href="#Toc16845_799972446">DenoptimGA Output</a></li>
+				<li><a href="#Toc17842_799972446">GA Run Input</a></li>
+				<li><a href="#Toc16845_799972446">GA Run Output</a></li>
+				<li><a href="#Toc17843_799972446">Interacting with Ongoing GA Run</a></li>
 			</ul></li>
 			<li><a href="#Toc14852_799972446">FragSpaceExplorer</a>
 			<ul>
@@ -124,24 +126,36 @@
 				<li><a href="#Toc17846_799972446">FragSpaceExplorer Output</a></li>
 				<li><a href="#Toc5490_1476255988">Restart FragSpaceExplorer from Checkpoint file</a></li>
 			</ul></li>
+			<li><a href="#Toc9999_2">Graph Editor</a></li>
+			<li><a href="#Toc9999_4">Genetic Operator</a></li>
+			<li><a href="#Toc9999_5">Fitness Provider Runner</a></li>
+			<li><a href="#Toc9999_6">3D Molecular Models Builder</a></li>
+			<li><a href="#Toc9999_7">Graph Isomorphism Analyzer</a></li>
+			<li><a href="#Toc9999_8">Graph List Comparator</a></li>
 		</ul></li>
 		<li><a href="#Toc35546_1191730726">Keywords</a>
 		<ul>
-			<li><a href="#Toc40912_1191730726">Fragment space definition</a></li>
+			<li><a href="#Toc40912_1191730726">Space of Graphs Building Blocks</a></li>
 			<li><a href="#Toc40914_1191730726">Ring closing machinery</a></li>
-			<li><a href="#Toc40916_1191730726">DenoptimGA</a></li>
-			<li><a href="#Toc40918_1191730726">DenoptimCG</a></li>
+			<li><a href="#Toc40916_1191730726">Genetic Algorithm (GA) Runner</a></li>
+			<li><a href="#Toc40918_1191730726">3D Molecular Models Builder</a></li>
 			<li><a href="#Toc13097_799972446">FragmentSpaceExplorer</a></li>
 			<li><a href="#Toc13097_123456789">Fitness provider</a></li>
+			<li><a href="#Toc88888_1">Stand-alone Graph Editor</a></li>
+			<!--<li><a href="#Toc88888_2">Stand-alone Genetic Operator</a></li>-->
+			<li><a href="#Toc88888_3">Stand-alone Fitness Runner</a></li>
+			<li><a href="#Toc88888_4">Stand-alone Graph Isomorphism Analyzer</a></li>
+			<li><a href="#Toc88888_5">Stand-alone Graph List Comparator</a></li>
 		</ul></li>
 		<li><a href="#Toc40920_1191730726">File Formats</a>
 		<ul>
-			<li><a href="#Toc16847_799972446">Molecular Fragments</a></li>
+			<li><a href="#Toc16847_799972446">Vertexes</a></li>
 			<li><a href="#Toc14763_799972446">Compatibility Matrix file</a></li>
 			<li><a href="#Toc16849_799972446">Ring closures Compatibility Matrix file</a></li>
 			<li><a href="#Toc16851_799972446">Initial Population File</a></li>
 			<li><a href="#Toc10339_2456711212">Candidate Chemical Entity Files</a></li>
 			<li><a href="#Toc16853_799972446">Fitness Files</a></li>
+			<li><a href="#Toc9999_3">Graph Editing Task Files</a></li>
 		</ul></li>
 	</ul>
 </div>
@@ -149,272 +163,129 @@
 <hr>
 
 <h1 class="western"><a name="Toc40894_1191730726"></a>About DENOPTIM</h1>
-<p>DENOPTIM stands for <i>De novo</i> Optimization of In/organic Molecules. DENOPTIM is
-a software suite for the <i>de novo</i> generation of diverse
-molecules with desired properties.</p>
+<p>DENOPTIM is an open source software suite for the <i>de novo</i> design of 
+chemical entities. The name <i>DENOPTIM</i> stands for "<i>De novo</i> 
+Optimization of In/organic Molecules" and wants to highlight that DENOPTIM is 
+designed to handle chemical entities way beyond the strict formalisms of organic 
+chemistry (i.e., valence rules). In fact, the development of DENOPTIM started 
+in <a href="https://doi.org/10.1021/ja300865u">2012</a> as a response to the 
+need of designing transition metal complexes and organometallic catalysts that 
+cannot not even be represented unambiguously by standard chemical 
+representations (e.g., multi-hapto metal-ligand complexes, ion pairs, 
+highly reactive catalyst intermediates).</p>
 
-<p>The source code is available on GitHub at 
-<a href="https://github.com/denoptim-project">https://github.com/denoptim-project</a></p>
-
-<p>The programs is written in Java
-and distributed under the AGPL v3.0 license. DENOPTIM required
-additional open source libraries that are distributed according to
-their respective licenses. Table 1 lists the software used, together
-with version and license details.</p>
-
-<table width="684">
-	<col width="154"/>
-	<col width="193"/>
-	<col width="311"/>
-
-	<thead>
-		<tr valign="middle">
-			<th width="154" style="background: #eeeeee"><p style="font-size: 12pt">Software</p></th>
-			<th width="193" style="background: #eeeeee"><p style="font-size: 12pt">License</p></th>
-			<th width="311" style="background: #eeeeee"><p style="font-size: 12pt">Comments</p></th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr valign="middle">
-			<td width="154"><p align="center">Java</p>
-			</td>
-			<td width="193"><p align="center">-</p>
-			</td>
-			<td width="311"><p align="center">Version JDK 1.6 or above required</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">JMol</p>
-			</td>
-			<td width="193"><p align="center">LGPL 2.0</p>
-			</td>
-			<td width="311"><p align="center">Version 14.29.55</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">apiguardian</p>
-			</td>
-			<td width="193"><p align="center">Apache v2.0</p>
-			</td>
-			<td width="311"><p align="center">Version 1.1.0</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">CDK</p>
-			</td>
-			<td width="193"><p align="center">LGPL v2.1</p>
-			</td>
-			<td width="311"><p align="center">Version 1.4.19</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">Commons-io</p>
-			</td>
-			<td width="193"><p align="center">Apache v2</p>
-			</td>
-			<td width="311"><p align="center">Version 2.4.0	</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">Commons-el</p>
-			</td>
-			<td width="193"><p align="center">Apache v2</p>
-			</td>
-			<td width="311"><p align="center">Version 1.0 </p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">Commons-lang</p>
-			</td>
-			<td width="193"><p align="center">Apache v2</p>
-			</td>
-			<td width="311"><p align="center">Version 3.1.0 </p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">Commons-cli</p>
-			</td>
-			<td width="193"><p align="center">Apache v2</p>
-			</td>
-			<td width="311"><p align="center">Version 1.3.1</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">Commons-math</p>
-			</td>
-			<td width="193"><p align="center">Apache v2</p>
-			</td>
-			<td width="311"><p align="center">Version 3.6.1</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">Commons-lang</p>
-			</td>
-			<td width="193"><p align="center">Apache v2</p>
-			</td>
-			<td width="311"><p align="center">Version 3.1.0 </p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">graphstream</p>
-			</td>
-			<td width="193"><p align="center">LGPL v3.0</p>
-			</td>
-			<td width="311"><p align="center">Version 1.3</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">JavaServlet</p>
-			</td>
-			<td width="193"><p align="center">CDDL v1.1</p>
-			</td>
-			<td width="311"><p align="center">Version 1.4</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">jfreechart</p>
-			</td>
-			<td width="193"><p align="center">LGPL v2.1</p>
-			</td>
-			<td width="311"><p align="center">Version 1.5</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">JUnit5</p>
-			</td>
-			<td width="193"><p align="center">EPC 2.0</p>
-			</td>
-			<td width="311"><p align="center">Version 5.5.2</p>
-			</td>
-		</tr>
-		<tr valign="middle">
-			<td width="154"><p align="center">vecmath</p>
-			</td>
-			<td width="193"><p align="center">GPL v2.0</p>
-			</td>
-			<td width="311"><p align="center">-</p>
-			</td>
-		</tr>
-	</tbody>
-	<caption align="bottom" style="font-size: 11pt"><i>Table 1: Software environment for DENOPTIM.</i></caption>
-</table>
-
-<ul>
-	<li><p><font face="Times New Roman, serif" style="font-size: 12pt" color="#00b8ff"><b>Java</b></font>
-	Both JDK and JRE need to be installed. There are both <i>OpenJava</i>
-	and <i>Oracle</i> Java implementations available. Although both
-	should be compatible, it is advisable to stick to a single version.</p></li>
-	<li><p><font face="Times New Roman, serif" style="font-size: 12pt" color="#00b8ff"><b>CDK</b></font> (<a href="https://cdk.github.io/">https://cdk.github.io/</a>) This
-	library is used within DENOPTIM for representing chemical objects and performing basic operations
-	such as calculation of SMILES, InChi keys, and Descriptors.</p></li>
-</ul>
+<h2>How To Cite</h2>
+<p>To cite DENOPTIM, please cite <a href="https://doi.org/10.1021/acs.jcim.9b00516"><i>J. Chem. Inf. Model.</i> <b>2019</b>, 59, 10, 4077–4082</a></p>
 
 <hr>
+<h1 class="western"><a name="Toc14757_7999724461"></a></a>Installation</h1>
 
-<h1 class="western"><a name="Toc14757_7999724461"></a></a>Compiling DENOPTIM</h1>
-
-<p>Once you have downloaded the source from <a href="https://github.com/denoptim-project">https://github.com/denoptim-project</a>,
-use the shell scripts have been created to compile the programs. These scripts assume <code>java</code> and <code>javac</code> are in your <code>$PATH</code>. Verify this preliminary condition by running 
-<pre class="bash"><code> java -version</code></pre>
-and
-<pre class="bash"><code> javac -version</code></pre>
-If you get a proper version of both <code>java</code> and <code>javac</code> then you can continue to build the DENOPTIM package.<br> A <code>build-all.sh</code> script allows to compile all
-the programs with one single command from the DENOPTIM root folder: 
-<pre class="bash"><code>cd build 
-bash build-all.sh </code></pre>
-</p>
-
-<p>Alternatively, all compiled programs can be stored in a <code>dist</code>
-directory which is created by the script using this sytax: 
-<pre class="bash"><code>bash build-all.sh makedist</code></pre>
-</p>
-
-<p>To compile specific programs simply substitute the <code>&lt;program_name&gt;</code>
-as required and run
-<pre class="bash"><code>build-&lt;program_name&gt;.sh</code></pre>
-</p>
+<h2 class="western"><a name="Toc14757_7999724222"></a></a>Install From Conda (recommended)</h2>
+<p>DENOPTIM can be installed on using conda package manager from the command 
+line on Linux/MacOS. On Windows this can be done on the Anaconda prompt or by 
+using <a href="<code>DENOPTIM_HOME</code>">Git Bash</a> terminal:
+<pre>conda install -c denoptim denoptim</pre></p>
+You should now have the <code>denoptim</code> command available. 
+Run the following and verify you get a help message:
+<pre>denoptim -h</pre></p>
+<p>The installation from conda has been completed.</p>
 
 
-<p>NOTE: If any changes are made to the dependent libraries (for e.g.
-CDK/DENOPTIM), please recompile all associated programs, for the
-changes to be effective. 
-</p>
+<h2 class="western"><a name="Toc14757_7999724223"></a></a>Build From Source</h2>
+<p>DENOPTIM can be built from source using <a href="https://maven.apache.org/">Maven</a>.</p>
+
+<p>First, download the <a href="https://github.com/denoptim-project/DENOPTIM/releases/latest">latest release</a>. This is more than enough for regular users. However, if you are after developing the DENOPTIM code then fork the repository and work with git.</p>
+
+<p>Extract the zip/tar.gz archive you have downloaded to generate a folder 
+we'll call <code>DENOPTIM_HOME</code>. In the following, remember to replace 
+<code>$DENOPTIM_HOME</code> with the pathname of the extracted DENOPTIM's 
+distribution folder on your system.</p>
+
+<p>Make sure you have an environment that includes JAVA and Maven. Such 
+environment can be created with by manual installation of both JAVA and 
+Maven manually, or it can be created using conda: 
+<pre>cd $DENOPTIM_HOME
+conda env create -f environment.yml
+conda activate dnp_env</pre></p>
+
+<p>Verify the requirements by running the two commands: 
+Both should return a message declaring the respective versions.
+<pre>javac -version
+mvn -version</pre></p>
+
+<p>Now, you can build DENOPTIM with
+<pre>mvn package</pre></p>
+
+<p>Once maven has finished, you can create call DENOPTIM using a command like the following (NB: replace $DENOPTIM_HOME and ${VERSION} as with the values that apply to your installation):</p>
+<p>On Linux/Mac and GitBash on Windows:
+<pre>java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar</pre>
+On Windows Anaconda prompt:
+<pre>java -jar $DENOPTIM_HOME\target\denoptim-${VERSION}-jar-with-dependencies.jar</pre></p>
+
+<p>The installation from source has been completed.</p>
 
 <hr>
 
 <h1 class="western"><a name="Toc14757_7999724462">Introduction to DENOPTIM</a></h1>
 
-<h2 class="western"><a name="Toc14747_799972446"></a>
-Representation of Chemical Entities</h2>
+<h2 class="western"><a name="Toc14747_799972446"></a>Representation of Chemical Entities</h2>
 
 <h3 class="western"><a name="Toc43997_808352928"></a>Graphs</h3>
 
 <p>DENOPTIM perceives chemical entities as graphs
-(outer graph in Figure 1) that are collections of vertices and edges. A vertex is a building block decorated with a list of attachment points (APs, arrows in Figure 1) that can be used to make edges with other vertices. Use of an attachment point is exclusive: edges can only be made between two attachment points that are available, i.e., not used to make other edges.</p> 
-<p>A vertex is typically a container for a molecular fragment. Fragments can contain any
-number of atoms or pseudo-atoms, and are represented by graphs themselves
-(inner graph in Figure 1), though DENOPTIM perceived them as single entities.</p> 
-<p>Edges represent an abstract relation between vertices that can typically be translated into an actual bond, but can also represent a pseudo-bond, or a spatial relation.</p>
-
-<p>Vertices and edges are organized in a spanning tree
+(outer graph in Figure 1): Graphs are collections of vertexes and edges. 
+Vertexes and edges are organized in a spanning tree
 (T), which is acyclic by definition,
 and a set of fundamental cycles (Fc). The latter set defined the chords:
 edges that do not belong to the spanning tree and that define cycles
-of vertices.</p>
+of vertexes.</p>
 <figure> 
 	<img src="figures/graphs.png" alt="figures/graphs.png" width="750"/>
 	<figcaption><i>Figure 1: Graph representation of chemical entities in DENOPTIM.</i></figcaption>
 </figure>
 
-<h3 class="western"><a name="Toc14749_799972446"></a>Fragments</h3>
-<p>Molecular fragments are typically generated by the fragmentation of molecular models of compounds taken from
-databases of interest. For instance, libraries of molecules, of
-crystal structures, of previously generated molecular models.
-Fragments have different roles in DENOPTIM:
+<h3 class="western"><a name="Toc14749_799972446"></a>Vertexes</h3>
+<p>Vertexes are abstract objects: graph's building blocks that are decorated with attachment points (AP, the arrows in Figure 1). One attachment points represent the possibility to form one connection with one other vertex.</p>
+
+<p>Vertexes come in three forms:
 <ul>
-	<li>the <i>scaffolds</i> are fragments used as
-	starting point for the construction of a chemical entity and
-	often correspond to the central core of the chemical entity under
-	construction (for instance, the
-	metal atom of a transition metal complex);</li>
-	<li>the <i>proper fragments</i>, which are used to expand and modify chemical
-	entities but not to start new ones from scratch,</li>
-	<li>and the <i>capping groups</i>, which are fragments with only one attachment
-	point and are used
-	to saturate and finalize chemical entities (see Capping procedure).</li>
+	<li><b>Molecular fragment</b>: chemical building blocks containing one or more atoms and bonds. Molecular fragments define the relation between attachment point on the vertex and atoms contained in the vertex, thus allowing, if needed, to represent open valences on molecular fragments as attachment points on vertexes. However, attachment points do not need to represent a given valence. The content of a molecular fragment vertex is constant.</li>
+	<li><b>Template</b>: vertexes that embed a graph. The attachment points on a template vertex, if any, are the reflection of the attachment points of to vertexes belonging to the embedded graph that are not used to made connections in such embedded graph. The structure of the embedded graph's spanning tree and the identify of each vertex may be fixed, in which case the template is a contained for a constant sub-graph, or may be editable allowing, for instance, to alter the embedded graph while retaining the structure defined by the template. </li>
+	<li><b>Empty vertexes</b>: can contain properties in any form, but do not contain atoms or embedded graphs. Empty vertexes are best interpreted as either property carriers or place-holding vertexes.</li>
 </ul></p>
 
-<p>Each fragment is characterized by its chemical constitution (i.e., atom,
-bonds, charges) and a set of attachment points. These attachment points are then projected to at the vertex level, so that when a vertex contains a fragment, the list of APS of the vertex is indeed the list defined by the underlying fragment. 
-Each attachment point
-(AP) defines where (i.e., on which atom/pseudo-atom) and possibly additional information such as formal bond order,
-geometry. DENOPTIM currently supports two strategies for handling
-attachment points: the valence-based approach, and the class-based
-approach.</code></p>
+<p>Independently on their nature, vertexes are further classified according to their role as building blocks. There are three roles for vertexes:
+<ul>
+	<li><i>scaffolds</i> are vertexes used only to start the construction of a graph and are the only vertex that can be used for this purpose. In fact, the scaffold is always the seed of the spanning trees of automatically built graphs. This role is often granted to a chemically critical building block, for example the metal center in a transition metal complex.</li>
 
-<h4 class="western"><a name="Toc14751_799972446"></a>Valence-based approach</h4>
-<p>Within the valence-based strategy, each attachment points is a portion of the
-user-defined free valence of a specific atom. Combination
-of attachment points are controlled only by the number of open
-valences on the atoms.</p>
+	<li><i>fragments</i> are vertexes that can be used freely in the construction of a graph, but cannot be used to start a new graph. This is the regular role for most building blocks.</li>
+	<li><i>capping groups</i> are vertexes that have only one attachment
+	point and are used to stop the grows of a chain off vertexes, typically
+	to saturate open valences (see Capping procedure, below).</li>
+</ul></p>
 
-<h4 class="western"><a name="Toc14753_799972446"></a>Class-based approach</h4>
-<p> When using class-based strategy, each attachment point is annotated with a
-label (i.e., a string with no spaces) specifying the so-called <i>class</i> of the attachment point (APClass).
-The APClass can be freely defined also by the user (e.g., via the GUI) as long as it adheres to the following syntax. 
+<h3 class="western"><a name="Toc14749_799972987"></a>Edges</h3>
+<p>Edges represent an abstract relation between vertexes. An edge is the connection between two attachment points. Edges are often the reflection of chemical bonds, pseudo-bond, spatial or relational information.</p>
+
+<h3 class="western"><a name="Toc14753_799972446"></a>Attachment Points and Attachment Point Class</h3>
+<p>Attachment points are owned by vertexes and represent the possibility of that specific vertex to form a connection, i.e., one edge, with one attachment point that is owned by another vertex. Attachment points can be decorated with information defining i) the atoms that holds an open valence (if any), ii) the spatial arrangement of the connected vertex in relation to the vertex holding the attachment point, and iii) a label used to classify the attachment points.</p>
+<p>The latter property, the label, is a string with no spaces specifying the so-called <b>class of the attachment point</b> (or attachment point class, APClass.
+The APClass can be defined also by the user (e.g., via the GUI) as long as it adheres to the following syntax. 
 <pre>&lt;string&gt;:&lt;int&gt;</pre> where 
 <ul>
 	<li><code>&lt;string&gt;</code> is an alphanumeric string, and</li>
 	<li><code>&lt;int&gt;</code> is a positive integer number.</li>
 </ul>
-To explain this syntax, we consider how fragmentation is performed, for instance, by GM3DFragmenter (available at
-<a href="https://github.com/denoptim-project/GM3DFragmenter">https://github.com/denoptim-project/GM3DFragmenter</a>). 
-The fragmentation algorithm
-uses cutting rules to identify the bond to break when generating fragments. 
+This syntax is best explain by providing an example of how molecular fragment can be generated from whole molecules. In particular, we consider our own fragmentation algorithm (see <a href="https://doi.org/10.1021/ci4007497"><i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 3, 767–780</a> - implementation available at
+<a href="https://github.com/denoptim-project/GM3DFragmenter">https://github.com/denoptim-project/GM3DFragmenter</a>).
+This fragmentation algorithm
+uses cutting rules to identify the bond to break in order to generate fragments. 
 For each broken bond two attachment
-points are generated (one on each side of the broken bond) and, in order to distinguish between the two sides of the broken bond, these attachment points are given two complementary APClasses. These APClasses share a common part (the reference to the cutting rule) and have an additional suffix that makes them distinguishable. For example, if the cutting rule is named <code>myCuttingRule</code>, the two APs will have APClass <code>myCuttingRule:0</code> and <code>myCuttingRule:1</code>.<p>
+points are generated (one on each side of the broken bond) and, in order to distinguish between the two sides of the broken bond, these attachment points are given two complementary APClasses. These APClasses share a common part (the reference to the cutting rule) and have an additional suffix that makes them distinguishable. For example, if the cutting rule is named <code>myCuttingRule</code>, the two APs will have APClass <code>myCuttingRule:0</code> and <code>myCuttingRule:1</code>.</p>
 
-<p>When working with the class-based approach valence rules are not imposed and the possibility to connect attachment points is decided by a Compatibility Matrix (see below). This allows to define a completely customizable set of rules for building any kind of entity, including  models of disconnected systems, active species and transition states. However, in order to make sure that the entities built with by class-based approach are valid chemical entities, an additional procedure takes care of saturating free attachment points that, if left unused, would result in unwanted open valences. This procedure is called "capping" and it adds "capping groups" on specifically defined free attachment points.</p>
+<p>Notably, APClasses are a way to encode the chemical environment of a the two sides of a bond that was broken to generate a pair of attachment points. Conversely, this encoded information on chemical environment can be exploited to control how attachment points are best combined to form vertex-vertex connections. In particular, while APClasses can be used to rebuilt only the types of connections that were originally broken in the fragmentation procedure, they also allow to introduce compatibilities across different APClasses. To this end, DENOPTIM used a so-called Compatibility Matrix (see below) to define which combinations of APClasses are to be considered as compatible when building or editing graph by attaching or replacing vertexes.</p>
+
+<p>The construction and editing of graphs is thus controlled by the APClass compatibilities and independent from valence rules. This allows to define a completely customizable set of rules for building any kind of entity, including  models of disconnected systems, active species and transition states. However, in order to make sure that the entities built this way are valid chemical entities, an additional procedure in needed to saturate the free attachment points that, if left unused, would result in unwanted open valences. This procedure is called "capping" and it adds "capping groups" (see above) on specifically defined free attachment points.</p>
 
 <p>The use of capping groups is particularly useful when standard “hydrogenation” routine (i.e., addition of H to every
 open valence) is expected to fail. This occurs when the chemical
@@ -426,64 +297,71 @@ which “hydrogenation” tools have been trained.</p>
 <h3 class="western"><a name="Toc43999_808352928"></a>Symmetry</h3>
 
 <p>DENOPTIM can repeat any graph operation on sets of APs that are
-related by high degree of topological similarity or constitutional
-symmetry. In order to be compatible with the use of both 2D and 3D
-fragments, the identification of symmetric APs considers only a
-restricted set of topological features of the APs and the surrounding
-chemical environment. In practice, APs are considered symmetric when
-they have<ul>
+related by high degree of topological similarity. APs are considered symmetric when
+they have
+<ul>
 <li>same attachment point class,</li>
-<li> same element as the
-AP’s source atom, </li>
-<li> same type and number of bonds connected to
-the source atom, </li>
-<li>same element and number of atoms connected to
-the source atom.</li>
-</ul> Users can control the probability of symmetric
-operations on specific AP classes by setting a numerical value (i.e.,
-0-100% probability of symmetric operations). 
+<li> same element as the AP’s source atom (if any), </li>
+<li> same type and number of bonds connected to the source atom (if any), </li>
+<li>same element and number of atoms connected to the source atom (if any).</li>
+</ul>
+Users can control the probability of symmetric operations on specific APClasses and include symmetry constraints also based on APClasses (see keywords section, below). 
 </p>
 
-<h2 class="western"><a name="Toc42056_808352928"></a>Fitness evaluation</h2>
 
-<p>DENOPTIM main programs generate chemicals entities
-automatically and save them into SDF files (structure-data file, (see <a href="#Toc10339_2456711212">Candidate Chemical Entity Files</a>): one file for each candidate chemical entity generated. This file contains the chemical
-representation of the entity as 2D/3D structure with
-connectivity table together with its graph representation, and can be used for further processing of the candidate. In fact, DENOPTIM offers the possibility to submit a subtask for each
-new entity encountered. This calculation is commonly referred as to
-the "fitness evaluation" owing to the fact that a fitness value, or
-figure of merit, is a typical way to quantify the extent 
-a candidate entity is suitable to a specific function or use.</p>
+<h2 class="western"><a name="Toc42056_808352928"></a>Evaluation of Chemical Entities: Fitness Evaluation</h2>
 
-<p>The fitness provider can be
+<p>The design of functional chemical entities depends on the capability of evaluating how candidate entities are fit for a given purpose: the evaluation of the fitness. In DENOPTIM, such evaluation aims to associate the internal representation of a chemical entity, i.e., a graph, with a numerical value, i.e., the fitness. For the sake of generality, DENOPTIM does not take any assumption as to how the fitness is calculated, but it assumes that a "fitness provider" is defined for the purpose of evaluating the fitness of each candidate.</p> 
+<p>Fitness providers can be of two types:
 <ul>
-	<li>internal: uses functionality within DENOPTIM to calculate descriptors and combine them into a numerical fitness value. The internal fitness provider does not perform any molecular modeling, such as geometry optimization and the like.</li>
-	<li>external: an executable placed outside of the DENOPTIM package. Currently <code>bash</code> o <code>python</code> scripts are supported. This ensures general applicability, as the external fitness provider can perform any sort of task, including any molecular modeling task. In fact, an external fitness provider is expected to do the following tasks:
+	<li>internal fitness provider: it's DENOPTIM's code that is executed within the DENOPTIM virtual machine to calculate descriptors from chemical representation that are built on-the-fly for each chemical entity from its graph representation. The descriptors are then combined into a numerical fitness value according to an equation that must be defined in the input. The internal fitness provider does not perform any molecular modeling, such as geometry optimization and the like.</li>
+
+	<li>external fitness provider: is software external to DENOPTIM, and that DENOPTIM runs as a sub-process to compute the fitness of a chemical entity. Any <code>bash</code> or <code>python</code> script can be executed as an external fitness provider. An external fitness provider is expected to do the following tasks:
 	<ol>
-        <li>Read the <a href="#Toc10339_2456711212">SDF file produced by DENOPTIM</a>.</li>
-        <li>Perform all molecular modeling tasks, including, for example, 3D model construction, property
+        <li>Read the input defining the entity to evaluate from an <a href="#Toc10339_2456711212">SDF file produced by DENOPTIM</a>.</li>
+        <li>Perform any molecular modeling tasks, including, for example, 3D model construction, property
         calculations, output file parsing, and post processing.</li>
-        <li>Calculate the fitness value from the above modeling tasks</li>
+        <li>Calculate the fitness value from the results of the molecular modeling tasks.</li>
         <li>Create an output SDF file (see <a href="#Toc16853_799972446">Fitness Files</a>) for storing
         the fitness value of the candidate entity (or a properly formatted error message) in addition to any useful output
         data that might be used to post-process the results.</li>
 	</ol>
-	DENOPTIM programs execute the fitness provider, wait for completion, and retrieve the final results from the <a href="#Toc16853_799972446">output fitness File</a>. Note that DENOPTIM programs do not interact with the running script.</li>
+	When DENOPTIM algorithms are asked to use an external fitness provider, they execute suck task, wait for completion, and retrieve the final results from the <a href="#Toc16853_799972446">output fitness file</a>. Note that DENOPTIM programs do not interact with the running script.</li>
 </ul></p>
 
 <hr>
 
-<h1 class="western"><a name="Toc14759_799972446"></a>Main DENOPTIM programs</h1>
+<h1 class="western"><a name="Toc14759_799972446"></a>DENOPTIM Programs</h1>
 
-<h2 class="western"><a name="Toc13237_799972445"></a>DENOPTIM-GUI: the graphical user interface</h2>
-<p>The graphical user interface (GUI) is the main interface used for preparing and inspecting DENOPTIM files and experiments. To launch the GUI just double click on the DENOPTIM-GUI.jar file or run <pre class="bash"><code> java -jar DENOPTIM-GUI.jar </code></pre></p>
-<p>The GUI offers also the possibility to run de novo design and virtual screening experiments that can otherwise be run by background processes with DenoptimGA.jar and FragSpaceExplorer.jar (see below). The threads executing GUI-controlled experiments are fully dependent on the GUI, and will be terminated upon closure of the GUI (the user receives a warning, in such cases). Moreover, the fragment space used in the GUI-controlled experiments is the same one defined within the GUI (for instance, to manually build graphs). Changes done to the fragment space defined in a GUI will affect the experiments controlled by that GUI. </p>
+<h2 class="western"><a name="Toc13237_799972445"></a>Graphical User Interface</h2>
+<p>The graphical user interface (GUI) is the main interface used for preparing and inspecting DENOPTIM files and experiments. To launch the GUI, you can chose one of the following:
+<ul>
+	<li>if you installed via conda (recommended), you can run the command following command.
+	<pre class="bash"><code>denoptim</code></pre></li>
+	<li>alternatively, double click on the <code>denoptim-${PKG_VERSION}-jar-with-dependencies.jar</code> file, the location of which depends on how you have installed DENOPTIM: this file will be under <code>target</code> subfolder of the DENOPTIM distribution folder (the folder downloaded to install the release) if you have built DENOPTIM from source, of it will be under the <code>${path_to_active_env_location}/lib/</code> for installation via conda.</li>
+	<li>another alternative is to run the following command, again the <code>${path_to_denoptim_jar}</code> depends on how you have installed DENOPTIM (see previous point):
+	<pre class="bash"><code> java -jar ${path_to_denoptim_jar}/denoptim-${PKG_VERSION}-jar-with-dependencies.jar </code></pre></li>
+</ul>
+For installation via conda, remember to activate the appropriate conda environment before issuing any of the above command.</p>
 
-<h2 class="western"><a name="Toc13237_799972446"></a>DenoptimGA</h2>
-<p>Molecular design where performance optimization is driven by a genetic algorithm where
-each molecule (a virtual chromosome) is represented by a graph. The
+<p>The GUI provides instruction to itself in the form of tool tip messages (hold the cursor still over a button or plot to get a short message explaining what is the functionality of that component) and question-mark-buttons ("?") that can be clicked to display more detailed instructions.</p>
+
+<p>The GUI can be used to open files directly from the command line:
+<pre class="bash"><code>denoptim path/to/file1 path/to/file2 path/to/file3 </code></pre>
+The above command will open the three files if their format is recognized as one of the file formats DENOPTIM's gui can open. These include:
+<ul>
+<li>SDF and JSON files containing vertexes, graphs or candidate entities</li>
+<li>text files containing list of <a href="#Toc35546_1191730726">Keywords and values</a> (i.e., input parameter files) and <a href="#Toc14763_799972446">Compatibility Matrix file</a>.</li>
+<li>folders containing the results of denovo and combinatorial design (see <a href="#Toc16845_799972446">GA Output</a> and <a href="#Toc17846_799972446">FragSpaceExplorer Output</a> respectively)</li>
+</ul>
+
+<p>Finally, the GUI offers also the possibility to configure and run de novo design and virtual screening experiments that can otherwise be run by background processes as explained below. The threads executing GUI-controlled experiments are fully dependent on the GUI, and will be terminated upon closure of the GUI (the user receives a warning, in such cases).</p>
+
+
+<h2 class="western"><a name="Toc13237_799972446"></a>Genetic Algorithm Runner</h2>
+<p>De novo design driven by a genetic algorithm using graphs as genome for chemical entities. The
 overall schematic of the genetic algorithm (GA) is shown in Figure 3.
-The algorithm begins with a population of molecules that can be given
+The algorithm begins with a population of candidates that can be given
 as input or generated from scratch. Next, a given number of
 generations are created by producing new offspring either from
 application of the genetic operators, or by building new entities
@@ -492,92 +370,68 @@ from scratch.</p>
 	<img src="figures/ea.gif" alt="figures/ea.gif" width="700"/>
 	<figcaption><i>Figure 3: Evolutionary optimization scheme.</i></figcaption>
 </figure>
-
 </p>
 
 <h3 class="western"><a name="Toc40898_1191730726"></a>Genetic Operations</h3>
-<p>In DENOPTIM, crossover (see Algorithm 1) and mutation are the main
-genetic operators used. Currently, these schemes are restricted to a
-single point in a graph. In addition, the vertex corresponding to the scaffold
-is not subject to crossover or mutation, i.e.,
-only vertices attached to the scaffold partake in the genetic
-exchange. In addition, for symmetric graphs, addition or removal of a
-vertex can be propagated across all points related
-by symmetry. Where APclasses are involved,
-crossover points are chosen according to the rules defined in the compatibility matrix.
-</p>
+<p>Genetic operations are meant to generate graph from scratch (i.e., construction operator), from one parent (i.e., mutation operator), or from a pair of parents (i.e., crossover operator). These events all have to respect the APClass compatibility rules that, together with the libraries of building blocks, define the space of graph building blocks (BB Space). In addition, for symmetric graphs, addition or removal of a
+vertex can be propagated across all sites related
+by symmetry. Notably, the vertex corresponding to the scaffold
+is not subject to crossover or mutation.</p>
 
-<div style="background: #f2f2f2; border: 1pt solid black; padding: 0in">
-<p style="margin: 0in;"><b>Require:</b> Scaffold and fragment libraries </p>
-<p style="margin: 0in;"><b>Require:</b> two molecular graphs <i>G<sub>1</sub></i> and <i>G<sub>2</sub></i></p>
-<p style="margin: 0in;">&nbsp;&nbsp;Select single crossover vertex <i>V<sub>i</sub></i> in <i>G<sub>1</sub></i></p>
-<p style="margin: 0in;">&nbsp;&nbsp;Remove edge with parent vertex <i>P<sub>G<sub>1</sub></sub></i> of <i>V<sub>i</sub></i>. Update attachment point status. </p>
-<p style="margin: 0in;">&nbsp;&nbsp;Extract vertex <i>V<sub>i</sub></i> and its children (connected vertices) <i>CV<sub>i</sub></i> </p>
-<p style="margin: 0in;">&nbsp;&nbsp;Select single crossover vertex <i>V<sub>j</sub></i> in <i>G<sub>2</sub></i> </p>
-<p style="margin: 0in;">&nbsp;&nbsp;Remove edge with parent vertex <i>P<sub>G<sub>2</sub></sub></i> of <i>V<sub>j</sub></i>. Update attachment point status.</p>
-<p style="margin: 0in;">&nbsp;&nbsp;Extract vertex <i>V<sub>j</sub></i> and its children (connected vertices) <i>CV<sub>j</sub></i></p>
-<p style="margin: 0in;">&nbsp;&nbsp;Remove vertex <i>V<sub>i</sub></i> and <i>CV<sub>i</sub></i> from <i>G<sub>1</sub></i> add to <i>P<sub>G<sub>2</sub></sub></i></p>
-<p style="margin: 0in;">&nbsp;&nbsp;Remove vertex <i>V<sub>j</sub></i> and <i>CV<sub>j</sub></i> from <i>G<sub>2</sub></i> and add to <i>P<sub>G<sub>1</sub></sub></i></p>
-</div>
-<p style="margin: 0in;"><font style="font-size: 11pt"><i>Algorithm 1: Crossover between two molecular graphs.</i></font></p>
+<p>The construction operator generates candidate by taking random choices on the scaffold vertex to use as graph seed, on the AP and incoming vertexes to use to grow a branch layer-by-layer. The random events are controlled by probabilities setting the likeliness of graph extension events according to graph features such the number of atoms in the corresponding chemical entity and the topological complexity (see <a href="#Toc44001_808352928">Substitution Probability</a>).</p>
 
-<p>Mutation in DENOPTIM can be performed in three ways:
-</p>
+<p>Mutation alters only one graph according to one of the following mutation types:
 <ul>
-	<li>Deletion involves
-	removing a randomly chosen vertex (fragment) and its children (if
-	any).</li>
-	<li>Substitution involves
-	replacing a randomly chosen vertex with another fragment which has
-	the same or lower number of attachment points. If reaction
-	information is included, then the replacing fragment should have a
-	compatible reaction type with that of its parent vertex. Any
-	children associated with the vertex to be substituted are removed.</li>
-	<li>Appending involves adding
-	a fragment to a randomly chosen vertex. This can also be viewed as
-	growth operation in which the graph may be further extended by
-	adding additional fragments provided the vertex has available
-	attachment points and/or fragments with compatible reactions.</li>
+	<li><i>change branch</i>: removes a branch of the graph and builds a replacement.</li>
+	<li><i>add link</i>: insets a vertex in between two previously-connected vertices.</li>
+	<li><i>change link</i>: replaces a non-terminal vertex while retaining the connectivity with downstream branches.</li>
+	<li><i>delete link</i>: removes a non-terminal vertex and reconnects the open ends generated by removal of the original vertex.</li>
+	<li><i>delete chain</i>: removes an entire branch in acyclic graphs or the part of a cyclic graph between two branching points thus opening the ring by removing the bridging chain.</li>
+	<li><i>extend</i>: extends a branch of the graph.</li>
+	<li><i>delete</i>: removes a branch starting from a vertex.</li>
 </ul>
+The mutation operator can be configured to perform also multi-site mutations: mutation that can alter a graph more multiple times on possibly independent location and performing independent mutation types.</p>
+
+<p>Crossover involves the swapping of one subgraph from each of the parents to the other parent. The subgraphs to swap (a.k.a. the crossover sites) need not to be terminal (i.e., crossover is not limited to dangling branches) and can be of any size, from a single vertex to an entire branch attached to the scaffold. When template vertexes are present in the parent graphs, crossover sites are defined so that the subgraphs to swap belong to graph that are at the same level of embedding in the recursive template-graph structure on the two parents. Moreover, the subgraphs can include only vertices belonging to the same level of embedding. Finally, while crossover generates two offspring from two parents, only one offspring is considered to be the product of a single crossover event.</p>
+
 
 <h3 class="western"><a name="Toc44001_808352928"></a>Substitution Probability</h3>
 
-<p>In order to prevent the generation of very large molecules, 
-the probability of appending a fragment to a free AP
-is typically chosen to decrease with the
-distance of the free AP from the root of the graph. 
-This distance is the so-called <i>level</i>, and refers to the fragment
-holding the free AP (Figure 4).
-For the levels L<sub>&gt;0</sub>
-the probability is lowered according to any one of the following
-schemes:</p>
+<p>The generation of very large graphs or graphs with too many incident edges on a single vertex can be reduced by tuning the so-called substitution probability: the probability of appending a vertex on to a free AP.
+The substitution probability (<i>P</i>) results from the product of two components: the growth probability (<i>P<sub>g</sub></i>), and the crowding probability (<i>P<sub>c</sub></i>).
+The growth probability (<i>P<sub>g</sub></i>) limits the growth of an entity. This limit can be expressed in terms of graph deepness (i.e., using the <i>level</i> of a vertex to determine the likeliness of further graph extension on that vertex, see Figure 4) or in terms of molecular size (i.e., number of heavy atoms, irrespectively of graph size).
+
+<figure> 
+	<img src="figures/graph_levels.png" alt="figures/graph_levels.png" width="429" border="0"/>
+	<figcaption><i>Figure 4: identification of levels in a graph. Each label L<sub>x</sub> identifies the shell of vertexes of level X. Red, dashed lines represent the border between levels. Yellow circles represent free APs. Squares of different color represent vertexes of different kind (scaffold, normal vertex, or capping group). To illustrate, vertex 1 is the scaffold vertex (i.e., represented by a red square) and is in level -1 (L<sub>-1</sub>), vertexes 2 (normal vertex represented by blue square), 3 (another normal vertex), and 5 (a capping group represented by a green square) are at level 0 (L<sub>0</sub>), and so on.</i></figcaption>
+</figure>
+
+The <b>growth probability</b> can be controlled by one of the following schemes (where <i>L</i> is either the vertex <i>level</i> or the number of heavy atoms):</p>
 
 <ul>
 	<li><b>EXP_DIFF</b>:
 	Given a growth multiplier factor <i>&lambda;</i>,
-	the probability of addition is given by the following equation
-	where <i>L</i>
-	is the level of the free AP.<br>
+	the probability of addition is given by<br>
 	<img src="figures/exp_diff.png" alt="figures/exp_diff.png" width="131" height="45"/></li>
 	<li><b>TANH</b>:
-        Given a growth multiplier factor <i>&lambda;</i>,
+    Given a growth multiplier factor <i>&lambda;</i>,
 	the probability of addition is
 	determined by <br>
 	<img src="figures/tanh.png" alt="figures/tanh.png" width="138" height="21"/></li>
 	<li><b>SIGMA</b>:
-	This scheme is based on two factors &sigma;<sub>1</sub> (the steepness of the function where the probability is 50%) and &sigma;<sub>2</sub> (the level of the point where the probability is 50%), and calculates the probability as <br>
+	This scheme is based on two factors &sigma;<sub>1</sub> (the steepness of the function where the probability is 50%) and &sigma;<sub>2</sub> (the value of <i>L</i> where the probability is 50%), and calculates the probability as <br>
 	<img src="figures/sigma.png" alt="figures/sigma.png" width="174" height="41"/></li>
-	<li><b>UNRESTRICTED</b>: This scheme allows for unrestricted growth (<i>p = 1</i> at all levels). Use with caution.</li>
+	<li><b>UNRESTRICTED</b>: This scheme allows for unrestricted growth (<i>p = 1</i> at all levels).</li>
 </ul>
 
-<figure> 
-	<img src="figures/subs_prob.png" alt="figures/subs_prob.png" width="350" border="0"/>
-	<figcaption><i>Figure 4: Level based probability for attaching fragments.</i></figcaption>
-</figure>
+<p>The <b>crowding probability</b> is meant to reduce the likeliness of adding incident edges to a vertex that is already using one or more APs rooted on the same source atom that holds the AP for which we are evaluating the substitution probability. Practically, for a free AP (<i>AP<sub>i</sub></i>) we define the <i>crowdedness</i> (<i>C<sub>AP<sub>i</sub></sub></i>) as the number of non-free APs that are rooted on the same source atom holding <i>AP<sub>i</sub></i>.</p>
+<p>For example, we consider vertex 3 in Figure 4 (i.e., the blue square at the center of the figure), and assume that the molecular representation of this vertex consists of a single atom holding four attachment points. To calculate the crowdedness of <i>AP<sub>2</sub></i> (i.e., the yellow circle located below the blue square representing vertex 3) we count the number of APs that i) share the same source atom of <i>AP<sub>2</sub></i>, and ii) are used to form edges with vertexes that are not capping groups. While condition <i>i</i> is satisfied by all four APs of the vertex, only two APs satisfy condition <i>ii</i>. The crowdedness of <i>AP<sub>2</sub></i> is thus <i>C<sub>AP<sub>2</sub></sub> = 2</i>.</p>
+<p>The crowding probability for <i>AP<sub>i</sub></i> is then calculated using the crowdedness <i>C<sub>AP<sub>i</sub></sub></i> according to any of the schemes presented above (<b>EXP_DIFF</b>, <b>TANH</b>, <b>SIGMA</b>, <b>UNRESTRICTED</b>) using <i>C<sub>AP<sub>i</sub></sub></i> in place of <i>L</i>.</p>
 
-<h3 class="western"><a name="Toc40900_1191730726"></a>GA Selection Strategies</h3>
 
-<p>An important aspect of any evolutionary system is that of the
+<h3 class="western"><a name="Toc40900_1191730726"></a>Parents Selection Strategies</h3>
+
+<p>An important aspect of any evolutionary algorithm is that of the
 selection of the best set of
 individuals (chromosomes) for the next generation. It is also
 essential to maintain enough diversity in the genetic material so
@@ -617,72 +471,83 @@ evaluations (generally equal to the number of processors available)
 submitted for parallel execution. The first such scheme (SCH-1) uses
 a serial batch processing scheme wherein, the subsequent batches can
 only be submitted on completion of the previous. This implies that
-while some jobs may be completed sooner, the program will still wait
-for the other submitted tasks to complete.</p>
+while some jobs may be completed sooner than others, the program will still wait
+for the other submitted tasks to complete before submitting another batch.</p>
 <p>To remove this waiting time, the second scheme (SCH-2) enables
 continuous submission so that new jobs may be launched whenever free
-CPUs are available. Notably, a side effect of this scheme is that results from
-a long running calculation, for e.g. started in <code>Gen01</code>, may only be
-available in <code>Gen20</code>. In such cases, the evaluated molecule will become
-part of the population only in generation 20. The fixed generational
+threads are available. Notably, a side effect of this scheme is that results from
+a long running calculation, for e.g. started in <code>Generation #1</code>, may only become
+available in <code>Generation #20</code>. In such cases, the evaluated molecule will become
+part of the population only in generation #20. The fixed generational
 behavior of the GA is subsequently lost.</p>
 
-<h3 class="western"><a name="Toc17842_799972446"></a>DenoptimGA Input</h3>
-
-<p>Input to DenoptimGA is in the
-form of a text file containing one input parameter per each line. The
+<h3 class="western"><a name="Toc17842_799972446"></a>GA Run Input</h3>
+<p>A GA run can be performed either by defining the input in the GUI and running the experiment from the gui, or by issuing this command:
+<pre class="bash"><code>denoptim -r GA input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text file collecting the configuration parameters for the GA program. Such file can have any name and contains one input parameter per line. The
 <code>#</code> character is used to denote a
 comment and lines starting with this character are not processed.
 Each input parameter is specified by means of a keyword.
-The complete list of keywords is available in the <a href="#Toc35546_1191730726">Keywords</a> section. Examples of input files can be found in the test folder.</p>
+The complete list of keywords is available in the <a href="#Toc35546_1191730726">Keywords</a> section. Examples of input files can be found in the test folder. Note that <code>input_parameters_file</code> file can be generated with the GUI from "New Evolutionary De Novo Design" button.</p>
 
-<h3 class="western"><a name="Toc16845_799972446"></a>DenoptimGA Output</h3>
+<h3 class="western"><a name="Toc16845_799972446"></a>GA Run Output</h3>
 
 <p>The program outputs a number of files during its execution. At the
 beginning of the execution, the program creates a directory
-<code>RUNDDMMYYYYHHMMSS</code> and a log file <code>RUNDDMMYYYYHHMMSS.log</code>
-that are named according to the date (<code>DDMMYYYY</code>)
-and time (<code>HHMMSS</code>). All files generated by DENOPTIN associated with the current run are
-stored in this folder. Instead, files managed by the fitness provider
-script are not controlled by DenoptimGA and can thus be placed 
+<code>RUNYYYYMMDDHHMMSS</code> and a log file <code>RUNYYYYMMDDHHMMSS.log</code>
+that are named according to the date (<code>YYYYMMDD</code>)
+and time (<code>HHMMSS</code>). All relevant files generated by DENOPTIN associated with the current run are
+stored in this folder. Instead, files managed by external fitness provider
+script are not directly used by the GA runner code and can thus be placed 
 anywhere. Files pertaining to a specific generation are stored in
-sub-folders <code>RUNDDMMYYYYHHMMSS/Gen#</code> (where <code>#</code> is the generation number), while the final results of an evolutionary
-experiment are collected in sub-folder <code>RUNDDMMYYYYHHMMSS/Final</code> (see Figure 5).</p>
+sub-folders <code>RUNYYYYMMDDHHMMSS/Gen#</code> (where <code>#</code> is the generation number), while the final results of an evolutionary
+experiment are collected in sub-folder <code>RUNYYYYMMDDHHMMSS/Final</code> (see Figure 5).</p>
 
 <figure> 
 	<img src="figures/ga_folders.png" alt="figures/ga_folders.png" width="500" border="0"/>
-	<figcaption><i>Figure 5: Directory structure from a DenoptimGA run.</i></figcaption>
+	<figcaption><i>Figure 5: Directory structure resulting from a GA run.</i></figcaption>
 </figure>
 
 <p>Once a generation is completed, the software creates a summary of the current population. For
 instance, the summary for generation <code>N</code>,
-where <code>N</code> is an integer number, is available as a TXT file (<code>GenN/GenN.txt</code>)
-or HTML (<code>GenN/GenN.html</code>).</p>
+where <code>N</code> is an integer number, is available as a TXT file (<code>GenN/GenN.txt</code>).</p>
+<p>The output from an ongoing or completes GA experiment can be inspected with the GUI:
+<pre class="bash"><code>denoptim /path/to/RUNYYYYMMDDHHMMSS</code></pre>
+</p>
+
+<h3 class="western"><a name="Toc17843_799972446"></a>Interacting with Ongoing GA Runs</h3>
+
+<p>During a GA run the user often desires to intervene with actions altering the course of the experiment. The GARunner runs a command listener that checks to instructions deposited in a dedicated location of the file system. Depending on the instruction found, DENOPTIM will try to perform the corresponding tasks as soon as compatible with the ongoing algorithm. Once an instruction has been found and interpreted by DENOPTIM (this event is reported in the log file), it cannot be undone/overwritten, even if it is still to be performed.</p>
+<p>The user can formulate instruction in the form of properly formatted ascii files (i.e., an <i>intructions_file</i>) that are deposited under the <code>RUNYYYYMMDDHHMMSS/interface</code> folder, i.e., a file-system location that is specific for a single GA run. The <i>intructions_file</i> has effects only on the specific GA run that generated the <code>RUNYYYYMMDDHHMMSS</code> folder.</p>
+<p>The <i>intructions_file</i> is a text file. The name of any such file is irrelevant: any file will be read irrespectively of its name. Each <i>intructions_file</i> is red line-by-line: each line can be arbitrarily long and will be interpreted as a single instruction. Each line begins with a keyword that defines the kind of instruction. The keyword is separated from the rest of the line by a blank space. After the blank space a variable number of arguments can be given depending on the specific instruction (see below). Currently the following instructions can be given to Denoptim:
+<ul>
+	<li>Terminate the GA experiment. Keyword: <code>STOP_GA</code>; Arguments: no further arguments required. Just type the <code>STOP_GA</code> keyword.</li>
+	<li>Remove one or more candidate from the current population. Keyword <code>REMOVE_CANDIDATE</code>, Arguments: space-separated list of candidate names (e.g., <code>REMOVE_CANDIDATE M00000028 M00000031</code> asks to remove both candidates from the population, if they are still in the population).</li>
+	<li>Evaluate one or more manually generated candidates and possibly include them into the population. Keyword <code>ADD_CANDIDATE</code>, Arguments: space-separated list of pathnames to files defining the candidate to be added (e.g., <code>ADD_CANDIDATE /tmp/candidate_1.sdf /tmp/candidate_2.sdf</code>)</li>
+</ul></p>
+
 
 <h2 class="western"><a name="Toc14852_799972446"></a>FragSpaceExplorer</h2>
 
-<p>FragSpaceExplorer 
-performs systematic exploration of chemical spaces. The tool can be
-used to visit all the combination of fragments that can be obtained
-from a given starting point (i.e., one or more graphs) and a defined
-fragment space, i.e., an ensemble of fragments, connection rules and
+<p>FragSpaceExplorer performs systematic exploration of the fragment space, or, more appropriately, of the space of graph building blocks - BB Space). The tool can be
+used to visit all the combination of building blocks that can be obtained
+from a given starting point (i.e., one or more graphs) and a defined BB Space, i.e., an ensemble of building blocks, connection rules and
 constraints. FragSpaceExplorer can be used for combinatorial
-approaches, where a number of alternative molecules need to be
+approaches, where a number of alternative chemical entities need to be
 generated and evaluated, and also to enumerate entities or just to
-appreciate the characteristics of a designed fragment space. For
-instance, you may want to know how many acceptable chemical entities
-are encoded in your fragment space, or the amount of redundancy in
-the fragment space (i.e., number of different graphs that encode the
+appreciate the characteristics of a designed BB Space. For
+instance, one may want to know how many acceptable chemical entities
+are encoded in a BB Space one has configured, or the amount of redundancy in
+such space (i.e., number of different graphs that encode the
 same chemical entity).</p>
 <p>A set of initial graphs (from now on referred as to the roots) can be
 given as input or build from a library of scaffolds.
 FragSpaceExplorer iterates over all roots and all the combination of
-fragments (including fragments, capping groups, if any, and the
+building blocks: vertexes of any type, including molecular fragments, capping groups, if any, and the
 “empty fragment”, which represents the possibility of leaving the
-AP unused if permitted) that can be appended to the set of free
-attachment points of each root graph. Only one fragment is appended
-on each attachment point, thus each root is coated by fragments
-layer-by-layer. The graphs generated by adding N layers of fragments
+AP unused if permitted. Only one vertex is appended
+on each attachment point, thus each root is coated by vertexes
+layer-by-layer. The graphs generated by adding N layers of vertexes
 belong to the L<sub>N-1</sub> and are used as roots to create the graphs of
 L<sub>N</sub> (Figure 6).</p>
 
@@ -695,68 +560,142 @@ L<sub>N</sub> (Figure 6).</p>
 <p>The exploration terminates with the exhaustion of the combinatorial space
 or with the completion of the maximum allowed level set by the user
 (see <a href="#Toc35546_1191730726">Keywords</a>).</p>
-<p>All graphs are stored as serialized DENOPTIMGraphs (i.e., binary file).
-Graphs that are complete (i.e., no capping needed) and acceptable
+<p>All graphs are complete (i.e., no capping groups needed, no forbidden free AP found) and acceptable
 (i.e., respecting all constraints imposed by the user; for instance
 max. number of heavy atoms, max. molecular weight, etc.) can be sent
 to a fitness evaluation task performed by an internal or external fitness provider. For
 example, the external subtask may include 3D model construction and
-property evaluation, or calculation of a fitness. 
-</p>
+property evaluation, or calculation of a fitness. Such fitness is recorded for each candidate, but is not used to guide the
+combinatorial search in any way.</p>
 
 <h3 class="western"><a name="Toc17844_799972446"></a>FragSpaceExplorer Input</h3>
-
-<p>FragSpaceExplorer accept a single argument that must be the pathname of a text
-parameters file. Possible keyword are listed in the <a href="#Toc35546_1191730726">Keywords</a> section. The only requirement is a <a href="#Toc40912_1191730726">Fragment space definition</a>.</p>
+<p>A FragSpaceExplorer run or FSE run) can be performed either by defining the input in the GUI and running the experiment from the gui, or by issuing this command:
+<pre class="bash"><code>denoptim -r FSE input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text file collecting the configuration parameters for the FragSpaceExplorer program. In particular, the only required input is the <a href="#Toc40912_1191730726">definition of the BB Space</a>. The <code>input_parameters_file</code> file can have any name, and contains one input parameter per line. The <code>#</code> character is used to denote a
+comment and lines starting with this character are not processed.
+Each input parameter is specified by means of a keyword.
+The complete list of keywords is available in the <a href="#Toc35546_1191730726">Keywords</a> section. Examples of input files can be found in the test folder. Note that <code>input_parameters_file</code> file can be generated with the GUI from "New Virtual Screening" button.</p>
 
 <h3 class="western"><a name="Toc17846_799972446"></a>FragSpaceExplorer Output</h3>
 <p>The output generated by FragSpaceExplorer is structured as the following
 folder tree:</p>
 <ul>
-	<li><code>FSEDDMMYYYYHHMMSS.log</code> (log file)</li>
-	<li><code>FSEDDMMYYYYHHMMSS.chk</code> (checkpoint file)</li>
-	<li><code>FSEDDMMYYYYHHMMSS</code>
+	<li><code>FSEYYYYMMDDHHMMSS.log</code> (log file)</li>
+	<li><code>FSEYYYYMMDDHHMMSS.chk</code> (checkpoint file)</li>
+	<li><code>FSEYYYYMMDDHHMMSS</code>
 	<ul>
 		<li><code>FSE-Level_-1</code>
 		<ul>
 			<li><code>FSE-Level_-1.txt</code> list of generated graphs as simplified (human readable) strings.</li>
-			<li><code>dg_1.ser</code> serialized (binary) DENOPTIMGraph representation of chemical entity with graphID=1</li>
-			<li><code>dg_2.ser</code> serialized (binary) DENOPTIMGraph representation of chemical entity with graphID=2</li> 
+			<li><code>dg_1.json</code> serialized graph representation of chemical entity with graphID=1</li>
+			<li><code>dg_2.json</code> serialized graph representation of chemical entity with graphID=2</li> 
 			<li>&hellip;</li>
 		</ul></li>
 		<li>&hellip; other <code>FSE-Level-</code> folders</li>
 	</ul></li>
 </ul>
-
+<p>The output from an ongoing or completes FSE experiment can be inspected with the GUI:
+<pre class="bash"><code>denoptim /path/to/FSEYYYYMMDDHHMMSS</code></pre>
 </p>
-<p>The binary files can be converted to a human readable format (i.e., SDF)
-with the utility tool SerConverter (see DENOPTIM's <a href="../src/misc/SerConverter/">SerConverter</a>).</p>
 
 <h3 class="western"><a name="Toc5490_1476255988"></a>Restart FragSpaceExplorer from Checkpoint file</h3>
-<p>FragSpaceExplorer can also be restarted from checkpoint file. 
-A checkpoint file is a binary file
-collecting the information about the latest stored graph
-corresponding to a point where all previously submitted asynchronous
-subprocesses were properly terminated. The checkpoint file is
-recorded with an interval that can be adjusted by the user (by
-default every N graphs, where N=100; see <a href="#Toc35546_1191730726">Keywords</a> section). In an
-event of an abrupt termination, the checkpoint file allows to restart
-the exploration from the point recorded in the file.
-FragSpaceExplorer reports proper informations as to where in the
-combinatorial space (i.e., root, level and fragment combination ID)
-the exploration is restarted. Calculation that were running when the
+<p>FragSpaceExplorer can be very long, so a checkpoint file is dumped at regular time intervals (by
+default every N graphs, where N=100; see <a href="#Toc35546_1191730726">Keywords</a> section) to keep track of where the exploration has arrived and, in case of abrupt termination of the execution, restart the FSE experiment from the checkpoint file. 
+Calculation that were running when the
 termination occurred or that were submitted after the generation of
 the checkpoint file are considered to be lost and will be
-re-submitted on restart. Therefore, to avoid duplicates the files related to those
-“lost” calculations should be collected and isolated. The binary
-checkpoint file can be converted into a readable version with 
-DENOPTIM's <a href="../src/misc/CheckpointReader/">ChechpointReader</a>.</p>
+re-submitted upon restart of the FSE run. Therefore, to avoid duplicates the files related to those
+“lost” calculations should be collected and isolated.</p>
+
+
+<h2 class="western"><a name="Toc9999_2"></a>Graph Editor</h2>
+<p>Graph Editor is a program for editing graphs from the command line. This allows embedding a graph edit task in any workflow external to denoptim. For example, in the fitness evaluation workflow of an external provider.</p>
+<p>The graph editor can be run with this command:
+<pre class="bash"><code>denoptim -r GE input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">keywords</a> providing all input parameters. Among these settings there is a text-based definition of the graph editing task. See <a href="#Toc9999_3">Graph Editing Task Files</a>.</p>
+
+
+<h2 class="western"><a name="Toc9999_4"></a>Genetic Operator</h2>
+<p>This is a program for performing genetic operations from the command line.</p>
+<p>This program can be run with this command:
+<pre class="bash"><code>denoptim -r GO input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+
+
+<h2 class="western"><a name="Toc9999_5"></a>Fitness Provider Runner</h2>
+<p>This is a program to lauch a fitness provider (internal or external) in the same way as done from within GA or FSE runs, but straight from the command line-</p>
+<p>This program can be run with this command:
+<pre class="bash"><code>denoptim -r FIT input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+
+
+<h2 class="western"><a name="Toc9999_6"></a>3D Molecular Models Builder</h2>
+<p>This is a program for converting graph representation into a 3D chemical representation by exploring the 3D features of building blocks and, if needed, perform a ring-closing conformational search (see <a href="https://doi.org/10.1021/acs.jcim.5b00424"><i>J. Chem. Inf. Model.</i> <b>2015</b>, 55, 9 1844-1856</a>).</p>
+<p>This program can be run with this command:
+<pre class="bash"><code>denoptim -r 3DB input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+<p><b>WARNING:</b> This program requires <a href="https://dasher.wustl.edu/tinker/">Tinker Molecular Modeling software</a> to be installed on the system. The user is responsible for installing Tinker in accordance with its license terms. Furthermore, the ring-closing conformational search requires a customized version of Tinker. Contact <a href="mailto:denoptim.project@gmail.com">denoptim.project@gmail.com</a> for instructions on how to modify Tinker and use the customized version in accordance with Tinker license's terms.</p>
+
+
+<h2 class="western"><a name="Toc9999_7"></a>Graph Isomorphism Analyzer</h2>
+<p>This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism". 
+ "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of  
+ <a href="https://mathworld.wolfram.com/IsomorphicGraphs.html">
+ graph isomorphism</a>
+ that differs from the most common meaning of isomorphism in graph theory.
+ In general, graph are considered undirected when evaluating
+ DENOPTIM-isomorphism. 
+ Next, since a graph is effectively 
+ a spanning tree (ST_i={{vertexes}, {acyclic edges}}) 
+ with a set of fundamental cycles (FC_i={C_1, C_2,...C_n}), 
+ any graph G={ST_i,FC_i} that contains one or more cycles 
+ can be represented in multiple
+ ways, G={ST_j,FC_j} or G={ST_k,FC_k}, that differ by the position of the
+ chord/s and by the corresponding pair of ring-closing vertexes between
+ which each chord is defined.
+ The DENOPTIM-isomorphism for two graphs G1 and G2 
+ is given by the common graph theory isomorphism between 
+ two undirected graphs U1 and U2 build respectively from G1 and G2.</p>
+ Finally,
+ <ul>
+ <li>vertexes are compared excluding their vertex ID,</li>
+ <li>edges are considered undirected and compared considering the 
+ bond type they declare and the 
+ identity of the attachment points connected thereby. This latter point
+ has an important implication: two apparently equal graphs (same vertexes
+ that are connected to each other forming the same vertex-chains) can be 
+ non-isomorphic when the APs used to connect two vertexes are not the
+ same. Chemically, this means the stereochemistry around one or both
+ vertexes, is different in the two graphs. Therefore two otherwise 
+ equal-looking graphs can very well be, de facto, not DENOPTIM-isomorphic.</li>
+ </ul>
+ <p>
+ This method makes use of the Vento-Foggia VF2 algorithm (see 
+ <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804">DOI:10.1109/TPAMI.2004.75</a>)
+ as implemented in <a href="https://jgrapht.org/">JGraphT</a>.</p>
+ <p><b>WARNING:</b> Detection of isomorphism can be very slow for pathological cases and
+ for graphs with large symmetric systems!
+</p>
+<!--
+	NB: the above text is very very similar (differences are meant to exclude javadoc links) from the DGraph.isIsomorphicTo() 
+	Please, keep in sync.
+	-->
+<p>The Graph Isomorphism Analyzer program can be run with this command:
+<pre class="bash"><code>denoptim -r GI input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+
+<h2 class="western"><a name="Toc9999_8"></a>Graph List Comparator</h2>
+<p>This program compares lists of graphs seeking for "DENOPTIM-isomorphic" graphs (see <a href="Toc9999_7">here</a> for the definition of "DENOPTIM-isomorphic").</p>
+<p>This program can be run with this command:
+<pre class="bash"><code>denoptim -r CGL input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+
 
 <hr>
 
 <h1 class="western"><a name="Toc35546_1191730726"></a>Keywords</h1>
 
-<p>When preparing an input file remember that:</p>
+<p>When preparing an input file remember these underlying conventions:</p>
 <ul>
 	<li>keyword can be accompanied by:
 	<ul>
@@ -766,20 +705,21 @@ DENOPTIM's <a href="../src/misc/CheckpointReader/">ChechpointReader</a>.</p>
 	</ul></li>
 	<li>keywords are case insensitive, but values are case sensitive;</li>
 	<li>the order of keywords in the file is irrelevant;</li>
-	<li>unless otherwise specified, only the last occurrence of a
+	<li>unless otherwise specified (some keyword do exploit repetition as a way to provide additional input), only the last occurrence of a
 	keyword define the used value of the corresponding parameter.</li>
 </ul>
 
 <p align="justify">The following tables list all the keywords grouped
-according to the main functionality/object affected by the use of a
+according to the main functionality affected by the use of a
 keyword. Unless otherwise specified, the use of the keywords is
 optional as most parameters have a default value. Since, the settings
 are reported in the beginning of the log file, the default value of a
 specific keyword can be found in the log file of a run performed
 without providing that specific keyword in the input file.</p>
 
+
 <br>
-<h3 class="western"><a name="Toc40912_1191730726"></a>Fragment space definition</h3>
+<h3 class="western"><a name="Toc40912_1191730726"></a>Definition of the Space of Graph Building Blocks (BB Space)</h3>
 <table width="100%">
 	<col width="102*"/>
 
@@ -882,7 +822,7 @@ without providing that specific keyword in the input file.</p>
 			(string), and the imposed value of the symmetric substitution
 			probability (double 0.0-1.0). The constraints defined by this
 			keyword overwrite the symmetric substitution probability defined
-			by DenoptimGA, and the requirement of the <code>FS-EnforceSymmetry</code> keyword.</p>
+			by GA parameters, and the requirement of the <code>FS-EnforceSymmetry</code> keyword.</p>
 			<p>Multiple constraints can be defined one by one. 
 			</p>
 			<p><br/>
@@ -898,7 +838,7 @@ without providing that specific keyword in the input file.</p>
 </table>
 
 <br>
-<h3 class="western"><a name="Toc40914_1191730726"></a>Ring closing machinery</h3>
+<h3 class="western"><a name="Toc40914_1191730726"></a>Ring-Closing machinery</h3>
 <table width="100%" cellpadding="4" cellspacing="0" style="border-collapse: collapse">
 	<col width="118*"/>
 
@@ -921,15 +861,6 @@ without providing that specific keyword in the input file.</p>
 			evaluated for all graph containing ring closing vertices. Also
 			requires chemical structures to be generated accordingly. No value
 			needed.</p>
-		</td>
-	</tr>
-	<tr valign="middle">
-		<td width="46%" style="background: #ffffff;  "><p><code>RC-RCPotentialType</code></p>
-		</td>
-		<td width="54%" style="background: #ffffff;  "><p>Specifies the type of ring closing potential to be used for
-			generation of ring closing conformations with DenoptimCG and
-			Tinker. Accepted values are “BONDOVERLAP” or
-			“BONDCOMPLEMENTARITY”</p>
 		</td>
 	</tr>
 	<tr valign="middle">
@@ -978,9 +909,9 @@ without providing that specific keyword in the input file.</p>
 		</td>
 		<td width="54%"><p>Defined the closability condition's evaluation mode:</p>
 			<ol start="0">
-				<li><p>only constitution of candidate ring,</p>
-				<li><p>only closability of 3D chain,</p>
-				<li><p>both 0 and 1.</p>
+				<li>only constitution of candidate ring,</li>
+				<li>only closability of 3D chain,</li>
+				<li>both 0 and 1.</li>
 			</ol>
 		</td>
 	</tr>
@@ -1059,13 +990,6 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="46%"><p><code>RC-LinearityLimit</code></p>
-		</td>
-		<td width="54%"><p>Specifies the bond angle above which the triplet of atoms is
-			considered linear.</p>
-		</td>
-	</tr>
-	<tr valign="middle">
 		<td width="46%"><p><code>RC-ExhaustiveConfSearch</code></p>
 		</td>
 		<td width="54%"><p>Requires the search for closable conformations to explore the
@@ -1121,13 +1045,13 @@ without providing that specific keyword in the input file.</p>
 	<tr valign="middle">
 		<td width="46%"><p><code>RC-ExtraDistanceToleranceFactor</code></p>
 		</td>
-		<td width="54%"><p>Specifies the factor multiplying the tolerance for inter atomic distances when evaluating the closability of a chain by a discrete (vs. continuous) exploration of torsional space.</p>
+		<td width="54%"><p>Specifies the factor multiplying the tolerance for inter-atomic distances when evaluating the closability of a chain by a discrete (vs. continuous) exploration of torsional space.</p>
 		</td>
 	</tr>
 </table>
 
 <br>
-<h3 class="western"><a name="Toc40916_1191730726"></a>DenoptimGA</h3>
+<h3 class="western"><a name="Toc40916_1191730726"></a>GA Runner</h3>
 <table width="100%">
 	<col width="102*"/>
 
@@ -1151,9 +1075,15 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-PrintLevel</code></p>
+		<td width="40%"><p><code>GA-MonitorDumpStep</code></p>
 		</td>
-		<td width="60%"><p>Specifies the amount of log produced.</p>
+		<td width="60%"><p>The monitor dump is a record of how many attempted and failed operations are performed to produce new candidate population members. The record is printed every N attempts to build a new candidate, and N can be specified by <code>GA-MonitorDumpStep</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-MonitorFile</code></p>
+		</td>
+		<td width="60%"><p>Specifies the pathname where to write monitor dumps and summaries. Dumps are snapshots taken with a frequency controlled by <code>GA-MonitorDumpStep</code>, while summaries are printed at the end of every generation.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
@@ -1211,6 +1141,13 @@ without providing that specific keyword in the input file.</p>
 			</code>keyword.</code></p>
 		</td>
 	</tr>
+		<tr valign="middle">
+		<td width="40%"><p><code>GA-MaxGeneticOpsAttempts</code></p>
+		</td>
+		<td width="60%"><p>Controls the maximum number
+			of attempts to perform a genetic operation such as crossover or mutation.</p>
+		</td>
+	</tr>
 	<tr valign="middle">
 		<td width="40%"><p><code>GA-GrowthProbScheme</code></p>
 		</td>
@@ -1223,28 +1160,89 @@ without providing that specific keyword in the input file.</p>
 			Genetic Operations.</p>
 		</td>
 	</tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-LevelGrowthMultiplier</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of the
+                    factor &lambda; used in graph level-based growth
+                    probability schemes <code>EXP_DIFF</code>, and
+                    <code>TANH</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-LevelGrowthSigmaSteepness</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>1 used in graph level-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-LevelGrowthSigmaMiddle</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>2 used in graph level-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-MolGrowthMultiplier</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of the
+                    factor &lambda; used in graph molecular size-based growth
+                    probability schemes <code>EXP_DIFF</code>, and
+                    <code>TANH</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-MolGrowthSigmaSteepness</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>1 used in graph molecular size-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
+    <tr valign="middle">
+            <td width="40%"><p><code>GA-MolGrowthSigmaMiddle</code></p>
+            </td>
+            <td width="60%"><p>Specifies the value of
+                    parameter &sigma;<sub></sub>2 used in graph molecular size-based growth
+                    probability scheme <code>SIGMA</code>.</p>
+            </td>
+    </tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-GrowthMultiplier</code></p>
+		<td width="40%"><p><code>GA-CrowdProbScheme</code></p>
+		</td>
+		<td width="60%"><p>Specifies the crowding
+			probability scheme. Acceptable values are: 
+			<code>EXP_DIFF</code>,
+			<code>TANH</code>,
+			<code>SIGMA</code>,
+			and <code>UNRESTRICTED</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-CrowdMultiplier</code></p>
 		</td>
 		<td width="60%"><p>Specifies the value of the
-			factor &lambda; used in growth
+			factor &lambda; used in crowding
 			probability schemes <code>EXP_DIFF</code>, and
 			<code>TANH</code>.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-GrowthSigmaSteepness</code></p>
+		<td width="40%"><p><code>GA-CrowdSigmaSteepness</code></p>
 		</td>
 		<td width="60%"><p>Specifies the value of
-			parameter &sigma;<sub></sub>1 used in growth
+			parameter &sigma;<sub></sub>1 used in crowding
 			probability scheme <code>SIGMA</code>.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-GrowthSigmaMiddle</code></p>
+		<td width="40%"><p><code>GA-CrowdSigmaMiddle</code></p>
 		</td>
 		<td width="60%"><p>Specifies the value of
-			parameter &sigma;<sub></sub>2 used in growth
+			parameter &sigma;<sub></sub>2 used in crowding
 			probability scheme <code>SIGMA</code>.</p>
 		</td>
 	</tr>
@@ -1258,17 +1256,30 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-CrossoverProbability</code></p>
+		<td width="40%"><p><code>GA-CrossoverWeight</code></p>
 		</td>
-		<td width="60%"><p>Specifies the probability
-			(0.0-1.0) at which crossover is performed.</code></p>
+		<td width="60%"><p>Specifies the relative weight of crossover when generating new candidate population members.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>GA-MutationProbability</code></p>
+		<td width="40%"><p><code>GA-MutationWeight</code></p>
 		</td>
-		<td width="60%"><p>Specifies the probability
-			(0.0-1.0) at which mutation is performed.</code></p>
+		<td width="60%"><p>Specifies the relative weight of mutation when generating new candidate population members.</p>
+		</td>
+	</tr>
+        <tr valign="middle">
+                <td width="40%"><p><code>GA-MultiSiteMutationWeights</code></p>
+                </td>
+<td width="60%"><p>Specifies the relative weight of multi-site mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutates again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the addition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.</p>
+<p>Provide values in a comma- or space-separated list. The first value is the weight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,
+<pre>GA-MultiSiteMutationWeights=10, 1</pre>
+enables up to two-sites mutation and with a weight that is 1/10 of the single-site mutation.</p>
+                </td>
+        </tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-ConstructionWeight</code></p>
+		</td>
+		<td width="60%"><p>Specifies the relative weight of construction from scratch when generating new candidate population members.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
@@ -1276,7 +1287,7 @@ without providing that specific keyword in the input file.</p>
 		</td>
 		<td width="60%"><p>Specifies the unspecific symmetric substitution probability.
 			Attachment point-class specific values are defined in the
-			definition of the fragment space.</p>
+			definition of the space of graph building blocks.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
@@ -1286,6 +1297,25 @@ without providing that specific keyword in the input file.</p>
 			for the elitist scheme (survival of the fittest), use <code>NONE</code>
 			for no replacement (all candidates become member of the
 			population, which keeps growing).</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-KeepNewRingSystemVertexes</code></p>
+		</td>
+		<td width="60%"><p>Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) as templates in the library of general-purpose building blocks. No new template will include a scaffold vertex or be
+			used as scaffold. See <code>GA-KeepNewRingSystemScaffolds</code> to enable the latter possibilities.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-KeepNewRingSystemScaffolds</code></p>
+		</td>
+		<td width="60%"><p>Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) that contain any scaffold vertex as template scaffolds.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GA-KeepNewRingSystemFitnessTrsh</code></p>
+		</td>
+		<td width="60%"><p>Specified a percentage of the current population fitness range in the form of %/100 double (i.e., a value between 0 and 1). This value represents a threshold limiting the possibility to store a newly encountered ring system only to those candidate items having a fitness that in in the best fraction of the instantaneous population range. For example, giving a value of 0.10 will make denoptim store new ring systems only from newly encountered candidates that are among the best 10% of the population in the moment each of these candidates is considered as a potential population member.</p>
 		</td>
 	</tr>
 	<tr >
@@ -1347,7 +1377,7 @@ without providing that specific keyword in the input file.</p>
 </table>
 
 <br>
-<h3 class="western"><a name="Toc40918_1191730726"></a>DenoptimCG</h3>
+<h3 class="western"><a name="Toc40918_1191730726"></a>3D Molecular Models Builder</h3>
 <table width="100%" cellpadding="4" cellspacing="0" style="border-collapse: collapse">
 	<col width="102*"/>
 
@@ -1364,28 +1394,28 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-WorkDir</code></p>
+		<td width="40%"><p><code>3DB-WorkDir</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of the directory where files will be
 			created. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-InpSDF</code></p>
+		<td width="40%"><p><code>3DB-InpSDF</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname to the input SDF file that must contain
-			DENOPTIMGraph representation of the chemical object. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
+			graph representation of the chemical object. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-OutSDF</code></p>
+		<td width="40%"><p><code>3DB-OutSDF</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of the output SDF file that will contain
 			the generated conformation. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-KeepDummyAtoms</code></p>
+		<td width="40%"><p><code>3DB-KeepDummyAtoms</code></p>
 		</td>
 		<td width="60%"><p>Dummy atoms are used to handle linearities and multi-hapto bonds.
 			By default all dummy atoms are removed before returning the final
@@ -1394,7 +1424,7 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-Verbosity</code></p>
+		<td width="40%"><p><code>3DB-Verbosity</code></p>
 		</td>
 		<td width="60%"><p>Specifies the verbosity level.</p>
 		</td>
@@ -1404,7 +1434,7 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-ToolPSSROT</code></p>
+		<td width="40%"><p><code>3DB-ToolPSSROT</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of Tinker’s <code>pssrot</code>
 			executable (see <a href="https://dasher.wustl.edu/tinker/">https://dasher.wustl.edu/tinker/</a>).
@@ -1412,7 +1442,7 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-ToolXYZINT</code></p>
+		<td width="40%"><p><code>3DB-ToolXYZINT</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of Tinker’s <code>xyzint</code>
 			executable (see <a href="https://dasher.wustl.edu/tinker/">https://dasher.wustl.edu/tinker/</a>).
@@ -1420,7 +1450,7 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-ToolINTXYZ</code></p>
+		<td width="40%"><p><code>3DB-ToolINTXYZ</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of Tinker’s <code>intxyz</code>
 			executable (see <a href="https://dasher.wustl.edu/tinker/">https://dasher.wustl.edu/tinker/</a>).
@@ -1428,40 +1458,40 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-ForceFieldFile</code></p>
+		<td width="40%"><p><code>3DB-ForceFieldFile</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of the file that
 			defines Tinker’s force field parameters (see
 			<a href="https://dasher.wustl.edu/tinker/">https://dasher.wustl.edu/tinker/</a>).
-			An example is available at src/DenoptimCG/data/uff_vdw.prm 
+			An example is available at src/main/resources/data/uff_vdw.prm 
 			<font color="#ff3333"><b>[REQUIRED]</b></font></p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-KeyFile</code></p>
+		<td width="40%"><p><code>3DB-KeyFile</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of the file with
 			Tinker’s keywords (see <a href="https://dasher.wustl.edu/tinker/">https://dasher.wustl.edu/tinker/</a>).
-			An example is available at src/DenoptimCG/data/build_uff.key 
+			An example is available at src/main/resources/data/build_uff.key 
 			<font color="#ff3333"><b>[REQUIRED]</b></font></p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-RCKeyFile</code></p>
+		<td width="40%"><p><code>3DB-RCKeyFile</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of	the Tinker’s keywords used in ring-closing conformational
 			searches (see <a href="https://doi.org/10.1021/acs.jcim.5b00424"><i>J. Chem. Inf. Model.</i> <b>2015</b>, 55, 9 1844-1856</a>)</p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-PSSROTParams</code></p>
+		<td width="40%"><p><code>3DB-PSSROTParams</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of a text file with the command line arguments for standard conformational search with Tinker’s
-			<code>pssrot</code>. An	example is available at <code>src/DenoptimCG/data/submit_pssrot</code> <font color="#ff3333"><b>[REQUIRED]</b></font></p>
+			<code>pssrot</code>. An	example is available at <code>src/main/resources/data/submit_pssrot</code> <font color="#ff3333"><b>[REQUIRED]</b></font></p>
 		</td>
 	</tr>
 	<tr valign="middle">
-		<td width="40%"><p><code>CG-RCPSSROTParams</code></p>
+		<td width="40%"><p><code>3DB-RCPSSROTParams</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of a text file with the command line arguments for ring-closing conformational search with Tinker’s
 			<code>pssrot</code> (see <a href="https://doi.org/10.1021/acs.jcim.5b00424"><i>J. Chem. Inf. Model.</i> <b>2015</b>, 55, 9 1844-1856</a>).</p>
@@ -1606,7 +1636,7 @@ without providing that specific keyword in the input file.</p>
 		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
 		</td>
 	</tr>
-		<tr>
+	<tr>
 		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
 		</td>
 	</tr>
@@ -1618,10 +1648,10 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
 
-	</tr>
-		<tr>
+	<tr>
 		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Internal Fitness Provider</p>
 		</td>
+	</tr>
 	</tr>
 	</tr>
 		<tr valign="middle">
@@ -1658,77 +1688,298 @@ without providing that specific keyword in the input file.</p>
 		</td>
 		<td width="60%"><p>Specifies the interpreter to use when running the external fitness provider source file.</p>
 		</td>
+	</tr>
 </table>
+
+<br>
+<h3 class="western"><a name="Toc88888_1"></a>Stand-alone Graph Editor</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>  
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-InputGraphs</code></p>
+		</td>
+		<td width="60%"><p>Pathname of a file containing the graphs to edit. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-GraphsEditsFile</code></p>
+		</td>
+		<td width="60%"><p>Pathname of a file defining the graph edit task. See <a href="#Toc9999_3">Graph Editing Task Files</a>. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-OutputGraphs</code></p>
+		</td>
+		<td width="60%"><p>Pathname of a file where to put the edited graphs. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-OutpotGraphsFormat</code></p>
+		</td>
+		<td width="60%"><p>Format of the output. Can be SDF or JSON.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-EnforceSymmetry</code></p>
+		</td>
+		<td width="60%"><p>Use y/yes to enforce the application of symmetry whenever possible.</p>
+		</td>
+	</tr>
+</table>
+
+<!-- //TODO: complete this part!
+<br>
+<h3 class="western"><a name="Toc88888_2"></a>Stand-alone Genetic Operator</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-OP</code></p>
+		</td>
+		<td width="60%"><p>Specifies the type of operation (Mutation or Crossover/Xover)</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-InpFile</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file containing an input graph.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-OutFile</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file where results will be saved.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-MutationTarget</code></p>
+		</td>
+		<td width="60%"><p>Identify the vertex to be mutated by its ID. To identify vertexes nested in templates, a sequence of ID can be used. For example: "1, 2, 3" identifies vertex with ID 3 that is embedded in the template vertex with ID 2,  that is embedded in the template vertex with ID 1.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-</code></p>
+		</td>
+		<td width="60%"><p></p>
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>_____</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>-</code></p>
+		</td>
+		<td width="60%"><p></p>
+		</td>
+	</tr>
+</table>
+-->
+
+<br>
+<h3 class="western"><a name="Toc88888_3"></a>Stand-alone Fitness Runner</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FR-Input</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file containing the graph for which the fitness has to be calculated.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FR-Output</code></p>
+		</td>
+		<td width="60%"><p>Pathname where results will be saved (see <a href="#Toc16853_799972446">Fitness Files</a>)</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FR-ExtractTemplates</code></p>
+		</td>
+		<td width="60%"><p>Add this keyword to request the extraction of template vertex from the result of the fitness evaluation process. This keyword is meant for testing purposes.</p>
+		</td>
+	</tr>
+</table>
+
+
+<br>
+<h3 class="western"><a name="Toc88888_4"></a>Stand-alone Graph Isomorphism Analyzer</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>Isomorphism-inpGraphA</code></p>
+		</td>
+		<td width="60%"><p>Pathname to one of the graph to be considered for the detection of <a href="Toc9999_7">DENOPTIM-isomorphism</a>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>Isomorphism-inpGraphB</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the other of the graph to be considered for the detection of <a href="Toc9999_7">DENOPTIM-isomorphism</a></p>
+		</td>
+	</tr>
+</table>
+
+<h3 class="western"><a name="Toc88888_5"></a>Stand-alone Graph List Comparator</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHLISTS-InputGraphs-A</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file containing the first list of graphs.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHLISTS-InputGraphs-B</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file containing the second list of graphs.</p>
+		</td>
+	</tr>
+	<!-- Not in use yet
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHLISTS-OutputGraphs</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file where resulting graphs will be saved.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHLISTS-OutputGraphsFormat</code></p>
+		</td>
+		<td width="60%"><p>Definition of the format to be use for output graphs.</p>
+		</td>
+	</tr>
+-->
+</table>
+
+<!-- Template for table
+<br>
+<h3 class="western"><a name="Toc88888_"></a>___WHAT?___</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>-</code></p>
+		</td>
+		<td width="60%"><p></p>
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>_____</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>-</code></p>
+		</td>
+		<td width="60%"><p></p>
+		</td>
+	</tr>
+</table>
+-->
+
 
 <hr>
 <h1 class="western"><a name="Toc40920_1191730726"></a>File Formats</h1>
 
-<h3 class="western"><a name="Toc16847_799972446"></a>Molecular Fragments</h3>
+<h3 class="western"><a name="Toc16847_799972446"></a>Vertexes</h3>
+<p>Vertexes can be define in files with two different formats: the <a href="https://en.wikipedia.org/wiki/Chemical_table_file#SDF">SDF</a>, and <a href="https://en.wikipedia.org/wiki/JSON">JSON</a>.</p>
 
-<p>SDF file format is used for
-any type of fragment (i.e., scaffolds, fragments, capping groups).
-The SDF files must include an <code>&lt;ATTACHMENT_POINT&gt;</code>
-tag reported with the following format:</p>
-
+<p>SDF file format are best suited for vertex that contain molecular fragment because they can be opened by any most molecular visualization packages. Still, SDF format can be used any type of vertex.</p>
+<p>The requirement for an the chemical representation contained in an SDF file to be perceived as a vertex is is the presence of associated data (also called tags, fields, or properties) that define the attachment points, i.e., the <code>&lt;ATTACHMENT_POINT&gt;</code> property. The value of this property must reflect the following syntax convention.
+For a single attachment point rooted on an atom (square brackets indicate optional components):
+<pre>
+n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub>[:bt<sub>A</sub>][:x<sub>A</sub>%y<sub>A</sub>%z<sub>A</sub>]
+</pre>
+For multiple attachment points rooted on the same atom (square brackets indicate optional components):
+<pre>
+n<sub>2</sub>#c<sub>B</sub>:sc<sub>B</sub>[:bt<sub>B</sub>][:x<sub>B</sub>%y<sub>B</sub>%z<sub>B</sub>],c<sub>C</sub>:sc<sub>C</sub>[:bt<sub>C</sub>][:x<sub>C</sub>%y<sub>C</sub>%z<sub>C</sub>]</pre>
+where: <ul>
+	<li>n<sub>1</sub> is the 1-based index of the atom/pseudo-atom on which attachment point <i>A</i> is rooted, while n<sub>2</sub> is the 1-based index of the atom/pseudo-atom on which both attachment point <i>B</i> and <i>C</i> are rooted.</li>
+	<li><i>c<sub>i</sub></i> is the first part (i.e., the so-called "rule") of the APClass of attachment point <i>i</i>.</li>
+	<li><i>sc<sub>i</sub></i> is the second part (i.e., the so-called "subclass") of the APClass of attachment point <i>i</i>.</li>
+	<li><i>bt<sub>i</sub></i> defined the bond type of the APClass of attachment point <i>i</i>. Possible values are <code>NONE</code>, <code>SINGLE</code>, <code>DOUBLE</code>, <code>TRIPLE</code>, <code>QUADRUPLE</code>, <code>ANY</code>, and <code>UNDEFINED</code>.</li>
+	<li><i>x<sub>i</sub></i>, <i>y<sub>i</sub></i>, and <i>z<sub>i</sub></i> are Cartesian coordinates defining the "AP vector". For APs rooted on atoms (the source atoms) the AP vector defines the ideal position where the atom that can be connected with the source atom should be placed upon formation of the bond.</li>
+</ul>
+In the SDF file strings pertaining a single source atom are separated by spaces. So the overall result is the following:
 <pre class="file">
 &hellip;
-&gt;&nbsp;&lt;ATTACHMENT_POINT&gt;
-n1:v1 n2:v2
+&gt;&nbsp;&lt;ATTACHMENT_POINTS&gt;
+n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub>:x<sub>A</sub>%y<sub>A</sub>%z<sub>A</sub>&nbsp;n<sub>2</sub>#c<sub>B</sub>:sc<sub>B</sub>:bt<sub>B</sub>:x<sub>B</sub>%y<sub>B</sub>%z<sub>B</sub>,c<sub>C</sub>:sc<sub>C</sub>:bt<sub>C</sub>:x<sub>C</sub>%y<sub>C</sub>%z<sub>C</sub>
 
 &hellip;
 </pre>
 
-<p>where n1, n2,&hellip; are the
-integers (1-to-N) that identify which atoms in the atom list of the
-SDF file hold attachment points, and v1,v2,&hellip; define the number of
-connections available.</p>
-<p>In case of class-based approach also the <code>&lt;CLASS&gt;</code>
-tag must be present in addition to the  <code>&lt;ATTACHMENT_POINT&gt;</code>
-tag. The following syntax is accepted when working with 2D molecular
-representations.</p>
+<p>Considering the optional components, the following alternatives are also recognized and used for APs that do not define bond types (NB: they accept the default bond type, i.e., <code>SINGLE</code>) and/or AP vectors.<ul>
+<li><code>n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub></code></li>
+<li><code>n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub>:x<sub>A</sub>%y<sub>A</sub>%z<sub>A</sub></code></li>
+<li><code>n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub></code> </li>
+</ul>
+</p>
+<p>Additional fields can be present in SDF files saved by DENOPTIM. In particular, DENOPTIM new version always saves the JSON format as one of the properties of the SDF file format.</p>
 
-<pre class="file">
-&hellip;
-&gt;&nbsp;&lt;CLASS&gt;
-n1#c1&nbsp;n2#c2,c3
-
-&gt;&nbsp;&lt;ATTACHMENT_POINT&gt;
-n1:v1&nbsp;n2:v2
-
-&hellip;
-</pre>
-
-<p>Where <i>c1</i>, <i>c2</i>, and <i>c3</i> are
-the attachment point classes of the attachment points located
-respectively on atoms <i>n1</i>, and <i>n2</i>. Note the syntax for the two
-attachment points on atom <i>n2</i>. While the number of open valences
-remains a single number (i.e., <i>v2</i> &gt; 1), multiple AP classes have
-to be reported in the <code>&lt;CLASS&gt;</code> tag.</p>
-
-<p>Instead, when working with 3D molecular representations the syntax includes a set of Cartesian coordinates for each attachment point.</p>
-
-<pre class="file">
-&hellip;
-&gt;&nbsp;&lt;CLASS&gt;
-n1#c1&nbsp;n2#c2:x2%y2%z2,c3:x3%y3%z3
-
-&gt;&nbsp;&lt;ATTACHMENT_POINT&gt;
-n1:v1&nbsp;n2:v2
-
-&hellip;
-</pre>
 
 
 <h3 class="western"><a name="Toc14763_799972446"></a>Compatibility Matrix file</h3>
-<p>The
-compatibility matrix file is a text file that includes blocks of
-information related to the class-based approach:</p>
+<p>The compatibility matrix file is a text file that includes blocks of
+information related to the APClass compatibility rules:</p>
 <ul>
-	<li>the definition of the AP class compatibility matrix (lines
+	<li>the definition of the actual AP class compatibility matrix (lines
 	starting with <code>RCN</code> keyword, comma-separated entries),</li>
-	<li>the AP class-to-bond order conversion key (<code>RBO</code> keyword),</li>
-	<li>the rules to append capping groups (<cose>CAP</cose> keyword),</li>
-	<li>the rules to discharge a graph if an AP of a specific APclass is not
+	<li>the rules to append capping groups (<code>CAP</code> keyword),</li>
+	<li>the rules to discharge a graph if an AP of a specific APClass is not
 	used (<code>DEL</code> keyword).</li>
 </ul>
 
@@ -1744,11 +1995,6 @@ RCN&nbsp;apclass2:0&nbsp;apclass2:1
 # In this example, no fragment will be attached to APs of class apclass2:1 
 RCN apclass2:1 none
 &hellip;
-# CLASS-to-BondOrder conversion
-RBO&nbsp;apclass1&nbsp;1
-RBO&nbsp;apclass2&nbsp;1
-RBO&nbsp;apclass3&nbsp;2
-&hellip;
 # Capping groups
 CAP&nbsp;apclass1:0&nbsp;cap1:0
 CAP&nbsp;apclass1:0&nbsp;cap2:0
@@ -1762,9 +2008,9 @@ DEL&nbsp;apclass1:0
 
 <p>The ring closures (RC) 
 compatibility matrix file specifies the pairs of AP classes that are
-allowed to form ring-closing bonds. Note that, contrarily to the
+allowed to form ring-closing bonds. Note that, contrary to the
 standard compatibility matrix, the RC compatibility matrix is
-symmetric. The syntax is the same as for a standard compatibility
+symmetric. The syntax is the same as for a general-purpose compatibility
 matrix.</p>
 
 <pre class="file">
@@ -1778,25 +2024,24 @@ RCN&nbsp;apclass1:1&nbsp;apclass1:0
 <h3 class="western"><a name="Toc16851_799972446"></a>Initial Population File</h3>
 
 <p>SDF format is used to provide an initial set of fully characterized
-molecules (i.e., initial population). To be properly interpreted by
+candidates (i.e., initial population). To be properly interpreted by
 DENOPTIM this SDF file must include the following tags:</p>
 <ul>
 	<li><code>&lt;FITNESS&gt;</code> tag specifying the numerical fitness value.</li>
 	<li><code>&lt;UID&gt;</code> tag specifying the unique identifier of the chemical entity (often the InChiKey).</li>
-	<li><code>&lt;GraphENC&gt;</code> tag specifying the essential part of the graph representation of the chemical entity.</li>
+	<li><code>&lt;GraphJson&gt;</code> tag specifying the essential part of the graph representation of the chemical entity.</li>
 </ul>
 
 
 <h3 class="western"><a name="Toc10339_2456711212"></a>Candidate Chemical Entity Files</h3>
 
 <p>SDF format file used to
-communicate the definition of any candidate chemical entity (e.g., a
-new candidate molecule in a molecular design run) to external fitness
+communicate the definition of a candidate entity to external fitness
 providers (see <a href="#Toc42056_808352928">Fitness evaluation</a>).</p>
 
-<p>DENOPTIM programs output the 2D/3D structure of the molecule (in SDF format) together with its DENOPTIMGraph representation 
-(tag <code>&lt;GraphENC&gt;</code>) and additional information
-(i.e., SMILES, InChiKey). By default, the Cartesian coordinates reported in these files are those of a three-dimensional tree-like model built by aligning each building block according to the attachment point vectors. The resulting geometry is not refined, and is only meant to facilitate further processing and visual inspection. While such geometry can be used as starting point for further molecular modeling, it should never be used to calculate any property dependent on the molecular geometry. The alignment of the building blocks is skipped when using the <code>FP-No3dTreeModel</code> keyword. In this case, the SDF file will contain Cartesian coordinates of the initial building blocks, and will therefore be characterized by a correct topology but a nonsensically geometrical arrangement of the atoms.</p>
+<p>DENOPTIM programs output a non-optimized 3D-structure of the chemical entity in SDF format together with its graph representation 
+(tag <code>&lt;GraphJson&gt;</code>) and additional information
+(i.e., SMILES, InChiKey, unique identifier). By default, the Cartesian coordinates reported in these files are those of a three-dimensional tree-like model built by aligning each building block according to the attachment point vectors. The resulting geometry is not refined, and is only meant to facilitate further processing and visual inspection. While such geometry can be used as starting point for further molecular modeling, it should never be used to calculate any property dependent on the molecular geometry. The alignment of the building blocks is skipped when using the <code>FP-No3dTreeModel</code> keyword. In this case, the SDF file will contain Cartesian coordinates of the initial building blocks, and will therefore be characterized by a correct topology but a non-sense arrangement of the atoms.</p>
 
 <h3 class="western"><a name="Toc16853_799972446"></a>Fitness Files</h3>
 <p>SDF format files used to store the final results for an evaluated chemical entity and to receive the fitness value from any external fitness provider. These files must contain one of these two tags:</p>
@@ -1839,11 +2084,14 @@ M&nbsp;&nbsp;END&nbsp;
 &gt;&nbsp;&lt;cdk:Title&gt;&nbsp;
 Mol_000027&nbsp;
 
-&gt;&nbsp;&lt;GraphENC&gt;&nbsp;
+&gt;&nbsp;&lt;GraphJson&gt;&nbsp;
 &hellip;
 
-&gt;&nbsp;&lt;Descriptors&gt;
-2.322&nbsp;153.726&nbsp;101.605&nbsp;&nbsp;0.686&nbsp;-0.583&nbsp;&nbsp;0.141&nbsp;
+&gt;&nbsp;&lt;Descriptors1&gt;
+2.322&nbsp;
+
+&gt;&nbsp;&lt;Descriptors2&gt;
+3.452&nbsp;
 
 &gt;&nbsp;&lt;FITNESS&gt;
 -10.096
@@ -1870,11 +2118,14 @@ M&nbsp;&nbsp;END&nbsp;
 &gt;&nbsp;&lt;cdk:Title&gt;&nbsp;
 Mol_000027&nbsp;
 
-&gt;&nbsp;&lt;GraphENC&gt;&nbsp;
+&gt;&nbsp;&lt;GraphJson&gt;&nbsp;
 &hellip;
 
-&gt;&nbsp;&lt;Descriptors&gt;
-2.322&nbsp;153.726&nbsp;101.605&nbsp;&nbsp;0.686&nbsp;-0.583&nbsp;&nbsp;0.141&nbsp;
+&gt;&nbsp;&lt;Descriptors1&gt;
+2.322&nbsp;
+
+&gt;&nbsp;&lt;Descriptors2&gt;
+3.452&nbsp;
 
 &gt;&nbsp;&lt;MOL_ERROR&gt;
 #ViolationOfConstraint:  Minimum non-bonded distance threshold violated. 2.766890
@@ -1882,6 +2133,58 @@ Mol_000027&nbsp;
 $$$$
 </pre>
 
+
+<h3 class="western"><a name="Toc9999_3"></a>Graph Editing Task Files</h3>
+<p>Example of JSON syntax for defining the most detailed vertex query. Any of the fields can be left removed. For example, removing the line with <code>"vertexId"</code> will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining <code>"incomingEdgeQuery"</code> (i.e., all the lines included in the curly brackets immediately following "incomingEdgeQuery") will make the vertex query match any vertex irrespectively of the properties of the edge that connects such vertex to its parent vertex (if any).</p>
+<pre>
+  "vertexQuery": {
+    "vertexId": 1,
+    "buildingBlockId": 4,
+    "buildingBlockType": "FRAGMENT",
+    "vertexType": "MolecularFragment",
+    "level": 2,
+    "incomingEdgeQuery": {
+      "srcVertexId": 1,
+      "trgVertexId": 2,
+      "srcAPID": 3,
+      "trgAPID": 4,
+      "bondType": "DOUBLE",
+      "srcAPC": {
+        "rule": "s",
+        "subClass": 0
+      },
+      "trgAPC": {
+        "rule": "t",
+        "subClass": 0
+      }
+    },
+    "outgoingEdgeQuery": {SAME SYNTAX of "incomingEdgeQuery"}
+  }
+</pre>
+
+<p>The above is a complete list of fields that can be used to define a vertex query, but a valid query can include any of those fields from none (i.e., a query that matches everything) to all of them (i.e., the most detailed query possible). For example, the following is a vertex query meant to match only vertexes in level 2:</p>
+<pre>
+  "vertexQuery": {
+      "level": 2
+  }
+</pre>
+
+<p>A sequence of graph editing tasks is defining using JSON syntax as following:</p>
+<pre>
+[
+  {
+    "task": "REPLACECHILD",
+    "vertexQuery": {...}
+  }
+  {
+    "task": ...,
+    "vertexQuery": {...}
+  }
+]
+</pre>
+
 <hr>
+
+
 </body>
 </html>

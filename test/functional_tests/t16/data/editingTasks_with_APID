@@ -1,0 +1,62 @@
+[
+  {
+    "task": "REPLACECHILD",
+    "vertexQuery": {
+       "level": 0,
+       "incomingEdgeQuery": {
+         "srcAPC": {
+           "rule": "cc",
+           "subClass": 0
+         }
+       }
+    },
+    "idAPOnIncomingGraph": 132,
+    "incomingGraph": {
+      "graphId": 0,
+      "gVertices": [
+        {
+          "lstAPs": [
+            {
+              "id": 132,
+              "atomPositionNumber": 0,
+              "atomPositionNumberInMol": 0,
+              "apClass": {
+                "rule": "ATplus",
+                "subClass": 0
+              },
+              "dirVec": {
+                "x": -0.0087,
+                "y": -0.007,
+                "z": -0.0079
+              }
+            }
+          ],
+          "lstSymAPs": [],
+          "vertexId": 1,
+          "buildingBlockId": 4,
+          "buildingBlockType": "FRAGMENT",
+          "isRCV": true,
+          "allowedMutationTypes": [
+            "DELETE",
+            "EXTEND",
+            "CHANGEBRANCH",
+            "CHANGELINK",
+            "ADDLINK",
+            "DELETELINK"
+          ],
+          "vertexType": "MolecularFragment"
+        }
+      ],
+      "gEdges": [],
+      "gRings": [],
+      "symVertices": []
+    }
+  },
+  {
+    "task": "DELETEVERTEX",
+    "vertexQuery": {
+       "buildingBlockId": 0,
+       "buildingBlockType": "FRAGMENT"
+    }
+  }
+]

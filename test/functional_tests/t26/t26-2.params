@@ -1,0 +1,20 @@
+#
+# Substitution of a non-scaffold vertex that is part of a ring
+#
+TESTGENOPS-OP=MUTATION
+TESTGENOPS-inpFile=graph-2.sdf
+TESTGENOPS-outFile=graph_mut-2.sdf
+TESTGENOPS-MutationTarget=13
+#TESTGENOPS-MutationType=EXPAND
+#TESTGENOPS-MutationType=CONTRACT
+TESTGENOPS-MutationType=CHANGELINK
+TESTGENOPS-NewVertexMolID=9
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
+FS-RotBondsDefFile=OTF_WDIR/rotatableBonds
+

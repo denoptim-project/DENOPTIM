@@ -9,8 +9,7 @@ FSE-NumOfProcessors=OTF_PROCS
 FSE-MAXLEVEL=2
 FP-Source=OTF_WDIR/fitness_provider.sh
 FP-Interpreter=bash
-FSE-ROOTGRAPHS=OTF_WDIR/roots.txt
-FSE-ROOTGRAPHSFORMAT=string
+FSE-ROOTGRAPHS=OTF_WDIR/roots.json
 
 # Definition of the Fragment Space 
 FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf

@@ -1,13 +1,15 @@
-#
 # README file for test folder of DENOPTIM
-# 
 
-=> PtCOLX2: published test case for evolutionary experiments.
 
-=> PtCOLX2_FSE: test case for exhaustive exploration of fragment space
+* `PtCOLX2`: playground example for evolutionary de novo design.
 
-=> functional_tests: dummy runs of various components of the DENOPTIM package
-                     meant to verify the functionality of the code. Require
-                     <code>bash</code> and <code>python</code> commands to be
-                     in the $PATH.
+* `PtCOLX2_FSE`: playground example for combinatorial design.
+
+* `cyclicpeptide`: playground example for evolutionary de novo design.
+
+* `functional_tests`: collection of automated runs testing the functionality of DENOPTIM (integration tests).
+
+* `diamonds`: numerical example for development of template-related functionality.
+
+* `polycycle:` numerical example for development of template-related functionality.
 

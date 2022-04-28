@@ -18,19 +18,19 @@
 
 package preparemopac;
 
-import denoptim.exception.DENOPTIMException;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import denoptim.io.DenoptimIO;
-import denoptim.task.ProcessHandler;
-
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
+
+import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
+import denoptim.task.ProcessHandler;
 
 
 
@@ -70,8 +70,8 @@ public class PrepareMOPAC
         {
             pmf.readParameters(paramFile);
             pmf.readMOPACKeywords(pmf.kwdsFile);
-            IAtomContainer mol = DenoptimIO.readSingleSDFFile(pmf.inpSDF);
-            DenoptimIO.writeMolecule(pmf.inpSDF, mol, false);
+            IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(pmf.inpSDF);
+            DenoptimIO.writeSDFFile(pmf.inpSDF, mol, false);
             
             // calculate charge
             double charge = AtomContainerManipulator.getTotalFormalCharge(mol);

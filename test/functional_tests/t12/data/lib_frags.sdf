@@ -1,76 +1,58 @@
-AttractorPLUS
-  CDK     0627192255
-Built manually
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0093    0.0078    0.0088 Cl  0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-AttractorPLUS
-
-> <cdk:Remark>
-Built manually
-
-> <CLASS>
-1#F:0:-0.0079%-0.0080%0.0056
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#F:0:SINGLE:-0.0079%-0.0080%0.0056 
 
 $$$$
-AttractorPLUS
-  CDK     0627192255
-Built manually
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0057   -0.0026    0.0077 F   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-AttractorPLUS
-
-> <cdk:Remark>
-Built manually
-
-> <CLASS>
-1#F:0:0.0066%0.0078%-0.0089
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#F:0:SINGLE:0.0066%0.0078%-0.0089 
 
 $$$$
-C_sp3_2H
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.0018    0.0027    0.0046 C   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-C_sp3_2H
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#cca:0:-0.4778%-1.3052%0.3575,cca:0:-0.4753%0.3404%-1.3043,ch:0:-0.4709%0.9548%0.9585,ch:0:1.4312%-0.0017%-0.0089
-
-> <ATTACHMENT_POINT>
-1:4
+> <ATTACHMENT_POINTS>
+1#cca:0:SINGLE:-0.4778%-1.3052%0.3575,cca:0:SINGLE:-0.4753%0.3404%-1.3043,ch:0:SINGLE:-0.4709%0.9548%0.9585,ch:0:SINGLE:1.4312%-0.0017%-0.0089 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.0025    0.0053   -0.0061 O   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
+> <ATTACHMENT_POINTS>
+1#coa:1:SINGLE:-0.4828%-1.3072%0.3502,cob:1:SINGLE:-0.4782%0.3535%-1.3094 
 
-> <cdk:Remark>
-From GM3DFragmenter
+$$$$
 
-> <CLASS>
-1#coa:1:-0.4828%-1.3072%0.3502,cob:1:-0.4782%0.3535%-1.3094
+  CDK     02102218203D
 
-> <ATTACHMENT_POINT>
-1:2
+  5  4  0  0  0  0  0  0  0  0999 V2000
+    0.7650    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.7650    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.1283   -0.5139    0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.1283   -0.5139   -0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.1283    0.5139   -0.8900 H   0  0  0  0  0  0  0  0  0  0  0  0
+  1  2  1  0  0  0  0 
+  1  3  1  0  0  0  0 
+  1  4  1  0  0  0  0 
+  2  5  1  0  0  0  0 
+M  END
+> <ATTACHMENT_POINTS>
+1#ccb:0:SINGLE:1.1283%1.0277%0.0000 2#cca:0:SINGLE:-1.1283%0.5139%0.8900,cca:0:SINGLE:-1.1283%-1.0277%0.0000 
 
 $$$$

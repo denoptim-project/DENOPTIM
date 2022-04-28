@@ -3,25 +3,28 @@
 #
 
 # Fitness provider
-FP-INTERPRETER=bash
-FP-SOURCE=data/fitness_provider_fromDB.sh
+FP-INTERPRETER=python
+FP-SOURCE=data/fitness_provider_fromDB.py
+FP-CheckUidBeforeFitness=yes
 
 # Parameters for the genetic algorithm
+GA-RANDOMSEED=12345
 GA-InitPoplnFile=data/initPopulation.sdf
 GA-numParallelTasks=5
-GA-parallelization=ASYNCHRONOUS
+#GA-parallelization=ASYNCHRONOUS
 GA-populationSize=25
 GA-numChildren=5
 GA-numGenerations=20
 GA-numConvGen=5
 GA-replacementStrategy=ELITIST
 GA-XOverSelectionMode=TS
-GA-crossoverProbability=0.50
-GA-mutationProbability=0.50
+GA-crossoverWeight=0.5
+GA-mutationWeight=0.2
+GA-ConstructionWeight=0.2
 GA-symmetryProbability=0.0
-GA-growthProbScheme=sigma
-GA-GrowthSigmaSteepness=3.0
-GA-GrowthSigmaMiddle=2.5
+GA-LevelGrowthProbScheme=sigma
+GA-LevelGrowthSigmaSteepness=3.0
+GA-LevelGrowthSigmaMiddle=2.5
 GA-PrecisionLevel=5
 
 # Definition of the Fragment Space 
@@ -29,7 +32,6 @@ FS-scaffoldLibFile=data/TCFS-1_scaff.sdf
 FS-fragmentLibFile=data/TCFS-1_frags.sdf
 FS-cappingFragmentLibFile=data/TCFS-1_caps.sdf
 FS-compMatrixFile=data/TCFS-1_CPMap.par
-FS-CONSTRAINSYMMETRY=Xlig:0 1.0
 FS-CONSTRAINSYMMETRY=LBisAminoPhosphineN:0 1.0
 FS-CONSTRAINSYMMETRY=LTrisAminoPhosphineN:0 1.0
 FS-CONSTRAINSYMMETRY=LMonoAminoPhosphineSubR:0 1.0

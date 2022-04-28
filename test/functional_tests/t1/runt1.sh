@@ -9,17 +9,28 @@
 # in the environment as $tinkerPathDENOPTIM
 #
 
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    echo "Test SKIPPED on Windows"
+    exit 0
+fi
+
 if [ ! -d "$tinkerPathDENOPTIM" ]
 then
     echo " "
     echo "WARNING! Cannot find Tinker executables in \$tinkerPathDENOPTIM"
     echo "If Tinker is installed, please set valiable \$tinkerPathDENOPTIM "
-    echo "in runAllTests.sh and run it again."
+    echo "in runTests.sh and run it again."
     echo "The value should be set to be the pathname of "
     echo "the bin folder containing all the executables of Tinker."
-    echo "The installation of Tinker must be configured with "
-    echo "'maxval' >= 12 (see sizes.i in Tinker's source code)."
     echo "Skipping test 't1'."
+    echo " "
+    echo "WARNING! Some peculiar test cases require this configuration of Tinker:"
+    echo "  -> 'maxval' >= 12 in sizes.i for Tinker version <7.x or sizes.f for >7.x"
+    echo "  -> 'maxtors' = 22 * n in torsions.f for Tinker versions > 7.x)"
+    echo "  -> 'maxbitor' = 65 * n in bitors.f for Tinker versions > 7.x)"
+    echo "Test t1 can be run with a default installation of Tinker, ignoring "
+    echo "the warnings about need of customized settings."
     echo " "
     exit 0
 else
@@ -49,71 +60,115 @@ else
     fi
 fi
 
+function compareElementalAnalysis()
+{
+    res="$1"
+    ref="$2"
+    nEnd=$(grep -n "M *END" "$res" | awk -F':' '{print $1}')
+    nEndRef=$(grep -n "M *END" "$ref" | awk -F':' '{print $1}')
+    for el in ' C  ' ' N  ' ' P  ' ' H  ' ' Cl ' ' Ru ' ' B  ' ' V  ' ' Rh  ' ' O  ' ' W  '
+    do
+        nEl=$(head -n "$nEnd" "$res" | grep -c " $el ")
+        nElRef=$(head -n "$nEndRef" "$ref" | grep -c " $el ")
+        if [ "$nEl" -ne "$nElRef" ]; then
+            echo "Test 't1' NOT PASSED (symptom: wrong number of $el atoms: $nEl, should be $nElRef)"
+            exit -1
+        fi
+    done
+}
+
 wrkDir=`pwd`
 
 files=$(ls input/*.sdf )
+nFiles=$(ls input/*.sdf | wc -l | awk '{print $1}')
 
 for f in $files
 do
     # Set file names
     inpSDF="$wrkDir/$f"
     fname=`basename "$inpSDF" .sdf`
-    tmpOptSDFFile="$wrkDir/$fname""_3Dbuilt.sdf"
-    tinkerparFile="$wrkDir/$fname""_tinker.par"
+    outSDF="$wrkDir/$fname""_3Dbuilt.sdf"
+    dnpParams="$wrkDir/$fname""_DnpCG.params"
     logFile="$wrkDir/$fname.log"
 
     #report
-    echo -ne ' progress: '$fname' / 5\r'
+    echo -ne ' progress: '$fname' / '$nFiles' \r'
 
     #Prepare parameters
-    echo "CG-inpSDF=$inpSDF" > "$tinkerparFile"
-    echo "CG-outSDF=$tmpOptSDFFile" >> "$tinkerparFile"
-    echo "FS-ScaffoldLibFile=$wrkDir/scaff.sdf" >> "$tinkerparFile"
-    echo "FS-FragmentLibFile=$wrkDir/frags.sdf" >> "$tinkerparFile"
-    echo "FS-CappingFragmentLibFile=$wrkDir/cap.sdf" >> "$tinkerparFile"
-    echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> "$tinkerparFile"
-    echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/DenoptimCG/data/rotatableBonds-1.0" >> "$tinkerparFile"
+    echo "3DB-inpSDF=$inpSDF" > "$dnpParams"
+    echo "3DB-outSDF=$outSDF" >> "$dnpParams"
+    echo "FS-ScaffoldLibFile=$wrkDir/scaff.sdf" >> "$dnpParams"
+    echo "FS-FragmentLibFile=$wrkDir/frags.sdf" >> "$dnpParams"
+    echo "FS-CappingFragmentLibFile=$wrkDir/cap.sdf" >> "$dnpParams"
+    echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> "$dnpParams"
+    echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/main/resources/data/rotatableBonds-1.0" >> "$dnpParams"
 
-    echo "CG-workDir=$wrkDir" >> "$tinkerparFile"
+    echo "3DB-workDir=$wrkDir" >> "$dnpParams"
     # location of the TINKER tools
-    echo "CG-toolPSSROT=$tinkerPathDENOPTIM/pssrot" >> "$tinkerparFile"
-    echo "CG-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> "$tinkerparFile"
-    echo "CG-toolINTXYZ=$tinkerPathDENOPTIM/intxyz" >> "$tinkerparFile"
+    echo "3DB-toolPSSROT=$tinkerPathDENOPTIM/pssrot" >> "$dnpParams"
+    echo "3DB-toolXYZINT=$tinkerPathDENOPTIM/xyzint" >> "$dnpParams"
+    echo "3DB-toolINTXYZ=$tinkerPathDENOPTIM/intxyz" >> "$dnpParams"
     # param file used by Tinker
-    echo "CG-ForceFieldFile=$DENOPTIM_HOME/src/DenoptimCG/data/uff_vdw.prm" >> "$tinkerparFile"
+    echo "3DB-ForceFieldFile=$DENOPTIM_HOME/src/main/resources/data/uff_vdw.prm" >> "$dnpParams"
     # key file to be used by tinker with PSSROT
     # this file is copied and edited for every molecule
-    echo "CG-KEYFILE=$DENOPTIM_HOME/src/DenoptimCG/data/build_uff.key" >> "$tinkerparFile"
+    echo "3DB-KEYFILE=$DENOPTIM_HOME/src/main/resources/data/build_uff.key" >> "$dnpParams"
     # parameters used by PSSROT
     # this file is copied and edited for every molecule
-    echo "CG-PSSROTPARAMS=$DENOPTIM_HOME/src/DenoptimCG/data/submit_pssrot" >> "$tinkerparFile"
-
+    echo "3DB-PSSROTPARAMS=$DENOPTIM_HOME/src/main/resources/data/submit_pssrot" >> "$dnpParams"
 
     #run builder
-    "$javaDENOPTIM" -jar "$DENOPTIMJarFiles/DenoptimCG.jar" "$tinkerparFile" &> "$logFile"
+    "$javaDENOPTIM" -jar "$denoptimJar" -r B3D "$dnpParams" &> "$logFile"
 
     #Check output
-    if [ ! -f "$tmpOptSDFFile" ]; then
+    if [ -f "$logFile" ]; then
+        if ! grep -q 'MolecularModelBuilder terminated normally' "$logFile"; then
+            if grep -q 'Tinker failed on task' "$logFile"; then
+                # In this case, Denoptim detected a problem in the Tinker job
+                # and cannot proceed. This kind of error is most ofted due to
+                # the limited defaults of Tinker not allowing for the 
+                # complexity that is included in some of the tests for DENOPTIM.
+                # We, therefore, print a warning and move on: this is most 
+                # likely not a problem due to DENOPTIM.
+                echo " "
+                echo "WARNING: Tinker job failed for molecule $fname."
+                n=$(grep -n 'Tinker failed on task' "$logFile" | awk -F':' '{print $1}')
+                nn=$(wc -l "$logFile" | awk '{print $1}')
+                tail -n $((nn - n)) "$logFile"
+                continue
+            else
+                echo " "
+                echo "ERROR! Something went wrong while building molecule $fname:"
+                echo "Error was not interpreted. See $logFile!"
+                echo " "
+                exit 1
+            fi
+        fi
+    else
+        echo " "
+        echo "ERROR! Something went wrong while building molecule $fname:"
+        echo "$logFile not found!"
+        echo " "
+        exit 1
+    fi
+    if [ ! -f "$outSDF" ]; then
 	echo " "
         echo "ERROR! Something went wrong while building molecule $fname:"
-	echo "$tmpOptSDFFile not found!"
+	echo "$outSDF not found!"
 	echo "Check log file $logFile"
 	echo " "
         exit 1
     fi
+
+    # Check outcome
+    expRes="$wrkDir/expected_results/$fname""_3Dbuilt.sdf"
+    if [ ! -f "$expRes" ]; then
+        echo "Cannot find expected result for $fname: $expRes"
+        exit 1
+    fi 
+    compareElementalAnalysis "$outSDF" "$expRes"
 done
 echo " "
-
-# Check outcome (only size of SDF files: #atoms+#bonds+props+headers)
-n=$(wc -l *3Dbuilt.sdf | tail -n 1 | awk '{print $1}')
-if [[ "$n" != 594 ]]
-then
-    echo " "
-    echo "Test 't1' NOT PASSED (symptom: )"
-    exit 1
-else
-    echo "Test 't1' PASSED"
-fi
-
+echo "Test 't1' PASSED"
 exit 0
 

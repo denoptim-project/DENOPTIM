@@ -1,0 +1,31 @@
+# Genetic Algorithm - parameters
+GA-RandomSeed=123456789
+GA-PopulationSize=30
+GA-NumChildren=20
+GA-NumGenerations=100
+GA-NumConvGen=100
+
+GA-MOLGROWTHPROBSCHEME=SIGMA
+GA-MOLGROWTHSIGMASTEEPNESS=0.2
+GA-MOLGROWTHSIGMAMIDDLE=20
+
+GA-XOverSelectionMode=TS
+GA-CrossoverWeight=1.0
+GA-MutationWeight=0.0
+GA-ConstructionWeight=0.0
+GA-SymmetryProbability=0.0
+GA-ReplacementStrategy=ELITIST
+GA-NumParallelTasks=1
+GA-Parallelization=Synchronous
+
+# Fragment Space - parameters
+FS-ScaffoldLibFile=data/lib_scaff.sdf
+FS-FragmentLibFile=data/lib_frags.sdf
+FS-CompMatrixFile=data/CPMap
+FS-MaxHeavyAtom=1000
+FS-MaxMW=6000
+FS-MaxRotatableBond=500
+
+# Fitness Provider - parameters
+FP-Equation=${taniToGoal}
+FP-DescriptorSpecs=${Variable.parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}

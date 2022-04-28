@@ -1,0 +1,52 @@
+# Genetic Algorithm - parameters
+GA-RandomSeed=1234567
+GA-PopulationSize=10
+GA-NumChildren=10
+GA-NumGenerations=100
+GA-NumConvGen=100
+
+GA-MOLGROWTHPROBSCHEME=SIGMA
+GA-MOLGROWTHSIGMASTEEPNESS=0.2
+GA-MOLGROWTHSIGMAMIDDLE=20
+
+GA-CrowdProbScheme=SIGMA
+GA-CrowdSigmaSteepness=1.3
+GA-CrowdSigmaMiddle=2.0
+
+#GA-KEEPNEWRINGSYSTEMVERTEXES
+#GA-KEEPNEWRINGSYSTEMFITNESSTRSH=0.10
+#GA-KEEPNEWRINGSYSTEMSCAFFOLDS
+
+GA-XOverSelectionMode=TS
+GA-CrossoverWeight=0.50
+GA-MutationWeight=0.90
+GA-ConstructionWeight=0.5
+GA-SymmetryProbability=0.0
+GA-ReplacementStrategy=ELITIST
+GA-NumParallelTasks=1
+GA-Parallelization=Synchronous
+# Fragment Space - parameters
+FS-ScaffoldLibFile=data/lib_frags.sdf
+FS-FragmentLibFile=data/lib_frags.sdf
+FS-CappingFragmentLibFile=data/lib_cap.sdf
+FS-CompMatrixFile=data/CPMap.par
+FS-MaxHeavyAtom=20
+FS-MaxMW=200
+FS-MaxRotatableBond=50
+RC-CloseRings=SELECTED_by_GUI
+FS-RCCompMatrixFile=data/RC-CPMap
+RC-RingSizeBias=5 2
+RC-RingSizeBias=6 4
+RC-RingSizeBias=7 1
+RC-RingSizeBias=4 1
+RC-MaxSizeNewRings=10
+RC-EvaluationClosabilityMode=3D-Conformation
+RC-RCCINDEX=data/rccIndex
+RC-RCCFOLDER=data/rccArchive
+
+# Fitness Provider - parameters
+#FP-Equation=${taniToGoal}
+#FP-DescriptorSpecs=${Variable.parametrized('taniToGoal','TanimotoSimilarity','PubchemFingerprinter, FILE:data/goal.sdf')}
+FP-Source=data/fitness_provider_w3D.sh
+FP-Interpreter=bash
+FP-CheckUidBeforeFitness=yes=yes

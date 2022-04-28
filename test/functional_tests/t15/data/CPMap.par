@@ -5,13 +5,6 @@ RCN cc:0 cc:0,F:0
 RCN co:0 co:1
 RCN co:1 cc:0
 RCN ch:0 F:0
-# CLASS-to-BondOrder conversion
-RBO cc 1
-RBO co 1
-RBO ch 1
-RBO hyd 1
-RBO F 1
-RBO ATneutral 1
 # Capping
 CAP cc:0 hyd:1
 CAP co:1 hyd:1

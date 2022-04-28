@@ -1,0 +1,19 @@
+#
+# adding a vertex in between two connected vertices
+#
+TESTGENOPS-OP=MUTATION
+TESTGENOPS-inpFile=graph-6.sdf
+TESTGENOPS-outFile=graph_mut-6.sdf
+TESTGENOPS-MutationTarget=2
+TESTGENOPS-MutationType=ADDLINK
+TESTGENOPS-ApIdOnTargetVertex=1
+TESTGENOPS-NewVertexMolID=11
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=lib_scaff.sdf
+FS-fragmentLibFile=lib_frags.sdf
+FS-cappingFragmentLibFile=lib_cap.sdf
+FS-compMatrixFile=CPMap.par
+FS-rcCompMatrixFile=RC-CPMap.par
+FS-RotBondsDefFile=rotatableBonds
+

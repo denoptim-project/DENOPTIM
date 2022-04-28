@@ -1,16 +1,10 @@
-hydrogen
-  CDK     0627192255
+
+  CDK     02102218203D
 
   1  0  0  0  0  0  0  0  0  0999 V2000
     0.1979   -2.4890    1.1502 H   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-hydrogen
-
-> <CLASS>
-1#hyd:1:0.4722%-1.7496%0.3846
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#hyd:1:SINGLE:0.4722%-1.7496%0.3846 
 
 $$$$

@@ -24,12 +24,6 @@
 # Settings and Parameters
 ###############################################################################
 
-#Java
-java="$javaDENOPTIM"
-
-#Denoptim home
-pathToDenoptimJars="$DENOPTIMJarFiles"
-
 # Map of unique identifiers to fitness or rejection due to steric hindrance
 uidToAtomClash="data/UIDsToAtomClash"
 uidToFitness="data/UIDsToFitness"
@@ -131,9 +125,8 @@ function abandonDueToChild {
 function cleanUpTmpFiles {
     if [ "$cleanup" == 0 ]
     then
-        rm -f "$inpSDF"
-        rm -f "$molUniqueFile"
-        rm -f "$log"
+        #rm -f "$inpSDF"
+        #rm -f "$log"
         rm -f "$preOutSDF"
     fi
 }
@@ -176,7 +169,7 @@ UIDFILE="$5"
 locDir="$(pwd)"
 
 molName=`basename "$inpSDF" .sdf`
-molNum=`basename "$inpSDF" "_I.sdf"`
+molNum=`basename "$inpSDF" "_inp.sdf"`
 
 preOutSDF="$wrkDir/preOut_${molNum}.sdf"
 
@@ -192,28 +185,11 @@ echo "Starting fitness calculation (ID:$taskId) at $beginTime"
 
 
 #
-# Create UID from input mol
-#
-echo "Generating UID for $molNum..."
-molUniqueFile="$wrkDir/${molNum}.uid"
-grep -A1 InChi "$inpSDF" | tail -n 1 > "$molUniqueFile"
-"$java" -jar "$pathToDenoptimJars/UpdateUID.jar" -m "$molUniqueFile" -s "$inpSDF" -k "$UIDFILE"
-if grep -q "Already exists." "$inpSDF"
-then
-   addPropertyToSingleMolSDF "EXIT_STATUS" "$E_OPTERROR" "$inpSDF"
-   abandonDueToChild "$inpSDF"
-elif grep -q "MOL_ERROR" "$inpSDF"
-then
-   addPropertyToSingleMolSDF "EXIT_STATUS" "$E_FATAL" "$inpSDF"
-   abandonDueToChild "$inpSDF"
-fi
-
-
-#
 # Recover fitness
 #
 echo "Recover fitness from list..."
-uid="$(cat "$molUniqueFile")"
+uid="$(grep -A1 InChi "$inpSDF" | tail -n 1)"
+echo "UID: $uid"
 cp "$inpSDF" "$preOutSDF"
 if grep -q "$uid" "$uidToAtomClash"
 then
@@ -225,7 +201,7 @@ then
     errMsg="#UID: not found"
     abandon "$preOutSDF" "$E_OPTERROR"
 else
-    fitness=$(grep "$uid" "$uidToFitness" | awk '{print $2}')
+    fitness=$(grep "$uid" "$uidToFitness" | tail -n 1 | awk '{print $2}')
     addPropertyToSingleMolSDF "FITNESS" "$fitness" "$preOutSDF"
 fi
 

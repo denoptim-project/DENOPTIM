@@ -4,6 +4,12 @@ wrkDir=`pwd`
 logFile="t13.log"
 paramFile="t13.params"
 
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    echo "Test SKIPPED on Windows"
+    exit 0
+fi
+
 mv data/* "$wrkDir"
 rm -rf data
 
@@ -19,11 +25,11 @@ done
 exec 6>&1
 exec > "$logFile"
 exec 2>&1
-"$javaDENOPTIM" -jar "$DENOPTIMJarFiles"/DenoptimGA.jar "$paramFile"
+"$javaDENOPTIM" -jar "$denoptimJar" -r GA "$paramFile"
 exec 1>&6 6>&- 
 
 #Check outcome
-ls "$wrkDir/RUN*/*FIT.sdf" | while read f 
+ls "$wrkDir/RUN*/Gen*/*out.sdf" | while read f 
 do 
     hasNull=$(grep -A1 "GraphENC" "$f" | grep -q "null") 
     if [[ $? == 0 ]] 

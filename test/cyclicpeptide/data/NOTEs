@@ -1,0 +1,13 @@
+These are things to be aware of:
+
+* Modify the template's contract by hand in the lib_scaff.sdf file.
+  fromn FIXED to FREE to allow modifications within the template.
+  This change can not yet be performed in the GUI.
+
+* Modify the type of building block ('buildingBlockType') of the empty
+  vertices that compose the template, and make it be 'FRAGMENT'. This 
+  to enable the identification of the suitable type of candidate 
+  building blocks to use in mutation of those vertices.
+  This change can not yet be performed in the GUI.
+
+

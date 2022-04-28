@@ -1,76 +1,40 @@
-AttractorPLUS
-  CDK     0627192255
-Built manually
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0025    0.0090   -0.0037 Cl  0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-AttractorPLUS
-
-> <cdk:Remark>
-Built manually
-
-> <CLASS>
-1#F:0:-0.0035%-0.0074%0.0026
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#F:0:SINGLE:-0.0035%-0.0074%0.0026 
 
 $$$$
-AttractorPLUS
-  CDK     0627192255
-Built manually
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0083   -0.0038   -0.0042 F   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-AttractorPLUS
-
-> <cdk:Remark>
-Built manually
-
-> <CLASS>
-1#F:0:0.0024%-0.0070%-0.0022
-
-> <ATTACHMENT_POINT>
-1:1
+> <ATTACHMENT_POINTS>
+1#F:0:SINGLE:0.0024%-0.0070%-0.0022 
 
 $$$$
-C_sp3_2H
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0076    0.0036    0.0064 C   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-C_sp3_2H
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#cca:0:-0.4707%-1.3020%0.3557,cca:0:-0.4702%0.3481%-1.3011,ch:0:-0.4718%0.9579%0.9422,ch:0:1.4310%-0.0009%0.0060
-
-> <ATTACHMENT_POINT>
-1:4
+> <ATTACHMENT_POINTS>
+1#cca:0:SINGLE:-0.4707%-1.3020%0.3557,cca:0:SINGLE:-0.4702%0.3481%-1.3011,ch:0:SINGLE:-0.4718%0.9579%0.9422,ch:0:SINGLE:1.4310%-0.0009%0.0060 
 
 $$$$
-Fragment
-  CDK     0627192255
-From GM3DFragmenter
+
+  CDK     02102218203D
+
   1  0  0  0  0  0  0  0  0  0999 V2000
    -0.0075   -0.0077    0.0059 O   0  0  0  0  0  0  0  0  0  0  0  0
 M  END
-> <cdk:Title>
-Fragment
-
-> <cdk:Remark>
-From GM3DFragmenter
-
-> <CLASS>
-1#coa:1:-0.4857%-1.2962%0.3517,cob:1:-0.4742%0.3498%-1.2982
-
-> <ATTACHMENT_POINT>
-1:2
+> <ATTACHMENT_POINTS>
+1#coa:1:SINGLE:-0.4857%-1.2962%0.3517,cob:1:SINGLE:-0.4742%0.3498%-1.2982 
 
 $$$$

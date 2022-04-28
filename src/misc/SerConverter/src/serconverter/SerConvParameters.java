@@ -18,23 +18,15 @@
 
 package serconverter;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.util.logging.Level;
+import java.util.ArrayList;
 
-import denoptim.molecule.DENOPTIMGraph;
 import denoptim.exception.DENOPTIMException;
-import denoptim.logging.DENOPTIMLogger;
-import denoptim.io.DenoptimIO;
-import denoptim.rings.RingClosureParameters;
+import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.rings.RingClosureParameters;
 
 
 /**
@@ -226,20 +218,20 @@ public class SerConvParameters
             return;
         }
 
-	if (!workDir.equals(".") && !DenoptimIO.checkExists(workDir))
+	if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
 	{
 	   msg = "Directory " + workDir + " not found. Please specify an "
 		 + "existing directory.";
 	   throw new DENOPTIMException(msg);
 	}
 
-        if (!DenoptimIO.checkExists(inpFile))
+        if (!FileUtils.checkExists(inpFile))
         {
             msg = "Input file '" + inpFile + "' not found.";
             throw new DENOPTIMException(msg);
         }
 
-        if (DenoptimIO.checkExists(outFile))
+        if (FileUtils.checkExists(outFile))
         {
             msg = "Output file '" + outFile + "' already exists.";
             throw new DENOPTIMException(msg);

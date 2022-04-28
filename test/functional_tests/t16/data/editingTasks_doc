@@ -1,0 +1,49 @@
+<p>A sequence of graph editing tasks is defining using JSON syntax as following:</p>
+<pre>
+[
+  {
+    "task": "REPLACECHILD",
+    "vertexQuery": {...}
+  }
+  {
+    "task": ...,
+    "vertexQuery": {...}
+  }
+]
+</pre>
+
+<p>Example of JSON syntax for defining the most detailed vertex query. Any of the fields can be left removed. For example, removing the line with <code>"vertexId"</code> will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining <code>"incomingEdgeQuery"</code> (i.e., all the lines included in the curly brakets immedialty following "incomingEdgeQuery") will make the vertex query match any vertex irrespectively of the properties of the edge that connects such verted to its parent vertex (if any).</p>
+<pre>
+  "vertexQuery": {
+    "vertexId": 1,
+    "buildingBlockId": 4,
+    "buildingBlockType": "FRAGMENT",
+    "vertexType": "MolecularFragment",
+    "level": 2,
+    "incomingEdgeQuery": {
+      "srcVertexId": 1,
+      "trgVertexId": 2,
+      "srcAPID": 3,
+      "trgAPID": 4,
+      "bondType": "DOUBLE",
+      "srcAPC": {
+        "rule": "s",
+        "subClass": 0
+      },
+      "trgAPC": {
+        "rule": "t",
+        "subClass": 0
+      }
+    },
+    "outgoingEdgeQuery": {SAME SYNTAX of "incomingEdgeQuery"}
+  }
+</pre>
+
+<p>The above is a complete list of fields that can be used to define a vertex query, but a valid query can include any of those fields from none (i.e., a query that matches everithing) to all of them (i.e., the most detailed query possible). For example, the following is a vertex query meant to match only vertexes in level 2:</p>
+<pre>
+  "vertexQuery": {
+      "level": 2
+  }
+</pre>
+
+

@@ -1,2 +1,76 @@
-DENOPTIMGraphEdit [[Type=ReplaceChild] [FocusVertex=*_1_0_-1] [IncomingGraph=0 1_5_1_-1] [FocusEdge=*_*_1_0_1_cc:0_*]] 
-DENOPTIMGraphEdit [[Type=DeleteVertex] [FocusVertex=*_1_1_*]]
+[
+  {
+    "task": "REPLACECHILD",
+    "vertexQuery": {
+       "level": 0,
+       "incomingEdgeQuery": {
+         "srcAPC": {
+           "rule": "cc",
+           "subClass": 0
+         }
+       }
+    },
+    "incomingGraph": {
+      "graphId": 0,
+      "gVertices": [
+        {
+          "lstAPs": [
+            {
+              "id": 22,
+              "atomPositionNumber": 0,
+              "atomPositionNumberInMol": 0,
+              "apClass": {
+                "rule": "F",
+                "subClass": 0,
+                "bndTyp": "SINGLE"
+              },
+              "dirVec": {
+                "x": 0.0065,
+                "y": -0.0029,
+                "z": 0.0045
+              }
+            }
+          ],
+          "lstSymAPs": [],
+          "mol": {
+            "atoms": [
+              {
+                "elSymbol": "Br",
+                "p3d": {
+                  "x": 0.0042,
+                  "y": -0.003,
+                  "z": -0.0094
+                }
+              }
+            ],
+            "bonds": []
+          },
+          "vertexId": 1,
+          "buildingBlockId": 4,
+          "buildingBlockType": "FRAGMENT",
+          "isRCV": false,
+          "allowedMutationTypes": [
+            "DELETE",
+            "EXTEND",
+            "CHANGEBRANCH",
+            "CHANGELINK",
+            "ADDLINK",
+            "DELETELINK",
+            "DELETECHAIN"
+          ],
+          "vertexType": "MolecularFragment"
+        }
+      ],
+      "gEdges": [],
+      "gRings": [],
+      "symVertices": []
+    }
+  },
+  {
+    "task": "DELETEVERTEX",
+    "vertexQuery": {
+       "buildingBlockId": 0,
+       "buildingBlockType": "FRAGMENT"
+    }
+  }
+]
