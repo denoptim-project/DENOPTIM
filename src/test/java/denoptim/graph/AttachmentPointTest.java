@@ -32,9 +32,11 @@ import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.geometry.BondTools;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.Vertex.BBType;
 
 /**
@@ -52,7 +54,53 @@ public class AttachmentPointTest
 	private final String APCLASS = APRULE
 			+ DENOPTIMConstants.SEPARATORAPPROPSCL + APSUBRULE;
 	private final Point3d DIRVEC = new Point3d(1.1, 2.2, 3.3);
-	
+
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testParsingofSdfAPString() throws Exception
+    {
+        String[] altStrings = {
+                "123#myrule:0:DOUBLE:1.0%2.0%-3.0",
+                "123#myrule:0:1.0%2.0%-3.0",
+                "123#myrule:0:UNDEFINED",
+                "123#myrule:0"};
+        
+        //NB: we will be changing the bond type of the static APClass
+        BondType[] expectedBT = {BondType.DOUBLE,
+                APClass.DEFAULTBT,
+                BondType.UNDEFINED,
+                APClass.DEFAULTBT};
+        
+        boolean[] check3d = {true, true, false, false};
+        
+        for (int i=0; i< altStrings.length; i++)
+        {
+            Object[] o = AttachmentPoint.processSdfString(altStrings[i]);
+            
+            assertTrue(Integer.class.isInstance(o[0]));
+            int atmId = (int) o[0];
+            assertEquals(122, atmId); //NB: 0-based from 1-based in SDF string
+            
+            assertTrue(o[1] instanceof APClass);
+            APClass apc = (APClass) o[1];
+            assertEquals(expectedBT[i], apc.getBondType());
+            
+            
+            if (check3d[i])
+            {
+                assertTrue(o[2] instanceof Point3d);
+                Point3d p3d = (Point3d)o[2];
+                double thrl = 0.0001;
+                assertTrue(Math.abs(p3d.x - 1.0) < thrl);
+                assertTrue(Math.abs(p3d.y - 2.0) < thrl);
+                assertTrue(Math.abs(p3d.z + 3.0) < thrl);
+            } else {
+                assertEquals(null,o[2]);
+            }
+        }
+    }
+    
 //-----------------------------------------------------------------------------
     
     @Test

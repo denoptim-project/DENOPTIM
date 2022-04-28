@@ -3077,23 +3077,29 @@ public class DGraph implements Cloneable
     
 //------------------------------------------------------------------------------
     
+    /*
+     * NB: this javadoc string is reproduced in the user manual HTML file.
+     * In case of modifications, please keep the two sources compatible by
+     * reproducing the modification on both sites.
+     */
+    
     /**
      * Checks if this graph is "DENOPTIM-isomorphic" to the other one given. 
      * "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of  
      * <a href="https://mathworld.wolfram.com/IsomorphicGraphs.html">
      * graph isomorphism</a>
      * that differs from the most common meaning of isomorphism in graph theory.
-     * In general, DENOPTIMGraphs are considered undirected when evaluating
+     * In general, graph are considered undirected when evaluating
      * DENOPTIM-isomorphism. 
-     * Next, since a DENOPTIMGraph is effectively 
+     * Next, since a graph is effectively 
      * a spanning tree (ST_i={{vertexes}, {acyclic edges}}) 
      * with a set of fundamental cycles (FC_i={C_1, C_2,...C_n}), 
-     * any DENOPTIMGraph G={ST_i,FC_i} that contains one or more cycles 
+     * any graph G={ST_i,FC_i} that contains one or more cycles 
      * can be represented in multiple
      * ways, G={ST_j,FC_j} or G={ST_k,FC_k}, that differ by the position of the
      * chord/s and by the corresponding pair of ring-closing vertexes between
      * which each chord is defined.
-     * The DENOPTIM-isomorphism for two DENOPTIMGraphs G1 and G2 
+     * The DENOPTIM-isomorphism for two graph G1 and G2 
      * is given by the common graph theory isomorphism between 
      * two undirected graphs U1 and U2 build respectively from G1 and G2 
      * with the convention defined in 
@@ -4251,7 +4257,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Recursive utility method for fixEdgeDirections(DENOPTIMGraph graph).
+     * Recursive utility method for fixEdgeDirections(graph).
      * @param v current vertex
      */
     private static void fixEdgeDirections(Vertex v, 

@@ -107,7 +107,7 @@
 			</ul></li>
 			<li><a href="#Toc42056_808352928">Fitness evaluation</a></li>
 		</ul></li>
-		<li><a href="#Toc14759_799972446">Main programs of the DENOPTIM package</a>
+		<li><a href="#Toc14759_799972446">Programs of the DENOPTIM package</a>
 		<ul>
 			<li><a href="#Toc13237_799972445">GUI: the Graphical User Interface</a></li>
 			<li><a href="#Toc13237_799972446">Genetic Algorithm Runner</a>
@@ -126,7 +126,12 @@
 				<li><a href="#Toc17846_799972446">FragSpaceExplorer Output</a></li>
 				<li><a href="#Toc5490_1476255988">Restart FragSpaceExplorer from Checkpoint file</a></li>
 			</ul></li>
-			<li><a href="#Toc14852_799999446">Other Programs</a></li>
+			<li><a href="#Toc9999_2">Graph Editor</a></li>
+			<li><a href="#Toc9999_4">Genetic Operator</a></li>
+			<li><a href="#Toc9999_5">Fitness Provider Runner</a></li>
+			<li><a href="#Toc9999_6">3D Molecular Models Builder</a></li>
+			<li><a href="#Toc9999_7">Graph Isomorphism Analyzer</a></li>
+			<li><a href="#Toc9999_8">Graph List Comparator</a></li>
 		</ul></li>
 		<li><a href="#Toc35546_1191730726">Keywords</a>
 		<ul>
@@ -136,10 +141,11 @@
 			<li><a href="#Toc40918_1191730726">3D Molecular Models Builder</a></li>
 			<li><a href="#Toc13097_799972446">FragmentSpaceExplorer</a></li>
 			<li><a href="#Toc13097_123456789">Fitness provider</a></li>
-		</ul></li>
-		<li><a href="#Toc9999_1">Utilities</a>
-		<ul>
-			<li><a href="#Toc9999_2">GraphEditor</a></li>
+			<li><a href="#Toc88888_1">Stand-alone Graph Editor</a></li>
+			<!--<li><a href="#Toc88888_2">Stand-alone Genetic Operator</a></li>-->
+			<li><a href="#Toc88888_3">Stand-alone Fitness Runner</a></li>
+			<li><a href="#Toc88888_4">Stand-alone Graph Isomorphism Analyzer</a></li>
+			<li><a href="#Toc88888_5">Stand-alone Graph List Comparator</a></li>
 		</ul></li>
 		<li><a href="#Toc40920_1191730726">File Formats</a>
 		<ul>
@@ -157,7 +163,16 @@
 <hr>
 
 <h1 class="western"><a name="Toc40894_1191730726"></a>About DENOPTIM</h1>
-<p>DENOPTIM is an open source software suite for the <i>de novo</i> design of chemical entities. The name <i>DENOPTIM</i> stands for "<i>De novo</i> Optimization of In/organic Molecules" and wants to highlight that DENOPTIM is designed to handle chemical entities way beyond the strict formalisms of organic chemistry (i.e., valence rules). In fact, the development of DENOPTIM started in <a href="https://doi.org/10.1021/ja300865u">2012</a> as a response to the need of designing transition metal complexes and organometallic catalysts that cannot not even be represented unambiguously by standard chemical representations (e.g., multi-hapto metal-ligand complexes, ion pairs, highly reactive catalyst intermediates).</p>
+<p>DENOPTIM is an open source software suite for the <i>de novo</i> design of 
+chemical entities. The name <i>DENOPTIM</i> stands for "<i>De novo</i> 
+Optimization of In/organic Molecules" and wants to highlight that DENOPTIM is 
+designed to handle chemical entities way beyond the strict formalisms of organic 
+chemistry (i.e., valence rules). In fact, the development of DENOPTIM started 
+in <a href="https://doi.org/10.1021/ja300865u">2012</a> as a response to the 
+need of designing transition metal complexes and organometallic catalysts that 
+cannot not even be represented unambiguously by standard chemical 
+representations (e.g., multi-hapto metal-ligand complexes, ion pairs, 
+highly reactive catalyst intermediates).</p>
 
 <h2>How To Cite</h2>
 <p>To cite DENOPTIM, please cite <a href="https://doi.org/10.1021/acs.jcim.9b00516"><i>J. Chem. Inf. Model.</i> <b>2019</b>, 59, 10, 4077–4082</a></p>
@@ -166,9 +181,12 @@
 <h1 class="western"><a name="Toc14757_7999724461"></a></a>Install DENOPTIM</h1>
 
 <h2 class="western"><a name="Toc14757_7999724222"></a></a>Install From Conda (recommended)</h2>
-<p>DENOPTIM can be installed on using conda package manager from the command line on Linux/MacOS. On Windows this can be done on the Anaconda prompt or by using <a href="<code>DENOPTIM_HOME</code>">Git Bash</a> terminal:
+<p>DENOPTIM can be installed on using conda package manager from the command 
+line on Linux/MacOS. On Windows this can be done on the Anaconda prompt or by 
+using <a href="<code>DENOPTIM_HOME</code>">Git Bash</a> terminal:
 <pre>conda install -c denoptim denoptim</pre></p>
-You should now have the <code>denoptim</code> command available. Run the following and verify you get a help message:
+You should now have the <code>denoptim</code> command available. 
+Run the following and verify you get a help message:
 <pre>denoptim -h</pre></p>
 <p>The installation from conda has been completed.</p>
 
@@ -178,9 +196,14 @@ You should now have the <code>denoptim</code> command available. Run the followi
 
 <p>First, download the <a href="https://github.com/denoptim-project/DENOPTIM/releases/latest">latest release</a>. This is more than enough for regular users. However, if you are after developing the DENOPTIM code then fork the repository and work with git.</p>
 
-<p>Extract the zip/tar.gz archive you have downloaded to generate a folder we'll call <code>DENOPTIM_HOME</code>. In the following, remember to replace <code>$DENOPTIM_HOME</code> with the pathname of the extracted DENOPTIM's distribution folder on your system.</p>
+<p>Extract the zip/tar.gz archive you have downloaded to generate a folder 
+we'll call <code>DENOPTIM_HOME</code>. In the following, remember to replace 
+<code>$DENOPTIM_HOME</code> with the pathname of the extracted DENOPTIM's 
+distribution folder on your system.</p>
 
-<p>Make sure you have an environment that includes JAVA and Maven. Such environment can be created with by manual installation of both JAVA and Maven manually, or it can be created using conda: 
+<p>Make sure you have an environment that includes JAVA and Maven. Such 
+environment can be created with by manual installation of both JAVA and 
+Maven manually, or it can be created using conda: 
 <pre>cd $DENOPTIM_HOME
 conda env create -f environment.yml
 conda activate dnp_env</pre></p>
@@ -369,7 +392,7 @@ is not subject to crossover or mutation.</p>
 </ul>
 The mutation operator can be configured to perform also multi-site mutations: mutation that can alter a graph more multiple times on possibly independent location and performing independent mutation types.</p>
 
-<p>Crossover involves the swapping of one subgraph from each of the parents to the other parent. The subgraphs to swap (a.k.a. the crossover sites) need not to be terminal (i.e., crossover is not limited to dangling branches) and can be of any size, from a single vertex to an entire branch attached to the scaffold. When template vertexes are present in the parent graphs, crossover sites are defined so that the subgraphs to swap belong to graph that are at the same level of embedding in the recursive template-graph structure on the two parents. Moreover, the subgraphs can include only vertices belonging to the same level of embedding. Finally, while crossover generates two offstrimg from two parents, only one offspring is considered to be the product of a single crossover event.</p>
+<p>Crossover involves the swapping of one subgraph from each of the parents to the other parent. The subgraphs to swap (a.k.a. the crossover sites) need not to be terminal (i.e., crossover is not limited to dangling branches) and can be of any size, from a single vertex to an entire branch attached to the scaffold. When template vertexes are present in the parent graphs, crossover sites are defined so that the subgraphs to swap belong to graph that are at the same level of embedding in the recursive template-graph structure on the two parents. Moreover, the subgraphs can include only vertices belonging to the same level of embedding. Finally, while crossover generates two offspring from two parents, only one offspring is considered to be the product of a single crossover event.</p>
 
 
 <h3 class="western"><a name="Toc44001_808352928"></a>Substitution Probability</h3>
@@ -460,12 +483,12 @@ behavior of the GA is subsequently lost.</p>
 
 <h3 class="western"><a name="Toc17842_799972446"></a>GA Run Input</h3>
 <p>A GA run can be performed either by defining the input in the GUI and running the experiment from the gui, or by issuing this command:
-<pre class="bash"><code>denoptim -r GA input_parameters</code></pre>
-where <code>input_parameters</code> is a text file collecting the configuration parameters for the GA program. Such file can have any name and contains one input parameter per line. The
+<pre class="bash"><code>denoptim -r GA input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text file collecting the configuration parameters for the GA program. Such file can have any name and contains one input parameter per line. The
 <code>#</code> character is used to denote a
 comment and lines starting with this character are not processed.
 Each input parameter is specified by means of a keyword.
-The complete list of keywords is available in the <a href="#Toc35546_1191730726">Keywords</a> section. Examples of input files can be found in the test folder. Note that <code>input_parameters</code> file can be generated with the GUI from "New Evolutionary De Novo Design" button.</p>
+The complete list of keywords is available in the <a href="#Toc35546_1191730726">Keywords</a> section. Examples of input files can be found in the test folder. Note that <code>input_parameters_file</code> file can be generated with the GUI from "New Evolutionary De Novo Design" button.</p>
 
 <h3 class="western"><a name="Toc16845_799972446"></a>GA Run Output</h3>
 
@@ -547,11 +570,11 @@ combinatorial search in any way.</p>
 
 <h3 class="western"><a name="Toc17844_799972446"></a>FragSpaceExplorer Input</h3>
 <p>A FragSpaceExplorer run or FSE run) can be performed either by defining the input in the GUI and running the experiment from the gui, or by issuing this command:
-<pre class="bash"><code>denoptim -r FSE input_parameters</code></pre>
-where <code>input_parameters</code> is a text file collecting the configuration parameters for the FragSpaceExplorer program. In particular, the only required input is the <a href="#Toc40912_1191730726">definition of the BB Space</a>. The <code>input_parameters</code> file can have any name, and contains one input parameter per line. The <code>#</code> character is used to denote a
+<pre class="bash"><code>denoptim -r FSE input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text file collecting the configuration parameters for the FragSpaceExplorer program. In particular, the only required input is the <a href="#Toc40912_1191730726">definition of the BB Space</a>. The <code>input_parameters_file</code> file can have any name, and contains one input parameter per line. The <code>#</code> character is used to denote a
 comment and lines starting with this character are not processed.
 Each input parameter is specified by means of a keyword.
-The complete list of keywords is available in the <a href="#Toc35546_1191730726">Keywords</a> section. Examples of input files can be found in the test folder. Note that <code>input_parameters</code> file can be generated with the GUI from "New Virtual Screening" button.</p>
+The complete list of keywords is available in the <a href="#Toc35546_1191730726">Keywords</a> section. Examples of input files can be found in the test folder. Note that <code>input_parameters_file</code> file can be generated with the GUI from "New Virtual Screening" button.</p>
 
 <h3 class="western"><a name="Toc17846_799972446"></a>FragSpaceExplorer Output</h3>
 <p>The output generated by FragSpaceExplorer is structured as the following
@@ -584,9 +607,89 @@ the checkpoint file are considered to be lost and will be
 re-submitted upon restart of the FSE run. Therefore, to avoid duplicates the files related to those
 “lost” calculations should be collected and isolated.</p>
 
-<h2 class="western"><a name="Toc14852_799999446"></a>Other Programs</h2>
-<p>The list of other utilities and programs that can be run from the command line is reported in the help message:
-<pre class="bash"><code>denoptim -h</code></pre></p>
+
+<h2 class="western"><a name="Toc9999_2"></a>Graph Editor</h2>
+<p>Graph Editor is a program for editing graphs from the command line. This allows embedding a graph edit task in any workflow external to denoptim. For example, in the fitness evaluation workflow of an external provider.</p>
+<p>The graph editor can be run with this command:
+<pre class="bash"><code>denoptim -r GE input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">keywords</a> providing all input parameters. Among these settings there is a text-based definition of the graph editing task. See <a href="#Toc9999_3">Graph Editing Task Files</a>.</p>
+
+
+<h2 class="western"><a name="Toc9999_4"></a>Genetic Operator</h2>
+<p>This is a program for performing genetic operations from the command line.</p>
+<p>This program can be run with this command:
+<pre class="bash"><code>denoptim -r GO input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+
+
+<h2 class="western"><a name="Toc9999_5"></a>Fitness Provider Runner</h2>
+<p>This is a program to lauch a fitness provider (internal or external) in the same way as done from within GA or FSE runs, but straight from the command line-</p>
+<p>This program can be run with this command:
+<pre class="bash"><code>denoptim -r FIT input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+
+
+<h2 class="western"><a name="Toc9999_6"></a>3D Molecular Models Builder</h2>
+<p>This is a program for converting graph representation into a 3D chemical representation by exploring the 3D features of building blocks and, if needed, perform a ring-closing conformational search (see <a href="https://doi.org/10.1021/acs.jcim.5b00424"><i>J. Chem. Inf. Model.</i> <b>2015</b>, 55, 9 1844-1856</a>).</p>
+<p>This program can be run with this command:
+<pre class="bash"><code>denoptim -r 3DB input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+<p><b>WARNING:</b> This program requires <a href="https://dasher.wustl.edu/tinker/">Tinker Molecular Modeling software</a> to be installed on the system. The user is responsible for installing Tinker in accordance with its license terms. Furthermore, the ring-closing conformational search requires a customized version of Tinker. Contact <a href="mailto:denoptim.project@gmail.com">denoptim.project@gmail.com</a> for instructions on how to modify Tinker and use the customized version in accordance with Tinker license's terms.</p>
+
+
+<h2 class="western"><a name="Toc9999_7"></a>Graph Isomorphism Analyzer</h2>
+<p>This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism". 
+ "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of  
+ <a href="https://mathworld.wolfram.com/IsomorphicGraphs.html">
+ graph isomorphism</a>
+ that differs from the most common meaning of isomorphism in graph theory.
+ In general, graph are considered undirected when evaluating
+ DENOPTIM-isomorphism. 
+ Next, since a graph is effectively 
+ a spanning tree (ST_i={{vertexes}, {acyclic edges}}) 
+ with a set of fundamental cycles (FC_i={C_1, C_2,...C_n}), 
+ any graph G={ST_i,FC_i} that contains one or more cycles 
+ can be represented in multiple
+ ways, G={ST_j,FC_j} or G={ST_k,FC_k}, that differ by the position of the
+ chord/s and by the corresponding pair of ring-closing vertexes between
+ which each chord is defined.
+ The DENOPTIM-isomorphism for two graphs G1 and G2 
+ is given by the common graph theory isomorphism between 
+ two undirected graphs U1 and U2 build respectively from G1 and G2.</p>
+ Finally,
+ <ul>
+ <li>vertexes are compared excluding their vertex ID,</li>
+ <li>edges are considered undirected and compared considering the 
+ bond type they declare and the 
+ identity of the attachment points connected thereby. This latter point
+ has an important implication: two apparently equal graphs (same vertexes
+ that are connected to each other forming the same vertex-chains) can be 
+ non-isomorphic when the APs used to connect two vertexes are not the
+ same. Chemically, this means the stereochemistry around one or both
+ vertexes, is different in the two graphs. Therefore two otherwise 
+ equal-looking graphs can very well be, de facto, not DENOPTIM-isomorphic.</li>
+ </ul>
+ <p>
+ This method makes use of the Vento-Foggia VF2 algorithm (see 
+ <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804">DOI:10.1109/TPAMI.2004.75</a>)
+ as implemented in <a href="https://jgrapht.org/">JGraphT</a>.</p>
+ <p><b>WARNING:</b> Detection of isomorphism can be very slow for pathological cases and
+ for graphs with large symmetric systems!
+</p>
+<!--
+	NB: the above text is very very similar (differences are meant to exclude javadoc links) from the DGraph.isIsomorphicTo() 
+	Please, keep in sync.
+	-->
+<p>The Graph Isomorphism Analyzer program can be run with this command:
+<pre class="bash"><code>denoptim -r GI input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+
+<h2 class="western"><a name="Toc9999_8"></a>Graph List Comparator</h2>
+<p>This program compares lists of graphs seeking for "DENOPTIM-isomorphic" graphs (see <a href="Toc9999_7">here</a> for the definition of "DENOPTIM-isomorphic").</p>
+<p>This program can be run with this command:
+<pre class="bash"><code>denoptim -r CGL input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+
 
 <hr>
 
@@ -607,12 +710,13 @@ re-submitted upon restart of the FSE run. Therefore, to avoid duplicates the fil
 </ul>
 
 <p align="justify">The following tables list all the keywords grouped
-according to the main functionality/object affected by the use of a
+according to the main functionality affected by the use of a
 keyword. Unless otherwise specified, the use of the keywords is
 optional as most parameters have a default value. Since, the settings
 are reported in the beginning of the log file, the default value of a
 specific keyword can be found in the log file of a run performed
 without providing that specific keyword in the input file.</p>
+
 
 <br>
 <h3 class="western"><a name="Toc40912_1191730726"></a>Definition of the Space of Graph Building Blocks (BB Space)</h3>
@@ -734,7 +838,7 @@ without providing that specific keyword in the input file.</p>
 </table>
 
 <br>
-<h3 class="western"><a name="Toc40914_1191730726"></a>Ring closing machinery</h3>
+<h3 class="western"><a name="Toc40914_1191730726"></a>Ring-Closing machinery</h3>
 <table width="100%" cellpadding="4" cellspacing="0" style="border-collapse: collapse">
 	<col width="118*"/>
 
@@ -805,9 +909,9 @@ without providing that specific keyword in the input file.</p>
 		</td>
 		<td width="54%"><p>Defined the closability condition's evaluation mode:</p>
 			<ol start="0">
-				<li><p>only constitution of candidate ring,</p>
-				<li><p>only closability of 3D chain,</p>
-				<li><p>both 0 and 1.</p>
+				<li>only constitution of candidate ring,</li>
+				<li>only closability of 3D chain,</li>
+				<li>both 0 and 1.</li>
 			</ol>
 		</td>
 	</tr>
@@ -884,7 +988,7 @@ without providing that specific keyword in the input file.</p>
 			evaluation of 3D chain closability by scanning the torsional
 			space.</p>
 		</td>
-	</tr
+	</tr>
 	<tr valign="middle">
 		<td width="46%"><p><code>RC-ExhaustiveConfSearch</code></p>
 		</td>
@@ -947,7 +1051,7 @@ without providing that specific keyword in the input file.</p>
 </table>
 
 <br>
-<h3 class="western"><a name="Toc40916_1191730726"></a>DenoptimGA</h3>
+<h3 class="western"><a name="Toc40916_1191730726"></a>GA Runner</h3>
 <table width="100%">
 	<col width="102*"/>
 
@@ -1164,7 +1268,7 @@ without providing that specific keyword in the input file.</p>
 		</td>
 	</tr>
         <tr valign="middle">
-                <td width="40%"><p><code>GA-MultiSiteMutationWeights</code>
+                <td width="40%"><p><code>GA-MultiSiteMutationWeights</code></p>
                 </td>
 <td width="60%"><p>Specifies the relative weight of multi-site mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutates again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the addition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.</p>
 <p>Provide values in a comma- or space-separated list. The first value is the weight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,
@@ -1300,7 +1404,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		<td width="40%"><p><code>3DB-InpSDF</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname to the input SDF file that must contain
-			DENOPTIMGraph representation of the chemical object. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
+			graph representation of the chemical object. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
 		</td>
 	</tr>
 	<tr valign="middle">
@@ -1532,7 +1636,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
 		</td>
 	</tr>
-		<tr>
+	<tr>
 		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
 		</td>
 	</tr>
@@ -1544,10 +1648,10 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		</td>
 	</tr>
 
-	</tr>
-		<tr>
+	<tr>
 		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Internal Fitness Provider</p>
 		</td>
+	</tr>
 	</tr>
 	</tr>
 		<tr valign="middle">
@@ -1584,23 +1688,247 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		</td>
 		<td width="60%"><p>Specifies the interpreter to use when running the external fitness provider source file.</p>
 		</td>
+	</tr>
+</table>
+
+<br>
+<h3 class="western"><a name="Toc88888_1"></a>Stand-alone Graph Editor</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>  
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-InputGraphs</code></p>
+		</td>
+		<td width="60%"><p>Pathname of a file containing the graphs to edit. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-GraphsEditsFile</code></p>
+		</td>
+		<td width="60%"><p>Pathname of a file defining the graph edit task. See <a href="#Toc9999_3">Graph Editing Task Files</a>. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-OutputGraphs</code></p>
+		</td>
+		<td width="60%"><p>Pathname of a file where to put the edited graphs. <font color="#ff3333"><b>[REQUIRED]</b></font></p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-OutpotGraphsFormat</code></p>
+		</td>
+		<td width="60%"><p>Format of the output. Can be SDF or JSON.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHEDIT-EnforceSymmetry</code></p>
+		</td>
+		<td width="60%"><p>Use y/yes to enforce the application of symmetry whenever possible.</p>
+		</td>
+	</tr>
+</table>
+
+<!-- //TODO: complete this part!
+<br>
+<h3 class="western"><a name="Toc88888_2"></a>Stand-alone Genetic Operator</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-OP</code></p>
+		</td>
+		<td width="60%"><p>Specifies the type of operation (Mutation or Crossover/Xover)</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-InpFile</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file containing an input graph.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-OutFile</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file where results will be saved.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-MutationTarget</code></p>
+		</td>
+		<td width="60%"><p>Identify the vertex to be mutated by its ID. To identify vertexes nested in templates, a sequence of ID can be used. For example: "1, 2, 3" identifies vertex with ID 3 that is embedded in the template vertex with ID 2,  that is embedded in the template vertex with ID 1.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>TESTGENOPS-</code></p>
+		</td>
+		<td width="60%"><p></p>
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>_____</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>-</code></p>
+		</td>
+		<td width="60%"><p></p>
+		</td>
+	</tr>
+</table>
+-->
+
+<br>
+<h3 class="western"><a name="Toc88888_3"></a>Stand-alone Fitness Runner</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FR-Input</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file containing the graph for which the fitness has to be calculated.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FR-Output</code></p>
+		</td>
+		<td width="60%"><p>Pathname where results will be saved (see <a href="#Toc16853_799972446">Fitness Files</a>)</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FR-ExtractTemplates</code></p>
+		</td>
+		<td width="60%"><p>Add this keyword to request the extraction of template vertex from the result of the fitness evaluation process. This keyword is meant for testing purposes.</p>
+		</td>
+	</tr>
 </table>
 
 
-<hr>
-<h1 class="western"><a name="Toc9999_1"></a>Utilities</h1>
+<br>
+<h3 class="western"><a name="Toc88888_4"></a>Stand-alone Graph Isomorphism Analyzer</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>Isomorphism-inpGraphA</code></p>
+		</td>
+		<td width="60%"><p>Pathname to one of the graph to be considered for the detection of <a href="Toc9999_7">DENOPTIM-isomorphism</a>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>Isomorphism-inpGraphB</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the other of the graph to be considered for the detection of <a href="Toc9999_7">DENOPTIM-isomorphism</a></p>
+		</td>
+	</tr>
+</table>
 
-<h3 class="western"><a name="Toc9999_2"></a>GraphEditor</h3>
-<p>GraphEditor is a standalone tool to modify DENOPTIMGraph programmatically outside DENOPTIM main programs. To use GraphEditor run the following command:
-<pre class="bash"><code> java -jar $DENOPTIM_HOME/build/GraphEditor.jar parameters_file</code></pre>
-where <code>$DENOPTIM_HOME</code> is the path to the DENOPTIM installation folder, and a <code>parameters_file</code> is a text parameters file with the keywords needed to perform the task. In addition to any definition of the building block space (see <a href="#Toc40912_1191730726">here</a>), GraphEditor is controlled by the following key-value pairs: 
-<ul>
-  <li><code>GRAPHEDIT-INPUTGRAPHS</code> (<b>REQUIRED</b>): the pathname to a file containing one or more graphs to be edited.</li>
-  <li><code>GRAPHEDIT-GRAPHSEDITSFILE</code> (<b>REQUIRED</b>): the pathname to a file containing one or more graph edit tasks (see <a href="#Toc9999_3">Graph Editing Task Files</a>).</li>
-  <li><code>GRAPHEDIT-OUTPUTGRAPHS</code> (<b>REQUIRED</b>): the pathname of a file where to put the resulting graphs.</li>
-  <li><code>GRAPHEDIT-OUTPUTGRAPHSFORMAT</code>: the format of the output.</li>
-  <li><code>GRAPHEDIT-VERBOSITY</code>: the amount of log.</li>
-</ul></p>
+<h3 class="western"><a name="Toc88888_5"></a>Stand-alone Graph List Comparator</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHLISTS-InputGraphs-A</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file containing the first list of graphs.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHLISTS-InputGraphs-B</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file containing the second list of graphs.</p>
+		</td>
+	</tr>
+	<!-- Not in use yet
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHLISTS-OutputGraphs</code></p>
+		</td>
+		<td width="60%"><p>Pathname to the file where resulting graphs will be saved.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>GRAPHLISTS-OutputGraphsFormat</code></p>
+		</td>
+		<td width="60%"><p>Definition of the format to be use for output graphs.</p>
+		</td>
+	</tr>
+-->
+</table>
+
+<!-- Template for table
+<br>
+<h3 class="western"><a name="Toc88888_"></a>___WHAT?___</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>-</code></p>
+		</td>
+		<td width="60%"><p></p>
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>_____</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>-</code></p>
+		</td>
+		<td width="60%"><p></p>
+		</td>
+	</tr>
+</table>
+-->
 
 
 <hr>
@@ -1671,7 +1999,7 @@ information related to the class-based approach:</p>
 	<li>the definition of the AP class compatibility matrix (lines
 	starting with <code>RCN</code> keyword, comma-separated entries),</li>
 	<li>the AP class-to-bond order conversion key (<code>RBO</code> keyword),</li>
-	<li>the rules to append capping groups (<cose>CAP</cose> keyword),</li>
+	<li>the rules to append capping groups (<code>CAP</code> keyword),</li>
 	<li>the rules to discharge a graph if an AP of a specific APclass is not
 	used (<code>DEL</code> keyword).</li>
 </ul>
@@ -1738,7 +2066,7 @@ communicate the definition of any candidate chemical entity (e.g., a
 new candidate molecule in a molecular design run) to external fitness
 providers (see <a href="#Toc42056_808352928">Fitness evaluation</a>).</p>
 
-<p>DENOPTIM programs output the 2D/3D structure of the molecule (in SDF format) together with its DENOPTIMGraph representation 
+<p>DENOPTIM programs output the 2D/3D structure of the molecule (in SDF format) together with its graph representation 
 (tag <code>&lt;GraphENC&gt;</code>) and additional information
 (i.e., SMILES, InChiKey). By default, the Cartesian coordinates reported in these files are those of a three-dimensional tree-like model built by aligning each building block according to the attachment point vectors. The resulting geometry is not refined, and is only meant to facilitate further processing and visual inspection. While such geometry can be used as starting point for further molecular modeling, it should never be used to calculate any property dependent on the molecular geometry. The alignment of the building blocks is skipped when using the <code>FP-No3dTreeModel</code> keyword. In this case, the SDF file will contain Cartesian coordinates of the initial building blocks, and will therefore be characterized by a correct topology but a nonsensically geometric arrangement of the atoms.</p>
 

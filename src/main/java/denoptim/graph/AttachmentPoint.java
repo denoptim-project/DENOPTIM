@@ -189,20 +189,34 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
             throws DENOPTIMException
     {
         this(owner);
-        processSdfString(str);
+        Object[] features = processSdfString(str);
+        this.atomPositionNumber = (int) features[0];
+        this.apClass = (APClass) features[1];
+        this.dirVec = (Point3d) features[2];
     }
  
 //-----------------------------------------------------------------------------
         
-    private void processSdfString(String str) throws DENOPTIMException
+    /**
+     * Parses the string format used to record one attachment point in SDF files.
+     * @param str the string to parse
+     * @return the array of attachment point features in this order<ol>
+     * <li>atomPositionNumber</li>
+     * <li>APClass</li>
+     * <li>vector</li>
+     * </ol>
+     * @throws DENOPTIMException
+     */
+    public static Object[] processSdfString(String str) throws DENOPTIMException
     {
+        Object[] features = new Object[3];
         try 
         {
             String[] parts = str.split(
                     Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPAAP));
             
             //WARNING here we convert from 1-based to 0-based index
-            this.atomPositionNumber = Integer.parseInt(parts[0])-1;
+            features[0] = Integer.parseInt(parts[0])-1;
 
             String[] details = parts[1].split(
                     Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPSCL));
@@ -211,33 +225,37 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
                 case 2:
                 {
                     //OK, APClass:subclass but no direction vector and no bnd type
-                    this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
-                    
-                    String[] coord = details[2].split(
-                            Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
-                    
-                    if (coord.length == 3)
-                    {
-                        this.dirVec = new Point3d(Double.parseDouble(coord[0]),
-                                Double.parseDouble(coord[1]),
-                                Double.parseDouble(coord[2]));
-                    }
+                    features[1] = APClass.make(details[0],Integer.parseInt(
+                            details[1]));
                     break;
                 }
                     
                 case 3:
                 {
                     //OK, APClass:subclass:direction_vector
-                    this.apClass = APClass.make(details[0],Integer.parseInt(details[1]));
+                    // or APClass:subclass:BondType
+                    features[1] = APClass.make(details[0],Integer.parseInt(
+                            details[1]));
                     
                     String[] coord = details[2].split(
                             Pattern.quote(DENOPTIMConstants.SEPARATORAPPROPXYZ)); 
-                    
-                    if (coord.length == 3)
+                    switch (coord.length)
                     {
-                        this.dirVec = new Point3d(Double.parseDouble(coord[0]),
-                                Double.parseDouble(coord[1]),
-                                Double.parseDouble(coord[2]));
+                        case 1:
+                            // OK, APClass:subclass:BondType
+                            features[1] = APClass.make(details[0],Integer.parseInt(
+                                    details[1]), BondType.valueOf(details[2]));
+                            break;
+                            
+                        case 3:
+                            //OK, APClass:subclass:direction_vector
+                            features[1] = APClass.make(details[0],Integer.parseInt(
+                                    details[1]));
+                            features[2] = new Point3d(
+                                    Double.parseDouble(coord[0]),
+                                    Double.parseDouble(coord[1]),
+                                    Double.parseDouble(coord[2]));
+                            break;
                     }
                     break;
                 }
@@ -245,7 +263,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
                 case 4:
                 {
                     //OK, new format that includes bond type
-                    this.apClass = APClass.make(details[0],
+                    features[1] = APClass.make(details[0],
                             Integer.parseInt(details[1]),
                             BondType.valueOf(details[2]));
                     
@@ -254,7 +272,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
                     
                     if (coord.length == 3)
                     {
-                        this.dirVec = new Point3d(Double.parseDouble(coord[0]),
+                        features[2] = new Point3d(Double.parseDouble(coord[0]),
                                 Double.parseDouble(coord[1]),
                                 Double.parseDouble(coord[2]));
                     }
@@ -270,6 +288,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
             throw new DENOPTIMException("Cannot construct AP from string '" 
                         + str + "'",t);
         }
+        return features;
     }
 
 //------------------------------------------------------------------------------
