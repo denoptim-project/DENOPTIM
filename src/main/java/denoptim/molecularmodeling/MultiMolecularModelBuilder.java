@@ -111,8 +111,7 @@ public class MultiMolecularModelBuilder
         RingClosureTool rct = new RingClosureTool(settings);
         ArrayList<ChemicalObjectModel> rcMols =new ArrayList<ChemicalObjectModel>();
         boolean skipConfSearch = false;
-        if (rcParams.allowRingClosures() && 
-            mol.getGraph().getRings().size() != 0)
+        if (rcParams.allowRingClosures() && mol.getGraph().hasOrEmbedsRings())
         {
             startTime = System.nanoTime();
             rcMols = rct.attemptAllRingClosures(mol);
@@ -129,12 +128,11 @@ public class MultiMolecularModelBuilder
             logger.log(Level.FINE, "TIME (close ring): "+time/1000000+" ms"
                       + " #frags: " + mol.getGraph().getVertexList().size()
                       + " #atoms: " + mol.getIAtomContainer().getAtomCount()
-                      + " #rings: " + mol.getGraph().getRings().size()
                       + " #rcaCombs: " + mol.getRCACombinations().size()
                       + " #allClosedRCSCombs: " + numAllClosedCombs);
             if (rcParams.requireCompleteRingclosure && numAllClosedCombs<1)
             {
-                logger.log(Level.INFO, "No fully closed RCS combinaton. "
+                logger.log(Level.INFO, "No fully closed RCA combinaton. "
                         + "Nothing to send to conformational search.");
                 skipConfSearch = true;
             }

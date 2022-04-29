@@ -608,9 +608,40 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Check for rings in this graph. Does not cross the template-barrier, i.e., 
+     * ignores any ring that is embedded at any level in any vertex of this
+     * graph, neither in any graph that embeds this graph. 
+     * @return <code>true</code> if there are rings in this graph.
+     */
     public boolean hasRings()
     {
         return gRings.size() > 0;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Check for rings in this graph and in any graph that is embedded at any 
+     * level in any vertex of this graph. Does not consider any graph that 
+     * embeds this graph. 
+     * @return <code>true</code> if there are rings in this graph or in embedded
+     * graphs.
+     */
+    public boolean hasOrEmbedsRings()
+    {
+        if (gRings.size() > 0)
+            return true;
+        for (Vertex v : gVertices)
+        {
+            if (!(v instanceof Template))
+                continue;
+            
+            Template t = (Template) v;
+            if (t.getInnerGraph().hasOrEmbedsRings())
+                return true;
+        }
+        return false;
     }
 
 //------------------------------------------------------------------------------
