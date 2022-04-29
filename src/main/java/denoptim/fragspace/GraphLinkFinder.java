@@ -181,6 +181,14 @@ public class GraphLinkFinder
             }
             
             // We map all the compatibilities before choosing a specific mapping
+            if (chosenNewLink.getNumberOfAPs()==2)
+            {
+
+                System.out.println("-");
+                System.out.println(chosenNewLink.getAP(0).getAPClass());
+                System.out.println(chosenNewLink.getAP(1).getAPClass());
+                System.out.println("-");
+            }
             APMapFinder apmf = new APMapFinder(fragSpace, originalLink, 
                     chosenNewLink, screenAll);
             

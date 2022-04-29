@@ -637,6 +637,11 @@ public class Template extends Vertex
     @Override
     public IAtomContainer getIAtomContainer()
     {   
+        /*
+        Problem is that here we still have the mol from the evaluation of the graph: we need to distinguish from this mol and the mol high-quality tht might have been imported upon creation of the Template 
+        To this end create a highQuality3D flag that holds this information and 
+        if (mol != null && hasHighQualityGeometry)
+            */
         if (mol != null)
         {
             return mol;

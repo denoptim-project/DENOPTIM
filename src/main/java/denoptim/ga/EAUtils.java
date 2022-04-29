@@ -50,6 +50,7 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
 import denoptim.graph.Template;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.CyclicGraphHandler;
@@ -1340,8 +1341,9 @@ public class EAUtils
         graph.addVertex(scafVertex);
         graph.setLocalMsg("NEW");
         
-        if (graph.getAvailableAPs().size()==0
-                && scafVertex instanceof Template)
+        if (scafVertex instanceof Template
+                && !((Template) scafVertex).getContractLevel().equals(
+                        ContractLevel.FIXED))
         {
             Monitor mnt = new Monitor();
             mnt.name = "IntraTemplateBuild";
@@ -1353,6 +1355,12 @@ public class EAUtils
                 // branch of the initial graph or deletes vertexes.
                 if (!graph.containsOrEmbedsVertex(mutableSite))
                     continue;
+                
+                // TODO: need to discriminate between EmptyVertexes that 
+                // represent placeholders and those that represent property carriers
+                // The first should always be mutated (as it happens now), but
+                // the latter should be kept intact.
+                // Possibly this is a case for subclassing the EmptyVertex.
                 
                 if (!GraphOperations.performMutation(mutableSite, mnt,
                         settings))

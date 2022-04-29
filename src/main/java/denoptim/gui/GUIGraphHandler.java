@@ -444,7 +444,7 @@ public class GUIGraphHandler extends GUICardPanel
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
                 }
-                btnFragSpace.setText("Change Library of Vertexes");
+                btnFragSpace.setText("Change BB Space");
             }
         });
         
@@ -498,12 +498,13 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		
 	    btnAddEmptyVrtx = new JButton("Add Empty Vertex");
-        btnAddEmptyVrtx.setToolTipText("<html>Creates an empty vertex "
-                + "(i.e., a vertex with attachment points<br>"
-                + "and properties, but that contains no atoms) and appends it "
-                + "to<br>"
-                + "the attachment points selected in the current graph."
-                + "<html>");
+        btnAddEmptyVrtx.setToolTipText(String.format("<html><body width='%1s'>"
+                + "Creates an empty vertex and appends it "
+                + "to the attachment points selected in the current graph.<br>"
+                + "Empty vertices have attachment points but do not contain "
+                + "atoms. Therefore, they can be used as place holders to define the "
+                + "graph structure without specifing an actual vertex."
+                + "<html>", 350));
         btnAddEmptyVrtx.setEnabled(true);
         btnAddEmptyVrtx.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -525,7 +526,7 @@ public class GUIGraphHandler extends GUICardPanel
                         return;
                     }
                 }
-                startGraphFromCreationOfEmptyVertex(selAps);
+                createEmptyVertexAndPlaceItInGraph(selAps);
             }
         });
         
@@ -796,7 +797,10 @@ public class GUIGraphHandler extends GUICardPanel
                 File outFile = fileAndFormat.file;
                 try
                 {
-                    DenoptimIO.writeVertexesToFile(outFile,fileAndFormat.format,
+                    // The writing method may change the extension. So we need
+                    // to get the return value.
+                    outFile = DenoptimIO.writeVertexesToFile(outFile,
+                            fileAndFormat.format,
                             templates);
                 }
                 catch (Exception ex)
@@ -942,11 +946,11 @@ public class GUIGraphHandler extends GUICardPanel
 	
 //-----------------------------------------------------------------------------
 	
-	private void startGraphFromCreationOfEmptyVertex(
+	private void createEmptyVertexAndPlaceItInGraph(
 	        ArrayList<AttachmentPoint> selAps)
 	{   
         GUIEmptyVertexMaker makeEmptyVertexDialog = 
-                new GUIEmptyVertexMaker(this);
+                new GUIEmptyVertexMaker(this, selAps.size()==0);
         makeEmptyVertexDialog.pack();
         Object evObj = makeEmptyVertexDialog.showDialog();
         if (evObj == null)
@@ -1076,7 +1080,7 @@ public class GUIGraphHandler extends GUICardPanel
                 // after this 'switch' block make no sense. Instead, we use the 
                 // same method called by the "Add Empty Vertex" button.
                 ArrayList<AttachmentPoint> selectedAPs = new ArrayList<>();
-                startGraphFromCreationOfEmptyVertex(selectedAPs);
+                createEmptyVertexAndPlaceItInGraph(selectedAPs);
                 return;
             
             case 11: 
@@ -1851,10 +1855,10 @@ public class GUIGraphHandler extends GUICardPanel
 	        JComboBox<BBType> bbTypeCmb = new JComboBox<BBType>(BBType.values());
 
 	        private String bbtTolTip = "<html><body width='%1s'>"
-	                + "Speicfy the type of contract of the template, i.e., "
-	                + "to what "
-	                + "extent the graph embedded in the template can change in "
-	                + "structure and/or identity of the vertexes.</html>";
+	                + "Speicfy the type of building block of the vertex. This"
+	                + "determines, for instance, the type of other vertexes "
+	                + "that can be used to replace thi one (if such mutation "
+	                + "is permitted).</html>";
 	        
 	        private int szTolTip = 250;
 	        

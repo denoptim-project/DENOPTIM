@@ -25,12 +25,16 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -45,6 +49,7 @@ import javax.swing.table.JTableHeader;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
 import denoptim.graph.EmptyVertex;
+import denoptim.graph.Vertex.BBType;
 
 public class GUIEmptyVertexMaker extends GUIModalDialog
 {
@@ -64,6 +69,9 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
     private JTable apTable;
     private DefaultTableModel apTabModel;
 	
+    private JPanel lineBBType;
+    private JComboBox<BBType> cmbBBType;
+    
     private JPanel lineRCV;
     private JRadioButton rcbIsRCV;
 
@@ -78,10 +86,50 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
     private DefaultTableModel propTabModel;
 	*/
     
+    private boolean canBeScaffold = true;
+    
+
 //------------------------------------------------------------------------------
 
-	public GUIEmptyVertexMaker(Component parent)
-	{
+    /**
+     * Constructs a maker that can make empty vertexes on a specific 
+     * {@link BBType} and does not allow to change such type.
+     * @param parent the parent component used to place the dialog in 
+     * proximity of the parent.
+     * @param givenType the given type of the generated vertexes.
+     */
+    public GUIEmptyVertexMaker(Component parent, BBType givenType)
+    {
+        this(parent, false);
+        BBType[] bt = new BBType[1];
+        bt[0] = givenType;
+        cmbBBType.setModel(new DefaultComboBoxModel<BBType>(bt));
+        cmbBBType.setEnabled(false);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructs a maker that can make empty vertexes freely.
+     * @param parent the parent component used to place the dialog in 
+     * proximity of the parent.
+     */
+    public GUIEmptyVertexMaker(Component parent)
+    {
+        this(parent, true);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructs a maker that can make empty vertexes, but controls whether
+     * the generated vertexes are allowed to be {@link BBType#SCAFFOLD}.
+     * @param parent the parent component used to place the dialog in 
+     * proximity of the parent.
+     */
+    public GUIEmptyVertexMaker(Component parent, boolean canBeScaffold)
+    {
+        this.canBeScaffold = canBeScaffold;
 	    setLocationRelativeTo(parent);
 	    setTitle("Create Empty Vertex");
 		centralPanel = new JPanel();
@@ -130,6 +178,7 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
                     apTabModel.addRow(new Object[]{apTabModel.getRowCount()+1,
                             apc.toString()});
                 }
+                updateBBTypeBasedOnAPCount();
             }
         });
         btnAPDelete = new JButton("Remove Selected");
@@ -146,6 +195,7 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
                         {
                             apTabModel.removeRow(selectedRowIds[i]);
                         }
+                        updateBBTypeBasedOnAPCount();
                     }
                 }
             }
@@ -171,12 +221,28 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
         );
         centralPanel.add(lineAPsBtns);
         
+
+        cmbBBType = new JComboBox<BBType>();
+        updateBBTypeBasedOnAPCount();
+        cmbBBType.setToolTipText(String.format("<html><body width='%1s'>"
+                + "Speicfy the type of building block of the vertex. This"
+                + "determines, for instance, the type of other vertexes "
+                + "that can be used to replace thi one (if such mutation "
+                + "is permitted).</html>",300));
+        lineBBType = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lineBBType.add(cmbBBType);
+        centralPanel.add(lineBBType);
+        
+        
         rcbIsRCV = new JRadioButton("ring-closing vertex");
         rcbIsRCV.setToolTipText("Select to mark this vertex as a ring-closing "
                 + "vertex");
         lineRCV = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lineRCV.add(rcbIsRCV);
         centralPanel.add(lineRCV);
+        
+        
+        
         
         //TODO: uncomment when properties will be enables
         /*
@@ -257,7 +323,8 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			    EmptyVertex ev = new EmptyVertex();
+			    EmptyVertex ev = new EmptyVertex(BBType.valueOf(
+			            cmbBBType.getSelectedItem().toString()));
 			    for (int i=0; i<apTabModel.getRowCount(); i++)
 			    {
 			        String apClass = apTabModel.getValueAt(i, 1).toString();
@@ -291,6 +358,58 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
 		this.btnCanc.setVisible(true);
 		
 		super.addToCentralPane(centralPanel);
+	}
+	
+//------------------------------------------------------------------------------
+	
+	private void updateBBTypeBasedOnAPCount()
+	{
+	    List<BBType> collection = new ArrayList<BBType>();
+	    
+	    if (canBeScaffold)
+	    {
+	        collection.add(BBType.SCAFFOLD);
+	        for (int i=0; i<BBType.values().length; i++)
+	            if (!collection.contains(BBType.values()[i]))
+	                collection.add(BBType.values()[i]);
+	    } else {
+    	    switch (apTabModel.getRowCount())
+    	    {
+    	        case 0:
+    	            collection.add(BBType.UNDEFINED);
+    	            break;
+    	            
+    	        case 1:
+                    collection.add(BBType.CAP);
+                    for (int i=0; i<BBType.values().length; i++)
+                    {
+                        BBType cand = BBType.values()[i];
+                        if (!collection.contains(cand)
+                                && !cand.equals(BBType.SCAFFOLD))
+                            collection.add(cand);
+                    }
+                    break;
+                    
+    	        default:
+    	            collection.add(BBType.FRAGMENT);
+                    for (int i=0; i<BBType.values().length; i++)
+                    {
+                        BBType cand = BBType.values()[i];
+                        if (!collection.contains(cand)
+                                && !cand.equals(BBType.SCAFFOLD)
+                                && !cand.equals(BBType.CAP))
+                            collection.add(cand);
+                    }
+                    break;
+    
+    	    }
+	    }
+	    BBType[] types = new BBType[collection.size()];
+	    for (int i=0; i<collection.size(); i++)
+        {
+	        types[i] = collection.get(i);
+        }new DefaultComboBoxModel<BBType>(types);
+        cmbBBType.setModel(new DefaultComboBoxModel<BBType>(types));
 	}
 	
 //------------------------------------------------------------------------------

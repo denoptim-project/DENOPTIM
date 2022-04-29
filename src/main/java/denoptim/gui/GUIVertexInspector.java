@@ -399,7 +399,7 @@ public class GUIVertexInspector extends GUICardPanel
         btnEmptFrag.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 GUIEmptyVertexMaker makeEmptyVertexDialog = 
-                        new GUIEmptyVertexMaker(btnEmptFrag);
+                        new GUIEmptyVertexMaker(btnEmptFrag, BBType.FRAGMENT);
                 makeEmptyVertexDialog.pack();
                 Object ev = makeEmptyVertexDialog.showDialog();
                 if (ev == null)
@@ -607,7 +607,10 @@ public class GUIVertexInspector extends GUICardPanel
                 File outFile = fileAndFormat.file;
                 try
                 {
-                    DenoptimIO.writeVertexesToFile(outFile,fileAndFormat.format,
+                    // The writing method may change the extension. So we need
+                    // to get the return value.
+                    outFile = DenoptimIO.writeVertexesToFile(outFile,
+                            fileAndFormat.format,
                             verticesLibrary);
                 }
 				catch (Exception ex)
