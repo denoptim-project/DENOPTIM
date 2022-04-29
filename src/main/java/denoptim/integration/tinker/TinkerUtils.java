@@ -590,8 +590,8 @@ public class TinkerUtils
         }
         catch (IOException nfe)
         {
-	    String msg = "File '" + filename + "' not found.";
-            throw new DENOPTIMException(msg,nfe);
+            String msg = "File '" + filename + "' not found.";
+            throw new DENOPTIMException(msg, nfe);
         }
         finally
         {
