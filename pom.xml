@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.denoptim</groupId>
   <artifactId>denoptim</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.2</version>
   <name>denoptim</name>
 
   <properties>
@@ -150,7 +150,7 @@
     <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
-        <version>5.3.16</version>
+        <version>5.3.19</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.github.dpaukov/combinatoricslib3 -->
     <dependency>
