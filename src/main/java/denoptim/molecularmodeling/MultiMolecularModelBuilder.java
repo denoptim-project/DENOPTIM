@@ -31,6 +31,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DGraph;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.integration.tinker.ConformationalSearchPSSROT;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;
@@ -40,6 +41,7 @@ import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 import denoptim.utils.AtomOrganizer;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ObjectPair;
+import denoptim.utils.Randomizer;
 import denoptim.utils.RotationalSpaceUtils;
 
 /**
@@ -55,9 +57,14 @@ public class MultiMolecularModelBuilder
     private MMBuilderParameters settings;
     
     /**
-     * Program.specific logger
+     * Program-specific logger
      */
     private Logger logger;
+    
+    /**
+     * Program-specific random numbers generator
+     */
+    private Randomizer rng;
 
 //------------------------------------------------------------------------------
 
@@ -66,6 +73,7 @@ public class MultiMolecularModelBuilder
     {
         this.settings = settings;
         this.logger = settings.getLogger();
+        this.rng = settings.getRandomizer();
         this.molName = molName;
         this.molGraph = molGraph;
     }
@@ -80,7 +88,7 @@ public class MultiMolecularModelBuilder
      * structure can be obtained if the provided graph allows for isomerism
      * for example by multiple possibility of ring formation or conformational
      * isomerism (not implemented yet).
-     * @throws TinkerException if thinker fails
+     * @throws TinkerException if Tinker fails
      */
 
     public ArrayList<IAtomContainer> buildMulti3DStructure() 
@@ -109,16 +117,16 @@ public class MultiMolecularModelBuilder
         // Evaluate source of isomerism
         // 1: Attempt Ring Closures 
         RingClosureTool rct = new RingClosureTool(settings);
-        ArrayList<ChemicalObjectModel> rcMols =new ArrayList<ChemicalObjectModel>();
+        ArrayList<ChemicalObjectModel> structures =new ArrayList<ChemicalObjectModel>();
         boolean skipConfSearch = false;
         if (rcParams.allowRingClosures() && mol.getGraph().hasOrEmbedsRings())
         {
             startTime = System.nanoTime();
-            rcMols = rct.attemptAllRingClosures(mol);
+            structures = rct.attemptAllRingClosures(mol);
             endTime = System.nanoTime();
             time = (endTime - startTime);
             int numAllClosedCombs = 0;
-            for (ChemicalObjectModel rcMol : rcMols)
+            for (ChemicalObjectModel rcMol : structures)
             {
                 Object o = rcMol.getIAtomContainer().getProperty(
                         DENOPTIMConstants.MOLERRORTAG);
@@ -139,38 +147,51 @@ public class MultiMolecularModelBuilder
         } else {
             ChemicalObjectModel nMol = mol.deepcopy();
             rct.saturateRingClosingAttractor(nMol);
-            rcMols = new ArrayList<ChemicalObjectModel>();
-            rcMols.add(nMol);
+            structures = new ArrayList<ChemicalObjectModel>();
+            structures.add(nMol);
         }
-
+        
+        /*
+        ArrayList<IAtomContainer> iacs = new ArrayList<IAtomContainer>();
+        for (ChemicalObjectModel com : structures)
+            iacs.add(com.getIAtomContainer());
+        DenoptimIO.writeSDFFile("/tmp/afterRC.sdf", iacs);
+        */
 
         // 2: Conformational search (if possible)
-        ArrayList<ChemicalObjectModel> csMols = new ArrayList<ChemicalObjectModel>();
-        if (skipConfSearch)
+        if (!skipConfSearch)
         {
-            csMols.addAll(rcMols);
-        } else {
-            ConformationalSearchPSSROT csPssRot = new ConformationalSearchPSSROT(
-                    settings);
             startTime = System.nanoTime();
-            csMols = csPssRot.performPSSROT(rcMols);
-            endTime = System.nanoTime();
+            ConformationalSearchPSSROT.performPSSROT(structures, "cs",
+                    settings.getParamFile(), 
+                    settings.getKeyFileParams(),
+                    settings.getInitPSSROTParams(),
+                    settings.getRestPSSROTParams(),
+                    settings.getPSSROTTool(),
+                    settings.getXYZINTTool(),
+                    settings.getWorkingDirectory(),
+                    settings.getTaskID(), logger);
             time = (endTime - startTime);
             logger.log(Level.FINE, "TIME (conf. search): "+time/1000000+" ms"
                       + " #frags: " + mol.getGraph().getVertexList().size()
                       + " #atoms: " + mol.getIAtomContainer().getAtomCount()
                       + " #rotBnds: " + mol.getRotatableBonds().size());
         }
-
+        
+        /*
+        ArrayList<IAtomContainer> iacs2 = new ArrayList<IAtomContainer>();
+        for (ChemicalObjectModel com : structures)
+            iacs.add(com.getIAtomContainer());
+        DenoptimIO.writeSDFFile("/tmp/afterCS.sdf", iacs2);
+        */
+        
         // Convert and return results
         ArrayList<IAtomContainer> results = new ArrayList<IAtomContainer>();
         DummyAtomHandler dah = new DummyAtomHandler(
                 DENOPTIMConstants.DUMMYATMSYMBOL, logger);
-        for (ChemicalObjectModel mol3db : csMols)
+        for (ChemicalObjectModel mol3db : structures)
         {
             IAtomContainer iac = mol3db.getIAtomContainer();
-            
-            //TODO-V3 make reordering optional
             
             IAtomContainer originalOrderMol = AtomOrganizer.makeReorderedCopy(
                     iac, mol3db.getOldToNewOrder(), mol3db.getNewToOldOrder());
@@ -219,7 +240,10 @@ public class MultiMolecularModelBuilder
         // Create 3D tree-like structure
         ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, 
                 settings.getRandomizer());
-        IAtomContainer initMol = tb.convertGraphTo3DAtomContainer(molGraph);
+        IAtomContainer initMol = tb.convertGraphTo3DAtomContainer(molGraph, 
+                false, //don't remove used RCAs
+                true,  //set the CDK requirements 
+                true); //rebuild low-quality structured embedded in templates
        
         // Reorder atoms and clone molecule.
         AtomOrganizer oa = new AtomOrganizer();
@@ -257,7 +281,8 @@ public class MultiMolecularModelBuilder
                 molName,
                 rotBonds,
                 oldToNewMap,
-                newToOldMap
+                newToOldMap,
+                logger
         );
     }
 

@@ -28,6 +28,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
@@ -409,11 +410,19 @@ public abstract class RunTimeParameters
             logger.setLevel(Level.INFO);
             String header = "Started logging for " + loggerIdentifier;
             logger.log(Level.INFO,header);
+        } else {
+            logger.addHandler(new StreamHandler(System.out, 
+                    new SimpleFormatter()));
         }
+        
         
         if (verbosity!=0)
         {
             logger.setLevel(verbosityTologLevel());
+            for (int iH=0; iH<logger.getHandlers().length; iH++)
+            {
+                logger.getHandlers()[iH].setLevel(verbosityTologLevel());
+            }
         }
         
         for (RunTimeParameters innerParams : otherParameters.values())

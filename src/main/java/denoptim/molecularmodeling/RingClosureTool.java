@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +41,9 @@ import denoptim.graph.Edge.BondType;
 import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosure;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.integration.tinker.ConformationalSearchPSSROT;
 import denoptim.integration.tinker.TinkerAtom;
+import denoptim.integration.tinker.TinkerException;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
@@ -137,26 +140,6 @@ public class RingClosureTool
         }
     }
 
-//------------------------------------------------------------------------------    
-    /**
-     *
-     * TODO: this method (from DENOPTIM3DMoleculeBuilder.java) should be made 
-     * public and moved to a more sensible location (i.e., a class of utilities
-     * for tinker methods)
-     *
-     */
-
-    private String getNameLastCycleFile(String fname, String tinkerresfile)
-                                                        throws DENOPTIMException
-    {
-        int lastIdx = MMBuilderUtils.countLinesWKeywordInFile(tinkerresfile,
-                " Final Function Value and Deformation");
-        String workDir = settings.getWorkingDirectory();
-        String xyzfile = workDir + fsep + fname + "." 
-                + GenUtils.getPaddedString(3, lastIdx - 1);
-        return xyzfile;
-    }
-
 //------------------------------------------------------------------------------
 
     /*
@@ -166,8 +149,8 @@ public class RingClosureTool
      * for tinker methods)
      */
 
-    private ArrayList<double[]> getTinkerCoords(String fname, String tinkerresfile)
-                                                        throws DENOPTIMException
+    private ArrayList<double[]> getTinkerCoords(String fname, String tinkerresfile) 
+            throws DENOPTIMException
     {
         ArrayList<Double> energies = TinkerUtils.readPSSROTOutput(tinkerresfile);
         if (energies.isEmpty())
@@ -197,22 +180,22 @@ public class RingClosureTool
     
     /**
      * Performs one or more attempts to close rings by conformational adaptation.
-     * The number of attempts (i.e, different set of rings), is given by the 
-     * information collected into the Molecule3DBuilder object provided as input.
+     * The number of attempts (i.e, different set of rings) and the list of
+     * definition of each attempt are defined into the object provided as input.
      * If no ring closure is possible, returns an empty array.
      * @param mol the input molecular system 
      * @return the list of generated molecules, if any.
      * @throws DENOPTIMException
+     * @throws TinkerException 
      */
 
     public ArrayList<ChemicalObjectModel> attemptAllRingClosures(
-                                 ChemicalObjectModel mol) throws DENOPTIMException
+            ChemicalObjectModel mol) throws DENOPTIMException, TinkerException
     {
         ArrayList<ChemicalObjectModel> rcMols = new ArrayList<ChemicalObjectModel>();
-        int i = 0;
-        for (Set<ObjectPair> rcaComb : mol.getRCACombinations())
+        for (int i=0; i<mol.getRCACombinations().size(); i++)
         {
-            i++;
+            Set<ObjectPair> rcaComb = mol.getRCACombinations().get(i);
             if (logger.isLoggable(Level.FINE))
             {
                 String s = "";
@@ -225,7 +208,9 @@ public class RingClosureTool
             }
 
             // Try to create new molecule
-            ChemicalObjectModel rcMol = attemptRingClosure(mol,rcaComb);
+            ChemicalObjectModel molTo3d = mol.deepcopy();
+            ChemicalObjectModel rcMol = attemptRingClosure(molTo3d, 
+                    molTo3d.getRCACombinations().get(i));
 
     	    // If some ring remains open, report in the MOL_ERROR field
     	    int newRingClosed = rcMol.getNewRingClosures().size();
@@ -315,23 +300,23 @@ public class RingClosureTool
      * that defines which atoms (chain head/tails) attract each other. 
      * The PSSROT engine is provided by an ad hoc modified version of Tinker
      * (call to external tool).
-     * @param molIn the input molecular system 
+     * @param chemObj the definition of the system to work with. This system
+     * will be modified.
      * @param rcaCombination the combination of RingClosingAttractors. This
      * object defines which pairs of RingClosingAttractors will we try to join
      * in this attempt.
      * @return a new molecular system with the freshly closed rings, if any,
      * otherwise an empty molecule.
      * @throws DENOPTIMException
+     * @throws TinkerException 
      */
 
-    public ChemicalObjectModel attemptRingClosure(ChemicalObjectModel molIn,
-                      Set<ObjectPair> rcaCombination) throws DENOPTIMException
+    public ChemicalObjectModel attemptRingClosure(ChemicalObjectModel chemObj,
+            Set<ObjectPair> rcaCombination) throws DENOPTIMException, TinkerException
     {
-        ChemicalObjectModel rcMol3d = molIn.deepcopy();
-        IAtomContainer fmol = rcMol3d.getIAtomContainer();
-        TinkerMolecule tmol = rcMol3d.getTinkerMolecule();
+        IAtomContainer fmol = chemObj.getIAtomContainer();
         String workDir = settings.getWorkingDirectory();
-        String molName = rcMol3d.getName();
+        String molName = chemObj.getName();
 
         // Increment iteration number (to make unique file names)
         itn++;
@@ -339,219 +324,81 @@ public class RingClosureTool
         logger.log(Level.INFO, "Attempting Ring Closure via conformational"
                                 + " adaptation for " + molName
                                 + " (PSSROT - Iteration: " + itn + ")");
-
-        // Prepare dummy space for text and coordinates
-        for (int i=0; i<fmol.getAtomCount(); i++)
-        {
-            double[] f = new double[3];
-            f[0] = fmol.getAtom(i).getPoint3d().x;
-            f[1] = fmol.getAtom(i).getPoint3d().y;
-            f[2] = fmol.getAtom(i).getPoint3d().z;
-        }
         
-        // Prepare Tinker INT file (Internal coordinates)
-        String rsIntFile = workDir + fsep + molName + "_rs" + itn + ".int";
-        TinkerUtils.writeIC(rsIntFile, tmol);
-
-        //Prepare Tinker KEY file (keywords, definition of potential)
-        String rsKeyFile = workDir + fsep + molName + "_rs" + itn + ".key";
-        StringBuilder rsSbKey = new StringBuilder(512);
-        // Molecule-independent keywords
-        for (String line : settings.getRSKeyFileParams())
-        {
-            rsSbKey.append(line).append("\n");
-        }
-        // Active pairs of RCAs
+        List<String> molSpecificKeyFileLines = new ArrayList<String>();
+        molSpecificKeyFileLines.addAll(settings.getRSKeyFileParams());
         for (ObjectPair op : rcaCombination)
         {
-            int iRcaA = ((Integer) op.getFirst()).intValue();
-            int iRcaB = ((Integer) op.getSecond()).intValue();
-            int iTnkAtmRcaA = rcMol3d.getTnkAtmIdOfRCA(
-                                                rcMol3d.getAttractor(iRcaA));
-            int iTnkAtmRcaB = rcMol3d.getTnkAtmIdOfRCA(
-                                                rcMol3d.getAttractor(iRcaB));
-            rsSbKey.append("RC-PAIR");
-            rsSbKey.append(" " + iTnkAtmRcaA + " " + iTnkAtmRcaB + "\n");
-        }
-
-        // get settings //TODO: this should happen inside RunTimeParameters
-        RingClosureParameters rcParams = new RingClosureParameters();
-        if (settings.containsParameters(ParametersType.RC_PARAMS))
-        {
-            rcParams = (RingClosureParameters)settings.getParameters(
-                    ParametersType.RC_PARAMS);
+            int iTnkAtmRcaA = chemObj.getTnkAtmIdOfRCA(
+                    (RingClosingAttractor) op.getFirst());
+            int iTnkAtmRcaB = chemObj.getTnkAtmIdOfRCA(
+                    (RingClosingAttractor) op.getSecond());
+            molSpecificKeyFileLines.add("RC-PAIR " + iTnkAtmRcaA + " " 
+                    + iTnkAtmRcaB);
         }
         
         // Definition of RingClosingPotential
-        rsSbKey.append("RC11BNDTERM\n");
-        rsSbKey.append("RC12BNDTERM NONE"+NL);
+        molSpecificKeyFileLines.add("RC11BNDTERM");
+        molSpecificKeyFileLines.add("RC12BNDTERM NONE");
         for (ObjectPair op : rcaCombination)
         {
-            int iRcaA = ((Integer) op.getFirst()).intValue();
-            int iRcaB = ((Integer) op.getSecond()).intValue();
-            RingClosingAttractor rca0 = rcMol3d.getAttractor(iRcaA);
-            RingClosingAttractor rca1 = rcMol3d.getAttractor(iRcaB);
+            RingClosingAttractor rca0 = (RingClosingAttractor) op.getFirst();
+            RingClosingAttractor rca1 = (RingClosingAttractor) op.getSecond();
             int s0t = fmol.indexOf(rca0.getSrcAtom()) + 1;
             int s1t = fmol.indexOf(rca1.getSrcAtom()) + 1;
-            int i0t = rcMol3d.getTnkAtmIdOfRCA(rca0);
-            int i1t = rcMol3d.getTnkAtmIdOfRCA(rca1);
+            int i0t = chemObj.getTnkAtmIdOfRCA(rca0);
+            int i1t = chemObj.getTnkAtmIdOfRCA(rca1);
 
             double parA = 0.0;
             double parB = 0.0;
             parA = (rca0.getParamA11() + rca1.getParamA11()) / 2.0;
             parB = (rca0.getParamB11() + rca1.getParamB11()) / 2.0;
 
-            rsSbKey.append("RC-11-PAIRS " + i0t + " " +s1t + " "
-                           + parA + " " + parB + "\n");
-
-            rsSbKey.append("RC-11-PAIRS " + s0t + " " + i1t + " "
-                           + parA + " " + parB + "\n");
+            molSpecificKeyFileLines.add("RC-11-PAIRS " + i0t + " " +s1t + " "
+                           + parA + " " + parB);
+            molSpecificKeyFileLines.add("RC-11-PAIRS " + s0t + " " + i1t + " "
+                           + parA + " " + parB);
         }
-            
-        //Finally write the keywords into the KEY file
-        DenoptimIO.writeData(rsKeyFile, rsSbKey.toString(), false);
-
-        // Prepare Tinker Submit file (PSSROT parameters)
-        String rsSubFile = workDir + fsep + molName + "_rs" + itn + ".sub";
-        StringBuilder rsSbSub = new StringBuilder(512);
-        rsSbSub.append(rsIntFile).append("\n");
-        // Molecule-independent section of SUB file
-        for (String line : settings.getRSInitPSSROTParams())
-        {
-            rsSbSub.append(line).append("\n");
-        }
-        // Rotatable bonds section of SUB file
-        for (ObjectPair rotBndOp : rcMol3d.getRotatableBonds())
-        {
-            int t1 = ((Integer)rotBndOp.getFirst()).intValue() + 1;
-            int t2 = ((Integer)rotBndOp.getSecond()).intValue() + 1;
-            rsSbSub.append(t1).append(" ").append(t2).append("\n");
-        }
-        rsSbSub.append("\n");
-        // Linear search section of SUB file
-        int sz = rcMol3d.getNumberRotatableBonds();
-        if (sz > 1)
-        {
-            ArrayList<String> txt = settings.getRSRestPSSROTParams();
-            for (int ir=0; ir<txt.size(); ir++)
-            {
-                // Control number of linear search directions
-                if (ir == 2)
-                {
-                    int maxDirs = Integer.parseInt(txt.get(ir));
-                    if (sz < maxDirs)
-                    {
-                        rsSbSub.append(sz).append("\n");
-                    }
-                    else
-                    {
-                        rsSbSub.append(maxDirs).append("\n");
-                    }
-                }
-                else
-                {
-                    String row = txt.get(ir);
-                    rsSbSub.append(row).append("\n");
-                }
-            }
-        }
-        else 
-        {
-            if (sz == 1)
-            {
-                // No linear search if there is only 1 rotation bond
-                String firstLine = settings.getRestPSSROTParams().get(0);
-                String lastLine = settings.getRestPSSROTParams().get(
-                                 settings.getRestPSSROTParams().size()-1);
-                rsSbSub.append(firstLine).append("\n");
-                rsSbSub.append("N").append("\n"); // no local search                
-                rsSbSub.append(lastLine).append("\n");
-            }
-        }
-        DenoptimIO.writeData(rsSubFile, rsSbSub.toString(), false);
-
-        logger.log(Level.INFO, "Submitting Ring-Closing PSSTOR");
-
-        // Perform Ring Search with Tinker's PSSROT
-        String rsOutFile = workDir + fsep + molName + "_rs" + itn + ".log";
-        String rsCmdStr = settings.getPSSROTTool() +
-                          " < " + rsSubFile + " > " + rsOutFile;
-        String rsID = "" + settings.getTaskID();
-        logger.log(Level.FINE, "CMD: " + rsCmdStr + " TskID: " + rsID);
-        ProcessHandler rsPh = new ProcessHandler(rsCmdStr, rsID);
-        try
-        {
-            rsPh.runProcessInBASH();
-            if (rsPh.getExitCode() != 0)
-            {
-                String msg = "PSSROT RingSearch failed for " + molName;
-                throw new DENOPTIMException(msg + NL + rsPh.getErrorOutput());
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new DENOPTIMException(ex);
-        }
-
-        // Convert XYZ output of Tinker to INT with same z.matrix
-        // Here we assume the file *.int with same basename exists
-        // (was used it as input for PSSROT-RingSearch) and that file works as
-        // template of the z-matrix
-        String orsIntfile = getNameLastCycleFile(molName + "_rs" + itn, rsOutFile);
-        String orsID = "" + settings.getTaskID();
-        String orsCmd = settings.getXYZINTTool() + " " + orsIntfile + " "
-                        + " T"; //set use of template (in Tinker)
-        logger.log(Level.FINE, "CMD: " + orsCmd + " TskID: " + orsID);
-        ProcessHandler orsPh = new ProcessHandler(orsCmd, orsID);
-        try
-        {
-            orsPh.runProcessInBASH();
-            if (orsPh.getExitCode() != 0)
-            {
-                String msg = "XYZINT (post RS) failed for " + molName;
-                throw new DENOPTIMException(msg + "\n"
-                                            + orsPh.getErrorOutput());
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new DENOPTIMException(ex);
-        }
-
-        // Update local molecular representation with output from RC-PSSROT
-        String newTnkIC = workDir + fsep + molName + "_rs" + itn + ".int_2";
-        TinkerMolecule tmpTmol = TinkerUtils.readTinkerIC(newTnkIC);
-        ArrayList<TinkerAtom> lstAtoms = tmpTmol.getAtoms();
-        for (int i=0; i<lstAtoms.size(); i++)
-        {
-            TinkerAtom ta = lstAtoms.get(i);
-            tmol.getAtom(i+1).setDistAngle(ta.getDistAngle());
-        }
-        rcMol3d.updateXYZFromINT();
+        
+        long startTime = System.nanoTime();
+        ConformationalSearchPSSROT.performPSSROT(chemObj, itn, "rs",
+                settings.getParamFile(), 
+                molSpecificKeyFileLines,
+                settings.getInitPSSROTParams(),
+                settings.getRestPSSROTParams(),
+                settings.getPSSROTTool(),
+                settings.getXYZINTTool(),
+                workDir,
+                settings.getTaskID(), logger);
+        long endTime = System.nanoTime();
+        long time = (endTime - startTime);
+        logger.log(Level.FINE, "TIME (RC conf. search): "+time/1000000+" ms"
+                  + " #frags: " + chemObj.getGraph().getVertexList().size()
+                  + " #atoms: " + chemObj.getIAtomContainer().getAtomCount()
+                  + " #rotBnds: " + chemObj.getRotatableBonds().size());
 
         logger.log(Level.INFO, "RC-PSSROT done. Now, post-processing.");
 
         // Evaluate proximity of RingClosingAttractor and close rings
-        closeRings(rcMol3d,rcaCombination);
-
-        // Update list rotatabe bonds
-        rcMol3d.purgeListRotatableBonds();
+        closeRings(chemObj, rcaCombination);
+        
+        // Update list rotatable bonds
+        chemObj.purgeListRotatableBonds();
 
         // Finalize the molecule: saturate free RCA
-        saturateRingClosingAttractor(rcMol3d);
+        saturateRingClosingAttractor(chemObj);
         
         // Cleanup
         FileUtils.deleteFilesContaining(workDir,molName + "_rs" + itn);
         
-        return rcMol3d;
+        return chemObj;
     }
 
 //------------------------------------------------------------------------------    
 
     /**
      * Makes new rings by connecting pairs of atoms that hold properly arranged
-     * RingClosingAttractors. For the criteria deciding which bonds are to be 
-     * closed, see method <code>boundableChainEnds</code>.
+     * RingClosingAttractors.
      *
      * @param mol the molecular system
      * @param rcaCombination the combination of RingClosingAttractors. This
@@ -559,8 +406,7 @@ public class RingClosureTool
      * in this attempt.
      */
 
-    public void closeRings(ChemicalObjectModel mol, 
-						 Set<ObjectPair> rcaCombination)
+    public void closeRings(ChemicalObjectModel mol, Set<ObjectPair> rcaCombination)
     {
         // get settings //TODO: this should happen inside RunTimeParameters
         RingClosureParameters rcParams = new RingClosureParameters();
@@ -574,17 +420,14 @@ public class RingClosureTool
         List<RingClosure> candidatesClosures = new ArrayList<RingClosure>();
         for (ObjectPair op : rcaCombination)
         {
-            logger.log(Level.FINEST, "closeRings: evaluating closure of "+op);
-
-            int iRcaA = ((Integer) op.getFirst()).intValue();
-            int iRcaB = ((Integer) op.getSecond()).intValue();
-            RingClosingAttractor rcaA = mol.getAttractor(iRcaA);
-            RingClosingAttractor rcaB = mol.getAttractor(iRcaB);
+            logger.log(Level.FINEST, "closeRings: evaluating closure of " + op);
+            RingClosingAttractor rcaA = (RingClosingAttractor) op.getFirst();
+            RingClosingAttractor rcaB = (RingClosingAttractor) op.getSecond();
             Point3d srcA = rcaA.getSrcAtom().getPoint3d();
             Point3d atmA = rcaA.getIAtom().getPoint3d();
             Point3d srcB = rcaB.getSrcAtom().getPoint3d();
             Point3d atmB = rcaB.getIAtom().getPoint3d();
-            RingClosure rc = new RingClosure(srcA,atmA,srcB,atmB);
+            RingClosure rc = new RingClosure(srcA, atmA, srcB, atmB);
             candidatesClosures.add(rc);
 
             //Define closability conditions
@@ -612,7 +455,7 @@ public class RingClosureTool
                 
     	    if (closeThisBnd)
             {
-    	        BondType bndTyp =  mol.getDRingFromRCAPair(op).getBondType();
+    	        BondType bndTyp = rcaA.getRCBondType();
     	        if (bndTyp.hasCDKAnalogue())
     	        {
     	            mol.addBond(rcaA.getSrcAtom(),rcaB.getSrcAtom(),rc, bndTyp);

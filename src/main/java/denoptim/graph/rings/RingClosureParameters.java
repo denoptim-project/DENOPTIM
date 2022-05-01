@@ -122,7 +122,7 @@ public class RingClosureParameters extends RunTimeParameters
 
     /**
      * Tolerance factor for interatomic distances. This value
-     * is the percentace (p) of the average between the attachment point 
+     * is the percentage (p) of the average between the attachment point 
      * vector lengths at the head (l_H) and tail (l_T) of a candidate 
      * chain.
      * </br>

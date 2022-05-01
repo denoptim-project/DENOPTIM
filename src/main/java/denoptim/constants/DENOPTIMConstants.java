@@ -32,7 +32,9 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.Vertex;
+import denoptim.graph.rings.RingClosingAttractor;
 
 
 /**
@@ -322,13 +324,21 @@ public final class DENOPTIMConstants
 
     /**
      * String tag of <code>Atom</code> property used to store the unique ID of
-     * the <code>DENOPTIMVertex</code> corresponding to the molecular fragment
+     * the  {@link Vertex} corresponding to the molecular fragment
      * to which the atom belongs.
      */
     public static final String ATMPROPVERTEXID = "DENOPTIMVertexID";
     
     /**
-     * String tag of <code>Atom</code> property used to store the original
+     * Name of <code>Atom</code> property used to store the unique ID of
+     * the {@link Vertex} that owns the atom and the IDs of any {@link Vertex}
+     * that embeds such vertex, thus creating a path from the outermost level
+     * down to the {@link Vertex} that owns the atom.
+     */
+    public static final String ATMPROPVERTEXPATH = "ATMPROPVERTEXPATH";
+    
+    /**
+     * Name of <code>Atom</code> property used to store the original
      * position of an atom in the atom list of the fragment.
      */
     public static final String ATMPROPORIGINALATMID = "DENOPTIMAtomPosition";
@@ -340,7 +350,7 @@ public final class DENOPTIMConstants
     public static final String BONDPROPROTATABLE = "DENOPTIMRotable";
 
     /**
-     * Recognised types of RingClosingAttractor and compatible types
+     * Recognized types of {@link RingClosingAttractor} and compatible types
      */
     public static final Map<String,String> RCATYPEMAP =
 		    new HashMap<String,String>() 
@@ -356,7 +366,28 @@ public final class DENOPTIMConstants
             put("ATN", "ATN");
         };
     };
-
+    
+    /**
+     * Property of a {@link IAtom} representing a {@link RingClosingAttractor}. 
+     * This property records the {@link APClass} of the 
+     * {@link AttachmentPoint} on which the attractor is attached  the graph.
+     */
+    public static final Object RCAPROPAPCTORCA = "RCAPROPAPCTORCA";
+    
+    /**
+     * Property of a {@link IAtom} representing a {@link RingClosingAttractor}. 
+     * This property records the {@link BondType} configured 
+     * for the bond to be closed by the ring.
+     */
+    public static final Object RCAPROPCHORDBNDTYP = "RCAPROPCHORDBNDTYP";
+    
+    /**
+     * Property of a {@link IAtom} representing a {@link RingClosingAttractor}. 
+     * This property records the {@link Ring} that the attractor is meant to 
+     * close, if any.
+     */
+    public static final Object RCAPROPRINGUSER = "RCAPROPRINGUSER";
+    
     /**
      * Smallest difference for comparison of double and float numbers.
      */

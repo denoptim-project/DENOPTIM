@@ -254,13 +254,6 @@ public class MMBuilderParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
 
-    public int getVerbosity()
-    {
-        return verbosity;
-    }
-
-//------------------------------------------------------------------------------
-
     public boolean debug()
     {
         return debug;

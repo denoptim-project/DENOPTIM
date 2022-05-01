@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -46,6 +47,7 @@ import denoptim.json.DENOPTIMgson;
 import denoptim.logging.StaticLogger;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
+import denoptim.utils.Randomizer;
 
 /**
  * A vertex is a data structure that has an identity and holds a 
@@ -689,10 +691,27 @@ public abstract class Vertex implements Cloneable
 //------------------------------------------------------------------------------
 
     public abstract boolean containsAtoms();
-    
+
 //------------------------------------------------------------------------------
 
     public abstract IAtomContainer getIAtomContainer();
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Method meant to trigger regeneration of the chemical representation, 
+     * typically needed to drop a low quality structure that is good enough for 
+     * most cheminformatic tasks, and replace it with a better quality structure
+     * that is suitable to be fed to molecular modeling tasks.
+     * tasks,
+     * @param logger
+     * @param rng
+     * @param removeUsedRCAs
+     * @param rebuild
+     * @return the generated structure
+     */
+    public abstract IAtomContainer getIAtomContainer(Logger logger, 
+            Randomizer rng, boolean removeUsedRCAs, boolean rebuild);
 
 //-----------------------------------------------------------------------------
 

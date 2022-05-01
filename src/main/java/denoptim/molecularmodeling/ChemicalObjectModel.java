@@ -48,7 +48,6 @@ import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Ring;
-import denoptim.graph.Vertex;
 import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosure;
 import denoptim.integration.tinker.TinkerAtom;
@@ -103,19 +102,9 @@ public class ChemicalObjectModel
     private ArrayList<Set<ObjectPair>> allRCACombs;
 
     /**
-     * Relation between pairs of RingClosingAttractors and DENOPTIMRings
-     */
-    private Map<ObjectPair,Ring> mapDRingsRCACombs;
-
-    /**
      * List of rotatable bonds
      */
     private ArrayList<ObjectPair> rotatableBnds;
-
-    /**
-     * Verbosity level
-     */
-    private int verbosity = 0;
 
     /**
      * List of new ring closing environments
@@ -155,7 +144,6 @@ public class ChemicalObjectModel
         this.attractors = new ArrayList<RingClosingAttractor>();
         this.attToAtmID = new HashMap<RingClosingAttractor,Integer>();
         this.allRCACombs = new ArrayList<Set<ObjectPair>>();
-        this.mapDRingsRCACombs = new HashMap<ObjectPair,Ring>();
         this.rotatableBnds = new ArrayList<ObjectPair>();
         this.newRingClosures = new ArrayList<RingClosure>();
         this.molName = "none";
@@ -176,7 +164,7 @@ public class ChemicalObjectModel
      * @param attractors all the ring closing attractors (RCA)
      * @param attToAtmID the correspondence between RCA and atom index
      * @param allRCACombs all combinations of compatible pairs of RCAs
-     * @param ringClosures the list of closed multifragment rings
+     * @param ringClosures the list of closed multi-fragment rings
      * @param logger the tool to use for logging.
      */
 
@@ -204,13 +192,12 @@ public class ChemicalObjectModel
         this.newRingClosures = ringClosures;
         this.overalRCScore = Double.NaN;
         this.atmOveralScore = Double.NaN;
-        this.mapDRingsRCACombs = new HashMap<ObjectPair,Ring>();
         if (this.attractors.size() != 0)
         {
-            if (molGraph.hasRings())
+            if (molGraph.hasOrEmbedsRings())
             {
                 // ring closures defined in the input
-                convertDENOPTIMRingIntoRcaCombinationns();
+                convertRingsToRCACombinations();
             }
         }
         this.oldToNewOrder = oldToNewOrder;
@@ -227,16 +214,22 @@ public class ChemicalObjectModel
      * @param tmol the internal coordinates representation
      * @param molName the reference name of this molecule
      * @param rotatableBnds the list of rotatable bonds (as pairs of atom 
-     * indeces)
+     * @param oldToNewOrder indexes that allow to map the atom position 
+     * before and after the reordering neede to make use of internal coordinates
+     * possible.
+     * @param newToOldOrder indexes that allow to map the atom position 
+     * before and after the reordering neede to make use of internal coordinates
+     * possible.
+     * @param logger the tool dealing with log messages.
+     * indexes)
      */
 
-    public ChemicalObjectModel(DGraph molGraph,
-                                IAtomContainer fmol, 
-                                TinkerMolecule tmol, 
-                                     String molName, 
-                ArrayList<ObjectPair> rotatableBnds,
-               ArrayList<Integer> oldToNewOrder,
-               ArrayList<Integer> newToOldOrder) throws DENOPTIMException
+    public ChemicalObjectModel(DGraph molGraph, IAtomContainer fmol, 
+            TinkerMolecule tmol, String molName,
+            ArrayList<ObjectPair> rotatableBnds,
+            ArrayList<Integer> oldToNewOrder,
+            ArrayList<Integer> newToOldOrder,
+            Logger logger) throws DENOPTIMException
     {
         this.molGraph = molGraph;
         this.fmol = fmol;
@@ -249,13 +242,12 @@ public class ChemicalObjectModel
         this.attToAtmID = new HashMap<RingClosingAttractor,Integer>();
         findAttractors();
         this.allRCACombs = new ArrayList<Set<ObjectPair>>();
-        this.mapDRingsRCACombs = new HashMap<ObjectPair,Ring>();
         if (this.attractors.size() != 0)
         {
-            if (molGraph.hasRings())
+            if (molGraph.hasOrEmbedsRings())
             {
                 // ring closures defined in the input
-                convertDENOPTIMRingIntoRcaCombinationns();
+                convertRingsToRCACombinations();
             }
         }
         this.newRingClosures = new ArrayList<RingClosure>();
@@ -263,13 +255,7 @@ public class ChemicalObjectModel
         this.atmOveralScore = Double.NaN;
         this.oldToNewOrder = oldToNewOrder;
         this.newToOldOrder = newToOldOrder;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    public void setVerbosity(int level)
-    {
-        this.verbosity = level;
+        this.logger = logger;
     }
     
 //------------------------------------------------------------------------------
@@ -300,78 +286,36 @@ public class ChemicalObjectModel
                 attToAtmID.put(rca, fmol.indexOf(atm));
             }
         }
-        
-        // Assign the class of the related attachment point to each RCA
-        for (RingClosingAttractor rca : attractors)
-        {
-            APClass apclass = getClassFromAttractor(rca);
-            rca.setApClass(apclass);
-        }
     }
 
 //------------------------------------------------------------------------------
 
-    private void convertDENOPTIMRingIntoRcaCombinationns()
+    private void convertRingsToRCACombinations()
     {
+        //When we give the a graph with rings, we are defining the RCA 
+        //combinations, so there will be only one RCA combination
         Set<ObjectPair> singleRCAcomb = new HashSet<ObjectPair>();
-        for (Ring dr : molGraph.getRings())
+        
+        for (int i=0; i<attractors.size(); i++)
         {
-            Vertex headVtx = dr.getHeadVertex();
-            Vertex tailVtx = dr.getTailVertex();
-
-            int iH = -1;
-            int iT = -1;
-            for (int i=0; i<attractors.size(); i++)
+            RingClosingAttractor rcaI = attractors.get(i);
+            Ring ringOwnerI = rcaI.getRingUser();
+            if (ringOwnerI==null)
+                continue;
+            
+            for (int j=i+1; j<attractors.size(); j++)
             {
-                RingClosingAttractor rca = attractors.get(i);
-                int vid = (Integer) rca.getIAtom().getProperty(
-                                            DENOPTIMConstants.ATMPROPVERTEXID);
-                
-                if (vid == headVtx.getVertexId())
+                RingClosingAttractor rcaJ = attractors.get(j);
+                Ring ringOwnerJ = rcaJ.getRingUser();
+                if (ringOwnerJ==null)
+                    continue;
+                if (ringOwnerI==ringOwnerJ)
                 {
-                    iH = i;
-                }
-                if (vid == tailVtx.getVertexId())
-                {
-                    iT = i;
-                }
-                if (iT > -1 && iH > -1)
-                {
-                    break;
+                    singleRCAcomb.add(new ObjectPair(rcaI, rcaJ));
                 }
             }
-
-            ObjectPair op;
-            if (iH > iT)
-            {
-                op = new ObjectPair(iT,iH);
-            }
-            else
-            {
-                op = new ObjectPair(iH,iT);
-            }
-
-            // Store this pair of RCAs
-            singleRCAcomb.add(op);
-            // and the relation between the pair and the associated DENOPTIMRing
-            mapDRingsRCACombs.put(op,dr);
         }
-
         allRCACombs.add(singleRCAcomb);
-    }
-
-//------------------------------------------------------------------------------
-
-    private APClass getClassFromAttractor(RingClosingAttractor rca)
-    {
-        APClass cls = null;
-        IAtom atm = rca.getIAtom();
-        int i = fmol.getAtomNumber(atm) + 1;
-        TinkerAtom tatm = tmol.getAtom(i);
-        int vtxId = tatm.getVertexId();
-        Edge edge = molGraph.getEdgeWithParent(vtxId);
-        cls = edge.getSrcAPClass();
-        return cls;
     }
 
 //------------------------------------------------------------------------------
@@ -597,29 +541,15 @@ public class ChemicalObjectModel
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the list of combinations of RingClosingAttractors. This method
-     * require that either the identifyRCACombinations method has been run 
-     * or the RCA combinations were provided by means of DENOPTIMRings in the
-     * DENOPTIMGraph
+     * Returns the list of combinations of {@link RingClosingAttractor}. 
+     * This method
+     * require that there are {@link Ring}s in the {@link DGraph} representation
+     * of this object.
      */
 
     public ArrayList<Set<ObjectPair>> getRCACombinations()
     {
         return allRCACombs;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns the DENOPTIMRing that corresponds to a given pair of
-     * RingClosingAttractors.
-     * @param pair the pair of RingClodingAttractors
-     * @return the correspondence bewteen RCAs and DENOPTIMRings
-     */
-
-    public Ring getDRingFromRCAPair(ObjectPair pairRCAs)
-    {
-        return mapDRingsRCACombs.get(pairRCAs);
     }
 
 //------------------------------------------------------------------------------
@@ -736,8 +666,8 @@ public class ChemicalObjectModel
      * the pair of involved atoms comes with the object RingClosure.
      * @param atmA the first atom
      * @param atmA the second atom
-     * @param nRc the RingClosure object describing the ring-closing arrangement of
-     * atoms
+     * @param nRc the RingClosure object describing the ring-closing arrangement
+     * of atoms.
      */
 
     public void addBond(IAtom atmA, IAtom atmB, RingClosure nRc, 
@@ -746,8 +676,8 @@ public class ChemicalObjectModel
         this.newRingClosures.add(nRc);
         this.overalRCScore = Double.NaN;
 
-        int iA = fmol.getAtomNumber(atmA);
-        int iB = fmol.getAtomNumber(atmB);
+        int iA = fmol.indexOf(atmA);
+        int iB = fmol.indexOf(atmB);
        
         if (bndTyp.hasCDKAnalogue())
         {
@@ -820,6 +750,7 @@ public class ChemicalObjectModel
      * @throws DENOPTIMException
      */ 
 
+    @SuppressWarnings("unchecked")
     public ChemicalObjectModel deepcopy() throws DENOPTIMException
     {
         String nMolName = this.molName;
@@ -840,41 +771,38 @@ public class ChemicalObjectModel
         }
 
         ArrayList<RingClosingAttractor> nAttractors = 
-                                        new ArrayList<RingClosingAttractor>();
+                new ArrayList<RingClosingAttractor>();
         Map<RingClosingAttractor,Integer> nAttToAtmID = 
-                                new HashMap<RingClosingAttractor,Integer>();
+                new HashMap<RingClosingAttractor,Integer>();
+        Map<RingClosingAttractor,RingClosingAttractor> oldToNewRCA =
+                new HashMap<RingClosingAttractor,RingClosingAttractor>();
         for (int iorca=0; iorca<attractors.size(); iorca++)
         {
             RingClosingAttractor oRca = attractors.get(iorca);
             int ioatm = this.getAtmIdOfRCA(oRca);
             IAtom atm = nFMol.getAtom(ioatm);
             RingClosingAttractor nRca = new RingClosingAttractor(atm,nFMol);
-            TinkerAtom nTa = nTMol.getAtom(ioatm+1);
-            int vtxId = nTa.getVertexId();
-            Edge edge = nMolGraph.getEdgeWithParent(vtxId);
-            APClass cls = edge.getSrcAPClass();
-            nRca.setApClass(cls);
             nAttractors.add(nRca);
-            nAttToAtmID.put(nRca,ioatm);
+            nAttToAtmID.put(nRca, ioatm);
+            oldToNewRCA.put(oRca, nRca);
         }
 
         ArrayList<Set<ObjectPair>> nAllRCACombs = 
-                                        new ArrayList<Set<ObjectPair>>();
+                new ArrayList<Set<ObjectPair>>();
         for (Set<ObjectPair> sop : this.allRCACombs)
         {
             Set<ObjectPair> nSop = new HashSet<ObjectPair>();
             for (ObjectPair op : sop)
             {
-                int fst = ((Integer)op.getFirst()).intValue();
-                int scn = ((Integer)op.getSecond()).intValue();
-                ObjectPair nOp = new ObjectPair(fst,scn);
+                ObjectPair nOp = new ObjectPair(
+                        oldToNewRCA.get(op.getFirst()), 
+                        oldToNewRCA.get(op.getSecond()));
                 nSop.add(nOp);
             }
             nAllRCACombs.add(nSop);
         }
 
-        ArrayList<RingClosure> nNewRingClosures = 
-                                        new ArrayList<RingClosure>();
+        ArrayList<RingClosure> nNewRingClosures = new ArrayList<RingClosure>();
         for (RingClosure rc : this.newRingClosures)
         {
             nNewRingClosures.add(rc.deepCopy());

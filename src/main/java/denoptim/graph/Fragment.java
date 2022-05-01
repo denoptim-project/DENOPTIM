@@ -21,6 +21,7 @@ package denoptim.graph;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
@@ -38,6 +39,7 @@ import denoptim.graph.Edge.BondType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
+import denoptim.utils.Randomizer;
 
 /**
  * Class representing a continuously connected portion of chemical object
@@ -703,6 +705,21 @@ public class Fragment extends Vertex
                 getProperty(DENOPTIMConstants.APSTAG));
         mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         return mol;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Although this type of vertex contains atoms, its content is fixed. 
+     * So, there is no need to regenerate its chemical representation. 
+     * Accordingly, this method is ignoring all the parameters and calling
+     * {@link #getIAtomContainer()}
+     */
+    @Override
+    public IAtomContainer getIAtomContainer(Logger logger, 
+            Randomizer rng, boolean removeUsedRCAs, boolean rebuild)
+    {
+        return getIAtomContainer();
     }
     
 //-----------------------------------------------------------------------------
