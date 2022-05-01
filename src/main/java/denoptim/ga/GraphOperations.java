@@ -397,7 +397,6 @@ public class GraphOperations
         DGraph gB = vB.getGraphOwner();
         
         // Exclude overlapping combinations
-        //TODO-gg remove should not be needed
         boolean exclude = false;
         for (Vertex[] pairA : chosenSequenceOfEndpoints)
         {
