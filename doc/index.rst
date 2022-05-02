@@ -12,6 +12,7 @@ Welcome to DENOPTIM's documentation!
 
    user/index
    developer/index
+   original_doc/user_manual
 
 This is a link to somewhere `like the doxygen docs <../../doxygen/html/index.html>`_ 
 and we'll see if it works.
