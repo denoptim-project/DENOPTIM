@@ -303,10 +303,9 @@ public class FragsCombinationIterator
         for (IdFragmentAndAP candSrcAp : allSrcAps)
         {
             sb.append(" -> Possibilities for "+candSrcAp+EOL);
-            for (IdFragmentAndAP i : candFragsPerAP.get(candSrcAp))
-            {
-                sb.append(" ---> " + i+EOL);
-            }
+            if (candFragsPerAP.containsKey(candSrcAp))
+                for (IdFragmentAndAP i : candFragsPerAP.get(candSrcAp))
+                    sb.append(" ---> " + i+EOL);
         }
         settings.getLogger().log(Level.FINE, sb.toString());
 
