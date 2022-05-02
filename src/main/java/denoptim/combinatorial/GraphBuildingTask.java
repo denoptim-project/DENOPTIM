@@ -355,9 +355,8 @@ public class GraphBuildingTask extends FitnessTask
 
                         // Prepare vector of results
                         // NB: in FSE we add also the ID of the root graph in 
-                        // this array
+                        // this array, and the level
                         Object[] altRes = new Object[5];
-
                         try 
                         {
                             // Prepare molecular representation
@@ -385,8 +384,9 @@ public class GraphBuildingTask extends FitnessTask
                             altRes[1] = smiles;
         
                             // Prepare INCHI-Key                    
-                            String inchiKey = MoleculeUtils.getInChIKeyForMolecule(
-                                    mol, ceblSettings.getLogger());
+                            String inchiKey = 
+                                    MoleculeUtils.getInChIKeyForMolecule(mol, 
+                                            ceblSettings.getLogger());
                             if (inchiKey == null)
                             {
                                 inchiKey = "UNDEFINED_INCHI";
@@ -401,6 +401,10 @@ public class GraphBuildingTask extends FitnessTask
                             // Optionally perform external task
                             if (ceblSettings.submitFitnessTask())
                             {
+                                // We change the graph that was originally given 
+                                // to the FitnessTask superclass!
+                                dGraph = g;
+                                result.setGraph(g);
                                 sendToFitnessProvider(altRes);
                             }
                         }
