@@ -1,0 +1,4 @@
+create denoptim.github.io pages
+set up a CI workflow that publishes sphinx and doxtygen docs there
+
+

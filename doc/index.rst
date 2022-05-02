@@ -7,9 +7,33 @@ Welcome to DENOPTIM's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
+   user/index
+   developer/index
+
+This is a link to somewhere `like the doxygen docs <../../doxygen/html/index.html>`_ 
+and we'll see if it works.
+
+fgihd;fgilhjsgh
+
+
+.. doxygenfunction:: denoptim::graph::Vertex::getBuildingBlockId
+
+
+fghjfghjfsj
+dhgjdghjd
+
+dfghndflhk
+
+:math:`\sqrt{a+b}`
+
+dghjdghjdgj
+
+.. doxygenclass:: denoptim::graph::Vertex
+   :project: denoptim
+   :members: getBuildingBlockId
 
 
 Indices and tables
