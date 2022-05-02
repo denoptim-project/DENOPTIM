@@ -5096,19 +5096,20 @@ public class DGraph implements Cloneable
                 int nCompType = 0;
                 for (IAtom atm : mol.atoms())
                 {
-                    if (atm.getSymbol().equals(rcaTyp))
+                    if (MoleculeUtils.getSymbolOrLabel(atm).equals(rcaTyp))
                     {
                         nThisType++;
                     }
-                    else if (atm.getSymbol().equals(rcaTypes.get(rcaTyp)))
+                    else if (MoleculeUtils.getSymbolOrLabel(atm).equals(
+                            rcaTypes.get(rcaTyp)))
                     {
                         nCompType++;
                     }
                 }
 
                 // check number of rca per type
-                if (nThisType > rcSettings.getMaxRcaPerType() ||
-                        nCompType > rcSettings.getMaxRcaPerType())
+                if (nThisType > rcSettings.getMaxRcaPerType(rcaTyp) ||
+                        nCompType > rcSettings.getMaxRcaPerType(rcaTyp))
                 {
                     String msg = "Evaluation of graph: too many RCAs! "
                             + rcaTyp + ":" + nThisType + " "
@@ -5116,8 +5117,8 @@ public class DGraph implements Cloneable
                     settings.getLogger().log(Level.FINE, msg);
                     return null;
                 }
-                if (nThisType < rcSettings.getMinRcaPerType() ||
-                        nCompType < rcSettings.getMinRcaPerType())
+                if (nThisType < rcSettings.getMinRcaPerType(rcaTyp) ||
+                        nCompType < rcSettings.getMinRcaPerType(rcaTyp))
                 {
                     String msg = "Evaluation of graph: too few RCAs! "
                             + rcaTyp + ":" + nThisType + " "

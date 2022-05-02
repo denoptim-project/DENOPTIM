@@ -98,12 +98,12 @@ public class RingClosureParameters extends RunTimeParameters
     /**
      * Minimum number of <code>RingClosingAttractor</code>s in a valid graph.
      */
-    protected int minRcaPerType = 0;
+    protected Map<String,Integer> minRcaPerType = new HashMap<String,Integer>();
 
     /**
      * Maximum number of <code>RingClosingAttractor</code>s in a valid graph.
      */
-    protected int maxRcaPerType = 50;
+    protected Map<String,Integer> maxRcaPerType = new HashMap<String,Integer>();
 
     /**
      * Minimum number of <code>RingClosure</code>s in a valid graph.
@@ -273,16 +273,30 @@ public class RingClosureParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
 
-    public int getMinRcaPerType()
+    /**
+     * @param type the elemental symbol of the RCA to consider.
+     * @return the minimum allowed number of RCAs or 0, if not set.
+     */
+    public int getMinRcaPerType(String type)
     {
-        return minRcaPerType;
+        if (minRcaPerType.containsKey(type))
+            return minRcaPerType.get(type);
+        else
+            return 0;
     }
 
 //------------------------------------------------------------------------------
 
-    public int getMaxRcaPerType()
+    /**
+     * @param type the elemental symbol of the RCA to consider.
+     * @return the maximum allowed number of RCAs or 0, if not set.
+     */
+    public int getMaxRcaPerType(String type)
     {
-        return maxRcaPerType;
+        if (maxRcaPerType.containsKey(type))
+            return maxRcaPerType.get(type);
+        else
+            return 10000;
     }
 
 //------------------------------------------------------------------------------
@@ -509,7 +523,13 @@ public class RingClosureParameters extends RunTimeParameters
             case "MINRCAPERTYPEPERGRAPH=":
                 try
                 {
-                    minRcaPerType = Integer.parseInt(value);
+                    String[] words = value.trim().split("\\s+");
+                    if (words.length!=2)
+                    {
+                        msg = "Unable to understand value '" + value + "'";
+                        throw new DENOPTIMException(msg);
+                    }
+                    minRcaPerType.put(words[1],Integer.parseInt(words[0]));
                 }
                 catch (Throwable t)
                 {
@@ -520,7 +540,13 @@ public class RingClosureParameters extends RunTimeParameters
             case "MAXRCAPERTYPEPERGRAPH=":
                 try
                 {
-                    maxRcaPerType = Integer.parseInt(value);
+                    String[] words = value.trim().split("\\s+");
+                    if (words.length!=2)
+                    {
+                        msg = "Unable to understand value '" + value + "'";
+                        throw new DENOPTIMException(msg);
+                    }
+                    maxRcaPerType.put(words[1],Integer.parseInt(words[0]));
                 }
                 catch (Throwable t)
                 {
@@ -735,10 +761,14 @@ public class RingClosureParameters extends RunTimeParameters
             throw new DENOPTIMException(msg);
         }
 
-        if (minRcaPerType > maxRcaPerType)
+        for (String type : minRcaPerType.keySet())
         {
-            msg = "Check values of maxRcaPerType and maxRcaPerType";
-            throw new DENOPTIMException(msg);
+            if (minRcaPerType.get(type) > maxRcaPerType.get(type))
+            {
+                msg = "Check values of max and min number of RCA for type '" 
+                        + type+"'.";
+                throw new DENOPTIMException(msg);
+            }
         }
 
         if (minRingClosures > maxRingClosures)
