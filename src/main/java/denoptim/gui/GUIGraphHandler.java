@@ -74,6 +74,8 @@ import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.utils.GraphConversionTool;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 
@@ -1370,14 +1372,27 @@ public class GUIGraphHandler extends GUICardPanel
 		dnGraphLibrary = readGraphsFromFile(file);
 		
 		try {
-		    if (FileUtils.detectFileFormat(file) == FileFormat.GRAPHSDF)
+		    switch (FileUtils.detectFileFormat(file))
 		    {
-		        molLibrary = DenoptimIO.readSDFFile(file.getAbsolutePath());
-		    } else {
-		        for (int i=0; i<dnGraphLibrary.size(); i++)
-	            {
-	                molLibrary.add(builder.newAtomContainer());
-	            }
+		        case GRAPHSDF:
+		            molLibrary = DenoptimIO.readSDFFile(file.getAbsolutePath());
+		            break;
+		            
+		        case GRAPHJSON:
+		            ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(
+		                    Logger.getLogger("GUILogger"), GUI.PRNG);
+		            for (int i=0; i<dnGraphLibrary.size(); i++)
+		            {
+		                molLibrary.add(t3d.convertGraphTo3DAtomContainer(
+		                        dnGraphLibrary.get(i),true));
+		            }
+		            break;
+		            
+		        default:
+		            for (int i=0; i<dnGraphLibrary.size(); i++)
+	                {
+	                    molLibrary.add(builder.newAtomContainer());
+	                }
 		    }
 		} catch (Throwable e) {
 			System.out.println("Could not read molecules from " + file);
