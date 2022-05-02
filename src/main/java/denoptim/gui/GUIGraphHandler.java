@@ -1370,7 +1370,15 @@ public class GUIGraphHandler extends GUICardPanel
 		dnGraphLibrary = readGraphsFromFile(file);
 		
 		try {
-			molLibrary = DenoptimIO.readSDFFile(file.getAbsolutePath());
+		    if (FileUtils.detectFileFormat(file) == FileFormat.GRAPHSDF)
+		    {
+		        molLibrary = DenoptimIO.readSDFFile(file.getAbsolutePath());
+		    } else {
+		        for (int i=0; i<dnGraphLibrary.size(); i++)
+	            {
+	                molLibrary.add(builder.newAtomContainer());
+	            }
+		    }
 		} catch (Throwable e) {
 			System.out.println("Could not read molecules from " + file);
 			for (int i=0; i<dnGraphLibrary.size(); i++)
