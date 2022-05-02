@@ -57,7 +57,7 @@ html_static_path = ['_static']
 
 
 breathe_projects = {
-  "denoptim" : "/Users/dg/src/DENOPTIM/doc/doxygen/xml/",
+  "denoptim" : "doxygen/xml/",
 }
 
 breathe_default_project = "denoptim"
