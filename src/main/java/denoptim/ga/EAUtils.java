@@ -302,7 +302,7 @@ public class EAUtils
         mnt.increase(CounterID.XOVERATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
         
-        int numatt = 0;
+        int numatt = 1;
         
         // Identify a pair of parents that can do crossover, and a pair of
         // vertexes from which we can define a subgraph (or a branch) to swap

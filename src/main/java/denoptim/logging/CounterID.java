@@ -171,6 +171,107 @@ public enum CounterID
                 + "the fitness evaluation of a candidate.";
     }
     
+    private String prettyName = "";
+    
+    static {
+        NEWCANDIDATEATTEMPTS.prettyName =
+                "#Attempts New Candidate";
+
+        XOVERATTEMPTS.prettyName =
+                "#Xover";
+        XOVERPARENTSEARCH.prettyName =
+                "#Xover Parents Search";
+        FAILEDXOVERATTEMPTS.prettyName =
+                "#Failed Xovers";
+        FAILEDXOVERATTEMPTS_FINDPARENTS.prettyName =
+                "#Failed Xovers_Find Parents";
+        FAILEDXOVERATTEMPTS_PERFORM.prettyName =
+                "#Failed Xovers_Perform";
+        FAILEDXOVERATTEMPTS_SETUPRINGS.prettyName =
+                "#Failed Xovers_Setup Rings";
+        FAILEDXOVERATTEMPTS_EVAL.prettyName =
+                "#Failed Xovers_Graph Filter";
+        FAILEDXOVERATTEMPTS_FORBENDS.prettyName =
+                "#Failed Xovers_Forbidden Ends";
+
+        MUTATTEMPTS.prettyName =
+                "#Mutation";
+        MUTPARENTSEARCH.prettyName =
+                "#Mutation Parent Search";
+        FAILEDMUTATTEMTS.prettyName =
+                "#Failed Mutation";
+        FAILEDMUTATTEMTS_PERFORM.prettyName =
+                "#Failed Mut_Perform";
+        FAILEDMUTATTEMTS_PERFORM_NOMUTSITE.prettyName =
+                "#Failed Mut_noMutSite";
+        FAILEDMUTATTEMTS_PERFORM_NOOWNER.prettyName =
+                "#Failed Mut_noOwner";
+        FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE.prettyName =
+                "#Failed Mut_bad Mut Type";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH.prettyName =
+                "#Failed Mut Change Branch";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK.prettyName =
+                "#Failed Mut Change Link";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND.prettyName =
+                "#Failed Mut Change Link_Find";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT.prettyName =
+                "#Failed Mut Change Link_Edit";
+        FAILEDMUTATTEMTS_PERFORM_NODELLINK_FINDPARENT.prettyName =
+                "#Failed Mut Delete Link_Find Parent";
+        FAILEDMUTATTEMTS_PERFORM_NODELLINK_EDIT.prettyName =
+                "#Failed Mut Delete Link_Edit";
+        FAILEDMUTATTEMTS_PERFORM_NODELETECHAIN.prettyName =
+                "#Failed Mut Delete Chain";
+        FAILEDMUTATTEMTS_PERFORM_NOADDLINK.prettyName =
+                "#Failed Mut Add Link";
+        FAILEDMUTATTEMTS_PERFORM_NOADDLINK_FIND.prettyName =
+                "#Failed Mut Add Link_Find";
+        FAILEDMUTATTEMTS_PERFORM_NOADDLINK_EDIT.prettyName =
+                "#Failed Mut Add Link_Edit";
+        FAILEDMUTATTEMTS_PERFORM_NOEXTEND.prettyName =
+                "#Failed Mut Extend";
+        FAILEDMUTATTEMTS_PERFORM_NODELETE.prettyName =
+                "#Failed Mut Delete";
+        FAILEDMUTATTEMTS_SETUPRINGS.prettyName =
+                "#Failed Mut_Setup Rings";
+        FAILEDMUTATTEMTS_EVAL.prettyName =
+                "#Failed Mut_Graph Filter";
+        FAILEDMUTATTEMTS_FORBENDS.prettyName =
+                "#Failed Mut_Forbidden Ends";
+
+        BUILDANEWATTEMPTS.prettyName =
+                "#Build Anew";
+        FAILEDBUILDATTEMPTS.prettyName =
+                "#Failed Build Anew";
+        FAILEDBUILDATTEMPTS_GRAPHBUILD.prettyName =
+                "#FailedBuild_GraphBuild";
+        FAILEDBUILDATTEMPTS_EVAL.prettyName =
+                "#FailedBuild_Graph Filter";
+        FAILEDBUILDATTEMPTS_SETUPRINGS.prettyName =
+                "#FailedBuild_Setup Rings";
+        FAILEDBUILDATTEMPTS_FORBIDENDS.prettyName =
+                "#FailedBuild_Forbidden Ends";
+
+        MANUALADDATTEMPTS.prettyName =
+                "#Manual Add";
+        FAILEDMANUALADDATTEMPTS.prettyName =
+                "#Failed Manual Add";
+        FAILEDMANUALADDATTEMPTS_EVAL.prettyName =
+                "#Failed Manual Add_Eval";
+
+        FITNESSEVALS.prettyName =
+                "#Fitness";
+        FAILEDFITNESSEVALS.prettyName =
+                "#Fitness_Failed Fitness Eval.";
+
+        DUPLICATEPREFITNESS.prettyName =
+                "#Duplicates Pre-Fitness";
+        FAILEDDUPLICATEPREFITNESSDETECTION.prettyName =
+                "#Failed Duplicate Pre-Fitness Detection";
+    }
+    
+//------------------------------------------------------------------------------
+    
     /**
      * @return a printable description of what this counter identifier 
      * refers to.
@@ -179,4 +280,17 @@ public enum CounterID
     {
         return description;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns a string representing the mane of this counter in a way that is
+     * pretty enough to be shown in user manuals or graphical interfaces
+     * @return a nice-looking name of this counter
+     */
+    public String getPrettyName()
+    {
+        return prettyName;
+    }
+    
 }
