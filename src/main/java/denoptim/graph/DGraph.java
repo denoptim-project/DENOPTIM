@@ -5094,16 +5094,20 @@ public class DGraph implements Cloneable
 
                 int nThisType = 0;
                 int nCompType = 0;
-                for (IAtom atm : mol.atoms())
+                for (Vertex v : getRCVertices())
                 {
-                    if (MoleculeUtils.getSymbolOrLabel(atm).equals(rcaTyp))
+                    if (v.containsAtoms())
                     {
-                        nThisType++;
-                    }
-                    else if (MoleculeUtils.getSymbolOrLabel(atm).equals(
-                            rcaTypes.get(rcaTyp)))
-                    {
-                        nCompType++;
+                        IAtom atm = v.getIAtomContainer().getAtom(0);
+                        if (MoleculeUtils.getSymbolOrLabel(atm).equals(rcaTyp))
+                        {
+                            nThisType++;
+                        }
+                        else if (MoleculeUtils.getSymbolOrLabel(atm).equals(
+                                rcaTypes.get(rcaTyp)))
+                        {
+                            nCompType++;
+                        }
                     }
                 }
 
