@@ -1163,11 +1163,6 @@ public class GUIInspectGARun extends GUICardPanel
         });
 
         rightDownPanel.add(monitorChartPanel,BorderLayout.CENTER);
-        
-        
-        /* 
-        CounterID.valueOf(headers[0]).getPrettyName()
-        */
 	}
 
 //------------------------------------------------------------------------------
@@ -1176,8 +1171,11 @@ public class GUIInspectGARun extends GUICardPanel
 	        int maxNeighbours)
 	{
         int initPos = allIndividuals.indexOf(item);
-        double tolerance = Math.abs(evoPlot.getRangeAxis()
+        double toleranceY = Math.abs(evoPlot.getRangeAxis()
                 .getRange().getLength() * 0.02);
+
+        double toleranceX = Math.abs(evoPlot.getDomainAxis()
+                .getRange().getLength() * 0.01);
         int nItems = 0;
         List<CandidateLW> overlappingItems = 
                 new ArrayList<CandidateLW>();
@@ -1190,9 +1188,13 @@ public class GUIInspectGARun extends GUICardPanel
                 nItems++;
                 continue;
             }
-            double delta = Math.abs(item.getFitness() 
+            double deltaY = Math.abs(item.getFitness() 
                     - c.getFitness());
-            if (delta > tolerance)
+            if (deltaY > toleranceY)
+                break;
+            double deltaX = Math.abs(item.getGeneration()
+                    - c.getGeneration());
+            if (deltaX > toleranceX)
                 break;
             overlappingItems.add(c);
             nItems++;
@@ -1206,9 +1208,13 @@ public class GUIInspectGARun extends GUICardPanel
                 nItems++;
                 continue;
             }
-            double delta = Math.abs(item.getFitness() 
+            double deltaY = Math.abs(item.getFitness() 
                     - c.getFitness());
-            if (delta > tolerance)
+            if (deltaY > toleranceY)
+                break;
+            double deltaX = Math.abs(item.getGeneration()
+                    - c.getGeneration());
+            if (deltaX > toleranceX)
                 break;
             overlappingItems.add(0,c);
             nItems++;
