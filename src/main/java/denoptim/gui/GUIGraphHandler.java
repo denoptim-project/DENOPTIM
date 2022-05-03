@@ -1388,6 +1388,10 @@ public class GUIGraphHandler extends GUICardPanel
 		            }
 		            break;
 		            
+		        case CANDIDATESDF:
+                    molLibrary = DenoptimIO.readSDFFile(file.getAbsolutePath());
+                    break;
+		            
 		        default:
 		            for (int i=0; i<dnGraphLibrary.size(); i++)
 	                {
