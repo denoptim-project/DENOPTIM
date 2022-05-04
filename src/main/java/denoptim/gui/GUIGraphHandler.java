@@ -68,6 +68,7 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
+import denoptim.graph.SymmetricSet;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -167,7 +168,8 @@ public class GUIGraphHandler extends GUICardPanel
 	private JButton btnAddLibVrtx;
     private JButton btnAddEmptyVrtx;
 	private JButton btnDelSel;
-	private JButton btnAddChord; 
+	private JButton btnAddChord;
+	private JButton btnAddSymSet;
 	
 	private JPanel pnlShowLabels;
 	private JButton btnLabAPC;
@@ -627,6 +629,58 @@ public class GUIGraphHandler extends GUICardPanel
             }
         });
         
+        // Controls to add chord (ring closing edge)
+        btnAddSymSet = new JButton("Set as Symmetric");
+        btnAddSymSet.setToolTipText("<html>Add a symmetric set that includes "
+                + "all selected vertexes.<html>");
+        btnAddSymSet.setEnabled(false);
+        btnAddSymSet.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Vertex> selVrtxs =
+                        visualPanel.getSelectedNodesInViewer();
+                if (selVrtxs.size() < 2)
+                {
+                    JOptionPane.showMessageDialog(btnAddSymSet,
+                            "<html>Number of selected vertices: "
+                            + selVrtxs.size() + " <br>"
+                            + "Please, drag the mouse and "
+                            + "select two or more vertices!<br> "
+                            + "Click again to unselect.</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                ArrayList<Integer> symIDs = new ArrayList<Integer>();
+                selVrtxs.stream().forEach(v -> symIDs.add(v.getVertexId()));
+                try
+                {
+                    dnGraph.addSymmetricSetOfVertices(new SymmetricSet(symIDs));
+                } catch (DENOPTIMException e1)
+                {
+                    JOptionPane.showMessageDialog(btnAddSymSet,
+                            String.format("<html><body width='%1s'>"
+                            + "Could not create SymmetriSet:<br>"
+                            + e1.getMessage() + "</html>", 300),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+    
+                // Update viewer
+                visualPanel.loadDnGraphToViewer(dnGraph,true);
+    
+                // Protect edited system
+                unsavedChanges = true;
+                protectEditedSystem();
+    
+                // The molecular representation is updated when we save changes
+                visualPanel.renderMolVieverToNeedUpdate();
+                updateMolViewer = true;
+            }
+        });
+        
         
 		GroupLayout lyoEditVertxs = new GroupLayout(pnlEditVrtxBtns);
 		pnlEditVrtxBtns.setLayout(lyoEditVertxs);
@@ -639,14 +693,16 @@ public class GUIGraphHandler extends GUICardPanel
 				.addComponent(btnAddLibVrtx)
                 .addComponent(btnAddEmptyVrtx)
 				.addComponent(btnDelSel)
-				.addComponent(btnAddChord));
+				.addComponent(btnAddChord)
+                .addComponent(btnAddSymSet));
 		lyoEditVertxs.setVerticalGroup(lyoEditVertxs.createSequentialGroup()
 				.addComponent(edtVertxsLab)
                 .addComponent(btnFragSpace)
 				.addComponent(btnAddLibVrtx)
                 .addComponent(btnAddEmptyVrtx)
 				.addComponent(btnDelSel)
-				.addComponent(btnAddChord));
+				.addComponent(btnAddChord)
+                .addComponent(btnAddSymSet));
 		graphCtrlPane.add(pnlEditVrtxBtns);
 		
 		graphCtrlPane.add(new JSeparator());
@@ -941,6 +997,7 @@ public class GUIGraphHandler extends GUICardPanel
         //btnAddEmptyVrtx.setEnabled(enable); //Always enabled
 		btnDelSel.setEnabled(enable);
 		btnAddChord.setEnabled(enable);
+		btnAddSymSet.setEnabled(enable);
 		btnLabAPC.setEnabled(enable);
         btnLabBT.setEnabled(enable);
         btnLabBB.setEnabled(enable);
