@@ -1112,6 +1112,9 @@ public class GUIInspectGARun extends GUICardPanel
             JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(
                     CounterID.valueOf(headers[iSeries]).getPrettyName());
             cbmi.setForeground(colors[iColor]);
+            cbmi.setToolTipText(String.format("<html><body width='%1s'>"
+                    + CounterID.valueOf(headers[iSeries]).getDescription()
+                    + ".</html>", 300));
 
             // We do this before setting the listener to avoid having to bypass
             if (iSeries!=0)

@@ -160,6 +160,12 @@ public enum CounterID
         FAILEDBUILDATTEMPTS_FORBIDENDS.description = "Construction of new "
                 + "graphs that ped to forbidden ends";
         
+        MANUALADDATTEMPTS.description = "Number of attempts to provide a "
+                + "manually bilt candidate";
+        FAILEDMANUALADDATTEMPTS.description = "Failed attempts to import "
+                + "a manually built cadidate";
+        FAILEDMANUALADDATTEMPTS_EVAL.description = "Failed attempts to pass "
+                + "graph evaluation test from manually added candidates";
         
         FITNESSEVALS.description = "Number of fitness evaluations";
         FAILEDFITNESSEVALS.description = "Number of failed fitness evaluations";
