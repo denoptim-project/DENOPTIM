@@ -20,6 +20,7 @@ package denoptim.gui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -69,6 +70,8 @@ public class GUIModalDialog extends JDialog
      */
     public GUIModalDialog()
     {
+        // To avoid conflict when having multiple modal dialogs open.
+        super(new Frame()); 
         initialize(false);
     }
 
