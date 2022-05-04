@@ -507,7 +507,7 @@ public class Template extends Vertex
                         continue;
                     if (innerToOuterAPs.containsKey(symInnerAP))
                     {
-                        symSetForThisAP.add(getIndedOfInnerAP(symInnerAP));
+                        symSetForThisAP.add(getIndexOfInnerAP(symInnerAP));
                         doneAPs.add(symInnerAP);
                     }
                 }
@@ -534,7 +534,7 @@ public class Template extends Vertex
                             continue;
                         if (innerToOuterAPs.containsKey(symInnerAPOnSymVrtx))
                         {
-                            symSetForThisAP.add(getIndedOfInnerAP
+                            symSetForThisAP.add(getIndexOfInnerAP
                                     (symInnerAPOnSymVrtx));
                             doneAPs.add(symInnerAPOnSymVrtx);
                         }
@@ -546,12 +546,12 @@ public class Template extends Vertex
                     // being members of the same symmetric set of vertexes.
                     if (innerToOuterAPs.containsKey(innerApOnSymVrtx))
                     {
-                        symSetForThisAP.add(getIndedOfInnerAP(innerApOnSymVrtx));
+                        symSetForThisAP.add(getIndexOfInnerAP(innerApOnSymVrtx));
                         doneAPs.add(innerApOnSymVrtx);
                     }
                     if (!doneAPs.contains(innerAP))
                     {
-                        symSetForThisAP.add(getIndedOfInnerAP(innerAP));
+                        symSetForThisAP.add(getIndexOfInnerAP(innerAP));
                         doneAPs.add(innerAP);
                     }
                 }
@@ -570,8 +570,7 @@ public class Template extends Vertex
      * The map is sorted, so the index should not change unless there are 
      * changes in the list of APs.
      */
-    //TODO-gg typo
-    private int getIndedOfInnerAP(AttachmentPoint ap)
+    private int getIndexOfInnerAP(AttachmentPoint ap)
     {
         int innerApIdx = -1;
         for (AttachmentPoint innerAP : innerToOuterAPs.keySet())

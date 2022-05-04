@@ -1075,8 +1075,8 @@ public class GUIInspectGARun extends GUICardPanel
 	    xAxis.setAutoRangeIncludesZero(false);
 	    // By default we show the first series (should be the number of attempts
 	    // to create candidates)
-	    NumberAxis yAxis = new NumberAxis("Counts");
-	    yAxis.setAutoRangeIncludesZero(false); //TODO-gg move
+	    NumberAxis yAxis = new NumberAxis("#");
+	    yAxis.setAutoRangeIncludesZero(false);
 	    
         monitorPlot = new XYPlot(null,xAxis,yAxis,null);
 
