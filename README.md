@@ -63,7 +63,7 @@ This is how to run the tests:
 cd $DENOPTIM_HOME/test/functional_tests
 bash runAllTests.sh
 ```
-The results will be collected in a temporary folder (typically `/tmp/denoptim_tesy`).
+The results will be collected in a temporary folder (typically `/tmp/denoptim_test`).
 
 
 ## User Manual
