@@ -464,34 +464,126 @@ public class Template extends Vertex
 
 //-----------------------------------------------------------------------------
     
-    //NB: since the symmetry depends on the embedded graph, what we want to do 
-    // on a template is define a symmetry constrain rather than set the sets of 
-    // symmetric vertices
+    /**
+     * This method exists by contract, but does not do anything because the
+     * concept of setting the symmetric set of APs in a template is not
+     * defined yet.
+     */
     @Override
     protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
     {
-        // TODO Auto-generated method stub
-        
+        // Do nothing... for now.   
     }
     
 //-----------------------------------------------------------------------------
     
     /**
-     * This operation cannot yet be done on a template because the 
-     *  SymmetricSet class holds only one set of integer identifiers that 
-     *  can be used to identify symmetric things like vertices in a graph,
-     *  or APs belonging to the SAME vertex. However, the symmetric APs on 
-     *  a template can belong to different vertices, meaning that
-     *  identifying these APs with indexes requires at least two sets of
-     *  indexes (one for the vertex, one for the AP).
-     *  For the moment, we cannot return a sensible ArrayList<SymmetricSet>
-     *  thus we return an empty one.
+     * The {@link SymmetricSet} produced from this method contain indexes of the
+     * {@link AttachmentPoint}s in the list returned by 
+     * {@link #getAttachmentPoints()}.
      */
     @Override
     public ArrayList<SymmetricSet> getSymmetricAPSets()
     {
-        //TODO: implement
-        return new ArrayList<SymmetricSet>();
+        ArrayList<SymmetricSet> allSymSets = new ArrayList<SymmetricSet>();
+        
+        List<AttachmentPoint> doneAPs = new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint innerAP : innerToOuterAPs.keySet())
+        {   
+            if (doneAPs.contains(innerAP))
+                continue;
+            
+            SymmetricSet symSetForThisAP = new SymmetricSet();
+            
+            Vertex vrtx = innerAP.getOwner();
+            int innerAPIdx = innerAP.getIndexInOwner();
+            SymmetricSet sAPsOnVrtx = vrtx.getSymmetricAPs(innerAPIdx);
+            if (sAPsOnVrtx!=null)
+            {
+                for (int apIdx : sAPsOnVrtx.getList())
+                {
+                    AttachmentPoint symInnerAP = vrtx.getAP(apIdx);
+                    if (doneAPs.contains(symInnerAP))
+                        continue;
+                    if (innerToOuterAPs.containsKey(symInnerAP))
+                    {
+                        symSetForThisAP.add(getIndedOfInnerAP(symInnerAP));
+                        doneAPs.add(symInnerAP);
+                    }
+                }
+            }
+            
+            List<Vertex> symVrtxs = innerGraph.getSymVertexesForVertex(vrtx);
+            for (Vertex symVrtx : symVrtxs)
+            {
+                //NB: we assume that this is the same vertex type as vrtx, but 
+                // a different instance. Thus the list of APs should be a match
+                // and we reuse the same index 'innerAPIdx'.
+                AttachmentPoint innerApOnSymVrtx = symVrtx.getAP(innerAPIdx);
+                if (doneAPs.contains(innerApOnSymVrtx))
+                    continue;
+                
+                SymmetricSet sAPsOnSymVrtx = symVrtx.getSymmetricAPs(innerAPIdx);
+                if (sAPsOnSymVrtx!=null)
+                {
+                    for (int apIdxOnSymVrtx : sAPsOnSymVrtx.getList())
+                    {
+                        AttachmentPoint symInnerAPOnSymVrtx = symVrtx.getAP(
+                                apIdxOnSymVrtx);
+                        if (doneAPs.contains(symInnerAPOnSymVrtx))
+                            continue;
+                        if (innerToOuterAPs.containsKey(symInnerAPOnSymVrtx))
+                        {
+                            symSetForThisAP.add(getIndedOfInnerAP
+                                    (symInnerAPOnSymVrtx));
+                            doneAPs.add(symInnerAPOnSymVrtx);
+                        }
+                    }
+                } else {
+                    // We need to add the AP at innerAPIdx anyway because even
+                    // it it does not have symmetric APs on its vertex owner it
+                    // is symmetric to the vrtx by means of the two vertexes 
+                    // being members of the same symmetric set of vertexes.
+                    if (innerToOuterAPs.containsKey(innerApOnSymVrtx))
+                    {
+                        symSetForThisAP.add(getIndedOfInnerAP(innerApOnSymVrtx));
+                        doneAPs.add(innerApOnSymVrtx);
+                    }
+                    if (!doneAPs.contains(innerAP))
+                    {
+                        symSetForThisAP.add(getIndedOfInnerAP(innerAP));
+                        doneAPs.add(innerAP);
+                    }
+                }
+            }
+            if (symSetForThisAP.size()>1)
+                allSymSets.add(symSetForThisAP);
+        }
+        return allSymSets;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Returns the index of the given AP in the sorted iterations over the
+     * keys of the mapping between inner and outer APs.
+     * The map is sorted, so the index should not change unless there are 
+     * changes in the list of APs.
+     */
+    //TODO-gg typo
+    private int getIndedOfInnerAP(AttachmentPoint ap)
+    {
+        int innerApIdx = -1;
+        for (AttachmentPoint innerAP : innerToOuterAPs.keySet())
+        {
+            innerApIdx++;
+            if (innerAP==ap)
+            {
+                return innerApIdx;
+            }
+            
+        }
+        return -1;
     }
 
 //-----------------------------------------------------------------------------
