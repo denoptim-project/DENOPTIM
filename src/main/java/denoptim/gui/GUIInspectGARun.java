@@ -22,6 +22,7 @@ package denoptim.gui;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -30,6 +31,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.FileFilter;
@@ -44,18 +47,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
@@ -91,6 +99,8 @@ import denoptim.files.FileUtils;
 import denoptim.graph.APClass;
 import denoptim.graph.CandidateLW;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.CounterID;
+import denoptim.logging.Monitor;
 import denoptim.utils.GenUtils;
 
 
@@ -119,7 +129,9 @@ public class GUIInspectGARun extends GUICardPanel
 	private JPanel ctrlPanelRow1Right;
     private JPanel ctrlPanelRow2Left;
 	private JSplitPane centralPanel;
-	private JPanel rightPanel;
+	private JSplitPane rightPanel;
+    private JPanel rightUpPanel;
+    private JPanel rightDownPanel;
 	private MoleculeViewPanel molViewer;
 	
 	private File srcFolder;
@@ -141,9 +153,22 @@ public class GUIInspectGARun extends GUICardPanel
 	private DefaultXYDataset datasetPopMax = new DefaultXYDataset();
 	private DefaultXYDataset datasetPopMean = new DefaultXYDataset();	
 	private DefaultXYDataset datasetPopMedian = new DefaultXYDataset();
-	private XYPlot plot;
-	private JFreeChart chart;
-	private ChartPanel chartPanel;
+	private XYPlot evoPlot;
+	private JFreeChart evoChart;
+	private ChartPanel evoChartPanel;
+	
+    private JPopupMenu evoSeriesCheckList;
+    private JButton evoSeriesBtn;
+	
+	private Map<CounterID,DefaultXYDataset> monitorDatasets = 
+	        new HashMap<CounterID,DefaultXYDataset>();
+	
+    private XYPlot monitorPlot;
+	private JFreeChart monitorChart;
+	private ChartPanel monitorChartPanel;
+	
+	private JPopupMenu monitorSeriesCheckList;
+	private JButton monitorSeriesBtn;
 	
 	
 	private final String NL = System.getProperty("line.separator");
@@ -174,6 +199,18 @@ public class GUIInspectGARun extends GUICardPanel
      */
     private Map<Integer,List<String>> candsPerGeneration;
     
+    /**
+     * Predefined list of data series colors.
+     */
+    private final Color[] colors = new Color[] {Color.black, Color.blue, 
+            Color.cyan, Color.darkGray, Color.green, Color.magenta, 
+            Color.orange, Color.pink, Color.red};
+    
+    /**
+     * Records the name of the first series in the monitor plot to facilitate
+     * its recovery upon chart reset.
+     */
+    private String nameFirstMonitorSeries = "unset";
 	
 //-----------------------------------------------------------------------------
 	
@@ -202,90 +239,86 @@ public class GUIInspectGARun extends GUICardPanel
 		// -> its own toolbar
 		// -> a central panel vertically divided in two
 		//    |-> mol/graph viewers? (LEFT)
-		//    |-> plot (RIGHT)
+		//    |-> plots (RIGHT)
 		
 		// Creating local tool bar
 		ctrlPanelRow1Left = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		ctrlPanelRow1Left.add(new JLabel("Population Features:"));
-		JCheckBox ctrlMin = new JCheckBox("Minimum");
-		ctrlMin.setToolTipText("The min fitness value in the population.");
-		ctrlMin.setSelected(true);
-		JCheckBox ctrlMax = new JCheckBox("Maximum");
-		ctrlMax.setToolTipText("The max fitness value in the population.");
-		ctrlMax.setSelected(true);
-		JCheckBox ctrlMean = new JCheckBox("Mean");
-		ctrlMean.setToolTipText("The mean fitness value in the population.");
-		JCheckBox ctrlMedian = new JCheckBox("Median");
-		ctrlMedian.setToolTipText("The median of the fitness in the "
-				+ "population.");
-		ctrlMin.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (ctrlMin.isSelected())
-				{
-					plot.getRenderer(2).setSeriesVisible(0,true);
-				}
-				else
-				{
-					plot.getRenderer(2).setSeriesVisible(0,false);
-				}
-			}
-		});
-		ctrlMax.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (ctrlMax.isSelected())
-				{
-					plot.getRenderer(3).setSeriesVisible(0,true);
-				}
-				else
-				{
-					plot.getRenderer(3).setSeriesVisible(0,false);
-				}
-			}
-		});
-		ctrlMean.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (ctrlMean.isSelected())
-				{
-					plot.getRenderer(4).setSeriesVisible(0,true);
-				}
-				else
-				{
-					plot.getRenderer(4).setSeriesVisible(0,false);
-				}
-			}
-		});
-		ctrlMedian.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (ctrlMedian.isSelected())
-				{
-					plot.getRenderer(5).setSeriesVisible(0,true);
-				}
-				else
-				{
-					plot.getRenderer(5).setSeriesVisible(0,false);
-				}
-			}
-		});
-		ctrlPanelRow1Left.add(ctrlMin);
-		ctrlPanelRow1Left.add(ctrlMax);
-		ctrlPanelRow1Left.add(ctrlMean);
-		ctrlPanelRow1Left.add(ctrlMedian);
-		JButton rstView = new JButton("Reset Chart View");
-		rstView.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				plot.getDomainAxis().setAutoRange(true);
-				plot.getRangeAxis().setAutoRange(true);
-				plot.getDomainAxis().setLowerBound(-0.5);			
-			}
-		});
-		ctrlPanelRow1Left.add(rstView);
+		
+	    evoSeriesCheckList = new JPopupMenu();
+        evoSeriesBtn = new JButton("Show/Hide Population Stats");
+        evoSeriesBtn.setComponentPopupMenu(evoSeriesCheckList);
+        evoSeriesBtn.setToolTipText(String.format(
+                "<html><body width='%1s'>Clock to select which population "
+                + "statistics to plot in the top plot.",300));
+        evoSeriesBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                evoSeriesCheckList.show(evoSeriesBtn, 0, 0);
+            }
+        });
+        ctrlPanelRow1Left.add(evoSeriesBtn);
+		
+		monitorSeriesCheckList = new JPopupMenu();
+        monitorSeriesBtn = new JButton("Show/Hide Monitor Series");
+        monitorSeriesBtn.setComponentPopupMenu(monitorSeriesCheckList);
+        monitorSeriesBtn.setToolTipText(String.format(
+                "<html><body width='%1s'>Clock to select which monitored event "
+                + "counts to plot in the bottom plot.",300));
+        monitorSeriesBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                monitorSeriesCheckList.show(monitorSeriesBtn, 0, 0);
+            }
+        });
+		ctrlPanelRow1Left.add(monitorSeriesBtn);
+		
+	    JButton rstView = new JButton("Reset Chart Views");
+        rstView.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                evoPlot.getDomainAxis().setAutoRange(true);
+                evoPlot.getRangeAxis().setAutoRange(true);
+                evoPlot.getDomainAxis().setLowerBound(-0.5);
+                for (int iItem=0; iItem<evoSeriesCheckList.getComponentCount(); 
+                        iItem++)
+                {
+                    Component c = evoSeriesCheckList.getComponent(iItem);
+                    if (c instanceof JCheckBoxMenuItem)
+                    {
+                        // NB: this sets the default series displayed upon reset
+                        if (((JCheckBoxMenuItem) c).getText().startsWith("Max")
+                            || ((JCheckBoxMenuItem) c).getText().startsWith("Min"))
+                            ((JCheckBoxMenuItem) c).setSelected(true);
+                        else
+                            ((JCheckBoxMenuItem) c).setSelected(false);
+                    }
+                }
+                
+                monitorPlot.getDomainAxis().setAutoRange(true);
+                monitorPlot.getRangeAxis().setAutoRange(true);
+                monitorPlot.getDomainAxis().setLowerBound(-0.5);
+                for (int iItem=0; iItem<monitorSeriesCheckList.getComponentCount(); 
+                        iItem++)
+                {
+                    Component c = monitorSeriesCheckList.getComponent(iItem);
+                    if (c instanceof JCheckBoxMenuItem)
+                    {
+                        // NB: this sets the default series displayed upon reset
+                        if (((JCheckBoxMenuItem) c).getText().startsWith(
+                                nameFirstMonitorSeries))
+                            ((JCheckBoxMenuItem) c).setSelected(true);
+                        else
+                            ((JCheckBoxMenuItem) c).setSelected(false);
+                    }
+                }
+            }
+        });
+        ctrlPanelRow1Left.add(rstView);
+		
+		// Done with left part of bar, not the right-hand part...
 	
 		ctrlPanelRow1Right = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		lblTotItems = new JLabel("No item loaded");
 		lblTotItems.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblTotItems.setPreferredSize(new Dimension(300,28));
 		ctrlPanelRow1Right.add(lblTotItems);
-		
 		
         ctrlPanelRow2Left = new JPanel(new FlowLayout(FlowLayout.LEFT));
         
@@ -416,12 +449,20 @@ public class GUIInspectGARun extends GUICardPanel
         
         this.add(ctrlPanel,BorderLayout.NORTH);
 		
-		// Setting structure of central panel	
+		// Setting structure of panels structure that goes in the center	
 		centralPanel = new JSplitPane();
 		centralPanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		centralPanel.setOneTouchExpandable(true);
-		rightPanel = new JPanel(); 
-		rightPanel.setLayout(new BorderLayout());
+		rightPanel = new JSplitPane();
+		rightPanel.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		rightPanel.setDividerLocation(300);
+		rightUpPanel = new JPanel(); 
+		rightUpPanel.setLayout(new BorderLayout());
+        rightDownPanel = new JPanel(); 
+        rightDownPanel.setLayout(new BorderLayout());
+        rightPanel.setTopComponent(rightUpPanel);
+        rightPanel.setBottomComponent(rightDownPanel);
+        
 		centralPanel.setRightComponent(rightPanel);
 		molViewer = new MoleculeViewPanel();
 		centralPanel.setLeftComponent(molViewer);
@@ -711,15 +752,15 @@ public class GUIInspectGARun extends GUICardPanel
         xAxis.setAutoRangeIncludesZero(false);
         NumberAxis yAxis = new NumberAxis("Fitness");
         yAxis.setAutoRangeIncludesZero(false);
-		plot = new XYPlot(null,xAxis,yAxis,null);
+		evoPlot = new XYPlot(null,xAxis,yAxis,null);
 		
-		chart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT,plot,false);
+		evoChart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT,evoPlot,false);
 		
-		plot.getDomainAxis().setLowerBound(-0.5); //min X-axis
-		plot.setBackgroundPaint(Color.WHITE);
-		plot.setDomainGridlinePaint(Color.LIGHT_GRAY);
-		plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
-		plot.setSeriesRenderingOrder(SeriesRenderingOrder.FORWARD);
+		evoPlot.getDomainAxis().setLowerBound(-0.5); //min X-axis
+		evoPlot.setBackgroundPaint(Color.WHITE);
+		evoPlot.setDomainGridlinePaint(Color.LIGHT_GRAY);
+		evoPlot.setRangeGridlinePaint(Color.LIGHT_GRAY);
+		evoPlot.setSeriesRenderingOrder(SeriesRenderingOrder.FORWARD);
 		// The following brings the points for datasets of selected
 		// items and the main dataset in front of the
 		// mean/min/max/median lines, thus allowing selection of points
@@ -727,7 +768,7 @@ public class GUIInspectGARun extends GUICardPanel
 		// front-most layer) prevent the mouse clicked event to identify the 
 		// item from datasetAllFit, thus preventing to display the molecular
 		// representation of that item.
-		plot.setDatasetRenderingOrder(DatasetRenderingOrder.REVERSE);
+		evoPlot.setDatasetRenderingOrder(DatasetRenderingOrder.REVERSE);
 		
 		// dataset of selected items
         Shape shape0 = new Ellipse2D.Double(
@@ -739,8 +780,8 @@ public class GUIInspectGARun extends GUICardPanel
                 new XYLineAndShapeRenderer(false, true);
         //NB: here is where we define that the selected ones are at '0'
         // Search for the 'HERE@HERE' string to find where I use this assumption
-        plot.setDataset(0, datasetSelected); 
-        plot.setRenderer(0, renderer0);
+        evoPlot.setDataset(0, datasetSelected); 
+        evoPlot.setRenderer(0, renderer0);
         renderer0.setSeriesShape(0, shape0);
         renderer0.setSeriesPaint(0, Color.red);
         renderer0.setSeriesFillPaint(0, Color.red);
@@ -756,8 +797,8 @@ public class GUIInspectGARun extends GUICardPanel
 	             GUIPreferences.chartPointSize);
 		XYLineAndShapeRenderer renderer1 = 
 		        new XYLineAndShapeRenderer(false, true);
-        plot.setDataset(1, datasetAllFit);
-        plot.setRenderer(1, renderer1);
+        evoPlot.setDataset(1, datasetAllFit);
+        evoPlot.setRenderer(1, renderer1);
         renderer1.setSeriesShape(0, shape1);
         renderer1.setSeriesPaint(0, new Color(192, 192, 192, 60));
         renderer1.setSeriesFillPaint(0, new Color(192, 192, 192, 60));
@@ -765,59 +806,134 @@ public class GUIInspectGARun extends GUICardPanel
         renderer1.setUseOutlinePaint(true);
         renderer1.setUseFillPaint(true);
         
+
+        // Collect the ooptional series for an easy selection in the menu list
+        evoSeriesCheckList = new JPopupMenu();
+        
         // min fitness in the population
         XYLineAndShapeRenderer renderer2 = 
         		new XYLineAndShapeRenderer(true, false);
-        plot.setDataset(2, datasetPopMin);
-        plot.setRenderer(2, renderer2);
+        evoPlot.setDataset(2, datasetPopMin);
+        evoPlot.setRenderer(2, renderer2);
         renderer2.setSeriesPaint(0, Color.blue);
+        //NB: 'rstView' button assumes this item string begins with "Min"
+        JCheckBoxMenuItem cbmiMin = new JCheckBoxMenuItem(
+                "Minimum Fitness in Population");
+        cbmiMin.setForeground(Color.blue);
+        cbmiMin.setSelected(true);
+        cbmiMin.addItemListener(new ItemListener(){
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                if (cbmiMin.isSelected())
+                {
+                    renderer2.setSeriesVisible(0, true);
+                } else {
+                    renderer2.setSeriesVisible(0, false);
+                }                    
+            }
+        });
+        evoSeriesCheckList.add(cbmiMin);
         
         // max fitness in the population
         XYLineAndShapeRenderer renderer3 = 
         		new XYLineAndShapeRenderer(true, false);
-        plot.setDataset(3, datasetPopMax);
-        plot.setRenderer(3, renderer3);
+        evoPlot.setDataset(3, datasetPopMax);
+        evoPlot.setRenderer(3, renderer3);
         renderer3.setSeriesPaint(0, Color.blue);
+        //NB: 'rstView' button assumes this item string begins with "Max"
+        JCheckBoxMenuItem cbmiMax = new JCheckBoxMenuItem(
+                "Maximum Fitness in Population");
+        cbmiMax.setForeground(Color.blue);
+        cbmiMax.setSelected(true);
+        cbmiMax.addItemListener(new ItemListener(){
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                if (cbmiMax.isSelected())
+                {
+                    renderer3.setSeriesVisible(0, true);
+                } else {
+                    renderer3.setSeriesVisible(0, false);
+                }                    
+            }
+        });
+        evoSeriesCheckList.add(cbmiMax);
         
         // mean fitness in the population
         XYLineAndShapeRenderer renderer4 = 
         		new XYLineAndShapeRenderer(true, false);
-        plot.setDataset(4, datasetPopMean);
-        plot.setRenderer(4, renderer4);
+        evoPlot.setDataset(4, datasetPopMean);
+        evoPlot.setRenderer(4, renderer4);
         renderer4.setSeriesPaint(0, Color.red);
         renderer4.setSeriesStroke(0, new BasicStroke(
                 2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
                 1.0f, new float[] {10.0f, 6.0f}, 0.0f));
         renderer4.setSeriesVisible(0, false);
+        JCheckBoxMenuItem cbmiMean = new JCheckBoxMenuItem(
+                "Mean of Fitness in Population");
+        cbmiMean.setForeground(Color.red);
+        cbmiMean.setSelected(false);
+        cbmiMean.addItemListener(new ItemListener(){
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                if (cbmiMean.isSelected())
+                {
+                    renderer4.setSeriesVisible(0, true);
+                } else {
+                    renderer4.setSeriesVisible(0, false);
+                }                    
+            }
+        });
+        evoSeriesCheckList.add(cbmiMean);
         
         // median fitness in the population
         XYLineAndShapeRenderer renderer5 = 
         		new XYLineAndShapeRenderer(true, false);
-        plot.setDataset(5, datasetPopMedian);
-        plot.setRenderer(5, renderer5);
+        evoPlot.setDataset(5, datasetPopMedian);
+        evoPlot.setRenderer(5, renderer5);
         renderer5.setSeriesPaint(0, Color.decode("#22BB22"));   
         renderer5.setSeriesStroke(0, new BasicStroke(
                     2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
                     1.0f, new float[] {3.0f, 6.0f}, 0.0f));
         renderer5.setSeriesVisible(0, false);
+        JCheckBoxMenuItem cbmiMedian = new JCheckBoxMenuItem(
+                "Median of Fitness in Population");
+        cbmiMedian.setForeground(Color.decode("#22BB22"));
+        cbmiMedian.setSelected(false);
+        cbmiMedian.addItemListener(new ItemListener(){
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                if (cbmiMedian.isSelected())
+                {
+                    renderer5.setSeriesVisible(0, true);
+                } else {
+                    renderer5.setSeriesVisible(0, false);
+                }                    
+            }
+        });
+        evoSeriesCheckList.add(cbmiMedian);
+        
         
 		// Create the actual panel that contains the chart
-		chartPanel = new ChartPanel(chart);
+		evoChartPanel = new ChartPanel(evoChart);
 		
 		// Adapt chart size to the size of the panel
-		rightPanel.addComponentListener(new ComponentAdapter() {
+		rightUpPanel.addComponentListener(new ComponentAdapter() {
 	        @Override
 	        public void componentResized(ComponentEvent e) {
-	        	chartPanel.setMaximumDrawHeight(e.getComponent().getHeight());
-	        	chartPanel.setMaximumDrawWidth(e.getComponent().getWidth());
-	        	chartPanel.setMinimumDrawWidth(e.getComponent().getWidth());
-	        	chartPanel.setMinimumDrawHeight(e.getComponent().getHeight());
+	        	evoChartPanel.setMaximumDrawHeight(e.getComponent().getHeight());
+	        	evoChartPanel.setMaximumDrawWidth(e.getComponent().getWidth());
+	        	evoChartPanel.setMinimumDrawWidth(e.getComponent().getWidth());
+	        	evoChartPanel.setMinimumDrawHeight(e.getComponent().getHeight());
 	        	// WARNING: this update is needed to make the new size affective
 	        	// also after movement of the JSplitPane divider, which is
 	        	// otherwise felt by this listener but the new sizes do not
 	        	// take effect. 
-	        	ChartEditor ce = ChartEditorManager.getChartEditor(chart);
-	        	ce.updateChart(chart);
+	        	ChartEditor ce = ChartEditorManager.getChartEditor(evoChart);
+	        	ce.updateChart(evoChart);
 	        }
 	    });
 		
@@ -841,7 +957,7 @@ public class GUIInspectGARun extends GUICardPanel
 		renderer1.setDefaultToolTipGenerator(ttg);
 		
 		// Click-based selection of item, possibly displaying mol structure
-		chartPanel.addChartMouseListener(new ChartMouseListener() {
+		evoChartPanel.addChartMouseListener(new ChartMouseListener() {
 			
 			@Override
 			public void chartMouseMoved(ChartMouseEvent e) {
@@ -873,7 +989,7 @@ public class GUIInspectGARun extends GUICardPanel
 		                List<CandidateLW> overlappingItems = getOverlappingItems(
 		                        item,25);
 		                CandidateLW choosenItem = choseAmongPossiblyOverlapping(
-		                        chartPanel, overlappingItems);
+		                        evoChartPanel, overlappingItems);
 		                if (choosenItem!=null)
 		                    renderViewWithSelectedItem(choosenItem);
 					}
@@ -886,9 +1002,170 @@ public class GUIInspectGARun extends GUICardPanel
 			}
 		});
 		
-		rightPanel.add(chartPanel,BorderLayout.CENTER);
+		rightUpPanel.add(evoChartPanel,BorderLayout.CENTER);
+		
+		buildAndFillMonitorPlot(file, parent);
 		
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	}
+	
+
+//------------------------------------------------------------------------------
+	
+	private void buildAndFillMonitorPlot(File runFolder, JComponent parent)
+	{
+	    File eaMonitorDumps = new File(runFolder + ".eaMonitor");
+	    if (!eaMonitorDumps.exists())
+	    {
+	        rightDownPanel.add(new JLabel("Monitor file " + eaMonitorDumps
+	                + "not found."));
+	        return;
+	    }
+	    ArrayList<String> lines = null;
+	    try
+        {
+            lines = DenoptimIO.readList(eaMonitorDumps.getAbsolutePath());
+        } catch (DENOPTIMException e1)
+        {
+            e1.printStackTrace();
+            rightDownPanel.add(new JLabel("Cannot read " + eaMonitorDumps));
+            return;
+        }
+	    if (lines.size()<2)
+	    {
+	        rightDownPanel.add(new JLabel("Not enough data to plot"));
+            return;
+        }
+	    
+	    String[] words = lines.get(0).trim().split("\\s+");
+	    String[] headers = IntStream.range(3, words.length)
+                .mapToObj(i -> words[i])
+                .toArray(String[]::new);
+	    
+	    // Prepare data storage structure...
+	    List<double[][]> xyData = new ArrayList<double[][]>();
+	    for (int iSeries=0; iSeries<headers.length; iSeries++)
+	        xyData.add(new double[2][lines.size()-1]);
+	    // ...and fill it with actual data
+	    int iRecordsKept = -1;
+	    for (int iRecordr=1; iRecordr<lines.size(); iRecordr++)
+	    {
+	        String line = lines.get(iRecordr).trim();
+	        
+	        // TODO: change. Now, we ignore dumps more frequent than generations
+	        if (!line.startsWith("SUMMARY"))
+	            continue;
+	        
+	        iRecordsKept++;
+	        String[] values = line.split("\\s+");
+	        for (int iSeries=3; iSeries<values.length; iSeries++)
+	        {
+	            xyData.get(iSeries-3)[0][iRecordsKept] = 
+	                    Double.valueOf(values[2]); // generation ID
+                xyData.get(iSeries-3)[1][iRecordsKept] = 
+                        Double.valueOf(values[iSeries]); // counter value
+	        }
+	    }
+	   
+	    // Done with collecting data, not build the plot
+	    
+	    NumberAxis xAxis = new NumberAxis("Generation");
+	    //"-0.5" because includes 0
+	    xAxis.setRange(-0.5, Double.valueOf(iRecordsKept)-0.5);
+	    xAxis.setAutoRangeIncludesZero(false);
+	    // By default we show the first series (should be the number of attempts
+	    // to create candidates)
+	    NumberAxis yAxis = new NumberAxis("#");
+	    yAxis.setAutoRangeIncludesZero(false);
+	    
+        monitorPlot = new XYPlot(null,xAxis,yAxis,null);
+
+        monitorChart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, 
+                monitorPlot, false);
+
+        monitorPlot.getDomainAxis().setLowerBound(-0.5); //min X-axis
+        monitorPlot.setBackgroundPaint(Color.WHITE);
+        monitorPlot.setDomainGridlinePaint(Color.LIGHT_GRAY);
+        monitorPlot.setRangeGridlinePaint(Color.LIGHT_GRAY);
+        // NB: ineffective
+        //monitorPlot.setDomainGridlinesVisible(true);
+        //monitorPlot.setRangeGridlinesVisible(true);
+        // Instead, this is needed to show the grid.
+        XYLineAndShapeRenderer renderer0 =
+            new XYLineAndShapeRenderer(false, true);
+        monitorPlot.setDataset(0, new DefaultXYDataset());
+        monitorPlot.setRenderer(0, renderer0);
+        
+        int iColor = 0;
+        for (int iSeries=0; iSeries<headers.length; iSeries++)
+        {
+            DefaultXYDataset dataset = new DefaultXYDataset();
+            dataset.addSeries(headers[iSeries], xyData.get(iSeries));
+            monitorDatasets.put(CounterID.valueOf(headers[iSeries]), dataset);
+            
+            XYLineAndShapeRenderer serierRenderer =
+                new XYLineAndShapeRenderer(true, false);
+            monitorPlot.setDataset(iSeries, dataset);
+            monitorPlot.setRenderer(iSeries, serierRenderer);
+            
+            serierRenderer.setSeriesPaint(0, colors[iColor]);
+            JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(
+                    CounterID.valueOf(headers[iSeries]).getPrettyName());
+            cbmi.setForeground(colors[iColor]);
+            cbmi.setToolTipText(String.format("<html><body width='%1s'>"
+                    + CounterID.valueOf(headers[iSeries]).getDescription()
+                    + ".</html>", 300));
+
+            // We do this before setting the listener to avoid having to bypass
+            if (iSeries!=0)
+            {
+                serierRenderer.setSeriesVisible(0, false);
+            } else {
+                nameFirstMonitorSeries = cbmi.getText();
+                cbmi.setSelected(true);
+            }
+            
+            cbmi.addItemListener(new ItemListener(){
+                @Override
+                public void itemStateChanged(ItemEvent e)
+                {
+                    if (cbmi.isSelected())
+                    {
+                        serierRenderer.setSeriesVisible(0, true);
+                    } else {
+                        serierRenderer.setSeriesVisible(0, false);
+                    }                    
+                }
+            });
+            monitorSeriesCheckList.add(cbmi);
+            
+            // Restart color sequence from beginning
+            iColor++;
+            if (iColor >= colors.length)
+                iColor = 0;
+        }
+
+        // Create the actual panel that contains the chart
+        monitorChartPanel = new ChartPanel(monitorChart);
+
+        // Adapt chart size to the size of the panel
+        rightDownPanel.addComponentListener(new ComponentAdapter() {
+	        @Override
+	        public void componentResized(ComponentEvent e) {
+	            monitorChartPanel.setMaximumDrawHeight(e.getComponent().getHeight());
+	            monitorChartPanel.setMaximumDrawWidth(e.getComponent().getWidth());
+	            monitorChartPanel.setMinimumDrawWidth(e.getComponent().getWidth());
+	            monitorChartPanel.setMinimumDrawHeight(e.getComponent().getHeight());
+	            // WARNING: this update is needed to make the new size affective
+	            // also after movement of the JSplitPane divider, which is
+	            // otherwise felt by this listener but the new sizes do not
+	            // take effect.
+	            ChartEditor ce = ChartEditorManager.getChartEditor(monitorChart);
+	            ce.updateChart(monitorChart);
+	        }
+        });
+
+        rightDownPanel.add(monitorChartPanel,BorderLayout.CENTER);
 	}
 
 //------------------------------------------------------------------------------
@@ -897,8 +1174,11 @@ public class GUIInspectGARun extends GUICardPanel
 	        int maxNeighbours)
 	{
         int initPos = allIndividuals.indexOf(item);
-        double tolerance = Math.abs(plot.getRangeAxis()
+        double toleranceY = Math.abs(evoPlot.getRangeAxis()
                 .getRange().getLength() * 0.02);
+
+        double toleranceX = Math.abs(evoPlot.getDomainAxis()
+                .getRange().getLength() * 0.01);
         int nItems = 0;
         List<CandidateLW> overlappingItems = 
                 new ArrayList<CandidateLW>();
@@ -911,9 +1191,13 @@ public class GUIInspectGARun extends GUICardPanel
                 nItems++;
                 continue;
             }
-            double delta = Math.abs(item.getFitness() 
+            double deltaY = Math.abs(item.getFitness() 
                     - c.getFitness());
-            if (delta > tolerance)
+            if (deltaY > toleranceY)
+                break;
+            double deltaX = Math.abs(item.getGeneration()
+                    - c.getGeneration());
+            if (deltaX > toleranceX)
                 break;
             overlappingItems.add(c);
             nItems++;
@@ -927,9 +1211,13 @@ public class GUIInspectGARun extends GUICardPanel
                 nItems++;
                 continue;
             }
-            double delta = Math.abs(item.getFitness() 
+            double deltaY = Math.abs(item.getFitness() 
                     - c.getFitness());
-            if (delta > tolerance)
+            if (deltaY > toleranceY)
+                break;
+            double deltaX = Math.abs(item.getGeneration()
+                    - c.getGeneration());
+            if (deltaX > toleranceX)
                 break;
             overlappingItems.add(0,c);
             nItems++;
@@ -1011,7 +1299,7 @@ public class GUIInspectGARun extends GUICardPanel
         datasetSelected.removeSeries("Selected_candidates");
         datasetSelected.addSeries("Selected_candidates", selectedCandsData);
         // NB the '0' is determined by initialization at HERE@HERE
-		plot.setDataset(0, datasetSelected);
+		evoPlot.setDataset(0, datasetSelected);
 		
 		// Update the molecular viewer
 		molViewer.loadChemicalStructureFromFile(item.getPathToFile());

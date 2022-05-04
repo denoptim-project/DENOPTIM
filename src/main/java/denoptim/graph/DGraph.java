@@ -608,9 +608,40 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Check for rings in this graph. Does not cross the template-barrier, i.e., 
+     * ignores any ring that is embedded at any level in any vertex of this
+     * graph, neither in any graph that embeds this graph. 
+     * @return <code>true</code> if there are rings in this graph.
+     */
     public boolean hasRings()
     {
         return gRings.size() > 0;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Check for rings in this graph and in any graph that is embedded at any 
+     * level in any vertex of this graph. Does not consider any graph that 
+     * embeds this graph. 
+     * @return <code>true</code> if there are rings in this graph or in embedded
+     * graphs.
+     */
+    public boolean hasOrEmbedsRings()
+    {
+        if (gRings.size() > 0)
+            return true;
+        for (Vertex v : gVertices)
+        {
+            if (!(v instanceof Template))
+                continue;
+            
+            Template t = (Template) v;
+            if (t.getInnerGraph().hasOrEmbedsRings())
+                return true;
+        }
+        return false;
     }
 
 //------------------------------------------------------------------------------
@@ -5063,21 +5094,26 @@ public class DGraph implements Cloneable
 
                 int nThisType = 0;
                 int nCompType = 0;
-                for (IAtom atm : mol.atoms())
+                for (Vertex v : getRCVertices())
                 {
-                    if (atm.getSymbol().equals(rcaTyp))
+                    if (v.containsAtoms())
                     {
-                        nThisType++;
-                    }
-                    else if (atm.getSymbol().equals(rcaTypes.get(rcaTyp)))
-                    {
-                        nCompType++;
+                        IAtom atm = v.getIAtomContainer().getAtom(0);
+                        if (MoleculeUtils.getSymbolOrLabel(atm).equals(rcaTyp))
+                        {
+                            nThisType++;
+                        }
+                        else if (MoleculeUtils.getSymbolOrLabel(atm).equals(
+                                rcaTypes.get(rcaTyp)))
+                        {
+                            nCompType++;
+                        }
                     }
                 }
 
                 // check number of rca per type
-                if (nThisType > rcSettings.getMaxRcaPerType() ||
-                        nCompType > rcSettings.getMaxRcaPerType())
+                if (nThisType > rcSettings.getMaxRcaPerType(rcaTyp) ||
+                        nCompType > rcSettings.getMaxRcaPerType(rcaTyp))
                 {
                     String msg = "Evaluation of graph: too many RCAs! "
                             + rcaTyp + ":" + nThisType + " "
@@ -5085,8 +5121,8 @@ public class DGraph implements Cloneable
                     settings.getLogger().log(Level.FINE, msg);
                     return null;
                 }
-                if (nThisType < rcSettings.getMinRcaPerType() ||
-                        nCompType < rcSettings.getMinRcaPerType())
+                if (nThisType < rcSettings.getMinRcaPerType(rcaTyp) ||
+                        nCompType < rcSettings.getMinRcaPerType(rcaTyp))
                 {
                     String msg = "Evaluation of graph: too few RCAs! "
                             + rcaTyp + ":" + nThisType + " "

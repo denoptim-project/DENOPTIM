@@ -62,6 +62,14 @@ then
     exit 1
 fi
 
+n=0;n=$(grep -l '\"gRings\": \[\],' "$wrkDir"/FSE*/*out.sdf | wc -l | awk '{print $1}')
+if [ $n != 1 ]
+then
+    echo " "
+    echo "Test 't2b' NOT PASSED (symptom: expecting one ring - found $n)"
+    exit 1
+fi
+
 grep -q 'FragSpaceExplorer run completed' "$wrkDir"/FSE*.log
 if [[ $? != 0 ]]
 then

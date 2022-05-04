@@ -1027,7 +1027,7 @@ public class CyclicGraphHandler
                     }
                     
                     if (rcaI.isCompatible(rcaJ) 
-                            && evaluateRCVPair(vI,vJ,graph,fragSpace))
+                            && evaluateRCVPair(vI,vJ,fragSpace))
                     {
                         //TODO: evaluate the use of ShortestPath instead of this
                         int ringSize = topoMat[vIdToAtmId.get(vI).get(0)]
@@ -1199,8 +1199,7 @@ public class CyclicGraphHandler
 
         //---------------------------------------------------------------------
 
-        public boolean getCompatibilityOfPair(Vertex vI, 
-                                                             Vertex vJ)
+        public boolean getCompatibilityOfPair(Vertex vI, Vertex vJ)
         {
             int i = lstVert.indexOf(vI); 
             int j = lstVert.indexOf(vJ);
@@ -1302,31 +1301,27 @@ public class CyclicGraphHandler
      *
      * @param vI first vertex
      * @param vJ second vertex
-     * @param graph the graph representation
      * @return <code>true</code> is the path satisfies the criteria
      */
 
-    private boolean evaluateRCVPair(Vertex vI, Vertex vJ,
-            DGraph molGraph, FragmentSpace fragSpace)
+    private boolean evaluateRCVPair(Vertex vI, Vertex vJ, 
+            FragmentSpace fragSpace)
                     throws DENOPTIMException
     {
         String s = "Evaluation of RCV pair " + vI + " " + vJ + ": ";
 
         // Get details on the first vertex (head)
-        int vIdI = vI.getVertexId();
-        Edge edgeI = molGraph.getEdgeWithParent(vIdI);
+        Edge edgeI = vI.getEdgeToParent();
         int srcApIdI = edgeI.getSrcAPID();
-        Vertex pvI = molGraph.getParent(vI);
-        AttachmentPoint srcApI = pvI.getAttachmentPoints().get(
-                                                                    srcApIdI);
+        Vertex pvI = vI.getParent();
+        AttachmentPoint srcApI = pvI.getAttachmentPoints().get(srcApIdI);
         int srcAtmIdI = srcApI.getAtomPositionNumber();
         APClass parentAPClsI = edgeI.getSrcAPClass();
 
         // Get details on the second vertex (tail)
-        int vIdJ = vJ.getVertexId();
-        Edge edgeJ = molGraph.getEdgeWithParent(vIdJ);
+        Edge edgeJ = vJ.getEdgeToParent();
         int srcApIdJ = edgeJ.getSrcAPID();
-        Vertex pvJ = molGraph.getParent(vJ);
+        Vertex pvJ = vJ.getParent();
         AttachmentPoint srcApJ =pvJ.getAttachmentPoints().get(srcApIdJ);
         int srcAtmIdJ = srcApJ.getAtomPositionNumber();
         APClass parentAPClsJ = edgeJ.getSrcAPClass();

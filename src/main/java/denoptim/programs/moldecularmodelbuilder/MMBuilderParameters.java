@@ -254,13 +254,6 @@ public class MMBuilderParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
 
-    public int getVerbosity()
-    {
-        return verbosity;
-    }
-
-//------------------------------------------------------------------------------
-
     public boolean debug()
     {
         return debug;
@@ -470,8 +463,14 @@ public class MMBuilderParameters extends RunTimeParameters
 
         if (otherParameters.containsKey(ParametersType.RC_PARAMS))
         {
+            if (rsPssrotFile==null)
+                throw new DENOPTIMException("Missing template for settings of "
+                        + "ring-closing PSSROT jobs.");
             TinkerUtils.readPSSROTParams(rsPssrotFile, rsPssrotParams_Init, 
                                                            rsPssrotParams_Rest);
+            if (rsKeyFile==null)
+                throw new DENOPTIMException("Missing template of "
+                        + "ring-closing PSSROT key file.");
             MMBuilderUtils.readKeyFileParams(rsKeyFile, rsKeyFileParams);
         }
         processOtherParameters();

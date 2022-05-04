@@ -159,6 +159,11 @@ do
 	echo " "
         exit 1
     fi
+    nl=$(wc -l < "$outSDF")
+    if [ 4 -gt "$nl" ]; then
+        echo "ERROR: Output file '$outSDF' is empty."
+        exit 1
+    fi
 
     # Check outcome
     expRes="$wrkDir/expected_results/$fname""_3Dbuilt.sdf"

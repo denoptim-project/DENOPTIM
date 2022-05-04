@@ -832,10 +832,10 @@ public class MoleculeUtils
     
     /**
      * Gets either the elemental symbol (for standard atoms) of the label (for
-     * pseudoatoms). Other classes implementing IAtom are not considered.
+     * pseudo-atoms). Other classes implementing IAtom are not considered.
      * This method is a response to the change from CDK-1.* to CDK-2.*. 
      * In the old CDK-1.* the getSymbol() method of IAtom would return the label 
-     * for a PseudoAtom, but this behaviour is not retained in newer versions.
+     * for a PseudoAtom, but this behavior is not retained in newer versions.
      * @param atm
      * @return either the element symbol of the label
      */

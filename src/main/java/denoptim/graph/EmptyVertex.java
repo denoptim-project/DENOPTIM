@@ -20,6 +20,7 @@ package denoptim.graph;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -30,6 +31,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MutationType;
+import denoptim.utils.Randomizer;
 
 
 /**
@@ -361,6 +363,21 @@ public class EmptyVertex extends Vertex
         iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
         
         return iac;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Although empty vertex do not contain atoms, by definitions, we allow
+     * the generation of an SDF representation that uses an empty atom list.
+     * However, this method is ignoring all the parameters and calling
+     * {@link #getIAtomContainer()}
+     */
+    @Override
+    public IAtomContainer getIAtomContainer(Logger logger, 
+            Randomizer rng, boolean removeUsedRCAs, boolean rebuild)
+    {
+        return getIAtomContainer();
     }
     
 //------------------------------------------------------------------------------

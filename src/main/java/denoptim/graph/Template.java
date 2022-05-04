@@ -464,34 +464,125 @@ public class Template extends Vertex
 
 //-----------------------------------------------------------------------------
     
-    //NB: since the symmetry depends on the embedded graph, what we want to do 
-    // on a template is define a symmetry constrain rather than set the sets of 
-    // symmetric vertices
+    /**
+     * This method exists by contract, but does not do anything because the
+     * concept of setting the symmetric set of APs in a template is not
+     * defined yet.
+     */
     @Override
     protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
     {
-        // TODO Auto-generated method stub
-        
+        // Do nothing... for now.   
     }
     
 //-----------------------------------------------------------------------------
     
     /**
-     * This operation cannot yet be done on a template because the 
-     *  SymmetricSet class holds only one set of integer identifiers that 
-     *  can be used to identify symmetric things like vertices in a graph,
-     *  or APs belonging to the SAME vertex. However, the symmetric APs on 
-     *  a template can belong to different vertices, meaning that
-     *  identifying these APs with indexes requires at least two sets of
-     *  indexes (one for the vertex, one for the AP).
-     *  For the moment, we cannot return a sensible ArrayList<SymmetricSet>
-     *  thus we return an empty one.
+     * The {@link SymmetricSet} produced from this method contain indexes of the
+     * {@link AttachmentPoint}s in the list returned by 
+     * {@link #getAttachmentPoints()}.
      */
     @Override
     public ArrayList<SymmetricSet> getSymmetricAPSets()
     {
-        //TODO: implement
-        return new ArrayList<SymmetricSet>();
+        ArrayList<SymmetricSet> allSymSets = new ArrayList<SymmetricSet>();
+        
+        List<AttachmentPoint> doneAPs = new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint innerAP : innerToOuterAPs.keySet())
+        {   
+            if (doneAPs.contains(innerAP))
+                continue;
+            
+            SymmetricSet symSetForThisAP = new SymmetricSet();
+            
+            Vertex vrtx = innerAP.getOwner();
+            int innerAPIdx = innerAP.getIndexInOwner();
+            SymmetricSet sAPsOnVrtx = vrtx.getSymmetricAPs(innerAPIdx);
+            if (sAPsOnVrtx!=null)
+            {
+                for (int apIdx : sAPsOnVrtx.getList())
+                {
+                    AttachmentPoint symInnerAP = vrtx.getAP(apIdx);
+                    if (doneAPs.contains(symInnerAP))
+                        continue;
+                    if (innerToOuterAPs.containsKey(symInnerAP))
+                    {
+                        symSetForThisAP.add(getIndexOfInnerAP(symInnerAP));
+                        doneAPs.add(symInnerAP);
+                    }
+                }
+            }
+            
+            List<Vertex> symVrtxs = innerGraph.getSymVertexesForVertex(vrtx);
+            for (Vertex symVrtx : symVrtxs)
+            {
+                //NB: we assume that this is the same vertex type as vrtx, but 
+                // a different instance. Thus the list of APs should be a match
+                // and we reuse the same index 'innerAPIdx'.
+                AttachmentPoint innerApOnSymVrtx = symVrtx.getAP(innerAPIdx);
+                if (doneAPs.contains(innerApOnSymVrtx))
+                    continue;
+                
+                SymmetricSet sAPsOnSymVrtx = symVrtx.getSymmetricAPs(innerAPIdx);
+                if (sAPsOnSymVrtx!=null)
+                {
+                    for (int apIdxOnSymVrtx : sAPsOnSymVrtx.getList())
+                    {
+                        AttachmentPoint symInnerAPOnSymVrtx = symVrtx.getAP(
+                                apIdxOnSymVrtx);
+                        if (doneAPs.contains(symInnerAPOnSymVrtx))
+                            continue;
+                        if (innerToOuterAPs.containsKey(symInnerAPOnSymVrtx))
+                        {
+                            symSetForThisAP.add(getIndexOfInnerAP
+                                    (symInnerAPOnSymVrtx));
+                            doneAPs.add(symInnerAPOnSymVrtx);
+                        }
+                    }
+                } else {
+                    // We need to add the AP at innerAPIdx anyway because even
+                    // it it does not have symmetric APs on its vertex owner it
+                    // is symmetric to the vrtx by means of the two vertexes 
+                    // being members of the same symmetric set of vertexes.
+                    if (innerToOuterAPs.containsKey(innerApOnSymVrtx))
+                    {
+                        symSetForThisAP.add(getIndexOfInnerAP(innerApOnSymVrtx));
+                        doneAPs.add(innerApOnSymVrtx);
+                    }
+                    if (!doneAPs.contains(innerAP))
+                    {
+                        symSetForThisAP.add(getIndexOfInnerAP(innerAP));
+                        doneAPs.add(innerAP);
+                    }
+                }
+            }
+            if (symSetForThisAP.size()>1)
+                allSymSets.add(symSetForThisAP);
+        }
+        return allSymSets;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Returns the index of the given AP in the sorted iterations over the
+     * keys of the mapping between inner and outer APs.
+     * The map is sorted, so the index should not change unless there are 
+     * changes in the list of APs.
+     */
+    private int getIndexOfInnerAP(AttachmentPoint ap)
+    {
+        int innerApIdx = -1;
+        for (AttachmentPoint innerAP : innerToOuterAPs.keySet())
+        {
+            innerApIdx++;
+            if (innerAP==ap)
+            {
+                return innerApIdx;
+            }
+            
+        }
+        return -1;
     }
 
 //-----------------------------------------------------------------------------
@@ -636,20 +727,43 @@ public class Template extends Vertex
      */
     @Override
     public IAtomContainer getIAtomContainer()
-    {   
-        if (mol != null)
+    {
+        Logger logger = Logger.getLogger("DummyLogger");
+        Randomizer rng = new Randomizer();
+        boolean removeUsedRCAs = true;
+        return getIAtomContainer(logger, rng, removeUsedRCAs, false);
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * The molecular representation, if any, is generated by this method and 
+     * stored until further changes in the content of this template.
+     * Successive calls of this method (i.e., prior to any other modification in
+     * this template's content) return the result stored in the first run 
+     * occurred after the last edit of this template's content.
+     * @param logger tool dealing with log messages
+     * @param rng random number generator and decision tool.
+     * @param removeUsedRCAs use <code>true</code> to remove the ring closing 
+     * attractors and replace them with a ring-closing bond according to the 
+     * bond type defined by the ring.
+     * @param rebuild use <code>true</code> to ignore any previously stored 
+     * chemical representation of this vertex and re-build from scratch.
+     * @return the molecular representation of the content of this template.
+     */
+    @Override
+    public IAtomContainer getIAtomContainer(Logger logger, 
+            Randomizer rng, boolean removeUsedRCAs, boolean rebuild)
+    {
+        if (mol!=null && !rebuild)
         {
             return mol;
         }
         try
-        {   
-            //TODO-gg change method to take these
-            Logger logger = Logger.getLogger("DummyLogger");
-            Randomizer rng = new Randomizer();
-            
+        {
             ThreeDimTreeBuilder t3b = new ThreeDimTreeBuilder(logger ,rng);
             IAtomContainer iac = t3b.convertGraphTo3DAtomContainer(
-                    innerGraph, true);
+                    innerGraph, removeUsedRCAs);
             
             // We have to ensure outer APs point to the correct source atom in
             // the atom list of the entire molecular representation of the 
@@ -677,13 +791,6 @@ public class Template extends Vertex
                     list.add(outAP);
                     apsPerAtom.put(atmIndexInMol, list);
                 }
-            }
-
-            for (int i = 0; i < iac.getAtomCount(); i++) {
-                IAtom a = iac.getAtom(i);
-                a.setProperty(DENOPTIMConstants.ATMPROPORIGINALATMID, i);
-                a.setProperty(DENOPTIMConstants.ATMPROPVERTEXID,
-                        getVertexId());
             }
             
             // Prepare SDF-like string for atom container. 0-based to 1-based

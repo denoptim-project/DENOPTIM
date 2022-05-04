@@ -73,12 +73,12 @@ public class GUI implements Runnable
 	/**
 	 * Default width
 	 */
-	private int width = 900;
+	private int width = 960;
 	
 	/**
 	 * Default height
 	 */
-	private int height = 650;
+	private int height = 690;
 	
 	/**
 	 * Command line options

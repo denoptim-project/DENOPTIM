@@ -146,8 +146,9 @@ public class GUIAPClassDefinitionDialog extends GUIModalDialog
 		
 		this.btnCanc.setEnabled(false);
 		this.btnCanc.setVisible(false);
-		
+	
 		pack();
+		
 	}
 
 //------------------------------------------------------------------------------

@@ -301,7 +301,7 @@ runTest "t16"
 #
 # t17: Evolution based on random seletion of known graphs
 #
-echo TODO: refactor DenoptimRND
+#TODO: refactor DenoptimRND?
 #runTest "t17"
 
 #

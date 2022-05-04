@@ -1818,6 +1818,7 @@ public class DenoptimIO
      * @param file the file where to print
      * @param format how to print graphs on file
      * @param modGraphs the list of graphs to print
+     * @return the reference to the file written.
      * @throws DENOPTIMException
      */
     public static File writeGraphsToFile(File file, FileFormat format,

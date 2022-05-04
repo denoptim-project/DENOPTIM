@@ -23,11 +23,11 @@ conda install -c denoptim-project  denoptim
 ### Build From Source
 Download and extract the <a href="https://github.com/denoptim-project/DENOPTIM/releases/latest">latest release</a> to create a folder we'll call `DENOPTIM_HOME`. In the following, remember to replace `$DENOPTIM_HOME` with the pathname of the extracted DENOPTIM's distribution folder on your system.
 
-Make sure you have an environment that includes JAVA and Maven. Such environment can be created with by manual installation of both JAVA and Maven manually, or it can be created using conda:
+Make sure you have an environment that includes JAVA and Maven. Such environment, which we call `dnp_devel`, can be created by manual installation of both JAVA and Maven, or it can be created using conda:
 ```
 cd $DENOPTIM_HOME
 conda env create -f environment.yml
-conda activate dnp_env
+conda activate dnp_devel
 ```
 
 Verify the requirements by running the two commands: Both should return a message declaring the respective versions.
@@ -63,7 +63,7 @@ This is how to run the tests:
 cd $DENOPTIM_HOME/test/functional_tests
 bash runAllTests.sh
 ```
-The results will be collected in a temporary folder (typically `/tmp/denoptim_tesy`).
+The results will be collected in a temporary folder (typically `/tmp/denoptim_test`).
 
 
 ## User Manual

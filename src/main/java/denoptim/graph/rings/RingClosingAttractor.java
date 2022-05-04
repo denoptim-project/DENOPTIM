@@ -23,9 +23,12 @@ import java.util.Map;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.graph.APClass;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Ring;
 import denoptim.utils.MoleculeUtils;
 
 
@@ -42,7 +45,7 @@ import denoptim.utils.MoleculeUtils;
 public class RingClosingAttractor
 {
     /**
-     * Parameter A for points in 11 relationship
+     * Parameter A for points in 1,1 relationship
      */
     final Map<String,Double> paramAR11 = new HashMap<String,Double>() {
         /**
@@ -58,7 +61,7 @@ public class RingClosingAttractor
     };
 
     /**
-     * Parameter B for points in 11 relationship
+     * Parameter B for points in 1,1 relationship
      */
     final Map<String,Double> paramBR11 = new HashMap<String,Double>() {
         /**
@@ -73,7 +76,7 @@ public class RingClosingAttractor
     };
 
     /**
-     * Parameter A for points in 12 relationship
+     * Parameter A for points in 1,2 relationship
      */
     final Map<String,Double> paramAR12 = new HashMap<String,Double>() {
         /**
@@ -88,7 +91,7 @@ public class RingClosingAttractor
     };
 
     /**
-     * Parameter B for points in 12 relationship
+     * Parameter B for points in 1,2 relationship
      */
     final Map<String,Double> paramBR12 = new HashMap<String,Double>() {
         /**
@@ -103,22 +106,22 @@ public class RingClosingAttractor
     };
 
     /**
-     * Parameter A for 1-1 interaction
+     * Parameter A for 1,1 interaction
      */
     private Double attA11 = 0.0;
  
     /**
-     * Parameter B for 1-1 interaction
+     * Parameter B for 1,1 interaction
      */
     private Double attB11 = 0.0;
 
     /**
-     * Parameter A for 1-2 interaction
+     * Parameter A for 1,2 interaction
      */
     private Double attA12 = 0.0;
 
     /**
-     * Parameter B for 1-2 interaction
+     * Parameter B for 1,2 interaction
      */
     private Double attB12 = 0.0;
 
@@ -141,14 +144,24 @@ public class RingClosingAttractor
      * Class of the Attachment Point represented by this RCA
      */
     private APClass apClass;
+    
+    /**
+     * Type of ring-closing bond that this ring-closing attractor is there to 
+     * create.
+     */
+    private BondType bndTyp;
+    
+    /**
+     * Reference to the graph {@link Ring} that represent the intention to 
+     * close a ring of vertices in DENOPTIM's graph representation of the
+     * chemical object.
+     */
+    private Ring ringUser;
 
     /**
      * Flag: this RingClosingAttractor is used to close a ring
      */ 
     private boolean used = false;
-
-    // Verbosity level
-    private static int verbosity = 0;
 
 
 //-----------------------------------------------------------------------------
@@ -165,22 +178,22 @@ public class RingClosingAttractor
 //-----------------------------------------------------------------------------
 
     /**
-     * Constructor for a RingClosingAttractor corresponding to an atom in a
-     * molecular object. Note that any atom can be used to conduct a
-     * RingClosingAttractor but only those deriving from ring closing fragments
-     * (which are identified by the atom symbol) are real RingClosingAttractor.
-     * After creation it is then suggested to check whether the resulting
-     * object is a real RingClosingAttractor by the use of method
-     * {@link #isAttractor() isAttractor}.
-     *
-     * @param atm the selected atom 
-     * @param mol the molecule containing the atom
+     * Constructor for a {@link RingClosingAttractor} corresponding to an atom 
+     * in an {@link IAtomContainer}. 
+     * Note that any atom can be used to construct a 
+     * {@link RingClosingAttractor},
+     * but only the elemental symbol stored in 
+     * {@link DENOPTIMConstants#RCATYPEMAP} are recognized and trigger the 
+     * perception of the candidate atom as a {@link RingClosingAttractor}.
+     * In which case the {@link #isAttractor()} method will return 
+     * <code>true</code>.
+     * @param atm the atom candidate to become a {@link RingClosingAttractor}.
+     * @param mol the molecule containing the candidate atom.
      */
 
     public RingClosingAttractor(IAtom atm, IAtomContainer mol)
     {
         this.atm = atm;
-        this.src = mol.getConnectedAtomsList(atm).get(0);
         for (String atyp : DENOPTIMConstants.RCATYPEMAP.keySet())
         {
             if (MoleculeUtils.getSymbolOrLabel(atm).equals(atyp))
@@ -192,6 +205,22 @@ public class RingClosingAttractor
                 this.attB12 = paramBR12.get(atyp);
                 break;
             }
+        }
+        // We can try to build RCAs from any atom, but only those atoms that
+        // really are RCAs do have the information we are extracting here
+        if (isAttractor())
+        {
+            //Well, any atom might have neighbors, but RCA only have 1. So
+            // the assumption is valid for RCAs.
+            this.src = mol.getConnectedAtomsList(atm).get(0);
+            // But, there are properties that can be found only in relation to
+            // actual RCAs (whether used to make a ring, or not)
+            this.apClass = (APClass) atm.getProperty(
+                    DENOPTIMConstants.RCAPROPAPCTORCA);
+            this.bndTyp = (BondType) atm.getProperty(
+                    DENOPTIMConstants.RCAPROPCHORDBNDTYP);
+            this.ringUser = (Ring) atm.getProperty(
+                    DENOPTIMConstants.RCAPROPRINGUSER);
         }
     }
 
@@ -231,7 +260,7 @@ public class RingClosingAttractor
 
     public String getType()
     {
-        return this.attType;
+        return attType;
     }
 
 //-----------------------------------------------------------------------------
@@ -244,7 +273,7 @@ public class RingClosingAttractor
 
     public IAtom getIAtom()
     {
-        return this.atm;
+        return atm;
     }
     
 //-----------------------------------------------------------------------------
@@ -269,7 +298,7 @@ public class RingClosingAttractor
 
     public IAtom getSrcAtom()
     {
-        return this.src;
+        return src;
     }
 
 //-----------------------------------------------------------------------------
@@ -284,18 +313,30 @@ public class RingClosingAttractor
     {
         return apClass;
     }
-
-//-----------------------------------------------------------------------------
+    
+ //-----------------------------------------------------------------------------
 
     /**
-     * Set the class of the Attachment Point occupied by this 
-     * RingClosingAttractor, if any.
-     * @param apclass2 the string format of the attachment point class
+     * Get the type of bond this attractor is meant to close.
+     * @return the type of ring-closing bond.
      */
 
-    public void setApClass(APClass apclass2)
+    public BondType getRCBondType()
     {
-        this.apClass = apclass2;
+        return bndTyp;
+    }
+    
+ //-----------------------------------------------------------------------------
+
+    /**
+     * Get the reference to the graph representation of the ring this attractor
+     * is meant to close.
+     * @return the ring in the graph representation, or null.
+     */
+
+    public Ring getRingUser()
+    {
+        return ringUser;
     }
 
 //-----------------------------------------------------------------------------
@@ -320,13 +361,13 @@ public class RingClosingAttractor
 
     public boolean isUsed()
     {
-        return this.used;
+        return used;
     }
 
 //-----------------------------------------------------------------------------
 
     /** 
-     * @return the parameter A for interactions with atoms/RCA in 1-1
+     * @return the parameter A for interactions with atoms/RCA in 1,1
      * relationship.
      */
 
@@ -338,7 +379,7 @@ public class RingClosingAttractor
 //-----------------------------------------------------------------------------
 
     /** 
-     * @return the parameter B for interactions with atoms/RCA in 1-1
+     * @return the parameter B for interactions with atoms/RCA in 1,1
      * relationship.
      */
 
@@ -350,7 +391,7 @@ public class RingClosingAttractor
 //-----------------------------------------------------------------------------
 
     /** 
-     * @return the parameter A for interactions with atoms/RCA in 1-2
+     * @return the parameter A for interactions with atoms/RCA in 1,2
      * relationship.
      */
 
@@ -362,7 +403,7 @@ public class RingClosingAttractor
 //-----------------------------------------------------------------------------
 
     /** 
-     * @return the parameter B for interactions with atoms/RCA in 1-2
+     * @return the parameter B for interactions with atoms/RCA in 1,2
      * relationship.
      */
 
@@ -381,19 +422,10 @@ public class RingClosingAttractor
     {
         String s = "RingClosingAttractor (Type:" + this.attType + " "
                     + "APClass:" + this.apClass + " "
-                    + "Used:" + this.used + " ";
-	if (verbosity > 2)
-	{
-            s = s + "Atm: " + this.atm.toString() 
-		  + " SrcAtm: " + this.src.toString();
-	}
-	else
-	{
-	    s = s + "Atm: " + MoleculeUtils.getSymbolOrLabel(this.atm) 
-		  + " SrcAtm: " + MoleculeUtils.getSymbolOrLabel(this.src);
-	}
-	s = s + ")";
-
+                    + "Used:" + this.used + " "
+                    + "Atm: " + MoleculeUtils.getSymbolOrLabel(this.atm) 
+                    + " SrcAtm: " + MoleculeUtils.getSymbolOrLabel(this.src)
+                    + ")";
         return s;
     }
 

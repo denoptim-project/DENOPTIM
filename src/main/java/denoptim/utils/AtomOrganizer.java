@@ -34,6 +34,9 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.APClass;
+import denoptim.graph.Edge.BondType;
+import denoptim.graph.Ring;
 
 
 /**
@@ -62,6 +65,7 @@ public class AtomOrganizer
     private int scheme = 1;
 
 //------------------------------------------------------------------------------
+
     public AtomOrganizer()
     {
         flags = new ArrayList<>();
@@ -135,8 +139,6 @@ public class AtomOrganizer
      */
     public IAtomContainer reorderStartingFrom(int seed, IAtomContainer mol)
             throws DENOPTIMException {
-        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
-        IAtomContainer newMol = builder.newAtomContainer();
         int flag = getFreeAtomsFlag(mol);
 
         //find new order of atoms using starting from 'seed'
@@ -167,7 +169,6 @@ public class AtomOrganizer
             deleteAtomsFlag(flag);
         }
 
-        //The reordered system is the output of this method
         return makeReorderedCopy(mol, 
                 atomOrders.get(seed), 
                 oldToNewOrder.get(seed));
@@ -181,9 +182,13 @@ public class AtomOrganizer
      * container are projected into the new one, namely
      * <ul>
      * <li>{@link DENOPTIMConstants#ATMPROPVERTEXID}</li>
+     * <li>{@link DENOPTIMConstants#ATMPROPVERTEXPATH}</li>
+     * <li>{@link DENOPTIMConstants#RCAPROPAPCTORCA}</li>
+     * <li>{@link DENOPTIMConstants#RCAPROPCHORDBNDTYP}</li>
+     * <li>{@link DENOPTIMConstants#RCAPROPRINGUSER}</li>
      * <li>{@link DENOPTIMConstants#MOLERRORTAG}</li>
      * </ul>
-     * @param original the container to reorganise.
+     * @param original the container to reorganize.
      * @param newToOldOrder list of atom indexes in the original atom container.
      * The list is supposed to work so that 
      * <pre>
@@ -211,7 +216,7 @@ public class AtomOrganizer
         for (int i = 0; i < original.getAtomCount(); i++) 
         {
             IAtom originalAtom = original.getAtom(newToOldOrder.get(i));
-            IAtom atm = MoleculeUtils.makeSameAtomAs(originalAtom,true,true);
+            IAtom atm = MoleculeUtils.makeSameAtomAs(originalAtom, true, true);
             String atmPropVID = " none";
             Object p = originalAtom.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
             if (p != null)
@@ -220,10 +225,43 @@ public class AtomOrganizer
                 atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, 
                         ((Integer) p).intValue());
             }
-            sbMolProp.append(atmPropVID);
+            sbMolProp.append(atmPropVID);            
+
+            Object pVPath = originalAtom.getProperty(
+                    DENOPTIMConstants.ATMPROPVERTEXPATH);
+            if (pVPath != null)
+            {
+                atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
+                        pVPath.toString());
+            }
+            
+            Object pAPCls = originalAtom.getProperty(
+                    DENOPTIMConstants.RCAPROPAPCTORCA);
+            if (pAPCls != null)
+            {
+                atm.setProperty(DENOPTIMConstants.RCAPROPAPCTORCA, 
+                        (APClass) pAPCls);
+            }
+            
+            Object pBndTyp = originalAtom.getProperty(
+                    DENOPTIMConstants.RCAPROPCHORDBNDTYP);
+            if (pBndTyp != null)
+            {
+                atm.setProperty(DENOPTIMConstants.RCAPROPCHORDBNDTYP, 
+                        (BondType) pBndTyp);
+            }
+            
+            Object pRing = originalAtom.getProperty(
+                    DENOPTIMConstants.RCAPROPRINGUSER);
+            if (pRing != null)
+            {
+                atm.setProperty(DENOPTIMConstants.RCAPROPRINGUSER, 
+                        (Ring) pRing);
+            }
+            
             iac.addAtom(atm);
         }
-        //NB: ATMPROPVERTEXID is integer when its atom property, but it's string
+        //NB: ATMPROPVERTEXID is integer when it's atom property, but it's string
         // when collected in a molecular property.
         iac.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, 
                 sbMolProp.toString().trim());
