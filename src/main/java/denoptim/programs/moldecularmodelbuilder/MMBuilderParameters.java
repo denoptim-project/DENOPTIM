@@ -333,7 +333,7 @@ public class MMBuilderParameters extends RunTimeParameters
         case "RCPSSROTPARAMS=":
             rsPssrotFile = value;
             break;
-        case "KEEPDUMMYATOMS=":
+        case "KEEPDUMMYATOMS":
             keepDummy = true;
             break;
         case "ATOMORDERINGSCHEME=":
