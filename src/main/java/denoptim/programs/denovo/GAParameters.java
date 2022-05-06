@@ -616,6 +616,7 @@ public class GAParameters extends RunTimeParameters
     }
     
 //------------------------------------------------------------------------------
+    
     public double getCrossoverWeight()
     {
         return crossoverWeight;
