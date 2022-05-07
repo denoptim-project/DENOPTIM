@@ -88,7 +88,7 @@ public enum CounterID
         FAILEDXOVERATTEMPTS.description = "Failed attempts to do build a graph "
                 + "by crossover";
         XOVERPARENTSEARCH.description = "Attempts to find a pairs of parents "
-                + "compatible with crossover.";
+                + "compatible with crossover";
         FAILEDXOVERATTEMPTS_FINDPARENTS.description = "Failed attemtps to find "
                 + "crossover partners";
         FAILEDXOVERATTEMPTS_PERFORM.description = "Failed crossover operations "
@@ -107,7 +107,7 @@ public enum CounterID
                 + " mutation";
         FAILEDMUTATTEMTS_PERFORM.description = "Failed mutation operation of "
                 + "parent "
-                + "that supports mutation.";
+                + "that supports mutation";
         FAILEDMUTATTEMTS_PERFORM_NOMUTSITE.description = "Mutation cannot be "
                 + "done because graph declares no mutation site";
         FAILEDMUTATTEMTS_PERFORM_NOOWNER.description = "Mutation cannot take "
@@ -125,12 +125,12 @@ public enum CounterID
         FAILEDMUTATTEMTS_PERFORM_NODELLINK_FINDPARENT.description = "Failed to "
                 + "identify the parent of a link selected for removal.";
         FAILEDMUTATTEMTS_PERFORM_NODELLINK_EDIT.description = "Failed to "
-                + "remove vertex and weld remaining parts.";
+                + "remove vertex and weld remaining parts";
         FAILEDMUTATTEMTS_PERFORM_NODELETECHAIN.description = "Failed to "
-                + "remove a chain of vertexes.";
+                + "remove a chain of vertexes";
         FAILEDMUTATTEMTS_PERFORM_NOADDLINK.description = "Mutation did not "
                 + "introduce a verted between a pairs of previously "
-                + "connected vertexes.";
+                + "connected vertexes";
         FAILEDMUTATTEMTS_PERFORM_NOADDLINK_FIND.description = "Failed to "
                 + "find an linking vertex";
         FAILEDMUTATTEMTS_PERFORM_NOADDLINK_EDIT.description = "Failed to "
@@ -170,11 +170,11 @@ public enum CounterID
         FITNESSEVALS.description = "Number of fitness evaluations";
         FAILEDFITNESSEVALS.description = "Number of failed fitness evaluations";
         
-        DUPLICATEPREFITNESS.description = "Number of candidates with duplicate "
-                + "UID detected prior to considering their fitness evaluation.";
+        DUPLICATEPREFITNESS.description = "Number of duplicate candidates "
+                + " detected prior to considering their fitness evaluation";
         FAILEDDUPLICATEPREFITNESSDETECTION.description = "Number of failed "
                 + "attempts to compare UID with known UIDs prior to considering "
-                + "the fitness evaluation of a candidate.";
+                + "the fitness evaluation of a candidate";
     }
     
     private String prettyName = "";

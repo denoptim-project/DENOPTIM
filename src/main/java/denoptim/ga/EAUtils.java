@@ -171,7 +171,7 @@ public class EAUtils
     protected static CandidateSource chooseGenerationMethod(GAParameters settings)
     {
         return pickNewCandidateGenerationMode(
-                settings.getConstructionWeight(), 
+                settings.getCrossoverWeight(), 
                 settings.getMutationWeight(),
                 settings.getConstructionWeight(),
                 settings.getRandomizer());
