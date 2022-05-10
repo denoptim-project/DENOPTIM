@@ -248,7 +248,7 @@ public class GUIInspectGARun extends GUICardPanel
         evoSeriesBtn = new JButton("Show/Hide Population Stats");
         evoSeriesBtn.setComponentPopupMenu(evoSeriesCheckList);
         evoSeriesBtn.setToolTipText(String.format(
-                "<html><body width='%1s'>Clock to select which population "
+                "<html><body width='%1s'>Click to select which population "
                 + "statistics to plot in the top plot.",300));
         evoSeriesBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -261,7 +261,7 @@ public class GUIInspectGARun extends GUICardPanel
         monitorSeriesBtn = new JButton("Show/Hide Monitor Series");
         monitorSeriesBtn.setComponentPopupMenu(monitorSeriesCheckList);
         monitorSeriesBtn.setToolTipText(String.format(
-                "<html><body width='%1s'>Clock to select which monitored event "
+                "<html><body width='%1s'>Click to select which monitored event "
                 + "counts to plot in the bottom plot.",300));
         monitorSeriesBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
