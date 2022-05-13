@@ -34,6 +34,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.geom.Ellipse2D;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -58,6 +61,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -207,6 +211,39 @@ public class GUIInspectGARun extends GUICardPanel
             Color.orange, Color.pink, Color.red};
     
     /**
+     * Predefined line strokes 
+     */
+    private final BasicStroke[] strokes = {
+            new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                  0.0f),
+            new BasicStroke(
+                    1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    1.0f, new float[] {4f, 2f}, 0.0f),
+            new BasicStroke(
+                    1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    1.0f, new float[] {6f, 2f}, 0.0f),
+            new BasicStroke(
+                    1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    1.0f, new float[] {6f, 2f, 4f, 2f}, 0.0f),
+            new BasicStroke(
+                    1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    1.0f, new float[] {6f, 2f, 4f, 2f, 4f, 2f}, 0.0f),
+            new BasicStroke(
+                    1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    1.0f, new float[] {6f, 2f, 4f, 2f, 4f, 2f, 4f, 2f}, 0.0f),
+            new BasicStroke(
+                    1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    1.0f, new float[] {6f, 2f, 6f, 2f, 4f, 2f}, 0.0f),
+            new BasicStroke(
+                    1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    1.0f, new float[] {6f, 2f, 6f, 2f, 4f, 2f, 4f, 2f}, 0.0f),
+            new BasicStroke(
+                    1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
+                    1.0f, new float[] {6f, 2f, 6f, 2f, 6f, 2f,
+                            4f, 2f, 4f, 2f, 4f, 2f}, 0.0f),
+    };
+    
+    /**
      * Records the name of the first series in the monitor plot to facilitate
      * its recovery upon chart reset.
      */
@@ -265,6 +302,10 @@ public class GUIInspectGARun extends GUICardPanel
         monitorSeriesBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 monitorSeriesCheckList.showMenu(monitorSeriesBtn, 0, 0);
+                /*
+                LineExamplePanel p = new LineExamplePanel();
+                p.showDialog();
+                */
             }
         });
 		ctrlPanelRow1Left.add(monitorSeriesBtn);
@@ -1002,6 +1043,57 @@ public class GUIInspectGARun extends GUICardPanel
 		mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 	
+//------------------------------------------------------------------------------
+
+	/**
+     * Modal dialog to display visual examples of line colors and strokes
+     */
+	/*
+    private class LineExamplePanel extends GUIModalDialog
+    {
+        public LineExamplePanel()
+        {
+            super(false);
+            this.setBounds(150, 150, 500, 200);
+            this.setTitle("LineExamples");
+            JPanel mainPanel = new JPanel();
+            mainPanel.setLayout(new BoxLayout(mainPanel, SwingConstants.VERTICAL));
+            JScrollPane scrolPane = new JScrollPane(mainPanel);
+            addToCentralPane(scrolPane);
+            
+            int iColor = 0;
+            int iStroke = 0;
+            for (int iSeries=0; iSeries<100; iSeries++)
+            {
+                Color color = colors[iColor];
+                BasicStroke stroke = strokes[iStroke];
+                JPanel linePanel = new JPanel() {
+                    protected void paintComponent(Graphics g) {
+                        super.paintComponent(g);
+                        g.setColor(color);
+                        ((Graphics2D) g).setStroke(stroke);
+                        g.drawLine(10,10, 5000, 15);
+                    };
+                };
+                JPanel locPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                mainPanel.add(linePanel);
+                mainPanel.add(new JLabel("Color: "+ iColor+" Stroke: "+iStroke));
+                
+                iColor++;
+                if (iColor >= colors.length)
+                {
+                    iColor = 0;
+                    if (iStroke < strokes.length-1)
+                    {
+                        iStroke++;
+                    } else {
+                        iStroke = 0;
+                    }
+                }
+            }
+        }
+	}
+	*/
 
 //------------------------------------------------------------------------------
 	
@@ -1090,6 +1182,7 @@ public class GUIInspectGARun extends GUICardPanel
         monitorPlot.setRenderer(0, renderer0);
         
         int iColor = 0;
+        int iStroke = 0;
         for (int iSeries=0; iSeries<headers.length; iSeries++)
         {
             DefaultXYDataset dataset = new DefaultXYDataset();
@@ -1102,6 +1195,7 @@ public class GUIInspectGARun extends GUICardPanel
             monitorPlot.setRenderer(iSeries, serierRenderer);
             
             serierRenderer.setSeriesPaint(0, colors[iColor]);
+            serierRenderer.setSeriesStroke(0, strokes[iStroke]);
             
             //Form here New with JCheckBox
             JCheckBox cbi = new JCheckBox(
@@ -1137,7 +1231,15 @@ public class GUIInspectGARun extends GUICardPanel
             // Restart color sequence from beginning
             iColor++;
             if (iColor >= colors.length)
+            {
                 iColor = 0;
+                if (iStroke < strokes.length-1)
+                {
+                    iStroke++;
+                } else {
+                    iStroke = 0;
+                }
+            }
         }
 
         // Create the actual panel that contains the chart
