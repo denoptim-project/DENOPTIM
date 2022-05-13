@@ -167,7 +167,7 @@ public class GUIInspectGARun extends GUICardPanel
 	private JFreeChart monitorChart;
 	private ChartPanel monitorChartPanel;
 	
-	private JPopupMenu monitorSeriesCheckList;
+	private ScrollableJPupupMenu monitorSeriesCheckList;
 	private JButton monitorSeriesBtn;
 	
 	
@@ -257,15 +257,14 @@ public class GUIInspectGARun extends GUICardPanel
         });
         ctrlPanelRow1Left.add(evoSeriesBtn);
 		
-		monitorSeriesCheckList = new JPopupMenu();
+		monitorSeriesCheckList = new ScrollableJPupupMenu();
         monitorSeriesBtn = new JButton("Show/Hide Monitor Series");
-        monitorSeriesBtn.setComponentPopupMenu(monitorSeriesCheckList);
         monitorSeriesBtn.setToolTipText(String.format(
                 "<html><body width='%1s'>Click to select which monitored event "
                 + "counts to plot in the bottom plot.",300));
         monitorSeriesBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                monitorSeriesCheckList.show(monitorSeriesBtn, 0, 0);
+                monitorSeriesCheckList.showMenu(monitorSeriesBtn, 0, 0);
             }
         });
 		ctrlPanelRow1Left.add(monitorSeriesBtn);
@@ -294,19 +293,13 @@ public class GUIInspectGARun extends GUICardPanel
                 monitorPlot.getDomainAxis().setAutoRange(true);
                 monitorPlot.getRangeAxis().setAutoRange(true);
                 monitorPlot.getDomainAxis().setLowerBound(-0.5);
-                for (int iItem=0; iItem<monitorSeriesCheckList.getComponentCount(); 
-                        iItem++)
+                for (JCheckBox cb : monitorSeriesCheckList.getAllBChekBoxes())
                 {
-                    Component c = monitorSeriesCheckList.getComponent(iItem);
-                    if (c instanceof JCheckBoxMenuItem)
-                    {
-                        // NB: this sets the default series displayed upon reset
-                        if (((JCheckBoxMenuItem) c).getText().startsWith(
-                                nameFirstMonitorSeries))
-                            ((JCheckBoxMenuItem) c).setSelected(true);
-                        else
-                            ((JCheckBoxMenuItem) c).setSelected(false);
-                    }
+                    // NB: this sets the default series displayed upon reset
+                    if (cb.getText().startsWith(nameFirstMonitorSeries))
+                        cb.setSelected(true);
+                    else
+                        cb.setSelected(false);
                 }
             }
         });
@@ -1109,10 +1102,12 @@ public class GUIInspectGARun extends GUICardPanel
             monitorPlot.setRenderer(iSeries, serierRenderer);
             
             serierRenderer.setSeriesPaint(0, colors[iColor]);
-            JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(
+            
+            //Form here New with JCheckBox
+            JCheckBox cbi = new JCheckBox(
                     CounterID.valueOf(headers[iSeries]).getPrettyName());
-            cbmi.setForeground(colors[iColor]);
-            cbmi.setToolTipText(String.format("<html><body width='%1s'>"
+            cbi.setForeground(colors[iColor]);
+            cbi.setToolTipText(String.format("<html><body width='%1s'>"
                     + CounterID.valueOf(headers[iSeries]).getDescription()
                     + ".</html>", 300));
 
@@ -1121,15 +1116,15 @@ public class GUIInspectGARun extends GUICardPanel
             {
                 serierRenderer.setSeriesVisible(0, false);
             } else {
-                nameFirstMonitorSeries = cbmi.getText();
-                cbmi.setSelected(true);
+                nameFirstMonitorSeries = cbi.getText();
+                cbi.setSelected(true);
             }
             
-            cbmi.addItemListener(new ItemListener(){
+            cbi.addItemListener(new ItemListener(){
                 @Override
                 public void itemStateChanged(ItemEvent e)
                 {
-                    if (cbmi.isSelected())
+                    if (cbi.isSelected())
                     {
                         serierRenderer.setSeriesVisible(0, true);
                     } else {
@@ -1137,7 +1132,7 @@ public class GUIInspectGARun extends GUICardPanel
                     }                    
                 }
             });
-            monitorSeriesCheckList.add(cbmi);
+            monitorSeriesCheckList.addCheckBox(cbi);
             
             // Restart color sequence from beginning
             iColor++;
