@@ -34,37 +34,26 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.geom.Ellipse2D;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.Line2D;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -74,8 +63,6 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.ChartMouseListener;
@@ -86,7 +73,6 @@ import org.jfree.chart.editor.ChartEditor;
 import org.jfree.chart.editor.ChartEditorManager;
 import org.jfree.chart.entity.PlotEntity;
 import org.jfree.chart.entity.XYItemEntity;
-import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.SeriesRenderingOrder;
@@ -95,16 +81,12 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
-import com.google.common.io.Files;
-
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
-import denoptim.graph.APClass;
 import denoptim.graph.CandidateLW;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
-import denoptim.logging.Monitor;
 import denoptim.utils.GenUtils;
 
 
@@ -206,9 +188,15 @@ public class GUIInspectGARun extends GUICardPanel
     /**
      * Predefined list of data series colors.
      */
-    private final Color[] colors = new Color[] {Color.black, Color.blue, 
-            Color.cyan, Color.darkGray, Color.green, Color.magenta, 
-            Color.orange, Color.pink, Color.red};
+    private final Color[] colors = new Color[] {Color.black, 
+            Color.decode("#354ccd"), //blue-ish
+            Color.decode("#1e9222"), //dark green
+            Color.decode("#9eca3f"), //light green
+            Color.decode("#28cbad"), //cyan-ish
+            Color.decode("#dea0c8"), //pink-ish
+            Color.decode("#dd6835"), //oragne
+            Color.decode("#b70505"), //red-ish
+            Color.decode("#a42ac4")}; //violet
     
     /**
      * Predefined line strokes 
