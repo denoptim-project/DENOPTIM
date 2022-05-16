@@ -53,7 +53,7 @@ public class Version
     public static final int MINOR = 1;
 
     /** The update letter. */
-    public static final int UPDATE = 2;
+    public static final int UPDATE = 3;
 
     /** String for the current version. */
     public static final String VERSION = "V" + MAJOR + "." + MINOR + "." + UPDATE;

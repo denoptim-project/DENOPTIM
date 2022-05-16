@@ -94,7 +94,7 @@ public class GUIPreferences {
 	 */
 	protected static boolean showLegenInEvolutionPlot = false;
 	
-	   /**
+    /**
      * Choice of displaying legend in monitor plot
      */
     protected static boolean showLegenInMonitorPlot = false;

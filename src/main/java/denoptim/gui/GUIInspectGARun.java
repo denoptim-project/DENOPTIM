@@ -299,7 +299,7 @@ public class GUIInspectGARun extends GUICardPanel
         });
 		ctrlPanelRow1Left.add(monitorSeriesBtn);
 		
-	    JButton rstView = new JButton("Reset Chart Views");
+	    JButton rstView = new JButton("Reset Charts");
         rstView.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 evoPlot.getDomainAxis().setAutoRange(true);
@@ -524,7 +524,8 @@ public class GUIInspectGARun extends GUICardPanel
 	                    + "<li>Use the <code>Reset Chart View</code> to reset "
 	                    + "the view.</li>"
 	                    + "<li>Right-click to get advanced controls and "
-	                    + "options</li>"
+	                    + "options, inclusing exporting the charts as PNG or "
+	                    + "SVG.</li>"
 	                    + "</ul></p>"
 	                    + "</body></html>";
 				JOptionPane.showMessageDialog(btnHelp, String.format(txt, 300),
