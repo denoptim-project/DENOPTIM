@@ -1197,6 +1197,8 @@ public class GUIVertexInspector extends GUICardPanel
 	        	// Make sure the new class has a proper syntax
 	        	GUIAPClassDefinitionDialog apcDefiner = 
                         new GUIAPClassDefinitionDialog(btnSaveEdits, false);
+	        	apcDefiner.setTitle("Confirm APClass on AP #"+i);
+	        	apcDefiner.setPreDefinedAPClass(currApClass);
                 Object chosen = apcDefiner.showDialog();
                 if (chosen != null)
                 {
