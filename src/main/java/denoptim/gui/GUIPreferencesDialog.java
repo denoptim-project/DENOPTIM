@@ -31,6 +31,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
@@ -83,6 +84,14 @@ public class GUIPreferencesDialog extends GUIModalDialog
     private JPanel pnlChartPointSize;
     private JLabel lblChartPointSize;
     private JTextField txtChartPointSize;
+    
+    private String namEvoChartLegend = "Display legend in evolution chart";
+    private JPanel pnlEvoChartLegend;
+    private JRadioButton rcbEvoChartLegend;
+
+    private String namMntChartLegend = "Display legend in monitor chart";
+    private JPanel pnlMntChartLegend;
+    private JRadioButton rcbMntChartLegend;
     
     private JPanel linePropTags;
     private JLabel lblPropTags;
@@ -276,6 +285,18 @@ public class GUIPreferencesDialog extends GUIModalDialog
         pnlChartPointSize.add(txtChartPointSize);
         centralPanel.add(pnlChartPointSize);
         
+        pnlEvoChartLegend = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rcbEvoChartLegend = new JRadioButton(namEvoChartLegend);
+        rcbEvoChartLegend.setSelected(GUIPreferences.showLegenInEvolutionPlot);
+        pnlEvoChartLegend.add(rcbEvoChartLegend);
+        centralPanel.add(pnlEvoChartLegend);
+        
+        pnlMntChartLegend = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rcbMntChartLegend = new JRadioButton(namMntChartLegend);
+        rcbMntChartLegend.setSelected(GUIPreferences.showLegenInMonitorPlot);
+        pnlMntChartLegend.add(rcbMntChartLegend);
+        centralPanel.add(pnlMntChartLegend);
+        
 		// Customize the buttons of the modal dialog
 		this.btnDone.setText("Save");
 		this.btnDone.setToolTipText("Save the values and close dialog");
@@ -361,5 +382,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         GUIPreferences.chartPointSize =
                 Integer.parseInt(txtChartPointSize.getText());
         GUIPreferences.tmpSpace = txtTmpSpace.getText();
+        GUIPreferences.showLegenInEvolutionPlot = rcbEvoChartLegend.isSelected();
+        GUIPreferences.showLegenInMonitorPlot = rcbMntChartLegend.isSelected();
 	}
 }

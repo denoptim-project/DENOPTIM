@@ -78,6 +78,7 @@ import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.SeriesRenderingOrder;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
 
@@ -191,7 +192,7 @@ public class GUIInspectGARun extends GUICardPanel
     private final Color[] colors = new Color[] {Color.black, 
             Color.decode("#354ccd"), //blue-ish
             Color.decode("#1e9222"), //dark green
-            Color.decode("#9eca3f"), //light green
+            Color.decode("#9eca2f"), //light green
             Color.decode("#28cbad"), //cyan-ish
             Color.decode("#dea0c8"), //pink-ish
             Color.decode("#dd6835"), //oragne
@@ -206,29 +207,29 @@ public class GUIInspectGARun extends GUICardPanel
                   0.0f),
             new BasicStroke(
                     1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
-                    1.0f, new float[] {4f, 2f}, 0.0f),
+                    1.0f, new float[] {2f, 2f}, 0.0f),
             new BasicStroke(
                     1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
-                    1.0f, new float[] {6f, 2f}, 0.0f),
+                    1.0f, new float[] {5f, 2f}, 0.0f),
             new BasicStroke(
                     1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
-                    1.0f, new float[] {6f, 2f, 4f, 2f}, 0.0f),
+                    1.0f, new float[] {2f, 2f, 5f, 2f}, 0.0f),
             new BasicStroke(
                     1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
-                    1.0f, new float[] {6f, 2f, 4f, 2f, 4f, 2f}, 0.0f),
+                    1.0f, new float[] {2f, 2f, 2f, 2f, 5f, 2f}, 0.0f),
             new BasicStroke(
                     1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
-                    1.0f, new float[] {6f, 2f, 4f, 2f, 4f, 2f, 4f, 2f}, 0.0f),
+                    1.0f, new float[] {2f, 2f, 2f, 2f, 2f, 2f, 5f, 2f}, 0.0f),
             new BasicStroke(
                     1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
-                    1.0f, new float[] {6f, 2f, 6f, 2f, 4f, 2f}, 0.0f),
+                    1.0f, new float[] {2f, 2f, 5f, 2f, 5f, 2f}, 0.0f),
             new BasicStroke(
                     1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
-                    1.0f, new float[] {6f, 2f, 6f, 2f, 4f, 2f, 4f, 2f}, 0.0f),
+                    1.0f, new float[] {2f, 2f, 2f, 2f, 5f, 2f, 5f, 2f}, 0.0f),
             new BasicStroke(
                     1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 
-                    1.0f, new float[] {6f, 2f, 6f, 2f, 6f, 2f,
-                            4f, 2f, 4f, 2f, 4f, 2f}, 0.0f),
+                    1.0f, new float[] {2f, 2f, 2f, 2f, 2f, 2f, 
+                            5f, 2f, 5f, 2f, 5f, 2f}, 0.0f),
     };
     
     /**
@@ -776,7 +777,10 @@ public class GUIInspectGARun extends GUICardPanel
         yAxis.setAutoRangeIncludesZero(false);
 		evoPlot = new XYPlot(null,xAxis,yAxis,null);
 		
-		evoChart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT,evoPlot,false);
+		evoChart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT,evoPlot,
+		        GUIPreferences.showLegenInEvolutionPlot);
+		if (evoChart.getLegend()!=null)
+		    evoChart.getLegend().setPosition(RectangleEdge.BOTTOM);
 		
 		evoPlot.getDomainAxis().setLowerBound(-0.5); //min X-axis
 		evoPlot.setBackgroundPaint(Color.WHITE);
@@ -1154,7 +1158,9 @@ public class GUIInspectGARun extends GUICardPanel
         monitorPlot = new XYPlot(null,xAxis,yAxis,null);
 
         monitorChart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, 
-                monitorPlot, false);
+                monitorPlot, GUIPreferences.showLegenInMonitorPlot);
+        if (monitorChart.getLegend()!=null)
+            monitorChart.getLegend().setPosition(RectangleEdge.BOTTOM);
 
         monitorPlot.getDomainAxis().setLowerBound(-0.5); //min X-axis
         monitorPlot.setBackgroundPaint(Color.WHITE);
