@@ -41,7 +41,7 @@ public class Version
             + "Einar Kjellback, "
             + "Marcello Costamagna";
     public static final String CONTACT = "see https://github.com/denoptim-project";
-    public static final String DATE = "May 4, 2022";
+    public static final String DATE = "May 16, 2022";
     public static final String MINIMUMJAVAVERSION = "1.8";
     
     //NB: Remember the version has to be consistent with the pom.xml file
@@ -53,7 +53,7 @@ public class Version
     public static final int MINOR = 1;
 
     /** The update letter. */
-    public static final int UPDATE = 1;
+    public static final int UPDATE = 2;
 
     /** String for the current version. */
     public static final String VERSION = "V" + MAJOR + "." + MINOR + "." + UPDATE;

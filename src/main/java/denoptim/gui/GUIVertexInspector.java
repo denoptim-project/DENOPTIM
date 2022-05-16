@@ -1070,6 +1070,7 @@ public class GUIVertexInspector extends GUICardPanel
 		btnOpenVrtxs.setEnabled(true);
 		btnOpenSMILES.setEnabled(true); 
 		btnOpenMol.setEnabled(true);
+		btnEmptFrag.setEnabled(true);
         if (vertex == null || vertex instanceof Fragment == false)
         {
             btnDelSel.setEnabled(false);
@@ -1098,8 +1099,9 @@ public class GUIVertexInspector extends GUICardPanel
 		btnOpenVrtxs.setEnabled(false);
 		btnOpenSMILES.setEnabled(false); 
 		btnOpenMol.setEnabled(false);
-		btnDelSel.setEnabled(false);
-		btnAtmToAP.setEnabled(false);
+		btnEmptFrag.setEnabled(false);
+		//btnDelSel.setEnabled(false);
+		//btnAtmToAP.setEnabled(false);
 		
 		navigSpinner.setModel(new SpinnerNumberModel(currVrtxIdx+1, 
 				currVrtxIdx+1, currVrtxIdx+1, 1));
@@ -1197,6 +1199,8 @@ public class GUIVertexInspector extends GUICardPanel
 	        	// Make sure the new class has a proper syntax
 	        	GUIAPClassDefinitionDialog apcDefiner = 
                         new GUIAPClassDefinitionDialog(btnSaveEdits, false);
+	        	apcDefiner.setTitle("Confirm APClass on AP #"+i);
+	        	apcDefiner.setPreDefinedAPClass(currApClass);
                 Object chosen = apcDefiner.showDialog();
                 if (chosen != null)
                 {

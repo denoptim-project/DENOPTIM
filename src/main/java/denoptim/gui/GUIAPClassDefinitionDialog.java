@@ -150,6 +150,17 @@ public class GUIAPClassDefinitionDialog extends GUIModalDialog
 		pack();
 		
 	}
+	
+//------------------------------------------------------------------------------
+	
+	/**
+	 * Sets the content of the text field with the given predefined text.
+	 * @param text
+	 */
+	public void setPreDefinedAPClass(String text)
+	{
+	    txtAPCName.setText(text);
+	}
 
 //------------------------------------------------------------------------------
 
