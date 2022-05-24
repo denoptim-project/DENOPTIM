@@ -41,7 +41,7 @@ Now, you can build DENOPTIM with
 mvn package
 ```
 
-Once maven has finished, you can create call DENOPTIM using a command like the following (NB: replace $DENOPTIM_HOME and ${VERSION} as with the values that apply to your installation):
+Once maven has finished, you can create call DENOPTIM using a command like the following (NB: replace `$DENOPTIM_HOME` and `${VERSION}` as with the values that apply to your installation):
 On Linux/Mac and GitBash on Windows:
 ```
 java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar
