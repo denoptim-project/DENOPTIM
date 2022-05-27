@@ -5,8 +5,8 @@ on:
     tags:
       - v*
 
-env:
-  ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+#env:
+#  ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
 
 jobs:
   build-and-publish:
