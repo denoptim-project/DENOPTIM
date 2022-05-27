@@ -20,7 +20,13 @@ jobs:
       uses: actions/checkout@master
 
     - name: Setup conda env
-      run: conda env update --file ../../conda/environment.yml --name base
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          auto-activate-base: false
+
+    - name: Conda info
+      run: conda info
 
     - name: Build package
       run: |
