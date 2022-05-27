@@ -27,11 +27,8 @@ jobs:
         activate-environment: anaconda-client-env
         environment-file: conda/environment.yml
 
-    - name: Build package
+    - name: Build package and publish
       run: |
-        conda config --set anaconda_upload no
-        conda build -c conda-forge --output-folder . .
+        conda config --set anaconda_upload yes
+        conda build -c conda-forge  .
 
-    - name: Publish to anaconda
-      run: |
-        anaconda upload linux-64/*.tar.bz2
