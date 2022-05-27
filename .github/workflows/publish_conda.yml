@@ -21,9 +21,9 @@ jobs:
 
     - name: Setup conda env
       uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          auto-activate-base: false
+      with:
+        auto-update-conda: true
+        auto-activate-base: false
 
     - name: Conda info
       run: conda info
