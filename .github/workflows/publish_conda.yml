@@ -5,8 +5,11 @@ on:
     tags:
       - v*
 
+env:
+  ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+
 jobs:
-  publish:
+  build-and-publish:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -15,9 +18,8 @@ jobs:
         $CONDA/bin/conda env update --file environment.yml --name base
     - name: build conda package
       run: |
+        $CONDA/bin/conda config --set anaconda_upload no
         $CONDA/bin/conda build -c conda-forge --output-folder . .
     - name: publish to anaconda
-      with:
-        anacondatoken: ${{ secrets.ANACONDA_TOKEN }}
       run: |
         $CONDA/bin/anaconda upload linux-64/*.tar.bz2
