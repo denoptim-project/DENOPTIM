@@ -1,6 +1,4 @@
 name: 'Publish Conda Package'
-description: 'Build and Publish Conda package to Anaconda '
-author: 'Marco Foscato'
 
 on:
   push:
