@@ -28,9 +28,6 @@ jobs:
     - name: Setup conda env
       run: conda install -c defaults anaconda-client conda-build
 
-    - name: Conda info
-      run: conda info
-
     - name: Build package
       run: |
         conda config --set anaconda_upload no
