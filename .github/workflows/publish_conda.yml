@@ -11,15 +11,21 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
     steps:
-    - uses: actions/checkout@master
+    - name: Checkout repo
+      uses: actions/checkout@master
+
     - name: Setup conda env
-      run: |
-        $CONDA/bin/conda env update --file ../../conda/environment.yml --name base
+      run: conda env update --file ../../conda/environment.yml --name base
+
     - name: Build package
       run: |
-        $CONDA/bin/conda config --set anaconda_upload no
-        $CONDA/bin/conda build -c conda-forge --output-folder . .
+        conda config --set anaconda_upload no
+        conda build -c conda-forge --output-folder . .
     - name: Publish to anaconda
       run: |
-        $CONDA/bin/anaconda upload linux-64/*.tar.bz2
+        anaconda upload linux-64/*.tar.bz2
