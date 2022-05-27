@@ -19,11 +19,14 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@master
 
-    - name: Setup conda env
+    - name: Get Miniconda
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
         auto-activate-base: false
+
+    - name: Setup conda env
+      run: conda install -c defaults anaconda-client conda-build
 
     - name: Conda info
       run: conda info
@@ -32,6 +35,8 @@ jobs:
       run: |
         conda config --set anaconda_upload no
         conda build -c conda-forge --output-folder . .
+        ls -l
+
     - name: Publish to anaconda
       run: |
         anaconda upload linux-64/*.tar.bz2
