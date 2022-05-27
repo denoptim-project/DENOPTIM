@@ -1,0 +1,6 @@
+name: dnp_package_builder
+channels:
+  - defaults
+dependencies:
+  - anaconda-client
+  - conda-build

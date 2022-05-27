@@ -1,0 +1,25 @@
+name: 'Publish Conda Package'
+description: 'Build and Publish Conda package to Anaconda '
+author: 'Marco Foscato'
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: prepare conda env
+      run: |
+        $CONDA/bin/conda env update --file environment.yml --name base
+    - name: build conda package
+      run: |
+        $CONDA/bin/conda build -c conda-forge --output-folder . .
+    - name: publish to anaconda
+      with:
+        anacondatoken: ${{ secrets.ANACONDA_TOKEN }}
+      run: |
+        $CONDA/bin/anaconda upload linux-64/*.tar.bz2
