@@ -1,0 +1,27 @@
+name: 'Test action to get tag'
+
+on:
+  push:
+    tags:
+      - tTag*
+
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+    - name: Get tag name
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+    - name: Use tag
+      run: echo "Version is:  ${{ steps.get_version.outputs.VERSION }}"
+
+    - name: Use in env
+      run: echo "Myvar: $MYVAR"
+      env: MYVAR: ${{ steps.get_version.outputs.VERSION }}
+
