@@ -2,7 +2,7 @@
 
 package:
   name: denoptim
-  version: {{ GIT_DESCRIBE_TAG }}
+  version: {{ environ.get('DENOPTIM_VERSION', '') }}
 
 source:
   path: ..
@@ -14,8 +14,6 @@ requirements:
   build:
     - openjdk =={{ openjdk_version }}
     - maven
-    script_env:
-      - DENOPTIM_VERSION
   run:
     - openjdk =={{ openjdk_version }}
 
