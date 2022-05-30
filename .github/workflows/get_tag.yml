@@ -19,9 +19,9 @@ jobs:
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
     - name: Use tag
-      run: echo Version is:  ${{ steps.get_version.outputs.VERSION }}
+      run: echo Version is  ${{ steps.get_version.outputs.VERSION }}
 
     - name: Use in env
-      run: echo Myvar: $MYVAR
+      run: echo Myvar $MYVAR
       env: MYVAR: ${{ steps.get_version.outputs.VERSION }}
 
