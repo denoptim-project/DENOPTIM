@@ -21,7 +21,9 @@ jobs:
 
     - name: Get version identifier
       id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+      run: |
+        echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
+        echo ${GITHUB_REF#refs/tags/v}
 
     - name: Setup Miniconda
       uses: conda-incubator/setup-miniconda@v2
