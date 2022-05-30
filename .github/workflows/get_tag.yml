@@ -3,7 +3,7 @@ name: 'Test action to get tag'
 on:
   push:
     tags:
-      - tTag*
+      - tTag[0-9]+.[0-9]+.[0-9]+*
 
 
 jobs:
