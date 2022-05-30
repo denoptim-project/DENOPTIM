@@ -23,5 +23,6 @@ jobs:
 
     - name: Use in env
       run: echo Myvar $MYVAR
-      env: MYVAR: ${{ steps.get_version.outputs.VERSION }}
+      env: 
+        MYVAR: ${{ steps.get_version.outputs.VERSION }}
 
