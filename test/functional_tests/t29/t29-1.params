@@ -9,5 +9,3 @@ GRAPHEDIT-OUTPUTGRAPHS=outGraphs-1.sdf
 
 #Fragment space
 FS-scaffoldLibFile=lib_scaff-1.sdf
-FS-fragmentLibFile=lib_scaff-1.sdf
-FS-compMatrixFile=CPMap-1.par
