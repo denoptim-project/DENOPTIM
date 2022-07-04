@@ -356,5 +356,10 @@ runTest "t27"
 #
 runTest "t28"
 
+#
+# t29: test graph editor upgrade
+#
+runTest "t29"
+
 echo "All done!"
 exit 0

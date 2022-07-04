@@ -1,0 +1,15 @@
+[
+  {
+    "task": "CHANGEVERTEX",
+    "vertexQuery": {
+       "level": -1
+    },
+    "incomingBBId": 0,
+    "incomingBBTyp": SCAFFOLD,
+    "incomingAPMap": {
+      0: 0,
+      1: 1,
+      2: 2
+    } 
+  }
+]

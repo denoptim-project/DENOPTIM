@@ -18,9 +18,13 @@
 
 package denoptim.utils;
 
+import java.util.LinkedHashMap;
+
+import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.EdgeQuery;
+import denoptim.graph.Vertex.BBType;
 import denoptim.graph.VertexQuery;
 
 
@@ -55,7 +59,7 @@ public class GraphEdit
     
     /**
      * The incoming graph for tasks that involve appending a subgraph onto
-     * another graph.
+     * another graph (when doing {@link EditTask#REPLACECHILD}).
      */
     private DGraph incomingGraph = null;
     
@@ -66,9 +70,52 @@ public class GraphEdit
      * list.
      */
     private Integer idAPOnIncomingGraph = null;
-    
 
-    public static enum EditTask {REPLACECHILD, DELETEVERTEX}
+    /**
+     * Index of the building block to use as incoming vertex when performing
+     * {@link EditTask#CHANGEVERTEX}. The index refers to the position of the 
+     * building blocks in a {@link FragmentSpace} that is expected to be 
+     * unambiguously identifiable (there should be only one available).
+     */
+    private int incomingBBId;
+
+    /**
+     * The type of the building block to use as incoming vertex when performing
+     * {@link EditTask#CHANGEVERTEX}. The building blocks in expected to
+     * be part of a {@link FragmentSpace} that is expected to be 
+     * unambiguously identifiable (there should be only one available).
+     */
+    private BBType incomingBBTyp;
+
+    /**
+     * Mapping of {@link AttachmentPoint}s between the current (first entry) and
+     * the incoming vertices (second entry) to be enforced when performing
+     * {@link EditTask#CHANGEVERTEX}. Values are indexes of APs in the
+     * respective AP lists.
+     */
+    private LinkedHashMap<Integer, Integer> incomingAPMap;
+    
+    /**
+     * Defined the kind of graph editing task.
+     */
+    public static enum EditTask {
+        /** 
+         * Replaces any child (or tree of children) of any vertex matching the 
+         * vertex query with a given incoming graph that may contain one or 
+         * more vertexes.
+         */
+        REPLACECHILD, 
+        
+        /**
+         * Removes any matching vertex.
+         */
+        DELETEVERTEX, 
+        
+        /**
+         * Changes any vertex matching the vertex query with the vertex given 
+         * as input and using the given AP mapping mask.
+         */
+        CHANGEVERTEX}
 
 //------------------------------------------------------------------------------
     
@@ -107,13 +154,15 @@ public class GraphEdit
 
 //------------------------------------------------------------------------------
 
-    public EditTask getType() {
+    public EditTask getType() 
+    {
         return task;
     }
 
 //------------------------------------------------------------------------------
 
-    public VertexQuery getVertexQuery() {
+    public VertexQuery getVertexQuery() 
+    {
         return vertexQuery;
     }
 
@@ -133,8 +182,30 @@ public class GraphEdit
 
 //------------------------------------------------------------------------------
 
-    public EdgeQuery getEdgeQuery() {
+    public EdgeQuery getEdgeQuery() 
+    {
         return edgeQuery;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public int getIncomingBBId()
+    {
+        return incomingBBId;
+    }
+
+//------------------------------------------------------------------------------
+
+    public BBType getIncomingBBType()
+    {
+        return incomingBBTyp;
+    }
+
+//------------------------------------------------------------------------------
+
+    public LinkedHashMap<Integer, Integer> getAPMappig()
+    {
+        return incomingAPMap;
     }
 
 //------------------------------------------------------------------------------

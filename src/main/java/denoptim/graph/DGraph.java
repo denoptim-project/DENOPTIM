@@ -6025,12 +6025,16 @@ public class DGraph implements Cloneable
      * @param edits the list of edit tasks.
      * @param symmetry if <code>true</code> the same operation is performed on
      * vertexes related by symmetry.
+     * @param fragSpace the space of building blocks needed to perform the 
+     * graph editing tasks. It may or may not be the space that generated the 
+     * original version of the graph to edit.
      * @param logger the logger to use
      * @return the modified graph.
      */
 
     public DGraph editGraph(ArrayList<GraphEdit> edits,
-            boolean symmetry, Logger logger) throws DENOPTIMException
+            boolean symmetry, FragmentSpace fragSpace, Logger logger) 
+                    throws DENOPTIMException
     {
         DGraph modGraph = this.clone();
 
@@ -6044,7 +6048,7 @@ public class DGraph implements Cloneable
                 {
                     DGraph inGraph = edit.getIncomingGraph();
                     VertexQuery query = edit.getVertexQuery();
-                    int idAPOnInGraph = -1; // Initialisation to invalid value
+                    int idAPOnInGraph = -1; // Initialization to invalid value
                     Vertex rootOfInGraph = null;
                     if (edit.getIncomingAPId() != null)
                     {
@@ -6086,10 +6090,10 @@ public class DGraph implements Cloneable
                                 vertexToReplace.getEdgeToParent();
                         if (edgeToParent == null)
                         {
-                            //The matched vertex has no parent, therefore there
+                            //The matched vertex has no parent, therefore
                             // the change would correspond to changing the graph 
                             // completely. This is unlikely the desired effect, 
-                            //so we do not do anything.
+                            // so we do not do anything.
                             continue;
                         }
                         Vertex parent = vertexToReplace.getParent();
@@ -6102,6 +6106,21 @@ public class DGraph implements Cloneable
                         modGraph.appendGraphOnGraph(parent, srcApId, inGraph,
                                 rootOfInGraph, idAPOnInGraph, bondType, 
                                 new HashMap<Integer,SymmetricSet>(), symmetry);
+                    }
+                    break;
+                }
+                case CHANGEVERTEX:
+                {
+                    ArrayList<Vertex> matches = modGraph.findVertices(
+                            edit.getVertexQuery(), logger);
+                    for (Vertex vertexToChange : matches)
+                    {
+                        DGraph graph = vertexToChange.getGraphOwner();
+                        graph.replaceVertex(vertexToChange,
+                                edit.getIncomingBBId(),
+                                edit.getIncomingBBType(),
+                                edit.getAPMappig(),
+                                fragSpace);
                     }
                     break;
                 }
