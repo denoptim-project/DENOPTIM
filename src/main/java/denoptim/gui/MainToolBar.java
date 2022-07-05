@@ -51,6 +51,7 @@ import javax.swing.event.MenuListener;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.Version;
 import denoptim.task.StaticTaskManager;
 
 
@@ -171,13 +172,19 @@ public class MainToolBar extends JMenuBar
 			
 			private JPanel getAboutPanel() {
 		        JPanel abtPanel = new JPanel();
-		        abtPanel.setLayout(new GridLayout(3, 1, 3, 0));
+		        abtPanel.setLayout(new GridLayout(4, 1, 3, 0));
+		        
+                JPanel row0 = new JPanel();
+                JLabel t0 = new JLabel("Version "+Version.VERSION);
+                row0.add(t0);
+                abtPanel.add(row0);
+		        
 		        JPanel row1 = new JPanel();
 		        JLabel t1 = new JLabel("DENOPTIM is open source software "
 		        		+" (Affero GPL-3.0).");
 		        row1.add(t1);
 		        abtPanel.add(row1);
-		        
+                
 		        JPanel row2 = new JPanel();
 		        JLabel t2 = new JLabel("Get involved at	");
 				JLabel h2 = new JLabel("http://github.com/denoptim-project");

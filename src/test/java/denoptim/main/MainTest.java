@@ -69,7 +69,7 @@ public class MainTest
         b = Main.defineProgramBehavior(new String[] {
                 "--"+CLIOptions.version.getLongOpt() });
         assertEquals(0, b.exitStatus, "Exit status");
-        assertTrue(b.helpMsg.startsWith("V"+Version.MAJOR), "Version msg");
+        assertTrue(b.helpMsg.startsWith(Version.VERSION), "Version msg");
         
         //
         // Testing the request for a specific type of run
