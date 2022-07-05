@@ -10,7 +10,10 @@ env:
 
 jobs:
   build-and-publish:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     defaults:
       run:
         shell: bash -l {0}
