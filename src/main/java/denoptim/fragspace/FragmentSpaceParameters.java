@@ -21,6 +21,7 @@ package denoptim.fragspace;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
@@ -342,24 +343,24 @@ public class FragmentSpaceParameters extends RunTimeParameters
         String msg = "";
         if (scaffoldLibFile.length() == 0)
         {
-            msg = "No scaffold library file specified.";
-            throw new DENOPTIMException(msg);
-        }
-        if (!FileUtils.checkExists(scaffoldLibFile))
-        {
-            msg = "Cannot find the scaffold library: " + scaffoldLibFile;
-            throw new DENOPTIMException(msg);
+            getLogger().log(Level.WARNING,"No scaffolds library file specified.");
+        } else {
+            if (!FileUtils.checkExists(scaffoldLibFile))
+            {
+                msg = "Cannot find the scaffold library: " + scaffoldLibFile;
+                throw new DENOPTIMException(msg);
+            }
         }
 
         if (fragmentLibFile.length() == 0)
         {
-            msg = "No fragment library file specified.";
-            throw new DENOPTIMException(msg);
-        }
-        if (!FileUtils.checkExists(fragmentLibFile))
-        {
-            msg = "Cannot find the fragment library: " +  fragmentLibFile;
-            throw new DENOPTIMException(msg);
+            getLogger().log(Level.WARNING,"No fragment library file specified.");
+        } else {
+            if (!FileUtils.checkExists(fragmentLibFile))
+            {
+                msg = "Cannot find the fragment library: " +  fragmentLibFile;
+                throw new DENOPTIMException(msg);
+            }
         }
 
         if (cappingLibFile.length() > 0)

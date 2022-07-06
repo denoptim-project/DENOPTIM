@@ -5645,17 +5645,35 @@ public class DGraph implements Cloneable
         return matches;
     }
 
-//-----------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------
 
     /**
      * Filters a list of vertices according to a query.
-     * vertex.
+     * vertex. Always removed symmetry-redundant matches.
      * @param vrtxQuery the query defining what is that we want to find.
      * @param logger manager of log
      * @return the list of vertexes that match the query.
      */
 
     public ArrayList<Vertex> findVertices(VertexQuery vrtxQuery, Logger logger)
+    {
+        return findVertices(vrtxQuery, true,logger);
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Filters a list of vertices according to a query.
+     * vertex.
+     * @param vrtxQuery the query defining what is that we want to find.
+     * @param purgeSym use <code>true</code> to remove symmetrically redundant 
+     * matches.
+     * @param logger manager of log
+     * @return the list of vertexes that match the query.
+     */
+
+    public ArrayList<Vertex> findVertices(VertexQuery vrtxQuery, 
+            boolean purgeSym, Logger logger)
     {
         ArrayList<Vertex> matches = new ArrayList<>(getVertexList());
 
@@ -5908,7 +5926,8 @@ public class DGraph implements Cloneable
         }
     
         // Identify symmetric sets and keep only one member
-        removeSymmetryRedundance(matches);
+        if (purgeSym)
+            removeSymmetryRedundance(matches);
 
         logger.log(Level.FINE, "Final Matches (after symmetry): " + matches);
 
@@ -6025,12 +6044,16 @@ public class DGraph implements Cloneable
      * @param edits the list of edit tasks.
      * @param symmetry if <code>true</code> the same operation is performed on
      * vertexes related by symmetry.
+     * @param fragSpace the space of building blocks needed to perform the 
+     * graph editing tasks. It may or may not be the space that generated the 
+     * original version of the graph to edit.
      * @param logger the logger to use
      * @return the modified graph.
      */
 
     public DGraph editGraph(ArrayList<GraphEdit> edits,
-            boolean symmetry, Logger logger) throws DENOPTIMException
+            boolean symmetry, FragmentSpace fragSpace, Logger logger) 
+                    throws DENOPTIMException
     {
         DGraph modGraph = this.clone();
 
@@ -6044,7 +6067,7 @@ public class DGraph implements Cloneable
                 {
                     DGraph inGraph = edit.getIncomingGraph();
                     VertexQuery query = edit.getVertexQuery();
-                    int idAPOnInGraph = -1; // Initialisation to invalid value
+                    int idAPOnInGraph = -1; // Initialization to invalid value
                     Vertex rootOfInGraph = null;
                     if (edit.getIncomingAPId() != null)
                     {
@@ -6086,10 +6109,10 @@ public class DGraph implements Cloneable
                                 vertexToReplace.getEdgeToParent();
                         if (edgeToParent == null)
                         {
-                            //The matched vertex has no parent, therefore there
+                            //The matched vertex has no parent, therefore
                             // the change would correspond to changing the graph 
                             // completely. This is unlikely the desired effect, 
-                            //so we do not do anything.
+                            // so we do not do anything.
                             continue;
                         }
                         Vertex parent = vertexToReplace.getParent();
@@ -6103,6 +6126,59 @@ public class DGraph implements Cloneable
                                 rootOfInGraph, idAPOnInGraph, bondType, 
                                 new HashMap<Integer,SymmetricSet>(), symmetry);
                     }
+                    break;
+                }
+                case CHANGEVERTEX:
+                {   
+                    // One of the ways to provide the incoming vertex/subgraph
+                    if (edit.getIncomingBBId() > -1 
+                            && edit.getIncomingBBType() != null
+                            && edit.getIncomingGraph() == null)
+                    {
+                        ArrayList<Vertex> matches = modGraph.findVertices(
+                                edit.getVertexQuery(), logger);
+                        for (Vertex vertexToChange : matches)
+                        {
+                            DGraph graph = vertexToChange.getGraphOwner();
+                            graph.replaceVertex(vertexToChange,
+                                    edit.getIncomingBBId(),
+                                    edit.getIncomingBBType(),
+                                    edit.getAPMappig(),
+                                    fragSpace);
+                        }
+                    }
+                    // Another of the ways to provide the incoming vertex/subgraph
+                    if (edit.getIncomingGraph() != null
+                            && edit.getIncomingBBType() == null)
+                    {
+                        // Since the replaceSingleSubGraph method below does not
+                        // deal with symmetry, we keep symmetrically-redundant
+                        // matches
+                        ArrayList<Vertex> matches = modGraph.findVertices(
+                                edit.getVertexQuery(), false, logger);
+                        
+                        for (Vertex vertexToChange : matches)
+                        {
+                            DGraph graph = vertexToChange.getGraphOwner();
+                            DGraph newSubG = edit.getIncomingGraph().clone();
+                            newSubG.renumberGraphVertices();
+                            
+                            LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap =
+                                    new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+                            for (Map.Entry<Integer,Integer> e : 
+                                edit.getAPMappig().entrySet())
+                            {
+                                apMap.put(vertexToChange.getAP(e.getKey()), 
+                                        newSubG.getAvailableAPs().get(
+                                                e.getValue()));
+                            }
+                            
+                            List<Vertex> oldSubG = new ArrayList<Vertex>();
+                            oldSubG.add(vertexToChange);
+                            graph.replaceSingleSubGraph(oldSubG, newSubG, apMap);
+                        }
+                    }
+                    
                     break;
                 }
                 case DELETEVERTEX:

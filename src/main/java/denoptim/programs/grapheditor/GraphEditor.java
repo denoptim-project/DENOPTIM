@@ -22,8 +22,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.task.ProgramTask;
 
 
@@ -63,15 +65,21 @@ public class GraphEditor extends ProgramTask
         // We might need the fragment space to read the input graphs with 
         // string-based encoding. Therefore, we read the graph after.
         geParams.readInputGraphs();
+        
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (geParams.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)geParams.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
 
         List<DGraph> modGraphs = new ArrayList<DGraph>();
-        int i = -1;
         for (DGraph graph : geParams.getInputGraphs())
         {
-            i++;
             DGraph modGraph = graph.editGraph(
                     geParams.getGraphEditTasks(),
                     geParams.symmetryFlag(),
+                    fsParams.getFragmentSpace(),
                     geParams.getLogger());
             modGraphs.add(modGraph);
         }

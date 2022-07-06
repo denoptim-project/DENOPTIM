@@ -2136,7 +2136,9 @@ $$$$
 
 
 <h3 class="western"><a name="Toc9999_3"></a>Graph Editing Task Files</h3>
-<p>Example of JSON syntax for defining the most detailed vertex query. Any of the fields can be left removed. For example, removing the line with <code>"vertexId"</code> will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining <code>"incomingEdgeQuery"</code> (i.e., all the lines included in the curly brackets immediately following "incomingEdgeQuery") will make the vertex query match any vertex irrespectively of the properties of the edge that connects such vertex to its parent vertex (if any).</p>
+<p>Example of JSON syntax for defining the most detailed vertex query and the editing task to perform.</p> 
+
+<p>In The vertex query (see example below), any of the fields can be removed. For example, removing the line with <code>"vertexId"</code> will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining <code>"incomingEdgeQuery"</code> (i.e., all the lines included in the curly brackets immediately following <code>"incomingEdgeQuery"</code>) will make the vertex query match any vertex irrespectively of the properties of the edge that connects such vertex to its parent vertex (if any).</p>
 <pre>
   "vertexQuery": {
     "vertexId": 1,
@@ -2170,7 +2172,22 @@ $$$$
   }
 </pre>
 
-<p>A sequence of graph editing tasks is defining using JSON syntax as following:</p>
+<p>The currently available graph editing tasks are:
+<ul>
+	<li>"CHANGEVERTEX": Changes any vertex matching the vertex query with the vertex given as input and using the given AP mapping mask. Requires the definition of these alternative set of additional fields:
+		<ul>
+			<li><code>incomingBBId</code>, <code>incomingBBTyp</code>, and <code>incomingAPMap</code>, which are respectively the index (0-based) of the building block to use to replace any matched vertex, it's type, and the mapping of attachment points (by 0-based index) to use when connecting the incoming vertex to the existing graph. Use of this functionality requires the definition of a space of building blocks. The space needed to perform the graph editing tasks may be different from that used to create the graph to edit, but is defined using the usual keywords defining the <a href="#Toc40912_1191730726">Space of Graphs Building Blocks</a> in the primary input file (NB: not in the graph editing task file).</li>
+			<li><code>incomingGraph</code> and <code>incomingAPMap</code>, which are respectively the JSON fomatted definition of a subgraph (NB: it may contain a single vertex) and the mapping of attachment points (by 0-based index) to use when connecting the incoming subgraph to the existing graph.</li>
+		</ul></li>
+	<li>"DELETEVERTEX": delete any vertex matching the vertex query.</li>
+	<li>"REPLACECHILD": Replaces any child (or tree of children) of any vertex matching the vertex query with a given incoming graph that may contain one or more vertexes. Requires the definition of these additional fields:
+		<ul>
+			<li><code>incomingGraph</code> to provide a JSON format of the graph to be inserted as a replacement to the child/children tree of any matched vertex.</li>
+			<li><code>idAPOnIncomingGraph</code> to provide the AP identifier (not the index!) of the AP on the incoming graph to use for connecting the edited graph with the incoming graph.</li>
+		</ul></li>
+</ul></p>
+
+<p>The graph edit tasks can be more than one. A sequence of graph editing tasks is defining using JSON syntax as following:</p>
 <pre>
 [
   {
@@ -2183,7 +2200,6 @@ $$$$
   }
 ]
 </pre>
-
 <hr>
 
 
