@@ -51,8 +51,7 @@ public class GraphEdParameters extends RunTimeParameters
     /**
      * Input graphs
      */
-    private ArrayList<DGraph> inGraphs = 
-					         new ArrayList<DGraph>();
+    private ArrayList<DGraph> inGraphs = new ArrayList<DGraph>();
 
     /**
      * Input molecular objects

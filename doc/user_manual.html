@@ -2174,16 +2174,10 @@ $$$$
 
 <p>The currently available graph editing tasks are:
 <ul>
-	<li>"CHANGEVERTEX": Changes any vertex matching the vertex query with the vertex given as input and using the given AP mapping mask. Requires the definition of these 
-		<!--
-		alternative set of 
--->
-		additional fields:
+	<li>"CHANGEVERTEX": Changes any vertex matching the vertex query with the vertex given as input and using the given AP mapping mask. Requires the definition of these alternative set of additional fields:
 		<ul>
-			<li><code>incomingBBId</code>, <code>incomingBBTyp</code>, and <code>incomingAPMap</code>, which are respectively the index (0-based) of the building block to use to replace any matched vertex, it's type, and the mapping of attachment points to use when connecting the incoming vertex to the existing graph. Use of this options requires defining a space of building blocks needed to perform the graph editing tasks (NB: such space may be different from that used to create the graph to edit).</li>
-<!--
-			<li><code>incomingGraph</code> and <code>incomingAPMap</code></li>
-		-->
+			<li><code>incomingBBId</code>, <code>incomingBBTyp</code>, and <code>incomingAPMap</code>, which are respectively the index (0-based) of the building block to use to replace any matched vertex, it's type, and the mapping of attachment points (by 0-based index) to use when connecting the incoming vertex to the existing graph. Use of this functionality requires the definition of a space of building blocks. The space needed to perform the graph editing tasks may be different from that used to create the graph to edit, but is defined using the usual keywords defining the <a href="#Toc40912_1191730726">Space of Graphs Building Blocks</a> in the primary input file (NB: not in the graph editing task file).</li>
+			<li><code>incomingGraph</code> and <code>incomingAPMap</code>, which are respectively the JSON fomatted definition of a subgraph (NB: it may contain a single vertex) and the mapping of attachment points (by 0-based index) to use when connecting the incoming subgraph to the existing graph.</li>
 		</ul></li>
 	<li>"DELETEVERTEX": delete any vertex matching the vertex query.</li>
 	<li>"REPLACECHILD": Replaces any child (or tree of children) of any vertex matching the vertex query with a given incoming graph that may contain one or more vertexes. Requires the definition of these additional fields:

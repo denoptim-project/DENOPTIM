@@ -77,7 +77,7 @@ public class GraphEdit
      * building blocks in a {@link FragmentSpace} that is expected to be 
      * unambiguously identifiable (there should be only one available).
      */
-    private int incomingBBId;
+    private int incomingBBId = -1;
 
     /**
      * The type of the building block to use as incoming vertex when performing
@@ -115,7 +115,8 @@ public class GraphEdit
          * Changes any vertex matching the vertex query with the vertex given 
          * as input and using the given AP mapping mask.
          */
-        CHANGEVERTEX}
+        CHANGEVERTEX
+    }
 
 //------------------------------------------------------------------------------
     
