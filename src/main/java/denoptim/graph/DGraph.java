@@ -1988,12 +1988,41 @@ public class DGraph implements Cloneable
             LinkedHashMap<Integer, Integer> apIdMap, FragmentSpace fragSpace)
                     throws DENOPTIMException
     {
+        return replaceVertex(vertex, bbId, bbt, apIdMap, true, fragSpace);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Replaced a given vertex belonging to this graph with a new vertex 
+     * generated specifically for this purpose. 
+     * @param vertex the vertex currently belonging to this graph and to be 
+     * replaced.
+     * @param bbId the building block Id of the building blocks that will 
+     * replace the original vertex.
+     * @param bbt the type of building block to be used to replace the 
+     * original vertex.
+     * @param apMap the mapping of attachment points needed to install the new
+     * vertex in the slot of the old one and recreate the edges to the rest of
+     * the graph.
+     * @return <code>true</code> if the substitution is successful.
+     * @throws DENOPTIMException
+     */
+    public boolean replaceVertex(Vertex vertex, int bbId, BBType bbt,
+            LinkedHashMap<Integer, Integer> apIdMap, boolean symmetry,
+            FragmentSpace fragSpace)
+                    throws DENOPTIMException
+    {
         if (!gVertices.contains(vertex))
         {
             return false;
         }
         
-        ArrayList<Vertex> symSites = getSymVertexesForVertex(vertex);
+        ArrayList<Vertex> symSites = new ArrayList<Vertex>();
+        if (symmetry)
+        {
+            symSites = getSymVertexesForVertex(vertex);
+        }
         if (symSites.size() == 0)
         {
             symSites.add(vertex);
@@ -6073,6 +6102,22 @@ public class DGraph implements Cloneable
                     {
                         AttachmentPoint ap = inGraph.getAPWithId(
                                 edit.getIncomingAPId().intValue());
+                        if (ap == null)
+                        {
+                            String msg = "Skipping " + edit.getType() + " on "
+                                    + "graph " + getGraphId() + ". The incoming"
+                                    + " graph has no AP with ID = " 
+                                    + edit.getIncomingAPId() + ". The IDs of "
+                                    + "free APs are:";
+                            for (AttachmentPoint freeAP : inGraph.getAvailableAPs())
+                            {
+                                msg = msg + " " + freeAP.getID();
+                            }
+                            msg = msg + ". "
+                                    + "Please, use one of those values in "
+                                    + "'idAPOnIncomingGraph'.";
+                            logger.log(Level.WARNING, msg);
+                        }
                         idAPOnInGraph = ap.getIndexInOwner();
                         rootOfInGraph = ap.getOwner();
                     } else {
@@ -6085,9 +6130,10 @@ public class DGraph implements Cloneable
                             rootOfInGraph = ap.getOwner();
                         } else {
                             String geClsName = GraphEdit.class.getSimpleName();
-                            String msg = "Skipping " + edit.getType() + "on "
+                            String msg = "Skipping " + edit.getType() + " on "
                                     + "graph " + getGraphId() + ". The incoming"
-                                    + " graph has more than one free AP and "
+                                    + " graph has more than one free AP ("
+                                    + freeAPs.size() + ") and "
                                     + "the " + geClsName + " "
                                     + "does not provide sufficient information "
                                     + "to unambiguously choose one AP. "
@@ -6098,15 +6144,10 @@ public class DGraph implements Cloneable
                     }
                     
                     ArrayList<Vertex> matches = modGraph.findVertices(query, 
-                            logger);
-                    if (symmetry)
-                    {
-                        modGraph.removeSymmetryRedundance(matches);
-                    }
+                            false, logger);
                     for (Vertex vertexToReplace : matches)
                     {
-                        Edge edgeToParent = 
-                                vertexToReplace.getEdgeToParent();
+                        Edge edgeToParent = vertexToReplace.getEdgeToParent();
                         if (edgeToParent == null)
                         {
                             //The matched vertex has no parent, therefore
@@ -6136,15 +6177,19 @@ public class DGraph implements Cloneable
                             && edit.getIncomingGraph() == null)
                     {
                         ArrayList<Vertex> matches = modGraph.findVertices(
-                                edit.getVertexQuery(), logger);
+                                edit.getVertexQuery(), false, logger);
                         for (Vertex vertexToChange : matches)
                         {
-                            DGraph graph = vertexToChange.getGraphOwner();
-                            graph.replaceVertex(vertexToChange,
-                                    edit.getIncomingBBId(),
-                                    edit.getIncomingBBType(),
-                                    edit.getAPMappig(),
-                                    fragSpace);
+                            if (modGraph.containsVertex(vertexToChange))
+                            {
+                                DGraph graph = vertexToChange.getGraphOwner();
+                                graph.replaceVertex(vertexToChange,
+                                        edit.getIncomingBBId(),
+                                        edit.getIncomingBBType(),
+                                        edit.getAPMappig(),
+                                        symmetry,
+                                        fragSpace);
+                            }
                         }
                     }
                     // Another of the ways to provide the incoming vertex/subgraph
@@ -6184,10 +6229,12 @@ public class DGraph implements Cloneable
                 case DELETEVERTEX:
                 {
                     ArrayList<Vertex> matches = modGraph.findVertices(
-                            edit.getVertexQuery(), logger);
+                            edit.getVertexQuery(), false, logger);
                     for (Vertex vertexToRemove : matches)
                     {
-                        modGraph.removeBranchStartingAt(vertexToRemove,symmetry);
+                        if (modGraph.containsVertex(vertexToRemove))
+                            modGraph.removeBranchStartingAt(vertexToRemove,
+                                    symmetry);
                     }
                     break;
                 }

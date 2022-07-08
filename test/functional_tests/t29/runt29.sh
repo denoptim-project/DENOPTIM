@@ -8,7 +8,7 @@ mv data/* "$wrkDir"
 rm -rf data
 
 #Run sub tests
-nSubTests=2
+nSubTests=10
 elSymbols=('C  ' 'N  ' 'P  ' 'H  ' 'ATM' 'O  ' 'Si ' 'F  ' 'S  ' 'Cl ' 'Ru ')
 totChecks=0
 for i in $(seq 1 $nSubTests)

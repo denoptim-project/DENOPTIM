@@ -1,0 +1,9 @@
+#
+# This is the parameter file for test t29-9
+#
+
+# Parameters for running the test
+GRAPHEDIT-INPUTGRAPHS=inGraphs-9.sdf
+GRAPHEDIT-GRAPHSEDITSFILE=editingTasks-9
+GRAPHEDIT-OUTPUTGRAPHS=outGraphs-9.sdf
+#GRAPHEDIT-EnforceSymmetry=yes
