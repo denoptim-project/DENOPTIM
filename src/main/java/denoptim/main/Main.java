@@ -41,6 +41,7 @@ import denoptim.logging.Version;
 import denoptim.programs.combinatorial.FragSpaceExplorer;
 import denoptim.programs.denovo.GARunner;
 import denoptim.programs.fitnessevaluator.FitnessRunner;
+import denoptim.programs.fragmenter.Fragmenter;
 import denoptim.programs.genetweeker.GeneOpsRunner;
 import denoptim.programs.grapheditor.GraphEditor;
 import denoptim.programs.graphlisthandler.GraphListsHandler;
@@ -108,8 +109,12 @@ public class Main
         /**
          * Run a comparison of lists of graphs.
          */
-        CLG;
+        CLG,
         
+        /**
+         * Run a fragmentation task
+         */
+        FRG;
         
         // NB: to define a new run type: 
         //  1) add the enum alternative. The order is somewhat related to the
@@ -147,6 +152,7 @@ public class Main
             CLG.description = "Comparison of Lists of Graphs";
             B3D.description = "stand-alone build a 3D molecular model from a "
                     + "graph";
+            FRG.description = "Fragmentation and fragment managment.";
             
             DRY.isCLIEnabled = false;
             FSE.isCLIEnabled = true;
@@ -158,6 +164,7 @@ public class Main
             GUI.isCLIEnabled = false;
             CLG.isCLIEnabled = true;
             B3D.isCLIEnabled = true;
+            FRG.isCLIEnabled = true;
             
             DRY.programTaskImpl = null;
             FSE.programTaskImpl = FragSpaceExplorer.class;
@@ -169,6 +176,7 @@ public class Main
             GUI.programTaskImpl = GUI.class;
             CLG.programTaskImpl = GraphListsHandler.class;
             B3D.programTaskImpl = MolecularModelBuilder.class;
+            FRG.programTaskImpl = Fragmenter.class;
         }
 
         /**

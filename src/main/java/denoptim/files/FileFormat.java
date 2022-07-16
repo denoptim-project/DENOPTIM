@@ -36,7 +36,7 @@ public enum FileFormat {
     FSE_RUN, GA_RUN,
     
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP, GO_PARAM, CLG_PARAM, GE_PARAM, 
-    GI_PARAM, B3D_PARAM,
+    GI_PARAM, B3D_PARAM, FRG_RUN, FRG_PARAM,
     
     TXT, GRAPHTXT,
     UNRECOGNIZED;
@@ -123,6 +123,11 @@ public enum FileFormat {
 
         //------------------------------------
         
+        FRG_RUN.extension = "";
+        FRG_RUN.isFolder = true;
+
+        //------------------------------------
+        
         GA_RUN.extension = "";
         GA_RUN.isFolder = true;
 
@@ -137,6 +142,12 @@ public enum FileFormat {
         FSE_PARAM.extension = "";
         FSE_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
                 "^" + ParametersType.CEBL_PARAMS.getKeywordRoot() + ".*"));
+        
+        //------------------------------------
+        
+        FRG_PARAM.extension = "";
+        FRG_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
+                "^" + ParametersType.FRG_PARAMS.getKeywordRoot() + ".*"));
         
         //------------------------------------
         
@@ -191,7 +202,8 @@ public enum FileFormat {
      * The kind of data found in a file.
      */
     public enum DataKind {GRAPH, VERTEX, GA_RUN, FSE_RUN, GA_PARAM, FSE_PARAM,
-        FR_PARAM, GO_PARAM, CLG_PARAM, GE_PARAM, GI_PARAM, COMP_MAP, B3D_PARAM}
+        FR_PARAM, GO_PARAM, CLG_PARAM, GE_PARAM, GI_PARAM, COMP_MAP, B3D_PARAM,
+        FRG_RUN, FRG_PARAM}
     
 //------------------------------------------------------------------------------
 
@@ -256,6 +268,12 @@ public enum FileFormat {
                         break;
                     case GA_PARAM:
                         ff = GA_PARAM;
+                        break;
+                    case FRG_RUN:
+                        ff = FRG_RUN;
+                        break;
+                    case FRG_PARAM:
+                        ff = FRG_PARAM;
                         break;
                     case FSE_PARAM:
                         ff = FSE_PARAM;
@@ -324,6 +342,7 @@ public enum FileFormat {
             FileFormat.GA_PARAM,  
             FileFormat.FSE_PARAM,
             FileFormat.FR_PARAM,
+            FileFormat.FRG_PARAM,
             FileFormat.COMP_MAP};
         return a;
     }

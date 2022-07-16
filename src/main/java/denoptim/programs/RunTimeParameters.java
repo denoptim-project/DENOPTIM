@@ -39,6 +39,7 @@ import denoptim.main.Main.RunType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fitnessevaluator.FRParameters;
+import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.genetweeker.GeneOpsRunnerParameters;
 import denoptim.programs.grapheditor.GraphEdParameters;
 import denoptim.programs.graphlisthandler.GraphListsHandlerParameters;
@@ -174,7 +175,12 @@ public abstract class RunTimeParameters
         /**
          * Parameters controlling the stand-alone detection of graph isomorphism.
          */
-        ISO_PARAMS;
+        ISO_PARAMS, 
+        
+        /**
+         * Parameters controlling the fragmenter.
+         */
+        FRG_PARAMS;
         
         /**
          * The root of any keyword that is meant to be used to set any of the
@@ -194,6 +200,7 @@ public abstract class RunTimeParameters
             RC_PARAMS.keywordRoot = "RC-";
             FIT_PARAMS.keywordRoot = "FP-";
             FR_PARAMS.keywordRoot = "FR-";
+            FRG_PARAMS.keywordRoot = "FRG-";
             MMB_PARAM.keywordRoot = "3DB-";
             GO_PARAMS.keywordRoot = "TESTGENOPS-";
             GE_PARAMS.keywordRoot = "GRAPHEDIT-";
@@ -203,6 +210,7 @@ public abstract class RunTimeParameters
             CEBL_PARAMS.implementation = CEBLParameters.class;
             GA_PARAMS.implementation = GAParameters.class;
             FS_PARAMS.implementation = FragmentSpaceParameters.class;
+            FS_PARAMS.implementation = FragmenterParameters.class;
             RC_PARAMS.implementation = RingClosureParameters.class;
             FIT_PARAMS.implementation = FitnessParameters.class;
             FR_PARAMS.implementation = FRParameters.class;
@@ -895,6 +903,26 @@ public abstract class RunTimeParameters
         sb.append("-------------------------------------------"
                 + "----------------------").append(NL);
         logger.log(Level.INFO,sb.toString());
+    }
+
+  //------------------------------------------------------------------------------
+
+    /**
+     * Ensures a pathname is not empty nor null and that it does lead to an 
+     * existing file or triggers an error.
+     * This is meant for checking initialization settings and does not print in
+     * the program specific log file.
+     */
+    protected void ensureFileExistsIfSet(String pathname)
+    {
+        if (pathname == null || pathname.isBlank())
+            return;
+                    
+        if (!FileUtils.checkExists(pathname))
+        {
+            String msg = "ERROR! File '" + pathname + "' not found!";
+            throw new Error(msg);
+        }
     }
     
 //------------------------------------------------------------------------------

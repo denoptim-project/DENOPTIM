@@ -1,0 +1,1025 @@
+###############################################################################
+###############################################################################
+##
+## "GM3DFragmenter: Cutting rules"
+##
+## The following rules were designed for the fragmentation of organic and
+## organometallic compounds with particular focus on N-heterocyclic carbenes
+## and phosphines.
+##
+##
+###############################################################################
+##
+## "CONVENTIONS ON PRIORITY:"
+##
+## first executed - Metal-Carbon bonds               (index  -inf.  to  -100000)
+##        V       - inorganic/organometallic ligands (index  -99999 to   -10000)
+##        V       - organic bonds in special ligands (index   -9999 to      -10)
+##  last executed - other organic bonds              (index       0 to     inf.)
+##
+##
+###############################################################################
+##
+## "Utilities: groups of elements"
+##
+## [TM] = Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr
+## [1st row] = Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn
+## [2nd row] = Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd
+## [3rd row] = La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg
+## [4th row] = Ac
+## [Lanthanides] = Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu
+## [Actinides]   = Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr
+##
+## [!TM] = !Sc,!Ti,!V,!Cr,!Mn,!Fe,!Co,!Ni,!Cu,!Zn,!Y,!Zr,!Nb,!Mo,!Tc,!Ru,!Rh,!Pd,!Ag,!Cd,!La,!Hf,!Ta,!W,!Re,!Os,!Ir,!Pt,!Au,!Hg,!Ac,!Ce,!Pr,!Nd,!Pm,!Sm,!Eu,!Gd,!Tb,!Dy,!Ho,!Er,!Tm,!Yb,!Lu,!Th,!Pa,!U,!Np,!Pu,!Am,!Cm,!Bk,!Cf,!Es,!Fm,!Md,!No,!Lr
+## [!1st row] = !Sc,!Ti,!V,!Cr,!Mn,!Fe,!Co,!Ni,!Cu,!Zn
+## [!2nd row] = !Y,!Zr,!Nb,!Mo,!Tc,!Ru,!Rh,!Pd,!Ag,!Cd
+## [!3rd row] = !La,!Hf,!Ta,!W,!Re,!Os,!Ir,!Pt,!Au,!Hg
+## [14th row] = !Ac
+## [1Lanthanides] = !Ce,!Pr,!Nd,!Pm,!Sm,!Eu,!Gd,!Tb,!Dy,!Ho,!Er,!Tm,!Yb,!Lu
+## [1Actinides]   = !Th,!Pa,!U,!Np,!Pu,!Am,!Cm,!Bk,!Cf,!Es,!Fm,!Md,!No,!Lr
+##
+## [Non-Metal] = B,C,N,O,F,Si,P,S,Cl,As,Se,Br,I
+## [Non-Metal] = #1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I
+## [!Non-Metal] = !B,!C,!N,!O,!F,!Si,!P,!S,!Cl,!As,!Se,!Br,!I
+##
+###############################################################################
+#
+# Rule's components matching any atom
+#
+# "Any atom but hydrogen"
+ANY [$([*;!#1])]
+# "Any 'small' substituent"
+ANY [$([*;!#1;X1]),$([*;X2]),$([*;X3]),$([*;X4]([#1])[#1]),$([*;X4]([#1])([#1])[#1])]
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: MULTIHAPTO LIGANDS"
+#
+###############################################################################
+###############################################################################
+#
+#
+# Metal-alkyne (Metallacyclopropene) pi-complex, L-ligand, Hapto-2
+#
+#      C
+# M-|-|||
+#      C
+# ex-triple CC bond reported as # or = or -
+#
+CTR MAlkyne -105000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X3]1(-[#1,#6])~[#6;X3](-[#1,#6])[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]1)] - HAPTO
+#
+# Metal-alkyne bridge between two metals (Metallacyclopropene) pi-complex, L-ligand, Hapto-2
+# 
+#      C
+# M-|-|||-|-M
+#      C
+#
+CTR MAlkyne2M -105100 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X4]12[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr][#6;X4]2[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]1)] - HAPTO
+#
+################################################
+#
+# Metal-Alkene pi-complex, L-ligand, Hapto-2
+#
+#      C
+# M-|-||
+#      C
+#
+# Note: Coordinated olefin is reported as C=C but also C-C
+#
+CTR MAlkene -130000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X4]1~[#6;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]1);!$([#6;X4]1~[#6;X4]2~[#6;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]12);!$([#6;X4]12~[#6;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]1[#6;X4]2);!$([#6;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] - HAPTO
+#
+################################################
+#
+# Metal-Alliy pi-complex, LX-ligand, Hapto-3
+#
+# M-|-allyl(3 carbons)
+#
+CTR MAllyl -140000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X4]12~[#6;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]1[#6;X4]2),$([#6;X4]1~[#6;X4]2~[#6;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]12);!$([#6;X4]1~[#6;X4]2~[#6;X4]3~[#6;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]123);!$([#6;X4]1~[#6;X4]~[#6;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr][#6;X4]1)] - HAPTO
+#
+################################################
+#
+# Butadiene pi-complex, L2-ligand, Hapto-4
+#
+# M-|-butadiene(4 carbons)
+#
+CTR MButadiene -150000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X4]1~[#6;X4]2~[#6;X4]3~[#6;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]123),$([#6;X4]1~[#6;X4]~[#6;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr][#6;X4]1);!$([*]1~[*]2~[*]3~[*]4~[*][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]1234);!$([*]1~[*]2~[*]3~[*]4~[*]5~[*][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]12345)] - HAPTO
+#
+################################################
+#
+# Metal-Cyclopentadienyl pi-complex, L2X-ligand, Hapto-5
+#
+# M-|-Cp(5 carbons)
+#
+CTR MCp -221000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X4]12[#6;X4]3[#6;X4]4[#6;X4]5[#6;X4]1[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]2345)] - HAPTO
+#
+# sandwich M-Cp-M
+#
+CTR MCpM -221100 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X5]12[#6;X5]3[#6;X5]4[#6;X5]5[#6;X5]1[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]2345)] - HAPTO
+#
+################################################
+#
+# Metal-Arene pi-complex, L3-ligand, Hapto-6
+#
+# M-|-arene(6 carbons)
+#
+CTR MArene -225000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X4]12[#6;X4]3[#6;X4]4[#6;X4]5[#6;X4]6[#6;X4]1[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]23456)] - HAPTO
+#
+# sandwich M-Ar-M
+#
+CTR MAreneM -125100 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X5]12[#6;X5]3[#6;X5]4[#6;X5]5[#6;X5]6[#6;X5]1[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]23456)] - HAPTO
+#
+################################################
+#
+# Metal-Cycloheptatrienido pi-complex, L3X-ligand, Hapto-7
+#
+# M-|-cycloheptatrienido(7carbons)
+#
+CTR MCycloheptatrienido -226000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X4]12[#6;X4]3[#6;X4]4[#6;X4]5[#6;X4]6[#6;X4]7[#6;X4]1[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]234567)] - HAPTO
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: N-HETEROCYCLIC CARBENES"
+#  L-ligand (Fisher carbene - singlet R2C'')
+#
+###############################################################################
+###############################################################################
+#
+# 5-member ring, NCNCC => imidazolylidene, benzimidazolylidene
+# includes condensed rings
+#
+CTR MImidazolylidene -100000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X3]1~[#7;X3]([#5,#6,#7,#8][*])~[#6;X3]~[#6;X3]~[#7;X3]~1[#5,#6,#7,#8][*]),$([#6;X3]1~[#7;X3]([#5,#6,#7,#8][*])~[#6;X3]~[#6;X3]~[#7;X3]~1[#1]),$([#6;X3]1~[#7;X3]([#1])~[#6;X3]~[#6;X3]~[#7;X3]~1[#1])] ~ OMRING>5
+#
+# Substituents on 5NHC (pseudo-Retrosynthetic rules on NHC-imidazolylide)
+# Note that the following 4 rules act on purely organic bonds, so in adding
+# rules for N-heterocycles there there will probably be some overlap.
+# "WARNING!" Be careful in changing the following 4 rules because there are
+# two different components to match "ANY ATOM"
+# See 'ANY'-labelled lines in this file!
+#
+CTR LImidazolylideneSubNS -20 [$([#7;X3]1([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#5,#6,#7,#8][*])~[#6;X3]~[#6;X3]~1),$([#7;X3]1([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#1])~[#6;X3]~[#6;X3]~1)] [$([*;!#1;X1]),$([*;X2]),$([*;X3]),$([*;X4]([#1])[#1]),$([*;X4]([#1])([#1])[#1])] - RING>7 OMRING>5
+CTR LImidazolylideneSubNL -10 [$([#7;X3]1([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#5,#6,#7,#8][*])~[#6;X3]~[#6;X3]~1),$([#7;X3]1([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#1])~[#6;X3]~[#6;X3]~1)] [$([*;!#1])] - RING>7 OMRING>5
+CTR LImidazolylideneSubCS -40 [$([#6;X3]1~[#7;X3]([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#5,#6,#7,#8][*])~[#6;X3]~1),$([#6;X3]1~[#7;X3]([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#1])~[#6;X3]~1),$([#6;X3]1~[#7;X3]([#1])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#1])~[#6;X3]~1)] [$([*;!#1;X1]),$([*;X2]),$([*;X3]),$([*;X4]([#1])[#1]),$([*;X4]([#1])([#1])[#1])] - RING>7 OMRING>7
+CTR LImidazolylideneSubCL -30 [$([#6;X3]1~[#7;X3]([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#5,#6,#7,#8][*])~[#6;X3]~1),$([#6;X3]1~[#7;X3]([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#1])~[#6;X3]~1),$([#6;X3]1~[#7;X3]([#1])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#1])~[#6;X3]~1)] [$([*;!#1])] - RING>7 OMRING>7
+#
+#
+# 5-member ring, NCNCC => imidazolidinylidene
+# includes condensed rings
+#
+CTR MImidazolidinylidene -101000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X3]1~[#7;X3]([#5,#6,#7,#8][*])-[#6;X4]-[#6;X4]-[#7;X3]~1[#5,#6,#7,#8][*]),$([#6;X3]1~[#7;X3]([#5,#6,#7,#8][*])-[#6;X4]-[#6;X4]-[#7;X3]~1[#1]),$([#6;X3]1~[#7;X3]([#1])-[#6;X4]-[#6;X4]-[#7;X3]~1[#1])] ~ OMRING>5
+#
+CTR LImidazolidinylideneSubNS -60 [$([#7;X3]1([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#5,#6,#7,#8][*])-[#6;X4]-[#6;X4]-1),$([#7;X3]1([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#1])-[#6;X4]-[#6;X4]-1)] [$([*;!#1;X1]),$([*;X2]),$([*;X3]),$([*;X4]([#1])[#1]),$([*;X4]([#1])([#1])[#1])] - RING>7 OMRING>5
+CTR LImidazolidinylideneSubNL -70 [$([#7;X3]1([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#5,#6,#7,#8][*])-[#6;X4]-[#6;X4]-1),$([#7;X3]1([#5,#6,#7,#8][*])~[#6](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])~[#7;X3]([#1])-[#6;X4]-[#6;X4]-1)] [$([*;!#1])] - RING>7 OMRING>5
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: ARYLIDENE"
+#
+###############################################################################
+###############################################################################
+#
+# M=|=C(H)-Ar(5/6-terms ring)
+CTR MArylmethylidene -110000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X3](-!@[c])-!@[c,#1]),$([#6;X3](-!@[#1])-!@[#1])] -,= OMRING>7
+#
+# Subtituents on arylidene
+CTR LArylmethylidene -50 [$([#6;X3]([c,#1])([c,#1])-,=[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] [$(c)] -!@
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: PHOSPHINES"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-PR3
+#
+CTR MPhosphine -11000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([P;X4]([#6])([#6])[#6]),$([P;H1;X4]([#6])[#6]),$([P;H2;X4][#6])] - OMRING>4
+#
+# Substituents
+# ============
+#
+# cut substituents on phosphole (P1C=CC=C1)
+CTR LPhospholeSubAlpha -160 [$([#6;X3]1~[#15;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1,#9,#17,#35,#53])[#6;X3]~[#6;X3]~[#6;X3]1)] [$([#6][#6;X3]~[#15;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] - RING>7 OMRING>4
+CTR LPhospholeSubBeta -161 [$([#6;X3]1~[#6;X3]~[#15;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1,#9,#17,#35,#53])[#6;X3]~[#6;X3]1)] [$([#6][#6;X3]~[#6;X3]~[#15;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] -!@
+#
+# cut substituents on phospholane 3,4,5,6 membered
+CTR LPhospholaneSubAlpha -150 [$([#6;X4]1-[#15;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1,#9,#17,#35,#53])[#6;X4]1),$([#6;X4]1-[#15;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1,#9,#17,#35,#53])[#6;X4][#6;X4]1),$([#6;X4]1-[#15;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1,#9,#17,#35,#53])[#6;X4][#6;X4][#6;X4]1),$([#6;X4]1-[#15;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1,#9,#17,#35,#53])[#6;X4][#6;X4][#6;X4][#6;X4]1)] [$([#6]-!@[#6;X4](-@[#6;X4])-@[#15;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] - RING>7 OMRING>4
+#
+# cut substituents on 3,4-diazaphospholane
+CTR LPhospholaneDiaza -140 [$([#6;X4]1[#15;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1,#9,#17,#35,#53])[#6;X4][#7;X3][#7;X3]1)] [$([#6]-!@[#6;X4]-@[#15;X4][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] - RING>7 OMRING>4
+#
+# cut P-|-Ar
+CTR LPhosphineSubAr -130 [$([#15;X4]([#6,#1,#9,#17,#35,#53])([#6,#1,#9,#17,#35,#53])([#6,#1,#9,#17,#35,#53])[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] [$(c)] - RING>7 OMRING>4
+#
+# cut P-|-R
+CTR LPhosphineSubS -120 [$([#15;X4]([#6,#1,#9,#17,#35,#53])([#6,#1,#9,#17,#35,#53])([#6,#1,#9,#17,#35,#53])[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] [$([#6;X2]#[#6;X2]),$([#6;X3]([#1;X1])=!@[#6;X3]([#1])[#1]),$([#6;X3]([#1;X1])=!@[#6;X3][#1]),$([#6;X4]([#1,#9;X1])([#1,#9;X1])[#1,#9;X1]),$([#6;X4]([#1,#9;X1])([#1,#9;X1])[*])] - RING>7 OMRING>4
+#
+# cut P-|-Rvarious
+CTR LPhosphineSubM -110 [$([#15;X4]([#6,#1,#9,#17,#35,#53])([#6,#1,#9,#17,#35,#53])([#6,#1,#9,#17,#35,#53])[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] [$([#6;X3]([#1,#9,#17,#35,#53;X1])=!@[#6,#7;X3]),$([#6;X3](=!@[#6,#7;X2])[#6;X4]([#1])[#1;X1]),$([#6;X3](=!@[#6;X3][#1;X1])[#6;X4]([#1;X1])[#1;X1]),$([#6;X3]1=[#6;X3]([#1;X1])-[#6;X4]([#1;X1])([#1;X1])-[#6]~[#6]1),$([#6;X4]([#17,#35,#53;X1])([#17,#35,#53;X1])[#17,#35,#53;X1]),$([#6;X4]([#17,#35,#53;X1])([#17,#35,#53;X1])[*]),$([#6;X4]([*;X1])([#6,#7,#8,#16;X2])[#6,#7,#8,#16;X2]),$([#6;X4]([*;X1])([#6,#7,#8,#16;X2])[#6,#7;X3][#1;X1]),$([#6;X4]([*;X1])([#6,#7,#8,#16;X2])[#6;X4]([#1;X1])[#1;X1]),$([#6;X4]([*;X1])([#6,#7;X3][#1;X1])[#6,#7;X3][#1;X1]),$([#6;X4]([*;X1])([#6,#7;X3])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([*;X1])([#6,#14;X4]([#1;X1])[#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7,#8,#16;X2])[#6,#7,#8,#16;X2]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7,#8,#16;X2])[#6,#7;X3][#1;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7,#8,#16;X2])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7;X3][#1;X1])[#6,#7;X3][#1;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7;X3])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#14;X4]([#1;X1])[#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#7;X3])([#6,#7;X3][#1;X1])[#6,#7;X3][#1;X1]),$([#6;X4]([#6,#7;X3])([#6,#7;X3][#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#7;X3])([#6,#14;X4]([#1;X1])[#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#14;X4]([#1;X1])[#1;X1])([#6,#14;X4]([#1;X1])[#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]12[#6;X4]3[#6;X4]4[#6;X4]5[#6;X4]1[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]2345)] - RING>7 OMRING>4
+#
+# removed from LPhosphineSubM because it makes phosphine too electron poor $([#6;X4]([*;X1])([#6,#14;X4]([#9;X1])[#9;X1])[#6,#14;X4]([#9;X1])[#9;X1])
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: PHOSPHITES"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-P(OR)3
+#
+CTR MPhosphite -12000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([P;X4]([#8;X2][#6])([#8;X2][#6])[#8;X2][#6])] - OMRING>4
+#
+# substituents
+CTR LPhosphiteSubO -200 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#8;X2][#6])([#8;X2][#6])[#8;X2][#6])] [$([#8;X2]P)] - RING>7 OMRING>4
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: PHOSPHONITE"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-P(OR)2(R)
+#
+CTR MPhosphonite -13000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([P;X4]([#8;X2][#6])([#6,#1])[#8;X2][#6])] - OMRING>4
+#
+# substituents
+CTR LPhosphoniteSubO -300 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#8;X2][#6])([#6,#1])[#8;X2][#6])] [$([#8;X2]P)] - RING>7 OMRING>4
+CTR LPhosphoniteSubR -310 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#8;X2][#6])([#6,#1])[#8;X2][#6])] [$([#6]P)] - RING>7 OMRING>4
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: PHOSPHINITE"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-P(OR)(R)2
+#
+CTR MPhosphinite -14000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([P;X4]([#6,#1])([#6,#1])[#8;X2][#6])] - OMRING>4
+#
+# substituents
+CTR LPhosphiniteSubO -400 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1])([#6,#1])[#8;X2][#6])] [$([#8;X2]P)] - RING>7 OMRING>4
+CTR LPhosphiniteSubR -410 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1])([#6,#1])[#8;X2][#6])] [$([#6]P)] - RING>7 OMRING>4
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: PHOSPHONATE"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-P(O)(OR)2
+#
+CTR MPhosphonate -15000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([P;X4](=[#8;X1])([#8;X2][#6])[#8;X2][#6])] - OMRING>4
+#
+# substituents
+CTR LPhosphonateSubO -500 [$([P;X4](=[#8;X1])([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#8;X2][#6])[#8;X2][#6])] [$([#8;X2]P)] - RING>7 OMRING>4
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: TRISAMINOPHOSPHINE"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-P(NR)3
+#
+CTR MTrisAminoPhosphine -15500 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([P;X4]([#7;X3]([#6,#1])[#6,#1])([#7;X3]([#6,#1])[#6,#1])[#7;X3]([#6,#1])[#6,#1])] - OMRING>4
+#
+# substituents
+CTR LTrisAminoPhosphineSubN -550 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#7;X3]([#6,#1])[#6,#1])([#7;X3]([#6,#1])[#6,#1])[#7;X3]([#6,#1])[#6,#1])] [$([#7;X3]P)] - RING>7 OMRING>4
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: BISAMINOPHOSPHINE"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-P(NR)2(R)
+#
+CTR MBisAminoPhosphine -15600 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([P;X4]([#7;X3]([#6,#1])[#6,#1])([#6,#1])[#7;X3]([#6,#1])[#6,#1])] - OMRING>4
+#
+# substituents
+CTR LBisAminoPhosphineSubN -600 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#7;X3]([#6,#1])[#6,#1])([#6,#1])[#7;X3]([#6,#1])[#6,#1])] [$([#7;X3]P)] - RING>7 OMRING>4
+# substituents on cyclic P1NCCN1 
+CTR LCycloBisAminoPhosphineSubN -610 [$([#7;X3]1[P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])[#7;X3]([#6,#1])[#6][#6]1)] [$([#6,#1])] - RING>7 OMRING>4
+# substituents on cyclic P1NC=CN1 (heterophosphole)
+CTR LCycloBisAminoPhospholeSubN -620 [$([#7;X3]1([#6,#1])[P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])[#7;X3]([#6,#1])[#6;X3]~[#6;X3]1)] [$([#6,#1])] - RING>7 OMRING>4
+CTR LBisAminoPhosphineSubR -630 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#7;X3]([#6,#1])[#6,#1])([#6,#1])[#7;X3]([#6,#1])[#6,#1])] [$([#6]P)] - RING>7 OMRING>4
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: MONOAMINOPHOSPHINE"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-P(NR)(R)2
+#
+CTR MMonoAminoPhosphine -15700 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([P;X4]([#6,#1])([#6,#1])[#7;X3]([#6,#1])[#6,#1])] - OMRING>4
+#
+# substituents
+CTR LMonoAminoPhosphineSubN -650 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1])([#6,#1])[#7;X3]([#6,#1])[#6,#1])] [$([#7;X3]P)] - RING>7 OMRING>4
+CTR LMonoAminoPhosphineSubR -660 [$([P;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6,#1])([#6,#1])[#7;X3]([#6,#1])[#6,#1])] [$([#6]P)] - RING>7 OMRING>4
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: IMINES"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-N(R)=C(R)R
+#
+CTR MImine -16000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([N;X3](-[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(-[#6])=!@C(-[#6,#1])-[#6,#1])] -!@
+#
+# Substituents on coordinating imines
+# cut R-|-N(M)=C(-R)-R
+CTR LImineSubN -700 [$([N;X3](-[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(-[#6])=C(-[#6,#1])-[#6,#1])] [$([#6]-[N;X3](-[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])=C(-[#6,#1])-[#6,#1])] -!@
+# cut R-|-C(-R)=N(M)-R
+# ignore C-{C,N-ring} that maight be confused with imine
+CTR LImineSubC -710 [$([#6]-[C;X3](-[#6,#1])=[N;X3](-[#6])-[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]);!$([#6]-[#6]1~[#7]~[B,C,N,O,Si,P,S,As,Se]~[B,C,N,O,Si,P,S,As,Se]~[B,C,N,O,Si,P,S,As,Se]1);!$([#6]-[#6]1~[#7]~[B,C,N,O,Si,P,S,As,Se]~[B,C,N,O,Si,P,S,As,Se]~[B,C,N,O,Si,P,S,As,Se]~[B,C,N,O,Si,P,S,As,Se]1)] [$([C;X3](-[#6,#1])(-[#6])=[N;X3](-[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])-[#6])] -!@
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: 6-members heteroaromatic L-ligands"
+# Also includes condensed rings
+#
+###############################################################################
+###############################################################################
+#
+# M-|-Pyridine
+#
+# "WARNING!" CDK's aromatic bond detection does not always succeed.
+# By mean of "-,=,:" this rule matches single, doubles and aromatic bonds in
+# any order and number
+#
+CTR MPyridine -17000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X3]1-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]1);!$([#7;X3][#6;X3]=[#8])] -!@
+#
+# M-|-Pyrazine
+#
+# "WARNING!" CDK's aromatic bond detection does not always succeed.
+# By mean of "-,=,:" this rule matches single, doubles and aromatic bonds in
+# any order and number
+# Note: other substituents than metal on the second N, are not included 
+#
+CTR MPyrazine -17300 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X3]1-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#7;X3]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])-,=,:[#6;X3]-,=,:[#6;X3]1),$([#7;X3]1-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#7;X2]-,=,:[#6;X3]-,=,:[#6;X3]1);!$([#7;X3][#6;X3]=[#8])] -!@
+#
+# M-|-Pyrimidine
+#
+# "WARNING!" CDK's aromatic bond detection does not always succeed.
+# By mean of "-,=,:" this rule matches single, doubles and aromatic bonds in
+# any order and number
+# Note: other substituents than metal on the second N, are not included 
+#
+CTR MPyrimidine -17600 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X3]1-,=,:[#6;X3]-,=,:[#7;X3]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]1),$([#7;X3]1-,=,:[#6;X3]-,=,:[#7;X2]-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]1);!$([#7;X3][#6;X3]=[#8])] -!@
+#
+# M-|-Pyridazine
+#
+# "WARNING!" CDK's aromatic bond detection does not always succeed.
+# By mean of "-,=,:" this rule matches single, doubles and aromatic bonds in
+# any order and number
+# Note: other substituents than metal on the second N, are not included 
+#
+CTR MPyridazine -17900 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X3]1-,=,:[#7;X3]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]1),$([#7;X3]1-,=,:[#7;X2]-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]1);!$([#7;X3][#6;X3]=[#8])] -!@
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: 5-members heteroaromatic L-ligands"
+# Also includes condensed rings
+#
+###############################################################################
+###############################################################################
+#
+# M-|-Pyrrole
+#
+CTR MPyrrole -18000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X3]1-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]1);!$([#7;X3][#6;X3]=[#8])] -!@
+#
+#
+# M-|-Pyrazole
+# NOTE: only the most common substitutions are taken into account on the second N.
+# Add more, if needed.
+# WARNING! does not take into account different mesomers
+#
+CTR MPyrazole -18500 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X3]1-,=,:[#7;X3]([#6,#1])-,=,:[#6;X3]-,=,:[#6;X3]-,=,:[#6;X3]1);!$([#7;X3][#6;X3]=[#8])] -!@
+#
+#
+# M-|-Imidazole
+# NOTE: to avoid matching imidazolate ligand, substituents on the second N are required
+# Only the most common substitutions are taken into account. Add more, if needed.
+# WARNING! does not take into account different mesomers
+#
+CTR MImidazole -19000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X3]1-,=,:[#6;X3]-,=,:[#7;X3]([#6,#1])-,=,:[#6;X3]-,=,:[#6;X3]1);!$([#7;X3][#6;X3]=[#8])] -!@
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: AMINES"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-NR3
+# ignore amide
+CTR MAmine -20000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X4]([#6,#1])([#6,#1])[#6,#1]);!$([#7]-[#6]=[#8;X1]);!$([#7]-[#6]=[#16;X1])] - OMRING>7
+#
+# substituents on coordinating amines
+CTR LAmineSubMono -1000 [$([#7;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#1])([#1])[#6])] [$([#6]-[#7;X4])] -!@
+CTR LAmineSubDi -1010 [$([#7;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#1])([#6])[#6])] [$([#6]-[#7;X4])] -!@
+CTR LAmineSubiTri -1020 [$([#7;X4]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])([#6])([#6])[#6])] [$([#6]-[#7;X4])] -!@
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: ALKOXYLATE"
+#
+###############################################################################
+###############################################################################
+#
+#
+# M-|-O-Ar(6-terms ring)
+# Also includes condensed rings
+CTR MAriloxylate -21000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#8;X2]-c1aaaaa1)] -!@
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: THIOLATE"
+#
+###############################################################################
+###############################################################################
+#
+#
+# M-|-S-Ar(6-terms ring)
+# Also includes condensed rings
+CTR MArilthiolate -25000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#16;X2]-c1aaaaa1)] -!@
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: CARBOXYLATE"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-OC(=O)R monodentate, monohapto
+CTR MCarboxylate -30000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#8;X2]-[#6;X3](=[#8;X1])[#6,#1])] -!@
+#
+# substituent on carboxylate
+CTR LCarboxylate -1100 [$([#6;X3](=[#8;X1])[#8;X2][Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])] [#6] -!@
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Organometallic features: ETHER"
+#
+###############################################################################
+###############################################################################
+#
+# M-|-OR2
+# ignore acetals, esters, thioesters
+CTR MEther -35000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#8;X3]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(-[#6;X4,X3])-[#6;X4,X3]);!$([#8;X3][#6;X3]=[#8;X1]);!$([#8;X3][#6;X3]=[#16;X1]);!$([#8;X3][#6;X4][#8][#6;X4]);!$([#8;X3][#6;X4][#8][#6;X3])] -!@
+#
+# substituent on coordinating ether
+# ignore acetals, esters, thioesters
+CTR LEtherR -1200 [$([#8;X3]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(-[#6])-[#6]);!$([#8;X3][#6;X3]=[#8;X1]);!$([#8;X3][#6;X3]=[#16;X1]);!$([#8;X3][#6;X4][#8][#6;X4]);!$([#8;X3][#6;X4][#8][#6;X3])] [$([#6;X4])] -!@
+CTR LEtherAr -1210 [$([#8;X3]([Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(-[#6])-[#6]);!$([#8;X3][#6;X3]=[#8;X1]);!$([#8;X3][#6;X3]=[#16;X1]);!$([#8;X3][#6;X4][#8][#6;X4]);!$([#8;X3][#6;X4][#8][#6;X3])] [c] -!@
+#
+#
+###############################################################################
+###############################################################################
+#
+# "Other organometallic/inorganic ligands"
+#
+###############################################################################
+###############################################################################
+#
+#
+# Carbonyl, not bridge
+# M-|-CO
+CTR MCO -50000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X2]#[#8;X1])] -!@
+#
+# Cyano, not bridge
+# M-|-CN
+CTR MCN -50100 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X2]#[#7;X1])] -!@
+#
+# Isocyanato, not bridge
+# M-|-N=C=O
+#
+CTR MNCO -50200 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X2]=[#6;X2]=[#8;X1])] -!@
+#
+# Isothiocyanato, N site, not bridge
+# M-|-N=C=S 
+# ignore M-N#C-S that is used in CSD for S(-)
+CTR MNCS -50300 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X2]=[#6;X2]=[#16;X1])] -!@
+#
+# Isothiocyanato, S site, not bridge
+# M-|-SCN
+CTR MSCN -50350 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#16;X2]~[#6;X2]~[#7;X1])] -!@
+#
+# All Halogens
+#CTR MX -60000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([F;X1]),$([Cl;X1]),$([Br;X1]),$([I;X1])] -!@
+CTR MF -60010 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#9;X1])] -!@
+CTR MCl -60020 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#17;X1])] -!@
+CTR MBr -60030 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#35;X1])] -!@
+CTR MI -60040 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#53;X1])] -!@
+#
+###############################################################################
+###############################################################################
+#
+#
+# "Organic moieties"
+# 
+#
+###############################################################################
+###############################################################################
+#
+#AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+#AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+#
+# AROMATIC SUBSTITUENTS
+#
+#AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+#AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+#
+# cut Ar-|-halogen
+#CTR sArX 450 [$([F;X1]),$([Cl;X1]),$([Br;X1]),$([I;X1])] [$(cCl),$(cBr),$(cF),$(cI)] -!@
+CTR sArF 470 [$([F;X1])] [$(cF)] -!@
+CTR sArCl 480 [$([Cl;X1])] [$(cCl)] -!@
+CTR sArBr 490 [$([Br;X1])] [$(cBr)] -!@
+CTR sArI 500 [$([I;X1])] [$(cI)] -!@
+#
+# cut Ar-|-CH3
+CTR sArMe 510 [$(C([#1])([#1])([#1])c)] [$(cC([#1])([#1])([#1]))] -!@
+#
+# cut Ar-|-Rmedium (-Et, -Pr, -iPr)
+CTR sArEP 520 [$(C([#1])([#1])(C([#1])([#1])([#1]))c),$(C([#1])([#1])(C([#1])([#1])(C([#1])([#1])([#1])))c),$(C(C([#1])([#1])([#1]))(C([#1])([#1])([#1]))([#1])c)] [$(cC)] -!@
+# cut Ar-|-Rlarge (-tBut)
+CTR sArTB 530 [$(C(C([#1])([#1])([#1]))(C([#1])([#1])([#1]))(C([#1])([#1])([#1]))c)] [$(cC)] -!@
+#
+# cut Ar-|-R
+CTR sArAlkS 540 [$(C([#1])([#1])C)] [$(cCC)] -!@
+CTR sArAlkM 550 [$(C([#1])(C)C)] [$(cCC)] -!@
+#
+# cut Ar-|-CX3
+CTR sArCX 570 [$(C(F)(F)F),$(C(Cl)(Cl)Cl),$(C(Br)(Br)Br),$(C(I)(I)I)] [$(cC)] -!@
+#
+# cut Ar-|-CN
+CTR sArCN 580 [$(C#N)] [$(cC#N)] -!@
+#
+# cut Ar-|-R general substituents to aromatic
+# ignore benzylic carbon connected to O, N or S
+# ignore Et, Pr, iPr, tBut and CX3 (from priority order)
+CTR sArOther 590 [$(C([C,c])c);!$(C~[#8]);!$(C~[#7]);!$(C~[#16])] [$(cC)] -!@
+#
+# Tested but not in use to preserve trityl-like systems
+# cut Ar-|-R-X  X = O, N, S
+#CTR sBenzyl 600 [$(C[#8]),$(C[#7]),$(C[#16])] [$(c1(C)ccccc1)] -!@
+#
+# cut Ar-|-OMe
+CTR sArOMe 650 [$(O(C([#1])([#1])[#1])c)] [$(cOC)] -!@
+#
+# cut Ar-|-OH
+CTR sArOH 660 [$(O([#1])c)] [$(cO([#1]))] -!@
+#
+# cut Ar-|-HN2
+CTR sArNH2 700 [$(N([#1])([#1])c)] [$(cN([#1])([#1]))] -!@
+#
+# cut Ar-|-NO2
+CTR sArNitro 710 [$([NX3](=O)(=O)),$([NX3+](=O)[O-])] [$(cN)] -!@
+#
+# cut Ar-|-SH
+CTR sArSH 800 [S;X2;$(S([#1])c)] [$(cS)] -!@
+#
+#OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+#OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+#
+#  OXYGEN
+#
+#OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+#OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+#
+# Alkyl ESTERS + ACIDS
+# keep the geometry of O=C-O by cutting the sigma bond C-C=O instead of C-O,
+# R3C-|-C(=O)O
+# S: R3 = H, H, R or H
+# M: R3 = H, R, R
+# L: R3 = R, R, R
+# ignore C=C-C(=O)O and Ph-C(=O)O
+CTR acEstS 1200 [$(C(=O)[O;X2][#6]);!$(C(=O)OC=O)] [$([C;X4]([#1])([#1])C(=O)O),$([#1])] -!@
+CTR acEstM 1210 [$(C(=O)[O;X2][#6]);!$(C(=O)OC=O)] [$(C([#1])C(=O)O);!$(C=C);!c;X4] -!@
+CTR acEstL 1220 [$(C(=O)[O;X2][#6]);!$(C(=O)OC=O)] [$(CC(=O)O);!c;X4] -!@
+#
+################################################
+# Carbamate
+# cut R-|-O-C(=O)-NR2
+CTR carbamateSubO 1250 [O;X2;$(OC(=O)N([#1,#6])[#1,#6])] [$([#6]-O-C(=O)-N)] -!@
+#
+################################################
+# Carbonate
+# cut R-|-O-C(=O)-O-R
+CTR carbonateSubO 1260 [O;X2;$(OC(=O)O[#6])] [$([#6]-O-C(=O)-O)] -!@
+#
+################################################
+# Alkyl ALCOHOLS
+# cut alcohols
+# ignore Ph-OH, enole =C-OH
+# S: X3 = H, H, R
+# L: X3 = R, R, R
+CTR alcohS 1300 [O;X2;$(O[#1])] [$(CO);$(C([#1])([#1]));!$(C=O);X4] -!@
+CTR alcohL 1310 [O;X2;$(O[#1])] [$(CO);!$(C=O);!c;X4] -!@
+# cut esterified alkylic alcohols X3C-|-O-C(=O)
+CTR alcohES 1320 [O;X2;$(OC(=O)[#6])] [$(CO);$(C([#1])([#1]));!$(C=O);X4] -!@
+CTR alcohEL 1330 [O;X2;$(OC(=O)[#6])] [$(CO);!$(C=O);!c;X4] -!@
+#
+################################################
+# Enol ETHERS
+# cut R-|-O-C=C with R alkyl
+# ignore R-O-Ph and Ph-O-C=C
+CTR EnolEthR 1400 [O;X2;$(O-C=C);$(O-[C;X4]);!$(OC=O);!$(Oc)] [C;X4;$(C-O-C=C)] -!@
+#
+# cut Ar-|-O-C=C
+CTR EnolEthA 1410 [O;X2;$(O-C=C);$(Oc);!$(OC=O)] [$(c-O-C=C)] -!@
+#
+################################################
+# ETHERS
+# cut R-|-O-R
+# ignore acetals and emiacetals
+CTR EthRR 1450 [O;!$(O[#1]);!$(OC=O);$(O([C;X4])[C;X4]);!$(O[C;X4]O[C;X4]);!$(O[C;X4]O[#6;X3])] [C;X4;$(C-O-[C;X4]);!$(C(OC)OC);!$(C(OC)O[#1])] -!@
+#
+# cut Ar-|-O-R
+# ignore acetals
+CTR EthArR 1460 [$(Oc);!$(OC=O);!$(O[C;X4]O[C;X4]);!$(O[C;X4]O[#6;X3])] [$(c-O-[C;X4])] -!@
+#
+# cut R-|-O-Ar
+# ignore acetals
+# ignore Ar-OMe
+CTR EthRAr 1470 [$(Oc);!$(OC=O);!$(O[C;X4]O[C;X4]);!$(O[C;X4]O[#6;X3])] [$([C;X4]-O-c);!$([C;X4]([#1])([#1])([#1])-O-c)] -!@
+#
+# cut Ar-|-O-Ar
+# ignore acetals
+CTR EthArAr 1480 [$(Oc);!$(OC=O);!$(O[C;X4]O[C;X4]);!$(O[C;X4]O[#6;X3])] [$(c-O-c)] -!@
+#
+################################################
+# CARBONYL on alkyl
+# cut X3C-|-C(=O)-R/Ar
+# S: X3 = H, H, R
+# L: X3 = R, R, R
+CTR ketonS 1500 [C;X3;$(C(=O)([C,c])[C,c])] [$([C;X4]([#1])([#1]))] -!@
+CTR ketABI 1510 [C;X3;$(C(=O)([C,c])[C,c])] [$([C;X3]=[C;X3])] -!@
+CTR ketonL 1520 [C;X3;$(C(=O)([C,c])[C,c])] [$([C;X4])] -!@
+#
+# cuts X3C-|-C(=O)H
+CTR aldehS 1550 [C;X3;$(C(=O)[#1])] [$([C;X4]([#1])([#1]))] -!@
+CTR aldehL 1560 [C;X3;$(C(=O)[#1])] [$([C;X4])] -!@
+#
+################################################
+# ACETALS
+# cut C/Ar-|-C(-O-R/Ar)(-O-R/Ar)-R/Ar
+#CTR acetalK 1600 [C;X4;$(C(O-[C,c])(O-[C,c])([C,c])[C,c])] [$([C,c]C(O-[C,c])(O-[C,c]))] -!@
+#CTR acetalA 1610 [C;X4;$(C(O-[C,c])(O-[C,c])([C,c])[#1])] [$([C,c]C(O-[C,c])(O-[C,c]))] -!@
+#
+#TODO add C(-O-|-R)-O-|-R
+#
+################################################
+# ORTHO ACETALS
+# cut C/Ar-|-C(-O)(-O)-O
+#CTR ortAcet 1650 [C;X4;$(C(O)(O)O)] [$([C,c]C(O)(O)O)] -!@
+#
+#TODO add C(-O-|-R)(-O-|-R)-O-|-R
+#
+################################################
+# PHENOL
+# already treated as aromatic substituent
+#
+################################################
+# ARYL ESTER
+# cut Ar-|-O-C(=O)R
+CTR arEst 1750 [$(Oc)] [$(c-O-C(=O)[#6])] -!@
+#
+################################################
+# ARYL KETONE
+# cut Ar-|-C(=O)-R
+CTR arKetR 1800 [C;X3;$(C(=O)C)] [$(cC(=O)C)] -!@
+# cut Ar-|-C(=O)-Ar
+CTR arKetA 1810 [C;X3;$(C(=O)c)] [$(cC(=O)c)] -!@
+#
+################################################
+# ESTERS of aromatic acids
+# cut Ar-|-C(=O)-OR
+CTR aroicEst 1900 [C;X3;$(C(=O)O[#6])] [$(cC(=O)O)] -!@
+#
+#
+#NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+#NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+#
+# NITROGEN
+#
+#NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+#NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+#
+# Alkyl AMIDES
+# keep the geometry of O=C-N by cutting the sigma bond C-C=O instead of C-N,
+# R3C-|-C(=O)N
+# S: R3 = H, H, R or H
+# M: R3 = H, R, R
+# L: R3 = R, R, R
+# ignore C=C-C(=O)N and Ph-C(=O)N and urea, imide
+CTR acAmdS 2100 [$(C(=O)[N;X3]);!$(C(=O)NC=O)] [$([C;X4]([#1])([#1])C(=O)N),$([#1])] -!@
+CTR acAmdM 2110 [$(C(=O)[N;X3]);!$(C(=O)NC=O)] [$([C;X4]([#1])C(=O)N)] -!@
+CTR acAmdL 2120 [$(C(=O)[N;X3]);!$(C(=O)NC=O)] [$([C;X4]C(=O)N)] -!@
+#
+################################################
+# Ar AMIDES
+# cut Ar-|-C(=O)-NR2
+CTR aroicAmd 2150 [C;X3;$(C(=O)N([#1,#6])[#1,#6])] [$(cC(=O)N)] -!@
+#
+################################################
+# Carbamate
+# cut R-N(R)-C(=O)-O-R
+CTR carbamateSubN 2160 [N;X3;$(NC(=O)O[#6])] [$([#6]-[N;X3]-C(=O)-O)] -!@
+#
+################################################
+# UREA
+# cut R-|-NC(=O)N-|-R2
+CTR urea 2180 [$([N;X3]~!@C(=O)~!@[N;X3])] [$([C,c][N;X3]C(=O)[N;X3])] -!@
+#
+################################################
+# acylated AMINES
+# cut C-|-N-C(=O)
+# ignore lactames
+CTR acyAmDi 2200 [N;X3;$(N([#1])(C)C(=O)[#6,#1])] [$(CN(C=O));!$(C=O)] -!@
+CTR acyAmTri 2210 [N;X3;$(N(C)(C)C(=O)[#6,#1])] [$(CN(C=O));!$(C=O)] -!@
+# sulf-acylated AMINES
+CTR slfAmDi 2220 [N;X3;$(N([#1])(C)S(=O))] [$(CN(S=O));!$(C=O)] -!@
+CTR slfAmTri 2230 [N;X3;$(N(C)(C)S(=O))] [$(CN(S=O));!$(C=O)] -!@
+#
+# acylated heteroaromatic N
+# cut R-|-N(5-members ring)
+CTR n5acyl 2250 [n;$(n1aaaa1)] [$(Cn)] -!@
+################################################
+# alkyl AMINES
+# cut (C3)N-|-CX4
+# ignore aromatic amines
+CTR aminMo 2300 [N;X3;$(N([#1])([#1])[C;X4])] [C;!c;X4;!$(C=!@O)] -!@
+CTR aminDi 2310 [N;X3;$(N([#1])([C,c])[C;X4])] [C;!c;X4;!$(C=!@O)] -!@
+CTR aminTri 2320 [N;X3;$(N([C,c])([C,c])[C;X4])] [C;!c;X4;!$(C=!@O)] -!@
+#
+################################################
+# aryl AMINES
+# cut (C3)N-|-Ar
+CTR arAmMo 2400 [N;X3;$(N([#1])([#1])c)] [$(cN)] -!@
+CTR arAmDi 2410 [N;X3;$(N([#1])([C,c])c)] [$(cN)] -!@
+CTR arAmTri 2420 [N;X3;$(N([C,c])([C,c])c)] [$(cN)] -!@
+# sulf-acylated aryl AMINES
+CTR arSlfAm 2440 [N;X3;$(N(c)S(=O))] [$(cN(S=O));!$(C=O)] -!@
+#
+################################################
+# IMINE
+# ignore metal coordinating imines
+# cut R-|-N=C(-R=)-R
+CTR ImineSubN 2500 [$([N;X2](-[#6])=C(-[#6,#1])-[#6])] [$([#6]-N=C(-[#6,#1])-[#6])] -!@
+# cut R-|-C(-R)=N-R
+CTR ImineSubC 2510 [$([#6]-!@[C;X3](-!@[#6,#1])=[N])] [$([C;X3](-!@[#6,#1])(-!@[#6])=[N;X2]-[#6])] -!@
+#
+################################################
+# IMIDE
+# cut R-|-N(C=O)C=O
+CTR imide 2600 [$(N(C=O)(C=O)C)] [$([C;X4]N(C=O)C=O)] -!@
+CTR acimide 2610 [$(C(=O)~!@[N]~!@C=O)] [$([C;X4]C(=O)N)] -!@
+#
+################################################
+# NITRO
+# cut R-|-NO2 (ArNO2 as aromatic substiruent)
+CTR Nitro 2800 [$([NX3](=O)(=O)),$([NX3+](=O)[O-])] [$(CN)] -!@
+#
+################################################
+# AMMONIUM
+# cut [N+]-|-C
+# ignore N-|-Ph
+CTR quatN 2900 [N;+1;X4] [C;!c] -!@
+#################################################
+# AZO
+# cut Ar/R-|-N=N-R
+CTR azo 2950 [N;X2;+0;$(N([C,c])=[N;X2;+0]-[C,c])] [$([C,c]-N=N-[C,c])] -!@
+#
+#
+#CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+#CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+#
+# CARBON
+#
+#CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+#CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+#
+# AROM-AROM
+# cut Ar-|-Ar
+CTR aromarom 3200 [$(c)] [$(c)] -!@
+#
+#
+#SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+#SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+#
+# SULFUR
+#
+#SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+#SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+#
+# Alkyl THIOL
+# cut R-|-SH
+CTR thiol 4000 [S;X2;$(S[#1])] [$([C;X4]S)] -!@
+#
+# Ar-SH already as aromatic substituent
+#
+################################################
+# THIOETHER
+# cut R-|-S-R
+CTR thioEtRR 4100 [S;X2;$(S([C;X4])[C;X4])] [$([C;X4]-S-[C;X4])] -!@
+#
+################################################
+# AROMATIC THIOETHER
+# cut Ar-|-S-R
+CTR ThEtArR 4200 [S;X2;$(S([C;X4])c)] [$(c-S-[C;X4])] -!@
+#
+# cut R-|-S-Ar
+CTR ThEtRAr 4210 [S;X2;$(S([C;X4])c)] [$([C;X4]-S-c)] -!@
+#
+# cut Ar-|-S-Ar
+CTR ThEtArAr 4250 [S;X2;$(S(c)c)] [$(c-S-c)] -!@
+#
+################################################
+# Alkyl SULFONAMIDE
+# cut R-|-S(=O)(=O)-N-R2
+CTR SulfAmdR 4300 [S;X4;$(S(=O)(=O)[N;X3])] [$([C;X4]S(=O)(=O)N)] -!@
+#
+# cut Ar-|-S(=O)(=O)-N-R2
+CTR SulfAmdAr 4350 [S;X4;$(S(=O)(=O)N)] [$(cS)] -!@
+#
+################################################
+# SULFONE
+# cut R-|-S(=O)(=O)-R
+CTR SulfoneRR 4400 [S;X4;$(S(=O)(=O)(C)C)] [$(CS)] -!@
+#
+# cut R-|-S(=O)(=O)-Ar
+CTR SulfoneRAr 4410 [S;X4;$(S(=O)(=O)(C)c)] [$(CS)] -!@
+#
+# cut Ar-|-S(=O)(=O)-R
+CTR SulfoneArR 4420 [S;X4;$(S(=O)(=O)(C)c)] [$(cS)] -!@
+#
+# cut Ar-|-S(=O)(=O)-Ar
+CTR SulfoneArAr 4430 [S;X4;$(S(=O)(=O)(c)c)] [$(cS)] -!@
+#
+################################################
+# SULFOXIDE (SULFINYL)
+# cut R-|-S(=O)-R
+CTR SulfinylRR 4500 [S;X3;$(S(=O)(C)C)] [$(CS)] -!@
+#
+# cut R-|-S(=O)-Ar
+CTR SulfinylRAr 4510 [S;X3;$(S(=O)(C)c)] [$(CS)] -!@
+#
+# cut Ar-|-S(=O)-R
+CTR SulfinylArR 4520 [S;X3;$(S(=O)(C)c)] [$(cS)] -!@
+#
+# cut Ar-|-S(=O)-Ar
+CTR SulfinylArAr 4530 [S;X3;$(S(=O)(c)c)] [$(cS)] -!@
+#
+################################################
+# SULFONIC ACIDS and SULFONATE
+# cut Ar/R-|-S(=O)(=O)O[H/(-)]
+CTR Sulfonic 4600 [$(S(=O)(=O)O)] [C,c] -!@
+#CTR Sulfonic 4600 [$(S(=O)(=O)O)] [C,C] -!@
+#
+################################################
+# SULFURIC and SULFATE
+# cut Ar/R-|-O-S(=O)(=O)O-[H/R/(-)]
+CTR Sulfuric 4610 [$(OS(=O)(=O)O)] [C,c] -!@
+#
+#
+#PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+#PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+#
+# PHOSPHORUS
+#
+#PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+#PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+#
+# PHOSPHINE P(R)3
+#
+# cut P-|-R
+#CTR phosphineR 5000 [$([P;X3]([#6,#1])([#6,#1])[#6,#1])] [$(CP),$([#1]P)] -!@
+#
+CTR phosphineSubAr 5010 [$([P;X3]([#6,#1,#9,#17,#35,#53])([#6,#1,#9,#17,#35,#53])[#6,#1,#9,#17,#35,#53])] [$(c)] -!@
+CTR phosphineSubS 5020 [$([P;X3]([#6,#1,#9,#17,#35,#53])([#6,#1,#9,#17,#35,#53])[#6,#1,#9,#17,#35,#53])] [$([#6;X2]#[#6;X2]),$([#6;X3]([#1;X1])=!@[#6;X3]([#1])[#1]),$([#6;X3]([#1;X1])=!@[#6;X3][#1]),$([#6;X4]([#1,#9;X1])([#1,#9;X1])[#1,#9;X1]),$([#6;X4]([#1,#9;X1])([#1,#9;X1])[*])] -!@
+CTR phosphineSubM 5030 [$([P;X3]([#6,#1,#9,#17,#35,#53])([#6,#1,#9,#17,#35,#53])[#6,#1,#9,#17,#35,#53])] [$([#6;X3]([#1,#9,#17,#35,#53;X1])=!@[#6,#7;X3]),$([#6;X3](=!@[#6,#7;X2])[#6;X4]([#1])[#1]),$([#6;X3](=!@[#6;X3][#1])[#6;X4]([#1])[#1]),$([#6;X3]1=[#6;X3]([#1;X1])-[#6;X4]([#1;X1])([#1;X1])-[#6]~[#6]1),$([#6;X4]([#17,#35,#53;X1])([#17,#35,#53;X1])[#17,#35,#53;X1]),$([#6;X4]([#17,#35,#53;X1])([#17,#35,#53;X1])[*]),$([#6;X4]([*;X1])([#6,#7,#8,#16;X2])[#6,#7,#8,#16;X2]),$([#6;X4]([*;X1])([#6,#7,#8,#16;X2])[#6,#7;X3][#1;X1]),$([#6;X4]([*;X1])([#6,#7,#8,#16;X2])[#6;X4]([#1;X1])[#1;X1]),$([#6;X4]([*;X1])([#6,#7;X3][#1;X1])[#6,#7;X3][#1;X1]),$([#6;X4]([*;X1])([#6,#7;X3])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([*;X1])([#6,#14;X4]([#1;X1])[#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([*;X1])([#6,#14;X4]([#9;X1])[#9;X1])[#6,#14;X4]([#9;X1])[#9;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7,#8,#16;X2])[#6,#7,#8,#16;X2]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7,#8,#16;X2])[#6,#7;X3][#1;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7,#8,#16;X2])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7;X3][#1;X1])[#6,#7;X3][#1;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#7;X3])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#7,#8,#16;X2])([#6,#14;X4]([#1;X1])[#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#7;X3])([#6,#7;X3][#1;X1])[#6,#7;X3][#1;X1]),$([#6;X4]([#6,#7;X3])([#6,#7;X3][#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#7;X3])([#6,#14;X4]([#1;X1])[#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]([#6,#14;X4]([#1;X1])[#1;X1])([#6,#14;X4]([#1;X1])[#1;X1])[#6,#14;X4]([#1;X1])[#1;X1]),$([#6;X4]12[#6;X4]3[#6;X4]4[#6;X4]5[#6;X4]1[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr]2345)] -!@
+#
+################################################
+#
+#  PHOSPHITE P(OR)3
+#
+# cut P-|-OR
+CTR phosphite 5100 [$([P;X3]([#8;X2][#6])([#8;X2][#6])[#8;X2][#6])] [$([#8;X2]P)] -!@
+#
+################################################
+#
+#  PHOSPHONITE P(OR)2(R)
+# cut RP-|-OR
+CTR phosphoniteSubO 5200 [$([P;X3]([#8;X2][#6])([#8;X2][#6])[#6,#1])] [$([#8;X2]P)] -!@
+# cut ROP-|-R
+CTR phosphoniteSubR 5210 [$([P;X3]([#8;X2][#6])([#8;X2][#6])[#6,#1])] [$([#6]P)] -!@
+#
+################################################
+#
+#  PHOSPHINITE P(OR)(R)2
+#
+# cut RP-|-OR
+CTR phosphiniteSubO 5300 [$([P;X3]([#8;X2][#6])([#6,#1])[#6,#1])] [$([#8;X2]P)] -!@
+# cut ROP-|-R
+CTR phosphiniteSubR 5310 [$([P;X3]([#8;X2][#6])([#6,#1])[#6,#1])] [$([#6]P),$([#1]P)] -!@
+#
+################################################
+#
+# PHOSPHONIUM
+#
+# cut P(+)-|-R
+CTR phosphonium 5400 [P;X4;$(P([#6])([#6])([#6])[#6])] [$([#6]P)] -!@
+#
+################################################
+#
+################################################
+#
+#  TRISAMINOPHOSPHINE P(NR)3
+#
+# cut P-|-NR
+CTR trisAminoPhosphine 5500 [$([P;X3]([#7;X3]([#6,#1])[#6,#1])([#7;X3]([#6,#1])[#6,#1])[#7;X3]([#6,#1])[#6,#1])] [$([#8;X2]P)] -!@
+#
+################################################
+#
+#  BISTRISAMINOPHOSPHINE P(NR)2(R)
+# cut RP-|-OR
+CTR bisAminoPhosphineSubN 5600 [$([P;X3]([#7;X3]([#6,#1])[#6,#1])([#7;X3]([#6,#1])[#6,#1])[#6,#1])] [$([#8;X2]P)] -!@
+# cut ROP-|-R
+CTR bisAminoPhosphineSubR 5610 [$([P;X3]([#7;X3]([#6,#1])[#6,#1])([#7;X3]([#6,#1])[#6,#1])[#6,#1])] [$([#6]P)] -!@
+#
+################################################
+#
+#  MONOAMINOPHOSPHINE P(NR)(R)2
+#
+# cut RP-|-NR
+CTR monoAminoPhosphineSubN 5700 [$([P;X3]([#7;X3]([#6,#1])[#6,#1])([#6,#1])[#6,#1])] [$([#8;X2]P)] -!@
+# cut RNP-|-R
+CTR monoAminoPhosphineSubR 5710 [$([P;X3]([#7;X3]([#6,#1])[#6,#1])([#6,#1])[#6,#1])] [$([#6]P),$([#1]P)] -!@
+#
+#
+###############################################################################
+###############################################################################
+#
+#
+#SiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSi
+#
+#  SILICON
+#
+#SiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSiSi
+#
+# Silanes
+#
+# cur R-SiR4
+CTR silane 6000 [$([#14;X4]([#6,#1])([#6,#1])([#6,#1])[#6,#1])] [$([#6][#14;X4])] -!@
+#
+# Siloxane
+# cur Ar-Si(OR)R3
+CTR siloxaneSubR 6100 [$([#14;X4]([#8;X2])([#6,#1])([#6,#1])[#6,#1])] [$([#6][#14;X4])] -!@
+CTR siloxaneSubO 6110 [$([#14;X4]([#8;X2])([#6,#1])([#6,#1])[#6,#1])] [$([#8][#14;X4])] -!@
+#
+

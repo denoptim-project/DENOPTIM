@@ -38,6 +38,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -103,6 +105,7 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphEdit;
 import denoptim.utils.GraphUtils;
@@ -2136,7 +2139,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of  {@link Vertex}es from a SDF file.
+     * Reads a list of {@link Vertex}es from a SDF file.
      *
      * @param fileName the pathname of the file to read.
      * @return the list of vertexes.
@@ -2163,6 +2166,146 @@ public class DenoptimIO
             vertexes.add(v);
         }
         return vertexes;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read cutting rules from a properly formatted text file.
+     * @param file the file to read.
+     * @param anyAtomRules the collector of the strings used to identify an
+     * any-atom query.
+     * @param cutRules the collector of the cutting rules.
+     * @throws DENOPTIMException in case there are errors in the formatting of 
+     * the text contained in the file.
+     */
+    public static void readCuttingRules(File file, 
+            List<String> anyAtomRules, List<CuttingRule> cutRules) 
+                    throws DENOPTIMException
+    {   
+        ArrayList<String> allLines = readList(file.getAbsolutePath());
+        
+        //Collect definitions of "any-atom": the rule's components used to match
+        // any element even dummies.
+        ArrayList<String> anyAtmLines = new ArrayList<String>();
+        allLines.stream()
+            .filter(line -> line.trim().startsWith("ANY"))
+            .forEach(line -> anyAtmLines.add(line.trim()));
+        if (anyAtmLines.size() == 0)
+        {
+            anyAtomRules.add("[$([*;!#1])]");
+            anyAtomRules.add("[$(*)]");
+        } else {
+            for (int i = 0; i<anyAtmLines.size(); i++)
+            {
+                try
+                {
+                    String[] words = anyAtmLines.get(i).split("\\s+");
+                    anyAtomRules.add(words[1]);
+                } catch (Throwable t) {
+                    throw new DENOPTIMException("ERROR in getting 'any-atom' "
+                            + "string. Check line '" + anyAtmLines.get(i) + "'"
+                            + "in file '" + file + "'.", t);
+                }
+            }
+        }
+
+        //Now get the list of cutting rules
+        ArrayList<String> cutRulLines = new ArrayList<String>();
+        allLines.stream()
+            .filter(line -> line.trim().startsWith("CTR"))
+            .forEach(line -> cutRulLines.add(line.trim()));
+        Set<Integer> usedPriorities = new HashSet<Integer>();
+        for (int i = 0; i<cutRulLines.size(); i++)
+        {
+            String[] words = cutRulLines.get(i).split("\\s+");
+            String name = words[1]; //name of the rule
+            if (words.length < 6)
+            {
+                throw new DENOPTIMException("ERROR in getting cutting rule."
+                        + " Found " + words.length + " parts inctead of 6."
+                        + "Check line '" + cutRulLines.get(i) + "'"
+                        + "in file '" + file + "'.");
+            }
+
+            // further details in map of options
+            ArrayList<String> opts = new ArrayList<String>();
+            if (words.length >= 7)
+            {
+                for (int wi=6; wi<words.length; wi++)
+                {
+                    opts.add(words[wi]);
+                }
+            }
+
+            int priority = Integer.parseInt(words[2]);
+            if (usedPriorities.contains(priority))
+            {
+                throw new DENOPTIMException("ERROR in getting cutting rule."
+                        + " Duplicate priority index " + priority + ". "
+                        + "Check line '" + cutRulLines.get(i) + "'"
+                        + "in file '" + file + "'.");
+            } else {
+                usedPriorities.add(priority);
+            }
+
+            CuttingRule rule = new CuttingRule(name,
+                            words[3],  //atom1
+                            words[4],  //atom2
+                            words[5],  //bond between 1 and 2
+                            priority,  
+                            opts);     
+
+            cutRules.add(rule);
+        }
+        
+        Collections.sort(cutRules, new Comparator<CuttingRule>() {
+
+            @Override
+            public int compare(CuttingRule r1, CuttingRule r2)
+            {
+                return Integer.compare(r1.getPriority(), r2.getPriority());
+            }
+            
+        });
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Writes a formatted text file that collects cutting rules and the 
+     * associated strings used to define 'any-atom' SMARTS queries.
+     * @param file the file where to write.
+     * @param anyAtmRules the strings defining 'any-atom' SMARTS queries.
+     * @param cutRules the cutting rules to write.
+     * @throws DENOPTIMException 
+     */
+    public static void writeCuttingRules(File file, List<String> anyAtmRules, 
+            List<CuttingRule> cutRules) throws DENOPTIMException
+    {
+        StringBuilder sb = new StringBuilder();
+        for (String anyAtmRule : anyAtmRules)
+        {
+            sb.append(DENOPTIMConstants.ANYATMRULKEYWORD).append(" ");
+            sb.append(anyAtmRule);
+            sb.append(NL);
+        }
+        for (CuttingRule r : cutRules)
+        {
+            sb.append(DENOPTIMConstants.CUTRULKEYWORD).append(" ");
+            sb.append(r.getName()).append(" ");
+            sb.append(r.getPriority()).append(" ");
+            sb.append(r.getSMARTSAtom0()).append(" ");
+            sb.append(r.getSMARTSAtom1()).append(" ");
+            sb.append(r.getSMARTSBnd()).append(" ");
+            if (r.getOptions()!=null)
+            {
+                for (String opt : r.getOptions())
+                    sb.append(opt).append(" ");
+            }
+            sb.append(NL);
+        }
+        writeData(file.getAbsolutePath(), sb.toString(), false);
     }
 
 //------------------------------------------------------------------------------

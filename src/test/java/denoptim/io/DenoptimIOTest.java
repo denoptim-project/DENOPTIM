@@ -61,6 +61,7 @@ import denoptim.graph.TemplateTest;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.fragmenter.CuttingRule;
 
 /**
  * Unit test for input/output.
@@ -426,5 +427,37 @@ public class DenoptimIOTest
         FileUtils.createDirectory(subDirName);
         assertTrue(FileFormat.GA_RUN == FileUtils.detectFileFormat(
                 new File(dirName)), "GA output folder");
+    }
+   
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testIOCuttingRules() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        
+        CuttingRule ctrA = new CuttingRule("myRuleA", 
+                "AAA", "{$([*]@C)}", "!@#", -123, null);
+        CuttingRule ctrB = new CuttingRule("myRuleB", 
+                "{$([*]@B)}", "BBB", "-", 1, null);
+       
+        ArrayList<CuttingRule> cutRules = new ArrayList<CuttingRule>();
+        cutRules.add(ctrA);
+        cutRules.add(ctrB);
+        
+        ArrayList<String> anyAtmRules = new ArrayList<String>();
+        anyAtmRules.add("BBB");
+        anyAtmRules.add("C@*{}C");
+        
+        File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "cutRule");
+        DenoptimIO.writeCuttingRules(tmpFile, anyAtmRules, cutRules);
+        
+        ArrayList<CuttingRule> readInCutRules = new ArrayList<CuttingRule>();
+        ArrayList<String> readInAnyAtmRules = new ArrayList<String>();
+        
+        DenoptimIO.readCuttingRules(tmpFile, readInAnyAtmRules, readInCutRules);
+        
+        assertEquals(cutRules.size(), readInCutRules.size());
+        
+        assertEquals(anyAtmRules,readInAnyAtmRules);
     }
 }
