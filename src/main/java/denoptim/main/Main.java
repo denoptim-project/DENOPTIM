@@ -137,15 +137,15 @@ public class Main
         
         static {
             DRY.description = "Dry run";
-            FSE.description = "combinatorial Fragment Space Exploration";
-            FIT.description = "stand-alone FITness evaluation";
+            FSE.description = "Combinatorial Fragment Space Exploration";
+            FIT.description = "Stand-alone FITness evaluation";
             GA.description = "Genetic Algorithm";
-            GE.description = "stand-alone Graph Editing task";
-            GI.description = "stand-alone Graph Isomorphism analysis";
-            GO.description = "stand-alone Genetic Operation";
+            GE.description = "Stand-alone Graph Editing task";
+            GI.description = "Stand-alone Graph Isomorphism analysis";
+            GO.description = "Stand-alone Genetic Operation";
             GUI.description = "Graphycal User Interface";
             CLG.description = "Comparison of Lists of Graphs";
-            B3D.description = "stand-alone build a 3D molecular model from a "
+            B3D.description = "Stand-alone build a 3D molecular model from a "
                     + "graph";
             
             DRY.isCLIEnabled = false;
