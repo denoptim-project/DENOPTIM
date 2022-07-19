@@ -102,15 +102,15 @@ public class EvolutionaryAlgorithm
     
     /**
      * List of IDs of candidates to be removed from the population. This list
-     * is cleared once it content has been processed.
+     * is cleared once its content has been processed.
      */
     private Set<String> candidatesToRemove = new HashSet<String>();
     
     /**
      * List of IDs of candidates to be evaluated upon request from the user.
-     * There candidates might or might not end up in the populations depending
-     * on their performance. This list
-     * is cleared once it content has been processed.
+     * These candidates might or might not end up in the populations depending
+     * on their performance. This list is cleared once its content has been 
+     * processed.
      */
     private List<String> candidatesToAdd = new ArrayList<String>();
 
