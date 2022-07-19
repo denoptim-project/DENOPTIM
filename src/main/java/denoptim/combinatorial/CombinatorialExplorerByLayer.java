@@ -345,7 +345,7 @@ public class CombinatorialExplorerByLayer
                   + "All graphs with ID higher than "
                   + chk.getLatestSafelyCompletedGraphId()
                   + " are now being re-generated. Be aware that this "
-                  + "incluses graphs managed either by "
+                  + "includes graphs managed either by "
                   + "partially executed or completed tasks of the previous "
                   + "run. "
                   + DENOPTIMConstants.EOL
