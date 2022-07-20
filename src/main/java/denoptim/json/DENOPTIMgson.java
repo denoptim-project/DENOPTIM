@@ -42,7 +42,7 @@ import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.DENOPTIMVertexDeserializer;
 
 /**
- * Class for de/serializing dENOPTIM graphs from/to JSOM format.
+ * Class for de/serializing DENOPTIM graphs from/to JSON format.
  */
 public class DENOPTIMgson
 {
