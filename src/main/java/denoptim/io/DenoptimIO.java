@@ -1648,7 +1648,7 @@ public class DenoptimIO
     
 //------------------------------------------------------------------------------
 
-    //TODO-v3+ this method should is almost a copy of the one working on graphs.
+    //TODO-v3+ this method should be almost a copy of the one working on graphs.
     // It should be possible to have one method do both tasks.
     
     /**
