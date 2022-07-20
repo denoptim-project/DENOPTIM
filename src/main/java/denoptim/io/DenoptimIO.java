@@ -48,7 +48,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,13 +62,16 @@ import org.openscience.cdk.AtomContainerSet;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
+import org.openscience.cdk.Isotope;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.formula.MolecularFormula;
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.io.Mol2Writer;
@@ -83,6 +88,7 @@ import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.InvPair;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -106,6 +112,7 @@ import denoptim.json.DENOPTIMgson;
 import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.utils.FormulaUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphEdit;
 import denoptim.utils.GraphUtils;
@@ -123,8 +130,15 @@ import denoptim.utils.Randomizer;
 public class DenoptimIO
 {
 
+    /**
+     * File separator from system.
+     */
 	public static final String FS = System.getProperty("file.separator");
-    public static final String NL = System.getProperty("line.separator");
+    
+	/**
+	 * Newline character from system.
+	 */
+	public static final String NL = System.getProperty("line.separator");
 
     // A list of properties used by CDK algorithms which must never be
     // serialized into the SD file format.
@@ -2166,6 +2180,69 @@ public class DenoptimIO
             vertexes.add(v);
         }
         return vertexes;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read molecular formula from TXT data representation produced by Cambridge
+     * Structural Database tools (such as Conquest). Essentially, this method 
+     * reads a text file expecting to find lines as the following among lines 
+     * with other kinds of information:
+     * <pre>
+     * REFCODE: ABEWOT
+     * [...]
+     * Formula:           C36 H44 Cl1 P2 Ru1 1+,F6 P1 1-
+     * </pre>
+     * @param file the text file to read
+     * @return the mapping of CSD's REFCODE as key to their respective 
+     * molecular formula as formatted in the input.
+     * @throws DENOPTIMException if any exception occurs during the reading of 
+     * the file or if the file does not exist.
+     */
+    public static LinkedHashMap<String, String> readCSDFormulae(File file) 
+            throws DENOPTIMException
+    {   
+        LinkedHashMap<String, String> allFormulae = new LinkedHashMap<String,String>();
+        BufferedReader buffRead = null;
+        try {
+            //Read the file line by line
+            buffRead = new BufferedReader(new FileReader(file));
+            String lineAll = null;
+            String refcode = "";
+            String formula = "";
+            while ((lineAll = buffRead.readLine()) != null) 
+            {
+                String[] lineArgs = lineAll.split(":");
+                //Get the name
+                if (lineArgs[0].equals("REFCODE")) 
+                 refcode = lineArgs[1].trim();
+
+                //Get the formula
+                if (lineArgs[0].equals("  Formula")) 
+                {
+                    formula = lineArgs[1].trim();
+                    //Store formula
+                    allFormulae.put(refcode,formula);
+                    //Clean fields
+                    refcode = "";
+                    formula = "";
+                }
+            }
+        } catch (FileNotFoundException fnf) {
+            throw new DENOPTIMException("File Not Found: " + file, fnf);
+        } catch (IOException ioex) {
+            throw new DENOPTIMException("Error reading file: " + file, ioex);
+        } finally {
+            try {
+                if (buffRead != null)
+                    buffRead.close();
+            } catch (IOException e) {
+                throw new DENOPTIMException("Error closing buffer to "+file, e);
+            }
+        }
+       
+        return allFormulae;
     }
     
 //------------------------------------------------------------------------------

@@ -23,7 +23,11 @@ import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 import java.util.logging.Level;
 
 import denoptim.combinatorial.CEBLUtils;
@@ -36,6 +40,7 @@ import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
+import denoptim.utils.FormulaUtils;
 
 
 /**
@@ -59,6 +64,12 @@ public class FragmenterParameters extends RunTimeParameters
     private String formulaeFile;
     
     /**
+     * Molecular formula read-in from CSD file. Data
+     * collected by CSD refcode.
+     */
+    private LinkedHashMap<String, String> formulae;
+    
+    /**
      * Pathname to the file containing the cutting rules.
      */
     private String cutRulesFile;
@@ -78,6 +89,13 @@ public class FragmenterParameters extends RunTimeParameters
      * Number of parallel tasks to run.
      */
     private int numParallelTasks = 1;
+    
+    /**
+     * Flag requesting the execution of elemental analysis and comparison 
+     * of the content of the structure file against a given molecular formula.
+     * This task is meant to identify structures with missing atoms.
+     */
+    private boolean checkFormula = false;
 
 
 //-----------------------------------------------------------------------------
@@ -93,11 +111,123 @@ public class FragmenterParameters extends RunTimeParameters
 //-----------------------------------------------------------------------------
 
     /**
-     * @return the number of parallel tasks to run.
+     * @return the number of parallel tasks to run. Default is 1.
      */
     public int getNumTasks()
     {
         return numParallelTasks;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Sets the number of parallel tasks to run.
+     * @param numParallelTasks
+     */
+    public void setNumTasks(int numParallelTasks)
+    {
+        this.numParallelTasks = numParallelTasks;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the pathname to the file containing the structures to work with.
+     */
+    public String getStructuresFile()
+    {
+        return structuresFile;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Sets the pathname of the file containing input structures.
+     * @param structuresFile the pathname.
+     */
+    public void setStructuresFile(String structuresFile)
+    {
+        this.structuresFile = structuresFile;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Sets the pathname of the file containing molecular formula with a format
+     * respecting Cambridge Structural Database format).
+     * @param formulaeFile
+     */
+    public void setFormulaeFile(String formulaeFile)
+    {
+        this.formulaeFile = formulaeFile;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the pathname to the file containing the molecular formulae to 
+     * work with.
+     */
+    public String getFormulaeFile()
+    {
+        return formulaeFile;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the cutting rules loaded from the input.
+     */
+    public List<CuttingRule> getCuttingRules()
+    {
+        return cuttingRules;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the SMRTS strings used in the cutting rules to identify any atom.
+     */
+    public List<String> getAnyAtomQuesties()
+    {
+        return anyAtomQuesties;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * 
+     * @return the eleme
+     */
+    public LinkedHashMap<String, String> getFormulae()
+    {
+        return formulae;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we are asked to perform the comparison of
+     * about of atoms for each element (i.e., elemental analysis) present in the
+     * structure file ({@link #structuresFile}) against that of a given 
+     * molecular formula, which comes
+     * from the {@link #formulaeFile}.
+     */
+    public boolean isCheckFormula()
+    {
+        return checkFormula;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Sets the value of the flag controlling the execution of elemental analysis
+     * on the structures.
+     * @param checkFormula use <code>true</code> to request the elemental analysis.
+     */
+    public void setCheckFormula(boolean checkFormula)
+    {
+        this.checkFormula = checkFormula;
     }
 
 //-----------------------------------------------------------------------------
@@ -130,12 +260,16 @@ public class FragmenterParameters extends RunTimeParameters
                 cutRulesFile = value;
                 break;
                 
+            case "CHECKFORMULA":
+                checkFormula = true;
+                break;
+                
 /*
             case "=":
                 = value;
                 break;
   */              
-            case "NUMOFPROCESSORS=":
+            case "PARALLELTASKS=":
                 try
                 {
                     numParallelTasks = Integer.parseInt(value);
@@ -179,10 +313,10 @@ public class FragmenterParameters extends RunTimeParameters
     	{
     	    ensureFileExists(workDir);
     	}
+    	ensureIsPositive("numParallelTasks", numParallelTasks, "PARALLELTASKS");
     	ensureFileExistsIfSet(structuresFile);
     	ensureFileExistsIfSet(cutRulesFile);
     	ensureFileExistsIfSet(formulaeFile);
-    	
     	
     	checkOtherParameters();
     }
@@ -201,9 +335,27 @@ public class FragmenterParameters extends RunTimeParameters
         
         anyAtomQuesties = new ArrayList<String>();
         cuttingRules = new ArrayList<CuttingRule>();
-        DenoptimIO.readCuttingRules(new File(cutRulesFile), anyAtomQuesties, 
-                cuttingRules);
-		
+        if (cutRulesFile!=null && !cutRulesFile.isBlank())
+        {
+            DenoptimIO.readCuttingRules(new File(cutRulesFile), anyAtomQuesties, 
+                    cuttingRules);
+        }
+        if (formulaeFile!=null && !formulaeFile.isBlank())
+        {
+            formulae = DenoptimIO.readCSDFormulae(new File(formulaeFile));
+            /*
+            //TODO-gg del after moving elsewhere
+    private Map<String, Map<String, ArrayList<Double>>> elementalAnalysisFromFormula;
+            elementalAnalysisFromFormula = new HashMap<String,Map<String,
+                    ArrayList<Double>>>();
+            for (String refCode : formulae.keySet())
+            {
+                String formula = formulae.get(refCode);
+                elementalAnalysisFromFormula.put(refCode, 
+                        FormulaUtils.parseCSDFormula(formula));
+            }
+            */
+        }
         processOtherParameters();
        
 		if (isMaster)

@@ -142,6 +142,9 @@ public abstract class ProgramTask extends Task
         thrownExc.printStackTrace(pw);
         String errFile = workDir + SEP + "ERROR";
         
+        //TODO-gg del
+        System.out.println(sw.toString());
+        
         try {
             DenoptimIO.writeData(errFile, sw.toString(), false);
             StaticLogger.appLogger.log(Level.SEVERE, 

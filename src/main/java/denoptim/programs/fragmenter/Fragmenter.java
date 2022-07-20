@@ -32,7 +32,7 @@ import denoptim.task.ProgramTask;
  * @author Marco Foscato
  */
 
-public class Fragmenter  extends ProgramTask
+public class Fragmenter extends ProgramTask
 {
     private  ParallelFragmentationAlgorithm fragAlgorithm = null;
 
@@ -66,6 +66,8 @@ public class Fragmenter  extends ProgramTask
         
         fragAlgorithm = new ParallelFragmentationAlgorithm(settings);
         fragAlgorithm.run();
+        
+        stopLogger();
     }
     
 //------------------------------------------------------------------------------

@@ -506,5 +506,11 @@ public final class DENOPTIMConstants
      * collecting cutting rules.
      */
     public static final String CUTRULKEYWORD = "CTR";
+
+    /**
+     * Property name used to store molecular formula as string in an atom
+     * container
+     */
+    public static final Object FORMULASTR = "FORMULASTR";
     
 }

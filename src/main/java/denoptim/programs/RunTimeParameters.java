@@ -968,6 +968,26 @@ public abstract class RunTimeParameters
      */
     protected void ensureIsPositive(String paramName, int value, String paramKey)
     {
+        if (value < 0)
+        {
+            String msg = "ERROR! Parameter '" + paramName + "' not striktly "
+                + "positive (" + value + "). "
+                + "Please, use a positive value for '" + paramType.keywordRoot 
+                + paramKey + "'.";
+            throw new Error(msg);
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Ensures that a parameter is a positive number (x>=0) or triggers an error.
+     * This is meant for checking initialization settings and does not print in
+     * the program specific log file.
+     */
+    protected void ensureIsPositiveOrZero(String paramName, int value, 
+            String paramKey)
+    {
         if (value <= 0)
         {
             String msg = "ERROR! Parameter '" + paramName + "' is negative ("

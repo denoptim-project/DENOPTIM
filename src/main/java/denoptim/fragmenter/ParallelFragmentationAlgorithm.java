@@ -19,11 +19,17 @@
 package denoptim.fragmenter;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -33,7 +39,11 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
+import denoptim.combinatorial.GraphBuildingTask;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -48,6 +58,7 @@ import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MoleculeUtils;
 
 
 /**
@@ -66,7 +77,7 @@ public class ParallelFragmentationAlgorithm
     /**
      * Storage of references to the submitted subtasks.
      */
-    final ArrayList<FragmentationTask> submitted;
+    final ArrayList<FragmenterTask> submitted;
 
     /**
      * Asynchronous tasks manager 
@@ -98,14 +109,6 @@ public class ParallelFragmentationAlgorithm
     public ParallelFragmentationAlgorithm(FragmenterParameters settings)
     {
         this.settings = settings;
-        
-        fsSettings = new FragmentSpaceParameters();
-        if (settings.containsParameters(ParametersType.FS_PARAMS))
-        {
-            fsSettings = (FragmentSpaceParameters)settings.getParameters(
-                    ParametersType.FS_PARAMS);
-        }
-        
         futures = new ArrayList<>();
         submitted = new ArrayList<>();
 
@@ -187,10 +190,11 @@ public class ParallelFragmentationAlgorithm
      * @return <code>true</code> if any of the subtasks has thrown an exception
      */
 
+  //TODO-gg del
     private boolean subtaskHasException()
     {
         boolean hasException = false;
-        for (FragmentationTask tsk : submitted)
+        for (FragmenterTask tsk : submitted)
         {
             if (tsk.foundException())
             {
@@ -209,11 +213,11 @@ public class ParallelFragmentationAlgorithm
      * Check for completion of all subtasks
      * @return <code>true</code> if all subtasks are completed
      */
-
+//TODO-gg del
     private boolean allTasksCompleted()
     {
         boolean allDone = true;
-        for (FragmentationTask tsk : submitted)
+        for (FragmenterTask tsk : submitted)
         {
             if (!tsk.isCompleted())
             {
@@ -228,31 +232,235 @@ public class ParallelFragmentationAlgorithm
 //------------------------------------------------------------------------------
 
     /**
-     * Run the combinatorial exploration 
+     * Run the parallelized task. 
+     * @throws FileNotFoundException 
      */
 
-    public void run() throws DENOPTIMException
+    public void run() throws DENOPTIMException, FileNotFoundException
     {
         String msg = "";
         StopWatch watch = new StopWatch();
         watch.start();
-
-        tpe.prestartAllCoreThreads();
-  
         
-        //TODO
-
+        // Split data in batches for parallelization
+        
+        // This is the collector of the mutating pathname to the file collecting
+        // the input structures for each thread.
+        File[] structures = new File[settings.getNumTasks()];
+        structures[0] = new File(settings.getStructuresFile());
+        if (settings.getNumTasks()>1 || settings.isCheckFormula())
+        {
+            settings.getLogger().log(Level.INFO, "Combining structures and "
+                    + "formulas...");
+            splitInputForThreads(settings);
+            for (int i=0; i<settings.getNumTasks(); i++)
+            {
+                structures[i] = new File(getStructureFileNameBatch(settings, i));
+            }
+        }
+        
+        // Start the parallel threads
+        tpe.prestartAllCoreThreads();
+        for (int i=0; i<settings.getNumTasks(); i++)
+        {
+            FragmenterTask task;
+            try
+            {
+                task = new FragmenterTask(structures[i], settings, i);
+            } catch (SecurityException | IOException e)
+            {
+                throw new Error("Unable to start fragmentation thread.",e);
+            }
+            submitted.add(task);
+            futures.add(tpe.submit(task));
+            settings.getLogger().log(Level.INFO, "Fragmenter task ("
+                    + i + ") submitted ");
+        }
+        
+        // This sounds weird when reading the doc, but the following does wait
+        // for the threads to complete.
+        
         // shutdown thread pool
         tpe.shutdown();
+        try
+        {
+            // wait a bit for pending tasks to finish
+            while (!tpe.awaitTermination(5, TimeUnit.SECONDS))
+            {
+                // do nothing
+            }
+        }
+        catch (InterruptedException ex)
+        {
+            //Do nothing
+        }
 
         // closing messages
         watch.stop();
         msg = "Overall time: " + watch.toString() + ". " 
             + DENOPTIMConstants.EOL
-            + "FragSpaceExplorer run completed." + DENOPTIMConstants.EOL;
+            + "ParallelFragemtationAlgorithm run completed." 
+            + DENOPTIMConstants.EOL;
         settings.getLogger().log(Level.INFO, msg);
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Splits the input data (from {@link FragmenterParameters}) into batches 
+     * suitable for parallel batch processing. Since we have to read all the 
+     * atom containers, we use this chance to store the molecular formula in 
+     * the property {@link DENOPTIMConstants#FORMULASTR}.
+     * @throws DENOPTIMException
+     * @throws FileNotFoundException
+     */
+    static void splitInputForThreads(FragmenterParameters settings) 
+            throws DENOPTIMException, FileNotFoundException
+    {
+        int maxBuffersSize = 50000;
+        int numBatches = settings.getNumTasks();
+        
+        IteratingSDFReader reader = new IteratingSDFReader(
+                new FileInputStream(settings.getStructuresFile()), 
+                DefaultChemObjectBuilder.getInstance());
+        
+        //If available we record CSD formula in properties of atom container
+        LinkedHashMap<String,String> formulae = settings.getFormulae();
+        
+        int index = -1;
+        int batchId = 0;
+        int buffersSize = 0;
+        boolean relyingOnListSize = false;
+        List<ArrayList<IAtomContainer>> batches = 
+                new ArrayList<ArrayList<IAtomContainer>>();
+        for (int i=0; i<numBatches; i++)
+        {
+            batches.add(new ArrayList<IAtomContainer>());
+        }
+        while (reader.hasNext())
+        {
+            index++;
+            buffersSize++;
+            IAtomContainer mol = reader.next();
+            
+            // It is convenient to place the formula in the atom container
+            if (formulae!=null && settings.isCheckFormula())
+            {
+                getFormulaForMol(mol, index, formulae);
+            }
+            
+            batches.get(batchId).add(mol);
+            
+            // Update batch ID for next mol
+            batchId++;
+            if (batchId >= numBatches)
+                batchId = 0;
+            
+            // If max buffer size is reached, then bump to file
+            if (buffersSize >= maxBuffersSize)
+            {
+                buffersSize = 0;
+                for (int i=0; i<numBatches; i++)
+                {
+                    DenoptimIO.writeSDFFile(
+                            getStructureFileNameBatch(settings, i),
+                            batches.get(i), true);
+                    batches.get(i).clear();
+                }
+            }
+        }
+        if (buffersSize < maxBuffersSize)
+        {
+            for (int i=0; i<numBatches; i++)
+            {
+                DenoptimIO.writeSDFFile(
+                        getStructureFileNameBatch(settings, i),
+                        batches.get(i), true);
+                batches.get(i).clear();
+            }
+        }
+        
+        // Check for consistency in the list of formulae
+        if (formulae!=null && relyingOnListSize 
+                && index != (formulae.size()-1))
+        {
+            throw new DENOPTIMException("Inconsistent number of formulae "
+                    + "(" + formulae.size() + ") "
+                    + "and structures ("+ index + ") when using the index "
+                    + "in the list of formulae as identifier. For your "
+                    + "sake this in not allowed.");
+        }
+    }
 
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds the pathname of the structure file generated for one of the
+     * parallel threads.
+     * @param settings settings we work with.
+     * @param i the index of the thread
+     * @return the pathname
+     */
+    static String getStructureFileNameBatch(
+            FragmenterParameters settings, int i)
+    {
+        return settings.getWorkDirectory() + DenoptimIO.FS 
+                + "structuresBatch-" + i + ".sdf";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Takes the molecular formula from the given list of formulae and 
+     * using the 'Title' property of the index or the molecule. The formula 
+     * taken from the list in argument is then placed among the properties
+     * of the chemical object.
+     */
+    private static boolean getFormulaForMol(IAtomContainer mol, int index,
+            LinkedHashMap<String,String> formulae) throws DENOPTIMException
+    {
+        boolean relyingOnListSize = false;
+
+        List<String> formulaeList = new ArrayList<String>(formulae.values());
+        
+        String molName = mol.getTitle();
+        if (molName!=null && !molName.isBlank())
+        {
+            if (formulae.containsKey(molName))
+            {
+                mol.setProperty(DENOPTIMConstants.FORMULASTR, 
+                        formulae.get(molName));
+            } else {
+                relyingOnListSize = true;
+                if (index<formulae.size())
+                {
+                    mol.setProperty(DENOPTIMConstants.FORMULASTR,
+                            formulaeList.get(index));
+                } else {
+                    throw new DENOPTIMException("There are not "
+                            + "enough formulae! Looking for "
+                            + "formula #"+ index + " but there are "
+                            + "only " + formulae.size() 
+                            + "entries.");
+                }
+            }
+        } else {
+            relyingOnListSize = true;
+            if (index<formulae.size())
+            {
+                mol.setProperty(DENOPTIMConstants.FORMULASTR,
+                        formulaeList.get(index));
+            } else {
+                throw new DENOPTIMException("There are not "
+                        + "enough formulae! Looking for "
+                        + "formula #"+ index + " but there are "
+                        + "only " + formulae.size() 
+                        + "entries.");
+            }
+        }
+        return relyingOnListSize;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -260,14 +468,14 @@ public class ParallelFragmentationAlgorithm
      */
 
     private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
-                            ArrayList<FragmentationTask> submitted)
+                            ArrayList<FragmenterTask> submitted)
     {
         for (Future<Object> f : futures)
         {
             f.cancel(true);
         }
 
-        for (FragmentationTask tsk: submitted)
+        for (FragmenterTask tsk: submitted)
         {
             tsk.stopTask();
         }

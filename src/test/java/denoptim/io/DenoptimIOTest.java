@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.vecmath.Point3d;
@@ -459,5 +460,32 @@ public class DenoptimIOTest
         assertEquals(cutRules.size(), readInCutRules.size());
         
         assertEquals(anyAtmRules,readInAnyAtmRules);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testReadCSDFormulae() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String txtFile = tempDir.getAbsolutePath() + SEP + "formulae.txt";
+        
+        String text = "REFCODE: MOL000001" + NL
+                + "Chemical" + NL
+                + "  Formula:           H2 O" + NL
+                + NL
+                + "REFCODE: BLABLA" + NL
+                + "Chemical" + NL
+                + "  Formula:           ABC" + NL
+                + NL
+                + "REFCODE: A" + NL
+                + "Chemical" + NL
+                + "  Formula:           H2 O" + NL;
+        
+        DenoptimIO.writeData(txtFile, text, false);
+        Map<String, String> data = DenoptimIO.readCSDFormulae(new File(txtFile));
+        assertEquals(3, data.size());
+        assertTrue(data.keySet().contains("MOL000001"));
+        assertTrue(data.keySet().contains("BLABLA"));
+        assertTrue(data.keySet().contains("A"));
     }
 }
