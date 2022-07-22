@@ -194,7 +194,7 @@ public class TinkerMolecule implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * This mehtod produces a shallow copy of the object
+     * This method produces a shallow copy of the object
      */
     @Override
     public Object clone() throws CloneNotSupportedException
@@ -205,7 +205,7 @@ public class TinkerMolecule implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * This mehtod produces a deep copy of the object
+     * This method produces a deep copy of the object
      */
     public TinkerMolecule deepCopy()
     {
