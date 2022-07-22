@@ -8,11 +8,11 @@ mv data/* "$wrkDir"
 rm -rf data
 
 #Run sub tests
-nSubTests=1
+expectedNoMissingAtomMols=(3 1 0)
+expectedPreFiltered=(0 0 2) 
+expectedFragments=(0 0 0)
+nSubTests=${#expectedNoMissingAtomMols[@]}
 totChecks=0
-expectedNoMissingAtomMols=(3)
-expectedFixedMols=(0)
-expectedFragments=(0)
 for i in $(seq 1 $nSubTests)
 do
     "$javaDENOPTIM" -jar "$denoptimJar" -r FRG "t30-$i.params" > "t30-$i.log" 2>&1 
@@ -34,17 +34,17 @@ do
         n=$(grep "\$\$\$\$" "$output"/structuresNoMissingAtoms* | wc -l)
         if [ "$n" -ne ${expectedNoMissingAtomMols[$i-1]} ]
         then
-            echo "Test 't30' NOT PASSED (symptom: wring number of structures without missing atoms: $n vs. ${expectedNoMissingAtomMols[$i-1]}."
+            echo "Test 't30' NOT PASSED (symptom: wrong number of structures without missing atoms: $n vs. ${expectedNoMissingAtomMols[$i-1]}."
             exit -1
         fi
     fi
 
-    if [ 0 -ne ${expectedFixedMols[$i-1]} ]
+    if [ 0 -ne ${expectedPreFiltered[$i-1]} ]
     then
-        n=$(grep "\$\$\$\$" "$output"/structuresFixed* | wc -l)
-        if [ "$n" -ne ${expectedFixedMols[$i-1]} ]
+        n=$(grep "\$\$\$\$" "$output"/structuresPreFiltered* | wc -l)
+        if [ "$n" -ne ${expectedPreFiltered[$i-1]} ]
         then
-            echo "Test 't30' NOT PASSED (symptom: wring number of structures without missing atoms: $n vs. ${expectedFixedMols[$i-1]}."
+            echo "Test 't30' NOT PASSED (symptom: wrong number of prefiltered structures : $n vs. ${expectedPreFiltered[$i-1]}."
             exit -1
         fi
     fi
@@ -54,7 +54,7 @@ do
         n=$(grep "\$\$\$\$" "$output"/Fragments* | wc -l)
         if [ "$n" -ne ${expectedFragments[$i-1]} ]
         then
-            echo "Test 't30' NOT PASSED (symptom: wring number of structures without missing atoms: $n vs. ${expectedFragments[$i-1]}."
+            echo "Test 't30' NOT PASSED (symptom: wrong number of structures without missing atoms: $n vs. ${expectedFragments[$i-1]}."
             exit -1
         fi
     fi

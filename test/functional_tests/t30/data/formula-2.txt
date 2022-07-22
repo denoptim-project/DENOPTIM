@@ -1,0 +1,5 @@
+REFCODE: MolWithBO4
+
+Chemical
+  Formula:           C16 H14 N3 Pt1 Cl1
+

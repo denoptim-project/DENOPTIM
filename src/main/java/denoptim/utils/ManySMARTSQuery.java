@@ -61,7 +61,7 @@ public class ManySMARTSQuery
 
                 // WARNING: assumptions on implicit H count and bond orders!
                 MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
-                MoleculeUtils.ensureNoUnsetBondOrders(mol);
+                MoleculeUtils.ensureNoUnsetBondOrdersSilent(mol);
                 
                 if (sp.matches(mol))
                 {

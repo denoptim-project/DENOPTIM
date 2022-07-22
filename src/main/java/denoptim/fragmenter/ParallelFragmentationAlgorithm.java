@@ -40,7 +40,9 @@ import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import denoptim.combinatorial.GraphBuildingTask;
@@ -59,6 +61,7 @@ import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
+import edu.uci.ics.jung.visualization.spatial.FastRenderingGraph;
 
 
 /**
@@ -248,7 +251,7 @@ public class ParallelFragmentationAlgorithm
         // the input structures for each thread.
         File[] structures = new File[settings.getNumTasks()];
         structures[0] = new File(settings.getStructuresFile());
-        if (settings.getNumTasks()>1 || settings.isCheckFormula())
+        if (settings.getNumTasks()>1 || settings.doCheckFormula())
         {
             settings.getLogger().log(Level.INFO, "Combining structures and "
                     + "formulas...");
@@ -343,8 +346,48 @@ public class ParallelFragmentationAlgorithm
             buffersSize++;
             IAtomContainer mol = reader.next();
             
+            // Comply to requirements to write SDF files: unset bond orders 
+            // can only be used in query-type files. So types 4 and 8 are not
+            // expected to be found (but CSD uses them...)
+            try
+            {
+                MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+                MoleculeUtils.ensureNoUnsetBondOrders(mol);
+            } catch (CDKException e)
+            {
+                if (!settings.acceptUnsetToSingeBO())
+                {
+                    settings.getLogger().log(Level.WARNING,"Some bond order are "
+                            + "unset and attempt to kekulize the system has failed "
+                            + "for structure " + index + "."
+                            + "This hampers use of SMARTS queries, which may very "
+                            + "not work as expected. Structure " + index + " will "
+                            + "be rejected. You can avoid rejection by using "
+                            + "keyword " 
+                            + ParametersType.FRG_PARAMS.getKeywordRoot() 
+                            + "UNSETTOSINGLEBO, but you'll "
+                            + "still be using a peculiar connectivity table were"
+                            + "many bonds are artificially markes as single to "
+                            + "avoid use of 'UNSET' bond order. "
+                            + "Further details on the problem: " + e.getMessage());
+                    continue;
+                } else {
+                    settings.getLogger().log(Level.WARNING,"Failed kekulization "
+                            + "for structure " + index + " but UNSETTOSINGLEBO "
+                            + "keyword used. Forcing use of single bonds to "
+                            + "replace bonds with unset order.");
+                    for (IBond bnd : mol.bonds())
+                    {
+                        if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+                        {
+                            bnd.setOrder(IBond.Order.SINGLE);
+                        }
+                    }
+                }
+            }
+            
             // It is convenient to place the formula in the atom container
-            if (formulae!=null && settings.isCheckFormula())
+            if (formulae!=null && settings.doCheckFormula())
             {
                 getFormulaForMol(mol, index, formulae);
             }

@@ -7,19 +7,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.aromaticity.Kekulization;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
+import org.openscience.cdk.isomorphism.Mappings;
+import org.openscience.cdk.smiles.FixBondOrdersTool;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.StaticLogger;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.utils.FormulaUtils;
+import denoptim.utils.ManySMARTSQuery;
+import denoptim.utils.MoleculeUtils;
 
 public class FragmenterTools
 {
@@ -49,7 +57,7 @@ public class FragmenterTools
                 DefaultChemObjectBuilder.getInstance());
 
         int index = -1;
-        int maxBufferSize = 500;
+        int maxBufferSize = 2000;
         ArrayList<IAtomContainer> buffer = new ArrayList<IAtomContainer>(500);
         try {
             while (reader.hasNext())
@@ -106,44 +114,76 @@ public class FragmenterTools
     
 //------------------------------------------------------------------------------
     
-    //TODO-gg del
-    public static void templateMethod(File input,
-            FragmenterParameters settings, File output) throws DENOPTIMException, IOException
+    /**
+     * Removes from the structures anyone that matches any of the given SMARTS 
+     * queries.
+     * @param input the source of chemical structures.
+     * @param smarts the queries leading to rejection.
+     * @param output the file where to write extracted structures.
+     * @param logger a task-dedicated logger where we print messages for the 
+     * user.
+     * @throws DENOPTIMException
+     * @throws IOException
+     */
+    public static void filterStrucutresBySMARTS(File input, Set<String> smarts,
+            File output, Logger logger) 
+                    throws DENOPTIMException, IOException
     {
         FileInputStream fis = new FileInputStream(input);
         IteratingSDFReader reader = new IteratingSDFReader(fis, 
                 DefaultChemObjectBuilder.getInstance());
 
+        int i = -1;
+        Map<String, String> smartsMap = new HashMap<String, String>();
+        for (String s : smarts)
+        {
+            i++;
+            smartsMap.put("prefilter-"+i, s);
+        }
+        
         int index = -1;
-        int bufferSize = 0;
-        int maxBufferSize = 500;
+        int maxBufferSize = 2000;
         ArrayList<IAtomContainer> buffer = new ArrayList<IAtomContainer>(500);
         try {
             while (reader.hasNext())
             {
                 index++;
-                bufferSize++;
-                IAtomContainer mol = reader.next();
-                if (mol.getProperty(DENOPTIMConstants.FORMULASTR)==null)
+                if (logger!=null)
                 {
-                    throw new Error("Property '" + DENOPTIMConstants.FORMULASTR 
-                            + "' not found in molecule " + index + " in file "
-                            + input + ". Cannot compare formula with elemental"
-                            + "analysis.");
+                    logger.log(Level.FINE,"Prefiltering structure " + index);
                 }
-                String formula = mol.getProperty(DENOPTIMConstants.FORMULASTR)
-                        .toString();
+                IAtomContainer mol = reader.next();
                 
+                ManySMARTSQuery msq = new ManySMARTSQuery(mol, smartsMap);
+                if (msq.hasProblems())
+                {
+                    String msg = "WARNING! Problems while searching for "
+                            + "specific atoms/bonds using SMARTS: " 
+                            + msq.getMessage();
+                    throw new DENOPTIMException(msg,msq.getProblem());
+                }
+                Map<String, Mappings> allMatches = msq.getAllMatches();
                 
-                
-                
-                
+                if (allMatches.size()==0)
+                {
+                    buffer.add(mol);
+                } else {
+                    String hits = "";
+                    for (String s : allMatches.keySet())
+                        hits = hits + DenoptimIO.NL + smartsMap.get(s);
+                    if (logger!=null)
+                    {
+                        logger.log(Level.INFO,"Found match for " + hits
+                                + "Rejecting structure " + index + ": " 
+                                + mol.getTitle());
+                    }
+                }
                 
                 // If max buffer size is reached, then bump to file
-                if (bufferSize >= maxBufferSize)
+                if (buffer.size() >= maxBufferSize)
                 {
-                    bufferSize = 0;
-                    DenoptimIO.writeSDFFile(output.getAbsolutePath(), buffer, true);
+                    DenoptimIO.writeSDFFile(output.getAbsolutePath(), buffer, 
+                            true);
                     buffer.clear();
                 }
             }
@@ -151,7 +191,68 @@ public class FragmenterTools
         finally {
             reader.close();
         }
-        if (bufferSize < maxBufferSize)
+        if (buffer.size() < maxBufferSize)
+        {
+            DenoptimIO.writeSDFFile(output.getAbsolutePath(), buffer, true);
+            buffer.clear();
+        }
+    }
+    
+//------------------------------------------------------------------------------
+ //TODO-GG del   
+    public static void codeTemplare(File input,
+            File output, Logger logger) 
+                    throws DENOPTIMException, IOException
+    {
+        FileInputStream fis = new FileInputStream(input);
+        IteratingSDFReader reader = new IteratingSDFReader(fis, 
+                DefaultChemObjectBuilder.getInstance());
+
+        int index = -1;
+        int maxBufferSize = 2000;
+        ArrayList<IAtomContainer> buffer = new ArrayList<IAtomContainer>(500);
+        try {
+            while (reader.hasNext())
+            {
+                index++;
+                if (logger!=null)
+                {
+                    logger.log(Level.FINE,"Checking _______ of "
+                            + "structure " + index);
+                }
+                IAtomContainer mol = reader.next();
+                
+                //TODO
+                
+                
+                /*
+                if (FormulaUtils.____()
+                        mol, logger))
+                {
+                    buffer.add(mol);
+                } else {
+                    if (logger!=null)
+                    {
+                        logger.log(Level.INFO,"______."
+                                + " Rejecting structure " + index + ": " 
+                                + mol.getTitle());
+                    }
+                }
+                */
+                
+                // If max buffer size is reached, then bump to file
+                if (buffer.size() >= maxBufferSize)
+                {
+                    DenoptimIO.writeSDFFile(output.getAbsolutePath(), buffer, 
+                            true);
+                    buffer.clear();
+                }
+            }
+        }
+        finally {
+            reader.close();
+        }
+        if (buffer.size() < maxBufferSize)
         {
             DenoptimIO.writeSDFFile(output.getAbsolutePath(), buffer, true);
             buffer.clear();

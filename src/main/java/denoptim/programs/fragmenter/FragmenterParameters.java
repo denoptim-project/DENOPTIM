@@ -24,9 +24,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.logging.Level;
 
@@ -96,8 +98,28 @@ public class FragmenterParameters extends RunTimeParameters
      * This task is meant to identify structures with missing atoms.
      */
     private boolean checkFormula = false;
+    
+    /**
+     * Flag requesting to force-accepting the approximation that converts all
+     * unset bond orders to single bond orders. This to signify 'a bond exist'
+     * between atoms for which there is no proper bond order. Still, 
+     * considerations based on evaluating the bond order will be misguided.
+     */
+    private boolean acceptUnsetToSingeBOApprox = false;
+    
+    /**
+     * Fag requesting the pre-fragmentation filtering of the structures.
+     */
+    private boolean preFilter = false;
+    
+    /**
+     * SMARTS identifying substructures that lead to rejection of a structure
+     * before fragmentation. I.e., structures matching any of these queries will
+     *  not be fragmented.
+     */
+    private Set<String> preFilterSMARTS = new HashSet<String>();
 
-
+    
 //-----------------------------------------------------------------------------
     
     /**
@@ -196,8 +218,7 @@ public class FragmenterParameters extends RunTimeParameters
 //-----------------------------------------------------------------------------
 
     /**
-     * 
-     * @return the eleme
+     * @return the list of molecular formulae read-in from text file.
      */
     public LinkedHashMap<String, String> getFormulae()
     {
@@ -213,7 +234,7 @@ public class FragmenterParameters extends RunTimeParameters
      * molecular formula, which comes
      * from the {@link #formulaeFile}.
      */
-    public boolean isCheckFormula()
+    public boolean doCheckFormula()
     {
         return checkFormula;
     }
@@ -229,9 +250,42 @@ public class FragmenterParameters extends RunTimeParameters
     {
         this.checkFormula = checkFormula;
     }
+    
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we are asked to filter initial structures.
+     */
+    public boolean doPreFilter()
+    {
+        return preFilter;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return the SMARTS queries identifying substructures that lead to 
+     * rejection of a structure before fragmentation.
+     */
+    public Set<String> getPreFiltrationSMARTS()
+    {
+        return preFilterSMARTS;
+    }
 
 //-----------------------------------------------------------------------------
 
+    /**
+     * @return <code>true</code> if we are want to ignore the fact we have 
+     * translated unset bond orders to single-order bonds.
+     */
+    public boolean acceptUnsetToSingeBO()
+    {
+        return acceptUnsetToSingeBOApprox;
+    }
+
+//-----------------------------------------------------------------------------
+    
     /**
      * Processes a keyword/value pair and assign the related parameters.
      * @param key the keyword as string
@@ -253,17 +307,27 @@ public class FragmenterParameters extends RunTimeParameters
                 break;
 
             case "FORMULATXTFILE=":
+                checkFormula = true;
                 formulaeFile = value;
+                break;
+                
+            case "PREFILTERSMARTS=":
+                preFilter = true;
+                preFilterSMARTS.add(value);
                 break;
 
             case "CUTTINGRULESFILE=":
                 cutRulesFile = value;
                 break;
                 
+                //TODO-GG remove this is redundant
             case "CHECKFORMULA":
                 checkFormula = true;
                 break;
                 
+            case "UNSETTOSINGLEBO":
+                acceptUnsetToSingeBOApprox = true;
+                break;
 /*
             case "=":
                 = value;

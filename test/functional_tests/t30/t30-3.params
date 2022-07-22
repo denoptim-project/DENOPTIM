@@ -1,0 +1,6 @@
+#
+# This is the parameter file for test t30-3
+#
+FRG-STRUCTURESFILE=mols-3.sdf
+FRG-PREFILTERSMARTS=Cl~[Pt]
+FRG-PREFILTERSMARTS=O-O

@@ -37,6 +37,7 @@ import denoptim.graph.Fragment;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.Task;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.TaskUtils;
 
 /**
@@ -135,7 +136,7 @@ public class FragmenterTask extends Task
 //------------------------------------------------------------------------------
 
     /**
-     * Builds the pathname of the structure file meant to be hold structues with
+     * Builds the pathname of the structure file meant to be hold structures
      * that survive the comparison of structure's elemental analysis against the
      * declared molecular formula.
      * @param settings settings we work with.
@@ -146,6 +147,21 @@ public class FragmenterTask extends Task
     {
         return settings.getWorkDirectory() + DenoptimIO.FS 
                 + "structuresNoMissingAtoms-" + i + ".sdf";
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds the pathname of the structure file meant to be hold structures
+     * that survive the pre-filtering step, if any.
+     * @param settings settings we work with.
+     * @param i the index of the thread
+     * @return the pathname
+     */
+    static String getPreFilteredFileName(FragmenterParameters settings, int i)
+    {
+        return settings.getWorkDirectory() + DenoptimIO.FS 
+                + "structuresPreFiltered-" + i + ".sdf";
     }
     
 //------------------------------------------------------------------------------
@@ -187,35 +203,29 @@ public class FragmenterTask extends Task
     public Object call() throws Exception
     {
         // Preliminary check for missing atoms by elemental analysis
-        if (settings.isCheckFormula())
+        if (settings.doCheckFormula())
         {
             logger.log(Level.INFO,"Starting elemental analysis");
-            FragmenterTools.checkElementalAnalysisAgainstFormula(inputFile, 
-                    new File(getConfirmedFormulaFileName(settings,id)), logger);
-            preliminaryResults = new File(getConfirmedFormulaFileName(settings,
+            File newResultsFile = new File(getConfirmedFormulaFileName(settings,
                     id));
+            FragmenterTools.checkElementalAnalysisAgainstFormula(inputFile,
+                    newResultsFile, logger);
+            preliminaryResults = newResultsFile;
         } else {
             preliminaryResults = inputFile;
         }
-      
-/*
-        //Check the quality of the 3D structures from CCDC
-        StructureChecker stuChk = new StructureChecker();
-            if (Parameters.chkFormula)
-            {
-                stuChk.check3DvsFormula();
-            }
-        if (Parameters.analyzeAndFix) 
-        {
-                stuChk.fixChemicalRepresentation();
-            }
 
-        //Prefilter
-        if (Parameters.preFiltering)
+        // Pre-fragmentation filter
+        if (settings.doPreFilter())
         {
-            stuChk.preFilter();
+            logger.log(Level.INFO,"Pre-filtering structures");
+            File newResultsFile = new File(getPreFilteredFileName(settings, id));
+            FragmenterTools.filterStrucutresBySMARTS(inputFile, 
+                    settings.getPreFiltrationSMARTS(), newResultsFile, logger);
+            preliminaryResults = newResultsFile;
         }
 
+/*
         //Now chop the molecules generating the fragments
         if (Parameters.chopMols)
         {
