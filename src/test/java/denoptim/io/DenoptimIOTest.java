@@ -347,6 +347,57 @@ public class DenoptimIOTest
 		assertTrue(allAPC.contains(APClass.make("otherClass:0")), 
 		        "Contains APClass (2)");
 	}
+	
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testAppendToJSON() throws Exception 
+    {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String pathName = tempDir.getAbsolutePath() + SEP + "vertexes.json";
+        
+        Fragment frag = new Fragment();
+        frag.addAtom(new Atom("C",new Point3d(0.0, 0.0, 1.0)));
+        frag.addAtom(new Atom("C",new Point3d(0.0, 1.0, 1.0)));
+        frag.addAPOnAtom(frag.getAtom(0), APClass.make("classAtmC:5"),
+                new Point3d(1.0, 0.0, 0.0));
+        frag.addAPOnAtom(frag.getAtom(1), APClass.make("classAtmC:5"),
+                new Point3d(1.0, 1.0, 0.0));
+        frag.projectAPsToProperties();
+        
+        Fragment frag2 = new Fragment();
+        frag2.addAtom(new Atom("O",new Point3d(0.0, 0.0, 1.0)));
+        frag2.addAPOnAtom(frag2.getAtom(0), APClass.make("Other:0"),
+                new Point3d(1.0, 0.0, 0.0));
+        frag2.projectAPsToProperties();
+
+        ArrayList<Vertex> frags = new ArrayList<Vertex>();
+        frags.add(frag);
+        frags.add(frag2);
+        
+        DenoptimIO.writeVertexesToFile(new File(pathName), FileFormat.VRTXJSON, 
+                frags);
+        
+        Fragment frag3 = new Fragment();
+        frag3.addAtom(new Atom("N",new Point3d(1.0, 0.0, 1.0)));
+        frag3.addAPOnAtom(frag3.getAtom(0), APClass.make("Other:0"),
+                new Point3d(1.0, 0.0, 0.0));
+        frag3.projectAPsToProperties();
+
+        ArrayList<Vertex> frags2 = new ArrayList<Vertex>();
+        frags2.add(frag3);
+        
+        DenoptimIO.writeVertexesToFile(new File(pathName), FileFormat.VRTXJSON, 
+                frags2, true);
+        
+        ArrayList<Vertex> frags3 = DenoptimIO.readDENOPTIMVertexesFromJSONFile(
+                pathName);
+        
+        assertEquals(3,frags3.size());
+        assertEquals("C",frags3.get(0).getIAtomContainer().getAtom(0).getSymbol());
+        assertEquals("O",frags3.get(1).getIAtomContainer().getAtom(0).getSymbol());
+        assertEquals("N",frags3.get(2).getIAtomContainer().getAtom(0).getSymbol());
+    }
 
 //------------------------------------------------------------------------------
 

@@ -70,7 +70,7 @@ import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 
 /**
- * Unit test for fragmenter's components.
+ * Unit test for fparallel ragmentation algorithm components.
  * 
  * @author Marco Foscato
  */

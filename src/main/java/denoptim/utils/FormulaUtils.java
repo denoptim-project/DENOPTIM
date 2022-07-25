@@ -367,21 +367,7 @@ public class FormulaUtils
         }
         
         // Elemental analysis on structure
-        Map<String,Double> elemAnalMolInfo = new HashMap<String,Double>();
-        for (IAtom atm : mol.atoms())
-        {
-            String elSymbol = atm.getSymbol();
-            //Deal with deuterium symbol
-            if (atm.getMassNumber()!=null && atm.getMassNumber() == 2)
-                elSymbol = "D";
-            if (elemAnalMolInfo.keySet().contains(elSymbol))
-            {
-                double num = elemAnalMolInfo.get(elSymbol) + 1.0;
-                elemAnalMolInfo.put(elSymbol,num);
-            } else {
-                elemAnalMolInfo.put(elSymbol,1.0);
-            }
-        }
+        Map<String,Double> elemAnalMolInfo = getElementalanalysis(mol);
         if (logger!=null && logger.getLevel() == Level.FINEST)
         {
             StringBuilder sb = new StringBuilder();
@@ -436,6 +422,33 @@ public class FormulaUtils
             break;
         }
         return foundMatch;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Threads Deuterium as a different element than Hydrogen.
+     * @param mol the system to analyze.
+     * @return a map with the amount of each element.
+     */
+    public static Map<String,Double> getElementalanalysis(IAtomContainer mol)
+    {
+        Map<String,Double> elemAnalMolInfo = new HashMap<String,Double>();
+        for (IAtom atm : mol.atoms())
+        {
+            String elSymbol = atm.getSymbol();
+            //Deal with deuterium symbol
+            if (atm.getMassNumber()!=null && atm.getMassNumber() == 2)
+                elSymbol = "D";
+            if (elemAnalMolInfo.keySet().contains(elSymbol))
+            {
+                double num = elemAnalMolInfo.get(elSymbol) + 1.0;
+                elemAnalMolInfo.put(elSymbol,num);
+            } else {
+                elemAnalMolInfo.put(elSymbol,1.0);
+            }
+        }
+        return elemAnalMolInfo;
     }
     
 //------------------------------------------------------------------------------

@@ -38,6 +38,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.graph.APClass;
 import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
@@ -77,7 +78,7 @@ public class FragmenterParameters extends RunTimeParameters
     private String cutRulesFile;
     
     /**
-     * List of cutting rules
+     * List of cutting rules sorted by priority.
      */
     List<CuttingRule> cuttingRules;
     
@@ -118,7 +119,84 @@ public class FragmenterParameters extends RunTimeParameters
      *  not be fragmented.
      */
     private Set<String> preFilterSMARTS = new HashSet<String>();
+    
+    /**
+     * Fag requesting the fragmentation of the structures.
+     */
+    private boolean doFragmentation = false;
+    
+    /**
+     * Flag requesting to reject fragments with minor isotopes.
+     */
+    private boolean doRejectWeirdIsotopes = true;
+    
+    /**
+     * Symbols of elements that lead to rejection of a fragment.
+     */
+    private Set<String> rejectedElements = new HashSet<String>();
+    
+    /**
+     * Lower limits of formula-based criteria for fragment rejection. I.e., if 
+     * a fragment has a formula that counts less then what defined here, it is
+     * rejected.
+     */
+    private Set<Map<String,Double>> formulaCriteriaLessThan = 
+            new HashSet<Map<String,Double>>();
+    
+    /**
+     * Upper limits of formula-based criteria for fragment rejection. I.e., if 
+     * a fragment has a formula that counts more then what defined here, it is
+     * rejected.
+     */
+    private Set<Map<String,Double>> formulaCriteriaMoreThan = 
+            new HashSet<Map<String,Double>>();
+    
+    /**
+     * The initial part of APClasses that lead to rejection of a fragment.
+     */
+    private Set<String> rejectedAPClasses = new HashSet<String>();
+    
+    /**
+     * Combination of strings matching the beginning of APClass names that 
+     * lead to rejection of a fragment.
+     */
+    private Set<String[]> rejectedAPClassCombinations = new HashSet<String[]>();
+    
+    /**
+     * Upper limit for number of non-H atoms in fragments. Negative number is
+     * used to disable checking of the number of atoms.
+     */
+    private int maxFragHeavyAtomCount = -1;
+    
+    /**
+     * Lower limit for number of non-H atoms in fragments. Negative number is
+     * used to disable checking of the number of atoms.
+     */
+    private int minFragHeavyAtomCount = -1;
+    
+    /**
+     * SMARTS leading to rejection of a fragment.
+     */
+    private Map<String, String>  fragRejectionSMARTS = new HashMap<String, String>();
+    
+    /**
+     * SMARTS leading to retention of a fragment. All fragments not matching one
+     * of these are rejected.
+     */
+    private Map<String, String>  fragRetentionSMARTS = new HashMap<String, String>();
 
+    /**
+     * Flag requesting to add dummy atoms on linearities. This to enable 
+     * 3D-modeling of the system with internal coordinates.
+     */
+    private boolean doAddDuOnLinearity = true;
+
+    /**
+     * Upper limit for an angle before it is treated as "flat" ("linear")
+     * angle, i.e., close enough to 180 DEG.
+     */
+    private double linearAngleLimit = 170.0;
+    
     
 //-----------------------------------------------------------------------------
     
@@ -272,9 +350,206 @@ public class FragmenterParameters extends RunTimeParameters
     {
         return preFilterSMARTS;
     }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we are asked to fragment structures.
+     */
+    public boolean doFragmentation()
+    {
+        return doFragmentation;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if we want to remove fragments that contain
+     * isotopes that are not the major isotope for that element.
+     */
+    public boolean doRejectWeirdIsotopes()
+    {
+        return doRejectWeirdIsotopes;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we want to add dummy atoms to resolve
+     * linearities in internal coordinates.
+     */
+    public boolean doAddDuOnLinearity()
+    {
+        return doAddDuOnLinearity;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the elemental symbols leading to rejection of a fragment.
+     */
+    public Set<String> getRejectedElements()
+    {
+        return rejectedElements;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the formula-based criteria to reject a fragment is there are too
+     * few atoms of a certain element.
+     */
+    public Set<Map<String, Double>> getFormulaCriteriaLessThan()
+    {
+        return formulaCriteriaLessThan;
+    }
+  
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return the formula-based criteria to reject a fragment is there are too
+     * many atoms of a certain element.
+     */
+    public Set<Map<String, Double>> getFormulaCriteriaMoreThan()
+    {
+        return formulaCriteriaMoreThan;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return the classes leading to rejection of a fragment.
+     */
+    public Set<String> getRejectedAPClasses()
+    {
+        return rejectedAPClasses;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return the combinations of classes leading to rejection of a fragment.
+     */
+    public Set<String[]> getRejectedAPClassCombinations()
+    {
+        return rejectedAPClassCombinations;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return the max number of heavy atoms to retain a fragment.
+     */
+    public int getMaxFragHeavyAtomCount()
+    {
+        return maxFragHeavyAtomCount;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return the min number of heavy atoms to retain a fragment.
+     */
+    public int getMinFragHeavyAtomCount()
+    {
+        return minFragHeavyAtomCount;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return the SMARTS that lead to rejection of a fragment.
+     */
+    public Map<String, String> getFragRejectionSMARTS()
+    {
+        return fragRejectionSMARTS;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return the SMARTS that lead to retention of a fragment.
+     */
+    public Map<String, String> getFragRetentionSMARTS()
+    {
+        return fragRetentionSMARTS;
+    }
 
 //-----------------------------------------------------------------------------
 
+    public void setRejectWeirdIsotopes(boolean doRejectWeirdIsotopes)
+    {
+        this.doRejectWeirdIsotopes = doRejectWeirdIsotopes;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    public void setRejectedElements(Set<String> rejectedElements)
+    {
+        this.rejectedElements = rejectedElements;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    public void setFormulaCriteriaLessThan(
+            Set<Map<String, Double>> formulaCriteriaLessThan)
+    {
+        this.formulaCriteriaLessThan = formulaCriteriaLessThan;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    public void setFormulaCriteriaMoreThan(
+            Set<Map<String, Double>> formulaCriteriaMoreThan)
+    {
+        this.formulaCriteriaMoreThan = formulaCriteriaMoreThan;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    public void setRejectedAPClasses(Set<String> rejectedAPClasses)
+    {
+        this.rejectedAPClasses = rejectedAPClasses;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    public void setRejectedAPClassCombinations(
+            Set<String[]> rejectedAPClassCombinations)
+    {
+        this.rejectedAPClassCombinations = rejectedAPClassCombinations;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    public void setMaxFragHeavyAtomCount(int maxFragHeavyAtomCount)
+    {
+        this.maxFragHeavyAtomCount = maxFragHeavyAtomCount;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    public void setMinFragHeavyAtomCount(int minFragHeavyAtomCount)
+    {
+        this.minFragHeavyAtomCount = minFragHeavyAtomCount;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    public void setFragRejectionSMARTS(Map<String, String> fragRejectionSMARTS)
+    {
+        this.fragRejectionSMARTS = fragRejectionSMARTS;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    public void setFragRetentionSMARTS(Map<String, String> fragRetentionSMARTS)
+    {
+        this.fragRetentionSMARTS = fragRetentionSMARTS;
+    }
+
+//-----------------------------------------------------------------------------
+    
     /**
      * @return <code>true</code> if we are want to ignore the fact we have 
      * translated unset bond orders to single-order bonds.
@@ -317,12 +592,8 @@ public class FragmenterParameters extends RunTimeParameters
                 break;
 
             case "CUTTINGRULESFILE=":
+                doFragmentation = true;
                 cutRulesFile = value;
-                break;
-                
-                //TODO-GG remove this is redundant
-            case "CHECKFORMULA":
-                checkFormula = true;
                 break;
                 
             case "UNSETTOSINGLEBO":
@@ -480,6 +751,29 @@ public class FragmenterParameters extends RunTimeParameters
             sb.append(otherCollector.getPrintedList());
         }
         return sb.toString();
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the upper limit for an angle before it is treated as "flat"
+     * angle, i.e., close enough to 180 DEG.
+     */
+    public double getLinearAngleLimit()
+    {
+        return linearAngleLimit;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the upper limit for an angle before it is treated as "flat" 
+     * angle, i.e., close enough to 180 DEG.
+     * @param linearAngleLimit the new value.
+     */
+    public void setLinearAngleLimit(double linearAngleLimit)
+    {
+        this.linearAngleLimit = linearAngleLimit;
     }
 
 //----------------------------------------------------------------------------

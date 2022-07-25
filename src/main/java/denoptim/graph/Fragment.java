@@ -19,6 +19,8 @@ package denoptim.graph;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -163,6 +165,10 @@ public class Fragment extends Vertex
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Depends on an healthy list of attachment points with properly set pointers
+     * to the source atoms.
+     */
     private void updateSymmetryRelations()
     {
         setSymmetricAPSets(identifySymmetryRelatedAPSets(mol, 
@@ -368,15 +374,39 @@ public class Fragment extends Vertex
         int atmId = mol.indexOf(srcAtm);
         return this.addAP(atmId, new Point3d(vector.x, vector.y, vector.z), apc);
     }
+    
+//-----------------------------------------------------------------------------
+    
+    public void removeAP(AttachmentPoint ap)
+    {
+        if (!getAttachmentPoints().contains(ap))
+            return;
+        
+        IAtom srcAtm = mol.getAtom(ap.getAtomPositionNumber());
+        
+        ArrayList<AttachmentPoint> apList = new ArrayList<>();
+        if (getAPCountOnAtom(srcAtm) > 0) {
+            apList = getAPsFromAtom(srcAtm);
+        }
+        apList.remove(ap);
+
+        getAttachmentPoints().remove(ap);
+        srcAtm.setProperty(DENOPTIMConstants.ATMPROPAPS, apList);
+        
+        updateSymmetryRelations();
+    }
 
 //-----------------------------------------------------------------------------
     
+    @SuppressWarnings("unchecked")
     public ArrayList<AttachmentPoint> getAPsFromAtom(IAtom srcAtm)
     {
-        @SuppressWarnings("unchecked")
-		ArrayList<AttachmentPoint> apsOnAtm = 
-        		(ArrayList<AttachmentPoint>) srcAtm.getProperty(
-        				DENOPTIMConstants.ATMPROPAPS);
+        ArrayList<AttachmentPoint> apsOnAtm = new ArrayList<AttachmentPoint>();
+        Object prop = srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS);
+        if (prop!=null)
+        {
+            apsOnAtm = (ArrayList<AttachmentPoint>) prop;
+        }
         return apsOnAtm;
     }
     
@@ -450,6 +480,7 @@ public class Fragment extends Vertex
      * Converts the internal notation defining APs (i.e., APs are stored in
      * as atom-specific properties) to the standard DENOPTIM formalism (i.e.,
      * APs are collected in a molecular property).
+     * WARNING: cannot be used after altering the atom list!
      * @return the list of APs. Note that these APs cannot respond to changes
      * in the atom list!
      */
@@ -487,7 +518,6 @@ public class Fragment extends Vertex
     
     public void projectPropertyToAP() throws DENOPTIMException
     {
-
 	    String allAtomsProp = "";    
 	    if (getProperty(DENOPTIMConstants.APSTAG) == null)
 	    {
@@ -794,9 +824,47 @@ public class Fragment extends Vertex
     
 //-----------------------------------------------------------------------------
     
+    //TODO-gg rename to removeAtom
     public void removeAtomAndConnectedElectronContainers(IAtom atom)
     {
-        mol.removeAtomAndConnectedElectronContainers(atom);
+        removeAtoms(Arrays.asList(atom));
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Removes a list of atoms and updates the list of attachment points.
+     * Use this method instead of {@link #removeAtomAndConnectedElectronContainers(IAtom)}
+     * to run the regeneration of the list of APs only once instead of for 
+     * every atom deletion.
+     * @param atoms the atoms to remove.
+     */
+    public void removeAtoms(Collection<IAtom> atoms)
+    {
+        for (IAtom atom : atoms)
+            mol.removeAtom(atom);
+        
+        lstAPs.clear();
+        
+        for (int atmId = 0; atmId<mol.getAtomCount(); atmId++)
+        {
+            IAtom srcAtm = mol.getAtom(atmId);
+            if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
+            {
+                ArrayList<AttachmentPoint> apsOnAtm = getAPsFromAtom(srcAtm);
+                for (int i = 0; i < apsOnAtm.size(); i++)
+                {
+                    AttachmentPoint ap = apsOnAtm.get(i);
+                    ap.setAtomPositionNumber(atmId);
+                }
+                lstAPs.addAll(apsOnAtm);
+            }
+        }
+
+        //Reorder according to DENOPTIMAttachmentPoint priority
+        lstAPs.sort(new AttachmentPointComparator());
+        
+        updateSymmetryRelations();
     }
     
 //-----------------------------------------------------------------------------
@@ -810,7 +878,7 @@ public class Fragment extends Vertex
     
     public int getConnectedAtomsCount(IAtom atom)
     {
-        return mol.getConnectedAtomsCount(atom);
+        return mol.getConnectedBondsCount(atom);
     }
     
 //------------------------------------------------------------------------------

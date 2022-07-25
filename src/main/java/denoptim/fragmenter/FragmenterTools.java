@@ -2,29 +2,43 @@ package denoptim.fragmenter;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.vecmath.Point3d;
+
+import org.openscience.cdk.Bond;
 import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.aromaticity.Kekulization;
-import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.PseudoAtom;
+import org.openscience.cdk.config.Isotopes;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.isomorphism.Mappings;
-import org.openscience.cdk.smiles.FixBondOrdersTool;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.graph.APClass;
+import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Fragment;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.logging.StaticLogger;
+import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.programs.fragmenter.MatchedBond;
+import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.FormulaUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MoleculeUtils;
@@ -198,6 +212,820 @@ public class FragmenterTools
         }
     }
     
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Performs fragmentation according to the given cutting rules.
+     * @param input the source of chemical structures.
+     * @param settings configurations including cutting rules and filtration 
+     * criteria.
+     * @param output the file where to write extracted structures.
+     * @param logger where to direct log messages. This is typically different 
+     * from the logger registered in the {@link FragmenterParameters}, which is
+     * the master logger, as we want thread-specific logging.
+     * @throws DENOPTIMException
+     * @throws IOException
+     */
+    
+    public static void fragmentation(File input, FragmenterParameters settings,
+            File output, Logger logger) throws DENOPTIMException, IOException
+    {   
+        FileInputStream fis = new FileInputStream(input);
+        IteratingSDFReader reader = new IteratingSDFReader(fis, 
+                DefaultChemObjectBuilder.getInstance());
+
+        int index = -1;
+        try {
+            while (reader.hasNext())
+            {
+                index++;
+                if (logger!=null)
+                {
+                    logger.log(Level.FINE,"Fragmenting structure " + index);
+                }
+                IAtomContainer mol = reader.next();
+                String molName = "noname-mol" + index;
+                if (mol.getTitle()!=null && !mol.getTitle().isBlank())
+                    molName = mol.getTitle();
+                
+                // Generate the fragments
+                ArrayList<Vertex> fragments = fragmentation(mol, 
+                        settings.getCuttingRules(), 
+                        logger);
+                if (logger!=null)
+                {
+                    logger.log(Level.FINE,"Fragmentation produced " 
+                            + fragments.size() + " fragments.");
+                }
+                
+                // Post-fragmentation processing of fragments
+                ArrayList<Vertex> keptFragments = new ArrayList<Vertex>();
+                int fragCounter = 0;
+                for (Vertex frag : fragments)
+                {
+                    if (!filterFragment((Fragment) frag, settings, logger))
+                    {
+                        continue;
+                    }
+                    
+                    if (MoleculeUtils.getDimensions(frag.getIAtomContainer())==3 
+                            && settings.doAddDuOnLinearity())
+                    {
+                        DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
+                                settings.getLinearAngleLimit());
+                    }
+                    
+                    // Add metadata
+                    frag.setProperty("cdk:Title", 
+                            "From_" + molName + "_" + fragCounter);
+                    fragCounter++;
+                    keptFragments.add(frag);
+                }
+                
+                if (logger!=null)
+                {
+                    logger.log(Level.FINE,"Fragments surviving post-"
+                            + "processing: " + keptFragments.size());
+                }
+                
+                //TODO remove duplicates
+                System.out.println("TODO");
+                
+                //TODO.gg format : use param
+                DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
+                        keptFragments,true);
+            }
+        } catch (Throwable t)
+        {
+            //TODO-gg del catching block and deal with exceptions in master thread
+            t.printStackTrace();
+        }
+        finally {
+            reader.close();
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Chops one chemical structure by applying the given cutting rules.
+     * @param mol
+     * @param rules
+     * @param logger
+     * @return
+     * @throws DENOPTIMException 
+     */
+    public static ArrayList<Vertex> fragmentation(IAtomContainer mol, 
+            List<CuttingRule> rules, Logger logger) throws DENOPTIMException
+    {   
+        Fragment masterFrag = new Fragment(mol,BBType.UNDEFINED);
+        IAtomContainer fragsMol = masterFrag.getIAtomContainer();
+        
+        // Identify bonds
+        Map<String, ArrayList<MatchedBond>> matchingbonds = 
+                FragmenterTools.getMatchingBondsAllInOne(fragsMol,rules,logger);
+        
+        // Select bonds to cut and what rule to use for cutting them
+        for (CuttingRule rule : rules) // NB: iterator follows rule's priority
+        {
+            String ruleName = rule.getName();
+
+            // Skip unmatched rules
+            if (!matchingbonds.keySet().contains(ruleName))
+                continue;
+
+            for (MatchedBond tb: matchingbonds.get(ruleName)) 
+            {
+                IAtom atmA = tb.getAtmSubClass0();
+                IAtom atmB = tb.getAtmSubClass1();
+
+                //ignore if bond already broken
+                if (!fragsMol.getConnectedAtomsList(atmA).contains(atmB))
+                { 
+                    continue;
+                }
+
+                //treatment of n-hapto ligands
+                if (rule.isHAPTO())
+                {
+                    // Get central atom (i.e., the "mono-hapto" side, 
+                    // typically the metal)
+                    // As a convention the central atom has subclass '0'
+                    IAtom centralAtm = atmA;
+
+                    // Get list of candidates for hapto-system: 
+                    // they have same cutting Rule and central metal
+                    ArrayList<IAtom> candidatesForHapto = new ArrayList<IAtom>();
+                    for (MatchedBond tbForHapto : matchingbonds.get(ruleName))
+                    {
+                        //Consider only bond involving same central atom
+                        if (tbForHapto.getAtmSubClass0() == centralAtm)
+                            candidatesForHapto.add(tbForHapto.getAtmSubClass1());
+                    }
+
+                    // Select atms in n-hapto system: contiguous neighbors with  
+                    // same type of bond with the same central atom.
+                    Set<IAtom> atmsInHapto = new HashSet<IAtom>();
+                    atmsInHapto.add(tb.getAtmSubClass1());
+                    atmsInHapto = exploreHapticity(tb.getAtmSubClass1(), 
+                            centralAtm, candidatesForHapto, fragsMol);
+                    if (atmsInHapto.size() == 1)
+                    {
+                        logger.log(Level.WARNING,"Unable to find more than one "
+                                + "bond involved in high-hapticity ligand! "
+                                + "Bond ignored.");
+                        continue;
+                    }
+
+                    // Check existence of all bonds involved in multihapto system
+                    boolean isSystemIntact = true;
+                    for (IAtom ligAtm : atmsInHapto)
+                    {
+                        List<IAtom> nbrsOfLigAtm = 
+                                fragsMol.getConnectedAtomsList(ligAtm);
+                        if (!nbrsOfLigAtm.contains(centralAtm))
+                        {
+                            isSystemIntact = false;
+                            break;
+                        }
+                    } 
+
+                    // If not, it means that another rule already acted on the  
+                    // system thus kill this attempt without generating du-atom
+                    if (!isSystemIntact)
+                        continue;
+
+                    // A dummy atom will be used to define attachment point of
+                    // ligand with high hapticity
+                    Point3d dummyP3d = new Point3d(); //Used also for 2D
+                    for (IAtom ligAtm : atmsInHapto)
+                    {
+                        Point3d ligP3d = MoleculeUtils.getPoint3d(ligAtm);
+                        dummyP3d.x = dummyP3d.x + ligP3d.x;
+                        dummyP3d.y = dummyP3d.y + ligP3d.y;
+                        dummyP3d.z = dummyP3d.z + ligP3d.z;
+                    }
+
+                    dummyP3d.x = dummyP3d.x / (double) atmsInHapto.size();
+                    dummyP3d.y = dummyP3d.y / (double) atmsInHapto.size();
+                    dummyP3d.z = dummyP3d.z / (double) atmsInHapto.size();
+
+                    //Add Dummy atom to molecular object
+                    //if no other Du is already in the same position
+                    IAtom dummyAtm = null;
+                    for (IAtom oldDu : fragsMol.atoms())
+                    {
+                        if (MoleculeUtils.getSymbolOrLabel(oldDu) 
+                                == DENOPTIMConstants.DUMMYATMSYMBOL)
+                        {
+                            Point3d oldDuP3d = oldDu.getPoint3d();
+                            if (oldDuP3d.distance(dummyP3d) < 0.002)
+                            {
+                                dummyAtm = oldDu;
+                                break;
+                            }
+                        } 
+                    }
+                
+                    if (dummyAtm==null)
+                    {
+                        dummyAtm = new PseudoAtom(DENOPTIMConstants.DUMMYATMSYMBOL);
+                        dummyAtm.setPoint3d(dummyP3d);
+                        fragsMol.addAtom(dummyAtm);
+                    }
+
+                    // Modify connectivity of atoms involved in high-hapticity 
+                    // coordination creation of Du-to-ATM bonds 
+                    // By internal convention the bond order is "SINGLE".
+                    IBond.Order border = IBond.Order.valueOf("SINGLE");
+                    
+                    for (IAtom ligAtm : atmsInHapto)
+                    {
+                        List<IAtom> nbrsOfDu = fragsMol.getConnectedAtomsList(
+                                dummyAtm);
+                        if (!nbrsOfDu.contains(ligAtm))
+                        {
+                            // Add bond with dummy
+                            Bond bnd = new Bond(dummyAtm,ligAtm,border);
+                            fragsMol.addBond(bnd);
+                        }
+                        // Remove bonds between central and coordinating atoms
+                        IBond oldBnd = fragsMol.getBond(centralAtm,ligAtm);
+                        fragsMol.removeBond(oldBnd);
+                    }
+                    
+                    // NB: by convention the "first" class (i.e., the ???:0 class)
+                    // is always  on the central atom.
+                    masterFrag.addAPOnAtom(centralAtm, rule.getAPClass0(), 
+                            MoleculeUtils.getPoint3d(dummyAtm));
+                    masterFrag.addAPOnAtom(dummyAtm, rule.getAPClass1(), 
+                            MoleculeUtils.getPoint3d(centralAtm));
+                } else {
+                    //treatment of mono-hapto ligands
+                    IBond bnd = fragsMol.getBond(atmA,atmB);
+                    fragsMol.removeBond(bnd);
+
+                    masterFrag.addAPOnAtom(atmA, rule.getAPClass0(), 
+                            MoleculeUtils.getPoint3d(atmB));
+                    masterFrag.addAPOnAtom(atmB, rule.getAPClass1(), 
+                            MoleculeUtils.getPoint3d(atmA));
+                } //end of if (hapticity>1)
+            } //end of loop over matching bonds
+        } //end of loop over rules
+        
+        // Extract isolated fragments
+        ArrayList<Vertex>  fragments = new ArrayList<Vertex>();
+        Set<Integer> doneAlready = new HashSet<Integer>();
+        for (int idx=0 ; idx<masterFrag.getAtomCount(); idx++)
+        {
+            if (doneAlready.contains(idx))
+                continue;
+            
+            Fragment cloneOfMaster = masterFrag.clone();
+            IAtomContainer iac = cloneOfMaster.getIAtomContainer();
+            Set<IAtom> atmsToKeep = exploreConnectivity(iac.getAtom(idx), iac);
+            atmsToKeep.stream().forEach(atm -> doneAlready.add(iac.indexOf(atm)));
+            
+            Set<IAtom> atmsToRemove = new HashSet<IAtom>();
+            for (IAtom atm : cloneOfMaster.atoms())
+            {
+                if (!atmsToKeep.contains(atm))
+                {
+                    atmsToRemove.add(atm);
+                }
+            }
+            cloneOfMaster.removeAtoms(atmsToRemove);
+            fragments.add(cloneOfMaster);
+        }
+        
+        return fragments;
+    }
+    
+//------------------------------------------------------------------------------
+    /**
+     * Identifies non-central atoms involved in the same n-hapto ligand as 
+     * the seed atom.
+     * @param seed atom acting as starting point.
+     * @param centralAtom the central atom (typically the metal) to which the
+     * seed is bonded as part of the multihapto system.
+     * @param candidates atoms that may belong to the multihapto ligand (i.e., 
+     * atoms that have matches the cutting rule).
+     * @param mol the atom container that own all the atoms we work with.
+     * @return list of atoms that is confirmed to belong the 
+     * multihapto system.
+     */
+
+    static Set<IAtom> exploreHapticity(IAtom seed, IAtom centralAtom, 
+            ArrayList<IAtom> candidates, IAtomContainer mol)
+    {
+        Set<IAtom> atmsInHapto = new HashSet<IAtom>();
+        atmsInHapto.add(seed);
+        ArrayList<IAtom> toVisitAtoms = new ArrayList<IAtom>();
+        toVisitAtoms.add(seed);
+        ArrayList<IAtom> visitedAtoms = new ArrayList<IAtom>();
+        while (toVisitAtoms.size()>0)
+        {
+            ArrayList<IAtom> toVisitLater = new ArrayList<IAtom>();
+            for (IAtom atomInFocus : toVisitAtoms)
+            {
+                if (visitedAtoms.contains(atomInFocus) 
+                        || atomInFocus==centralAtom)
+                    continue;
+                else 
+                    visitedAtoms.add(atomInFocus);
+                
+                if (candidates.contains(atomInFocus))
+                {
+                    atmsInHapto.add(atomInFocus);
+                    toVisitLater.addAll(mol.getConnectedAtomsList(atomInFocus));
+                }
+            }
+            toVisitAtoms.clear();
+            toVisitAtoms.addAll(toVisitLater);
+        }
+        return atmsInHapto;
+    }
+    
+//------------------------------------------------------------------------------
+    /**
+     * Explores the connectivity annotating which atoms have been visited.
+     * @param seed atom acting as starting point.
+     * @param mol the atom container that own all the atoms we work with.
+     * @return list of atoms that is confirmed to belong the continuously 
+     * connected system of the seed atom.
+     */
+
+    static Set<IAtom> exploreConnectivity(IAtom seed, IAtomContainer mol)
+    {
+        Set<IAtom> atmsReachableFromSeed = new HashSet<IAtom>();
+        ArrayList<IAtom> toVisitAtoms = new ArrayList<IAtom>();
+        toVisitAtoms.add(seed);
+        ArrayList<IAtom> visitedAtoms = new ArrayList<IAtom>();
+        while (toVisitAtoms.size()>0)
+        {
+            ArrayList<IAtom> toVisitLater = new ArrayList<IAtom>();
+            for (IAtom atomInFocus : toVisitAtoms)
+            {
+                if (visitedAtoms.contains(atomInFocus))
+                    continue;
+                else 
+                    visitedAtoms.add(atomInFocus);
+                
+                atmsReachableFromSeed.add(atomInFocus);
+                toVisitLater.addAll(mol.getConnectedAtomsList(atomInFocus));
+            }
+            toVisitAtoms.clear();
+            toVisitAtoms.addAll(toVisitLater);
+        }
+        return atmsReachableFromSeed;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Identification of the bonds matching a list of SMARTS queries
+     * @param mol chemical system to be analyzed
+     * @param rules priority-sorted list of cutting rules.
+     * @param logger
+     * @return the list of matches.
+     */
+
+    static Map<String, ArrayList<MatchedBond>> getMatchingBondsAllInOne(
+            IAtomContainer mol, List<CuttingRule> rules, Logger logger)
+    {
+        // Collect all SMARTS queries
+        Map<String,String> smarts = new HashMap<String,String>();
+        for (CuttingRule rule : rules)
+        {
+            smarts.put(rule.getName(),rule.getWholeSMARTSRule());
+        }
+
+        // Prepare a data structure for the return value
+        Map<String, ArrayList<MatchedBond>> bondsMatchingRules = 
+                new HashMap<String, ArrayList<MatchedBond>>();
+
+        // Get all the matches to the SMARTS queries
+        ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
+        if (msq.hasProblems())
+        {
+            if (logger!=null)
+            {
+                logger.log(Level.WARNING, "Problem matching SMARTS: " 
+                        + msq.getMessage());
+            }
+            return bondsMatchingRules;
+        }
+
+        for (CuttingRule rule : rules)
+        {
+            String ruleName = rule.getName();
+
+            if (msq.getNumMatchesOfQuery(ruleName) == 0)
+            {
+                continue;
+            }
+           
+            // Apply further options of cutting rule
+            Mappings purgedPairs = msq.getMatchesOfSMARTS(ruleName);
+            
+            // Evaluate subclass membership and eventually store target bonds
+            ArrayList<MatchedBond> bondsMatched = new ArrayList<MatchedBond>();
+            for (int[] pair : purgedPairs) 
+            {
+                if (pair.length!=2)
+                {
+                    throw new Error("Cutting rule: " + ruleName 
+                            + " has identified " + pair.length + " atoms "
+                            + "instead of 2. Modify rule to make it find a "
+                            + "pair of atoms.");
+                }
+                MatchedBond tb = new MatchedBond(mol.getAtom(pair[0]),
+                        mol.getAtom(pair[1]), rule);
+                bondsMatched.add(tb);
+            }
+
+            if (!bondsMatched.isEmpty())
+                bondsMatchingRules.put(ruleName, bondsMatched);
+        }
+
+        return bondsMatchingRules;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Filter fragments according to the criteria defined in the settings. Log
+     * is sent to logger in the {@link FragmenterParameters} argument.
+     * @param frag the fragment to analyze. 
+     * @param settings collection of settings including filtering criteria.
+     * @return <code>true</code> if the fragment should be kept, or 
+     * <code>false</code> if any of the filtering criteria is offended and,
+     * therefore, the fragment should be rejected.
+     */
+    public static boolean filterFragment(Fragment frag, 
+            FragmenterParameters settings)
+    {
+       return filterFragment(frag, settings, settings.getLogger());
+    }
+//------------------------------------------------------------------------------
+    
+    /**
+     * Filter fragments according to the criteria defined in the settings.
+     * @param frag the fragment to analyze. 
+     * @param settings collection of settings including filtering criteria.
+     * @param logger where to direct log messages. This is typically different 
+     * from the logger registered in the {@link FragmenterParameters}, which is
+     * the master logger, as we want thread-specific logging.
+     * @return <code>true</code> if the fragment should be kept, or 
+     * <code>false</code> if any of the filtering criteria is offended and,
+     * therefore, the fragment should be rejected.
+     */
+    public static boolean filterFragment(Fragment frag, 
+            FragmenterParameters settings, Logger logger)
+    {
+        // Default filtering criteria: get ring of R/*/X/Xx
+        for (IAtom atm : frag.atoms())
+        {
+            if (MoleculeUtils.isElement(atm))
+            {
+                continue;
+            }
+            String smb = MoleculeUtils.getSymbolOrLabel(atm);
+            if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(smb))
+            {
+                continue;
+            }
+            logger.log(Level.FINE,"Removing fragment contains non-element '"
+                    + smb + "'");
+            return false;
+        }
+        // Incomplete fragmentation: an atom has the same coords of an AP.
+        for (AttachmentPoint ap : frag.getAttachmentPoints())
+        {
+            Point3d ap3d = ap.getDirectionVector();
+            if (ap3d!=null)
+            {
+                for (IAtom atm : frag.atoms())
+                {
+                    Point3d atm3d = MoleculeUtils.getPoint3d(atm);
+                    double dist = ap3d.distance(atm3d);
+                    if (dist < 0.0002)
+                    {
+                        logger.log(Level.FINE,"Removing fragment with AP" 
+                                + frag.getIAtomContainer().indexOf(atm)
+                                + " and atom " + MoleculeUtils.getSymbolOrLabel(atm) 
+                                + " coincide.");
+                        return false;
+                    }
+                }
+            }
+        }
+        if (settings.doRejectWeirdIsotopes())
+        {
+            for (IAtom atm : frag.atoms())
+            {
+                if (MoleculeUtils.isElement(atm))
+                {
+                    // Unconfigured isotope has null mass number
+                    if (atm.getMassNumber() == null)
+                        continue;
+                    
+                    String symb =  MoleculeUtils.getSymbolOrLabel(atm);
+                    int a = atm.getMassNumber();
+                    try {
+                        IIsotope major = Isotopes.getInstance().getMajorIsotope(symb);
+                        if (a != major.getMassNumber())
+                        {
+                            logger.log(Level.FINE,"Removing fragment containing "
+                                    + "isotope "+symb+a+".");
+                            return false;
+                        }
+                    } catch (Throwable t) {
+                        logger.log(Level.WARNING,"Not able to perform Isotope"
+                                + "detection.");
+                    }
+                }
+                
+            }
+        }
+        
+        // User-controlled filtering criteria
+        
+        if (settings.getRejectedElements().size() > 0)
+        {
+            for (IAtom atm : frag.atoms())
+            {
+                String symb = MoleculeUtils.getSymbolOrLabel(atm);
+                if (settings.getRejectedElements().contains(symb))
+                {
+                    logger.log(Level.FINE,"Removing fragment containing '" 
+                            + symb + "'.");
+                    return false;
+                }
+            }
+        }
+        
+        if (settings.getFormulaCriteriaLessThan().size() > 0
+                || settings.getFormulaCriteriaMoreThan().size() > 0)
+        {
+            Map<String,Double> eaMol = FormulaUtils.getElementalanalysis(
+                    frag.getIAtomContainer());
+            
+            for (Map<String,Double> criterion : 
+                settings.getFormulaCriteriaLessThan())
+            {
+                for (String el : criterion.keySet())
+                {
+                    if (eaMol.containsKey(el))
+                    {
+                        // -0.5 to make it strictly less-than
+                        if (eaMol.get(el) - criterion.get(el) > -0.5)
+                        {
+                            logger.log(Level.FINE,"Removing fragment that "
+                                    + "contains only too much '" + el + "' "
+                                    + "as requested by formula"
+                                    + "-based (less-than) settings.");
+                            return false;
+                        }
+                    }
+                }
+            }
+            
+            for (Map<String,Double> criterion : 
+                settings.getFormulaCriteriaMoreThan())
+            {
+                for (String el : criterion.keySet())
+                {
+                    if (!eaMol.containsKey(el))
+                    {
+                        logger.log(Level.FINE,"Removing fragment that does not "
+                                + "contain '" + el + "' as requested by formula"
+                                + "-based (more-than) settings.");
+                        return false;
+                    } else {
+                        // 0.5 to make it strictly more-than
+                        if (eaMol.get(el) - criterion.get(el) < 0.5)
+                        {
+                            logger.log(Level.FINE,"Removing fragment that "
+                                    + "contains only too little '" + el + "' "
+                                    + "as requested by formula"
+                                    + "-based (more-than) settings.");
+                            return false;
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+        if (settings.getRejectedAPClasses().size() > 0)
+        {
+            for (APClass apc : frag.getAllAPClasses())
+            {
+                for (String s : settings.getRejectedAPClasses())
+                {
+                    if (apc.toString().startsWith(s))
+                    {
+                        logger.log(Level.FINE,"Removing fragment with APClass "
+                                + apc);
+                        return false;
+                    }    
+                }
+            }
+        }
+        
+        if (settings.getRejectedAPClassCombinations().size() > 0)
+        {
+            loopOverCombinations:
+            for (String[] conditions : settings.getRejectedAPClassCombinations())
+            {
+                for (int ip=0; ip<conditions.length; ip++)
+                {   
+                    String condition = conditions[ip];
+                    boolean found = false;
+                    for (APClass apc : frag.getAllAPClasses())
+                    {
+                        if (apc.toString().startsWith(condition))
+                        {
+                            found = true;
+                            continue;
+                        }
+                    }
+                    if (!found)
+                        continue loopOverCombinations;
+                    // Here we do have at least one AP satisfying the condition.
+                }
+                // Here we managed o satisfy all conditions. Therefore, we can
+                // reject this fragment
+                
+                String allCondsAsString = "";
+                for (int i=0; i<conditions.length; i++)
+                    allCondsAsString = allCondsAsString + " " + conditions[i];
+                
+                logger.log(Level.FINE,"Removing fragment with combination of "
+                        + "APClasses matching '" + allCondsAsString + "'.");
+                return false;
+            }
+        }
+        
+        if (settings.getMaxFragHeavyAtomCount()>0 
+                || settings.getMinFragHeavyAtomCount()>0)
+        {
+            int totHeavyAtm = 0;
+            for (IAtom atm : frag.atoms())
+            {
+                if (MoleculeUtils.isElement(atm))
+                {
+                    String symb = MoleculeUtils.getSymbolOrLabel(atm);
+                    if ((!symb.equals("H")) && (!symb.equals(
+                            DENOPTIMConstants.DUMMYATMSYMBOL)))
+                        totHeavyAtm++;
+                }
+            }
+            if (settings.getMaxFragHeavyAtomCount() > 0 
+                    && totHeavyAtm > settings.getMaxFragHeavyAtomCount())
+            {
+                logger.log(Level.FINE,"Removing fragment with too many atoms (" 
+                        + totHeavyAtm + " < " 
+                        + settings.getMaxFragHeavyAtomCount() 
+                        + ")");
+                return false;
+            }
+            if (settings.getMinFragHeavyAtomCount() > 0 
+                    && totHeavyAtm < settings.getMinFragHeavyAtomCount())
+            {
+                logger.log(Level.FINE,"Removing fragment with too few atoms (" 
+                        + totHeavyAtm + " < " 
+                        + settings.getMinFragHeavyAtomCount() 
+                        + ")");
+                return false;
+            }
+        }
+        
+        if (settings.getFragRejectionSMARTS().size() > 0)
+        {
+            ManySMARTSQuery msq = new ManySMARTSQuery(frag.getIAtomContainer(),
+                    settings.getFragRejectionSMARTS());
+            if (msq.hasProblems())
+            {
+                logger.log(Level.WARNING,"Problems evaluating SMARTS-based "
+                        + "rejection criteria. " + msq.getMessage());
+            }
+        
+            for (String criterion : settings.getFragRejectionSMARTS().keySet())
+            {
+                if (msq.getNumMatchesOfQuery(criterion)>0)
+                {
+                    logger.log(Level.FINE,"Removing fragment that matches "
+                            + "SMARTS-based rejection criteria '" + criterion 
+                            + "'.");
+                    return false;
+                }
+            }
+        }
+        
+        if (settings.getFragRetentionSMARTS().size() > 0)
+        {
+            ManySMARTSQuery msq = new ManySMARTSQuery(frag.getIAtomContainer(),
+                    settings.getFragRetentionSMARTS());
+            if (msq.hasProblems())
+            {
+                logger.log(Level.WARNING,"Problems evaluating SMARTS-based "
+                        + "rejection criteria. " + msq.getMessage());
+            }
+        
+            for (String criterion : settings.getFragRetentionSMARTS().keySet())
+            {
+                if (msq.getNumMatchesOfQuery(criterion) == 0)
+                {
+                    logger.log(Level.FINE,"Removing fragment that does not "
+                            + "match SMARTS-based retention criteria '" 
+                            + criterion + "'.");
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Create a 2x2 matrix-like map containing sublass membership of the two 
+     * atoms given.
+     * The int[] m0 and m1 are groups of atom indexes that taken as a whole
+     * identify a group of atoms that matches the SMARTS query. Thus, each
+     * iterable iterates over the groups matching each query.
+     * @return a map where key is subclass and values are the boolean signalling 
+     * whether the first (i.e., atm0) or and the second (atm1) atom are members
+     * of the first the key subclass.
+     */
+    static Map<Integer,List<Boolean>> getSubClassMatrix(int atm0, int atm1, 
+            Iterable<int[]> matches0, Iterable<int[]> matches1)
+    {
+        Map<Integer,List<Boolean>> subclassesVSatms = 
+                new HashMap<Integer,List<Boolean>>();
+
+        // Which atom matches subclass 0?
+        List<Boolean> subclass0 = new ArrayList<Boolean>(
+                Arrays.asList(false,false));
+        boolean doneAtm0 = false;
+        boolean doneAtm1 = false;
+        // for each group of atoms matching the SMARTS query 
+        for (int[] p : matches0)
+        {
+            for (int j=0; j<p.length; j++)
+            {
+                int id = p[j];
+                if (id == atm0)
+                {
+                    subclass0.set(0,true);
+                    doneAtm0 = true;
+                }
+                if (id == atm1)
+                {
+                    subclass0.set(1,true);
+                    doneAtm1 = true;
+                }
+            }
+            // just to speed up
+            if (doneAtm0 & doneAtm1)
+                break;
+        }
+        subclassesVSatms.put(0,subclass0);
+
+        // Which atom matches subclass 1?
+        List<Boolean> subclass1 = new ArrayList<Boolean>(
+                Arrays.asList(false,false));
+        doneAtm0 = false;
+        doneAtm1 = false;
+        for (int[] p : matches1)
+        {
+            for (int j=0; j<p.length; j++)
+            {
+                int id = p[j];
+                if (id == atm0)
+                {
+                    subclass1.set(0,true);
+                    doneAtm0 = true;
+                }
+                if (id == atm1)
+                {
+                    subclass1.set(1,true);
+                    doneAtm1 = true;
+                }
+            }
+            if (doneAtm0 & doneAtm1)
+                break;
+        }
+        subclassesVSatms.put(1,subclass1);
+        
+        return subclassesVSatms;
+    }
+    
+//------------------------------------------------------------------------------
+     
 //------------------------------------------------------------------------------
  //TODO-GG del   
     public static void codeTemplare(File input,

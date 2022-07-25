@@ -157,8 +157,7 @@ public class MoleculeUtils
                 res = true;
             }
         } catch (Throwable t) {
-            throw new Error("ERROR! Unable to create IsotopeFactory "
-                                        + " (in AtomUtils.getAtomicNumber)");
+            throw new Error("ERROR! Unable to create Isotope.");
         }
         return res;
     }
@@ -1180,6 +1179,63 @@ public class MoleculeUtils
         frag.updateAPs();
         
         return frag.getIAtomContainer();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Determines the dimensionality of the given chemical object.
+     * @param mol the given chemical object
+     * @return dimensionality of this object: 2, or 3, or -1 if neither 2 nor 3.
+     */
+    public static int getDimensions(IAtomContainer mol)
+    {
+        final int is2D = 2;
+        final int is3D = 3;
+        final int not2or3D = -1;
+
+        int numOf2D = 0;
+        int numOf3D = 0;
+
+        for (IAtom atm : mol.atoms())
+        {
+            Point2d p2d = new Point2d();
+            Point3d p3d = new Point3d();
+            p2d = atm.getPoint2d();
+            boolean have2D = true;
+            if (p2d == null)
+            {
+                have2D = false;
+                p3d = atm.getPoint3d();
+                if (p3d == null)
+                {
+                    return not2or3D;
+                }
+            }
+            ArrayList<Double> pointer = new ArrayList<Double>();
+            try {
+                if (have2D)
+                {
+                    pointer.add(p2d.x);
+                    pointer.add(p2d.y);
+                    numOf2D++;
+                } else {
+                    pointer.add(p3d.x);
+                    pointer.add(p3d.y);
+                    pointer.add(p3d.z);
+                    numOf3D++;
+                }
+            } catch (Throwable t) {
+                return not2or3D;
+            }
+        }
+
+        if (numOf2D == mol.getAtomCount())
+            return is2D;
+        else if (numOf3D == mol.getAtomCount())
+            return is3D;
+        else
+            return not2or3D;
     }
 
 //------------------------------------------------------------------------------

@@ -6,6 +6,7 @@ import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.tools.periodictable.PeriodicTable;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
 
 /**
@@ -75,6 +76,7 @@ public class CuttingRule
      * @param smartsBnd the part of the SMARTS query pertaining the bond.
      * @param priority the priority index
      * @param opts any additional options.
+     * @throws DENOPTIMException 
      */
     public CuttingRule(String ruleName, String smartsAtm0, String smartsAtm1, 
             String smartsBnd, int priority, ArrayList<String> opts)
@@ -85,6 +87,16 @@ public class CuttingRule
         this.smartsBnd = smartsBnd;
         this.priority = priority;
         this.opts = opts;
+        try
+        {
+            apc0 = APClass.make(ruleName + DENOPTIMConstants.SEPARATORAPPROPSCL
+                    + "0");
+            apc1 = APClass.make(ruleName + DENOPTIMConstants.SEPARATORAPPROPSCL 
+                    + "1");
+        } catch (DENOPTIMException e)
+        {
+            //cannot happen
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -107,29 +119,6 @@ public class CuttingRule
    {
        return priority;
    }
-
-//------------------------------------------------------------------------------
-//TODO remove 2 methods
-    /**
-     * Returns the name of SubClass0
-     */
-    public String getSubClassName0()
-    {
-        return apc0.toString(); //TODO del
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns the name of SubClass1
-     */
-    public String getSubClassName1()
-    {
-        if (this.isSymmetric())
-            return apc0.toString(); //TODO del
-	else
-	    return apc1.toString(); //TODO del
-    }
 
 //------------------------------------------------------------------------------
 

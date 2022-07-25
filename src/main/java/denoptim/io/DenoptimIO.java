@@ -34,6 +34,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.http.HttpClient.Version;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -216,6 +217,22 @@ public class DenoptimIO
     public static File writeVertexesToFile(File file, FileFormat format,
             ArrayList<Vertex> vertexes) throws DENOPTIMException 
     {
+        return writeVertexesToFile(file, format, vertexes, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes vertexes to file. Always overwrites.
+     *
+     * @param file the file where to print
+     * @param format how to print vertexes on file
+     * @param vertexes the list of vertexes to print
+     * @throws DENOPTIMException
+     */
+    public static File writeVertexesToFile(File file, FileFormat format,
+            ArrayList<Vertex> vertexes, boolean append) throws DENOPTIMException 
+    {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {
             file = new File(file.getAbsoluteFile()+"."+format.getExtension());
@@ -223,11 +240,11 @@ public class DenoptimIO
         switch (format)
         {
             case VRTXJSON:
-                writeVertexesToJSON(file, vertexes);
+                writeVertexesToJSON(file, vertexes, append);
                 break;
                 
             case VRTXSDF:
-                writeVertexesToSDF(file, vertexes, false);
+                writeVertexesToSDF(file, vertexes, append);
                 break;
                 
             default:
@@ -236,7 +253,7 @@ public class DenoptimIO
         }
         return file;
     }
-    
+   
 //------------------------------------------------------------------------------
     
     /**
@@ -249,8 +266,33 @@ public class DenoptimIO
     public static void writeVertexesToJSON(File file,
             ArrayList<Vertex> vertexes) throws DENOPTIMException
     {
+        writeVertexesToJSON(file, vertexes, false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Writes vertexes to JSON file. Always overwrites.
+     *
+     * @param file the file where to print.
+     * @param vertexes the list of vertexes to print.
+     * @param append use <code>true</code> to append to the existing list of 
+     * vertexes found in the file.
+     * @throws DENOPTIMException
+     */
+    public static void writeVertexesToJSON(File file,
+            ArrayList<Vertex> vertexes, boolean append) throws DENOPTIMException
+    {
         Gson writer = DENOPTIMgson.getWriter();
-        writeData(file.getAbsolutePath(), writer.toJson(vertexes), false);
+        if (append)
+        {
+            ArrayList<Vertex> allVertexes = readDENOPTIMVertexesFromJSONFile(
+                    file.getAbsolutePath());
+            allVertexes.addAll(vertexes);
+            writeData(file.getAbsolutePath(), writer.toJson(allVertexes), false);
+        } else {
+            writeData(file.getAbsolutePath(), writer.toJson(vertexes), false);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -2252,7 +2294,8 @@ public class DenoptimIO
      * @param file the file to read.
      * @param anyAtomRules the collector of the strings used to identify an
      * any-atom query.
-     * @param cutRules the collector of the cutting rules.
+     * @param cutRules the collector of the cutting rules. The collection is 
+     * already sorted by priority when wthis methos returns.
      * @throws DENOPTIMException in case there are errors in the formatting of 
      * the text contained in the file.
      */

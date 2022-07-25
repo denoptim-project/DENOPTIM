@@ -225,14 +225,17 @@ public class FragmenterTask extends Task
             preliminaryResults = newResultsFile;
         }
 
-/*
-        //Now chop the molecules generating the fragments
-        if (Parameters.chopMols)
+        // Fragmentation of structures
+        if (settings.doFragmentation())
         {
-            Fragmenter fr = new Fragmenter();
-            fr.chopMolecules();
+            logger.log(Level.INFO,"Fragmentation of structures");
+            File newResultsFile = new File(getFragmentsFileName(settings, id));
+            FragmenterTools.fragmentation(inputFile, settings, newResultsFile,
+                    logger);
+            preliminaryResults = newResultsFile;
         }
 
+/*
         Librarian lib = new Librarian();
             //Applay rejection rules to library of fragments
             if (Parameters.onlyFiltering)
