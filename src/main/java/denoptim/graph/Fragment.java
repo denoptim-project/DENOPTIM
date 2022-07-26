@@ -21,12 +21,19 @@ package denoptim.graph;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
+import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
+import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -38,6 +45,7 @@ import com.google.gson.Gson;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.simplified.UndirectedEdge;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
@@ -67,6 +75,12 @@ public class Fragment extends Vertex
 	 * Molecular representation of this fragment
 	 */
 	private IAtomContainer mol;
+	
+	/**
+	 * jGraph representation used for detecting fragment isomorphism.
+	 */
+	private DefaultUndirectedGraph<FragIsomorphNode,FragIsomorphEdge> 
+	    jGraphFragIsomorphism;
 
 	
 //-----------------------------------------------------------------------------
@@ -796,6 +810,13 @@ public class Fragment extends Vertex
     
 //-----------------------------------------------------------------------------
 
+    public int getBondCount()
+    {
+        return mol.getBondCount();
+    }
+    
+//-----------------------------------------------------------------------------
+
     public void addBond(IBond bond)
     {
         mol.addBond(bond);
@@ -884,7 +905,9 @@ public class Fragment extends Vertex
 //------------------------------------------------------------------------------
     
     /**
-     * Compares this and another fragment ignoring vertex IDs.
+     * Compares this and another fragment ignoring vertex IDs. Ignores isomerism
+     * and geometric differences as it only considers the number of atoms and 
+     * bonds.
      * @param other
      * @param reason string builder used to build the message clarifying the 
      * reason for returning <code>false</code>.
@@ -908,7 +931,143 @@ public class Fragment extends Vertex
         }
         return sameVertexFeatures(other, reason);
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Creates a graph representation of this fragment where both atoms and 
+     * {@link AttachmentPoint}s are represented as nodes, and edges are either
+     * bonds or atom-to-attachment point connections. Note that dummy atoms
+     * meant to heal linearities  ({@value DENOPTIMConstants#DUMMYATMSYMBOL} 
+     * with only one connected neighbor) are ignored.
+     * @return the graph.
+     */
+    public DefaultUndirectedGraph<FragIsomorphNode,FragIsomorphEdge> 
+        getJGraphFragIsomorphism()
+    {
+        if (jGraphFragIsomorphism != null)
+        {
+            return jGraphFragIsomorphism;
+        }
+        jGraphFragIsomorphism = new DefaultUndirectedGraph<>(
+                FragIsomorphEdge.class);
+        
+        Map<IAtom,FragIsomorphNode> atmToNode = 
+                new HashMap<IAtom,FragIsomorphNode>();
+        Set<IAtom> ignoredDu = new HashSet<IAtom>();
+        for (IAtom atm : mol.atoms())
+        {
+            if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(
+                    MoleculeUtils.getSymbolOrLabel(atm))
+                    && mol.getConnectedBondsCount(atm)<2)
+            {
+                //Ignore Du on linearities
+                ignoredDu.add(atm);
+                continue;
+            }
+            FragIsomorphNode node = new FragIsomorphNode(atm);
+            atmToNode.put(atm,node);
+            jGraphFragIsomorphism.addVertex(node);
+        }
+        for (IBond bnd : mol.bonds())
+        {
+            if (bnd.getAtomCount() > 2)
+            {
+                throw new IllegalArgumentException("Cannot handle bonds that involve "
+                        + "more than two atoms");
+            }
+            if (ignoredDu.contains(bnd.getAtom(0)) 
+                    || ignoredDu.contains(bnd.getAtom(0)))
+            {
+                //Ignore Du on linearities
+                continue;
+            }
+
+            FragIsomorphEdge edge = new FragIsomorphEdge(bnd);
+            jGraphFragIsomorphism.addEdge(atmToNode.get(bnd.getAtom(0)), 
+                    atmToNode.get(bnd.getAtom(1)), edge);
+        }
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            FragIsomorphNode node = new FragIsomorphNode(ap);
+            jGraphFragIsomorphism.addVertex(node);
+            FragIsomorphEdge edge = new FragIsomorphEdge();
+            jGraphFragIsomorphism.addEdge(atmToNode.get(mol.getAtom(
+                    ap.getAtomPositionNumber())), node, edge);
+        }
+        
+        //TODO-gg del
+        /*
+        System.out.println(" ");
+        System.out.println("JGraph for fragment:");
+        for (FragIsomorphNode n : jGraphFragIsomorphism.vertexSet())
+        {
+            String s = "";
+            if (n.isAtm)
+            {
+                IAtom a = (IAtom) n.original;
+                s = " " + MoleculeUtils.getSymbolOrLabel(a)
+                    + mol.indexOf(a);
+            }
+            System.out.println(" n: "+n.getLabel()+s);
+        }
+        for (FragIsomorphEdge e : jGraphFragIsomorphism.edgeSet())
+        {
+            String s = "";
+            if (e.isBond)
+            {
+                IBond b = (IBond) e.original;
+                s = " " + MoleculeUtils.getSymbolOrLabel(b.getAtom(0))
+                    + mol.indexOf(b.getAtom(0))
+                    + "-" + MoleculeUtils.getSymbolOrLabel(b.getAtom(1))
+                    + mol.indexOf(b.getAtom(1));
+            }
+            System.out.println(" e: "+e.label+s);
+        }
+        */
+        
+        return jGraphFragIsomorphism;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks for isomorphism of the graph representation of this and another 
+     * fragment. The graph representation results from the combination of the
+     * molecular structure (atoms as nodes, bonds as edges of the graph) 
+     * and the presence of attachment points (attachment points as nodes of the
+     * graph). See {@link #getJGraphFragIsomorphism()} for details.
+     * Does not consider three-dimensional features. Does not consider dummy
+     * atoms on linearities so, de facto, fragments can be isomorphic and have a 
+     * different number of atoms and bonds.
+     * @param other the other building block to consider.
+     * @return <code>true</code> if at least one isomorphism exists.
+     */
+    public boolean isIsomorphicTo(Vertex other)
+    {
+        if (!(other instanceof Fragment))
+        {
+            return false;
+        }
+        Fragment otherFrag = (Fragment) other;
+          
+        // NB: do not add a comparison of #atoms or #bonds because they may be
+        // different as a result of a different number of dummy atoms placed
+        // on linearities. Such atoms are not considered when checking for 
+        // isomorphism so, de facto, fragments can be isomorphic and have a 
+        // different number of atoms and bonds.
+         
+        if (this.getAttachmentPoints().size() 
+                != otherFrag.getAttachmentPoints().size())
+        {
+            return false;
+        }
   
+        FragmentIsomorphismInspector fii = new FragmentIsomorphismInspector(
+                this, otherFrag); 
+        return fii.isomorphismExists();
+    }
+    
 //------------------------------------------------------------------------------
 
     public int getHeavyAtomsCount()

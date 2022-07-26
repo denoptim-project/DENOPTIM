@@ -97,11 +97,6 @@ public class ParallelFragmentationAlgorithm
      */
     private FragmenterParameters settings = null;
 
-    /**
-     * Settings and definition of the fragment space
-     */
-    private FragmentSpaceParameters fsSettings = null;
-
     
 //-----------------------------------------------------------------------------
 

@@ -8,9 +8,9 @@ mv data/* "$wrkDir"
 rm -rf data
 
 #Run sub tests
-expectedNoMissingAtomMols=(3 1 0 0)
-expectedPreFiltered=(0 0 2 0)  
-expectedFragments=(0 0 0 10)
+expectedNoMissingAtomMols=(3 1 0 0 0)
+expectedPreFiltered=(0 0 2 0 0)  
+expectedFragments=(0 0 0 20 12)
 nSubTests=${#expectedNoMissingAtomMols[@]}
 totChecks=0
 for i in $(seq 1 $nSubTests)
@@ -54,7 +54,7 @@ do
         n=$(grep "\$\$\$\$" "$output"/Fragments* | wc -l)
         if [ "$n" -ne ${expectedFragments[$i-1]} ]
         then
-            echo "Test 't30' NOT PASSED (symptom: wrong number of structures without missing atoms: $n vs. ${expectedFragments[$i-1]}."
+            echo "Test 't30' NOT PASSED (symptom: wrong number of fragments peoduced: $n vs. ${expectedFragments[$i-1]}."
             exit -1
         fi
     fi

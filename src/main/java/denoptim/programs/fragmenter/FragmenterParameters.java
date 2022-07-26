@@ -19,6 +19,7 @@
 package denoptim.programs.fragmenter;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,14 +33,19 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.logging.Level;
 
+import org.openscience.cdk.interfaces.IAtomContainer;
+
 import denoptim.combinatorial.CEBLUtils;
 import denoptim.combinatorial.CheckPoint;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.files.UndetectedFileFormatException;
 import denoptim.graph.APClass;
 import denoptim.graph.DGraph;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
@@ -196,6 +202,16 @@ public class FragmenterParameters extends RunTimeParameters
      * angle, i.e., close enough to 180 DEG.
      */
     private double linearAngleLimit = 170.0;
+
+    /**
+     * Pathname to file with fragments that can be ignored.
+     */
+    private String ignorableFragmentsFile = "";
+    
+    /**
+     * List of fragment that can be rejected.
+     */
+    private ArrayList<Vertex> ignorableFragments = new ArrayList<Vertex>();
     
     
 //-----------------------------------------------------------------------------
@@ -550,6 +566,13 @@ public class FragmenterParameters extends RunTimeParameters
 
 //-----------------------------------------------------------------------------
     
+    public ArrayList<Vertex> getIgnorableFragments()
+    {
+        return ignorableFragments;
+    }
+
+//----------------------------------------------------------------------------
+
     /**
      * @return <code>true</code> if we are want to ignore the fact we have 
      * translated unset bond orders to single-order bonds.
@@ -599,6 +622,11 @@ public class FragmenterParameters extends RunTimeParameters
             case "UNSETTOSINGLEBO":
                 acceptUnsetToSingeBOApprox = true;
                 break;
+
+            case "IGNORABLEFRAGMENTS=":
+                ignorableFragmentsFile = value;
+                break;
+                
 /*
             case "=":
                 = value;
@@ -652,6 +680,7 @@ public class FragmenterParameters extends RunTimeParameters
     	ensureFileExistsIfSet(structuresFile);
     	ensureFileExistsIfSet(cutRulesFile);
     	ensureFileExistsIfSet(formulaeFile);
+    	ensureFileExistsIfSet(ignorableFragmentsFile);
     	
     	checkOtherParameters();
     }
@@ -678,20 +707,21 @@ public class FragmenterParameters extends RunTimeParameters
         if (formulaeFile!=null && !formulaeFile.isBlank())
         {
             formulae = DenoptimIO.readCSDFormulae(new File(formulaeFile));
-            /*
-            //TODO-gg del after moving elsewhere
-    private Map<String, Map<String, ArrayList<Double>>> elementalAnalysisFromFormula;
-            elementalAnalysisFromFormula = new HashMap<String,Map<String,
-                    ArrayList<Double>>>();
-            for (String refCode : formulae.keySet())
-            {
-                String formula = formulae.get(refCode);
-                elementalAnalysisFromFormula.put(refCode, 
-                        FormulaUtils.parseCSDFormula(formula));
-            }
-            */
         }
         processOtherParameters();
+        
+        if (ignorableFragmentsFile!=null && !ignorableFragmentsFile.isBlank())
+        {
+            try
+            {
+                ignorableFragments = DenoptimIO.readVertexes(
+                        new File(ignorableFragmentsFile), BBType.UNDEFINED);
+            } catch (Throwable e)
+            {
+                throw new DENOPTIMException("Problems reading file '" 
+                        + ignorableFragmentsFile + "'", e);
+            }
+        }
        
 		if (isMaster)
 		{

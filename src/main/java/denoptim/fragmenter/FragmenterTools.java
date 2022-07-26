@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
+import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
@@ -25,15 +26,20 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.isomorphism.Mappings;
+import org.openscience.cdk.signature.MoleculeSignature;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.FragIsomorphEdge;
+import denoptim.graph.FragIsomorphNode;
 import denoptim.graph.Fragment;
+import denoptim.graph.FragmentIsomorphismInspector;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.simplified.UndirectedEdge;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
@@ -268,6 +274,22 @@ public class FragmenterTools
                         continue;
                     }
                     
+                    //Compare with list of fragments to ignore
+                    if (settings.getIgnorableFragments().size() > 0)
+                    {
+                        if (settings.getIgnorableFragments().stream()
+                                .anyMatch(ignorable -> ((Fragment)frag)
+                                        .isIsomorphicTo(ignorable)))
+                        {
+                            if (logger!=null)
+                            {
+                                logger.log(Level.FINE,"Fragment " + fragCounter 
+                                        + " is ignorable.");
+                            }
+                            continue;
+                        }
+                    }
+                    
                     if (MoleculeUtils.getDimensions(frag.getIAtomContainer())==3 
                             && settings.doAddDuOnLinearity())
                     {
@@ -279,9 +301,49 @@ public class FragmenterTools
                     frag.setProperty("cdk:Title", 
                             "From_" + molName + "_" + fragCounter);
                     fragCounter++;
+                    
+                    
+                    
+                    /*
+                        if (removeDuplicates)
+                        {
+                            //Compare frag with the alreagy generated frags
+                            if (newFragment(frag,outFile))
+                            {
+                                if (repOnScreen >= 1)
+                                    System.out.println("NEW Fragment added!");
+                                IAtomContainer ac = frag.toIAtomContainer(outFormat);
+                                IOtools.writeSDFAppend(outFile, ac, true);
+                                numTotFrag++;
+                            } else {
+                                if (repOnScreen >= 1)
+                                    System.out.println("Not a new fragment.");
+                            }
+                        } else
+                        {
+                            if (lookForTargets)
+                            {
+                                //Compare frag with the library of targets
+                                if (hitTargetFragment(frag,targetFile,targetFormat))
+                                {
+                                String hit = frag.getProperty("TARGETHIT").toString();
+                                String fragFile = fragCollectingDir+"/"+"hittingTarget_"+hit+".sdf";
+                                IAtomContainer ac = frag.toIAtomContainer(outFormat);
+                                IOtools.writeSDFAppend(fragFile, ac, true);
+                                numTotFrag++;
+                                }
+                            } else {
+                                if (repOnScreen >= 1)
+                                    System.out.println("KEEP-FRAGMENTS MODE: Fragment added to the ouput list");
+                                IAtomContainer ac = frag.toIAtomContainer(outFormat);
+                                IOtools.writeSDFAppend(outFile, ac, true);
+                                numTotFrag++;
+                            }
+            }
+                    
+                    */
                     keptFragments.add(frag);
                 }
-                
                 if (logger!=null)
                 {
                     logger.log(Level.FINE,"Fragments surviving post-"
@@ -947,81 +1009,6 @@ public class FragmenterTools
         }
         
         return true;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Create a 2x2 matrix-like map containing sublass membership of the two 
-     * atoms given.
-     * The int[] m0 and m1 are groups of atom indexes that taken as a whole
-     * identify a group of atoms that matches the SMARTS query. Thus, each
-     * iterable iterates over the groups matching each query.
-     * @return a map where key is subclass and values are the boolean signalling 
-     * whether the first (i.e., atm0) or and the second (atm1) atom are members
-     * of the first the key subclass.
-     */
-    static Map<Integer,List<Boolean>> getSubClassMatrix(int atm0, int atm1, 
-            Iterable<int[]> matches0, Iterable<int[]> matches1)
-    {
-        Map<Integer,List<Boolean>> subclassesVSatms = 
-                new HashMap<Integer,List<Boolean>>();
-
-        // Which atom matches subclass 0?
-        List<Boolean> subclass0 = new ArrayList<Boolean>(
-                Arrays.asList(false,false));
-        boolean doneAtm0 = false;
-        boolean doneAtm1 = false;
-        // for each group of atoms matching the SMARTS query 
-        for (int[] p : matches0)
-        {
-            for (int j=0; j<p.length; j++)
-            {
-                int id = p[j];
-                if (id == atm0)
-                {
-                    subclass0.set(0,true);
-                    doneAtm0 = true;
-                }
-                if (id == atm1)
-                {
-                    subclass0.set(1,true);
-                    doneAtm1 = true;
-                }
-            }
-            // just to speed up
-            if (doneAtm0 & doneAtm1)
-                break;
-        }
-        subclassesVSatms.put(0,subclass0);
-
-        // Which atom matches subclass 1?
-        List<Boolean> subclass1 = new ArrayList<Boolean>(
-                Arrays.asList(false,false));
-        doneAtm0 = false;
-        doneAtm1 = false;
-        for (int[] p : matches1)
-        {
-            for (int j=0; j<p.length; j++)
-            {
-                int id = p[j];
-                if (id == atm0)
-                {
-                    subclass1.set(0,true);
-                    doneAtm0 = true;
-                }
-                if (id == atm1)
-                {
-                    subclass1.set(1,true);
-                    doneAtm1 = true;
-                }
-            }
-            if (doneAtm0 & doneAtm1)
-                break;
-        }
-        subclassesVSatms.put(1,subclass1);
-        
-        return subclassesVSatms;
     }
     
 //------------------------------------------------------------------------------
