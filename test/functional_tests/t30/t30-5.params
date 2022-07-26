@@ -1,5 +1,5 @@
 #
-# This is the parameter file for test t30-4
+# This is the parameter file for test t30-5
 #
 FRG-VERBOSITY=4
 FRG-STRUCTURESFILE=mols-5.sdf

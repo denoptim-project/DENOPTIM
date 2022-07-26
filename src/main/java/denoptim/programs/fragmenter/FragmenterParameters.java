@@ -213,6 +213,18 @@ public class FragmenterParameters extends RunTimeParameters
      */
     private ArrayList<Vertex> ignorableFragments = new ArrayList<Vertex>();
     
+    /**
+     * Pathname to file with fragments that will be retained, i.e., any 
+     * isomorphic fragment of any of these will be kept, all the rest rejected.
+     */
+    private String targetFragmentsFile = "";
+    
+    /**
+     * List of fragment that will be retained, i.e., any 
+     * isomorphic fragment of any of these will be kept, all the rest rejected.
+     */
+    private ArrayList<Vertex> targetFragments = new ArrayList<Vertex>();
+    
     
 //-----------------------------------------------------------------------------
     
@@ -566,9 +578,23 @@ public class FragmenterParameters extends RunTimeParameters
 
 //-----------------------------------------------------------------------------
     
+    /**
+     * @return list of fragment that can be rejected.
+     */
     public ArrayList<Vertex> getIgnorableFragments()
     {
         return ignorableFragments;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * @return the list of fragment that will be retained, i.e., any 
+     * isomorphic fragment of any of these will be kept, all the rest rejected.
+     */
+    public ArrayList<Vertex> getTargetFragments()
+    {
+        return targetFragments;
     }
 
 //----------------------------------------------------------------------------
@@ -627,6 +653,10 @@ public class FragmenterParameters extends RunTimeParameters
                 ignorableFragmentsFile = value;
                 break;
                 
+            case "TARGETFRAGMENTS=":
+                targetFragmentsFile = value;
+                break;
+                
 /*
             case "=":
                 = value;
@@ -681,6 +711,7 @@ public class FragmenterParameters extends RunTimeParameters
     	ensureFileExistsIfSet(cutRulesFile);
     	ensureFileExistsIfSet(formulaeFile);
     	ensureFileExistsIfSet(ignorableFragmentsFile);
+    	ensureFileExistsIfSet(targetFragmentsFile);
     	
     	checkOtherParameters();
     }
@@ -720,6 +751,19 @@ public class FragmenterParameters extends RunTimeParameters
             {
                 throw new DENOPTIMException("Problems reading file '" 
                         + ignorableFragmentsFile + "'", e);
+            }
+        }
+        
+        if (targetFragmentsFile!=null && !targetFragmentsFile.isBlank())
+        {
+            try
+            {
+                targetFragments = DenoptimIO.readVertexes(
+                        new File(targetFragmentsFile), BBType.UNDEFINED);
+            } catch (Throwable e)
+            {
+                throw new DENOPTIMException("Problems reading file '" 
+                        + targetFragmentsFile + "'", e);
             }
         }
        

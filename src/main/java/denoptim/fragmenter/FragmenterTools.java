@@ -274,6 +274,11 @@ public class FragmenterTools
                         continue;
                     }
                     
+                    // Add metadata
+                    frag.setProperty("cdk:Title", 
+                            "From_" + molName + "_" + fragCounter);
+                    fragCounter++;
+                    
                     //Compare with list of fragments to ignore
                     if (settings.getIgnorableFragments().size() > 0)
                     {
@@ -290,18 +295,28 @@ public class FragmenterTools
                         }
                     }
                     
+                    //Compare with list of fragments to retain
+                    if (settings.getTargetFragments().size() > 0)
+                    {
+                        if (!settings.getTargetFragments().stream()
+                                .anyMatch(ignorable -> ((Fragment)frag)
+                                        .isIsomorphicTo(ignorable)))
+                        {
+                            if (logger!=null)
+                            {
+                                logger.log(Level.FINE,"Fragment " + fragCounter 
+                                      + " doesn't match any target: rejected.");
+                            }
+                            continue;
+                        }
+                    }
+                    
                     if (MoleculeUtils.getDimensions(frag.getIAtomContainer())==3 
                             && settings.doAddDuOnLinearity())
                     {
                         DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
                                 settings.getLinearAngleLimit());
                     }
-                    
-                    // Add metadata
-                    frag.setProperty("cdk:Title", 
-                            "From_" + molName + "_" + fragCounter);
-                    fragCounter++;
-                    
                     
                     
                     /*
