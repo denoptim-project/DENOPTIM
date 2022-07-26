@@ -41,6 +41,7 @@ import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.fragmenter.MatchedBond;
 import denoptim.utils.ManySMARTSQuery;
+import denoptim.utils.MoleculeUtils;
 
 /**
  * Unit test for fragmenter's tools.
@@ -551,5 +552,37 @@ public class FragmenterToolsTest
         assertTrue(FragmenterTools.filterFragment(frag2, settings));
         assertFalse(FragmenterTools.filterFragment(frag3, settings));
         assertTrue(FragmenterTools.filterFragment(frag4, settings));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetMWSlotIdentifier() throws Exception
+    {
+        int slotSize = 2;
+        IAtomContainer mol1 = builder.newAtomContainer();
+        mol1.addAtom(new Atom("H"));
+        IAtomContainer mol2 = builder.newAtomContainer();
+        mol2.addAtom(new Atom("H"));
+        mol2.addAtom(new Atom("H"));
+        IAtomContainer mol3 = builder.newAtomContainer();
+        mol3.addAtom(new Atom("H"));
+        mol3.addAtom(new Atom("H"));
+        mol3.addAtom(new Atom("H"));
+        IAtomContainer mol4 = builder.newAtomContainer();
+        mol4.addAtom(new Atom("C"));
+        IAtomContainer mol5 = builder.newAtomContainer();
+        mol5.addAtom(new Atom("C"));
+        mol5.addAtom(new PseudoAtom(DENOPTIMConstants.DUMMYATMSYMBOL));
+        Fragment f1 = new Fragment(mol1, BBType.UNDEFINED);
+        Fragment f2 = new Fragment(mol2, BBType.UNDEFINED);
+        Fragment f3 = new Fragment(mol3, BBType.UNDEFINED);
+        Fragment f4 = new Fragment(mol4, BBType.UNDEFINED);
+        Fragment f5 = new Fragment(mol5, BBType.UNDEFINED);
+        assertEquals("0-2",FragmenterTools.getMWSlotIdentifier(f1, slotSize));
+        assertEquals("2-4",FragmenterTools.getMWSlotIdentifier(f2, slotSize));
+        assertEquals("2-4",FragmenterTools.getMWSlotIdentifier(f3, slotSize));
+        assertEquals("12-14",FragmenterTools.getMWSlotIdentifier(f4, slotSize));
+        assertEquals("12-14",FragmenterTools.getMWSlotIdentifier(f5, slotSize));
     }
 }

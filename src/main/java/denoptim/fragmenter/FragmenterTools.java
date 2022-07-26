@@ -27,6 +27,7 @@ import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.isomorphism.Mappings;
 import org.openscience.cdk.signature.MoleculeSignature;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -275,8 +276,8 @@ public class FragmenterTools
                     }
                     
                     // Add metadata
-                    frag.setProperty("cdk:Title", 
-                            "From_" + molName + "_" + fragCounter);
+                    String fragIdStr = "From_" + molName + "_" + fragCounter;
+                    frag.setProperty("cdk:Title", fragIdStr);
                     fragCounter++;
                     
                     //Compare with list of fragments to ignore
@@ -311,6 +312,7 @@ public class FragmenterTools
                         }
                     }
                     
+                    // Add dummy atoms on linearities
                     if (MoleculeUtils.getDimensions(frag.getIAtomContainer())==3 
                             && settings.doAddDuOnLinearity())
                     {
@@ -318,59 +320,92 @@ public class FragmenterTools
                                 settings.getLinearAngleLimit());
                     }
                     
-                    
-                    /*
-                        if (removeDuplicates)
+                    if (settings.getIsomorphicSampleSize() > 0)
+                    {
+                        synchronized (settings.MANAGEMWSLOTSSLOCK)
                         {
-                            //Compare frag with the alreagy generated frags
-                            if (newFragment(frag,outFile))
+                            String mwSlotID = getMWSlotIdentifier(frag, 
+                                    settings.getMWSlotSize());
+    
+                            File mwFileUnq = settings.getMWSlotFileNameUnqFrags(
+                                    mwSlotID);
+                            File mwFileAll = settings.getMWSlotFileNameAllFrags(
+                                    mwSlotID);
+                            
+                            // Compare this fragment with previously seen ones
+                            ArrayList<Vertex> knownFrags = 
+                                    DenoptimIO.readVertexes(mwFileUnq, 
+                                            BBType.UNDEFINED);
+                            Vertex unqVersion = knownFrags.stream()
+                                .filter(knownFrag -> 
+                                    ((Fragment)frag).isIsomorphicTo(knownFrag))
+                                .findAny()
+                                .orElse(null);
+                            if (unqVersion!=null)
                             {
-                                if (repOnScreen >= 1)
-                                    System.out.println("NEW Fragment added!");
-                                IAtomContainer ac = frag.toIAtomContainer(outFormat);
-                                IOtools.writeSDFAppend(outFile, ac, true);
-                                numTotFrag++;
-                            } else {
-                                if (repOnScreen >= 1)
-                                    System.out.println("Not a new fragment.");
-                            }
-                        } else
-                        {
-                            if (lookForTargets)
-                            {
-                                //Compare frag with the library of targets
-                                if (hitTargetFragment(frag,targetFile,targetFormat))
+                                // Identify this unique fragment
+                                String isoFamID = unqVersion.getProperty(
+                                        DENOPTIMConstants.ISOMORPHICFAMILYID)
+                                        .toString();
+                                
+                                // Do we already have enough isomorphs of this frag?
+                                int sampleSize = settings.getIsomorphsCount()
+                                        .get(isoFamID);
+                                if (sampleSize < settings.getIsomorphicSampleSize())
                                 {
-                                String hit = frag.getProperty("TARGETHIT").toString();
-                                String fragFile = fragCollectingDir+"/"+"hittingTarget_"+hit+".sdf";
-                                IAtomContainer ac = frag.toIAtomContainer(outFormat);
-                                IOtools.writeSDFAppend(fragFile, ac, true);
-                                numTotFrag++;
+                                    // Add this isomorphic version to the sample
+                                    frag.setProperty(
+                                            DENOPTIMConstants.ISOMORPHICFAMILYID,
+                                            isoFamID);
+                                    settings.getIsomorphsCount().put(isoFamID,
+                                            sampleSize+1);
+                                    DenoptimIO.writeVertexToFile(mwFileAll, 
+                                            FileFormat.VRTXSDF, frag, true);
+                                } else {
+                                    // This would be inefficient in the long run
+                                    // because it by-passes the splitting by MW. 
+                                    // Do not do it!
+                                    /*
+                                    if (logger!=null)
+                                    {
+                                        logger.log(Level.FINE,"Fragment " 
+                                              + fragCounter 
+                                              + " is isomorphic to unique fragment " 
+                                              + unqVersionID + ", but we already "
+                                              + "have a sample of " + sampleSize
+                                              + ": ignoring this fragment from now "
+                                              + "on.");
+                                    }
+                                    settings.getIgnorableFragments().add(frag);
+                                    */
                                 }
                             } else {
-                                if (repOnScreen >= 1)
-                                    System.out.println("KEEP-FRAGMENTS MODE: Fragment added to the ouput list");
-                                IAtomContainer ac = frag.toIAtomContainer(outFormat);
-                                IOtools.writeSDFAppend(outFile, ac, true);
-                                numTotFrag++;
+                                // This is a never-seen fragment
+                                String isoFamID = settings.newIsomorphicFamilyID();
+                                frag.setProperty(
+                                        DENOPTIMConstants.ISOMORPHICFAMILYID,
+                                        isoFamID);
+                                settings.getIsomorphsCount().put(isoFamID, 1);
+                                DenoptimIO.writeVertexToFile(mwFileUnq, 
+                                        FileFormat.VRTXSDF, frag, true);
+                                DenoptimIO.writeVertexToFile(mwFileAll, 
+                                        FileFormat.VRTXSDF, frag, true);
                             }
-            }
-                    
-                    */
-                    keptFragments.add(frag);
+                        } // end synchronized block
+                    } else {
+                        keptFragments.add(frag);
+                    }
                 }
-                if (logger!=null)
+                if (settings.getIsomorphicSampleSize()<0)
                 {
-                    logger.log(Level.FINE,"Fragments surviving post-"
-                            + "processing: " + keptFragments.size());
+                    if (logger!=null)
+                    {
+                        logger.log(Level.FINE,"Fragments surviving post-"
+                                + "processing: " + keptFragments.size());
+                    }
+                    DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
+                            keptFragments,true);
                 }
-                
-                //TODO remove duplicates
-                System.out.println("TODO");
-                
-                //TODO.gg format : use param
-                DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
-                        keptFragments,true);
             }
         } catch (Throwable t)
         {
@@ -1022,12 +1057,25 @@ public class FragmenterTools
                 }
             }
         }
-        
         return true;
     }
     
 //------------------------------------------------------------------------------
-     
+  
+    /**
+     * Determines the name of the MW slot to use when comparing the given
+     * fragment with previously stored fragments.
+     * @param frag the fragment for which we want the MW slot identifier.
+     * @param slotSize the size of the MW slot.
+     * @return the MW slot identifier.
+     */
+    public static String getMWSlotIdentifier(Vertex frag, int slotSize)
+    {
+        double mw = AtomContainerManipulator.getMass(frag.getIAtomContainer());
+        int slotNum = (int) (mw / (Double.valueOf(slotSize)));
+        return slotNum*slotSize + "-" + (slotNum+1)*slotSize;
+    }
+    
 //------------------------------------------------------------------------------
  //TODO-GG del   
     public static void codeTemplare(File input,
@@ -1052,7 +1100,7 @@ public class FragmenterTools
                 }
                 IAtomContainer mol = reader.next();
                 
-                //TODO
+                //TODO-gg
                 
                 
                 /*

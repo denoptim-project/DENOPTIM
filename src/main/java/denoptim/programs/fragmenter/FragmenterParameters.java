@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -225,6 +226,52 @@ public class FragmenterParameters extends RunTimeParameters
      */
     private ArrayList<Vertex> targetFragments = new ArrayList<Vertex>();
     
+    /**
+     * Size of the sample of isomorphic fragments to collect. When this number
+     * N is larger then zero, we will collect the first N isomorphic forms of
+     * each fragment.
+     */
+    private int isomorphicSampleSize = -1;
+    
+    /**
+     * Molecular weight slot width for collecting fragments.
+     */
+    private int mwSlotSize = 2;
+    
+    /**
+     * Mapping of the molecular weight slot identifier to the file collecting
+     * all collected fragments belonging to that MW slot.
+     */
+    private Map<String,File> mwSlotToAllFragsFile = new HashMap<String,File>();
+    
+    /**
+     * Mapping of the molecular weight slot identifier to the file collecting
+     * unique fragments belonging to that MW slot.
+     */
+    private Map<String,File> mwSlotToUnqFragsFile = new HashMap<String,File>();
+    
+    
+    /**
+     * Counts of isomorphic versions of each known fragment generated in
+     * a fragmentation process. The key is a string that identifies the vertex 
+     * without having to hold the entire data structure of it.
+     */
+    private Map<String, Integer> isomorphsCount;
+    
+    //TODO: We could use something like the SizeControlledSet used in the EA to 
+    // collect unique identifiers.
+    
+    /**
+     * Unique identifier of a family of ismorphic versions of a fragment,.
+     */
+    private AtomicInteger unqIsomorphicFamilyId = new AtomicInteger(0);
+    
+    /**
+     * Synchronization lock for manipulating a) the collections (i.e., MW slots)
+     * of fragments produced by multiple threads and b) the relative information 
+     * (i.e., isomorphic family size).
+     */
+    public final Object MANAGEMWSLOTSSLOCK = new Object();
     
 //-----------------------------------------------------------------------------
     
@@ -599,6 +646,107 @@ public class FragmenterParameters extends RunTimeParameters
 
 //----------------------------------------------------------------------------
 
+    public int getIsomorphicSampleSize()
+    {
+        return isomorphicSampleSize;
+    }
+
+//----------------------------------------------------------------------------
+
+    public void setIsomorphicSampleSize(int isomorphicSampleSize)
+    {
+        this.isomorphicSampleSize = isomorphicSampleSize;
+    }
+
+//----------------------------------------------------------------------------
+
+    public int getMWSlotSize()
+    {
+        return mwSlotSize;
+    }
+
+//----------------------------------------------------------------------------
+
+    public void setMWSlotSize(int mwSlotSize)
+    {
+        this.mwSlotSize = mwSlotSize;
+    }
+
+//----------------------------------------------------------------------------
+
+    public Map<String, File> getMWSlotToAllFragsFile()
+    {
+        return mwSlotToAllFragsFile;
+    }
+
+//----------------------------------------------------------------------------
+
+    public void setMWSlotToAllFragsFile(Map<String, File> mwSlotToAllFragsFile)
+    {
+        this.mwSlotToAllFragsFile = mwSlotToAllFragsFile;
+    }
+
+//----------------------------------------------------------------------------
+
+    public Map<String, File> getMWSlotToUnqFragsFile()
+    {
+        return mwSlotToUnqFragsFile;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds the pathname of the file meant to hold unique fragments 
+     * from within a given MW slot, i.e., holding the unique version of 
+     * isomorphic fragment families.
+     * @param mwSlotId the identifier of the MW slot.
+     * @return the file collecting the unique version of isomorphic fragment
+     * families in the MW range of interest.
+     */
+    public File getMWSlotFileNameUnqFrags(String mwSlotId)
+    {
+        return new File(getWorkDirectory() + DenoptimIO.FS 
+                + "Fragments-MWSlot_" + mwSlotId + "_Unq.sdf");
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds the pathname of the file meant to be hold all isomorphic fragments 
+     * from a given MW slot.
+     * @param mwSlotId the identifier of the MW slot.
+     * @return the file collecting all isomorphic fragment
+     * families in the MW range of interest.
+     */
+    public File getMWSlotFileNameAllFrags(String mwSlotId)
+    {
+        return new File(getWorkDirectory() + DenoptimIO.FS 
+                + "Fragments-MWSlot_" + mwSlotId + "_All.sdf");
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the counts of isomorphic versions of each fragment.
+     */
+    public Map<String,Integer> getIsomorphsCount()
+    {
+        return isomorphsCount;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Produced a new unique identifier for a family of isomorphic fragments.
+     * @return the unique ID.
+     */
+    public String newIsomorphicFamilyID()
+    {
+        return "IsomorphicFamily_" + unqIsomorphicFamilyId.getAndIncrement();
+    }
+    
+//------------------------------------------------------------------------------
+
     /**
      * @return <code>true</code> if we are want to ignore the fact we have 
      * translated unset bond orders to single-order bonds.
@@ -608,7 +756,7 @@ public class FragmenterParameters extends RunTimeParameters
         return acceptUnsetToSingeBOApprox;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * Processes a keyword/value pair and assign the related parameters.

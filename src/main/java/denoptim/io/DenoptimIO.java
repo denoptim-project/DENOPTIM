@@ -227,6 +227,24 @@ public class DenoptimIO
      *
      * @param file the file where to print
      * @param format how to print vertexes on file
+     * @param vertex the vertex to print
+     * @throws DENOPTIMException
+     */
+    public static File writeVertexToFile(File file, FileFormat format,
+            Vertex vertex, boolean append) throws DENOPTIMException 
+    {
+        ArrayList<Vertex> lst = new ArrayList<Vertex>();
+        lst.add(vertex);
+        return writeVertexesToFile(file, format, lst, append);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes vertexes to file. Always overwrites.
+     *
+     * @param file the file where to print
+     * @param format how to print vertexes on file
      * @param vertexes the list of vertexes to print
      * @throws DENOPTIMException
      */

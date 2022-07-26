@@ -512,5 +512,14 @@ public final class DENOPTIMConstants
      * container
      */
     public static final Object FORMULASTR = "FORMULASTR";
+
+    /**
+     * Property used to store the identifier of the family of isomorphic 
+     * fragments that owns a fragment. Essentially, this identifies the
+     * unique fragments (those with unique value for this properties) and
+     * allows to find all their family members, i.e., other fragments that 
+     * differ by conformers/geometries with the first one found.
+     */
+    public static final Object ISOMORPHICFAMILYID = "ISOMORPHICFAMILYID";
     
 }

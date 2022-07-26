@@ -136,6 +136,7 @@ public class Fragment extends Vertex
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         
         this.mol = MoleculeUtils.makeSameAs(mol);
+        MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(this.mol);
 
         Object prop = mol.getProperty(DENOPTIMConstants.APSTAG);
         if (prop != null)
