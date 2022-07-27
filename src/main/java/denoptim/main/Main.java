@@ -50,12 +50,12 @@ import denoptim.task.ProgramTask;
 import denoptim.task.StaticTaskManager;
 
 /**
- * Entry point of any kind of run of the denoptim program.
+ * Entry point of any kind of run of the DENOPTIM program.
  */
 public class Main
 {
     /**
-     * Types of runs that can be requested to the denoptim Main class.
+     * Types of runs that can be requested to the DENOPTIM Main class.
      */
     public static enum RunType {
         /**
@@ -343,7 +343,7 @@ public class Main
         try {
             format = FileUtils.detectFileFormat(file);
         } catch (Throwable t) {
-            // Ignore: if anything goes wrong well still get UNRECOGNIZED which
+            // Ignore: if anything goes wrong, will still get UNRECOGNIZED which
             // triggers the error.
         }
         if (FileFormat.UNRECOGNIZED.equals(format))

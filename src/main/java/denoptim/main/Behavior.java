@@ -24,7 +24,7 @@ import org.apache.commons.cli.CommandLine;
 import denoptim.main.Main.RunType;
 
 /**
- * Represents the behavior of the program at start-up. This class in mostly 
+ * Represents the behavior of the program at start-up. This class is mostly 
  * meant to test the functionality of denoptim's main launcher.
  */
 public class Behavior

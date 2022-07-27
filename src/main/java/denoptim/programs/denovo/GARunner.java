@@ -31,7 +31,7 @@ import denoptim.ga.ExternalCmdsListener;
 import denoptim.task.ProgramTask;
 
 /**
- * Programs that runs de novo design by a genetic algorithms.
+ * Programs that runs de novo design by a genetic algorithm.
  * 
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
