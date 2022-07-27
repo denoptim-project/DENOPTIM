@@ -403,7 +403,7 @@ public class FragmenterTools
                             }
                         } // end synchronized block
                     } else {
-                        //TODO-gg no removal of duplicates?
+                        //If we are here, we did not ask to remove duplicates
                         keptFragments.add(frag);
                     }
                 }

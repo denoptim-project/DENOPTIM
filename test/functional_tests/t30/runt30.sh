@@ -8,11 +8,14 @@ mv data/* "$wrkDir"
 rm -rf data
 
 # Here we define the expected results
-#             sub test ID: 1  2  3  4  5  6  7  8   
-expectedNoMissingAtomMols=(3  1  0  0  0  0  0  0)
-      expectedPreFiltered=(0  0  2  0  0  0  0  0)  
-        expectedFragments=(0  0  0 20 12  8  6 11)
-  expectedIsomorphicFrags=(0  0  0  0  0  0 30 11)
+#             sub test ID: 1  2  3  4  5  6  7  8   9 
+expectedNoMissingAtomMols=(3  1  0  0  0  0  0  0   0)
+      expectedPreFiltered=(0  0  2  0  0  0  0  0   0)  
+        expectedFragments=(0  0  0 20 12  8  6 11 140)
+  expectedIsomorphicFrags=(0  0  0  0  0  0 30 11   0)
+
+# NB: for t30-9 the 140 result from counting 70 twice.
+
 nSubTests=${#expectedNoMissingAtomMols[@]}
 
 #Run sub tests
@@ -58,7 +61,7 @@ do
         n=$(grep "\$\$\$\$" "$output"/Fragments* | wc -l)
         if [ "$n" -ne ${expectedFragments[$i-1]} ]
         then
-            echo "Test 't30' NOT PASSED (symptom: wrong number of fragments peoduced: $n vs. ${expectedFragments[$i-1]}."
+            echo "Test 't30' NOT PASSED (symptom: wrong number of fragments produced: $n vs. ${expectedFragments[$i-1]}."
             exit -1
         fi
     fi

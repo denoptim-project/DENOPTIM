@@ -522,9 +522,9 @@ public final class DENOPTIMConstants
      * differ by conformers/geometries with the first one found.
      */
     public static final Object ISOMORPHICFAMILYID = "ISOMORPHICFAMILYID";
-
+    
     /**
-     * Initial part of filename used to collect fragment belonging to a certain
+     * Initial part of filename used to collect fragments belonging to a certain
      * molecular weight slot.
      */
     public static final String MWSLOTFRAGSFILENAMEROOT = "MWSlot_";

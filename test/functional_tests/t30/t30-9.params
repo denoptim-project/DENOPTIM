@@ -1,0 +1,7 @@
+#
+# This is the parameter file for test t30-9
+#
+FRG-VERBOSITY=4
+FRG-PARALLELTASKS=3
+FRG-STRUCTURESFILE=mols-7.sdf
+FRG-CUTTINGRULESFILE=cutRul_3.0.rul

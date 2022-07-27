@@ -150,6 +150,16 @@ public class FragmenterTask extends Task
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * @return the pathname to the file collecting results
+     */
+    public String getResultFile()
+    {
+        return results;
+    }
+    
+//------------------------------------------------------------------------------
 
     /**
      * Builds the pathname of the structure file meant to be hold structures
@@ -310,11 +320,11 @@ public class FragmenterTask extends Task
         
         
         // Final message
+        results = preliminaryResults.getAbsolutePath();
         if (settings.getNumTasks()>1)
         {
             logger.log(Level.INFO,"Fragmenter task " + id + " completed.");
         } else {
-            results = preliminaryResults.getAbsolutePath();
             logger.log(Level.INFO,"Results available in "+results);
         }
         

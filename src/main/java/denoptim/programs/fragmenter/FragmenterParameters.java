@@ -227,19 +227,19 @@ public class FragmenterParameters extends RunTimeParameters
     private ArrayList<Vertex> targetFragments = new ArrayList<Vertex>();
     
     /**
-     * Flag signaling the need to manage isomorphic families, i.e., manage
-     * duplicate fragments. This is needed if any of these are true:<ul>
-     * <li>we want to identify isomorphic fragments and keep only one 
+     * <p>Flag signaling the need to manage isomorphic families, i.e., manage
+     * duplicate fragments. This is needed if 
+     * we want to identify isomorphic fragments and keep only one 
      * isomorphic fragment (i.e.,
      * remove all duplicate fragments), or more then more isomorphic fragment. 
      * In the latter case, we essentially want to sample the isomorphic family.
      * The extent of this, i.e., the size of the sample is controlled by
-     * {@link #isomorphicSampleSize}).</li>
-     * <li>we run multiple threads, each of which may generate a new fragment 
+     * {@link #isomorphicSampleSize}).</p>
+     * <p>Also, if we run multiple threads and want to remove duplicate fragments
+     * , each of thread may generate a new fragment 
      * that the others have not yet found. Thus, the existence of the new 
      * fragment must be communicated to the other threads avoiding concurrent
-     * generation of the same fragment from different threads.</li>
-     * </ul>
+     * generation of the same fragment from different threads.</p>
      * The management of isomorphic families involves:<ol>
      * <li>Splitting fragments according to molecular weight (MW) to limit the
      * operations on the list of fragments to a small portion of the entire 
@@ -677,19 +677,20 @@ public class FragmenterParameters extends RunTimeParameters
 //------------------------------------------------------------------------------
 
     /**
-     * One needs to manage isomorphic families, i.e., manage
-     * duplicate fragments if any of these are true:<ul>
-     * <li>we want to identify isomorphic fragments and keep only one 
+     * <p>One needs to manage isomorphic families, i.e., manage
+     * duplicate fragments if we want to identify isomorphic fragments and 
+     * keep only one 
      * isomorphic fragment (i.e.,
      * remove all duplicate fragments), or more then more isomorphic fragment. 
      * In the latter case, we essentially want to sample the isomorphic family.
      * The extent of this, i.e., the size of the sample is controlled by
-     * {@link #isomorphicSampleSize}).</li>
-     * <li>we run multiple threads, each of which may generate a new fragment 
+     * {@link #isomorphicSampleSize}).</p>
+     * <p>Also, if we run multiple threads and want to remove duplicate fragments
+     * , each of thread may generate a new fragment 
      * that the others have not yet found. Thus, the existence of the new 
      * fragment must be communicated to the other threads avoiding concurrent
-     * generation of the same fragment from different threads.</li>
-     * </ul>
+     * generation of the same fragment from different threads.</p>
+     * 
      * The management of isomorphic families involves:<ol>
      * <li>Splitting fragments according to molecular weight (MW) to limit the
      * operations on the list of fragments to a small portion of the entire 
@@ -1000,16 +1001,6 @@ public class FragmenterParameters extends RunTimeParameters
                 throw new DENOPTIMException("Problems reading file '" 
                         + targetFragmentsFile + "'", e);
             }
-        }
-        
-        //NB: doManageIsomorphicFamilies is set to true also by reading 
-        // keywords asking to set isomorphicSampleSize >0 (yes, I do mean 0!)
-        // which is a way to ask for removal of duplicates.
-        // And by the keyword that removes duplicates.
-        
-        if (isomorphicSampleSize > 1 || numParallelTasks > 1)
-        {
-            doManageIsomorphicFamilies = true;
         }
        
 		if (isMaster)
