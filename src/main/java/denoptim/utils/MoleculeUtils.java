@@ -672,6 +672,8 @@ public class MoleculeUtils
     
 //------------------------------------------------------------------------------
 
+    //TODO: should we set only values that would otherwise be null?
+    
     /**
      * Sets zero implicit hydrogen count to all atoms.
      * @param iac the container to process

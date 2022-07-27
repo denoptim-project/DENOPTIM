@@ -7,11 +7,15 @@ paramFile="t30.params"
 mv data/* "$wrkDir"
 rm -rf data
 
-#Run sub tests
-expectedNoMissingAtomMols=(3 1 0 0 0 0)
-expectedPreFiltered=(0 0 2 0 0 0)  
-expectedFragments=(0 0 0 20 12 8)
+# Here we define the expected results
+#             sub test ID: 1  2  3  4  5  6  7     
+expectedNoMissingAtomMols=(3  1  0  0  0  0  0)
+      expectedPreFiltered=(0  0  2  0  0  0  0)  
+        expectedFragments=(0  0  0 20 12  8  6)
+  expectedIsomorphicFrags=(0  0  0  0  0  0 30)
 nSubTests=${#expectedNoMissingAtomMols[@]}
+
+#Run sub tests
 totChecks=0
 for i in $(seq 1 $nSubTests)
 do
@@ -55,6 +59,16 @@ do
         if [ "$n" -ne ${expectedFragments[$i-1]} ]
         then
             echo "Test 't30' NOT PASSED (symptom: wrong number of fragments peoduced: $n vs. ${expectedFragments[$i-1]}."
+            exit -1
+        fi
+    fi
+
+    if [ 0 -ne ${expectedIsomorphicFrags[$i-1]} ]
+    then
+        n=$(grep "\$\$\$\$" "$output"/MW*All* | wc -l)
+        if [ "$n" -ne ${expectedIsomorphicFrags[$i-1]} ]
+        then
+            echo "Test 't30' NOT PASSED (symptom: wrong number of fragments produced: $n vs. ${expectedFragments[$i-1]}."
             exit -1
         fi
     fi

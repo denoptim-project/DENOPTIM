@@ -31,6 +31,7 @@ import java.util.Set;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge.BondType;
@@ -521,5 +522,28 @@ public final class DENOPTIMConstants
      * differ by conformers/geometries with the first one found.
      */
     public static final Object ISOMORPHICFAMILYID = "ISOMORPHICFAMILYID";
+
+    /**
+     * Initial part of filename used to collect fragment belonging to a certain
+     * molecular weight slot.
+     */
+    public static final String MWSLOTFRAGSFILENAMEROOT = "MWSlot_";
+    
+    /**
+     * Final part of filename used to collect unique fragments in a certain
+     * molecular weight slot.
+     */
+    public static final String MWSLOTFRAGSUNQFILENANEEND = "_Unq";
+    
+    /**
+     * Final part of filename used to collect all samples fragments in a certain
+     * molecular weight slot including isomorphic duplicates.
+     */
+    public static final String MWSLOTFRAGSALLFILENANEEND = "_All";
+    
+    /**
+     * Format for intermediate files used during fragmentation.
+     */
+    public static final FileFormat TMPFRAGFILEFORMAT = FileFormat.VRTXSDF;
     
 }

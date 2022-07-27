@@ -184,13 +184,13 @@ public class FragmenterParameters extends RunTimeParameters
     /**
      * SMARTS leading to rejection of a fragment.
      */
-    private Map<String, String>  fragRejectionSMARTS = new HashMap<String, String>();
+    private Map<String, String> fragRejectionSMARTS = new HashMap<String, String>();
     
     /**
      * SMARTS leading to retention of a fragment. All fragments not matching one
      * of these are rejected.
      */
-    private Map<String, String>  fragRetentionSMARTS = new HashMap<String, String>();
+    private Map<String, String> fragRetentionSMARTS = new HashMap<String, String>();
 
     /**
      * Flag requesting to add dummy atoms on linearities. This to enable 
@@ -227,11 +227,41 @@ public class FragmenterParameters extends RunTimeParameters
     private ArrayList<Vertex> targetFragments = new ArrayList<Vertex>();
     
     /**
-     * Size of the sample of isomorphic fragments to collect. When this number
-     * N is larger then zero, we will collect the first N isomorphic forms of
-     * each fragment.
+     * Flag signaling the need to manage isomorphic families, i.e., manage
+     * duplicate fragments. This is needed if any of these are true:<ul>
+     * <li>we want to identify isomorphic fragments and keep only one 
+     * isomorphic fragment (i.e.,
+     * remove all duplicate fragments), or more then more isomorphic fragment. 
+     * In the latter case, we essentially want to sample the isomorphic family.
+     * The extent of this, i.e., the size of the sample is controlled by
+     * {@link #isomorphicSampleSize}).</li>
+     * <li>we run multiple threads, each of which may generate a new fragment 
+     * that the others have not yet found. Thus, the existence of the new 
+     * fragment must be communicated to the other threads avoiding concurrent
+     * generation of the same fragment from different threads.</li>
+     * </ul>
+     * The management of isomorphic families involves:<ol>
+     * <li>Splitting fragments according to molecular weight (MW) to limit the
+     * operations on the list of fragments to a small portion of the entire 
+     * list of fragments.</li>
+     * <li>Separate collection of unique versions of a fragment (the first found)
+     * and of the sample of the family of fragments isomorphic to the first.</li>
+     * <li>Thread-safe manipulation of the two MW-split collections: 
+     * the unique, and the family sample.</li>
+     * <li>Unification of the MW-split collections to obtain the overall result.
+     * </li>
+     * </ol>
      */
-    private int isomorphicSampleSize = -1;
+    // NB: javadoc reproduced also in the getter method. See below
+    private boolean doManageIsomorphicFamilies = false;
+    
+    /**
+     * Size of the sample of isomorphic fragments to collect. When this number
+     * N is larger then one, we will collect the first N isomorphic forms of
+     * each fragment. A value of 1 corresponds to saying "remove all isomorphic
+     * duplicates".
+     */
+    private int isomorphicSampleSize = 1;
     
     /**
      * Molecular weight slot width for collecting fragments.
@@ -250,19 +280,18 @@ public class FragmenterParameters extends RunTimeParameters
      */
     private Map<String,File> mwSlotToUnqFragsFile = new HashMap<String,File>();
     
-    
     /**
      * Counts of isomorphic versions of each known fragment generated in
      * a fragmentation process. The key is a string that identifies the vertex 
      * without having to hold the entire data structure of it.
      */
-    private Map<String, Integer> isomorphsCount;
+    private Map<String,Integer> isomorphsCount = new HashMap<String,Integer>();
     
     //TODO: We could use something like the SizeControlledSet used in the EA to 
     // collect unique identifiers.
     
     /**
-     * Unique identifier of a family of ismorphic versions of a fragment,.
+     * Unique identifier of a family of isomorphic versions of a fragment,.
      */
     private AtomicInteger unqIsomorphicFamilyId = new AtomicInteger(0);
     
@@ -273,7 +302,8 @@ public class FragmenterParameters extends RunTimeParameters
      */
     public final Object MANAGEMWSLOTSSLOCK = new Object();
     
-//-----------------------------------------------------------------------------
+    
+//------------------------------------------------------------------------------
     
     /**
      * Constructor
@@ -283,7 +313,7 @@ public class FragmenterParameters extends RunTimeParameters
         super(ParametersType.FRG_PARAMS);
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @return the number of parallel tasks to run. Default is 1.
@@ -293,7 +323,7 @@ public class FragmenterParameters extends RunTimeParameters
         return numParallelTasks;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Sets the number of parallel tasks to run.
@@ -304,7 +334,7 @@ public class FragmenterParameters extends RunTimeParameters
         this.numParallelTasks = numParallelTasks;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @return the pathname to the file containing the structures to work with.
@@ -314,7 +344,7 @@ public class FragmenterParameters extends RunTimeParameters
         return structuresFile;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * Sets the pathname of the file containing input structures.
@@ -325,7 +355,7 @@ public class FragmenterParameters extends RunTimeParameters
         this.structuresFile = structuresFile;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * Sets the pathname of the file containing molecular formula with a format
@@ -337,7 +367,7 @@ public class FragmenterParameters extends RunTimeParameters
         this.formulaeFile = formulaeFile;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @return the pathname to the file containing the molecular formulae to 
@@ -348,7 +378,7 @@ public class FragmenterParameters extends RunTimeParameters
         return formulaeFile;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @return the cutting rules loaded from the input.
@@ -358,7 +388,7 @@ public class FragmenterParameters extends RunTimeParameters
         return cuttingRules;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @return the SMRTS strings used in the cutting rules to identify any atom.
@@ -368,7 +398,7 @@ public class FragmenterParameters extends RunTimeParameters
         return anyAtomQuesties;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @return the list of molecular formulae read-in from text file.
@@ -378,7 +408,7 @@ public class FragmenterParameters extends RunTimeParameters
         return formulae;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return <code>true</code> if we are asked to perform the comparison of
@@ -392,7 +422,7 @@ public class FragmenterParameters extends RunTimeParameters
         return checkFormula;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Sets the value of the flag controlling the execution of elemental analysis
@@ -405,7 +435,7 @@ public class FragmenterParameters extends RunTimeParameters
     }
     
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return <code>true</code> if we are asked to filter initial structures.
@@ -415,7 +445,7 @@ public class FragmenterParameters extends RunTimeParameters
         return preFilter;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return the SMARTS queries identifying substructures that lead to 
@@ -426,7 +456,7 @@ public class FragmenterParameters extends RunTimeParameters
         return preFilterSMARTS;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return <code>true</code> if we are asked to fragment structures.
@@ -436,7 +466,7 @@ public class FragmenterParameters extends RunTimeParameters
         return doFragmentation;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @return <code>true</code> if we want to remove fragments that contain
@@ -447,7 +477,7 @@ public class FragmenterParameters extends RunTimeParameters
         return doRejectWeirdIsotopes;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return <code>true</code> if we want to add dummy atoms to resolve
@@ -458,7 +488,7 @@ public class FragmenterParameters extends RunTimeParameters
         return doAddDuOnLinearity;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @return the elemental symbols leading to rejection of a fragment.
@@ -468,7 +498,7 @@ public class FragmenterParameters extends RunTimeParameters
         return rejectedElements;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * @return the formula-based criteria to reject a fragment is there are too
@@ -479,7 +509,7 @@ public class FragmenterParameters extends RunTimeParameters
         return formulaCriteriaLessThan;
     }
   
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return the formula-based criteria to reject a fragment is there are too
@@ -490,7 +520,7 @@ public class FragmenterParameters extends RunTimeParameters
         return formulaCriteriaMoreThan;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return the classes leading to rejection of a fragment.
@@ -500,7 +530,7 @@ public class FragmenterParameters extends RunTimeParameters
         return rejectedAPClasses;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return the combinations of classes leading to rejection of a fragment.
@@ -510,7 +540,7 @@ public class FragmenterParameters extends RunTimeParameters
         return rejectedAPClassCombinations;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return the max number of heavy atoms to retain a fragment.
@@ -520,7 +550,7 @@ public class FragmenterParameters extends RunTimeParameters
         return maxFragHeavyAtomCount;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return the min number of heavy atoms to retain a fragment.
@@ -530,7 +560,7 @@ public class FragmenterParameters extends RunTimeParameters
         return minFragHeavyAtomCount;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return the SMARTS that lead to rejection of a fragment.
@@ -540,7 +570,7 @@ public class FragmenterParameters extends RunTimeParameters
         return fragRejectionSMARTS;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return the SMARTS that lead to retention of a fragment.
@@ -550,21 +580,21 @@ public class FragmenterParameters extends RunTimeParameters
         return fragRetentionSMARTS;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public void setRejectWeirdIsotopes(boolean doRejectWeirdIsotopes)
     {
         this.doRejectWeirdIsotopes = doRejectWeirdIsotopes;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setRejectedElements(Set<String> rejectedElements)
     {
         this.rejectedElements = rejectedElements;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setFormulaCriteriaLessThan(
             Set<Map<String, Double>> formulaCriteriaLessThan)
@@ -572,7 +602,7 @@ public class FragmenterParameters extends RunTimeParameters
         this.formulaCriteriaLessThan = formulaCriteriaLessThan;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setFormulaCriteriaMoreThan(
             Set<Map<String, Double>> formulaCriteriaMoreThan)
@@ -580,14 +610,14 @@ public class FragmenterParameters extends RunTimeParameters
         this.formulaCriteriaMoreThan = formulaCriteriaMoreThan;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setRejectedAPClasses(Set<String> rejectedAPClasses)
     {
         this.rejectedAPClasses = rejectedAPClasses;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setRejectedAPClassCombinations(
             Set<String[]> rejectedAPClassCombinations)
@@ -595,35 +625,35 @@ public class FragmenterParameters extends RunTimeParameters
         this.rejectedAPClassCombinations = rejectedAPClassCombinations;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setMaxFragHeavyAtomCount(int maxFragHeavyAtomCount)
     {
         this.maxFragHeavyAtomCount = maxFragHeavyAtomCount;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setMinFragHeavyAtomCount(int minFragHeavyAtomCount)
     {
         this.minFragHeavyAtomCount = minFragHeavyAtomCount;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setFragRejectionSMARTS(Map<String, String> fragRejectionSMARTS)
     {
         this.fragRejectionSMARTS = fragRejectionSMARTS;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setFragRetentionSMARTS(Map<String, String> fragRetentionSMARTS)
     {
         this.fragRetentionSMARTS = fragRetentionSMARTS;
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return list of fragment that can be rejected.
@@ -633,7 +663,7 @@ public class FragmenterParameters extends RunTimeParameters
         return ignorableFragments;
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * @return the list of fragment that will be retained, i.e., any 
@@ -643,50 +673,84 @@ public class FragmenterParameters extends RunTimeParameters
     {
         return targetFragments;
     }
+    
+//------------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------
+    /**
+     * One needs to manage isomorphic families, i.e., manage
+     * duplicate fragments if any of these are true:<ul>
+     * <li>we want to identify isomorphic fragments and keep only one 
+     * isomorphic fragment (i.e.,
+     * remove all duplicate fragments), or more then more isomorphic fragment. 
+     * In the latter case, we essentially want to sample the isomorphic family.
+     * The extent of this, i.e., the size of the sample is controlled by
+     * {@link #isomorphicSampleSize}).</li>
+     * <li>we run multiple threads, each of which may generate a new fragment 
+     * that the others have not yet found. Thus, the existence of the new 
+     * fragment must be communicated to the other threads avoiding concurrent
+     * generation of the same fragment from different threads.</li>
+     * </ul>
+     * The management of isomorphic families involves:<ol>
+     * <li>Splitting fragments according to molecular weight (MW) to limit the
+     * operations on the list of fragments to a small portion of the entire 
+     * list of fragments.</li>
+     * <li>Separate collection of unique versions of a fragment (the first found)
+     * and of the sample of the family of fragments isomorphic to the first.</li>
+     * <li>Thread-safe manipulation of the two MW-split collections: 
+     * the unique, and the family sample.</li>
+     * <li>Unification of the MW-split collections to obtain the overall result.
+     * </li>
+     * </ol>
+     * @return <code>true</code> if we need to manage isomorphic families.
+     */
+    public boolean doManageIsomorphicFamilies()
+    {
+        return doManageIsomorphicFamilies;
+    }
+    
+//------------------------------------------------------------------------------
 
     public int getIsomorphicSampleSize()
     {
         return isomorphicSampleSize;
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public void setIsomorphicSampleSize(int isomorphicSampleSize)
     {
         this.isomorphicSampleSize = isomorphicSampleSize;
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public int getMWSlotSize()
     {
         return mwSlotSize;
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public void setMWSlotSize(int mwSlotSize)
     {
         this.mwSlotSize = mwSlotSize;
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public Map<String, File> getMWSlotToAllFragsFile()
     {
         return mwSlotToAllFragsFile;
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public void setMWSlotToAllFragsFile(Map<String, File> mwSlotToAllFragsFile)
     {
         this.mwSlotToAllFragsFile = mwSlotToAllFragsFile;
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     public Map<String, File> getMWSlotToUnqFragsFile()
     {
@@ -706,13 +770,15 @@ public class FragmenterParameters extends RunTimeParameters
     public File getMWSlotFileNameUnqFrags(String mwSlotId)
     {
         return new File(getWorkDirectory() + DenoptimIO.FS 
-                + "Fragments-MWSlot_" + mwSlotId + "_Unq.sdf");
+                + DENOPTIMConstants.MWSLOTFRAGSFILENAMEROOT + mwSlotId 
+                + DENOPTIMConstants.MWSLOTFRAGSUNQFILENANEEND + "."
+                + DENOPTIMConstants.TMPFRAGFILEFORMAT.getExtension());
     }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Builds the pathname of the file meant to be hold all isomorphic fragments 
+     * Builds the pathname of the file meant to hold all isomorphic fragments 
      * from a given MW slot.
      * @param mwSlotId the identifier of the MW slot.
      * @return the file collecting all isomorphic fragment
@@ -721,7 +787,9 @@ public class FragmenterParameters extends RunTimeParameters
     public File getMWSlotFileNameAllFrags(String mwSlotId)
     {
         return new File(getWorkDirectory() + DenoptimIO.FS 
-                + "Fragments-MWSlot_" + mwSlotId + "_All.sdf");
+                + DENOPTIMConstants.MWSLOTFRAGSFILENAMEROOT + mwSlotId 
+                + DENOPTIMConstants.MWSLOTFRAGSALLFILENANEEND + "."
+                + DENOPTIMConstants.TMPFRAGFILEFORMAT.getExtension());
     }
 
 //------------------------------------------------------------------------------
@@ -805,6 +873,11 @@ public class FragmenterParameters extends RunTimeParameters
                 targetFragmentsFile = value;
                 break;
                 
+            case "ISOMORPHICSAMPLESIZE=":
+                isomorphicSampleSize = Integer.parseInt(value);
+                break;
+                
+                
 /*
             case "=":
                 = value;
@@ -841,7 +914,7 @@ public class FragmenterParameters extends RunTimeParameters
         }
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Evaluate consistency of input parameters.
@@ -864,7 +937,7 @@ public class FragmenterParameters extends RunTimeParameters
     	checkOtherParameters();
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Processes all parameters and initialize related objects.
@@ -913,6 +986,11 @@ public class FragmenterParameters extends RunTimeParameters
                 throw new DENOPTIMException("Problems reading file '" 
                         + targetFragmentsFile + "'", e);
             }
+        }
+        
+        if (isomorphicSampleSize > 1 || numParallelTasks > 1)
+        {
+            doManageIsomorphicFamilies = true;
         }
        
 		if (isMaster)
@@ -998,6 +1076,6 @@ public class FragmenterParameters extends RunTimeParameters
         this.linearAngleLimit = linearAngleLimit;
     }
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 }

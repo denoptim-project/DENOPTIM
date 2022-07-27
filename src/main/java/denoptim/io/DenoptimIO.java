@@ -28,11 +28,13 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.http.HttpClient.Version;
 import java.text.DateFormat;
@@ -2444,6 +2446,48 @@ public class DenoptimIO
             sb.append(NL);
         }
         writeData(file.getAbsolutePath(), sb.toString(), false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Appends the second file to the first.
+     * @param f1 file being elongated
+     * @param list files providing the content to place in f1.
+     * @throws IOException 
+     */
+    public static void appendTxtFiles(File f1, List<File> files) throws IOException
+    {
+        FileWriter fw;
+        BufferedWriter bw;
+        PrintWriter pw = null;
+        try
+        {
+            fw = new FileWriter(f1, true);
+            bw = new BufferedWriter(fw);
+            pw = new PrintWriter(bw);
+            for (File inFile : files)
+            {
+                FileReader fr;
+                BufferedReader br = null;
+                try
+                {
+                    fr = new FileReader(inFile);
+                    br = new BufferedReader(fr);
+                    String line = null;
+                    while ((line = br.readLine()) != null) 
+                    {
+                        pw.println(line);
+                    }
+                } finally {
+                    if (br != null)
+                        br.close();
+                }
+            }
+        } finally {
+            if (pw!=null)
+                pw.close();
+        }
     }
 
 //------------------------------------------------------------------------------

@@ -320,7 +320,11 @@ public class FragmenterTools
                                 settings.getLinearAngleLimit());
                     }
                     
-                    if (settings.getIsomorphicSampleSize() > 0)
+                     // Management of duplicate fragments:
+                     // -> identify duplicates (isomorphic fragments), 
+                     // -> keep one (or more, if we want to sample the isomorphs),
+                     // -> reject the rest.
+                    if (settings.doManageIsomorphicFamilies())
                     {
                         synchronized (settings.MANAGEMWSLOTSSLOCK)
                         {
@@ -333,14 +337,18 @@ public class FragmenterTools
                                     mwSlotID);
                             
                             // Compare this fragment with previously seen ones
-                            ArrayList<Vertex> knownFrags = 
-                                    DenoptimIO.readVertexes(mwFileUnq, 
-                                            BBType.UNDEFINED);
-                            Vertex unqVersion = knownFrags.stream()
-                                .filter(knownFrag -> 
-                                    ((Fragment)frag).isIsomorphicTo(knownFrag))
-                                .findAny()
-                                .orElse(null);
+                            Vertex unqVersion = null;
+                            if (mwFileUnq.exists())
+                            {
+                                ArrayList<Vertex> knownFrags = 
+                                        DenoptimIO.readVertexes(mwFileUnq, 
+                                                BBType.UNDEFINED);
+                                unqVersion = knownFrags.stream()
+                                    .filter(knownFrag -> 
+                                        ((Fragment)frag).isIsomorphicTo(knownFrag))
+                                    .findAny()
+                                    .orElse(null);
+                            }
                             if (unqVersion!=null)
                             {
                                 // Identify this unique fragment
@@ -361,6 +369,7 @@ public class FragmenterTools
                                             sampleSize+1);
                                     DenoptimIO.writeVertexToFile(mwFileAll, 
                                             FileFormat.VRTXSDF, frag, true);
+                                    keptFragments.add(frag);
                                 } else {
                                     // This would be inefficient in the long run
                                     // because it by-passes the splitting by MW. 
@@ -390,19 +399,21 @@ public class FragmenterTools
                                         FileFormat.VRTXSDF, frag, true);
                                 DenoptimIO.writeVertexToFile(mwFileAll, 
                                         FileFormat.VRTXSDF, frag, true);
+                                keptFragments.add(frag);
                             }
                         } // end synchronized block
                     } else {
+                        //TODO-gg no removal of duplicates?
                         keptFragments.add(frag);
                     }
                 }
-                if (settings.getIsomorphicSampleSize()<0)
+                if (logger!=null)
                 {
-                    if (logger!=null)
-                    {
-                        logger.log(Level.FINE,"Fragments surviving post-"
-                                + "processing: " + keptFragments.size());
-                    }
+                    logger.log(Level.FINE,"Fragments surviving post-"
+                            + "processing: " + keptFragments.size());
+                }
+                if (!settings.doManageIsomorphicFamilies())
+                {
                     DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
                             keptFragments,true);
                 }
@@ -1071,6 +1082,11 @@ public class FragmenterTools
      */
     public static String getMWSlotIdentifier(Vertex frag, int slotSize)
     {
+        for (IAtom a : frag.getIAtomContainer().atoms())
+        {
+            if (a.getImplicitHydrogenCount()==null)
+                a.setImplicitHydrogenCount(0);
+        }
         double mw = AtomContainerManipulator.getMass(frag.getIAtomContainer());
         int slotNum = (int) (mw / (Double.valueOf(slotSize)));
         return slotNum*slotSize + "-" + (slotNum+1)*slotSize;

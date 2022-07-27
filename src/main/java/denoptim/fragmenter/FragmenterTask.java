@@ -79,6 +79,11 @@ public class FragmenterTask extends Task
      * Logger for this task.
      */
     private Logger logger = null;
+    
+    /**
+     * Pathname to thread-specific log.
+     */
+    private String logFilePathname = "unset";
 
 //------------------------------------------------------------------------------
     
@@ -108,7 +113,8 @@ public class FragmenterTask extends Task
             logger.removeHandler(logger.getHandlers()[0]);
         }
 
-        FileHandler fileHdlr = new FileHandler(getLogFileName(settings,id));
+        this.logFilePathname = getLogFileName(settings,id);
+        FileHandler fileHdlr = new FileHandler(logFilePathname);
         SimpleFormatter formatterTxt = new SimpleFormatter();
         fileHdlr.setFormatter(formatterTxt);
         logger.setUseParentHandlers(false);
@@ -131,6 +137,16 @@ public class FragmenterTask extends Task
     {
         return settings.getWorkDirectory() + DenoptimIO.FS 
                 + "structuresBatch-" + i + ".sdf";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the pathname of the log file.
+     */
+    public String getLogFilePathname()
+    {
+        return logFilePathname;
     }
     
 //------------------------------------------------------------------------------
@@ -177,6 +193,20 @@ public class FragmenterTask extends Task
     {
         return settings.getWorkDirectory() + DenoptimIO.FS 
                 + "Fragments-" + i + ".sdf";
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds the pathname of the structure file meant to be hold fragments 
+     * resulting from all tasks.
+     * @param settings settings we work with.
+     * @return the pathname
+     */
+    static String getFragmentsFileName(FragmenterParameters settings)
+    {
+        return settings.getWorkDirectory() + DenoptimIO.FS 
+                + "Fragments.sdf";
     }
     
 //------------------------------------------------------------------------------
@@ -279,8 +309,13 @@ public class FragmenterTask extends Task
         
         
         // Final message
-        results = preliminaryResults.getAbsolutePath();
-        logger.log(Level.INFO,"Results available in "+results);
+        if (settings.getNumTasks()>1)
+        {
+            logger.log(Level.INFO,"Fragmenter task " + id + " completed.");
+        } else {
+            results = preliminaryResults.getAbsolutePath();
+            logger.log(Level.INFO,"Results available in "+results);
+        }
         
         // We stop the logger's file handler to remove the lock file.
         for (Handler h : logger.getHandlers()) 
