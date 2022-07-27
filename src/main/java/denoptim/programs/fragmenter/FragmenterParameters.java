@@ -266,7 +266,7 @@ public class FragmenterParameters extends RunTimeParameters
     /**
      * Molecular weight slot width for collecting fragments.
      */
-    private int mwSlotSize = 2;
+    private int mwSlotSize = 10;
     
     /**
      * Mapping of the molecular weight slot identifier to the file collecting
@@ -875,6 +875,16 @@ public class FragmenterParameters extends RunTimeParameters
                 
             case "ISOMORPHICSAMPLESIZE=":
                 isomorphicSampleSize = Integer.parseInt(value);
+                if (isomorphicSampleSize>0)
+                    doManageIsomorphicFamilies = true;
+                break;
+                
+            case "REMOVEDUPLICATES":
+                doManageIsomorphicFamilies = true;
+                break;
+                
+            case "MWSLOTSIZE=":
+                mwSlotSize = Integer.parseInt(value);
                 break;
                 
                 
@@ -883,6 +893,7 @@ public class FragmenterParameters extends RunTimeParameters
                 = value;
                 break;
   */              
+                
             case "PARALLELTASKS=":
                 try
                 {
@@ -928,6 +939,9 @@ public class FragmenterParameters extends RunTimeParameters
     	    ensureFileExists(workDir);
     	}
     	ensureIsPositive("numParallelTasks", numParallelTasks, "PARALLELTASKS");
+    	ensureIsPositive("isomorphicSampleSize", isomorphicSampleSize, 
+    	        "ISOMORPHICSAMPLESIZE");
+    	ensureIsPositive("mwSlotSize", mwSlotSize, "MWSLOTSIZE");
     	ensureFileExistsIfSet(structuresFile);
     	ensureFileExistsIfSet(cutRulesFile);
     	ensureFileExistsIfSet(formulaeFile);
@@ -987,6 +1001,11 @@ public class FragmenterParameters extends RunTimeParameters
                         + targetFragmentsFile + "'", e);
             }
         }
+        
+        //NB: doManageIsomorphicFamilies is set to true also by reading 
+        // keywords asking to set isomorphicSampleSize >0 (yes, I do mean 0!)
+        // which is a way to ask for removal of duplicates.
+        // And by the keyword that removes duplicates.
         
         if (isomorphicSampleSize > 1 || numParallelTasks > 1)
         {

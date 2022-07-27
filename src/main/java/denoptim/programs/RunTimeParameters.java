@@ -968,7 +968,7 @@ public abstract class RunTimeParameters
      */
     protected void ensureIsPositive(String paramName, int value, String paramKey)
     {
-        if (value < 0)
+        if (value <= 0)
         {
             String msg = "ERROR! Parameter '" + paramName + "' not striktly "
                 + "positive (" + value + "). "
@@ -988,7 +988,7 @@ public abstract class RunTimeParameters
     protected void ensureIsPositiveOrZero(String paramName, int value, 
             String paramKey)
     {
-        if (value <= 0)
+        if (value < 0)
         {
             String msg = "ERROR! Parameter '" + paramName + "' is negative ("
                 + value + "). "
