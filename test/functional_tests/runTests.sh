@@ -361,5 +361,10 @@ runTest "t28"
 #
 runTest "t29"
 
+#
+# t30: test fragmenter
+#
+runTest "t30"
+
 echo "All done!"
 exit 0

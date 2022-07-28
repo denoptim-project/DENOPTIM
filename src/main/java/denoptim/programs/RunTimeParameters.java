@@ -197,10 +197,10 @@ public abstract class RunTimeParameters
             CEBL_PARAMS.keywordRoot = "FSE-";
             GA_PARAMS.keywordRoot = "GA-";
             FS_PARAMS.keywordRoot = "FS-";
+            FRG_PARAMS.keywordRoot = "FRG-";
             RC_PARAMS.keywordRoot = "RC-";
             FIT_PARAMS.keywordRoot = "FP-";
             FR_PARAMS.keywordRoot = "FR-";
-            FRG_PARAMS.keywordRoot = "FRG-";
             MMB_PARAM.keywordRoot = "3DB-";
             GO_PARAMS.keywordRoot = "TESTGENOPS-";
             GE_PARAMS.keywordRoot = "GRAPHEDIT-";
@@ -210,7 +210,7 @@ public abstract class RunTimeParameters
             CEBL_PARAMS.implementation = CEBLParameters.class;
             GA_PARAMS.implementation = GAParameters.class;
             FS_PARAMS.implementation = FragmentSpaceParameters.class;
-            FS_PARAMS.implementation = FragmenterParameters.class;
+            FRG_PARAMS.implementation = FragmenterParameters.class;
             RC_PARAMS.implementation = RingClosureParameters.class;
             FIT_PARAMS.implementation = FitnessParameters.class;
             FR_PARAMS.implementation = FRParameters.class;

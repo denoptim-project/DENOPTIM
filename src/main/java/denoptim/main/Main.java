@@ -152,7 +152,7 @@ public class Main
             CLG.description = "Comparison of Lists of Graphs";
             B3D.description = "stand-alone build a 3D molecular model from a "
                     + "graph";
-            FRG.description = "Fragmentation and fragment managment.";
+            FRG.description = "Fragmentation and managment of fragments.";
             
             DRY.isCLIEnabled = false;
             FSE.isCLIEnabled = true;
