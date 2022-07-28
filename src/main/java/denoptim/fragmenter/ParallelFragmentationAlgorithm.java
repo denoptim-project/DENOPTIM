@@ -53,6 +53,7 @@ import denoptim.combinatorial.GraphBuildingTask;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
+import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.FragsCombinationIterator;
@@ -64,6 +65,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.task.ParallelAsynchronousTaskExecutor;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 import edu.uci.ics.jung.visualization.spatial.FastRenderingGraph;
@@ -75,27 +77,13 @@ import edu.uci.ics.jung.visualization.spatial.FastRenderingGraph;
  * @author Marco Foscato
  */
 
-public class ParallelFragmentationAlgorithm
-{
+public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExecutor
+{   
+    
     /**
-     * Storage of references to the submitted subtasks as <code>Future</code>
+     * Collection of files with input
      */
-    final List<Future<Object>> futures;
-
-    /**
-     * Storage of references to the submitted subtasks.
-     */
-    final ArrayList<FragmenterTask> submitted;
-
-    /**
-     * Asynchronous tasks manager 
-     */
-    final ThreadPoolExecutor tpe;
-
-    /**
-     * If any, here we stores the exception returned by a subtask
-     */
-    private Throwable thrownByTask;
+    private File[] structures;
     
     /**
      * All settings controlling the tasks executed by this class.
@@ -111,144 +99,19 @@ public class ParallelFragmentationAlgorithm
 
     public ParallelFragmentationAlgorithm(FragmenterParameters settings)
     {
+        super(settings.getNumTasks(), settings.getLogger());
         this.settings = settings;
-        futures = new ArrayList<>();
-        submitted = new ArrayList<>();
-
-        tpe = new ThreadPoolExecutor(settings.getNumTasks(),
-                settings.getNumTasks(),
-                Long.MAX_VALUE,
-                TimeUnit.NANOSECONDS,
-                new ArrayBlockingQueue<Runnable>(1));
-
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
-            @Override
-            public void run()
-            {
-                tpe.shutdown(); // Disable new tasks from being submitted
-                try
-                {
-                    // Wait a while for existing tasks to terminate
-                    if (!tpe.awaitTermination(30, TimeUnit.SECONDS))
-                    {
-                        tpe.shutdownNow(); // Cancel currently executing tasks
-                    }
-
-                    if (!tpe.awaitTermination(60, TimeUnit.SECONDS))
-                    {
-                        // pool didn't terminate after the second try
-                    }
-                }
-                catch (InterruptedException ie)
-                {
-                    cleanup(tpe, futures, submitted);
-                    // (Re-)Cancel if current thread also interrupted
-                    tpe.shutdownNow();
-                    // Preserve interrupt status
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
-
-        // by default the ThreadPoolExecutor will throw an exception
-        tpe.setRejectedExecutionHandler(new RejectedExecutionHandler()
-        {
-            @Override
-            public void rejectedExecution(Runnable r, 
-                    ThreadPoolExecutor executor)
-            {
-                try
-                {
-                    // this will block if the queue is full
-                    executor.getQueue().put(r);
-                }
-                catch (InterruptedException ex)
-                {
-                    ex.printStackTrace();
-                    String msg = "EXCEPTION in rejectedExecution.";
-                    settings.getLogger().log(Level.WARNING,msg);
-                }
-            }
-        });
     }
 
 //------------------------------------------------------------------------------
 
-    /**
-     * Stops all subtasks and shutdown executor
-     */
-
-    public void stopRun()
+    protected boolean doPreFlightOperations()
     {
-        cleanup(tpe, futures, submitted);
-        tpe.shutdown();
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Looks for exceptions in the subtasks and, if any, store its reference
-     * locally to allow reporting it back from the main thread.
-     * @return <code>true</code> if any of the subtasks has thrown an exception
-     */
-
-  //TODO-gg del
-    private boolean subtaskHasException()
-    {
-        boolean hasException = false;
-        for (FragmenterTask tsk : submitted)
-        {
-            if (tsk.foundException())
-            {
-                hasException = true;
-                thrownByTask = tsk.getException();
-                break;
-            }
-        }
-
-        return hasException;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Check for completion of all subtasks
-     * @return <code>true</code> if all subtasks are completed
-     */
-//TODO-gg del
-    private boolean allTasksCompleted()
-    {
-        boolean allDone = true;
-        for (FragmenterTask tsk : submitted)
-        {
-            if (!tsk.isCompleted())
-            {
-                allDone = false;
-                break;
-            }
-        }
-
-        return allDone;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Run the parallelized task. 
-     */
-
-    public void run() throws DENOPTIMException, IOException
-    {
-        String msg = "";
-        StopWatch watch = new StopWatch();
-        watch.start();
-        
         // Split data in batches for parallelization
         
         // This is the collector of the mutating pathname to the file collecting
         // the input structures for each thread.
-        File[] structures = new File[settings.getNumTasks()];
+        structures = new File[settings.getNumTasks()];
         structures[0] = new File(settings.getStructuresFile());
         if (settings.getNumTasks()>1 || settings.doCheckFormula())
         {
@@ -260,9 +123,13 @@ public class ParallelFragmentationAlgorithm
                 structures[i] = new File(getStructureFileNameBatch(settings, i));
             }
         }
+        return true;
+    }
         
-        // Start the parallel threads
-        tpe.prestartAllCoreThreads();
+//------------------------------------------------------------------------------
+
+    protected void createAndSubmitTasks()
+    {
         for (int i=0; i<settings.getNumTasks(); i++)
         {
             FragmenterTask task;
@@ -273,81 +140,83 @@ public class ParallelFragmentationAlgorithm
             {
                 throw new Error("Unable to start fragmentation thread.",e);
             }
-            submitted.add(task);
-            futures.add(tpe.submit(task));
-            settings.getLogger().log(Level.INFO, "Fragmenter task "
-                    + i + " submitted. Log file: " + task.getLogFilePathname());
+            submitTask(task, task.getLogFilePathname());
         }
+    }
+    
+//------------------------------------------------------------------------------
+
+    protected boolean doPostFlightOperations()
+    {
         
-        // This sounds weird when reading the doc, but the following does wait
-        // for the threads to complete.
-        
-        // shutdown thread pool
-        tpe.shutdown();
-        try
+        /*
+        // Extract a representative conformation from each family of isomorphic fragments
+        if (settings.extactRepresentativeConformer())
         {
-            // wait a bit for pending tasks to finish
-            while (!tpe.awaitTermination(5, TimeUnit.SECONDS))
+            int sampleSize = Math.min(FragmenterParameters.MAXISOMORPHICSAMPLESIZE, 
+                    settings.getIsomorphicSampleSize());
+            if (sampleSize < settings.getIsomorphicSampleSize())
             {
-                // do nothing
+                settings.getLogger().log(Level.WARNING,"Limiting the sample of "
+                        + "isomorphic fragments to " + sampleSize);
             }
+            
+            // Looping over the old champions (i.e., the first fragment found 
+            // for each isomorphic family's sample)
+            for (File mwSlotFile : getFilesCollectingIsomorphicFamilyChampions(
+                    new File(settings.getWorkDirectory())))
+            {
+                List<Vertex> oldChampions;
+                try
+                {
+                    oldChampions = DenoptimIO.readVertexes(mwSlotFile,
+                            BBType.UNDEFINED);
+                } catch (Throwable e)
+                {
+                    
+                    throw new Error("Unable to extract representative "
+                            + "conformations. Problems opening file '"
+                            + mwSlotFile + "'.",  e);
+                }
+                for (Vertex oldChampion : oldChampions)
+                {
+                    
+                }
+            }
+            
         }
-        catch (InterruptedException ex)
-        {
-            //Do nothing
-        }
+        */
         
+        // Identify (and possibly collect) final results
         if (settings.doManageIsomorphicFamilies())
         {
-            // Collect MW-split fragments in one basket
             // We collect only the unique champion of each isomorphic family.
-            File workDir = new File(settings.getWorkDirectory());
-            List<File> files = Arrays.stream(workDir.listFiles(new FileFilter(){
-                @Override
-                public boolean accept(File pathname) {
-                    if (pathname.getName().startsWith(
-                            DENOPTIMConstants.MWSLOTFRAGSFILENAMEROOT)
-                        && pathname.getName().contains(
-                            DENOPTIMConstants.MWSLOTFRAGSUNQFILENANEEND))
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            })).collect(Collectors.toList());
-            files.sort(new Comparator<File>() {
-
-                @Override
-                public int compare(File o1, File o2)
-                {
-                    // The filename is like "Fragments-MWSlot_50-52_Unq.sdf"
-                    String s1 = o1.getName().replace(
-                            DENOPTIMConstants.MWSLOTFRAGSFILENAMEROOT,"");
-                    int i1 = Integer.valueOf(s1.substring(0,s1.indexOf("-")));
-                    String s2 = o2.getName().replace(
-                            DENOPTIMConstants.MWSLOTFRAGSFILENAMEROOT,"");
-                    int i2 = Integer.valueOf(s2.substring(0,s2.indexOf("-")));
-                    return Integer.compare(i1, i2);
-                }
-            
-            });
+            List<File> files = getFilesCollectingIsomorphicFamilyChampions(
+                    new File(settings.getWorkDirectory()));
             File allFragsFile = new File(FragmenterTask.getFragmentsFileName(
                     settings));
             switch (DENOPTIMConstants.TMPFRAGFILEFORMAT)
             {
                 case VRTXSDF:
-                    FileUtils.copyFile(files.get(0), allFragsFile);
-                    DenoptimIO.appendTxtFiles(allFragsFile, 
-                            files.subList(1,files.size()));
+                    try
+                    {
+                        FileUtils.copyFile(files.get(0), allFragsFile);
+                        DenoptimIO.appendTxtFiles(allFragsFile, 
+                                files.subList(1,files.size()));
+                    } catch (IOException e)
+                    {
+                        throw new Error("Unable to create new file '" 
+                                + allFragsFile + "'",e);
+                    }
                     break;
                     
                 case VRTXJSON:
                     //TODO
                     // also check allFragsFile: it already contains extension.
-                    throw new DENOPTIMException("NOT IMPLEMENTED YET!");
+                    throw new Error("NOT IMPLEMENTED YET!");
                     
                 default:
-                    throw new DENOPTIMException("Unexpected format "
+                    throw new Error("Unexpected format "
                             + DENOPTIMConstants.TMPFRAGFILEFORMAT + " for "
                             + "for final collection of fragments");
             }
@@ -355,6 +224,8 @@ public class ParallelFragmentationAlgorithm
                     + "collected in file " + allFragsFile);
         } else if (settings.getNumTasks()>1) {
             List<File> files = submitted.stream()
+                    .filter(task -> task instanceof FragmenterTask)
+                    .map(task -> (FragmenterTask) task)
                     .map(FragmenterTask::getResultFile)
                     .map(pathname -> new File(pathname))
                     .collect(Collectors.toList());
@@ -370,18 +241,25 @@ public class ParallelFragmentationAlgorithm
             switch (DENOPTIMConstants.TMPFRAGFILEFORMAT)
             {
                 case VRTXSDF:
-                    FileUtils.copyFile(files.get(0), allFragsFile);
-                    DenoptimIO.appendTxtFiles(allFragsFile, 
-                            files.subList(1,files.size()));
+                    try 
+                    {
+                        FileUtils.copyFile(files.get(0), allFragsFile);
+                        DenoptimIO.appendTxtFiles(allFragsFile, 
+                                files.subList(1,files.size()));
+                    } catch (IOException e)
+                    {
+                        throw new Error("Unable to create new file '" 
+                                + allFragsFile + "'",e);
+                    }
                     break;
                     
                 case VRTXJSON:
                     //TODO
                     // also check allFragsFile: it already contains extension.
-                    throw new DENOPTIMException("NOT IMPLEMENTED YET!");
+                    throw new Error("NOT IMPLEMENTED YET!");
                     
                 default:
-                    throw new DENOPTIMException("Unexpected format "
+                    throw new Error("Unexpected format "
                             + DENOPTIMConstants.TMPFRAGFILEFORMAT + " for "
                             + "for final collection of fragments");
             }
@@ -392,20 +270,47 @@ public class ParallelFragmentationAlgorithm
             // We should be here only when we run on single thread with no
             // handling of isomorphic families (i.e., no removal of duplicates)
             settings.getLogger().log(Level.INFO, "Results "
-                    + "in file " + submitted.get(0).results);
-        }        
-        
-        //TODO-GG deal with exceptions generated by tasks (e.g., when adding dummy on linearities)
-        
-        // closing messages
-        watch.stop();
-        msg = "Overall time: " + watch.toString() + ". " 
-            + DENOPTIMConstants.EOL
-            + "ParallelFragemtationAlgorithm run completed." 
-            + DENOPTIMConstants.EOL;
-        settings.getLogger().log(Level.INFO, msg);
+                    + "in file " + ((FragmenterTask) submitted.get(0)).results);
+        }
+        return true;
     }
     
+//------------------------------------------------------------------------------
+    
+    private List<File> getFilesCollectingIsomorphicFamilyChampions(File workDir)
+    {
+        List<File> files = Arrays.stream(workDir.listFiles(new FileFilter(){
+            @Override
+            public boolean accept(File pathname) {
+                if (pathname.getName().startsWith(
+                        DENOPTIMConstants.MWSLOTFRAGSFILENAMEROOT)
+                    && pathname.getName().contains(
+                        DENOPTIMConstants.MWSLOTFRAGSUNQFILENANEEND))
+                {
+                    return true;
+                }
+                return false;
+            }
+        })).collect(Collectors.toList());
+        files.sort(new Comparator<File>() {
+    
+            @Override
+            public int compare(File o1, File o2)
+            {
+                // The filename is like "MWSlot_50-52_Unq.sdf"
+                String s1 = o1.getName().replace(
+                        DENOPTIMConstants.MWSLOTFRAGSFILENAMEROOT,"");
+                int i1 = Integer.valueOf(s1.substring(0,s1.indexOf("-")));
+                String s2 = o2.getName().replace(
+                        DENOPTIMConstants.MWSLOTFRAGSFILENAMEROOT,"");
+                int i2 = Integer.valueOf(s2.substring(0,s2.indexOf("-")));
+                return Integer.compare(i1, i2);
+            }
+        
+        });
+        return files;
+    }
+
 //------------------------------------------------------------------------------
     
     /**
@@ -416,15 +321,24 @@ public class ParallelFragmentationAlgorithm
      * @throws DENOPTIMException
      * @throws FileNotFoundException
      */
-    static void splitInputForThreads(FragmenterParameters settings) 
-            throws DENOPTIMException, FileNotFoundException
+    static void splitInputForThreads(FragmenterParameters settings)
     {
         int maxBuffersSize = 50000;
         int numBatches = settings.getNumTasks();
         
-        IteratingSDFReader reader = new IteratingSDFReader(
-                new FileInputStream(settings.getStructuresFile()), 
-                DefaultChemObjectBuilder.getInstance());
+        IteratingSDFReader reader;
+        try
+        {
+            reader = new IteratingSDFReader(
+                    new FileInputStream(settings.getStructuresFile()), 
+                    DefaultChemObjectBuilder.getInstance());
+        } catch (FileNotFoundException e1)
+        {
+            // Cannot happen: we ensured the file exist, but it might have been 
+            // removed after the check
+            throw new Error("File '" + settings.getStructuresFile() + "' can "
+                    + "not be found anymore.");
+        }
         
         //If available we record CSD formula in properties of atom container
         LinkedHashMap<String,String> formulae = settings.getFormulae();
@@ -504,9 +418,14 @@ public class ParallelFragmentationAlgorithm
                 buffersSize = 0;
                 for (int i=0; i<numBatches; i++)
                 {
-                    DenoptimIO.writeSDFFile(
-                            getStructureFileNameBatch(settings, i),
-                            batches.get(i), true);
+                    String filename = getStructureFileNameBatch(settings, i);
+                    try
+                    {
+                        DenoptimIO.writeSDFFile(filename, batches.get(i), true);
+                    } catch (DENOPTIMException e)
+                    {
+                        throw new Error("Cannot write to '" + filename + "'.");
+                    }
                     batches.get(i).clear();
                 }
             }
@@ -515,9 +434,14 @@ public class ParallelFragmentationAlgorithm
         {
             for (int i=0; i<numBatches; i++)
             {
-                DenoptimIO.writeSDFFile(
-                        getStructureFileNameBatch(settings, i),
-                        batches.get(i), true);
+                String filename = getStructureFileNameBatch(settings, i);
+                try
+                {
+                    DenoptimIO.writeSDFFile(filename, batches.get(i), true);
+                } catch (DENOPTIMException e)
+                {
+                    throw new Error("Cannot write to '" + filename + "'.");
+                }
                 batches.get(i).clear();
             }
         }
@@ -526,7 +450,7 @@ public class ParallelFragmentationAlgorithm
         if (formulae!=null && relyingOnListSize 
                 && index != (formulae.size()-1))
         {
-            throw new DENOPTIMException("Inconsistent number of formulae "
+            throw new Error("Inconsistent number of formulae "
                     + "(" + formulae.size() + ") "
                     + "and structures ("+ index + ") when using the index "
                     + "in the list of formulae as identifier. For your "
@@ -559,7 +483,7 @@ public class ParallelFragmentationAlgorithm
      * of the chemical object.
      */
     private static boolean getFormulaForMol(IAtomContainer mol, int index,
-            LinkedHashMap<String,String> formulae) throws DENOPTIMException
+            LinkedHashMap<String,String> formulae)
     {
         boolean relyingOnListSize = false;
 
@@ -579,7 +503,7 @@ public class ParallelFragmentationAlgorithm
                     mol.setProperty(DENOPTIMConstants.FORMULASTR,
                             formulaeList.get(index));
                 } else {
-                    throw new DENOPTIMException("There are not "
+                    throw new Error("There are not "
                             + "enough formulae! Looking for "
                             + "formula #"+ index + " but there are "
                             + "only " + formulae.size() 
@@ -593,7 +517,7 @@ public class ParallelFragmentationAlgorithm
                 mol.setProperty(DENOPTIMConstants.FORMULASTR,
                         formulaeList.get(index));
             } else {
-                throw new DENOPTIMException("There are not "
+                throw new Error("There are not "
                         + "enough formulae! Looking for "
                         + "formula #"+ index + " but there are "
                         + "only " + formulae.size() 

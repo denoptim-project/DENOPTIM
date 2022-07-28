@@ -47,8 +47,13 @@ import denoptim.utils.TaskUtils;
  * depending on the configurations given upon construction of the task.
  */
 
-public class FragmenterTask extends Task
-{   
+public class ConformerCollectorTask extends Task
+{
+    /**
+     * Identifier of this task's thread.
+     */
+    private int id = -1;
+    
     /**
      * File containing the input for this task (i.e., a structure file)
      */
@@ -92,7 +97,7 @@ public class FragmenterTask extends Task
      * @throws SecurityException
      * @throws IOException
      */
-    public FragmenterTask(File inputFile, FragmenterParameters settings,
+    public ConformerCollectorTask(File inputFile, FragmenterParameters settings,
             int id) throws SecurityException, IOException
     {
     	super(TaskUtils.getUniqueTaskIndex());

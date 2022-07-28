@@ -273,6 +273,11 @@ public class FragmenterParameters extends RunTimeParameters
     private int isomorphicSampleSize = 1;
     
     /**
+     * Maximum isomorphic sample size
+     */
+    public static final int MAXISOMORPHICSAMPLESIZE = 50;
+    
+    /**
      * Molecular weight slot width for collecting fragments.
      */
     private int mwSlotSize = 10;
@@ -310,6 +315,13 @@ public class FragmenterParameters extends RunTimeParameters
      * (i.e., isomorphic family size).
      */
     public final Object MANAGEMWSLOTSSLOCK = new Object();
+    
+    /**
+     * Flag signaling the request to analyze each isomorphic family to extract
+     * the most representative fragment and make it be the champion of that
+     * family.
+     */
+    private boolean extactRepresentativeConformer = false;
     
     
 //------------------------------------------------------------------------------
@@ -1206,7 +1218,18 @@ public class FragmenterParameters extends RunTimeParameters
     {
         this.linearAngleLimit = linearAngleLimit;
     }
+    
+//------------------------------------------------------------------------------
 
+    /**
+     * @return <code>true</code> if we want to extract the most representative 
+     * conformer from each isomorphic family.
+     */
+    public boolean extactRepresentativeConformer()
+    {
+        return extactRepresentativeConformer;
+    }
+    
 //------------------------------------------------------------------------------
 
 }
