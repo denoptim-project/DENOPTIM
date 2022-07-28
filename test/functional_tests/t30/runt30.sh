@@ -8,11 +8,12 @@ mv data/* "$wrkDir"
 rm -rf data
 
 # Here we define the expected results
-#             sub test ID: 1  2  3  4  5  6  7  8   9 
-expectedNoMissingAtomMols=(3  1  0  0  0  0  0  0   0)
-      expectedPreFiltered=(0  0  2  0  0  0  0  0   0)  
-        expectedFragments=(0  0  0 20 12  8  6 11 140)
-  expectedIsomorphicFrags=(0  0  0  0  0  0 30 11   0)
+#             sub test ID: 1  2  3  4  5  6  7  8   9  10
+expectedNoMissingAtomMols=(9  1  0  0  0  0  0  0   0   0)
+      expectedPreFiltered=(0  0  2  0  0  0  0  0   0   0)  
+        expectedFragments=(0  0  0 20 12  8  6 11 140  10)
+  expectedIsomorphicFrags=(0  0  0  0  0  0 30 11   0   0)
+          expectedResults=(9  0  2  0  0  0  0  0   0   0)
 
 # NB: for t30-9 the 140 result from counting 70 twice.
 
@@ -72,6 +73,16 @@ do
         if [ "$n" -ne ${expectedIsomorphicFrags[$i-1]} ]
         then
             echo "Test 't30' NOT PASSED (symptom: wrong number of fragments produced: $n vs. ${expectedFragments[$i-1]}."
+            exit -1
+        fi
+    fi
+
+    if [ 0 -ne ${expectedResults[$i-1]} ]
+    then
+        n=$(grep "\$\$\$\$" "$output"/Results.sdf | wc -l)
+        if [ "$n" -ne ${expectedResults[$i-1]} ]
+        then
+            echo "Test 't30' NOT PASSED (symptom: wrong number of structures in 'Results' file: $n vs. ${expectedResults[$i-1]}."
             exit -1
         fi
     fi

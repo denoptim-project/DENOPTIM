@@ -222,6 +222,20 @@ public class FragmenterTask extends Task
 //------------------------------------------------------------------------------
 
     /**
+     * Builds the pathname of the structure file meant to be hold results that
+     * are not necessarily fragments.
+     * @param settings settings we work with.
+     * @return the pathname
+     */
+    static String getResultsFileName(FragmenterParameters settings)
+    {
+        return settings.getWorkDirectory() + DenoptimIO.FS 
+                + "Results.sdf";
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Builds the pathname of the log file for this task.
      * @param settings settings we work with.
      * @param i the index of the thread
@@ -274,39 +288,24 @@ public class FragmenterTask extends Task
                     logger);
             preliminaryResults = newResultsFile;
         }
+        
+        if (!settings.doFragmentation() && settings.doFiltering())
+        {
+            logger.log(Level.INFO,"Filtering fragments");
+            File newResultsFile = new File(getFragmentsFileName(settings, id));
+            FragmenterTools.manageFragmentCollection(inputFile, settings, 
+                    newResultsFile, logger);
+            preliminaryResults = newResultsFile;
+        }
+        
+        
 
 /*
 //TODO-gg
-        Librarian lib = new Librarian();
-            //Applay rejection rules to library of fragments
-            if (Parameters.onlyFiltering)
-                lib.filter();
-
-        //Split library in small MW-range pieces
-        if (Parameters.MWsplitting)
-            lib.mwSplitting();
-
-        //Merge MW-splitted libraries
-        if (Parameters.MWMerge)
-            lib.mwMerge();
-
-            //Merge libraries
-            if (Parameters.mergeLibraries)
-                lib.mergeLibraries();
-
-            //Reorder according to molecular weight
-            if (Parameters.orderMW)
-                lib.reorderMW(Parameters.MWascending);
 
         //Group rotamers
             if (Parameters.groupingRotamers & !Parameters.mergeLibraries)
                 lib.groupRotamers();
-
-        //Extract Classes
-        if (Parameters.extractClass)
-            lib.extractClass();
-        if (Parameters.extractSMARTS)
-                lib.extractSMARTS();
 
         //Managment of compatibility matrix
         CPMapManager cpmm = new CPMapManager();
@@ -314,8 +313,6 @@ public class FragmenterTask extends Task
             cpmm.makeFromCuttingRules();
         
         */
-        
-        //results = getFragmentsFileName(settings,id);
         
         
         

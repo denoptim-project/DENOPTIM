@@ -133,6 +133,15 @@ public class FragmenterParameters extends RunTimeParameters
     private boolean doFragmentation = false;
     
     /**
+     * Flag requesting to do post-fragmentation processing of fragments, i.e.,
+     * application of all filtration and rejection rules that can be applied 
+     * after fragmentation, though starting from an input that is already a
+     * collection of fragments. Essentially, skip fragmentation and filter the 
+     * given fragments
+     */
+    private boolean doFiltering = false;
+    
+    /**
      * Flag requesting to reject fragments with minor isotopes.
      */
     private boolean doRejectWeirdIsotopes = true;
@@ -501,10 +510,10 @@ public class FragmenterParameters extends RunTimeParameters
 //------------------------------------------------------------------------------
 
     /**
-     * @return the formula-based criteria to reject a fragment is there are too
+     * @return the formula-based criteria to reject a fragment if there are too
      * few atoms of a certain element.
      */
-    public Set<Map<String, Double>> getFormulaCriteriaLessThan()
+    public Set<Map<String, Double>> getRejectedFormulaLessThan()
     {
         return formulaCriteriaLessThan;
     }
@@ -512,10 +521,10 @@ public class FragmenterParameters extends RunTimeParameters
 //------------------------------------------------------------------------------
     
     /**
-     * @return the formula-based criteria to reject a fragment is there are too
+     * @return the formula-based criteria to reject a fragment if there are too
      * many atoms of a certain element.
      */
-    public Set<Map<String, Double>> getFormulaCriteriaMoreThan()
+    public Set<Map<String, Double>> getRejectedFormulaMoreThan()
     {
         return formulaCriteriaMoreThan;
     }
@@ -817,6 +826,18 @@ public class FragmenterParameters extends RunTimeParameters
 //------------------------------------------------------------------------------
 
     /**
+     * @return <code>true</code> if we want to do post-processing (i.e., filter 
+     * and reject or collect fragments) on a given list of fragments (i.e.,
+     * the input), thus skipping any fragmentation.
+     */
+    public boolean doFiltering()
+    {
+        return doFiltering;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * @return <code>true</code> if we are want to ignore the fact we have 
      * translated unset bond orders to single-order bonds.
      */
@@ -868,14 +889,22 @@ public class FragmenterParameters extends RunTimeParameters
 
             case "IGNORABLEFRAGMENTS=":
                 ignorableFragmentsFile = value;
+                doFiltering = true;
                 break;
                 
             case "TARGETFRAGMENTS=":
                 targetFragmentsFile = value;
+                doFiltering = true;
                 break;
                 
             case "ISOMORPHICSAMPLESIZE=":
-                isomorphicSampleSize = Integer.parseInt(value);
+                try {
+                    isomorphicSampleSize = Integer.parseInt(value);
+                } catch (Throwable t)
+                {
+                    msg = "Unable to parse value of " + key + ": '" + value + "'";
+                    throw new DENOPTIMException(msg);
+                }
                 if (isomorphicSampleSize>0)
                     doManageIsomorphicFamilies = true;
                 break;
@@ -885,13 +914,98 @@ public class FragmenterParameters extends RunTimeParameters
                 break;
                 
             case "MWSLOTSIZE=":
-                mwSlotSize = Integer.parseInt(value);
+                try {
+                    mwSlotSize = Integer.parseInt(value);
+                } catch (Throwable t)
+                {
+                    msg = "Unable to parse value of " + key + ": '" + value + "'";
+                    throw new DENOPTIMException(msg);
+                }
                 break;
                 
+            case "REJECTMINORISOTOPES":
+                doRejectWeirdIsotopes = true;
+                doFiltering = true;
+                break;
+                
+            case "REJECTELEMENT=":
+                rejectedElements.add(value);
+                doFiltering = true;
+                break;
+                
+            case "REJFORMULALESSTHAN=":
+                Map<String,Double> elSymbolsCount = null;
+                try {
+                    elSymbolsCount = FormulaUtils.parseFormula(value);
+                } catch (Throwable t)
+                {
+                    msg = "Unable to parse value of " + key + ": '" + value + "'";
+                    throw new DENOPTIMException(msg);
+                }
+                formulaCriteriaLessThan.add(elSymbolsCount);
+                doFiltering = true;
+                break;
+                
+            case "REJFORMULAMORETHAN=":
+                Map<String,Double> elSymbolsCount2= null;
+                try {
+                    elSymbolsCount2 = FormulaUtils.parseFormula(value);
+                } catch (Throwable t)
+                {
+                    msg = "Unable to parse value of " + key + ": '" + value + "'";
+                    throw new DENOPTIMException(msg);
+                }
+                formulaCriteriaMoreThan.add(elSymbolsCount2);
+                doFiltering = true;
+                break;
+                
+            case "REJECTAPCLASS=":
+                rejectedAPClasses.add(value);
+                doFiltering = true;
+                break;
+                
+            case "REJECTAPCLASSCOMBINATION=":
+                String[] lst = value.split("\\s+");
+                rejectedAPClassCombinations.add(lst);
+                doFiltering = true;
+                break;
+                
+            case "MAXFRAGSIZE=":
+                try {
+                    maxFragHeavyAtomCount = Integer.parseInt(value);
+                } catch (Throwable t)
+                {
+                    msg = "Unable to parse value of " + key + ": '" + value + "'";
+                    throw new DENOPTIMException(msg);
+                }
+                doFiltering = true;
+                break;
+                
+            case "MINFRAGSIZE=":
+                try {
+                    minFragHeavyAtomCount = Integer.parseInt(value);
+                } catch (Throwable t)
+                {
+                    msg = "Unable to parse value of " + key + ": '" + value + "'";
+                    throw new DENOPTIMException(msg);
+                }
+                doFiltering = true;
+                break;
+                
+            case "REJECTSMARTS=":
+                fragRejectionSMARTS.put(value, value);
+                doFiltering = true;
+                break;
+                
+            case "RETAINSMARTS=":
+                fragRetentionSMARTS.put(value, value);
+                doFiltering = true;
+                break;
                 
 /*
             case "=":
                 = value;
+                doFiltering = true;
                 break;
   */              
                 

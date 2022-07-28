@@ -1,0 +1,8 @@
+#
+# This is the parameter file for test t30-10
+#
+FRG-VERBOSITY=4
+FRG-STRUCTURESFILE=inputFrags-10.sdf
+#
+FRG-REJFORMULALESSTHAN=H5
+FRG-REJFORMULALESSTHAN=C3

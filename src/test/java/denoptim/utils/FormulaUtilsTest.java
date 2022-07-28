@@ -47,6 +47,33 @@ public class FormulaUtilsTest
      * Private builder of atom containers
      */
     private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testParseFormula() throws Exception
+    {
+        String formula = "H2 O";
+        Map<String, Double> elCounts = FormulaUtils.parseFormula(formula);
+        assertEquals("H 2.0 O 1.0",convertSimpleToString(elCounts));
+        
+        formula = "H2 O1";
+        elCounts = FormulaUtils.parseFormula(formula);
+        assertEquals("H 2.0 O 1.0",convertSimpleToString(elCounts));
+        
+        formula = "O H2";
+        elCounts = FormulaUtils.parseFormula(formula);
+        assertEquals("H 2.0 O 1.0",convertSimpleToString(elCounts));
+        
+        formula = "O1 H2";
+        elCounts = FormulaUtils.parseFormula(formula);
+        assertEquals("H 2.0 O 1.0",convertSimpleToString(elCounts));
+        
+        formula = "O H2 C3 W2 Ca";
+        elCounts = FormulaUtils.parseFormula(formula);
+        assertEquals("C 3.0 Ca 1.0 H 2.0 O 1.0 W 2.0",
+                convertSimpleToString(elCounts));
+    }
     
 //------------------------------------------------------------------------------
     
@@ -115,6 +142,22 @@ public class FormulaUtilsTest
                 + "N 0.0 1.0 0.0 0.0 0.0 6.0 0.0 0.0 6.0 12.0 18.0 24.0 30.0 6.0 12.0 18.0 24.0 30.0 6.0 12.0 18.0 24.0 30.0 "
                 + "O 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 2.0 3.0 4.0 5.0 1.0 2.0 3.0 4.0 5.0 1.0 2.0 3.0 4.0 5.0",
                 convertToString(elCounts));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private String convertSimpleToString(Map<String,Double> elCounts)
+    {
+        List<String> els = new ArrayList<String>();
+        els.addAll(elCounts.keySet());
+        Collections.sort(els);
+        StringBuilder sb = new StringBuilder();
+        for (String el : els)
+        {
+            sb.append(" ").append(el);
+            sb.append(String.format(" %.1f", elCounts.get(el)));
+        }
+        return sb.toString().trim();
     }
     
 //------------------------------------------------------------------------------

@@ -27,6 +27,39 @@ import denoptim.io.DenoptimIO;
  */
 public class FormulaUtils
 {
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads a molecular formula written as "H2 O" or "C6 H12 O6". Stochiometric
+     * coefficients can be non-integer
+     * @param formula
+     */
+    public static Map<String,Double> parseFormula(String formula)
+    {
+        Map<String,Double> elementsMap = new HashMap<String,Double>();
+        String[] words = formula.split("\\s+");
+        for (int i=0; i<words.length; i++)
+        {
+            String elSymbol = "";
+            Double elCount = 0.0;
+            int characterIdx = 0;
+            while (characterIdx<words[i].length() 
+                    && Character.isLetter(words[i].charAt(characterIdx)))
+            {
+                characterIdx++;
+            }
+            elSymbol = words[i].substring(0,characterIdx);
+            if (characterIdx<words[i].length())
+            {
+                elCount = Double.parseDouble(words[i].substring(characterIdx));
+            } else {
+                elCount = 1.0;
+            }
+            elementsMap.put(elSymbol, elCount);
+        }
+        return elementsMap;
+    }
  
 //------------------------------------------------------------------------------
     

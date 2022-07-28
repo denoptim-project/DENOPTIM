@@ -320,11 +320,25 @@ public class FragmenterTools
                                 settings.getLinearAngleLimit());
                     }
                     
-                     // Management of duplicate fragments:
-                     // -> identify duplicates (isomorphic fragments), 
-                     // -> keep one (or more, if we want to sample the isomorphs),
-                     // -> reject the rest.
-                    if (settings.doManageIsomorphicFamilies())
+                    // Management of duplicate fragments:
+                    // -> identify duplicates (isomorphic fragments), 
+                    // -> keep one (or more, if we want to sample the isomorphs),
+                    // -> reject the rest.
+                    // We need to manage duplicates if any of this is true:
+                    // a) we want to reject some (all) duplicates. 
+                    //    This corresponds to saying that the size
+                    //    of the sample of the isomorphic family is larger than
+                    //    1. Conversely, an isomorphic sample size of 1 
+                    //    corresponds to say "remove all duplicates and keep 
+                    //    only the first member of the isomorphic family".
+                    // b) we run multiple threads, each of which may generate
+                    //    a new fragment that the others have not yet found.
+                    //    Thus, the existence of the new fragment must be communicated to the other threads
+                    // NB: with more than one thread we need to synchronize
+                    // checking and definition of unique vertexes.
+                    
+                    if (settings.getIsomorphicSampleSize() > 1
+                            || settings.getNumTasks() > 1)
                     {
                         synchronized (settings.MANAGEMWSLOTSSLOCK)
                         {
@@ -403,7 +417,7 @@ public class FragmenterTools
                             }
                         } // end synchronized block
                     } else {
-                        //If we are here, we did not ask to remove duplicates
+                        //TODO-gg no removal of duplicates?
                         keptFragments.add(frag);
                     }
                 }
@@ -412,7 +426,7 @@ public class FragmenterTools
                     logger.log(Level.FINE,"Fragments surviving post-"
                             + "processing: " + keptFragments.size());
                 }
-                if (!settings.doManageIsomorphicFamilies())
+                if (settings.getIsomorphicSampleSize()<2)
                 {
                     DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
                             keptFragments,true);
@@ -888,14 +902,14 @@ public class FragmenterTools
             }
         }
         
-        if (settings.getFormulaCriteriaLessThan().size() > 0
-                || settings.getFormulaCriteriaMoreThan().size() > 0)
+        if (settings.getRejectedFormulaLessThan().size() > 0
+                || settings.getRejectedFormulaMoreThan().size() > 0)
         {
             Map<String,Double> eaMol = FormulaUtils.getElementalanalysis(
                     frag.getIAtomContainer());
             
             for (Map<String,Double> criterion : 
-                settings.getFormulaCriteriaLessThan())
+                settings.getRejectedFormulaLessThan())
             {
                 for (String el : criterion.keySet())
                 {
@@ -915,7 +929,7 @@ public class FragmenterTools
             }
             
             for (Map<String,Double> criterion : 
-                settings.getFormulaCriteriaMoreThan())
+                settings.getRejectedFormulaMoreThan())
             {
                 for (String el : criterion.keySet())
                 {
