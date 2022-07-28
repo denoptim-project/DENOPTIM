@@ -32,6 +32,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
+import denoptim.files.UndetectedFileFormatException;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.FragIsomorphEdge;
@@ -270,163 +271,20 @@ public class FragmenterTools
                 int fragCounter = 0;
                 for (Vertex frag : fragments)
                 {
-                    if (!filterFragment((Fragment) frag, settings, logger))
-                    {
-                        continue;
-                    }
-                    
                     // Add metadata
                     String fragIdStr = "From_" + molName + "_" + fragCounter;
                     frag.setProperty("cdk:Title", fragIdStr);
                     fragCounter++;
                     
-                    //Compare with list of fragments to ignore
-                    if (settings.getIgnorableFragments().size() > 0)
-                    {
-                        if (settings.getIgnorableFragments().stream()
-                                .anyMatch(ignorable -> ((Fragment)frag)
-                                        .isIsomorphicTo(ignorable)))
-                        {
-                            if (logger!=null)
-                            {
-                                logger.log(Level.FINE,"Fragment " + fragCounter 
-                                        + " is ignorable.");
-                            }
-                            continue;
-                        }
-                    }
-                    
-                    //Compare with list of fragments to retain
-                    if (settings.getTargetFragments().size() > 0)
-                    {
-                        if (!settings.getTargetFragments().stream()
-                                .anyMatch(ignorable -> ((Fragment)frag)
-                                        .isIsomorphicTo(ignorable)))
-                        {
-                            if (logger!=null)
-                            {
-                                logger.log(Level.FINE,"Fragment " + fragCounter 
-                                      + " doesn't match any target: rejected.");
-                            }
-                            continue;
-                        }
-                    }
-                    
-                    // Add dummy atoms on linearities
-                    if (MoleculeUtils.getDimensions(frag.getIAtomContainer())==3 
-                            && settings.doAddDuOnLinearity())
-                    {
-                        DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
-                                settings.getLinearAngleLimit());
-                    }
-                    
-                    // Management of duplicate fragments:
-                    // -> identify duplicates (isomorphic fragments), 
-                    // -> keep one (or more, if we want to sample the isomorphs),
-                    // -> reject the rest.
-                    // We need to manage duplicates if any of this is true:
-                    // a) we want to reject some (all) duplicates. 
-                    //    This corresponds to saying that the size
-                    //    of the sample of the isomorphic family is larger than
-                    //    1. Conversely, an isomorphic sample size of 1 
-                    //    corresponds to say "remove all duplicates and keep 
-                    //    only the first member of the isomorphic family".
-                    // b) we run multiple threads, each of which may generate
-                    //    a new fragment that the others have not yet found.
-                    //    Thus, the existence of the new fragment must be communicated to the other threads
-                    // NB: with more than one thread we need to synchronize
-                    // checking and definition of unique vertexes.
-                    
-                    if (settings.getIsomorphicSampleSize() > 1
-                            || settings.getNumTasks() > 1)
-                    {
-                        synchronized (settings.MANAGEMWSLOTSSLOCK)
-                        {
-                            String mwSlotID = getMWSlotIdentifier(frag, 
-                                    settings.getMWSlotSize());
-    
-                            File mwFileUnq = settings.getMWSlotFileNameUnqFrags(
-                                    mwSlotID);
-                            File mwFileAll = settings.getMWSlotFileNameAllFrags(
-                                    mwSlotID);
-                            
-                            // Compare this fragment with previously seen ones
-                            Vertex unqVersion = null;
-                            if (mwFileUnq.exists())
-                            {
-                                ArrayList<Vertex> knownFrags = 
-                                        DenoptimIO.readVertexes(mwFileUnq, 
-                                                BBType.UNDEFINED);
-                                unqVersion = knownFrags.stream()
-                                    .filter(knownFrag -> 
-                                        ((Fragment)frag).isIsomorphicTo(knownFrag))
-                                    .findAny()
-                                    .orElse(null);
-                            }
-                            if (unqVersion!=null)
-                            {
-                                // Identify this unique fragment
-                                String isoFamID = unqVersion.getProperty(
-                                        DENOPTIMConstants.ISOMORPHICFAMILYID)
-                                        .toString();
-                                
-                                // Do we already have enough isomorphs of this frag?
-                                int sampleSize = settings.getIsomorphsCount()
-                                        .get(isoFamID);
-                                if (sampleSize < settings.getIsomorphicSampleSize())
-                                {
-                                    // Add this isomorphic version to the sample
-                                    frag.setProperty(
-                                            DENOPTIMConstants.ISOMORPHICFAMILYID,
-                                            isoFamID);
-                                    settings.getIsomorphsCount().put(isoFamID,
-                                            sampleSize+1);
-                                    DenoptimIO.writeVertexToFile(mwFileAll, 
-                                            FileFormat.VRTXSDF, frag, true);
-                                    keptFragments.add(frag);
-                                } else {
-                                    // This would be inefficient in the long run
-                                    // because it by-passes the splitting by MW. 
-                                    // Do not do it!
-                                    /*
-                                    if (logger!=null)
-                                    {
-                                        logger.log(Level.FINE,"Fragment " 
-                                              + fragCounter 
-                                              + " is isomorphic to unique fragment " 
-                                              + unqVersionID + ", but we already "
-                                              + "have a sample of " + sampleSize
-                                              + ": ignoring this fragment from now "
-                                              + "on.");
-                                    }
-                                    settings.getIgnorableFragments().add(frag);
-                                    */
-                                }
-                            } else {
-                                // This is a never-seen fragment
-                                String isoFamID = settings.newIsomorphicFamilyID();
-                                frag.setProperty(
-                                        DENOPTIMConstants.ISOMORPHICFAMILYID,
-                                        isoFamID);
-                                settings.getIsomorphsCount().put(isoFamID, 1);
-                                DenoptimIO.writeVertexToFile(mwFileUnq, 
-                                        FileFormat.VRTXSDF, frag, true);
-                                DenoptimIO.writeVertexToFile(mwFileAll, 
-                                        FileFormat.VRTXSDF, frag, true);
-                                keptFragments.add(frag);
-                            }
-                        } // end synchronized block
-                    } else {
-                        //TODO-gg no removal of duplicates?
-                        keptFragments.add(frag);
-                    }
+                    manageFragmentCollection(frag, fragCounter, settings,
+                            keptFragments, logger);
                 }
                 if (logger!=null)
                 {
                     logger.log(Level.FINE,"Fragments surviving post-"
                             + "processing: " + keptFragments.size());
                 }
-                if (settings.getIsomorphicSampleSize()<2)
+                if (!settings.doManageIsomorphicFamilies())
                 {
                     DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
                             keptFragments,true);
@@ -787,6 +645,207 @@ public class FragmenterTools
 
         return bondsMatchingRules;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Management of fragments: includes application of fragment filters, 
+     * rejection rules, and collection rules (also of isomorphic fragments, thus
+     * management of duplicates) to manipulate collection of fragments.
+     */
+    public static void manageFragmentCollection(File input, 
+            FragmenterParameters settings,
+            File output, Logger logger) throws DENOPTIMException, IOException, 
+                IllegalArgumentException, UndetectedFileFormatException
+    {
+        FileInputStream fis = new FileInputStream(input);
+        IteratingSDFReader reader = new IteratingSDFReader(fis, 
+                DefaultChemObjectBuilder.getInstance());
+
+        int index = -1;
+        int maxBufferSize = 2000;
+        ArrayList<Vertex> buffer = new ArrayList<Vertex>(500);
+        try {
+            while (reader.hasNext())
+            {
+                index++;
+                if (logger!=null)
+                {
+                    logger.log(Level.FINE,"Processing fragment " + index);
+                }
+                Vertex frag = new Fragment(reader.next(), BBType.UNDEFINED);
+                manageFragmentCollection(frag, index, settings,
+                        buffer, logger);
+                
+                // If max buffer size is reached, then bump to file
+                if (buffer.size() >= maxBufferSize)
+                {
+                    DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
+                            buffer, true);
+                    buffer.clear();
+                }
+            }
+        }
+        finally {
+            reader.close();
+        }
+        if (buffer.size() < maxBufferSize)
+        {
+            DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
+                    buffer, true);
+            buffer.clear();
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Management of fragments: includes application of fragment filters, 
+     * rejection rules, and collection rules (also of isomorphic fragments, thus
+     * management of duplicates) to manipulate collection of fragments.
+     * @throws DENOPTIMException 
+     * @throws IOException 
+     * @throws UndetectedFileFormatException 
+     * @throws IllegalArgumentException 
+     */
+    public static void manageFragmentCollection(Vertex frag, int fragCounter, 
+            FragmenterParameters settings, 
+            List<Vertex> collector, Logger logger) 
+                    throws DENOPTIMException, IllegalArgumentException, 
+                    UndetectedFileFormatException, IOException
+    {
+
+        if (!filterFragment((Fragment) frag, settings, logger))
+        {
+            return;
+        }
+        
+        //Compare with list of fragments to ignore
+        if (settings.getIgnorableFragments().size() > 0)
+        {
+            if (settings.getIgnorableFragments().stream()
+                    .anyMatch(ignorable -> ((Fragment)frag)
+                            .isIsomorphicTo(ignorable)))
+            {
+                if (logger!=null)
+                {
+                    logger.log(Level.FINE,"Fragment " + fragCounter 
+                            + " is ignorable.");
+                }
+                return;
+            }
+        }
+        
+        //Compare with list of fragments to retain
+        if (settings.getTargetFragments().size() > 0)
+        {
+            if (!settings.getTargetFragments().stream()
+                    .anyMatch(ignorable -> ((Fragment)frag)
+                            .isIsomorphicTo(ignorable)))
+            {
+                if (logger!=null)
+                {
+                    logger.log(Level.FINE,"Fragment " + fragCounter 
+                          + " doesn't match any target: rejected.");
+                }
+                return;
+            }
+        }
+        
+        // Add dummy atoms on linearities
+        if (MoleculeUtils.getDimensions(frag.getIAtomContainer())==3 
+                && settings.doAddDuOnLinearity())
+        {
+            DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
+                    settings.getLinearAngleLimit());
+        }
+        
+         // Management of duplicate fragments:
+         // -> identify duplicates (isomorphic fragments), 
+         // -> keep one (or more, if we want to sample the isomorphs),
+         // -> reject the rest.
+        if (settings.doManageIsomorphicFamilies())
+        {
+            synchronized (settings.MANAGEMWSLOTSSLOCK)
+            {
+                String mwSlotID = getMWSlotIdentifier(frag, 
+                        settings.getMWSlotSize());
+
+                File mwFileUnq = settings.getMWSlotFileNameUnqFrags(
+                        mwSlotID);
+                File mwFileAll = settings.getMWSlotFileNameAllFrags(
+                        mwSlotID);
+                
+                // Compare this fragment with previously seen ones
+                Vertex unqVersion = null;
+                if (mwFileUnq.exists())
+                {
+                    ArrayList<Vertex> knownFrags = 
+                            DenoptimIO.readVertexes(mwFileUnq,BBType.UNDEFINED);
+                    unqVersion = knownFrags.stream()
+                        .filter(knownFrag -> 
+                            ((Fragment)frag).isIsomorphicTo(knownFrag))
+                        .findAny()
+                        .orElse(null);
+                }
+                if (unqVersion!=null)
+                {
+                    // Identify this unique fragment
+                    String isoFamID = unqVersion.getProperty(
+                            DENOPTIMConstants.ISOMORPHICFAMILYID)
+                            .toString();
+                    
+                    // Do we already have enough isomorphs of this frag?
+                    int sampleSize = settings.getIsomorphsCount()
+                            .get(isoFamID);
+                    if (sampleSize < settings.getIsomorphicSampleSize())
+                    {
+                        // Add this isomorphic version to the sample
+                        frag.setProperty(
+                                DENOPTIMConstants.ISOMORPHICFAMILYID,
+                                isoFamID);
+                        settings.getIsomorphsCount().put(isoFamID,
+                                sampleSize+1);
+                        DenoptimIO.writeVertexToFile(mwFileAll, 
+                                FileFormat.VRTXSDF, frag, true);
+                        collector.add(frag);
+                    } else {
+                        // This would be inefficient in the long run
+                        // because it by-passes the splitting by MW. 
+                        // Do not do it!
+                        /*
+                        if (logger!=null)
+                        {
+                            logger.log(Level.FINE,"Fragment " 
+                                  + fragCounter 
+                                  + " is isomorphic to unique fragment " 
+                                  + unqVersionID + ", but we already "
+                                  + "have a sample of " + sampleSize
+                                  + ": ignoring this fragment from now "
+                                  + "on.");
+                        }
+                        settings.getIgnorableFragments().add(frag);
+                        */
+                    }
+                } else {
+                    // This is a never-seen fragment
+                    String isoFamID = settings.newIsomorphicFamilyID();
+                    frag.setProperty(
+                            DENOPTIMConstants.ISOMORPHICFAMILYID,
+                            isoFamID);
+                    settings.getIsomorphsCount().put(isoFamID, 1);
+                    DenoptimIO.writeVertexToFile(mwFileUnq, 
+                            FileFormat.VRTXSDF, frag, true);
+                    DenoptimIO.writeVertexToFile(mwFileAll, 
+                            FileFormat.VRTXSDF, frag, true);
+                    collector.add(frag);
+                }
+            } // end synchronized block
+        } else {
+            //If we are here, we did not ask to remove duplicates
+            collector.add(frag);
+        }
+    }
 
 //------------------------------------------------------------------------------
     
@@ -804,6 +863,7 @@ public class FragmenterTools
     {
        return filterFragment(frag, settings, settings.getLogger());
     }
+
 //------------------------------------------------------------------------------
     
     /**
@@ -909,46 +969,43 @@ public class FragmenterTools
                     frag.getIAtomContainer());
             
             for (Map<String,Double> criterion : 
-                settings.getRejectedFormulaLessThan())
+                settings.getRejectedFormulaMoreThan())
             {
                 for (String el : criterion.keySet())
                 {
                     if (eaMol.containsKey(el))
                     {
                         // -0.5 to make it strictly less-than
-                        if (eaMol.get(el) - criterion.get(el) > -0.5)
+                        if (eaMol.get(el) - criterion.get(el) > 0.5)
                         {
                             logger.log(Level.FINE,"Removing fragment that "
                                     + "contains only too much '" + el + "' "
                                     + "as requested by formula"
-                                    + "-based (less-than) settings.");
+                                    + "-based (more-than) settings.");
                             return false;
                         }
                     }
                 }
             }
             
-            for (Map<String,Double> criterion : 
-                settings.getRejectedFormulaMoreThan())
+            Map<String,Double> criterion = settings.getRejectedFormulaLessThan();
+            for (String el : criterion.keySet())
             {
-                for (String el : criterion.keySet())
+                if (!eaMol.containsKey(el))
                 {
-                    if (!eaMol.containsKey(el))
+                    logger.log(Level.FINE,"Removing fragment that does not "
+                            + "contain '" + el + "' as requested by formula"
+                            + "-based (less-than) settings.");
+                    return false;
+                } else {
+                    // 0.5 to make it strictly more-than
+                    if (eaMol.get(el) - criterion.get(el) < -0.5)
                     {
-                        logger.log(Level.FINE,"Removing fragment that does not "
-                                + "contain '" + el + "' as requested by formula"
-                                + "-based (more-than) settings.");
+                        logger.log(Level.FINE,"Removing fragment that "
+                                + "contains only too little '" + el + "' "
+                                + "as requested by formula"
+                                + "-based (less-than) settings.");
                         return false;
-                    } else {
-                        // 0.5 to make it strictly more-than
-                        if (eaMol.get(el) - criterion.get(el) < 0.5)
-                        {
-                            logger.log(Level.FINE,"Removing fragment that "
-                                    + "contains only too little '" + el + "' "
-                                    + "as requested by formula"
-                                    + "-based (more-than) settings.");
-                            return false;
-                        }
                     }
                 }
             }

@@ -156,8 +156,8 @@ public class FragmenterParameters extends RunTimeParameters
      * a fragment has a formula that counts less then what defined here, it is
      * rejected.
      */
-    private Set<Map<String,Double>> formulaCriteriaLessThan = 
-            new HashSet<Map<String,Double>>();
+    private Map<String,Double> formulaCriteriaLessThan = 
+            new HashMap<String,Double>();
     
     /**
      * Upper limits of formula-based criteria for fragment rejection. I.e., if 
@@ -513,7 +513,7 @@ public class FragmenterParameters extends RunTimeParameters
      * @return the formula-based criteria to reject a fragment if there are too
      * few atoms of a certain element.
      */
-    public Set<Map<String, Double>> getRejectedFormulaLessThan()
+    public Map<String, Double> getRejectedFormulaLessThan()
     {
         return formulaCriteriaLessThan;
     }
@@ -605,15 +605,15 @@ public class FragmenterParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
     
-    public void setFormulaCriteriaLessThan(
-            Set<Map<String, Double>> formulaCriteriaLessThan)
+    public void setRejectedFormulaLessThan(
+            Map<String, Double> formulaMax)
     {
-        this.formulaCriteriaLessThan = formulaCriteriaLessThan;
+        this.formulaCriteriaLessThan = formulaMax;
     }
 
 //------------------------------------------------------------------------------
     
-    public void setFormulaCriteriaMoreThan(
+    public void setRejectedFormulaMoreThan(
             Set<Map<String, Double>> formulaCriteriaMoreThan)
     {
         this.formulaCriteriaMoreThan = formulaCriteriaMoreThan;
@@ -934,6 +934,13 @@ public class FragmenterParameters extends RunTimeParameters
                 break;
                 
             case "REJFORMULALESSTHAN=":
+                if (formulaCriteriaLessThan.size()>0)
+                {
+                    msg = "Attempt to specify more than one criterion for "
+                            + "rejecting fragments based on a lower-limit "
+                            + "molecular formula. ";
+                    throw new DENOPTIMException(msg);
+                }
                 Map<String,Double> elSymbolsCount = null;
                 try {
                     elSymbolsCount = FormulaUtils.parseFormula(value);
@@ -942,7 +949,7 @@ public class FragmenterParameters extends RunTimeParameters
                     msg = "Unable to parse value of " + key + ": '" + value + "'";
                     throw new DENOPTIMException(msg);
                 }
-                formulaCriteriaLessThan.add(elSymbolsCount);
+                formulaCriteriaLessThan = elSymbolsCount;
                 doFiltering = true;
                 break;
                 

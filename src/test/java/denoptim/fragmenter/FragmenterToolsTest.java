@@ -491,26 +491,22 @@ public class FragmenterToolsTest
         formulaA.put("C", 5.0);
         formulaA.put("H", 6.0);
         Map<String,Double> formulaB = new HashMap<String,Double>();
-        formulaB.put("O", 2.0);
+        formulaB.put("O", 1.0);
         formulaMin.add(formulaA);
         formulaMin.add(formulaB);
-        settings.setFormulaCriteriaLessThan(formulaMin);
+        settings.setRejectedFormulaMoreThan(formulaMin);
         assertFalse(FragmenterTools.filterFragment(frag1, settings));
         assertTrue(FragmenterTools.filterFragment(frag2, settings));
         assertFalse(FragmenterTools.filterFragment(frag3, settings));
         assertFalse(FragmenterTools.filterFragment(frag4, settings));
         
         //Formula more-than
-        Set<Map<String,Double>> formulaMax = new HashSet<Map<String,Double>>();
-        Map<String,Double> formulaC = new HashMap<String,Double>();
-        formulaC.put("C", 3.0);
-        formulaC.put("H", 2.0);
-        Map<String,Double> formulaD = new HashMap<String,Double>();
-        formulaD.put("O", 1.0);
-        formulaMax.add(formulaC);
-        formulaMax.add(formulaD);
+        Map<String,Double> formulaMax = new HashMap<String,Double>();
+        formulaMax.put("C", 3.0);
+        formulaMax.put("H", 2.0);
+        formulaMax.put("O", 1.0);
         settings = new FragmenterParameters();
-        settings.setFormulaCriteriaMoreThan(formulaMax);
+        settings.setRejectedFormulaLessThan(formulaMax);
         assertFalse(FragmenterTools.filterFragment(frag1, settings));
         assertFalse(FragmenterTools.filterFragment(frag2, settings));
         assertTrue(FragmenterTools.filterFragment(frag3, settings));
