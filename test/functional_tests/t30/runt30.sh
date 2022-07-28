@@ -8,12 +8,12 @@ mv data/* "$wrkDir"
 rm -rf data
 
 # Here we define the expected results
-#             sub test ID: 1  2  3  4  5  6  7  8   9  10
-expectedNoMissingAtomMols=(9  1  0  0  0  0  0  0   0   0)
-      expectedPreFiltered=(0  0  2  0  0  0  0  0   0   0)  
-        expectedFragments=(0  0  0 20 12  8  6 11 140  10)
-  expectedIsomorphicFrags=(0  0  0  0  0  0 30 11   0   0)
-          expectedResults=(9  0  2  0  0  0  0  0   0   0)
+#             sub test ID: 1  2  3  4  5  6  7  8   9 10 11 12 13 14
+expectedNoMissingAtomMols=(9  1  0  0  0  0  0  0   0  0  0  0  0  0)
+      expectedPreFiltered=(0  0  2  0  0  0  0  0   0  0  0  0  0  0)  
+        expectedFragments=(0  0  0 20 12  8  6 11 140  4  2  2  2  3)
+  expectedIsomorphicFrags=(0  0  0  0  0  0 30 11   0  0  0  0  0  0)
+          expectedResults=(9  0  2  0  0  0  0  0   0  0  0  0  0  0)
 
 # NB: for t30-9 the 140 result from counting 70 twice.
 

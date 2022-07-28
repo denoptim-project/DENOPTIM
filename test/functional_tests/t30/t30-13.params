@@ -1,0 +1,9 @@
+#
+# This is the parameter file for test t30-13
+#
+FRG-VERBOSITY=4
+#FRG-PARALLELTASKS=3
+FRG-STRUCTURESFILE=inputFrags-13.sdf
+#
+FRG-REJECTSMARTS=[#8][#6]1~[#6]~[#6]~[#6]~[#6]~[#6]~1
+FRG-REJECTSMARTS=C(=O)[#8,#7]

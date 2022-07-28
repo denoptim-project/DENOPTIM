@@ -540,7 +540,7 @@ public class FragmenterToolsTest
         
         //SMARTS query retention
         smarts = new HashMap<String,String>();
-        smarts.put("C", "C!@-C");
+        smarts.put("C", "O-O");
         smarts.put("D", "CCl");
         settings = new FragmenterParameters();
         settings.setFragRetentionSMARTS(smarts);

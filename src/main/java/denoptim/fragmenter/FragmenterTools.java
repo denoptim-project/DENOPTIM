@@ -979,9 +979,10 @@ public class FragmenterTools
                         if (eaMol.get(el) - criterion.get(el) > 0.5)
                         {
                             logger.log(Level.FINE,"Removing fragment that "
-                                    + "contains only too much '" + el + "' "
+                                    + "contains too much '" + el + "' "
                                     + "as requested by formula"
-                                    + "-based (more-than) settings.");
+                                    + "-based (more-than) settings (" + el
+                                    + eaMol.get(el)  + " > " + criterion + ").");
                             return false;
                         }
                     }
@@ -1002,9 +1003,10 @@ public class FragmenterTools
                     if (eaMol.get(el) - criterion.get(el) < -0.5)
                     {
                         logger.log(Level.FINE,"Removing fragment that "
-                                + "contains only too little '" + el + "' "
+                                + "contains too little '" + el + "' "
                                 + "as requested by formula"
-                                + "-based (less-than) settings.");
+                                + "-based settings (" + el
+                                + eaMol.get(el)  + " < " + criterion + ").");
                         return false;
                     }
                 }
@@ -1128,15 +1130,20 @@ public class FragmenterTools
                         + "rejection criteria. " + msq.getMessage());
             }
         
+            boolean matchesAny = false;
             for (String criterion : settings.getFragRetentionSMARTS().keySet())
             {
-                if (msq.getNumMatchesOfQuery(criterion) == 0)
+                if (msq.getNumMatchesOfQuery(criterion) > 0)
                 {
-                    logger.log(Level.FINE,"Removing fragment that does not "
-                            + "match SMARTS-based retention criteria '" 
-                            + criterion + "'.");
-                    return false;
+                    matchesAny = true;
+                    break;
                 }
+            }
+            if (!matchesAny)
+            {
+                logger.log(Level.FINE,"Removing fragment that does not "
+                        + "match any SMARTS-based retention criteria.");
+                return false;
             }
         }
         return true;

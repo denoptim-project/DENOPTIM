@@ -1,5 +1,5 @@
 
-  CDK     07282210353D
+  CDK     07282211433D
 
   4  3  0  0  0  0  0  0  0  0999 V2000
    -0.0006   -0.0006   -0.0006 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -114,7 +114,7 @@ M  END
 
 $$$$
 
-  CDK     07282210353D
+  CDK     07282211433D
 
   7  6  0  0  0  0  0  0  0  0999 V2000
    -0.0035   -0.0001   -0.0001 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -132,7 +132,7 @@ $$$$
   2  7  1  0  0  0  0
 M  END
 > <ATTACHMENT_POINTS>
-2#C:0:SINGLE:1.8997%1.0224%0.0000 
+2#C2:0:SINGLE:1.8997%1.0224%0.0000 
 
 > <VertexJson>
 {
@@ -142,7 +142,7 @@ M  END
       "atomPositionNumber": 1,
       "atomPositionNumberInMol": -1,
       "apClass": {
-        "rule": "C",
+        "rule": "C2",
         "subClass": 0,
         "bndTyp": "SINGLE"
       },
@@ -263,7 +263,7 @@ M  END
   "buildingBlockType": "FRAGMENT",
   "isRCV": false,
   "properties": {
-    "ATTACHMENT_POINTS": "2#C:0:SINGLE:1.8997%1.0224%0.0000 "
+    "ATTACHMENT_POINTS": "2#C2:0:SINGLE:1.8997%1.0224%0.0000 "
   },
   "uniquefyingPropertyKeys": [],
   "allowedMutationTypes": [
@@ -280,7 +280,7 @@ M  END
 
 $$$$
 
-  CDK     07282210353D
+  CDK     07282211433D
 
  10  9  0  0  0  0  0  0  0  0999 V2000
    -0.0284   -0.0310    0.0031 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -497,9 +497,9 @@ M  END
 
 $$$$
 
-  CDK     07282210353D
+  CDK     07282211433D
 
- 13 12  0  0  0  0  0  0  0  0999 V2000
+ 12 11  0  0  0  0  0  0  0  0999 V2000
    -0.0448   -0.0057   -0.0051 C   0  0  0  0  0  0  0  0  0  0  0  0
     1.4784    0.0016   -0.0052 C   0  0  0  0  0  0  0  0  0  0  0  0
     2.0432    1.4186   -0.0053 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -508,7 +508,6 @@ $$$$
    -0.4258   -0.5308   -0.8856 H   0  0  0  0  0  0  0  0  0  0  0  0
    -0.4237   -0.5306    0.8777 H   0  0  0  0  0  0  0  0  0  0  0  0
     1.8441   -0.5432   -0.8832 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.8436   -0.5417    0.8732 H   0  0  0  0  0  0  0  0  0  0  0  0
     1.6782    1.9619    0.8733 H   0  0  0  0  0  0  0  0  0  0  0  0
     1.6777    1.9635   -0.8829 H   0  0  0  0  0  0  0  0  0  0  0  0
     3.9474    1.9506   -0.8856 H   0  0  0  0  0  0  0  0  0  0  0  0
@@ -520,24 +519,38 @@ $$$$
   1  6  1  0  0  0  0
   1  7  1  0  0  0  0
   2  8  1  0  0  0  0
-  2  9  1  0  0  0  0
+  3  9  1  0  0  0  0
   3 10  1  0  0  0  0
-  3 11  1  0  0  0  0
+  4 11  1  0  0  0  0
   4 12  1  0  0  0  0
-  4 13  1  0  0  0  0
 M  END
 > <ATTACHMENT_POINTS>
-4#C:0:SINGLE:3.9908%0.4172%-0.0038 
+2#foo:2:SINGLE:1.8436%-0.5417%0.8732 4#C4:0:SINGLE:3.9908%0.4172%-0.0038 
 
 > <VertexJson>
 {
   "lstAPs": [
     {
+      "id": 85,
+      "atomPositionNumber": 1,
+      "atomPositionNumberInMol": -1,
+      "apClass": {
+        "rule": "foo",
+        "subClass": 2,
+        "bndTyp": "SINGLE"
+      },
+      "dirVec": {
+        "x": 1.8436,
+        "y": -0.5417,
+        "z": 0.8732
+      }
+    },
+    {
       "id": 88,
       "atomPositionNumber": 3,
       "atomPositionNumberInMol": -1,
       "apClass": {
-        "rule": "C",
+        "rule": "C4",
         "subClass": 0,
         "bndTyp": "SINGLE"
       },
@@ -613,14 +626,6 @@ M  END
           "x": 1.8441,
           "y": -0.5432,
           "z": -0.8832
-        }
-      },
-      {
-        "elSymbol": "H",
-        "p3d": {
-          "x": 1.8436,
-          "y": -0.5417,
-          "z": 0.8732
         }
       },
       {
@@ -708,7 +713,7 @@ M  END
       },
       {
         "atomIds": [
-          1,
+          2,
           8
         ],
         "bo": "SINGLE"
@@ -722,7 +727,7 @@ M  END
       },
       {
         "atomIds": [
-          2,
+          3,
           10
         ],
         "bo": "SINGLE"
@@ -733,13 +738,6 @@ M  END
           11
         ],
         "bo": "SINGLE"
-      },
-      {
-        "atomIds": [
-          3,
-          12
-        ],
-        "bo": "SINGLE"
       }
     ]
   },
@@ -748,7 +746,7 @@ M  END
   "buildingBlockType": "FRAGMENT",
   "isRCV": false,
   "properties": {
-    "ATTACHMENT_POINTS": "4#C:0:SINGLE:3.9908%0.4172%-0.0038 "
+    "ATTACHMENT_POINTS": "2#foo:2:SINGLE:1.8436%-0.5417%0.8732 4#C4:0:SINGLE:3.9908%0.4172%-0.0038 "
   },
   "uniquefyingPropertyKeys": [],
   "allowedMutationTypes": [
@@ -765,7 +763,7 @@ M  END
 
 $$$$
 
-  CDK     07282211293D
+  CDK     07282211433D
 
  10  9  0  0  0  0  0  0  0  0999 V2000
     2.3890   -0.3324   -0.0092 O   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1034,7 +1032,7 @@ M  END
 
 $$$$
 
-  CDK     07282211303D
+  CDK     07282211433D
 
  10  9  0  0  0  0  0  0  0  0999 V2000
     2.3890   -0.3324   -0.0092 O   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1303,7 +1301,7 @@ M  END
 
 $$$$
 
-  CDK     07282211363D
+  CDK     07282211433D
 
  18 17  0  0  0  0  0  0  0  0999 V2000
     5.8242   -0.7227    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -1343,7 +1341,7 @@ $$$$
   3 18  1  0  0  0  0
 M  END
 > <ATTACHMENT_POINTS>
-1#c:1:SINGLE:6.7370%-0.1271%0.0000 
+1#foo:2:SINGLE:6.7370%-0.1271%0.0000 
 
 > <VertexJson>
 {
@@ -1353,8 +1351,8 @@ M  END
       "atomPositionNumber": 0,
       "atomPositionNumberInMol": -1,
       "apClass": {
-        "rule": "c",
-        "subClass": 1,
+        "rule": "foo",
+        "subClass": 2,
         "bndTyp": "SINGLE"
       },
       "dirVec": {
@@ -1639,7 +1637,7 @@ M  END
   "buildingBlockType": "FRAGMENT",
   "isRCV": false,
   "properties": {
-    "ATTACHMENT_POINTS": "1#c:1:SINGLE:6.7370%-0.1271%0.0000 "
+    "ATTACHMENT_POINTS": "1#foo:2:SINGLE:6.7370%-0.1271%0.0000 "
   },
   "uniquefyingPropertyKeys": [],
   "allowedMutationTypes": [
