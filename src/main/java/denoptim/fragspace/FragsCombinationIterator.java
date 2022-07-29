@@ -87,7 +87,7 @@ public class FragsCombinationIterator
     private ArrayList<Integer> totCandsPerAP = new ArrayList<Integer>();
 
     /**
-     * Total number for combinations
+     * Total number of combinations
      */
     private int totCombs = 0;
 
