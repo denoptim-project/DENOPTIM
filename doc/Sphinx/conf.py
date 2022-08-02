@@ -31,7 +31,7 @@ release = '3'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-'breathe',
+'breathe', 
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -55,6 +55,9 @@ html_theme =  'sphinxdoc'# 'nature' #'alabaster'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+javadoc_url_map = {
+  "denoptim" : ('doxygen/xml/', 'javadoc8')
+}
 
 breathe_projects = {
   "denoptim" : "doxygen/xml/",
