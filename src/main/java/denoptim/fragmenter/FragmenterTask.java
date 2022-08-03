@@ -1,7 +1,6 @@
 /*
  *   DENOPTIM
- *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no> and
- *   Marco Foscato <marco.foscato@uib.no>
+ *   Copyright (C) 2022 Marco Foscato <marco.foscato@uib.no>
  * 
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
@@ -157,7 +156,7 @@ public class FragmenterTask extends Task
 //------------------------------------------------------------------------------
 
     /**
-     * Builds the pathname of the structure file meant to be hold structures
+     * Builds the pathname of the structure file meant to hold structures
      * that survive the comparison of structure's elemental analysis against the
      * declared molecular formula.
      * @param settings settings we work with.
@@ -173,7 +172,7 @@ public class FragmenterTask extends Task
 //------------------------------------------------------------------------------
 
     /**
-     * Builds the pathname of the structure file meant to be hold structures
+     * Builds the pathname of the structure file meant to hold structures
      * that survive the pre-filtering step, if any.
      * @param settings settings we work with.
      * @param i the index of the thread
@@ -188,7 +187,7 @@ public class FragmenterTask extends Task
 //------------------------------------------------------------------------------
 
     /**
-     * Builds the pathname of the structure file meant to be hold fragments 
+     * Builds the pathname of the structure file meant to hold fragments 
      * resulting from this task.
      * @param settings settings we work with.
      * @param i the index of the thread
@@ -203,7 +202,7 @@ public class FragmenterTask extends Task
 //------------------------------------------------------------------------------
 
     /**
-     * Builds the pathname of the structure file meant to be hold fragments 
+     * Builds the pathname of the structure file meant to hold fragments 
      * resulting from all tasks.
      * @param settings settings we work with.
      * @return the pathname
@@ -217,7 +216,7 @@ public class FragmenterTask extends Task
 //------------------------------------------------------------------------------
 
     /**
-     * Builds the pathname of the structure file meant to be hold results that
+     * Builds the pathname of the structure file meant to hold results that
      * are not necessarily fragments.
      * @param settings settings we work with.
      * @return the pathname
@@ -236,7 +235,7 @@ public class FragmenterTask extends Task
      * @param i the index of the thread
      * @return the pathname
      */
-    static String getLogFileName(FragmenterParameters settings, int i)
+    private static String getLogFileName(FragmenterParameters settings, int i)
     {
         return settings.getWorkDirectory() + DenoptimIO.FS 
                 + "FragmenterTask-" + i + ".log";

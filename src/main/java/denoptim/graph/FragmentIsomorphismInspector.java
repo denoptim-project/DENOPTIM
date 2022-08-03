@@ -1,7 +1,9 @@
 package denoptim.graph;
 
 import java.util.Comparator;
+import java.util.Iterator;
 
+import org.jgrapht.GraphMapping;
 import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
 
 /**
@@ -59,12 +61,11 @@ public class FragmentIsomorphismInspector
     }
     
 //------------------------------------------------------------------------------
-    /*
-    public VF2GraphMappingIterator<FragIsomorphNode, FragIsomorphEdge> getMappings()
+    
+    public Iterator<GraphMapping<FragIsomorphNode, FragIsomorphEdge>> getMappings()
     {
         return vf2.getMappings();
     }
-    */
     
 //------------------------------------------------------------------------------    
     

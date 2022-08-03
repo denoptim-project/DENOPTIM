@@ -749,6 +749,8 @@ public class Fragment extends Vertex
         mol.setProperty(DENOPTIMConstants.APSTAG, 
                 getProperty(DENOPTIMConstants.APSTAG));
         mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+        mol.setProperty(DENOPTIMConstants.ISOMORPHICFAMILYID,
+                getProperty(DENOPTIMConstants.ISOMORPHICFAMILYID));
         return mol;
     }
     

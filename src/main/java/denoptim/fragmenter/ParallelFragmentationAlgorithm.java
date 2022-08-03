@@ -1,6 +1,6 @@
 /*
  *   DENOPTIM
- *   Copyright (C) 2019 Marco Foscato <marco.foscato@uib.no>
+ *   Copyright (C) 2022 Marco Foscato <marco.foscato@uib.no>
  * 
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
@@ -72,7 +72,7 @@ import edu.uci.ics.jung.visualization.spatial.FastRenderingGraph;
 
 
 /**
- * fragments a list of chemical systems by running parallel fragmentation tasks.
+ * Fragments a list of chemical systems by running parallel fragmentation tasks.
  *
  * @author Marco Foscato
  */
@@ -148,44 +148,19 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
 
     protected boolean doPostFlightOperations()
     {
-        
-        /*
-        // Extract a representative conformation from each family of isomorphic fragments
         if (settings.extactRepresentativeConformer())
         {
-            int sampleSize = Math.min(FragmenterParameters.MAXISOMORPHICSAMPLESIZE, 
-                    settings.getIsomorphicSampleSize());
-            if (sampleSize < settings.getIsomorphicSampleSize())
+            ParallelConformerExtractionAlgorithm extractor = 
+                    new ParallelConformerExtractionAlgorithm(settings);
+            try
             {
-                settings.getLogger().log(Level.WARNING,"Limiting the sample of "
-                        + "isomorphic fragments to " + sampleSize);
-            }
-            
-            // Looping over the old champions (i.e., the first fragment found 
-            // for each isomorphic family's sample)
-            for (File mwSlotFile : getFilesCollectingIsomorphicFamilyChampions(
-                    new File(settings.getWorkDirectory())))
+                extractor.run();
+            } catch (Exception e)
             {
-                List<Vertex> oldChampions;
-                try
-                {
-                    oldChampions = DenoptimIO.readVertexes(mwSlotFile,
-                            BBType.UNDEFINED);
-                } catch (Throwable e)
-                {
-                    
-                    throw new Error("Unable to extract representative "
-                            + "conformations. Problems opening file '"
-                            + mwSlotFile + "'.",  e);
-                }
-                for (Vertex oldChampion : oldChampions)
-                {
-                    
-                }
+                throw new Error("Could not extract the most common conformer. "
+                        + e.getMessage(), e);
             }
-            
         }
-        */
         
         // Identify (and possibly collect) final results
         if (settings.doManageIsomorphicFamilies())
@@ -277,7 +252,7 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
     
 //------------------------------------------------------------------------------
     
-    private List<File> getFilesCollectingIsomorphicFamilyChampions(File workDir)
+    protected static List<File> getFilesCollectingIsomorphicFamilyChampions(File workDir)
     {
         List<File> files = Arrays.stream(workDir.listFiles(new FileFilter(){
             @Override

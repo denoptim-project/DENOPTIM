@@ -795,7 +795,8 @@ public class FragmenterTools
                             DENOPTIMConstants.ISOMORPHICFAMILYID)
                             .toString();
                     
-                    // Do we already have enough isomorphs of this frag?
+                    // Do we already have enough isomorphic family members 
+                    // for this fragment?
                     int sampleSize = settings.getIsomorphsCount()
                             .get(isoFamID);
                     if (sampleSize < settings.getIsomorphicSampleSize())

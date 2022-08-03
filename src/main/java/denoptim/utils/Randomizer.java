@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.Collection;
 
+import javax.vecmath.Point3d;
+
 import org.apache.commons.math3.random.MersenneTwister;
 
 import denoptim.exception.DENOPTIMException;
@@ -219,6 +221,29 @@ public class Randomizer
     public boolean nextBoolean(double prob)
     {
         return nextDouble() < prob;
+    }
+    
+//------------------------------------------------------------------------------
+    /**
+     * Returns a point in three-dimensional space with a random set of 
+     * coordinates, the absolute value of which is at most the value given as
+     * argument.
+     * @param maxAbsValue the maximum absolute value of any Cartesian coordinate.
+     * @return a point in Cartesian space with a random position.
+     */
+    
+    public Point3d getNoisyPoint(double maxAbsValue)
+    {
+        double xFactor = nextDouble();
+        double yFactor = nextDouble();
+        double zFactor = nextDouble();
+        double xSign = Double.valueOf(nextInt(2));
+        double ySign = Double.valueOf(nextInt(2));
+        double zSign = Double.valueOf(nextInt(2));
+
+        return new Point3d(maxAbsValue*xFactor*xSign,
+                maxAbsValue*yFactor*ySign,
+                maxAbsValue*zFactor*zSign);
     }
       
 //------------------------------------------------------------------------------

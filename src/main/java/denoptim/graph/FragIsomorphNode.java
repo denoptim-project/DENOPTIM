@@ -1,5 +1,7 @@
 package denoptim.graph;
 
+import javax.vecmath.Point3d;
+
 import org.openscience.cdk.interfaces.IAtom;
 
 import denoptim.utils.MoleculeUtils;
@@ -58,6 +60,17 @@ public class FragIsomorphNode
     public boolean isAtm()
     {
         return isAtm;
+    }
+
+//------------------------------------------------------------------------------
+    
+    public Point3d getPoint3d()
+    {
+        if (original instanceof AttachmentPoint)
+            return ((AttachmentPoint) original).getDirectionVector();
+        if (original instanceof IAtom)
+            return MoleculeUtils.getPoint3d((IAtom) original);
+        return null;
     }
 
 //------------------------------------------------------------------------------

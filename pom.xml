@@ -169,7 +169,24 @@
         <artifactId>combinatoricslib3</artifactId>
         <version>3.3.3</version>
     </dependency>
-</dependencies>
+    <!-- https://mvnrepository.com/artifact/org.biojava/biojava-core -->
+    <dependency>
+        <groupId>org.biojava</groupId>
+        <artifactId>biojava-core</artifactId>
+        <version>6.0.5</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.biojava/biojava-structure -->
+    <dependency>
+        <groupId>org.biojava</groupId>
+        <artifactId>biojava-structure</artifactId>
+        <version>6.0.5</version>
+    </dependency>
+    <dependency>
+    	<groupId>net.sourceforge.jdistlib</groupId>
+    	<artifactId>jdistlib</artifactId>
+    	<version>0.4.5</version>
+    </dependency>
+  </dependencies>
   
   <build>
     <resources>
