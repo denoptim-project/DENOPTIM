@@ -181,11 +181,6 @@
         <artifactId>biojava-structure</artifactId>
         <version>6.0.5</version>
     </dependency>
-    <dependency>
-    	<groupId>net.sourceforge.jdistlib</groupId>
-    	<artifactId>jdistlib</artifactId>
-    	<version>0.4.5</version>
-    </dependency>
   </dependencies>
   
   <build>

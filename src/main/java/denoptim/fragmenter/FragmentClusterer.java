@@ -26,11 +26,11 @@ import org.apache.commons.math3.ml.clustering.evaluation.SumOfClusterVariances;
 import org.apache.commons.math3.ml.distance.DistanceMeasure;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import org.biojava.nbio.structure.geometry.SuperPositionSVD;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.utils.Randomizer;
-import net.sourceforge.jdistlib.disttest.DistributionTest;
 
 /**
  * Performs k-mean clustering on the data using as measure of the distance 
@@ -111,12 +111,13 @@ public class FragmentClusterer
 
     public boolean cluster()
     {
+        /*
         if (isDataUnimodal())
         {
-            // This to run only the case where K = 1 to get the stats as if K>1
+            // This to run only the case where K = 1 and get the stats as if K>1
             maxK = 2; 
         }
-        
+        */
         // Clustering 
         for (int k=1; k<Math.min(data.size(), maxK); k++)
         {
@@ -191,20 +192,81 @@ public class FragmentClusterer
             throw new DENOPTIMException("Need at least ten data points to do "
                     + "statistics and infere modality of data.");
         
-        EmpiricalDistribution dataDistribution = new EmpiricalDistribution(
-                Math.max(data.length/10, 5));
+        int nBins = Math.max(data.length/10, 6);
+        EmpiricalDistribution dataDistribution = new EmpiricalDistribution(nBins);
         dataDistribution.load(data);
         
         List<SummaryStatistics> ss = dataDistribution.getBinStats();
-        double[] distProfile = new double[ss.size()];
-        int j=0;
-        for (SummaryStatistics s : ss)
+        double[] distributionProfile = new double[nBins];
+        for (int j=0; j<nBins; j++)
         {
-            distProfile[j] = s.getN();
-            j++;
+            SummaryStatistics s = ss.get(j);
+            distributionProfile[j] = s.getN();
+          //TODO-gg del
+            System.out.println("-> "+s.getN());
+        }
+        EmpiricalDistribution distDistribution = new EmpiricalDistribution(nBins);
+        distDistribution.load(distributionProfile);
+        double origVariance = distDistribution.getNumericalVariance();
+        
+      //TODO-gg del
+        System.out.println("OV "+origVariance);
+        
+        double minVariance = Double.MAX_VALUE;
+        for (int splitPt=1; splitPt<nBins-1; splitPt++)
+        {
+            double movingPartUpperLimit = dataDistribution.getUpperBounds()[splitPt];
+            
+            // Build a new distribution using all point above movingPartUpperLimit
+            // as they are, and mirroring all those below movingPartUpperLimit
+            // onto the other side of movingPartUpperLimit.
+            List<Double> foldedDataLst = new ArrayList<Double>();
+            for (int dataIdx=0; dataIdx<data.length; dataIdx++)
+            {
+                double value = data[dataIdx];
+                if (value < movingPartUpperLimit)
+                {
+                    double newValue = movingPartUpperLimit 
+                            + (movingPartUpperLimit-value);
+                    foldedDataLst.add(newValue);
+                } else {
+                    foldedDataLst.add(value);
+                }
+            }
+            double[] foldedData = new double[foldedDataLst.size()];
+            int id = 0;
+            for (Double d : foldedDataLst)
+            {
+                foldedData[id] = d;
+                id++;
+            }
+            EmpiricalDistribution foldedDataDistribution = 
+                    new EmpiricalDistribution(nBins);
+            foldedDataDistribution.load(foldedData);
+            
+            // Analyze the folded data to get the variance of the distribution
+            List<SummaryStatistics> foldedSs = foldedDataDistribution.getBinStats();
+            double[] foldedDistributionProfile = new double[nBins];
+            for (int j=0; j<nBins; j++)
+            {
+                SummaryStatistics s = foldedSs.get(j);
+                foldedDistributionProfile[j] = s.getN();
+            }
+            EmpiricalDistribution foldedDistDistribution = 
+                    new EmpiricalDistribution(nBins);
+            foldedDistDistribution.load(foldedDistributionProfile);
+            double foldedVariance = foldedDistDistribution.getNumericalVariance();
+            
+            if (foldedVariance < minVariance)
+                minVariance = foldedVariance;
+
+            //TODO-gg del
+            System.out.println(" "+splitPt+" "+foldedVariance);
         }
         
-        double[] dipTestResult = DistributionTest.diptest(distProfile);
+        System.out.println(" ");
+        
+        //TODO-gg deldouble[] dipTestResult = DistributionTest.diptest(distProfile);
         
         //TODO-gg
         return true;

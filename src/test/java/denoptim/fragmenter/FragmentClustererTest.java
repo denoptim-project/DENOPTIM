@@ -97,6 +97,10 @@ public class FragmentClustererTest
             sample.add(cf);
         }
         
+        FragmentClusterer fc = new FragmentClusterer(sample);
+        fc.cluster();
+        assertEquals(1,fc.getBestSet().size());
+        
         Point3d[] pointsB = new Point3d[] {
                 new Point3d(0.4574,-0.0273,0.3953), 
                 new Point3d(-1.2914,-0.0103,-0.0437),
@@ -118,6 +122,10 @@ public class FragmentClustererTest
             cf.setOrderOfNodes(getNatualrNodeOrder(frag));
             sample.add(cf);
         }
+        
+        fc = new FragmentClusterer(sample);
+        fc.cluster();
+        assertEquals(2,fc.getBestSet().size());
         
         Point3d[] pointsC = new Point3d[] {
                 new Point3d(0,0,0), 
@@ -141,7 +149,7 @@ public class FragmentClustererTest
             sample.add(cf);
         }
         
-        FragmentClusterer fc = new FragmentClusterer(sample);
+        fc = new FragmentClusterer(sample);
         fc.cluster();
         assertEquals(3,fc.getBestSet().size());
     }
@@ -280,7 +288,7 @@ public class FragmentClustererTest
      */
     private Point3d getNoizyPoint(Point3d p)
     {
-        Point3d noise = rng.getNoisyPoint(0.1);
+        Point3d noise = rng.getNoisyPoint(1.0);
         return new Point3d(p.x+noise.x, p.y+noise.y, p.z+noise.z);
     }
     
