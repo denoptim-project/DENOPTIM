@@ -21,10 +21,14 @@ package denoptim.utils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
+
+import org.apache.commons.math3.ml.clustering.Clusterable;
+import org.apache.commons.math3.ml.clustering.DoublePoint;
 
 import denoptim.constants.DENOPTIMConstants;
 
@@ -448,6 +452,23 @@ public class MathUtils
 	normalDir.normalize();
 
         return normalDir;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static double[] centroidOf(Collection<double[]> points, int dimension) 
+    {
+        double[] centroid = new double[dimension];
+        for (double[] point : points) 
+        {
+            for (int i = 0; i < centroid.length; i++) {
+                centroid[i] += point[i];
+            }
+        }
+        for (int i = 0; i < centroid.length; i++) {
+            centroid[i] /= points.size();
+        }
+        return centroid;
     }
 
 //------------------------------------------------------------------------------

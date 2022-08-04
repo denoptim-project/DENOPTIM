@@ -1,11 +1,14 @@
 package denoptim.fragmenter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,18 +19,29 @@ import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
+import org.apache.commons.math3.ml.clustering.Cluster;
+import org.apache.commons.math3.ml.clustering.Clusterable;
+import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.apache.commons.math3.ml.clustering.MultiKMeansPlusPlusClusterer;
 import org.apache.commons.math3.ml.clustering.evaluation.SumOfClusterVariances;
 import org.apache.commons.math3.ml.distance.DistanceMeasure;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import org.biojava.nbio.structure.geometry.SuperPositionSVD;
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DGraph.StringFormat;
+import denoptim.io.DenoptimIO;
 import denoptim.graph.Fragment;
 import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.MathUtils;
+import denoptim.utils.Randomizer;
 
 /**
  * Performs k-means clustering on the data using as measure of the distance 
@@ -128,6 +142,8 @@ public class FragmentClusterer
             MultiKMeansPlusPlusClusterer<ClusterableFragment> multiKmpp = 
                     new MultiKMeansPlusPlusClusterer<ClusterableFragment>(
                             kmppClusterer, settings.getMaxTrials());
+            
+            //TODO-gg what about evaluator in MultiKMeans...
             
             // Perform multiple clustering attempts
             List<CentroidCluster<ClusterableFragment>> result = 
@@ -238,8 +254,15 @@ public class FragmentClusterer
             kvalues[k-1] = k;
             sumOfVariance[k-1] = sumsOfVariance.get(k);
         }
-
-        // Verify elbow is significant
+        // Empirical way to detect unimodal distribution, i.e., single cluster
+        // 1) Ensure there is a significant variance in the data
+        // 2) Ensure the sum of variance in the clusters decreases significantly.
+        
+        // This is 1) verify that variance is significant
+        boolean isVarianceToSmall = isVarianceTooSmall(clusters.get(1).get(0), 
+                new DistanceAsRMSD());
+        
+        // This is 2) verify that elbow is significant
         double minSoV = Collections.min(sumsOfVariance.values());
         double maxSoV = Collections.max(sumsOfVariance.values());
         if ((maxSoV-minSoV) > settings.getThresholdRangeSoV())
@@ -299,7 +322,122 @@ public class FragmentClusterer
         return clusters.get(bestK); 
     }
     
- //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+    protected static boolean isVarianceTooSmall(
+            CentroidCluster<ClusterableFragment> cluster, DistanceMeasure measure)
+    {
+        if (!cluster.getPoints().isEmpty())
+        {
+            return true;
+        }
+        
+        // Build reference unimodal data around same center and with same size
+        double[] center = cluster.getCenter().getPoint();
+        Cluster<DoublePoint> refCluster = new Cluster<DoublePoint>();
+        Set<double[]> refClusterCoords = new HashSet<double[]>();
+        for (int i=0; i<cluster.getPoints().size(); i++)
+        {
+            //TODO-gg add noise
+            double[] coords = center;
+            refCluster.addPoint(new DoublePoint(coords));
+            refClusterCoords.add(coords);
+        }
+        double[] refCentroidCoords = MathUtils.centroidOf(refClusterCoords, 
+                center.length);
+
+        // Compute variance of reference dataset
+        final Variance refStat = new Variance();
+        for (double[] coords : refClusterCoords) 
+        {
+            refStat.increment(measure.compute(coords,refCentroidCoords));
+        }
+        double refVariance = refStat.getResult();
+        
+        
+        
+        
+
+        
+        return false;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * Build a reference unimodal distribution of points in N dimensional space 
+     * by adding
+     * normally distributed noise to the given center, 
+     * and calculates the variance over the distribution of points for 
+     * the given distance measure w.r.t. that distribution's centroid. This
+     * is repeated a number of times (i.e., the repetitions) to get multiple
+     * estimates of the variance. From the distribution of variance values
+     * we calculate mean and standard deviation, which are used to calculate
+     * the result according to
+     * <pre>
+     *  result = m + strDevFactor * sd
+     * </pre>
+     * where
+     * <ul>
+     * <li><i>m</i> is the mean of the variance over the repetitions,</li>
+     * <li><i>sd</i> its standard deviation</li>
+     * <li><i>strDevFactor</i> one of the method's arguments</li>
+     * <li>and <i>result</i> is the value returned by the method.</li>
+     * </ul>
+     * @param center a 3*N dimensional vector that represents the initial center.
+     * Note that the centroid of the generated distribution equals this 
+     * argument only for an infinite number of points. 
+     * @param size the number of points to have in the reference distribution.
+     * @param measure the distance measure used to calculate variance of the 
+     * distribution.
+     * @param maxNoise absolute value of the maximum distortion on a single 
+     * coordinate in the N dimensional space.
+     * @param maxRepetitions number of independent repetitions of the variance 
+     * calculation.
+     * @param strDevFactor the factor multiplying the standard deviation to 
+     * produce the result.
+     * @return
+     */
+    protected static double getVarianceOfNoisyDistorsions(double[] center, 
+            int size,
+            DistanceMeasure measure, double maxNoise, int maxRepetitions,
+            double strDevFactor)
+    {
+        // We use always the same randomizer to get reproducible values.
+        Randomizer rng = new Randomizer(1L);
+        
+        double sumOfVariance = 0;
+        SummaryStatistics varStats = new SummaryStatistics();
+        for (int r=0; r<maxRepetitions; r++)
+        {
+            List<double[]> refClusterCoords = new ArrayList<double[]>();
+            for (int k=0; k<size; k++)
+            {
+                double[] coords = Arrays.copyOf(center, center.length);
+                for (int j=0; j<coords.length; j++)
+                {
+                    coords[j] = coords[j] + maxNoise*(2*rng.nextNormalDouble()-1);
+                }
+                refClusterCoords.add(coords);
+            }
+            double[] refCentroidCoords = MathUtils.centroidOf(refClusterCoords, 
+                    center.length);
+            
+            // Compute variance of reference dataset
+            final Variance refStat = new Variance();
+            for (double[] coords : refClusterCoords) 
+            {
+                double rmsd = measure.compute(coords,refCentroidCoords);
+                refStat.increment(rmsd);
+            }
+            double variance = refStat.getResult();
+            varStats.addValue(variance);
+            sumOfVariance = sumOfVariance +variance;
+        }
+        return varStats.getMean() + strDevFactor * varStats.getStandardDeviation();
+    }   
+    
+//-----------------------------------------------------------------------------
 
     /**
      * Detects the elbow in the profile defined by the two vectors. Implements

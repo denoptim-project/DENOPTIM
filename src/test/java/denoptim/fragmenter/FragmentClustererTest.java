@@ -36,6 +36,7 @@ import com.google.common.collect.Sets;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.files.FileFormat;
+import denoptim.fragmenter.FragmentClusterer.DistanceAsRMSD;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.FragIsomorphNode;
@@ -66,8 +67,60 @@ public class FragmentClustererTest
      * Random number generator
      */
     private Randomizer rng = new Randomizer(1L);
-   
-  //-----------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetVarianceOfUnimodalRef()
+    {
+        double[] center = new double[] {
+                0,0,0,
+                1,0,0,
+                0,1,0,
+                0,0,1,
+                -1,0,0,
+                0,-1,0,
+                0,0,-1,
+                1,0,0,
+                0,1,0,
+                0,0,1,
+                -1,0,0,
+                0,-1,0,
+                0,0,-1,
+                1,0,0,
+                0,1,0,
+                0,0,1,
+                -1,0,0,
+                0,-1,0,
+                0,0,-1};
+        double var = FragmentClusterer.getVarianceOfNoisyDistorsions(center,10, 
+                new DistanceAsRMSD(), 0.1, 5, 2.0);
+        double[] center2 = new double[] {
+                0,0,0,
+                2,0,0,
+                0,2,0,
+                0,0,2,
+                -2,0,0,
+                0,-2,0,
+                0,0,-2,
+                6,0,0,
+                0,6,0,
+                0,0,6,
+                -6,0,0,
+                0,-6,0,
+                0,0,-6,
+                8,0,0,
+                0,8,0,
+                0,0,8,
+                -8,0,0,
+                0,-8,0,
+                0,0,-8};
+        double var2 = FragmentClusterer.getVarianceOfNoisyDistorsions(center2,10, 
+                new DistanceAsRMSD(), 0.1, 5, 2.0);
+        assertTrue(Math.abs(var-var2) < var*0.02);
+    }
+    
+//-----------------------------------------------------------------------------
 
     @Test
     public void testCluster() throws Exception
