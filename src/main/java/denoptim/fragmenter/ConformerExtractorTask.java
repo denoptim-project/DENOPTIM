@@ -173,9 +173,11 @@ public class ConformerExtractorTask extends Task
     public Object call() throws Exception
     {
         List<ClusterableFragment> sample = collectClusterableFragmentsFromFile();
-
-        //TODO-gg
         
+        FragmentClusterer clusterer = new FragmentClusterer(sample, settings);
+        clusterer.cluster();
+        
+        //TODO-gg get cluster centroids OR single-cluster centroid OR what?
         
         // Final message
         logger.log(Level.INFO,"Analysis of isomorphic family completed.");

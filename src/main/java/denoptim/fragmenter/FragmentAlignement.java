@@ -15,7 +15,6 @@ import denoptim.graph.FragmentIsomorphismInspector;
 
 public class FragmentAlignement
 {
-
     /**
      * Lowest RMSD upon alignment
      */

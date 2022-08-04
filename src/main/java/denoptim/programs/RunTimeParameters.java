@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -258,7 +259,7 @@ public abstract class RunTimeParameters
     /**
      * New line character
      */
-    protected final String NL = System.getProperty("line.separator");
+    public final String NL = System.getProperty("line.separator");
     
 //-----------------------------------------------------------------------------
     
@@ -423,6 +424,43 @@ public abstract class RunTimeParameters
                     new SimpleFormatter()));
         }
         
+        if (verbosity!=0)
+        {
+            logger.setLevel(verbosityTologLevel());
+            for (int iH=0; iH<logger.getHandlers().length; iH++)
+            {
+                logger.getHandlers()[iH].setLevel(verbosityTologLevel());
+            }
+        }
+        
+        for (RunTimeParameters innerParams : otherParameters.values())
+        {
+            innerParams.setLogger(logger);
+        }
+        
+        return logger;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Starts a program-specific logger that prints to System.err stream.
+     * @param loggerIdentifier
+     * @return
+     */
+    public Logger startConsoleLogger(String loggerIdentifier)
+    {
+        logger = Logger.getLogger(loggerIdentifier);
+        
+        int n = logger.getHandlers().length;
+        for (int i=0; i<n; i++)
+        {
+            logger.removeHandler(logger.getHandlers()[0]);
+        }
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setFormatter(new SimpleFormatter());
+        handler.setLevel(Level.INFO);
+        logger.addHandler(handler);
         
         if (verbosity!=0)
         {
@@ -510,6 +548,34 @@ public abstract class RunTimeParameters
     public int getVerbosity()
     {
 	    return verbosity;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Set the level of verbosity. If any associated logger exists, the level is
+     * set accordingly. The change affects all embedded sets of parameters.
+     * The integer is translated in a {@link Level}
+     * so that -3 (or lower) corresponds to {@link Level#OFF},
+     * 0 is the normal {@link Level#INFO},
+     * and 3 (or higher) corresponds to {@link Level#FINEST}. 
+     */
+    public void setVerbosity(int l)
+    {
+        this.verbosity = l;
+        if (logger!=null)
+        {
+            logger.setLevel(verbosityTologLevel());
+            for (int iH=0; iH<logger.getHandlers().length; iH++)
+            {
+                logger.getHandlers()[iH].setLevel(verbosityTologLevel());
+            }
+        }
+        
+        for (RunTimeParameters innerParams : otherParameters.values())
+        {
+            innerParams.setVerbosity(l);
+        }
     }
 
 //-----------------------------------------------------------------------------

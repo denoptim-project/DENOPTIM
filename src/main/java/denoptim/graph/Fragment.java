@@ -999,36 +999,6 @@ public class Fragment extends Vertex
                     ap.getAtomPositionNumber())), node, edge);
         }
         
-        //TODO-gg del
-        /*
-        System.out.println(" ");
-        System.out.println("JGraph for fragment:");
-        for (FragIsomorphNode n : jGraphFragIsomorphism.vertexSet())
-        {
-            String s = "";
-            if (n.isAtm)
-            {
-                IAtom a = (IAtom) n.original;
-                s = " " + MoleculeUtils.getSymbolOrLabel(a)
-                    + mol.indexOf(a);
-            }
-            System.out.println(" n: "+n.getLabel()+s);
-        }
-        for (FragIsomorphEdge e : jGraphFragIsomorphism.edgeSet())
-        {
-            String s = "";
-            if (e.isBond)
-            {
-                IBond b = (IBond) e.original;
-                s = " " + MoleculeUtils.getSymbolOrLabel(b.getAtom(0))
-                    + mol.indexOf(b.getAtom(0))
-                    + "-" + MoleculeUtils.getSymbolOrLabel(b.getAtom(1))
-                    + mol.indexOf(b.getAtom(1));
-            }
-            System.out.println(" e: "+e.label+s);
-        }
-        */
-        
         return jGraphFragIsomorphism;
     }
     

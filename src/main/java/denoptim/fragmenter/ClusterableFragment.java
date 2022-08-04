@@ -93,4 +93,6 @@ public class ClusterableFragment implements Clusterable
         return allCoords;
     }
 
+//------------------------------------------------------------------------------
+    
 }
