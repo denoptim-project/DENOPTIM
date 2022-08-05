@@ -99,10 +99,13 @@ public class FragmentClusterer
 //------------------------------------------------------------------------------
     
     /**
-     * Constructor for an alignment of two fragments. 
-     * Note we first have to find an ordering of the atoms/AP that is consistent.
-     * Thus we check for isomorphism between the fragments.
-     * @param data collection of fragments to clusterize.
+     * Constructor for a clusterer of fragments. 
+     * Note we first have to find an ordering of the atoms/AP that is consistent
+     * throughout the dataset. We expect this ordering to be done prior to 
+     * attempting the clustering.
+     * @param data collection of fragments to clusterize. The coordinates vector
+     * of each of these is expected to have a consistent ordering, but the 
+     * value of the coordinates will be edited to align the geometries.
      * @param settings configuration of the clustering method
      * @throws DENOPTIMException if an isomorphism is not found.
      */
@@ -126,8 +129,32 @@ public class FragmentClusterer
      */
     public void cluster()
     {
+        // Align to data centroid because KMeans++Clusterer calculates cluster 
+        // centroids on the raw data so the raw data must be first aligned or
+        // the cluster centroids would be too distorted.
+        List<double[]> allDataCoords = new ArrayList<double[]>();
+        int nCoords = data.get(0).getPoint().length;
+        for (int i=0; i<data.size(); i++)
+        {
+            allDataCoords.add(Arrays.copyOf(data.get(i).getPoint(), nCoords));
+        }
+        Point3d[] centroid = ClusterableFragment.convertToPointArray(
+                MathUtils.centroidOf(allDataCoords, nCoords));
+        SuperPositionSVD svd = new SuperPositionSVD(false);
+        for (int i=0; i<data.size(); i++)
+        {
+            Point3d[] point = ClusterableFragment.convertToPointArray(
+                    data.get(i).getPoint());
+            svd.superposeAndTransform(centroid,point);
+            data.get(i).setCoordsVector(ClusterableFragment.convertToCoordsVector(
+                    point));
+        }
+        
+        // Determine the maximum value of k
         int effectiveMaxK = Math.max(1, Math.min(data.size() 
                 / settings.getDataFraction(), settings.getMaxK()));
+        
+        // Do all attempts to identify k clusters
         for (int k=1; k<effectiveMaxK; k++)
         {
             if (logger!=null)
@@ -211,7 +238,8 @@ public class FragmentClusterer
                         coordsB[j+2]);
             }
             SuperPositionSVD svd = new SuperPositionSVD(false);
-            return svd.getRmsd(ptsA,ptsB);
+            double rmsd = svd.getRmsd(ptsA,ptsB);
+            return rmsd;
         }
     }
     
@@ -259,9 +287,24 @@ public class FragmentClusterer
         // 2) Ensure the sum of variance in the clusters decreases significantly.
         
         // This is 1) verify that variance is significant
-        boolean isVarianceToSmall = isVarianceTooSmall(clusters.get(1).get(0), 
-                new DistanceAsRMSD());
+        double[] center = clusters.get(1).get(0).getCenter().getPoint();
+        double empVariance = sumsOfVariance.get(1);
         
+        double refVariance = getVarianceOfNoisyDistorsions(center, center.length,
+                new DistanceAsRMSD(), 0.2, 5, 2.0); //TODO use tuneable params
+        boolean tooLowVariance = empVariance < refVariance;
+        if (tooLowVariance)
+        {
+            if (logger!=null)
+            {
+                logger.log(Level.WARNING, "Variance in k=1 cluster is low: "
+                        + empVariance + "<" + refVariance + ". "
+                        + "This looks like an unimodal dataset where there is "
+                        + "only one cluster.");
+            }
+            return clusters.get(1);
+        } 
+    
         // This is 2) verify that elbow is significant
         double minSoV = Collections.min(sumsOfVariance.values());
         double maxSoV = Collections.max(sumsOfVariance.values());
@@ -320,46 +363,6 @@ public class FragmentClusterer
             }
         }
         return clusters.get(bestK); 
-    }
-    
-//-----------------------------------------------------------------------------
-
-    protected static boolean isVarianceTooSmall(
-            CentroidCluster<ClusterableFragment> cluster, DistanceMeasure measure)
-    {
-        if (!cluster.getPoints().isEmpty())
-        {
-            return true;
-        }
-        
-        // Build reference unimodal data around same center and with same size
-        double[] center = cluster.getCenter().getPoint();
-        Cluster<DoublePoint> refCluster = new Cluster<DoublePoint>();
-        Set<double[]> refClusterCoords = new HashSet<double[]>();
-        for (int i=0; i<cluster.getPoints().size(); i++)
-        {
-            //TODO-gg add noise
-            double[] coords = center;
-            refCluster.addPoint(new DoublePoint(coords));
-            refClusterCoords.add(coords);
-        }
-        double[] refCentroidCoords = MathUtils.centroidOf(refClusterCoords, 
-                center.length);
-
-        // Compute variance of reference dataset
-        final Variance refStat = new Variance();
-        for (double[] coords : refClusterCoords) 
-        {
-            refStat.increment(measure.compute(coords,refCentroidCoords));
-        }
-        double refVariance = refStat.getResult();
-        
-        
-        
-        
-
-        
-        return false;
     }
     
 //-----------------------------------------------------------------------------

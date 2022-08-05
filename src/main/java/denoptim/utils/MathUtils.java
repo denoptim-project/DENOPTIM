@@ -461,11 +461,13 @@ public class MathUtils
         double[] centroid = new double[dimension];
         for (double[] point : points) 
         {
-            for (int i = 0; i < centroid.length; i++) {
+            for (int i = 0; i < centroid.length; i++) 
+            {
                 centroid[i] += point[i];
             }
         }
-        for (int i = 0; i < centroid.length; i++) {
+        for (int i = 0; i < centroid.length; i++) 
+        {
             centroid[i] /= points.size();
         }
         return centroid;

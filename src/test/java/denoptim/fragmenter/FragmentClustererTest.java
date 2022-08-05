@@ -19,6 +19,8 @@ import java.util.logging.Level;
 
 import javax.vecmath.Point3d;
 
+import org.apache.commons.math3.ml.clustering.Clusterable;
+import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.PseudoAtom;
@@ -68,6 +70,71 @@ public class FragmentClustererTest
      */
     private Randomizer rng = new Randomizer(1L);
 
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testDistanceAsRMSD()
+    {
+        DistanceAsRMSD measure = new DistanceAsRMSD();
+        
+        double[] pA = new double[] {0,0,0,   0,0,0};
+        double[] pB = new double[] {0,0,0,   1,0,0};
+        double[] pC = new double[] {0,0,0,   2,0,0};
+
+        // NB: this RMSD upon alignement not distance!
+        double val = measure.compute(pA, pB); 
+        assertTrue(Math.abs(val - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pA) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pA, pA) - 0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pB) - 0) < 0.0001);
+        
+        assertTrue(Math.abs(measure.compute(pA, pC) - 1.0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pC, pA) - 1.0) < 0.0001);
+
+        assertTrue(Math.abs(measure.compute(pB, pC) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pC, pB) - 0.5) < 0.0001);
+        
+        pA = new double[] {0,0,0,   0,0,0};
+        pB = new double[] {0,0,0,   0,1,0};
+        pC = new double[] {0,0,0,   0,2,0};
+        assertTrue(Math.abs(measure.compute(pA, pB) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pA) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pA, pA) - 0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pB) - 0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pA, pC) - 1.0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pC, pA) - 1.0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pC) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pC, pB) - 0.5) < 0.0001);
+        
+        pA = new double[] {0,0,0,   0,0,0};
+        pB = new double[] {0,0,0,   0,0,1};
+        pC = new double[] {0,0,0,   0,0,2};
+        assertTrue(Math.abs(measure.compute(pA, pB) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pA) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pA, pA) - 0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pB) - 0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pA, pC) - 1.0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pC, pA) - 1.0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pC) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pC, pB) - 0.5) < 0.0001);
+
+        pA = new double[] {0,0,0,   0,0,0};
+        pB = new double[] {0,0,1,   0,0,0};
+        pC = new double[] {0,0,2,   0,0,0};
+        assertTrue(Math.abs(measure.compute(pA, pB) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pA) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pA, pA) - 0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pB) - 0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pA, pC) - 1.0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pC, pA) - 1.0) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pC) - 0.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pC, pB) - 0.5) < 0.0001);
+        
+        pA = new double[] {0,0,0,   1,0,0};
+        pB = new double[] {0,0,0,   6,0,0};
+        assertTrue(Math.abs(measure.compute(pA, pB) - 2.5) < 0.0001);
+        assertTrue(Math.abs(measure.compute(pB, pA) - 2.5) < 0.0001);
+    }
 //------------------------------------------------------------------------------
     
     @Test
@@ -305,18 +372,18 @@ public class FragmentClustererTest
     @Test
     public void testCluster2() throws Exception
     {
-        double noise = 0.0001;
+        double noise = 0.0;
         List<ClusterableFragment> sample = new ArrayList<ClusterableFragment>();
 
-        Point3d[] pointsA = new Point3d[] {
+        Point3d[] points = new Point3d[] {
                 new Point3d(0,0,0), 
                 new Point3d(1,0,0)};
         for (int i=0; i<10; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
-            mol.addAtom(new Atom("C", getNoisyPoint(pointsA[0])));
+            mol.addAtom(new Atom("C", getNoisyPoint(points[0],noise)));
             Fragment frag = new Fragment(mol, BBType.UNDEFINED);
-            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsA[1],noise));
+            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(points[1],noise));
             ClusterableFragment cf = new ClusterableFragment(frag);
             cf.setOrderOfNodes(getNatualrNodeOrder(frag));
             sample.add(cf);
@@ -334,22 +401,43 @@ public class FragmentClustererTest
         
         for (int k=2; k<10; k++)
         {
-            Point3d[] pointsB = new Point3d[] {
-                    new Point3d(0,0,0), 
-                    new Point3d(k,0,0)};
+            points = new Point3d[] {
+                    new Point3d(6,0,0), 
+                    new Point3d(0,0,0)};
             for (int i=0; i<10; i++)
             {
                 IAtomContainer mol = builder.newAtomContainer();
-                mol.addAtom(new Atom("C", getNoisyPoint(pointsB[0])));
+                mol.addAtom(new Atom("C", getNoisyPoint(points[0],noise)));
                 Fragment frag = new Fragment(mol, BBType.UNDEFINED);
-                frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsB[1],noise));
+                frag.addAP(0, APClass.make("A:0"), getNoisyPoint(points[1],noise));
                 ClusterableFragment cf = new ClusterableFragment(frag);
                 cf.setOrderOfNodes(getNatualrNodeOrder(frag));
                 sample.add(cf);
             }
             
+            //TODO-gg
+            ArrayList<Vertex> lstVrtx = new ArrayList<Vertex>();
+            for (ClusterableFragment cf : sample)
+                lstVrtx.add(cf.getOriginalFragment());
+            DenoptimIO.writeVertexesToFile(new File("/tmp/cf.sdf"), FileFormat.VRTXSDF, lstVrtx, false);
+            
+            
             fc = new FragmentClusterer(sample,settings);
             fc.cluster();
+            
+            //TODO-gg del
+            DistanceAsRMSD dm = new DistanceAsRMSD();
+            Variance v = new Variance();
+            Clusterable center = fc.getClusters(1).get(0).getCenter();
+            System.out.println("Center"+arrayToString(center.getPoint()));
+            
+            for (ClusterableFragment cf : fc.getClusters(1).get(0).getPoints())
+            {
+                System.out.println("Point "+arrayToString(cf.getPoint()));
+                double dist = dm.compute(cf.getPoint(), center.getPoint());
+                v.increment(dist);
+                System.out.println(" "+dist+" "+v.getResult());
+            }
             assertEquals(k,fc.getBestSet().size());
         }
         
@@ -361,6 +449,14 @@ public class FragmentClustererTest
             lstVrtx.add(cf.getOriginalFragment());
         DenoptimIO.writeVertexesToFile(new File("/tmp/cf.sdf"), FileFormat.VRTXSDF, lstVrtx, false);
         */
+    }
+    
+    private String arrayToString(double[] a)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i<a.length; i++)
+            sb.append(String.format("%.3f ", a[i]));
+        return sb.toString();
     }
     
 //------------------------------------------------------------------------------
