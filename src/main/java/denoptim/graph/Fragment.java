@@ -799,11 +799,24 @@ public class Fragment extends Vertex
 
 //-----------------------------------------------------------------------------
 
+    //TODO-gg remove in favor of getIndexOf
+    /**
+     * 
+     * @param atom
+     * @return
+     * @deprecated use {@link #indexOf(IAtom)}
+     */
+    @Deprecated
     public int getAtomNumber(IAtom atom)
     {
         return mol.getAtomNumber(atom);
     }
 
+    public int indexOf(IAtom atom)
+    {
+        return mol.indexOf(atom);
+    }
+    
 //-----------------------------------------------------------------------------
 
     public int getAtomCount()

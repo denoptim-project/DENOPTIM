@@ -354,6 +354,22 @@ public class DenoptimIO
         }
         writeSDFFile(file.getAbsolutePath(), lst, append);
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes {@link IAtomContainer} to SDF file.
+     *
+     * @param fileName The file to be write to.
+     * @param mol     The moleculs to be written.
+     * @throws DENOPTIMException
+     */
+    public static void writeSDFFile(String fileName, IAtomContainer mol) 
+            throws DENOPTIMException {
+        ArrayList<IAtomContainer>  mols = new ArrayList<IAtomContainer>();
+        mols.add(mol);
+        writeSDFFile(fileName, mols, false);
+    }
     
 //------------------------------------------------------------------------------
 

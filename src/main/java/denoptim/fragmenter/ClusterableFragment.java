@@ -31,6 +31,7 @@ public class ClusterableFragment implements Clusterable
      * Ordered list of nodes determined by isomorphism.
      */
     List<FragIsomorphNode> orderedNodes;
+    //TODO-gg make private?
     
     /**
      * Ordered list of coordinated reflecting the ordered list of atoms/APs.
@@ -75,9 +76,53 @@ public class ClusterableFragment implements Clusterable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Define the node order from the list of atoms and attachment points.
+     * This method is useful to bypass the finding of a consistent node order 
+     * via detection of the graph isomorphism.
+     */
+    public void setNaturalNodeOrder()
+    {
+        List<FragIsomorphNode> naturalOrder = new ArrayList<FragIsomorphNode>();
+        Set<FragIsomorphNode> nodeSet = 
+                frag.getJGraphFragIsomorphism().vertexSet();
+        for (IAtom atm : frag.atoms())
+        {
+            for (FragIsomorphNode n : nodeSet)
+            {
+                if (n.getOriginal() == atm)
+                {
+                    naturalOrder.add(n);
+                    break;
+                }
+            }
+        }
+        for (AttachmentPoint ap : frag.getAttachmentPoints())
+        {
+            for (FragIsomorphNode n : nodeSet)
+            {
+                if (n.getOriginal() == ap)
+                {
+                    naturalOrder.add(n);
+                    break;
+                }
+            }
+        }
+        setOrderOfNodes(naturalOrder);
+    }
+    
+//------------------------------------------------------------------------------
+    
     protected void setCoordsVector(double[] coords)
     {
         this.allCoords = coords;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    protected void setCoordsVector(Point3d[] ptsJ)
+    {
+        this.allCoords = convertToCoordsVector(ptsJ);
     }
     
 //------------------------------------------------------------------------------
@@ -135,6 +180,44 @@ public class ClusterableFragment implements Clusterable
             pts[j] = new Point3d(coords[i], coords[i+1], coords[i+2]);
         }
         return pts;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns a shallow copy where the vector of coordinates has a new 
+     * reference. Thus, changes to the clone's coordinates vector do not affect 
+     * the original.
+     */
+    @Override
+    public ClusterableFragment clone()
+    {
+        ClusterableFragment clone = new ClusterableFragment(this.frag);
+        clone.setOrderOfNodes(orderedNodes);
+        return clone;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public Fragment getTransformedCopy()
+    {
+        Fragment copy = frag.clone();
+        
+        Point3d[] newCoords = ClusterableFragment.convertToPointArray(allCoords);
+        int j=0;
+        for (FragIsomorphNode node : this.orderedNodes)
+        {
+            if (node.isAtm())
+            {
+                int atmId = frag.indexOf((IAtom) node.getOriginal());
+                copy.getAtom(atmId).setPoint3d(newCoords[j]);
+            } else {
+                int apId = frag.getIndexOfAP((AttachmentPoint) node.getOriginal());
+                copy.getAP(apId).setDirectionVector(newCoords[j]);
+            }
+            j++;
+        }
+        return copy;
     }
 
 //------------------------------------------------------------------------------

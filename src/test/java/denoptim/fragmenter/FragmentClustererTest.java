@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import javax.vecmath.Point3d;
 
 import org.apache.commons.math3.ml.clustering.Clusterable;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
@@ -135,12 +136,29 @@ public class FragmentClustererTest
         assertTrue(Math.abs(measure.compute(pA, pB) - 2.5) < 0.0001);
         assertTrue(Math.abs(measure.compute(pB, pA) - 2.5) < 0.0001);
     }
+    
 //------------------------------------------------------------------------------
     
     @Test
-    public void testGetVarianceOfUnimodalRef()
+    public void testGetRMSDStatsOfNoisyDistorsions()
     {
         double[] center = new double[] {
+                0,0,0,
+                1,0,0,
+                0,1,0,
+                0,0,1};
+        SummaryStatistics s1 = FragmentClusterer.getRMSDStatsOfNoisyDistorsions(
+                center, 100, 0.1);
+        double[] center2 = new double[] {
+                0,0,0,
+                0,0,10,
+                0,20,0,
+                0,0,20};
+        SummaryStatistics s2 = FragmentClusterer.getRMSDStatsOfNoisyDistorsions(
+                center2, 100, 0.1);
+        assertTrue(Math.abs(s1.getMean()-s2.getMean()) < 0.05);
+        
+        center = new double[] {
                 0,0,0,
                 1,0,0,
                 0,1,0,
@@ -160,38 +178,42 @@ public class FragmentClustererTest
                 -1,0,0,
                 0,-1,0,
                 0,0,-1};
-        double var = FragmentClusterer.getVarianceOfNoisyDistorsions(center,10, 
-                new DistanceAsRMSD(), 0.1, 5, 2.0);
-        double[] center2 = new double[] {
+        SummaryStatistics s3 = FragmentClusterer.getRMSDStatsOfNoisyDistorsions(
+                center, 100, 0.1);
+        center2 = new double[] {
                 0,0,0,
-                2,0,0,
-                0,2,0,
-                0,0,2,
-                -2,0,0,
-                0,-2,0,
-                0,0,-2,
-                6,0,0,
-                0,6,0,
-                0,0,6,
-                -6,0,0,
-                0,-6,0,
-                0,0,-6,
-                8,0,0,
-                0,8,0,
-                0,0,8,
-                -8,0,0,
-                0,-8,0,
-                0,0,-8};
-        double var2 = FragmentClusterer.getVarianceOfNoisyDistorsions(center2,10, 
-                new DistanceAsRMSD(), 0.1, 5, 2.0);
-        assertTrue(Math.abs(var-var2) < var*0.02);
+                20,0,0,
+                0,20,0,
+                0,0,20,
+                -20,0,0,
+                0,-20,0,
+                0,0,-20,
+                60,0,0,
+                0,60,0,
+                0,0,60,
+                -60,0,0,
+                0,-60,0,
+                0,0,-60,
+                80,0,0,
+                0,80,0,
+                0,0,80,
+                -80,0,0,
+                0,-80,0,
+                0,0,-80};
+        SummaryStatistics s4 = FragmentClusterer.getRMSDStatsOfNoisyDistorsions(
+                center2, 100, 0.1);
+        assertTrue(Math.abs(s3.getMean()-s4.getMean()) < 0.05);
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     @Test
     public void testCluster() throws Exception
     {
+        double noise = 0.25; 
+        // NB: the distortions are [-noise,noise] and is uniformely distributed
+        // So, the extreme cases have same probability of no distortion
+        
         // Build first set of fragment (should all be in one cluster)
         List<ClusterableFragment> sample = new ArrayList<ClusterableFragment>();
         Point3d[] pointsA = new Point3d[] {
@@ -203,16 +225,16 @@ public class FragmentClustererTest
         for (int i=0; i<10; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
-            mol.addAtom(new Atom("C", getNoisyPoint(pointsA[0])));
-            mol.addAtom(new Atom("H", getNoisyPoint(pointsA[1])));
-            mol.addAtom(new Atom("O", getNoisyPoint(pointsA[2])));
+            mol.addAtom(new Atom("C", getNoisyPoint(pointsA[0],noise)));
+            mol.addAtom(new Atom("H", getNoisyPoint(pointsA[1],noise)));
+            mol.addAtom(new Atom("O", getNoisyPoint(pointsA[2],noise)));
             mol.addBond(0,1,IBond.Order.SINGLE);
             mol.addBond(0,2,IBond.Order.SINGLE);
             Fragment frag = new Fragment(mol, BBType.UNDEFINED);
-            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsA[3]));
-            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsA[4]));
+            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsA[3],noise));
+            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsA[4],noise));
             ClusterableFragment cf = new ClusterableFragment(frag);
-            cf.setOrderOfNodes(getNatualrNodeOrder(frag));
+            cf.setNaturalNodeOrder();
             sample.add(cf);
         }
         
@@ -226,7 +248,7 @@ public class FragmentClustererTest
         // NB: unimodal distribution is assumed as a start and "confirmed"
         // empirically only by the small amount of change in the elbow plot.
         fc.cluster();
-        assertEquals(1,fc.getBestSet().size());
+        assertEquals(1,fc.getClusters().size());
         
         Point3d[] pointsB = new Point3d[] {
                 new Point3d(0.4574,-0.0273,0.3953), 
@@ -237,22 +259,22 @@ public class FragmentClustererTest
         for (int i=0; i<5; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
-            mol.addAtom(new Atom("C", getNoisyPoint(pointsB[0])));
-            mol.addAtom(new Atom("H", getNoisyPoint(pointsB[1])));
-            mol.addAtom(new Atom("O", getNoisyPoint(pointsB[2])));
+            mol.addAtom(new Atom("C", getNoisyPoint(pointsB[0],noise)));
+            mol.addAtom(new Atom("H", getNoisyPoint(pointsB[1],noise)));
+            mol.addAtom(new Atom("O", getNoisyPoint(pointsB[2],noise)));
             mol.addBond(0,1,IBond.Order.SINGLE);
             mol.addBond(0,2,IBond.Order.SINGLE);
             Fragment frag = new Fragment(mol, BBType.UNDEFINED);
-            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsB[3]));
-            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsB[4]));
+            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsB[3],noise));
+            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsB[4],noise));
             ClusterableFragment cf = new ClusterableFragment(frag);
-            cf.setOrderOfNodes(getNatualrNodeOrder(frag));
+            cf.setNaturalNodeOrder();
             sample.add(cf);
         }
         
         fc = new FragmentClusterer(sample,settings);
         fc.cluster();
-        assertEquals(2,fc.getBestSet().size());
+        assertEquals(2,fc.getClusters().size());
         
         Point3d[] pointsC = new Point3d[] {
                 new Point3d(0,0,0), 
@@ -260,25 +282,25 @@ public class FragmentClustererTest
                 new Point3d(0,2,0),
                 new Point3d(-2,0,0),
                 new Point3d(0,-2,0)};
-        for (int i=0; i<3; i++)
+        for (int i=0; i<5; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
-            mol.addAtom(new Atom("C", getNoisyPoint(pointsC[0])));
-            mol.addAtom(new Atom("H", getNoisyPoint(pointsC[1])));
-            mol.addAtom(new Atom("O", getNoisyPoint(pointsC[2])));
+            mol.addAtom(new Atom("C", getNoisyPoint(pointsC[0],noise)));
+            mol.addAtom(new Atom("H", getNoisyPoint(pointsC[1],noise)));
+            mol.addAtom(new Atom("O", getNoisyPoint(pointsC[2],noise)));
             mol.addBond(0,1,IBond.Order.SINGLE);
             mol.addBond(0,2,IBond.Order.SINGLE);
             Fragment frag = new Fragment(mol, BBType.UNDEFINED);
-            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsC[3]));
-            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsC[4]));
+            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsC[3],noise));
+            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsC[4],noise));
             ClusterableFragment cf = new ClusterableFragment(frag);
-            cf.setOrderOfNodes(getNatualrNodeOrder(frag));
+            cf.setNaturalNodeOrder();
             sample.add(cf);
         }
                 
         fc = new FragmentClusterer(sample,settings);
         fc.cluster();
-        assertEquals(3,fc.getBestSet().size());
+        assertEquals(3,fc.getClusters().size());
         
         Point3d[] pointsD = new Point3d[] {
                 new Point3d(5,0,0), 
@@ -286,25 +308,25 @@ public class FragmentClustererTest
                 new Point3d(8,0,0),
                 new Point3d(5,1,0),
                 new Point3d(0,0,0)};
-        for (int i=0; i<3; i++)
+        for (int i=0; i<5; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
-            mol.addAtom(new Atom("C", getNoisyPoint(pointsD[0])));
-            mol.addAtom(new Atom("H", getNoisyPoint(pointsD[1])));
-            mol.addAtom(new Atom("O", getNoisyPoint(pointsD[2])));
+            mol.addAtom(new Atom("C", getNoisyPoint(pointsD[0],noise)));
+            mol.addAtom(new Atom("H", getNoisyPoint(pointsD[1],noise)));
+            mol.addAtom(new Atom("O", getNoisyPoint(pointsD[2],noise)));
             mol.addBond(0,1,IBond.Order.SINGLE);
             mol.addBond(0,2,IBond.Order.SINGLE);
             Fragment frag = new Fragment(mol, BBType.UNDEFINED);
-            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsD[3]));
-            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsD[4]));
+            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsD[3],noise));
+            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsD[4],noise));
             ClusterableFragment cf = new ClusterableFragment(frag);
-            cf.setOrderOfNodes(getNatualrNodeOrder(frag));
+            cf.setNaturalNodeOrder();
             sample.add(cf);
         }
                 
         fc = new FragmentClusterer(sample,settings);
         fc.cluster();
-        assertEquals(4,fc.getBestSet().size());
+        assertEquals(4,fc.getClusters().size());
         
         Point3d[] pointsE = new Point3d[] {
                 new Point3d(5,0,0), 
@@ -312,25 +334,25 @@ public class FragmentClustererTest
                 new Point3d(8,0,0),
                 new Point3d(5,1,0),
                 new Point3d(7,0,0)};
-        for (int i=0; i<3; i++)
+        for (int i=0; i<5; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
-            mol.addAtom(new Atom("C", getNoisyPoint(pointsE[0])));
-            mol.addAtom(new Atom("H", getNoisyPoint(pointsE[1])));
-            mol.addAtom(new Atom("O", getNoisyPoint(pointsE[2])));
+            mol.addAtom(new Atom("C", getNoisyPoint(pointsE[0],noise)));
+            mol.addAtom(new Atom("H", getNoisyPoint(pointsE[1],noise)));
+            mol.addAtom(new Atom("O", getNoisyPoint(pointsE[2],noise)));
             mol.addBond(0,1,IBond.Order.SINGLE);
             mol.addBond(0,2,IBond.Order.SINGLE);
             Fragment frag = new Fragment(mol, BBType.UNDEFINED);
-            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsE[3]));
-            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsE[4]));
+            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsE[3],noise));
+            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsE[4],noise));
             ClusterableFragment cf = new ClusterableFragment(frag);
-            cf.setOrderOfNodes(getNatualrNodeOrder(frag));
+            cf.setNaturalNodeOrder();
             sample.add(cf);
         }
                 
         fc = new FragmentClusterer(sample,settings);
         fc.cluster();
-        assertEquals(5,fc.getBestSet().size());
+        assertEquals(5,fc.getClusters().size());
         
         Point3d[] pointsF = new Point3d[] {
                 new Point3d(4,0,0), 
@@ -338,33 +360,67 @@ public class FragmentClustererTest
                 new Point3d(8,0,0),
                 new Point3d(3,0,0),
                 new Point3d(7,0,0)};
-        for (int i=0; i<3; i++)
+        for (int i=0; i<5; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
-            mol.addAtom(new Atom("C", getNoisyPoint(pointsF[0])));
-            mol.addAtom(new Atom("H", getNoisyPoint(pointsF[1])));
-            mol.addAtom(new Atom("O", getNoisyPoint(pointsF[2])));
+            mol.addAtom(new Atom("C", getNoisyPoint(pointsF[0],noise)));
+            mol.addAtom(new Atom("H", getNoisyPoint(pointsF[1],noise)));
+            mol.addAtom(new Atom("O", getNoisyPoint(pointsF[2],noise)));
             mol.addBond(0,1,IBond.Order.SINGLE);
             mol.addBond(0,2,IBond.Order.SINGLE);
             Fragment frag = new Fragment(mol, BBType.UNDEFINED);
-            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsF[3]));
-            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsF[4]));
+            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsF[3],noise));
+            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsF[4],noise));
             ClusterableFragment cf = new ClusterableFragment(frag);
-            cf.setOrderOfNodes(getNatualrNodeOrder(frag));
+            cf.setNaturalNodeOrder();
             sample.add(cf);
         }
                 
         fc = new FragmentClusterer(sample,settings);
         fc.cluster();
-        assertEquals(6,fc.getBestSet().size());
+        assertEquals(6,fc.getClusters().size());
         
         // Keep this code: it might be useful to look at the geometries.
-        /*
+        
         ArrayList<Vertex> lstVrtx = new ArrayList<Vertex>();
         for (ClusterableFragment cf : sample)
             lstVrtx.add(cf.getOriginalFragment());
         DenoptimIO.writeVertexesToFile(new File("/tmp/cf.sdf"), FileFormat.VRTXSDF, lstVrtx, false);
-        */
+        
+        //TODO-gg see what the centroids look like! 
+        List<Fragment> centroids = fc.getClusterCentroids();
+        for (int i=0; i<fc.getClusters().size(); i++)
+        {
+            ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+            for (ClusterableFragment cf : fc.getClusters().get(i).getPoints())
+            {
+                mols.add(getMol(cf.getTransformedCopy()));
+            }
+            DenoptimIO.writeSDFFile("/tmp/cluster_"+i+".sdf", mols);
+            
+            
+            ArrayList<IAtomContainer> molsTrs = new ArrayList<IAtomContainer>();
+            for (Fragment f : fc.getTransformedClusters().get(i))
+            {
+                molsTrs.add(getMol(f));
+            }
+            DenoptimIO.writeSDFFile("/tmp/cluster_"+i+"_trns.sdf", molsTrs);
+            
+            IAtomContainer center = getMol(centroids.get(i));
+            DenoptimIO.writeSDFFile("/tmp/cluster_"+i+"_centroid.sdf", center);
+        }
+        
+    }
+    
+    //TODO-gg del 
+    private IAtomContainer getMol(Fragment frag)
+    {
+        IAtomContainer mol = builder.newAtomContainer();
+        for (IAtom a : frag.atoms())
+            mol.addAtom(new Atom(a.getSymbol(),a.getPoint3d()));
+        for (AttachmentPoint ap : frag.getAttachmentPoints())
+            mol.addAtom(new PseudoAtom("W",ap.getDirectionVector()));
+        return mol;
     }
     
 //-----------------------------------------------------------------------------
@@ -372,73 +428,74 @@ public class FragmentClustererTest
     @Test
     public void testCluster2() throws Exception
     {
-        double noise = 0.0;
+        double noise = 0.25; 
+        // NB: the distortions are [-noise,noise] and is uniformely distributed
+        // So, the extreme cases have same probability of no distortion
+        
         List<ClusterableFragment> sample = new ArrayList<ClusterableFragment>();
 
         Point3d[] points = new Point3d[] {
                 new Point3d(0,0,0), 
                 new Point3d(1,0,0)};
-        for (int i=0; i<10; i++)
+        for (int i=0; i<5; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
             mol.addAtom(new Atom("C", getNoisyPoint(points[0],noise)));
             Fragment frag = new Fragment(mol, BBType.UNDEFINED);
             frag.addAP(0, APClass.make("A:0"), getNoisyPoint(points[1],noise));
             ClusterableFragment cf = new ClusterableFragment(frag);
-            cf.setOrderOfNodes(getNatualrNodeOrder(frag));
+            cf.setNaturalNodeOrder();
             sample.add(cf);
         }
         
         FragmenterParameters settings = new FragmenterParameters();
         
         //TODO-gg remove
-        settings.startConsoleLogger("ClustererTest");
-        settings.setVerbosity(2);
+        //settings.startConsoleLogger("ClustererTest");
+        //settings.setVerbosity(2);
         
         FragmentClusterer fc = new FragmentClusterer(sample,settings);
         fc.cluster();
-        assertEquals(1,fc.getBestSet().size());
+        assertEquals(1,fc.getClusters().size());
         
+        
+        // Adding same points that are just placed elsewhere in space
+        points = new Point3d[] {
+                new Point3d(0,0,-1), 
+                new Point3d(0,0,-2)};
+        for (int i=0; i<5; i++)
+        {
+            IAtomContainer mol = builder.newAtomContainer();
+            mol.addAtom(new Atom("C", getNoisyPoint(points[0],noise)));
+            Fragment frag = new Fragment(mol, BBType.UNDEFINED);
+            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(points[1],noise));
+            ClusterableFragment cf = new ClusterableFragment(frag);
+            cf.setNaturalNodeOrder();
+            sample.add(cf);
+        }
+        fc = new FragmentClusterer(sample,settings);
+        fc.cluster();
+        assertEquals(1,fc.getClusters().size());
+        
+        // Add more clusters (each different from each other and the old ones)
         for (int k=2; k<10; k++)
         {
             points = new Point3d[] {
-                    new Point3d(6,0,0), 
+                    new Point3d(k,0,0), 
                     new Point3d(0,0,0)};
-            for (int i=0; i<10; i++)
+            for (int i=0; i<5; i++)
             {
                 IAtomContainer mol = builder.newAtomContainer();
                 mol.addAtom(new Atom("C", getNoisyPoint(points[0],noise)));
                 Fragment frag = new Fragment(mol, BBType.UNDEFINED);
                 frag.addAP(0, APClass.make("A:0"), getNoisyPoint(points[1],noise));
                 ClusterableFragment cf = new ClusterableFragment(frag);
-                cf.setOrderOfNodes(getNatualrNodeOrder(frag));
+                cf.setNaturalNodeOrder();
                 sample.add(cf);
             }
-            
-            //TODO-gg
-            ArrayList<Vertex> lstVrtx = new ArrayList<Vertex>();
-            for (ClusterableFragment cf : sample)
-                lstVrtx.add(cf.getOriginalFragment());
-            DenoptimIO.writeVertexesToFile(new File("/tmp/cf.sdf"), FileFormat.VRTXSDF, lstVrtx, false);
-            
-            
             fc = new FragmentClusterer(sample,settings);
             fc.cluster();
-            
-            //TODO-gg del
-            DistanceAsRMSD dm = new DistanceAsRMSD();
-            Variance v = new Variance();
-            Clusterable center = fc.getClusters(1).get(0).getCenter();
-            System.out.println("Center"+arrayToString(center.getPoint()));
-            
-            for (ClusterableFragment cf : fc.getClusters(1).get(0).getPoints())
-            {
-                System.out.println("Point "+arrayToString(cf.getPoint()));
-                double dist = dm.compute(cf.getPoint(), center.getPoint());
-                v.increment(dist);
-                System.out.println(" "+dist+" "+v.getResult());
-            }
-            assertEquals(k,fc.getBestSet().size());
+            assertEquals(k,fc.getClusters().size());
         }
         
         
@@ -450,100 +507,18 @@ public class FragmentClustererTest
         DenoptimIO.writeVertexesToFile(new File("/tmp/cf.sdf"), FileFormat.VRTXSDF, lstVrtx, false);
         */
     }
-    
-    private String arrayToString(double[] a)
-    {
-        StringBuilder sb = new StringBuilder();
-        for (int i=0; i<a.length; i++)
-            sb.append(String.format("%.3f ", a[i]));
-        return sb.toString();
-    }
-    
-//------------------------------------------------------------------------------
-    
-    @Test
-    public void testFindElbow() throws Exception
-    {
-        double[] x = new double[] {1,  2,    3,      4,     5,      6};
-        double[] y = new double[] {18, 0.01, 0.0075, 0.0060, 0.0035, 0.0015};
-        assertEquals(2, FragmentClusterer.findElbow(x,y));
-        
-        x = new double[] {1,  2,   3,  4,  5,      6};
-        y = new double[] {20, 18, 16, 14, 10, 0.0015};
-        assertEquals(6, FragmentClusterer.findElbow(x,y));
-        
-        x = new double[] {1,  2,   3,   4, 5, 6, 7,   8,   9,   10, 11};
-        y = new double[] {12, 7, 3.5, 2.2, 2, 2, 1, 1.5, 0.75, 0.5,  0};
-        assertEquals(4, FragmentClusterer.findElbow(x,y));
-        
-        x = new double[] {1,  2,   3,    4, 5, 6, 7,   8,   9,   10, 11};
-        y = new double[] {10, 11, 3.5, 2.2, 2, 2, 1, 1.5, 0.75, 0.5,  0};
-        assertEquals(4, FragmentClusterer.findElbow(x,y));
-        
-        x = new double[] {1,  2,   3,  4, 5, 6, 7,   8,   9,   10, 11};
-        y = new double[] {11, 10, 11, 10, 2, 2, 1, 1.5, 0.75, 0.5,  0};
-        assertEquals(5, FragmentClusterer.findElbow(x,y));
-        
-        x = new double[] {1,  2};
-        y = new double[] {11, 10};
-        assertEquals(2, FragmentClusterer.findElbow(x,y));
-        
-        x = new double[] {1};
-        y = new double[] {11};
-        assertEquals(1, FragmentClusterer.findElbow(x,y));
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * This method is needed to bypass the finding of a consistent node order 
-     * via detection of the graph isomorphism.
-     */
-    private List<FragIsomorphNode> getNatualrNodeOrder(Fragment frag)
-    {
-        List<FragIsomorphNode> naturalOrder = new ArrayList<FragIsomorphNode>();
-        Set<FragIsomorphNode> nodeSet = frag.getJGraphFragIsomorphism().vertexSet();
-        for (IAtom atm : frag.atoms())
-        {
-            for (FragIsomorphNode n : nodeSet)
-            {
-                if (n.getOriginal() == atm)
-                {
-                    naturalOrder.add(n);
-                    break;
-                }
-            }
-        }
-        for (AttachmentPoint ap : frag.getAttachmentPoints())
-        {
-            for (FragIsomorphNode n : nodeSet)
-            {
-                if (n.getOriginal() == ap)
-                {
-                    naturalOrder.add(n);
-                    break;
-                }
-            }
-        }
-        return naturalOrder;
-    }
 
 //------------------------------------------------------------------------------
     
+    /**
+     * The noise magnitude is to be interpreted as half of the overall magnitude.
+     * And the distribution of noise is uniform in 
+     * [-noiseMagnitude,noiseMagnitude].
+     */
     private Point3d getNoisyPoint(Point3d p, double noiseMagnitude)
     {
         Point3d noise = rng.getNoisyPoint(noiseMagnitude);
         return new Point3d(p.x+noise.x, p.y+noise.y, p.z+noise.z);
-    }
-    
-//------------------------------------------------------------------------------
-   
-    /*
-     * Max noise magnitude is hard-coded
-     */
-    private Point3d getNoisyPoint(Point3d p)
-    {
-        return getNoisyPoint(p, 0.5);
     }
     
 //------------------------------------------------------------------------------
