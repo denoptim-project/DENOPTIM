@@ -8,7 +8,9 @@ import java.util.Set;
 
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.Clusterable;
+import org.apache.commons.math3.ml.distance.DistanceMeasure;
 
+import denoptim.fragmenter.FragmentClusterer.DistanceAsRMSD;
 import denoptim.utils.MathUtils;
 
 /**
@@ -38,17 +40,30 @@ public class DynamicCentroidCluster
      */
     private boolean updateCentroid = false;
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor that defines an empty cluster. Centroid will be defined in
+     * the first call of {@link #addPoint(ClusterableFragment)} as a clone of 
+     * the added fragment.
+     */
+    public DynamicCentroidCluster()
+    {
+        this.points = new ArrayList<ClusterableFragment>();
+    }
     
 //------------------------------------------------------------------------------
     
     /**
-     * Constructor that defines the current centroid.
+     * Constructor that defines the current centroid to be a clone of the given
+     * fragment and adds the given fragment as a member of the cluster.
      * @param centroid the current centroid.
      */
     public DynamicCentroidCluster(ClusterableFragment centroid)
     {
         this.points = new ArrayList<ClusterableFragment>();
-        this.centroid = centroid;
+        this.centroid = centroid.clone();
+        this.points.add(centroid);
     }
     
 //------------------------------------------------------------------------------
@@ -57,7 +72,8 @@ public class DynamicCentroidCluster
      * Get the point chosen to be the centroid of this cluster.
      * @return chosen cluster centroid
      */
-    public ClusterableFragment getCentroid() {
+    public ClusterableFragment getCentroid() 
+    {
         if (updateCentroid)
         {
             List<double[]> membersCoords = new ArrayList<double[]>();
@@ -77,12 +93,48 @@ public class DynamicCentroidCluster
 //------------------------------------------------------------------------------
     
     /**
+     * Gets the original data that upon clustering is closest to the cluster 
+     * centroid according to the given distance metrics.
+     * @param measure the distance metrics to use to determine which data is 
+     * closest to the centroid.
+     * @return the cluster member that is closest to the cluster centroid.
+     */
+    public ClusterableFragment getNearestToCentroid(DistanceMeasure measure)
+    {
+        if (points.size() == 1)
+            return points.get(0);
+        
+        ClusterableFragment centroid = getCentroid();
+        
+        ClusterableFragment nearest = null;
+        double smallestDistance = Double.MAX_VALUE;
+        for (ClusterableFragment cf : points)
+        {
+            double distance = measure.compute(centroid.getPoint(),cf.getPoint());
+            if (distance < smallestDistance)
+            {
+                nearest = cf;
+                smallestDistance = distance;
+            }       
+        }
+        return nearest;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
      * Add a new member of this cluster.
      * @param point the member to add.
      */
     public void addPoint(ClusterableFragment point)
     {
-        updateCentroid = true;
+        if (centroid == null)
+        {
+            // First time ever we add a point
+            centroid = point.clone();
+        } else {
+            updateCentroid = true;
+        }
         points.add(point);
     }
 

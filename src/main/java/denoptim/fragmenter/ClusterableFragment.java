@@ -172,6 +172,19 @@ public class ClusterableFragment implements Clusterable
     {       
         return allCoords;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Get the ordered list of nodes representing each either an atom or an
+     * attachment point is the alignment of fragments.
+     * @returnthe ordered list of nodes representing each either an atom or an
+     * attachment point is the alignment of fragments.
+     */
+    public List<FragIsomorphNode> getOrderedNodes()
+    {
+        return orderedNodes;
+    }
 
 //------------------------------------------------------------------------------
     

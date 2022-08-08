@@ -387,6 +387,17 @@ public class FragmenterParameters extends RunTimeParameters
      */
     private double factorForSDOnStatsOfUnimodalPop = 1.0;
     
+    /**
+     * Flag requesting to same cluster centroids rather than the actual fragments
+     * that are closest to the centroids.
+     */
+    private boolean useCentroidsAsRepresentativeConformer = true;
+    
+    /**
+     * Flag requesting to print clusters of fragments to file
+     */
+    private boolean saveClustersOfConformerToFile = false;
+    
     
 //------------------------------------------------------------------------------
     
@@ -1519,6 +1530,61 @@ public class FragmenterParameters extends RunTimeParameters
             double factorForSDOnStatsOfUnimodalPop)
     {
         this.factorForSDOnStatsOfUnimodalPop = factorForSDOnStatsOfUnimodalPop;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if we are asked to save cluster centroids 
+     * rather than the actual fragments that are closest to the centroids
+     * upon
+     * extraction of the most representative conformers.
+     */
+    public boolean isUseCentroidsAsRepresentativeConformer()
+    {
+        return useCentroidsAsRepresentativeConformer;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @param useCentroidsAsRepresentativeConformer set to 
+     * <code>true</code> to request saving cluster centroids 
+     * rather than the actual fragments that are closest to the centroids
+     * upon
+     * extraction of the most representative conformers.
+     */
+    public void setUseCentroidsAsRepresentativeConformer(
+            boolean useCentroidsAsRepresentativeConformer)
+    {
+        this.useCentroidsAsRepresentativeConformer = 
+                useCentroidsAsRepresentativeConformer;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if we are asked to print clusters of fragments 
+     * to file upon
+     * extraction of the most representative conformers.
+     */
+    public boolean isSaveClustersOfConformerToFile()
+    {
+        return saveClustersOfConformerToFile;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the flag requesting to print clusters of fragments to file upon
+     * extraction of the most representative conformers.
+     * @param saveClustersOfConformerToFile use <code>true</code> to request
+     * printing clusters of fragments to file.
+     */
+    public void setSaveClustersOfConformerToFile(
+            boolean saveClustersOfConformerToFile)
+    {
+        this.saveClustersOfConformerToFile = saveClustersOfConformerToFile;
     }
     
 //------------------------------------------------------------------------------

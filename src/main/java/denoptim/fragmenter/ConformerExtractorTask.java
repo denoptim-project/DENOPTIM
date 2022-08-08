@@ -54,6 +54,8 @@ import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.fragmenter.FragmentClusterer.DistanceAsRMSD;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.FragIsomorphEdge;
 import denoptim.graph.FragIsomorphNode;
@@ -177,7 +179,26 @@ public class ConformerExtractorTask extends Task
         FragmentClusterer clusterer = new FragmentClusterer(sample, settings);
         clusterer.cluster();
         
-        //TODO-gg get cluster centroids OR single-cluster centroid OR what?
+        List<Fragment> representativeFragments = null;
+        if (settings.isUseCentroidsAsRepresentativeConformer())
+        {
+            representativeFragments = clusterer.getClusterCentroids();
+        } else {
+            representativeFragments = clusterer.getNearestToClusterCentroids();
+        }
+        //TODO-gg 
+        //DenoptimIO.writeVertexesToFile(new File(""), FileFormat.VRTXSDF, representativeFragments);
+        
+        if (settings.isSaveClustersOfConformerToFile())
+        {
+            List<List<Fragment>> clusters = clusterer.getTransformedClusters();
+            for (int iCluster=0; iCluster<clusters.size(); iCluster++)
+            {
+                //TODO-gg
+               // DenoptimIO.writeVertexesToFile(new File(getClusterPathname()),
+               //         FileFormat.VRTXSDF, clusters.get(iCluster));
+            }
+        }
         
         // Final message
         logger.log(Level.INFO,"Analysis of isomorphic family completed.");
@@ -311,7 +332,7 @@ public class ConformerExtractorTask extends Task
                 
                 List<FragIsomorphNode> orderedNodes = 
                         new ArrayList<FragIsomorphNode>();
-                for (FragIsomorphNode nOnFirst : sample.get(0).orderedNodes)
+                for (FragIsomorphNode nOnFirst : sample.get(0).getOrderedNodes())
                 {
                     orderedNodes.add(
                             fa.getLowestRMSDMapping().getVertexCorrespondence(

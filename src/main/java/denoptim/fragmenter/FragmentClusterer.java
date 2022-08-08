@@ -158,9 +158,7 @@ public class FragmentClusterer
         // Start by assigning each data to its own cluster
         for (int i=0; i<data.size(); i++)
         {
-            ClusterableFragment centroid = data.get(i).clone();
-            DynamicCentroidCluster cluster = new DynamicCentroidCluster(centroid);
-            cluster.addPoint(data.get(i));
+            DynamicCentroidCluster cluster = new DynamicCentroidCluster(data.get(i));
             clusters.add(cluster);
         }
         
@@ -352,7 +350,7 @@ public class FragmentClusterer
             stats.addValue(rmsd);
         }
         return stats;
-    }   
+    }
     
 //------------------------------------------------------------------------------
 
@@ -379,6 +377,14 @@ public class FragmentClusterer
                         coordsB[j+1],
                         coordsB[j+2]);
             }
+            SuperPositionSVD svd = new SuperPositionSVD(false);
+            double rmsd = svd.getRmsd(ptsA,ptsB);
+            return rmsd;
+        }
+        
+        public double compute(Point3d[] ptsA, Point3d[] ptsB)
+                throws DimensionMismatchException
+        {
             SuperPositionSVD svd = new SuperPositionSVD(false);
             double rmsd = svd.getRmsd(ptsA,ptsB);
             return rmsd;
@@ -427,7 +433,9 @@ public class FragmentClusterer
     /**
      * Once the clustering is done, this method return the list of cluster 
      * centroids. Note the centroids are not part of the initial data. 
-     * Moreover, the fragments's coordinates a
+     * Use {@link #getNearestToClusterCentroids()} to get the actual fragments
+     * from the initial dataset and that are closest to their respective
+     * cluster centroid.
      * @return the cluster centroids, or an empty list if {@link #clusters} has
      * not been called.
      */
@@ -437,12 +445,36 @@ public class FragmentClusterer
         for (int i=0; i<clusters.size(); i++)
         {   
             DynamicCentroidCluster cluster = clusters.get(i);
-            ClusterableFragment centroid = (ClusterableFragment) cluster.getCentroid();
-
+            ClusterableFragment centroid = cluster.getCentroid();
             Fragment frag = centroid.getTransformedCopy();
             centroids.add(frag);
         }
         return centroids; 
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Once the clustering is done, this method return the list of fragments 
+     * that are nearest to the respective cluster centroid. 
+     * Note the centroids are not part of the initial data, but the nearest to
+     * the centroid is.
+     * @return the fragment that is closest to each cluster centroid,
+     *  or an empty list if {@link #clusters} has
+     * not been called.
+     */
+    public List<Fragment> getNearestToClusterCentroids()
+    {
+        List<Fragment> nearestToCentroid = new ArrayList<Fragment>();
+        for (int i=0; i<clusters.size(); i++)
+        {   
+            DynamicCentroidCluster cluster = clusters.get(i);
+            ClusterableFragment nearest = cluster.getNearestToCentroid(
+                    new DistanceAsRMSD());
+            Fragment frag = nearest.getTransformedCopy();
+            nearestToCentroid.add(frag);
+        }
+        return nearestToCentroid; 
     }
 
 //------------------------------------------------------------------------------

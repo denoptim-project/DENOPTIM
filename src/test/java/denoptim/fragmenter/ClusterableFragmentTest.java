@@ -86,7 +86,7 @@ public class ClusterableFragmentTest
         cf.setNaturalNodeOrder();
         
         double value = 0.0;
-        for (FragIsomorphNode n : cf.orderedNodes)
+        for (FragIsomorphNode n : cf.getOrderedNodes())
         {
             value += 1.0;
             assertTrue(Math.abs(value-n.getPoint3d().x) < 0.0001);

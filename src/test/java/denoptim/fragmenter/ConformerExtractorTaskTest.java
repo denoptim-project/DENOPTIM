@@ -129,24 +129,24 @@ public class ConformerExtractorTaskTest
         for (IAtom atm : frag1.atoms())
         {
             assertEquals(atm.getSymbol(),
-                    sample.get(0).orderedNodes.get(j).getLabel());
+                    sample.get(0).getOrderedNodes().get(j).getLabel());
             j++;
         }
         for (AttachmentPoint ap : frag1.getAttachmentPoints())
         {
             assertEquals(ap.getAPClass().toString(),
-                    sample.get(0).orderedNodes.get(j).getLabel());
+                    sample.get(0).getOrderedNodes().get(j).getLabel());
             j++;
         }
         
         // All the others should have the same order of atoms/APs
         for (ClusterableFragment cf : sample)
         {
-            for (int i=0; i<cf.orderedNodes.size(); i++)
+            for (int i=0; i<cf.getOrderedNodes().size(); i++)
             {
-                FragIsomorphNode n = cf.orderedNodes.get(i);
-                assertEquals(sample.get(0).orderedNodes.get(i).getLabel(),
-                        cf.orderedNodes.get(i).getLabel());
+                FragIsomorphNode n = cf.getOrderedNodes().get(i);
+                assertEquals(sample.get(0).getOrderedNodes().get(i).getLabel(),
+                        cf.getOrderedNodes().get(i).getLabel());
             }
         }
     }
