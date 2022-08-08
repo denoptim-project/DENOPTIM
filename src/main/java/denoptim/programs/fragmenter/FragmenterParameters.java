@@ -43,6 +43,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.fragmenter.FragmentClusterer;
 import denoptim.graph.APClass;
 import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
@@ -360,6 +361,31 @@ public class FragmenterParameters extends RunTimeParameters
      * family.
      */
     private boolean extactRepresentativeConformer = false;
+    
+    /**
+     * Size of on-the-fly generated, normally distributed noise-distorted 
+     * population of geometries used to determine properties of unimodal 
+     * population of distorted of points around an N-dimensional point. Used
+     * by {@link FragmentClusterer}.
+     */
+    private int sizeUnimodalPop = 20;
+    
+    /**
+     * Maximum amount of absolute noise used to generate normally distributed 
+     * noise-distorted population of points around an N-dimensional point.
+     * Used by {@link FragmentClusterer}.
+     */
+    private double maxNoiseUnimodalPop = 0.2;
+    
+    /**
+     * Factor used to multiply the standard deviation when adding it to the mean
+     * of the RMSD for a unimodal
+     * population of distorted of points around an N-dimensional point, thus 
+     * defining a threshold for deciding whether a query point belong to that
+     * population or not.
+     * Used by {@link FragmentClusterer}.
+     */
+    private double factorForSDOnStatsOfUnimodalPop = 1.0;
     
     
 //------------------------------------------------------------------------------
@@ -1415,6 +1441,84 @@ public class FragmenterParameters extends RunTimeParameters
     public boolean extactRepresentativeConformer()
     {
         return extactRepresentativeConformer;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the size of the population of normally distributed noise-distorted
+     * population used to define the threshold RMSD of a unimodal distribution
+     * of geometric distortions.
+     */
+    public int getSizeUnimodalPop()
+    {
+        return sizeUnimodalPop;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the size of the population of normally distributed noise-distorted
+     * population used to define the threshold RMSD of a unimodal distribution
+     * of geometric distortions.
+     */
+    public void setSizeUnimodalPop(int sizeUnimodalPop)
+    {
+        this.sizeUnimodalPop = sizeUnimodalPop;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the maximum noise of the population of normally distributed 
+     * noise-distorted
+     * population used to define the threshold RMSD of a unimodal distribution
+     * of geometric distortions.
+     */
+    public double getMaxNoiseUnimodalPop()
+    {
+        return maxNoiseUnimodalPop;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the maximum noise of the population of normally distributed 
+     * noise-distorted
+     * population used to define the threshold RMSD of a unimodal distribution
+     * of geometric distortions.
+     */
+    public void setMaxNoiseUnimodalPop(double maxNoiseUnimodalPop)
+    {
+        this.maxNoiseUnimodalPop = maxNoiseUnimodalPop;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the weight of the standard deviation when calculating the 
+     * RMSD threshold from the statistics of the RMSD over the population of 
+     * normally distributed noise-distorted points with unimodal distribution
+     * of geometric distortions.
+     */
+    public double getFactorForSDOnStatsOfUnimodalPop()
+    {
+        return factorForSDOnStatsOfUnimodalPop;
+    }
+
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the weight of the standard deviation when calculating the 
+     * RMSD threshold from the statistics of the RMSD over the population of 
+     * normally distributed noise-distorted points with unimodal distribution
+     * of geometric distortions.
+     */
+    public void setFactorForSDOnStatsOfUnimodalPop(
+            double factorForSDOnStatsOfUnimodalPop)
+    {
+        this.factorForSDOnStatsOfUnimodalPop = factorForSDOnStatsOfUnimodalPop;
     }
     
 //------------------------------------------------------------------------------

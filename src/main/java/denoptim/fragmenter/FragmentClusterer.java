@@ -49,7 +49,24 @@ import denoptim.utils.MathUtils;
 import denoptim.utils.Randomizer;
 
 /**
- * TODO-gg
+ * <p>This tool clusters fragment based on geometrical features. For each fragment 
+ * all atoms and all attachment points are used to define a set of points in 
+ * space (see {@link ClusterableFragment}). Then the RMSD of the 
+ * points' position upon superposition is used to decide if geometries 
+ * belong to the same cluster. The threshold RMSD value used to take the decision
+ * is calculated from a unimodal distribution of geometries generated from the 
+ * centroid of the cluster by altering its set of geometries with normally 
+ * distributed noise. The population of these normally distorted geoemtries
+ * is unimodal, by definition, and is used to calculate the thershold RMSD as
+ * <pre>
+ * threshold = RMSD_mean + x * RMSD_Standard_deviation
+ * </pre>
+ * where mean and standard deviation are the values for a normally distributed
+ * noise-distorted population generated on-the-fly for the cluster centroid of 
+ * interest.</p>
+ * <p>The factor x above, the size of the noise-distorted population, and the
+ * max amount of noise are parameters that are defined via the 
+ * {@link FragmenterParameters} object given to the constructor.</p>
  * 
  * @author Marco Foscato
  */
@@ -57,14 +74,14 @@ import denoptim.utils.Randomizer;
 public class FragmentClusterer
 {   
     /**
-     * The list of fragments that should be organized into clusters.
+     * The list of fragments to be clustered.
      */
     private List<ClusterableFragment> data;
     
     /**
-     * Currently defined list of clusters. Initially empty, then contains one
-     * cluster per each data point, and the is pruned to retain only significant
-     * clusters.
+     * Current list of clusters. Initially empty, then contains one
+     * cluster per each data point, and then is pruned to retain only 
+     * the clusters surviving the merging.
      */
     private List<DynamicCentroidCluster> clusters =
             new ArrayList<DynamicCentroidCluster>();
@@ -82,15 +99,25 @@ public class FragmentClusterer
 //------------------------------------------------------------------------------
     
     /**
-     * TODO-gg
-     * Constructor for a clusterer of fragments. 
-     * Note we first have to find an ordering of the atoms/AP that is consistent
-     * throughout the dataset. We expect this ordering to be done prior to 
-     * attempting the clustering.
+     * Constructor for a clusterer of fragments. Clustering is based on the
+     * geometry of the arrangement of atoms and attachment points. To compare
+     * the positions in space of each point consistently, we need a consistent 
+     * mapping of the points, i.e., a 
+     * definition of that is the correct order of points for each fragment to
+     * analyze. Use {@link FragmentAlignement} to find such mapping to produce
+     * {@link ClusterableFragment} that have a ordered sets of points 
+     * reflecting a consistent mapping throughout the list of fragments.
      * @param data collection of fragments to clusterize. The coordinates vector
      * of each of these is expected to have a consistent ordering, but the 
      * value of the coordinates will be edited to align the geometries.
-     * @param settings configuration of the clustering method
+     * @param settings configuration of the clustering method. This includes the 
+     * size, max amount of noise of the reference unimodal population with 
+     * normally distributed noise used to calculate the RMSD of a unimodal
+     * distribution of distotsions. It also define the factor used to weight 
+     * the standard deviation when adding it to the mean of the RMSD of the 
+     * unimodal population. The resulting value is the threshold RMSD value that
+     * is used to decide if two geometries are part of the same unimodal
+     *  distribution, i.e., the same cluster.
      * @throws DENOPTIMException if an isomorphism is not found.
      */
     public FragmentClusterer(List<ClusterableFragment> data,
@@ -104,7 +131,27 @@ public class FragmentClusterer
 //------------------------------------------------------------------------------
 
     /**
-     * TODO-gg
+     * Runs the clustering algorithm:
+     * <ol>
+     * <li>creates a cluster for each fragment</li>
+     * <li>tries to merge clusters. The condition for merging is that the 
+     * the centroids of the clusters have an RMSD upon superposition that is 
+     * lower than the threshold (see below).</li>
+     * <li>repeat the merging until no more changes occur in the list of 
+     * clusters.</li>
+     * </ol>
+     * The threshold for merging is derived from the RMSD of a sample of 
+     * distorted geometries of the centroid, where the distortion is normally 
+     * distributed. The threshold is calculated as:
+     * <pre>
+     * threshold = RMSD_mean + x * RMSD_standard_deviation
+     * </pre>
+     * where mean and standard deviation are calculated on the sample of normally
+     * distorted geometries of the centroid (see 
+     * {@link #getRMSDStatsOfNoisyDistorsions(double[], int, double)}). 
+     * The factor x, the maximum about of
+     * noise, and size of the sample are controlled by the settings given upon
+     * construction of an instance of this class.
      */
     public void cluster()
     {
@@ -166,16 +213,18 @@ public class FragmentClusterer
                 logger.log(Level.FINE,"Clustering around centroid "+i+"...");
             }
             
-            ClusterableFragment centroidI = (ClusterableFragment) clusterI.getCentroid();
-            
-            //TODO-gg consider using RMSD of bond lengths and angles?
+            ClusterableFragment centroidI = 
+                    (ClusterableFragment) clusterI.getCentroid();
             
             // Define a distance (RMSD upon superposition) for discriminating
             // this geometry from the others.
             SummaryStatistics refRMSDStats = getRMSDStatsOfNoisyDistorsions(
-                    centroidI.getPoint(), 20, 0.2); //TODO-gg tuneable params
+                    centroidI.getPoint(),
+                    settings.getSizeUnimodalPop(),
+                    settings.getMaxNoiseUnimodalPop());
             double rmsdThreshold = refRMSDStats.getMean() 
-                    + 1.0*refRMSDStats.getStandardDeviation(); //TODO-gg tuneable params
+                    + settings.getFactorForSDOnStatsOfUnimodalPop() 
+                    * refRMSDStats.getStandardDeviation();
             
             for (int j=i+1; j<clusters.size(); j++)
             {
@@ -257,17 +306,22 @@ public class FragmentClusterer
 //------------------------------------------------------------------------------
    
     /**
-     * Produces an sample of N-dimensional points by adding normally distributed 
-     * noise on the given N-dimensional center. Then, computes the new centroid 
-     * of the dataset and produces the statistics of the RMDS between each point
-     * and the new centroid.
+     * Computes statistics for a unimodal, normally noise-distorted population
+     * of points generated by distorting a given N-dimensional vector.
+     * This is done by producing a dataset of N-dimensional points by adding
+     * normally distributed 
+     * noise on the given N-dimensional center. 
+     * Then, this method computes the new centroid 
+     * of the dataset and produces the statistics of the RMDS upon superposition
+     * of new centroid to the centroid.
      * @param center the N-dimensional point around which noise is added.
      * @param sampleSize the size of the distribution of N-dimensional points 
-     * that we generate aroung the center.
+     * that we generate around the center.
      * @param maxNoise absolute value of the maximum noise. Noise is generated
      * with a Normal distribution centered at 0.0 and going from -maxNoise to
      * +maxNoise.
-     * @return the statistics of the RMSD of the distribution.
+     * @return the statistics of the RMSD for the normally
+     * distributed noise-distorted population.
      */
     protected static SummaryStatistics getRMSDStatsOfNoisyDistorsions(
             double[] center, int sampleSize, double maxNoise)
@@ -349,7 +403,8 @@ public class FragmentClusterer
      * Once the clustering is done, this method return the list of clusters.
      * Each cluster contains objects that are transformed to best align with the
      * centroid of the cluster.
-     * @return the clusters.
+     * @return the list of clusters, or an empty list if {@link #clusters} has
+     * not been called.
      */
     public List<List<Fragment>> getTransformedClusters()
     {
@@ -373,7 +428,8 @@ public class FragmentClusterer
      * Once the clustering is done, this method return the list of cluster 
      * centroids. Note the centroids are not part of the initial data. 
      * Moreover, the fragments's coordinates a
-     * @return the cluster centroids.
+     * @return the cluster centroids, or an empty list if {@link #clusters} has
+     * not been called.
      */
     public List<Fragment> getClusterCentroids()
     {
