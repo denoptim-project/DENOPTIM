@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
+import javax.swing.RepaintManager;
 import javax.vecmath.Point3d;
 
 import org.apache.commons.math3.exception.DimensionMismatchException;
@@ -186,17 +187,22 @@ public class ConformerExtractorTask extends Task
         } else {
             representativeFragments = clusterer.getNearestToClusterCentroids();
         }
-        //TODO-gg 
-        //DenoptimIO.writeVertexesToFile(new File(""), FileFormat.VRTXSDF, representativeFragments);
+        List<Vertex> representativeVertexes = new ArrayList<Vertex>();
+        representativeVertexes.addAll(representativeFragments);
+        DenoptimIO.writeVertexesToFile(new File(getClusterCentroidsPathname(
+                settings, isomorphicFamilyId)), FileFormat.VRTXSDF, 
+                representativeVertexes);
         
         if (settings.isSaveClustersOfConformerToFile())
         {
             List<List<Fragment>> clusters = clusterer.getTransformedClusters();
             for (int iCluster=0; iCluster<clusters.size(); iCluster++)
             {
-                //TODO-gg
-               // DenoptimIO.writeVertexesToFile(new File(getClusterPathname()),
-               //         FileFormat.VRTXSDF, clusters.get(iCluster));
+                List<Vertex> clusterMembers = new ArrayList<Vertex>();
+                clusterMembers.addAll(clusters.get(iCluster));
+                DenoptimIO.writeVertexesToFile(new File(getClusterPathname(
+                        settings, isomorphicFamilyId, iCluster)),
+                        FileFormat.VRTXSDF, clusterMembers);
             }
         }
         
@@ -343,6 +349,37 @@ public class ConformerExtractorTask extends Task
             }
         }
         return sample;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds the pathname for the file where we save the members of a given 
+     * cluster.
+     * @param settings settings we work with.
+     * @param i the index of the cluster
+     * @return the pathname
+     */
+    static String getClusterPathname(FragmenterParameters settings, 
+            String isomorphicFamilyId, int i)
+    {
+        return settings.getWorkDirectory() + DenoptimIO.FS 
+                + isomorphicFamilyId + "_cluster-" + i + ".sdf";
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds the pathname for the file where we save all the centroids of 
+     * clusters.
+     * @param settings settings we work with.
+     * @return the pathname
+     */
+    static String getClusterCentroidsPathname(FragmenterParameters settings, 
+            String isomorphicFamilyId)
+    {
+        return settings.getWorkDirectory() + DenoptimIO.FS 
+                + isomorphicFamilyId + "_centroids.sdf";
     }
 
 //------------------------------------------------------------------------------

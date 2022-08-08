@@ -217,7 +217,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeVertexesToFile(File file, FileFormat format,
-            ArrayList<Vertex> vertexes) throws DENOPTIMException 
+            List<Vertex> vertexes) throws DENOPTIMException 
     {
         return writeVertexesToFile(file, format, vertexes, false);
     }
@@ -251,7 +251,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeVertexesToFile(File file, FileFormat format,
-            ArrayList<Vertex> vertexes, boolean append) throws DENOPTIMException 
+            List<Vertex> vertexes, boolean append) throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {
@@ -284,7 +284,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeVertexesToJSON(File file,
-            ArrayList<Vertex> vertexes) throws DENOPTIMException
+            List<Vertex> vertexes) throws DENOPTIMException
     {
         writeVertexesToJSON(file, vertexes, false);
     }
@@ -301,7 +301,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeVertexesToJSON(File file,
-            ArrayList<Vertex> vertexes, boolean append) throws DENOPTIMException
+            List<Vertex> vertexes, boolean append) throws DENOPTIMException
     {
         Gson writer = DENOPTIMgson.getWriter();
         if (append)
@@ -328,7 +328,7 @@ public class DenoptimIO
     public static void writeVertexToSDF(String pathName, Vertex vertex) 
             throws DENOPTIMException 
     {
-        ArrayList<Vertex> lst = new ArrayList<Vertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         lst.add(vertex);
         writeVertexesToSDF(new File(pathName), lst, false);
     }
@@ -344,10 +344,10 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeVertexesToSDF(File file, 
-            ArrayList<Vertex> vertexes, boolean append) 
+            List<Vertex> vertexes, boolean append) 
                     throws DENOPTIMException 
     {
-        ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
+        List<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (Vertex v : vertexes) 
         {
             lst.add(v.getIAtomContainer());
@@ -366,7 +366,7 @@ public class DenoptimIO
      */
     public static void writeSDFFile(String fileName, IAtomContainer mol) 
             throws DENOPTIMException {
-        ArrayList<IAtomContainer>  mols = new ArrayList<IAtomContainer>();
+        List<IAtomContainer>  mols = new ArrayList<IAtomContainer>();
         mols.add(mol);
         writeSDFFile(fileName, mols, false);
     }
@@ -380,8 +380,8 @@ public class DenoptimIO
      * @param mols     The molecules to be written.
      * @throws DENOPTIMException
      */
-    public static void writeSDFFile(String fileName,
-            ArrayList<IAtomContainer> mols) throws DENOPTIMException {
+    public static void writeSDFFile(String fileName, List<IAtomContainer> mols) 
+            throws DENOPTIMException {
         writeSDFFile(fileName,mols, false);
     }
 
@@ -395,9 +395,8 @@ public class DenoptimIO
      * @param append use <code>true</code> to append to the file
      * @throws DENOPTIMException
      */
-    public static void writeSDFFile(String fileName,
-            ArrayList<IAtomContainer> mols, boolean append) 
-                    throws DENOPTIMException 
+    public static void writeSDFFile(String fileName, List<IAtomContainer> mols, 
+            boolean append) throws DENOPTIMException 
     {
         SDFWriter sdfWriter = null;
         try {
