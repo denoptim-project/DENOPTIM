@@ -17,7 +17,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 
 import org.apache.commons.math3.ml.clustering.Clusterable;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -50,7 +52,9 @@ import denoptim.io.DenoptimIO;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.fragmenter.MatchedBond;
+import denoptim.utils.CartesianSpaceUtils;
 import denoptim.utils.ManySMARTSQuery;
+import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 import uk.ac.ebi.beam.Bond;
@@ -210,6 +214,10 @@ public class FragmentClustererTest
     @Test
     public void testCluster() throws Exception
     {
+        // Use this to create informative logs and files that allow to 
+        // see what geometries are put in each cluster
+        boolean manualDebug = false;
+        
         double noise = 0.25; 
         // NB: the distortions are [-noise,noise] and is uniformely distributed
         // So, the extreme cases have same probability of no distortion
@@ -225,30 +233,72 @@ public class FragmentClustererTest
         for (int i=0; i<10; i++)
         {
             IAtomContainer mol = builder.newAtomContainer();
-            mol.addAtom(new Atom("C", getNoisyPoint(pointsA[0],noise)));
-            mol.addAtom(new Atom("H", getNoisyPoint(pointsA[1],noise)));
-            mol.addAtom(new Atom("O", getNoisyPoint(pointsA[2],noise)));
+            Point3d pA = getNoisyPoint(pointsA[0],noise);
+            Point3d pB = getNoisyPoint(pointsA[1],noise);
+            Point3d pC = getNoisyPoint(pointsA[2],noise);
+            Point3d pD = getNoisyPoint(pointsA[3],noise);
+            Point3d pE = getNoisyPoint(pointsA[4],noise);
+            Matrix4d tM = new Matrix4d();
+            tM.rotX(i*17.0);
+            tM.rotY(i*17.0);
+            tM.rotZ(-i*17.0);
+            tM.setTranslation(new Vector3d(i,i,i));
+            tM.transform(pA);
+            tM.transform(pB);
+            tM.transform(pC);
+            tM.transform(pD);
+            tM.transform(pE);
+            mol.addAtom(new Atom("C", pA));
+            mol.addAtom(new Atom("H", pB));
+            mol.addAtom(new Atom("O", pC));
             mol.addBond(0,1,IBond.Order.SINGLE);
             mol.addBond(0,2,IBond.Order.SINGLE);
             Fragment frag = new Fragment(mol, BBType.UNDEFINED);
-            frag.addAP(0, APClass.make("A:0"), getNoisyPoint(pointsA[3],noise));
-            frag.addAP(0, APClass.make("B:0"), getNoisyPoint(pointsA[4],noise));
+            frag.addAP(0, APClass.make("A:0"), pD);
+            frag.addAP(0, APClass.make("B:0"), pE);
             ClusterableFragment cf = new ClusterableFragment(frag);
             cf.setNaturalNodeOrder();
             sample.add(cf);
         }
         
+        if (manualDebug)
+        {
+            ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+            for (int i=0; i<sample.size(); i++)
+            {
+                mols.add(getMol(sample.get(i).getOriginalFragment()));
+            }
+            DenoptimIO.writeSDFFile("/tmp/original_sample.sdf", mols);
+        }
+        
         FragmenterParameters settings = new FragmenterParameters();
         
-        //TODO-gg remove
-        settings.startConsoleLogger("ClustererTest");
-        settings.setVerbosity(2);
+        if (manualDebug)
+        {
+            settings.startConsoleLogger("ClustererTest");
+            settings.setVerbosity(2);
+        }
         
         FragmentClusterer fc = new FragmentClusterer(sample,settings);
-        // NB: unimodal distribution is assumed as a start and "confirmed"
-        // empirically only by the small amount of change in the elbow plot.
         fc.cluster();
         assertEquals(1,fc.getClusters().size());
+        
+        if (manualDebug)
+        {
+            ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+            for (int i=0; i<fc.getTransformedClusters().get(0).size(); i++)
+            {
+                mols.add(getMol(fc.getTransformedClusters().get(0).get(i)));
+            }
+            DenoptimIO.writeSDFFile("/tmp/transformed.sdf", mols);
+            
+            ArrayList<IAtomContainer> mols2 = new ArrayList<IAtomContainer>();
+            for (int i=0; i<sample.size(); i++)
+            {
+                mols2.add(getMol(sample.get(i).getOriginalFragment()));
+            }
+            DenoptimIO.writeSDFFile("/tmp/original_sample_after.sdf", mols2);
+        }
         
         Point3d[] pointsB = new Point3d[] {
                 new Point3d(0.4574,-0.0273,0.3953), 
@@ -380,39 +430,107 @@ public class FragmentClustererTest
         fc.cluster();
         assertEquals(6,fc.getClusters().size());
         
-        // Keep this code: it might be useful to look at the geometries.
-        
-        ArrayList<Vertex> lstVrtx = new ArrayList<Vertex>();
-        for (ClusterableFragment cf : sample)
-            lstVrtx.add(cf.getOriginalFragment());
-        DenoptimIO.writeVertexesToFile(new File("/tmp/cf.sdf"), FileFormat.VRTXSDF, lstVrtx, false);
-        
-        //TODO-gg see what the centroids look like! 
         List<Fragment> centroids = fc.getClusterCentroids();
-        for (int i=0; i<fc.getClusters().size(); i++)
+        List<DynamicCentroidCluster> clusters = fc.getClusters();
+        List<List<Fragment>> trnsClusters = fc.getTransformedClusters();
+        for (int iCluster=0; iCluster<centroids.size(); iCluster++)
         {
-            ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
-            for (ClusterableFragment cf : fc.getClusters().get(i).getPoints())
+            assertEquals(trnsClusters.get(iCluster).size(),
+                    clusters.get(iCluster).getPoints().size(),
+                    "Number of members in the cluster and transformed cluster");
+            int numMembers = trnsClusters.get(iCluster).size();
+            for (int iMember=0; iMember<numMembers; iMember++)
             {
-                mols.add(getMol(cf.getTransformedCopy()));
+                Fragment centroid = centroids.get(iCluster);
+                ClusterableFragment clustFrag = clusters.get(
+                        iCluster).getPoints().get(iMember);
+                Fragment trnsClustFrag = clusters.get(
+                        iCluster).getPoints().get(iMember).getTransformedCopy();
+                Fragment trnsFrag = trnsClusters.get(iCluster).get(iMember);
+                
+                int iPoint = 0;
+                for (IAtom atm : centroid.atoms())
+                {
+                    // Check that the three points are effectively the same
+                    Point3d trnsFragPt = trnsFrag.getAtom(iPoint).getPoint3d();
+                    Point3d trnsCopyPt = trnsClustFrag.getAtom(iPoint).getPoint3d();
+                    Point3d clustFragPt = ClusterableFragment.convertToPointArray(
+                            clustFrag.allCoords)[iPoint];
+                    assertTrue(trnsFragPt.distance(trnsCopyPt) < 0.001);
+                    assertTrue(trnsFragPt.distance(clustFragPt) < 0.001);
+
+                    // Check that the centroid is not too far.
+                    // We expect the centroid to be somewhat close to the norm
+                    // of the distortion distribution, but it is not spot-on
+                    // because the number of samples in the uniform distribution
+                    // is very limited. 
+                    // Therefore, we allow for an additional 50%
+                    Point3d centroidPt = atm.getPoint3d();
+                    assertTrue(centroidPt.distance(trnsFragPt) < noise*1.5);
+                    // NB: no need to check trnsCopyPt and clustFragPt as we
+                    // already know they are sufficiently close to each other.
+                    
+                    iPoint++;
+                }
+                int iAP = 0;
+                for (AttachmentPoint ap : centroid.getAttachmentPoints())
+                {
+                    // Check that the three points are effectively the same
+                    Point3d trnsFragPt = trnsFrag.getAP(iAP).getDirectionVector();
+                    Point3d trnsCopyPt = trnsClustFrag.getAP(iAP).getDirectionVector();
+                    Point3d clustFragPt = ClusterableFragment.convertToPointArray(
+                            clustFrag.allCoords)[iPoint];
+                    assertTrue(trnsFragPt.distance(trnsCopyPt) < 0.001);
+                    assertTrue(trnsFragPt.distance(clustFragPt) < 0.001);
+                    
+                    Point3d centroidPt = ap.getDirectionVector();
+                    assertTrue(centroidPt.distance(trnsFragPt) < noise*1.5);
+                    // NB: no need to check trnsCopyPt and clustFragPt as we
+                    // already know they are sufficiently close to each other.
+                    
+                    iPoint++;
+                    iAP++;
+                }
             }
-            DenoptimIO.writeSDFFile("/tmp/cluster_"+i+".sdf", mols);
-            
-            
-            ArrayList<IAtomContainer> molsTrs = new ArrayList<IAtomContainer>();
-            for (Fragment f : fc.getTransformedClusters().get(i))
-            {
-                molsTrs.add(getMol(f));
-            }
-            DenoptimIO.writeSDFFile("/tmp/cluster_"+i+"_trns.sdf", molsTrs);
-            
-            IAtomContainer center = getMol(centroids.get(i));
-            DenoptimIO.writeSDFFile("/tmp/cluster_"+i+"_centroid.sdf", center);
-        }
+        }       
         
+        if (manualDebug)
+        {
+            ArrayList<Vertex> lstVrtx = new ArrayList<Vertex>();
+            for (ClusterableFragment cf : sample)
+                lstVrtx.add(cf.getOriginalFragment());
+            DenoptimIO.writeVertexesToFile(new File("/tmp/vertexes.sdf"), 
+                    FileFormat.VRTXSDF, lstVrtx, false);
+            
+            for (int i=0; i<fc.getClusters().size(); i++)
+            {
+                ArrayList<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+                for (ClusterableFragment cf : fc.getClusters().get(i).getPoints())
+                {
+                    mols.add(getMol(cf.getTransformedCopy()));
+                }
+                DenoptimIO.writeSDFFile("/tmp/cluster_"+i+".sdf", mols);
+                
+                
+                ArrayList<IAtomContainer> molsTrs = new ArrayList<IAtomContainer>();
+                for (Fragment f : fc.getTransformedClusters().get(i))
+                {
+                    molsTrs.add(getMol(f));
+                }
+                DenoptimIO.writeSDFFile("/tmp/cluster_"+i+"_trns.sdf", molsTrs);
+                
+                IAtomContainer center = getMol(centroids.get(i));
+                DenoptimIO.writeSDFFile("/tmp/cluster_"+i+"_centroid.sdf", center);
+            }
+        }
     }
     
-    //TODO-gg del 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Converts the fragment into a collection of atoms where attachment points
+     * are converted into atoms that can be visualized with any molecular viewer.
+     */
     private IAtomContainer getMol(Fragment frag)
     {
         IAtomContainer mol = builder.newAtomContainer();
@@ -449,8 +567,6 @@ public class FragmentClustererTest
         }
         
         FragmenterParameters settings = new FragmenterParameters();
-        
-        //TODO-gg remove
         //settings.startConsoleLogger("ClustererTest");
         //settings.setVerbosity(2);
         
@@ -498,13 +614,13 @@ public class FragmentClustererTest
             assertEquals(k,fc.getClusters().size());
         }
         
-        
         // Keep this code: it might be useful to look at the geometries.
         /*
         ArrayList<Vertex> lstVrtx = new ArrayList<Vertex>();
         for (ClusterableFragment cf : sample)
             lstVrtx.add(cf.getOriginalFragment());
-        DenoptimIO.writeVertexesToFile(new File("/tmp/cf.sdf"), FileFormat.VRTXSDF, lstVrtx, false);
+        DenoptimIO.writeVertexesToFile(new File("/tmp/cf.sdf"), 
+        FileFormat.VRTXSDF, lstVrtx, false);
         */
     }
 

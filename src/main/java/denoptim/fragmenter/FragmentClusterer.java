@@ -130,7 +130,8 @@ public class FragmentClusterer
         if (logger!=null)
         {
             StringBuilder sb = new StringBuilder();
-            sb.append("Final number of clusters: "+clusters.size());
+            sb.append("Final number of clusters: ").append(clusters.size());
+            sb.append(" (#iter. "+i+")");
             sb.append(settings.NL);
             for (int j=0; j<clusters.size(); j++)
             {
@@ -344,8 +345,6 @@ public class FragmentClusterer
 
 //------------------------------------------------------------------------------
 
-    //TODO-gg not sure this works as intended...
-    
     /**
      * Once the clustering is done, this method return the list of clusters.
      * Each cluster contains objects that are transformed to best align with the

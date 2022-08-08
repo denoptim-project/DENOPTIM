@@ -361,7 +361,7 @@ public class DenoptimIO
      * Writes {@link IAtomContainer} to SDF file.
      *
      * @param fileName The file to be write to.
-     * @param mol     The moleculs to be written.
+     * @param mol     The molecules to be written.
      * @throws DENOPTIMException
      */
     public static void writeSDFFile(String fileName, IAtomContainer mol) 
