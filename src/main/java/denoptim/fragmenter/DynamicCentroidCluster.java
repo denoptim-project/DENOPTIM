@@ -13,10 +13,12 @@ import denoptim.utils.MathUtils;
 
 /**
  * A cluster with a centroid that can be updated after definition of the cluster.
+ * The centroid is updated every time we request the get the centroid and there
+ * has been an operation that changed the members (i.e., a points in the cluster)
+ * of this cluster (i.e., 
+ * addition or removal of members).
  * 
  * @author Marco Foscato
- *
- * @param <T> the type of points that can be clustered
  */
 public class DynamicCentroidCluster 
 {
@@ -74,6 +76,10 @@ public class DynamicCentroidCluster
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Add a new member of this cluster.
+     * @param point the member to add.
+     */
     public void addPoint(ClusterableFragment point)
     {
         updateCentroid = true;
@@ -82,6 +88,10 @@ public class DynamicCentroidCluster
 
 //------------------------------------------------------------------------------
     
+    /**
+     * Remove the given cluster member, if it is a member of this cluster.
+     * @param points the member to remove.
+     */
     public void removeAll(Collection<ClusterableFragment> points)
     {
         updateCentroid = true;
@@ -94,7 +104,8 @@ public class DynamicCentroidCluster
      * Get the points contained in the cluster.
      * @return points contained in the cluster
      */
-    public List<ClusterableFragment> getPoints() {
+    public List<ClusterableFragment> getPoints() 
+    {
         return points;
     }
 

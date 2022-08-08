@@ -18,7 +18,7 @@ import denoptim.graph.Fragment;
 
 /**
  * Represents a fragment that can by clustered based on the 3*N coordinate of
- * atoms and attachment points, i.e.,  N is the sum of atoms and attachment points.
+ * atoms and attachment points, i.e., N is the sum of atoms and attachment points.
  */
 public class ClusterableFragment implements Clusterable
 {
@@ -30,8 +30,7 @@ public class ClusterableFragment implements Clusterable
     /**
      * Ordered list of nodes determined by isomorphism.
      */
-    List<FragIsomorphNode> orderedNodes;
-    //TODO-gg make private?
+    private List<FragIsomorphNode> orderedNodes;
     
     /**
      * Ordered list of coordinated reflecting the ordered list of atoms/APs.
@@ -113,6 +112,12 @@ public class ClusterableFragment implements Clusterable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Sets the coordinates of each atom and attachment point in this object.
+     * Does not change the values in the original fragment used to construct an 
+     * instance of this object.
+     * @param coords the 3*N-dimensional coordinates.
+     */
     protected void setCoordsVector(double[] coords)
     {
         this.allCoords = coords;
@@ -120,13 +125,23 @@ public class ClusterableFragment implements Clusterable
     
 //------------------------------------------------------------------------------
     
-    protected void setCoordsVector(Point3d[] ptsJ)
+    /**
+     * Sets the coordinates of each atom and attachment point in this object.
+     * Does not change the values in the original fragment used to construct an 
+     * instance of this object.
+     * @param pts the N point in 3-dimensional space.
+     */
+    protected void setCoordsVector(Point3d[] pts)
     {
-        this.allCoords = convertToCoordsVector(ptsJ);
+        this.allCoords = convertToCoordsVector(pts);
     }
     
 //------------------------------------------------------------------------------
     
+    /**
+     * The original fragment used to construct an instance of this object.
+     * @return
+     */
     protected Fragment getOriginalFragment()
     {
         return frag;
@@ -134,6 +149,10 @@ public class ClusterableFragment implements Clusterable
 
 //------------------------------------------------------------------------------
     
+    /**
+     * @return the graph representation of the original fragment
+     * used to construct an instance of this object.
+     */
     protected DefaultUndirectedGraph<FragIsomorphNode, FragIsomorphEdge> 
         getJGraphFragIsomorphism()
     {
@@ -156,6 +175,13 @@ public class ClusterableFragment implements Clusterable
 
 //------------------------------------------------------------------------------
     
+    /**
+     * Converts an array of 3-dimensional points in a vector of coordinates in 
+     * 3*N-dimensional space where coordinated are ordered as 
+     * [x1, y1, z1, x2, y2, z2, ...]
+     * @param pts points in 3-dimensional space.
+     * @return vector in N-dimensional space
+     */
     public static double[] convertToCoordsVector(Point3d[] pts)
     {
         double[] coords = new double[pts.length*3];
@@ -171,6 +197,13 @@ public class ClusterableFragment implements Clusterable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Converts an array of 3*N-dimensional coordinates into an array of 
+     * 3-dimensional points assuming coordinated are ordered as 
+     * [x1, y1, z1, x2, y2, z2, ...].
+     * @param coords the N-dimensional array.
+     * @return the array of points in 3-dimensional space.
+     */
     public static Point3d[] convertToPointArray(double[] coords)
     {
         Point3d[] pts = new Point3d[coords.length/3];
@@ -199,6 +232,11 @@ public class ClusterableFragment implements Clusterable
     
 //------------------------------------------------------------------------------
 
+    /**
+     * @return a copy of the original fragment where the coordinates of each atom 
+     * and attachment point have been transformed to reflect the content of 
+     * the N-dimensional vector of coordinate of this class.
+     */
     public Fragment getTransformedCopy()
     {
         Fragment copy = frag.clone();
