@@ -331,7 +331,6 @@ public class ConformerExtractorTask extends Task
     {
         List<ClusterableFragment> sample = new ArrayList<ClusterableFragment>();
         int molId = -1;
-        Fragment firstFrag = null;
         while (reader.hasNext())
         {
             if (sample.size()==FragmenterParameters.MAXISOMORPHICSAMPLESIZE)
