@@ -253,7 +253,6 @@ public class APClass implements Cloneable,Comparable<APClass>
             } else {
                 // NB: the default bond type for RCAs must not be changed, but
                 // For non-RCA APClasses we do update the bond type.
-                // TODO: trigger error instead
                 if (bt != newApc.bndTyp && !RCAAPCLASSSET.contains(newApc))
                 {
                     System.err.println("WARNING! Changing bond order of "

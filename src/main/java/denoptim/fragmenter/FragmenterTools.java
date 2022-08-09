@@ -233,10 +233,12 @@ public class FragmenterTools
      * the master logger, as we want thread-specific logging.
      * @throws DENOPTIMException
      * @throws IOException
+     * @throws UndetectedFileFormatException 
+     * @throws IllegalArgumentException 
      */
     
     public static void fragmentation(File input, FragmenterParameters settings,
-            File output, Logger logger) throws DENOPTIMException, IOException
+            File output, Logger logger) throws DENOPTIMException, IOException, IllegalArgumentException, UndetectedFileFormatException
     {   
         FileInputStream fis = new FileInputStream(input);
         IteratingSDFReader reader = new IteratingSDFReader(fis, 
@@ -290,12 +292,7 @@ public class FragmenterTools
                             keptFragments,true);
                 }
             }
-        } catch (Throwable t)
-        {
-            //TODO-gg del catching block and deal with exceptions in master thread
-            t.printStackTrace();
-        }
-        finally {
+        } finally {
             reader.close();
         }
     }
@@ -1172,64 +1169,5 @@ public class FragmenterTools
     }
     
 //------------------------------------------------------------------------------
- //TODO-GG del   
-    public static void codeTemplare(File input,
-            File output, Logger logger) 
-                    throws DENOPTIMException, IOException
-    {
-        FileInputStream fis = new FileInputStream(input);
-        IteratingSDFReader reader = new IteratingSDFReader(fis, 
-                DefaultChemObjectBuilder.getInstance());
-
-        int index = -1;
-        int maxBufferSize = 2000;
-        ArrayList<IAtomContainer> buffer = new ArrayList<IAtomContainer>(500);
-        try {
-            while (reader.hasNext())
-            {
-                index++;
-                if (logger!=null)
-                {
-                    logger.log(Level.FINE,"Checking _______ of "
-                            + "structure " + index);
-                }
-                IAtomContainer mol = reader.next();
-                
-                //TODO-gg
-                
-                
-                /*
-                if (FormulaUtils.____()
-                        mol, logger))
-                {
-                    buffer.add(mol);
-                } else {
-                    if (logger!=null)
-                    {
-                        logger.log(Level.INFO,"______."
-                                + " Rejecting structure " + index + ": " 
-                                + mol.getTitle());
-                    }
-                }
-                */
-                
-                // If max buffer size is reached, then bump to file
-                if (buffer.size() >= maxBufferSize)
-                {
-                    DenoptimIO.writeSDFFile(output.getAbsolutePath(), buffer, 
-                            true);
-                    buffer.clear();
-                }
-            }
-        }
-        finally {
-            reader.close();
-        }
-        if (buffer.size() < maxBufferSize)
-        {
-            DenoptimIO.writeSDFFile(output.getAbsolutePath(), buffer, true);
-            buffer.clear();
-        }
-    }
-
+ 
 }

@@ -132,7 +132,7 @@ public abstract class ProgramTask extends Task
     /**
      * Method that can be called to create a text file with the error triggered 
      * by any {@link Throwable} that can be thrown by the execution of the 
-     * program. The file names "ERROR" will be created in the working directory
+     * program. The file named "ERROR" will be created in the working directory
      * specified to this {@link ProgramTask}.
      */
     public void printErrorToFile()
@@ -141,9 +141,6 @@ public abstract class ProgramTask extends Task
         PrintWriter pw = new PrintWriter(sw);
         thrownExc.printStackTrace(pw);
         String errFile = workDir + SEP + "ERROR";
-        
-        //TODO-gg del
-        System.out.println(sw.toString());
         
         try {
             DenoptimIO.writeData(errFile, sw.toString(), false);

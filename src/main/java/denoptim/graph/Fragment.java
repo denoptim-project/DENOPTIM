@@ -809,19 +809,6 @@ public class Fragment extends Vertex
 
 //-----------------------------------------------------------------------------
 
-    //TODO-gg remove in favor of getIndexOf
-    /**
-     * 
-     * @param atom
-     * @return
-     * @deprecated use {@link #indexOf(IAtom)}
-     */
-    @Deprecated
-    public int getAtomNumber(IAtom atom)
-    {
-        return mol.getAtomNumber(atom);
-    }
-
     public int indexOf(IAtom atom)
     {
         return mol.indexOf(atom);
@@ -871,8 +858,7 @@ public class Fragment extends Vertex
     
 //-----------------------------------------------------------------------------
     
-    //TODO-gg rename to removeAtom
-    public void removeAtomAndConnectedElectronContainers(IAtom atom)
+    public void removeAtom(IAtom atom)
     {
         removeAtoms(Arrays.asList(atom));
     }
@@ -881,7 +867,7 @@ public class Fragment extends Vertex
     
     /**
      * Removes a list of atoms and updates the list of attachment points.
-     * Use this method instead of {@link #removeAtomAndConnectedElectronContainers(IAtom)}
+     * Use this method instead of {@link #removeAtom(IAtom)}
      * to run the regeneration of the list of APs only once instead of for 
      * every atom deletion.
      * @param atoms the atoms to remove.

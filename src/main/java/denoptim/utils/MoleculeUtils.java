@@ -1175,7 +1175,7 @@ public class MoleculeUtils
         }
         for (IAtom a : atmosToRemove)
         {
-            frag.removeAtomAndConnectedElectronContainers(a);
+            frag.removeAtom(a);
         }
         
         frag.updateAPs();
