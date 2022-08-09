@@ -296,6 +296,7 @@ public class ConformerExtractorTask extends Task
             throws DENOPTIMException
     {
         IteratingSDFReader reader;
+        List<ClusterableFragment> result;
         try
         {
             reader = new IteratingSDFReader(
@@ -308,8 +309,21 @@ public class ConformerExtractorTask extends Task
             throw new Error("File '" + isoFamMembersFile + "' can "
                     + "not be found anymore.");
         }
-        return extractClusterableFragments(reader,
-                isomorphicFamilyId, logger);
+        try 
+        {
+            result =  extractClusterableFragments(reader,
+                    isomorphicFamilyId, logger);
+        } finally {
+            try
+            {
+                reader.close();
+            } catch (IOException e)
+            {
+                throw new DENOPTIMException("Couls not close reader on file '"
+                        + isoFamMembersFile + "'.",e);
+            }
+        }
+        return result;
     }
     
 //------------------------------------------------------------------------------

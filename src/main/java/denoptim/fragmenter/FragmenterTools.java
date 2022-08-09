@@ -209,8 +209,7 @@ public class FragmenterTools
                     buffer.clear();
                 }
             }
-        }
-        finally {
+        } finally {
             reader.close();
         }
         if (buffer.size() < maxBufferSize)
@@ -682,8 +681,7 @@ public class FragmenterTools
                     buffer.clear();
                 }
             }
-        }
-        finally {
+        } finally {
             reader.close();
         }
         if (buffer.size() < maxBufferSize)

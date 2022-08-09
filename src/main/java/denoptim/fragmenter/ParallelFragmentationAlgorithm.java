@@ -335,83 +335,103 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
         {
             batches.add(new ArrayList<IAtomContainer>());
         }
-        while (reader.hasNext())
+        try
         {
-            index++;
-            buffersSize++;
-            IAtomContainer mol = reader.next();
-            
-            // Comply to requirements to write SDF files: unset bond orders 
-            // can only be used in query-type files. So types 4 and 8 are not
-            // expected to be found (but CSD uses them...)
-            try
+            while (reader.hasNext())
             {
-                MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
-                MoleculeUtils.ensureNoUnsetBondOrders(mol);
-            } catch (CDKException e)
-            {
-                if (!settings.acceptUnsetToSingeBO())
+                index++;
+                buffersSize++;
+                IAtomContainer mol = reader.next();
+                
+                // Comply to requirements to write SDF files: unset bond orders 
+                // can only be used in query-type files. So types 4 and 8 are not
+                // expected to be found (but CSD uses them...)
+                try
                 {
-                    settings.getLogger().log(Level.WARNING,"Some bond order are "
-                            + "unset and attempt to kekulize the system has failed "
-                            + "for structure " + index + "."
-                            + "This hampers use of SMARTS queries, which may very "
-                            + "not work as expected. Structure " + index + " will "
-                            + "be rejected. You can avoid rejection by using "
-                            + "keyword " 
-                            + ParametersType.FRG_PARAMS.getKeywordRoot() 
-                            + "UNSETTOSINGLEBO, but you'll "
-                            + "still be using a peculiar connectivity table were"
-                            + "many bonds are artificially markes as single to "
-                            + "avoid use of 'UNSET' bond order. "
-                            + "Further details on the problem: " + e.getMessage());
-                    continue;
-                } else {
-                    settings.getLogger().log(Level.WARNING,"Failed kekulization "
-                            + "for structure " + index + " but UNSETTOSINGLEBO "
-                            + "keyword used. Forcing use of single bonds to "
-                            + "replace bonds with unset order.");
-                    for (IBond bnd : mol.bonds())
+                    MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+                    MoleculeUtils.ensureNoUnsetBondOrders(mol);
+                } catch (CDKException e)
+                {
+                    if (!settings.acceptUnsetToSingeBO())
                     {
-                        if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+                        settings.getLogger().log(Level.WARNING,"Some bond order "
+                                + "are unset and attempt to kekulize the "
+                                + "system has failed "
+                                + "for structure " + index + "."
+                                + "This hampers use of SMARTS queries, which "
+                                + "may very "
+                                + "not work as expected. Structure " + index 
+                                + " will "
+                                + "be rejected. You can avoid rejection by using "
+                                + "keyword " 
+                                + ParametersType.FRG_PARAMS.getKeywordRoot() 
+                                + "UNSETTOSINGLEBO, but you'll "
+                                + "still be using a peculiar connectivity "
+                                + "table were"
+                                + "many bonds are artificially markes as "
+                                + "single to "
+                                + "avoid use of 'UNSET' bond order. "
+                                + "Further details on the problem: " 
+                                + e.getMessage());
+                        continue;
+                    } else {
+                        settings.getLogger().log(Level.WARNING,"Failed "
+                                + "kekulization "
+                                + "for structure " + index 
+                                + " but UNSETTOSINGLEBO "
+                                + "keyword used. Forcing use of single bonds to "
+                                + "replace bonds with unset order.");
+                        for (IBond bnd : mol.bonds())
                         {
-                            bnd.setOrder(IBond.Order.SINGLE);
+                            if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+                            {
+                                bnd.setOrder(IBond.Order.SINGLE);
+                            }
                         }
                     }
                 }
-            }
-            
-            // It is convenient to place the formula in the atom container
-            if (formulae!=null && settings.doCheckFormula())
-            {
-                getFormulaForMol(mol, index, formulae);
-            }
-            
-            batches.get(batchId).add(mol);
-            
-            // Update batch ID for next mol
-            batchId++;
-            if (batchId >= numBatches)
-                batchId = 0;
-            
-            // If max buffer size is reached, then bump to file
-            if (buffersSize >= maxBuffersSize)
-            {
-                buffersSize = 0;
-                for (int i=0; i<numBatches; i++)
+                
+                // It is convenient to place the formula in the atom container
+                if (formulae!=null && settings.doCheckFormula())
                 {
-                    String filename = getStructureFileNameBatch(settings, i);
-                    try
+                    getFormulaForMol(mol, index, formulae);
+                }
+                
+                batches.get(batchId).add(mol);
+                
+                // Update batch ID for next mol
+                batchId++;
+                if (batchId >= numBatches)
+                    batchId = 0;
+                
+                // If max buffer size is reached, then bump to file
+                if (buffersSize >= maxBuffersSize)
+                {
+                    buffersSize = 0;
+                    for (int i=0; i<numBatches; i++)
                     {
-                        DenoptimIO.writeSDFFile(filename, batches.get(i), true);
-                    } catch (DENOPTIMException e)
-                    {
-                        throw new Error("Cannot write to '" + filename + "'.");
+                        String filename = getStructureFileNameBatch(settings, i);
+                        try
+                        {
+                            DenoptimIO.writeSDFFile(filename, batches.get(i), true);
+                        } catch (DENOPTIMException e)
+                        {
+                            throw new Error("Cannot write to '" + filename + "'.");
+                        }
+                        batches.get(i).clear();
                     }
-                    batches.get(i).clear();
                 }
             }
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e1)
+            {
+                throw new Error("Could not close reader of SDF file '"
+                        + settings.getStructuresFile() + "'",e1);
+            }
         }
+        
         if (buffersSize < maxBuffersSize)
         {
             for (int i=0; i<numBatches; i++)
