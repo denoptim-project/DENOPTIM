@@ -280,8 +280,10 @@ public class ConformerExtractorTask extends Task
         {
             if (sample.size()==FragmenterParameters.MAXISOMORPHICSAMPLESIZE)
             {
-                logger.log(Level.INFO,"Sample reached the maximum size: "
-                        + sample.size() + ". Ignoring any further fragment.");
+                if (logger !=null)
+                    logger.log(Level.INFO,"Sample reached the maximum size: "
+                            + sample.size() 
+                            + ". Ignoring any further fragment.");
                 break;
             }
             
@@ -303,19 +305,22 @@ public class ConformerExtractorTask extends Task
             {
                 try
                 {
-                    logger.log(Level.INFO,"Adding fragment " + molId 
+                    if (logger !=null)
+                        logger.log(Level.FINE,"Adding fragment " + molId 
                             + " " + molName + "to the sample of isomorphic "
                             + "family.");
                     frag = new Fragment(mol,BBType.UNDEFINED);
                 } catch (DENOPTIMException e)
                 {
-                    logger.log(Level.WARNING, "Skipping fragment " + molId 
+                    if (logger !=null)
+                        logger.log(Level.WARNING, "Skipping fragment " + molId 
                             + " " + molName + "because it could not "
                             + "be converted into a fragment.");
                     continue;
                 }
             } else {
-                logger.log(Level.INFO, "Skipping fragment " + molId 
+                if (logger !=null)
+                    logger.log(Level.FINE, "Skipping fragment " + molId 
                         + " " + molName + "because it does not "
                         + "belong to isomorphic family '" + isomorphicFamilyId 
                         + "'.");
@@ -339,7 +344,8 @@ public class ConformerExtractorTask extends Task
                     fa = new FragmentAlignement(firstFrag, frag);
                 } catch (DENOPTIMException e)
                 {
-                    logger.log(Level.WARNING, "Skipping fragment " + molId 
+                    if (logger !=null)
+                        logger.log(Level.WARNING, "Skipping fragment " + molId 
                             + " '" + mol.getTitle() + "' because no "
                             + "isomorphism could be found with the first "
                             + "fragment in the sample.");
@@ -358,6 +364,9 @@ public class ConformerExtractorTask extends Task
                 sample.add(clusterable);
             }
         }
+        if (logger !=null)
+            logger.log(Level.INFO, "Sample for " + isomorphicFamilyId 
+                    + " contains " + sample.size() + " fragments.");
         return sample;
     }
     

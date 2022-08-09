@@ -1,7 +1,7 @@
 #
 # This is the parameter file for test t30-15
 #
-FRG-VERBOSITY=3
+FRG-VERBOSITY=0
 FRG-PARALLELTASKS=3
 FRG-STRUCTURESFILE=mols-15.sdf
 FRG-CUTTINGRULESFILE=cutRul_3.0.rul
