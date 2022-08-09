@@ -359,7 +359,7 @@ public class ThreeDimTreeBuilder
         if (setCDKRequirements)
         {
             MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
-            MoleculeUtils.ensureNoUnsetBondOrders(mol);
+            MoleculeUtils.ensureNoUnsetBondOrdersSilent(mol);
         }
         
         // Code that may turn out useful for deep level debugging

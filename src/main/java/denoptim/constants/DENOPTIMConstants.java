@@ -20,6 +20,7 @@
 package denoptim.constants;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.Set;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge.BondType;
@@ -143,6 +145,26 @@ public final class DENOPTIMConstants
 				"Np", "Pu",
 			        "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No",
 				"Lr"}));
+    
+    /**
+     * Elemental symbols of all metal elements, including alkaly, 
+     * transition metals, actinides, lantanides, and post-transition metals from
+     * the p-clock up to the off-diagonal elements (i.e., includes Ge and Sb).
+     */
+    public static ArrayList<String> ALL_METALS = new ArrayList<String>(
+            Arrays.asList("Li", "Na", "K", "Rb", "Cs", "Fr",
+            "Be", "Mg", "Ca", "Sr", "Ba", "Ra",
+            "Al", "Ga", "In", "Tl", 
+            "Ge", "Sn", "Pb", 
+            "Sb", "Bi", 
+            "Po",
+            "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn",
+            "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd",
+            "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg",
+            "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er",
+            "Tm", "Yb", "Lu",
+            "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", 
+            "Md", "No", "Lr"));
     
     public static final Set<String> ALLOWED_ELEMENTS = 
                     new HashSet<>(Arrays.asList(new String[] {"C", "H", 
@@ -473,5 +495,55 @@ public final class DENOPTIMConstants
      * branch holding that {@link Vertex}.
      */
     public static final Object GRAPHBRANCHID = "GRAPHBRANCHID";
+
+    /**
+     * Keyword that identifies rows defining 'any-atom' SMARTS queries in files
+     * collecting cutting rules.
+     */
+    public static final String ANYATMRULKEYWORD = "ANY";
+    
+    /**
+     * Keyword that identifies rows defining cutting rules in files
+     * collecting cutting rules.
+     */
+    public static final String CUTRULKEYWORD = "CTR";
+
+    /**
+     * Property name used to store molecular formula as string in an atom
+     * container
+     */
+    public static final Object FORMULASTR = "FORMULASTR";
+
+    /**
+     * Property used to store the identifier of the family of isomorphic 
+     * fragments that owns a fragment. Essentially, this identifies the
+     * unique fragments (those with unique value for this properties) and
+     * allows to find all their family members, i.e., other fragments that 
+     * differ by conformers/geometries with the first one found.
+     */
+    public static final Object ISOMORPHICFAMILYID = "ISOMORPHICFAMILYID";
+    
+    /**
+     * Initial part of filename used to collect fragments belonging to a certain
+     * molecular weight slot.
+     */
+    public static final String MWSLOTFRAGSFILENAMEROOT = "MWSlot_";
+    
+    /**
+     * Final part of filename used to collect unique fragments in a certain
+     * molecular weight slot.
+     */
+    public static final String MWSLOTFRAGSUNQFILENANEEND = "_Unq";
+    
+    /**
+     * Final part of filename used to collect all samples fragments in a certain
+     * molecular weight slot including isomorphic duplicates.
+     */
+    public static final String MWSLOTFRAGSALLFILENANEEND = "_All";
+    
+    /**
+     * Format for intermediate files used during fragmentation.
+     */
+    public static final FileFormat TMPFRAGFILEFORMAT = FileFormat.VRTXSDF;
     
 }

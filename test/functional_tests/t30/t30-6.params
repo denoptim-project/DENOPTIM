@@ -1,0 +1,7 @@
+#
+# This is the parameter file for test t30-6
+#
+FRG-VERBOSITY=4
+FRG-STRUCTURESFILE=mols-6.sdf
+FRG-CUTTINGRULESFILE=cutRul_3.0.rul
+FRG-TARGETFRAGMENTS=targets-6.sdf

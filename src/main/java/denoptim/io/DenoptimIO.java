@@ -28,16 +28,21 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.http.HttpClient.Version;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,7 +51,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,13 +65,16 @@ import org.openscience.cdk.AtomContainerSet;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
+import org.openscience.cdk.Isotope;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.formula.MolecularFormula;
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.io.Mol2Writer;
@@ -81,6 +91,7 @@ import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.InvPair;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
+import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -103,6 +114,8 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.utils.FormulaUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphEdit;
 import denoptim.utils.GraphUtils;
@@ -120,8 +133,15 @@ import denoptim.utils.Randomizer;
 public class DenoptimIO
 {
 
+    /**
+     * File separator from system.
+     */
 	public static final String FS = System.getProperty("file.separator");
-    public static final String NL = System.getProperty("line.separator");
+    
+	/**
+	 * Newline character from system.
+	 */
+	public static final String NL = System.getProperty("line.separator");
 
     // A list of properties used by CDK algorithms which must never be
     // serialized into the SD file format.
@@ -197,7 +217,41 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeVertexesToFile(File file, FileFormat format,
-            ArrayList<Vertex> vertexes) throws DENOPTIMException 
+            List<Vertex> vertexes) throws DENOPTIMException 
+    {
+        return writeVertexesToFile(file, format, vertexes, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes vertexes to file. Always overwrites.
+     *
+     * @param file the file where to print
+     * @param format how to print vertexes on file
+     * @param vertex the vertex to print
+     * @throws DENOPTIMException
+     */
+    public static File writeVertexToFile(File file, FileFormat format,
+            Vertex vertex, boolean append) throws DENOPTIMException 
+    {
+        ArrayList<Vertex> lst = new ArrayList<Vertex>();
+        lst.add(vertex);
+        return writeVertexesToFile(file, format, lst, append);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes vertexes to file. Always overwrites.
+     *
+     * @param file the file where to print
+     * @param format how to print vertexes on file
+     * @param vertexes the list of vertexes to print
+     * @throws DENOPTIMException
+     */
+    public static File writeVertexesToFile(File file, FileFormat format,
+            List<Vertex> vertexes, boolean append) throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {
@@ -206,11 +260,11 @@ public class DenoptimIO
         switch (format)
         {
             case VRTXJSON:
-                writeVertexesToJSON(file, vertexes);
+                writeVertexesToJSON(file, vertexes, append);
                 break;
                 
             case VRTXSDF:
-                writeVertexesToSDF(file, vertexes, false);
+                writeVertexesToSDF(file, vertexes, append);
                 break;
                 
             default:
@@ -219,7 +273,7 @@ public class DenoptimIO
         }
         return file;
     }
-    
+   
 //------------------------------------------------------------------------------
     
     /**
@@ -230,10 +284,35 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeVertexesToJSON(File file,
-            ArrayList<Vertex> vertexes) throws DENOPTIMException
+            List<Vertex> vertexes) throws DENOPTIMException
+    {
+        writeVertexesToJSON(file, vertexes, false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Writes vertexes to JSON file. Always overwrites.
+     *
+     * @param file the file where to print.
+     * @param vertexes the list of vertexes to print.
+     * @param append use <code>true</code> to append to the existing list of 
+     * vertexes found in the file.
+     * @throws DENOPTIMException
+     */
+    public static void writeVertexesToJSON(File file,
+            List<Vertex> vertexes, boolean append) throws DENOPTIMException
     {
         Gson writer = DENOPTIMgson.getWriter();
-        writeData(file.getAbsolutePath(), writer.toJson(vertexes), false);
+        if (append)
+        {
+            ArrayList<Vertex> allVertexes = readDENOPTIMVertexesFromJSONFile(
+                    file.getAbsolutePath());
+            allVertexes.addAll(vertexes);
+            writeData(file.getAbsolutePath(), writer.toJson(allVertexes), false);
+        } else {
+            writeData(file.getAbsolutePath(), writer.toJson(vertexes), false);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -249,7 +328,7 @@ public class DenoptimIO
     public static void writeVertexToSDF(String pathName, Vertex vertex) 
             throws DENOPTIMException 
     {
-        ArrayList<Vertex> lst = new ArrayList<Vertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         lst.add(vertex);
         writeVertexesToSDF(new File(pathName), lst, false);
     }
@@ -265,15 +344,31 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeVertexesToSDF(File file, 
-            ArrayList<Vertex> vertexes, boolean append) 
+            List<Vertex> vertexes, boolean append) 
                     throws DENOPTIMException 
     {
-        ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
+        List<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (Vertex v : vertexes) 
         {
             lst.add(v.getIAtomContainer());
         }
         writeSDFFile(file.getAbsolutePath(), lst, append);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes {@link IAtomContainer} to SDF file.
+     *
+     * @param fileName The file to be write to.
+     * @param mol     The molecules to be written.
+     * @throws DENOPTIMException
+     */
+    public static void writeSDFFile(String fileName, IAtomContainer mol) 
+            throws DENOPTIMException {
+        List<IAtomContainer>  mols = new ArrayList<IAtomContainer>();
+        mols.add(mol);
+        writeSDFFile(fileName, mols, false);
     }
     
 //------------------------------------------------------------------------------
@@ -285,8 +380,8 @@ public class DenoptimIO
      * @param mols     The molecules to be written.
      * @throws DENOPTIMException
      */
-    public static void writeSDFFile(String fileName,
-            ArrayList<IAtomContainer> mols) throws DENOPTIMException {
+    public static void writeSDFFile(String fileName, List<IAtomContainer> mols) 
+            throws DENOPTIMException {
         writeSDFFile(fileName,mols, false);
     }
 
@@ -300,9 +395,8 @@ public class DenoptimIO
      * @param append use <code>true</code> to append to the file
      * @throws DENOPTIMException
      */
-    public static void writeSDFFile(String fileName,
-            ArrayList<IAtomContainer> mols, boolean append) 
-                    throws DENOPTIMException 
+    public static void writeSDFFile(String fileName, List<IAtomContainer> mols, 
+            boolean append) throws DENOPTIMException 
     {
         SDFWriter sdfWriter = null;
         try {
@@ -2136,7 +2230,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of  {@link Vertex}es from a SDF file.
+     * Reads a list of {@link Vertex}es from a SDF file.
      *
      * @param fileName the pathname of the file to read.
      * @return the list of vertexes.
@@ -2163,6 +2257,252 @@ public class DenoptimIO
             vertexes.add(v);
         }
         return vertexes;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read molecular formula from TXT data representation produced by Cambridge
+     * Structural Database tools (such as Conquest). Essentially, this method 
+     * reads a text file expecting to find lines as the following among lines 
+     * with other kinds of information:
+     * <pre>
+     * REFCODE: ABEWOT
+     * [...]
+     * Formula:           C36 H44 Cl1 P2 Ru1 1+,F6 P1 1-
+     * </pre>
+     * @param file the text file to read
+     * @return the mapping of CSD's REFCODE as key to their respective 
+     * molecular formula as formatted in the input.
+     * @throws DENOPTIMException if any exception occurs during the reading of 
+     * the file or if the file does not exist.
+     */
+    public static LinkedHashMap<String, String> readCSDFormulae(File file) 
+            throws DENOPTIMException
+    {   
+        LinkedHashMap<String, String> allFormulae = new LinkedHashMap<String,String>();
+        BufferedReader buffRead = null;
+        try {
+            //Read the file line by line
+            buffRead = new BufferedReader(new FileReader(file));
+            String lineAll = null;
+            String refcode = "";
+            String formula = "";
+            while ((lineAll = buffRead.readLine()) != null) 
+            {
+                String[] lineArgs = lineAll.split(":");
+                //Get the name
+                if (lineArgs[0].equals("REFCODE")) 
+                 refcode = lineArgs[1].trim();
+
+                //Get the formula
+                if (lineArgs[0].equals("  Formula")) 
+                {
+                    formula = lineArgs[1].trim();
+                    //Store formula
+                    allFormulae.put(refcode,formula);
+                    //Clean fields
+                    refcode = "";
+                    formula = "";
+                }
+            }
+        } catch (FileNotFoundException fnf) {
+            throw new DENOPTIMException("File Not Found: " + file, fnf);
+        } catch (IOException ioex) {
+            throw new DENOPTIMException("Error reading file: " + file, ioex);
+        } finally {
+            try {
+                if (buffRead != null)
+                    buffRead.close();
+            } catch (IOException e) {
+                throw new DENOPTIMException("Error closing buffer to "+file, e);
+            }
+        }
+       
+        return allFormulae;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read cutting rules from a properly formatted text file.
+     * @param file the file to read.
+     * @param anyAtomRules the collector of the strings used to identify an
+     * any-atom query.
+     * @param cutRules the collector of the cutting rules. The collection is 
+     * already sorted by priority when wthis methos returns.
+     * @throws DENOPTIMException in case there are errors in the formatting of 
+     * the text contained in the file.
+     */
+    public static void readCuttingRules(File file, 
+            List<String> anyAtomRules, List<CuttingRule> cutRules) 
+                    throws DENOPTIMException
+    {   
+        ArrayList<String> allLines = readList(file.getAbsolutePath());
+        
+        //Collect definitions of "any-atom": the rule's components used to match
+        // any element even dummies.
+        ArrayList<String> anyAtmLines = new ArrayList<String>();
+        allLines.stream()
+            .filter(line -> line.trim().startsWith("ANY"))
+            .forEach(line -> anyAtmLines.add(line.trim()));
+        if (anyAtmLines.size() == 0)
+        {
+            anyAtomRules.add("[$([*;!#1])]");
+            anyAtomRules.add("[$(*)]");
+        } else {
+            for (int i = 0; i<anyAtmLines.size(); i++)
+            {
+                try
+                {
+                    String[] words = anyAtmLines.get(i).split("\\s+");
+                    anyAtomRules.add(words[1]);
+                } catch (Throwable t) {
+                    throw new DENOPTIMException("ERROR in getting 'any-atom' "
+                            + "string. Check line '" + anyAtmLines.get(i) + "'"
+                            + "in file '" + file + "'.", t);
+                }
+            }
+        }
+
+        //Now get the list of cutting rules
+        ArrayList<String> cutRulLines = new ArrayList<String>();
+        allLines.stream()
+            .filter(line -> line.trim().startsWith("CTR"))
+            .forEach(line -> cutRulLines.add(line.trim()));
+        Set<Integer> usedPriorities = new HashSet<Integer>();
+        for (int i = 0; i<cutRulLines.size(); i++)
+        {
+            String[] words = cutRulLines.get(i).split("\\s+");
+            String name = words[1]; //name of the rule
+            if (words.length < 6)
+            {
+                throw new DENOPTIMException("ERROR in getting cutting rule."
+                        + " Found " + words.length + " parts inctead of 6."
+                        + "Check line '" + cutRulLines.get(i) + "'"
+                        + "in file '" + file + "'.");
+            }
+
+            // further details in map of options
+            ArrayList<String> opts = new ArrayList<String>();
+            if (words.length >= 7)
+            {
+                for (int wi=6; wi<words.length; wi++)
+                {
+                    opts.add(words[wi]);
+                }
+            }
+
+            int priority = Integer.parseInt(words[2]);
+            if (usedPriorities.contains(priority))
+            {
+                throw new DENOPTIMException("ERROR in getting cutting rule."
+                        + " Duplicate priority index " + priority + ". "
+                        + "Check line '" + cutRulLines.get(i) + "'"
+                        + "in file '" + file + "'.");
+            } else {
+                usedPriorities.add(priority);
+            }
+
+            CuttingRule rule = new CuttingRule(name,
+                            words[3],  //atom1
+                            words[4],  //atom2
+                            words[5],  //bond between 1 and 2
+                            priority,  
+                            opts);     
+
+            cutRules.add(rule);
+        }
+        
+        Collections.sort(cutRules, new Comparator<CuttingRule>() {
+
+            @Override
+            public int compare(CuttingRule r1, CuttingRule r2)
+            {
+                return Integer.compare(r1.getPriority(), r2.getPriority());
+            }
+            
+        });
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Writes a formatted text file that collects cutting rules and the 
+     * associated strings used to define 'any-atom' SMARTS queries.
+     * @param file the file where to write.
+     * @param anyAtmRules the strings defining 'any-atom' SMARTS queries.
+     * @param cutRules the cutting rules to write.
+     * @throws DENOPTIMException 
+     */
+    public static void writeCuttingRules(File file, List<String> anyAtmRules, 
+            List<CuttingRule> cutRules) throws DENOPTIMException
+    {
+        StringBuilder sb = new StringBuilder();
+        for (String anyAtmRule : anyAtmRules)
+        {
+            sb.append(DENOPTIMConstants.ANYATMRULKEYWORD).append(" ");
+            sb.append(anyAtmRule);
+            sb.append(NL);
+        }
+        for (CuttingRule r : cutRules)
+        {
+            sb.append(DENOPTIMConstants.CUTRULKEYWORD).append(" ");
+            sb.append(r.getName()).append(" ");
+            sb.append(r.getPriority()).append(" ");
+            sb.append(r.getSMARTSAtom0()).append(" ");
+            sb.append(r.getSMARTSAtom1()).append(" ");
+            sb.append(r.getSMARTSBnd()).append(" ");
+            if (r.getOptions()!=null)
+            {
+                for (String opt : r.getOptions())
+                    sb.append(opt).append(" ");
+            }
+            sb.append(NL);
+        }
+        writeData(file.getAbsolutePath(), sb.toString(), false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Appends the second file to the first.
+     * @param f1 file being elongated
+     * @param list files providing the content to place in f1.
+     * @throws IOException 
+     */
+    public static void appendTxtFiles(File f1, List<File> files) throws IOException
+    {
+        FileWriter fw;
+        BufferedWriter bw;
+        PrintWriter pw = null;
+        try
+        {
+            fw = new FileWriter(f1, true);
+            bw = new BufferedWriter(fw);
+            pw = new PrintWriter(bw);
+            for (File inFile : files)
+            {
+                FileReader fr;
+                BufferedReader br = null;
+                try
+                {
+                    fr = new FileReader(inFile);
+                    br = new BufferedReader(fr);
+                    String line = null;
+                    while ((line = br.readLine()) != null) 
+                    {
+                        pw.println(line);
+                    }
+                } finally {
+                    if (br != null)
+                        br.close();
+                }
+            }
+        } finally {
+            if (pw!=null)
+                pw.close();
+        }
     }
 
 //------------------------------------------------------------------------------

@@ -1,0 +1,5 @@
+#
+# This is the parameter file for test t30-16
+#
+FRG-STRUCTURESFILE=isomorphicFamily-16.sdf
+FRG-CLUSTERIZEANDCOLLECT=MOSTCENTRAL

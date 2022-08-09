@@ -940,13 +940,13 @@ public class GUIVertexInspector extends GUICardPanel
     		for (IAtom atm : frag.getConnectedAtomsList(trgAtm))
     		{
     			str = str + " " + atm.getSymbol() 
-    	                + (frag.getAtomNumber(atm));
+    	                + (frag.indexOf(atm));
     		}
     		System.out.println("Connected atoms: "+str);
     		
 			JOptionPane.showMessageDialog(this,
 	                "<html>Atom "+ trgAtm.getSymbol() 
-	                + (frag.getAtomNumber(trgAtm)) 
+	                + (frag.indexOf(trgAtm)) 
 	                + " has zero or more than one neighbour.<br>I can only "
 	                + "transform atoms"
 	                + " that have one and only one neighbour.</html>",
@@ -1019,7 +1019,7 @@ public class GUIVertexInspector extends GUICardPanel
     	        ArrayList<AttachmentPoint> apsOnAtm = frag.getAPsFromAtom(atm);
     	        frag.getAttachmentPoints().removeAll(apsOnAtm);
     	    }
-    	    frag.removeAtomAndConnectedElectronContainers(atm);
+    	    frag.removeAtom(atm);
     	}
     	frag.updateAPs();
     }

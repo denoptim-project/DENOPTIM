@@ -35,6 +35,7 @@ import denoptim.graph.DGraph.DENOPTIMGraphDeserializer;
 import denoptim.graph.DGraph.DENOPTIMGraphSerializer;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.DENOPTIMEdgeSerializer;
+import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
 import denoptim.graph.Ring.DENOPTIMRingSerializer;
 import denoptim.graph.Template;
@@ -145,6 +146,10 @@ public class DENOPTIMgson
                     && field.getName().equals("owner")) {
                 return true;
             }
+            if (field.getDeclaringClass() == Fragment.class
+                    && field.getName().equals("jGraphFragIsomorphism")) {
+                return true;
+            }
             if (field.getDeclaringClass() == Template.class
                     && field.getName().equals("mol")) {
                 return true;
@@ -179,6 +184,10 @@ public class DENOPTIMgson
             }
             if (field.getDeclaringClass() == Vertex.class
                     && field.getName().equals("owner")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == Fragment.class
+                    && field.getName().equals("jGraphFragIsomorphism")) {
                 return true;
             }
             if (field.getDeclaringClass() == Template.class

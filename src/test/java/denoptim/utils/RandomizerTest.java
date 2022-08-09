@@ -20,6 +20,8 @@ package denoptim.utils;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import javax.vecmath.Point3d;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * @author Marco Foscato
  */
 
-public class RandomUtilsTest
+public class RandomizerTest
 {
     
 //------------------------------------------------------------------------------
@@ -58,6 +60,22 @@ public class RandomUtilsTest
         {
             assertTrue(thrsld > Math.abs(resA[i] - resB[i]),
                     "Inconsistent sequence of random doubles");
+        }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test 
+    public void tesGetNoisyPoint() throws Exception
+    {
+        Randomizer rng = new Randomizer(123);
+        double maxVal = 12.34;
+        for (int i=0; i<10; i++)
+        {
+            Point3d p = rng.getNoisyPoint(maxVal);
+            assertTrue(maxVal >= Math.abs(p.x));
+            assertTrue(maxVal >= Math.abs(p.y));
+            assertTrue(maxVal >= Math.abs(p.z));
         }
     }
     

@@ -1,0 +1,20 @@
+REFCODE: MOL1
+
+Chemical
+  Formula:           (C18 V2 H16)n,2n(H2 O1),Cl 1-
+
+REFCODE: MOL2
+
+Chemical
+  Formula:           (C18 V2 H16)n,2n(H2 O1),Cl 1-
+
+REFCODE: MOL3
+
+Chemical
+  Formula:           (C18 V2 H16)n,2n(H2 O1),Cl 1-
+
+REFCODE: MOL4
+
+Chemical
+  Formula:           (C18 V2 H16)n,2n(H2 O1),Cl 1-
+

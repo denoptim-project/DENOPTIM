@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +40,7 @@ import denoptim.main.Main.RunType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fitnessevaluator.FRParameters;
+import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.genetweeker.GeneOpsRunnerParameters;
 import denoptim.programs.grapheditor.GraphEdParameters;
 import denoptim.programs.graphlisthandler.GraphListsHandlerParameters;
@@ -174,7 +176,12 @@ public abstract class RunTimeParameters
         /**
          * Parameters controlling the stand-alone detection of graph isomorphism.
          */
-        ISO_PARAMS;
+        ISO_PARAMS, 
+        
+        /**
+         * Parameters controlling the fragmenter.
+         */
+        FRG_PARAMS;
         
         /**
          * The root of any keyword that is meant to be used to set any of the
@@ -191,6 +198,7 @@ public abstract class RunTimeParameters
             CEBL_PARAMS.keywordRoot = "FSE-";
             GA_PARAMS.keywordRoot = "GA-";
             FS_PARAMS.keywordRoot = "FS-";
+            FRG_PARAMS.keywordRoot = "FRG-";
             RC_PARAMS.keywordRoot = "RC-";
             FIT_PARAMS.keywordRoot = "FP-";
             FR_PARAMS.keywordRoot = "FR-";
@@ -203,6 +211,7 @@ public abstract class RunTimeParameters
             CEBL_PARAMS.implementation = CEBLParameters.class;
             GA_PARAMS.implementation = GAParameters.class;
             FS_PARAMS.implementation = FragmentSpaceParameters.class;
+            FRG_PARAMS.implementation = FragmenterParameters.class;
             RC_PARAMS.implementation = RingClosureParameters.class;
             FIT_PARAMS.implementation = FitnessParameters.class;
             FR_PARAMS.implementation = FRParameters.class;
@@ -250,7 +259,7 @@ public abstract class RunTimeParameters
     /**
      * New line character
      */
-    protected final String NL = System.getProperty("line.separator");
+    public final String NL = System.getProperty("line.separator");
     
 //-----------------------------------------------------------------------------
     
@@ -415,6 +424,43 @@ public abstract class RunTimeParameters
                     new SimpleFormatter()));
         }
         
+        if (verbosity!=0)
+        {
+            logger.setLevel(verbosityTologLevel());
+            for (int iH=0; iH<logger.getHandlers().length; iH++)
+            {
+                logger.getHandlers()[iH].setLevel(verbosityTologLevel());
+            }
+        }
+        
+        for (RunTimeParameters innerParams : otherParameters.values())
+        {
+            innerParams.setLogger(logger);
+        }
+        
+        return logger;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Starts a program-specific logger that prints to System.err stream.
+     * @param loggerIdentifier
+     * @return
+     */
+    public Logger startConsoleLogger(String loggerIdentifier)
+    {
+        logger = Logger.getLogger(loggerIdentifier);
+        
+        int n = logger.getHandlers().length;
+        for (int i=0; i<n; i++)
+        {
+            logger.removeHandler(logger.getHandlers()[0]);
+        }
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setFormatter(new SimpleFormatter());
+        handler.setLevel(Level.INFO);
+        logger.addHandler(handler);
         
         if (verbosity!=0)
         {
@@ -502,6 +548,34 @@ public abstract class RunTimeParameters
     public int getVerbosity()
     {
 	    return verbosity;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Set the level of verbosity. If any associated logger exists, the level is
+     * set accordingly. The change affects all embedded sets of parameters.
+     * The integer is translated in a {@link Level}
+     * so that -3 (or lower) corresponds to {@link Level#OFF},
+     * 0 is the normal {@link Level#INFO},
+     * and 3 (or higher) corresponds to {@link Level#FINEST}. 
+     */
+    public void setVerbosity(int l)
+    {
+        this.verbosity = l;
+        if (logger!=null)
+        {
+            logger.setLevel(verbosityTologLevel());
+            for (int iH=0; iH<logger.getHandlers().length; iH++)
+            {
+                logger.getHandlers()[iH].setLevel(verbosityTologLevel());
+            }
+        }
+        
+        for (RunTimeParameters innerParams : otherParameters.values())
+        {
+            innerParams.setVerbosity(l);
+        }
     }
 
 //-----------------------------------------------------------------------------
@@ -896,6 +970,26 @@ public abstract class RunTimeParameters
                 + "----------------------").append(NL);
         logger.log(Level.INFO,sb.toString());
     }
+
+  //------------------------------------------------------------------------------
+
+    /**
+     * Ensures a pathname is not empty nor null and that it does lead to an 
+     * existing file or triggers an error.
+     * This is meant for checking initialization settings and does not print in
+     * the program specific log file.
+     */
+    protected void ensureFileExistsIfSet(String pathname)
+    {
+        if (pathname == null || pathname.isBlank())
+            return;
+                    
+        if (!FileUtils.checkExists(pathname))
+        {
+            String msg = "ERROR! File '" + pathname + "' not found!";
+            throw new Error(msg);
+        }
+    }
     
 //------------------------------------------------------------------------------
 
@@ -941,6 +1035,26 @@ public abstract class RunTimeParameters
     protected void ensureIsPositive(String paramName, int value, String paramKey)
     {
         if (value <= 0)
+        {
+            String msg = "ERROR! Parameter '" + paramName + "' not striktly "
+                + "positive (" + value + "). "
+                + "Please, use a positive value for '" + paramType.keywordRoot 
+                + paramKey + "'.";
+            throw new Error(msg);
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Ensures that a parameter is a positive number (x>=0) or triggers an error.
+     * This is meant for checking initialization settings and does not print in
+     * the program specific log file.
+     */
+    protected void ensureIsPositiveOrZero(String paramName, int value, 
+            String paramKey)
+    {
+        if (value < 0)
         {
             String msg = "ERROR! Parameter '" + paramName + "' is negative ("
                 + value + "). "

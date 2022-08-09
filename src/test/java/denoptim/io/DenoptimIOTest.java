@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.vecmath.Point3d;
@@ -61,6 +62,7 @@ import denoptim.graph.TemplateTest;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.fragmenter.CuttingRule;
 
 /**
  * Unit test for input/output.
@@ -345,6 +347,57 @@ public class DenoptimIOTest
 		assertTrue(allAPC.contains(APClass.make("otherClass:0")), 
 		        "Contains APClass (2)");
 	}
+	
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testAppendToJSON() throws Exception 
+    {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String pathName = tempDir.getAbsolutePath() + SEP + "vertexes.json";
+        
+        Fragment frag = new Fragment();
+        frag.addAtom(new Atom("C",new Point3d(0.0, 0.0, 1.0)));
+        frag.addAtom(new Atom("C",new Point3d(0.0, 1.0, 1.0)));
+        frag.addAPOnAtom(frag.getAtom(0), APClass.make("classAtmC:5"),
+                new Point3d(1.0, 0.0, 0.0));
+        frag.addAPOnAtom(frag.getAtom(1), APClass.make("classAtmC:5"),
+                new Point3d(1.0, 1.0, 0.0));
+        frag.projectAPsToProperties();
+        
+        Fragment frag2 = new Fragment();
+        frag2.addAtom(new Atom("O",new Point3d(0.0, 0.0, 1.0)));
+        frag2.addAPOnAtom(frag2.getAtom(0), APClass.make("Other:0"),
+                new Point3d(1.0, 0.0, 0.0));
+        frag2.projectAPsToProperties();
+
+        ArrayList<Vertex> frags = new ArrayList<Vertex>();
+        frags.add(frag);
+        frags.add(frag2);
+        
+        DenoptimIO.writeVertexesToFile(new File(pathName), FileFormat.VRTXJSON, 
+                frags);
+        
+        Fragment frag3 = new Fragment();
+        frag3.addAtom(new Atom("N",new Point3d(1.0, 0.0, 1.0)));
+        frag3.addAPOnAtom(frag3.getAtom(0), APClass.make("Other:0"),
+                new Point3d(1.0, 0.0, 0.0));
+        frag3.projectAPsToProperties();
+
+        ArrayList<Vertex> frags2 = new ArrayList<Vertex>();
+        frags2.add(frag3);
+        
+        DenoptimIO.writeVertexesToFile(new File(pathName), FileFormat.VRTXJSON, 
+                frags2, true);
+        
+        ArrayList<Vertex> frags3 = DenoptimIO.readDENOPTIMVertexesFromJSONFile(
+                pathName);
+        
+        assertEquals(3,frags3.size());
+        assertEquals("C",frags3.get(0).getIAtomContainer().getAtom(0).getSymbol());
+        assertEquals("O",frags3.get(1).getIAtomContainer().getAtom(0).getSymbol());
+        assertEquals("N",frags3.get(2).getIAtomContainer().getAtom(0).getSymbol());
+    }
 
 //------------------------------------------------------------------------------
 
@@ -426,5 +479,64 @@ public class DenoptimIOTest
         FileUtils.createDirectory(subDirName);
         assertTrue(FileFormat.GA_RUN == FileUtils.detectFileFormat(
                 new File(dirName)), "GA output folder");
+    }
+   
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testIOCuttingRules() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        
+        CuttingRule ctrA = new CuttingRule("myRuleA", 
+                "AAA", "{$([*]@C)}", "!@#", -123, null);
+        CuttingRule ctrB = new CuttingRule("myRuleB", 
+                "{$([*]@B)}", "BBB", "-", 1, null);
+       
+        ArrayList<CuttingRule> cutRules = new ArrayList<CuttingRule>();
+        cutRules.add(ctrA);
+        cutRules.add(ctrB);
+        
+        ArrayList<String> anyAtmRules = new ArrayList<String>();
+        anyAtmRules.add("BBB");
+        anyAtmRules.add("C@*{}C");
+        
+        File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "cutRule");
+        DenoptimIO.writeCuttingRules(tmpFile, anyAtmRules, cutRules);
+        
+        ArrayList<CuttingRule> readInCutRules = new ArrayList<CuttingRule>();
+        ArrayList<String> readInAnyAtmRules = new ArrayList<String>();
+        
+        DenoptimIO.readCuttingRules(tmpFile, readInAnyAtmRules, readInCutRules);
+        
+        assertEquals(cutRules.size(), readInCutRules.size());
+        
+        assertEquals(anyAtmRules,readInAnyAtmRules);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testReadCSDFormulae() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String txtFile = tempDir.getAbsolutePath() + SEP + "formulae.txt";
+        
+        String text = "REFCODE: MOL000001" + NL
+                + "Chemical" + NL
+                + "  Formula:           H2 O" + NL
+                + NL
+                + "REFCODE: BLABLA" + NL
+                + "Chemical" + NL
+                + "  Formula:           ABC" + NL
+                + NL
+                + "REFCODE: A" + NL
+                + "Chemical" + NL
+                + "  Formula:           H2 O" + NL;
+        
+        DenoptimIO.writeData(txtFile, text, false);
+        Map<String, String> data = DenoptimIO.readCSDFormulae(new File(txtFile));
+        assertEquals(3, data.size());
+        assertTrue(data.keySet().contains("MOL000001"));
+        assertTrue(data.keySet().contains("BLABLA"));
+        assertTrue(data.keySet().contains("A"));
     }
 }

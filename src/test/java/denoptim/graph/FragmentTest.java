@@ -20,6 +20,7 @@ package denoptim.graph;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,6 +36,7 @@ import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.utils.DummyAtomHandler;
 
 /**
  * Unit test for DENOPTIMFragment
@@ -185,7 +187,7 @@ public class FragmentTest
         
         return v;
     }
-
+    
 //------------------------------------------------------------------------------
 
     @Test
@@ -226,5 +228,120 @@ public class FragmentTest
     }
     
 //------------------------------------------------------------------------------
+    
+    public static Fragment makeFragmentA() throws DENOPTIMException
+    {
+        Fragment v = new Fragment();
+        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2 = new Atom("O", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
+        v.addAtom(a1);
+        v.addAtom(a2);
+        v.addAtom(a3);
+        v.addBond(new Bond(a1, a2));
+        v.addBond(new Bond(a2, a3));
+        v.addAPOnAtom(a3, APClass.make("apc:1"),
+                new Point3d(new double[]{0.0, 2.2, 3.3}));
+        v.addAPOnAtom(a3, APClass.make("apc:2"),
+                new Point3d(new double[]{0.0, 0.0, 3.3}));
+        v.addAPOnAtom(a3, APClass.make("foo:0"),
+                new Point3d(new double[]{0.0, 0.0, 1.1}));
+        v.addAPOnAtom(a1, APClass.make("foo:0"),
+                new Point3d(new double[]{3.0, 0.0, 3.3}));
+        return v;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Differs from the fragment produced by {@link #makeFragmentA()} only by
+     * the identity of one atom.
+     */
+    
+    public static Fragment makeFragmentB() throws DENOPTIMException
+    {
+        Fragment v = new Fragment();
+        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2 = new Atom("O", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        Atom a3 = new Atom("H", new Point3d(new double[]{2.0, 1.1, 2.2})); // <<= here is the difference
+        v.addAtom(a1);
+        v.addAtom(a2);
+        v.addAtom(a3);
+        v.addBond(new Bond(a1, a2));
+        v.addBond(new Bond(a2, a3));
+        v.addAPOnAtom(a3, APClass.make("apc:1"),
+                new Point3d(new double[]{0.0, 2.2, 3.3}));
+        v.addAPOnAtom(a3, APClass.make("apc:2"),
+                new Point3d(new double[]{0.0, 0.0, 3.3}));
+        v.addAPOnAtom(a3, APClass.make("foo:0"),
+                new Point3d(new double[]{0.0, 0.0, 1.1}));
+        v.addAPOnAtom(a1, APClass.make("foo:0"),
+                new Point3d(new double[]{3.0, 0.0, 3.3}));
+        return v;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Differs from the fragment produced by {@link #makeFragmentA()} only by
+     * the one {@link APCLass}. 
+     */
+    
+    public static Fragment makeFragmentC() throws DENOPTIMException
+    {
+        Fragment v = new Fragment();
+        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2 = new Atom("O", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        Atom a3 = new Atom("C", new Point3d(new double[]{2.0, 1.1, 2.2}));
+        v.addAtom(a1);
+        v.addAtom(a2);
+        v.addAtom(a3);
+        v.addBond(new Bond(a1, a2));
+        v.addBond(new Bond(a2, a3));
+        v.addAPOnAtom(a3, APClass.make("apc:1"),
+                new Point3d(new double[]{0.0, 2.2, 3.3}));
+        v.addAPOnAtom(a3, APClass.make("apc:2"),
+                new Point3d(new double[]{0.0, 0.0, 3.3}));
+        v.addAPOnAtom(a3, APClass.make("foo:0"),
+                new Point3d(new double[]{0.0, 0.0, 1.1}));
+        v.addAPOnAtom(a1, APClass.make("foo:1"),  // <<= here is the difference
+                new Point3d(new double[]{3.0, 0.0, 3.3}));
+        return v;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testIsomorphicTo() throws Exception
+    {
+        Fragment vA = makeFragmentA();
+        Fragment vB = makeFragmentB();
+        Fragment vC = makeFragmentC();
+        assertTrue(vA.isIsomorphicTo(vA));
+        assertTrue(vB.isIsomorphicTo(vB));
+        assertTrue(vC.isIsomorphicTo(vC));
+        
+        assertFalse(vA.isIsomorphicTo(vB));
+        assertFalse(vB.isIsomorphicTo(vA));
+        assertFalse(vA.isIsomorphicTo(vC));
+        assertFalse(vB.isIsomorphicTo(vC));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testIsomorphicInLinear() throws Exception
+    {
+        Fragment vA = makeFragmentA();
+        DummyAtomHandler.addDummiesOnLinearities((Fragment) vA, 170.0);
+        Fragment vB = makeFragmentA();
 
+        assertTrue(vA.isIsomorphicTo(vA));
+        assertTrue(vA.isIsomorphicTo(vB));
+        assertTrue(vB.isIsomorphicTo(vA));
+    }
+    
+//------------------------------------------------------------------------------
+
+    
 }

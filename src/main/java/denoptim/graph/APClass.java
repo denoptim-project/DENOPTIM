@@ -120,6 +120,7 @@ public class APClass implements Cloneable,Comparable<APClass>
      * cutting rule that generated the attachment point, and the second is the
      * integer desymmetrizing the two attachment points created by braking 
      * asymmetric bonds.
+     * @throws DENOPTIMException when syntax of the string is not correct.
      */
     
     public static APClass make(String ruleAndSubclass) throws DENOPTIMException 
@@ -252,7 +253,6 @@ public class APClass implements Cloneable,Comparable<APClass>
             } else {
                 // NB: the default bond type for RCAs must not be changed, but
                 // For non-RCA APClasses we do update the bond type.
-                // TODO: trigger error instead
                 if (bt != newApc.bndTyp && !RCAAPCLASSSET.contains(newApc))
                 {
                     System.err.println("WARNING! Changing bond order of "
@@ -337,11 +337,11 @@ public class APClass implements Cloneable,Comparable<APClass>
     /**
      * Do not use this to make SDF representations. Use {@link #toSDFString()}
      * instead.
-     * @return a string meant for human reading.
+     * @return a string meant for human reading. E.g., "Rule:0".
      */
     public String toString() {
         return rule + DENOPTIMConstants.SEPARATORAPPROPSCL 
-        + Integer.toString(subClass);
+                + Integer.toString(subClass);
     }
     
 //------------------------------------------------------------------------------

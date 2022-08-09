@@ -24,7 +24,7 @@ import denoptim.graph.Vertex;
 /**
  * This class represents a subgraph feature that defined the structure of a 
  * graph. Namely, it represents either a {@link Vertex}
- * of a {@link AttachmentPoint} that needs to exist for the structure 
+ * or a {@link AttachmentPoint} that needs to exist for the structure 
  * of a subgraph to be retained.
  */
 

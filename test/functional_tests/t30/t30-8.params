@@ -1,0 +1,9 @@
+#
+# This is the parameter file for test t30-8
+# (same as t30-4 but with removal of duplicates)
+FRG-VERBOSITY=4
+FRG-STRUCTURESFILE=mols-4.sdf
+FRG-CUTTINGRULESFILE=cutRul_3.0.rul
+#FRG-ISOMORPHICSAMPLESIZE=1
+#same as
+FRG-REMOVEDUPLICATES
