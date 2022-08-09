@@ -224,7 +224,6 @@ public class FormulaUtils
         } //end of loop over mols
  
         //Find largest molecule (from formula weight)
-        int largestMol = 0;
         double largestMass = 0.0;
         for (int i = 0; i < mols.length; i++)
         {
@@ -238,7 +237,6 @@ public class FormulaUtils
             if (mass > largestMass)
             {
                 largestMass = mass;
-                largestMol = i;
             }
         }
    

@@ -155,7 +155,7 @@ public class FormulaUtilsTest
         for (String el : els)
         {
             sb.append(" ").append(el);
-            sb.append(String.format(" %.1f", elCounts.get(el)));
+            sb.append(GenUtils.getEnglishFormattedDecimal(" #.#", 1, elCounts.get(el)));
         }
         return sb.toString().trim();
     }
@@ -173,7 +173,7 @@ public class FormulaUtilsTest
             sb.append(" ").append(el);
             for (Double v : elCounts.get(el))
             {
-                sb.append(String.format(" %.1f", v));
+                sb.append(GenUtils.getEnglishFormattedDecimal(" #.#", 1, v));
             }
         }
         return sb.toString().trim();
