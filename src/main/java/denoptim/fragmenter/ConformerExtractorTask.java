@@ -92,6 +92,11 @@ public class ConformerExtractorTask extends Task
     private File isoFamMembersFile;
     
     /**
+     * List of fragments defining an isomorphic family to analyse.
+     */
+    private List<ClusterableFragment> sample;
+    
+    /**
      * The data structure holding the results of this task.
      */
     protected String results = null;
@@ -112,8 +117,53 @@ public class ConformerExtractorTask extends Task
     private String logFilePathname = "unset";
 
 //------------------------------------------------------------------------------
-    
 
+    /**
+     * Constructs a task that will analyze the given isomorphic family.
+     * @param isomorphicFamily the fragments belonging to the isomorphic 
+     * family to analyze. We do check for isomorphism and keep only the 
+     * fragments that have an isomorphism with the first fragment in this list.
+     * @param settings parameters controlling the job.
+     * @throws SecurityException
+     * @throws IOException
+     */
+    public ConformerExtractorTask(List<Vertex> isomorphicFamily, 
+            FragmenterParameters settings) throws SecurityException, IOException
+    {
+        super(TaskUtils.getUniqueTaskIndex());
+        if (isomorphicFamily.size()==0)
+        {
+            throw new Error("Attempt to create a " 
+                    + this.getClass().getSimpleName() + " from empty list of "
+                    + "fragments.");
+        }
+        this.isomorphicFamilyId = "undefinedIsoFamID";
+        this.settings = settings;
+        this.logger = settings.getLogger();
+        
+        List<ClusterableFragment> sample = new ArrayList<ClusterableFragment>();
+        for (int i=0; i<isomorphicFamily.size(); i++)
+        {
+            Fragment frag = (Fragment) isomorphicFamily.get(i);
+            populateListOfClusterizableFragments(sample, frag, logger, 
+                    i + " ");
+        }
+        this.sample = sample;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructs a task that will analyze the isomorphic family of the given 
+     * fragment. We expect to find the rest of its family in filenames
+     * conventionally names according to 
+     * {@link FragmenterParameters#getMWSlotFileNameAllFrags(String)}.
+     * @param oldChampions one of the fragments belonging to the isomorphic 
+     * family to analyze. 
+     * @param settings parameters controlling the job.
+     * @throws SecurityException
+     * @throws IOException
+     */
     public ConformerExtractorTask(Vertex oldChampions, 
             FragmenterParameters settings) throws SecurityException, IOException
     {
@@ -175,7 +225,8 @@ public class ConformerExtractorTask extends Task
     @Override
     public Object call() throws Exception
     {
-        List<ClusterableFragment> sample = collectClusterableFragmentsFromFile();
+        if (isoFamMembersFile!=null)
+            sample = collectClusterableFragmentsFromFile();
         
         FragmentClusterer clusterer = new FragmentClusterer(sample, settings, 
                 logger);
@@ -191,6 +242,11 @@ public class ConformerExtractorTask extends Task
             representativeFragments = clusterer.getNearestToClusterCentroids();
             pathname = getChosenFragPathname(settings, isomorphicFamilyId);
         }
+        if (settings.isStandaloneFragmentClustering())
+        {
+            pathname = FragmenterTask.getResultsFileName(settings);
+        }
+        
         List<Vertex> representativeVertexes = new ArrayList<Vertex>();
         representativeVertexes.addAll(representativeFragments);
         DenoptimIO.writeVertexesToFile(new File(pathname), FileFormat.VRTXSDF, 
@@ -327,47 +383,72 @@ public class ConformerExtractorTask extends Task
                 continue;
             }
             
-            // The clusterable fragments are fragment with a consistent
-            // ordering of the atoms/APs list, so that such order can be used
-            // to calculate RMSD between fragments.
-            ClusterableFragment clusterable =  new ClusterableFragment(frag);
-            if (sample.size()==0)
-            {
-                clusterable.setOrderOfNodes(
-                        clusterable.getJGraphFragIsomorphism().vertexSet());
-                sample.add(clusterable);
-                firstFrag = frag;
-            } else {
-                FragmentAlignement fa;
-                try
-                {
-                    fa = new FragmentAlignement(firstFrag, frag);
-                } catch (DENOPTIMException e)
-                {
-                    if (logger !=null)
-                        logger.log(Level.WARNING, "Skipping fragment " + molId 
-                            + " '" + mol.getTitle() + "' because no "
-                            + "isomorphism could be found with the first "
-                            + "fragment in the sample.");
-                    continue;
-                }
-                
-                List<FragIsomorphNode> orderedNodes = 
-                        new ArrayList<FragIsomorphNode>();
-                for (FragIsomorphNode nOnFirst : sample.get(0).getOrderedNodes())
-                {
-                    orderedNodes.add(
-                            fa.getLowestRMSDMapping().getVertexCorrespondence(
-                                    nOnFirst, true));
-                }
-                clusterable.setOrderOfNodes(orderedNodes);
-                sample.add(clusterable);
-            }
+            populateListOfClusterizableFragments(sample, frag, logger, 
+                    molId + " " + molName);
         }
         if (logger !=null)
             logger.log(Level.INFO, "Sample for " + isomorphicFamilyId 
                     + " contains " + sample.size() + " fragments.");
         return sample;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Tries to add a fragment into a sample of isomorphic fragments. Looks
+     * for an isomorphism to define a consistent ordering of 
+     * {@link FragIsomorphNode} that allows clustering of fragments.
+     * @param sample the collection of isomorphic fragments. Can be empty, in 
+     * which case, we just add the fragment into this list.
+     * @param frag the fragment that we try to add to the sample.
+     * @param logger where any log should be posted.
+     * @param fragId a string identifying the fragment. Typically the index in 
+     * a list of fragments.
+     * @return <code>true</code> if the fragment has been added to the sample
+     * of <code>false</code> if no isomorphism could be found and, therefore,
+     * the fragment is not added to the sample.
+     */
+    public static boolean populateListOfClusterizableFragments(
+            List<ClusterableFragment> sample, Fragment frag, Logger logger,
+            String fragId)
+    {
+        // The clusterable fragments are fragment with a consistent
+        // ordering of the atoms/APs list, so that such order can be used
+        // to calculate RMSD between fragments.
+        ClusterableFragment clusterable =  new ClusterableFragment(frag);
+        if (sample.size()==0)
+        {
+            clusterable.setOrderOfNodes(
+                    clusterable.getJGraphFragIsomorphism().vertexSet());
+            sample.add(clusterable);
+        } else {
+            FragmentAlignement fa;
+            try
+            {
+                fa = new FragmentAlignement(sample.get(0).getOriginalFragment(),
+                        frag);
+            } catch (DENOPTIMException e)
+            {
+                if (logger !=null)
+                    logger.log(Level.WARNING, "Skipping fragment " + fragId 
+                        + " because no "
+                        + "isomorphism could be found with the first "
+                        + "fragment in the sample.");
+                return false;
+            }
+            
+            List<FragIsomorphNode> orderedNodes = 
+                    new ArrayList<FragIsomorphNode>();
+            for (FragIsomorphNode nOnFirst : sample.get(0).getOrderedNodes())
+            {
+                orderedNodes.add(
+                        fa.getLowestRMSDMapping().getVertexCorrespondence(
+                                nOnFirst, true));
+            }
+            clusterable.setOrderOfNodes(orderedNodes);
+            sample.add(clusterable);
+        }
+        return true;
     }
     
 //------------------------------------------------------------------------------
@@ -413,7 +494,7 @@ public class ConformerExtractorTask extends Task
             String isomorphicFamilyId)
     {
         return settings.getWorkDirectory() + DenoptimIO.FS 
-                + isomorphicFamilyId + "_chosen.sdf";
+                + isomorphicFamilyId + "_mostCentralFrags.sdf";
     }
     
 //------------------------------------------------------------------------------

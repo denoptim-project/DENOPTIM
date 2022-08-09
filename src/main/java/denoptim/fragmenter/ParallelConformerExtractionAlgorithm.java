@@ -99,9 +99,9 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
 //-----------------------------------------------------------------------------
 
     /**
-     * Constructor
+     * Constructor. We expect to run this from 
+     * {@link ParallelFragmentationAlgorithm}.
      */
-
     public ParallelConformerExtractionAlgorithm(FragmenterParameters settings)
     {
         super(settings.getNumTasks(), settings.getLogger());

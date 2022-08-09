@@ -19,10 +19,15 @@
 package denoptim.programs.fragmenter;
 
 import java.io.File;
+import java.util.List;
 
 import denoptim.combinatorial.CombinatorialExplorerByLayer;
+import denoptim.fragmenter.ConformerExtractorTask;
 import denoptim.fragmenter.ParallelFragmentationAlgorithm;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.graph.Vertex;
+import denoptim.graph.Vertex.BBType;
+import denoptim.io.DenoptimIO;
 import denoptim.task.ProgramTask;
 
 
@@ -64,8 +69,18 @@ public class Fragmenter extends ProgramTask
         settings.startProgramSpecificLogger(loggerIdentifier);
         settings.printParameters();
         
-        fragAlgorithm = new ParallelFragmentationAlgorithm(settings);
-        fragAlgorithm.run();
+        if (settings.isStandaloneFragmentClustering())
+        {
+
+            List<Vertex> fragments = DenoptimIO.readVertexes(
+                    new File(settings.getStructuresFile()), BBType.UNDEFINED);
+            ConformerExtractorTask cet = new ConformerExtractorTask(fragments,
+                    settings);
+            cet.call();
+        } else {
+            fragAlgorithm = new ParallelFragmentationAlgorithm(settings);
+            fragAlgorithm.run();
+        }
         
         stopLogger();
     }

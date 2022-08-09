@@ -149,10 +149,10 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
     protected boolean doPostFlightOperations()
     {
         // Identify (and possibly collect) final results. The files collecting
-        // results change depending on the task we have done, and on "how" we
-        // have done them, meaning in a parallelized fashion or not.
+        // results change depending on the task we have done, and on whether
+        // we ran them in a parallelized fashion or not.
         List<File> resultFiles = new ArrayList<File>();
-        if (settings.extactRepresentativeConformer())
+        if (settings.doExtactRepresentativeConformer())
         {
             ParallelConformerExtractionAlgorithm extractor = 
                     new ParallelConformerExtractionAlgorithm(settings);

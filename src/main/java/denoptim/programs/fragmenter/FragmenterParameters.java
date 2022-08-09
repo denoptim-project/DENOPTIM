@@ -288,6 +288,8 @@ public class FragmenterParameters extends RunTimeParameters
      */
     private int maxK = 20;
     
+    //TODO-gg remove old variables meant for k-means clustering
+    
     /**
      * Fraction of the list of clusterizable fragment (as M of 1/M) used to 
      * determine the max number of clusters to search for as data_size*1/M.
@@ -360,7 +362,7 @@ public class FragmenterParameters extends RunTimeParameters
      * the most representative fragment and make it be the champion of that
      * family.
      */
-    private boolean extactRepresentativeConformer = false;
+    private boolean doExtactRepresentativeConformer = false;
     
     /**
      * Size of on-the-fly generated, normally distributed noise-distorted 
@@ -397,6 +399,11 @@ public class FragmenterParameters extends RunTimeParameters
      * Flag requesting to print clusters of fragments to file
      */
     private boolean saveClustersOfConformerToFile = false;
+    
+    /**
+     * Flag requesting to run fragment clusterer in standalone fashion
+     */
+    private boolean isStandaloneFragmentClustering = false;
     
     
 //------------------------------------------------------------------------------
@@ -1249,12 +1256,12 @@ public class FragmenterParameters extends RunTimeParameters
                 switch (value.trim().toUpperCase())
                 {
                     case "CENTROIDS":
-                        extactRepresentativeConformer = true;
+                        doExtactRepresentativeConformer = true;
                         useCentroidsAsRepresentativeConformer = true;
                         break;
                         
                     case "MOSTCENTRAL":
-                        extactRepresentativeConformer = true;
+                        doExtactRepresentativeConformer = true;
                         useCentroidsAsRepresentativeConformer = false;
                         break;
                         
@@ -1265,13 +1272,13 @@ public class FragmenterParameters extends RunTimeParameters
                 break;
                 
             case "SAVECLUSTERS":
-                extactRepresentativeConformer = true;
+                doExtactRepresentativeConformer = true;
                 saveClustersOfConformerToFile = true;
                 break;
                 
             // Duplicated to avoid confusion on whether the '=' sign is needed or not.
             case "SAVECLUSTERS=":
-                extactRepresentativeConformer = true;
+                doExtactRepresentativeConformer = true;
                 saveClustersOfConformerToFile = true;
                 break;
 
@@ -1401,6 +1408,11 @@ public class FragmenterParameters extends RunTimeParameters
                         + targetFragmentsFile + "'", e);
             }
         }
+        
+        if (!doFragmentation && doExtactRepresentativeConformer)
+        {
+            isStandaloneFragmentClustering = true;
+        }
        
 		if (isMaster)
 		{
@@ -1491,9 +1503,9 @@ public class FragmenterParameters extends RunTimeParameters
      * @return <code>true</code> if we want to extract the most representative 
      * conformer from each isomorphic family.
      */
-    public boolean extactRepresentativeConformer()
+    public boolean doExtactRepresentativeConformer()
     {
-        return extactRepresentativeConformer;
+        return doExtactRepresentativeConformer;
     }
 
 //------------------------------------------------------------------------------
@@ -1627,6 +1639,17 @@ public class FragmenterParameters extends RunTimeParameters
             boolean saveClustersOfConformerToFile)
     {
         this.saveClustersOfConformerToFile = saveClustersOfConformerToFile;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if we are asked to run only the clustering of
+     * fragments from a given list of fragment.
+     */
+    public boolean isStandaloneFragmentClustering()
+    {
+        return isStandaloneFragmentClustering;
     }
     
 //------------------------------------------------------------------------------
