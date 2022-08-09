@@ -32,7 +32,7 @@ import denoptim.programs.RunTimeParameters.ParametersType;
 public enum FileFormat {
     
     CANDIDATESDF,
-    GRAPHJSON, GRAPHSDF, VRTXJSON, VRTXSDF,
+    GRAPHJSON, GRAPHSDF, VRTXJSON, VRTXSDF, MOLSDF,
     FSE_RUN, GA_RUN,
     
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP, GO_PARAM, CLG_PARAM, GE_PARAM, 
@@ -115,6 +115,18 @@ public enum FileFormat {
                 "^> *<" + DENOPTIMConstants.GRAPHJSONTAG + ">.*"
                 ));
         VRTXSDF.endOfSampleRegex = "\\$\\$\\$\\$";
+        
+        //------------------------------------
+        
+        MOLSDF.extension = "sdf";
+        MOLSDF.negatingRegex = new HashSet<String>(Arrays.asList(
+                "^> *<" + DENOPTIMConstants.FITNESSTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.APSTAG+">.*",
+                "^> *<" + DENOPTIMConstants.MOLERRORTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.UNIQUEIDTAG + ">.*",
+                "^> *<" + DENOPTIMConstants.GRAPHJSONTAG + ">.*"
+                ));
+        MOLSDF.endOfSampleRegex = "\\$\\$\\$\\$";
 
         //------------------------------------
         
@@ -229,6 +241,7 @@ public enum FileFormat {
                         ff = VRTXSDF;
                         break;
                     default:
+                        ff = MOLSDF;
                         break;
                 }
                 break;
@@ -319,7 +332,8 @@ public enum FileFormat {
                 // GraphSDF must come before Vertex SDF
                 FileFormat.CANDIDATESDF,
                 FileFormat.GRAPHSDF, 
-                FileFormat.VRTXSDF};
+                FileFormat.VRTXSDF,
+                FileFormat.MOLSDF};
         return a;
     }
     

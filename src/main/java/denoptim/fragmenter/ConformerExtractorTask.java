@@ -181,17 +181,20 @@ public class ConformerExtractorTask extends Task
         clusterer.cluster();
         
         List<Fragment> representativeFragments = null;
+        String pathname = "";
         if (settings.isUseCentroidsAsRepresentativeConformer())
         {
             representativeFragments = clusterer.getClusterCentroids();
+            pathname = getClusterCentroidsPathname(settings, isomorphicFamilyId);
         } else {
             representativeFragments = clusterer.getNearestToClusterCentroids();
+            pathname = getChosenFragPathname(settings, isomorphicFamilyId);
         }
         List<Vertex> representativeVertexes = new ArrayList<Vertex>();
         representativeVertexes.addAll(representativeFragments);
-        DenoptimIO.writeVertexesToFile(new File(getClusterCentroidsPathname(
-                settings, isomorphicFamilyId)), FileFormat.VRTXSDF, 
+        DenoptimIO.writeVertexesToFile(new File(pathname), FileFormat.VRTXSDF, 
                 representativeVertexes);
+        results = pathname;
         
         if (settings.isSaveClustersOfConformerToFile())
         {
@@ -380,6 +383,31 @@ public class ConformerExtractorTask extends Task
     {
         return settings.getWorkDirectory() + DenoptimIO.FS 
                 + isomorphicFamilyId + "_centroids.sdf";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Builds the pathname for the file where we save all the fragments that we
+     * found to be closest to each cluster's centroid.
+     * @param settings settings we work with.
+     * @return the pathname
+     */
+    static String getChosenFragPathname(FragmenterParameters settings, 
+            String isomorphicFamilyId)
+    {
+        return settings.getWorkDirectory() + DenoptimIO.FS 
+                + isomorphicFamilyId + "_chosen.sdf";
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the pathname to the files collecting results
+     */
+    public String getResultFile()
+    {
+        return results;
     }
 
 //------------------------------------------------------------------------------

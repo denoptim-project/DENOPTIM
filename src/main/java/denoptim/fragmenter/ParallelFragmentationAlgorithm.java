@@ -148,6 +148,10 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
 
     protected boolean doPostFlightOperations()
     {
+        // Identify (and possibly collect) final results. The files collecting
+        // results change depending on the task we have done, and on "how" we
+        // have done them, meaning in a parallelized fashion or not.
+        List<File> resultFiles = new ArrayList<File>();
         if (settings.extactRepresentativeConformer())
         {
             ParallelConformerExtractionAlgorithm extractor = 
@@ -160,93 +164,95 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
                 throw new Error("Could not extract the most common conformer. "
                         + e.getMessage(), e);
             }
+            for (String pathname : extractor.results)
+            {
+                resultFiles.add(new File(pathname));
+            }
+        } else {
+            if (settings.doManageIsomorphicFamilies())
+            {
+                // We collect only the unique champion of each isomorphic family.
+                resultFiles = getFilesCollectingIsomorphicFamilyChampions(
+                        new File(settings.getWorkDirectory()));
+            } else if (settings.getNumTasks()>1) {
+                resultFiles = submitted.stream()
+                        .filter(task -> task instanceof FragmenterTask)
+                        .map(task -> (FragmenterTask) task)
+                        .map(FragmenterTask::getResultFile)
+                        .map(pathname -> new File(pathname))
+                        .collect(Collectors.toList());
+            } else if (settings.getNumTasks()==1) {
+                // We should be here only when we run on single thread with no
+                // handling of isomorphic families (i.e., no removal of 
+                // duplicates)
+                resultFiles.add(new File (((FragmenterTask) 
+                        submitted.get(0)).results));
+            }
         }
         
-        // Identify (and possibly collect) final results
-        if (settings.doManageIsomorphicFamilies())
+        File allFragsFile;
+        FileFormat outputFormat = null;
+        if (settings.doFragmentation())
         {
-            // We collect only the unique champion of each isomorphic family.
-            List<File> files = getFilesCollectingIsomorphicFamilyChampions(
-                    new File(settings.getWorkDirectory()));
-            File allFragsFile = new File(FragmenterTask.getFragmentsFileName(
+            allFragsFile = new File(FragmenterTask.getFragmentsFileName(
                     settings));
-            switch (DENOPTIMConstants.TMPFRAGFILEFORMAT)
-            {
-                case VRTXSDF:
-                    try
-                    {
-                        FileUtils.copyFile(files.get(0), allFragsFile);
-                        DenoptimIO.appendTxtFiles(allFragsFile, 
-                                files.subList(1,files.size()));
-                    } catch (IOException e)
-                    {
-                        throw new Error("Unable to create new file '" 
-                                + allFragsFile + "'",e);
-                    }
-                    break;
-                    
-                case VRTXJSON:
-                    //TODO
-                    // also check allFragsFile: it already contains extension.
-                    throw new Error("NOT IMPLEMENTED YET!");
-                    
-                default:
-                    throw new Error("Unexpected format "
-                            + DENOPTIMConstants.TMPFRAGFILEFORMAT + " for "
-                            + "for final collection of fragments");
-            }
-            settings.getLogger().log(Level.INFO, "Unique fragments "
-                    + "collected in file " + allFragsFile);
-        } else if (settings.getNumTasks()>1) {
-            List<File> files = submitted.stream()
-                    .filter(task -> task instanceof FragmenterTask)
-                    .map(task -> (FragmenterTask) task)
-                    .map(FragmenterTask::getResultFile)
-                    .map(pathname -> new File(pathname))
-                    .collect(Collectors.toList());
-            File allFragsFile;
-            if (settings.doFragmentation())
-            {
-                allFragsFile = new File(FragmenterTask.getFragmentsFileName(
-                        settings));
-            } else {
-                allFragsFile = new File(FragmenterTask.getResultsFileName(
-                        settings));
-            }
-            switch (DENOPTIMConstants.TMPFRAGFILEFORMAT)
-            {
-                case VRTXSDF:
-                    try 
-                    {
-                        FileUtils.copyFile(files.get(0), allFragsFile);
-                        DenoptimIO.appendTxtFiles(allFragsFile, 
-                                files.subList(1,files.size()));
-                    } catch (IOException e)
-                    {
-                        throw new Error("Unable to create new file '" 
-                                + allFragsFile + "'",e);
-                    }
-                    break;
-                    
-                case VRTXJSON:
-                    //TODO
-                    // also check allFragsFile: it already contains extension.
-                    throw new Error("NOT IMPLEMENTED YET!");
-                    
-                default:
-                    throw new Error("Unexpected format "
-                            + DENOPTIMConstants.TMPFRAGFILEFORMAT + " for "
-                            + "for final collection of fragments");
-            }
-            settings.getLogger().log(Level.INFO, "Results "
-                    + "collected in file " + allFragsFile);
-            
-        } else if (settings.getNumTasks()==1) {
-            // We should be here only when we run on single thread with no
-            // handling of isomorphic families (i.e., no removal of duplicates)
-            settings.getLogger().log(Level.INFO, "Results "
-                    + "in file " + ((FragmenterTask) submitted.get(0)).results);
+            outputFormat = DENOPTIMConstants.TMPFRAGFILEFORMAT;
+        } else {
+            allFragsFile = new File(FragmenterTask.getResultsFileName(
+                    settings));
+            outputFormat = FileFormat.MOLSDF;
         }
+        
+        switch (outputFormat)
+        {
+            case MOLSDF:
+                try
+                {
+                    FileUtils.copyFile(resultFiles.get(0), allFragsFile);
+                    if (resultFiles.size()>1)
+                    {
+                        DenoptimIO.appendTxtFiles(allFragsFile, 
+                                resultFiles.subList(1,resultFiles.size()));
+                    }
+                } catch (IOException e)
+                {
+                    throw new Error("Unable to create new file '" 
+                            + allFragsFile + "'",e);
+                }
+                break;
+            
+            case VRTXSDF:
+                try
+                {
+                    FileUtils.copyFile(resultFiles.get(0), allFragsFile);
+                    if (resultFiles.size()>1)
+                    {
+                        DenoptimIO.appendTxtFiles(allFragsFile, 
+                                resultFiles.subList(1,resultFiles.size()));
+                    }
+                } catch (IOException e)
+                {
+                    throw new Error("Unable to create new file '" 
+                            + allFragsFile + "'",e);
+                }
+                break;
+                
+            case VRTXJSON:
+                //TODO
+                // also check allFragsFile: it already contains extension.
+                throw new Error("NOT IMPLEMENTED YET!");
+                
+            
+                
+            default:
+                throw new Error("Unexpected format "
+                        + DENOPTIMConstants.TMPFRAGFILEFORMAT + " for "
+                        + "for final collection of fragments");
+        }
+        
+        settings.getLogger().log(Level.INFO, "Results "
+                + "collected in file " + allFragsFile);
+        
         return true;
     }
     

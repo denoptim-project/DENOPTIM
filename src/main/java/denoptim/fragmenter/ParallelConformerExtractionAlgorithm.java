@@ -66,6 +66,7 @@ import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.ParallelAsynchronousTaskExecutor;
+import denoptim.task.Task;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 import edu.uci.ics.jung.visualization.spatial.FastRenderingGraph;
@@ -91,6 +92,14 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
      * representative champion.
      */
     private int sampleSize = 1;
+    
+    /**
+     * List of pathnames collecting the most representative conformers, 
+     * as defined
+     * by the settings (i.e., either cluster centroids or fragment closest to
+     * the centroids).
+     */
+    protected List<String> results = new ArrayList<String>();
 
     
 //-----------------------------------------------------------------------------
@@ -143,10 +152,10 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
             }
             for (Vertex oldChampion : oldChampions)
             {
-                ConformerExtractorTask_BUTTA task;
+                ConformerExtractorTask task;
                 try
                 {
-                    task = new ConformerExtractorTask_BUTTA(oldChampion, settings);
+                    task = new ConformerExtractorTask(oldChampion, settings);
                 } catch (SecurityException | IOException e)
                 {
                     throw new Error("Unable to start fragmentation thread.",e);
@@ -160,6 +169,10 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
 
     protected boolean doPostFlightOperations()
     {
+        for (Task t : submitted)
+        {
+            results.add(((ConformerExtractorTask)t).getResultFile());
+        }
         return true;
     }
  
