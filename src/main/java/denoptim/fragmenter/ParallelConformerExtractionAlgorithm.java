@@ -88,12 +88,6 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
     private FragmenterParameters settings = null;
     
     /**
-     * Max number of isomorphic fragment among which we search for a 
-     * representative champion.
-     */
-    private int sampleSize = 1;
-    
-    /**
      * List of pathnames collecting the most representative conformers, 
      * as defined
      * by the settings (i.e., either cluster centroids or fragment closest to
@@ -118,13 +112,6 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
 
     protected boolean doPreFlightOperations()
     {
-        sampleSize = Math.min(FragmenterParameters.MAXISOMORPHICSAMPLESIZE, 
-                settings.getIsomorphicSampleSize());
-        if (sampleSize < settings.getIsomorphicSampleSize())
-        {
-            settings.getLogger().log(Level.WARNING, "Limiting the sample of "
-                    + "isomorphic fragments to " + sampleSize);
-        }
         return true;
     }
         
@@ -132,7 +119,7 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
 
     protected void createAndSubmitTasks()
     {
-        // Looping over the current champions. There are just the first fragment 
+        // Looping over the current champions. These are just the first fragment 
         // found for each isomorphic family's sample.
         for (File mwSlotFile : ParallelFragmentationAlgorithm
                 .getFilesCollectingIsomorphicFamilyChampions(new File(

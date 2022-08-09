@@ -1244,6 +1244,48 @@ public class FragmenterParameters extends RunTimeParameters
                 fragRetentionSMARTS.put(value, value);
                 doFiltering = true;
                 break;
+
+            case "CLUSTERIZEANDCOLLECT=":
+                switch (value.trim().toUpperCase())
+                {
+                    case "CENTROIDS":
+                        extactRepresentativeConformer = true;
+                        useCentroidsAsRepresentativeConformer = true;
+                        break;
+                        
+                    case "MOSTCENTRAL":
+                        extactRepresentativeConformer = true;
+                        useCentroidsAsRepresentativeConformer = false;
+                        break;
+                        
+                    default:
+                        throw new DENOPTIMException("Unable to parse value of " 
+                                + key + ": '" + value + "'");
+                }
+                break;
+                
+            case "SAVECLUSTERS":
+                extactRepresentativeConformer = true;
+                saveClustersOfConformerToFile = true;
+                break;
+                
+            // Duplicated to avoid confusion on whether the '=' sign is needed or not.
+            case "SAVECLUSTERS=":
+                extactRepresentativeConformer = true;
+                saveClustersOfConformerToFile = true;
+                break;
+
+            case "SIZEUNIMODALPOPULATION=":
+                sizeUnimodalPop = Integer.parseInt(value);
+                break;
+                
+            case "MAXNOISEUNIMODALPOPULATION=":
+                maxNoiseUnimodalPop = Double.parseDouble(value);
+                break;
+
+            case "SDWEIGHTUNIMODALPOPULATION=":
+                factorForSDOnStatsOfUnimodalPop = Double.parseDouble(value);
+                break;
                 
 /*
             case "=":

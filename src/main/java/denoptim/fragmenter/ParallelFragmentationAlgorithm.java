@@ -258,7 +258,8 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
     
 //------------------------------------------------------------------------------
     
-    protected static List<File> getFilesCollectingIsomorphicFamilyChampions(File workDir)
+    protected static List<File> getFilesCollectingIsomorphicFamilyChampions(
+            File workDir)
     {
         List<File> files = Arrays.stream(workDir.listFiles(new FileFilter(){
             @Override

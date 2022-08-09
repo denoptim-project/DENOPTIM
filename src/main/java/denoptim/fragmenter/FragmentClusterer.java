@@ -117,7 +117,8 @@ public class FragmentClusterer
      * the standard deviation when adding it to the mean of the RMSD of the 
      * unimodal population. The resulting value is the threshold RMSD value that
      * is used to decide if two geometries are part of the same unimodal
-     *  distribution, i.e., the same cluster.
+     * distribution, i.e., the same cluster.
+     *  
      * @throws DENOPTIMException if an isomorphism is not found.
      */
     public FragmentClusterer(List<ClusterableFragment> data,
@@ -125,7 +126,45 @@ public class FragmentClusterer
     {
         this.data = data;
         this.settings = settings;
-        this.logger = settings.getLogger();
+        this.logger = null;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructor for a clusterer of fragments. Clustering is based on the
+     * geometry of the arrangement of atoms and attachment points. To compare
+     * the positions in space of each point consistently, we need a consistent 
+     * mapping of the points, i.e., a 
+     * definition of that is the correct order of points for each fragment to
+     * analyze. Use {@link FragmentAlignement} to find such mapping to produce
+     * {@link ClusterableFragment} that have a ordered sets of points 
+     * reflecting a consistent mapping throughout the list of fragments.
+     * @param data collection of fragments to clusterize. The coordinates vector
+     * of each of these is expected to have a consistent ordering, but the 
+     * value of the coordinates will be edited to align the geometries.
+     * @param settings configuration of the clustering method. This includes the 
+     * size, max amount of noise of the reference unimodal population with 
+     * normally distributed noise used to calculate the RMSD of a unimodal
+     * distribution of distotsions. It also define the factor used to weight 
+     * the standard deviation when adding it to the mean of the RMSD of the 
+     * unimodal population. The resulting value is the threshold RMSD value that
+     * is used to decide if two geometries are part of the same unimodal
+     * distribution, i.e., the same cluster.
+     * @param logger where to put all log. Note that due to the likely 
+     * parallelization of fragment clustering tasks, usually there are
+     * multiple instances of this class, and we usually prefer to log each
+     * instance independently. Therefore, here one can offer a specific logger
+     * to use instead of that from the {@link FragmenterParameters} parameter.
+     *  
+     * @throws DENOPTIMException if an isomorphism is not found.
+     */
+    public FragmentClusterer(List<ClusterableFragment> data,
+            FragmenterParameters settings, Logger logger)
+    {
+        this.data = data;
+        this.settings = settings;
+        this.logger = logger;
     }
     
 //------------------------------------------------------------------------------

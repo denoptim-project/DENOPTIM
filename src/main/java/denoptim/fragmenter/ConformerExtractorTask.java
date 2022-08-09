@@ -140,7 +140,7 @@ public class ConformerExtractorTask extends Task
             logger.removeHandler(logger.getHandlers()[0]);
         }
         this.logFilePathname = settings.getWorkDirectory() + DenoptimIO.FS 
-                + taskAndFamId;
+                + taskAndFamId + ".log";
         FileHandler fileHdlr = new FileHandler(logFilePathname);
         SimpleFormatter formatterTxt = new SimpleFormatter();
         fileHdlr.setFormatter(formatterTxt);
@@ -177,7 +177,8 @@ public class ConformerExtractorTask extends Task
     {
         List<ClusterableFragment> sample = collectClusterableFragmentsFromFile();
         
-        FragmentClusterer clusterer = new FragmentClusterer(sample, settings);
+        FragmentClusterer clusterer = new FragmentClusterer(sample, settings, 
+                logger);
         clusterer.cluster();
         
         List<Fragment> representativeFragments = null;
@@ -292,24 +293,31 @@ public class ConformerExtractorTask extends Task
             {
                 continue;
             }
+            
+            String molName = "";
+            if (mol.getTitle()!=null && !mol.getTitle().isBlank())
+                molName = "'" + mol.getTitle() + "' ";
+            
             Fragment frag = null;
             if (isomorphicFamilyId.equals(prop.toString()))
             {
+                
                 try
                 {
                     logger.log(Level.INFO,"Adding fragment " + molId 
-                            + " '" + mol.getTitle() + "' to the sample.");
+                            + " " + molName + "to the sample of isomorphic "
+                            + "family.");
                     frag = new Fragment(mol,BBType.UNDEFINED);
                 } catch (DENOPTIMException e)
                 {
                     logger.log(Level.WARNING, "Skipping fragment " + molId 
-                            + " '" + mol.getTitle() + "' because it could not "
+                            + " " + molName + "because it could not "
                             + "be converted into a fragment.");
                     continue;
                 }
             } else {
                 logger.log(Level.INFO, "Skipping fragment " + molId 
-                        + " '" + mol.getTitle() + "' because it does not "
+                        + " " + molName + "because it does not "
                         + "belong to isomorphic family '" + isomorphicFamilyId 
                         + "'.");
                 continue;
