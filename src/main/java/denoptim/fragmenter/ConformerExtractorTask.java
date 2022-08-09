@@ -301,7 +301,6 @@ public class ConformerExtractorTask extends Task
             Fragment frag = null;
             if (isomorphicFamilyId.equals(prop.toString()))
             {
-                
                 try
                 {
                     logger.log(Level.INFO,"Adding fragment " + molId 

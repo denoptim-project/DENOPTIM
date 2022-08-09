@@ -118,7 +118,10 @@ public class Fragment extends Vertex
 
     /**
      * Constructor from an atom container, which has APs only as 
-     * molecular properties. WARNING: other properties of the atom container
+     * molecular properties. Property 
+     * {@link DENOPTIMConstants#ISOMORPHICFAMILYID} is copied into the fragment,
+     * if present.
+     * WARNING: other properties of the atom container
      * are not imported!
      * @param vertexId the identifier of the vertex to construct
      * @param mol the molecular representation
@@ -151,6 +154,13 @@ public class Fragment extends Vertex
         this.setAsRCV(getNumberOfAPs() == 1
                 && APClass.RCAAPCLASSSET.contains(
                         getAttachmentPoints().get(0).getAPClass()));
+        
+        Object isomorph = mol.getProperty(DENOPTIMConstants.ISOMORPHICFAMILYID);
+        if (isomorph != null)
+        {
+            this.setProperty(DENOPTIMConstants.ISOMORPHICFAMILYID, 
+                    isomorph.toString());
+        }
     }
 
 //------------------------------------------------------------------------------
