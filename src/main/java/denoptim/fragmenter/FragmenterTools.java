@@ -616,7 +616,7 @@ public class FragmenterTools
                 continue;
             }
            
-            // Apply further options of cutting rule
+            // Get atoms matching cutting rule queries
             Mappings purgedPairs = msq.getMatchesOfSMARTS(ruleName);
             
             // Evaluate subclass membership and eventually store target bonds
@@ -632,7 +632,10 @@ public class FragmenterTools
                 }
                 MatchedBond tb = new MatchedBond(mol.getAtom(pair[0]),
                         mol.getAtom(pair[1]), rule);
-                bondsMatched.add(tb);
+                
+                // Apply any further option of the cutting rule
+                if (tb.satisfiesRuleOptions(logger))
+                    bondsMatched.add(tb);
             }
 
             if (!bondsMatched.isEmpty())

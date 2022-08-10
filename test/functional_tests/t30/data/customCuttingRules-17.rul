@@ -1,0 +1,4 @@
+# 
+# Cutting rules meant only to run a specific test
+#
+CTR cn 0 [#7] [#6] ~ RING>5 OMRING>5

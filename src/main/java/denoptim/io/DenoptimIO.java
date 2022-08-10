@@ -2333,8 +2333,7 @@ public class DenoptimIO
      * the text contained in the file.
      */
     public static void readCuttingRules(File file, 
-            List<CuttingRule> cutRules) 
-                    throws DENOPTIMException
+            List<CuttingRule> cutRules) throws DENOPTIMException
     {   
         ArrayList<String> allLines = readList(file.getAbsolutePath());
         
