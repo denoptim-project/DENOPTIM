@@ -2327,44 +2327,17 @@ public class DenoptimIO
     /**
      * Read cutting rules from a properly formatted text file.
      * @param file the file to read.
-     * @param anyAtomRules the collector of the strings used to identify an
-     * any-atom query.
      * @param cutRules the collector of the cutting rules. The collection is 
-     * already sorted by priority when wthis methos returns.
+     * already sorted by priority when this method returns.
      * @throws DENOPTIMException in case there are errors in the formatting of 
      * the text contained in the file.
      */
     public static void readCuttingRules(File file, 
-            List<String> anyAtomRules, List<CuttingRule> cutRules) 
+            List<CuttingRule> cutRules) 
                     throws DENOPTIMException
     {   
         ArrayList<String> allLines = readList(file.getAbsolutePath());
         
-        //Collect definitions of "any-atom": the rule's components used to match
-        // any element even dummies.
-        ArrayList<String> anyAtmLines = new ArrayList<String>();
-        allLines.stream()
-            .filter(line -> line.trim().startsWith("ANY"))
-            .forEach(line -> anyAtmLines.add(line.trim()));
-        if (anyAtmLines.size() == 0)
-        {
-            anyAtomRules.add("[$([*;!#1])]");
-            anyAtomRules.add("[$(*)]");
-        } else {
-            for (int i = 0; i<anyAtmLines.size(); i++)
-            {
-                try
-                {
-                    String[] words = anyAtmLines.get(i).split("\\s+");
-                    anyAtomRules.add(words[1]);
-                } catch (Throwable t) {
-                    throw new DENOPTIMException("ERROR in getting 'any-atom' "
-                            + "string. Check line '" + anyAtmLines.get(i) + "'"
-                            + "in file '" + file + "'.", t);
-                }
-            }
-        }
-
         //Now get the list of cutting rules
         ArrayList<String> cutRulLines = new ArrayList<String>();
         allLines.stream()

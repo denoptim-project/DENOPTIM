@@ -91,12 +91,6 @@ public class FragmenterParameters extends RunTimeParameters
     List<CuttingRule> cuttingRules;
     
     /**
-     * List of known 'any-atom' SMARTS queries. We keep this information to
-     * by-pass any attempt to search for any atom.
-     */
-    List<String> anyAtomQuesties;
-    
-    /**
      * Number of parallel tasks to run.
      */
     private int numParallelTasks = 1;
@@ -449,16 +443,6 @@ public class FragmenterParameters extends RunTimeParameters
     public List<CuttingRule> getCuttingRules()
     {
         return cuttingRules;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * @return the SMRTS strings used in the cutting rules to identify any atom.
-     */
-    public List<String> getAnyAtomQuesties()
-    {
-        return anyAtomQuesties;
     }
 
 //------------------------------------------------------------------------------
@@ -1175,12 +1159,10 @@ public class FragmenterParameters extends RunTimeParameters
         if (isMaster)
             createWorkingDirectory();
         
-        anyAtomQuesties = new ArrayList<String>();
         cuttingRules = new ArrayList<CuttingRule>();
         if (cutRulesFile!=null && !cutRulesFile.isBlank())
         {
-            DenoptimIO.readCuttingRules(new File(cutRulesFile), anyAtomQuesties, 
-                    cuttingRules);
+            DenoptimIO.readCuttingRules(new File(cutRulesFile), cuttingRules);
         }
         if (formulaeFile!=null && !formulaeFile.isBlank())
         {

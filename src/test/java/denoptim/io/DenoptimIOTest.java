@@ -504,13 +504,9 @@ public class DenoptimIOTest
         DenoptimIO.writeCuttingRules(tmpFile, anyAtmRules, cutRules);
         
         ArrayList<CuttingRule> readInCutRules = new ArrayList<CuttingRule>();
-        ArrayList<String> readInAnyAtmRules = new ArrayList<String>();
-        
-        DenoptimIO.readCuttingRules(tmpFile, readInAnyAtmRules, readInCutRules);
+        DenoptimIO.readCuttingRules(tmpFile, readInCutRules);
         
         assertEquals(cutRules.size(), readInCutRules.size());
-        
-        assertEquals(anyAtmRules,readInAnyAtmRules);
     }
     
 //------------------------------------------------------------------------------
