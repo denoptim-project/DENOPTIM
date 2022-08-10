@@ -126,6 +126,7 @@
 				<li><a href="#Toc17846_799972446">FragSpaceExplorer Output</a></li>
 				<li><a href="#Toc5490_1476255988">Restart FragSpaceExplorer from Checkpoint file</a></li>
 			</ul></li>
+			<li><a href="#Toc2222_0">Fragmenter</a></li>
 			<li><a href="#Toc9999_2">Graph Editor</a></li>
 			<li><a href="#Toc9999_4">Genetic Operator</a></li>
 			<li><a href="#Toc9999_5">Fitness Provider Runner</a></li>
@@ -141,6 +142,7 @@
 			<li><a href="#Toc40918_1191730726">3D Molecular Models Builder</a></li>
 			<li><a href="#Toc13097_799972446">FragmentSpaceExplorer</a></li>
 			<li><a href="#Toc13097_123456789">Fitness provider</a></li>
+			<li><a href="#Toc2222_1">Fragmenter</a></li>
 			<li><a href="#Toc88888_1">Stand-alone Graph Editor</a></li>
 			<!--<li><a href="#Toc88888_2">Stand-alone Genetic Operator</a></li>-->
 			<li><a href="#Toc88888_3">Stand-alone Fitness Runner</a></li>
@@ -276,8 +278,7 @@ The APClass can be defined also by the user (e.g., via the GUI) as long as it ad
 	<li><code>&lt;string&gt;</code> is an alphanumeric string, and</li>
 	<li><code>&lt;int&gt;</code> is a positive integer number.</li>
 </ul>
-This syntax is best explain by providing an example of how molecular fragment can be generated from whole molecules. In particular, we consider our own fragmentation algorithm (see <a href="https://doi.org/10.1021/ci4007497"><i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 3, 767–780</a> - implementation available at
-<a href="https://github.com/denoptim-project/GM3DFragmenter">https://github.com/denoptim-project/GM3DFragmenter</a>).
+This syntax is best explain by providing an example of how molecular fragment can be generated from whole molecules. In particular, we consider our own fragmentation algorithm (see <a href="https://doi.org/10.1021/ci4007497"><i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 3, 767–780</a>), which is implemented in the program <a href="#Toc2222_0">Fragmenter</a>.
 This fragmentation algorithm
 uses cutting rules to identify the bond to break in order to generate fragments. 
 For each broken bond two attachment
@@ -607,9 +608,16 @@ the checkpoint file are considered to be lost and will be
 re-submitted upon restart of the FSE run. Therefore, to avoid duplicates the files related to those
 “lost” calculations should be collected and isolated.</p>
 
+<h2 class="western"><a name="Toc2222_0"></a>Fragmenter</h2>
+<p>Fragmenter is a program that performs fragmentation of molecules and management of fragments. Fragmentation is based on the application of bond-cutting rules that identify which bonds should be broken (see <a href="https://doi.org/10.1021/ci4007497"><i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 3, 767–780</a>). Each broken bond is replaces by a pair of attachment points: one attachment point on each of the atoms (or pseudoatoms) that were originally bonded. The attachment point class (APClass) on each such attachment points is defined by the string identifying the cutting rule (i.e., the rule name) and an integer that distinguish the two ends of the broken bond. For example, if the cutting rule is named <code>myCuttingRule</code>, the two APs will have APClass <code>myCuttingRule:0</code> and <code>myCuttingRule:1</code>.</p>
+<p>Fragmenter can also filter fragments according to criteria based on fragment's molecular formula, number of non-Hydrogen atoms, substructures (by SMARTS), and pool of attachment points. Moreover, graph-isomorphic fragments (i.e., fragments that have the same topological structure of atoms, bonds, and attachment points, but possibly different geometry) can be collected and analyzed by Fragmenter to identify clusters of geometries and extract the most representative geometry for each cluster. Both filtration and clustering are tasks that can be performed during the fragmentation of molecules or in a standalone fashion.</p>
+<p>The Fragmenter can be run with this command:
+<pre class="bash"><code>denoptim -r FRG input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">keywords</a> providing all input parameters and settings.</p>
+
 
 <h2 class="western"><a name="Toc9999_2"></a>Graph Editor</h2>
-<p>Graph Editor is a program for editing graphs from the command line. This allows embedding a graph edit task in any workflow external to denoptim. For example, in the fitness evaluation workflow of an external provider.</p>
+<p>Graph Editor is a program for editing graphs from the command line. This allows embedding a graph edit task in any work flow external to denoptim. For example, in the fitness evaluation work flow of an external provider.</p>
 <p>The graph editor can be run with this command:
 <pre class="bash"><code>denoptim -r GE input_parameters_file</code></pre>
 where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">keywords</a> providing all input parameters. Among these settings there is a text-based definition of the graph editing task. See <a href="#Toc9999_3">Graph Editing Task Files</a>.</p>
@@ -623,7 +631,7 @@ where <code>input_parameters_file</code> is a text parameters file with the <a h
 
 
 <h2 class="western"><a name="Toc9999_5"></a>Fitness Provider Runner</h2>
-<p>This is a program to lauch a fitness provider (internal or external) in the same way as done from within GA or FSE runs, but straight from the command line-</p>
+<p>This is a program to launch a fitness provider (internal or external) in the same way as done from within GA or FSE runs, but straight from the command line-</p>
 <p>This program can be run with this command:
 <pre class="bash"><code>denoptim -r FIT input_parameters_file</code></pre>
 where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
@@ -866,7 +874,7 @@ without providing that specific keyword in the input file.</p>
 	<tr valign="middle">
 		<td width="46%" style="background: #ffffff;  "><p><code>RC-Verbosity</code></p>
 		</td>
-		<td width="54%" style="background: #ffffff;  "><p>Specifies the verbosity level of the ring closing machinery.</p>
+		<td width="54%" style="background: #ffffff;  "><p>Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity. </p>
 		</td>
 	</tr>
 	<tr>
@@ -1427,7 +1435,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 	<tr valign="middle">
 		<td width="40%"><p><code>3DB-Verbosity</code></p>
 		</td>
-		<td width="60%"><p>Specifies the verbosity level.</p>
+		<td width="60%"><p>Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity. </p>
 		</td>
 	</tr>
 	<tr>
@@ -1578,7 +1586,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 	<tr valign="middle">
 		<td width="40%"><p><code>FSE-Verbosity</code></p>
 		</td>
-		<td width="60%"><p>Specifies the verbosity level.</p>
+		<td width="60%"><p>Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity. </p>
 		</td>
 	</tr>
 	<tr>
@@ -1691,6 +1699,216 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		</td>
 	</tr>
 </table>
+
+
+<br>
+<h3 class="western"><a name="Toc2222_1"></a>Fragmenter</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>  
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-WORKDIR</code></p>
+		</td>
+		<td width="60%"><p>A pathname where all files related to the execution of the fragmenter will be placed.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-STRUCTURESFILE</code></p>
+		</td>
+		<td width="60%"><p>The pathname to the SDF file containing the input to be processed. Depending on the task, this keyword is used to specify where to take molecular structured to be fragmented or fragments to be filtered or clustered.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-PARALLELTASKS</code></p>
+		</td>
+		<td width="60%"><p>Specifies the number (integer) of parallel threads when performing parallelizable tasks such as fragmentation or analysis of isomorphic fragment families.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-VERBOSITY</code></p>
+		</td>
+		<td width="60%"><p>Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity. </p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Pre-Fragmentation Operation</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-FORMULATXTFILE</code></p>
+		</td>
+		<td width="60%"><p>The pathname to a TXT file containing the molecular formulae for the structures to be fragmenter. Use this keyword to enable detection of missing atoms by checking of consistency between declared molecular formula (reported in the pathname given here) and actual molecular formula found in the structure file. Molecules with missing atoms are not fragmented.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-PREFILTERSMARTS</code></p>
+		</td>
+		<td width="60%"><p>Specifies the SMARTS query to filter structure before fragmentation. Any input molecule matching the SMARTS query will not be fragmenter. This keyword can be used multiple times to define more than one pre-filtering SMARTS criterion.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-UNSETTOSINGLEBO</code></p>
+		</td>
+		<td width="60%"><p>Use this keyword (no value needed) to request the conversion of all UNSET bond types to SINGLE bond types in any molecule to be fragmented.</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Fragmentation</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-CUTTINGRULESFILE</code></p>
+		</td>
+		<td width="60%"><p>The pathname to the file defining cutting rules.</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Post-Fragmentation Filtering</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-IGNORABLEFRAGMENTS</code></p>
+		</td>
+		<td width="60%"><p>The pathname to a file containing fragments that can be ignored. Any fragment isomorphic to any of the ignorable fragments will be
+		rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-TARGETFRAGMENTS</code></p>
+		</td>
+		<td width="60%"><p>The pathname to fragments to be collected. Only fragment isomorphic to any of the target fragments will be kept.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-ISOMORPHICSAMPLESIZE</code></p>
+		</td>
+		<td width="60%"><p>Specifies the number (integer) of isomorphic fragments to collect. Isomorphic versions of any fragment for which this number of versions has already been collected will be rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REMOVEDUPLICATES</code></p>
+		</td>
+		<td width="60%"><p>Use this keyword (no value needed) to request that any fragment that is isomorphic to a fragment already found should be rejected. Corresponds to setting FRG-ISOMORPHICSAMPLESIZE=1</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-MWSLOTSIZE</code></p>
+		</td>
+		<td width="60%"><p>Specifies the size (integer) of the slots used to collect fragment by molecular weight when indexing fragments to facilitate fast comparison against the bulk of generated fragments. Small value make search for duplicate fragments fast, but increase the number of stored files.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTMINORISOTOPES</code></p>
+		</td>
+		<td width="60%"><p>Use this keyword (no value needed) to request the removal of any fragment containing isotopes different from the major isotope of a specific element (e.g., <sup>13</sup>C, <sup>2</sup>H)</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTELEMENT</code></p>
+		</td>
+		<td width="60%"><p>Specifies an elemental symbol. Any fragment containing such element will be rejected. This keyword can be used multiple times to define more than one criterion.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJFORMULALESSTHAN</code></p>
+		</td>
+		<td width="60%"><p>Specifies the minimum molecular formula of any fragment (Example of format <code>C6 H12 O6</code>). Requires that all fragments have at least at least the given molecular formula. Only one such keyword can be used.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJFORMULAMORETHAN</code></p>
+		</td>
+		<td width="60%"><p>Specifies the maximum molecular formula of any fragment (Example of format <code>C6 H12 O6</code>). Triggers rejection of fragments with a molecular formula counting more atoms than what defined by the value of this keyword for any of the elements. This keyword can be used multiple times.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTAPCLASS</code></p>
+		</td>
+		<td width="60%"><p>Specifies a string that identifies the beginning of APClasses leading to rejection of fragments. For example, using <code>myClass</code> as value of this keyword will cause rejection of fragment holding attachment points of APClass <code>myClassA:0</code>, <code>myClassA:1</code>, or <code>myClassB:0</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTAPCLASSCOMBINATION</code></p>
+		</td>
+		<td width="60%"><p>Specifies a set of string where each string identifies the beginning of APClasses. Causes the rejection of fragments holding at least one attachment point matching each string.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-MAXFRAGSIZE</code></p>
+		</td>
+		<td width="60%"><p>Specified the maximum number (integer) of non-hydrogen atom. Fragments with more atoms will be rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-MINFRAGSIZE</code></p>
+		</td>
+		<td width="60%"><p>Specified the minimum number (integer) of non-hydrogen atom. Fragments with less atoms will be rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTSMARTS</code></p>
+		</td>
+		<td width="60%"><p>Specifies a SMARTS query for substructures leading to rejection of fragments. This keyword can be used multiple times. Fragments matching any of the given SMARTS will be rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-RETAINSMARTS</code></p>
+		</td>
+		<td width="60%"><p>Specifies a SMARTS query for substructures leading to retention of fragments. This keyword can be used multiple times. Fragments not matching any of the given SMARTS will be rejected.</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Analysis of Isomorphic Fragments</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-CLUSTERIZEANDCOLLECT</code></p>
+		</td>
+		<td width="60%"><p>This keyword requests the clustering of isomorphic fragments by RMSD upon frozen geometry superposition, and the identification of the most representative geometry of each cluster. Use this keyword with value equal to either <code>CENTROIDS</code>, to collect the cluster centroid as the most representative geometry for each cluster, or <code>MOSTCENTRAL</code> to choose the actual fragment that is closest (smallest RMSD upon superposition) to the cluster centroid.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-SAVECLUSTERS</code></p>
+		</td>
+		<td width="60%"><p>Use this keyword (with no value) to request the generation of one file collecting all members of a cluster of geometries for isomorphic fragments. This will generate one file for each cluster.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-SIZEUNIMODALPOPULATION</code></p>
+		</td>
+		<td width="60%"><p>Specifies the number of geometries (integer) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-MAXNOISEUNIMODALPOPULATION</code></p>
+		</td>
+		<td width="60%"><p>Specified the maximum amount of noise (double, in angstrom) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-SDWEIGHTUNIMODALPOPULATION</code></p>
+		</td>
+		<td width="60%"><p>Specifies the weight (double) of the standard deviation when calculating the threshold RMSD value for distinguishing geometries. The threshold is calculated as 
+			<pre>threshold_RMSD = mean_RMSD + factor * standard_deviation_RMSD</pre></p>
+		</td>
+	</tr>
+</table>
+
 
 <br>
 <h3 class="western"><a name="Toc88888_1"></a>Stand-alone Graph Editor</h3>

@@ -1087,12 +1087,6 @@ public class FragmenterParameters extends RunTimeParameters
                 saveClustersOfConformerToFile = true;
                 break;
                 
-            // Duplicated to avoid confusion on whether the '=' sign is needed or not.
-            case "SAVECLUSTERS=":
-                doExtactRepresentativeConformer = true;
-                saveClustersOfConformerToFile = true;
-                break;
-
             case "SIZEUNIMODALPOPULATION=":
                 sizeUnimodalPop = Integer.parseInt(value);
                 break;
