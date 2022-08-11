@@ -46,43 +46,40 @@ import denoptim.graph.Fragment;
 import denoptim.io.DenoptimIO;
 
 /**
- * Toll to remove dummy atoms from linearities of multi-hapto sites.
+ * Toll to add/remove dummy atoms from linearities or multi-hapto sites.
  * 
  * @author Marco Foscato
  * @author Vishwesh Venkatraman
  */
 public class DummyAtomHandler
 {
+    /**
+     * The elemental symbol that we consider to be the symbol of a dummy atom.
+     */
     private String elm = "";
     
-    //Recursion flag for reporting infos
+    //Recursion flag for reporting info
     int recNum = 1;
 
     /**
      * Program-specific logger
      */
     private Logger logger;
-    
-    private final static String NL = DENOPTIMConstants.EOL;
      
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Constructor defining a specific elemental symbol to consider the symbol
+     * of dummy atoms.
+     * @param elm the elemental symbol that we consider to be the symbol of a 
+     * dummy atom.
+     * @param logger
+     */
     public DummyAtomHandler(String elm, Logger logger)
     {
         this.elm = elm;
         this.logger = logger;
-    }    
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Returns true is the given string corresponds to an element symbol
-     */
-
-    public static boolean isElement(String s)
-    {
-        return DENOPTIMConstants.ALL_ELEMENTS.contains(s);
     }
     
 //------------------------------------------------------------------------------
@@ -101,7 +98,7 @@ public class DummyAtomHandler
             String symbol = MoleculeUtils.getSymbolOrLabel(atm);
             if (elm.equals(""))
             {
-                if (!isElement(symbol))
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(symbol))
                 {
                     dummiesList.add(atm);
                 }
@@ -122,7 +119,7 @@ public class DummyAtomHandler
             for (IAtom du : dummiesList)
             {
                 sb.append(" " + getSDFAtomNumber(mol,du)+" size: "
-                        + dummiesList.size() + NL);
+                        + dummiesList.size() + DenoptimIO.NL);
             }
             logger.log(Level.FINEST,sb.toString());
         }
@@ -156,7 +153,7 @@ public class DummyAtomHandler
             String symbol = MoleculeUtils.getSymbolOrLabel(atm);
             if (elm.equals(""))
             {
-                if (!isElement(symbol))
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(symbol))
                 {
                     dummiesList.add(atm);
                 }
@@ -177,7 +174,7 @@ public class DummyAtomHandler
             for (IAtom du : dummiesList)
             {
                 sb.append(" " + getSDFAtomNumber(mol,du)+" size: "
-                        + dummiesList.size() + NL);
+                        + dummiesList.size() + DenoptimIO.NL);
             }
             logger.log(Level.FINEST,sb.toString());
         }
@@ -220,13 +217,13 @@ public class DummyAtomHandler
                 {
                     Set<IAtom> s = goupsOfTerms.get(i);
                     sb.append(" Group "+i+" - Hapticity: "+hapticity.get(i)
-                        +" => "+NL);
+                        +" => "+DenoptimIO.NL);
                     for (IAtom sa : s)
                     {
                         sb.append((mol.indexOf(sa)+1)+
                                 MoleculeUtils.getSymbolOrLabel(sa)+" ");
                     }
-                    sb.append(NL);
+                    sb.append(DenoptimIO.NL);
                 }
                 logger.log(Level.FINEST, sb.toString());
             }
@@ -421,19 +418,40 @@ public class DummyAtomHandler
      * Append dummy atoms on otherwise linear arrangements of atoms. This
      * to allow the use of internal coordinates when doing 3d-modeling.
      * Dummy atoms are connected to the central atom of a linear 
-     * (or close-to-linear) bend. Attachment points are also taken into account
+     * (or close-to-linear) bend. Attachment points are also taken into account.
+     * Dummy atoms with no attachment point and
+     * only one connected neighbor are assumed to be linearity-breaking dummy
+     * atoms. Therefore, no additional dummy is added on central atoms that 
+     * already have such neighbor.
      * @param frag the fragment to be modified.
      * @param angLim the upper limit for an angle before we consider it flat, 
      * i.e., 180 DEG angle.
      */
     public static void addDummiesOnLinearities(Fragment frag, double angLim)
     {
+        loopOverAtoms:
         for (IAtom atm : frag.atoms())
         {
             Point3d pC = MoleculeUtils.getPoint3d(atm);
             List<IAtom> nbrs = frag.getConnectedAtomsList(atm);
             List<AttachmentPoint> nbrAP = frag.getAPsFromAtom(atm);
-            loopOVerNeigborsOfOneAtom:
+            
+            // Is there a linearity-breaking dummy atom already?
+            for (IAtom nbr : nbrs)
+            {
+                if (MoleculeUtils.isDummy(nbr) 
+                        && frag.getConnectedAtomsCount(nbr)==1
+                        && frag.getAPCountOnAtom(nbr)==0)
+                {
+                    // WARNING: we do not check the values of the angles!
+                    // We assume that nbr is a linearity-breaking Du.
+                    continue loopOverAtoms;
+                }
+            }
+            
+            // Decide if this atom is at the center of a linearity, 
+            // and possibly add linearity-breaking dummy atom
+            loopOverNeigborsOfOneAtom:
             for(int i=0; i<(nbrs.size()+nbrAP.size()); i++)
             {
                 Point3d pL = null;
@@ -456,7 +474,7 @@ public class DummyAtomHandler
                     }
                     double angle = MathUtils.angle(pL, pC, pR);
                     if (angle > angLim)
-                    {
+                    {   
                         // APs' heads are locations to avoid
                         List<Point3d> placesToAvoid = new ArrayList<Point3d>();
                         for (AttachmentPoint ap : nbrAP)
@@ -470,7 +488,7 @@ public class DummyAtomHandler
                         // Connect dummy atom
                         IBond dummyBnd = new Bond(dummyAtm,atm);
                         frag.addBond(dummyBnd);
-                        break loopOVerNeigborsOfOneAtom;
+                        break loopOverNeigborsOfOneAtom;
                     }
                 }
             }

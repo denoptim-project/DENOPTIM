@@ -121,6 +121,23 @@ public class MoleculeUtils
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * Checks if the given atom is a dummy atom based on the elemental symbol
+     * and the string used for dummy atom as a convention in DENOPTIM (uses
+     * {@link DENOPTIMConstants#DUMMYATMSYMBOL}. For detecting dummy atoms
+     * beyond DENOPTIM's convention, use {@link DummyAtomHandler}.
+     * @param atm
+     * @return <code>true</code> if the symbol of the atom indicates this is a 
+     * dummy atom according to DENOPTIM's convention.
+     */
+    public static boolean isDummy(IAtom atm)
+    {
+        String el = getSymbolOrLabel(atm);
+        return DENOPTIMConstants.DUMMYATMSYMBOL.equals(el);
+    }
+    
+//------------------------------------------------------------------------------
 
     /**
      * Check element symbol corresponds to real element of Periodic Table

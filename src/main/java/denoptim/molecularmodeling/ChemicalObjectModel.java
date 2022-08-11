@@ -622,7 +622,7 @@ public class ChemicalObjectModel
             {
                 String elA = atmA.getSymbol();
 
-                if (!DummyAtomHandler.isElement(elA))
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(elA))
                     continue;
 
                 IAtom[] toExclude = PathTools.findClosestByBond(fmol,atmA,4);
@@ -635,7 +635,7 @@ public class ChemicalObjectModel
                         continue;
 
                     String elB = atmB.getSymbol();
-                    if (!DummyAtomHandler.isElement(elB))
+                    if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(elB))
                         continue;
 
                     double dist = atmA.getPoint3d().distance(atmB.getPoint3d());
