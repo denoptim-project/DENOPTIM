@@ -22,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -54,7 +55,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	/**
 	 * The currently loaded list of vertices
 	 */
-	private ArrayList<Vertex> vertexLibrary =
+	private List<Vertex> vertexLibrary =
 			new ArrayList<Vertex>();
 	
 	/**
@@ -228,15 +229,15 @@ public class GUIVertexSelector extends GUIModalDialog
 	
 	/**
 	 * Load the list of vertexes to choose from.
-	 * @param vrtxLib the list of vertexes among which the usel will be allowed 
+	 * @param fragments the list of vertexes among which the usel will be allowed 
 	 * to chose.
 	 * @param initialId the index of the one vertex that should be displayed 
 	 * when showing the dialog.
 	 */
-	public void load(ArrayList<Vertex> vrtxLib, int initialId) 
+	public void load(List<Vertex> fragments, int initialId) 
 	{
 //        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        vertexLibrary = vrtxLib;
+        vertexLibrary = fragments;
         currVrtxIdx = initialId;
         loadCurrentVrtxIdxToViewer();
         updateVrtxListSpinner();

@@ -116,7 +116,7 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
         if (settings.getNumTasks()>1 || settings.doCheckFormula())
         {
             settings.getLogger().log(Level.INFO, "Combining structures and "
-                    + "formulas...");
+                    + "formulae...");
             splitInputForThreads(settings);
             for (int i=0; i<settings.getNumTasks(); i++)
             {

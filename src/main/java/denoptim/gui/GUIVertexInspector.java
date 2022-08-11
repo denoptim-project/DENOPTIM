@@ -27,14 +27,18 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -62,6 +66,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileAndFormat;
 import denoptim.files.FileUtils;
+import denoptim.fragmenter.FragmenterTools;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge.BondType;
@@ -70,6 +75,9 @@ import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.StaticLogger;
+import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.utils.MoleculeUtils;
 
 
@@ -139,7 +147,10 @@ public class GUIVertexInspector extends GUICardPanel
     
 	private JPanel pnlAtmToAP;
 	private JButton btnAtmToAP;
-	
+
+    private JPanel pnlChop;
+    private JButton btnChop;
+    
 	private JPanel pnlDelSel;
 	private JButton btnDelSel;
 	
@@ -497,6 +508,146 @@ public class GUIVertexInspector extends GUICardPanel
 		pnlAtmToAP.add(btnAtmToAP);
 		ctrlPane.add(pnlAtmToAP);
 		
+	    pnlChop = new JPanel();
+	    btnChop = new JButton("Chop Structure");
+        btnChop.setToolTipText(String.format("<html>Applies cutting rules on "
+                + "the current structure to generate fragments.</html>", 400));
+	    btnChop.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                vertex = vertexViewer.getLoadedStructure();
+                if (vertex==null 
+                        || vertex.getIAtomContainer().getBondCount() == 0)
+                {
+                    JOptionPane.showMessageDialog(btnChop,
+                            "<html>System contains 0 bonds. "
+                            + "Nothing to chop.</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                
+                FragmenterParameters settings = new FragmenterParameters();
+                settings.startConsoleLogger("GUI-controlledFragmenterLogger");
+                
+                File cutRulFile = null;
+                try
+                {
+                    cutRulFile = new File (getClass().getClassLoader()
+                            .getResource("data/cutting_rules").toURI());
+                } catch (URISyntaxException e)
+                {
+                    // Should not happen
+                    e.printStackTrace();
+                }
+                List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+                try
+                {
+                    DenoptimIO.readCuttingRules(cutRulFile, cuttingRules);
+                } catch (DENOPTIMException e)
+                {
+                    JOptionPane.showMessageDialog(btnChop,String.format(
+                            "<html>Could not read cutting rules from '" 
+                            + cutRulFile.getAbsolutePath() + "'. Hint: "
+                            + e.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                
+                List<Vertex> fragments = null;
+                try
+                {
+                    fragments = FragmenterTools.fragmentation(
+                            vertex.getIAtomContainer(), cuttingRules, 
+                            settings.getLogger());
+                } catch (DENOPTIMException e)
+                {
+                    JOptionPane.showMessageDialog(btnChop,String.format(
+                            "<html>Could not complete fragmentation. Hint: "
+                            + e.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                
+                //TODO-gg add filtering
+                
+                if (fragments.size() == 0)
+                {
+                    JOptionPane.showMessageDialog(btnAddVrtx,
+                            "<html>Fragmentation produced no fragments!'</html>",
+                            "Error",
+                            JOptionPane.WARNING_MESSAGE,
+                            UIManager.getIcon("OptionPane.warningIcon"));
+                    return;
+                }
+                
+                if (fragments.size() == 1)
+                {
+                    importVertices(fragments);
+                    return;
+                }
+                
+                String[] options = new String[]{"All", 
+                        "Selected",
+                        "Cancel"};
+                String txt = "<html><body width='%1s'>Do you want to "
+                        + "append all building blocks or only selected ones?"
+                        + "</html>";
+                int res = JOptionPane.showOptionDialog(btnAddVrtx,
+                        String.format(txt,200),
+                        "Append Building Blocks",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        UIManager.getIcon("OptionPane.warningIcon"),
+                        options,
+                        options[0]);
+                
+                if (res == 2)
+                {
+                    return;
+                }
+                
+                switch (res)
+                {
+                    case 0:
+                        importVertices(fragments);
+                        break;
+                        
+                    case 1:
+                        List<Vertex> selectedVrtxs = 
+                                new ArrayList<Vertex>();
+                        GUIVertexSelector vrtxSelector = new GUIVertexSelector(
+                                btnAddVrtx,true);
+                        vrtxSelector.setRequireApSelection(false);
+                        vrtxSelector.load(fragments, 0);
+                        Object selected = vrtxSelector.showDialog();
+
+                        if (selected != null)
+                        {
+                            @SuppressWarnings("unchecked")
+                            List<ArrayList<Integer>> selList = 
+                                    (ArrayList<ArrayList<Integer>>) selected;
+                            for (ArrayList<Integer> pair : selList)
+                            {
+                                selectedVrtxs.add(fragments.get(pair.get(0)));
+                            }
+                        }
+                        importVertices(selectedVrtxs);
+                        break;
+                    
+                    default:
+                        return;
+                }
+            }
+        });
+        pnlChop.add(btnChop);
+        ctrlPane.add(pnlChop);
+		
+		
 		pnlDelSel = new JPanel();
 		btnDelSel = new JButton("Remove Atoms");
 		btnDelSel.setToolTipText("<html>Removes all selected atoms from the "
@@ -813,9 +964,9 @@ public class GUIVertexInspector extends GUICardPanel
     
     /**
      * Imports vertices.
-     * @param list the list of vertices to import
+     * @param fragments the list of vertices to import
      */
-    public void importVertices(ArrayList<Vertex> list)
+    public void importVertices(List<Vertex> fragments)
     {   
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         
@@ -832,9 +983,9 @@ public class GUIVertexInspector extends GUICardPanel
         }
         
         boolean addedOne = false;
-        if (list.size() > 0)
+        if (fragments.size() > 0)
         {
-            verticesLibrary.addAll(list);
+            verticesLibrary.addAll(fragments);
             addedOne = true;
             
             // Display the first
