@@ -18,6 +18,7 @@
 
 package denoptim.gui;
 
+import java.awt.FlowLayout;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -120,6 +121,41 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
         defaultRulesTable.getTableHeader().setPreferredSize(
                 new Dimension(defaultRulesScrollPane.getWidth(), 40));
         
+        String[] emptyRow = new String[] {
+                "double click to edit...","","","","",""};
+        
+        JButton btnAddDefaultRule = new JButton("Add Rule");
+        btnAddDefaultRule.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                defaultRulesTabModel.addRow(emptyRow);
+            }
+        });
+        JButton btnRemoveDefaultRule = new JButton("Remove Selected");
+        btnRemoveDefaultRule.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if (defaultRulesTable.getRowCount() > 0) 
+                {
+                    if (defaultRulesTable.getSelectedRowCount() > 0) 
+                    {
+                        int selectedRowIds[] = 
+                                defaultRulesTable.getSelectedRows();
+                        Arrays.sort(selectedRowIds);
+                        for (int i=(selectedRowIds.length-1); i>-1; i--) 
+                        {
+                            defaultRulesTabModel.removeRow(
+                                    selectedRowIds[i]);
+                        }
+                    }
+                }
+            }
+        });
+        
         customRulesTabModel = new DefaultTableModel();
         customRulesTabModel.setColumnCount(6);
         customRulesTabModel.setColumnIdentifiers(column_names);
@@ -133,8 +169,6 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
         customRulesTable.setToolTipText("Double click to edit any entry.");
         customRulesTable.putClientProperty("terminateEditOnFocusLost", 
                 Boolean.TRUE);
-        String[] emptyRow = new String[] {
-                "double click to edit...","","","","",""};
         customRulesTabModel.addRow(emptyRow);
         
         JButton btnAddCustomRule = new JButton("Add Rule");
@@ -173,21 +207,33 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
         customRulesTable.getTableHeader().setPreferredSize(
                 new Dimension(customRulesScrollPane.getWidth(), 40));
         
+
+        JPanel pnlBottonsDefaultRules = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pnlBottonsDefaultRules.add(btnAddDefaultRule);
+        pnlBottonsDefaultRules.add(btnRemoveDefaultRule);
+        
         JPanel headerDefaultBlock = new JPanel(new BorderLayout());
         headerDefaultBlock.add(rdbUseDefault, BorderLayout.WEST);
+        headerDefaultBlock.add(pnlBottonsDefaultRules, BorderLayout.CENTER);
         
         JPanel defaultRulesPanel = new JPanel(new BorderLayout());
         defaultRulesPanel.add(headerDefaultBlock, BorderLayout.NORTH);
         defaultRulesPanel.add(defaultRulesScrollPane, BorderLayout.CENTER);
+        
+        
+        JPanel pnlBottonsCustomRules = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pnlBottonsCustomRules.add(btnAddCustomRule);
+        pnlBottonsCustomRules.add(btnRemoveCustomRule);
 
         JPanel headerCustomBlock = new JPanel(new BorderLayout());
         headerCustomBlock.add(rdbUseCustom, BorderLayout.WEST);
-        headerCustomBlock.add(btnAddCustomRule, BorderLayout.CENTER);
-        headerCustomBlock.add(btnRemoveCustomRule, BorderLayout.EAST);
+        headerCustomBlock.add(pnlBottonsCustomRules, BorderLayout.CENTER);
         
         JPanel customRulesPanel = new JPanel(new BorderLayout());
         customRulesPanel.add(headerCustomBlock, BorderLayout.NORTH);
         customRulesPanel.add(customRulesScrollPane, BorderLayout.CENTER);
+        
+        
         JSplitPane masterPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         masterPane.setTopComponent(defaultRulesPanel);
         masterPane.setBottomComponent(customRulesPanel);
