@@ -701,10 +701,18 @@ public class FragmenterTools
      * Management of fragments: includes application of fragment filters, 
      * rejection rules, and collection rules (also of isomorphic fragments, thus
      * management of duplicates) to manipulate collection of fragments.
-     * @throws DENOPTIMException 
-     * @throws IOException 
-     * @throws UndetectedFileFormatException 
-     * @throws IllegalArgumentException 
+     * @param frag the fragment to analyze now. This is a fragment that is 
+     * candidates to enter the collection of fragments.
+     * @param fragCounter fragment index. Used only for logging purposes.
+     * @param settings configuration of the filters and methods uses throughout 
+     * the fragmentation and pre-/post-processing of fragments.
+     * @param collector where accepted fragments are collected. This is the 
+     * collection of fragment where we want to put <code>frag</code>.
+     * @param logger where to direct all log.
+     * @throws DENOPTIMException
+     * @throws IllegalArgumentException
+     * @throws UndetectedFileFormatException
+     * @throws IOException
      */
     public static void manageFragmentCollection(Vertex frag, int fragCounter, 
             FragmenterParameters settings, 

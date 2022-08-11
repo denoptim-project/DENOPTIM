@@ -27,28 +27,39 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -66,6 +77,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileAndFormat;
 import denoptim.files.FileUtils;
+import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragmenter.FragmenterTools;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
@@ -78,6 +90,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.MoleculeUtils;
 
 
@@ -510,7 +523,8 @@ public class GUIVertexInspector extends GUICardPanel
 		
 	    pnlChop = new JPanel();
 	    btnChop = new JButton("Chop Structure");
-        btnChop.setToolTipText(String.format("<html>Applies cutting rules on "
+        btnChop.setToolTipText(String.format("<html><body width='%1s'"
+                + "Applies cutting rules on "
                 + "the current structure to generate fragments.</html>", 400));
 	    btnChop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -527,9 +541,11 @@ public class GUIVertexInspector extends GUICardPanel
                     return;
                 }
                 
+                // This gives us the possibility to control the fragmentation
                 FragmenterParameters settings = new FragmenterParameters();
                 settings.startConsoleLogger("GUI-controlledFragmenterLogger");
                 
+                // Read default cutting rules
                 File cutRulFile = null;
                 try
                 {
@@ -540,14 +556,16 @@ public class GUIVertexInspector extends GUICardPanel
                     // Should not happen
                     e.printStackTrace();
                 }
-                List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+                List<CuttingRule> defaultCuttingRules = 
+                        new ArrayList<CuttingRule>();
                 try
                 {
-                    DenoptimIO.readCuttingRules(cutRulFile, cuttingRules);
+                    DenoptimIO.readCuttingRules(cutRulFile, defaultCuttingRules);
                 } catch (DENOPTIMException e)
                 {
                     JOptionPane.showMessageDialog(btnChop,String.format(
-                            "<html>Could not read cutting rules from '" 
+                            "<html><body width='%1s'"
+                            + "Could not read cutting rules from '" 
                             + cutRulFile.getAbsolutePath() + "'. Hint: "
                             + e.getMessage() + "</html>", 400),
                             "Error",
@@ -556,7 +574,18 @@ public class GUIVertexInspector extends GUICardPanel
                     return;
                 }
                 
-                List<Vertex> fragments = null;
+                // Build a dialog that offers the possibility to see and edit 
+                // default cutting rules, and to define custom ones from scratch
+                CuttingrulesSelectionDialog cuttingRulesSelector = new CuttingrulesSelectionDialog(
+                        defaultCuttingRules);
+                cuttingRulesSelector.pack();
+                cuttingRulesSelector.setVisible(true);
+                @SuppressWarnings("unchecked")
+                List<CuttingRule> cuttingRules = 
+                        (List<CuttingRule>) cuttingRulesSelector.result;
+                
+                // Now chop the structure to produce fragments
+                List<Vertex> fragments;
                 try
                 {
                     fragments = FragmenterTools.fragmentation(
@@ -565,7 +594,8 @@ public class GUIVertexInspector extends GUICardPanel
                 } catch (DENOPTIMException e)
                 {
                     JOptionPane.showMessageDialog(btnChop,String.format(
-                            "<html>Could not complete fragmentation. Hint: "
+                            "<html><body width='%1s'"
+                            + "Could not complete fragmentation. Hint: "
                             + e.getMessage() + "</html>", 400),
                             "Error",
                             JOptionPane.ERROR_MESSAGE,
@@ -573,12 +603,19 @@ public class GUIVertexInspector extends GUICardPanel
                     return;
                 }
                 
-                //TODO-gg add filtering
+                // Add linearity-breaking dummy atoms
+                for (Vertex frag : fragments)
+                {
+                    DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
+                            settings.getLinearAngleLimit());
+                }
                 
+                // The resulting fragments are loaded into the viewer, without
+                // removing the original structure.
                 if (fragments.size() == 0)
                 {
                     JOptionPane.showMessageDialog(btnAddVrtx,
-                            "<html>Fragmentation produced no fragments!'</html>",
+                            "<html>Fragmentation produced no fragments!</html>",
                             "Error",
                             JOptionPane.WARNING_MESSAGE,
                             UIManager.getIcon("OptionPane.warningIcon"));
@@ -592,12 +629,13 @@ public class GUIVertexInspector extends GUICardPanel
                 }
                 
                 String[] options = new String[]{"All", 
-                        "Selected",
+                        "Select",
                         "Cancel"};
-                String txt = "<html><body width='%1s'>Do you want to "
-                        + "append all building blocks or only selected ones?"
+                String txt = "<html><body width='%1s'>Fragmentation produced "
+                        + fragments.size() + " fragments. Do you want to "
+                        + "append all or select some?"
                         + "</html>";
-                int res = JOptionPane.showOptionDialog(btnAddVrtx,
+                int answer = JOptionPane.showOptionDialog(btnAddVrtx,
                         String.format(txt,200),
                         "Append Building Blocks",
                         JOptionPane.DEFAULT_OPTION,
@@ -606,12 +644,12 @@ public class GUIVertexInspector extends GUICardPanel
                         options,
                         options[0]);
                 
-                if (res == 2)
+                if (answer == 2)
                 {
                     return;
                 }
                 
-                switch (res)
+                switch (answer)
                 {
                     case 0:
                         importVertices(fragments);
@@ -697,7 +735,7 @@ public class GUIVertexInspector extends GUICardPanel
         });
         pnlSaveEdits.add(btnSaveEdits);
         ctrlPane.add(pnlSaveEdits);
-		this.add(ctrlPane,BorderLayout.EAST);
+		this.add(ctrlPane, BorderLayout.EAST);
 		
 		
 		// Panel with buttons to the bottom of the frame
