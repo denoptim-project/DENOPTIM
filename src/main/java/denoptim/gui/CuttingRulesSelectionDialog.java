@@ -430,6 +430,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                 close();
             }
         });
+        getRootPane().setDefaultButton(btnDone);
         
         this.btnCanc.setToolTipText("Exit without running fragmentation.");
     }
