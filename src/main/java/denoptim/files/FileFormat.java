@@ -36,7 +36,7 @@ public enum FileFormat {
     FSE_RUN, GA_RUN,
     
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP, GO_PARAM, CLG_PARAM, GE_PARAM, 
-    GI_PARAM, B3D_PARAM, FRG_RUN, FRG_PARAM,
+    GI_PARAM, B3D_PARAM, FRG_RUN, FRG_PARAM, CUTRULE,
     
     TXT, GRAPHTXT,
     UNRECOGNIZED;
@@ -160,6 +160,12 @@ public enum FileFormat {
         FRG_PARAM.extension = "";
         FRG_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
                 "^" + ParametersType.FRG_PARAMS.getKeywordRoot() + ".*"));
+        
+        //------------------------------------
+        
+        CUTRULE.extension = "";
+        CUTRULE.definingRegex = new HashSet<String>(Arrays.asList(
+                "^CTR.*"));
         
         //------------------------------------
         

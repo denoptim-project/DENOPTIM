@@ -2400,23 +2400,15 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
     
     /**
-     * Writes a formatted text file that collects cutting rules and the 
-     * associated strings used to define 'any-atom' SMARTS queries.
+     * Writes a formatted text file that collects cutting rule.
      * @param file the file where to write.
-     * @param anyAtmRules the strings defining 'any-atom' SMARTS queries.
      * @param cutRules the cutting rules to write.
      * @throws DENOPTIMException 
      */
-    public static void writeCuttingRules(File file, List<String> anyAtmRules, 
+    public static void writeCuttingRules(File file,
             List<CuttingRule> cutRules) throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder();
-        for (String anyAtmRule : anyAtmRules)
-        {
-            sb.append(DENOPTIMConstants.ANYATMRULKEYWORD).append(" ");
-            sb.append(anyAtmRule);
-            sb.append(NL);
-        }
         for (CuttingRule r : cutRules)
         {
             sb.append(DENOPTIMConstants.CUTRULKEYWORD).append(" ");

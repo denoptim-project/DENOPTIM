@@ -330,6 +330,35 @@ public class CuttingRule
 				"_opts:"+opts;
         return str;
     }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    public boolean equals(Object o)
+    {
+        if (!(o instanceof CuttingRule))
+            return false;
+                
+        CuttingRule other = (CuttingRule) o;
+        if (!this.getName().equals(other.getName()))
+            return false;
+        if (!this.getSMARTSAtom0().equals(other.getSMARTSAtom0()))
+            return false;
+        if (!this.getSMARTSAtom1().equals(other.getSMARTSAtom1()))
+            return false;
+        if (!this.getSMARTSBnd().equals(other.getSMARTSBnd()))
+            return false;
+        if (this.getPriority() != other.getPriority())
+            return false;
+        if (this.getOptions().size() != other.getOptions().size())
+            return false;
+        for (int i=0; i<this.getOptions().size(); i++)
+        {
+            if (!this.getOptions().get(i).equals(other.getOptions().get(i)))
+                return false;
+        }
+        return true;
+    }
 
 //------------------------------------------------------------------------------
     

@@ -169,6 +169,19 @@ public class GUIVertexInspector extends GUICardPanel
 	
 	private JPanel pnlSaveEdits;
 	private JButton btnSaveEdits;
+	
+	/**
+	 * File storing the latest version of modified cutting rules used to do 
+	 * fragmentation, or null if no fragmentation has been done using cutting 
+	 * rules, or we has so far only used default cutting rules.
+	 */
+	private File lastUsedCutRulFile = null;
+	
+    /**
+     * Flag indicating whether to preselect the default or the custom list of 
+     * cutting rules next time we are asked to display the dialog.
+     */
+    private boolean useDefaultNextTime = true;
 
 	
 //-----------------------------------------------------------------------------
@@ -573,16 +586,45 @@ public class GUIVertexInspector extends GUICardPanel
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
                 }
+             
+                // Read last used cutting rules
+                List<CuttingRule> customCuttingRules = 
+                        new ArrayList<CuttingRule>();
+                try
+                {
+                    if (lastUsedCutRulFile!=null)
+                        DenoptimIO.readCuttingRules(lastUsedCutRulFile, 
+                                customCuttingRules);
+                } catch (DENOPTIMException e)
+                {
+                    JOptionPane.showMessageDialog(btnChop,String.format(
+                            "<html><body width='%1s'"
+                            + "Could not read cutting rules from '" 
+                            + cutRulFile.getAbsolutePath() + "'. Hint: "
+                            + e.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
                 
                 // Build a dialog that offers the possibility to see and edit 
                 // default cutting rules, and to define custom ones from scratch
-                CuttingrulesSelectionDialog cuttingRulesSelector = new CuttingrulesSelectionDialog(
-                        defaultCuttingRules);
-                cuttingRulesSelector.pack();
-                cuttingRulesSelector.setVisible(true);
+                CuttingrulesSelectionDialog crs = new CuttingrulesSelectionDialog(
+                        defaultCuttingRules, customCuttingRules, 
+                        useDefaultNextTime);
+                crs.pack();
+                crs.setVisible(true);
                 @SuppressWarnings("unchecked")
                 List<CuttingRule> cuttingRules = 
-                        (List<CuttingRule>) cuttingRulesSelector.result;
+                        (List<CuttingRule>) crs.result;
+                if (cuttingRules==null)
+                    return;
+                
+                if (crs.lastUsedCutRulFile != null)
+                    lastUsedCutRulFile = crs.lastUsedCutRulFile;
+                
+                useDefaultNextTime = crs.useDefaultNextTime;
                 
                 // Now chop the structure to produce fragments
                 List<Vertex> fragments;
@@ -610,9 +652,9 @@ public class GUIVertexInspector extends GUICardPanel
                             settings.getLinearAngleLimit());
                 }
                 
-                // The resulting fragments are loaded into the viewer, without
-                // removing the original structure.
-                if (fragments.size() == 0)
+                // Signal no result obtained
+                if (fragments.size() < 1 || (fragments.size() == 1 &&
+                        ((Fragment)fragments.get(0)).isIsomorphicTo(vertex)))
                 {
                     JOptionPane.showMessageDialog(btnAddVrtx,
                             "<html>Fragmentation produced no fragments!</html>",
@@ -622,11 +664,8 @@ public class GUIVertexInspector extends GUICardPanel
                     return;
                 }
                 
-                if (fragments.size() == 1)
-                {
-                    importVertices(fragments);
-                    return;
-                }
+                // The resulting fragments are loaded into the viewer, without
+                // removing the original structure.
                 
                 String[] options = new String[]{"All", 
                         "Select",

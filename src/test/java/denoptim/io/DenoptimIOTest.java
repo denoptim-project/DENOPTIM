@@ -496,12 +496,8 @@ public class DenoptimIOTest
         cutRules.add(ctrA);
         cutRules.add(ctrB);
         
-        ArrayList<String> anyAtmRules = new ArrayList<String>();
-        anyAtmRules.add("BBB");
-        anyAtmRules.add("C@*{}C");
-        
         File tmpFile = new File(tempDir.getAbsolutePath() + SEP + "cutRule");
-        DenoptimIO.writeCuttingRules(tmpFile, anyAtmRules, cutRules);
+        DenoptimIO.writeCuttingRules(tmpFile, cutRules);
         
         ArrayList<CuttingRule> readInCutRules = new ArrayList<CuttingRule>();
         DenoptimIO.readCuttingRules(tmpFile, readInCutRules);

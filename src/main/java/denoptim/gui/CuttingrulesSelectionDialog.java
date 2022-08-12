@@ -23,6 +23,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,9 +41,12 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.files.FileUtils;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
@@ -70,23 +74,48 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
     private DefaultTableModel defaultRulesTabModel;
     private DefaultTableModel customRulesTabModel;
     
+    /**
+     * The file where we last saved cutting rules different from the default.
+     */
+    protected File lastUsedCutRulFile = null;
+    
+    /**
+     * The file where we will save next edited list of cutting rules
+     */
+    protected File nextWrittenCutRulFile = null;
+    
+    /**
+     * Flag indicating whether to preselect the default or the custom list of 
+     * cutting rules next time we are asked to display the dialog.
+     */
+    protected boolean useDefaultNextTime = true;
+    
 //-----------------------------------------------------------------------------
     
     /**
      * Constructor
      * @param defaultCuttingRules 
-     * @param paramsHolder 
+     * @param lastUsedCutRulFile 
+     * @throws DENOPTIMException 
      */
-    public CuttingrulesSelectionDialog(List<CuttingRule> defaultCuttingRules)
+    public CuttingrulesSelectionDialog(List<CuttingRule> defaultCuttingRules,
+            List<CuttingRule> customCuttingRules, boolean preselectDefault) 
     {
         super();
         setTitle("Choose Cutting Rules");
         
         rdbUseDefault = new JRadioButton("Use default cutting rules.");
-        rdbUseDefault.setSelected(true);
         rdbUseCustom = new JRadioButton(
                 "Use the following curtomized cutting rules.");
-        rdbUseCustom.setSelected(false);
+
+        if (preselectDefault)
+        {
+            rdbUseDefault.setSelected(true);
+            rdbUseCustom.setSelected(false);
+        } else {
+            rdbUseDefault.setSelected(false);
+            rdbUseCustom.setSelected(true);
+        }
         ButtonGroup rdbGroup = new ButtonGroup();
         rdbGroup.add(rdbUseDefault);
         rdbGroup.add(rdbUseCustom);
@@ -101,7 +130,18 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
                 "<html><b>Option</b></html>"};
         defaultRulesTabModel.setColumnIdentifiers(column_names);
         JTable defaultRulesTable = new JTable(defaultRulesTabModel);
-        defaultRulesTable.setToolTipText("Double click to edit any entry.");
+        try
+        {
+            nextWrittenCutRulFile = getTmpFileForCuttingRules();
+        } catch (DENOPTIMException e2)
+        {
+            e2.printStackTrace();
+            nextWrittenCutRulFile = new File("edited_cuttingrules");
+        }
+        defaultRulesTable.setToolTipText("<html>"
+                + "Double click to edit any entry. <br>"
+                + "Edited lists are saved in '" 
+                + nextWrittenCutRulFile.getAbsolutePath() + "'</html>");
         defaultRulesTable.putClientProperty("terminateEditOnFocusLost", 
                 Boolean.TRUE);
         for (CuttingRule cr : defaultCuttingRules)
@@ -166,10 +206,30 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
                     getRowHeight() * getRowCount());
             }
         };;
-        customRulesTable.setToolTipText("Double click to edit any entry.");
+        customRulesTable.setToolTipText("<html>"
+                + "Double click to edit any entry. <br>"
+                + "Edited lists are saved in '" 
+                + nextWrittenCutRulFile.getAbsolutePath() + "'</html>");
         customRulesTable.putClientProperty("terminateEditOnFocusLost", 
                 Boolean.TRUE);
-        customRulesTabModel.addRow(emptyRow);
+        if (customCuttingRules.size()==0)
+        {
+            customRulesTabModel.addRow(emptyRow);
+        } else {
+            for (CuttingRule cr : customCuttingRules)
+            {
+                String[] values = new String[6];
+                values[0] = cr.getName();
+                values[1] = String.valueOf(cr.getPriority());
+                values[2] = cr.getSMARTSAtom0();
+                values[3] = cr.getSMARTSBnd();
+                values[4] = cr.getSMARTSAtom1();
+                StringBuilder sb = new StringBuilder();
+                cr.getOptions().stream().forEach(s -> sb.append(" " + s));
+                values[5] = sb.toString();
+                customRulesTabModel.addRow(values);
+            }
+        }
         
         JButton btnAddCustomRule = new JButton("Add Rule");
         btnAddCustomRule.addActionListener(new ActionListener() {
@@ -255,6 +315,8 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
                 DefaultTableModel chosenTab = defaultRulesTabModel;
                 if (rdbUseCustom.isSelected())
                     chosenTab = customRulesTabModel;
+                
+                boolean setOfCuttingRulesHasBeenModified = false;
                     
                 List<CuttingRule> chosenOnes = new ArrayList<CuttingRule>();
                 for (int iRow=0; iRow<chosenTab.getRowCount(); iRow++)
@@ -265,8 +327,9 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
                         values[iCol] = chosenTab.getValueAt(iRow,iCol)
                                 .toString().trim();
                     }
-                    ArrayList<String> opts = new ArrayList<String>(
-                            Arrays.asList(chosenTab.getValueAt(iRow,5)
+                    ArrayList<String> opts = new ArrayList<String>();
+                    if (!chosenTab.getValueAt(iRow,5).toString().trim().isBlank())
+                        opts.addAll(Arrays.asList(chosenTab.getValueAt(iRow,5)
                                     .toString().trim().split("\\s+")));
                     
                     int prioIdx = 0;
@@ -285,16 +348,74 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
                                 UIManager.getIcon("OptionPane.errorIcon"));
                         continue;
                     }
-                    chosenOnes.add(new CuttingRule(values[0], values[2], 
-                            values[4], values[3], prioIdx, 
-                            opts));
+                    
+                    CuttingRule newCuttingRule = new CuttingRule(values[0], 
+                            values[2], values[4], values[3], prioIdx, opts);
+                    chosenOnes.add(newCuttingRule);
+                    
+                    // Verify introduction of differences
+                    if (!setOfCuttingRulesHasBeenModified)
+                    {
+                        boolean fromDefault = false;
+                        if (defaultCuttingRules.size() > iRow)
+                        {
+                            fromDefault = defaultCuttingRules.get(iRow).equals(
+                                    newCuttingRule);
+                        }
+                        boolean fromCustom = false;
+                        if (customCuttingRules.size() > iRow)
+                        {
+                            fromCustom = customCuttingRules.get(iRow).equals(
+                                    newCuttingRule);
+                        }
+                        if (!fromDefault && !fromCustom)
+                        {
+                            setOfCuttingRulesHasBeenModified = true;
+                        }
+                    }
                 }
+                
+                // Verify shortening of the list of rules (case jnot covered above)
+                if (chosenOnes.size() != defaultCuttingRules.size()
+                        && chosenOnes.size() != customCuttingRules.size())
+                {
+                    setOfCuttingRulesHasBeenModified = true;
+                }
+                
+                //Store a copy of the modified/customized rules
+                useDefaultNextTime = false;
+                if (setOfCuttingRulesHasBeenModified)
+                {
+                    try
+                    {
+                        lastUsedCutRulFile = nextWrittenCutRulFile;
+                        DenoptimIO.writeCuttingRules(lastUsedCutRulFile, 
+                                chosenOnes);
+                        FileUtils.addToRecentFiles(lastUsedCutRulFile, 
+                                FileFormat.CUTRULE);
+                    } catch (DENOPTIMException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    if (rdbUseDefault.isSelected())
+                        useDefaultNextTime = true;
+                }
+                
                 result = chosenOnes;
                 close();
             }
         });
         
         this.btnCanc.setToolTipText("Exit without running fragmentation.");
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    private File getTmpFileForCuttingRules() throws DENOPTIMException
+    {
+        File parent = new File(GUIPreferences.tmpSpace);
+        return FileUtils.getAvailableFileName(parent, "cuttingRules");
     }
 	
 //-----------------------------------------------------------------------------

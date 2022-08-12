@@ -495,12 +495,6 @@ public final class DENOPTIMConstants
      * branch holding that {@link Vertex}.
      */
     public static final Object GRAPHBRANCHID = "GRAPHBRANCHID";
-
-    /**
-     * Keyword that identifies rows defining 'any-atom' SMARTS queries in files
-     * collecting cutting rules.
-     */
-    public static final String ANYATMRULKEYWORD = "ANY";
     
     /**
      * Keyword that identifies rows defining cutting rules in files
