@@ -610,7 +610,7 @@ public class GUIVertexInspector extends GUICardPanel
                 
                 // Build a dialog that offers the possibility to see and edit 
                 // default cutting rules, and to define custom ones from scratch
-                CuttingrulesSelectionDialog crs = new CuttingrulesSelectionDialog(
+                CuttingRulesSelectionDialog crs = new CuttingRulesSelectionDialog(
                         defaultCuttingRules, customCuttingRules, 
                         useDefaultNextTime);
                 crs.pack();

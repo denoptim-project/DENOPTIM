@@ -23,6 +23,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +63,7 @@ import denoptim.programs.fragmenter.FragmenterParameters;
  * GUI-controlled fragmentation.
  */
 
-class CuttingrulesSelectionDialog extends GUIModalDialog
+class CuttingRulesSelectionDialog extends GUIModalDialog
 {
     /**
      * Version ID
@@ -98,7 +100,7 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
      * @param lastUsedCutRulFile 
      * @throws DENOPTIMException 
      */
-    public CuttingrulesSelectionDialog(List<CuttingRule> defaultCuttingRules,
+    public CuttingRulesSelectionDialog(List<CuttingRule> defaultCuttingRules,
             List<CuttingRule> customCuttingRules, boolean preselectDefault) 
     {
         super();
@@ -144,6 +146,17 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
                 + nextWrittenCutRulFile.getAbsolutePath() + "'</html>");
         defaultRulesTable.putClientProperty("terminateEditOnFocusLost", 
                 Boolean.TRUE);
+        defaultRulesTable.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                rdbUseDefault.setSelected(true);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {}
+        });
         for (CuttingRule cr : defaultCuttingRules)
         {
             String[] values = new String[6];
@@ -212,6 +225,17 @@ class CuttingrulesSelectionDialog extends GUIModalDialog
                 + nextWrittenCutRulFile.getAbsolutePath() + "'</html>");
         customRulesTable.putClientProperty("terminateEditOnFocusLost", 
                 Boolean.TRUE);
+        customRulesTable.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                rdbUseCustom.setSelected(true);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {}
+        });
         if (customCuttingRules.size()==0)
         {
             customRulesTabModel.addRow(emptyRow);
