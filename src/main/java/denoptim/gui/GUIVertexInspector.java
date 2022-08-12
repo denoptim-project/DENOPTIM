@@ -117,8 +117,7 @@ public class GUIVertexInspector extends GUICardPanel
 	/**
 	 * The currently loaded list of fragments
 	 */
-	private ArrayList<Vertex> verticesLibrary =
-			new ArrayList<Vertex>();
+	private ArrayList<Vertex> verticesLibrary = new ArrayList<Vertex>();
 	
 	/**
 	 * The currently loaded vertex

@@ -129,7 +129,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                 "<html><b>SMARTS Atom 1</b></html>",
                 "<html><b>SMARTS Bond 1-2</b></html>",
                 "<html><b>SMARTS Atom 2</b></html>",
-                "<html><b>Option</b></html>"};
+                "<html><b>Options</b></html>"};
         defaultRulesTabModel.setColumnIdentifiers(column_names);
         JTable defaultRulesTable = new JTable(defaultRulesTabModel);
         try
@@ -236,24 +236,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
             @Override
             public void focusLost(FocusEvent e) {}
         });
-        if (customCuttingRules.size()==0)
-        {
-            customRulesTabModel.addRow(emptyRow);
-        } else {
-            for (CuttingRule cr : customCuttingRules)
-            {
-                String[] values = new String[6];
-                values[0] = cr.getName();
-                values[1] = String.valueOf(cr.getPriority());
-                values[2] = cr.getSMARTSAtom0();
-                values[3] = cr.getSMARTSBnd();
-                values[4] = cr.getSMARTSAtom1();
-                StringBuilder sb = new StringBuilder();
-                cr.getOptions().stream().forEach(s -> sb.append(" " + s));
-                values[5] = sb.toString();
-                customRulesTabModel.addRow(values);
-            }
-        }
+        buildCustomRulesTable(customCuttingRules, emptyRow);
         
         JButton btnAddCustomRule = new JButton("Add Rule");
         btnAddCustomRule.addActionListener(new ActionListener() {
@@ -286,32 +269,61 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                 }
             }
         });
+        JButton btnImportRules = new JButton("Import Rules...");
+        btnImportRules.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                customCuttingRules.clear();
+                File cutRulFile = GUIFileOpener.pickFile(btnImportRules);
+                try
+                {
+                    DenoptimIO.readCuttingRules(cutRulFile, customCuttingRules);
+                } catch (DENOPTIMException e1)
+                {
+                    JOptionPane.showMessageDialog(btnImportRules,String.format(
+                            "<html><body width='%1s'"
+                            + "Could not read cutting rules from '" 
+                            + cutRulFile.getAbsolutePath() + "'. Hint: "
+                            + e1.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                buildCustomRulesTable(customCuttingRules, emptyRow);
+                rdbUseCustom.setSelected(true);
+                pack();
+            }
+        });
         
         JScrollPane customRulesScrollPane = new JScrollPane(customRulesTable);
         customRulesTable.getTableHeader().setPreferredSize(
                 new Dimension(customRulesScrollPane.getWidth(), 40));
         
 
-        JPanel pnlBottonsDefaultRules = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        pnlBottonsDefaultRules.add(btnAddDefaultRule);
-        pnlBottonsDefaultRules.add(btnRemoveDefaultRule);
+        JPanel pnlButtonsDefaultRules = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pnlButtonsDefaultRules.add(btnAddDefaultRule);
+        pnlButtonsDefaultRules.add(btnRemoveDefaultRule);
         
         JPanel headerDefaultBlock = new JPanel(new BorderLayout());
         headerDefaultBlock.add(rdbUseDefault, BorderLayout.WEST);
-        headerDefaultBlock.add(pnlBottonsDefaultRules, BorderLayout.CENTER);
+        headerDefaultBlock.add(pnlButtonsDefaultRules, BorderLayout.CENTER);
         
         JPanel defaultRulesPanel = new JPanel(new BorderLayout());
         defaultRulesPanel.add(headerDefaultBlock, BorderLayout.NORTH);
         defaultRulesPanel.add(defaultRulesScrollPane, BorderLayout.CENTER);
         
         
-        JPanel pnlBottonsCustomRules = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        pnlBottonsCustomRules.add(btnAddCustomRule);
-        pnlBottonsCustomRules.add(btnRemoveCustomRule);
+        JPanel pnlButtonsCustomRules = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pnlButtonsCustomRules.add(btnAddCustomRule);
+        pnlButtonsCustomRules.add(btnRemoveCustomRule);
+        pnlButtonsCustomRules.add(btnImportRules);
 
         JPanel headerCustomBlock = new JPanel(new BorderLayout());
         headerCustomBlock.add(rdbUseCustom, BorderLayout.WEST);
-        headerCustomBlock.add(pnlBottonsCustomRules, BorderLayout.CENTER);
+        headerCustomBlock.add(pnlButtonsCustomRules, BorderLayout.CENTER);
         
         JPanel customRulesPanel = new JPanel(new BorderLayout());
         customRulesPanel.add(headerCustomBlock, BorderLayout.NORTH);
@@ -433,6 +445,35 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         getRootPane().setDefaultButton(btnDone);
         
         this.btnCanc.setToolTipText("Exit without running fragmentation.");
+    }
+
+//-----------------------------------------------------------------------------
+    
+    private void buildCustomRulesTable(List<CuttingRule> customCuttingRules,
+            String[] emptyRow)
+    {
+        for (int iRow=(customRulesTabModel.getRowCount()-1); iRow>-1; iRow--)
+        {
+            customRulesTabModel.removeRow(iRow);
+        }
+        if (customCuttingRules.size()==0)
+        {
+            customRulesTabModel.addRow(emptyRow);
+        } else {
+            for (CuttingRule cr : customCuttingRules)
+            {
+                String[] values = new String[6];
+                values[0] = cr.getName();
+                values[1] = String.valueOf(cr.getPriority());
+                values[2] = cr.getSMARTSAtom0();
+                values[3] = cr.getSMARTSBnd();
+                values[4] = cr.getSMARTSAtom1();
+                StringBuilder sb = new StringBuilder();
+                cr.getOptions().stream().forEach(s -> sb.append(" " + s));
+                values[5] = sb.toString();
+                customRulesTabModel.addRow(values);
+            }
+        }
     }
     
 //-----------------------------------------------------------------------------
