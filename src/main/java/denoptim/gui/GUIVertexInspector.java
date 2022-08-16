@@ -588,6 +588,7 @@ public class GUIVertexInspector extends GUICardPanel
                             JOptionPane.ERROR_MESSAGE,
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
+                } finally {
                 }
              
                 // Read last used cutting rules
