@@ -2321,6 +2321,47 @@ public class DenoptimIO
        
         return allFormulae;
     }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read cutting rules from a stream
+     * @param reader the stream providing text lines.
+     * @param cutRules the collector of the cutting rules. The collection is 
+     * already sorted by priority when this method returns.
+     * @param source the source of text. This is used only in logging as the
+     * source of the text that we are trying to convert into cutting rules.
+     * For example, a file name. 
+     * @throws DENOPTIMException in case there are errors in the formatting of 
+     * the text contained in the file.
+     */
+    public static void readCuttingRules(BufferedReader reader, 
+            List<CuttingRule> cutRules, String source) throws DENOPTIMException
+    {
+        ArrayList<String> cutRulLines = new ArrayList<String>();
+        try
+        {
+            String line = null;
+            while ((line = reader.readLine()) != null) 
+            {
+                if (line.trim().startsWith(DENOPTIMConstants.CUTRULKEYWORD))
+                    cutRulLines.add(line.trim());
+            }
+        } catch (IOException e)
+        {
+            throw new DENOPTIMException(e);
+        } finally {
+            if (reader != null)
+                try
+                {
+                    reader.close();
+                } catch (IOException e)
+                {
+                    throw new DENOPTIMException(e);
+                }
+        }
+        readCuttingRules(cutRulLines, cutRules, source);
+    }
     
 //------------------------------------------------------------------------------
     
@@ -2340,8 +2381,32 @@ public class DenoptimIO
         //Now get the list of cutting rules
         ArrayList<String> cutRulLines = new ArrayList<String>();
         allLines.stream()
-            .filter(line -> line.trim().startsWith("CTR"))
+            .filter(line -> line.trim().startsWith(
+                    DENOPTIMConstants.CUTRULKEYWORD))
             .forEach(line -> cutRulLines.add(line.trim()));
+        
+        readCuttingRules(cutRulLines, cutRules, "file '" 
+                + file.getAbsolutePath()+ "'");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read cutting rules from a properly formatted text file.
+     * @param cutRulLines text lines containing cutting rules. These are 
+     * expected to be lines starting with the 
+     * {@link DENOPTIMConstants.CUTRULKEYWORD} keyword.
+     * @param cutRules the collector of the cutting rules. The collection is 
+     * already sorted by priority when this method returns.
+     * @param source the source of text. This is used only in logging as the
+     * source of the text that we are trying to convert into cutting rules.
+     * For example, a file name. 
+     * @throws DENOPTIMException in case there are errors in the formatting of 
+     * the text contained in the file.
+     */
+    public static void readCuttingRules(ArrayList<String> cutRulLines,
+            List<CuttingRule> cutRules, String source) throws DENOPTIMException
+    {   
         Set<Integer> usedPriorities = new HashSet<Integer>();
         for (int i = 0; i<cutRulLines.size(); i++)
         {
@@ -2352,7 +2417,7 @@ public class DenoptimIO
                 throw new DENOPTIMException("ERROR in getting cutting rule."
                         + " Found " + words.length + " parts inctead of 6."
                         + "Check line '" + cutRulLines.get(i) + "'"
-                        + "in file '" + file + "'.");
+                        + "in " + source + ".");
             }
 
             // further details in map of options
@@ -2371,7 +2436,7 @@ public class DenoptimIO
                 throw new DENOPTIMException("ERROR in getting cutting rule."
                         + " Duplicate priority index " + priority + ". "
                         + "Check line '" + cutRulLines.get(i) + "'"
-                        + "in file '" + file + "'.");
+                        + "in " + source + ".");
             } else {
                 usedPriorities.add(priority);
             }

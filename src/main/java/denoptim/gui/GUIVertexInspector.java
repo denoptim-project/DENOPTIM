@@ -26,8 +26,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -535,7 +537,7 @@ public class GUIVertexInspector extends GUICardPanel
 		
 	    pnlChop = new JPanel();
 	    btnChop = new JButton("Chop Structure");
-        btnChop.setToolTipText(String.format("<html><body width='%1s'"
+        btnChop.setToolTipText(String.format("<html><body width='%1s'>"
                 + "Applies cutting rules on "
                 + "the current structure to generate fragments.</html>", 400));
 	    btnChop.addActionListener(new ActionListener() {
@@ -557,33 +559,36 @@ public class GUIVertexInspector extends GUICardPanel
                 FragmenterParameters settings = new FragmenterParameters();
                 settings.startConsoleLogger("GUI-controlledFragmenterLogger");
                 
-                // Read default cutting rules
-                File cutRulFile = null;
-                try
-                {
-                    cutRulFile = new File (getClass().getClassLoader()
-                            .getResource("data/cutting_rules").toURI());
-                } catch (URISyntaxException e)
-                {
-                    // Should not happen
-                    e.printStackTrace();
-                }
                 List<CuttingRule> defaultCuttingRules = 
                         new ArrayList<CuttingRule>();
+                BufferedReader reader = null;
                 try
                 {
-                    DenoptimIO.readCuttingRules(cutRulFile, defaultCuttingRules);
-                } catch (DENOPTIMException e)
+                    try {
+                        reader = new BufferedReader(
+                                new InputStreamReader(getClass()
+                                        .getClassLoader().getResourceAsStream(
+                                                "data/cutting_rules")));
+                        DenoptimIO.readCuttingRules(reader, defaultCuttingRules, 
+                                "bundled jar");
+                    } finally {
+                        if (reader!=null)
+                            reader.close();
+                    }
+                } catch (Exception e )
                 {
+                    e.printStackTrace();
                     JOptionPane.showMessageDialog(btnChop,String.format(
-                            "<html><body width='%1s'"
-                            + "Could not read cutting rules from '" 
-                            + cutRulFile.getAbsolutePath() + "'. Hint: "
+                            "<html><body width='%1s'>"
+                            + "Could not read default cutting rules from "
+                            + "bundled jar. "
+                            + "Hint: "
                             + e.getMessage() + "</html>", 400),
                             "Error",
                             JOptionPane.ERROR_MESSAGE,
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
+                } finally {
                 }
              
                 // Read last used cutting rules
@@ -598,8 +603,9 @@ public class GUIVertexInspector extends GUICardPanel
                 {
                     JOptionPane.showMessageDialog(btnChop,String.format(
                             "<html><body width='%1s'"
-                            + "Could not read cutting rules from '" 
-                            + cutRulFile.getAbsolutePath() + "'. Hint: "
+                            + "Could not read last-used cutting rules from '"
+                            + lastUsedCutRulFile + "'. "
+                            + "Hint: "
                             + e.getMessage() + "</html>", 400),
                             "Error",
                             JOptionPane.ERROR_MESSAGE,
