@@ -41,7 +41,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -84,7 +83,6 @@ import org.apache.batik.swing.gvt.GVTTreeRendererListener;
 import org.apache.batik.swing.gvt.Interactor;
 import org.apache.batik.swing.gvt.JGVTComponent;
 import org.apache.batik.swing.gvt.JGVTComponentListener;
-import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 import org.apache.batik.swing.svg.GVTTreeBuilderListener;
 
@@ -708,7 +706,6 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                         (mods & InputEvent.CTRL_DOWN_MASK) != 0;
                 }
             };
-            
             // Finally, enable the desired interactors. It is crucial to do this
             // in the right order because the interactors are added to a List
             // that retains the order and the events are interpreted so that
