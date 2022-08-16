@@ -24,13 +24,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
@@ -479,6 +483,26 @@ public class DenoptimIOTest
         FileUtils.createDirectory(subDirName);
         assertTrue(FileFormat.GA_RUN == FileUtils.detectFileFormat(
                 new File(dirName)), "GA output folder");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testReadCuttingRulsedDefault() throws Exception {
+        List<CuttingRule> defaultCuttingRules = new ArrayList<CuttingRule>();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(getClass()
+                            .getClassLoader().getResourceAsStream(
+                                    "data/cutting_rules")));
+            DenoptimIO.readCuttingRules(reader, defaultCuttingRules, 
+                    "bundled jar");
+        } finally {
+            if (reader!=null)
+                reader.close();
+        }
+        assertTrue(defaultCuttingRules.size() > 100);
     }
    
 //------------------------------------------------------------------------------
