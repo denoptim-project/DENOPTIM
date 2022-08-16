@@ -62,7 +62,7 @@ import denoptim.utils.SizeControlledSet;
  * a given generation can only become part of that very generation. 
  * This, however, is only possible when accepting a somewhat inefficient
  * use of the resources every time a generation is about to be completed. 
- * To illustrate: consider the moment when the are N free seats in the 
+ * To illustrate: consider the moment when there are N free seats in the 
  * population (i.e., candidates still to build and evaluate) 
  * and M potentially available seats for candidate evaluation threads,
  * where N&lt;M. The algorithm will generate N candidates, and M-N 

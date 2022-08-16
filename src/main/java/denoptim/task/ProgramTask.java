@@ -35,7 +35,7 @@ import denoptim.utils.TaskUtils;
 
 /**
  * Task structure for any of the main programs in the denoptim project, such as 
- * genetic algorithm and combinatorial explored of fragment spaces. 
+ * genetic algorithm and combinatorial exploreation of fragment spaces. 
  * Any implementation of this class must define a {@link #runProgram()} method
  * that runs the actual program implementation.
  */
