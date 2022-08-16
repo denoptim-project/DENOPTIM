@@ -18,19 +18,46 @@
 
 package denoptim.gui;
 
+import java.awt.Graphics;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
+import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -39,8 +66,27 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
+
+import org.apache.batik.bridge.UpdateManagerEvent;
+import org.apache.batik.bridge.UpdateManagerListener;
+import org.apache.batik.swing.JSVGCanvas;
+import org.apache.batik.swing.JSVGScrollPane;
+import org.apache.batik.swing.gvt.AbstractImageZoomInteractor;
+import org.apache.batik.swing.gvt.AbstractPanInteractor;
+import org.apache.batik.swing.gvt.AbstractResetTransformInteractor;
+import org.apache.batik.swing.gvt.AbstractRotateInteractor;
+import org.apache.batik.swing.gvt.AbstractZoomInteractor;
+import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
+import org.apache.batik.swing.gvt.GVTTreeRendererListener;
+import org.apache.batik.swing.gvt.Interactor;
+import org.apache.batik.swing.gvt.JGVTComponent;
+import org.apache.batik.swing.gvt.JGVTComponentListener;
+import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
+import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
+import org.apache.batik.swing.svg.GVTTreeBuilderListener;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
@@ -65,6 +111,7 @@ import denoptim.programs.fragmenter.FragmenterParameters;
 
 class CuttingRulesSelectionDialog extends GUIModalDialog
 {
+
     /**
      * Version ID
      */
@@ -123,7 +170,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         rdbGroup.add(rdbUseCustom);
         
         defaultRulesTabModel = new DefaultTableModel();
-        defaultRulesTabModel.setColumnCount(6);
+        defaultRulesTabModel.setColumnCount(7);
         String column_names[]= {"<html><b>Rule Name</b></html>", 
                 "<html><b>Order of Use</b></html>",
                 "<html><b>SMARTS Atom 1</b></html>",
@@ -208,6 +255,8 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                 }
             }
         });
+        JButton btnViewSelectedDefaultRule = new SMARTSVisualizationButton(
+                defaultRulesTable, defaultRulesTabModel);
         
         customRulesTabModel = new DefaultTableModel();
         customRulesTabModel.setColumnCount(6);
@@ -269,6 +318,8 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                 }
             }
         });
+        JButton btnViewSelectedCustomRule = new SMARTSVisualizationButton(
+                customRulesTable, customRulesTabModel);
         JButton btnImportRules = new JButton("Import Rules...");
         btnImportRules.addActionListener(new ActionListener() {
 
@@ -306,6 +357,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         JPanel pnlButtonsDefaultRules = new JPanel(new FlowLayout(FlowLayout.LEFT));
         pnlButtonsDefaultRules.add(btnAddDefaultRule);
         pnlButtonsDefaultRules.add(btnRemoveDefaultRule);
+        pnlButtonsDefaultRules.add(btnViewSelectedDefaultRule);
         
         JPanel headerDefaultBlock = new JPanel(new BorderLayout());
         headerDefaultBlock.add(rdbUseDefault, BorderLayout.WEST);
@@ -319,6 +371,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         JPanel pnlButtonsCustomRules = new JPanel(new FlowLayout(FlowLayout.LEFT));
         pnlButtonsCustomRules.add(btnAddCustomRule);
         pnlButtonsCustomRules.add(btnRemoveCustomRule);
+        pnlButtonsCustomRules.add(btnViewSelectedCustomRule);
         pnlButtonsCustomRules.add(btnImportRules);
 
         JPanel headerCustomBlock = new JPanel(new BorderLayout());
@@ -374,7 +427,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                     } catch (Throwable t)
                     {
                         JOptionPane.showMessageDialog(btnDone,String.format(
-                                "<html><body width='%1s'"
+                                "<html><body width='%1s'>"
                                 + "Could not convert string '" + values[1]
                                 + "' into an integer. Ignoring row " + iRow 
                                 + " in table of custom cutting rules.</html>",
@@ -411,7 +464,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                     }
                 }
                 
-                // Verify shortening of the list of rules (case jnot covered above)
+                // Verify shortening of the list of rules (case not covered above)
                 if (chosenOnes.size() != defaultCuttingRules.size()
                         && chosenOnes.size() != customCuttingRules.size())
                 {
@@ -445,6 +498,245 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         getRootPane().setDefaultButton(btnDone);
         
         this.btnCanc.setToolTipText("Exit without running fragmentation.");
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * A button that opens a modal dialog displaying the PNGs with a visual
+     * representation of SMARTS queries that are selected in the table given
+     * upon construction.
+     */
+    private class SMARTSVisualizationButton extends JButton
+    {
+        /**
+         * A reference to this very instance. Only needed to place child dialogs.
+         */
+        private Component refToThis;
+        
+        private String templateURL = "https://smarts.plus/smartsview/"
+                + "download_rest?smarts="
+                + "SMARTS;"
+                + "filetype=svg;"
+                + "vmode=0;"
+                + "textdesc=1;"
+                + "depsymbols=1;"
+                + "smartsheading=0"; //makes text size too small for long SMARTS
+        
+        public SMARTSVisualizationButton(JTable table, 
+                DefaultTableModel tabModel)
+        {
+            super("Visualize Selected...");
+            refToThis = this;
+            addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    if (table.getRowCount()==0 
+                            || table.getSelectedRowCount()==0) 
+                    {
+                        JOptionPane.showMessageDialog(refToThis, 
+                                "No SMARTS selected.", 
+                                "Visualization of SMARTS", 
+                                JOptionPane.PLAIN_MESSAGE);
+                        return;
+                    }
+                    
+                    JPanel masterPanel = new JPanel();
+                    masterPanel.setLayout(new BoxLayout(masterPanel, 
+                            BoxLayout.PAGE_AXIS));
+
+                    int selectedRowIds[] = table.getSelectedRows();
+                    Arrays.sort(selectedRowIds);
+                    for (int i=0; i<selectedRowIds.length; i++) 
+                    {
+                        String smarts = tabModel.getValueAt(
+                                        selectedRowIds[i],2).toString()
+                                + tabModel.getValueAt(
+                                        selectedRowIds[i],3).toString()
+                                + tabModel.getValueAt(
+                                        selectedRowIds[i],4).toString();
+
+                        smarts = escapeCharactersForSMARTSViewer(smarts);
+                        String url = templateURL.replace("SMARTS", smarts);
+
+                        JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                        header.add(new JLabel(tabModel.getValueAt(
+                                selectedRowIds[i],0).toString() + " - "));
+                        
+                        JLabel link = new JLabel("Download SVG");
+                        link.setForeground(Color.BLUE.darker());
+                        link.setCursor(Cursor.getPredefinedCursor(
+                                Cursor.HAND_CURSOR));
+                        link.addMouseListener(new MouseAdapter() {
+                            
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                try {
+                                    Desktop.getDesktop().browse(new URI(url));
+                                } catch (IOException | URISyntaxException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        });
+                        header.add(link);
+                        
+                        // This is a trick to set the minimal size of the frame
+                        header.add(new JLabel("                             "
+                                + "                                         "));
+                        
+                        masterPanel.add(header);
+                        
+                        MyJSVGCanvas svgCanvas = new MyJSVGCanvas();
+                        svgCanvas.setURI(url);
+                        masterPanel.add(svgCanvas);
+                    }
+                    GUIModalDialog dialog = new GUIModalDialog(true);
+                    dialog.addToCentralPane(masterPanel);
+                    dialog.btnCanc.setVisible(false);
+                    dialog.btnExtra.setText("?");
+                    dialog.btnExtra.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent e)
+                        {
+                            JOptionPane.showMessageDialog(dialog.btnExtra, 
+                                    String.format("<html><body width='%1s'>"
+                    + "<p>Visual representations of SMARTS are depicted by the "
+                    + "SMARTSview service offered "
+                    + "by the ZBH - Center for Bioinformatics of the "
+                    + "University of Hamburg (visit https://smarts.plus/).</p>"
+                    + "<br><ul>"
+                    + "<li>Use the 'Download SVG' button to download the "
+                    + "figure.</li>"
+                    + "<li>Pan the image in any direction by dragging the mouse "
+                    + "(left button).</li>"
+                    + "<li>Zoom in/out by holding the SHIFT key while dragging "
+                    + "down-/up-wards.</li></ul></html>", 400), 
+                                    "Visualization of SMARTS - Instructions", 
+                                    JOptionPane.PLAIN_MESSAGE);
+                            return;
+                        }
+                    });
+                    dialog.showDialog();
+                }
+            });
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Special canvas that overrides the set interpretation of mouse+key input
+     * to achieve a simplified zoom/pan capability using only BUTTON1 and
+     * SHIFT or CTRL keys.
+     */
+    private class MyJSVGCanvas extends JSVGCanvas
+    {
+        /**
+         * Version ID
+         */
+        private static final long serialVersionUID = 1L;
+
+        public MyJSVGCanvas()
+        {
+            super();
+            
+            // To change the interaction modes. First, disable the defaults
+            setEnableZoomInteractor(false);
+            setEnableImageZoomInteractor(false);
+            setEnablePanInteractor(false);
+            setEnableRotateInteractor(false);
+            setEnableResetTransformInteractor(false);
+            
+            // Override the  disabled default interactors that are still saved 
+            // as fields.
+            
+            // Then, we add our own interpreters of the mouse+key input
+            
+            /**
+             * Excluded because it does only zoom-in, no zoom-out.
+             */
+            zoomInteractor = null;
+            
+            /**
+             * Zoom view in/out as a response to SHIFT+BUTTON1 drag down/up
+             */
+            imageZoomInteractor = new AbstractImageZoomInteractor() {
+                public boolean startInteraction(InputEvent ie) {
+                    int mods = ie.getModifiersEx();
+                    return
+                            ie.getID() == MouseEvent.MOUSE_PRESSED &&
+                            (mods & InputEvent.BUTTON1_DOWN_MASK) != 0 &&
+                            (mods & InputEvent.SHIFT_DOWN_MASK) != 0;
+                }
+            };
+            
+            /**
+             * Pan view with BUTTON1 drag
+             */
+            panInteractor = new AbstractPanInteractor() {
+                public boolean startInteraction(InputEvent ie) {
+                    int mods = ie.getModifiersEx();
+                    return
+                        ie.getID() == MouseEvent.MOUSE_PRESSED &&
+                        (mods & InputEvent.BUTTON1_DOWN_MASK) != 0;
+                }
+                
+                /**
+                 * Prevents the action from being interrupted when mouse exits 
+                 * the component.
+                 */
+                @Override
+                public void mouseExited(MouseEvent e) {}
+            };
+
+            /**
+             * No reason to allow rotation of imae containing text.
+             */
+            rotateInteractor = null;
+            
+            /**
+             * Reset view with CTRL+BUTTON1
+             */
+            resetTransformInteractor = new AbstractResetTransformInteractor() {
+                public boolean startInteraction(InputEvent ie) {
+                    int mods = ie.getModifiersEx();
+                    return
+                        ie.getID() == MouseEvent.MOUSE_PRESSED &&
+                        (mods & InputEvent.CTRL_DOWN_MASK) != 0;
+                }
+            };
+            
+            // Finally, enable the desired interactors. It is crucial to do this
+            // in the right order because the interactors are added to a List
+            // that retains the order and the events are interpreted so that
+            // the first interactor that returns true from startInteraction
+            // does the action, the others are not tested. Therefore, pan
+            // interactor, which has the less restrictive mask, must go last.
+            setEnableImageZoomInteractor(true);
+            setEnableResetTransformInteractor(true);
+            setEnablePanInteractor(true);
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Escaping some characters as explained in 
+     * <a href="https://smarts.plus/rest">https://smarts.plus/rest</a>.
+     */
+    private String escapeCharactersForSMARTSViewer(String smarts)
+    {
+        String escapedSmarts = smarts;
+        escapedSmarts = escapedSmarts.replaceAll("%", "%25");
+        escapedSmarts = escapedSmarts.replaceAll("&", "%26");
+        escapedSmarts = escapedSmarts.replaceAll("\\+", "%2B");
+        escapedSmarts = escapedSmarts.replaceAll("#", "%23");
+        escapedSmarts = escapedSmarts.replaceAll(";", "%3B");
+        
+        return escapedSmarts;
     }
 
 //-----------------------------------------------------------------------------

@@ -928,7 +928,7 @@ public class GUIGraphHandler extends GUICardPanel
 						+ "<li>Use mouse mode <i>Move</i> to drag the graph in "
 						+ "any direction, <code>ALT</code>+drag to rotate, and "
 						+ "<code>CTRL</code>+drag to skew the graph. Wheel, or "
-						+ "analogous, to zomm in/out.</li>"
+						+ "analogous, to zoom in/out.</li>"
 						+ "</ul>Mouse mode can be changed also by double click "
 						+ "in the graph area, away from any vertex/edge, and "
 						+ "hitting <code>p</code> for <i>Pick</i> or "

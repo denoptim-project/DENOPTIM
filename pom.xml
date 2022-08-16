@@ -181,6 +181,12 @@
         <artifactId>biojava-structure</artifactId>
         <version>6.0.5</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-swing -->
+	<dependency>
+	    <groupId>org.apache.xmlgraphics</groupId>
+	    <artifactId>batik-swing</artifactId>
+	    <version>1.14</version>
+	</dependency>
   </dependencies>
   
   <build>

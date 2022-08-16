@@ -92,7 +92,7 @@ public class GraphViewerPanel extends JPanel
 	
     public enum JVertexType {SCAF, FRAG, CAP, RCV, AP, NONE};
     
-    // Properties fired y this class and intercepted in parent containers
+    // Properties fired by this class and intercepted in parent containers
     public static final String PROPERTYNODECLICKED = "NODECLICKED";
     public static final String PROPERTYMOUSEMODE = "SETMOUSEMODE";
     
