@@ -3,7 +3,7 @@
 # (same as t30-4 but with removal of duplicates)
 FRG-VERBOSITY=4
 FRG-STRUCTURESFILE=mols-4.sdf
-FRG-CUTTINGRULESFILE=cutRul_3.0.rul
+FRG-CUTTINGRULESFILE=cutting_rules
 #FRG-ISOMORPHICSAMPLESIZE=1
 #same as
 FRG-REMOVEDUPLICATES
