@@ -486,7 +486,8 @@ public class FragmenterTools
                 }
             }
             cloneOfMaster.removeAtoms(atmsToRemove);
-            fragments.add(cloneOfMaster);
+            if (cloneOfMaster.getAttachmentPoints().size()>0)
+                fragments.add(cloneOfMaster);
         }
         
         return fragments;
