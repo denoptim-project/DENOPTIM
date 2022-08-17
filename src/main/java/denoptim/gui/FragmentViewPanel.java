@@ -513,6 +513,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		}
 		
 		setJmolViewer();
+
+        jmolPanel.viewer.evalString("zoom OUT");
 		
 		if (parent!=null)
 		{
@@ -748,6 +750,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		jmolPanel.viewer.openFile(tmpSDFFile);
 
 		setJmolViewer();
+
+        jmolPanel.viewer.evalString("zoom OUT");
 	}
 
 //-----------------------------------------------------------------------------
