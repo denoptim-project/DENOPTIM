@@ -911,26 +911,25 @@ public class GUIVertexInspector extends GUICardPanel
 		// Cleanup
 		clearCurrentSystem();
 		
-		try {			
-		    //TODO-gg multiple?
-			IAtomContainer mol = DenoptimIO.readAllAtomContainers(file).get(0);
-			
-			// We mean to import only the structure: get rid of AP
-			mol.setProperty(DENOPTIMConstants.APSTAG,null);
-			
-			// NB: here we let the vertexViewer create a fragment object that we
-			// then put into the local library. This to make sure that the 
-			// references to atoms selected in the viewer are referring to
-			// members of the "vertex" object
-			vertexViewer.loadPlainStructure(mol);
-			vertex = vertexViewer.getLoadedStructure();
+		try {
+		    for (IAtomContainer mol : DenoptimIO.readAllAtomContainers(file))
+    	    {	
+    			// We mean to import only the structure: get rid of AP
+    			mol.setProperty(DENOPTIMConstants.APSTAG,null);
+    			
+    			// NB: here we let the vertexViewer create a fragment object that we
+    			// then put into the local library. This to make sure that the 
+    			// references to atoms selected in the viewer are referring to
+    			// members of the "vertex" object
+    			vertexViewer.loadPlainStructure(mol);
+    			vertex = vertexViewer.getLoadedStructure();
 
-			// the system is not a fragment but, this is done for consistency:
-			// when we have a molecule loaded the list is not empty
-			// The currently viewed fragment (if any) is always part of the lib
-			verticesLibrary.add(vertex);
-			currVrtxIdx = verticesLibrary.size()-1;
-
+    			// the system is not a fragment but, this is done for consistency:
+    			// when we have a molecule loaded the list is not empty
+    			// The currently viewed fragment (if any) is always part of the lib
+    			verticesLibrary.add(vertex);
+    			currVrtxIdx = verticesLibrary.size()-1;
+    	    }
 			updateVrtxListSpinner();
 			unsavedChanges = true;
 	        btnDelSel.setEnabled(true);
