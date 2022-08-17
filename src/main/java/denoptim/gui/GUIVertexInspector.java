@@ -380,17 +380,6 @@ public class GUIVertexInspector extends GUICardPanel
 				{
 					return;
 				}
-				if (!inFile.getName().endsWith(".sdf"))
-				{
-					JOptionPane.showMessageDialog(btnOpenMol,
-			                "<html>Expecting and MDL SDF file, but file<br>'"
-							+ inFile.getAbsolutePath() + "' does not have .sdf"
-							+ " extension.</html>",
-			                "Error",
-			                JOptionPane.ERROR_MESSAGE,
-			                UIManager.getIcon("OptionPane.errorIcon"));
-					return;
-				}
 				importStructureFromFile(inFile);
 			}
 		});
@@ -588,7 +577,6 @@ public class GUIVertexInspector extends GUICardPanel
                             JOptionPane.ERROR_MESSAGE,
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
-                } finally {
                 }
              
                 // Read last used cutting rules

@@ -27,8 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +39,14 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.vecmath.Point3d;
 
+import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.io.CifFileReader;
+import org.biojava.nbio.structure.io.cif.CifStructureConsumer;
+import org.biojava.nbio.structure.io.cif.CifStructureConverter;
+import org.jmol.adapter.smarter.SmarterJmolAdapter;
+import org.jmol.api.JmolViewer;
+import org.jmol.viewer.FileManager;
+import org.jmol.viewer.Viewer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
@@ -84,6 +94,49 @@ public class DenoptimIOTest
 
     @TempDir
     File tempDir;
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testReadAllAtomContainersFromCIF() throws Exception {
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+        String tmpFile = tempDir.getAbsolutePath() + SEP + "test.cif";
+        
+        String[] sourceCIFs = {"fromCOD.cif","multipleStructure.cif"};
+        int[] expectedMols = new int[]{1, 3};
+        int[][] expectedAtms = {{81}, {42,45,48}};
+        int[][] expectedBnds = {{85}, {44,47,50}};
+        
+        for (int i=0; i<sourceCIFs.length; i++) 
+        {
+            // Make a copy of the test file to read from file system
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader(
+                        new InputStreamReader(getClass()
+                                .getClassLoader().getResourceAsStream(
+                                        sourceCIFs[i])));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+                while ((line = reader.readLine()) != null) 
+                {
+                    sb.append(line).append(NL);
+                }
+                DenoptimIO.writeData(tmpFile, sb.toString(), false);
+            } finally {
+                if (reader!=null)
+                    reader.close();
+            }
+            List<IAtomContainer> mols = DenoptimIO.readAllAtomContainers(
+                    new File(tmpFile));
+            assertEquals(expectedMols[i], mols.size());
+            for (int j=0; j<mols.size(); j++)
+            {
+                assertEquals(expectedAtms[i][j], mols.get(j).getAtomCount());
+                assertEquals(expectedBnds[i][j], mols.get(j).getBondCount());
+            }
+        }
+    }
     
 //------------------------------------------------------------------------------
 

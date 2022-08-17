@@ -46,6 +46,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -61,6 +62,9 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
+import org.jmol.adapter.smarter.SmarterJmolAdapter;
+import org.jmol.api.JmolViewer;
+import org.jmol.viewer.Viewer;
 import org.openscience.cdk.AtomContainerSet;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.ChemFile;
@@ -68,6 +72,7 @@ import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.Isotope;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.formula.MolecularFormula;
+import org.openscience.cdk.geometry.CrystalGeometryTools;
 import org.openscience.cdk.geometry.GeometryTools;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -78,7 +83,9 @@ import org.openscience.cdk.interfaces.IChemModel;
 import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IChemSequence;
+import org.openscience.cdk.interfaces.ICrystal;
 import org.openscience.cdk.interfaces.IIsotope;
+import org.openscience.cdk.io.FormatFactory;
 import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
@@ -86,7 +93,9 @@ import org.openscience.cdk.io.Mol2Writer;
 import org.openscience.cdk.io.ReaderFactory;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.io.XYZWriter;
+import org.openscience.cdk.io.formats.CIFFormat;
 import org.openscience.cdk.io.formats.IChemFormat;
+import org.openscience.cdk.io.formats.IResourceFormat;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
 import org.openscience.cdk.renderer.RendererModel;
 import org.openscience.cdk.renderer.font.AWTFontManager;
@@ -164,7 +173,10 @@ public class DenoptimIO
     
     /**
      * Returns a single collection with all atom containers found in a file of
-     * any format.
+     * any format. CIF files are internally converted to SDF files, causing loss
+     * of information beyond molecular structure in Cartesian coordinates. So,
+     * if you need more than molecular structure from CIF files, do not use this
+     * method.
      * @param file the file to read.
      * @return the list of containers found in the file.
      * @throws IOException if the file is not found or not readable.
@@ -173,11 +185,55 @@ public class DenoptimIO
     public static List<IAtomContainer> readAllAtomContainers(File file) 
             throws IOException, CDKException
     {
-        FileReader fileReader = new FileReader(file);
-        ReaderFactory readerFact = new ReaderFactory();
-        ISimpleChemObjectReader reader = readerFact.createReader(fileReader);
-        IChemFile chemFile = (IChemFile) reader.read((IChemObject) new ChemFile());
-        return ChemFileManipulator.getAllAtomContainers(chemFile);
+        
+        List<IAtomContainer> results = null;
+        IChemFormat chemFormat = new FormatFactory().guessFormat(
+                new BufferedReader(new FileReader(file)));
+        if (chemFormat instanceof CIFFormat)
+        {
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //                            WARNING
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //
+            // * CDK's CIFReader is broken (skips lines _audit, AND ignores 
+            //   connectivity)
+            // * BioJava's fails on CIF files that do not complain to mmCIF 
+            //   format. Try this:
+            //   CifStructureConverter.fromPath(f.toPath());
+            //
+            // The workaround unit CDK's implementation is fixed, is to use Jmol
+            // to read the CIF and make an SDF that can then be read normally. 
+            // In fact, Jmol's reader is more robust than CDK's and more 
+            // versatile than BioJava's. 
+            // Moreover it reads also the bonds defined in the CIF 
+            // (which OpenBabel does not read).
+            // Yet, Jmol's methods are not visible and require spinning a 
+            // a viewer.
+            
+            //TODO-gg use silent viewer also in GUI
+            
+            Map<String, Object> info = new Hashtable<String, Object>();
+            info.put("adapter", new SmarterJmolAdapter());
+            info.put("isApp", false);
+            info.put("silent", "");
+            Viewer v =  new Viewer(info);
+            v.loadModelFromFile(null, file.getAbsolutePath(), null, null,
+                    false, null, null, null, 0, " ");
+            String tmp = FileUtils.getTempFolder() + FS + "convertedCIF.sdf";
+            v.scriptWait("write " + tmp + " as sdf");
+            v.dispose();
+            
+            results = readAllAtomContainers(new File(tmp));
+        } else {
+            FileReader fileReader = new FileReader(file);
+            ReaderFactory readerFact = new ReaderFactory();
+            ISimpleChemObjectReader reader = readerFact.createReader(fileReader);
+            IChemFile chemFile = (IChemFile) reader.read(
+                    (IChemObject) new ChemFile());
+            results = ChemFileManipulator.getAllAtomContainers(chemFile);
+        }
+        
+        return results;
     }
 
 //------------------------------------------------------------------------------

@@ -8,12 +8,12 @@ mv data/* "$wrkDir"
 rm -rf data
 
 # Here we define the expected results
-#             sub test ID: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18
-expctdNoMissingAtomMols=(9  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)
-    expectedPreFiltered=(0  0  2  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)  
-      expectedFragments=(0  0  0 20 12  8  6 11 70  0  0  0  0  0  9  0  4  2)
-expectedIsomorphicFrags=(0  0  0  0  0  0 30 11  0  0  0  0  0  0 96  0  0  0)
-        expectedResults=(9  1  2  0  0  0  0  0  0  4  2  2  2  3  0  2  0  0)
+#           sub test ID: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
+expctdNoMissingAtomMols=(9  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)
+    expectedPreFiltered=(0  0  2  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)  
+      expectedFragments=(0  0  0 20 12  8  6 11 70  0  0  0  0  0  9  0  4  2  7)
+expectedIsomorphicFrags=(0  0  0  0  0  0 30 11  0  0  0  0  0  0 96  0  0  0  0)
+        expectedResults=(9  1  2  0  0  0  0  0  0  4  2  2  2  3  0  2  0  0  0)
 
 nSubTests=${#expctdNoMissingAtomMols[@]}
 

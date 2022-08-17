@@ -20,6 +20,7 @@ import org.openscience.cdk.Bond;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.config.Isotopes;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -43,6 +44,7 @@ import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.simplified.UndirectedEdge;
 import denoptim.io.DenoptimIO;
+import denoptim.io.IteractingAtomContainerReader;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.fragmenter.MatchedBond;
@@ -234,25 +236,26 @@ public class FragmenterTools
      * @throws IOException
      * @throws UndetectedFileFormatException 
      * @throws IllegalArgumentException 
+     * @throws CDKException 
      */
     
     public static void fragmentation(File input, FragmenterParameters settings,
-            File output, Logger logger) throws DENOPTIMException, IOException, IllegalArgumentException, UndetectedFileFormatException
-    {   
-        FileInputStream fis = new FileInputStream(input);
-        IteratingSDFReader reader = new IteratingSDFReader(fis, 
-                DefaultChemObjectBuilder.getInstance());
+            File output, Logger logger) throws CDKException, IOException, 
+    DENOPTIMException, IllegalArgumentException, UndetectedFileFormatException
+    {
+        IteractingAtomContainerReader iterator = 
+                new IteractingAtomContainerReader(input);
 
         int index = -1;
         try {
-            while (reader.hasNext())
+            while (iterator.hasNext())
             {
                 index++;
                 if (logger!=null)
                 {
                     logger.log(Level.FINE,"Fragmenting structure " + index);
                 }
-                IAtomContainer mol = reader.next();
+                IAtomContainer mol = iterator.next();
                 String molName = "noname-mol" + index;
                 if (mol.getTitle()!=null && !mol.getTitle().isBlank())
                     molName = mol.getTitle();
@@ -276,7 +279,6 @@ public class FragmenterTools
                     String fragIdStr = "From_" + molName + "_" + fragCounter;
                     frag.setProperty("cdk:Title", fragIdStr);
                     fragCounter++;
-                    
                     manageFragmentCollection(frag, fragCounter, settings,
                             keptFragments, logger);
                 }
@@ -292,7 +294,7 @@ public class FragmenterTools
                 }
             }
         } finally {
-            reader.close();
+            iterator.close();
         }
     }
     
