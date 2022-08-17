@@ -210,8 +210,6 @@ public class DenoptimIO
             // Yet, Jmol's methods are not visible and require spinning a 
             // a viewer.
             
-            //TODO-gg use silent viewer also in GUI
-            
             Map<String, Object> info = new Hashtable<String, Object>();
             info.put("adapter", new SmarterJmolAdapter());
             info.put("isApp", false);

@@ -20,11 +20,14 @@ package denoptim.gui;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.util.Hashtable;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.api.JmolViewer;
+import org.jmol.viewer.Viewer;
 
 public class JmolPanel extends JPanel
 {
@@ -39,8 +42,12 @@ public class JmolPanel extends JPanel
     private final Dimension hostPanelSize = new Dimension();
 
     public JmolPanel() {
-        viewer = JmolViewer.allocateViewer(this, new SmarterJmolAdapter(), 
-        null, null, null, null, null); //NB: can add listener here
+        Map<String, Object> info = new Hashtable<String, Object>();
+        info.put("display", this);
+        info.put("adapter", new SmarterJmolAdapter());
+        info.put("isApp", false);
+        info.put("silent", "");
+        viewer =  new Viewer(info);
     }
     
 //------------------------------------------------------------------------------
