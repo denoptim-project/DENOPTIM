@@ -22,6 +22,7 @@ package denoptim.gui;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -575,7 +576,14 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		sb.append("M  END").append(NL).append("$$$$");
 		
 		DenoptimIO.writeData(tmpSDFFile, sb.toString(), false);
-		mol = DenoptimIO.getFirstMolInSDFFile(tmpSDFFile);
+		try
+        {
+            mol = DenoptimIO.readAllAtomContainers(new File(tmpSDFFile)).get(0);
+        } catch (Exception e)
+        {
+            throw new DENOPTIMException("Unable to fetch molecule from tmp SDF",
+                    e);
+        }
 		return mol;
 	}
 	

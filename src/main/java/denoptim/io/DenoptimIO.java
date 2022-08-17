@@ -73,13 +73,20 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemFile;
+import org.openscience.cdk.interfaces.IChemModel;
+import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.interfaces.IChemSequence;
 import org.openscience.cdk.interfaces.IIsotope;
+import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.io.Mol2Writer;
+import org.openscience.cdk.io.ReaderFactory;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.io.XYZWriter;
+import org.openscience.cdk.io.formats.IChemFormat;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
 import org.openscience.cdk.renderer.RendererModel;
 import org.openscience.cdk.renderer.font.AWTFontManager;
@@ -152,6 +159,26 @@ public class DenoptimIO
     
     private static final IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns a single collection with all atom containers found in a file of
+     * any format.
+     * @param file the file to read.
+     * @return the list of containers found in the file.
+     * @throws IOException if the file is not found or not readable.
+     * @throws CDKException if the reading of the file goes wrong.
+     */
+    public static List<IAtomContainer> readAllAtomContainers(File file) 
+            throws IOException, CDKException
+    {
+        FileReader fileReader = new FileReader(file);
+        ReaderFactory readerFact = new ReaderFactory();
+        ISimpleChemObjectReader reader = readerFact.createReader(fileReader);
+        IChemFile chemFile = (IChemFile) reader.read((IChemObject) new ChemFile());
+        return ChemFileManipulator.getAllAtomContainers(chemFile);
+    }
 
 //------------------------------------------------------------------------------
 
@@ -189,21 +216,6 @@ public class DenoptimIO
         }
 
         return lstContainers;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Reads a file SDF file possible containing multiple molecules,
-     * and returns only the first one.
-     *
-     * @param fileName the file containing the molecules
-     * @return the first molecular object in the file
-     * @throws DENOPTIMException
-     */
-    public static IAtomContainer getFirstMolInSDFFile(String fileName)
-            throws DENOPTIMException {
-        return readSDFFile(fileName).get(0);
     }
     
 //------------------------------------------------------------------------------

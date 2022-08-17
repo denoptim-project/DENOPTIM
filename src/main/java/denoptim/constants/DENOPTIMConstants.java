@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemModel;
+import org.openscience.cdk.interfaces.IChemSequence;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;

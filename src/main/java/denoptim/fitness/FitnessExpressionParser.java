@@ -18,6 +18,7 @@
 
 package denoptim.fitness;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -570,7 +571,8 @@ public class FitnessExpressionParser
         IBitFingerprint fp = null;
         try
         {
-            IAtomContainer refMol = DenoptimIO.getFirstMolInSDFFile(fileName);
+            IAtomContainer refMol = DenoptimIO.readAllAtomContainers(
+                    new File(fileName)).get(0);
             
             if (fingerprinter instanceof ShortestPathFingerprinter)
             {
@@ -587,7 +589,7 @@ public class FitnessExpressionParser
             }
             
             fp = fingerprinter.getBitFingerprint(refMol);
-        } catch (CDKException e)
+        } catch (Exception e)
         {
             throw new DENOPTIMException("ERROR! Unable to read molecule from "
                     + "file '" + fileName + "'.",e);

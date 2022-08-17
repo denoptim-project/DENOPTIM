@@ -1456,7 +1456,7 @@ public class GUIGraphHandler extends GUICardPanel
 	                }
 		    }
 		} catch (Throwable e) {
-			System.out.println("Could not read molecules from " + file);
+			System.out.println("Could not read graphs from " + file);
 			for (int i=0; i<dnGraphLibrary.size(); i++)
 			{
 				molLibrary.add(builder.newAtomContainer());

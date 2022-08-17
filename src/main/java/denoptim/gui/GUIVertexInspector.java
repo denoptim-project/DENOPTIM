@@ -924,8 +924,8 @@ public class GUIVertexInspector extends GUICardPanel
 		clearCurrentSystem();
 		
 		try {			
-			IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(
-					file.getAbsolutePath());
+		    //TODO-gg multiple?
+			IAtomContainer mol = DenoptimIO.readAllAtomContainers(file).get(0);
 			
 			// We mean to import only the structure: get rid of AP
 			mol.setProperty(DENOPTIMConstants.APSTAG,null);

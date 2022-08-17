@@ -200,8 +200,9 @@ public class MoleculeViewPanel extends JSplitPane
 		IAtomContainer mol;
 		TreeMap<String,String> availableProps = new TreeMap<String,String>();
 		try {
-			mol = DenoptimIO.getFirstMolInSDFFile(item.getSDFFile());
-		} catch (DENOPTIMException e1) {
+			mol = DenoptimIO.readAllAtomContainers(
+			        new File(item.getSDFFile())).get(0);
+		} catch (Exception e1) {
 			return;
 		}
 		for (Object propRef : mol.getProperties().keySet())
@@ -340,14 +341,14 @@ public class MoleculeViewPanel extends JSplitPane
                     // so far, there is no case where the fully defined graph 
                     // is needed. We only need its string representation.
 					
-					item = new Candidate(DenoptimIO.readSDFFile(
-							file.getAbsolutePath()).get(0),false,true);
-				} catch (DENOPTIMException e1) {
+					item = new Candidate(DenoptimIO.readAllAtomContainers(
+					        file).get(0),false,true);
+				} catch (Exception e1) {
 				    try {
 				        item = Candidate.fromAtomContainerNoGraph(
-				                DenoptimIO.readSDFFile(
-				                        file.getAbsolutePath()).get(0), true);
-				    } catch (DENOPTIMException e2) {
+				                DenoptimIO.readAllAtomContainers(
+				                        file).get(0), true);
+				    } catch (Exception e2) {
     					e1.printStackTrace();
     					this.setCursor(Cursor.getPredefinedCursor(
     							Cursor.DEFAULT_CURSOR));
@@ -391,8 +392,8 @@ public class MoleculeViewPanel extends JSplitPane
 		if (molFile != null)
 		{
 			try {
-				mol = DenoptimIO.getFirstMolInSDFFile(molFile.getAbsolutePath());
-			} catch (DENOPTIMException e) {
+				mol = DenoptimIO.readAllAtomContainers(molFile).get(0);
+			} catch (Exception e) {
 				System.out.println("Could not read descriptors from '" 
 						+ molFile + "': "+e.getLocalizedMessage());
 			}
