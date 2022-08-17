@@ -23,51 +23,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.PseudoAtom;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.silent.Bond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.files.FileUtils;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.fragspace.IdFragmentAndAP;
-import denoptim.graph.APClass;
-import denoptim.graph.AttachmentPoint;
-import denoptim.graph.DGraph;
-import denoptim.graph.Edge;
-import denoptim.graph.Edge.BondType;
-import denoptim.graph.Fragment;
-import denoptim.graph.Ring;
-import denoptim.graph.SymmetricSet;
-import denoptim.graph.Template;
-import denoptim.graph.Vertex;
-import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.fragmenter.FragmenterParameters;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.MoleculeUtils;
 
 /**
  * Unit test for fparallel ragmentation algorithm components.

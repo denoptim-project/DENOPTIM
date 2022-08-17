@@ -43,16 +43,13 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.APClass;
 import denoptim.graph.DGraph;
-import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Ring;
 import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosure;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.MathUtils;
 import denoptim.utils.ObjectPair;
 

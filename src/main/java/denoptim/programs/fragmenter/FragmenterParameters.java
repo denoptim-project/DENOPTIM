@@ -19,7 +19,6 @@
 package denoptim.programs.fragmenter;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,22 +29,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.combinatorial.CEBLUtils;
-import denoptim.combinatorial.CheckPoint;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragmenter.FragmentClusterer;
-import denoptim.graph.APClass;
-import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;

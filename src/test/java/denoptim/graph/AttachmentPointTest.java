@@ -32,7 +32,6 @@ import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
-import org.openscience.cdk.geometry.BondTools;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;

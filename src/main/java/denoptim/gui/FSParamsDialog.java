@@ -27,8 +27,6 @@ import javax.swing.UIManager;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.graph.rings.RingClosureParameters;
-import denoptim.programs.RunTimeParameters.ParametersType;
 
 /**
  * A modal dialog to define a fragment space and load it.

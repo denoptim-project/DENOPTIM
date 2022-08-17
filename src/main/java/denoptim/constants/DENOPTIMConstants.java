@@ -28,13 +28,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IChemModel;
-import org.openscience.cdk.interfaces.IChemSequence;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Vertex;

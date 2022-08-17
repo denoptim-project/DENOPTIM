@@ -27,26 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 import javax.vecmath.Point3d;
 
-import org.biojava.nbio.structure.Structure;
-import org.biojava.nbio.structure.io.CifFileReader;
-import org.biojava.nbio.structure.io.cif.CifStructureConsumer;
-import org.biojava.nbio.structure.io.cif.CifStructureConverter;
-import org.jmol.adapter.smarter.SmarterJmolAdapter;
-import org.jmol.api.JmolViewer;
-import org.jmol.viewer.FileManager;
-import org.jmol.viewer.Viewer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.Atom;

@@ -4,8 +4,6 @@ import java.util.logging.Logger;
 
 import org.openscience.cdk.interfaces.IAtom;
 
-import denoptim.graph.APClass;
-
 public class MatchedBond
 {
     /**

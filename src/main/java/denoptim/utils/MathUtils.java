@@ -27,9 +27,6 @@ import java.util.List;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
-import org.apache.commons.math3.ml.clustering.Clusterable;
-import org.apache.commons.math3.ml.clustering.DoublePoint;
-
 import denoptim.constants.DENOPTIMConstants;
 
 /**

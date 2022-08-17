@@ -1,38 +1,19 @@
 package denoptim.fragmenter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
-import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.isomorphism.Mappings;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.smiles.SmilesParser;
-
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.graph.APClass;
@@ -40,11 +21,6 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.FragIsomorphNode;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex.BBType;
-import denoptim.programs.fragmenter.CuttingRule;
-import denoptim.programs.fragmenter.FragmenterParameters;
-import denoptim.programs.fragmenter.MatchedBond;
-import denoptim.utils.ManySMARTSQuery;
-import denoptim.utils.MoleculeUtils;
 
 /**
  * Unit test for fragmenter's tools.

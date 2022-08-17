@@ -46,7 +46,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -76,7 +75,6 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.utils.GraphConversionTool;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 

@@ -1,48 +1,22 @@
 package denoptim.fragmenter;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.ml.clustering.CentroidCluster;
-import org.apache.commons.math3.ml.clustering.Cluster;
-import org.apache.commons.math3.ml.clustering.Clusterable;
-import org.apache.commons.math3.ml.clustering.DoublePoint;
-import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
-import org.apache.commons.math3.ml.clustering.MultiKMeansPlusPlusClusterer;
-import org.apache.commons.math3.ml.clustering.evaluation.SumOfClusterVariances;
 import org.apache.commons.math3.ml.distance.DistanceMeasure;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
-import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import org.biojava.nbio.structure.geometry.CalcPoint;
 import org.biojava.nbio.structure.geometry.SuperPositionSVD;
-import org.openscience.cdk.Atom;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.AttachmentPoint;
-import denoptim.graph.DGraph.StringFormat;
-import denoptim.graph.FragIsomorphNode;
-import denoptim.io.DenoptimIO;
 import denoptim.graph.Fragment;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.utils.MathUtils;

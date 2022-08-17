@@ -1,61 +1,23 @@
 package denoptim.fragmenter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
 
-import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
-import javax.vecmath.Vector3d;
 
-import org.apache.commons.math3.ml.clustering.Clusterable;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
-import org.openscience.cdk.PseudoAtom;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.isomorphism.Mappings;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.smiles.SmilesParser;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.files.FileFormat;
 import denoptim.fragmenter.FragmentClusterer.DistanceAsRMSD;
 import denoptim.graph.APClass;
-import denoptim.graph.AttachmentPoint;
-import denoptim.graph.FragIsomorphNode;
 import denoptim.graph.Fragment;
-import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.io.DenoptimIO;
-import denoptim.programs.fragmenter.CuttingRule;
-import denoptim.programs.fragmenter.FragmenterParameters;
-import denoptim.programs.fragmenter.MatchedBond;
-import denoptim.utils.ManySMARTSQuery;
-import denoptim.utils.MoleculeUtils;
-import denoptim.utils.Randomizer;
-import uk.ac.ebi.beam.Bond;
 
 /**
  * Unit test for fragmenter's tools.

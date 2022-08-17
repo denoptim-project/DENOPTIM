@@ -20,23 +20,15 @@ package denoptim.fragmenter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 
-import org.apache.xerces.xni.parser.XMLDTDContentModelSource;
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.graph.Fragment;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.Task;
-import denoptim.utils.MoleculeUtils;
 import denoptim.utils.TaskUtils;
 
 /**

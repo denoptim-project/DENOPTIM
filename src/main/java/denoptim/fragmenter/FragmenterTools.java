@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
-import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
@@ -27,7 +25,6 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.isomorphism.Mappings;
-import org.openscience.cdk.signature.MoleculeSignature;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -36,13 +33,9 @@ import denoptim.files.FileFormat;
 import denoptim.files.UndetectedFileFormatException;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.FragIsomorphEdge;
-import denoptim.graph.FragIsomorphNode;
 import denoptim.graph.Fragment;
-import denoptim.graph.FragmentIsomorphismInspector;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.simplified.UndirectedEdge;
 import denoptim.io.DenoptimIO;
 import denoptim.io.IteractingAtomContainerReader;
 import denoptim.programs.fragmenter.CuttingRule;

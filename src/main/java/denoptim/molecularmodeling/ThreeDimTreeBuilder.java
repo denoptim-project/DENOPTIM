@@ -49,7 +49,6 @@ import denoptim.graph.Edge.BondType;
 import denoptim.graph.Ring;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
-import denoptim.programs.RunTimeParameters;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MathUtils;

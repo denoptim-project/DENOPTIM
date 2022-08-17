@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,10 +45,8 @@ import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;
-import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
-import denoptim.task.ProcessHandler;
 import denoptim.utils.GenUtils;
 import denoptim.utils.ObjectPair;
 

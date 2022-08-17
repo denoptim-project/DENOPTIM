@@ -21,7 +21,6 @@ package denoptim.graph;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -32,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
-import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
 import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -45,7 +43,6 @@ import com.google.gson.Gson;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
-import denoptim.graph.simplified.UndirectedEdge;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;

@@ -38,7 +38,6 @@ import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.SymmetricSet;
 import denoptim.graph.Vertex;
-import denoptim.logging.CounterID;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.combinatorial.CEBLParameters;
