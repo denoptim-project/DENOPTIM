@@ -18,7 +18,7 @@
 
 package denoptim.utils;
 
-import java.io.IOException;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -34,41 +34,10 @@ import denoptim.constants.DENOPTIMConstants;
  * General utilities
  */
 
-public class GenUtils
+public class GeneralUtils
 {
     private static Runtime RUNTIME = Runtime.getRuntime();
     private final static String NL = DENOPTIMConstants.EOL;
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * C++ equivalent of a getchar()
-     */
-     
-    public static void pause() {
-        System.err.println("Press a key to continue");
-        try 
-        {
-            int inchar = System.in.read();
-        }
-        catch (IOException e)
-        {
-            System.err.println("Error reading from user");
-        }
-    }
-    
-//------------------------------------------------------------------------------
-
-    public static String getFileExtension(String fname)
-    {
-        String ext = "";
-        if (fname.contains("."))
-        {
-	        int dotPos = fname.lastIndexOf(".");
-	        ext = fname.substring(dotPos);
-        }
-        return ext;
-    }
 
 //------------------------------------------------------------------------------
 

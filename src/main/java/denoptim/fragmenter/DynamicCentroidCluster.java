@@ -1,16 +1,11 @@
 package denoptim.fragmenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.math3.ml.clustering.Cluster;
-import org.apache.commons.math3.ml.clustering.Clusterable;
 import org.apache.commons.math3.ml.distance.DistanceMeasure;
 
-import denoptim.fragmenter.FragmentClusterer.DistanceAsRMSD;
 import denoptim.utils.MathUtils;
 
 /**

@@ -63,7 +63,7 @@ public class GenUtilsTest
         Set<Integer> expectedThree = new HashSet<Integer>(Arrays.asList(
                 11));
         
-        GenUtils.unionOfIntersectingSets(list);
+        GeneralUtils.unionOfIntersectingSets(list);
         assertEquals(3,list.size(),"Number of united sets");
         assertEquals(expectedOne,list.get(0),"Elements in first set");
         assertEquals(expectedTwo,list.get(1),"Elements in second set");

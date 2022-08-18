@@ -18,21 +18,9 @@
 
 package denoptim.task;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -40,35 +28,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
-import denoptim.combinatorial.GraphBuildingTask;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.files.FileFormat;
-import denoptim.files.UndetectedFileFormatException;
-import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.fragspace.FragsCombination;
-import denoptim.fragspace.FragsCombinationIterator;
-import denoptim.fragspace.IdFragmentAndAP;
-import denoptim.graph.DGraph;
-import denoptim.graph.Vertex;
-import denoptim.graph.Vertex.BBType;
-import denoptim.io.DenoptimIO;
-import denoptim.programs.RunTimeParameters.ParametersType;
-import denoptim.programs.combinatorial.CEBLParameters;
-import denoptim.programs.fragmenter.FragmenterParameters;
-import denoptim.utils.GraphUtils;
-import denoptim.utils.MoleculeUtils;
-import edu.uci.ics.jung.visualization.spatial.FastRenderingGraph;
 
 
 /**
@@ -193,7 +157,7 @@ abstract public class ParallelAsynchronousTaskExecutor
      * locally to allow reporting it back from the main thread.
      * @return <code>true</code> if any of the subtasks has thrown an exception
      */
-    private boolean subtaskHasException()
+    protected boolean subtaskHasException()
     {
         boolean hasException = false;
         for (Task tsk : submitted)
@@ -205,8 +169,18 @@ abstract public class ParallelAsynchronousTaskExecutor
                 break;
             }
         }
-
         return hasException;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the trace of the problem occurred in the first subtask that was
+     * detected to have a problem.
+     */
+    protected Throwable getExceptionFromSubTask()
+    {
+        return thrownByTask;
     }
 
 //------------------------------------------------------------------------------
@@ -215,7 +189,7 @@ abstract public class ParallelAsynchronousTaskExecutor
      * Check for completion of all subtasks
      * @return <code>true</code> if all subtasks are completed
      */
-    private boolean allTasksCompleted()
+    protected boolean allTasksCompleted()
     {
         boolean allDone = true;
         for (Task tsk : submitted)
@@ -226,7 +200,6 @@ abstract public class ParallelAsynchronousTaskExecutor
                 break;
             }
         }
-
         return allDone;
     }
 

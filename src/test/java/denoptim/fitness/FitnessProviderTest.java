@@ -176,7 +176,7 @@ public class FitnessProviderTest
         List<String> classNames = new ArrayList<String>();
         classNames.add("denoptim.fitness.descriptors.TanimotoMolSimilarity");
         DescriptorEngine engine = new DescriptorEngine(classNames,null);
-        List<IDescriptor> iDescs =  engine.instantiateDescriptors(classNames);
+        engine.instantiateDescriptors(classNames);
         IDescriptor iDesc = new TanimotoMolSimilarity();
         
         //Customise parameters used to calculate descriptors

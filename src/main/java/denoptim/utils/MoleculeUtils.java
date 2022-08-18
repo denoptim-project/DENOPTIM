@@ -63,7 +63,6 @@ import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.smiles.FixBondOrdersTool;
 import org.openscience.cdk.smiles.SmiFlavor;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
@@ -82,7 +81,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import io.github.dan2097.jnainchi.InchiFlag;
 import io.github.dan2097.jnainchi.InchiOptions;
-import net.sf.jniinchi.INCHI_RET;
+import io.github.dan2097.jnainchi.InchiStatus;
 
 
 /**
@@ -118,6 +117,23 @@ public class MoleculeUtils
             throw new DENOPTIMException(ex);
         }
         return ret_wd;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks if the given atom is a dummy atom based on the elemental symbol
+     * and the string used for dummy atom as a convention in DENOPTIM (uses
+     * {@link DENOPTIMConstants#DUMMYATMSYMBOL}. For detecting dummy atoms
+     * beyond DENOPTIM's convention, use {@link DummyAtomHandler}.
+     * @param atm
+     * @return <code>true</code> if the symbol of the atom indicates this is a 
+     * dummy atom according to DENOPTIM's convention.
+     */
+    public static boolean isDummy(IAtom atm)
+    {
+        String el = getSymbolOrLabel(atm);
+        return DENOPTIMConstants.DUMMYATMSYMBOL.equals(el);
     }
     
 //------------------------------------------------------------------------------
@@ -472,14 +488,14 @@ public class MoleculeUtils
         {
             InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();
             InChIGenerator gen = factory.getInChIGenerator(fmol, options);
-            INCHI_RET ret = gen.getReturnStatus();
-            if (ret == INCHI_RET.WARNING)
+            InchiStatus ret = gen.getStatus();
+            if (ret == InchiStatus.WARNING)
             {
                 //String error = gen.getMessage();
                 //InChI generated, but with warning message
                 //return new ObjectPair(null, error);
             }
-            else if (ret != INCHI_RET.OKAY)
+            else if (ret != InchiStatus.SUCCESS)
             {
                 return null;
             }
@@ -929,8 +945,6 @@ public class MoleculeUtils
                     oAtm.getHybridization().toString()));
         if (oAtm.getImplicitHydrogenCount() != null && !ignoreImplicitH)
             nAtm.setImplicitHydrogenCount(oAtm.getImplicitHydrogenCount());
-        if (oAtm.getStereoParity() != null)
-            nAtm.setStereoParity(oAtm.getStereoParity());
         if (oAtm.getMaxBondOrder() != null)
             nAtm.setMaxBondOrder(oAtm.getMaxBondOrder());
         if (oAtm.getNaturalAbundance() != null)

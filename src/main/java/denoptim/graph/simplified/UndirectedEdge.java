@@ -21,7 +21,7 @@ package denoptim.graph.simplified;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Vertex;
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 
 /**
  * This class represents an undirected version of the edge between two vertices.
@@ -92,12 +92,12 @@ public class UndirectedEdge
         Vertex tvB = apB.getOwner();
         
         String invariantTA = tvA.getBuildingBlockType().toOldInt() +
-                GenUtils.getPaddedString(6,tvA.getBuildingBlockId()) +
-                GenUtils.getPaddedString(4,apA.getIndexInOwner());
+                GeneralUtils.getPaddedString(6,tvA.getBuildingBlockId()) +
+                GeneralUtils.getPaddedString(4,apA.getIndexInOwner());
         
         String invariantTB = tvB.getBuildingBlockType().toOldInt() +
-                GenUtils.getPaddedString(6,tvB.getBuildingBlockId()) +
-                GenUtils.getPaddedString(4,apB.getIndexInOwner());
+                GeneralUtils.getPaddedString(6,tvB.getBuildingBlockId()) +
+                GeneralUtils.getPaddedString(4,apB.getIndexInOwner());
                 
         String tmp = invariantTA + invariantTB;
         if (invariantTA.compareTo(invariantTB) > 0)

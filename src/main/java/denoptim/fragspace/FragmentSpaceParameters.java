@@ -75,11 +75,6 @@ public class FragmentSpaceParameters extends RunTimeParameters
     protected String rotBndsFile = "";
 
     /**
-     * Flag defining use of AP class-based approach
-     */
-    private boolean apClassBasedApproch = false;
-
-    /**
      * Maximum number of heavy (non-hydrogen) atoms accepted
      */
     protected int maxHeavyAtom = 100;

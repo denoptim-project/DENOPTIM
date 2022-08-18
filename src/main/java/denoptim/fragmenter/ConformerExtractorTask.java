@@ -23,53 +23,29 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 
-import javax.swing.RepaintManager;
-import javax.vecmath.Point3d;
-
-import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
-import org.apache.commons.math3.ml.clustering.MultiKMeansPlusPlusClusterer;
-import org.apache.commons.math3.ml.distance.DistanceMeasure;
-import org.apache.xerces.xni.parser.XMLDTDContentModelSource;
-import org.jgrapht.GraphMapping;
-import org.jgrapht.graph.DefaultUndirectedGraph;
-import org.openscience.cdk.Atom;
 import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.geometry.alignment.KabschAlignment;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
-import denoptim.fragmenter.FragmentClusterer.DistanceAsRMSD;
-import denoptim.graph.AttachmentPoint;
-import denoptim.graph.FragIsomorphEdge;
 import denoptim.graph.FragIsomorphNode;
 import denoptim.graph.Fragment;
-import denoptim.graph.FragmentIsomorphismInspector;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.Task;
 import denoptim.utils.TaskUtils;
-import edu.uci.ics.jung.algorithms.util.KMeansClusterer;
-import org.biojava.nbio.structure.geometry.SuperPositionSVD;
 
 /**
  * Task that analyzes an isomorphic family of fragments to identify the most 

@@ -31,6 +31,7 @@ import javax.swing.JPanel;
  * @author Marco Foscato
  */
 
+@SuppressWarnings("serial")
 public class ButtonsBar extends JPanel
 {
 	private GridBagConstraints cmdGridConstraints = new GridBagConstraints();

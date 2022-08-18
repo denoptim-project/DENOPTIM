@@ -21,10 +21,8 @@ package denoptim.programs.fragmenter;
 import java.io.File;
 import java.util.List;
 
-import denoptim.combinatorial.CombinatorialExplorerByLayer;
 import denoptim.fragmenter.ConformerExtractorTask;
 import denoptim.fragmenter.ParallelFragmentationAlgorithm;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;

@@ -34,21 +34,16 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.swing.BoxLayout;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-import org.jmol.awtjs.swing.BorderLayout;
-import org.jmol.awtjs.swing.JPanel;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
@@ -200,8 +195,9 @@ public class MoleculeViewPanel extends JSplitPane
 		IAtomContainer mol;
 		TreeMap<String,String> availableProps = new TreeMap<String,String>();
 		try {
-			mol = DenoptimIO.getFirstMolInSDFFile(item.getSDFFile());
-		} catch (DENOPTIMException e1) {
+			mol = DenoptimIO.readAllAtomContainers(
+			        new File(item.getSDFFile())).get(0);
+		} catch (Exception e1) {
 			return;
 		}
 		for (Object propRef : mol.getProperties().keySet())
@@ -340,14 +336,14 @@ public class MoleculeViewPanel extends JSplitPane
                     // so far, there is no case where the fully defined graph 
                     // is needed. We only need its string representation.
 					
-					item = new Candidate(DenoptimIO.readSDFFile(
-							file.getAbsolutePath()).get(0),false,true);
-				} catch (DENOPTIMException e1) {
+					item = new Candidate(DenoptimIO.readAllAtomContainers(
+					        file).get(0),false,true);
+				} catch (Exception e1) {
 				    try {
 				        item = Candidate.fromAtomContainerNoGraph(
-				                DenoptimIO.readSDFFile(
-				                        file.getAbsolutePath()).get(0), true);
-				    } catch (DENOPTIMException e2) {
+				                DenoptimIO.readAllAtomContainers(
+				                        file).get(0), true);
+				    } catch (Exception e2) {
     					e1.printStackTrace();
     					this.setCursor(Cursor.getPredefinedCursor(
     							Cursor.DEFAULT_CURSOR));
@@ -359,11 +355,9 @@ public class MoleculeViewPanel extends JSplitPane
 
 		fillDataTable(file);
 
-		int i=0;
 		// This is often needed to wait for the 'zap' script to finish.
         while (jmolPanel.viewer.isScriptExecuting())
         {
-            i++;
             try
             {
                 Thread.sleep(100);
@@ -391,8 +385,8 @@ public class MoleculeViewPanel extends JSplitPane
 		if (molFile != null)
 		{
 			try {
-				mol = DenoptimIO.getFirstMolInSDFFile(molFile.getAbsolutePath());
-			} catch (DENOPTIMException e) {
+				mol = DenoptimIO.readAllAtomContainers(molFile).get(0);
+			} catch (Exception e) {
 				System.out.println("Could not read descriptors from '" 
 						+ molFile + "': "+e.getLocalizedMessage());
 			}

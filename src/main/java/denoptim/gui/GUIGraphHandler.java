@@ -46,7 +46,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -76,7 +75,6 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.utils.GraphConversionTool;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 
@@ -928,7 +926,7 @@ public class GUIGraphHandler extends GUICardPanel
 						+ "<li>Use mouse mode <i>Move</i> to drag the graph in "
 						+ "any direction, <code>ALT</code>+drag to rotate, and "
 						+ "<code>CTRL</code>+drag to skew the graph. Wheel, or "
-						+ "analogous, to zomm in/out.</li>"
+						+ "analogous, to zoom in/out.</li>"
 						+ "</ul>Mouse mode can be changed also by double click "
 						+ "in the graph area, away from any vertex/edge, and "
 						+ "hitting <code>p</code> for <i>Pick</i> or "
@@ -1275,7 +1273,6 @@ public class GUIGraphHandler extends GUICardPanel
 		// Create clones of fragments and put the into 'compatFrags'
 		collectFragAndAPsCompatibleWithSelectedAPs(selAps);
 		
-		Vertex.BBType trgFrgType = Vertex.BBType.UNDEFINED;
 		ArrayList<Vertex> vertxLib = new ArrayList<Vertex>();		
 		String[] options = new String[]{"Any Vertex",
 				"Compatible Vertices ("+compatVrtxs.size()+")",
@@ -1292,18 +1289,15 @@ public class GUIGraphHandler extends GUICardPanel
 		switch (res)
 		{
 			case 0:
-			    ArrayList<Vertex> tmp = fragSpace.getFragmentLibrary();
-				vertxLib = new  ArrayList<Vertex>();
+				vertxLib = new ArrayList<Vertex>();
 		        for (Vertex bb : fragSpace.getFragmentLibrary())
 		        {
 		        	vertxLib.add(bb.clone());
 		        }
-				trgFrgType = Vertex.BBType.FRAGMENT;
 				break;
 				
 			case 1:
 				vertxLib = compatVrtxs;
-				trgFrgType = Vertex.BBType.FRAGMENT;
 				break;
 				
 			case 2:
@@ -1312,7 +1306,6 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		            vertxLib.add(bb.clone());
 		        }
-				trgFrgType = Vertex.BBType.CAP;
 				break;
 			default:
 				return;
@@ -1337,7 +1330,8 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			return;
 		}
-		ArrayList<Integer> trgFragApId = 
+		@SuppressWarnings("unchecked")
+        ArrayList<Integer> trgFragApId = 
 		        ((ArrayList<ArrayList<Integer>>)selected).get(0);
 		Vertex chosenVrtx = vertxLib.get(trgFragApId.get(0));
 		
@@ -1456,7 +1450,7 @@ public class GUIGraphHandler extends GUICardPanel
 	                }
 		    }
 		} catch (Throwable e) {
-			System.out.println("Could not read molecules from " + file);
+			System.out.println("Could not read graphs from " + file);
 			for (int i=0; i<dnGraphLibrary.size(); i++)
 			{
 				molLibrary.add(builder.newAtomContainer());
@@ -1542,9 +1536,6 @@ public class GUIGraphHandler extends GUICardPanel
     		catch (UndetectedFileFormatException uff) 
     		{
                 String[] options = {"Abandon", "SDF", "JSON"};
-                FileFormat[] ffs = {null,
-                        FileFormat.GRAPHSDF,
-                        FileFormat.GRAPHJSON};
                 int res = JOptionPane.showOptionDialog(this,
                     "<html>Failed to detect file type from file's "
                     + "extension.<br>"
@@ -1557,7 +1548,6 @@ public class GUIGraphHandler extends GUICardPanel
                     UIManager.getIcon("OptionPane.warningIcon"),
                     options,
                     options[0]);
-                FileFormat ff = null;
                 switch (res)
                 {
                     case 0:
@@ -1855,7 +1845,8 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * Dialog to configure one or more templates.
 	 */
-	private class ConfigTemplateDialog extends GUIModalDialog
+	@SuppressWarnings("serial")
+    private class ConfigTemplateDialog extends GUIModalDialog
 	{   
 	    private JPanel centralPanel;
 	    private JScrollPane scrollPanel;
@@ -1866,12 +1857,12 @@ public class GUIGraphHandler extends GUICardPanel
 	    /**
 	     * Creates a modal dialog with a specified number of limes allowing to 
 	     * configure the properties of the templates to be created from graphs.
-	     * @param parent the parent component calling this modal dialog.
+	     * @param refForPlacement the component used to place this dialog.
 	     * @param num the number of templates to configure.
 	     */
-	    public ConfigTemplateDialog(Component parent, int num)
+	    public ConfigTemplateDialog(Component refForPlacement, int num)
 	    {
-	        setLocationRelativeTo(parent);
+	        super(refForPlacement);
 	        setTitle("Define Properties of Templates");
 	        centralPanel = new JPanel();
 	        centralPanel.setLayout(new BoxLayout(

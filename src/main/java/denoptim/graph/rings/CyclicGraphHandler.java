@@ -836,12 +836,6 @@ public class CyclicGraphHandler
      */
     private class RingSizeManager
     {
-        // The graph representation of the INITIAL system. Note that
-        // As we select candidate pairs of RCAs and define candidate 
-        // DENOPTIMRings this DENOPTIMGraph will keep representing the 
-        // initial system
-        private DGraph graph;
-
         // Molecular representation of the current system
         private IAtomContainer mol;
 
@@ -897,8 +891,6 @@ public class CyclicGraphHandler
         public void initialize(IAtomContainer origMol, DGraph graph)
                                                       throws DENOPTIMException
         {
-            // Store current system
-            this.graph = graph;
             try
             {
                 mol = (IAtomContainer) origMol.clone();

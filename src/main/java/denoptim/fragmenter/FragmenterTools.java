@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,18 +14,17 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
-import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.config.Isotopes;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.isomorphism.Mappings;
-import org.openscience.cdk.signature.MoleculeSignature;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -35,14 +33,11 @@ import denoptim.files.FileFormat;
 import denoptim.files.UndetectedFileFormatException;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.FragIsomorphEdge;
-import denoptim.graph.FragIsomorphNode;
 import denoptim.graph.Fragment;
-import denoptim.graph.FragmentIsomorphismInspector;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.graph.simplified.UndirectedEdge;
 import denoptim.io.DenoptimIO;
+import denoptim.io.IteractingAtomContainerReader;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.fragmenter.MatchedBond;
@@ -234,25 +229,26 @@ public class FragmenterTools
      * @throws IOException
      * @throws UndetectedFileFormatException 
      * @throws IllegalArgumentException 
+     * @throws CDKException 
      */
     
     public static void fragmentation(File input, FragmenterParameters settings,
-            File output, Logger logger) throws DENOPTIMException, IOException, IllegalArgumentException, UndetectedFileFormatException
-    {   
-        FileInputStream fis = new FileInputStream(input);
-        IteratingSDFReader reader = new IteratingSDFReader(fis, 
-                DefaultChemObjectBuilder.getInstance());
+            File output, Logger logger) throws CDKException, IOException, 
+    DENOPTIMException, IllegalArgumentException, UndetectedFileFormatException
+    {
+        IteractingAtomContainerReader iterator = 
+                new IteractingAtomContainerReader(input);
 
         int index = -1;
         try {
-            while (reader.hasNext())
+            while (iterator.hasNext())
             {
                 index++;
                 if (logger!=null)
                 {
                     logger.log(Level.FINE,"Fragmenting structure " + index);
                 }
-                IAtomContainer mol = reader.next();
+                IAtomContainer mol = iterator.next();
                 String molName = "noname-mol" + index;
                 if (mol.getTitle()!=null && !mol.getTitle().isBlank())
                     molName = mol.getTitle();
@@ -276,7 +272,6 @@ public class FragmenterTools
                     String fragIdStr = "From_" + molName + "_" + fragCounter;
                     frag.setProperty("cdk:Title", fragIdStr);
                     fragCounter++;
-                    
                     manageFragmentCollection(frag, fragCounter, settings,
                             keptFragments, logger);
                 }
@@ -292,7 +287,7 @@ public class FragmenterTools
                 }
             }
         } finally {
-            reader.close();
+            iterator.close();
         }
     }
     
@@ -486,7 +481,8 @@ public class FragmenterTools
                 }
             }
             cloneOfMaster.removeAtoms(atmsToRemove);
-            fragments.add(cloneOfMaster);
+            if (cloneOfMaster.getAttachmentPoints().size()>0)
+                fragments.add(cloneOfMaster);
         }
         
         return fragments;
@@ -616,7 +612,7 @@ public class FragmenterTools
                 continue;
             }
            
-            // Apply further options of cutting rule
+            // Get atoms matching cutting rule queries
             Mappings purgedPairs = msq.getMatchesOfSMARTS(ruleName);
             
             // Evaluate subclass membership and eventually store target bonds
@@ -632,7 +628,10 @@ public class FragmenterTools
                 }
                 MatchedBond tb = new MatchedBond(mol.getAtom(pair[0]),
                         mol.getAtom(pair[1]), rule);
-                bondsMatched.add(tb);
+                
+                // Apply any further option of the cutting rule
+                if (tb.satisfiesRuleOptions(logger))
+                    bondsMatched.add(tb);
             }
 
             if (!bondsMatched.isEmpty())
@@ -698,10 +697,18 @@ public class FragmenterTools
      * Management of fragments: includes application of fragment filters, 
      * rejection rules, and collection rules (also of isomorphic fragments, thus
      * management of duplicates) to manipulate collection of fragments.
-     * @throws DENOPTIMException 
-     * @throws IOException 
-     * @throws UndetectedFileFormatException 
-     * @throws IllegalArgumentException 
+     * @param frag the fragment to analyze now. This is a fragment that is 
+     * candidates to enter the collection of fragments.
+     * @param fragCounter fragment index. Used only for logging purposes.
+     * @param settings configuration of the filters and methods uses throughout 
+     * the fragmentation and pre-/post-processing of fragments.
+     * @param collector where accepted fragments are collected. This is the 
+     * collection of fragment where we want to put <code>frag</code>.
+     * @param logger where to direct all log.
+     * @throws DENOPTIMException
+     * @throws IllegalArgumentException
+     * @throws UndetectedFileFormatException
+     * @throws IOException
      */
     public static void manageFragmentCollection(Vertex frag, int fragCounter, 
             FragmenterParameters settings, 

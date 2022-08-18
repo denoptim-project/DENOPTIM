@@ -88,7 +88,7 @@ import denoptim.files.FileUtils;
 import denoptim.graph.CandidateLW;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 
 
 /**
@@ -372,7 +372,8 @@ public class GUIInspectGARun extends GUICardPanel
         openGeneratinGraphs.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Ask which generation
-                GenerationChoiceDialog dialog = new GenerationChoiceDialog();
+                GenerationChoiceDialog dialog = new GenerationChoiceDialog(
+                        openGeneratinGraphs);
                 Object res = dialog.showDialog();
                 if (res==null)
                 {
@@ -542,12 +543,12 @@ public class GUIInspectGARun extends GUICardPanel
 	/**
 	 * Modal dialog that asks the user for a generation number.
 	 */
+    @SuppressWarnings("serial")
     private class GenerationChoiceDialog extends GUIModalDialog
     {
-        public GenerationChoiceDialog()
+        public GenerationChoiceDialog(Component refForPlacement)
         {
-            super(false);
-            this.setBounds(150, 150, 500, 200);
+            super(refForPlacement,false);
             this.setTitle("Choose Generation");
             
             Dimension sizeNameFields = new Dimension(200,
@@ -627,7 +628,7 @@ public class GUIInspectGARun extends GUICardPanel
 			int genId = Integer.parseInt(genFolder.getName().substring(3));
 			int padSize = genFolder.getName().substring(3).length();
 			
-			String zeroedGenId = GenUtils.getPaddedString(padSize,genId);
+			String zeroedGenId = GeneralUtils.getPaddedString(padSize,genId);
 			
 			// Read Generation summaries
 			File genSummary = new File(genFolder 
@@ -996,7 +997,6 @@ public class GUIInspectGARun extends GUICardPanel
 			{   
 				if (e.getEntity() instanceof XYItemEntity)
 				{
-				    XYItemEntity i = (XYItemEntity) e.getEntity();
 					XYDataset ds = ((XYItemEntity)e.getEntity()).getDataset();
 					if (!ds.equals(datasetAllFit))
 					{

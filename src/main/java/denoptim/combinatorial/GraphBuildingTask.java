@@ -38,12 +38,11 @@ import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.SymmetricSet;
 import denoptim.graph.Vertex;
-import denoptim.logging.CounterID;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.task.FitnessTask;
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 
@@ -508,7 +507,7 @@ public class GraphBuildingTask extends FitnessTask
         fitProvMol.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         String molName = DENOPTIMConstants.FITFILENAMEPREFIX 
-        		+ GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
+        		+ GeneralUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                            GraphUtils.getUniqueMoleculeIndex());
         fitProvMol.setProperty(CDKConstants.TITLE, molName);
         

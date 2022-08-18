@@ -26,7 +26,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileAndFormat;
 import denoptim.files.FileUtils;
+import denoptim.fragmenter.FragmenterTools;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge.BondType;
@@ -70,6 +73,9 @@ import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
+import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.MoleculeUtils;
 
 
@@ -96,8 +102,7 @@ public class GUIVertexInspector extends GUICardPanel
 	/**
 	 * The currently loaded list of fragments
 	 */
-	private ArrayList<Vertex> verticesLibrary =
-			new ArrayList<Vertex>();
+	private ArrayList<Vertex> verticesLibrary = new ArrayList<Vertex>();
 	
 	/**
 	 * The currently loaded vertex
@@ -139,12 +144,28 @@ public class GUIVertexInspector extends GUICardPanel
     
 	private JPanel pnlAtmToAP;
 	private JButton btnAtmToAP;
-	
+
+    private JPanel pnlChop;
+    private JButton btnChop;
+    
 	private JPanel pnlDelSel;
 	private JButton btnDelSel;
 	
 	private JPanel pnlSaveEdits;
 	private JButton btnSaveEdits;
+	
+	/**
+	 * File storing the latest version of modified cutting rules used to do 
+	 * fragmentation, or null if no fragmentation has been done using cutting 
+	 * rules, or we has so far only used default cutting rules.
+	 */
+	private File lastUsedCutRulFile = null;
+	
+    /**
+     * Flag indicating whether to preselect the default or the custom list of 
+     * cutting rules next time we are asked to display the dialog.
+     */
+    private boolean useDefaultNextTime = true;
 
 	
 //-----------------------------------------------------------------------------
@@ -175,7 +196,7 @@ public class GUIVertexInspector extends GUICardPanel
 		// - (South) general controls (load, save, close)
 		
 		// The viewer with Jmol and APtable
-		vertexViewer = new VertexViewPanel(this,true);
+		vertexViewer = new VertexViewPanel(true);
 		vertexViewer.addPropertyChangeListener(
 		        IVertexAPSelection.APDATACHANGEEVENT, 
 		        new PropertyChangeListener() {
@@ -294,7 +315,8 @@ public class GUIVertexInspector extends GUICardPanel
 
 						if (selected != null)
 						{
-						    ArrayList<ArrayList<Integer>> selList = 
+						    @SuppressWarnings("unchecked")
+                            ArrayList<ArrayList<Integer>> selList = 
 						            (ArrayList<ArrayList<Integer>>) selected;
 						    for (ArrayList<Integer> pair : selList)
 						    {
@@ -342,17 +364,6 @@ public class GUIVertexInspector extends GUICardPanel
 				{
 					return;
 				}
-				if (!inFile.getName().endsWith(".sdf"))
-				{
-					JOptionPane.showMessageDialog(btnOpenMol,
-			                "<html>Expecting and MDL SDF file, but file<br>'"
-							+ inFile.getAbsolutePath() + "' does not have .sdf"
-							+ " extension.</html>",
-			                "Error",
-			                JOptionPane.ERROR_MESSAGE,
-			                UIManager.getIcon("OptionPane.errorIcon"));
-					return;
-				}
 				importStructureFromFile(inFile);
 			}
 		});
@@ -365,7 +376,7 @@ public class GUIVertexInspector extends GUICardPanel
                         + "<br> an internet connection.</html>");
         btnOpenSMILES.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                	String smiles = JOptionPane.showInputDialog(
+                	String smiles = JOptionPane.showInputDialog(btnOpenSMILES,
                 			"Please input SMILES: ");
                 	if (smiles != null && !smiles.trim().equals(""))
                 	{
@@ -497,6 +508,200 @@ public class GUIVertexInspector extends GUICardPanel
 		pnlAtmToAP.add(btnAtmToAP);
 		ctrlPane.add(pnlAtmToAP);
 		
+	    pnlChop = new JPanel();
+	    btnChop = new JButton("Chop Structure");
+        btnChop.setToolTipText(String.format("<html><body width='%1s'>"
+                + "Applies cutting rules on "
+                + "the current structure to generate fragments.</html>", 400));
+	    btnChop.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                vertex = vertexViewer.getLoadedStructure();
+                if (vertex==null 
+                        || vertex.getIAtomContainer().getBondCount() == 0)
+                {
+                    JOptionPane.showMessageDialog(btnChop,
+                            "<html>System contains 0 bonds. "
+                            + "Nothing to chop.</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                
+                // This gives us the possibility to control the fragmentation
+                FragmenterParameters settings = new FragmenterParameters();
+                settings.startConsoleLogger("GUI-controlledFragmenterLogger");
+                
+                List<CuttingRule> defaultCuttingRules = 
+                        new ArrayList<CuttingRule>();
+                BufferedReader reader = null;
+                try
+                {
+                    try {
+                        reader = new BufferedReader(
+                                new InputStreamReader(getClass()
+                                        .getClassLoader().getResourceAsStream(
+                                                "data/cutting_rules")));
+                        DenoptimIO.readCuttingRules(reader, defaultCuttingRules, 
+                                "bundled jar");
+                    } finally {
+                        if (reader!=null)
+                            reader.close();
+                    }
+                } catch (Exception e )
+                {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(btnChop,String.format(
+                            "<html><body width='%1s'>"
+                            + "Could not read default cutting rules from "
+                            + "bundled jar. "
+                            + "Hint: "
+                            + e.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+             
+                // Read last used cutting rules
+                List<CuttingRule> customCuttingRules = 
+                        new ArrayList<CuttingRule>();
+                try
+                {
+                    if (lastUsedCutRulFile!=null)
+                        DenoptimIO.readCuttingRules(lastUsedCutRulFile, 
+                                customCuttingRules);
+                } catch (DENOPTIMException e)
+                {
+                    JOptionPane.showMessageDialog(btnChop,String.format(
+                            "<html><body width='%1s'"
+                            + "Could not read last-used cutting rules from '"
+                            + lastUsedCutRulFile + "'. "
+                            + "Hint: "
+                            + e.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                
+                // Build a dialog that offers the possibility to see and edit 
+                // default cutting rules, and to define custom ones from scratch
+                CuttingRulesSelectionDialog crs = new CuttingRulesSelectionDialog(
+                        defaultCuttingRules, customCuttingRules, 
+                        useDefaultNextTime, btnChop);
+                crs.pack();
+                crs.setVisible(true);
+                @SuppressWarnings("unchecked")
+                List<CuttingRule> cuttingRules = 
+                        (List<CuttingRule>) crs.result;
+                if (cuttingRules==null)
+                    return;
+                
+                if (crs.lastUsedCutRulFile != null)
+                    lastUsedCutRulFile = crs.lastUsedCutRulFile;
+                
+                useDefaultNextTime = crs.useDefaultNextTime;
+                
+                // Now chop the structure to produce fragments
+                List<Vertex> fragments;
+                try
+                {
+                    fragments = FragmenterTools.fragmentation(
+                            vertex.getIAtomContainer(), cuttingRules, 
+                            settings.getLogger());
+                } catch (DENOPTIMException e)
+                {
+                    JOptionPane.showMessageDialog(btnChop,String.format(
+                            "<html><body width='%1s'"
+                            + "Could not complete fragmentation. Hint: "
+                            + e.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                
+                // Add linearity-breaking dummy atoms
+                for (Vertex frag : fragments)
+                {
+                    DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
+                            settings.getLinearAngleLimit());
+                }
+                
+                // Signal no result obtained
+                if (fragments.size() < 1 || (fragments.size() == 1 &&
+                        ((Fragment)fragments.get(0)).isIsomorphicTo(vertex)))
+                {
+                    JOptionPane.showMessageDialog(btnAddVrtx,
+                            "<html>Fragmentation produced no fragments!</html>",
+                            "Error",
+                            JOptionPane.WARNING_MESSAGE,
+                            UIManager.getIcon("OptionPane.warningIcon"));
+                    return;
+                }
+                
+                // The resulting fragments are loaded into the viewer, without
+                // removing the original structure.
+                
+                String[] options = new String[]{"All", 
+                        "Select",
+                        "Cancel"};
+                String txt = "<html><body width='%1s'>Fragmentation produced "
+                        + fragments.size() + " fragments. Do you want to "
+                        + "append all or select some?"
+                        + "</html>";
+                int answer = JOptionPane.showOptionDialog(btnAddVrtx,
+                        String.format(txt,200),
+                        "Append Building Blocks",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        UIManager.getIcon("OptionPane.warningIcon"),
+                        options,
+                        options[0]);
+                
+                if (answer == 2)
+                {
+                    return;
+                }
+                
+                switch (answer)
+                {
+                    case 0:
+                        importVertices(fragments);
+                        break;
+                        
+                    case 1:
+                        List<Vertex> selectedVrtxs = 
+                                new ArrayList<Vertex>();
+                        GUIVertexSelector vrtxSelector = new GUIVertexSelector(
+                                btnAddVrtx,true);
+                        vrtxSelector.setRequireApSelection(false);
+                        vrtxSelector.load(fragments, 0);
+                        Object selected = vrtxSelector.showDialog();
+
+                        if (selected != null)
+                        {
+                            @SuppressWarnings("unchecked")
+                            List<ArrayList<Integer>> selList = 
+                                    (ArrayList<ArrayList<Integer>>) selected;
+                            for (ArrayList<Integer> pair : selList)
+                            {
+                                selectedVrtxs.add(fragments.get(pair.get(0)));
+                            }
+                        }
+                        importVertices(selectedVrtxs);
+                        break;
+                    
+                    default:
+                        return;
+                }
+            }
+        });
+        pnlChop.add(btnChop);
+        ctrlPane.add(pnlChop);
+		
+		
 		pnlDelSel = new JPanel();
 		btnDelSel = new JButton("Remove Atoms");
 		btnDelSel.setToolTipText("<html>Removes all selected atoms from the "
@@ -546,7 +751,7 @@ public class GUIVertexInspector extends GUICardPanel
         });
         pnlSaveEdits.add(btnSaveEdits);
         ctrlPane.add(pnlSaveEdits);
-		this.add(ctrlPane,BorderLayout.EAST);
+		this.add(ctrlPane, BorderLayout.EAST);
 		
 		
 		// Panel with buttons to the bottom of the frame
@@ -690,26 +895,25 @@ public class GUIVertexInspector extends GUICardPanel
 		// Cleanup
 		clearCurrentSystem();
 		
-		try {			
-			IAtomContainer mol = DenoptimIO.getFirstMolInSDFFile(
-					file.getAbsolutePath());
-			
-			// We mean to import only the structure: get rid of AP
-			mol.setProperty(DENOPTIMConstants.APSTAG,null);
-			
-			// NB: here we let the vertexViewer create a fragment object that we
-			// then put into the local library. This to make sure that the 
-			// references to atoms selected in the viewer are referring to
-			// members of the "vertex" object
-			vertexViewer.loadPlainStructure(mol);
-			vertex = vertexViewer.getLoadedStructure();
+		try {
+		    for (IAtomContainer mol : DenoptimIO.readAllAtomContainers(file))
+    	    {	
+    			// We mean to import only the structure: get rid of AP
+    			mol.setProperty(DENOPTIMConstants.APSTAG,null);
+    			
+    			// NB: here we let the vertexViewer create a fragment object that we
+    			// then put into the local library. This to make sure that the 
+    			// references to atoms selected in the viewer are referring to
+    			// members of the "vertex" object
+    			vertexViewer.loadPlainStructure(mol);
+    			vertex = vertexViewer.getLoadedStructure();
 
-			// the system is not a fragment but, this is done for consistency:
-			// when we have a molecule loaded the list is not empty
-			// The currently viewed fragment (if any) is always part of the lib
-			verticesLibrary.add(vertex);
-			currVrtxIdx = verticesLibrary.size()-1;
-
+    			// the system is not a fragment but, this is done for consistency:
+    			// when we have a molecule loaded the list is not empty
+    			// The currently viewed fragment (if any) is always part of the lib
+    			verticesLibrary.add(vertex);
+    			currVrtxIdx = verticesLibrary.size()-1;
+    	    }
 			updateVrtxListSpinner();
 			unsavedChanges = true;
 	        btnDelSel.setEnabled(true);
@@ -813,9 +1017,9 @@ public class GUIVertexInspector extends GUICardPanel
     
     /**
      * Imports vertices.
-     * @param list the list of vertices to import
+     * @param fragments the list of vertices to import
      */
-    public void importVertices(ArrayList<Vertex> list)
+    public void importVertices(List<Vertex> fragments)
     {   
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         
@@ -832,9 +1036,9 @@ public class GUIVertexInspector extends GUICardPanel
         }
         
         boolean addedOne = false;
-        if (list.size() > 0)
+        if (fragments.size() > 0)
         {
-            verticesLibrary.addAll(list);
+            verticesLibrary.addAll(fragments);
             addedOne = true;
             
             // Display the first

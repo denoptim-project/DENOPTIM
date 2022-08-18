@@ -27,6 +27,7 @@ import java.util.HashMap;
  * @author Marco Foscato
  */
 
+@SuppressWarnings("serial")
 public class FragsCombination extends HashMap<IdFragmentAndAP, IdFragmentAndAP>
 {
 

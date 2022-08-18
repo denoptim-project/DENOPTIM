@@ -18,12 +18,13 @@
 
 package denoptim.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -54,7 +55,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	/**
 	 * The currently loaded list of vertices
 	 */
-	private ArrayList<Vertex> vertexLibrary =
+	private List<Vertex> vertexLibrary =
 			new ArrayList<Vertex>();
 	
 	/**
@@ -101,16 +102,14 @@ public class GUIVertexSelector extends GUIModalDialog
 	 * @param use3rd set <code>true</code> to request the third button
      * in the control panel.
 	 */
-	public GUIVertexSelector(JComponent parent, boolean use3rd)
+	public GUIVertexSelector(Component refForPlacement, boolean use3rd)
 	{
-		super(use3rd);
-		setLocationRelativeTo(parent);
+		super(refForPlacement, use3rd);
 		
 		// The viewer with Jmol and APtable (not editable)
 		vertexViewer = new VertexViewPanel(false);
 		addToCentralPane(vertexViewer);
 		
-        //super.setBounds(150, 150, 400, 550);
         this.setTitle("Select Vertex and AP");
 		
 		// Controls for navigating the vertices list
@@ -147,7 +146,6 @@ public class GUIVertexSelector extends GUIModalDialog
                     + "'Done' button.</html>");
             this.btnExtra.addActionListener(new ActionListener() {
                 
-                @SuppressWarnings("unchecked")
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     ArrayList<Integer> ids = vertexViewer.getSelectedAPIDs();
@@ -228,15 +226,15 @@ public class GUIVertexSelector extends GUIModalDialog
 	
 	/**
 	 * Load the list of vertexes to choose from.
-	 * @param vrtxLib the list of vertexes among which the usel will be allowed 
+	 * @param fragments the list of vertexes among which the usel will be allowed 
 	 * to chose.
 	 * @param initialId the index of the one vertex that should be displayed 
 	 * when showing the dialog.
 	 */
-	public void load(ArrayList<Vertex> vrtxLib, int initialId) 
+	public void load(List<Vertex> fragments, int initialId) 
 	{
 //        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        vertexLibrary = vrtxLib;
+        vertexLibrary = fragments;
         currVrtxIdx = initialId;
         loadCurrentVrtxIdxToViewer();
         updateVrtxListSpinner();
@@ -245,6 +243,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	
 //-----------------------------------------------------------------------------
 	
+    @SuppressWarnings("unchecked")
     private void appendToResult(int vrtxId, int apId)
     {
         if (result == null)
@@ -339,18 +338,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	{
 		private boolean inEnabled = true;
 		
-		public VrtxSpinnerChangeEvent()
-		{}
-		
-		/**
-		 * Enables/disable the listener
-		 * @param var <code>true</code> to activate listener, 
-		 * <code>false</code> to disable.
-		 */
-		public void setEnabled(boolean var)
-		{
-			this.inEnabled = var;
-		}
+		public VrtxSpinnerChangeEvent() {}
 		
         @Override
         public void stateChanged(ChangeEvent event)

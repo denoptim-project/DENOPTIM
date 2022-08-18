@@ -20,15 +20,13 @@
 package denoptim.utils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
-
-import org.apache.commons.math3.ml.clustering.Clusterable;
-import org.apache.commons.math3.ml.clustering.DoublePoint;
 
 import denoptim.constants.DENOPTIMConstants;
 
@@ -270,7 +268,7 @@ public class MathUtils
     public static double roundValue(double val, int decimalPlaces)
     {
         BigDecimal bd = new BigDecimal(val);
-        bd = bd.setScale(decimalPlaces, BigDecimal.ROUND_UP);
+        bd = bd.setScale(decimalPlaces, RoundingMode.UP);
         return bd.doubleValue();
     }
 

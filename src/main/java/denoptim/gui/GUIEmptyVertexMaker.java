@@ -28,7 +28,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -75,7 +74,7 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
     private JPanel lineRCV;
     private JRadioButton rcbIsRCV;
 
-    //TODO: uncomment when properties will be enables
+    //TODO: uncomment when properties will be enabled
     /*
     private JPanel linePropBtns;
     private JButton btnPropInsert;
@@ -124,13 +123,14 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
     /**
      * Constructs a maker that can make empty vertexes, but controls whether
      * the generated vertexes are allowed to be {@link BBType#SCAFFOLD}.
-     * @param parent the parent component used to place the dialog in 
+     * @param refForPlacement the component used to place the dialog in 
      * proximity of the parent.
      */
-    public GUIEmptyVertexMaker(Component parent, boolean canBeScaffold)
+    @SuppressWarnings("serial")
+    public GUIEmptyVertexMaker(Component refForPlacement, boolean canBeScaffold)
     {
+        super(refForPlacement);
         this.canBeScaffold = canBeScaffold;
-	    setLocationRelativeTo(parent);
 	    setTitle("Create Empty Vertex");
 		centralPanel = new JPanel();
         centralPanel.setLayout(new BoxLayout(

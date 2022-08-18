@@ -41,7 +41,6 @@ import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 import denoptim.utils.AtomOrganizer;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.ObjectPair;
-import denoptim.utils.Randomizer;
 import denoptim.utils.RotationalSpaceUtils;
 
 /**
@@ -60,11 +59,6 @@ public class MultiMolecularModelBuilder
      * Program-specific logger
      */
     private Logger logger;
-    
-    /**
-     * Program-specific random numbers generator
-     */
-    private Randomizer rng;
 
 //------------------------------------------------------------------------------
 
@@ -73,7 +67,6 @@ public class MultiMolecularModelBuilder
     {
         this.settings = settings;
         this.logger = settings.getLogger();
-        this.rng = settings.getRandomizer();
         this.molName = molName;
         this.molGraph = molGraph;
     }

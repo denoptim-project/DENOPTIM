@@ -18,8 +18,6 @@
 
 package denoptim.utils;
 
-import java.nio.ByteBuffer;
-import java.security.SecureRandom;
 import java.util.Collection;
 
 import javax.vecmath.Point3d;

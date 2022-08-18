@@ -8,16 +8,14 @@ mv data/* "$wrkDir"
 rm -rf data
 
 # Here we define the expected results
-#             sub test ID: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
-expectedNoMissingAtomMols=(9  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0)
-      expectedPreFiltered=(0  0  2  0  0  0  0  0  0  0  0  0  0  0  0  0)  
-        expectedFragments=(0  0  0 20 12  8  6 11 70  0  0  0  0  0  9  0)
-  expectedIsomorphicFrags=(0  0  0  0  0  0 30 11  0  0  0  0  0  0 96  0)
-          expectedResults=(9  1  2  0  0  0  0  0  0  4  2  2  2  3  0  2)
+#           sub test ID: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
+expctdNoMissingAtomMols=(9  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)
+    expectedPreFiltered=(0  0  2  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)  
+      expectedFragments=(0  0  0 20 12  8  6 11 70  0  0  0  0  0  9  0  4  2  7)
+expectedIsomorphicFrags=(0  0  0  0  0  0 30 11  0  0  0  0  0  0 96  0  0  0  0)
+        expectedResults=(9  1  2  0  0  0  0  0  0  4  2  2  2  3  0  2  0  0  0)
 
-# NB: for t30-9 the 140 result from counting 70 twice.
-
-nSubTests=${#expectedNoMissingAtomMols[@]}
+nSubTests=${#expctdNoMissingAtomMols[@]}
 
 #Run sub tests
 totChecks=0
@@ -37,12 +35,12 @@ do
         exit -1
     fi
     
-    if [ 0 -ne ${expectedNoMissingAtomMols[$i-1]} ]
+    if [ 0 -ne ${expctdNoMissingAtomMols[$i-1]} ]
     then
         n=$(grep "\$\$\$\$" "$output"/structuresNoMissingAtoms* | wc -l)
-        if [ "$n" -ne ${expectedNoMissingAtomMols[$i-1]} ]
+        if [ "$n" -ne ${expctdNoMissingAtomMols[$i-1]} ]
         then
-            echo "Test 't30' NOT PASSED (symptom: wrong number of structures without missing atoms: $n vs. ${expectedNoMissingAtomMols[$i-1]}. Step $i"
+            echo "Test 't30' NOT PASSED (symptom: wrong number of structures without missing atoms: $n vs. ${expctdNoMissingAtomMols[$i-1]}. Step $i"
             exit -1
         fi
     fi

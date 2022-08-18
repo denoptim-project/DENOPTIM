@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,12 +44,8 @@ import denoptim.integration.tinker.ConformationalSearchPSSROT;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerException;
 import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.integration.tinker.TinkerUtils;
-import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
-import denoptim.task.ProcessHandler;
-import denoptim.utils.GenUtils;
 import denoptim.utils.ObjectPair;
 
 /**
@@ -71,11 +66,6 @@ public class RingClosureTool
      * File separator
      */
     final String fsep = System.getProperty("file.separator");
-    
-    /**
-     * New line character
-     */
-    private static final String NL = DENOPTIMConstants.EOL;
     
     /**
      * Settings controlling the calculation
@@ -138,42 +128,6 @@ public class RingClosureTool
                 throw new DENOPTIMException(msg);
             }
         }
-    }
-
-//------------------------------------------------------------------------------
-
-    /*
-     *
-     * TODO: this method (from DENOPTIM3DMoleculeBuilder.java) should be made 
-     * public and moved to a more sensible location (i.e., a class of utilities
-     * for tinker methods)
-     */
-
-    private ArrayList<double[]> getTinkerCoords(String fname, String tinkerresfile) 
-            throws DENOPTIMException
-    {
-        ArrayList<Double> energies = TinkerUtils.readPSSROTOutput(tinkerresfile);
-        if (energies.isEmpty())
-        {
-            return null;
-        }
-
-        int idx = -1;
-        double eng = Double.MAX_VALUE;
-        for (int i = 0; i < energies.size(); i++)
-        {
-            double val = energies.get(i).doubleValue();
-            if (val < eng)
-            {
-                idx = i;
-                eng = val;
-            }
-        }
-
-        String workDir = settings.getWorkingDirectory();
-        String xyzfile = workDir + fsep + fname + "." + GenUtils.getPaddedString(3, idx);
-        ArrayList<double[]> coords = TinkerUtils.readTinkerXYZ(xyzfile);
-        return coords;
     }
 
 //------------------------------------------------------------------------------
@@ -526,7 +480,7 @@ public class RingClosureTool
         		// This code is temporary as will be removed by the introduction
         		// proper capping group selection and use (TODO)
         		IAtom fatm = rca.getIAtom();
-        		TinkerAtom tatm = tmol.getAtom(fmol.getAtomNumber(fatm) + 1);
+        		TinkerAtom tatm = tmol.getAtom(fmol.indexOf(fatm) + 1);
         		tatm.setAtomString("H");
         		double[] ic = tatm.getDistAngle();
         		ic[0] = 1.10; //hard coded bond  

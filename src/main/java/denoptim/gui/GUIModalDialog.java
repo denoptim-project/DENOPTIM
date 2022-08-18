@@ -20,6 +20,7 @@ package denoptim.gui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -62,28 +63,33 @@ public class GUIModalDialog extends JDialog
 	 * The result to be returned once the dialog is closed
 	 */
 	protected Object result = null;
-	
+    
 //------------------------------------------------------------------------------
     
     /**
      * Constructor
+     * @param refForPlacement a component close to which the dialog window 
+     * should be opened.
      */
-    public GUIModalDialog()
+    public GUIModalDialog(Component refForPlacement)
     {
-        // To avoid conflict when having multiple modal dialogs open.
-        super(new Frame()); 
-        initialize(false);
+        this(refForPlacement,false);
     }
-
+    
 //------------------------------------------------------------------------------
-	
-	/**
-	 * Constructor
-	 * @param useExtraButton set <code>true</code> to request three buttons
-	 * in the control panel.
-	 */
-    public GUIModalDialog(boolean useExtraButton)
+    
+    /**
+     * Constructor
+     * @param refForPlacement a component close to which the dialog window 
+     * should be opened.
+     * @param useExtraButton use <code>true</code> to make a dialog with three 
+     * buttons, which you can edit afterwards.
+     */
+    public GUIModalDialog(Component refForPlacement, boolean useExtraButton)
     {
+        //To avoid conflict when having multiple modal dialogs open.
+        super(new Frame()); 
+        setLocationRelativeTo(refForPlacement);
         initialize(useExtraButton);
     }
     
@@ -93,7 +99,6 @@ public class GUIModalDialog extends JDialog
 	{
 		this.setModal(true);
 		this.setLayout(new BorderLayout());
-		//this.setBounds(150, 150, 800, 450);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		
 		btnDone = new JButton("Done");

@@ -18,6 +18,7 @@
 
 package denoptim.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -107,7 +108,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
     
     private String namSMILESTo3D = "SMILES-to-3D converer";
     private JPanel pnlSMILESTo3D;
-    private JComboBox cmbSMILESTo3D;
+    private JComboBox<SMITo3DEngine> cmbSMILESTo3D;
     private JLabel lblSMILESTo3D;
     
 	
@@ -115,8 +116,14 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	
 //------------------------------------------------------------------------------
 
-	public GUIPreferencesDialog()
+	/**
+	 * Constructs a dialog for setting the preferences of the GUI.
+	 * @param refForPlacement the component used to place this dialog.
+	 */
+	@SuppressWarnings("serial")
+    public GUIPreferencesDialog(Component refForPlacement)
 	{
+	    super(refForPlacement);
 	    setTitle("Preferences");
 		centralPanel = new JPanel();
         JScrollPane scrollablePane = new JScrollPane(centralPanel);
@@ -145,7 +152,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         pnlSMILESTo3D = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblSMILESTo3D = new JLabel(namSMILESTo3D + ": " 
         		+ GUIPreferences.smiTo3dResolver + " - Change to ");
-        cmbSMILESTo3D = new JComboBox(SMITo3DEngine.values());
+        cmbSMILESTo3D = new JComboBox<SMITo3DEngine>(SMITo3DEngine.values());
         cmbSMILESTo3D.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

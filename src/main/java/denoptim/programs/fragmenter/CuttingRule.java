@@ -1,13 +1,20 @@
 package denoptim.programs.fragmenter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.openscience.cdk.ChemObject;
-import org.openscience.cdk.tools.periodictable.PeriodicTable;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.isomorphism.Mappings;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.APClass;
+import denoptim.utils.ManySMARTSQuery;
+import denoptim.utils.MoleculeUtils;
 
 /**
  * A cutting rule with three SMARTS queries (atom 1, bond, atom2) and options.
@@ -316,6 +323,164 @@ public class CuttingRule
 				"_priority:"+priority+
 				"_opts:"+opts;
         return str;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
+    public boolean equals(Object o)
+    {
+        if (!(o instanceof CuttingRule))
+            return false;
+                
+        CuttingRule other = (CuttingRule) o;
+        if (!this.getName().equals(other.getName()))
+            return false;
+        if (!this.getSMARTSAtom0().equals(other.getSMARTSAtom0()))
+            return false;
+        if (!this.getSMARTSAtom1().equals(other.getSMARTSAtom1()))
+            return false;
+        if (!this.getSMARTSBnd().equals(other.getSMARTSBnd()))
+            return false;
+        if (this.getPriority() != other.getPriority())
+            return false;
+        if (this.getOptions().size() != other.getOptions().size())
+            return false;
+        for (int i=0; i<this.getOptions().size(); i++)
+        {
+            if (!this.getOptions().get(i).equals(other.getOptions().get(i)))
+                return false;
+        }
+        return true;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks if a given bond satisfies the additional options of this rule
+     * beyond the matching of the SMARTS queries.
+     * @param matchedBond the bond to test.
+     * @param logger where any log should be directed.
+     * @return <code>true</code> if the bond satisfies the condition.
+     */
+    public Boolean satisfiesOptions(MatchedBond matchedBond, Logger logger)
+    {
+        IAtom atmS = matchedBond.getAtmSubClass0();
+        IAtom atmT = matchedBond.getAtmSubClass1();
+        IAtomContainer mol = atmS.getContainer();
+        int idxSInMol = mol.indexOf(atmS);
+        int idxTInMol = mol.indexOf(atmT);
+        
+        boolean hasHapto = false;
+        boolean checkRings = false;
+        int minSzRing = -1;
+        boolean checkOMRings = false;
+        int minSzOMRing = -1;
+        for (String opt : opts)
+        {
+            if (opt.startsWith("HAPTO"))
+                hasHapto = true;
+            
+            if (opt.startsWith("RING>"))
+            {
+                checkRings = true;
+                minSzRing = Integer.parseInt(opt.replace("RING>","").trim());
+                
+            } else if (opt.startsWith("OMRING"))
+            {
+                checkOMRings = true;
+                minSzOMRing = Integer.parseInt(opt.replace("OMRING>","").trim());
+            }
+        }
+        
+        // from here it is all about OM/Ring, and these are both incompatible 
+        // with HAPTO. So if we have HAPTO we should not test OM/Ring-options
+        if (hasHapto)
+            return true;
+        
+        // Build SMARTS queries for rings as large as needed to test criteria
+        Map<String,String> allSmarts = new HashMap<String,String>();
+        StringBuilder smartsBuilder = new StringBuilder();
+        // "ring size" i = 1
+        smartsBuilder.append(this.getSMARTSAtom0());
+        smartsBuilder.append("1");
+        smartsBuilder.append(this.getSMARTSBnd());
+        // "ring size" i=2
+        smartsBuilder.append(this.getSMARTSAtom1());
+        smartsBuilder.append("~");
+        // "ring size" from 3 and on
+        for (int i=3; i<Math.max(minSzRing, minSzOMRing)+1; i++)
+        {
+            smartsBuilder.append("[*]~");
+            allSmarts.put("ring"+i, smartsBuilder.toString()+"1");
+        }
+        
+        // Find all rings matching the queries
+        ManySMARTSQuery msq = new ManySMARTSQuery(mol, allSmarts);
+        if (msq.hasProblems())
+        {
+            if (logger!=null)
+            {
+                logger.log(Level.WARNING, "Problem matching SMARTS for OM/RING "
+                        + "options. Ignoring bond for which we cannot check if "
+                        + "we satisfy OM/RING options. " + msq.getMessage());
+            }
+            return false;
+        }
+        
+        for (int ringSize=3; ringSize<Math.max(minSzRing, minSzOMRing)+1; ringSize++)
+        {
+            String smartsName = "ring"+ringSize;
+            if (msq.getNumMatchesOfQuery(smartsName) == 0)
+            {
+                continue;
+            }
+            
+            // Get atoms matching cutting rule queries
+            Mappings atomsInAllRings = msq.getMatchesOfSMARTS(smartsName);
+            for (int[] atmsInOneRing : atomsInAllRings) 
+            {
+                if (atmsInOneRing[0]==idxSInMol && atmsInOneRing[1]==idxTInMol)
+                {
+                    boolean isOMRing = false;
+                    for (int j=0; j<atmsInOneRing.length; j++)
+                    {
+                        IAtom atmInRing = mol.getAtom(atmsInOneRing[j]);
+                        
+                        if (MoleculeUtils.isElement(atmInRing) 
+                                && DENOPTIMConstants.ALL_METALS.contains(
+                                        atmInRing.getSymbol()))
+                        {
+                            isOMRing = true;
+                            break;
+                        }
+                    }
+                    if (!isOMRing && checkRings && ringSize<=minSzRing)
+                    {
+
+                        logger.log(Level.FINEST,"Bond between " + idxSInMol 
+                                + " and " + idxTInMol + " matches SMARTS of "
+                                + "cutting rule '" + this.ruleName 
+                                + "', but does not satisfy "
+                                + "RING>" + minSzRing + " as it is part of "
+                                + "a " + ringSize + "-member organic-only ring.");
+                        return false;
+                    }
+                    if (isOMRing && checkOMRings && ringSize<=minSzOMRing)
+                    {
+                        logger.log(Level.FINEST,"Bond between " + idxSInMol 
+                                + " and " + idxTInMol + " matches SMARTS of "
+                                + "cutting rule '" + this.ruleName 
+                                + "', but does not satisfy "
+                                + "OMRING>" + minSzOMRing + " as it is part of "
+                                + "a " + ringSize + "-member ring including a "
+                                + "metal.");
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
 //------------------------------------------------------------------------------

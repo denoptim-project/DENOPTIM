@@ -3,7 +3,7 @@
   <groupId>org.denoptim</groupId>
   <artifactId>denoptim</artifactId>
 
-  <version>3.1.6</version>
+  <version>3.2.0</version>
   <!-- WARNING: the vesion must be changes also in doc/user_manual.html-->
 
   <name>denoptim</name>
@@ -181,6 +181,12 @@
         <artifactId>biojava-structure</artifactId>
         <version>6.0.5</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-swing -->
+	<dependency>
+	    <groupId>org.apache.xmlgraphics</groupId>
+	    <artifactId>batik-swing</artifactId>
+	    <version>1.14</version>
+	</dependency>
   </dependencies>
   
   <build>

@@ -83,7 +83,6 @@ public class ConformationalSearchPSSROT
             String pssExePathName, String xyzintPathName, String workDir, 
             int taskId, Logger logger) throws DENOPTIMException, TinkerException
     {
-        ArrayList<ChemicalObjectModel> nMols = new ArrayList<>();
         for (int i=0; i<mols.size(); i++)
         {
     	    Object molErroProp = mols.get(i).getIAtomContainer().getProperty(

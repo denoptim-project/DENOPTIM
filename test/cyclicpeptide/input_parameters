@@ -2,8 +2,8 @@
 GA-RandomSeed=123456789
 GA-PopulationSize=30
 GA-NumChildren=20
-GA-NumGenerations=100
-GA-NumConvGen=100
+GA-NumGenerations=20
+GA-NumConvGen=5
 
 GA-MOLGROWTHPROBSCHEME=SIGMA
 GA-MOLGROWTHSIGMASTEEPNESS=0.2

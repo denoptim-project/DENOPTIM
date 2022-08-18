@@ -19,7 +19,6 @@
 package denoptim.programs.fragmenter;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,22 +29,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.combinatorial.CEBLUtils;
-import denoptim.combinatorial.CheckPoint;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
-import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragmenter.FragmentClusterer;
-import denoptim.graph.APClass;
-import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
@@ -89,12 +80,6 @@ public class FragmenterParameters extends RunTimeParameters
      * List of cutting rules sorted by priority.
      */
     List<CuttingRule> cuttingRules;
-    
-    /**
-     * List of known 'any-atom' SMARTS queries. We keep this information to
-     * by-pass any attempt to search for any atom.
-     */
-    List<String> anyAtomQuesties;
     
     /**
      * Number of parallel tasks to run.
@@ -449,16 +434,6 @@ public class FragmenterParameters extends RunTimeParameters
     public List<CuttingRule> getCuttingRules()
     {
         return cuttingRules;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * @return the SMRTS strings used in the cutting rules to identify any atom.
-     */
-    public List<String> getAnyAtomQuesties()
-    {
-        return anyAtomQuesties;
     }
 
 //------------------------------------------------------------------------------
@@ -1087,12 +1062,6 @@ public class FragmenterParameters extends RunTimeParameters
                 saveClustersOfConformerToFile = true;
                 break;
                 
-            // Duplicated to avoid confusion on whether the '=' sign is needed or not.
-            case "SAVECLUSTERS=":
-                doExtactRepresentativeConformer = true;
-                saveClustersOfConformerToFile = true;
-                break;
-
             case "SIZEUNIMODALPOPULATION=":
                 sizeUnimodalPop = Integer.parseInt(value);
                 break;
@@ -1181,12 +1150,10 @@ public class FragmenterParameters extends RunTimeParameters
         if (isMaster)
             createWorkingDirectory();
         
-        anyAtomQuesties = new ArrayList<String>();
         cuttingRules = new ArrayList<CuttingRule>();
         if (cutRulesFile!=null && !cutRulesFile.isBlank())
         {
-            DenoptimIO.readCuttingRules(new File(cutRulesFile), anyAtomQuesties, 
-                    cuttingRules);
+            DenoptimIO.readCuttingRules(new File(cutRulesFile), cuttingRules);
         }
         if (formulaeFile!=null && !formulaeFile.isBlank())
         {

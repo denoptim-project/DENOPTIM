@@ -377,7 +377,7 @@ public class GraphLinkFinder
             APMapping currentMapping = new APMapping();
             // yes, a nested loop would do it, but for now I use the same code
             // as for when there is no limit to the number of keys (here, always 2)
-            Boolean stopped = FragmentSpaceUtils.recursiveCombiner(keys, 
+            FragmentSpaceUtils.recursiveCombiner(keys, 
                     currentKey, apCompatilities, currentMapping, apMappings, 
                     screenAll, maxCombs);
             

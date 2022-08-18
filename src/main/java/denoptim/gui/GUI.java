@@ -227,7 +227,7 @@ public class GUI implements Runnable
 		if (StaticTaskManager.hasActive())
 		{
 			String[] options = new String[]{"Yes, stop running tasks","No"};
-			int res = JOptionPane.showOptionDialog(null,
+			int res = JOptionPane.showOptionDialog(frame,
 					"<html>Found running tasks.<br>Do you want to "
 				            + "stop all running tasks?</html>",
 				    "Stop all?", 
@@ -247,7 +247,7 @@ public class GUI implements Runnable
 		} catch (Exception e) {
 			e.printStackTrace();
 			String[] options = new String[]{"Yes, stop and close"};
-			int res = JOptionPane.showOptionDialog(null,
+			JOptionPane.showOptionDialog(frame,
 					"<html>Problems killing the running tasks.<br>Will force "
 					+ "quit all tasks and shutdown.</html>",
 				    "Force quit", 
@@ -267,7 +267,7 @@ public class GUI implements Runnable
             + "close this window?</html>",
             */
 			String[] options = new String[]{"Yes","No"};
-			int res = JOptionPane.showOptionDialog(null,
+			int res = JOptionPane.showOptionDialog(frame,
 			        "Found unsaved changes. "
 			        + "Are you sure you want to close this window?",
 				    "Close Window?", 

@@ -28,11 +28,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Vertex;
@@ -495,12 +497,6 @@ public final class DENOPTIMConstants
      * branch holding that {@link Vertex}.
      */
     public static final Object GRAPHBRANCHID = "GRAPHBRANCHID";
-
-    /**
-     * Keyword that identifies rows defining 'any-atom' SMARTS queries in files
-     * collecting cutting rules.
-     */
-    public static final String ANYATMRULKEYWORD = "ANY";
     
     /**
      * Keyword that identifies rows defining cutting rules in files

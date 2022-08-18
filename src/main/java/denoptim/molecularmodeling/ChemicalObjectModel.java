@@ -43,16 +43,13 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.graph.APClass;
 import denoptim.graph.DGraph;
-import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Ring;
 import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosure;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.MathUtils;
 import denoptim.utils.ObjectPair;
 
@@ -622,7 +619,7 @@ public class ChemicalObjectModel
             {
                 String elA = atmA.getSymbol();
 
-                if (!DummyAtomHandler.isElement(elA))
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(elA))
                     continue;
 
                 IAtom[] toExclude = PathTools.findClosestByBond(fmol,atmA,4);
@@ -635,7 +632,7 @@ public class ChemicalObjectModel
                         continue;
 
                     String elB = atmB.getSymbol();
-                    if (!DummyAtomHandler.isElement(elB))
+                    if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(elB))
                         continue;
 
                     double dist = atmA.getPoint3d().distance(atmB.getPoint3d());

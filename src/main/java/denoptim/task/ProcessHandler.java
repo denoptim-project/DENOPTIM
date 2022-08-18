@@ -47,6 +47,7 @@ public class ProcessHandler
     /**
      * A user-assigned id for this task.
      */
+    @SuppressWarnings("unused")
     private String id = null;
 
     private String cmdStr = null;
@@ -246,12 +247,22 @@ public class ProcessHandler
             }
         }
     }
+  
+//------------------------------------------------------------------------------
 
+    /**
+     * Get the content of the standard output for the process.
+     * @return the output as a string.
+     */
+    public String getStandardOutput()
+    {
+        return standardOutput;
+    }
+    
 //------------------------------------------------------------------------------
 
     /**
      * Get the content of the error output for the process.
-     *
      * @return the output as a string.
      */
     public String getErrorOutput()

@@ -1,0 +1,6 @@
+#
+# This is the parameter file for test t30-17
+#
+FRG-VERBOSITY=0
+FRG-STRUCTURESFILE=mols-17.sdf
+FRG-CUTTINGRULESFILE=customCuttingRules-17.rul
