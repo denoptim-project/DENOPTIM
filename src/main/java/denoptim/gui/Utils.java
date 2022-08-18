@@ -18,13 +18,7 @@
 
 package denoptim.gui;
 
-import java.awt.Component;
-import java.awt.Frame;
-import java.awt.Dialog;
-
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import denoptim.files.FileUtils;
 
