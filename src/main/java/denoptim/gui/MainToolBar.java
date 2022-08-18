@@ -154,7 +154,10 @@ public class MainToolBar extends JMenuBar
 		JMenuItem prefs = new JMenuItem("Preferences");
 		prefs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				GUIPreferencesDialog prefDialog = new GUIPreferencesDialog();
+			    // NB: if the component used to place the dialog JMenuItem, the
+			    // dialog is NOT placed close to the menu (e.g., in other screen).
+				GUIPreferencesDialog prefDialog = new GUIPreferencesDialog(
+				        menuDenoptim);
 				prefDialog.pack();
 				prefDialog.setVisible(true);
 			}

@@ -375,7 +375,7 @@ public class GUIVertexInspector extends GUICardPanel
                         + "<br> an internet connection.</html>");
         btnOpenSMILES.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                	String smiles = JOptionPane.showInputDialog(
+                	String smiles = JOptionPane.showInputDialog(btnOpenSMILES,
                 			"Please input SMILES: ");
                 	if (smiles != null && !smiles.trim().equals(""))
                 	{
@@ -588,7 +588,7 @@ public class GUIVertexInspector extends GUICardPanel
                 // default cutting rules, and to define custom ones from scratch
                 CuttingRulesSelectionDialog crs = new CuttingRulesSelectionDialog(
                         defaultCuttingRules, customCuttingRules, 
-                        useDefaultNextTime);
+                        useDefaultNextTime, btnChop);
                 crs.pack();
                 crs.setVisible(true);
                 @SuppressWarnings("unchecked")

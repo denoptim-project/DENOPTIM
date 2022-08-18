@@ -18,6 +18,7 @@
 
 package denoptim.gui;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -40,18 +41,15 @@ class FSParamsDialog extends GUIModalDialog
     private static final long serialVersionUID = 1L;
 
     private FSParametersForm fsParsForm;
-	
-	private GUICardPanel parent;
-	
+    
 //-----------------------------------------------------------------------------
 	
 	/**
 	 * Constructor
 	 */
-	public FSParamsDialog(GUICardPanel parentPanel)
+	public FSParamsDialog(Component refForPlacement)
 	{
-		super();
-		this.parent = parentPanel;
+		super(refForPlacement);
 		
 		fsParsForm = new FSParametersForm(this.getSize());
 		addToCentralPane(fsParsForm);

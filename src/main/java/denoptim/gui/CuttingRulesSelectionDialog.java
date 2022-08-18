@@ -114,9 +114,10 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
      * @throws DENOPTIMException 
      */
     public CuttingRulesSelectionDialog(List<CuttingRule> defaultCuttingRules,
-            List<CuttingRule> customCuttingRules, boolean preselectDefault) 
+            List<CuttingRule> customCuttingRules, boolean preselectDefault,
+            Component refForPlacement) 
     {
-        super();
+        super(refForPlacement);
         setTitle("Choose Cutting Rules");
         
         rdbUseDefault = new JRadioButton("Use default cutting rules.");
@@ -558,7 +559,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                         svgCanvas.setURI(url);
                         masterPanel.add(svgCanvas);
                     }
-                    GUIModalDialog dialog = new GUIModalDialog(true);
+                    GUIModalDialog dialog = new GUIModalDialog(refToThis,true);
                     dialog.addToCentralPane(masterPanel);
                     dialog.btnCanc.setVisible(false);
                     dialog.btnExtra.setText("?");

@@ -19,12 +19,12 @@
 package denoptim.gui;
 
 import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -102,16 +102,14 @@ public class GUIVertexSelector extends GUIModalDialog
 	 * @param use3rd set <code>true</code> to request the third button
      * in the control panel.
 	 */
-	public GUIVertexSelector(JComponent parent, boolean use3rd)
+	public GUIVertexSelector(Component refForPlacement, boolean use3rd)
 	{
-		super(use3rd);
-		setLocationRelativeTo(parent);
+		super(refForPlacement, use3rd);
 		
 		// The viewer with Jmol and APtable (not editable)
 		vertexViewer = new VertexViewPanel(false);
 		addToCentralPane(vertexViewer);
 		
-        //super.setBounds(150, 150, 400, 550);
         this.setTitle("Select Vertex and AP");
 		
 		// Controls for navigating the vertices list

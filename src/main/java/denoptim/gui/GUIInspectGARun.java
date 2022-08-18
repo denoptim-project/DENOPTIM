@@ -372,7 +372,8 @@ public class GUIInspectGARun extends GUICardPanel
         openGeneratinGraphs.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Ask which generation
-                GenerationChoiceDialog dialog = new GenerationChoiceDialog();
+                GenerationChoiceDialog dialog = new GenerationChoiceDialog(
+                        openGeneratinGraphs);
                 Object res = dialog.showDialog();
                 if (res==null)
                 {
@@ -544,10 +545,9 @@ public class GUIInspectGARun extends GUICardPanel
 	 */
     private class GenerationChoiceDialog extends GUIModalDialog
     {
-        public GenerationChoiceDialog()
+        public GenerationChoiceDialog(Component refForPlacement)
         {
-            super(false);
-            this.setBounds(150, 150, 500, 200);
+            super(refForPlacement,false);
             this.setTitle("Choose Generation");
             
             Dimension sizeNameFields = new Dimension(200,

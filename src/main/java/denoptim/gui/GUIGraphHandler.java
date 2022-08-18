@@ -1864,12 +1864,12 @@ public class GUIGraphHandler extends GUICardPanel
 	    /**
 	     * Creates a modal dialog with a specified number of limes allowing to 
 	     * configure the properties of the templates to be created from graphs.
-	     * @param parent the parent component calling this modal dialog.
+	     * @param refForPlacement the component used to place this dialog.
 	     * @param num the number of templates to configure.
 	     */
-	    public ConfigTemplateDialog(Component parent, int num)
+	    public ConfigTemplateDialog(Component refForPlacement, int num)
 	    {
-	        setLocationRelativeTo(parent);
+	        super(refForPlacement);
 	        setTitle("Define Properties of Templates");
 	        centralPanel = new JPanel();
 	        centralPanel.setLayout(new BoxLayout(

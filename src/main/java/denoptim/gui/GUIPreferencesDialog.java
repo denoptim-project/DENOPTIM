@@ -19,6 +19,7 @@
 package denoptim.gui;
 
 import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -115,8 +116,13 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	
 //------------------------------------------------------------------------------
 
-	public GUIPreferencesDialog()
+	/**
+	 * Constructs a dialog for setting the preferences of the GUI.
+	 * @param refForPlacement the component used to place this dialog.
+	 */
+	public GUIPreferencesDialog(Component refForPlacement)
 	{
+	    super(refForPlacement);
 	    setTitle("Preferences");
 		centralPanel = new JPanel();
         JScrollPane scrollablePane = new JScrollPane(centralPanel);

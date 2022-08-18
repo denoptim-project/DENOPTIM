@@ -654,7 +654,7 @@ public class FitnessParametersForm extends ParametersForm
             {
                 ParametrizedDescriptorDefinition dialog = 
                         new ParametrizedDescriptorDefinition(descNameToTune,
-                                paramsToTune);
+                                paramsToTune, btnDDValueParams);
                 if (dialog.result!=null)
                 {
                     tabCustomVarsMod.addRow((Object[]) dialog.result);
@@ -771,7 +771,7 @@ public class FitnessParametersForm extends ParametersForm
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				AtomSpecExpressionDefinition dialog = 
-				        new AtomSpecExpressionDefinition();
+				        new AtomSpecExpressionDefinition(btAtomSpecVar);
 				Object[] res = (Object[]) dialog.showDialog();
 				if (res!=null)
 				{
@@ -786,7 +786,7 @@ public class FitnessParametersForm extends ParametersForm
             {
                 ParametrizedDescriptorDefinition dialog = 
                         new ParametrizedDescriptorDefinition(descNameToTune,
-                                paramsToTune);
+                                paramsToTune, btnDDValueParams);
                 Object[] res = (Object[]) dialog.showDialog();
                 if (res!=null)
                 {
@@ -1123,10 +1123,10 @@ public class FitnessParametersForm extends ParametersForm
     
     private class ParametrizedDescriptorDefinition extends GUIModalDialog
     {   
-        public ParametrizedDescriptorDefinition(String descName, String[] paramNames)
+        public ParametrizedDescriptorDefinition(String descName, 
+                String[] paramNames, Component refForPlacement)
         {
-            super(true);
-            this.setBounds(150, 150, 500, 200);
+            super(refForPlacement, true);
             this.setTitle("Define parametrized descriptor variable");
             
             Dimension sizeNameFields = new Dimension(200,preferredHeight);
@@ -1272,10 +1272,9 @@ public class FitnessParametersForm extends ParametersForm
     
     private class AtomSpecExpressionDefinition extends GUIModalDialog
     {
-    	public AtomSpecExpressionDefinition()
+    	public AtomSpecExpressionDefinition(Component refForPlacement)
     	{
-    		super();
-    		this.setBounds(150, 150, 500, 200);
+    		super(refForPlacement);
     		this.setTitle("Define atom-specific variable");
     		
     		Dimension sizeNameFields = new Dimension(200,preferredHeight);

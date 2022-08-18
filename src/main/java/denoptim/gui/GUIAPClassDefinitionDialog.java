@@ -20,12 +20,12 @@ package denoptim.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -79,9 +79,9 @@ public class GUIAPClassDefinitionDialog extends GUIModalDialog
 	
 //------------------------------------------------------------------------------
 
-	public GUIAPClassDefinitionDialog(JComponent parent, boolean askForBO)
+	public GUIAPClassDefinitionDialog(Component refForPlacement, boolean askForBO)
 	{
-        setLocationRelativeTo(parent);
+	    super(refForPlacement);
 	    setTitle("APClass Definition");
 		centralPanel = new JPanel();
         centralPanel.setLayout(new BoxLayout(
