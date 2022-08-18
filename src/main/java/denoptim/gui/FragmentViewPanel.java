@@ -58,6 +58,7 @@ import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Fragment;
@@ -368,7 +369,10 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	
 	public String getDataFromJmol()
 	{
-		return jmolPanel.viewer.getData("*", "txt");
+	    String data = jmolPanel.viewer.getData("*", "txt");
+	    data = data.replaceAll(" Xx  ", 
+	            " " + DENOPTIMConstants.DUMMYATMSYMBOL + "  ");
+		return data;
 	}
 	
 //-----------------------------------------------------------------------------
