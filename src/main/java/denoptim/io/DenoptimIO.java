@@ -171,10 +171,13 @@ public class DenoptimIO
     public static List<IAtomContainer> readAllAtomContainers(File file) 
             throws IOException, CDKException
     {
-        
         List<IAtomContainer> results = null;
+     
+        FileReader formatReader = new FileReader(file);
         IChemFormat chemFormat = new FormatFactory().guessFormat(
-                new BufferedReader(new FileReader(file)));
+                new BufferedReader(formatReader));
+        formatReader.close();
+        
         if (chemFormat instanceof CIFFormat)
         {
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -215,6 +218,7 @@ public class DenoptimIO
             IChemFile chemFile = (IChemFile) reader.read(
                     (IChemObject) new ChemFile());
             results = ChemFileManipulator.getAllAtomContainers(chemFile);
+            fileReader.close();
         }
         
         return results;
