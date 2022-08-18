@@ -133,7 +133,6 @@ public class DenoptimIOTest
         assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
         
         EmptyVertex v = new EmptyVertex();
-        Point3d xyz = new Point3d(1.1,-2.2,3.3);
         v.addAP(APClass.make("myClass:0"));
         v.addAP(APClass.make("myClass:1"));
         v.addAP(APClass.make("myClass:2"));

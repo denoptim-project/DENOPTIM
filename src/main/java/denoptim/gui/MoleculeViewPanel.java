@@ -355,11 +355,9 @@ public class MoleculeViewPanel extends JSplitPane
 
 		fillDataTable(file);
 
-		int i=0;
 		// This is often needed to wait for the 'zap' script to finish.
         while (jmolPanel.viewer.isScriptExecuting())
         {
-            i++;
             try
             {
                 Thread.sleep(100);

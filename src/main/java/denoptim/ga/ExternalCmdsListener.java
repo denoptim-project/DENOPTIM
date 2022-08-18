@@ -87,6 +87,7 @@ public class ExternalCmdsListener implements Runnable
     /**
      * Starts listening for events and keeps listening in its own thread
      */
+    @SuppressWarnings("unchecked")
     public void run() 
     {
         try {

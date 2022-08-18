@@ -169,7 +169,7 @@ public class GUIPrepareFitnessRunner extends GUIPrepare
             this.add(scrollablePane);
         }
         
-      //-----------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
         
         /**
          * Imports parameters from a properly formatted parameters file.
@@ -179,14 +179,15 @@ public class GUIPrepareFitnessRunner extends GUIPrepare
          */
         
         @Override
-        public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
+        public void importParametersFromDenoptimParamsFile(String fileName) 
+                throws Exception
         {
             importParametersFromDenoptimParamsFile(fileName,"FR-");
         }
         
-      //-----------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
         
-        @SuppressWarnings("unchecked")
+
         @Override
         public void importSingleParameter(String key, String value) 
                 throws Exception 
@@ -201,8 +202,8 @@ public class GUIPrepareFitnessRunner extends GUIPrepare
             else
             {
                 JOptionPane.showMessageDialog(this,
-                        "<html>Parameter '" + key + "' is not recognized<br> and "
-                                + "will be ignored.</html>",
+                        "<html>Parameter '" + key + "' is not recognized<br> "
+                                + "and will be ignored.</html>",
                         "WARNING",
                         JOptionPane.WARNING_MESSAGE,
                         UIManager.getIcon("OptionPane.errorIcon"));

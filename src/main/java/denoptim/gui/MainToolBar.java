@@ -405,7 +405,6 @@ public class MainToolBar extends JMenuBar
     {
         openRecent.removeAll();
         Map<File,FileFormat> recentFiles = DenoptimIO.readRecentFilesMap();
-        int s = recentFiles.size();
         if (recentFiles.size() == 0)
         {
             openRecent.setEnabled(false);
@@ -426,6 +425,7 @@ public class MainToolBar extends JMenuBar
     
 //-----------------------------------------------------------------------------
     
+    @SuppressWarnings("serial")
     private class RecentFileItem extends JMenuItem {
         protected FileFormat ff;
         protected File file;

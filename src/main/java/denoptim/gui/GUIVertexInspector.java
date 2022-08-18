@@ -196,7 +196,7 @@ public class GUIVertexInspector extends GUICardPanel
 		// - (South) general controls (load, save, close)
 		
 		// The viewer with Jmol and APtable
-		vertexViewer = new VertexViewPanel(this,true);
+		vertexViewer = new VertexViewPanel(true);
 		vertexViewer.addPropertyChangeListener(
 		        IVertexAPSelection.APDATACHANGEEVENT, 
 		        new PropertyChangeListener() {
@@ -315,7 +315,8 @@ public class GUIVertexInspector extends GUICardPanel
 
 						if (selected != null)
 						{
-						    ArrayList<ArrayList<Integer>> selList = 
+						    @SuppressWarnings("unchecked")
+                            ArrayList<ArrayList<Integer>> selList = 
 						            (ArrayList<ArrayList<Integer>>) selected;
 						    for (ArrayList<Integer> pair : selList)
 						    {

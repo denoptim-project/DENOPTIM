@@ -80,7 +80,7 @@ import denoptim.json.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters;
 import denoptim.programs.RunTimeParameters.ParametersType;
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphEdit;
 import denoptim.utils.GraphUtils;
@@ -4237,7 +4237,7 @@ public class DGraph implements Cloneable
                   .map(HashSet::new)
                   .collect(Collectors.toList());
 
-        GenUtils.unionOfIntersectingSets(disjointMultiCycleVertices);
+        GeneralUtils.unionOfIntersectingSets(disjointMultiCycleVertices);
 
         List<DGraph> subgraphs = new ArrayList<>();
         for (Set<Vertex> fusedRing : disjointMultiCycleVertices) {

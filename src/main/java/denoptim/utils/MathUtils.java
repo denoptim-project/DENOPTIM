@@ -20,6 +20,7 @@
 package denoptim.utils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -267,7 +268,7 @@ public class MathUtils
     public static double roundValue(double val, int decimalPlaces)
     {
         BigDecimal bd = new BigDecimal(val);
-        bd = bd.setScale(decimalPlaces, BigDecimal.ROUND_UP);
+        bd = bd.setScale(decimalPlaces, RoundingMode.UP);
         return bd.doubleValue();
     }
 

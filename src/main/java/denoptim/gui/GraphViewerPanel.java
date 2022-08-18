@@ -25,7 +25,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Paint;
-import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
@@ -721,7 +720,6 @@ public class GraphViewerPanel extends JPanel
         @Override
         protected void handlePopup(MouseEvent e)
         {
-            Point p = e.getPoint();
             GraphOptsPopup popup = new GraphOptsPopup();
             popup.show((Component) e.getSource(), e.getX(), e.getY());
         }

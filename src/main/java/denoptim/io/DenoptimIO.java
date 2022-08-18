@@ -19,14 +19,7 @@
 
 package denoptim.io;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,7 +39,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +48,6 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-
 import org.apache.commons.io.FilenameUtils;
 import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.viewer.Viewer;
@@ -66,11 +56,8 @@ import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.geometry.GeometryTools;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
-import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
@@ -84,16 +71,7 @@ import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.io.XYZWriter;
 import org.openscience.cdk.io.formats.CIFFormat;
 import org.openscience.cdk.io.formats.IChemFormat;
-import org.openscience.cdk.renderer.AtomContainerRenderer;
-import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.renderer.font.AWTFontManager;
-import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
-import org.openscience.cdk.renderer.generators.BasicBondGenerator;
-import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
-import org.openscience.cdk.renderer.generators.IGenerator;
-import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.smiles.InvPair;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 import com.google.gson.Gson;
@@ -121,7 +99,6 @@ import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphEdit;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
 
@@ -144,13 +121,6 @@ public class DenoptimIO
 	 * Newline character from system.
 	 */
 	public static final String NL = System.getProperty("line.separator");
-
-    // A list of properties used by CDK algorithms which must never be
-    // serialized into the SD file format.
-
-    private static final ArrayList<String> cdkInternalProperties
-            = new ArrayList<>(Arrays.asList(new String[]
-            {InvPair.CANONICAL_LABEL, InvPair.INVARIANCE_PAIR}));
     
     private static final IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
@@ -1296,201 +1266,6 @@ public class DenoptimIO
         }
         writeSDFFile(file.getAbsolutePath(), 
                 candidate.getFitnessProviderOutputRepresentation(), append);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Writes a PNG representation of the molecule
-     *
-     * @param mol      the molecule
-     * @param fileName output file
-     * @param logger program-specific logger.
-     * @throws DENOPTIMException
-     */
-
-    public static void moleculeToPNG(IAtomContainer mol, String fileName, 
-            Logger logger)
-            throws DENOPTIMException {
-        IAtomContainer iac = null;
-        if (!GeometryTools.has2DCoordinates(mol)) {
-            iac = MoleculeUtils.generate2DCoordinates(mol, logger);
-        } else {
-            iac = mol;
-        }
-
-        if (iac == null) {
-            throw new DENOPTIMException("Failed to generate 2D coordinates.");
-        }
-
-        try {
-            int WIDTH = 500;
-            int HEIGHT = 500;
-            // the draw area and the image should be the same size
-            Rectangle drawArea = new Rectangle(WIDTH, HEIGHT);
-            Image image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-
-            // generators make the image elements
-            ArrayList<IGenerator<IAtomContainer>> generators = new ArrayList<>();
-            generators.add(new BasicSceneGenerator());
-            generators.add(new BasicBondGenerator());
-            generators.add(new BasicAtomGenerator());
-
-
-            GeometryTools.translateAllPositive(iac);
-
-            // the renderer needs to have a toolkit-specific font manager
-            AtomContainerRenderer renderer =
-                    new AtomContainerRenderer(generators, new AWTFontManager());
-
-            RendererModel model = renderer.getRenderer2DModel();
-            model.set(BasicSceneGenerator.UseAntiAliasing.class, true);
-            //model.set(BasicAtomGenerator.KekuleStructure.class, true);
-            model.set(BasicBondGenerator.BondWidth.class, 2.0);
-            model.set(BasicAtomGenerator.ColorByType.class, true);
-            model.set(BasicAtomGenerator.ShowExplicitHydrogens.class, false);
-            model.getParameter(BasicSceneGenerator.FitToScreen.class).setValue(Boolean.TRUE);
-
-
-            // the call to 'setup' only needs to be done on the first paint
-            renderer.setup(iac, drawArea);
-
-            // paint the background
-            Graphics2D g2 = (Graphics2D) image.getGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
-
-            g2.setColor(Color.WHITE);
-            g2.fillRect(0, 0, WIDTH, HEIGHT);
-
-
-            // the paint method also needs a toolkit-specific renderer
-            renderer.paint(iac, new AWTDrawVisitor(g2),
-                    new Rectangle2D.Double(0, 0, WIDTH, HEIGHT), true);
-
-            ImageIO.write((RenderedImage) image, "PNG", new File(fileName));
-        } catch (IOException ioe) {
-            throw new DENOPTIMException(ioe);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Write the molecule in V3000 format.
-     *
-     * @param outfile
-     * @param mol
-     * @throws Exception
-     */
-
-    @SuppressWarnings({ "ConvertToTryWithResources", "unused" })
-    private static void writeV3000File(String outfile, IAtomContainer mol)
-            throws DENOPTIMException {
-        StringBuilder sb = new StringBuilder(1024);
-
-        String title = (String) mol.getProperty(CDKConstants.TITLE);
-        if (title == null)
-            title = "";
-        if (title.length() > 80)
-            title = title.substring(0, 80);
-        sb.append(title).append("\n");
-
-        sb.append("  CDK     ").append(new SimpleDateFormat("MMddyyHHmm").
-                format(System.currentTimeMillis()));
-        sb.append("\n\n");
-
-        sb.append("  0  0  0     0  0            999 V3000\n");
-
-        sb.append("M  V30 BEGIN CTAB\n");
-        sb.append("M  V30 COUNTS ").append(mol.getAtomCount()).append(" ").
-                append(mol.getBondCount()).append(" 0 0 0\n");
-        sb.append("M  V30 BEGIN ATOM\n");
-        for (int f = 0; f < mol.getAtomCount(); f++) {
-            IAtom atom = mol.getAtom(f);
-            sb.append("M  V30 ").append((f + 1)).append(" ").append(atom.getSymbol()).
-                    append(" ").append(atom.getPoint3d().x).append(" ").
-                    append(atom.getPoint3d().y).append(" ").
-                    append(atom.getPoint3d().z).append(" ").append("0");
-            sb.append("\n");
-        }
-        sb.append("M  V30 END ATOM\n");
-        sb.append("M  V30 BEGIN BOND\n");
-
-        Iterator<IBond> bonds = mol.bonds().iterator();
-        int f = 0;
-        while (bonds.hasNext()) {
-            IBond bond = bonds.next();
-            int bondType = bond.getOrder().numeric();
-            String bndAtoms = "";
-            if (bond.getStereo() == IBond.Stereo.UP_INVERTED ||
-                    bond.getStereo() == IBond.Stereo.DOWN_INVERTED ||
-                    bond.getStereo() == IBond.Stereo.UP_OR_DOWN_INVERTED) {
-                // turn around atom coding to correct for inv stereo
-                bndAtoms = mol.getAtomNumber(bond.getAtom(1)) + 1 + " ";
-                bndAtoms += mol.getAtomNumber(bond.getAtom(0)) + 1;
-            } else {
-                bndAtoms = mol.getAtomNumber(bond.getAtom(0)) + 1 + " ";
-                bndAtoms += mol.getAtomNumber(bond.getAtom(1)) + 1;
-            }
-
-//            String stereo = "";
-//            switch(bond.getStereo())
-//            {
-//                case UP:
-//                    stereo += "1";
-//                    break;
-//       		case UP_INVERTED:
-//                    stereo += "1";
-//                    break;
-//                case DOWN:
-//                    stereo += "6";
-//                    break;
-//                case DOWN_INVERTED:
-//                    stereo += "6";
-//                    break;
-//                case UP_OR_DOWN:
-//                    stereo += "4";
-//                    break;
-//                case UP_OR_DOWN_INVERTED:
-//                    stereo += "4";
-//                    break;
-//                case E_OR_Z:
-//                    stereo += "3";
-//                    break;
-//                default:
-//                    stereo += "0";
-//            }
-
-            sb.append("M  V30 ").append((f + 1)).append(" ").append(bondType).
-                    append(" ").append(bndAtoms).append("\n");
-            f = f + 1;
-        }
-
-        sb.append("M  V30 END BOND\n");
-        sb.append("M  V30 END CTAB\n");
-        sb.append("M  END\n\n");
-
-        Map<Object, Object> sdFields = mol.getProperties();
-        if (sdFields != null) {
-            for (Object propKey : sdFields.keySet()) {
-                if (!cdkInternalProperties.contains((String) propKey)) {
-                    sb.append("> <").append(propKey).append(">");
-                    sb.append("\n");
-                    sb.append("").append(sdFields.get(propKey));
-                    sb.append("\n\n");
-                }
-            }
-        }
-        sb.append("$$$$\n");
-
-        try {
-            FileWriter fw = new FileWriter(outfile);
-            fw.write(sb.toString());
-            fw.close();
-        } catch (IOException ioe) {
-            throw new DENOPTIMException(ioe);
-        }
     }
 
 //------------------------------------------------------------------------------

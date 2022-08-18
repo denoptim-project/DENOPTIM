@@ -37,7 +37,6 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.io.DenoptimIO;
-import denoptim.utils.GenUtils;
 import denoptim.utils.MathUtils;
 
 /**
@@ -381,7 +380,6 @@ public class RingClosureFinder
                 pt.z = newVec.z + srcRotBnd.z;
             }
         }
-
         return res;
     }
 
@@ -408,7 +406,6 @@ public class RingClosureFinder
         } catch (Throwable thr)
         {
             System.out.println("Unable to write SDF: "+thr);
-            GenUtils.pause();
         }
     }
 

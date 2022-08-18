@@ -941,7 +941,6 @@ public class FitnessParametersForm extends ParametersForm
 	private class DescriptorTreeNode extends DefaultMutableTreeNode
     {
 		protected DescriptorForFitness dff;
-		protected boolean isLeaf = false;
 
 		/**
 		 * Constructor meant for nodes representing an actual descriptor value.
@@ -951,7 +950,6 @@ public class FitnessParametersForm extends ParametersForm
 		public DescriptorTreeNode(DescriptorForFitness dff) {
 			super(dff.getShortName());
 			this.dff = dff;
-			this.isLeaf = true;
 		}
 
 		/**
@@ -1121,6 +1119,7 @@ public class FitnessParametersForm extends ParametersForm
     
 //------------------------------------------------------------------------------
     
+    @SuppressWarnings("serial")
     private class ParametrizedDescriptorDefinition extends GUIModalDialog
     {   
         public ParametrizedDescriptorDefinition(String descName, 
@@ -1270,6 +1269,7 @@ public class FitnessParametersForm extends ParametersForm
     
 //------------------------------------------------------------------------------
     
+    @SuppressWarnings("serial")
     private class AtomSpecExpressionDefinition extends GUIModalDialog
     {
     	public AtomSpecExpressionDefinition(Component refForPlacement)

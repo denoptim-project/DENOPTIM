@@ -28,7 +28,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 
 /**
  * This class represents the edge between two vertices.
@@ -226,20 +226,20 @@ public class Edge
         Vertex ovB = other.trgAP.getOwner();
         
         String invariantTA = tvA.getBuildingBlockType().toOldInt() +
-                GenUtils.getPaddedString(6,tvA.getBuildingBlockId()) +
-                GenUtils.getPaddedString(4,srcAP.getIndexInOwner());
+                GeneralUtils.getPaddedString(6,tvA.getBuildingBlockId()) +
+                GeneralUtils.getPaddedString(4,srcAP.getIndexInOwner());
         
         String invariantTB = tvB.getBuildingBlockType().toOldInt() +
-                GenUtils.getPaddedString(6,tvB.getBuildingBlockId()) +
-                GenUtils.getPaddedString(4,trgAP.getIndexInOwner());
+                GeneralUtils.getPaddedString(6,tvB.getBuildingBlockId()) +
+                GeneralUtils.getPaddedString(4,trgAP.getIndexInOwner());
         
         String invariantOA = ovA.getBuildingBlockType().toOldInt() +
-                GenUtils.getPaddedString(6,ovA.getBuildingBlockId()) +
-                GenUtils.getPaddedString(4,other.srcAP.getIndexInOwner());
+                GeneralUtils.getPaddedString(6,ovA.getBuildingBlockId()) +
+                GeneralUtils.getPaddedString(4,other.srcAP.getIndexInOwner());
         
         String invariantOB = ovB.getBuildingBlockType().toOldInt() +
-                GenUtils.getPaddedString(6,ovB.getBuildingBlockId()) +
-                GenUtils.getPaddedString(4,other.trgAP.getIndexInOwner());
+                GeneralUtils.getPaddedString(6,ovB.getBuildingBlockId()) +
+                GeneralUtils.getPaddedString(4,other.trgAP.getIndexInOwner());
                 
         String invariantThis = invariantTA + invariantTB;
         if (invariantTA.compareTo(invariantTB) > 0)

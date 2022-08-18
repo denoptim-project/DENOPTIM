@@ -126,6 +126,7 @@ public class GUIEmptyVertexMaker extends GUIModalDialog
      * @param refForPlacement the component used to place the dialog in 
      * proximity of the parent.
      */
+    @SuppressWarnings("serial")
     public GUIEmptyVertexMaker(Component refForPlacement, boolean canBeScaffold)
     {
         super(refForPlacement);

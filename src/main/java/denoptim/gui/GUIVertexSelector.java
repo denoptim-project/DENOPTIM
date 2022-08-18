@@ -146,7 +146,6 @@ public class GUIVertexSelector extends GUIModalDialog
                     + "'Done' button.</html>");
             this.btnExtra.addActionListener(new ActionListener() {
                 
-                @SuppressWarnings("unchecked")
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     ArrayList<Integer> ids = vertexViewer.getSelectedAPIDs();
@@ -244,6 +243,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	
 //-----------------------------------------------------------------------------
 	
+    @SuppressWarnings("unchecked")
     private void appendToResult(int vrtxId, int apId)
     {
         if (result == null)
@@ -338,18 +338,7 @@ public class GUIVertexSelector extends GUIModalDialog
 	{
 		private boolean inEnabled = true;
 		
-		public VrtxSpinnerChangeEvent()
-		{}
-		
-		/**
-		 * Enables/disable the listener
-		 * @param var <code>true</code> to activate listener, 
-		 * <code>false</code> to disable.
-		 */
-		public void setEnabled(boolean var)
-		{
-			this.inEnabled = var;
-		}
+		public VrtxSpinnerChangeEvent() {}
 		
         @Override
         public void stateChanged(ChangeEvent event)

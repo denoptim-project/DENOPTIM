@@ -81,7 +81,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import io.github.dan2097.jnainchi.InchiFlag;
 import io.github.dan2097.jnainchi.InchiOptions;
-import net.sf.jniinchi.INCHI_RET;
+import io.github.dan2097.jnainchi.InchiStatus;
 
 
 /**
@@ -488,14 +488,14 @@ public class MoleculeUtils
         {
             InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();
             InChIGenerator gen = factory.getInChIGenerator(fmol, options);
-            INCHI_RET ret = gen.getReturnStatus();
-            if (ret == INCHI_RET.WARNING)
+            InchiStatus ret = gen.getStatus();
+            if (ret == InchiStatus.WARNING)
             {
                 //String error = gen.getMessage();
                 //InChI generated, but with warning message
                 //return new ObjectPair(null, error);
             }
-            else if (ret != INCHI_RET.OKAY)
+            else if (ret != InchiStatus.SUCCESS)
             {
                 return null;
             }
@@ -945,8 +945,6 @@ public class MoleculeUtils
                     oAtm.getHybridization().toString()));
         if (oAtm.getImplicitHydrogenCount() != null && !ignoreImplicitH)
             nAtm.setImplicitHydrogenCount(oAtm.getImplicitHydrogenCount());
-        if (oAtm.getStereoParity() != null)
-            nAtm.setStereoParity(oAtm.getStereoParity());
         if (oAtm.getMaxBondOrder() != null)
             nAtm.setMaxBondOrder(oAtm.getMaxBondOrder());
         if (oAtm.getNaturalAbundance() != null)

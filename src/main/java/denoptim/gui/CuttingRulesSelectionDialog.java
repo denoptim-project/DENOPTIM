@@ -228,6 +228,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         customRulesTabModel = new DefaultTableModel();
         customRulesTabModel.setColumnCount(6);
         customRulesTabModel.setColumnIdentifiers(column_names);
+        @SuppressWarnings("serial")
         JTable customRulesTable = new JTable(customRulesTabModel) {
             @Override
             public Dimension getPreferredScrollableViewportSize() {
@@ -474,6 +475,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
      * representation of SMARTS queries that are selected in the table given
      * upon construction.
      */
+    @SuppressWarnings("serial")
     private class SMARTSVisualizationButton extends JButton
     {
         /**

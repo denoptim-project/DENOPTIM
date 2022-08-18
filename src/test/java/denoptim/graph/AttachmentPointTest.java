@@ -46,8 +46,6 @@ import denoptim.graph.Vertex.BBType;
 
 public class AttachmentPointTest
 {
-	private final int ATMID = 6;
-	private final int APCONN = 3;
 	private final String APRULE = "MyRule";
 	private final String APSUBRULE = "1";
 	private final String APCLASS = APRULE
@@ -647,7 +645,6 @@ public class AttachmentPointTest
         AttachmentPoint ap0 = v1.getAP(0);
         AttachmentPoint ap1 = v1.getAP(1);
         AttachmentPoint ap2 = v1.getAP(2);
-        AttachmentPoint ap3 = v1.getAP(3);
         
         /*
          *  ap0 
@@ -671,7 +668,6 @@ public class AttachmentPointTest
         ap0 = t2.getAP(0);
         ap1 = t2.getAP(1);
         ap2 = t2.getAP(2);
-        ap3 = t2.getAP(3);
         
         assertTrue(ap0.hasSameSrcAtom(ap1),"Intra-Template (A)");
         assertTrue(ap1.hasSameSrcAtom(ap0),"Intra-Template (B)");

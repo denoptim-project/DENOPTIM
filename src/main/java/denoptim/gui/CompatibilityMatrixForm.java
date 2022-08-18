@@ -109,14 +109,6 @@ public class CompatibilityMatrixForm extends JPanel {
      * attachment point classes compatibility matrix
      */
     private HashMap<APClass, ArrayList<APClass>> compatMap = 
-    			new HashMap<APClass, ArrayList<APClass>>(); 
-
-    /**
-     * Data structure that stores compatible APclasses for joining APs 
-     * in ring-closing bonds. Symmetric, purpose specific
-     * compatibility matrix.
-     */
-    private HashMap<APClass, ArrayList<APClass>> rcCompatMap = 
     			new HashMap<APClass, ArrayList<APClass>>();
 
     /**
@@ -162,7 +154,8 @@ public class CompatibilityMatrixForm extends JPanel {
 	
 //-----------------------------------------------------------------------------
 	
-	public CompatibilityMatrixForm()
+	@SuppressWarnings("serial")
+    public CompatibilityMatrixForm()
 	{
 		this.setLayout(new BorderLayout());
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -434,7 +427,14 @@ public class CompatibilityMatrixForm extends JPanel {
                             }
                     		ArrayList<APClass> newTrg = 
                     		        new ArrayList<APClass>();
-                    		newTrg.addAll(compatMap.get(srcOrig));
+                    		try
+                            {
+                                newTrg.addAll(compatMap.get(APClass.make(srcOrig)));
+                            } catch (DENOPTIMException e1)
+                            {
+                                // Should not happen
+                                e1.printStackTrace();
+                            }
 	    	                compatMap.put(srcAPClass,newTrg);
 	    	                allAPClsInCPMap.add(srcAPClass);
                     	}
@@ -828,8 +828,6 @@ public class CompatibilityMatrixForm extends JPanel {
                         Arrays.sort(selectedRowIds);
                         for (int i=(selectedRowIds.length-1); i>-1; i--)
                         {
-                            Object o = tableCapping.getValueAt(
-                                    selectedRowIds[i], 0);
                             APClass apc = null;
                             try
                             {
@@ -1427,7 +1425,7 @@ public class CompatibilityMatrixForm extends JPanel {
 			this.setBackground(DEFAULTBACKGROUND);
 			this.setLayout(new BorderLayout());
 			
-			this.trgDelListener = new TrgRemovalListener(srcAPClass,this);
+			this.trgDelListener = new TrgRemovalListener(srcAPClass);
 			
 			srcClassName = new JTextField(srcAPClass.toString());
 			srcClassName.setBorder(null);
@@ -1487,7 +1485,7 @@ public class CompatibilityMatrixForm extends JPanel {
 	                JScrollPane scrollTrg = new JScrollPane(trgClsList);
 	                
 	                JOptionPane.showMessageDialog(
-	                        null,
+	                        btnAdd,
 	                        scrollTrg,
 	                        "Choose Compatible APClasses",
 	                        JOptionPane.PLAIN_MESSAGE);
@@ -1668,12 +1666,10 @@ public class CompatibilityMatrixForm extends JPanel {
 	private class TrgRemovalListener implements PropertyChangeListener
 	{
 		private APClass srcAPClass;
-		private Component srcAPClassRulesPanel;
 		
-		public TrgRemovalListener(APClass srcAPClass, Component panel)
+		public TrgRemovalListener(APClass srcAPClass)
 		{
 			this.srcAPClass = srcAPClass;
-			this.srcAPClassRulesPanel = panel;
 		}
 
 		public void propertyChange(PropertyChangeEvent evt) 
@@ -1686,7 +1682,8 @@ public class CompatibilityMatrixForm extends JPanel {
 	
 //-----------------------------------------------------------------------------
 	
-	private class CompatRulesHeader extends JPanel
+	@SuppressWarnings("serial")
+    private class CompatRulesHeader extends JPanel
 	{
 		private Dimension minSrcAPClassName = new Dimension(200,26);
 		public final Color DEFAULTBACKGROUND = 
@@ -1721,6 +1718,7 @@ public class CompatibilityMatrixForm extends JPanel {
     
 //-----------------------------------------------------------------------------
     
+    @SuppressWarnings("serial")
     private class TargetAPClassToken extends JPanel
     {
     	private APClass trgAPClass;

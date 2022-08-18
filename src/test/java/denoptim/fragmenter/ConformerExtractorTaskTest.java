@@ -18,7 +18,6 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.FragIsomorphNode;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex.BBType;
 
@@ -120,7 +119,6 @@ public class ConformerExtractorTaskTest
         {
             for (int i=0; i<cf.getOrderedNodes().size(); i++)
             {
-                FragIsomorphNode n = cf.getOrderedNodes().get(i);
                 assertEquals(sample.get(0).getOrderedNodes().get(i).getLabel(),
                         cf.getOrderedNodes().get(i).getLabel());
             }

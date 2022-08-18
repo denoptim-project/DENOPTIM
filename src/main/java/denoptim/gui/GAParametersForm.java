@@ -1511,7 +1511,7 @@ public class GAParametersForm extends ParametersForm
         double[][] data = new double[2][y.size()];
         for (int level=0; level<100; level++)
         {
-        	data[0][level] = new Double(level);
+        	data[0][level] = level;
         	data[1][level] = y.get(level);
         }
         
@@ -1611,7 +1611,7 @@ public class GAParametersForm extends ParametersForm
         double[][] data = new double[2][y.size()];
         for (int numHeavyAtoms=0; numHeavyAtoms<100; numHeavyAtoms++)
         {
-          data[0][numHeavyAtoms] = new Double(numHeavyAtoms);
+          data[0][numHeavyAtoms] = numHeavyAtoms;
           data[1][numHeavyAtoms] = y.get(numHeavyAtoms);
         }
 
@@ -1711,7 +1711,7 @@ public class GAParametersForm extends ParametersForm
         double[][] data = new double[2][y.size()];
         for (int crowdedness=0; crowdedness<100; crowdedness++)
         {
-            data[0][crowdedness] = new Double(crowdedness);
+            data[0][crowdedness] = crowdedness;
             data[1][crowdedness] = y.get(crowdedness);
         }
         

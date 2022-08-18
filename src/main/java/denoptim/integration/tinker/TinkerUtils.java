@@ -39,7 +39,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.molecularmodeling.MMBuilderUtils;
 import denoptim.utils.ConnectedLigand;
 import denoptim.utils.ConnectedLigandComparator;
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 import denoptim.utils.MathUtils;
 import denoptim.utils.ObjectPair;
 
@@ -1070,7 +1070,7 @@ public class TinkerUtils
         try
         {
             fr = new ReversedLinesFileReader(new File(
-                    logPathName));
+                    logPathName), null);
 
             int numEmpty = 0;
             for (int i=0; i<100; i++) //at most 100 lines are read
@@ -1119,7 +1119,7 @@ public class TinkerUtils
     {
         int lastI = MMBuilderUtils.countLinesWKeywordInFile(tinkerLog, pattern);
         String xyzfile = workDir + System.getProperty("file.separator") + fname 
-                + "." + GenUtils.getPaddedString(3, lastI - 1);
+                + "." + GeneralUtils.getPaddedString(3, lastI - 1);
         return xyzfile;
     }
 

@@ -157,7 +157,7 @@ abstract public class ParallelAsynchronousTaskExecutor
      * locally to allow reporting it back from the main thread.
      * @return <code>true</code> if any of the subtasks has thrown an exception
      */
-    private boolean subtaskHasException()
+    protected boolean subtaskHasException()
     {
         boolean hasException = false;
         for (Task tsk : submitted)
@@ -169,8 +169,18 @@ abstract public class ParallelAsynchronousTaskExecutor
                 break;
             }
         }
-
         return hasException;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the trace of the problem occurred in the first subtask that was
+     * detected to have a problem.
+     */
+    protected Throwable getExceptionFromSubTask()
+    {
+        return thrownByTask;
     }
 
 //------------------------------------------------------------------------------
@@ -179,7 +189,7 @@ abstract public class ParallelAsynchronousTaskExecutor
      * Check for completion of all subtasks
      * @return <code>true</code> if all subtasks are completed
      */
-    private boolean allTasksCompleted()
+    protected boolean allTasksCompleted()
     {
         boolean allDone = true;
         for (Task tsk : submitted)
@@ -190,7 +200,6 @@ abstract public class ParallelAsynchronousTaskExecutor
                 break;
             }
         }
-
         return allDone;
     }
 

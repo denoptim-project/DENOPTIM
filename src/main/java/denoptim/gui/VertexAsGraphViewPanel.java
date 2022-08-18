@@ -18,14 +18,12 @@
 
 package denoptim.gui;
 
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -83,10 +81,6 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	// more general. The overall editablility is given by general && local.
 	private boolean vertexSpecificAPTabEditable = true;
 	
-	private final String NL = System.getProperty("line.separator");
-	
-	private JComponent parent;
-
 //-----------------------------------------------------------------------------
 
 	/**
@@ -96,20 +90,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	 */
 	public VertexAsGraphViewPanel(boolean editableTable)
 	{
-		this(null,editableTable);
-	}
-	
-//-----------------------------------------------------------------------------
-
-	/**
-	 * Constructor that allows to specify whether the AP table is editable or 
-	 * not.
-	 * @param parent the parent component
-	 * @param editableTable use <code>true</code> to make the AP table editable
-	 */
-	public VertexAsGraphViewPanel(JComponent parent, boolean editableTable)
-	{
-		this(parent,editableTable,340);
+		this(editableTable,340);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -121,10 +102,9 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 	 * @param editableTable use <code>true</code> to make the AP table editable
 	 * @param dividerPosition allows to set the initial position of the divide
 	 */
-	public VertexAsGraphViewPanel(JComponent parent, boolean editableTable, 
+	public VertexAsGraphViewPanel(boolean editableTable, 
 	        int dividerPosition)
 	{
-		this.parent = parent;
 		editableAPTable = editableTable;
 		initialize(dividerPosition);
 	}

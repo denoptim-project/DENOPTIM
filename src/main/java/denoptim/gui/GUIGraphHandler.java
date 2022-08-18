@@ -1273,7 +1273,6 @@ public class GUIGraphHandler extends GUICardPanel
 		// Create clones of fragments and put the into 'compatFrags'
 		collectFragAndAPsCompatibleWithSelectedAPs(selAps);
 		
-		Vertex.BBType trgFrgType = Vertex.BBType.UNDEFINED;
 		ArrayList<Vertex> vertxLib = new ArrayList<Vertex>();		
 		String[] options = new String[]{"Any Vertex",
 				"Compatible Vertices ("+compatVrtxs.size()+")",
@@ -1290,18 +1289,15 @@ public class GUIGraphHandler extends GUICardPanel
 		switch (res)
 		{
 			case 0:
-			    ArrayList<Vertex> tmp = fragSpace.getFragmentLibrary();
-				vertxLib = new  ArrayList<Vertex>();
+				vertxLib = new ArrayList<Vertex>();
 		        for (Vertex bb : fragSpace.getFragmentLibrary())
 		        {
 		        	vertxLib.add(bb.clone());
 		        }
-				trgFrgType = Vertex.BBType.FRAGMENT;
 				break;
 				
 			case 1:
 				vertxLib = compatVrtxs;
-				trgFrgType = Vertex.BBType.FRAGMENT;
 				break;
 				
 			case 2:
@@ -1310,7 +1306,6 @@ public class GUIGraphHandler extends GUICardPanel
 		        {
 		            vertxLib.add(bb.clone());
 		        }
-				trgFrgType = Vertex.BBType.CAP;
 				break;
 			default:
 				return;
@@ -1335,7 +1330,8 @@ public class GUIGraphHandler extends GUICardPanel
 		{
 			return;
 		}
-		ArrayList<Integer> trgFragApId = 
+		@SuppressWarnings("unchecked")
+        ArrayList<Integer> trgFragApId = 
 		        ((ArrayList<ArrayList<Integer>>)selected).get(0);
 		Vertex chosenVrtx = vertxLib.get(trgFragApId.get(0));
 		
@@ -1540,9 +1536,6 @@ public class GUIGraphHandler extends GUICardPanel
     		catch (UndetectedFileFormatException uff) 
     		{
                 String[] options = {"Abandon", "SDF", "JSON"};
-                FileFormat[] ffs = {null,
-                        FileFormat.GRAPHSDF,
-                        FileFormat.GRAPHJSON};
                 int res = JOptionPane.showOptionDialog(this,
                     "<html>Failed to detect file type from file's "
                     + "extension.<br>"
@@ -1555,7 +1548,6 @@ public class GUIGraphHandler extends GUICardPanel
                     UIManager.getIcon("OptionPane.warningIcon"),
                     options,
                     options[0]);
-                FileFormat ff = null;
                 switch (res)
                 {
                     case 0:
@@ -1853,7 +1845,8 @@ public class GUIGraphHandler extends GUICardPanel
 	/**
 	 * Dialog to configure one or more templates.
 	 */
-	private class ConfigTemplateDialog extends GUIModalDialog
+	@SuppressWarnings("serial")
+    private class ConfigTemplateDialog extends GUIModalDialog
 	{   
 	    private JPanel centralPanel;
 	    private JScrollPane scrollPanel;

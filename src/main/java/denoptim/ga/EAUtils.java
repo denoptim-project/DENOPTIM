@@ -61,7 +61,7 @@ import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
@@ -514,7 +514,7 @@ public class EAUtils
         {
             chosenOffspring = settings.getRandomizer().randomlyChooseOne(
                     validOffspring);
-            chosenOffspring.setName("M" + GenUtils.getPaddedString(
+            chosenOffspring.setName("M" + GeneralUtils.getPaddedString(
                     DENOPTIMConstants.MOLDIGITS,
                     GraphUtils.getUniqueMoleculeIndex()));
         } else {
@@ -639,7 +639,7 @@ public class EAUtils
         offspring.setUID(res[0].toString().trim());
         offspring.setSmiles(res[1].toString().trim());
         offspring.setChemicalRepresentation((IAtomContainer) res[2]);
-        offspring.setName("M" + GenUtils.getPaddedString(
+        offspring.setName("M" + GeneralUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
         
@@ -709,7 +709,7 @@ public class EAUtils
         candidate.setSmiles(res[1].toString().trim());
         candidate.setChemicalRepresentation((IAtomContainer) res[2]);
         
-        candidate.setName("M" + GenUtils.getPaddedString(
+        candidate.setName("M" + GeneralUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
         
@@ -801,7 +801,7 @@ public class EAUtils
         candidate.setSmiles(res[1].toString().trim());
         candidate.setChemicalRepresentation((IAtomContainer) res[2]);
         
-        candidate.setName("M" + GenUtils.getPaddedString(
+        candidate.setName("M" + GeneralUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
         
@@ -1072,7 +1072,7 @@ public class EAUtils
         int ndigits = String.valueOf(settings.getNumberOfGenerations()).length();
         
         sb.append(settings.getDataDirectory()).append(FSEP).append("Gen")
-            .append(GenUtils.getPaddedString(ndigits, genID));
+            .append(GeneralUtils.getPaddedString(ndigits, genID));
         
         return sb.toString();
     }
@@ -1087,9 +1087,9 @@ public class EAUtils
         int ndigits = String.valueOf(settings.getNumberOfGenerations()).length();
         
         sb.append(settings.getDataDirectory()).append(FSEP)
-            .append("Gen").append(GenUtils.getPaddedString(ndigits, genID))
+            .append("Gen").append(GeneralUtils.getPaddedString(ndigits, genID))
             .append(FSEP)
-            .append("Gen").append(GenUtils.getPaddedString(ndigits, genID))
+            .append("Gen").append(GeneralUtils.getPaddedString(ndigits, genID))
             .append(".txt");
         
         return sb.toString();
@@ -1235,7 +1235,7 @@ public class EAUtils
                 int ctr = GraphUtils.getUniqueMoleculeIndex();
                 int gctr = GraphUtils.getUniqueGraphIndex();
                 
-                String molName = "M" + GenUtils.getPaddedString(8, ctr);
+                String molName = "M" + GeneralUtils.getPaddedString(8, ctr);
                 candidate.setName(molName);
                 candidate.getGraph().setGraphId(gctr);
                 candidate.getGraph().setLocalMsg("INITIAL_POPULATION");

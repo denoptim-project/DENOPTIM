@@ -375,7 +375,7 @@ public class AtomOrganizer
             int atmidx = mol.indexOf(connectedAtom);
 
             // move to the next shell of atoms
-            if (mol.getConnectedAtomsCount(connectedAtom) > 1) {
+            if (mol.getConnectedBondsCount(connectedAtom) > 1) {
                 exploreMolecule(atmidx, flag, mol, ap);
             }
         }
@@ -420,7 +420,7 @@ public class AtomOrganizer
                 // Set layer lidx+1 to all connected atoms
                 for (IAtom ngbAtm : neighbourAtoms)
                 {
-                    int ngbAtmIdx = mol.getAtomNumber(ngbAtm);
+                    int ngbAtmIdx = mol.indexOf(ngbAtm);
                     if (!flags.get(lyflg).get(ngbAtmIdx))
                     {
                         int layerOfNgbAtm = lidx + 1;
@@ -454,7 +454,7 @@ public class AtomOrganizer
             // Report atoms to ordered list
             for (IAtom orderedAtm : atmInLyr) {
                 // Identify atom
-                int atmidx = mol.getAtomNumber(orderedAtm);
+                int atmidx = mol.indexOf(orderedAtm);
 
                 // Add to ordered lists
                 processAtom(atmidx, ap, flag);
@@ -541,8 +541,8 @@ public class AtomOrganizer
         List<ConnectedLigand> ligList = new ArrayList<>();
         for (IAtom seed : inList)
         {
-            ConnectedLigand lig = new ConnectedLigand(seed, 
-                                             mol.getConnectedAtomsCount(seed));
+            ConnectedLigand lig = new ConnectedLigand(seed,
+                    mol.getConnectedBondsCount(seed));
             ligList.add(lig);
         }
 
@@ -558,8 +558,8 @@ public class AtomOrganizer
 //------------------------------------------------------------------------------
     /**
      * Generates a vector of boolean flags. The size of the vector equals the
-     * number of atoms in the <code>IAtomContainer<code/>.
-     * All flags are initialized to <code>false<code/>.
+     * number of atoms in the <code>IAtomContainer</code>.
+     * All flags are initialized to <code>false</code>.
      *
      * @param mol molecular object for which the vector of flags has to be
      * generated.

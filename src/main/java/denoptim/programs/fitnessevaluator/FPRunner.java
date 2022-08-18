@@ -67,8 +67,6 @@ public class FPRunner
      * Asynchronous tasks manager 
      */
     final ThreadPoolExecutor tpe;
-
-    private Throwable thrownByTask;
     
     /**
      * The parameters controlling the 
