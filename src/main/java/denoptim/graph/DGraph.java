@@ -2661,7 +2661,6 @@ public class DGraph implements Cloneable
      * {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} on any of 
      * the parent vertexes.
      */
-    @SuppressWarnings("unchecked")
     public List<Integer> getBranchIdOfVertexAtPosition(int i)
     {
         return getBranchIdOfVertex(getVertexAtPosition(i));

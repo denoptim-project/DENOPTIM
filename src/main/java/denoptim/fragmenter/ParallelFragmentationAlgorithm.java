@@ -514,6 +514,7 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
      * clean all reference to submitted tasks
      */
 
+    @SuppressWarnings("unused")
     private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
                             ArrayList<FragmenterTask> submitted)
     {

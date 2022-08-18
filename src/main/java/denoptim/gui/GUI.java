@@ -247,7 +247,7 @@ public class GUI implements Runnable
 		} catch (Exception e) {
 			e.printStackTrace();
 			String[] options = new String[]{"Yes, stop and close"};
-			int res = JOptionPane.showOptionDialog(frame,
+			JOptionPane.showOptionDialog(frame,
 					"<html>Problems killing the running tasks.<br>Will force "
 					+ "quit all tasks and shutdown.</html>",
 				    "Force quit", 

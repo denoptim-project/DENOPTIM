@@ -52,20 +52,7 @@ import jakarta.el.VariableMapper;
  * Class parsing fitness expression by means of Expression Language.
  */
 public class FitnessExpressionParser
-{
-    /**
-     * Formulation of the internally provided fitness
-     */
-    private String fitnessExpression = "";
-    
-    /**
-     * List of custom variable definitions read from input. 
-     * These lines are the definition of atom/bond specific 
-     * descriptors, and custom parametrized descriptors.
-     */
-    private List<String> customVarDescExpressions = 
-            new ArrayList<String>();
-    
+{  
     /**
      * List of variables used in the calculation of the fitness. 
      * For instance, atom/bond specific descriptors, and custom parameterized 
@@ -333,6 +320,7 @@ public class FitnessExpressionParser
          * Mapper that always returns a new blank instance of {@link Variable}.
          */
         private VariableMapper vm = new VariableMapper() {
+            @SuppressWarnings("serial")
             @Override
             public ValueExpression resolveVariable(String variable) {
                 ValueExpression ve = new ValueExpression() {

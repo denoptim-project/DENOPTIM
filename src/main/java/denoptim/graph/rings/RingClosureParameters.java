@@ -163,7 +163,10 @@ public class RingClosureParameters extends RunTimeParameters
      */
     protected ArrayList<Integer> ringSizeBias = new ArrayList<Integer>()
         {
-            private final long serialVersionUID = 1L;
+            /**
+             * Version ID
+             */
+            private static final long serialVersionUID = 1L;
             {
                 for (int i=0; i<maxRingSize+1; i++)
                 {

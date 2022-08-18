@@ -1736,7 +1736,7 @@ public class FragmentSpace
         {
             int currentKey = 0;
             APMapping currentMapping = new APMapping();
-            Boolean stopped = FragmentSpaceUtils.recursiveCombiner(keys, currentKey, 
+            FragmentSpaceUtils.recursiveCombiner(keys, currentKey, 
                     apCompatilities, currentMapping, apMappings, true, 
                     maxCombinations);
         }

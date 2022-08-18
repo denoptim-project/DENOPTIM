@@ -101,7 +101,7 @@ public class ExternalCmdsListener implements Runnable
 			    }
 			    for (WatchEvent<?> event : key.pollEvents()) 
 			    {
-			        WatchEvent.Kind kind = event.kind();
+			        WatchEvent.Kind<?> kind = event.kind();
 
 			        // There seems to be a possibility for nasty events that need 
 			        // to be ignored.

@@ -65,7 +65,13 @@ public class APClass implements Cloneable,Comparable<APClass>
      * Recognized attachment point classes of RingClosingAttractor
      */
     public static final Set<APClass> RCAAPCLASSSET = 
-    	    new HashSet<APClass>(){{
+    	    new HashSet<APClass>(){
+                /**
+                 * Version ID
+                 */
+                private static final long serialVersionUID = 1L;
+
+            {
     	        APClass a = getUnique("ATplus", 0, BondType.ANY);
     	        add(a);
     	        synchronized (uniqueAPClassesLock)
