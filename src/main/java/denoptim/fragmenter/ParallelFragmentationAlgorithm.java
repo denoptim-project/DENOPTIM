@@ -169,6 +169,15 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
             }
         }
         
+        // In case we did not produce anything
+        if (resultFiles.size()==0)
+        {
+            settings.getLogger().log(Level.INFO, "No results to collect. "
+                    + "All done.");
+            return true;
+        }
+        
+        // If we did produce something, we go ahead
         File allFragsFile;
         FileFormat outputFormat = null;
         if (settings.doFragmentation())

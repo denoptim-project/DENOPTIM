@@ -270,8 +270,13 @@ public class FragmenterTask extends Task
         {
             logger.log(Level.INFO,"Fragmentation of structures");
             File newResultsFile = new File(getFragmentsFileName(settings, id));
-            FragmenterTools.fragmentation(inputFile, settings, newResultsFile,
-                    logger);
+            boolean producedSomething = FragmenterTools.fragmentation(inputFile, 
+                    settings, newResultsFile,logger);
+            if (!producedSomething)
+            {
+                completed = true;
+                return null;
+            }
             preliminaryResults = newResultsFile;
         }
         

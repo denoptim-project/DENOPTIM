@@ -221,7 +221,7 @@ public class FragmenterTools
      * @param input the source of chemical structures.
      * @param settings configurations including cutting rules and filtration 
      * criteria.
-     * @param output the file where to write extracted structures.
+     * @param output the file where to write extracted structures. 
      * @param logger where to direct log messages. This is typically different 
      * from the logger registered in the {@link FragmenterParameters}, which is
      * the master logger, as we want thread-specific logging.
@@ -230,15 +230,20 @@ public class FragmenterTools
      * @throws UndetectedFileFormatException 
      * @throws IllegalArgumentException 
      * @throws CDKException 
+     * @return <code>true</code> if the fragmentation produced at least one 
+     * fragment that survived post filtering, i.e., the <code>output</code> file
+     * does contain something.
      */
     
-    public static void fragmentation(File input, FragmenterParameters settings,
+    public static boolean fragmentation(File input, FragmenterParameters settings,
             File output, Logger logger) throws CDKException, IOException, 
     DENOPTIMException, IllegalArgumentException, UndetectedFileFormatException
     {
         IteractingAtomContainerReader iterator = 
                 new IteractingAtomContainerReader(input);
 
+        int totalProd = 0;
+        int totalKept = 0;
         int index = -1;
         try {
             while (iterator.hasNext())
@@ -262,6 +267,7 @@ public class FragmenterTools
                     logger.log(Level.FINE,"Fragmentation produced " 
                             + fragments.size() + " fragments.");
                 }
+                totalProd += fragments.size();
                 
                 // Post-fragmentation processing of fragments
                 ArrayList<Vertex> keptFragments = new ArrayList<Vertex>();
@@ -280,7 +286,8 @@ public class FragmenterTools
                     logger.log(Level.FINE,"Fragments surviving post-"
                             + "processing: " + keptFragments.size());
                 }
-                if (!settings.doManageIsomorphicFamilies())
+                totalKept += keptFragments.size();
+                if (!settings.doManageIsomorphicFamilies() && totalKept>0)
                 {
                     DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
                             keptFragments,true);
@@ -289,6 +296,27 @@ public class FragmenterTools
         } finally {
             iterator.close();
         }
+        
+        // Did we actually produce anything? We might not...
+        if (totalProd==0)
+        {
+            if (logger!=null)
+            {
+                logger.log(Level.WARNING,"No fragment produced. Cutting rules "
+                        + "were ineffective on the given structures.");
+            }
+            return false;
+        } else if (totalKept==0)
+        {
+            if (logger!=null)
+            {
+                logger.log(Level.WARNING,"No fragment kept out of " + totalProd 
+                        + " produced fragments. Filtering criteria might be "
+                        + "too restrictive.");
+            }
+            return false;
+        }
+        return true;
     }
     
 //------------------------------------------------------------------------------

@@ -1039,15 +1039,15 @@ public class FragmenterParameters extends RunTimeParameters
                 break;
 
             case "CLUSTERIZEANDCOLLECT=":
+                doManageIsomorphicFamilies = true;
+                doExtactRepresentativeConformer = true;
                 switch (value.trim().toUpperCase())
                 {
                     case "CENTROIDS":
-                        doExtactRepresentativeConformer = true;
                         useCentroidsAsRepresentativeConformer = true;
                         break;
                         
                     case "MOSTCENTRAL":
-                        doExtactRepresentativeConformer = true;
                         useCentroidsAsRepresentativeConformer = false;
                         break;
                         
