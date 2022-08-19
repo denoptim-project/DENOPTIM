@@ -266,6 +266,10 @@ public class Main
                 reportError("Only one input file allowed when requesting run "
                         + behavior.runType + ". Found " + inputFiles.size()
                         + " files: " + inputFiles, 1);
+            } else if (inputFiles.size()<1)
+            {   
+                reportError("Need an input file when requesting run "
+                    + behavior.runType + ". Found " + inputFiles.size(), 1);
             }
             File inpFile = new File(inputFiles.get(0));
             File wDir = inpFile.getParentFile();
