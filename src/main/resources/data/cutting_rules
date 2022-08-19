@@ -732,6 +732,11 @@ CTR arKetA 1810 [C;X3;$(C(=O)c)] [$(cC(=O)c)] -!@
 # cut Ar-|-C(=O)-OR
 CTR aroicEst 1900 [C;X3;$(C(=O)O[#6])] [$(cC(=O)O)] -!@
 #
+################################################
+# CARBOXYLIC aromatic acid 
+# cut Ar-|-C(=O)-OH
+CTR aroicAcid 1910 [C;X3;$(C(=O)O[#1])] [$(cC(=O)O)] -!@
+#
 #
 #NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 #NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
