@@ -69,6 +69,9 @@ The results will be collected in a temporary folder (typically `/tmp/denoptim_te
 ## User Manual
 The complete user manual is available [on line](http://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html). Alternatively, you can download the HTML file that can be viewed with any Firefox/Safari/Edge/Chrome or any Internet browser.
 
+## Tutorials
+See the [tutirials page](https://denoptim-project.github.io/tutorials).
+
 ## Quick Start
 The entry point of any DENOPTIM activity is the command `denoptim`, which results from the [installation](#installation).
 To launch the graphical user interface (GUI) run the command without any argument:
