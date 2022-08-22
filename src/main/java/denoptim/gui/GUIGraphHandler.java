@@ -446,7 +446,7 @@ public class GUIGraphHandler extends GUICardPanel
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
                 }
-                btnFragSpace.setText("Change BB Space");
+                btnFragSpace.setText("Change BBSpace");
             }
         });
         
