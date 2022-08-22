@@ -364,7 +364,7 @@ public class FSParametersForm extends ParametersForm
 
         String toolTipPar1 = "Pathname of the file containing the list of scaffolds.";
         linePar1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar1 = new JLabel("Scaffold fragments library:", SwingConstants.LEFT);
+        lblPar1 = new JLabel("Library of Scaffolds:", SwingConstants.LEFT);
         lblPar1.setPreferredSize(fileLabelSize);
         lblPar1.setToolTipText(toolTipPar1);
         txtPar1 = new JTextField();
@@ -385,7 +385,7 @@ public class FSParametersForm extends ParametersForm
 
         String toolTipPar2 = "Pathname of the file containing the list of fragments.";
         linePar2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblPar2 = new JLabel("Fragments library:", SwingConstants.LEFT);
+        lblPar2 = new JLabel("Library of vertices:", SwingConstants.LEFT);
         lblPar2.setPreferredSize(fileLabelSize);
         lblPar2.setToolTipText(toolTipPar2);
         txtPar2 = new JTextField();
