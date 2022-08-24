@@ -19,8 +19,14 @@
 package denoptim.programs.deamon;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import denoptim.graph.DGraph;
+import denoptim.io.DenoptimIO;
 import denoptim.task.ProgramTask;
+
+import py4j.GatewayServer;
 
 /**
  * A program that start a Py4J gateway server, which listens to calls from 
@@ -31,6 +37,7 @@ import denoptim.task.ProgramTask;
 public class Py4JServerLauncher extends ProgramTask
 {
 
+    List<DGraph> graphs = null;
 //------------------------------------------------------------------------------
     
     /**
@@ -50,6 +57,12 @@ public class Py4JServerLauncher extends ProgramTask
     {
         //TODO
         System.out.println("TODO stat server");
+        graphs = DenoptimIO.readDENOPTIMGraphsFromSDFile("/tmp/graphs.sdf");
+        
+        GatewayServer gatewayServer = new GatewayServer(new ArrayList<DGraph>());
+        gatewayServer.start();
+        System.out.println("Gateway Server Started");
+        
     }
     
 //------------------------------------------------------------------------------
