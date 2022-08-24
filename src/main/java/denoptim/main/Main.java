@@ -39,7 +39,7 @@ import denoptim.files.FileUtils;
 import denoptim.gui.GUI;
 import denoptim.logging.Version;
 import denoptim.programs.combinatorial.FragSpaceExplorer;
-import denoptim.programs.deamon.Py4JServerLauncher;
+import denoptim.programs.deamon.Py4JGetawayServer;
 import denoptim.programs.denovo.GARunner;
 import denoptim.programs.fitnessevaluator.FitnessRunner;
 import denoptim.programs.fragmenter.Fragmenter;
@@ -204,7 +204,7 @@ public class Main
             CLG.programTaskImpl = GraphListsHandler.class;
             B3D.programTaskImpl = MolecularModelBuilder.class;
             FRG.programTaskImpl = Fragmenter.class;
-            PY4J.programTaskImpl = Py4JServerLauncher.class;
+            PY4J.programTaskImpl = null;
         }
 
         /**
@@ -289,6 +289,21 @@ public class Main
             System.exit(0);
         }
         
+        // Deal with deamon/server launches
+        if (RunType.PY4J.equals(behavior.runType))
+        {
+            try
+            {
+                Py4JGetawayServer.launch();
+            } catch (Throwable e)
+            {
+                e.printStackTrace();
+                reportError("Could not start J2PyServer. Hint on problem: " 
+                        + e.getMessage(), 1);
+            }
+            return;
+        }
+        
         List<String> inputFiles = behavior.cmd.getArgList();
         
         // We instantiate also the task manager, even if it might not be used.
@@ -339,8 +354,8 @@ public class Main
     /**
      * Creates a task for the given class.
      * @param taskClass
-     * @param inputFile can be null if workDir is null as well.
-     * @param workDir can be null if inputFile is null as well.
+     * @param inputFile
+     * @param workDir
      * @throws SecurityException 
      * @throws NoSuchMethodException 
      */
@@ -358,15 +373,9 @@ public class Main
         ProgramTask task = null;
         try
         {
-            Constructor<?> taskBuilder = null;
-            if (inputFile==null && workDir==null)
-            {
-                taskBuilder = taskClass.getConstructor();
-                task = (ProgramTask) taskBuilder.newInstance();
-            } else {
-                taskBuilder = taskClass.getConstructor(File.class,File.class);
-                task = (ProgramTask) taskBuilder.newInstance(inputFile,workDir);
-            }
+            Constructor<?> taskBuilder = taskClass.getConstructor(File.class,
+                    File.class);
+            task = (ProgramTask) taskBuilder.newInstance(inputFile,workDir);
         } catch (Exception e)
         {
             reportError("Could not create a program task for " 
