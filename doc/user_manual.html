@@ -11,36 +11,43 @@
 			border: 1px solid black;
 			border-collapse: collapse;
 		}
-		h1 { margin-bottom: 0.08in; 
-			background: transparent; 
-			page-break-after: avoid; 
-			page-break-before: always;
-			font-family: "Arial", sans-serif; 
-			font-size: 18pt; 
-			font-weight: bold }
-		h2 { margin-top: 0.14in; 
-			margin-bottom: 0.08in; 
-			background: transparent; 
-			page-break-after: avoid; 
-			font-family: "Arial", sans-serif; 
-			font-size: 16pt; 
-			font-weight: bold }
-		h3 { margin-top: 0.1in; 
-			margin-bottom: 0.08in; 
-			background: transparent; 
-			page-break-before: auto; 
+		h1 { margin-bottom: 0.08in;
+			background: transparent;
 			page-break-after: avoid;
-			font-family: "Arial", sans-serif; 
-			font-size: 14pt; 
-			font-style: italic; 
+			page-break-before: always;
+			font-family: "Arial", sans-serif;
+			font-size: 18pt;
+			font-weight: bold }
+		h2 { margin-top: 0.14in;
+			margin-bottom: 0.08in;
+			background: transparent;
+			page-break-after: avoid;
+			font-family: "Arial", sans-serif;
+			font-size: 16pt;
+			font-weight: bold }
+		h3 { margin-top: 0.1in;
+			margin-bottom: 0.08in;
+			background: transparent;
+			page-break-before: auto;
+			page-break-after: avoid;
+			font-family: "Arial", sans-serif;
+			font-size: 14pt;
+			font-style: italic;
 			font-weight: normal }
-		h4 { margin-top: 0.1in; 
-			margin-bottom: 0.08in; 
-			background: transparent; 
-			page-break-before: auto; 
+		h4 { margin-top: 0.1in;
+			margin-bottom: 0.08in;
+			background: transparent;
+			page-break-before: auto;
 			page-break-after: avoid}
 		a:link { color: #000080; text-decoration: underline }
 		pre.bash {
+			margin-top: 0.6;
+			margin-bottom: 0.6;
+			background-color: black;
+			color: white;
+			font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+			padding: 5px;}
+		pre.python {
 			margin-top: 0.6;
 			margin-bottom: 0.6;
 			background-color: black;
@@ -133,6 +140,7 @@
 			<li><a href="#Toc9999_6">3D Molecular Models Builder</a></li>
 			<li><a href="#Toc9999_7">Graph Isomorphism Analyzer</a></li>
 			<li><a href="#Toc9999_8">Graph List Comparator</a></li>
+			<li><a href="#Header_PythonGateway">Python Gateway Server</a></li>
 		</ul></li>
 		<li><a href="#Toc35546_1191730726">Keywords</a>
 		<ul>
@@ -167,15 +175,15 @@
 <hr>
 
 <h1 class="western"><a name="Toc40894_1191730726"></a>About DENOPTIM</h1>
-<p>DENOPTIM is an open source software suite for the <i>de novo</i> design of 
-chemical entities. The name <i>DENOPTIM</i> stands for "<i>De novo</i> 
-Optimization of In/organic Molecules" and wants to highlight that DENOPTIM is 
-designed to handle chemical entities way beyond the strict formalisms of organic 
-chemistry (i.e., valence rules). In fact, the development of DENOPTIM started 
-in <a href="https://doi.org/10.1021/ja300865u">2012</a> as a response to the 
-need of designing transition metal complexes and organometallic catalysts that 
-cannot not even be represented unambiguously by standard chemical 
-representations (e.g., multi-hapto metal-ligand complexes, ion pairs, 
+<p>DENOPTIM is an open source software suite for the <i>de novo</i> design of
+chemical entities. The name <i>DENOPTIM</i> stands for "<i>De novo</i>
+Optimization of In/organic Molecules" and wants to highlight that DENOPTIM is
+designed to handle chemical entities way beyond the strict formalisms of organic
+chemistry (i.e., valence rules). In fact, the development of DENOPTIM started
+in <a href="https://doi.org/10.1021/ja300865u">2012</a> as a response to the
+need of designing transition metal complexes and organometallic catalysts that
+cannot not even be represented unambiguously by standard chemical
+representations (e.g., multi-hapto metal-ligand complexes, ion pairs,
 highly reactive catalyst intermediates).</p>
 
 <h2>How To Cite</h2>
@@ -185,11 +193,11 @@ highly reactive catalyst intermediates).</p>
 <h1 class="western"><a name="Toc14757_7999724461"></a></a>Installation</h1>
 
 <h2 class="western"><a name="Toc14757_7999724222"></a></a>Install From Conda (recommended)</h2>
-<p>DENOPTIM can be installed on using conda package manager from the command 
-line on Linux/MacOS. On Windows this can be done on the Anaconda prompt or by 
+<p>DENOPTIM can be installed on using conda package manager from the command
+line on Linux/MacOS. On Windows this can be done on the Anaconda prompt or by
 using <a href="<code>DENOPTIM_HOME</code>">Git Bash</a> terminal:
 <pre>conda install -c denoptim denoptim</pre></p>
-You should now have the <code>denoptim</code> command available. 
+You should now have the <code>denoptim</code> command available.
 Run the following and verify you get a help message:
 <pre>denoptim -h</pre></p>
 <p>The installation from conda has been completed.</p>
@@ -200,19 +208,19 @@ Run the following and verify you get a help message:
 
 <p>First, download the <a href="https://github.com/denoptim-project/DENOPTIM/releases/latest">latest release</a>. This is more than enough for regular users. However, if you are after developing the DENOPTIM code then fork the repository and work with git.</p>
 
-<p>Extract the zip/tar.gz archive you have downloaded to generate a folder 
-we'll call <code>DENOPTIM_HOME</code>. In the following, remember to replace 
-<code>$DENOPTIM_HOME</code> with the pathname of the extracted DENOPTIM's 
+<p>Extract the zip/tar.gz archive you have downloaded to generate a folder
+we'll call <code>DENOPTIM_HOME</code>. In the following, remember to replace
+<code>$DENOPTIM_HOME</code> with the pathname of the extracted DENOPTIM's
 distribution folder on your system.</p>
 
-<p>Make sure you have an environment that includes JAVA and Maven. Such 
-environment can be created with by manual installation of both JAVA and 
-Maven manually, or it can be created using conda: 
+<p>Make sure you have an environment that includes JAVA and Maven. Such
+environment can be created with by manual installation of both JAVA and
+Maven manually, or it can be created using conda:
 <pre>cd $DENOPTIM_HOME
 conda env create -f environment.yml
 conda activate dnp_env</pre></p>
 
-<p>Verify the requirements by running the two commands: 
+<p>Verify the requirements by running the two commands:
 Both should return a message declaring the respective versions.
 <pre>javac -version
 mvn -version</pre></p>
@@ -237,13 +245,13 @@ On Windows Anaconda prompt:
 <h3 class="western"><a name="Toc43997_808352928"></a>Graphs</h3>
 
 <p>DENOPTIM perceives chemical entities as graphs
-(outer graph in Figure 1): Graphs are collections of vertexes and edges. 
+(outer graph in Figure 1): Graphs are collections of vertexes and edges.
 Vertexes and edges are organized in a spanning tree
 (T), which is acyclic by definition,
 and a set of fundamental cycles (Fc). The latter set defined the chords:
 edges that do not belong to the spanning tree and that define cycles
 of vertexes.</p>
-<figure> 
+<figure>
 	<img src="figures/graphs.png" alt="figures/graphs.png" width="750"/>
 	<figcaption><i>Figure 1: Graph representation of chemical entities in DENOPTIM.</i></figcaption>
 </figure>
@@ -274,15 +282,15 @@ of vertexes.</p>
 <h3 class="western"><a name="Toc14753_799972446"></a>Attachment Points and Attachment Point Class</h3>
 <p>Attachment points are owned by vertexes and represent the possibility of that specific vertex to form a connection, i.e., one edge, with one attachment point that is owned by another vertex. Attachment points can be decorated with information defining i) the atoms that holds an open valence (if any), ii) the spatial arrangement of the connected vertex in relation to the vertex holding the attachment point, and iii) a label used to classify the attachment points.</p>
 <p>The latter property, the label, is a string with no spaces specifying the so-called <b>class of the attachment point</b> (or attachment point class, APClass.
-The APClass can be defined also by the user (e.g., via the GUI) as long as it adheres to the following syntax. 
-<pre>&lt;string&gt;:&lt;int&gt;</pre> where 
+The APClass can be defined also by the user (e.g., via the GUI) as long as it adheres to the following syntax.
+<pre>&lt;string&gt;:&lt;int&gt;</pre> where
 <ul>
 	<li><code>&lt;string&gt;</code> is an alphanumeric string, and</li>
 	<li><code>&lt;int&gt;</code> is a positive integer number.</li>
 </ul>
 This syntax is best explain by providing an example of how molecular fragment can be generated from whole molecules. In particular, we consider our own fragmentation algorithm (see <a href="https://doi.org/10.1021/ci4007497"><i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 3, 767–780</a>), which is implemented in the program <a href="#Toc2222_0">Fragmenter</a>.
 This fragmentation algorithm
-uses cutting rules to identify the bond to break in order to generate fragments. 
+uses cutting rules to identify the bond to break in order to generate fragments.
 For each broken bond two attachment
 points are generated (one on each side of the broken bond) and, in order to distinguish between the two sides of the broken bond, these attachment points are given two complementary APClasses. These APClasses share a common part (the reference to the cutting rule) and have an additional suffix that makes them distinguishable. For example, if the cutting rule is named <code>myCuttingRule</code>, the two APs will have APClass <code>myCuttingRule:0</code> and <code>myCuttingRule:1</code>.</p>
 
@@ -293,7 +301,7 @@ points are generated (one on each side of the broken bond) and, in order to dist
 <p>The use of capping groups is particularly useful when standard “hydrogenation” routine (i.e., addition of H to every
 open valence) is expected to fail. This occurs when the chemical
 entities under construction are not standard organic molecules similar to those for
-which “hydrogenation” tools have been trained.</p> 
+which “hydrogenation” tools have been trained.</p>
 
 <p>The settings of the capping procedure define the list of APClasses that need to be capped, and the APClasses of the capping groups to use for each of the APClasses that need capping. These settings are part of the Compatibility Matrix file (see below).</p>
 
@@ -308,13 +316,13 @@ they have
 <li> same type and number of bonds connected to the source atom (if any), </li>
 <li>same element and number of atoms connected to the source atom (if any).</li>
 </ul>
-Users can control the probability of symmetric operations on specific APClasses and include symmetry constraints also based on APClasses (see keywords section, below). 
+Users can control the probability of symmetric operations on specific APClasses and include symmetry constraints also based on APClasses (see keywords section, below).
 </p>
 
 
 <h2 class="western"><a name="Toc42056_808352928"></a>Evaluation of Chemical Entities: Fitness Evaluation</h2>
 
-<p>The design of functional chemical entities depends on the capability of evaluating how candidate entities are fit for a given purpose: the evaluation of the fitness. In DENOPTIM, such evaluation aims to associate the internal representation of a chemical entity, i.e., a graph, with a numerical value, i.e., the fitness. For the sake of generality, DENOPTIM does not take any assumption as to how the fitness is calculated, but it assumes that a "fitness provider" is defined for the purpose of evaluating the fitness of each candidate.</p> 
+<p>The design of functional chemical entities depends on the capability of evaluating how candidate entities are fit for a given purpose: the evaluation of the fitness. In DENOPTIM, such evaluation aims to associate the internal representation of a chemical entity, i.e., a graph, with a numerical value, i.e., the fitness. For the sake of generality, DENOPTIM does not take any assumption as to how the fitness is calculated, but it assumes that a "fitness provider" is defined for the purpose of evaluating the fitness of each candidate.</p>
 <p>Fitness providers can be of two types:
 <ul>
 	<li>internal fitness provider: it's DENOPTIM's code that is executed within the DENOPTIM virtual machine to calculate descriptors from chemical representation that are built on-the-fly for each chemical entity from its graph representation. The descriptors are then combined into a numerical fitness value according to an equation that must be defined in the input. The internal fitness provider does not perform any molecular modeling, such as geometry optimization and the like.</li>
@@ -369,7 +377,7 @@ as input or generated from scratch. Next, a given number of
 generations are created by producing new offspring either from
 application of the genetic operators, or by building new entities
 from scratch.</p>
-<figure> 
+<figure>
 	<img src="figures/ea.gif" alt="figures/ea.gif" width="700"/>
 	<figcaption><i>Figure 3: Evolutionary optimization scheme.</i></figcaption>
 </figure>
@@ -404,7 +412,7 @@ The mutation operator can be configured to perform also multi-site mutations: mu
 The substitution probability (<i>P</i>) results from the product of two components: the growth probability (<i>P<sub>g</sub></i>), and the crowding probability (<i>P<sub>c</sub></i>).
 The growth probability (<i>P<sub>g</sub></i>) limits the growth of an entity. This limit can be expressed in terms of graph deepness (i.e., using the <i>level</i> of a vertex to determine the likeliness of further graph extension on that vertex, see Figure 4) or in terms of molecular size (i.e., number of heavy atoms, irrespectively of graph size).
 
-<figure> 
+<figure>
 	<img src="figures/graph_levels.png" alt="figures/graph_levels.png" width="429" border="0"/>
 	<figcaption><i>Figure 4: identification of levels in a graph. Each label L<sub>x</sub> identifies the shell of vertexes of level X. Red, dashed lines represent the border between levels. Yellow circles represent free APs. Squares of different color represent vertexes of different kind (scaffold, normal vertex, or capping group). To illustrate, vertex 1 is the scaffold vertex (i.e., represented by a red square) and is in level -1 (L<sub>-1</sub>), vertexes 2 (normal vertex represented by blue square), 3 (another normal vertex), and 5 (a capping group represented by a green square) are at level 0 (L<sub>0</sub>), and so on.</i></figcaption>
 </figure>
@@ -452,7 +460,7 @@ DENOPTIM the following selection strategies are available:</p>
 	the roulette wheel, the area of the portion being proportional to
 	its fitness. The wheel is then spun a number of times and the chromosome corresponding to the
 	slice that comes under the wheel marker is added to the pool.</li>
-	<li><b>Stochastic universal sampling (SUS)</b>: 
+	<li><b>Stochastic universal sampling (SUS)</b>:
 	differs from RW in that it uses <i>N</i> (number
 	of selections required) equally spaced pointers. The population is
 	shuffled randomly and a single random number <i>r</i> in the range
@@ -501,12 +509,12 @@ beginning of the execution, the program creates a directory
 that are named according to the date (<code>YYYYMMDD</code>)
 and time (<code>HHMMSS</code>). All relevant files generated by DENOPTIN associated with the current run are
 stored in this folder. Instead, files managed by external fitness provider
-script are not directly used by the GA runner code and can thus be placed 
+script are not directly used by the GA runner code and can thus be placed
 anywhere. Files pertaining to a specific generation are stored in
 sub-folders <code>RUNYYYYMMDDHHMMSS/Gen#</code> (where <code>#</code> is the generation number), while the final results of an evolutionary
 experiment are collected in sub-folder <code>RUNYYYYMMDDHHMMSS/Final</code> (see Figure 5).</p>
 
-<figure> 
+<figure>
 	<img src="figures/ga_folders.png" alt="figures/ga_folders.png" width="500" border="0"/>
 	<figcaption><i>Figure 5: Directory structure resulting from a GA run.</i></figcaption>
 </figure>
@@ -554,7 +562,7 @@ layer-by-layer. The graphs generated by adding N layers of vertexes
 belong to the L<sub>N-1</sub> and are used as roots to create the graphs of
 L<sub>N</sub> (Figure 6).</p>
 
-<figure> 
+<figure>
 	<img src="figures/fse_levels.png" alt="fse_levels.png" width="300"/>
 	<figcaption><i>Figure 6: Numbering of the levels (L) in FragSpaceExplorer.</i></figcaption>
 </figure>
@@ -591,7 +599,7 @@ folder tree:</p>
 		<ul>
 			<li><code>FSE-Level_-1.txt</code> list of generated graphs as simplified (human readable) strings.</li>
 			<li><code>dg_1.json</code> serialized graph representation of chemical entity with graphID=1</li>
-			<li><code>dg_2.json</code> serialized graph representation of chemical entity with graphID=2</li> 
+			<li><code>dg_2.json</code> serialized graph representation of chemical entity with graphID=2</li>
 			<li>&hellip;</li>
 		</ul></li>
 		<li>&hellip; other <code>FSE-Level-</code> folders</li>
@@ -603,7 +611,7 @@ folder tree:</p>
 
 <h3 class="western"><a name="Toc5490_1476255988"></a>Restart FragSpaceExplorer from Checkpoint file</h3>
 <p>FragSpaceExplorer can be very long, so a checkpoint file is dumped at regular time intervals (by
-default every N graphs, where N=100; see <a href="#Toc35546_1191730726">Keywords</a> section) to keep track of where the exploration has arrived and, in case of abrupt termination of the execution, restart the FSE experiment from the checkpoint file. 
+default every N graphs, where N=100; see <a href="#Toc35546_1191730726">Keywords</a> section) to keep track of where the exploration has arrived and, in case of abrupt termination of the execution, restart the FSE experiment from the checkpoint file.
 Calculation that were running when the
 termination occurred or that were submitted after the generation of
 the checkpoint file are considered to be lost and will be
@@ -648,46 +656,46 @@ where <code>input_parameters_file</code> is a text parameters file with the <a h
 
 
 <h2 class="western"><a name="Toc9999_7"></a>Graph Isomorphism Analyzer</h2>
-<p>This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism". 
- "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of  
+<p>This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism".
+ "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of
  <a href="https://mathworld.wolfram.com/IsomorphicGraphs.html">
  graph isomorphism</a>
  that differs from the most common meaning of isomorphism in graph theory.
  In general, graph are considered undirected when evaluating
- DENOPTIM-isomorphism. 
- Next, since a graph is effectively 
- a spanning tree (ST_i={{vertexes}, {acyclic edges}}) 
- with a set of fundamental cycles (FC_i={C_1, C_2,...C_n}), 
- any graph G={ST_i,FC_i} that contains one or more cycles 
+ DENOPTIM-isomorphism.
+ Next, since a graph is effectively
+ a spanning tree (ST_i={{vertexes}, {acyclic edges}})
+ with a set of fundamental cycles (FC_i={C_1, C_2,...C_n}),
+ any graph G={ST_i,FC_i} that contains one or more cycles
  can be represented in multiple
  ways, G={ST_j,FC_j} or G={ST_k,FC_k}, that differ by the position of the
  chord/s and by the corresponding pair of ring-closing vertexes between
  which each chord is defined.
- The DENOPTIM-isomorphism for two graphs G1 and G2 
- is given by the common graph theory isomorphism between 
+ The DENOPTIM-isomorphism for two graphs G1 and G2
+ is given by the common graph theory isomorphism between
  two undirected graphs U1 and U2 build respectively from G1 and G2.</p>
  Finally,
  <ul>
  <li>vertexes are compared excluding their vertex ID,</li>
- <li>edges are considered undirected and compared considering the 
- bond type they declare and the 
+ <li>edges are considered undirected and compared considering the
+ bond type they declare and the
  identity of the attachment points connected thereby. This latter point
  has an important implication: two apparently equal graphs (same vertexes
- that are connected to each other forming the same vertex-chains) can be 
+ that are connected to each other forming the same vertex-chains) can be
  non-isomorphic when the APs used to connect two vertexes are not the
  same. Chemically, this means the stereochemistry around one or both
- vertexes, is different in the two graphs. Therefore two otherwise 
+ vertexes, is different in the two graphs. Therefore two otherwise
  equal-looking graphs can very well be, de facto, not DENOPTIM-isomorphic.</li>
  </ul>
  <p>
- This method makes use of the Vento-Foggia VF2 algorithm (see 
+ This method makes use of the Vento-Foggia VF2 algorithm (see
  <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804">DOI:10.1109/TPAMI.2004.75</a>)
  as implemented in <a href="https://jgrapht.org/">JGraphT</a>.</p>
  <p><b>WARNING:</b> Detection of isomorphism can be very slow for pathological cases and
  for graphs with large symmetric systems!
 </p>
 <!--
-	NB: the above text is very very similar (differences are meant to exclude javadoc links) from the DGraph.isIsomorphicTo() 
+	NB: the above text is very very similar (differences are meant to exclude javadoc links) from the DGraph.isIsomorphicTo()
 	Please, keep in sync.
 	-->
 <p>The Graph Isomorphism Analyzer program can be run with this command:
@@ -699,6 +707,30 @@ where <code>input_parameters_file</code> is a text parameters file with the <a h
 <p>This program can be run with this command:
 <pre class="bash"><code>denoptim -r CGL input_parameters_file</code></pre>
 where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
+
+<h2 class="western"><a name="Header_PythonGateway"></a>Python Gateway Server</h2>
+<p>This server, which exploits <a href="https://www.py4j.org/">Py4J</a> functionality, 
+	allows to use DENOPTIM from Python. After starting the server,
+	files containing DENOPTIM-like data, such as, vertexes, graphs, and molecular
+	representations, can be read in Python to produce Python objects that offer
+	most of the functionality used within DENOPTIM.</p>
+<p>Here is a typical workflow for analyzing DENOPTIM data with Python:
+<ol>
+	<li>Start the Python Gateway Server:
+		<pre class="bash"><code>denoptim -r PY4J</code></pre>
+		This will hold the shell until the server is no longer needed and the user kills the server, for example with <code>ctrl+C</code>.</li>
+	<li>While the server is running, start Python and creeate a client gateway that reads data from a file, for example, <code>my_file_with_a_graph.sdf</code>:
+		<pre class="python">
+from py4j.java_gateway import JavaGateway
+gateway = JavaGateway()
+data = gateway.entry_point.loadData("my_file_with_a_graph.sdf")
+		</pre></li>
+	<li>Now <code>data</code> contains the graph imported from the file. From now, the content of <code>data</code> can be manipulated in Python as any other python object. To see what you can do with it, type <code>data.</code> and hit &lt;<code>tab</code>&gt;. This generates the list of methods that can be called. For example, <code>data.getGraphId()</code> return the identifier of the graph stored in the file (i.e., the integer 123 in the example below).
+		<pre class="python">
+>>> data.getGraphId() 
+123
+</pre></li>
+</ol></p>
 
 
 <hr>
@@ -833,7 +865,7 @@ without providing that specific keyword in the input file.</p>
 			probability (double 0.0-1.0). The constraints defined by this
 			keyword overwrite the symmetric substitution probability defined
 			by GA parameters, and the requirement of the <code>FS-EnforceSymmetry</code> keyword.</p>
-			<p>Multiple constraints can be defined one by one. 
+			<p>Multiple constraints can be defined one by one.
 			</p>
 			<p><br/>
 
@@ -949,7 +981,7 @@ without providing that specific keyword in the input file.</p>
 		<td width="46%"><p><code>RC-RingSizeBias</code></p>
 		</td>
 		<td width="54%"><p>Specifies the bias associated to a given ring size when selecting
-			the combination of rings (i.e., RCAs) for a given graph. 
+			the combination of rings (i.e., RCAs) for a given graph.
 			</p>
 			<p>The syntax is:</p>
 			<p><code>RC-RingSizeBias=&lt;size&gt;
@@ -957,7 +989,7 @@ without providing that specific keyword in the input file.</p>
 			<p>Multiple occurrence of this keyword can be used.</p>
 			<p>Example: the following lines give to all 6-member rings a
 			probability of being formed that is twice that given to all
-			5-member rings. Instead 7-membered rings will never be formed.  
+			5-member rings. Instead 7-membered rings will never be formed.
 			</p>
 			<p><code>RC-RingSizeBias=5 1</code></p>
 			<p><code>RC-RingSizeBias=6 2</code></p>
@@ -988,7 +1020,7 @@ without providing that specific keyword in the input file.</p>
 		</td>
 		<td width="54%"><p>Specifies the maximum number of rotatable bonds for which 3D chain
 			closability is evaluated. Chains with a number of rotatable bonds
-			higher than this value are assumed closable. 
+			higher than this value are assumed closable.
 			</p>
 		</td>
 	</tr>
@@ -1039,7 +1071,7 @@ without providing that specific keyword in the input file.</p>
 		<td width="46%"><p><code>RC-MaxDotProd</code></p>
 		</td>
 		<td width="54%"><p>Specifies the maximum value that is considered acceptable for the
-			dot product of the AP-vectors at the two end of a closing chain. 
+			dot product of the AP-vectors at the two end of a closing chain.
 			</p>
 		</td>
 	</tr>
@@ -1049,7 +1081,7 @@ without providing that specific keyword in the input file.</p>
 		<td width="54%"><p>Specifies the absolute normal deviation of the ideal value (a
 			value between 0.0 and </code>1.0)
 			that is considered acceptable for distances when evaluating the 3D
-			ring closability of a conformation. 
+			ring closability of a conformation.
 			</p>
 		</td>
 	</tr>
@@ -1081,7 +1113,7 @@ without providing that specific keyword in the input file.</p>
 	<tr valign="middle">
 		<td width="40%"><p><code>GA-PrecisionLevel</code></p>
 		</td>
-		<td width="60%"><p>Specifies the number of figures used to report the fitness. 
+		<td width="60%"><p>Specifies the number of figures used to report the fitness.
 			</p>
 		</td>
 	</tr>
@@ -1106,7 +1138,7 @@ without providing that specific keyword in the input file.</p>
 	<tr valign="middle">
 		<td width="40%"><p><code>GA-SortByIncreasingFitness</code></p>
 		</td>
-		<td width="60%"><p>Requires to sort the candidates according 
+		<td width="60%"><p>Requires to sort the candidates according
 			to ascending rather than descending fitness.</p>
 		</td>
 	</tr>
@@ -1163,7 +1195,7 @@ without providing that specific keyword in the input file.</p>
 		<td width="40%"><p><code>GA-GrowthProbScheme</code></p>
 		</td>
 		<td width="60%"><p>Specifies the growth
-			probability scheme. Acceptable values are: 
+			probability scheme. Acceptable values are:
 			<code>EXP_DIFF</code>,
 			<code>TANH</code>,
 			<code>SIGMA</code>,
@@ -1225,7 +1257,7 @@ without providing that specific keyword in the input file.</p>
 		<td width="40%"><p><code>GA-CrowdProbScheme</code></p>
 		</td>
 		<td width="60%"><p>Specifies the crowding
-			probability scheme. Acceptable values are: 
+			probability scheme. Acceptable values are:
 			<code>EXP_DIFF</code>,
 			<code>TANH</code>,
 			<code>SIGMA</code>,
@@ -1375,13 +1407,13 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 	<tr valign="middle">
 		<td width="40%"><p><code>GA-Parallelization</code></p>
 		</td>
-		<td width="60%"><p>Specifies the parallelization scheme: 
+		<td width="60%"><p>Specifies the parallelization scheme:
 			<code>synchronous</code>
 			if parallel tasks are submitted in
 			batches, thus no new task is submitted until the last of the
-			previous tasks is completed, or <code>asynchronous</code> 
+			previous tasks is completed, or <code>asynchronous</code>
 			if a new parallel tasks is submitted as soon as
-			any of the previous task is completed. 
+			any of the previous task is completed.
 			</p>
 		</td>
 	</tr>
@@ -1474,7 +1506,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		<td width="60%"><p>Specifies the pathname of the file that
 			defines Tinker’s force field parameters (see
 			<a href="https://dasher.wustl.edu/tinker/">https://dasher.wustl.edu/tinker/</a>).
-			An example is available at src/main/resources/data/uff_vdw.prm 
+			An example is available at src/main/resources/data/uff_vdw.prm
 			<font color="#ff3333"><b>[REQUIRED]</b></font></p>
 		</td>
 	</tr>
@@ -1483,7 +1515,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		</td>
 		<td width="60%"><p>Specifies the pathname of the file with
 			Tinker’s keywords (see <a href="https://dasher.wustl.edu/tinker/">https://dasher.wustl.edu/tinker/</a>).
-			An example is available at src/main/resources/data/build_uff.key 
+			An example is available at src/main/resources/data/build_uff.key
 			<font color="#ff3333"><b>[REQUIRED]</b></font></p>
 		</td>
 	</tr>
@@ -1548,7 +1580,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		<td width="40%"><p><code>FSE-UIDFile</code></p>
 		</td>
 		<td width="60%"><p>Specifies the pathname of the file with unique chemical entity
-			IDs. 
+			IDs.
 			</p>
 		</td>
 	</tr>
@@ -1563,7 +1595,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		<td width="40%"><p><code>FSE-MaxWait</code></p>
 		</td>
 		<td width="60%"><p>Specifies the wall time limit (in seconds) for waiting for
-			completion of one or more tasks. Accepts only integer numbers. 
+			completion of one or more tasks. Accepts only integer numbers.
 			</p>
 		</td>
 	</tr>
@@ -1572,7 +1604,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		</td>
 		<td width="60%"><p>Specifies the sleeping time (or time step, in seconds) between
 			checks for completion of one or more tasks. Accepts only integer
-			numbers. 
+			numbers.
 			</p>
 		</td>
 	</tr>
@@ -1581,7 +1613,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		</td>
 		<td width="60%"><p>Specifies the number of asynchronous processes that can be run in
 			parallel. Usually this corresponds to the number of slave cores,
-			if 1 such core corresponds to 1 external task. 
+			if 1 such core corresponds to 1 external task.
 			</p>
 		</td>
 	</tr>
@@ -1609,7 +1641,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		<td width="60%"><p>Specifies the format of the root graphs. Acceptable values are
 			'STRING' for human readable graphs as those reported by DENOPTIM
 			tools in SDF files (default), or 'BYTE' for serialized graphs
-			stored in binary files. 
+			stored in binary files.
 			</p>
 		</td>
 	</tr>
@@ -1706,7 +1738,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 <br>
 <h3 class="western"><a name="Toc2222_1"></a>Fragmenter</h3>
 <table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
-	<col width="102*"/>  
+	<col width="102*"/>
 	<col width="154*"/>
 	<tr valign="middle">
 		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
@@ -1905,7 +1937,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 	<tr valign="middle">
 		<td width="40%"><p><code>FRG-SDWEIGHTUNIMODALPOPULATION</code></p>
 		</td>
-		<td width="60%"><p>Specifies the weight (double) of the standard deviation when calculating the threshold RMSD value for distinguishing geometries. The threshold is calculated as 
+		<td width="60%"><p>Specifies the weight (double) of the standard deviation when calculating the threshold RMSD value for distinguishing geometries. The threshold is calculated as
 			<pre>threshold_RMSD = mean_RMSD + factor * standard_deviation_RMSD</pre></p>
 		</td>
 	</tr>
@@ -1915,7 +1947,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 <br>
 <h3 class="western"><a name="Toc88888_1"></a>Stand-alone Graph Editor</h3>
 <table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
-	<col width="102*"/>  
+	<col width="102*"/>
 	<col width="154*"/>
 	<tr valign="middle">
 		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
@@ -2225,9 +2257,9 @@ CTR MAlkene -1 [Pt] [$([#6;X4]1~[#6;X4][Pt]1)] - HAPTO
 
 <h3 class="western"><a name="Toc2222_3"></a>Formula file</h3>
 <p>The file collecting molecular formulae for chemical structures provided in an associated SDF file is a text file with keyword-labelled lines. Each entry, i.e., each structure, is associated with a group of lines starting with the keyword <code>REFCODE:</code>. The group of line must contain the keyword <code>Formula:</code> which identifies the line containing the actual molecular formula. The molecular formula can include multiple molecules, and variable stoichiometric factors. Example of valid formulae are:
-<ul> 
-	<li><code>C6 H12 O6</code></li>  
-	<li><code>(C18 V2 H16)n,2n(H2 O1),Cl 1-</code></li>  
+<ul>
+	<li><code>C6 H12 O6</code></li>
+	<li><code>(C18 V2 H16)n,2n(H2 O1),Cl 1-</code></li>
 	<li><code>(C44 H32 Fe2 N24 Pd2)n,6(H2 O1)</code></li>
 	<li><code>C19 H27 N2 O9 Zn2 1+,C1 N1 S1 1-</code></li>
 	<li><code>C9 H24 P2 2+,2(C1 F3 O3 S1 1-)</code></li>
@@ -2267,9 +2299,9 @@ information related to the APClass compatibility rules:</p>
 RCN&nbsp;apclass1:0&nbsp;apclass1:1,apclass2:0,apclass2:1
 RCN&nbsp;apclass1:1&nbsp;apclass1:0
 RCN&nbsp;apclass2:0&nbsp;apclass2:1
-# Note the any class name not found in the library of fragments can be used to impose that no fragment (excluding 
+# Note the any class name not found in the library of fragments can be used to impose that no fragment (excluding
 # capping groups) is attached on APs of a specific class.
-# In this example, no fragment will be attached to APs of class apclass2:1 
+# In this example, no fragment will be attached to APs of class apclass2:1
 RCN apclass2:1 none
 &hellip;
 # Capping groups
@@ -2283,7 +2315,7 @@ DEL&nbsp;apclass1:0
 
 <h3 class="western"><a name="Toc16849_799972446"></a>Ring Closures Compatibility Matrix file</h3>
 
-<p>The ring closures (RC) 
+<p>The ring closures (RC)
 compatibility matrix file specifies the pairs of AP classes that are
 allowed to form ring-closing bonds. Note that, contrary to the
 standard compatibility matrix, the RC compatibility matrix is
@@ -2316,7 +2348,7 @@ DENOPTIM this SDF file must include the following tags:</p>
 communicate the definition of a candidate entity to external fitness
 providers (see <a href="#Toc42056_808352928">Fitness evaluation</a>).</p>
 
-<p>DENOPTIM programs output a non-optimized 3D-structure of the chemical entity in SDF format together with its graph representation 
+<p>DENOPTIM programs output a non-optimized 3D-structure of the chemical entity in SDF format together with its graph representation
 (tag <code>&lt;GraphJson&gt;</code>) and additional information
 (i.e., SMILES, InChiKey, unique identifier). By default, the Cartesian coordinates reported in these files are those of a three-dimensional tree-like model built by aligning each building block according to the attachment point vectors. The resulting geometry is not refined, and is only meant to facilitate further processing and visual inspection. While such geometry can be used as starting point for further molecular modeling, it should never be used to calculate any property dependent on the molecular geometry. The alignment of the building blocks is skipped when using the <code>FP-No3dTreeModel</code> keyword. In this case, the SDF file will contain Cartesian coordinates of the initial building blocks, and will therefore be characterized by a correct topology but a non-sense arrangement of the atoms.</p>
 
@@ -2340,7 +2372,7 @@ providers (see <a href="#Toc42056_808352928">Fitness evaluation</a>).</p>
 </ul>
 <p>Additional tag defining an unique identifier of the entity (i.e., <code>&gt; &lt;UID&gt;</code>) is also needed.</p>
 
-<p>Any type and number of descriptors and properties can be included in the SDF file using the 
+<p>Any type and number of descriptors and properties can be included in the SDF file using the
 '<code>&gt;&nbsp;&lt;DATA&gt;</code>' syntax, where <code>DATA</code>
 is replaced by the name of a specific data tag. The number and kind of descriptors depends
 on the specific application.</p>
@@ -2412,7 +2444,7 @@ $$$$
 
 
 <h3 class="western"><a name="Toc9999_3"></a>Graph Editing Task Files</h3>
-<p>Example of JSON syntax for defining the most detailed vertex query and the editing task to perform.</p> 
+<p>Example of JSON syntax for defining the most detailed vertex query and the editing task to perform.</p>
 
 <p>In The vertex query (see example below), any of the fields can be removed. For example, removing the line with <code>"vertexId"</code> will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining <code>"incomingEdgeQuery"</code> (i.e., all the lines included in the curly brackets immediately following <code>"incomingEdgeQuery"</code>) will make the vertex query match any vertex irrespectively of the properties of the edge that connects such vertex to its parent vertex (if any).</p>
 <pre>
