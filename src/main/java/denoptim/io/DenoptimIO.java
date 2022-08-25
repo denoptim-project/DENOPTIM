@@ -92,6 +92,14 @@ import denoptim.graph.DGraph;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.gui.GUICompatibilityMatrixTab;
+import denoptim.gui.GUIGraphHandler;
+import denoptim.gui.GUIInspectFSERun;
+import denoptim.gui.GUIInspectGARun;
+import denoptim.gui.GUIPrepareFSERun;
+import denoptim.gui.GUIPrepareFitnessRunner;
+import denoptim.gui.GUIPrepareGARun;
+import denoptim.gui.GUIVertexInspector;
 import denoptim.json.DENOPTIMgson;
 import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
@@ -124,6 +132,90 @@ public class DenoptimIO
     
     private static final IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads any content of a given pathname and tries to read DENOPTIM data 
+     * from it. As the type of the returned value if not defined this method
+     * is meant of untyped coding context, like the interfacing with Python. 
+     * Please, avoid to use it in typed code context, like within JAVA code.
+     * @param pathname the pathname to read.
+     * @return any DENOPTIM-like data that could be found in the given pathname.
+     * @throws Exception if for any reason no data can be returned.
+     */
+    public static Object readDENOPTIMData(String pathname) 
+            throws Exception
+    {
+        Object data = null;
+        File file = new File(pathname);
+        FileFormat format = FileFormat.UNRECOGNIZED;
+        format = FileUtils.detectFileFormat(file);
+        if (format == FileFormat.UNRECOGNIZED)
+        {
+            throw new UndetectedFileFormatException(file);
+        }
+        switch (format)
+        {
+            case VRTXSDF:
+            {
+                ArrayList<Vertex> vrtxs = readVertexes(file, BBType.FRAGMENT);
+                if (vrtxs.size()>1)
+                    data = vrtxs;
+                else
+                    data = vrtxs.get(0);
+                break; 
+            }
+            
+            case VRTXJSON:
+            {
+                ArrayList<Vertex> vrtxs = readVertexes(file, BBType.FRAGMENT);
+                if (vrtxs.size()>1)
+                    data = vrtxs;
+                else
+                    data = vrtxs.get(0);
+                break;  
+            }
+                
+            case CANDIDATESDF:
+            {
+                ArrayList<Candidate> cands = readCandidates(file, true);
+                if (cands.size()>1)
+                    data = cands;
+                else
+                    data = cands.get(0);
+                break;
+            }
+                
+            case GRAPHSDF:
+            {
+                ArrayList<DGraph> graphs = readDENOPTIMGraphsFromFile(file, 
+                        format);
+                if (graphs.size()>1)
+                    data = graphs;
+                else
+                    data = graphs.get(0);
+                break;
+            }
+                
+            case GRAPHJSON:
+            {
+                ArrayList<DGraph> graphs = readDENOPTIMGraphsFromFile(file, 
+                        format);
+                if (graphs.size()>1)
+                    data = graphs;
+                else
+                    data = graphs.get(0);
+                break;
+            }
+                
+            default:
+                throw new DENOPTIMException("Data from file of format '"
+                        + format + "' cannot be loaded yet. Please, contact"
+                        + "the development team.");
+        }
+        return data;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -1332,11 +1424,11 @@ public class DenoptimIO
         
         return graphEditTasks;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <code>DENOPTIMGraph</code>s from file.
+     * Reads a list of <{@link DGraph}s from file.
      *
      * @param fileName the pathname of the file to read
      * @return the list of graphs
@@ -1347,7 +1439,26 @@ public class DenoptimIO
             throws Exception 
     {
         FileFormat ff = FileUtils.detectFileFormat(inFile);
-        switch (ff) 
+        return readDENOPTIMGraphsFromFile(inFile, ff);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads a list of {@link DGraph}s from file.
+     *
+     * @param inFile the file to read
+     * @param format the format of the file to read. We assume this has been
+     * detected from previous calls of {@link FileUtils#detectFileFormat(File)}
+     *  and that now we want to avoid having to call that method again.
+     * @return the list of graphs
+     * @throws Exception 
+     */
+    
+    public static ArrayList<DGraph> readDENOPTIMGraphsFromFile(File inFile,
+            FileFormat format) throws Exception 
+    {
+        switch (format) 
         {
             case GRAPHJSON:
                 return DenoptimIO.readDENOPTIMGraphsFromJSONFile(
@@ -1385,15 +1496,15 @@ public class DenoptimIO
                 return graphs;
                 
             default:
-                throw new Exception("Format '" + ff + "' could not be used to "
-                        + "read graphs from file '" + inFile + "'.");
+                throw new Exception("Format '" + format + "' could not be used "
+                        + "to read graphs from file '" + inFile + "'.");
         }
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <code>DENOPTIMGraph</code>s from a SDF file.
+     * Reads a list of <{@link DGraph}s from a SDF file.
      *
      * @param fileName the pathname of the file to read.
      * @return the list of graphs
@@ -1519,7 +1630,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <code>DENOPTIMGraph</code>s from a text file.
+     * Reads a list of <{@link DGraph}s from a text file.
      *
      * @param fileName the pathname of the file to read.
      * @return the list of graphs.
@@ -1640,7 +1751,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <code>DENOPTIMGraph</code>s from a JSON file.
+     * Reads a list of <{@link DGraph}s from a JSON file.
      * @param fileName the pathname of the file to read
      * @return the list of graphs
      * @throws DENOPTIMException

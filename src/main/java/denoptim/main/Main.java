@@ -37,6 +37,7 @@ import denoptim.exception.ExceptionUtils;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.gui.GUI;
+import denoptim.integration.python.Py4JGetawayServer;
 import denoptim.logging.Version;
 import denoptim.programs.combinatorial.FragSpaceExplorer;
 import denoptim.programs.denovo.GARunner;
@@ -114,7 +115,12 @@ public class Main
         /**
          * Run a fragmentation task
          */
-        FRG;
+        FRG,
+        
+        /**
+         * Starts a listener to Python;
+         */
+        PY4J;
         
         // NB: to define a new run type: 
         //  1) add the enum alternative. The order is somewhat related to the
@@ -140,6 +146,12 @@ public class Main
          */
         private boolean isCLIEnabled = true;
         
+        /**
+         * Flag indicating if this run type needs any input file when called
+         * from CLI.
+         */
+        private boolean needsInputFile = false;
+        
         static {
             DRY.description = "Dry run";
             FSE.description = "combinatorial Fragment Space Exploration";
@@ -153,6 +165,7 @@ public class Main
             B3D.description = "stand-alone build a 3D molecular model from a "
                     + "graph";
             FRG.description = "Fragmentation and managment of fragments";
+            PY4J.description = "Starts a server listening to Python";
             
             DRY.isCLIEnabled = false;
             FSE.isCLIEnabled = true;
@@ -165,6 +178,20 @@ public class Main
             CLG.isCLIEnabled = true;
             B3D.isCLIEnabled = true;
             FRG.isCLIEnabled = true;
+            PY4J.isCLIEnabled = true;
+            
+            DRY.needsInputFile = false;
+            FSE.needsInputFile = true;
+            FIT.needsInputFile = true;
+            GA.needsInputFile = true;
+            GE.needsInputFile = true;
+            GI.needsInputFile = true;
+            GO.needsInputFile = true;
+            GUI.needsInputFile = false;
+            CLG.needsInputFile = true;
+            B3D.needsInputFile = true;
+            FRG.needsInputFile = true;
+            PY4J.needsInputFile = false;
             
             DRY.programTaskImpl = null;
             FSE.programTaskImpl = FragSpaceExplorer.class;
@@ -177,6 +204,7 @@ public class Main
             CLG.programTaskImpl = GraphListsHandler.class;
             B3D.programTaskImpl = MolecularModelBuilder.class;
             FRG.programTaskImpl = Fragmenter.class;
+            PY4J.programTaskImpl = null;
         }
 
         /**
@@ -224,6 +252,17 @@ public class Main
         {
             return isCLIEnabled;
         }
+        
+        /**
+         * Returns <code>true</code> if this run type needs an input file when
+         * requested from CLI.
+         * @return <code>true</code> if this run type needs an input file when
+         * requested from CLI.
+         */
+        boolean needsInputFile()
+        {
+            return needsInputFile;
+        }
     };
     
 //------------------------------------------------------------------------------
@@ -250,6 +289,21 @@ public class Main
             System.exit(0);
         }
         
+        // Deal with deamon/server launches
+        if (RunType.PY4J.equals(behavior.runType))
+        {
+            try
+            {
+                Py4JGetawayServer.launch();
+            } catch (Throwable e)
+            {
+                e.printStackTrace();
+                reportError("Could not start J2PyServer. Hint on problem: " 
+                        + e.getMessage(), 1);
+            }
+            return;
+        }
+        
         List<String> inputFiles = behavior.cmd.getArgList();
         
         // We instantiate also the task manager, even if it might not be used.
@@ -261,21 +315,28 @@ public class Main
         if (ProgramTask.class.isAssignableFrom(
                 behavior.runType.getProgramTaskImpl()))
         {
+            File inpFile = null;
+            File wDir = null;
             if (inputFiles.size()>1)
             {    
                 reportError("Only one input file allowed when requesting run "
                         + behavior.runType + ". Found " + inputFiles.size()
                         + " files: " + inputFiles, 1);
-            } else if (inputFiles.size()<1)
-            {   
-                reportError("Need an input file when requesting run "
-                    + behavior.runType + ". Found " + inputFiles.size(), 1);
             }
-            File inpFile = new File(inputFiles.get(0));
-            File wDir = inpFile.getParentFile();
-            if (wDir==null)
+            if (behavior.runType.needsInputFile())
             {
-                wDir = new File(System.getProperty("user.dir"));
+                if (inputFiles.size()<1)
+                {   
+                    reportError("Need an input file when requesting run "
+                        + behavior.runType + ". Found " + inputFiles.size(), 1);
+                } else if (inputFiles.size()==1) {
+                    inpFile = new File(inputFiles.get(0));
+                    wDir = inpFile.getParentFile();
+                    if (wDir==null)
+                    {
+                        wDir = new File(System.getProperty("user.dir"));
+                    }
+                }
             }
             runProgramTask(behavior.runType.getProgramTaskImpl(), inpFile, wDir);
             terminate();
@@ -312,10 +373,9 @@ public class Main
         ProgramTask task = null;
         try
         {
-            Constructor<?> taskConstructor = taskClass.getConstructor(File.class, 
+            Constructor<?> taskBuilder = taskClass.getConstructor(File.class,
                     File.class);
-            task = (ProgramTask) taskConstructor.newInstance(inputFile, 
-                    workDir);
+            task = (ProgramTask) taskBuilder.newInstance(inputFile,workDir);
         } catch (Exception e)
         {
             reportError("Could not create a program task for " 

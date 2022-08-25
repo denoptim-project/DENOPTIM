@@ -182,11 +182,17 @@
         <version>6.0.5</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-swing -->
-	<dependency>
-	    <groupId>org.apache.xmlgraphics</groupId>
-	    <artifactId>batik-swing</artifactId>
-	    <version>1.14</version>
-	</dependency>
+    <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-swing</artifactId>
+        <version>1.14</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/net.sf.py4j/py4j -->
+    <dependency>
+        <groupId>net.sf.py4j</groupId>
+        <artifactId>py4j</artifactId>
+        <version>0.10.9.7</version>
+    </dependency>
   </dependencies>
   
   <build>
