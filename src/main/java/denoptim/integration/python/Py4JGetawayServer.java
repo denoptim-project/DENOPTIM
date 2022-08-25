@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.programs.deamon;
+package denoptim.integration.python;
 import denoptim.io.DenoptimIO;
 
 import py4j.GatewayServer;
