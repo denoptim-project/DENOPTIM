@@ -147,7 +147,7 @@ public class Main
         private boolean isCLIEnabled = true;
         
         /**
-         * Flag indicating if this run type needs any input file whenn called
+         * Flag indicating if this run type needs any input file when called
          * from CLI.
          */
         private boolean needsInputFile = false;
