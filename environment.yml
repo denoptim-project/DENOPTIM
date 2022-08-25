@@ -5,3 +5,4 @@ dependencies:
   - openjdk=11.0*
   - maven
   - python
+  - py4j

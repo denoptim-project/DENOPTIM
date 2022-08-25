@@ -17,9 +17,13 @@
  */
 
 package denoptim.integration.python;
+import java.net.BindException;
+
+import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
 
 import py4j.GatewayServer;
+import py4j.Py4JNetworkException;
 
 /**
  * A tool that start a Py4J gateway server that can listens to calls from 
@@ -52,12 +56,22 @@ public class Py4JGetawayServer
      * Starts a gateway server using this class as entry point, which then
      * becomes the interpreter of any data fed-in by the 
      * {@link #loadData(String)} method.
+     * @throws DENOPTIMException 
      */
-    public static void launch()
+    public static void launch() throws DENOPTIMException
     {
         Py4JGetawayServer launcher = new Py4JGetawayServer();
         GatewayServer gatewayServer = new GatewayServer(launcher);
-        gatewayServer.start();
+        try
+        {
+            gatewayServer.start();
+        } catch (Py4JNetworkException e)
+        {
+            if (e.getCause() instanceof BindException
+                    && e.getCause().getMessage().contains("already in use"))
+                throw new DENOPTIMException("DENOPTIM Py4J server already "
+                        + "running!",e);
+        }
         launcher.setServer(gatewayServer);
     }
     
@@ -72,7 +86,6 @@ public class Py4JGetawayServer
     public Object loadData(String pathname) throws Exception
     {
         this.pathname = pathname;
-        System.out.println("Loading data from '" + pathname + "'");
         data = DenoptimIO.readDENOPTIMData(pathname);
         return data;
     }
