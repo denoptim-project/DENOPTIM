@@ -1,0 +1,7 @@
+#
+# This is the parameter file for test t30-5
+#
+FRG-VERBOSITY=4
+FRG-STRUCTURESFILE=mols-5.sdf
+FRG-CUTTINGRULESFILE=cutting_rules
+FRG-IGNORABLEFRAGMENTS=ignorable-5.sdf

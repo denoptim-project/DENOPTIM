@@ -524,38 +524,22 @@ public class ParametersForm extends JPanel implements IParametersForm
 	
 	private class FieldListener implements DocumentListener
 	{
-		private boolean isActive = true;
-		
-		public void setActive(boolean active)
-		{
-			this.isActive = active;
-		}
-		
 		@Override
 		public void insertUpdate(DocumentEvent e) 
 		{
-			if (isActive)
-			{
-				unsavedChanges = true;
-			}
+		    unsavedChanges = true;
 		}
 	
 		@Override
 		public void removeUpdate(DocumentEvent e) 
 		{
-			if (isActive)
-			{
-				unsavedChanges = true;
-			}
+		    unsavedChanges = true;
 		}
 	
 		@Override
 		public void changedUpdate(DocumentEvent e) 
 		{
-			if (isActive)
-			{
-				unsavedChanges = true;
-			}
+		    unsavedChanges = true;
 		}
 	}
 	
@@ -563,20 +547,10 @@ public class ParametersForm extends JPanel implements IParametersForm
 	
 	private class RdbFieldChange implements ChangeListener
 	{
-		private boolean isActive = true;
-		
-		public void setActive(boolean active)
-		{
-			this.isActive = active;
-		}
-		
 		@Override
 		public void stateChanged(ChangeEvent e) 
 		{
-			if (isActive)
-			{
-				unsavedChanges = true;
-			}
+		    unsavedChanges = true;
 		}	
 	}
 	
@@ -584,20 +558,10 @@ public class ParametersForm extends JPanel implements IParametersForm
 
 	private class TabFieldChange implements TableModelListener
 	{	
-		private boolean isActive = true;
-		
-		public void setActive(boolean active)
-		{
-			this.isActive = active;
-		}
-
 		@Override
 		public void tableChanged(TableModelEvent e) 
 		{
-			if (isActive)
-			{
-				unsavedChanges = true;
-			}
+		    unsavedChanges = true;
 		}
 	}
 	
@@ -605,22 +569,11 @@ public class ParametersForm extends JPanel implements IParametersForm
 	
 	private class CmbFieldChange implements ActionListener
 	{
-		private boolean isActive = true;
-		
-		public void setActive(boolean active)
-		{
-			this.isActive = active;
-		}
-
 		@Override
 		public void actionPerformed(ActionEvent e) 
 		{
-			if (isActive)
-			{
-				unsavedChanges = true;
-			}
+			unsavedChanges = true;
 		}
-		
 	}
 	
 //-----------------------------------------------------------------------------

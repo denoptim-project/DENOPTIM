@@ -2,11 +2,16 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.denoptim</groupId>
   <artifactId>denoptim</artifactId>
-  <version>3.0.2</version>
+
+  <version>3.2.0</version>
+  <!-- WARNING: the vesion must be changes also in doc/user_manual.html-->
+
   <name>denoptim</name>
 
   <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
   </properties>
   
   <dependencies>
@@ -62,6 +67,12 @@
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
         <version>1.5.3</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.jfree/jfreesvg -->
+    <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreesvg</artifactId>
+        <version>3.4.2</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
     <dependency>
@@ -150,7 +161,7 @@
     <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
-        <version>5.3.19</version>
+        <version>5.3.20</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.github.dpaukov/combinatoricslib3 -->
     <dependency>
@@ -158,9 +169,33 @@
         <artifactId>combinatoricslib3</artifactId>
         <version>3.3.3</version>
     </dependency>
-</dependencies>
+    <!-- https://mvnrepository.com/artifact/org.biojava/biojava-core -->
+    <dependency>
+        <groupId>org.biojava</groupId>
+        <artifactId>biojava-core</artifactId>
+        <version>6.0.5</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.biojava/biojava-structure -->
+    <dependency>
+        <groupId>org.biojava</groupId>
+        <artifactId>biojava-structure</artifactId>
+        <version>6.0.5</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-swing -->
+	<dependency>
+	    <groupId>org.apache.xmlgraphics</groupId>
+	    <artifactId>batik-swing</artifactId>
+	    <version>1.14</version>
+	</dependency>
+  </dependencies>
   
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>

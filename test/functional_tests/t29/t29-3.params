@@ -1,0 +1,8 @@
+#
+# This is the parameter file for test t29-3
+#
+
+# Parameters for running the test
+GRAPHEDIT-INPUTGRAPHS=inGraphs-3.sdf
+GRAPHEDIT-GRAPHSEDITSFILE=editingTasks-3
+GRAPHEDIT-OUTPUTGRAPHS=outGraphs-3.sdf

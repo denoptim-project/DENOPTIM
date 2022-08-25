@@ -1,0 +1,7 @@
+name: dnp_package_builder
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - anaconda-client
+  - conda-build

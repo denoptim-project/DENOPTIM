@@ -19,29 +19,26 @@
 
 package denoptim.io;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
+
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,35 +48,30 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
-
 import org.apache.commons.io.FilenameUtils;
+import org.jmol.adapter.smarter.SmarterJmolAdapter;
+import org.jmol.viewer.Viewer;
 import org.openscience.cdk.AtomContainerSet;
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.geometry.GeometryTools;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
-import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemFile;
+import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.io.FormatFactory;
+import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.io.Mol2Writer;
+import org.openscience.cdk.io.ReaderFactory;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.io.XYZWriter;
-import org.openscience.cdk.renderer.AtomContainerRenderer;
-import org.openscience.cdk.renderer.RendererModel;
-import org.openscience.cdk.renderer.font.AWTFontManager;
-import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
-import org.openscience.cdk.renderer.generators.BasicBondGenerator;
-import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
-import org.openscience.cdk.renderer.generators.IGenerator;
-import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
+import org.openscience.cdk.io.formats.CIFFormat;
+import org.openscience.cdk.io.formats.IChemFormat;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.smiles.InvPair;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 import com.google.gson.Gson;
@@ -103,10 +95,10 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.logging.StaticLogger;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphEdit;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
 
@@ -120,18 +112,87 @@ import denoptim.utils.Randomizer;
 public class DenoptimIO
 {
 
+    /**
+     * File separator from system.
+     */
 	public static final String FS = System.getProperty("file.separator");
-    public static final String NL = System.getProperty("line.separator");
-
-    // A list of properties used by CDK algorithms which must never be
-    // serialized into the SD file format.
-
-    private static final ArrayList<String> cdkInternalProperties
-            = new ArrayList<>(Arrays.asList(new String[]
-            {InvPair.CANONICAL_LABEL, InvPair.INVARIANCE_PAIR}));
+    
+	/**
+	 * Newline character from system.
+	 */
+	public static final String NL = System.getProperty("line.separator");
     
     private static final IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns a single collection with all atom containers found in a file of
+     * any format. CIF files are internally converted to SDF files, causing loss
+     * of information beyond molecular structure in Cartesian coordinates. So,
+     * if you need more than molecular structure from CIF files, do not use this
+     * method.
+     * @param file the file to read.
+     * @return the list of containers found in the file.
+     * @throws IOException if the file is not found or not readable.
+     * @throws CDKException if the reading of the file goes wrong.
+     */
+    public static List<IAtomContainer> readAllAtomContainers(File file) 
+            throws IOException, CDKException
+    {
+        List<IAtomContainer> results = null;
+     
+        FileReader formatReader = new FileReader(file);
+        IChemFormat chemFormat = new FormatFactory().guessFormat(
+                new BufferedReader(formatReader));
+        formatReader.close();
+        
+        if (chemFormat instanceof CIFFormat)
+        {
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //                            WARNING
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //
+            // * CDK's CIFReader is broken (skips lines _audit, AND ignores 
+            //   connectivity)
+            // * BioJava's fails on CIF files that do not complain to mmCIF 
+            //   format. Try this:
+            //   CifStructureConverter.fromPath(f.toPath());
+            //
+            // The workaround unit CDK's implementation is fixed, is to use Jmol
+            // to read the CIF and make an SDF that can then be read normally. 
+            // In fact, Jmol's reader is more robust than CDK's and more 
+            // versatile than BioJava's. 
+            // Moreover it reads also the bonds defined in the CIF 
+            // (which OpenBabel does not read).
+            // Yet, Jmol's methods are not visible and require spinning a 
+            // a viewer.
+            
+            Map<String, Object> info = new Hashtable<String, Object>();
+            info.put("adapter", new SmarterJmolAdapter());
+            info.put("isApp", false);
+            info.put("silent", "");
+            Viewer v =  new Viewer(info);
+            v.loadModelFromFile(null, file.getAbsolutePath(), null, null,
+                    false, null, null, null, 0, " ");
+            String tmp = FileUtils.getTempFolder() + FS + "convertedCIF.sdf";
+            v.scriptWait("write " + tmp + " as sdf");
+            v.dispose();
+            
+            results = readAllAtomContainers(new File(tmp));
+        } else {
+            FileReader fileReader = new FileReader(file);
+            ReaderFactory readerFact = new ReaderFactory();
+            ISimpleChemObjectReader reader = readerFact.createReader(fileReader);
+            IChemFile chemFile = (IChemFile) reader.read(
+                    (IChemObject) new ChemFile());
+            results = ChemFileManipulator.getAllAtomContainers(chemFile);
+            fileReader.close();
+        }
+        
+        return results;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -170,20 +231,39 @@ public class DenoptimIO
 
         return lstContainers;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a file SDF file possible containing multiple molecules,
-     * and returns only the first one.
+     * Writes vertexes to file. Always overwrites.
      *
-     * @param fileName the file containing the molecules
-     * @return the first molecular object in the file
+     * @param file the file where to print
+     * @param format how to print vertexes on file
+     * @param vertexes the list of vertexes to print
      * @throws DENOPTIMException
      */
-    public static IAtomContainer getFirstMolInSDFFile(String fileName)
-            throws DENOPTIMException {
-        return readSDFFile(fileName).get(0);
+    public static File writeVertexesToFile(File file, FileFormat format,
+            List<Vertex> vertexes) throws DENOPTIMException 
+    {
+        return writeVertexesToFile(file, format, vertexes, false);
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes vertexes to file. Always overwrites.
+     *
+     * @param file the file where to print
+     * @param format how to print vertexes on file
+     * @param vertex the vertex to print
+     * @throws DENOPTIMException
+     */
+    public static File writeVertexToFile(File file, FileFormat format,
+            Vertex vertex, boolean append) throws DENOPTIMException 
+    {
+        ArrayList<Vertex> lst = new ArrayList<Vertex>();
+        lst.add(vertex);
+        return writeVertexesToFile(file, format, lst, append);
     }
     
 //------------------------------------------------------------------------------
@@ -197,7 +277,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static File writeVertexesToFile(File file, FileFormat format,
-            ArrayList<Vertex> vertexes) throws DENOPTIMException 
+            List<Vertex> vertexes, boolean append) throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
         {
@@ -206,11 +286,11 @@ public class DenoptimIO
         switch (format)
         {
             case VRTXJSON:
-                writeVertexesToJSON(file, vertexes);
+                writeVertexesToJSON(file, vertexes, append);
                 break;
                 
             case VRTXSDF:
-                writeVertexesToSDF(file, vertexes, false);
+                writeVertexesToSDF(file, vertexes, append);
                 break;
                 
             default:
@@ -219,7 +299,7 @@ public class DenoptimIO
         }
         return file;
     }
-    
+   
 //------------------------------------------------------------------------------
     
     /**
@@ -230,10 +310,35 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeVertexesToJSON(File file,
-            ArrayList<Vertex> vertexes) throws DENOPTIMException
+            List<Vertex> vertexes) throws DENOPTIMException
+    {
+        writeVertexesToJSON(file, vertexes, false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Writes vertexes to JSON file. Always overwrites.
+     *
+     * @param file the file where to print.
+     * @param vertexes the list of vertexes to print.
+     * @param append use <code>true</code> to append to the existing list of 
+     * vertexes found in the file.
+     * @throws DENOPTIMException
+     */
+    public static void writeVertexesToJSON(File file,
+            List<Vertex> vertexes, boolean append) throws DENOPTIMException
     {
         Gson writer = DENOPTIMgson.getWriter();
-        writeData(file.getAbsolutePath(), writer.toJson(vertexes), false);
+        if (append)
+        {
+            ArrayList<Vertex> allVertexes = readDENOPTIMVertexesFromJSONFile(
+                    file.getAbsolutePath());
+            allVertexes.addAll(vertexes);
+            writeData(file.getAbsolutePath(), writer.toJson(allVertexes), false);
+        } else {
+            writeData(file.getAbsolutePath(), writer.toJson(vertexes), false);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -249,7 +354,7 @@ public class DenoptimIO
     public static void writeVertexToSDF(String pathName, Vertex vertex) 
             throws DENOPTIMException 
     {
-        ArrayList<Vertex> lst = new ArrayList<Vertex>();
+        List<Vertex> lst = new ArrayList<Vertex>();
         lst.add(vertex);
         writeVertexesToSDF(new File(pathName), lst, false);
     }
@@ -265,15 +370,31 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeVertexesToSDF(File file, 
-            ArrayList<Vertex> vertexes, boolean append) 
+            List<Vertex> vertexes, boolean append) 
                     throws DENOPTIMException 
     {
-        ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
+        List<IAtomContainer> lst = new ArrayList<IAtomContainer>();
         for (Vertex v : vertexes) 
         {
             lst.add(v.getIAtomContainer());
         }
         writeSDFFile(file.getAbsolutePath(), lst, append);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes {@link IAtomContainer} to SDF file.
+     *
+     * @param fileName The file to be write to.
+     * @param mol     The molecules to be written.
+     * @throws DENOPTIMException
+     */
+    public static void writeSDFFile(String fileName, IAtomContainer mol) 
+            throws DENOPTIMException {
+        List<IAtomContainer>  mols = new ArrayList<IAtomContainer>();
+        mols.add(mol);
+        writeSDFFile(fileName, mols, false);
     }
     
 //------------------------------------------------------------------------------
@@ -285,8 +406,8 @@ public class DenoptimIO
      * @param mols     The molecules to be written.
      * @throws DENOPTIMException
      */
-    public static void writeSDFFile(String fileName,
-            ArrayList<IAtomContainer> mols) throws DENOPTIMException {
+    public static void writeSDFFile(String fileName, List<IAtomContainer> mols) 
+            throws DENOPTIMException {
         writeSDFFile(fileName,mols, false);
     }
 
@@ -300,9 +421,8 @@ public class DenoptimIO
      * @param append use <code>true</code> to append to the file
      * @throws DENOPTIMException
      */
-    public static void writeSDFFile(String fileName,
-            ArrayList<IAtomContainer> mols, boolean append) 
-                    throws DENOPTIMException 
+    public static void writeSDFFile(String fileName, List<IAtomContainer> mols, 
+            boolean append) throws DENOPTIMException 
     {
         SDFWriter sdfWriter = null;
         try {
@@ -1151,201 +1271,6 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Writes a PNG representation of the molecule
-     *
-     * @param mol      the molecule
-     * @param fileName output file
-     * @param logger program-specific logger.
-     * @throws DENOPTIMException
-     */
-
-    public static void moleculeToPNG(IAtomContainer mol, String fileName, 
-            Logger logger)
-            throws DENOPTIMException {
-        IAtomContainer iac = null;
-        if (!GeometryTools.has2DCoordinates(mol)) {
-            iac = MoleculeUtils.generate2DCoordinates(mol, logger);
-        } else {
-            iac = mol;
-        }
-
-        if (iac == null) {
-            throw new DENOPTIMException("Failed to generate 2D coordinates.");
-        }
-
-        try {
-            int WIDTH = 500;
-            int HEIGHT = 500;
-            // the draw area and the image should be the same size
-            Rectangle drawArea = new Rectangle(WIDTH, HEIGHT);
-            Image image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-
-            // generators make the image elements
-            ArrayList<IGenerator<IAtomContainer>> generators = new ArrayList<>();
-            generators.add(new BasicSceneGenerator());
-            generators.add(new BasicBondGenerator());
-            generators.add(new BasicAtomGenerator());
-
-
-            GeometryTools.translateAllPositive(iac);
-
-            // the renderer needs to have a toolkit-specific font manager
-            AtomContainerRenderer renderer =
-                    new AtomContainerRenderer(generators, new AWTFontManager());
-
-            RendererModel model = renderer.getRenderer2DModel();
-            model.set(BasicSceneGenerator.UseAntiAliasing.class, true);
-            //model.set(BasicAtomGenerator.KekuleStructure.class, true);
-            model.set(BasicBondGenerator.BondWidth.class, 2.0);
-            model.set(BasicAtomGenerator.ColorByType.class, true);
-            model.set(BasicAtomGenerator.ShowExplicitHydrogens.class, false);
-            model.getParameter(BasicSceneGenerator.FitToScreen.class).setValue(Boolean.TRUE);
-
-
-            // the call to 'setup' only needs to be done on the first paint
-            renderer.setup(iac, drawArea);
-
-            // paint the background
-            Graphics2D g2 = (Graphics2D) image.getGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
-
-            g2.setColor(Color.WHITE);
-            g2.fillRect(0, 0, WIDTH, HEIGHT);
-
-
-            // the paint method also needs a toolkit-specific renderer
-            renderer.paint(iac, new AWTDrawVisitor(g2),
-                    new Rectangle2D.Double(0, 0, WIDTH, HEIGHT), true);
-
-            ImageIO.write((RenderedImage) image, "PNG", new File(fileName));
-        } catch (IOException ioe) {
-            throw new DENOPTIMException(ioe);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Write the molecule in V3000 format.
-     *
-     * @param outfile
-     * @param mol
-     * @throws Exception
-     */
-
-    @SuppressWarnings({ "ConvertToTryWithResources", "unused" })
-    private static void writeV3000File(String outfile, IAtomContainer mol)
-            throws DENOPTIMException {
-        StringBuilder sb = new StringBuilder(1024);
-
-        String title = (String) mol.getProperty(CDKConstants.TITLE);
-        if (title == null)
-            title = "";
-        if (title.length() > 80)
-            title = title.substring(0, 80);
-        sb.append(title).append("\n");
-
-        sb.append("  CDK     ").append(new SimpleDateFormat("MMddyyHHmm").
-                format(System.currentTimeMillis()));
-        sb.append("\n\n");
-
-        sb.append("  0  0  0     0  0            999 V3000\n");
-
-        sb.append("M  V30 BEGIN CTAB\n");
-        sb.append("M  V30 COUNTS ").append(mol.getAtomCount()).append(" ").
-                append(mol.getBondCount()).append(" 0 0 0\n");
-        sb.append("M  V30 BEGIN ATOM\n");
-        for (int f = 0; f < mol.getAtomCount(); f++) {
-            IAtom atom = mol.getAtom(f);
-            sb.append("M  V30 ").append((f + 1)).append(" ").append(atom.getSymbol()).
-                    append(" ").append(atom.getPoint3d().x).append(" ").
-                    append(atom.getPoint3d().y).append(" ").
-                    append(atom.getPoint3d().z).append(" ").append("0");
-            sb.append("\n");
-        }
-        sb.append("M  V30 END ATOM\n");
-        sb.append("M  V30 BEGIN BOND\n");
-
-        Iterator<IBond> bonds = mol.bonds().iterator();
-        int f = 0;
-        while (bonds.hasNext()) {
-            IBond bond = bonds.next();
-            int bondType = bond.getOrder().numeric();
-            String bndAtoms = "";
-            if (bond.getStereo() == IBond.Stereo.UP_INVERTED ||
-                    bond.getStereo() == IBond.Stereo.DOWN_INVERTED ||
-                    bond.getStereo() == IBond.Stereo.UP_OR_DOWN_INVERTED) {
-                // turn around atom coding to correct for inv stereo
-                bndAtoms = mol.getAtomNumber(bond.getAtom(1)) + 1 + " ";
-                bndAtoms += mol.getAtomNumber(bond.getAtom(0)) + 1;
-            } else {
-                bndAtoms = mol.getAtomNumber(bond.getAtom(0)) + 1 + " ";
-                bndAtoms += mol.getAtomNumber(bond.getAtom(1)) + 1;
-            }
-
-//            String stereo = "";
-//            switch(bond.getStereo())
-//            {
-//                case UP:
-//                    stereo += "1";
-//                    break;
-//       		case UP_INVERTED:
-//                    stereo += "1";
-//                    break;
-//                case DOWN:
-//                    stereo += "6";
-//                    break;
-//                case DOWN_INVERTED:
-//                    stereo += "6";
-//                    break;
-//                case UP_OR_DOWN:
-//                    stereo += "4";
-//                    break;
-//                case UP_OR_DOWN_INVERTED:
-//                    stereo += "4";
-//                    break;
-//                case E_OR_Z:
-//                    stereo += "3";
-//                    break;
-//                default:
-//                    stereo += "0";
-//            }
-
-            sb.append("M  V30 ").append((f + 1)).append(" ").append(bondType).
-                    append(" ").append(bndAtoms).append("\n");
-            f = f + 1;
-        }
-
-        sb.append("M  V30 END BOND\n");
-        sb.append("M  V30 END CTAB\n");
-        sb.append("M  END\n\n");
-
-        Map<Object, Object> sdFields = mol.getProperties();
-        if (sdFields != null) {
-            for (Object propKey : sdFields.keySet()) {
-                if (!cdkInternalProperties.contains((String) propKey)) {
-                    sb.append("> <").append(propKey).append(">");
-                    sb.append("\n");
-                    sb.append("").append(sdFields.get(propKey));
-                    sb.append("\n\n");
-                }
-            }
-        }
-        sb.append("$$$$\n");
-
-        try {
-            FileWriter fw = new FileWriter(outfile);
-            fw.write(sb.toString());
-            fw.close();
-        } catch (IOException ioe) {
-            throw new DENOPTIMException(ioe);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Reads a list of graph editing tasks from a JSON file
      *
      * @param fileName the pathname of the file to read
@@ -1818,6 +1743,7 @@ public class DenoptimIO
      * @param file the file where to print
      * @param format how to print graphs on file
      * @param modGraphs the list of graphs to print
+     * @return the reference to the file written.
      * @throws DENOPTIMException
      */
     public static File writeGraphsToFile(File file, FileFormat format,
@@ -2135,7 +2061,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of  {@link Vertex}es from a SDF file.
+     * Reads a list of {@link Vertex}es from a SDF file.
      *
      * @param fileName the pathname of the file to read.
      * @return the list of vertexes.
@@ -2162,6 +2088,281 @@ public class DenoptimIO
             vertexes.add(v);
         }
         return vertexes;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read molecular formula from TXT data representation produced by Cambridge
+     * Structural Database tools (such as Conquest). Essentially, this method 
+     * reads a text file expecting to find lines as the following among lines 
+     * with other kinds of information:
+     * <pre>
+     * REFCODE: ABEWOT
+     * [...]
+     * Formula:           C36 H44 Cl1 P2 Ru1 1+,F6 P1 1-
+     * </pre>
+     * @param file the text file to read
+     * @return the mapping of CSD's REFCODE as key to their respective 
+     * molecular formula as formatted in the input.
+     * @throws DENOPTIMException if any exception occurs during the reading of 
+     * the file or if the file does not exist.
+     */
+    public static LinkedHashMap<String, String> readCSDFormulae(File file) 
+            throws DENOPTIMException
+    {   
+        LinkedHashMap<String, String> allFormulae = new LinkedHashMap<String,String>();
+        BufferedReader buffRead = null;
+        try {
+            //Read the file line by line
+            buffRead = new BufferedReader(new FileReader(file));
+            String lineAll = null;
+            String refcode = "";
+            String formula = "";
+            while ((lineAll = buffRead.readLine()) != null) 
+            {
+                String[] lineArgs = lineAll.split(":");
+                //Get the name
+                if (lineArgs[0].equals("REFCODE")) 
+                 refcode = lineArgs[1].trim();
+
+                //Get the formula
+                if (lineArgs[0].equals("  Formula")) 
+                {
+                    formula = lineArgs[1].trim();
+                    //Store formula
+                    allFormulae.put(refcode,formula);
+                    //Clean fields
+                    refcode = "";
+                    formula = "";
+                }
+            }
+        } catch (FileNotFoundException fnf) {
+            throw new DENOPTIMException("File Not Found: " + file, fnf);
+        } catch (IOException ioex) {
+            throw new DENOPTIMException("Error reading file: " + file, ioex);
+        } finally {
+            try {
+                if (buffRead != null)
+                    buffRead.close();
+            } catch (IOException e) {
+                throw new DENOPTIMException("Error closing buffer to "+file, e);
+            }
+        }
+       
+        return allFormulae;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read cutting rules from a stream
+     * @param reader the stream providing text lines.
+     * @param cutRules the collector of the cutting rules. The collection is 
+     * already sorted by priority when this method returns.
+     * @param source the source of text. This is used only in logging as the
+     * source of the text that we are trying to convert into cutting rules.
+     * For example, a file name. 
+     * @throws DENOPTIMException in case there are errors in the formatting of 
+     * the text contained in the file.
+     */
+    public static void readCuttingRules(BufferedReader reader, 
+            List<CuttingRule> cutRules, String source) throws DENOPTIMException
+    {
+        ArrayList<String> cutRulLines = new ArrayList<String>();
+        try
+        {
+            String line = null;
+            while ((line = reader.readLine()) != null) 
+            {
+                if (line.trim().startsWith(DENOPTIMConstants.CUTRULKEYWORD))
+                    cutRulLines.add(line.trim());
+            }
+        } catch (IOException e)
+        {
+            throw new DENOPTIMException(e);
+        } finally {
+            if (reader != null)
+                try
+                {
+                    reader.close();
+                } catch (IOException e)
+                {
+                    throw new DENOPTIMException(e);
+                }
+        }
+        readCuttingRules(cutRulLines, cutRules, source);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read cutting rules from a properly formatted text file.
+     * @param file the file to read.
+     * @param cutRules the collector of the cutting rules. The collection is 
+     * already sorted by priority when this method returns.
+     * @throws DENOPTIMException in case there are errors in the formatting of 
+     * the text contained in the file.
+     */
+    public static void readCuttingRules(File file, 
+            List<CuttingRule> cutRules) throws DENOPTIMException
+    {   
+        ArrayList<String> allLines = readList(file.getAbsolutePath());
+        
+        //Now get the list of cutting rules
+        ArrayList<String> cutRulLines = new ArrayList<String>();
+        allLines.stream()
+            .filter(line -> line.trim().startsWith(
+                    DENOPTIMConstants.CUTRULKEYWORD))
+            .forEach(line -> cutRulLines.add(line.trim()));
+        
+        readCuttingRules(cutRulLines, cutRules, "file '" 
+                + file.getAbsolutePath()+ "'");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Read cutting rules from a properly formatted text file.
+     * @param cutRulLines text lines containing cutting rules. These are 
+     * expected to be lines starting with the 
+     * {@link DENOPTIMConstants.CUTRULKEYWORD} keyword.
+     * @param cutRules the collector of the cutting rules. The collection is 
+     * already sorted by priority when this method returns.
+     * @param source the source of text. This is used only in logging as the
+     * source of the text that we are trying to convert into cutting rules.
+     * For example, a file name. 
+     * @throws DENOPTIMException in case there are errors in the formatting of 
+     * the text contained in the file.
+     */
+    public static void readCuttingRules(ArrayList<String> cutRulLines,
+            List<CuttingRule> cutRules, String source) throws DENOPTIMException
+    {   
+        Set<Integer> usedPriorities = new HashSet<Integer>();
+        for (int i = 0; i<cutRulLines.size(); i++)
+        {
+            String[] words = cutRulLines.get(i).split("\\s+");
+            String name = words[1]; //name of the rule
+            if (words.length < 6)
+            {
+                throw new DENOPTIMException("ERROR in getting cutting rule."
+                        + " Found " + words.length + " parts inctead of 6."
+                        + "Check line '" + cutRulLines.get(i) + "'"
+                        + "in " + source + ".");
+            }
+
+            // further details in map of options
+            ArrayList<String> opts = new ArrayList<String>();
+            if (words.length >= 7)
+            {
+                for (int wi=6; wi<words.length; wi++)
+                {
+                    opts.add(words[wi]);
+                }
+            }
+
+            int priority = Integer.parseInt(words[2]);
+            if (usedPriorities.contains(priority))
+            {
+                throw new DENOPTIMException("ERROR in getting cutting rule."
+                        + " Duplicate priority index " + priority + ". "
+                        + "Check line '" + cutRulLines.get(i) + "'"
+                        + "in " + source + ".");
+            } else {
+                usedPriorities.add(priority);
+            }
+
+            CuttingRule rule = new CuttingRule(name,
+                            words[3],  //atom1
+                            words[4],  //atom2
+                            words[5],  //bond between 1 and 2
+                            priority,  
+                            opts);     
+
+            cutRules.add(rule);
+        }
+        
+        Collections.sort(cutRules, new Comparator<CuttingRule>() {
+
+            @Override
+            public int compare(CuttingRule r1, CuttingRule r2)
+            {
+                return Integer.compare(r1.getPriority(), r2.getPriority());
+            }
+            
+        });
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Writes a formatted text file that collects cutting rule.
+     * @param file the file where to write.
+     * @param cutRules the cutting rules to write.
+     * @throws DENOPTIMException 
+     */
+    public static void writeCuttingRules(File file,
+            List<CuttingRule> cutRules) throws DENOPTIMException
+    {
+        StringBuilder sb = new StringBuilder();
+        for (CuttingRule r : cutRules)
+        {
+            sb.append(DENOPTIMConstants.CUTRULKEYWORD).append(" ");
+            sb.append(r.getName()).append(" ");
+            sb.append(r.getPriority()).append(" ");
+            sb.append(r.getSMARTSAtom0()).append(" ");
+            sb.append(r.getSMARTSAtom1()).append(" ");
+            sb.append(r.getSMARTSBnd()).append(" ");
+            if (r.getOptions()!=null)
+            {
+                for (String opt : r.getOptions())
+                    sb.append(opt).append(" ");
+            }
+            sb.append(NL);
+        }
+        writeData(file.getAbsolutePath(), sb.toString(), false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Appends the second file to the first.
+     * @param f1 file being elongated
+     * @param list files providing the content to place in f1.
+     * @throws IOException 
+     */
+    public static void appendTxtFiles(File f1, List<File> files) throws IOException
+    {
+        FileWriter fw;
+        BufferedWriter bw;
+        PrintWriter pw = null;
+        try
+        {
+            fw = new FileWriter(f1, true);
+            bw = new BufferedWriter(fw);
+            pw = new PrintWriter(bw);
+            for (File inFile : files)
+            {
+                FileReader fr;
+                BufferedReader br = null;
+                try
+                {
+                    fr = new FileReader(inFile);
+                    br = new BufferedReader(fr);
+                    String line = null;
+                    while ((line = br.readLine()) != null) 
+                    {
+                        pw.println(line);
+                    }
+                } finally {
+                    if (br != null)
+                        br.close();
+                }
+            }
+        } finally {
+            if (pw!=null)
+                pw.close();
+        }
     }
 
 //------------------------------------------------------------------------------

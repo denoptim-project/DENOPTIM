@@ -19,11 +19,19 @@ package denoptim.graph;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
+import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -38,6 +46,7 @@ import denoptim.graph.Edge.BondType;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
+import denoptim.utils.Randomizer;
 
 /**
  * Class representing a continuously connected portion of chemical object
@@ -63,6 +72,12 @@ public class Fragment extends Vertex
 	 * Molecular representation of this fragment
 	 */
 	private IAtomContainer mol;
+	
+	/**
+	 * jGraph representation used for detecting fragment isomorphism.
+	 */
+	private DefaultUndirectedGraph<FragIsomorphNode,FragIsomorphEdge> 
+	    jGraphFragIsomorphism;
 
 	
 //-----------------------------------------------------------------------------
@@ -100,7 +115,10 @@ public class Fragment extends Vertex
 
     /**
      * Constructor from an atom container, which has APs only as 
-     * molecular properties. WARNING: other properties of the atom container
+     * molecular properties. Property 
+     * {@link DENOPTIMConstants#ISOMORPHICFAMILYID} is copied into the fragment,
+     * if present.
+     * WARNING: other properties of the atom container
      * are not imported!
      * @param vertexId the identifier of the vertex to construct
      * @param mol the molecular representation
@@ -118,6 +136,7 @@ public class Fragment extends Vertex
         this.lstSymAPs = new ArrayList<SymmetricSet>();
         
         this.mol = MoleculeUtils.makeSameAs(mol);
+        MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(this.mol);
 
         Object prop = mol.getProperty(DENOPTIMConstants.APSTAG);
         if (prop != null)
@@ -132,6 +151,13 @@ public class Fragment extends Vertex
         this.setAsRCV(getNumberOfAPs() == 1
                 && APClass.RCAAPCLASSSET.contains(
                         getAttachmentPoints().get(0).getAPClass()));
+        
+        Object isomorph = mol.getProperty(DENOPTIMConstants.ISOMORPHICFAMILYID);
+        if (isomorph != null)
+        {
+            this.setProperty(DENOPTIMConstants.ISOMORPHICFAMILYID, 
+                    isomorph.toString());
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -161,6 +187,10 @@ public class Fragment extends Vertex
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Depends on an healthy list of attachment points with properly set pointers
+     * to the source atoms.
+     */
     private void updateSymmetryRelations()
     {
         setSymmetricAPSets(identifySymmetryRelatedAPSets(mol, 
@@ -366,15 +396,39 @@ public class Fragment extends Vertex
         int atmId = mol.indexOf(srcAtm);
         return this.addAP(atmId, new Point3d(vector.x, vector.y, vector.z), apc);
     }
+    
+//-----------------------------------------------------------------------------
+    
+    public void removeAP(AttachmentPoint ap)
+    {
+        if (!getAttachmentPoints().contains(ap))
+            return;
+        
+        IAtom srcAtm = mol.getAtom(ap.getAtomPositionNumber());
+        
+        ArrayList<AttachmentPoint> apList = new ArrayList<>();
+        if (getAPCountOnAtom(srcAtm) > 0) {
+            apList = getAPsFromAtom(srcAtm);
+        }
+        apList.remove(ap);
+
+        getAttachmentPoints().remove(ap);
+        srcAtm.setProperty(DENOPTIMConstants.ATMPROPAPS, apList);
+        
+        updateSymmetryRelations();
+    }
 
 //-----------------------------------------------------------------------------
     
+    @SuppressWarnings("unchecked")
     public ArrayList<AttachmentPoint> getAPsFromAtom(IAtom srcAtm)
     {
-        @SuppressWarnings("unchecked")
-		ArrayList<AttachmentPoint> apsOnAtm = 
-        		(ArrayList<AttachmentPoint>) srcAtm.getProperty(
-        				DENOPTIMConstants.ATMPROPAPS);
+        ArrayList<AttachmentPoint> apsOnAtm = new ArrayList<AttachmentPoint>();
+        Object prop = srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS);
+        if (prop!=null)
+        {
+            apsOnAtm = (ArrayList<AttachmentPoint>) prop;
+        }
         return apsOnAtm;
     }
     
@@ -448,6 +502,7 @@ public class Fragment extends Vertex
      * Converts the internal notation defining APs (i.e., APs are stored in
      * as atom-specific properties) to the standard DENOPTIM formalism (i.e.,
      * APs are collected in a molecular property).
+     * WARNING: cannot be used after altering the atom list!
      * @return the list of APs. Note that these APs cannot respond to changes
      * in the atom list!
      */
@@ -485,7 +540,6 @@ public class Fragment extends Vertex
     
     public void projectPropertyToAP() throws DENOPTIMException
     {
-
 	    String allAtomsProp = "";    
 	    if (getProperty(DENOPTIMConstants.APSTAG) == null)
 	    {
@@ -702,7 +756,24 @@ public class Fragment extends Vertex
         mol.setProperty(DENOPTIMConstants.APSTAG, 
                 getProperty(DENOPTIMConstants.APSTAG));
         mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+        mol.setProperty(DENOPTIMConstants.ISOMORPHICFAMILYID,
+                getProperty(DENOPTIMConstants.ISOMORPHICFAMILYID));
         return mol;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Although this type of vertex contains atoms, its content is fixed. 
+     * So, there is no need to regenerate its chemical representation. 
+     * Accordingly, this method is ignoring all the parameters and calling
+     * {@link #getIAtomContainer()}
+     */
+    @Override
+    public IAtomContainer getIAtomContainer(Logger logger, 
+            Randomizer rng, boolean removeUsedRCAs, boolean rebuild)
+    {
+        return getIAtomContainer();
     }
     
 //-----------------------------------------------------------------------------
@@ -735,16 +806,23 @@ public class Fragment extends Vertex
 
 //-----------------------------------------------------------------------------
 
-    public int getAtomNumber(IAtom atom)
+    public int indexOf(IAtom atom)
     {
-        return mol.getAtomNumber(atom);
+        return mol.indexOf(atom);
     }
-
+    
 //-----------------------------------------------------------------------------
 
     public int getAtomCount()
     {
         return mol.getAtomCount();
+    }
+    
+//-----------------------------------------------------------------------------
+
+    public int getBondCount()
+    {
+        return mol.getBondCount();
     }
     
 //-----------------------------------------------------------------------------
@@ -777,9 +855,46 @@ public class Fragment extends Vertex
     
 //-----------------------------------------------------------------------------
     
-    public void removeAtomAndConnectedElectronContainers(IAtom atom)
+    public void removeAtom(IAtom atom)
     {
-        mol.removeAtomAndConnectedElectronContainers(atom);
+        removeAtoms(Arrays.asList(atom));
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Removes a list of atoms and updates the list of attachment points.
+     * Use this method instead of {@link #removeAtom(IAtom)}
+     * to run the regeneration of the list of APs only once instead of for 
+     * every atom deletion.
+     * @param atoms the atoms to remove.
+     */
+    public void removeAtoms(Collection<IAtom> atoms)
+    {
+        for (IAtom atom : atoms)
+            mol.removeAtom(atom);
+        
+        lstAPs.clear();
+        
+        for (int atmId = 0; atmId<mol.getAtomCount(); atmId++)
+        {
+            IAtom srcAtm = mol.getAtom(atmId);
+            if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
+            {
+                ArrayList<AttachmentPoint> apsOnAtm = getAPsFromAtom(srcAtm);
+                for (int i = 0; i < apsOnAtm.size(); i++)
+                {
+                    AttachmentPoint ap = apsOnAtm.get(i);
+                    ap.setAtomPositionNumber(atmId);
+                }
+                lstAPs.addAll(apsOnAtm);
+            }
+        }
+
+        //Reorder according to DENOPTIMAttachmentPoint priority
+        lstAPs.sort(new AttachmentPointComparator());
+        
+        updateSymmetryRelations();
     }
     
 //-----------------------------------------------------------------------------
@@ -793,13 +908,15 @@ public class Fragment extends Vertex
     
     public int getConnectedAtomsCount(IAtom atom)
     {
-        return mol.getConnectedAtomsCount(atom);
+        return mol.getConnectedBondsCount(atom);
     }
     
 //------------------------------------------------------------------------------
     
     /**
-     * Compares this and another fragment ignoring vertex IDs.
+     * Compares this and another fragment ignoring vertex IDs. Ignores isomerism
+     * and geometric differences as it only considers the number of atoms and 
+     * bonds.
      * @param other
      * @param reason string builder used to build the message clarifying the 
      * reason for returning <code>false</code>.
@@ -823,7 +940,113 @@ public class Fragment extends Vertex
         }
         return sameVertexFeatures(other, reason);
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Creates a graph representation of this fragment where both atoms and 
+     * {@link AttachmentPoint}s are represented as nodes, and edges are either
+     * bonds or atom-to-attachment point connections. Note that dummy atoms
+     * meant to heal linearities  ({@value DENOPTIMConstants#DUMMYATMSYMBOL} 
+     * with only one connected neighbor) are ignored.
+     * @return the graph.
+     */
+    public DefaultUndirectedGraph<FragIsomorphNode,FragIsomorphEdge> 
+        getJGraphFragIsomorphism()
+    {
+        if (jGraphFragIsomorphism != null)
+        {
+            return jGraphFragIsomorphism;
+        }
+        jGraphFragIsomorphism = new DefaultUndirectedGraph<>(
+                FragIsomorphEdge.class);
+        
+        Map<IAtom,FragIsomorphNode> atmToNode = 
+                new HashMap<IAtom,FragIsomorphNode>();
+        Set<IAtom> ignoredDu = new HashSet<IAtom>();
+        for (IAtom atm : mol.atoms())
+        {
+            if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(
+                    MoleculeUtils.getSymbolOrLabel(atm))
+                    && mol.getConnectedBondsCount(atm)<2)
+            {
+                //Ignore Du on linearities
+                ignoredDu.add(atm);
+                continue;
+            }
+            FragIsomorphNode node = new FragIsomorphNode(atm);
+            atmToNode.put(atm,node);
+            jGraphFragIsomorphism.addVertex(node);
+        }
+        for (IBond bnd : mol.bonds())
+        {
+            if (bnd.getAtomCount() > 2)
+            {
+                throw new IllegalArgumentException("Cannot handle bonds that involve "
+                        + "more than two atoms");
+            }
+            if (ignoredDu.contains(bnd.getAtom(0)) 
+                    || ignoredDu.contains(bnd.getAtom(0)))
+            {
+                //Ignore Du on linearities
+                continue;
+            }
+
+            FragIsomorphEdge edge = new FragIsomorphEdge(bnd);
+            jGraphFragIsomorphism.addEdge(atmToNode.get(bnd.getAtom(0)), 
+                    atmToNode.get(bnd.getAtom(1)), edge);
+        }
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            FragIsomorphNode node = new FragIsomorphNode(ap);
+            jGraphFragIsomorphism.addVertex(node);
+            FragIsomorphEdge edge = new FragIsomorphEdge();
+            jGraphFragIsomorphism.addEdge(atmToNode.get(mol.getAtom(
+                    ap.getAtomPositionNumber())), node, edge);
+        }
+        
+        return jGraphFragIsomorphism;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks for isomorphism of the graph representation of this and another 
+     * fragment. The graph representation results from the combination of the
+     * molecular structure (atoms as nodes, bonds as edges of the graph) 
+     * and the presence of attachment points (attachment points as nodes of the
+     * graph). See {@link #getJGraphFragIsomorphism()} for details.
+     * Does not consider three-dimensional features. Does not consider dummy
+     * atoms on linearities so, de facto, fragments can be isomorphic and have a 
+     * different number of atoms and bonds.
+     * @param other the other building block to consider.
+     * @return <code>true</code> if at least one isomorphism exists.
+     */
+    public boolean isIsomorphicTo(Vertex other)
+    {
+        if (!(other instanceof Fragment))
+        {
+            return false;
+        }
+        Fragment otherFrag = (Fragment) other;
+          
+        // NB: do not add a comparison of #atoms or #bonds because they may be
+        // different as a result of a different number of dummy atoms placed
+        // on linearities. Such atoms are not considered when checking for 
+        // isomorphism so, de facto, fragments can be isomorphic and have a 
+        // different number of atoms and bonds.
+         
+        if (this.getAttachmentPoints().size() 
+                != otherFrag.getAttachmentPoints().size())
+        {
+            return false;
+        }
   
+        FragmentIsomorphismInspector fii = new FragmentIsomorphismInspector(
+                this, otherFrag); 
+        return fii.isomorphismExists();
+    }
+    
 //------------------------------------------------------------------------------
 
     public int getHeavyAtomsCount()

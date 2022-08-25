@@ -21,15 +21,12 @@ package denoptim.ga;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.paukov.combinatorics3.Generator;
@@ -397,7 +394,6 @@ public class GraphOperations
         DGraph gB = vB.getGraphOwner();
         
         // Exclude overlapping combinations
-        //TODO-gg remove should not be needed
         boolean exclude = false;
         for (Vertex[] pairA : chosenSequenceOfEndpoints)
         {
@@ -1131,70 +1127,62 @@ public class GraphOperations
                             ap.getAPClass()),
                     settings.getSymmetryProbability(),
                     fsParams.getRandomizer());
-            SymmetricSet symAPs = new SymmetricSet();
-            if (curVrtx.hasSymmetricAP() 
+            SymmetricSet symAPs = curVrtx.getSymmetricAPs(apId);
+            if (symAPs!=null 
                     && (cpOnSymAPs || symmetryOnAps)
                     && !allowOnlyRingClosure)
             {
-                symAPs = curVrtx.getSymmetricAPs(apId);
-				if (symAPs != null)
-				{   
-                    // Are symmetric APs rooted on same atom?
-                    boolean allOnSameSrc = true;
-                    for (Integer symApId : symAPs.getList())
+                // Are symmetric APs rooted on same atom?
+                boolean allOnSameSrc = true;
+                for (Integer symApId : symAPs.getList())
+                {
+                    if (!curVrtx.getAttachmentPoints().get(symApId)
+                            .hasSameSrcAtom(ap))
                     {
-                        if (!curVrtx.getAttachmentPoints().get(symApId)
-                                .hasSameSrcAtom(ap))
-                        {
-                            allOnSameSrc = false;
-                            break;
-                        }
-                    }
-                    
-                    if (allOnSameSrc)
-                    {
-                        // If the APs are rooted on the same src atom, we want to
-                        // apply the crowdedness probability to avoid over crowded
-                        // atoms
-                        
-                        int crowdedness = EAUtils.getCrowdedness(ap);
-                        
-                        SymmetricSet toKeep = new SymmetricSet();
-                        
-                        // Start by keeping "ap"
-                        toKeep.add(apId);
-                        crowdedness = crowdedness + 1;
-                        
-                        // Pick the accepted value once (used to decide how much
-                        // crowdedness we accept)
-                        double shot = settings.getRandomizer().nextDouble();
-                        
-                        // Keep as many as allowed by the crowdedness decision
-                        for (Integer symApId : symAPs.getList())
-                        {
-                            if (symApId.compareTo(apId) == 0)
-                                continue;
-                            
-                            double crowdProb = EAUtils.getCrowdingProbability(
-                                    crowdedness, settings);
-                            
-                            if (shot > crowdProb)
-                                break;
-                            
-                            toKeep.add(symApId);
-                            crowdedness = crowdedness + 1;
-                        }
-                        
-                        // Adjust the list of symmetric APs to work with
-                        symAPs = toKeep;
+                        allOnSameSrc = false;
+                        break;
                     }
                 }
-				else
-				{
-				    symAPs = new SymmetricSet();
-				    symAPs.add(apId);
-				}
+                
+                if (allOnSameSrc)
+                {
+                    // If the APs are rooted on the same src atom, we want to
+                    // apply the crowdedness probability to avoid over crowded
+                    // atoms
+                    
+                    int crowdedness = EAUtils.getCrowdedness(ap);
+                    
+                    SymmetricSet toKeep = new SymmetricSet();
+                    
+                    // Start by keeping "ap"
+                    toKeep.add(apId);
+                    crowdedness = crowdedness + 1;
+                    
+                    // Pick the accepted value once (used to decide how much
+                    // crowdedness we accept)
+                    double shot = settings.getRandomizer().nextDouble();
+                    
+                    // Keep as many as allowed by the crowdedness decision
+                    for (Integer symApId : symAPs.getList())
+                    {
+                        if (symApId.compareTo(apId) == 0)
+                            continue;
+                        
+                        double crowdProb = EAUtils.getCrowdingProbability(
+                                crowdedness, settings);
+                        
+                        if (shot > crowdProb)
+                            break;
+                        
+                        toKeep.add(symApId);
+                        crowdedness = crowdedness + 1;
+                    }
+                    
+                    // Adjust the list of symmetric APs to work with
+                    symAPs = toKeep;
+                }
             } else {
+                symAPs = new SymmetricSet();
                 symAPs.add(apId);
             }
 

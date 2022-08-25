@@ -20,6 +20,7 @@
 package denoptim.constants;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,12 +28,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.Vertex;
+import denoptim.graph.rings.RingClosingAttractor;
 
 
 /**
@@ -141,6 +147,26 @@ public final class DENOPTIMConstants
 				"Np", "Pu",
 			        "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No",
 				"Lr"}));
+    
+    /**
+     * Elemental symbols of all metal elements, including alkaly, 
+     * transition metals, actinides, lantanides, and post-transition metals from
+     * the p-clock up to the off-diagonal elements (i.e., includes Ge and Sb).
+     */
+    public static ArrayList<String> ALL_METALS = new ArrayList<String>(
+            Arrays.asList("Li", "Na", "K", "Rb", "Cs", "Fr",
+            "Be", "Mg", "Ca", "Sr", "Ba", "Ra",
+            "Al", "Ga", "In", "Tl", 
+            "Ge", "Sn", "Pb", 
+            "Sb", "Bi", 
+            "Po",
+            "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn",
+            "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd",
+            "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg",
+            "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er",
+            "Tm", "Yb", "Lu",
+            "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", 
+            "Md", "No", "Lr"));
     
     public static final Set<String> ALLOWED_ELEMENTS = 
                     new HashSet<>(Arrays.asList(new String[] {"C", "H", 
@@ -322,13 +348,21 @@ public final class DENOPTIMConstants
 
     /**
      * String tag of <code>Atom</code> property used to store the unique ID of
-     * the <code>DENOPTIMVertex</code> corresponding to the molecular fragment
+     * the  {@link Vertex} corresponding to the molecular fragment
      * to which the atom belongs.
      */
     public static final String ATMPROPVERTEXID = "DENOPTIMVertexID";
     
     /**
-     * String tag of <code>Atom</code> property used to store the original
+     * Name of <code>Atom</code> property used to store the unique ID of
+     * the {@link Vertex} that owns the atom and the IDs of any {@link Vertex}
+     * that embeds such vertex, thus creating a path from the outermost level
+     * down to the {@link Vertex} that owns the atom.
+     */
+    public static final String ATMPROPVERTEXPATH = "ATMPROPVERTEXPATH";
+    
+    /**
+     * Name of <code>Atom</code> property used to store the original
      * position of an atom in the atom list of the fragment.
      */
     public static final String ATMPROPORIGINALATMID = "DENOPTIMAtomPosition";
@@ -340,7 +374,7 @@ public final class DENOPTIMConstants
     public static final String BONDPROPROTATABLE = "DENOPTIMRotable";
 
     /**
-     * Recognised types of RingClosingAttractor and compatible types
+     * Recognized types of {@link RingClosingAttractor} and compatible types
      */
     public static final Map<String,String> RCATYPEMAP =
 		    new HashMap<String,String>() 
@@ -356,7 +390,28 @@ public final class DENOPTIMConstants
             put("ATN", "ATN");
         };
     };
-
+    
+    /**
+     * Property of a {@link IAtom} representing a {@link RingClosingAttractor}. 
+     * This property records the {@link APClass} of the 
+     * {@link AttachmentPoint} on which the attractor is attached  the graph.
+     */
+    public static final Object RCAPROPAPCTORCA = "RCAPROPAPCTORCA";
+    
+    /**
+     * Property of a {@link IAtom} representing a {@link RingClosingAttractor}. 
+     * This property records the {@link BondType} configured 
+     * for the bond to be closed by the ring.
+     */
+    public static final Object RCAPROPCHORDBNDTYP = "RCAPROPCHORDBNDTYP";
+    
+    /**
+     * Property of a {@link IAtom} representing a {@link RingClosingAttractor}. 
+     * This property records the {@link Ring} that the attractor is meant to 
+     * close, if any.
+     */
+    public static final Object RCAPROPRINGUSER = "RCAPROPRINGUSER";
+    
     /**
      * Smallest difference for comparison of double and float numbers.
      */
@@ -442,5 +497,49 @@ public final class DENOPTIMConstants
      * branch holding that {@link Vertex}.
      */
     public static final Object GRAPHBRANCHID = "GRAPHBRANCHID";
+    
+    /**
+     * Keyword that identifies rows defining cutting rules in files
+     * collecting cutting rules.
+     */
+    public static final String CUTRULKEYWORD = "CTR";
+
+    /**
+     * Property name used to store molecular formula as string in an atom
+     * container
+     */
+    public static final Object FORMULASTR = "FORMULASTR";
+
+    /**
+     * Property used to store the identifier of the family of isomorphic 
+     * fragments that owns a fragment. Essentially, this identifies the
+     * unique fragments (those with unique value for this properties) and
+     * allows to find all their family members, i.e., other fragments that 
+     * differ by conformers/geometries with the first one found.
+     */
+    public static final Object ISOMORPHICFAMILYID = "ISOMORPHICFAMILYID";
+    
+    /**
+     * Initial part of filename used to collect fragments belonging to a certain
+     * molecular weight slot.
+     */
+    public static final String MWSLOTFRAGSFILENAMEROOT = "MWSlot_";
+    
+    /**
+     * Final part of filename used to collect unique fragments in a certain
+     * molecular weight slot.
+     */
+    public static final String MWSLOTFRAGSUNQFILENANEEND = "_Unq";
+    
+    /**
+     * Final part of filename used to collect all samples fragments in a certain
+     * molecular weight slot including isomorphic duplicates.
+     */
+    public static final String MWSLOTFRAGSALLFILENANEEND = "_All";
+    
+    /**
+     * Format for intermediate files used during fragmentation.
+     */
+    public static final FileFormat TMPFRAGFILEFORMAT = FileFormat.VRTXSDF;
     
 }

@@ -36,8 +36,10 @@ import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.molecularmodeling.MMBuilderUtils;
 import denoptim.utils.ConnectedLigand;
 import denoptim.utils.ConnectedLigandComparator;
+import denoptim.utils.GeneralUtils;
 import denoptim.utils.MathUtils;
 import denoptim.utils.ObjectPair;
 
@@ -356,14 +358,16 @@ public class TinkerUtils
 
         if (coords.size() != natom)
         {
-            throw new DENOPTIMException("Incorrect number of atoms perceived in " + filename);
+            throw new DENOPTIMException("Incorrect number of atoms perceived "
+                    + "in " + filename);
         }
 
         return coords;
 
     }
 
-//------------------------------------------------------------------------------    
+//------------------------------------------------------------------------------   
+    
     /**
      * Write Tinker INT file.
      *
@@ -373,7 +377,7 @@ public class TinkerUtils
      */
 
     public static void writeIC(String filename, TinkerMolecule tmol)
-                                                        throws DENOPTIMException
+            throws DENOPTIMException
     {
         FileWriter fw = null;
         try
@@ -557,9 +561,8 @@ public class TinkerUtils
      * @throws DENOPTIMException
      */
     public static void readPSSROTParams(String filename, 
-                                                     ArrayList<String> initPars,
-                                                     ArrayList<String> restPars)
-                                                        throws DENOPTIMException
+            ArrayList<String> initPars, ArrayList<String> restPars)
+                    throws DENOPTIMException
     {
         BufferedReader br = null;
         String line;
@@ -590,8 +593,8 @@ public class TinkerUtils
         }
         catch (IOException nfe)
         {
-	    String msg = "File '" + filename + "' not found.";
-            throw new DENOPTIMException(msg,nfe);
+            String msg = "File '" + filename + "' not found.";
+            throw new DENOPTIMException(msg, nfe);
         }
         finally
         {
@@ -677,7 +680,9 @@ public class TinkerUtils
                 }
                 catch (Throwable t)
                 {
-                    String msg = "Format of Tinker's atom type definition not recognized. \nDetails:\n"+t.getMessage();
+                    String msg = "Format of Tinker's atom type definition not "
+                            + "recognized. " + NL + "Details: " + NL 
+                            + t.getMessage();
                     throw new DENOPTIMException(msg);
                 }
             }
@@ -1065,7 +1070,7 @@ public class TinkerUtils
         try
         {
             fr = new ReversedLinesFileReader(new File(
-                    logPathName));
+                    logPathName), null);
 
             int numEmpty = 0;
             for (int i=0; i<100; i++) //at most 100 lines are read
@@ -1091,6 +1096,34 @@ public class TinkerUtils
         throw new TinkerException(errMsg, taskName);
     }
 
+//------------------------------------------------------------------------------
+    
+    /**
+     * Identifies how many iteration Tinker has done by looking into the log
+     * file, searching for a given pattern. The resulting number of iterations
+     * is translated in the pathname of the last iteration file. The iteration
+     * files have names like  
+     * <code>filename.000</code>, <code>filename.001</code>, 
+     * <code>filename.002</code>. So, if Tinker took 56 iteration, this method
+     * will return <code>filename.055</code>.
+     * @param workDir the directory expected to contain the iteration files.
+     * @param fname the basename of the iteration file.
+     * @param tinkerLog the log file where we count the iterations by searching 
+     * the patters.
+     * @param pattern the pattern to search in the log file
+     * @return the pathname of the last cycle-file.
+     * @throws DENOPTIMException
+     */
+    public static String getNameLastCycleFile(String workDir, String fname, 
+            String tinkerLog, String pattern) throws DENOPTIMException
+    {
+        int lastI = MMBuilderUtils.countLinesWKeywordInFile(tinkerLog, pattern);
+        String xyzfile = workDir + System.getProperty("file.separator") + fname 
+                + "." + GeneralUtils.getPaddedString(3, lastI - 1);
+        return xyzfile;
+    }
+
+    
 //------------------------------------------------------------------------------
 
 }

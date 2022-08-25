@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +49,7 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
 import denoptim.graph.Template;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.CyclicGraphHandler;
@@ -61,7 +61,7 @@ import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
@@ -170,7 +170,7 @@ public class EAUtils
     protected static CandidateSource chooseGenerationMethod(GAParameters settings)
     {
         return pickNewCandidateGenerationMode(
-                settings.getConstructionWeight(), 
+                settings.getCrossoverWeight(), 
                 settings.getMutationWeight(),
                 settings.getConstructionWeight(),
                 settings.getRandomizer());
@@ -301,7 +301,7 @@ public class EAUtils
         mnt.increase(CounterID.XOVERATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
         
-        int numatt = 0;
+        int numatt = 1;
         
         // Identify a pair of parents that can do crossover, and a pair of
         // vertexes from which we can define a subgraph (or a branch) to swap
@@ -514,7 +514,7 @@ public class EAUtils
         {
             chosenOffspring = settings.getRandomizer().randomlyChooseOne(
                     validOffspring);
-            chosenOffspring.setName("M" + GenUtils.getPaddedString(
+            chosenOffspring.setName("M" + GeneralUtils.getPaddedString(
                     DENOPTIMConstants.MOLDIGITS,
                     GraphUtils.getUniqueMoleculeIndex()));
         } else {
@@ -639,7 +639,7 @@ public class EAUtils
         offspring.setUID(res[0].toString().trim());
         offspring.setSmiles(res[1].toString().trim());
         offspring.setChemicalRepresentation((IAtomContainer) res[2]);
-        offspring.setName("M" + GenUtils.getPaddedString(
+        offspring.setName("M" + GeneralUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
         
@@ -709,7 +709,7 @@ public class EAUtils
         candidate.setSmiles(res[1].toString().trim());
         candidate.setChemicalRepresentation((IAtomContainer) res[2]);
         
-        candidate.setName("M" + GenUtils.getPaddedString(
+        candidate.setName("M" + GeneralUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
         
@@ -801,7 +801,7 @@ public class EAUtils
         candidate.setSmiles(res[1].toString().trim());
         candidate.setChemicalRepresentation((IAtomContainer) res[2]);
         
-        candidate.setName("M" + GenUtils.getPaddedString(
+        candidate.setName("M" + GeneralUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
         
@@ -1072,7 +1072,7 @@ public class EAUtils
         int ndigits = String.valueOf(settings.getNumberOfGenerations()).length();
         
         sb.append(settings.getDataDirectory()).append(FSEP).append("Gen")
-            .append(GenUtils.getPaddedString(ndigits, genID));
+            .append(GeneralUtils.getPaddedString(ndigits, genID));
         
         return sb.toString();
     }
@@ -1087,9 +1087,9 @@ public class EAUtils
         int ndigits = String.valueOf(settings.getNumberOfGenerations()).length();
         
         sb.append(settings.getDataDirectory()).append(FSEP)
-            .append("Gen").append(GenUtils.getPaddedString(ndigits, genID))
+            .append("Gen").append(GeneralUtils.getPaddedString(ndigits, genID))
             .append(FSEP)
-            .append("Gen").append(GenUtils.getPaddedString(ndigits, genID))
+            .append("Gen").append(GeneralUtils.getPaddedString(ndigits, genID))
             .append(".txt");
         
         return sb.toString();
@@ -1235,7 +1235,7 @@ public class EAUtils
                 int ctr = GraphUtils.getUniqueMoleculeIndex();
                 int gctr = GraphUtils.getUniqueGraphIndex();
                 
-                String molName = "M" + GenUtils.getPaddedString(8, ctr);
+                String molName = "M" + GeneralUtils.getPaddedString(8, ctr);
                 candidate.setName(molName);
                 candidate.getGraph().setGraphId(gctr);
                 candidate.getGraph().setLocalMsg("INITIAL_POPULATION");
@@ -1340,8 +1340,9 @@ public class EAUtils
         graph.addVertex(scafVertex);
         graph.setLocalMsg("NEW");
         
-        if (graph.getAvailableAPs().size()==0
-                && scafVertex instanceof Template)
+        if (scafVertex instanceof Template
+                && !((Template) scafVertex).getContractLevel().equals(
+                        ContractLevel.FIXED))
         {
             Monitor mnt = new Monitor();
             mnt.name = "IntraTemplateBuild";
@@ -1353,6 +1354,12 @@ public class EAUtils
                 // branch of the initial graph or deletes vertexes.
                 if (!graph.containsOrEmbedsVertex(mutableSite))
                     continue;
+                
+                // TODO: need to discriminate between EmptyVertexes that 
+                // represent placeholders and those that represent property carriers
+                // The first should always be mutated (as it happens now), but
+                // the latter should be kept intact.
+                // Possibly this is a case for subclassing the EmptyVertex.
                 
                 if (!GraphOperations.performMutation(mutableSite, mnt,
                         settings))

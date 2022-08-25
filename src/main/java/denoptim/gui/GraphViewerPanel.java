@@ -25,7 +25,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Paint;
-import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
@@ -92,7 +91,7 @@ public class GraphViewerPanel extends JPanel
 	
     public enum JVertexType {SCAF, FRAG, CAP, RCV, AP, NONE};
     
-    // Properties fired y this class and intercepted in parent containers
+    // Properties fired by this class and intercepted in parent containers
     public static final String PROPERTYNODECLICKED = "NODECLICKED";
     public static final String PROPERTYMOUSEMODE = "SETMOUSEMODE";
     
@@ -721,7 +720,6 @@ public class GraphViewerPanel extends JPanel
         @Override
         protected void handlePopup(MouseEvent e)
         {
-            Point p = e.getPoint();
             GraphOptsPopup popup = new GraphOptsPopup();
             popup.show((Component) e.getSource(), e.getX(), e.getY());
         }

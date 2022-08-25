@@ -18,9 +18,9 @@
 
 package denoptim.utils;
 
-import java.nio.ByteBuffer;
-import java.security.SecureRandom;
 import java.util.Collection;
+
+import javax.vecmath.Point3d;
 
 import org.apache.commons.math3.random.MersenneTwister;
 
@@ -178,6 +178,23 @@ public class Randomizer
 //------------------------------------------------------------------------------
 
     /**
+     * Returns the next pseudo-random, normally distributed double value between
+     * 0.0 and 1.0 from this random number generator's sequence. 
+     * Standard deviation 1.0.
+     * @return the next normally distributed double between 0.0 and 1.0, with
+     * standard deviation 1.0.
+     */
+    public double nextNormalDouble()
+    {
+        double d = getRNG().nextGaussian();
+        if (debug)
+            print(d,"double");
+        return d;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Returns a pseudo-random, uniformly distributed int value between 0 
      * (inclusive) and the specified value (exclusive), drawn from this random 
      * number generator's sequence.
@@ -219,6 +236,50 @@ public class Randomizer
     public boolean nextBoolean(double prob)
     {
         return nextDouble() < prob;
+    }
+    
+//------------------------------------------------------------------------------
+    /**
+     * Returns a point in three-dimensional space with a random set of 
+     * coordinates, the absolute value of which is at most the value given as
+     * argument. Values are uniformely distributed [-maxAbsValue,maxAbsValue].
+     * @param maxAbsValue the maximum absolute value of any Cartesian coordinate.
+     * @return a point in Cartesian space with a random position.
+     */
+    
+    public Point3d getNoisyPoint(double maxAbsValue)
+    {
+        double xFactor = nextDouble();
+        double yFactor = nextDouble();
+        double zFactor = nextDouble();
+        double xSign = nextBoolean() ? 1.0 : -1.0;
+        double ySign = nextBoolean() ? 1.0 : -1.0;
+        double zSign = nextBoolean() ? 1.0 : -1.0;
+
+        return new Point3d(maxAbsValue*xFactor*xSign,
+                maxAbsValue*yFactor*ySign,
+                maxAbsValue*zFactor*zSign);
+    }
+    
+//------------------------------------------------------------------------------
+ 
+    /**
+     * Returns a point in three-dimensional space with a random set of 
+     * coordinates, the absolute value of which is at most the value given as
+     * argument. Values are normally distributed [-maxAbsValue,maxAbsValue].
+     * @param maxAbsValue the maximum absolute value of any Cartesian coordinate.
+     * @return a point in Cartesian space with a random position.
+     */
+    
+    public Point3d getNormallyNoisyPoint(double maxAbsValue)
+    {
+        double xFactor = 2*nextNormalDouble()-1;
+        double yFactor = 2*nextNormalDouble()-1;
+        double zFactor = 2*nextNormalDouble()-1;
+
+        return new Point3d(maxAbsValue*xFactor,
+                maxAbsValue*yFactor,
+                maxAbsValue*zFactor);
     }
       
 //------------------------------------------------------------------------------

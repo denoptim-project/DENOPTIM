@@ -1,0 +1,8 @@
+#
+# This is the parameter file for test t30-2
+# (here we just test the use of the FRG-UNSETTOSINGLEBO keyword)
+#
+FRG-VERBOSITY=4
+FRG-STRUCTURESFILE=mols-2.sdf
+FRG-FORMULATXTFILE=formula-2.txt
+FRG-UNSETTOSINGLEBO

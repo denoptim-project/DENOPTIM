@@ -42,7 +42,7 @@ import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.task.FitnessTask;
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 
@@ -355,9 +355,8 @@ public class GraphBuildingTask extends FitnessTask
 
                         // Prepare vector of results
                         // NB: in FSE we add also the ID of the root graph in 
-                        // this array
+                        // this array, and the level
                         Object[] altRes = new Object[5];
-
                         try 
                         {
                             // Prepare molecular representation
@@ -385,8 +384,9 @@ public class GraphBuildingTask extends FitnessTask
                             altRes[1] = smiles;
         
                             // Prepare INCHI-Key                    
-                            String inchiKey = MoleculeUtils.getInChIKeyForMolecule(
-                                    mol, ceblSettings.getLogger());
+                            String inchiKey = 
+                                    MoleculeUtils.getInChIKeyForMolecule(mol, 
+                                            ceblSettings.getLogger());
                             if (inchiKey == null)
                             {
                                 inchiKey = "UNDEFINED_INCHI";
@@ -401,6 +401,10 @@ public class GraphBuildingTask extends FitnessTask
                             // Optionally perform external task
                             if (ceblSettings.submitFitnessTask())
                             {
+                                // We change the graph that was originally given 
+                                // to the FitnessTask superclass!
+                                dGraph = g;
+                                result.setGraph(g);
                                 sendToFitnessProvider(altRes);
                             }
                         }
@@ -466,8 +470,33 @@ public class GraphBuildingTask extends FitnessTask
      */
 
     private void sendToFitnessProvider(Object[] res) throws Throwable
-    {
+    {   
         String molinchi = res[0].toString().trim();
+
+        //TODO: consider adding this. However, a UID based only on chemical
+        // constitution, might fail to appreciate some difference between the 
+        //generated graphs, in particular differences in free APs and APClasses.
+        /*
+        if (((FitnessParameters) ceblSettings.getParameters(
+                        ParametersType.FIT_PARAMS)).checkPreFitnessUID())
+        {
+            try
+            {
+                if (!scs.addNewUniqueEntry(molinchi))
+                {
+                    //TODO: one day we'll have a monitor for FSE
+                    //mnt.increase(CounterID.DUPLICATEPREFITNESS);
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                //TODO: one day we'll have a monitor for FSE
+                //mnt.increase(CounterID.FAILEDDUPLICATEPREFITNESSDETECTION);
+               
+            }
+        }
+        */
+        
         String molsmiles = res[1].toString().trim();
         fitProvMol = (IAtomContainer) res[2];
         String parentGraphId = res[3].toString().trim();
@@ -478,9 +507,11 @@ public class GraphBuildingTask extends FitnessTask
         fitProvMol.setProperty(DENOPTIMConstants.PARENTGRAPHTAG, parentGraphId);
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         String molName = DENOPTIMConstants.FITFILENAMEPREFIX 
-        		+ GenUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
+        		+ GeneralUtils.getPaddedString(DENOPTIMConstants.MOLDIGITS,
                                            GraphUtils.getUniqueMoleculeIndex());
         fitProvMol.setProperty(CDKConstants.TITLE, molName);
+        
+        
         fitProvInputFile = workDir + SEP + molName 
         		+ DENOPTIMConstants.FITFILENAMEEXTIN;
         fitProvOutFile = workDir + SEP + molName 
@@ -491,6 +522,7 @@ public class GraphBuildingTask extends FitnessTask
         
         result.setName(molName);
         result.setSmiles(molsmiles);
+        result.setUID(molinchi);
         
         runFitnessProvider();
     }

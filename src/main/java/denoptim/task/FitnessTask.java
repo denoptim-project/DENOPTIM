@@ -50,7 +50,7 @@ public abstract class FitnessTask extends Task
 	/**
 	 * The graph representation of the entity to evaluate.
 	 */
-    protected final DGraph dGraph;
+    protected DGraph dGraph;
     
 	/**
 	 * The chemical representation of the entity to evaluate. We do not check 
@@ -231,7 +231,8 @@ public abstract class FitnessTask extends Task
         boolean unreadable = false;
         try
         {
-            processedMol = DenoptimIO.getFirstMolInSDFFile(fitProvOutFile);
+            processedMol = DenoptimIO.readAllAtomContainers(new File(
+                    fitProvOutFile)).get(0);
             if (processedMol.isEmpty())
             {
                 unreadable=true;

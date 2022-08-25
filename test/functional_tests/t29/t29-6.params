@@ -1,0 +1,12 @@
+#
+# This is the parameter file for test t29-5
+#
+
+# Parameters for running the test
+GRAPHEDIT-INPUTGRAPHS=inGraphs-5.sdf
+GRAPHEDIT-GRAPHSEDITSFILE=editingTasks-5
+GRAPHEDIT-OUTPUTGRAPHS=outGraphs-6.sdf
+GRAPHEDIT-EnforceSymmetry=yes
+
+# Incoming fragment
+FS-fragmentLibFile=lib_frag-5.sdf

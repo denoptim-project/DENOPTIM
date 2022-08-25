@@ -162,8 +162,6 @@ public class FitnessProvider
 	
 	public double getFitness(IAtomContainer iac) throws Exception 
 	{
-		boolean debug = false; // for debug only!
-		
 		if (engine == null)
 		{
 			throw new DENOPTIMException("Internal fitness provider has not been"
@@ -380,6 +378,7 @@ public class FitnessProvider
             
             VariableMapper vm = new VariableMapper() {
 
+                @SuppressWarnings("serial")
                 @Override
                 public ValueExpression resolveVariable(String varName)
                 {

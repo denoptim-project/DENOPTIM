@@ -18,6 +18,7 @@
 
 package denoptim.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -31,6 +32,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
@@ -84,6 +86,14 @@ public class GUIPreferencesDialog extends GUIModalDialog
     private JLabel lblChartPointSize;
     private JTextField txtChartPointSize;
     
+    private String namEvoChartLegend = "Display legend in evolution chart";
+    private JPanel pnlEvoChartLegend;
+    private JRadioButton rcbEvoChartLegend;
+
+    private String namMntChartLegend = "Display legend in monitor chart";
+    private JPanel pnlMntChartLegend;
+    private JRadioButton rcbMntChartLegend;
+    
     private JPanel linePropTags;
     private JLabel lblPropTags;
     private DefaultTableModel tabModPropTags;
@@ -98,7 +108,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
     
     private String namSMILESTo3D = "SMILES-to-3D converer";
     private JPanel pnlSMILESTo3D;
-    private JComboBox cmbSMILESTo3D;
+    private JComboBox<SMITo3DEngine> cmbSMILESTo3D;
     private JLabel lblSMILESTo3D;
     
 	
@@ -106,8 +116,14 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	
 //------------------------------------------------------------------------------
 
-	public GUIPreferencesDialog()
+	/**
+	 * Constructs a dialog for setting the preferences of the GUI.
+	 * @param refForPlacement the component used to place this dialog.
+	 */
+	@SuppressWarnings("serial")
+    public GUIPreferencesDialog(Component refForPlacement)
 	{
+	    super(refForPlacement);
 	    setTitle("Preferences");
 		centralPanel = new JPanel();
         JScrollPane scrollablePane = new JScrollPane(centralPanel);
@@ -136,7 +152,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         pnlSMILESTo3D = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblSMILESTo3D = new JLabel(namSMILESTo3D + ": " 
         		+ GUIPreferences.smiTo3dResolver + " - Change to ");
-        cmbSMILESTo3D = new JComboBox(SMITo3DEngine.values());
+        cmbSMILESTo3D = new JComboBox<SMITo3DEngine>(SMITo3DEngine.values());
         cmbSMILESTo3D.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -276,6 +292,18 @@ public class GUIPreferencesDialog extends GUIModalDialog
         pnlChartPointSize.add(txtChartPointSize);
         centralPanel.add(pnlChartPointSize);
         
+        pnlEvoChartLegend = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rcbEvoChartLegend = new JRadioButton(namEvoChartLegend);
+        rcbEvoChartLegend.setSelected(GUIPreferences.showLegenInEvolutionPlot);
+        pnlEvoChartLegend.add(rcbEvoChartLegend);
+        centralPanel.add(pnlEvoChartLegend);
+        
+        pnlMntChartLegend = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rcbMntChartLegend = new JRadioButton(namMntChartLegend);
+        rcbMntChartLegend.setSelected(GUIPreferences.showLegenInMonitorPlot);
+        pnlMntChartLegend.add(rcbMntChartLegend);
+        centralPanel.add(pnlMntChartLegend);
+        
 		// Customize the buttons of the modal dialog
 		this.btnDone.setText("Save");
 		this.btnDone.setToolTipText("Save the values and close dialog");
@@ -361,5 +389,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         GUIPreferences.chartPointSize =
                 Integer.parseInt(txtChartPointSize.getText());
         GUIPreferences.tmpSpace = txtTmpSpace.getText();
+        GUIPreferences.showLegenInEvolutionPlot = rcbEvoChartLegend.isSelected();
+        GUIPreferences.showLegenInMonitorPlot = rcbMntChartLegend.isSelected();
 	}
 }

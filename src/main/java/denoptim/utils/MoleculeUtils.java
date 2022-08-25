@@ -36,6 +36,7 @@ import javax.vecmath.Point3d;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.AtomRef;
+import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.aromaticity.Kekulization;
 import org.openscience.cdk.config.IsotopeFactory;
@@ -80,7 +81,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import io.github.dan2097.jnainchi.InchiFlag;
 import io.github.dan2097.jnainchi.InchiOptions;
-import net.sf.jniinchi.INCHI_RET;
+import io.github.dan2097.jnainchi.InchiStatus;
 
 
 /**
@@ -116,6 +117,23 @@ public class MoleculeUtils
             throw new DENOPTIMException(ex);
         }
         return ret_wd;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks if the given atom is a dummy atom based on the elemental symbol
+     * and the string used for dummy atom as a convention in DENOPTIM (uses
+     * {@link DENOPTIMConstants#DUMMYATMSYMBOL}. For detecting dummy atoms
+     * beyond DENOPTIM's convention, use {@link DummyAtomHandler}.
+     * @param atm
+     * @return <code>true</code> if the symbol of the atom indicates this is a 
+     * dummy atom according to DENOPTIM's convention.
+     */
+    public static boolean isDummy(IAtom atm)
+    {
+        String el = getSymbolOrLabel(atm);
+        return DENOPTIMConstants.DUMMYATMSYMBOL.equals(el);
     }
     
 //------------------------------------------------------------------------------
@@ -155,8 +173,7 @@ public class MoleculeUtils
                 res = true;
             }
         } catch (Throwable t) {
-            throw new Error("ERROR! Unable to create IsotopeFactory "
-                                        + " (in AtomUtils.getAtomicNumber)");
+            throw new Error("ERROR! Unable to create Isotope.");
         }
         return res;
     }
@@ -332,7 +349,7 @@ public class MoleculeUtils
         
         // WARNING: assumptions on implicit H count and bond orders!
         MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(fmol);
-        MoleculeUtils.ensureNoUnsetBondOrders(fmol);
+        MoleculeUtils.ensureNoUnsetBondOrdersSilent(fmol);
 
         String smiles = "";
         try
@@ -471,14 +488,14 @@ public class MoleculeUtils
         {
             InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();
             InChIGenerator gen = factory.getInChIGenerator(fmol, options);
-            INCHI_RET ret = gen.getReturnStatus();
-            if (ret == INCHI_RET.WARNING)
+            InchiStatus ret = gen.getStatus();
+            if (ret == InchiStatus.WARNING)
             {
                 //String error = gen.getMessage();
                 //InChI generated, but with warning message
                 //return new ObjectPair(null, error);
             }
-            else if (ret != INCHI_RET.OKAY)
+            else if (ret != InchiStatus.SUCCESS)
             {
                 return null;
             }
@@ -671,6 +688,8 @@ public class MoleculeUtils
     
 //------------------------------------------------------------------------------
 
+    //TODO: should we set only values that would otherwise be null?
+    
     /**
      * Sets zero implicit hydrogen count to all atoms.
      * @param iac the container to process
@@ -685,18 +704,43 @@ public class MoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Sets bond order = single to all otherwise unset bonds.
+     * Sets bond order = single to all otherwise unset bonds. In case of failed 
+     * kekulization this method reports a warning but does not throw an 
+     * exception.
      * @param iac the container to process
      */
     
-    public static void ensureNoUnsetBondOrders(IAtomContainer iac)
+    public static void ensureNoUnsetBondOrdersSilent(IAtomContainer iac)
     {
         try {
-            Kekulization.kekulize(iac);
+            ensureNoUnsetBondOrders(iac);
         } catch (CDKException e) {
             StaticLogger.appLogger.log(Level.WARNING, "Kekulization failed. "
-                    + "Bond orders will be unreliable.");
+                    + "Bond orders will be unreliable as all unset bonds are"
+                    + "now converted to single-order bonds.");
         }
+        for (IBond bnd : iac.bonds())
+        {
+            if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+            {
+                bnd.setOrder(IBond.Order.SINGLE);
+            }
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets bond order = single to all otherwise unset bonds. In case of failed 
+     * kekulization this method reports a warning but does not throw an 
+     * exception.
+     * @param iac the container to process
+     * @throws CDKException 
+     */
+    
+    public static void ensureNoUnsetBondOrders(IAtomContainer iac) throws CDKException
+    {
+        Kekulization.kekulize(iac);
         
         for (IBond bnd : iac.bonds())
         {
@@ -705,6 +749,89 @@ public class MoleculeUtils
                 bnd.setOrder(IBond.Order.SINGLE);
             }
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Looks for carbon atoms that are flagged as aromatic, but do not have any
+     * double bond and are, therefore, not properly Kekularized.
+     * @param mol the molecule to analyze.
+     * @return a non-empty string if there is any carbon atom that does not look 
+     * properly Kekularized.
+     */
+    public static String missmatchingAromaticity(IAtomContainer mol)
+    {
+        String cause = "";
+        for (IAtom atm : mol.atoms())
+        {
+            //Check carbons with or without aromatic flags
+            if (atm.getSymbol().equals("C") && atm.getFormalCharge() == 0
+                    && mol.getConnectedBondsCount(atm) == 3)
+            {
+                if (atm.getFlag(CDKConstants.ISAROMATIC))
+                {
+                    int n = numOfBondsWithBO(atm, mol, IBond.Order.DOUBLE);
+                    if (n == 0)
+                    {
+                        cause = "Aromatic atom " + getAtomRef(atm,mol) 
+                        + " has 3 connected atoms but no double bonds";
+                        return cause;
+                    }
+                } else {
+                    for (IAtom nbr : mol.getConnectedAtomsList(atm))
+                    {
+                        if (nbr.getSymbol().equals("C"))
+                        {
+                            if (nbr.getFormalCharge() == 0)
+                            {
+                                if (mol.getConnectedBondsCount(nbr) == 3)
+                                {
+                                    int nNbr = numOfBondsWithBO(nbr, mol, 
+                                            IBond.Order.SINGLE);
+                                    int nAtm = numOfBondsWithBO(atm, mol, 
+                                            IBond.Order.SINGLE);
+                                    if ((nNbr == 3) && (nAtm == 3))
+                                    {
+                                        cause = "Connected atoms "
+                                            + getAtomRef(atm, mol) + " " 
+                                            + getAtomRef(nbr, mol) 
+                                            + " have 3 connected atoms "
+                                            + "but no double bond. They are "
+                                            + "likely to be aromatic but no "
+                                            + "aromaticity has been reported.";
+                                        return cause;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return cause;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the number of bonds, with a certain bond order, surrounding the
+     * given atom.
+     * @param atm the atom to look at
+     * @param mol its container
+     * @param order the bond order to count.
+     * @return the number of bonds with that order.
+     */
+    public static int numOfBondsWithBO(IAtom atm, IAtomContainer mol, 
+            IBond.Order order)
+    {
+        int n = 0;
+        for (IBond bnd : mol.getConnectedBondsList(atm))
+        {
+            if (bnd.getOrder() == order)
+                n++;
+        }
+        return n;
     }
     
 //------------------------------------------------------------------------------
@@ -818,8 +945,6 @@ public class MoleculeUtils
                     oAtm.getHybridization().toString()));
         if (oAtm.getImplicitHydrogenCount() != null && !ignoreImplicitH)
             nAtm.setImplicitHydrogenCount(oAtm.getImplicitHydrogenCount());
-        if (oAtm.getStereoParity() != null)
-            nAtm.setStereoParity(oAtm.getStereoParity());
         if (oAtm.getMaxBondOrder() != null)
             nAtm.setMaxBondOrder(oAtm.getMaxBondOrder());
         if (oAtm.getNaturalAbundance() != null)
@@ -832,10 +957,10 @@ public class MoleculeUtils
     
     /**
      * Gets either the elemental symbol (for standard atoms) of the label (for
-     * pseudoatoms). Other classes implementing IAtom are not considered.
+     * pseudo-atoms). Other classes implementing IAtom are not considered.
      * This method is a response to the change from CDK-1.* to CDK-2.*. 
      * In the old CDK-1.* the getSymbol() method of IAtom would return the label 
-     * for a PseudoAtom, but this behaviour is not retained in newer versions.
+     * for a PseudoAtom, but this behavior is not retained in newer versions.
      * @param atm
      * @return either the element symbol of the label
      */
@@ -866,6 +991,17 @@ public class MoleculeUtils
             }
         }       
         return s;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return a string with the element symbol and the atom number (1-based)
+     * of the given atom.
+     */
+    public static String getAtomRef(IAtom atm, IAtomContainer mol)
+    {
+        return atm.getSymbol() + (mol.indexOf(atm) +1);
     }
     
 //------------------------------------------------------------------------------
@@ -1053,12 +1189,69 @@ public class MoleculeUtils
         }
         for (IAtom a : atmosToRemove)
         {
-            frag.removeAtomAndConnectedElectronContainers(a);
+            frag.removeAtom(a);
         }
         
         frag.updateAPs();
         
         return frag.getIAtomContainer();
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Determines the dimensionality of the given chemical object.
+     * @param mol the given chemical object
+     * @return dimensionality of this object: 2, or 3, or -1 if neither 2 nor 3.
+     */
+    public static int getDimensions(IAtomContainer mol)
+    {
+        final int is2D = 2;
+        final int is3D = 3;
+        final int not2or3D = -1;
+
+        int numOf2D = 0;
+        int numOf3D = 0;
+
+        for (IAtom atm : mol.atoms())
+        {
+            Point2d p2d = new Point2d();
+            Point3d p3d = new Point3d();
+            p2d = atm.getPoint2d();
+            boolean have2D = true;
+            if (p2d == null)
+            {
+                have2D = false;
+                p3d = atm.getPoint3d();
+                if (p3d == null)
+                {
+                    return not2or3D;
+                }
+            }
+            ArrayList<Double> pointer = new ArrayList<Double>();
+            try {
+                if (have2D)
+                {
+                    pointer.add(p2d.x);
+                    pointer.add(p2d.y);
+                    numOf2D++;
+                } else {
+                    pointer.add(p3d.x);
+                    pointer.add(p3d.y);
+                    pointer.add(p3d.z);
+                    numOf3D++;
+                }
+            } catch (Throwable t) {
+                return not2or3D;
+            }
+        }
+
+        if (numOf2D == mol.getAtomCount())
+            return is2D;
+        else if (numOf3D == mol.getAtomCount())
+            return is3D;
+        else
+            return not2or3D;
     }
 
 //------------------------------------------------------------------------------

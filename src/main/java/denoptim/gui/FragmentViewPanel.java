@@ -22,6 +22,7 @@ package denoptim.gui;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,6 +58,7 @@ import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Fragment;
@@ -367,7 +369,10 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	
 	public String getDataFromJmol()
 	{
-		return jmolPanel.viewer.getData("*", "txt");
+	    String data = jmolPanel.viewer.getData("*", "txt");
+	    data = data.replaceAll(" Xx  ", 
+	            " " + DENOPTIMConstants.DUMMYATMSYMBOL + "  ");
+		return data;
 	}
 	
 //-----------------------------------------------------------------------------
@@ -512,6 +517,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		}
 		
 		setJmolViewer();
+
+        jmolPanel.viewer.evalString("zoom OUT");
 		
 		if (parent!=null)
 		{
@@ -575,7 +582,14 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		sb.append("M  END").append(NL).append("$$$$");
 		
 		DenoptimIO.writeData(tmpSDFFile, sb.toString(), false);
-		mol = DenoptimIO.getFirstMolInSDFFile(tmpSDFFile);
+		try
+        {
+            mol = DenoptimIO.readAllAtomContainers(new File(tmpSDFFile)).get(0);
+        } catch (Exception e)
+        {
+            throw new DENOPTIMException("Unable to fetch molecule from tmp SDF",
+                    e);
+        }
 		return mol;
 	}
 	
@@ -740,6 +754,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		jmolPanel.viewer.openFile(tmpSDFFile);
 
 		setJmolViewer();
+
+        jmolPanel.viewer.evalString("zoom OUT");
 	}
 
 //-----------------------------------------------------------------------------

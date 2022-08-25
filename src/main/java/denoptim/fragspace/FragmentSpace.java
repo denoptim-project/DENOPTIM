@@ -277,9 +277,11 @@ public class FragmentSpace
      * 
      * @param scaffFile  pathname to library of fragments used to start the
      *                   construction of any new graph (i.e., seed or root
-     *                   fragments, a.k.a. scaffolds).
+     *                   fragments, a.k.a. scaffolds). Can be null or empty
+     *                   in which case no scaffold is imported.
      * @param fragFile   pathname to the library of fragments for general
-     *                   purpose.
+     *                   purpose. Can be null or empty
+     *                   in which case no fragment is imported.
      * @param capFile    pathname to the library of single-AP fragments used to
      *                   cap free attachment points (i.e., the capping groups).
      * @param cpmFile    pathname to the compatibility matrix, capping, and 
@@ -329,35 +331,41 @@ public class FragmentSpace
         }
         
         ArrayList<Vertex> fragLib = new ArrayList<Vertex>();
-        try
+        if (fragFile != null && fragFile.length() > 0)
         {
-            fragLib = DenoptimIO.readVertexes(new File(fragFile),
-                    BBType.FRAGMENT);
-            for (int i=0; i<fragLib.size(); i++)
+            try
             {
-                fragLib.get(i).setBuildingBlockId(i);
+                fragLib = DenoptimIO.readVertexes(new File(fragFile),
+                        BBType.FRAGMENT);
+                for (int i=0; i<fragLib.size(); i++)
+                {
+                    fragLib.get(i).setBuildingBlockId(i);
+                }
+            } catch (IllegalArgumentException | UndetectedFileFormatException
+                    | IOException | DENOPTIMException e)
+            {
+                throw new DENOPTIMException("Cound not read library of fragments "
+                        + "from file '" + fragFile + "'.", e);
             }
-        } catch (IllegalArgumentException | UndetectedFileFormatException
-                | IOException | DENOPTIMException e)
-        {
-            throw new DENOPTIMException("Cound not read library of fragments "
-                    + "from file '" + fragFile + "'.", e);
         }
         
         ArrayList<Vertex> scaffLib = new ArrayList<Vertex>();
-        try
+        if (scaffFile != null && scaffFile.length() > 0)
         {
-            scaffLib = DenoptimIO.readVertexes(new File(scaffFile),
-                    BBType.SCAFFOLD);
-            for (int i=0; i<scaffLib.size(); i++)
+            try
             {
-                scaffLib.get(i).setBuildingBlockId(i);
+                scaffLib = DenoptimIO.readVertexes(new File(scaffFile),
+                        BBType.SCAFFOLD);
+                for (int i=0; i<scaffLib.size(); i++)
+                {
+                    scaffLib.get(i).setBuildingBlockId(i);
+                }
+            } catch (IllegalArgumentException | UndetectedFileFormatException
+                    | IOException | DENOPTIMException e)
+            {
+                throw new DENOPTIMException("Cound not read library of scaffolds "
+                        + "from file '" + fragFile + "'.", e);
             }
-        } catch (IllegalArgumentException | UndetectedFileFormatException
-                | IOException | DENOPTIMException e)
-        {
-            throw new DENOPTIMException("Cound not read library of scaffolds "
-                    + "from file '" + fragFile + "'.", e);
         }
 
         define(settings, scaffLib, fragLib, cappLib, cpMap, capMap, forbEnds, 
@@ -1728,7 +1736,7 @@ public class FragmentSpace
         {
             int currentKey = 0;
             APMapping currentMapping = new APMapping();
-            Boolean stopped = FragmentSpaceUtils.recursiveCombiner(keys, currentKey, 
+            FragmentSpaceUtils.recursiveCombiner(keys, currentKey, 
                     apCompatilities, currentMapping, apMappings, true, 
                     maxCombinations);
         }

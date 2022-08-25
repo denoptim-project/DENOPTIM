@@ -20,7 +20,9 @@
 package denoptim.utils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.vecmath.Point3d;
@@ -266,7 +268,7 @@ public class MathUtils
     public static double roundValue(double val, int decimalPlaces)
     {
         BigDecimal bd = new BigDecimal(val);
-        bd = bd.setScale(decimalPlaces, BigDecimal.ROUND_UP);
+        bd = bd.setScale(decimalPlaces, RoundingMode.UP);
         return bd.doubleValue();
     }
 
@@ -448,6 +450,25 @@ public class MathUtils
 	normalDir.normalize();
 
         return normalDir;
+    }
+    
+//------------------------------------------------------------------------------
+
+    public static double[] centroidOf(Collection<double[]> points, int dimension) 
+    {
+        double[] centroid = new double[dimension];
+        for (double[] point : points) 
+        {
+            for (int i = 0; i < centroid.length; i++) 
+            {
+                centroid[i] += point[i];
+            }
+        }
+        for (int i = 0; i < centroid.length; i++) 
+        {
+            centroid[i] /= points.size();
+        }
+        return centroid;
     }
 
 //------------------------------------------------------------------------------

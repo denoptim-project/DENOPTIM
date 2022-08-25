@@ -18,45 +18,67 @@
 
 package denoptim.logging;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.main.Main;
 
 /**
- *  Version numbers used here are broken into 3 parts: major, minor, and 
- *  update, and are written as V<major>.<minor>.<update> (e.g. V0.1.1).  
- *  Major numbers will change at the time of major reworking of some 
- *  part of the system.  Minor numbers for each public release or 
- *  change big enough to cause incompatibilities.  Finally update
- *  will be incremented for small bug fixes and changes that
- *  probably wouldn't be too noticeable .  
-
+ * Class handling DENOPTIM's version identifier for headers. Note that the 
+ * numerical version ID is written in the form 
+ * v&lt;major&gt;.&lt;minor&gt;.&lt;update&gt;
+ *  (e.g. v0.1.1) and is defined in the pol.xml
+ * 
  * @author Vishwesh Venkatraman 
  */
 public class Version
 {
     public static final String NAME = "DENOPTIM";
     public static final String AUTHORS = "Vishwesh Venkatraman, Marco Foscato";
-    public static final String CONTRIBUTORS = "David Grellscheid​, "
+    public static final String CONTRIBUTORS = "David Grellscheid, "
             + "Einar Kjellback, "
             + "Marcello Costamagna";
     public static final String CONTACT = "see https://github.com/denoptim-project";
-    public static final String DATE = "Apr 27, 2022";
     public static final String MINIMUMJAVAVERSION = "1.8";
+
+    /**
+     * Version identifier (from pom.xml via Maven properties) 
+     */
+    public static final String VERSION;
+    static {
+        final Properties properties = new Properties();
+        String tmpVersion = "VersionNotFound";
+        try
+        {
+            properties.load(Main.class.getClassLoader().getResourceAsStream(
+                    "project.properties"));
+            tmpVersion = properties.getProperty("version");
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        VERSION = tmpVersion;
+    };
     
-    //NB: Remember the version has to be consistent with the pom.xml file
-    
-    /** The major version number. */
-    public static final int MAJOR = 3;
-
-    /** The minor version number. */
-    public static final int MINOR = 0;
-
-    /** The update letter. */
-    public static final int UPDATE = 2;
-
-    /** String for the current version. */
-    public static final String VERSION = "V" + MAJOR + "." + MINOR + "." + UPDATE;
+    /**
+     * Build date (from Maven properties)
+     */
+    public static final String DATE;
+    static {
+        final Properties properties = new Properties();
+        String tmpVersion = "BuildDateNotFound";
+        try
+        {
+            properties.load(Main.class.getClassLoader().getResourceAsStream(
+                    "project.properties"));
+            tmpVersion = properties.getProperty("build_date");
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        DATE = tmpVersion;
+    };
 
 //------------------------------------------------------------------------------    
 

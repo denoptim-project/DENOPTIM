@@ -19,7 +19,6 @@
 
 package denoptim.graph;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,7 +32,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
-import denoptim.utils.GenUtils;
+import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 
 /**
@@ -752,11 +751,11 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
         if (dirVec != null)
         {
             sb.append(DENOPTIMConstants.SEPARATORAPPROPSCL);
-            sb.append(GenUtils.getEnglishFormattedDecimal("###.####",dirVec.x));
+            sb.append(GeneralUtils.getEnglishFormattedDecimal("###.####",dirVec.x));
             sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
-            sb.append(GenUtils.getEnglishFormattedDecimal("###.####",dirVec.y));
+            sb.append(GeneralUtils.getEnglishFormattedDecimal("###.####",dirVec.y));
             sb.append(DENOPTIMConstants.SEPARATORAPPROPXYZ);
-            sb.append(GenUtils.getEnglishFormattedDecimal("###.####",dirVec.z));
+            sb.append(GeneralUtils.getEnglishFormattedDecimal("###.####",dirVec.z));
         }
         return sb.toString();
     }

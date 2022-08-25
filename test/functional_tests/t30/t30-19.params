@@ -1,0 +1,5 @@
+#
+# This is the parameter file for test t30-19
+#
+FRG-STRUCTURESFILE=mols-19.cif
+FRG-CUTTINGRULESFILE=cutting_rules

@@ -58,13 +58,13 @@ public class APMapping extends LinkedHashMap<AttachmentPoint, AttachmentPoint>
 //------------------------------------------------------------------------------
 
     /**
-     * Produced an index-based version of this mapping where each index
+     * Produces an index-based version of this mapping where each index
      * represents the attachment point as its index in the owner vertex
      * (i.e., the integer is the result of 
      * {@link Vertex#getIndexInOwner()}. 
      * For the indexes to work properly, all the 1st/2nd APs in the mapping 
      * pairs, must consistently belong to the same vertex. 
-     * @return an index-based analogue of this mapping.
+     * @return an index-based analog of this mapping.
      * @throws DENOPTIMException if APs belong to different owners so the
      * int-based mapping cannot be produced.
      */

@@ -88,7 +88,7 @@ public enum CounterID
         FAILEDXOVERATTEMPTS.description = "Failed attempts to do build a graph "
                 + "by crossover";
         XOVERPARENTSEARCH.description = "Attempts to find a pairs of parents "
-                + "compatible with crossover.";
+                + "compatible with crossover";
         FAILEDXOVERATTEMPTS_FINDPARENTS.description = "Failed attemtps to find "
                 + "crossover partners";
         FAILEDXOVERATTEMPTS_PERFORM.description = "Failed crossover operations "
@@ -107,7 +107,7 @@ public enum CounterID
                 + " mutation";
         FAILEDMUTATTEMTS_PERFORM.description = "Failed mutation operation of "
                 + "parent "
-                + "that supports mutation.";
+                + "that supports mutation";
         FAILEDMUTATTEMTS_PERFORM_NOMUTSITE.description = "Mutation cannot be "
                 + "done because graph declares no mutation site";
         FAILEDMUTATTEMTS_PERFORM_NOOWNER.description = "Mutation cannot take "
@@ -125,12 +125,12 @@ public enum CounterID
         FAILEDMUTATTEMTS_PERFORM_NODELLINK_FINDPARENT.description = "Failed to "
                 + "identify the parent of a link selected for removal.";
         FAILEDMUTATTEMTS_PERFORM_NODELLINK_EDIT.description = "Failed to "
-                + "remove vertex and weld remaining parts.";
+                + "remove vertex and weld remaining parts";
         FAILEDMUTATTEMTS_PERFORM_NODELETECHAIN.description = "Failed to "
-                + "remove a chain of vertexes.";
+                + "remove a chain of vertexes";
         FAILEDMUTATTEMTS_PERFORM_NOADDLINK.description = "Mutation did not "
                 + "introduce a verted between a pairs of previously "
-                + "connected vertexes.";
+                + "connected vertexes";
         FAILEDMUTATTEMTS_PERFORM_NOADDLINK_FIND.description = "Failed to "
                 + "find an linking vertex";
         FAILEDMUTATTEMTS_PERFORM_NOADDLINK_EDIT.description = "Failed to "
@@ -160,16 +160,123 @@ public enum CounterID
         FAILEDBUILDATTEMPTS_FORBIDENDS.description = "Construction of new "
                 + "graphs that ped to forbidden ends";
         
+        MANUALADDATTEMPTS.description = "Number of attempts to provide a "
+                + "manually bilt candidate";
+        FAILEDMANUALADDATTEMPTS.description = "Failed attempts to import "
+                + "a manually built cadidate";
+        FAILEDMANUALADDATTEMPTS_EVAL.description = "Failed attempts to pass "
+                + "graph evaluation test from manually added candidates";
         
         FITNESSEVALS.description = "Number of fitness evaluations";
         FAILEDFITNESSEVALS.description = "Number of failed fitness evaluations";
         
-        DUPLICATEPREFITNESS.description = "Number of candidates with duplicate "
-                + "UID detected prior to considering their fitness evaluation.";
+        DUPLICATEPREFITNESS.description = "Number of duplicate candidates "
+                + " detected prior to considering their fitness evaluation";
         FAILEDDUPLICATEPREFITNESSDETECTION.description = "Number of failed "
                 + "attempts to compare UID with known UIDs prior to considering "
-                + "the fitness evaluation of a candidate.";
+                + "the fitness evaluation of a candidate";
     }
+    
+    private String prettyName = "";
+    
+    static {
+        NEWCANDIDATEATTEMPTS.prettyName =
+                "#Attempts New Candidate";
+
+        XOVERATTEMPTS.prettyName =
+                "#Xover";
+        XOVERPARENTSEARCH.prettyName =
+                "#Xover Parents Search";
+        FAILEDXOVERATTEMPTS.prettyName =
+                "#Failed Xovers";
+        FAILEDXOVERATTEMPTS_FINDPARENTS.prettyName =
+                "#Failed Xovers_Find Parents";
+        FAILEDXOVERATTEMPTS_PERFORM.prettyName =
+                "#Failed Xovers_Perform";
+        FAILEDXOVERATTEMPTS_SETUPRINGS.prettyName =
+                "#Failed Xovers_Setup Rings";
+        FAILEDXOVERATTEMPTS_EVAL.prettyName =
+                "#Failed Xovers_Graph Filter";
+        FAILEDXOVERATTEMPTS_FORBENDS.prettyName =
+                "#Failed Xovers_Forbidden Ends";
+
+        MUTATTEMPTS.prettyName =
+                "#Mutation";
+        MUTPARENTSEARCH.prettyName =
+                "#Mutation Parent Search";
+        FAILEDMUTATTEMTS.prettyName =
+                "#Failed Mutation";
+        FAILEDMUTATTEMTS_PERFORM.prettyName =
+                "#Failed Mut_Perform";
+        FAILEDMUTATTEMTS_PERFORM_NOMUTSITE.prettyName =
+                "#Failed Mut_noMutSite";
+        FAILEDMUTATTEMTS_PERFORM_NOOWNER.prettyName =
+                "#Failed Mut_noOwner";
+        FAILEDMUTATTEMTS_PERFORM_BADMUTTYPE.prettyName =
+                "#Failed Mut_bad Mut Type";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGEBRANCH.prettyName =
+                "#Failed Mut Change Branch";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK.prettyName =
+                "#Failed Mut Change Link";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_FIND.prettyName =
+                "#Failed Mut Change Link_Find";
+        FAILEDMUTATTEMTS_PERFORM_NOCHANGELINK_EDIT.prettyName =
+                "#Failed Mut Change Link_Edit";
+        FAILEDMUTATTEMTS_PERFORM_NODELLINK_FINDPARENT.prettyName =
+                "#Failed Mut Delete Link_Find Parent";
+        FAILEDMUTATTEMTS_PERFORM_NODELLINK_EDIT.prettyName =
+                "#Failed Mut Delete Link_Edit";
+        FAILEDMUTATTEMTS_PERFORM_NODELETECHAIN.prettyName =
+                "#Failed Mut Delete Chain";
+        FAILEDMUTATTEMTS_PERFORM_NOADDLINK.prettyName =
+                "#Failed Mut Add Link";
+        FAILEDMUTATTEMTS_PERFORM_NOADDLINK_FIND.prettyName =
+                "#Failed Mut Add Link_Find";
+        FAILEDMUTATTEMTS_PERFORM_NOADDLINK_EDIT.prettyName =
+                "#Failed Mut Add Link_Edit";
+        FAILEDMUTATTEMTS_PERFORM_NOEXTEND.prettyName =
+                "#Failed Mut Extend";
+        FAILEDMUTATTEMTS_PERFORM_NODELETE.prettyName =
+                "#Failed Mut Delete";
+        FAILEDMUTATTEMTS_SETUPRINGS.prettyName =
+                "#Failed Mut_Setup Rings";
+        FAILEDMUTATTEMTS_EVAL.prettyName =
+                "#Failed Mut_Graph Filter";
+        FAILEDMUTATTEMTS_FORBENDS.prettyName =
+                "#Failed Mut_Forbidden Ends";
+
+        BUILDANEWATTEMPTS.prettyName =
+                "#Build Anew";
+        FAILEDBUILDATTEMPTS.prettyName =
+                "#Failed Build Anew";
+        FAILEDBUILDATTEMPTS_GRAPHBUILD.prettyName =
+                "#FailedBuild_GraphBuild";
+        FAILEDBUILDATTEMPTS_EVAL.prettyName =
+                "#FailedBuild_Graph Filter";
+        FAILEDBUILDATTEMPTS_SETUPRINGS.prettyName =
+                "#FailedBuild_Setup Rings";
+        FAILEDBUILDATTEMPTS_FORBIDENDS.prettyName =
+                "#FailedBuild_Forbidden Ends";
+
+        MANUALADDATTEMPTS.prettyName =
+                "#Manual Add";
+        FAILEDMANUALADDATTEMPTS.prettyName =
+                "#Failed Manual Add";
+        FAILEDMANUALADDATTEMPTS_EVAL.prettyName =
+                "#Failed Manual Add_Eval";
+
+        FITNESSEVALS.prettyName =
+                "#Fitness";
+        FAILEDFITNESSEVALS.prettyName =
+                "#Fitness_Failed Fitness Eval.";
+
+        DUPLICATEPREFITNESS.prettyName =
+                "#Duplicates Pre-Fitness";
+        FAILEDDUPLICATEPREFITNESSDETECTION.prettyName =
+                "#Failed Duplicate Pre-Fitness Detection";
+    }
+    
+//------------------------------------------------------------------------------
     
     /**
      * @return a printable description of what this counter identifier 
@@ -179,4 +286,17 @@ public enum CounterID
     {
         return description;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns a string representing the mane of this counter in a way that is
+     * pretty enough to be shown in user manuals or graphical interfaces
+     * @return a nice-looking name of this counter
+     */
+    public String getPrettyName()
+    {
+        return prettyName;
+    }
+    
 }

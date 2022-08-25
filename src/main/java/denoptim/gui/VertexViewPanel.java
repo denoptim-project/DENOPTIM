@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
@@ -46,7 +45,7 @@ import denoptim.graph.Vertex;
 
 
 /**
- * A panel for visualising vertices. This is a deck of cards that brings up a
+ * A panel for visualizing vertices. This is a deck of cards that brings up a
  * specific card depending on the type of vertex to visualize.
  * 
  * @author Marco Foscato
@@ -93,9 +92,6 @@ public class VertexViewPanel extends JPanel
 	 */
 	private boolean switchbleByVertexType = true;
 	
-	private JComponent parent;
-	
-
 //-----------------------------------------------------------------------------
 
 	/**
@@ -105,21 +101,7 @@ public class VertexViewPanel extends JPanel
 	 */
 	public VertexViewPanel(boolean editableTable)
 	{
-		this(null, editableTable);
-	}
-	
-//-----------------------------------------------------------------------------
-
-	/**
-	 * Constructor that allows to specify whether the AP table is editable or 
-	 * not.
-	 * @param the parent component to which we bound this panel.
-	 * @param editableTable use <code>true</code> to make the AP table editable
-	 */
-	public VertexViewPanel(JComponent parent, boolean editableTable)
-	{
 	    super(new BorderLayout());
-	    this.parent = parent;
 		this.editableAPTable = editableTable;
 		initialize();
 	}
@@ -164,7 +146,7 @@ public class VertexViewPanel extends JPanel
         emptyViewerCard.setToolTipText("Vertices are displayed here.");
         centralPanel.add(emptyViewerCard, EMPTYCARDNAME);
         
-        graphNodeViewer = new VertexAsGraphViewPanel(this, editableAPTable,300);
+        graphNodeViewer = new VertexAsGraphViewPanel(editableAPTable,300);
         graphNodeViewer.addPropertyChangeListener(
                 IVertexAPSelection.APDATACHANGEEVENT, 
                 new PropertyChangeListener() {

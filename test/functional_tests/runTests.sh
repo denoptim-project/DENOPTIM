@@ -301,7 +301,7 @@ runTest "t16"
 #
 # t17: Evolution based on random seletion of known graphs
 #
-echo TODO: refactor DenoptimRND
+#TODO: refactor DenoptimRND?
 #runTest "t17"
 
 #
@@ -355,6 +355,16 @@ runTest "t27"
 # t28: test crossover inside templates
 #
 runTest "t28"
+
+#
+# t29: test graph editor upgrade
+#
+runTest "t29"
+
+#
+# t30: test fragmenter
+#
+runTest "t30"
 
 echo "All done!"
 exit 0

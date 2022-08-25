@@ -46,9 +46,9 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.Ring;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
-import denoptim.programs.RunTimeParameters;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MathUtils;
@@ -59,7 +59,7 @@ import denoptim.utils.Randomizer;
 /**
  * Tool to build build three-dimensional (3D) tree-like molecular structures 
  * from {@link DGraph}. The molecular structure is assembled from the
- * building blocks by attaching any set of atoms/pseudoatoms contained in the
+ * building blocks by attaching any set of atoms/pseudo-atoms contained in the
  * building block, and (optionally) aligning each incoming building block by 
  * using the geometric parameters defined in their attachment points.
  * By default, this builder does align building blocks, but method 
@@ -158,7 +158,7 @@ public class ThreeDimTreeBuilder
     public IAtomContainer convertGraphTo3DAtomContainer(DGraph graph)
                                                         throws DENOPTIMException
     {
-    	return convertGraphTo3DAtomContainer(graph,false);
+    	return convertGraphTo3DAtomContainer(graph, false);
     }
     
 //------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ public class ThreeDimTreeBuilder
     public IAtomContainer convertGraphTo3DAtomContainer(DGraph graph,
             boolean removeUsedRCAs) throws DENOPTIMException
     {
-        return convertGraphTo3DAtomContainer(graph,removeUsedRCAs,true);
+        return convertGraphTo3DAtomContainer(graph,removeUsedRCAs,true, false);
     }
     
 //------------------------------------------------------------------------------
@@ -203,21 +203,21 @@ public class ThreeDimTreeBuilder
      * Created a three-dimensional molecular representation from a given 
      * {@link DGraph}. The conversion creates also two maps to retrace the 
      * attachment points within the final 3D structure both based on 
-     * the ID of the source DENOPTIMVertex and correspondence to DENOPTIMEdge.
+     * the ID of the source {@link Vertex} and correspondence to {@link Edge}.
      * To retrieve this information see properties
      * {@link DENOPTIMConstants#MOLPROPAPxATOM},
      * {@link DENOPTIMConstants#MOLPROPAPxBOND},
      * {@link DENOPTIMConstants#MOLPROPAPxVID} and
      * {@link DENOPTIMConstants#MOLPROPAPxEDGE}. 
      * In addition each atom is blended with the unique index
-     * of the DENOPTIMVertex corresponding to the molecular fragment to which
+     * of the {@link Vertex} corresponding to the molecular fragment to which
      * the atom belongs.
      * 
      * @param graph the {@link DGraph} to be transformed into a 3D molecule
      * @param removeUsedRCAs when <code>true</code> this method will remove 
      * used RCAs (the content of ring-closing vertexes, RCVs) 
      * and add bonds to close the rings
-     * defined by the DENOPTIMRings in the graph (does not alter the graph).
+     * defined by the {@link Ring} in the graph (does not alter the graph).
      * Does not change unused RCVs. Unused RCVs should have been already 
      * replaced by capping groups (or removed, if no capping needed), 
      * with the 
@@ -227,6 +227,8 @@ public class ThreeDimTreeBuilder
      * that the CDK requirements for IAtomContainers are all met. Namely,
      * no bond order is 'undefined' and that intrinsic hydrogen is zero for all
      * atoms (i.e., internal convention in DENOPTIM: all atoms are explicit).
+     * @return rebuild when <code>true</code> the chemical representation of 
+     * every building block is rebuilt ignoring previously available structures.
      * @return the <code>AtomContainer</code> representation
      * @throws DENOPTIMException
      */
@@ -234,7 +236,7 @@ public class ThreeDimTreeBuilder
     //NB: there is unused code that could turn out useful in debugging.
     @SuppressWarnings("unused") 
     public IAtomContainer convertGraphTo3DAtomContainer(DGraph graph,
-            boolean removeUsedRCAs, boolean setCDKRequirements) 
+            boolean removeUsedRCAs, boolean setCDKRequirements, boolean rebuild) 
                     throws DENOPTIMException
     {
         IAtomContainer mol = builder.newAtomContainer();
@@ -247,7 +249,8 @@ public class ThreeDimTreeBuilder
         IAtomContainer iacRootVrtx = null;
         if (rootVrtx.containsAtoms())
         {
-            iacRootVrtx = rootVrtx.getIAtomContainer();
+            iacRootVrtx = rootVrtx.getIAtomContainer(logger, randomizer, 
+                    removeUsedRCAs, rebuild);
         
             if (iacRootVrtx == null)
             {
@@ -256,9 +259,19 @@ public class ThreeDimTreeBuilder
                         + "Building blocks: " + rootVrtx;
                 throw new IllegalArgumentException(msg);
             }
-            
+
             for (IAtom atm : iacRootVrtx.atoms())
             {
+                Object prevPath = atm.getProperty(
+                        DENOPTIMConstants.ATMPROPVERTEXPATH);
+                if (prevPath!=null)
+                {
+                    atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
+                            idRootVrtx + ", " + prevPath.toString());
+                } else {
+                    atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
+                            idRootVrtx);
+                }
                 atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID,idRootVrtx);
             }
             mol.add(iacRootVrtx);
@@ -316,13 +329,13 @@ public class ThreeDimTreeBuilder
                 // Append next building block on AP-vector - start recursion
                 append3DFragmentsViaEdges(mol, graph,
                         apSrc.getAtomPositionNumber(),
-                        srcPtApSrc,trgPtApSrc,edge,removeUsedRCAs,
+                        srcPtApSrc,trgPtApSrc,edge,removeUsedRCAs, rebuild,
                         apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
             } else {
                 // Append next building block - start recursion
                 Point3d pt = getRandomPoint(mol);
                 append3DFragmentsViaEdges(mol, graph, -1, pt, pt, edge, 
-                        removeUsedRCAs,
+                        removeUsedRCAs, rebuild,
                         apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
             }
         }
@@ -345,7 +358,7 @@ public class ThreeDimTreeBuilder
         if (setCDKRequirements)
         {
             MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
-            MoleculeUtils.ensureNoUnsetBondOrders(mol);
+            MoleculeUtils.ensureNoUnsetBondOrdersSilent(mol);
         }
         
         // Code that may turn out useful for deep level debugging
@@ -498,7 +511,7 @@ public class ThreeDimTreeBuilder
 
     private void append3DFragmentsViaEdges(IAtomContainer mol, DGraph graph,
             int idSrcAtmA, Point3d srcApA, Point3d trgApA, Edge edge, 
-            boolean removeUsedRCAs,
+            boolean removeUsedRCAs, boolean rebuild,
             Map<Integer,ArrayList<AttachmentPoint>> apsPerVertexId,
             Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge,
             Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom,
@@ -521,7 +534,8 @@ public class ThreeDimTreeBuilder
         IAtomContainer inFrag = null;
         if (inVtx.containsAtoms())
         {
-            inFrag = inVtx.getIAtomContainer();
+            inFrag = inVtx.getIAtomContainer(logger, randomizer, removeUsedRCAs, 
+                    true);
             if (inFrag == null)
             {
                 String msg = "ThreeDimTreeBuilder found a building block "
@@ -719,6 +733,16 @@ public class ThreeDimTreeBuilder
             // Store vertex ID on atoms
             for (IAtom atm : inFrag.atoms())
             {
+                Object prevPath = atm.getProperty(
+                        DENOPTIMConstants.ATMPROPVERTEXPATH);
+                if (prevPath!=null)
+                {
+                    atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
+                            idInVrx + ", " + prevPath.toString());
+                } else {
+                    atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
+                            idInVrx);
+                }
                 atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID,idInVrx);
             }
             
@@ -726,20 +750,44 @@ public class ThreeDimTreeBuilder
             mol.add(inFrag);
         }
         
-        // Make the bond (if any) according to graph's edge
+        // Make the bond (if any) according to graph's edge.
+        // NB: we are still using CDK's Bond class, but we might need an 
+        // implementation IBond that includes all denoptim's bond types, so
+        // that we can deal with cases where bndTyp.hasCDKAnalogue() is false .
         BondType bndTyp = edge.getBondType();
         if (bndTyp.hasCDKAnalogue() && idSrcAtmA>-1 && inVtx.containsAtoms())
         {
-            IBond bnd = new Bond(mol.getAtom(idSrcAtmA),
-                    inFrag.getAtom(apB.getAtomPositionNumber()), 
+            IAtom atmToBind = inFrag.getAtom(apB.getAtomPositionNumber());
+            IBond bnd = new Bond(mol.getAtom(idSrcAtmA), atmToBind, 
                     bndTyp.getCDKOrder());
             mol.addBond(bnd);
             
-            // Store the APs related to the new bond
+            // Store the APs related to this atom-to-RCA bond
             ArrayList<AttachmentPoint> apsOnBond = new ArrayList<>();
             apsOnBond.add(edge.getSrcAP());
             apsOnBond.add(edge.getTrgAP());
             apsPerBond.put(bnd,apsOnBond);
+            
+            if (inVtx.isRCV())
+            {
+                atmToBind.setProperty(DENOPTIMConstants.RCAPROPAPCTORCA, 
+                        edge.getSrcAP().getAPClass());
+                //Since inVtx is RCV there can be only one ring, if any...
+                ArrayList<Ring> rings = graph.getRingsInvolvingVertex(inVtx);
+                if (rings.size()>0)
+                {
+                    // We record the type of the ring-closing bond, not that
+                    // of the Atom-to-RCA bond.
+                    atmToBind.setProperty(DENOPTIMConstants.RCAPROPCHORDBNDTYP, 
+                            rings.get(0).getBondType());
+                    atmToBind.setProperty(DENOPTIMConstants.RCAPROPRINGUSER, 
+                            rings.get(0));
+                } else {
+                    //...but if none is there, the APClass is enough
+                    atmToBind.setProperty(DENOPTIMConstants.RCAPROPCHORDBNDTYP, 
+                            edge.getSrcAP().getAPClass().getBondType());
+                }
+            }
         }
         
         // Store APs per building block and per atom (if atom exists)
@@ -793,12 +841,13 @@ public class ThreeDimTreeBuilder
                 append3DFragmentsViaEdges(mol, graph,
                         nextEdge.getSrcAP().getAtomPositionNumberInMol(), 
                         srcNextApA, trgNextApA, nextEdge, removeUsedRCAs,
+                        rebuild,
                         apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
             } else {
                 // Append next building block - start recursion
                 Point3d pt = getRandomPoint(mol);
                 append3DFragmentsViaEdges(mol, graph, -1, pt, pt, nextEdge, 
-                        removeUsedRCAs,
+                        removeUsedRCAs, rebuild,
                         apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
             }
         }

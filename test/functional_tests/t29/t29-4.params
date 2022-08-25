@@ -1,0 +1,11 @@
+#
+# This is the parameter file for test t29-4
+#
+
+# Parameters for running the test
+GRAPHEDIT-INPUTGRAPHS=inGraphs-4.sdf
+GRAPHEDIT-GRAPHSEDITSFILE=editingTasks-4
+GRAPHEDIT-OUTPUTGRAPHS=outGraphs-4.sdf
+
+# Incoming fragment
+FS-fragmentLibFile=lib_frag-4.sdf

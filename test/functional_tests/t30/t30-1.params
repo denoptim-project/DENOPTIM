@@ -1,0 +1,6 @@
+#
+# This is the parameter file for test t30-1
+#
+FRG-PARALLELTASKS=2
+FRG-STRUCTURESFILE=mols-1.sdf
+FRG-FORMULATXTFILE=formula-1.txt

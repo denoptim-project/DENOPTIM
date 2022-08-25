@@ -264,7 +264,7 @@ public class FragmentSpaceTest
     	*/
     	
     	FragmentSpaceParameters fsp = new FragmentSpaceParameters();
-    	FragmentSpace fs = new FragmentSpace(fsp, scaffLibFile, fragLibFile, 
+    	new FragmentSpace(fsp, scaffLibFile, fragLibFile, 
     	        capLibFile, cpmFile);
     	return fsp;
 	}

@@ -217,7 +217,6 @@ public class StaticTaskManager
     public static void subtractDoneTasks(int doneTasksCount)
     {
     	synchronized (LOCK) {
-	    	int max = maxProgressBar;
 	    	int val = valProgressBar;
 	    	valProgressBar = val+doneTasksCount;
 	    	if (valProgressBar == maxProgressBar)

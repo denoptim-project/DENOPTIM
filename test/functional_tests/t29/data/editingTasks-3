@@ -1,0 +1,13 @@
+[
+  {
+     "task": "DELETEVERTEX",
+     "vertexQuery": {
+        "incomingEdgeQuery": {
+           "srcAPC": {
+              "rule": "RuX",
+              "subClass": 0
+           }
+        }
+     }
+  }
+]

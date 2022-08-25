@@ -87,6 +87,7 @@ public class ExternalCmdsListener implements Runnable
     /**
      * Starts listening for events and keeps listening in its own thread
      */
+    @SuppressWarnings("unchecked")
     public void run() 
     {
         try {
@@ -101,7 +102,7 @@ public class ExternalCmdsListener implements Runnable
 			    }
 			    for (WatchEvent<?> event : key.pollEvents()) 
 			    {
-			        WatchEvent.Kind kind = event.kind();
+			        WatchEvent.Kind<?> kind = event.kind();
 
 			        // There seems to be a possibility for nasty events that need 
 			        // to be ignored.

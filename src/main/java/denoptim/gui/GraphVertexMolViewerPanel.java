@@ -46,7 +46,6 @@ import denoptim.gui.GraphViewerPanel.JVertexType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.MoleculeUtils;
-import denoptim.utils.Randomizer;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 

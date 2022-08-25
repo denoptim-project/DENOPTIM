@@ -1,0 +1,11 @@
+#
+# This is the parameter file for test t29-1
+#
+
+# Parameters for running the test
+GRAPHEDIT-INPUTGRAPHS=inGraphs-1.sdf
+GRAPHEDIT-GRAPHSEDITSFILE=editingTasks-1
+GRAPHEDIT-OUTPUTGRAPHS=outGraphs-1.sdf
+
+#Fragment space
+FS-scaffoldLibFile=lib_scaff-1.sdf

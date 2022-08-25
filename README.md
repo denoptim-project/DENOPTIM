@@ -23,11 +23,11 @@ conda install -c denoptim-project  denoptim
 ### Build From Source
 Download and extract the <a href="https://github.com/denoptim-project/DENOPTIM/releases/latest">latest release</a> to create a folder we'll call `DENOPTIM_HOME`. In the following, remember to replace `$DENOPTIM_HOME` with the pathname of the extracted DENOPTIM's distribution folder on your system.
 
-Make sure you have an environment that includes JAVA and Maven. Such environment can be created with by manual installation of both JAVA and Maven manually, or it can be created using conda:
+Make sure you have an environment that includes JAVA and Maven. Such environment, which we call `dnp_devel`, can be created by manual installation of both JAVA and Maven, or it can be created using conda:
 ```
 cd $DENOPTIM_HOME
 conda env create -f environment.yml
-conda activate dnp_env
+conda activate dnp_devel
 ```
 
 Verify the requirements by running the two commands: Both should return a message declaring the respective versions.
@@ -41,7 +41,7 @@ Now, you can build DENOPTIM with
 mvn package
 ```
 
-Once maven has finished, you can create call DENOPTIM using a command like the following (NB: replace $DENOPTIM_HOME and ${VERSION} as with the values that apply to your installation):
+Once maven has finished, you can create call DENOPTIM using a command like the following (NB: replace `$DENOPTIM_HOME` and `${VERSION}` as with the values that apply to your installation):
 On Linux/Mac and GitBash on Windows:
 ```
 java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar
@@ -63,11 +63,14 @@ This is how to run the tests:
 cd $DENOPTIM_HOME/test/functional_tests
 bash runAllTests.sh
 ```
-The results will be collected in a temporary folder (typically `/tmp/denoptim_tesy`).
+The results will be collected in a temporary folder (typically `/tmp/denoptim_test`).
 
 
 ## User Manual
 The complete user manual is available [on line](http://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html). Alternatively, you can download the HTML file that can be viewed with any Firefox/Safari/Edge/Chrome or any Internet browser.
+
+## Tutorials
+See the [tutirials page](https://denoptim-project.github.io/tutorials).
 
 ## Quick Start
 The entry point of any DENOPTIM activity is the command `denoptim`, which results from the [installation](#installation).

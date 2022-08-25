@@ -43,7 +43,6 @@ import denoptim.graph.Edge;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.programs.RunTimeParameters;
 import denoptim.utils.Randomizer;
 
 

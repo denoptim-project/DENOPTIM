@@ -35,12 +35,12 @@ import denoptim.constants.DENOPTIMConstants;
 public class GUIPreferences {
 
 	/**
-	 * DENOPTIMGraph visualization: font size of labels
+	 * Graph visualization: font size of labels
 	 */
 	protected static int graphLabelFontSize = 10;
 	
 	/**
-	 * DENOPTIMGraph visualization: size of nodes
+	 * Graph visualization: size of nodes
 	 */
 	protected static int graphNodeSize = 30;
 	
@@ -89,4 +89,13 @@ public class GUIPreferences {
 	protected static SMITo3DEngine smiTo3dResolver = 
 			SMITo3DEngine.CACTVS;
 	
+	/**
+	 * Choice of displaying legend in evolution plot
+	 */
+	protected static boolean showLegenInEvolutionPlot = false;
+	
+    /**
+     * Choice of displaying legend in monitor plot
+     */
+    protected static boolean showLegenInMonitorPlot = false;
 }

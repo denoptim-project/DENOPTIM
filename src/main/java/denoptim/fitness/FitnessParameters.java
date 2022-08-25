@@ -63,13 +63,6 @@ public class FitnessParameters extends RunTimeParameters
 			new ArrayList<String>();
     
     /**
-     * List of variables used in the calculation of the fitness. 
-     * For instance, atom/bond specific descriptors, and custom parameterized 
-     * descriptors.
-     */
-    private List<Variable> variables = new ArrayList<Variable>();
-    
-    /**
      * The list of descriptors needed to calculate the variables that are
      * used to calculate the fitness with the internal fitness provider.
      */
@@ -269,7 +262,6 @@ public class FitnessParameters extends RunTimeParameters
     	{
 	        FitnessExpressionParser fep = new FitnessExpressionParser();
     	    fep.parse(fitnessExpression, customVarDescExpressions);
-    	    variables = fep.getVariables();
     	    descriptors = fep.getDescriptors();
     	}
     	if (!checkPreFitnessUIDFromInput && useExternalFitness)

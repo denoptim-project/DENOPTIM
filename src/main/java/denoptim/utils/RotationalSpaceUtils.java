@@ -87,10 +87,10 @@ public class RotationalSpaceUtils
     	    b.setProperty(DENOPTIMConstants.BONDPROPROTATABLE,"false");
     	}
 
-        // Deal with interfragment bonds
+        // Deal with inter-fragment bonds
         if (addIterfragBonds)
         {
-            rotatableBonds.addAll(getInterfragBonds(mol));
+            rotatableBonds.addAll(getInterVertexBonds(mol));
         }
 
         // We'll use SMARTS so get rid of pseudoatoms that can create problems
@@ -227,12 +227,12 @@ public class RotationalSpaceUtils
      * @param mol the molecule as IAtomContainer
      * @throws DENOPTIMException
      */
-    public static ArrayList<ObjectPair> getInterfragBonds(IAtomContainer mol) 
+    public static ArrayList<ObjectPair> getInterVertexBonds(IAtomContainer mol) 
                                                         throws DENOPTIMException
     {
         ArrayList<ObjectPair> interfragBonds = new ArrayList<ObjectPair>();
 
-        String p = DENOPTIMConstants.ATMPROPVERTEXID;
+        String p = DENOPTIMConstants.ATMPROPVERTEXPATH;
         for (IBond bnd : mol.bonds())
         {
             if (bnd.getAtomCount() == 2)
@@ -253,9 +253,7 @@ public class RotationalSpaceUtils
                     {
                         newRotBnd = new ObjectPair(Integer.valueOf(idAtmA),
                                 Integer.valueOf(idAtmB));
-                    }
-                    else
-                    {
+                    } else {
                         newRotBnd = new ObjectPair(Integer.valueOf(idAtmB),
                                 Integer.valueOf(idAtmA));
                     }

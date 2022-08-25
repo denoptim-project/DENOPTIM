@@ -484,6 +484,7 @@ public class FileUtils
      * @return the format of that file or null.
      * @throws IOException
      */
+    @SuppressWarnings("rawtypes")
     public static FileFormat detectKindOfJSONFile(String fileName) 
             throws IOException
     {

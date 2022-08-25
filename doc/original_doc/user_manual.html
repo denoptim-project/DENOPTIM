@@ -80,7 +80,7 @@
 <p align="center" style="font-size: 44pt">DENOPTIM</p>
 <p align="center" style="font-size: 32pt"><i>De novo</i> Optimization of In/organic Molecules</p>
 <p><br/></p>
-<p align="center" style="font-size: 20pt"><i>Version 3.0.2, April 2022</i></p>
+<p align="center" style="font-size: 20pt"><i>Version 3.2.0, Aug 2022</i></p>
 <p align="center" style="font-size: 20pt">User Manual</p>
 <p><br/></p>
 
@@ -126,6 +126,7 @@
 				<li><a href="#Toc17846_799972446">FragSpaceExplorer Output</a></li>
 				<li><a href="#Toc5490_1476255988">Restart FragSpaceExplorer from Checkpoint file</a></li>
 			</ul></li>
+			<li><a href="#Toc2222_0">Fragmenter</a></li>
 			<li><a href="#Toc9999_2">Graph Editor</a></li>
 			<li><a href="#Toc9999_4">Genetic Operator</a></li>
 			<li><a href="#Toc9999_5">Fitness Provider Runner</a></li>
@@ -141,6 +142,7 @@
 			<li><a href="#Toc40918_1191730726">3D Molecular Models Builder</a></li>
 			<li><a href="#Toc13097_799972446">FragmentSpaceExplorer</a></li>
 			<li><a href="#Toc13097_123456789">Fitness provider</a></li>
+			<li><a href="#Toc2222_1">Fragmenter</a></li>
 			<li><a href="#Toc88888_1">Stand-alone Graph Editor</a></li>
 			<!--<li><a href="#Toc88888_2">Stand-alone Genetic Operator</a></li>-->
 			<li><a href="#Toc88888_3">Stand-alone Fitness Runner</a></li>
@@ -150,10 +152,12 @@
 		<li><a href="#Toc40920_1191730726">File Formats</a>
 		<ul>
 			<li><a href="#Toc16847_799972446">Vertexes</a></li>
-			<li><a href="#Toc14763_799972446">Compatibility Matrix file</a></li>
-			<li><a href="#Toc16849_799972446">Ring closures Compatibility Matrix file</a></li>
-			<li><a href="#Toc16851_799972446">Initial Population File</a></li>
-			<li><a href="#Toc10339_2456711212">Candidate Chemical Entity Files</a></li>
+			<li><a href="#Toc2222_2">Cutting rules</a></li>
+			<li><a href="#Toc2222_3">Molecular Formula</a></li>
+			<li><a href="#Toc14763_799972446">Compatibility Matrix</a></li>
+			<li><a href="#Toc16849_799972446">Ring closures Compatibility Matrix</a></li>
+			<li><a href="#Toc16851_799972446">Initial Population</a></li>
+			<li><a href="#Toc10339_2456711212">Candidate Chemical Entity</a></li>
 			<li><a href="#Toc16853_799972446">Fitness Files</a></li>
 			<li><a href="#Toc9999_3">Graph Editing Task Files</a></li>
 		</ul></li>
@@ -276,8 +280,7 @@ The APClass can be defined also by the user (e.g., via the GUI) as long as it ad
 	<li><code>&lt;string&gt;</code> is an alphanumeric string, and</li>
 	<li><code>&lt;int&gt;</code> is a positive integer number.</li>
 </ul>
-This syntax is best explain by providing an example of how molecular fragment can be generated from whole molecules. In particular, we consider our own fragmentation algorithm (see <a href="https://doi.org/10.1021/ci4007497"><i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 3, 767–780</a> - implementation available at
-<a href="https://github.com/denoptim-project/GM3DFragmenter">https://github.com/denoptim-project/GM3DFragmenter</a>).
+This syntax is best explain by providing an example of how molecular fragment can be generated from whole molecules. In particular, we consider our own fragmentation algorithm (see <a href="https://doi.org/10.1021/ci4007497"><i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 3, 767–780</a>), which is implemented in the program <a href="#Toc2222_0">Fragmenter</a>.
 This fragmentation algorithm
 uses cutting rules to identify the bond to break in order to generate fragments. 
 For each broken bond two attachment
@@ -607,9 +610,16 @@ the checkpoint file are considered to be lost and will be
 re-submitted upon restart of the FSE run. Therefore, to avoid duplicates the files related to those
 “lost” calculations should be collected and isolated.</p>
 
+<h2 class="western"><a name="Toc2222_0"></a>Fragmenter</h2>
+<p>Fragmenter is a program that performs fragmentation of molecules and management of fragments. Fragmentation is based on the application of bond-cutting rules that identify which bonds should be broken (see <a href="https://doi.org/10.1021/ci4007497"><i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 3, 767–780</a>). Each broken bond is replaces by a pair of attachment points: one attachment point on each of the atoms (or pseudoatoms) that were originally bonded. The attachment point class (APClass) on each such attachment points is defined by the string identifying the cutting rule (i.e., the rule name) and an integer that distinguish the two ends of the broken bond. For example, if the cutting rule is named <code>myCuttingRule</code>, the two APs will have APClass <code>myCuttingRule:0</code> and <code>myCuttingRule:1</code>.</p>
+<p>Fragmenter can also filter fragments according to criteria based on fragment's molecular formula, number of non-Hydrogen atoms, substructures (by SMARTS), and pool of attachment points. Moreover, graph-isomorphic fragments (i.e., fragments that have the same topological structure of atoms, bonds, and attachment points, but possibly different geometry) can be collected and analyzed by Fragmenter to identify clusters of geometries and extract the most representative geometry for each cluster. Both filtration and clustering are tasks that can be performed during the fragmentation of molecules or in a standalone fashion.</p>
+<p>The Fragmenter can be run with this command:
+<pre class="bash"><code>denoptim -r FRG input_parameters_file</code></pre>
+where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">keywords</a> providing all input parameters and settings.</p>
+
 
 <h2 class="western"><a name="Toc9999_2"></a>Graph Editor</h2>
-<p>Graph Editor is a program for editing graphs from the command line. This allows embedding a graph edit task in any workflow external to denoptim. For example, in the fitness evaluation workflow of an external provider.</p>
+<p>Graph Editor is a program for editing graphs from the command line. This allows embedding a graph edit task in any work flow external to denoptim. For example, in the fitness evaluation work flow of an external provider.</p>
 <p>The graph editor can be run with this command:
 <pre class="bash"><code>denoptim -r GE input_parameters_file</code></pre>
 where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">keywords</a> providing all input parameters. Among these settings there is a text-based definition of the graph editing task. See <a href="#Toc9999_3">Graph Editing Task Files</a>.</p>
@@ -623,7 +633,7 @@ where <code>input_parameters_file</code> is a text parameters file with the <a h
 
 
 <h2 class="western"><a name="Toc9999_5"></a>Fitness Provider Runner</h2>
-<p>This is a program to lauch a fitness provider (internal or external) in the same way as done from within GA or FSE runs, but straight from the command line-</p>
+<p>This is a program to launch a fitness provider (internal or external) in the same way as done from within GA or FSE runs, but straight from the command line-</p>
 <p>This program can be run with this command:
 <pre class="bash"><code>denoptim -r FIT input_parameters_file</code></pre>
 where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
@@ -632,7 +642,7 @@ where <code>input_parameters_file</code> is a text parameters file with the <a h
 <h2 class="western"><a name="Toc9999_6"></a>3D Molecular Models Builder</h2>
 <p>This is a program for converting graph representation into a 3D chemical representation by exploring the 3D features of building blocks and, if needed, perform a ring-closing conformational search (see <a href="https://doi.org/10.1021/acs.jcim.5b00424"><i>J. Chem. Inf. Model.</i> <b>2015</b>, 55, 9 1844-1856</a>).</p>
 <p>This program can be run with this command:
-<pre class="bash"><code>denoptim -r 3DB input_parameters_file</code></pre>
+<pre class="bash"><code>denoptim -r B3D input_parameters_file</code></pre>
 where <code>input_parameters_file</code> is a text parameters file with the <a href="#Toc35546_1191730726">Keywords</a> providing all input parameters.</p>
 <p><b>WARNING:</b> This program requires <a href="https://dasher.wustl.edu/tinker/">Tinker Molecular Modeling software</a> to be installed on the system. The user is responsible for installing Tinker in accordance with its license terms. Furthermore, the ring-closing conformational search requires a customized version of Tinker. Contact <a href="mailto:denoptim.project@gmail.com">denoptim.project@gmail.com</a> for instructions on how to modify Tinker and use the customized version in accordance with Tinker license's terms.</p>
 
@@ -866,7 +876,7 @@ without providing that specific keyword in the input file.</p>
 	<tr valign="middle">
 		<td width="46%" style="background: #ffffff;  "><p><code>RC-Verbosity</code></p>
 		</td>
-		<td width="54%" style="background: #ffffff;  "><p>Specifies the verbosity level of the ring closing machinery.</p>
+		<td width="54%" style="background: #ffffff;  "><p>Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity. </p>
 		</td>
 	</tr>
 	<tr>
@@ -890,14 +900,15 @@ without providing that specific keyword in the input file.</p>
 		<td width="46%" style="background: #ffffff;  "><p><code>RC-MinRCAPerTypePerGraph</code></p>
 		</td>
 		<td width="54%" style="background: #ffffff;  "><p>Specifies the minimum number of ring closing attractors of the
-			same type per graph.</p>
+			 a given type per graph. Does not consider RCAs embedded in Templates. Does not distinguish between used and free RCAs. The format is:<p><code>&lt;value&gt; &lt;type&gt;</code></p>where <code>&lt;value&gt;</code> is an integer, and <code>&lt;type&gt;</code> is one among the pseudo-atom elemental symbols used for ring closing attractors (<code>ATM</code>, <code>ATP</code>, <code>ATN</code>)</p>
 		</td>
 	</tr>
 	<tr valign="middle">
 		<td width="46%" style="background: #ffffff;  "><p><code>RC-MaxRCAPerTypePerGraph</code></p>
 		</td>
 		<td width="54%" style="background: #ffffff;  "><p>Specifies the maximum number of ring closing attractors of the
-			same type that are accepted for a single graph.</p>
+
+                         a given type per graph. Does not consider RCAs embedded in Templates. Does not distinguish between used and free RCAs. The format is:<p><code>value type</code></p>where <code>value</code> is an integer, and <code>type</code> is one among the pseudo-atom elemental symbols used for ring closing attractors (<code>ATM</code>, <code>ATP</code>, <code>ATN</code>).</p>
 		</td>
 	</tr>
 	<tr>
@@ -1426,7 +1437,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 	<tr valign="middle">
 		<td width="40%"><p><code>3DB-Verbosity</code></p>
 		</td>
-		<td width="60%"><p>Specifies the verbosity level.</p>
+		<td width="60%"><p>Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity. </p>
 		</td>
 	</tr>
 	<tr>
@@ -1577,7 +1588,7 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 	<tr valign="middle">
 		<td width="40%"><p><code>FSE-Verbosity</code></p>
 		</td>
-		<td width="60%"><p>Specifies the verbosity level.</p>
+		<td width="60%"><p>Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity. </p>
 		</td>
 	</tr>
 	<tr>
@@ -1690,6 +1701,216 @@ enables up to two-sites mutation and with a weight that is 1/10 of the single-si
 		</td>
 	</tr>
 </table>
+
+
+<br>
+<h3 class="western"><a name="Toc2222_1"></a>Fragmenter</h3>
+<table width="100%" cellpadding="4" cellspacing="0" style="background: transparent; page-break-before: auto; page-break-after: auto; page-break-inside: auto; border-collapse: collapse">
+	<col width="102*"/>  
+	<col width="154*"/>
+	<tr valign="middle">
+		<td width="40%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Keyword</p>
+		</td>
+		<td width="60%" bgcolor="#aadcf7" style="background: #aadcf7"><p>Description</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>General</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-WORKDIR</code></p>
+		</td>
+		<td width="60%"><p>A pathname where all files related to the execution of the fragmenter will be placed.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-STRUCTURESFILE</code></p>
+		</td>
+		<td width="60%"><p>The pathname to the SDF file containing the input to be processed. Depending on the task, this keyword is used to specify where to take molecular structured to be fragmented or fragments to be filtered or clustered.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-PARALLELTASKS</code></p>
+		</td>
+		<td width="60%"><p>Specifies the number (integer) of parallel threads when performing parallelizable tasks such as fragmentation or analysis of isomorphic fragment families.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-VERBOSITY</code></p>
+		</td>
+		<td width="60%"><p>Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity. </p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Pre-Fragmentation Operation</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-FORMULATXTFILE</code></p>
+		</td>
+		<td width="60%"><p>The pathname to a TXT file (see <a href="#Toc2222_3">Formula file</a>) containing the molecular formulae for the structures to be fragmenter. Use this keyword to enable detection of missing atoms by checking of consistency between declared molecular formula (reported in the pathname given here) and actual molecular formula found in the structure file. Molecules with missing atoms are not fragmented.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-PREFILTERSMARTS</code></p>
+		</td>
+		<td width="60%"><p>Specifies the SMARTS query to filter structure before fragmentation. Any input molecule matching the SMARTS query will not be fragmenter. This keyword can be used multiple times to define more than one pre-filtering SMARTS criterion.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-UNSETTOSINGLEBO</code></p>
+		</td>
+		<td width="60%"><p>Use this keyword (no value needed) to request the conversion of all UNSET bond types to SINGLE bond types in any molecule to be fragmented.</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Fragmentation</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-CUTTINGRULESFILE</code></p>
+		</td>
+		<td width="60%"><p>The pathname to the file defining cutting rules (see <a href="#Toc2222_2">Cutting rules file</a>).</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Post-Fragmentation Filtering</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-IGNORABLEFRAGMENTS</code></p>
+		</td>
+		<td width="60%"><p>The pathname to a file containing fragments that can be ignored. Any fragment isomorphic to any of the ignorable fragments will be
+		rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-TARGETFRAGMENTS</code></p>
+		</td>
+		<td width="60%"><p>The pathname to fragments to be collected. Only fragment isomorphic to any of the target fragments will be kept.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-ISOMORPHICSAMPLESIZE</code></p>
+		</td>
+		<td width="60%"><p>Specifies the number (integer) of isomorphic fragments to collect. Isomorphic versions of any fragment for which this number of versions has already been collected will be rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REMOVEDUPLICATES</code></p>
+		</td>
+		<td width="60%"><p>Use this keyword (no value needed) to request that any fragment that is isomorphic to a fragment already found should be rejected. Corresponds to setting FRG-ISOMORPHICSAMPLESIZE=1</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-MWSLOTSIZE</code></p>
+		</td>
+		<td width="60%"><p>Specifies the size (integer) of the slots used to collect fragment by molecular weight when indexing fragments to facilitate fast comparison against the bulk of generated fragments. Small value make search for duplicate fragments fast, but increase the number of stored files.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTMINORISOTOPES</code></p>
+		</td>
+		<td width="60%"><p>Use this keyword (no value needed) to request the removal of any fragment containing isotopes different from the major isotope of a specific element (e.g., <sup>13</sup>C, <sup>2</sup>H)</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTELEMENT</code></p>
+		</td>
+		<td width="60%"><p>Specifies an elemental symbol. Any fragment containing such element will be rejected. This keyword can be used multiple times to define more than one criterion.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJFORMULALESSTHAN</code></p>
+		</td>
+		<td width="60%"><p>Specifies the minimum molecular formula of any fragment (Example of format <code>C6 H12 O6</code>). Requires that all fragments have at least at least the given molecular formula. Only one such keyword can be used.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJFORMULAMORETHAN</code></p>
+		</td>
+		<td width="60%"><p>Specifies the maximum molecular formula of any fragment (Example of format <code>C6 H12 O6</code>). Triggers rejection of fragments with a molecular formula counting more atoms than what defined by the value of this keyword for any of the elements. This keyword can be used multiple times.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTAPCLASS</code></p>
+		</td>
+		<td width="60%"><p>Specifies a string that identifies the beginning of APClasses leading to rejection of fragments. For example, using <code>myClass</code> as value of this keyword will cause rejection of fragment holding attachment points of APClass <code>myClassA:0</code>, <code>myClassA:1</code>, or <code>myClassB:0</code>.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTAPCLASSCOMBINATION</code></p>
+		</td>
+		<td width="60%"><p>Specifies a set of string where each string identifies the beginning of APClasses. Causes the rejection of fragments holding at least one attachment point matching each string.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-MAXFRAGSIZE</code></p>
+		</td>
+		<td width="60%"><p>Specified the maximum number (integer) of non-hydrogen atom. Fragments with more atoms will be rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-MINFRAGSIZE</code></p>
+		</td>
+		<td width="60%"><p>Specified the minimum number (integer) of non-hydrogen atom. Fragments with less atoms will be rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-REJECTSMARTS</code></p>
+		</td>
+		<td width="60%"><p>Specifies a SMARTS query for substructures leading to rejection of fragments. This keyword can be used multiple times. Fragments matching any of the given SMARTS will be rejected.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-RETAINSMARTS</code></p>
+		</td>
+		<td width="60%"><p>Specifies a SMARTS query for substructures leading to retention of fragments. This keyword can be used multiple times. Fragments not matching any of the given SMARTS will be rejected.</p>
+		</td>
+	</tr>
+	</tr>
+		<tr>
+		<td colspan="2" width="100%" valign="middle" style="background: #eeeeee"><p>Analysis of Isomorphic Fragments</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-CLUSTERIZEANDCOLLECT</code></p>
+		</td>
+		<td width="60%"><p>This keyword requests the clustering of isomorphic fragments by RMSD upon frozen geometry superposition, and the identification of the most representative geometry of each cluster. Use this keyword with value equal to either <code>CENTROIDS</code>, to collect the cluster centroid as the most representative geometry for each cluster, or <code>MOSTCENTRAL</code> to choose the actual fragment that is closest (smallest RMSD upon superposition) to the cluster centroid.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-SAVECLUSTERS</code></p>
+		</td>
+		<td width="60%"><p>Use this keyword (with no value) to request the generation of one file collecting all members of a cluster of geometries for isomorphic fragments. This will generate one file for each cluster.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-SIZEUNIMODALPOPULATION</code></p>
+		</td>
+		<td width="60%"><p>Specifies the number of geometries (integer) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-MAXNOISEUNIMODALPOPULATION</code></p>
+		</td>
+		<td width="60%"><p>Specified the maximum amount of noise (double, in angstrom) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.</p>
+		</td>
+	</tr>
+	<tr valign="middle">
+		<td width="40%"><p><code>FRG-SDWEIGHTUNIMODALPOPULATION</code></p>
+		</td>
+		<td width="60%"><p>Specifies the weight (double) of the standard deviation when calculating the threshold RMSD value for distinguishing geometries. The threshold is calculated as 
+			<pre>threshold_RMSD = mean_RMSD + factor * standard_deviation_RMSD</pre></p>
+		</td>
+	</tr>
+</table>
+
 
 <br>
 <h3 class="western"><a name="Toc88888_1"></a>Stand-alone Graph Editor</h3>
@@ -1953,7 +2174,7 @@ where: <ul>
 	<li><i>bt<sub>i</sub></i> defined the bond type of the APClass of attachment point <i>i</i>. Possible values are <code>NONE</code>, <code>SINGLE</code>, <code>DOUBLE</code>, <code>TRIPLE</code>, <code>QUADRUPLE</code>, <code>ANY</code>, and <code>UNDEFINED</code>.</li>
 	<li><i>x<sub>i</sub></i>, <i>y<sub>i</sub></i>, and <i>z<sub>i</sub></i> are Cartesian coordinates defining the "AP vector". For APs rooted on atoms (the source atoms) the AP vector defines the ideal position where the atom that can be connected with the source atom should be placed upon formation of the bond.</li>
 </ul>
-In the SDF file strings pertaining a single source atom are separated by spaces. So the overall result is the following:
+In the SDF file strings pertaining a single source atom are separated by spaces. So the overall result is the following:</p>
 <pre class="file">
 &hellip;
 &gt;&nbsp;&lt;ATTACHMENT_POINTS&gt;
@@ -1969,6 +2190,62 @@ n<sub>1</sub>#c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub>:x<sub>A</sub>%y<sub>A<
 </ul>
 </p>
 <p>Additional fields can be present in SDF files saved by DENOPTIM. In particular, DENOPTIM new version always saves the JSON format as one of the properties of the SDF file format.</p>
+
+
+
+<h3 class="western"><a name="Toc2222_2"></a>Cutting rules file</h3>
+<p>The file defining cutting rules is a text file with keyword-labelled lines. Each line starting with the <code>CTR</code> keyword defines the specifics for a single cutting rule acoording to the following syntax:</p>
+<pre>CTR rulename priority 1st_atm_SMARTS 2nd_atm_SMARTS bnd_SMARTS [options]</pre>
+<p>Where:
+<ul>
+<li><code>rulename</code> is a single word defining the mane of the cutting rule. The class of attachment points generated by the action of the cutting rule derives from this rule name.</li>
+<li><code>priority</code> is an integer (with sign) that is used to specify the priority
+order for the application of cutting rules. The priority follows ascending order.</li>
+<li><code>1st_atm_SMARTS</code> is an atom SMARTS query matching one of the atoms involved in the bond.</li>
+<li><code>2nd_atm_SMARTS</code> is an atom SMARTS query matching one of the atoms involved in the bond.</li>
+<li><code>bnd_SMARTS</code> is a bond component of the SMARTS query matching the bond between the atoms identified above. The complete bond SMARTS is built by merging the three components in the order <code>1st_atm_SMARTS + bnd_SMARTS + 2nd_atm_SMARTS</code></li>
+<li><code>options</code> is an optional list of settings that apply to the cutting rule.
+For a candidate bond to be considered a true match, all optional conditions must be satisfied simultaneously (i.e., logical AND).
+  <ul>
+  <li><code>HAPTO</code> specifies that the bond matched by the cutting rule has to be part of multihapto system. Use of this option is not compatible with RING and OMRING options.</li>
+  <li><code>RING&gt;n</code> (where n is an integer) specifies that the target bond, if part of an organic ring (i.e., not containing any metal atoms), is considered a true match only if the number of ring members is greater than <code>n</code>.</li>
+  <li><code>OMRING&gt;n</code> (where n is an integer) works like RING&gt;n but is restricted to rings involving one or more metals.</li>
+  </ul>
+</li>
+</ul></p>
+<p>Here is an example of the content of a cutting rule file:</p>
+<pre class="file">
+&hellip;
+CTR sArAlkM 2 [$(C([#1])(C)C)] [$(cCC)] -!@
+CTR MAlkene -1 [Pt] [$([#6;X4]1~[#6;X4][Pt]1)] - HAPTO
+&hellip;
+</pre>
+<p>A file with a complete set of cutting rules is available under the <code>test/functional_tests/t30/data</code> folder of the distribution folder.</p>
+
+
+<h3 class="western"><a name="Toc2222_3"></a>Formula file</h3>
+<p>The file collecting molecular formulae for chemical structures provided in an associated SDF file is a text file with keyword-labelled lines. Each entry, i.e., each structure, is associated with a group of lines starting with the keyword <code>REFCODE:</code>. The group of line must contain the keyword <code>Formula:</code> which identifies the line containing the actual molecular formula. The molecular formula can include multiple molecules, and variable stoichiometric factors. Example of valid formulae are:
+<ul> 
+	<li><code>C6 H12 O6</code></li>  
+	<li><code>(C18 V2 H16)n,2n(H2 O1),Cl 1-</code></li>  
+	<li><code>(C44 H32 Fe2 N24 Pd2)n,6(H2 O1)</code></li>
+	<li><code>C19 H27 N2 O9 Zn2 1+,C1 N1 S1 1-</code></li>
+	<li><code>C9 H24 P2 2+,2(C1 F3 O3 S1 1-)</code></li>
+</ul></p>
+<p>Here is an example of the content of a formula file containing the molecular formula for multiple structure. Each structure is identified by the <code>REFCODE</code> identifier.
+<pre class="file">
+&hellip;
+REFCODE: ABCDEF
+  &hellip;
+  Formula:      C6 H12 O6
+  &hellip;
+
+REFCODE: GHIJKL
+  &hellip;
+  Formula:      (H2 O), C2 H6 O
+  &hellip;
+&hellip;
+</pre></p>
 
 
 
@@ -2135,7 +2412,9 @@ $$$$
 
 
 <h3 class="western"><a name="Toc9999_3"></a>Graph Editing Task Files</h3>
-<p>Example of JSON syntax for defining the most detailed vertex query. Any of the fields can be left removed. For example, removing the line with <code>"vertexId"</code> will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining <code>"incomingEdgeQuery"</code> (i.e., all the lines included in the curly brackets immediately following "incomingEdgeQuery") will make the vertex query match any vertex irrespectively of the properties of the edge that connects such vertex to its parent vertex (if any).</p>
+<p>Example of JSON syntax for defining the most detailed vertex query and the editing task to perform.</p> 
+
+<p>In The vertex query (see example below), any of the fields can be removed. For example, removing the line with <code>"vertexId"</code> will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining <code>"incomingEdgeQuery"</code> (i.e., all the lines included in the curly brackets immediately following <code>"incomingEdgeQuery"</code>) will make the vertex query match any vertex irrespectively of the properties of the edge that connects such vertex to its parent vertex (if any).</p>
 <pre>
   "vertexQuery": {
     "vertexId": 1,
@@ -2169,7 +2448,22 @@ $$$$
   }
 </pre>
 
-<p>A sequence of graph editing tasks is defining using JSON syntax as following:</p>
+<p>The currently available graph editing tasks are:
+<ul>
+	<li>"CHANGEVERTEX": Changes any vertex matching the vertex query with the vertex given as input and using the given AP mapping mask. Requires the definition of these alternative set of additional fields:
+		<ul>
+			<li><code>incomingBBId</code>, <code>incomingBBTyp</code>, and <code>incomingAPMap</code>, which are respectively the index (0-based) of the building block to use to replace any matched vertex, it's type, and the mapping of attachment points (by 0-based index) to use when connecting the incoming vertex to the existing graph. Use of this functionality requires the definition of a space of building blocks. The space needed to perform the graph editing tasks may be different from that used to create the graph to edit, but is defined using the usual keywords defining the <a href="#Toc40912_1191730726">Space of Graphs Building Blocks</a> in the primary input file (NB: not in the graph editing task file).</li>
+			<li><code>incomingGraph</code> and <code>incomingAPMap</code>, which are respectively the JSON fomatted definition of a subgraph (NB: it may contain a single vertex) and the mapping of attachment points (by 0-based index) to use when connecting the incoming subgraph to the existing graph.</li>
+		</ul></li>
+	<li>"DELETEVERTEX": delete any vertex matching the vertex query.</li>
+	<li>"REPLACECHILD": Replaces any child (or tree of children) of any vertex matching the vertex query with a given incoming graph that may contain one or more vertexes. Requires the definition of these additional fields:
+		<ul>
+			<li><code>incomingGraph</code> to provide a JSON format of the graph to be inserted as a replacement to the child/children tree of any matched vertex.</li>
+			<li><code>idAPOnIncomingGraph</code> to provide the AP identifier (not the index!) of the AP on the incoming graph to use for connecting the edited graph with the incoming graph.</li>
+		</ul></li>
+</ul></p>
+
+<p>The graph edit tasks can be more than one. A sequence of graph editing tasks is defining using JSON syntax as following:</p>
 <pre>
 [
   {
@@ -2182,7 +2476,6 @@ $$$$
   }
 ]
 </pre>
-
 <hr>
 
 

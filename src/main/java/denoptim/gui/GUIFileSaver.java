@@ -95,7 +95,7 @@ public class GUIFileSaver
         {
             return null;
         }
-        FileAndFormat ff = new FileAndFormat(file,FileFormat.fromString(
+        FileAndFormat ff = new FileAndFormat(file, FileFormat.fromString(
                 fileChooser.getFileFilter().getDescription(), DataKind.VERTEX));
         return ff;
     }
