@@ -20,7 +20,7 @@ package denoptim.graph;
 
 /**
  * A light-weight candidate is a very low-demanding collection of data upon
- * a specific candidate item. This dies NOT include the {@link DGraph}
+ * a specific candidate item. This does NOT include the {@link DGraph}
  * or any molecular representation. The purpose of this class is to encapsulate 
  * only the lowest possible amount of information needed manipulate the item
  * in a larger list of items (e.g., when plotting evolution plots).
