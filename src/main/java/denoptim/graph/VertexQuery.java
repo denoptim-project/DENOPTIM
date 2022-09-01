@@ -22,7 +22,7 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 
 /**
- * Query for searching vertexes.
+ * Query for searching vertices.
  * @author Marco Foscato
  */
 
@@ -73,7 +73,7 @@ public class VertexQuery
      * @param bbType the query on vertex's building block type, or null,
      * @param bbID  the query on vertex's building block ID in the library of 
      * hit type, or null.
-     * @param level the level of the vertexes to match, or null. Remember level
+     * @param level the level of the vertices to match, or null. Remember level
      * is an integer that starts from -1.
      * @param eIn the edge query (filters candidates based on the connection of
      * a candidate with the rest of the graph) for incoming connections where

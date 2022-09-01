@@ -1101,10 +1101,10 @@ public class Fragment extends Vertex
 
     /**
      * A list of mutation sites from within this vertex.
-     * @param ignoredTypes a collection of mutation types to ignore. Vertexes
+     * @param ignoredTypes a collection of mutation types to ignore. vertices
      * that allow only ignored types of mutation will
      * not be considered mutation sites.
-     * @return the list of vertexes that allow any non-ignored mutation type.
+     * @return the list of vertices that allow any non-ignored mutation type.
      */
     
     @Override
