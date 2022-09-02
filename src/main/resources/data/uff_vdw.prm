@@ -145,7 +145,7 @@ atom        120    R     "Dummy atom"                   1     1.0      9
 #
 atom        121    ATP   "AttractorPLUS"                1     1.0      1
 atom        122    ATM   "AttractorMINUS"               1     1.0      1
-#
+atom        123    ATN   "AttractorNEUTRAL"             1     1.0      1
 #
 #
 #  Van der Waals Parameters 
@@ -274,4 +274,6 @@ vdw        118                3.2360     0.0110
 vdw        120                0.0000     0.0000
 # Atractors
 vdw        121                0.0000     0.0000
+vdw        122                0.0000     0.0000
+vdw        123                0.0000     0.0000
 
