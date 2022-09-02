@@ -245,6 +245,14 @@ public class FragmentClusterer
                 if (toRemoveClusters.contains(clusterJ))
                     continue;
                 
+                //TODO: consider re-aligning to test alternative mappings. This
+                // because the mapping is done once against the first item in 
+                // the sample, but to distinguish sample members N!=1 and M!=1
+                // a different mapping (i.e., a different isomorphism) might be
+                // preferable.
+                // Essentially, this means "get rid of the assumption that one 
+                // isomorphism is suitable to align all members of the sample.
+                
                 ClusterableFragment centroidJ = (ClusterableFragment) 
                         clusterJ.getCentroid();
                 

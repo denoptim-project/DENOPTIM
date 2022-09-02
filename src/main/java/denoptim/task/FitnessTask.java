@@ -323,6 +323,7 @@ public abstract class FitnessTask extends Task
             }
             catch (Throwable t)
             {
+                // TODO: why sync? Is it really needed?
                 synchronized (lock)
                 {
                     hasException = true;
