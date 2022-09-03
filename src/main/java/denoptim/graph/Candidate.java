@@ -22,6 +22,8 @@ import java.io.File;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -82,12 +84,13 @@ public class Candidate implements Comparable<Candidate>, Cloneable
     private String error;
     
     /**
-     * Flag signalling the presence of a fitness value associated
+     * Flag signaling the presence of a fitness value associated
      */
     private boolean hasFitness;
     
     /**
-     * ID of the generation this molecule belong to (or -1)
+     * ID of the generation at which this candidate was generated. This may not
+     * be the generation at which this candidate entered the population!
      */
     private int generationId = -1;
     
@@ -399,6 +402,11 @@ public class Candidate implements Comparable<Candidate>, Cloneable
     public IAtomContainer getFitnessProviderOutputRepresentation() throws DENOPTIMException
     {
         IAtomContainer iacForFitFile = iac;
+        if (iacForFitFile==null)
+        {
+            IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+            iacForFitFile = builder.newAtomContainer();
+        }
         iacForFitFile.setProperty(CDKConstants.TITLE, name);
         iacForFitFile.setProperty(DENOPTIMConstants.GCODETAG, graph.getGraphId());
         iacForFitFile.setProperty(DENOPTIMConstants.GRAPHTAG, graph.toString());
@@ -561,6 +569,12 @@ public class Candidate implements Comparable<Candidate>, Cloneable
     
 //------------------------------------------------------------------------------
     
+    /**
+     * The generation this candidate belong to is that in which it was generated.
+     * In asynchronous experiments, the generation at which a candidate is 
+     * generated and that when it enters the population may be different.
+     * @return the generation at which a candidate is generated.
+     */
     public int getGeneration()
     {
 	    return generationId;

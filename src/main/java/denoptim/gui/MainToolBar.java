@@ -318,8 +318,8 @@ public class MainToolBar extends JMenuBar
 							new JComboBox<String>(options);
 					cmbFiletype.setSelectedIndex(0);
 					JLabel msgText = new JLabel(String.format(
-							"<html><body width="
-							+ "'%1s'>Failed to detect file type automatically."
+							"<html><body width='%1s'>"
+							+ "Failed to detect file type automatically."
 							+ "<br>Please, specify how to interpret file "
 							+ "'" + file.getAbsolutePath() + "'.",270));
 					int res = JOptionPane.showConfirmDialog(open, 
@@ -526,10 +526,22 @@ public class MainToolBar extends JMenuBar
                 mainPanel.add(txt);
                 txt.displayContent(file);
                 break;
+                
+            case UNRECOGNIZED:
+                JOptionPane.showMessageDialog(this,
+                        "File format '" + fileFormat + "' not recognized.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE,
+                        UIManager.getIcon("OptionPane.errorIcon"));
+                break;
 			
 			default:
-				JOptionPane.showMessageDialog(this,
-						"File format '" + fileFormat + "' not recognized.",
+				JOptionPane.showMessageDialog(this,String.format(
+                        "<html><body width='%1s'>"
+						+ "There is no specific visual representation of file"
+						+ " format '" + fileFormat + "'. If you think there "
+						+ "should be a way to visually inspect this file, "
+						+ "please, write to the development team.",300),
 		                "Error",
 		                JOptionPane.ERROR_MESSAGE,
 		                UIManager.getIcon("OptionPane.errorIcon"));

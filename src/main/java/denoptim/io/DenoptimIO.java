@@ -208,6 +208,16 @@ public class DenoptimIO
                     data = graphs.get(0);
                 break;
             }
+            
+            case GENSUMMARY:
+            {
+                List<Candidate> cands = readGenerationFromSummary(file);
+                if (cands.size()>1)
+                    data = cands;
+                else
+                    data = cands.get(0);
+                break;
+            }
                 
             default:
                 throw new DENOPTIMException("Data from file of format '"
@@ -215,6 +225,53 @@ public class DenoptimIO
                         + "the development team.");
         }
         return data;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Reads a {@link FileFormat#GENSUMMARY} file and searches all the files
+     * defining each member of the population. If the pathnames found in
+     * {@link FileFormat#GENSUMMARY} do not exist, this method will try to
+     * build the candidate's files pathnames relative to the location of the 
+     * {@link FileFormat#GENSUMMARY}. This assumes that the original folder
+     * structure of a {@link FileFormat#GA_RUN} has been preserved.
+     * 
+     * @param file the generation summary file ({@link FileFormat#GENSUMMARY}) 
+     * to read
+     * @return population members
+     * @throws DENOPTIMException
+     */
+    public static List<Candidate> readGenerationFromSummary(File file) 
+            throws DENOPTIMException
+    {
+        ArrayList<Candidate> cands = new ArrayList<Candidate>();
+        List<String> pathnames = readPopulationMemberPathnames(file);
+        String genSummaryParentDir = file.getParent(); // GenXXX folder
+        for (String candPathname : pathnames)
+        {
+            File candFile = new File(candPathname);
+            if (candFile.exists())
+            {
+                cands.add(readCandidates(candFile).get(0));
+            } else if (genSummaryParentDir!=null) {
+                // Extract the possibly non-existing pathname where the
+                // candidates files were originally generated
+                String runFolderPathname = 
+                        candFile.getParentFile() // GenXXX
+                        .getParent(); // RUN###
+                if (runFolderPathname==null)
+                    throw new DENOPTIMException("Unable to find parent "
+                            + "folder for '"+ genSummaryParentDir +"'");
+                
+                String genAndMolPath = candFile.getAbsolutePath()
+                        .substring(runFolderPathname.length());
+                
+                cands.add(readCandidates(new File(
+                        genSummaryParentDir+genAndMolPath)).get(0));
+            }
+        }
+        return cands;
     }
     
 //------------------------------------------------------------------------------
@@ -785,8 +842,8 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Read the min, max, mean, and median of a population from
-     * "Gen.*\.txt" file
+     * Read the min, max, mean, and median of a population from 
+     * {@link FileFormat#GENSUMMARY} file.
      *
      * @param fileName  the pathname to the file to read.
      * @return list of data
@@ -826,8 +883,8 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Read the pathnames to the population members from a population summary
-     * "Gen.*\.txt" file
+     * Read the pathnames to the population members from a 
+     * {@link FileFormat#GENSUMMARY} file.
      *
      * @param fileName  the pathname to the file to read.
      * @return list of data
@@ -1304,10 +1361,24 @@ public class DenoptimIO
         String filename = file.getAbsolutePath();
         ArrayList<Candidate> candidates = new ArrayList<>();
         ArrayList<IAtomContainer> iacs = readSDFFile(file.getAbsolutePath());
+        
+        // Try to identify the generation at which this candidate was generated
+        int genID = -1;
+        if (file.getParentFile()!=null 
+                && file.getParentFile().getName().startsWith(
+                        DENOPTIMConstants.GAGENDIRNAMEROOT))
+        {
+            String genFolderName = file.getParentFile().getName();
+            genID = Integer.valueOf(genFolderName.substring(
+                    DENOPTIMConstants.GAGENDIRNAMEROOT.length()));
+        }
+        
         for (IAtomContainer iac : iacs) {
-            Candidate mol = new Candidate(iac, false, allowNoUID);
-            mol.setSDFFile(filename);
-            candidates.add(mol);
+            Candidate cand = new Candidate(iac, false, allowNoUID);
+            cand.setSDFFile(filename);
+            if (genID!=-1)
+                cand.setGeneration(genID);
+            candidates.add(cand);
         }
         return candidates;
     }
