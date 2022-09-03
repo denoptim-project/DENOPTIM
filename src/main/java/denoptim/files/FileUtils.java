@@ -458,7 +458,7 @@ public class FileUtils
                 break;
     		
     		case "TXT":
-                ff = FileFormat.GRAPHTXT;
+    		    ff = FileUtils.detectKindOfTXTFile(inFile.getAbsolutePath());
                 break;
                 
     		case "":
@@ -560,7 +560,7 @@ public class FileUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Looks into a text file and tries to understand is the file is a 
+     * Looks into a text file and tries to understand if the file is a 
      * collection of parameters for any specific DENOPTIM module.
      * @param fileName The pathname of the file to analyze
      * @return a the format of the parameter file or null.
@@ -571,6 +571,24 @@ public class FileUtils
             throws IOException
     {
     	return FileUtils.detectKindFile(fileName, FileFormat.getParameterFormats());
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Looks into a text file and tries to understand if the file is a 
+     * known text file. Note that parameters file, which are in fact text files,
+     * are not detected here ad they are treated by the dedicated method 
+     * {@link FileUtils#detectKindOfParameterFile(String)}.
+     * @param fileName The pathname of the file to analyze
+     * @return a the format of the text file or null.
+     * @throws IOException 
+     * @throws Exception
+     */
+    public static FileFormat detectKindOfTXTFile(String fileName) 
+            throws IOException
+    {
+        return FileUtils.detectKindFile(fileName, FileFormat.getTXTFormats());
     }
 
 //------------------------------------------------------------------------------
