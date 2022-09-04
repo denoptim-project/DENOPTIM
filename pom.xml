@@ -207,8 +207,17 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <version>2.0.0</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>add-third-party</goal>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
-          <verbose>true</verbose>
+          <verbose>false</verbose>
           <outputDirectory>licenses</outputDirectory>
           <missingFile>licenses/resolve_missing.properties</missingFile>
           <useMissingFile>true</useMissingFile>
