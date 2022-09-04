@@ -204,6 +204,20 @@
     </resources>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>2.0.0</version>
+        <configuration>
+          <verbose>true</verbose>
+          <outputDirectory>licenses</outputDirectory>
+          <missingFile>licenses/resolve_missing.properties</missingFile>
+          <useMissingFile>true</useMissingFile>
+          <licensesConfigFile>licenses/manually_configured_licenses.xml</licensesConfigFile>
+          <licensesOutputDirectory>licenses/dependencies</licensesOutputDirectory>
+          <cleanLicensesOutputDirectory>true</cleanLicensesOutputDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <version>3.2.0</version>
       </plugin>

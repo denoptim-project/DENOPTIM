@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<licenseSummary xmlns="http://mojo.codehaus.org/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://mojo.codehaus.org/ licenses.xsd">
+  <dependencies>
+    <dependency>
+      <groupId>openchart</groupId>
+      <artifactId>openchart</artifactId>
+      <licenses>
+        <license>
+          <name>The GNU Lesser General Public License, Version 2.1</name>
+          <url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>java3d</groupId>
+      <artifactId>vecmath</artifactId>
+      <licenses>
+        <license>
+          <name>GNU General Public License version 2</name>
+          <url>https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>javax.vecmath</groupId>
+      <artifactId>vecmath</artifactId>
+      <licenses>
+        <license>
+          <name>GNU General Public License, version 2, with the Classpath Exception</name>
+          <url>https://openjdk.org/legal/gplv2+ce.html</url>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.jmol</groupId>
+      <artifactId>jmol</artifactId>
+      <licenses>
+        <license>
+          <name>The GNU Lesser General Public License, Version 2.1</name>
+          <url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <licenses>
+        <license>
+          <name>The Apache Software License, Version 2.0</name>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>org.biojava.thirdparty</groupId>
+      <artifactId>forester</artifactId>
+      <licenses>
+        <license>
+          <name>The GNU Lesser General Public License, Version 2.1</name>
+          <url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+  </dependencies>
+</licenseSummary>
