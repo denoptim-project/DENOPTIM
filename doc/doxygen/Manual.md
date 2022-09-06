@@ -137,6 +137,7 @@ Here the method [isIsomorphicTo](#denoptim.graph.Dgraph.isIsomorphicTo()) is run
 | denoptim.files | Package for the management of the file provided to or by DENOPTIM |
 | denoptim.constants | Package that collects all the general constants of DENOPTIM |
 | denoptim.exception| Package that handles the eventual exception thrown by DENOPTIM |
+| denoptim.ion | package that contains all the utility methods for input and output |
 
 
 ## Test
