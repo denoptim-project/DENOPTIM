@@ -10,10 +10,9 @@ import denoptim.utils.MathUtils;
 
 /**
  * A cluster with a centroid that can be updated after definition of the cluster.
- * The centroid is updated every time we request the get the centroid and there
+ * The centroid is updated every time we request to get the centroid and there
  * has been an operation that changed the members (i.e., a points in the cluster)
- * of this cluster (i.e., 
- * addition or removal of members).
+ * of this cluster (i.e., addition or removal of members).
  * 
  * @author Marco Foscato
  */

@@ -377,7 +377,7 @@ public class FragmenterTools
                             candidatesForHapto.add(tbForHapto.getAtmSubClass1());
                     }
 
-                    // Select atms in n-hapto system: contiguous neighbors with  
+                    // Select atoms in n-hapto system: contiguous neighbors with  
                     // same type of bond with the same central atom.
                     Set<IAtom> atmsInHapto = new HashSet<IAtom>();
                     atmsInHapto.add(tb.getAtmSubClass1());
@@ -391,7 +391,7 @@ public class FragmenterTools
                         continue;
                     }
 
-                    // Check existence of all bonds involved in multihapto system
+                    // Check existence of all bonds involved in multi-hapto system
                     boolean isSystemIntact = true;
                     for (IAtom ligAtm : atmsInHapto)
                     {
@@ -1082,7 +1082,7 @@ public class FragmenterTools
                         continue loopOverCombinations;
                     // Here we do have at least one AP satisfying the condition.
                 }
-                // Here we managed o satisfy all conditions. Therefore, we can
+                // Here we manage or satisfy all conditions. Therefore, we can
                 // reject this fragment
                 
                 String allCondsAsString = "";

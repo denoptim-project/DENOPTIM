@@ -164,7 +164,7 @@ public class ThreeDimTreeBuilder
 //------------------------------------------------------------------------------
 
     /**
-     * Created a three-dimensional molecular representation from a given 
+     * Creates a three-dimensional molecular representation from a given 
      * {@link DGraph}. The conversion creates also two maps to retrace the 
      * attachment points within the final 3D structure both based on 
      * the ID of the source DENOPTIMVertex and correspondence to DENOPTIMEdge.

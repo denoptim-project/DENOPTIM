@@ -23,7 +23,7 @@ import denoptim.utils.MathUtils;
 import denoptim.utils.Randomizer;
 
 /**
- * <p>This tool clusters fragment based on geometrical features. For each fragment 
+ * <p>This tool clusters fragments based on geometrical features. For each fragment 
  * all atoms and all attachment points are used to define a set of points in 
  * space (see {@link ClusterableFragment}). Then the RMSD of the 
  * points' position upon superposition is used to decide if geometries 
@@ -31,7 +31,7 @@ import denoptim.utils.Randomizer;
  * is calculated from a unimodal distribution of geometries generated from the 
  * centroid of the cluster by altering its set of geometries with normally 
  * distributed noise. The population of these normally distorted geoemtries
- * is unimodal, by definition, and is used to calculate the thershold RMSD as
+ * is unimodal, by definition, and is used to calculate the threshold RMSD as
  * <pre>
  * threshold = RMSD_mean + x * RMSD_Standard_deviation
  * </pre>

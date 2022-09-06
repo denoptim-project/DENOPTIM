@@ -18,13 +18,12 @@ import denoptim.graph.FragIsomorphNode;
 import denoptim.graph.Fragment;
 
 /**
- * Represents a fragment that can by clustered based on the 3*N coordinate of
+ * Represents a fragment that can be clustered based on the 3*N coordinate of
  * atoms and attachment points, i.e., N is the sum of atoms and attachment points.
  * Note that dummy atoms meant to break linearities 
  * (i.e., {@value DENOPTIMConstants#DUMMYATMSYMBOL} 
  * with only one connected neighbor)
- * are not part of the pool of 
- * N points.
+ * are not part of the pool of N points.
  */
 public class ClusterableFragment implements Clusterable
 {
