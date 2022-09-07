@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Where
-        run:
+        run: |
           pwd
           ls
       - name: Doxygen Action
