@@ -1,0 +1,16 @@
+name: 'Doxygen Documentation'
+
+on:
+  push:
+    branches:
+      - 'devel_docs'
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+
+jobs:
+    steps:
+    - name: documentation
+      uses: mattnotmitt/doxygen-action@v1.9.4
+      with:
+        working-directory: 'submodule/'
+        doxyfile-path: 'doc/doxygen'
