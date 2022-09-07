@@ -15,6 +15,6 @@ jobs:
     steps:
       - name: Doxygen Action
         uses: mattnotmitt/doxygen-action@1.9.4
-          with:
-            working-directory: 'submodule/'
-            doxyfile-path: 'doc/doxygen'
+        with:
+          working-directory: 'submodule/'
+          doxyfile-path: 'doc/doxygen'
