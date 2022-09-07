@@ -10,6 +10,8 @@ jobs:
     runs-on: [ubuntu-latest]
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@devel_docs
       - name: Where
         run: |
           pwd
@@ -19,4 +21,3 @@ jobs:
         with:
           doxyfile-path: ./Doxyfile
           working-directory: ./doc/doxygen
-          
