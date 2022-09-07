@@ -877,18 +877,6 @@ WARN_LOGFILE           =
 INPUT                  = ../../src/main/java ../../src/test/java\
                         user_manual.md\
                         Manual.md\
-                        Fitness.md\
-                        EvolutionaryAlgorithm.md\
-                        GraphEditing.md\
-                        GUI.md\
-                        GraphIsomorphism.md\
-                        GeneticOperations.md\
-                        FragmentSpaceExploration.md\
-                        ListOfGraphs.md\
-                        3DBuilder.md\
-                        Dry.md\
-                        GenerationMethods.md\
-                        SelectionMethods.md\
 
 
 # This tag can be used to specify the character encoding of the source files
