@@ -8,6 +8,8 @@ on:
 jobs:
   documentation:
     runs-on: [ubuntu-latest]
+    env:
+      working-directory: ./doc/doxygen
 
     steps:
       - name: Where
@@ -17,4 +19,5 @@ jobs:
       - name: Doxygen Action
         uses: mattnotmitt/doxygen-action@1.9.4
         with:
+          working-directory: ${{env.working-directory}}
           doxyfile-path: 'doc/doxygen'
