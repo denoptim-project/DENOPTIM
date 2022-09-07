@@ -8,7 +8,7 @@ on:
 jobs:
   documentation:
     runs-on: ${{ matrix.os }}
-        os: [ubuntu-latest, macos-latest, windows-latest]
+         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
       - name: Doxygen Action
