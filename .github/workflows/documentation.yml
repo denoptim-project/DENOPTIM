@@ -7,7 +7,7 @@ on:
 
 jobs:
     steps:
-    - name: documentation
+    name: documentation
       uses: mattnotmitt/doxygen-action@v1.9.4
       with:
         working-directory: 'submodule/'
