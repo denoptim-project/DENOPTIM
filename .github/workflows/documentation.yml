@@ -11,11 +11,11 @@ jobs:
 
     steps:
       - name: Where
-        run: 
+        run:
           pwd
           ls
       - name: Doxygen Action
         uses: mattnotmitt/doxygen-action@1.9.4
         with:
-          working-directory: '../..'
+          working-directory: 'doxygen'
           doxyfile-path: './Doxyfile'
