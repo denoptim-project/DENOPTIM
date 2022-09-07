@@ -10,9 +10,10 @@ jobs:
     runs-on: [ubuntu-latest]
 
     steps:
+      - name: Where
+        run:
+          pwd
       - name: Doxygen Action
-         run: |
-           pwd
         uses: mattnotmitt/doxygen-action@1.9.4
         with:
           working-directory: '../..'
