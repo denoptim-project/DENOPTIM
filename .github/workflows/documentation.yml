@@ -11,7 +11,9 @@ jobs:
 
     steps:
       - name: Doxygen Action
+         run: |
+           pwd
         uses: mattnotmitt/doxygen-action@1.9.4
         with:
-          working-directory: 'doc/'
+          working-directory: '../..'
           doxyfile-path: './Doxyfile'
