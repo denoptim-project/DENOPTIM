@@ -5,7 +5,7 @@ Introduction
 ------------
 
 The different capabilities of DENOPTIM are well described by its different [Programs](#Programs).
-Each program works in a stand-alone fashion or in parallel to others, and the starting point for each one of these programs is the class denoptim.Main in the homonymous package.
+Each program works in a stand-alone fashion or in parallel to others, and the starting point for each one of these programs is the class denoptim.main in the homonymous package.
 (due to maven structure)
 
 From the command line a typical input has the form:
