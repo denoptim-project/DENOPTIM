@@ -862,7 +862,7 @@ WARN_FORMAT            = "$file:$line: $text"
 # specified the warning and error messages are written to standard output
 # (stdout).
 
-WARN_LOGFILE           =
+WARN_LOGFILE           = doxygen_warn.log
 
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
@@ -876,7 +876,7 @@ WARN_LOGFILE           =
 
 INPUT                  = ../../src/main/java ../../src/test/java\
                         user_manual.md\
-                        Manual.md\
+                        developer_manual.md\
 
 
 # This tag can be used to specify the character encoding of the source files
