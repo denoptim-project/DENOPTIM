@@ -27,17 +27,10 @@ The command is firstly parsed, checked and collected in a so-called
 [Behavior](#denoptim.main.Behavior).
 
 This step verifies the validity of the input command and the input files.
-Once this step is completed, this information is used to build a __ProgramTask__ (i.e., the program requested by the user).
+Once this step is completed, this information is used to build an implementation of [ProgramTask](#denoptim.task.ProgramTask) (i.e., the program requested by the user). These classes can be found in subpackages of denoptim.programs.
+[ProgramTask](#denoptim.task.ProgramTask) has the method
+[runProgram()](#denoptim.programs.denovo.GARunner.runProgram()) that performs the following steps:
 
-A ProgramTask is defined by a __programTaskImplememter__, the class used to start the program, and the input files as its argumemts.
-
-The ProgramTaskImplementer is a class specific to each program. These classes can be found in the packages named denoptim.programs."*" (where * stands for a name associated to the given program).
-Each one of these classes executes a method call   
-
-[runProgram()](#denoptim.programs.denovo.GARunner.runProgram())
-
-
-This method has a similar structure for all the programs with the actions:
 *	Read the parameters file
 *	Check the parameters
 *	Process the parameters
@@ -86,7 +79,7 @@ As usual, after passing by Main, this run is hadled by its ProgramTask implement
 This class handles the possible root graphs provided buy the user and grows them through all the possible combinations (given the Fragment Space) layer-by-layer stopping at the level expressed by the user.
 All the combinations of fragments that can be attached to a given root graph are obtained with the class [FragsCombinationIterator](#denoptim.fragspace.FragsCombinationIterator) in the package denoptim.fragspace.
 The construction is done in an asynchronous fashion and each task of building a new candidate is executed by the class [GraphBuildingTask](#denoptim.combinatorial.CombinatorialExplorerByLayer) in the same package. This class extends each graph as specified, relying mainly on the package denoptim.graph. Each task can than call other external subtasks for generating 3D molecular models (denoptim.molecularmodeling) or for fitness evaluation (denoptim.fitness).
-Being usually composed of a great number of tasks and hence being prone to errors this run periodically generates [CheckPoints](#denoptim.combinatoral.CheckPoint). These are collections of all the relevant info needed to keep track of the history of all the candidates generated so far, and, in case or failure, work as starting points for further attempts.
+Being usually composed of a great number of tasks and hence being prone to errors this run periodically generates [CheckPoints](#denoptim.combinatorial.CheckPoint). These are collections of all the relevant info needed to keep track of the history of all the candidates generated so far, and, in case or failure, work as starting points for further attempts.
 
 
 ### Graph Editing {#GE}
@@ -114,19 +107,19 @@ In the progress of the fitness evaluation program there is a difference from oth
 ### 3D Molecular Models Builder {#B3D}
 
 
-The programTask implementer for this run is the class [MolecularModelBuilder](#denoptim.programs.molecularmodelbuilder.MolecularModelBuilder) in the package denoptim.programs.molecularmodelbuilder. This program constructs a 3D molecular model given a graph of a DENOPTIM candidate. The class that actually handles the construction is [MultiMolecularModelBuilder](#denoptim.molecularmodeling.MultiMolecularModelBuilder) in the package denoptim.molecularmodeling. Here the 3D model is constructed with also relying on the package denoptim.integration.tinker (see [here](#ThreeDBuilder)]). Each model is managed and stored as a [ChemicalObjectModel](#denoptim.molecularmodeling.ChemicalObjectModel).
+The programTask implementer for this run is the class [MolecularModelBuilder](#denoptim.programs.moldecularmodelbuilder.MolecularModelBuilder) in the package denoptim.programs.molecularmodelbuilder. This program constructs a 3D molecular model given a graph of a DENOPTIM candidate. The class that actually handles the construction is [MultiMolecularModelBuilder](#denoptim.programs.moldecularmodelbuilder.MolecularModelBuilder) in the package denoptim.molecularmodeling. Here the 3D model is constructed with also relying on the package denoptim.integration.tinker (see [here](#ThreeDBuilder)]). Each model is managed and stored as a [ChemicalObjectModel](#denoptim.molecularmodeling.ChemicalObjectModel).
 
 
 ### Graph Isomorphism Analyzer {#GI}
 
 
-This program is implemented in the class [Isomorphism](#denoptim.programs.isomorphism.Isomorphism) in the package denoptim.programs.isomorphism. Here two graphs are compared by means of the method [isIsomorphicTo](#denoptim.graph.Dgraph.isIsomorphicTo()) defined in the class [DGraph](#denoptim.graph.DGraph) in the package denoptim.graph. Here the graph are compared with the Vento-Foggia algorithm(add link) using the external library org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector. (see the user manual for more [info](#GraphIsomorphism)).
+This program is implemented in the class [Isomorphism](#denoptim.programs.isomorphism.Isomorphism) in the package denoptim.programs.isomorphism. Here two graphs are compared by means of the method [isIsomorphicTo](#denoptim.graph.DGraph.isIsomorphicTo()) defined in the class [DGraph](#denoptim.graph.DGraph) in the package denoptim.graph. Here the graph are compared with the Vento-Foggia algorithm(add link) using the external library org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector. (see the user manual for more [info](#GraphIsomorphism)).
 
 ### Graph List Comparator {#CLG}
 
 
-This program allows to deal with lists of graphs and more specifically, search for denoptim isomorphism within these lists. The run is implemented by the class [GraphListsHandler](#denoptim.programs.graphlistshandler.GraphListsHandler) in the package denoptim.programs.graphlistshandler.
-Here the method [isIsomorphicTo](#denoptim.graph.Dgraph.isIsomorphicTo()) is run through all the lists provided in the input files.
+This program allows to deal with lists of graphs and more specifically, search for denoptim isomorphism within these lists. The run is implemented by the class [GraphListsHandler](#denoptim.programs.graphlisthandler.GraphListsHandler) in the package denoptim.programs.graphlistshandler.
+Here the method [isIsomorphicTo](#denoptim.graph.DGraph.isIsomorphicTo()) is run through all the lists provided in the input files.
 
 
 ### Graphical User Interface {#GUI}
