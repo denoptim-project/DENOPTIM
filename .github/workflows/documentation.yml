@@ -20,6 +20,10 @@ jobs:
         with:
           doxyfile-path: ./Doxyfile
           working-directory: ./doc/doxygen
+
+      - name: Check broken links
+         run:! grep -q "\.md:" doxygen_warn.log
+
       # Deploy the HTML documentation to GitHub Pages
       - name: GH Pages Deployment
         uses: peaceiris/actions-gh-pages@v3
