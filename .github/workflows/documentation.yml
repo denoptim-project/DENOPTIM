@@ -22,7 +22,7 @@ jobs:
           working-directory: ./doc/doxygen
 
       - name: Check broken links
-        run:! grep -q "\.md:" doxygen_warn.log
+        run: ! grep -q "\.md:" doxygen_warn.log
 
       # Deploy the HTML documentation to GitHub Pages
       - name: GH Pages Deployment
