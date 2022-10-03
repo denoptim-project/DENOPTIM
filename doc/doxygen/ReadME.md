@@ -1,13 +1,10 @@
 Doxygen Documentation                  
 ======================
 
-DENOPTIM's Documentation is built with Doxygen.
-See [here](https://doxygen.nl/index.html) for more information about Doxygen and its use.
 
-This directory contains all the documents used to construct the documentation and
-the Doxyfile and DoxygenLayout files are the one used to manage doxygen input, ouput and relationships.
+This directory contains all the files used to construct the documentation with [Doxygen](https://doxygen.nl/index.html). The Doxyfile and DoxygenLayout files are the one used to manage doxygen input, ouput and relationships.
 
-In case some modifications occur in the the new documentation is build by executing the command
+In case some modifications occur in the the new documentation is built by executing the command
 
   doxygen
 
@@ -22,4 +19,4 @@ If instead you want to learn about DENOPTIM software architecture and its logic 
 
 [Developer's Manual](developer_manual.md)
 
-The two manuals are extensively interlinked to aid better comprehension.
+The two manuals are extensively interlinked to aid a better comprehension.

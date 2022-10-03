@@ -78,7 +78,7 @@ Documentation
 
 We invite the reader to go through the following introduction to learn the fundamentals of DENOPTIM, its methods and terminology.
 It follows the user's manual of the software, which is meant to elucidate the programs DENOPTIM can run and explain their use. 
-Throughout the manual there are also several references to the [developer's manual](Manual.md) which is meant instead to elucidate aspects more related to DENOPTIM's software architecture and its algorithms programming. 
+Throughout the manual there are also several references to the [developer's manual](developer_manual.md) which is meant instead to elucidate aspects more related to DENOPTIM's software architecture and its algorithms programming. 
 
 * * *
 Introduction to DENOPTIM
@@ -327,7 +327,7 @@ A FragSpaceExplorer run (or FSE run) can be performed either by defining the inp
 
     denoptim -r FSE input_parameters_file
 
-where `input_parameters_file` is a text file collecting the configuration parameters for the FragSpaceExplorer program. In particular, the only required input is the [definition of the BB Space](#BBSpace). The `input_parameters_file` file can have any name, and contains one input parameter per line. The `#` character is used to denote a comment and lines starting with this character are not processed. Each input parameter is specified by means of a keyword. The complete list of keywords is available in the [Keywords](##Keywords) section. Examples of input files can be found in the test folder. Note that `input_parameters_file` file can be generated with the GUI from "New Virtual Screening" button.
+where `input_parameters_file` is a text file collecting the configuration parameters for the FragSpaceExplorer program. In particular, the only required input is the [definition of the BB Space](#BBSpace). The `input_parameters_file` file can have any name, and contains one input parameter per line. The `#` character is used to denote a comment and lines starting with this character are not processed. Each input parameter is specified by means of a keyword. The complete list of keywords is available in the [Keywords](#Keywords) section. Examples of input files can be found in the test folder. Note that `input_parameters_file` file can be generated with the GUI from "New Virtual Screening" button.
 
 ### FragSpaceExplorer Output {#FragSpaceExplorerOutput}
 
@@ -460,9 +460,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### Definition of the Space of Graph Building Blocks (BB Space) {#BBSpace}
-
- 
+### Definition of the Space of Graph Building Blocks(BB Space) {#BBSpace}
 
 | Keyword | Description |
 | :------- | :----------- |
@@ -626,7 +624,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FP-No3dTreeModel`| Prevents reporting candidates using a three-dimensional molecular model that is built by aligning each building block to the attachment point vector of its parent building block. Such "three-dimensional tree" (3d-tree) structure is not refined in any way, and is only meant to provide a somewhat preliminary geometry to be further refined. Using this keyword prevents the generation of such 3d-trees, and makes denoptim build a molecular model that uses original Cartesian coordinates of the building blocks as provided in the libraries of scaffolds, fragments and capping groups.|
 |__Internal Fitness Provider__||
 |`FP-Equation`| Specifies the expression to be used for calculation of the fitness value from available descriptors (i.e., from CDK library). Descriptor values, i.e., variables, and numerical constants can be combined using operators such as +, -, \*, /, % (Modulo/remainder), and parenthesis. The expression must start with `${` and end with `}`. For example,<br><br>    ${0.23*nBase - 1.1*naAromAtom + myVariable}<br><br>is a valid expression where `nBase` and `naAromAtom` are the names of molecular descriptors implemented in the CDK library, and `myVariable` is the name of a user-defined variable. The latter is defined by meas of a `FP-DescriptorSpecs` keyword, see below.|
-|`FP-DescriptorSpecs`| Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax:<br><br>    ${atomSpecific('<variableName>','<descriptor_name>','<SMARTS>')}<br><br>where: <br> *   `<variableName>` is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the `FP-Equation` keyword,<br> *   `<descriptor_name>`, is the name of the descriptor in the CDK implementation, <br> *   `<SMARTS>` is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.|
+|`FP-DescriptorSpecs`| Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax:<br><br>    ${atomSpecific(`<variableName>`,`<descriptor_name>`,`<SMARTS>`)}<br><br>where: <br> *   `<variableName>` is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the `FP-Equation` keyword,<br> *   `<descriptor_name>`, is the name of the descriptor in the CDK implementation, <br> *   `<SMARTS>` is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.|
 |__External Fitness Provider__||
 |`FP-Source`| Specifies the pathname of the executable to run to evaluate the fitness.|
 |`FP-Interpreter`| Specifies the interpreter to use when running the external fitness provider source file.|
