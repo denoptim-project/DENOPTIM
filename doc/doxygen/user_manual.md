@@ -1,30 +1,25 @@
 
-DENOPTIM
-========
+# DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
 _Version 3.2.0, Aug 2022_
 
 [TOC]
 
 
-About DENOPTIM
-==============
+# About DENOPTIM
 
 DENOPTIM is an open source software suite for the _de novo_ design of chemical entities. The name _DENOPTIM_ stands for  '_De novo_ Optimization of In/organic Molecules' and wants to highlight that DENOPTIM is designed to handle chemical entities way beyond the strict formalisms of organic chemistry (i.e., valence rules). In fact, the development of DENOPTIM started in [2012](https://doi.org/10.1021/ja300865u) as a response to the need of designing transition metal complexes and organometallic catalysts that cannot even be represented unambiguously by standard chemical representations (e.g., multi-hapto metal-ligand complexes, ion pairs, highly reactive catalyst intermediates).
 
-How To Cite
------------
+## How To Cite
 
 To cite DENOPTIM, please cite [_J. Chem. Inf. Model._ **2019**, 59, 10, 4077–4082](https://doi.org/10.1021/acs.jcim.9b00516)
 
 * * *
 
-Installation
-============
+# Installation
  
 
-Install From Conda (recommended)
---------------------------------
+## Install From Conda (recommended)
 
 DENOPTIM can be installed on using conda package manager from the command line on Linux/MacOS. On Windows this can be done on the Anaconda prompt or by using [Git Bash](<code>DENOPTIM_HOME</code>) terminal:
 
@@ -36,8 +31,7 @@ You should now have the `denoptim` command available. Run the following and veri
 
 The installation from conda has been completed.
 
-Build From Source
------------------
+## Build From Source
 
 DENOPTIM can be built from source using [Maven](https://maven.apache.org/).
 
@@ -73,19 +67,16 @@ On Windows Anaconda prompt:
 The installation from source has been completed.
 
 * * *
-Documentation
-============================
+# Documentation
 
 We invite the reader to go through the following introduction to learn the fundamentals of DENOPTIM, its methods and terminology.
 It follows the user's manual of the software, which is meant to elucidate the programs DENOPTIM can run and explain their use. 
 Throughout the manual there are also several references to the [developer's manual](developer_manual.md) which is meant instead to elucidate aspects more related to DENOPTIM's software architecture and its algorithms programming. 
 
 * * *
-Introduction to DENOPTIM
-========================
+# Introduction to DENOPTIM
 
-Representation of Chemical Entities
------------------------------------
+## Representation of Chemical Entities
 
 ### Graphs
 
@@ -147,8 +138,7 @@ DENOPTIM can repeat any graph operation on sets of APs that are related by high 
 
 Users can control the probability of symmetric operations on specific APClasses and include symmetry constraints also based on APClasses (see keywords section, below).
 
-Evaluation of Chemical Entities: Fitness Evaluation {#FitnessEvaluation}
----------------------------------------------------
+## Evaluation of Chemical Entities: Fitness Evaluation {#FitnessEvaluation}
 
 The design of functional chemical entities depends on the capability of evaluating how candidate entities are fit for a given purpose: the evaluation of the fitness. In DENOPTIM, such evaluation aims to associate the internal representation of a chemical entity, i.e., a graph, with a numerical value, i.e., the fitness. For the sake of generality, DENOPTIM does not take any assumption as to how the fitness is calculated, but it assumes that a "fitness provider" is defined for the purpose of evaluating the fitness of each candidate.
 
@@ -166,11 +156,9 @@ Fitness providers can be of two types:
 
 * * *
 
-DENOPTIM Programs {#Programs}
-=================
+# DENOPTIM Programs {#Programs}
 
-Graphical User Interface
-------------------------
+## Graphical User Interface
 
 The graphical user interface (GUI) is the main interface used for preparing and inspecting DENOPTIM files and experiments. To launch the GUI, you can chose one of the following:
 
@@ -200,8 +188,7 @@ The above command will open the three files if their format is recognized as one
 
 Finally, the GUI offers also the possibility to configure and run de novo design and virtual screening experiments that can otherwise be run by background processes as explained below. The threads executing GUI-controlled experiments are fully dependent on the GUI, and will be terminated upon closure of the GUI (the user receives a warning, in such cases).
 
-Genetic Algorithm Runner
-------------------------
+## Genetic Algorithm Runner
 
 De novo design driven by a genetic algorithm using graphs as genome for chemical entities. The overall schematic of the genetic algorithm (GA) is shown in Figure 3. The algorithm begins with a population of candidates that can be given as input or generated from scratch. Next, a given number of generations are created by producing new offspring either from application of the genetic operators, or by building new entities from scratch.
 
@@ -306,8 +293,7 @@ The _intructions\_file_ is a text file. The name of any such file is irrelevant:
 *   Remove one or more candidate from the current population. Keyword __`REMOVE_CANDIDATE`__, Arguments: space-separated list of candidate names (e.g., `REMOVE_CANDIDATE M00000028 M00000031` asks to remove both candidates from the population, if they are still in the population).
 *   Evaluate one or more manually generated candidates and possibly include them into the population. Keyword __`ADD_CANDIDATE`__, Arguments: space-separated list of pathnames to files defining the candidate to be added (e.g., `ADD_CANDIDATE /tmp/candidate_1.sdf /tmp/candidate_2.sdf`)
 
-FragSpaceExplorer
------------------
+## FragSpaceExplorer
 
 FragSpaceExplorer performs systematic exploration of the fragment space, or, more appropriately, of the space of graph building blocks - BB Space). The tool can be used to visit all the combination of building blocks that can be obtained from a given starting point (i.e., one or more graphs) and a defined BB Space, i.e., an ensemble of building blocks, connection rules and constraints. FragSpaceExplorer can be used for combinatorial approaches, where a number of alternative chemical entities need to be generated and evaluated, and also to enumerate entities or just to appreciate the characteristics of a designed BB Space. For instance, one may want to know how many acceptable chemical entities are encoded in a BB Space one has configured, or the amount of redundancy in such space (i.e., number of different graphs that encode the same chemical entity).
 
@@ -351,8 +337,7 @@ The output from an ongoing or completes FSE experiment can be inspected with the
 
 FragSpaceExplorer can be very long, so a checkpoint file is dumped at regular time intervals (by default every N graphs, where N=100; see [Keywords](#Keywords) section) to keep track of where the exploration has arrived and, in case of abrupt termination of the execution, restart the FSE experiment from the checkpoint file. Calculation that were running when the termination occurred or that were submitted after the generation of the checkpoint file are considered to be lost and will be re-submitted upon restart of the FSE run. Therefore, to avoid duplicate the files related to those “lost”, calculations should be collected and isolated.
 
-Fragmenter {#Fragmenter}
-----------
+## Fragmenter {#Fragmenter}
 
 Fragmenter is a program that performs fragmentation of molecules and management of fragments. Fragmentation is based on the application of bond-cutting rules that identify which bonds should be broken (see [_J. Chem. Inf. Model._ **2014**, 54, 3, 767–780](https://doi.org/10.1021/ci4007497)). Each broken bond is replaced by a pair of attachment points: one attachment point on each of the atoms (or pseudoatoms) that were originally bonded. The attachment point class (APClass) on each such attachment points is defined by the string identifying the cutting rule (i.e., the rule name) and an integer that distinguish the two ends of the broken bond. For example, if the cutting rule is named `myCuttingRule`, the two APs will have APClass `myCuttingRule:0` and `myCuttingRule:1`.
 
@@ -364,8 +349,7 @@ The Fragmenter can be run with this command:
 
 where `input_parameters_file` is a text parameters file with the [keywords](#Keywords) providing all input parameters and settings.
 
-Graph Editor
-------------
+## Graph Editor
 
 Graph Editor is a program for editing graphs from the command line. This allows embedding a graph edit task in any work flow external to denoptim. For example, in the fitness evaluation work flow of an external provider.
 
@@ -375,8 +359,7 @@ The graph editor can be run with this command:
 
 where `input_parameters_file` is a text parameters file with the [keywords](#Keywords) providing all input parameters. Among these settings there is a text-based definition of the graph editing task. See [Graph Editing Task Files](#GraphEditingTaskFiles).
 
-Genetic Operator
-----------------
+## Genetic Operator
 
 This is a program for performing genetic operations from the command line.
 
@@ -386,8 +369,7 @@ This program can be run with this command:
 
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
-Fitness Provider Runner
------------------------
+## Fitness Provider Runner
 
 This is a program to launch a fitness provider (internal or external), in the same way it is done within GA or FSE runs, but straight from the command line-
 
@@ -397,8 +379,7 @@ This program can be run with this command:
 
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
-3D Molecular Models Builder {#3DBuilder}
----------------------------
+## 3D Molecular Models Builder {#ThreeDBuilder}
 
 This is a program for converting graph representation into a 3D chemical representation by exploring the 3D features of building blocks and, if needed, perform a ring-closing conformational search (see [_J. Chem. Inf. Model._ **2015**, 55, 9 1844-1856](https://doi.org/10.1021/acs.jcim.5b00424)).
 
@@ -410,8 +391,7 @@ where `input_parameters_file` is a text parameters file with the [Keywords](#Key
 
 **WARNING:** This program requires [Tinker Molecular Modeling software](https://dasher.wustl.edu/tinker/) to be installed on the system. The user is responsible for installing Tinker in accordance with its license terms. Furthermore, the ring-closing conformational search requires a customized version of Tinker. Contact [denoptim.project@gmail.com](mailto:denoptim.project@gmail.com) for instructions on how to modify Tinker and use the customized version in accordance with Tinker license's terms.
 
-Graph Isomorphism Analyzer {#GraphIsomorphism}
---------------------------
+## Graph Isomorphism Analyzer {#GraphIsomorphism}
 
 This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism". "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of [graph isomorphism](https://mathworld.wolfram.com/IsomorphicGraphs.html) that differs from the most common meaning of isomorphism in graph theory. In general, graphs are considered undirected when evaluating DENOPTIM-isomorphism. Next, since a graph is effectively a spanning tree (ST\_i={{vertices}, {acyclic edges}}) with a set of fundamental cycles (FC\_i={C\_1, C\_2,...C\_n}), any graph G={ST\_i,FC\_i} that contains one or more cycles can be represented in multiple ways, G={ST\_j,FC\_j} or G={ST\_k,FC\_k}, that differ by the position of the chord/s and by the corresponding pair of ring-closing vertices between each chord defined. The DENOPTIM-isomorphism for two graphs G1 and G2 is given by the common graph theory isomorphism between two undirected graphs U1 and U2 built respectively from G1 and G2.
 
@@ -430,8 +410,7 @@ The Graph Isomorphism Analyzer program can be run with this command:
 
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
-Graph List Comparator
----------------------
+## Graph List Comparator
 
 This program compares lists of graphs seeking for "DENOPTIM-isomorphic" graphs (see [here](denoptim-isomorhic link) for the definition of "DENOPTIM-isomorphic").
 
@@ -441,10 +420,7 @@ This program can be run with this command:
 
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
-* * *
-
-Keywords {#Keywords}
-========
+# Keywords {#Keywords}
 
 When preparing an input file remember these underlying conventions:
 
@@ -460,8 +436,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### Definition of the Space of Graph Building Blocks(BB Space) {#BBSpace}
-
+## Definition of the Space of Graph Building Blocks (BB Space) {#BBSpace}
 | Keyword | Description |
 | :------- | :----------- |
 |__General__  ||
@@ -481,7 +456,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### Ring-Closing machinery
+## Ring-Closing machinery
 
  
 
@@ -516,7 +491,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### GA Runner
+## GA Runner
 
  
 
@@ -566,7 +541,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### 3D Molecular Models Builder
+## 3D Molecular Models Builder
 
  
 
@@ -590,7 +565,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### FragmentSpaceExplorer
+## FragmentSpaceExplorer
 
  
 
@@ -614,7 +589,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### Fitness Provider
+## Fitness Provider
 
  
 
@@ -631,7 +606,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### Fragmenter
+## Fragmenter
 
  
 
@@ -643,11 +618,11 @@ The following tables list all the keywords grouped according to the main functio
 |`FRG-PARALLELTASKS`| Specifies the number (integer) of parallel threads when performing parallelizable tasks such as fragmentation or analysis of isomorphic fragment families.|
 |`FRG-VERBOSITY`| Specifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
 |__Pre-Fragmentation Operation__||
-|`FRG-FORMULATXTFILE`| The pathname to a TXT file (see [Formula file](#Toc2222_3)) containing the molecular formulae for the structures to be fragmented. Use this keyword to enable detection of missing atoms by checking the consistency between declared molecular formula (reported in the pathname given here) and actual molecular formula found in the structure file. Molecules with missing atoms are not fragmented.|
+|`FRG-FORMULATXTFILE`| The pathname to a TXT file (see [Formula file](#FormulaFile)) containing the molecular formulae for the structures to be fragmented. Use this keyword to enable detection of missing atoms by checking the consistency between declared molecular formula (reported in the pathname given here) and actual molecular formula found in the structure file. Molecules with missing atoms are not fragmented.|
 |`FRG-PREFILTERSMARTS`| Specifies the SMARTS query to filter structure before fragmentation. Any input molecule matching the SMARTS query will not be fragmented. This keyword can be used multiple times to define more than one pre-filtering SMARTS criterion.|
 |`FRG-UNSETTOSINGLEBO`| Use this keyword (no value needed) to request the conversion of all UNSET bond types to SINGLE bond types in any molecule to be fragmented.|
 |__Fragmentation__||
-|`FRG-CUTTINGRULESFILE`| The pathname to the file defining cutting rules (see [Cutting rules file](#Toc2222_2)).|
+|`FRG-CUTTINGRULESFILE`| The pathname to the file defining cutting rules (see [Cutting rules file](#CuttingRules)).|
 |__Post-Fragmentation Filtering__||
 |`FRG-IGNORABLEFRAGMENTS`| The pathname to a file containing fragments that can be ignored. Any fragment isomorphic to any of the ignorable fragments will be rejected.| 
 |`FRG-TARGETFRAGMENTS`| The pathname to fragments to be collected. Only fragment isomorphic to any of the target fragments will be kept.| 
@@ -673,7 +648,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### Stand-alone Graph Editor
+## Stand-alone Graph Editor
 
  
 
@@ -688,7 +663,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### Stand-alone Fitness Runner
+## Stand-alone Fitness Runner
 
  
 
@@ -700,7 +675,7 @@ The following tables list all the keywords grouped according to the main functio
 
   
 
-### Stand-alone Graph Isomorphism Analyzer
+## Stand-alone Graph Isomorphism Analyzer
 
  
 
@@ -709,7 +684,7 @@ The following tables list all the keywords grouped according to the main functio
 |`Isomorphism-inpGraphA`| Pathname to one of the graph to be considered for the detection of [DENOPTIM-isomorphism](Toc9999_7)(add internal link).|
 |`Isomorphism-inpGraphB`| Pathname to the other of the graph to be considered for the detection of [DENOPTIM-isomorphism](Toc9999_7)(add internal link)|
 
-### Stand-alone Graph List Comparator
+## Stand-alone Graph List Comparator
 
  
 
@@ -720,10 +695,9 @@ The following tables list all the keywords grouped according to the main functio
 
 * * *
 
-File Formats
-============
+# File Formats
 
-### Vertices
+## Vertices
 
 Vertices can be defined in files with two different formats: the [SDF](https://en.wikipedia.org/wiki/Chemical_table_file#SDF), and [JSON](https://en.wikipedia.org/wiki/JSON).
 
@@ -761,7 +735,7 @@ Considering the optional components, the following alternatives are also recogni
 
 Additional fields can be present in SDF files saved by DENOPTIM. In particular, DENOPTIM new version always saves the JSON format as one of the properties of the SDF file format.
 
-### Cutting rules file
+## Cutting rules file {#CuttingRules}
 
 The file defining cutting rules is a text file with keyword-labelled lines. Each line starting with the `CTR` keyword defines the specifics for a single cutting rule acoording to the following syntax:
 
@@ -788,7 +762,7 @@ Here is an example of the content of a cutting rule file:
 
 A file with a complete set of cutting rules is available under the `test/functional_tests/t30/data` folder of the distribution folder.
 
-### Formula file
+## Formula file {#FormulaFile}
 
 The file collecting molecular formulae for chemical structures provided in an associated SDF file is a text file with keyword-labelled lines. Each entry, i.e., each structure, is associated with a group of lines starting with the keyword `REFCODE:`. The group of line must contain the keyword `Formula:` which identifies the line containing the actual molecular formula. The molecular formula can include multiple molecules, and variable stoichiometric factors. Example of valid formulae are:
 
@@ -812,7 +786,7 @@ Here is an example of the content of a formula file containing the molecular for
         …
     …
 
-### Compatibility Matrix file {#CompatibilityMatrixfile}
+## Compatibility Matrix file {#CompatibilityMatrixfile}
 
 The compatibility matrix file is a text file that includes blocks of information related to the APClass compatibility rules:
 
@@ -838,7 +812,7 @@ Example of a compatibility matrix file:
     # Forbidden ends
     DEL apclass1:0
 
-### Ring Closures Compatibility Matrix file
+## Ring Closures Compatibility Matrix file
 
 The ring closures (RC) compatibility matrix file specifies the pairs of AP classes that are allowed to form ring-closing bonds. Note that, contrary to the standard compatibility matrix, the RC compatibility matrix is symmetric. The syntax is the same as for a general-purpose compatibility matrix.
 
@@ -847,7 +821,7 @@ The ring closures (RC) compatibility matrix file specifies the pairs of AP class
     RCN apclass1:1 apclass1:0
     …
 
-### Initial Population File
+## Initial Population File
 
 SDF format is used to provide an initial set of fully characterized candidates (i.e., initial population). To be properly interpreted by DENOPTIM this SDF file must include the following tags:
 
@@ -855,13 +829,13 @@ SDF format is used to provide an initial set of fully characterized candidates (
 *   `<UID>` tag specifying the unique identifier of the chemical entity (often the InChiKey).
 *   `<GraphJson>` tag specifying the essential part of the graph representation of the chemical entity.
 
-### Candidate Chemical Entity Files  {#CandidateChemicalEntityFiles}
+## Candidate Chemical Entity Files  {#CandidateChemicalEntityFiles}
 
 SDF format file used to communicate the definition of a candidate entity to external fitness providers (see [Fitness evaluation](#FitnessEvaluation)).
 
 DENOPTIM programs output a non-optimized 3D-structure of the chemical entity in SDF format together with its graph representation (tag `<GraphJson>`) and additional information (i.e., SMILES, InChiKey, unique identifier). By default, the Cartesian coordinates reported in these files are those of a three-dimensional tree-like model built by aligning each building block according to the attachment point vectors. The resulting geometry is not refined, and is only meant to facilitate further processing and visual inspection. While such geometry can be used as starting point for further molecular modeling, it should never be used to calculate any property dependent on the molecular geometry. The alignment of the building blocks is skipped when using the `FP-No3dTreeModel` keyword. In this case, the SDF file will contain Cartesian coordinates of the initial building blocks, and will therefore be characterized by a correct topology but a non-sense arrangement of the atoms.
 
-### Fitness Files {#FitnessFiles}
+## Fitness Files {#FitnessFiles}
 
 SDF format files used to store the final results for an evaluated chemical entity and to receive the fitness value from any external fitness provider. These files must contain one of these two tags:
 
@@ -940,7 +914,7 @@ Example of an SDF file with error due to violation of constraints:
 
     $$$$
 
-### Graph Editing Task Files {#GraphEditingTaskFiles}
+## Graph Editing Task Files {#GraphEditingTaskFiles}
 
 Example of JSON syntax for defining the most detailed vertex query and the editing task to perform.
 

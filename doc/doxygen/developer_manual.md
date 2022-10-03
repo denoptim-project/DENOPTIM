@@ -114,7 +114,7 @@ In the progress of the fitness evaluation program there is a difference from oth
 ### 3D Molecular Models Builder {#B3D}
 
 
-The programTask implementer for this run is the class [MolecularModelBuilder](#denoptim.programs.molecularmodelbuilder.MolecularModelBuilder) in the package denoptim.programs.molecularmodelbuilder. This program constructs a 3D molecular model given a graph of a DENOPTIM candidate. The class that actually handles the construction is [MultiMolecularModelBuilder](#denoptim.molecularmodeling.MultiMolecularModelBuilder) in the package denoptim.molecularmodeling. Here the 3D model is constructed with also relying on the package denoptim.integration.tinker (see [here](#3DBuilder)]). Each model is managed and stored as a [ChemicalObjectModel](#denoptim.molecularmodeling.ChemicalObjectModel).
+The programTask implementer for this run is the class [MolecularModelBuilder](#denoptim.programs.molecularmodelbuilder.MolecularModelBuilder) in the package denoptim.programs.molecularmodelbuilder. This program constructs a 3D molecular model given a graph of a DENOPTIM candidate. The class that actually handles the construction is [MultiMolecularModelBuilder](#denoptim.molecularmodeling.MultiMolecularModelBuilder) in the package denoptim.molecularmodeling. Here the 3D model is constructed with also relying on the package denoptim.integration.tinker (see [here](#ThreeDBuilder)]). Each model is managed and stored as a [ChemicalObjectModel](#denoptim.molecularmodeling.ChemicalObjectModel).
 
 
 ### Graph Isomorphism Analyzer {#GI}
