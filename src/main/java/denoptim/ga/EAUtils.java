@@ -817,16 +817,11 @@ public class EAUtils
      * @throws DENOPTIMException
      */
 
-    protected static void outputPopulationDetails(Population population, 
+    public static void outputPopulationDetails(Population population, 
             String filename, GAParameters settings) throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
-        sb.append(String.format("%-20s", "#Name "));
-        sb.append(String.format("%-20s", "GraphId "));
-        sb.append(String.format("%-30s", "UID "));
-        sb.append(String.format("%-15s","Fitness "));
-
-        sb.append("Source ");
+        sb.append(DENOPTIMConstants.GAGENSUMMARYHEADER);
         sb.append(NL);
 
         df.setMaximumFractionDigits(settings.getPrecisionLevel());
@@ -912,31 +907,6 @@ public class EAUtils
             sb.append(NL);
         } else {
             sb.append(String.format("%-30s", "SKEW:")).append(" NaN (sdev too small)");
-            sb.append(NL);
-        }
-
-        HashMap<Integer, Integer> scf_cntr = new HashMap<>();
-        for (int i=0; i<popln.size(); i++)
-        {
-            Candidate mol = popln.get(i);
-            DGraph g = mol.getGraph();
-            int scafIdx = g.getSourceVertex().getBuildingBlockId() + 1;
-            if (scf_cntr.containsKey(scafIdx)) {
-                scf_cntr.put(scafIdx, scf_cntr.get(scafIdx)+1);
-            } else {
-                scf_cntr.put(scafIdx, 1);
-            }
-        }
-
-        sb.append(NL+NL+"#####SCAFFOLD ANALYSIS##### (Scaffolds list current "
-                + "size: " + fragSpace.getScaffoldLibrary().size() + ")" 
-                + NL);
-        List<Integer> sortedKeys = new ArrayList<Integer>(scf_cntr.keySet());
-        Collections.sort(sortedKeys);
-        for (Integer k : sortedKeys)
-        {
-            
-            sb.append(k).append(" ").append(scf_cntr.get(k));
             sb.append(NL);
         }
         
@@ -1071,7 +1041,8 @@ public class EAUtils
         
         int ndigits = String.valueOf(settings.getNumberOfGenerations()).length();
         
-        sb.append(settings.getDataDirectory()).append(FSEP).append("Gen")
+        sb.append(settings.getDataDirectory()).append(FSEP).append(
+                DENOPTIMConstants.GAGENDIRNAMEROOT)
             .append(GeneralUtils.getPaddedString(ndigits, genID));
         
         return sb.toString();
@@ -1087,9 +1058,11 @@ public class EAUtils
         int ndigits = String.valueOf(settings.getNumberOfGenerations()).length();
         
         sb.append(settings.getDataDirectory()).append(FSEP)
-            .append("Gen").append(GeneralUtils.getPaddedString(ndigits, genID))
+            .append(DENOPTIMConstants.GAGENDIRNAMEROOT)
+            .append(GeneralUtils.getPaddedString(ndigits, genID))
             .append(FSEP)
-            .append("Gen").append(GeneralUtils.getPaddedString(ndigits, genID))
+            .append(DENOPTIMConstants.GAGENDIRNAMEROOT)
+            .append(GeneralUtils.getPaddedString(ndigits, genID))
             .append(".txt");
         
         return sb.toString();

@@ -209,11 +209,17 @@ public final class DENOPTIMConstants
      */
     public static final String APCMAPIGNORE = "#";
     
-
     /**
      * Prefix for generation folders
      */
     public static final String GAGENDIRNAMEROOT = "Gen";
+    
+    /**
+     * Header of text files collection generation details
+     */
+    public static final String GAGENSUMMARYHEADER = "#Name               "
+            + "GraphId             UID                           "
+            + "Fitness        Source";
     
     /**
      * Prefix for graph indexing files

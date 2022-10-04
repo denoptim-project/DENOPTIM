@@ -8,7 +8,7 @@ source:
   path: ..
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -16,6 +16,8 @@ requirements:
     - maven
   run:
     - openjdk =={{ openjdk_version }}
+    - python
+    - py4j
 
 test:
   commands:

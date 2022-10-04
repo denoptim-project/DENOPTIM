@@ -38,7 +38,7 @@ public enum FileFormat {
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP, GO_PARAM, CLG_PARAM, GE_PARAM, 
     GI_PARAM, B3D_PARAM, FRG_RUN, FRG_PARAM, CUTRULE,
     
-    TXT, GRAPHTXT,
+    TXT, GRAPHTXT, GENSUMMARY,
     UNRECOGNIZED;
         
     private String extension = "";
@@ -214,6 +214,12 @@ public enum FileFormat {
         //------------------------------------
         
         GRAPHTXT.extension = "txt";
+        
+        //------------------------------------
+        
+        GENSUMMARY.extension = "txt";
+        GENSUMMARY.definingRegex = new HashSet<String>(Arrays.asList(
+                "^" + DENOPTIMConstants.GAGENSUMMARYHEADER + ".*"));
     }
     
     /**
@@ -364,6 +370,24 @@ public enum FileFormat {
             FileFormat.FR_PARAM,
             FileFormat.FRG_PARAM,
             FileFormat.COMP_MAP};
+        return a;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the collection of file formats restricted to TXT files (excluded
+     * parameter files)
+     * @return the collection of file formats restricted to TXT files.
+     */
+    public static FileFormat[] getTXTFormats()
+    {
+        FileFormat[] a = {
+                FileFormat.GENSUMMARY,
+                FileFormat.CUTRULE,
+                FileFormat.GRAPHTXT,
+                FileFormat.TXT
+        };
         return a;
     }
     

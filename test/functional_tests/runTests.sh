@@ -366,5 +366,10 @@ runTest "t29"
 #
 runTest "t30"
 
+#
+# t31: test Py4J integration
+#
+runTest "t31"
+
 echo "All done!"
 exit 0
