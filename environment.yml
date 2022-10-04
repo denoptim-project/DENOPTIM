@@ -5,3 +5,5 @@ dependencies:
   - openjdk=11.0*
   - maven
   - python
+  - doxygen
+  - graphviz

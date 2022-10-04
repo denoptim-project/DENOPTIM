@@ -74,7 +74,7 @@ public class GARunner extends ProgramTask
 //------------------------------------------------------------------------------
 
     @Override
-    public void runProgramma() throws Throwable
+    public void runProgram() throws Throwable
     {
         GAParameters settings = new GAParameters();
         if (workDir != null)

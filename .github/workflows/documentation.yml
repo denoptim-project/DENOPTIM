@@ -19,10 +19,14 @@ jobs:
         uses: mattnotmitt/doxygen-action@1.9.4
         with:
           doxyfile-path: ./Doxyfile
-          working-directory: ./doc/doxygen
-
-      - name: Check broken links
-        run: grep "\.md:" ./doc/doxygen/doxygen_warn.log ; if [ $? -eq 0 ] ; then exit 1 ; fi
+          working-directory: ./doc
+           
+      - name: Check for broken links in Markdown
+        run: |
+           if grep -q "\.md:" ./doc/doxygen_warn.log; then
+             grep "\.md:" ./doc/doxygen_warn.log
+             exit 1
+           fi
 
       # Deploy the HTML documentation to GitHub Pages
       - name: GH Pages Deployment
@@ -30,5 +34,5 @@ jobs:
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./doc/doxygen/html/
+          publish_dir: ./doc/html/
           force_orphan: true
