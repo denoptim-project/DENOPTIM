@@ -407,7 +407,7 @@ public class GUIInspectGARun extends GUICardPanel
                 }
                 
                 // Collect population
-                String pathtoTmpFile = Utils.getTempFile("population_al_gen" 
+                String pathtoTmpFile = Utils.getTempFile("population_at_gen" 
                         + genId + ".sdf");
                 mainPanel.setCursor(Cursor.getPredefinedCursor(
                         Cursor.WAIT_CURSOR));
