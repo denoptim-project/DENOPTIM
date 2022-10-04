@@ -23,7 +23,7 @@ To cite DENOPTIM, please cite [_J. Chem. Inf. Model._ **2019**, 59, 10, 4077–4
 
 DENOPTIM can be installed on using conda package manager from the command line on Linux/MacOS. On Windows this can be done on the Anaconda prompt or by using [Git Bash](<code>DENOPTIM_HOME</code>) terminal:
 
-    conda install -c denoptim denoptim
+    conda install -c denoptim-project denoptim
 
 You should now have the `denoptim` command available. Run the following and verify you get a help message:
 
@@ -43,7 +43,7 @@ Make sure you have an environment that includes JAVA and Maven. Such environment
 
     cd $DENOPTIM\_HOME
     conda env create -f environment.yml
-    conda activate dnp\_env
+    conda activate dnp_devel
 
 Verify the requirements by running the two commands: Both should return a message declaring the respective versions.
 

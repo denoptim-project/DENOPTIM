@@ -1,53 +1,34 @@
-DENOPTIM Developer's Manual
-===========================
+# DENOPTIM Developer's Manual
 
-Introduction
-------------
+This manual integrates the [JavaDoc](html/annotated.html) to provide an overview on the software logic and facilitate understanding, development, and debug of the code. It is a manual meant for developers, not for users. If you are looking for information on how to use DENOPTIM, check the [users manual](user_manual.md).
 
-The different capabilities of DENOPTIM are well described by its different [Programs](#Programs).
-Each program works in a stand-alone fashion or in parallel to others, and each one starts in the class denoptim.main in the homonymous package.
+* * *
 
-From the command line a typical input has the form:
+## Execution Logic
 
-    denoptim (-r) GA,FIT,FSE... file1 file2 ... fileN
-             (-h)
-             (-v)
+The [Main](#denoptim.main.Main) class is meant to be the only JAVA Main class in the DENOPTIM package and is the execution entry point for all the functionality implemented in the DENOPTIM package. Accordingly, the [main()](#denoptim.main.Main.main) method defines the actual [Behavior](#denoptim.main.Behavior) of the software upon parsing the list of program arguments. The [Behavior](#denoptim.main.Behavior) may correspond to
+* returning an error in case of unacceptable list or program arguments (i.e., a `null` [RunType](#denoptim.main.Main.RunType)),
+* terminating, possibly upon printing some information such as the help message (i.e., a `DRY` [RunType](#denoptim.main.Main.RunType)),
+* launching the graphical user interface (i.e., a `GUI` [RunType](#denoptim.main.Main.RunType)),
+* launching the execution of anyone among the [main program tasks](#Programs) (i.e., any other [RunType](#denoptim.main.Main.RunType). The specific implementation of [ProgramTask](#denoptim.task.ProgramTask) for a given [RunType](#denoptim.main.Main.RunType) is defined within the definitions of a [RunType](#denoptim.main.Main.RunType)). 
 
-the word _denoptim_ stands for an alias for the DENOPTIM's path on the machine (it is the alias automatically generated when DENOPTIM is installed with Conda).
-The arguments in parentheses are the so-called _options_, i.e., the three possibilities that DENOPTIM can perform from the command line. These are:  
-__help (-h)__: prints the help message as an aid for the user    
-__version (-v)__: prints the version of DENOPTIM running on the user's machine   
-__run (-r)__: executes one of the possible DENOPTIM programs.
+The latter occurs by creating an instance of [ProgramTask](#denoptim.task.ProgramTask), typically by passing as parameters to the constructor the pathname to a working directory and the pathname to a configuration file defining any settings that control the specifics of the task at hand. Any such implementation of [ProgramTask](#denoptim.task.ProgramTask) is a callable where the usual `call` method, in addition to dealing with general-purpose process management tasks, embeds a call to method [runProgram()](#denoptim.task.ProgramTask.runProgram), which is where the main task is coded. 
 
-__GA__, __FIT__, __FSE__ etc are _RunTypes_, i.e., the acronym to identify a run and call it from the command line.
-The files are the input files specified by the user.
+Typically, any parsing of the configuration file occurs at the beginning of the [runProgram()](#denoptim.task.ProgramTask.runProgram) and populated an instance of [RunTimeParameters](#denoptim.programs.RunTimeParameters). The latter is a class meant to collect program-specific settings and  utilities, such as logger and randomizer, that are used in various parts on a program. Therefore, [RunTimeParameters](#denoptim.programs.RunTimeParameters) are passed around to child methods to make these settings and utilities available where needed.
 
-The command is firstly parsed, checked and collected in a so-called [Behavior](#denoptim.main.Behavior).
-This step verifies the validity of the input command and the input files.
-Once this step is completed, this information builds an implementation of [ProgramTask](#denoptim.task.ProgramTask) (i.e., the program requested by the user). These classes can be found inthe subpackages of denoptim.programs.A [ProgramTask](#denoptim.task.ProgramTask) has the method [runProgram()](#denoptim.task.ProgramTask.runProgram()) that performs the following steps:
-
-*	Read the parameters file
-*	Check the parameters
-*	Process the parameters
-*	Start the program specific logger
-*	Print parameters  
-
-Except the methods _check the parameters_ and _process the parameters_, which are performed by a specific class associated with the specific program task (e.g.,for the GA this is performed by the class [GAParameters](#denoptim.programs.denovo.GAParameters) in the package denoptim.programs.denovo) all the others are performed by the class [RunTimeParameters](#denoptim.programs.RunTimeParameters) in the package denoptim.programs. These methods create a unique set of parameters (i.e., settings) that serve as argument for the class performing the program.
-This class is usually located in a package identified by a name descriptive of the associated program(e.g., denoptim.ga for the Genetic Algotithm, denoptim.fragmenter for the fragmentation algorithm).
-
-This is the typical workflow for every denoptim program with few minor exceptions. At this point, every program is handled by different packages and every program has its principal package. These are discussed below for each program:
+Implementations of [ProgramTask](#denoptim.task.ProgramTask)s are collected in sub-packages of the [denoptim.programs](#denoptim.programs) package together with the corresponding program-specific implementation of [RunTimeParameters](#denoptim.programs.RunTimeParameters).
 
 
 * * *
 
-Runs
-----
+## Run types
+
 
 | Run | Description|
 | --- | -----------|
 | __GUI__ | [Graphical User Interface](#GUI)|
 | __GA__  | [Genetic Algorithm](#GA)|
-| __FSE__ | [Fragment Space Exploaration](#FSE) |
+| __FSE__ | [Fragment Space Exploration](#FSE) |
 | __FRG__ | [Fragmenter](#FRG) |
 | __GE__  | [Graph Editing](#GE) |
 | __GO__  | [Genetic Operation](#GO) |
@@ -59,94 +40,61 @@ Runs
 
 ### Genetic Algorithm {#GA}
 
-This run is implemented by the class [GARunner](#denoptim.programs.denovo.GARunner) in the package denoptim.programs.denovo.
-A peculiarity of this program is that, the class [EvolutionaryAlgorithm](#denoptim.ga.EvolutionaryAlgorithm) (in the package denoptim.ga) which ultimately performs the run, besides the settings, it also includes an [ExternalCommandListener](#denoptim.ga.ExternalCmdsListener) in its arguments. Such listener is the class that makes possible for the user to interact with the algorithm during its execution (see [here](#GAInteract)).
-The run is mainly operated by this package and its workflow is easily trackable through the different classes.
-Noteworthy, the structure of the algorithm is influenced by its capability of running two parallelization schemes: _synchronous_ and _asynchronous_. The synchronous scheme is somewhat the classical genetic optimization algorithm where each generation is perfectly distinguished from the others. The asynchronous scheme instead loses this clear definition since a generation does not necessarily need to be completed in order for others to keep propagate. This forces some deviation of the algorithm from what could be considered a more standard GA. For example the selection step is not operated when the all generation is completed but just before a genetic operation such as _crossover_ or _mutation_ is required to generate a new candidate. This means that the selection is done on the _current (or past) population_ rather than on a _completed generation_.    
+The [ProgramTask](#denoptim.task.ProgramTask) implementation dealing with GA experiments is the [GARunner](#denoptim.programs.denovo.GARunner). Besides class [EvolutionaryAlgorithm](#denoptim.ga.EvolutionaryAlgorithm) which ultimately performs the evolutionary experiment, besides the settings [GARunner](#denoptim.programs.denovo.GARunner) creates an [ExternalCommandListener](#denoptim.ga.ExternalCmdsListener) in its arguments. Such listener is responsible for the interaction between an ongoing evolutionary experiment and the user (see [here](#GAInteract)).
 
-Although all the main functionalities of the genetic algorithm are in this package there are several more packages involved such as denoptim.graph for graph manipulation, denoptim.fitness for fitness evaluation and many others such as logging or 3D molecular model building.
+The specifics of the evolutionary algorithm's implementation are deeply affected by its capability of running two parallelization schemes: _synchronous_ and _asynchronous_. The synchronous scheme follows the classical evolutionary optimization algorithm where each generation is isolated from the others. In the asynchronous scheme, instead, new candidates are created continuously without stopping the generation of candidates at the end of a generations. Because of this peculiarity, selection of candidates for mutation and crossover is done upon requesting a _crossover_ or _mutation_ event.
+
 
 ### Fragment Space Exploration  {#FSE}
 
+The [ProgramTask](#denoptim.task.ProgramTask) implementation dealing with combinatorial experiments is the [FragSpaceExplorer](#denoptim.programs.combinatorial.FragSpaceExplorer), while the algorithm is coded in the [CombinatorialExplorerByLayer](#denoptim.combinatorial.CombinatorialExplorerByLayer).
+Given a graph, i.e., the so-called root graph, all the combinations of fragments that can be attached on the root graph are obtained from the [FragsCombinationIterator](#denoptim.fragspace.FragsCombinationIterator). Once the combination of fragments to be attached on the root graph is defined, the construction of the resulting graph, or graphs (multiple graphs can result by closing different sets of fundamental rings on the same spanning tree) is done by the [GraphBuildingTask](#denoptim.combinatorial.CombinatorialExplorerByLayer).
 
-As usual, after passing by Main, this run is hadled by its [ProgramTask](#denoptim.task.ProgramTask), i.e., the class [FragSpaceExplorer](#denoptim.programs.combinatorial.FragSpaceExplorer) in the package denoptim.programs.combinatorial. Here the settings for the experiment are built and passed to the class [CombinatorialExplorerByLayer](#denoptim.combinatorial.CombinatorialExplorerByLayer) in the package denoptim.combinatorial.
-
-This class handles the possible root graphs provided buy the user and grows them through all the possible combinations layer-by-layer stopping at the level expressed by the user.
-All the combinations of fragments that can be attached to a given root graph are obtained with the class [FragsCombinationIterator](#denoptim.fragspace.FragsCombinationIterator) in the package denoptim.fragspace.
-The construction is done in an asynchronous fashion and each task of building a new candidate is executed by the class [GraphBuildingTask](#denoptim.combinatorial.CombinatorialExplorerByLayer) in the same package. This class extends each graph as specified, relying mainly on the package denoptim.graph. Each task can than call other external subtasks for generating 3D molecular models (denoptim.molecularmodeling) or for fitness evaluation (denoptim.fitness).
-Being usually composed of a great number of tasks, and hence being prone to errors, this run periodically generates [CheckPoints](#denoptim.combinatorial.CheckPoint), i.e., collections of all the relevant info needed to keep track of the history of all the candidates generated so far, and, in case of failure, work as starting points for further attempts.
+This type of run has the capability to periodically save [CheckPoints](#denoptim.combinatorial.CheckPoint) that allow to restart the exploration should is be interrupted by any reason.
 
 
 ### Graph Editing {#GE}
 
+The [ProgramTask](#denoptim.task.ProgramTask) dealing with standalone graph editing tasks is the [GraphEditor](#denoptim.programs.grapheditor.GraphEditor). This class essentially allows to prepare everything that may be needed to call method [DGraph.editGraph](#denoptim.graph.DGraph.editGraph()).
 
-The [ProgramTask](#denoptim.task.ProgramTask) of this run is the class [GraphEditor](#denoptim.programs.grapheditor.GraphEditor) in the package denoptim.programs.grapheditor. Here,the run is executes the method [editGraph](#denoptim.graph.DGraph.editGraph()) defined in the class [DGraph](#denoptim.graph.DGraph) in the package denoptim.graph. This method can perform three editing operations:
-
-- __REPLACECHILD__
-- __CHANGEVERTEX__
-- __DELETEVERTEX__
-
-All these functions are mainly operated by classes in the same package denoptim.graph.
-More on these at [Graph Editing Task Files](#GraphEditingTaskFiles)
 
 ### Genetic Operation {#GO}
 
-This run is to be considered as a subset the Genetic Algorithm program. The [ProgramTask](#denoptim.task.ProgramTask) of this run is the class [GeneOpsRunner](#denoptim.programs.genetweeker.GeneOpsRunner) in the package denoptim.programs.genetweeker. Here the settings are not arguments for a class defined in a particular packages but, depending on what specified by the user, this class can run a __Mutation__ or a __Crossover__ operations. Although these two functions are defined in this class they ultimately rely on the class [GraphOperations](#denoptim.ga.GraphOperations) in the package denoptim.ga.
+The [ProgramTask](#denoptim.task.ProgramTask) dealing with standalone genetic operations is [GeneOpsRunner](#denoptim.programs.genetweeker.GeneOpsRunner). This class essentially allows to prepare everything that may be needed to perform mutations and crossover operations outside a genetic algorithm.
+
 
 ### Fitness {#FIT}
 
-
-In the overall progress of the fitness evaluation program there is a difference from the others programs in how packages are called. It starts in the main, which calls the [ProgramTask](#denoptim.task.ProgramTask) in the package denoptim.programs.fitnessevaluator which does some preliminary settings of the task but than calls the class [FitnessTask](#denoptim.task.FitnessTask) in the package denoptim.task. At this point there is the program discriminates between running an __internal__ or an __external__ fitness provider. An internal fitness provider is mainly run by the package denoptim.fitness (this is the usual progress of a run). In case of an external fitness provider a [ProcessHandler](#denoptim.task.ProcessHandler) is used to interface DENOPTIM with an external program.
+The [ProgramTask](#denoptim.task.ProgramTask) dealing with standalone fitness calculations [FitnessRunner](#denoptim.programs.fitnessevaluator.FitnessRunner). An instance of [FPRunner](#denoptim.programs.fitnessevaluator.FPRunner) is created to run a task that may use the __internal__ or an __external__ fitness provider. The internal fitness provider uses only functionality available within the DENOPTIM package, while the external fitness provider runs a [ProcessHandler](#denoptim.task.ProcessHandler) to create an external subprocess and retrieve the fitness from the output of such process (NB: not the log or return value).
 
 
 ### 3D Molecular Models Builder {#B3D}
 
-
-The [ProgramTask](#denoptim.task.ProgramTask) of this run is the class [MolecularModelBuilder](#denoptim.programs.moldecularmodelbuilder.MolecularModelBuilder) in the package denoptim.programs.molecularmodelbuilder. This program constructs a 3D molecular model given a graph of [Candidate](#denoptim.graph.Candidate). The class that actually handles the construction is [MultiMolecularModelBuilder](#denoptim.programs.moldecularmodelbuilder.MolecularModelBuilder) in the package denoptim.molecularmodeling. Here the 3D model is constructed also relying on the package denoptim.integration.tinker (see [here](#ThreeDBuilder)]). Each model is managed and stored as a [ChemicalObjectModel](#denoptim.molecularmodeling.ChemicalObjectModel).
+The [ProgramTask](#denoptim.task.ProgramTask) dealing with standalone construction of three-dimensional (3D) molecular models is the [MolecularModelBuilder](#denoptim.programs.moldecularmodelbuilder.MolecularModelBuilder). The construction of one or more 3D models for a [Candidate](#denoptim.graph.Candidate) is [MultiMolecularModelBuilder](#denoptim.programs.moldecularmodelbuilder.MolecularModelBuilder).
 
 
 ### Graph Isomorphism Analyzer {#GI}
 
+The [ProgramTask](#denoptim.task.ProgramTask) dealing with standalone detection of graph isomorphism is [Isomorphism](#denoptim.programs.isomorphism.Isomorphism). Here, two graphs are compared by means of the method [DGraph.isIsomorphicTo](#denoptim.graph.DGraph.isIsomorphicTo()). his method uses the Vento-Foggia algorithm (see [DOI:10.1109/TPAMI.2004.75](http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804)) implemented in the [JGraphT library](https://jgrapht.org/).
 
-For this run the [ProgramTask](#denoptim.task.ProgramTask) is the class [Isomorphism](#denoptim.programs.isomorphism.Isomorphism) in the package denoptim.programs.isomorphism. Here, two graphs are compared by means of the method [isIsomorphicTo](#denoptim.graph.DGraph.isIsomorphicTo()) defined in the class [DGraph](#denoptim.graph.DGraph) in the package denoptim.graph. The graphs are compared with the Vento-Foggia algorithm (see [DOI:10.1109/TPAMI.2004.75](http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=1323804)) using the external library org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector. (see the user manual for more [info](#GraphIsomorphism)).
 
 ### Graph List Comparator {#CLG}
 
-
-This program allows to deal with lists of graphs and more specifically, search for denoptim isomorphism within these lists. The run is implemented by the class [GraphListsHandler](#denoptim.programs.graphlisthandler.GraphListsHandler) in the package denoptim.programs.graphlistshandler.
-Here the method [isIsomorphicTo](#denoptim.graph.DGraph.isIsomorphicTo()) is run through all the lists provided in the input files.
+The [ProgramTask](#denoptim.task.ProgramTask) dealing with standalone comparison of lists of graphs is [GraphListsHandler](#denoptim.programs.graphlisthandler.GraphListsHandler). Here the method [isIsomorphicTo](#denoptim.graph.DGraph.isIsomorphicTo()) is use to compare each member of a list with each member of another list.
 
 
 ### Fragmenter {#FRG}
 
-The [ProgramTask](#denoptim.task.ProgramTask) for this run is the class [Fragmenter](#denoptim.programs.fragmenter.Fragmenter) in the  package denoptim.programs.fragmenter. Besides the usual parameter class this package contains the classes [CuttingRule](#denoptim.programs.fragmenter.CuttingRule) and [MatchedBond](denoptim.programs.fragmenter.MatchedBond) which define these two respective core concepts of the run. The [runProgram](denoptim.task.ProgramTask.runProgram()) method of this run has the potential of calling two different tasks: the Fragmentation ([ParallelFragmentationAlgorithm](#denoptim.fragmenter.ParallelFragmentationAlgorithm)) and the Extraction of Conformers([ConformerExtractorTask](#denoptim.fragmenter.ConformerExtractorTask)). Both this methods are collected in the package denoptim.fragmenter.
-The conformer extraction task analyzes an isomorphic family of fragments and identifies the most representative one, which is usually made available for the successive fragmentation.
-The fragmentation task instead creates fragments from a list of candidates by chopping parts matching the SMARTS queries expressed by the user.  
+The [ProgramTask](#denoptim.task.ProgramTask) performing fragmentation tasks and management of fragment libraries is the [Fragmenter](#denoptim.programs.fragmenter.Fragmenter). 
+
+When fragmentation is requires, the [ParallelFragmentationAlgorithm](#denoptim.fragmenter.ParallelFragmentationAlgorithm) can parallelize the work as follows:
+1. Split input structures in N batches.​
+2. Run N fragmentation threads in parallel.​ Each thread contributes creating an molecular weight (MW)-resolved fragment collections. MW is intrinsic property, and therefore it’s thread-safe.​ Moreover, in case of need to identify isomorphic fragments, a single fragment is used to represent each isomorphic family (i.e., the list of fragments isomorphic to each other).
+
+Also when the task is the extraction of representative geometries, the work can be parallelized. This is done by [ParallelConformerExtractionAlgorithm](#denoptim.fragmenter.ParallelConformerExtractionAlgorithm), which runs one thread for each isomorphic family in an asynchronous parallelization scheme.
+ 
 
 ### Graphical User Interface {#GUI}
 
-## Other Packages
+Contrarily to most of the other run types, the launching of the GUI occurs directly via running [GUI](#denoptim.gui.GUI) without involving any [ProgramTask](#denoptim.task.ProgramTask) implementation. 
 
-| Package | Description|
-| ------- | -----------|
-| denoptim.fragspace| Package that handles the space of building blocks, i.e., the space comprised of the lists of [Vertices](#denoptim.graph.Vertex) and the rules governing their connections to form a DENOPTIM [Graph](#denoptim.graph.DGraph)|
-| denoptim.logging | Package that manages and defines the tools used to monitor and log all the the operations performed throughout any given run|
-| denoptim.utils | Package that collects all the utilities needed by different DENOPTIM tasks |
-| denoptim.json | Package used to manage json files |
-| denoptim.files | Package for the management of the file provided to or by DENOPTIM |
-| denoptim.constants | Package that collects all the general constants of DENOPTIM |
-| denoptim.exception| Package that handles the eventual exception thrown by DENOPTIM |
-| denoptim.io | Package that contains all the utility methods for input and output |
-
-
-## Test
-
-### Unit Tests
-
-The Unit Test classes can be found in their respective packages and they appear as one or more additional class/es. If you want to check on this independentely from the main packages you can find the Unit Tests on the voice __Files__ in the menu bar above.
-
-### Functional Tests
-
-Under the directory _test_ there are five different examples of DENOPTIM's runs and some of its most important features.
-Besides, there is a folder which collects all the so-called functional test which are a collection of automated runs testing the functionality of DENOPTIM (integration tests). 
-All these tests and examples can be run by executing the relative shell script present in each folder.
