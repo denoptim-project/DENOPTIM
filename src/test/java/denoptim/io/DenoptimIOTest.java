@@ -49,7 +49,10 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.ga.EAUtils;
+import denoptim.ga.Population;
 import denoptim.graph.APClass;
+import denoptim.graph.Candidate;
 import denoptim.graph.CandidateLW;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
@@ -64,6 +67,7 @@ import denoptim.graph.TemplateTest;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fragmenter.CuttingRule;
 
 /**
@@ -218,6 +222,70 @@ public class DenoptimIOTest
         sb = new StringBuilder();
         assertTrue(v.sameAs(readInVrtxs.get(0),sb),"Same vertex content: " 
                 + sb.toString());
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testReadGenerationFromSummary() throws Exception {
+
+        assertTrue(this.tempDir.isDirectory(),"Should be a directory ");
+
+        GAParameters settings = new GAParameters();
+        settings.setPopulationSize(2);
+        settings.setWorkingDirectory(tempDir.getAbsolutePath());
+        
+        String genDir = EAUtils.getPathNameToGenerationFolder(26,settings);
+        FileUtils.createDirectory(genDir);
+        
+        Candidate c1 = new Candidate(new DGraph());
+        c1.setFitness(1.111);
+        c1.setUID("111");
+        c1.getGraph().setGraphId(1);
+        String pathname = genDir + SEP + "M001.sdf";
+        c1.setSDFFile(pathname);
+        DenoptimIO.writeCandidateToFile(new File(pathname), c1, false);
+        
+        Candidate c2 = new Candidate(new DGraph());
+        c2.setFitness(2.2);
+        c2.setUID("222");
+        c2.getGraph().setGraphId(2);
+        pathname = genDir + SEP + "M002.sdf";
+        c2.setSDFFile(pathname);
+        DenoptimIO.writeCandidateToFile(new File(pathname), c2, false);
+        
+        Population pop = new Population(settings);
+        pop.add(c1);
+        pop.add(c2);
+        String summary = EAUtils.getPathNameToGenerationDetailsFile(26,settings);
+        EAUtils.outputPopulationDetails(pop, summary, settings);
+        
+        List<Candidate> cands = DenoptimIO.readGenerationFromSummary(
+                new File(summary));
+        
+        assertEquals(2,cands.size());
+        assertEquals("111",cands.get(0).getUID());
+        assertEquals("222",cands.get(1).getUID());
+        assertEquals(1,cands.get(0).getGraph().getGraphId());
+        assertEquals(2,cands.get(1).getGraph().getGraphId());
+        
+        // We test also the possibility that the run folder has been moved, and
+        // thus the pathname have to be made relative to the pathname of the
+        // generation summary
+        String newPath = tempDir.getAbsolutePath() + SEP + "otherPlace";
+        FileUtils.createDirectory(newPath);
+        org.apache.commons.io.FileUtils.copyDirectory(new File(genDir),
+                new File(newPath));
+        
+        cands.clear();
+        cands = DenoptimIO.readGenerationFromSummary(
+                new File(summary));
+        
+        assertEquals(2,cands.size());
+        assertEquals("111",cands.get(0).getUID());
+        assertEquals("222",cands.get(1).getUID());
+        assertEquals(1,cands.get(0).getGraph().getGraphId());
+        assertEquals(2,cands.get(1).getGraph().getGraphId());
     }
     
 //------------------------------------------------------------------------------
@@ -501,13 +569,15 @@ public class DenoptimIOTest
         assertTrue(FileFormat.COMP_MAP == FileUtils.detectFileFormat(file),
                 "Compatibility Matrix (1)");
         
-        DenoptimIO.writeData(pathName, "RBO SOMETING", false);
-        assertTrue(FileFormat.COMP_MAP == FileUtils.detectFileFormat(file),
-                "Compatibility Matrix (2)");
-        
         DenoptimIO.writeData(pathName, "CAP SOMETING", false);
         assertTrue(FileFormat.COMP_MAP == FileUtils.detectFileFormat(file),
                 "Compatibility Matrix (3)");
+        
+        File txtFile = new File(pathName+ ".txt");
+        DenoptimIO.writeData(txtFile.getAbsolutePath(), 
+                DENOPTIMConstants.GAGENSUMMARYHEADER, false);
+        assertTrue(FileFormat.GENSUMMARY == FileUtils.detectFileFormat(txtFile),
+                "Generation summary");
         
         String dirName = tempDir.getAbsolutePath() + SEP + "blabla1234";
         String subDirName = dirName + SEP+DENOPTIMConstants.FSEIDXNAMEROOT+"0";

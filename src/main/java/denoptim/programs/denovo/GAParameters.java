@@ -568,6 +568,13 @@ public class GAParameters extends RunTimeParameters
 
 //------------------------------------------------------------------------------
 
+    public void setPopulationSize(int size)
+    {
+        populationSize = size;
+    }
+    
+//------------------------------------------------------------------------------
+
     public int getPopulationSize()
     {
         return populationSize;

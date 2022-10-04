@@ -23,7 +23,7 @@ import denoptim.utils.MathUtils;
 import denoptim.utils.Randomizer;
 
 /**
- * <p>This tool clusters fragments based on geometrical features. For each fragment 
+ * <p>This tool clusters fragments based on geometry features. For each fragment 
  * all atoms and all attachment points are used to define a set of points in 
  * space (see {@link ClusterableFragment}). Then the RMSD of the 
  * points' position upon superposition is used to decide if geometries 
@@ -244,6 +244,14 @@ public class FragmentClusterer
                 
                 if (toRemoveClusters.contains(clusterJ))
                     continue;
+                
+                //TODO: consider re-aligning to test alternative mappings. This
+                // because the mapping is done once against the first item in 
+                // the sample, but to distinguish sample members N!=1 and M!=1
+                // a different mapping (i.e., a different isomorphism) might be
+                // preferable.
+                // Essentially, this means "get rid of the assumption that one 
+                // isomorphism is suitable to align all members of the sample.
                 
                 ClusterableFragment centroidJ = (ClusterableFragment) 
                         clusterJ.getCentroid();

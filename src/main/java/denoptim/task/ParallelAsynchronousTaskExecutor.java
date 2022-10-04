@@ -225,7 +225,7 @@ abstract public class ParallelAsynchronousTaskExecutor
         
         // This sounds weird when reading the doc, but the following does wait
         // for the threads to complete.
-        // TODO-gg try ExecutorCompletionService
+        // TODO try ExecutorCompletionService
         
         // shutdown thread pool
         tpe.shutdown();

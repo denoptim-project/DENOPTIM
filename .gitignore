@@ -9,7 +9,6 @@ build/manifest.mf
 build/lib
 build/dist
 build/images
-lib/DENOPTIM.jar
 bin/
 .idea
 *.iml
