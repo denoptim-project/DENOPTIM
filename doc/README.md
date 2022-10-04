@@ -1,22 +1,24 @@
-Doxygen Documentation                  
-======================
+HTML Documentation                  
+==================
+
+## Online Documnetation
+An online version of the documentation is available at [ADD_URL](#FIXME).
 
 
-This directory contains all the files used to construct the documentation with [Doxygen](https://doxygen.nl/index.html). The Doxyfile and DoxygenLayout files are the one used to manage doxygen input, ouput and relationships.
+## Offline Documentation
+Documentation can be built locally to make it available offline. This is particularly useful to test changes to the documentation.
 
-In case some modifications occur in the the new documentation is built by executing the command
+### Build
+The directory where this README file is located contains all the source files needed to build the documentation with [Doxygen](https://doxygen.nl/index.html). The Doxyfile and DoxygenLayout files define input and configurationa of Doxygen.
+
+To build the html pages of the documentation run the following command from within the `doc`
 
   doxygen
 
-in this directory. The new, modified documentation will be visible in the file index.html under the
-directory html
 
-To learn how to use DENOPTIM for running experiments and simulations click on the User's Manual.  
+### Usage
+Once you have built the local documentation, its entry point will be file ./html/index.html. You can open such file any browser. Double click on it open it from the command line. For example, 
 
-[User's Manual](user_manual.md)    
+  firefox ./html/index.html
 
-If instead you want to learn about DENOPTIM software architecture and its logic click on the Developer's Manual
 
-[Developer's Manual](developer_manual.md)
-
-The two manuals are extensively interlinked to aid a better comprehension.
