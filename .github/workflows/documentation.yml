@@ -21,10 +21,17 @@ jobs:
           doxyfile-path: ./Doxyfile
           working-directory: ./doc
 
+      - name: List Warnings
+        run: cat ./doc/doxygen_warn.log
+
+      - name: Grep
+        run: grep "\.md:" ./doc/doxygen_warn.log 
+           
       - name: Check broken links
         run: |
-           grep "\.md:" ./doc/doxygen_warn.log 
-           if [ "$?" -eq 0 ]
+           found=$(grep "\.md:" ./doc/doxygen_warn.log)
+           echo "Found: $found"
+           if [ "$found" -eq 0 ]
            then 
              exit 1
            fi
