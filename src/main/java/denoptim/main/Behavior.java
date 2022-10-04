@@ -24,7 +24,7 @@ import org.apache.commons.cli.CommandLine;
 import denoptim.main.Main.RunType;
 
 /**
- * Represents the behavior of the program at start-up. This class is mostly 
+ * Represents the behavior of the program at start-up. This class is mostly
  * meant to test the functionality of denoptim's main launcher.
  */
 public class Behavior
@@ -33,28 +33,28 @@ public class Behavior
      * The help message
      */
     protected String helpMsg = "";
-    
+
     /**
      * The error message
      */
     protected String errorMsg = "";
 
     /**
-     * A non-zero value means some error has occurred and the program will 
+     * A non-zero value means some error has occurred and the program will
      * terminate.
      */
     protected int exitStatus = 0;
-    
+
     /**
      * The type of run that is requested.
      */
     protected RunType runType = null;
-    
+
     /**
      * The parsed command line arguments.
      */
     protected CommandLine cmd = null;
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -64,7 +64,7 @@ public class Behavior
      * @param exitStatus any non-zero corresponds to an error.
      * @param errorMsg the error message, if any.
      */
-    public Behavior(RunType runType, CommandLine cmd, int exitStatus, 
+    public Behavior(RunType runType, CommandLine cmd, int exitStatus,
             String helpMsg, String errorMsg)
     {
         this.helpMsg = helpMsg;
@@ -73,7 +73,7 @@ public class Behavior
         this.runType = runType;
         this.cmd = cmd;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -85,7 +85,7 @@ public class Behavior
     {
         this(runType, cmd, 0, null, null);
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
 }

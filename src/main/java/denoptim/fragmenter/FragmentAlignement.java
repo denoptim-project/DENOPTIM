@@ -13,6 +13,11 @@ import denoptim.graph.FragIsomorphNode;
 import denoptim.graph.Fragment;
 import denoptim.graph.FragmentIsomorphismInspector;
 
+/**
+ * Class performing the alignment of {@link Fragment}s
+ * @author marcof
+ *
+ */
 public class FragmentAlignement
 {
     /**

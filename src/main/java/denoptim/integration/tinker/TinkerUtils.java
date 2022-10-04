@@ -41,6 +41,7 @@ import denoptim.utils.ConnectedLigand;
 import denoptim.utils.ConnectedLigandComparator;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.MathUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.ObjectPair;
 
 
@@ -718,7 +719,7 @@ public class TinkerUtils
 //------------------------------------------------------------------------------
  
     /**
-     * Convert <code>IAtomContainer</code> to <code>TinkerMolecule</code>.
+     * Convert {@link IAtomContainer} to {@link TinkerMolecule}.
      * Supports only containers where all atoms are reachable following
      * the connectivity and starting from any other atom in the container.
      * @param mol the CDK molecule to convert
@@ -746,7 +747,8 @@ public class TinkerUtils
             IAtom atmI = mol.getAtom(i);
             if (debug)
             {
-                System.err.println("Atom to IC: "+atmI.getSymbol()+" "+i);
+                System.err.println("Atom to IC: "
+                        +MoleculeUtils.getSymbolOrLabel(atmI)+" "+i);
             }
 
             // define the bond length
@@ -815,7 +817,7 @@ public class TinkerUtils
                 nbrs[3] = i5;
             }
 
-            String symb = atmI.getSymbol();
+            String symb = MoleculeUtils.getSymbolOrLabel(atmI);
             int atyp = 0; // Tinker types are assigned later
 
             TinkerAtom ta = new TinkerAtom(i+1, symb, atyp,
@@ -915,7 +917,8 @@ public class TinkerUtils
             {
                 if (debug)
                 {
-                   System.err.println("  Eval. 3rd (ANG): " + nbr.getSymbol()
+                   System.err.println("  Eval. 3rd (ANG): " + 
+                           MoleculeUtils.getSymbolOrLabel(nbr)
                    + mol.indexOf(nbr) + " " 
                    + (mol.indexOf(nbr) < i1) + " "
                    + (nbr != atmI1) + " " 
@@ -937,7 +940,7 @@ public class TinkerUtils
                         if (debug)
                         {
                             System.err.println("  ...but collinear with "
-                                               + atmI3.getSymbol() + i3
+                                    + MoleculeUtils.getSymbolOrLabel(atmI3) + i3
                                                + " (i4-i2-i3: " + dbcAng 
                                                + ")");
                         }
@@ -952,7 +955,8 @@ public class TinkerUtils
             {
                 if (debug)
                 {
-                   System.err.println("  Eval. 3rd (TOR): " + nbr.getSymbol()
+                   System.err.println("  Eval. 3rd (TOR): " 
+                            + MoleculeUtils.getSymbolOrLabel(nbr)
                    + mol.indexOf(nbr) + " "
                    + (mol.indexOf(nbr) < i1) + " "
                    + (nbr != atmI1) + " "
@@ -1017,11 +1021,11 @@ public class TinkerUtils
             if (!tMap.containsKey(st))
             {
                 String msg = "Unable to assign atom type to atom '" + st +"'. ";
-		if (st.equals("R"))
-		{
-		    msg = msg + "Unusual dummy atom symbols get atom symbol "
-		      + "'R'. Please, add atom type 'R' in your atom type map.";
-		}
+        		if (st.equals("R"))
+        		{
+        		    msg = msg + "Unusual dummy atom symbols get atom symbol "
+        		      + "'R'. Please, add atom type 'R' in your atom type map.";
+        		}
                 throw new DENOPTIMException(msg);
             }
             Integer val = tMap.get(st);

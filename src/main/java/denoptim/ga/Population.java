@@ -72,9 +72,10 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     {
         super();
         this.settings = settings;
-        if (((FragmentSpaceParameters) settings.getParameters(
-                ParametersType.FS_PARAMS)).getFragmentSpace()
-                .useAPclassBasedApproach())
+        FragmentSpaceParameters fsParams = ((FragmentSpaceParameters) 
+                settings.getParameters(ParametersType.FS_PARAMS));
+        if (fsParams!=null && 
+                fsParams.getFragmentSpace().useAPclassBasedApproach())
         {
             xoverCompatibilities = new XoverSitesAmongCandidates();
         }
