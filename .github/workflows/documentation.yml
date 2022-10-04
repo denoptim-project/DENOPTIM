@@ -20,19 +20,11 @@ jobs:
         with:
           doxyfile-path: ./Doxyfile
           working-directory: ./doc
-
-      - name: List Warnings
-        run: cat ./doc/doxygen_warn.log
-
-      - name: Grep
-        run: grep "\.md:" ./doc/doxygen_warn.log 
            
-      - name: Check broken links
+      - name: Check for broken links in Markdown
         run: |
-           found=$(grep "\.md:" ./doc/doxygen_warn.log)
-           echo "Found: $found"
-           if [ "$found" -eq 0 ]
-           then 
+           if grep -q "\.md:" ./doc/doxygen_warn.log; then
+             grep "\.md:" ./doc/doxygen_warn.log
              exit 1
            fi
 
