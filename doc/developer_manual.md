@@ -1,6 +1,6 @@
 # DENOPTIM Developer's Manual
 
-This manual integrates the [JavaDoc](html/annotated.html) to provide an overview on the software logic and facilitate understanding, development, and debug of the code. It is a manual meant for developers, not for users. If you are looking for information on how to use DENOPTIM, check the [users manual](user_manual.md).
+This manual integrates the [JavaDoc](annotated.html) to provide an overview on the software logic and facilitate understanding, development, and debug of the code. It is a manual meant for developers, not for users. If you are looking for information on how to use DENOPTIM, check the [user's manual](user_manual.md).
 
 * * *
 
@@ -50,7 +50,7 @@ The specifics of the evolutionary algorithm's implementation are deeply affected
 The [ProgramTask](#denoptim.task.ProgramTask) implementation dealing with combinatorial experiments is the [FragSpaceExplorer](#denoptim.programs.combinatorial.FragSpaceExplorer), while the algorithm is coded in the [CombinatorialExplorerByLayer](#denoptim.combinatorial.CombinatorialExplorerByLayer).
 Given a graph, i.e., the so-called root graph, all the combinations of fragments that can be attached on the root graph are obtained from the [FragsCombinationIterator](#denoptim.fragspace.FragsCombinationIterator). Once the combination of fragments to be attached on the root graph is defined, the construction of the resulting graph, or graphs (multiple graphs can result by closing different sets of fundamental rings on the same spanning tree) is done by the [GraphBuildingTask](#denoptim.combinatorial.CombinatorialExplorerByLayer).
 
-This type of run has the capability to periodically save [CheckPoints](#denoptim.combinatorial.CheckPoint) that allow to restart the exploration should is be interrupted by any reason.
+This type of run has the capability to periodically save [CheckPoints](#denoptim.combinatorial.CheckPoint) that allow to restart the exploration should it be interrupted by any reason.
 
 
 ### Graph Editing {#GE}
@@ -89,7 +89,7 @@ The [ProgramTask](#denoptim.task.ProgramTask) performing fragmentation tasks and
 
 When fragmentation is requires, the [ParallelFragmentationAlgorithm](#denoptim.fragmenter.ParallelFragmentationAlgorithm) can parallelize the work as follows:
 1. Split input structures in N batches.​
-2. Run N fragmentation threads in parallel.​ Each thread contributes creating an molecular weight (MW)-resolved fragment collections. MW is intrinsic property, and therefore it’s thread-safe.​ Moreover, in case of need to identify isomorphic fragments, a single fragment is used to represent each isomorphic family (i.e., the list of fragments isomorphic to each other).
+2. Run N fragmentation threads in parallel.​ Each thread contributes creating a molecular weight (MW)-resolved fragment collections. MW is an intrinsic property, and therefore it’s thread-safe.​ Moreover, in case of need to identify isomorphic fragments, a single fragment is used to represent each isomorphic family (i.e., the list of fragments isomorphic to each other).
 
 Also when the task is the extraction of representative geometries, the work can be parallelized. This is done by [ParallelConformerExtractionAlgorithm](#denoptim.fragmenter.ParallelConformerExtractionAlgorithm), which runs one thread for each isomorphic family in an asynchronous parallelization scheme.
  

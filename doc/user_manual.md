@@ -41,7 +41,7 @@ Extract the zip/tar.gz archive you have downloaded to generate a folder we'll ca
 
 Make sure you have an environment that includes JAVA and Maven. Such environment can be created by manual installation of both JAVA and Maven, or it can be created using conda:
 
-    cd $DENOPTIM\_HOME
+    cd $DENOPTIM_HOME
     conda env create -f environment.yml
     conda activate dnp_devel
 
@@ -54,15 +54,15 @@ Now, you can build DENOPTIM with
 
     mvn package
 
-Once maven has finished, you can create call DENOPTIM using a command like the following (NB: replace $DENOPTIM\_HOME and ${VERSION} as with the values that apply to your installation):
+Once maven has finished, you can create call DENOPTIM using a command like the following (NB: replace $DENOPTIM_HOME and ${VERSION} as with the values that apply to your installation):
 
 On Linux/Mac and GitBash on Windows:
 
-    java -jar $DENOPTIM\_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar
+    java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar
 
 On Windows Anaconda prompt:
 
-    java -jar $DENOPTIM\_HOME\\target\\denoptim-${VERSION}-jar-with-dependencies.jar
+    java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar
 
 The installation from source has been completed.
 
@@ -190,10 +190,13 @@ Finally, the GUI offers also the possibility to configure and run de novo design
 
 ## Genetic Algorithm Runner
 
-De novo design driven by a genetic algorithm using graphs as genome for chemical entities. The overall schematic of the genetic algorithm (GA) is shown in Figure 3. The algorithm begins with a population of candidates that can be given as input or generated from scratch. Next, a given number of generations are created by producing new offspring either from application of the genetic operators, or by building new entities from scratch.
+De novo design driven by a genetic algorithm using graphs as genome for chemical entities. The overall schematic of the genetic algorithm (GA) is shown in Figure 3. The algorithm begins with a population of candidates that can be given as input or generated from scratch. Next, a given number of generations are created by producing new offspring either from application of the genetic operators, or by building new entities from scratch.  
+  
+
 
 ![Figure 3: Evolutionary optimization scheme.](figures/ea.gif)
 
+  
 
 ### Genetic Operations
 
@@ -227,15 +230,15 @@ The __growth probability__ can be controlled by one of the following schemes (wh
 
 *   **EXP\_DIFF**: Given a growth multiplier factor _λ_, the probability of addition is given by  
 
-    \f$p = \frac {1 - e^{(-L\lambda)}}{1 + e^{(-L\lambda)}} \f$  
+     \f$ \large p = \frac {1 - e^{(-L\lambda)}}{1 + e^{(-L\lambda)}}  \f$ 
 
 *   **TANH**: Given a growth multiplier factor _λ_, the probability of addition is determined by   
 
-    \f$p = 1 - tanh(\lambda L) \f$
+    \f$ \large p = 1 - tanh(\lambda L) \f$
 
 *   **SIGMA**: This scheme is based on two factors \f$σ_1\f$ (the steepness of the function where the probability is 50%) and \f$σ_2\f$ (the value of _L_ where the probability is 50%), and calculates the probability as   
 
-    \f$p = 1 - \frac {1}{1 + e^{(-\sigma_1(L -\sigma_2)}} \f$
+    \f$ \large p = 1 - \frac {1}{1 + e^{(-\sigma_1(L -\sigma_2)}} \f$
 
 *   **UNRESTRICTED**: This scheme allows for unrestricted growth (_p = 1_ at all levels).
 
@@ -289,7 +292,7 @@ The user can formulate instructions in the form of properly formatted ascii file
 
 The _intructions\_file_ is a text file. The name of any such file is irrelevant: any file will be read irrespectively of its name. Each _intructions\_file_ is red line-by-line: each line can be arbitrarily long and will be interpreted as a single instruction. Each line begins with a keyword that defines the kind of instruction. The keyword is separated from the rest of the line by a blank space. After the blank space a variable number of arguments can be given depending on the specific instruction (see below). Currently, the following instructions can be given to DENOPTIM:
 
-*   Terminate the GA experiment. Keyword: __`STOP_GA`__; Arguments: no further arguments required. Just type the `STOP_GA` keyword.
+*   Terminate the GA experiment. Keyword: `STOP_GA`; Arguments: no further arguments required. Just type the `STOP_GA` keyword.
 *   Remove one or more candidate from the current population. Keyword __`REMOVE_CANDIDATE`__, Arguments: space-separated list of candidate names (e.g., `REMOVE_CANDIDATE M00000028 M00000031` asks to remove both candidates from the population, if they are still in the population).
 *   Evaluate one or more manually generated candidates and possibly include them into the population. Keyword __`ADD_CANDIDATE`__, Arguments: space-separated list of pathnames to files defining the candidate to be added (e.g., `ADD_CANDIDATE /tmp/candidate_1.sdf /tmp/candidate_2.sdf`)
 
@@ -393,7 +396,7 @@ where `input_parameters_file` is a text parameters file with the [Keywords](#Key
 
 ## Graph Isomorphism Analyzer {#GraphIsomorphism}
 
-This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism". "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of [graph isomorphism](https://mathworld.wolfram.com/IsomorphicGraphs.html) that differs from the most common meaning of isomorphism in graph theory. In general, graphs are considered undirected when evaluating DENOPTIM-isomorphism. Next, since a graph is effectively a spanning tree (ST\_i={{vertices}, {acyclic edges}}) with a set of fundamental cycles (FC\_i={C\_1, C\_2,...C\_n}), any graph G={ST\_i,FC\_i} that contains one or more cycles can be represented in multiple ways, G={ST\_j,FC\_j} or G={ST\_k,FC\_k}, that differ by the position of the chord/s and by the corresponding pair of ring-closing vertices between each chord defined. The DENOPTIM-isomorphism for two graphs G1 and G2 is given by the common graph theory isomorphism between two undirected graphs U1 and U2 built respectively from G1 and G2.
+This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism". "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of [graph isomorphism](https://mathworld.wolfram.com/IsomorphicGraphs.html) that differs from the most common meaning of isomorphism in graph theory. In general, graphs are considered undirected when evaluating DENOPTIM-isomorphism. Next, since a graph is effectively a spanning tree (ST\_i={{vertices}, {acyclic edges}}) with a set of fundamental cycles (FC\_i={C<sub>1</sub>, C<sub>2</sub>,...C<sub>n</sub>}), any graph G={ST<sub>i</sub>,FC<sub>i</sub>} that contains one or more cycles can be represented in multiple ways, G={ST<sub>j</sub>,FC<sub>j</sub>} or G={ST<sub>k</sub>,FC<sub>k</sub>}, that differ by the position of the chord/s and by the corresponding pair of ring-closing vertices between each chord defined. The DENOPTIM-isomorphism for two graphs G1 and G2 is given by the common graph theory isomorphism between two undirected graphs U1 and U2 built respectively from G1 and G2.
 
 Finally,
 

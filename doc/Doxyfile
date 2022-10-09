@@ -877,6 +877,7 @@ WARN_LOGFILE           = doxygen_warn.log
 INPUT                  = ../src/main/java ../src/test/java\
                         user_manual.md\
                         developer_manual.md\
+                        ./html/annotated.html
 
 
 # This tag can be used to specify the character encoding of the source files
