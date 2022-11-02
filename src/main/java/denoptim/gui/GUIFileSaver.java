@@ -99,6 +99,24 @@ public class GUIFileSaver
                 fileChooser.getFileFilter().getDescription(), DataKind.VERTEX));
         return ff;
     }
+    
+//-----------------------------------------------------------------------------
+    
+    public static FileAndFormat pickFileForSavingCuttingRules(Component parent)
+    {
+        fileChooser.resetChoosableFileFilters();
+        File file;
+        if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION)
+        {
+            file = fileChooser.getSelectedFile();
+        }
+        else
+        {
+            return null;
+        }
+        FileAndFormat ff = new FileAndFormat(file, FileFormat.CUTRULE);
+        return ff;
+    }
 	
 //-----------------------------------------------------------------------------
 
