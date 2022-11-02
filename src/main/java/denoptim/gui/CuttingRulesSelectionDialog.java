@@ -39,6 +39,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -50,6 +51,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
@@ -59,6 +61,7 @@ import org.apache.batik.swing.gvt.AbstractPanInteractor;
 import org.apache.batik.swing.gvt.AbstractResetTransformInteractor;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileAndFormat;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.io.DenoptimIO;
@@ -317,6 +320,81 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
             }
         });
         
+
+        JButton btnSaveRules = new JButton("Save Rules...");
+        btnSaveRules.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                List<CuttingRule> rules = new ArrayList<CuttingRule>();
+                if (customRulesTabModel.getRowCount() > 0) 
+                {
+                    for (int i=0; i<customRulesTabModel.getRowCount(); i++) 
+                    {
+                        Vector rowdat = customRulesTabModel.getDataVector().elementAt(i);
+                        try
+                        {
+                            String optsStr = (String) rowdat.elementAt(5);
+                            rules.add(new CuttingRule(
+                                (String) rowdat.elementAt(0),
+                                (String) rowdat.elementAt(2),
+                                (String) rowdat.elementAt(4),
+                                (String) rowdat.elementAt(3),
+                                Integer.valueOf((String) rowdat.elementAt(1)),
+                                new ArrayList<String>(
+                                        Arrays.asList(optsStr.split("\\s+")))));
+                        } catch (Exception ecr)
+                        {
+                            JOptionPane.showMessageDialog(btnSaveRules,
+                                    String.format("<html><body width='%1s'>"
+                                            + "Could not create cutting rule "
+                                            + "from these"
+                                            + "values: "
+                                            + rowdat.elementAt(i)
+                                            + ". Hint: " + ecr.getMessage()
+                                            + ". Skipping this line!</html>",
+                                            400),
+                                    "Error",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    UIManager.getIcon("OptionPane.errorIcon"));
+                            continue;
+                        }
+                        String name = (String) customRulesTabModel.getValueAt(i, 0);
+                        System.out.println("Name: "+name);
+                    }
+                }
+                
+                FileAndFormat fileAndFormat = 
+                        GUIFileSaver.pickFileForSavingCuttingRules(btnSaveRules);
+                if (fileAndFormat == null)
+                {
+                    return;
+                }
+                try
+                {
+                    DenoptimIO.writeCuttingRules(fileAndFormat.file, rules);
+                    FileUtils.addToRecentFiles(fileAndFormat.file, 
+                            FileFormat.CUTRULE);
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(btnSaveRules,
+                            "Could not write to '" + fileAndFormat.file + "'! "
+                            + "Hint: "+ex.getMessage(),
+                            "Error",
+                            JOptionPane.PLAIN_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                FileUtils.addToRecentFiles(fileAndFormat.file,
+                        fileAndFormat.format);
+            }
+        });
+        
+        
+        
         JScrollPane customRulesScrollPane = new JScrollPane(customRulesTable);
         customRulesTable.getTableHeader().setPreferredSize(
                 new Dimension(customRulesScrollPane.getWidth(), 40));
@@ -341,6 +419,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         pnlButtonsCustomRules.add(btnRemoveCustomRule);
         pnlButtonsCustomRules.add(btnViewSelectedCustomRule);
         pnlButtonsCustomRules.add(btnImportRules);
+        pnlButtonsCustomRules.add(btnSaveRules);
 
         JPanel headerCustomBlock = new JPanel(new BorderLayout());
         headerCustomBlock.add(rdbUseCustom, BorderLayout.WEST);
