@@ -62,7 +62,7 @@ On Linux/Mac and GitBash on Windows:
 
 On Windows Anaconda prompt:
 
-    java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar
+    java -jar $DENOPTIM_HOME\target\denoptim-${VERSION}-jar-with-dependencies.jar
 
 The installation from source has been completed.
 
