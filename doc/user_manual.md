@@ -110,7 +110,7 @@ Attachment points are owned by vertices and represent the possibility of that sp
 
 The latter property, the label, is a string with no spaces specifying the so-called __class of the attachment point__ (or attachment point class), APClass. The APClass can be defined also by the user (e.g., via the GUI) as long as it adheres to the following syntax.
 
-__string:int__
+`<string>:<int>`
 
 where
 
@@ -228,7 +228,7 @@ The generation of very large graphs or graphs with too many incident edges on a 
 
 The __growth probability__ can be controlled by one of the following schemes (where _L_ is either the vertex _level_ or the number of heavy atoms):
 
-*   **EXP\_DIFF**: Given a growth multiplier factor _λ_, the probability of addition is given by  
+*   **EXP_DIFF**: Given a growth multiplier factor _λ_, the probability of addition is given by  
 
      \f$ \large p = \frac {1 - e^{(-L\lambda)}}{1 + e^{(-L\lambda)}}  \f$
 
@@ -246,7 +246,7 @@ The **crowding probability** is meant to reduce the likeliness of adding inciden
 
 For example, we consider vertex 3 in Figure 4 (i.e., the blue square at the center of the figure), and assume that the molecular representation of this vertex consists of a single atom holding four attachment points. To calculate the crowdedness of _AP2_ (i.e., the yellow circle located below the blue square representing vertex 3) we count the number of APs that i) share the same source atom of _AP2_, and ii) are used to form edges with vertices that are not capping groups. While condition _i_ is satisfied by all four APs of the vertex, only two APs satisfy condition _ii_. The crowdedness of _AP2_ is thus _CAP2 = 2_.
 
-The crowding probability for _APi_ is then calculated using the crowdedness _CAPi_ according to any of the schemes presented above (**EXP\_DIFF**, **TANH**, **SIGMA**, **UNRESTRICTED**) using _CAPi_ in place of _L_.
+The crowding probability for _APi_ is then calculated using the crowdedness _CAPi_ according to any of the schemes presented above (**EXP_DIFF**, **TANH**, **SIGMA**, **UNRESTRICTED**) using _CAPi_ in place of _L_.
 
 ### Parents Selection Strategies
 
@@ -288,19 +288,19 @@ The output from an ongoing or completes GA experiment can be inspected with the 
 
 During a GA run the user often desires to intervene with actions altering the course of the experiment. The GARunner runs a command listener that checks for instructions deposited in a dedicated location of the file system. Depending on the instructions found, DENOPTIM will try to perform the corresponding tasks as soon as compatible with the ongoing algorithm. Once an instruction has been found and interpreted by DENOPTIM (this event is reported in the log file), it cannot be undone/overwritten, even if it is still to be performed.
 
-The user can formulate instructions in the form of properly formatted ascii files (i.e., an _intructions\_file_) that are deposited under the `RUNYYYYMMDDHHMMSS/interface` folder, i.e., a file-system location that is specific for a single GA run. The _intructions\_file_ has effects only on the specific GA run that generated the `RUNYYYYMMDDHHMMSS` folder.
+The user can formulate instructions in the form of properly formatted ascii files (i.e., an _intructions_file_) that are deposited under the `RUNYYYYMMDDHHMMSS/interface` folder, i.e., a file-system location that is specific for a single GA run. The _intructions_file_ has effects only on the specific GA run that generated the `RUNYYYYMMDDHHMMSS` folder.
 
-The _intructions\_file_ is a text file. The name of any such file is irrelevant: any file will be read irrespectively of its name. Each _intructions\_file_ is red line-by-line: each line can be arbitrarily long and will be interpreted as a single instruction. Each line begins with a keyword that defines the kind of instruction. The keyword is separated from the rest of the line by a blank space. After the blank space a variable number of arguments can be given depending on the specific instruction (see below). Currently, the following instructions can be given to DENOPTIM:
+The _intructions_file_ is a text file. The name of any such file is irrelevant: any file will be read irrespectively of its name. Each _intructions_file_ is red line-by-line: each line can be arbitrarily long and will be interpreted as a single instruction. Each line begins with a keyword that defines the kind of instruction. The keyword is separated from the rest of the line by a blank space. After the blank space a variable number of arguments can be given depending on the specific instruction (see below). Currently, the following instructions can be given to DENOPTIM:
 
 *   Terminate the GA experiment. Keyword: `STOP_GA`; Arguments: no further arguments required. Just type the `STOP_GA` keyword.
-*   Remove one or more candidate from the current population. Keyword __`REMOVE_CANDIDATE`__, Arguments: space-separated list of candidate names (e.g., `REMOVE_CANDIDATE M00000028 M00000031` asks to remove both candidates from the population, if they are still in the population).
-*   Evaluate one or more manually generated candidates and possibly include them into the population. Keyword __`ADD_CANDIDATE`__, Arguments: space-separated list of pathnames to files defining the candidate to be added (e.g., `ADD_CANDIDATE /tmp/candidate_1.sdf /tmp/candidate_2.sdf`)
+*   Remove one or more candidate from the current population. Keyword `REMOVE_CANDIDATE` , Arguments: space-separated list of candidate names (e.g., `REMOVE_CANDIDATE M00000028 M00000031` asks to remove both candidates from the population, if they are still in the population).
+*   Evaluate one or more manually generated candidates and possibly include them into the population. Keyword `ADD_CANDIDATE`, Arguments: space-separated list of pathnames to files defining the candidate to be added (e.g., `ADD_CANDIDATE /tmp/candidate_1.sdf /tmp/candidate_2.sdf`)
 
 ## FragSpaceExplorer
 
 FragSpaceExplorer performs systematic exploration of the fragment space, or, more appropriately, of the space of graph building blocks - BB Space). The tool can be used to visit all the combination of building blocks that can be obtained from a given starting point (i.e., one or more graphs) and a defined BB Space, i.e., an ensemble of building blocks, connection rules and constraints. FragSpaceExplorer can be used for combinatorial approaches, where a number of alternative chemical entities need to be generated and evaluated, and also to enumerate entities or just to appreciate the characteristics of a designed BB Space. For instance, one may want to know how many acceptable chemical entities are encoded in a BB Space one has configured, or the amount of redundancy in such space (i.e., number of different graphs that encode the same chemical entity).
 
-A set of initial graphs (from now on referred as the roots) can be given as input or built from a library of scaffolds. FragSpaceExplorer iterates over all roots and all the combinations of building blocks: vertices of any type, including molecular fragments, capping groups, if any, and the “empty fragment”, which represents the possibility of leaving the AP unused if permitted. Only one vertex is appended on each attachment point, thus each root is coated by vertices layer-by-layer. The graphs generated by adding N layers of vertices belong to the LN-1 and are used as roots to create the graphs of LN (Figure 6).
+A set of initial graphs (from now on referred as the roots) can be given as input or built from a library of scaffolds. FragSpaceExplorer iterates over all roots and all the combinations of building blocks: vertices of any type, including molecular fragments, capping groups, if any, and the “empty fragment”, which represents the possibility of leaving the AP unused if permitted. Only one vertex is appended on each attachment point, thus each root is coated by vertices layer-by-layer. The graphs generated by adding N layers of vertices belong to the L<sub>N-1</sub> and are used as roots to create the graphs of L<sub>N</sub> (Figure 6).
 
 ![Figure 6: Numbering of the levels (L) in FragSpaceExplorer.](figures/fse_levels.png){html: width=25%, height=25%}
 
@@ -396,7 +396,7 @@ where `input_parameters_file` is a text parameters file with the [Keywords](#Key
 
 ## Graph Isomorphism Analyzer {#GraphIsomorphism}
 
-This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism". "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of [graph isomorphism](https://mathworld.wolfram.com/IsomorphicGraphs.html) that differs from the most common meaning of isomorphism in graph theory. In general, graphs are considered undirected when evaluating DENOPTIM-isomorphism. Next, since a graph is effectively a spanning tree (ST\_i={{vertices}, {acyclic edges}}) with a set of fundamental cycles (FC\_i={C<sub>1</sub>, C<sub>2</sub>,...C<sub>n</sub>}), any graph G={ST<sub>i</sub>,FC<sub>i</sub>} that contains one or more cycles can be represented in multiple ways, G={ST<sub>j</sub>,FC<sub>j</sub>} or G={ST<sub>k</sub>,FC<sub>k</sub>}, that differ by the position of the chord/s and by the corresponding pair of ring-closing vertices between each chord defined. The DENOPTIM-isomorphism for two graphs G1 and G2 is given by the common graph theory isomorphism between two undirected graphs U1 and U2 built respectively from G1 and G2.
+This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism". "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of [graph isomorphism](https://mathworld.wolfram.com/IsomorphicGraphs.html) that differs from the most common meaning of isomorphism in graph theory. In general, graphs are considered undirected when evaluating DENOPTIM-isomorphism. Next, since a graph is effectively a spanning tree (ST<sub>i</sub>={{vertices}, {acyclic edges}}) with a set of fundamental cycles (FC<sub>i</sub>={C<sub>1</sub>, C<sub>2</sub>,...C<sub>n</sub>}), any graph G={ST<sub>i</sub>,FC<sub>i</sub>} that contains one or more cycles can be represented in multiple ways, G={ST<sub>j</sub>,FC<sub>j</sub>} or G={ST<sub>k</sub>,FC<sub>k</sub>}, that differ by the position of the chord/s and by the corresponding pair of ring-closing vertices between each chord defined. The DENOPTIM-isomorphism for two graphs G1 and G2 is given by the common graph theory isomorphism between two undirected graphs U1 and U2 built respectively from G1 and G2.
 
 Finally,
 
@@ -557,7 +557,7 @@ The following tables list all the keywords grouped according to the main functio
 |`GA-XOverSelectionMode`| Specifies the strategy for selecting crossover partners. Acceptable values are: `RANDOM`, `TS`, `RW`, and `SUS`.See Genetic Operations.|
 |`GA-CrossoverWeight`| Specifies the relative weight of crossover when generating new candidate population members.|
 |`GA-MutationWeight`| Specifies the relative weight of mutation when generating new candidate population members.|
-|`GA-MultiSiteMutationWeights`| Specifies the relative weight of multi-site mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutated again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the addition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.<br><br>Provide values in a comma- or space-separated list. The first value is the weight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,<br><br>GA-MultiSiteMutationWeights=10, 1<br><br>enables up to two-sites mutation and with a weight that is 1/10 of the single-site mutation.
+|`GA-MultiSiteMutationWeights`| Specifies the relative weight of multi-site mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutated again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the addition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.<br><br>Provide values in a comma- or space-separated list. The first value is the weight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,<br><br>`GA-MultiSiteMutationWeights=10, 1`<br><br>enables up to two-sites mutation and with a weight that is 1/10 of the single-site mutation.
 |`GA-ConstructionWeight`| Specifies the relative weight of construction from scratch when generating new candidate population members.|
 |`GA-SymmetryProbability`| Specifies the unspecific symmetric substitution probability. Attachment point-class specific values are defined in the definition of the space of graph building blocks.|
 |`GA-ReplacementStrategy`| Specifies the population members replacement strategy: `ELITIST` for the elitist scheme (survival of the fittest), use `NONE` for no replacement (all candidates become member of the population, which keeps growing).|
@@ -581,7 +581,7 @@ The following tables list all the keywords grouped according to the main functio
 | Keyword | Description |
 | :------- | :----------- |
 |__General__  ||
-|`3DB-WorkDir`| Specifies the pathname of the directory where files will be created. **\[REQUIRED\]**|
+|`3DB-WorkDir`| Specifies the pathname of the directory where files will be created. __[REQUIRED]__|
 |`3DB-InpSDF`| Specifies the pathname to the input SDF file that must contain graph representation of the chemical object. __[REQUIRED]__|
 |`3DB-OutSDF`| Specifies the pathname of the output SDF file that will contain the generated conformation. __[REQUIRED]__|
 |`3DB-KeepDummyAtoms`| Dummy atoms are used to handle linearities and multi-hapto bonds. By default all dummy atoms are removed before returning the final structure. This keyword prevents removal of the dummy atoms. No value needed.|
@@ -590,8 +590,8 @@ The following tables list all the keywords grouped according to the main functio
 |`3DB-ToolPSSROT`| Specifies the pathname of Tinker’s `pssrot` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
 |`3DB-ToolXYZINT`| Specifies the pathname of Tinker’s `xyzint` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
 |`3DB-ToolINTXYZ`| Specifies the pathname of Tinker’s `intxyz` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
-|`3DB-ForceFieldFile`| Specifies the pathname of the file that defines Tinker’s force field parameters (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/uff\_vdw.prm __[REQUIRED]__|
-|`3DB-KeyFile`| Specifies the pathname of the file with Tinker’s keywords (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/build\_uff.key __[REQUIRED]__|
+|`3DB-ForceFieldFile`| Specifies the pathname of the file that defines Tinker’s force field parameters (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/uff_vdw.prm __[REQUIRED]__|
+|`3DB-KeyFile`| Specifies the pathname of the file with Tinker’s keywords (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/build_uff.key __[REQUIRED]__|
 |`3DB-RCKeyFile`| Specifies the pathname of the Tinker’s keywords used in ring-closing conformational searches (see [_J. Chem. Inf. Model._ **2015**, 55, 9 1844-1856](https://doi.org/10.1021/acs.jcim.5b00424))|
 |`3DB-PSSROTParams`| Specifies the pathname of a text file with the command line arguments for standard conformational search with Tinker’s `pssrot`. An example is available at `src/main/resources/data/submit_pssrot` __[REQUIRED]__|
 |`3DB-RCPSSROTParams`| Specifies the pathname of a text file with the command line arguments for ring-closing conformational search with Tinker’s `pssrot` (see [_J. Chem. Inf. Model._ **2015**, 55, 9 1844-1856](https://doi.org/10.1021/acs.jcim.5b00424)).|
@@ -632,7 +632,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FP-No3dTreeModel`| Prevents reporting candidates using a three-dimensional molecular model that is built by aligning each building block to the attachment point vector of its parent building block. Such "three-dimensional tree" (3d-tree) structure is not refined in any way, and is only meant to provide a somewhat preliminary geometry to be further refined. Using this keyword prevents the generation of such 3d-trees, and makes denoptim build a molecular model that uses original Cartesian coordinates of the building blocks as provided in the libraries of scaffolds, fragments and capping groups.|
 |__Internal Fitness Provider__||
 |`FP-Equation`| Specifies the expression to be used for calculation of the fitness value from available descriptors (i.e., from CDK library). Descriptor values, i.e., variables, and numerical constants can be combined using operators such as +, -, \*, /, % (Modulo/remainder), and parenthesis. The expression must start with `${` and end with `}`. For example,<br><br>    ${0.23*nBase - 1.1*naAromAtom + myVariable}<br><br>is a valid expression where `nBase` and `naAromAtom` are the names of molecular descriptors implemented in the CDK library, and `myVariable` is the name of a user-defined variable. The latter is defined by meas of a `FP-DescriptorSpecs` keyword, see below.|
-|`FP-DescriptorSpecs`| Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax:<br><br>    ${atomSpecific(`<variableName>`,`<descriptor_name>`,`<SMARTS>`)}<br><br>where: <br> *   `<variableName>` is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the `FP-Equation` keyword,<br> *   `<descriptor_name>`, is the name of the descriptor in the CDK implementation, <br> *   `<SMARTS>` is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.|
+|`FP-DescriptorSpecs`| Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax:<br><br>    ${atomSpecific('<variableName>','<descriptor_name>','<SMARTS>')}<br><br>where: <br> *   `<variableName>` is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the `FP-Equation` keyword,<br> *   `<descriptor_name>`, is the name of the descriptor in the CDK implementation, <br> *   `<SMARTS>` is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.|
 |__External Fitness Provider__||
 |`FP-Source`| Specifies the pathname of the executable to run to evaluate the fitness.|
 |`FP-Interpreter`| Specifies the interpreter to use when running the external fitness provider source file.|
@@ -662,7 +662,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FRG-ISOMORPHICSAMPLESIZE`| Specifies the number (integer) of isomorphic fragments to collect. Isomorphic versions of any fragment for which this number of versions has already been collected will be rejected.|
 |`FRG-REMOVEDUPLICATES`| Use this keyword (no value needed) to request that any fragment that is isomorphic to a fragment already found should be rejected. Corresponds to setting FRG-ISOMORPHICSAMPLESIZE=1|
 |`FRG-MWSLOTSIZE`| Specifies the size (integer) of the slots used to collect fragment by molecular weight when indexing fragments to facilitate fast comparison against the bulk of generated fragments. Small value make search for duplicate fragments fast, but increase the number of stored files.|
-|`FRG-REJECTMINORISOTOPES`| Use this keyword (no value needed) to request the removal of any fragment containing isotopes different from the major isotope of a specific element (e.g., 13C, 2H)|
+|`FRG-REJECTMINORISOTOPES`| Use this keyword (no value needed) to request the removal of any fragment containing isotopes different from the major isotope of a specific element (e.g., <sup>13</sup>C, <sup>2</sup>H)|
 |`FRG-REJECTELEMENT`| Specifies an elemental symbol. Any fragment containing such element will be rejected. This keyword can be used multiple times to define more than one criterion.|
 |`FRG-REJFORMULALESSTHAN`| Specifies the minimum molecular formula of any fragment (Example of format `C6 H12 O6`). Requires that all fragments have at least at least the given molecular formula. Only one such keyword can be used.|
 |`FRG-REJFORMULAMORETHAN`| Specifies the maximum molecular formula of any fragment (Example of format `C6 H12 O6`). Triggers rejection of fragments with a molecular formula counting more atoms than what defined by the value of this keyword for any of the elements. This keyword can be used multiple times.|
@@ -677,7 +677,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FRG-SAVECLUSTERS`| Use this keyword (with no value) to request the generation of one file collecting all members of a cluster of geometries for isomorphic fragments. This will generate one file for each cluster.|
 |`FRG-SIZEUNIMODALPOPULATION`| Specifies the number of geometries (integer) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.|
 |`FRG-MAXNOISEUNIMODALPOPULATION`| Specified the maximum amount of noise (double, in angstrom) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.|
-|`FRG-SDWEIGHTUNIMODALPOPULATION`| Specifies the weight (double) of the standard deviation when calculating the threshold RMSD value for distinguishing geometries. The threshold is calculated as<br><br>threshold\_RMSD = mean\_RMSD + factor \* standard\_deviation\_RMSD|
+|`FRG-SDWEIGHTUNIMODALPOPULATION`| Specifies the weight (double) of the standard deviation when calculating the threshold RMSD value for distinguishing geometries. The threshold is calculated as <br> threshold_RMSD = mean_RMSD + factor * standard_deviation_RMSD|
 
 
 
@@ -714,8 +714,8 @@ The following tables list all the keywords grouped according to the main functio
 
 | Keyword | Description |
 | :------- | :----------- |
-|`Isomorphism-inpGraphA`| Pathname to one of the graph to be considered for the detection of [DENOPTIM-isomorphism](Toc9999_7)(add internal link).|
-|`Isomorphism-inpGraphB`| Pathname to the other of the graph to be considered for the detection of [DENOPTIM-isomorphism](Toc9999_7)(add internal link)|
+|`Isomorphism-inpGraphA`| Pathname to one of the graph to be considered for the detection of [DENOPTIM-isomorphism](#GraphIsomorphism).|
+|`Isomorphism-inpGraphB`| Pathname to the other of the graph to be considered for the detection of [DENOPTIM-isomorphism](#GraphIsomorphism)|
 
 ## Stand-alone Graph List Comparator
 
@@ -738,11 +738,11 @@ SDF file format are best suited for vertices that contain molecular fragments be
 
 The requirement for the chemical representation contained in an SDF file to be perceived as a vertex is the presence of associated data (also called tags, fields, or properties) that define the attachment points, i.e., the `<ATTACHMENT_POINT>` property. The value of this property must reflect the following syntax convention. For a single attachment point rooted on an atom (square brackets indicate optional components):
 
-`n1#cA:csA\[:btA\]\[:xA%yA%zA\]`
+n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>[:bt<sub>A</sub>][:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>]
 
 For multiple attachment points rooted on the same atom (square brackets indicate optional components):
 
-`n2#cB:scB\[:btB\]\[:xB%yB%zB\],cC:scC\[:btC\]\[:xC%yC%zC\]`
+n<sub>2</sub>`#`c<sub>B</sub>:sc<sub>B</sub>[:bt<sub>B</sub>][:x<sub>B</sub>%y<sub>B</sub>%z<sub>B</sub>],c<sub>C</sub>:sc<sub>C</sub>[:bt<sub>C</sub>][:x<sub>C</sub>%y<sub>C</sub>%z<sub>C</sub>]</pre>
 
 where:
 
@@ -754,11 +754,12 @@ where:
 
 In the SDF file strings pertaining a single source atom are separated by spaces. So the overall result is the following:
 
-    …
-    > <ATTACHMENT\_POINTS>
-    n1#cA:csA:btA:xA%yA%zA n2#cB:scB:btB:xB%yB%zB,cC:scC:btC:xC%yC%zC
 
-    …
+…  
+`>` <ATTACHMENT_POINTS>     
+n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub>:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>&nbsp;n<sub>2</sub>`#`c<sub>B</sub>:sc<sub>B</sub>:bt<sub>B</sub>:x<sub>B</sub>`%`y<sub>B</sub>`%`z<sub>B</sub>,c<sub>C</sub>:sc<sub>C</sub>:bt<sub>C</sub>:x<sub>C</sub>`%`y<sub>C</sub>`%`z<sub>C</sub>  
+…
+
 
 Considering the optional components, the following alternatives are also recognized and used for APs that do not define bond types (NB: they accept the default bond type, i.e., `SINGLE`) and/or AP vectors.
 
@@ -772,7 +773,7 @@ Additional fields can be present in SDF files saved by DENOPTIM. In particular, 
 
 The file defining cutting rules is a text file with keyword-labelled lines. Each line starting with the `CTR` keyword defines the specifics for a single cutting rule acoording to the following syntax:
 
-`CTR rulename priority 1st\_atm\_SMARTS 2nd\_atm\_SMARTS bnd\_SMARTS \[options\]
+`CTR rulename priority 1st_atm_SMARTS 2nd_atm_SMARTS bnd_SMARTS \[options\]
 
 Where:
 
@@ -789,8 +790,8 @@ Where:
 Here is an example of the content of a cutting rule file:
 
     …
-    CTR sArAlkM 2 \[$(C(\[#1\])(C)C)\] \[$(cCC)\] -!@  
-    CTR MAlkene -1 \[Pt\] \[$(\[#6;X4\]1~\[#6;X4\]\[Pt\]1)\] - HAPTO
+    CTR sArAlkM 2 [$(C([#1])(C)C)] [$(cCC)] -!@  
+    CTR MAlkene -1 [Pt] [$([#6;X4]1~[#6;X4][Pt]1)] - HAPTO
     …
 
 A file with a complete set of cutting rules is available under the `test/functional_tests/t30/data` folder of the distribution folder.
@@ -875,7 +876,7 @@ SDF format files used to store the final results for an evaluated chemical entit
 *   `<MOL_ERROR>` tag specifying that the candidate entity cannot be coupled with a fitness value. The content of this field is used to report details on the reasons leading to this result. The following syntax must be used:   
 
         …
-        > <Mol\_ERROR>
+        > <Mol_ERROR>
         #Keyword identifying error1: details characterizing the error1
         #Keyword identifying error2: details characterizing the error2
 
@@ -889,7 +890,7 @@ Any type and number of descriptors and properties can be included in the SDF fil
 
 Example of a fitness file with properly terminated calculation of the fitness value:
 
-    Mol\_000027 
+    Mol_000027 
       CDK     1101131251 
 
     126128  0  0  0  0  0  0  0  0999 V2000 
@@ -901,7 +902,7 @@ Example of a fitness file with properly terminated calculation of the fitness va
      43 89  1  0  0  0  0 
     M  END 
     > <cdk:Title> 
-    Mol\_000027 
+    Mol_000027 
 
     > <GraphJson> 
     …
@@ -919,7 +920,7 @@ Example of a fitness file with properly terminated calculation of the fitness va
 
 Example of an SDF file with error due to violation of constraints:
 
-    Mol\_000027 
+    Mol_000027 
       CDK     1101131251 
 
     126128  0  0  0  0  0  0  0  0999 V2000 
@@ -931,7 +932,7 @@ Example of an SDF file with error due to violation of constraints:
      43 89  1  0  0  0  0 
     M  END 
     > <cdk:Title> 
-    Mol\_000027 
+    Mol_000027 
 
     > <GraphJson> 
     …
@@ -942,7 +943,7 @@ Example of an SDF file with error due to violation of constraints:
     > <Descriptors2>
     3.452 
 
-    > <MOL\_ERROR>
+    > <MOL_ERROR>
     #ViolationOfConstraint:  Minimum non-bonded distance threshold violated. 2.766890
 
     $$$$
