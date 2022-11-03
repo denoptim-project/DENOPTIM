@@ -31,10 +31,12 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.fitness.FitnessParameters;
 import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 
 
 /**
@@ -363,6 +365,16 @@ public class CEBLParameters extends RunTimeParameters
     {
         String msg = "";
 
+        if (otherParameters.containsKey(ParametersType.FIT_PARAMS))
+        {
+            runFitnessTask = true;
+        } else {
+            // We ensure there is a fitness parameters because we'll take the 
+            // logger and default settings from there in GraphBuildingTask
+            otherParameters.put(ParametersType.FIT_PARAMS, 
+                    new FitnessParameters());
+        }
+
     	if (!workDir.equals(".") && !FileUtils.checkExists(workDir))
     	{
     	    msg = "Directory '" + workDir + "' not found. Please specify an "
@@ -428,11 +440,6 @@ public class CEBLParameters extends RunTimeParameters
             createWorkingDirectory();
 		
         processOtherParameters();
-        
-        if (otherParameters.containsKey(ParametersType.FIT_PARAMS))
-        {
-            runFitnessTask = true;
-        }
         
 		if (useGivenRoots)
 		{
