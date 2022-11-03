@@ -116,6 +116,7 @@ public class GraphBuildingTask extends FitnessTask
                 ParametersType.FIT_PARAMS),
                 new Candidate(molGraph.clone()));
         this.ceblSettings = settings;
+        // NB: we also ensure the fragment space parameters are not null
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
         {
@@ -123,6 +124,7 @@ public class GraphBuildingTask extends FitnessTask
                     ParametersType.FS_PARAMS);
         }
         this.fragSpace = fsParams.getFragmentSpace();
+        
         dGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
         rootId = molGraph.getGraphId();
         graphId = dGraph.getGraphId();

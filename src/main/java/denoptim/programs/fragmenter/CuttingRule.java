@@ -89,6 +89,18 @@ public class CuttingRule
             String smartsBnd, int priority, ArrayList<String> opts)
     {
         this.ruleName = ruleName;
+        if (ruleName.isEmpty() || ruleName.isBlank())
+            throw new IllegalArgumentException("ruleName cannot be '" 
+                    + ruleName + "'");
+        if (smartsAtm0.isEmpty() || smartsAtm0.isBlank())
+            throw new IllegalArgumentException("SMARTS for atom cannot be '" 
+                    + smartsAtm0 + "'");
+        if (smartsAtm1.isEmpty() || smartsAtm1.isBlank())
+            throw new IllegalArgumentException("SMARTS for atom cannot be '" 
+                    + smartsAtm1 + "'");
+        if (smartsBnd.isEmpty() || smartsBnd.isBlank())
+            throw new IllegalArgumentException("SMARTS for bond cannot be '" 
+                    + smartsBnd + "'");
         this.smartsAtm0 = smartsAtm0;
         this.smartsAtm1 = smartsAtm1;
         this.smartsBnd = smartsBnd;
