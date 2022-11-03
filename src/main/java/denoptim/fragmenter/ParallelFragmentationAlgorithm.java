@@ -340,7 +340,8 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
                 // expected to be found (but CSD uses them...)
                 try
                 {
-                    MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+                    // MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+                    MoleculeUtils.explicitHydrogens(mol);
                     MoleculeUtils.ensureNoUnsetBondOrders(mol);
                 } catch (CDKException e)
                 {
