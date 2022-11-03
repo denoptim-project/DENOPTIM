@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 3.2.0, Aug 2022_
+_Version 3.2.1, Aug 2022_
 
 [TOC]
 
@@ -17,7 +17,7 @@ To cite DENOPTIM, please cite [_J. Chem. Inf. Model._ **2019**, 59, 10, 4077–4
 * * *
 
 # Installation
- 
+
 
 ## Install From Conda (recommended)
 
@@ -70,8 +70,8 @@ The installation from source has been completed.
 # Documentation
 
 We invite the reader to go through the following introduction to learn the fundamentals of DENOPTIM, its methods and terminology.
-It follows the user's manual of the software, which is meant to elucidate the programs DENOPTIM can run and explain their use. 
-Throughout the manual there are also several references to the [developer's manual](developer_manual.md) which is meant instead to elucidate aspects more related to DENOPTIM's software architecture and its algorithms programming. 
+It follows the user's manual of the software, which is meant to elucidate the programs DENOPTIM can run and explain their use.
+Throughout the manual there are also several references to the [developer's manual](developer_manual.md) which is meant instead to elucidate aspects more related to DENOPTIM's software architecture and its algorithms programming.
 
 * * *
 # Introduction to DENOPTIM
@@ -146,12 +146,12 @@ Fitness providers can be of two types:
 
 *   internal fitness provider: it's DENOPTIM's code that is executed within the DENOPTIM virtual machine to calculate descriptors from chemical representation that are built on-the-fly for each chemical entity from its graph representation. The descriptors are then combined into a numerical fitness value according to an equation that must be defined in the input. The internal fitness provider does not perform any molecular modeling, such as geometry optimization and the like.
 *   external fitness provider: it's a software external to DENOPTIM, that DENOPTIM runs as a sub-process to compute the fitness of a chemical entity. Any `bash` or `python` script can be executed as an external fitness provider. An external fitness provider is expected to do the following tasks:
-    
+
     1.  Read the input defining the entity to evaluate from an [SDF file produced by DENOPTIM](#CandidateChemicalEntityFiles).
     2.  Perform any molecular modeling tasks, including, for example, 3D model construction, property calculations, output file parsing, and post processing.
     3.  Calculate the fitness value from the results of the molecular modeling tasks.
     4.  Create an output SDF file (see [Fitness Files](#FitnessFiles)) for storing the fitness value of the candidate entity (or a properly formatted error message) in addition to any useful output data that might be used to post-process the results.
-    
+
     When DENOPTIM algorithms are asked to use an external fitness provider, they execute such task, wait for completion, and retrieve the final results from the [output fitness file](#FitnessFiles). Note that DENOPTIM programs do not interact with the running script.
 
 * * *
@@ -163,14 +163,14 @@ Fitness providers can be of two types:
 The graphical user interface (GUI) is the main interface used for preparing and inspecting DENOPTIM files and experiments. To launch the GUI, you can chose one of the following:
 
 *   if you installed via conda (recommended), you can run the command following command.
-    
+
         denoptim
-    
+
 *   alternatively, double click on the `denoptim-${PKG_VERSION}-jar-with-dependencies.jar` file, the location of which depends on how you have installed DENOPTIM: this file will be under `target` subfolder of the DENOPTIM distribution folder (the folder downloaded to install the release) if you have built DENOPTIM from source, of it will be under the `${path_to_active_env_location}/lib/` for installation via conda.
 *   another alternative is to run the following command, again the `${path_to_denoptim_jar}` depends on how you have installed DENOPTIM (see previous point):
-    
-         java -jar ${path_to_denoptim_jar}/denoptim-${PKG_VERSION}-jar-with-dependencies.jar 
-    
+
+         java -jar ${path_to_denoptim_jar}/denoptim-${PKG_VERSION}-jar-with-dependencies.jar
+
 
 For installation via conda, remember to activate the appropriate conda environment before issuing any of the above command.
 
@@ -178,7 +178,7 @@ The GUI provides instruction to itself in the form of tool tip messages (hold th
 
 The GUI can be used to open files directly from the command line:
 
-    denoptim path/to/file1 path/to/file2 path/to/file3 
+    denoptim path/to/file1 path/to/file2 path/to/file3
 
 The above command will open the three files if their format is recognized as one of the file formats DENOPTIM's gui can open. These include:
 
@@ -191,12 +191,12 @@ Finally, the GUI offers also the possibility to configure and run de novo design
 ## Genetic Algorithm Runner
 
 De novo design driven by a genetic algorithm using graphs as genome for chemical entities. The overall schematic of the genetic algorithm (GA) is shown in Figure 3. The algorithm begins with a population of candidates that can be given as input or generated from scratch. Next, a given number of generations are created by producing new offspring either from application of the genetic operators, or by building new entities from scratch.  
-  
+
 
 
 ![Figure 3: Evolutionary optimization scheme.](figures/ea.gif)
 
-  
+
 
 ### Genetic Operations
 
@@ -230,7 +230,7 @@ The __growth probability__ can be controlled by one of the following schemes (wh
 
 *   **EXP\_DIFF**: Given a growth multiplier factor _λ_, the probability of addition is given by  
 
-     \f$ \large p = \frac {1 - e^{(-L\lambda)}}{1 + e^{(-L\lambda)}}  \f$ 
+     \f$ \large p = \frac {1 - e^{(-L\lambda)}}{1 + e^{(-L\lambda)}}  \f$
 
 *   **TANH**: Given a growth multiplier factor _λ_, the probability of addition is determined by   
 
@@ -423,6 +423,36 @@ This program can be run with this command:
 
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
+## Python Gateway Server
+
+This server, which exploits [Py4J](https://www.py4j.org/) functionality,
+allows to use DENOPTIM from Python. After starting the server, files containing
+DENOPTIM-like data, such as, vertexes, graphs, and molecular representations,
+can be read in Python to produce Python objects that offer most of the
+functionality used within DENOPTIM.  
+
+Here is a typical workflow for analyzing DENOPTIM data with Python:
+
+1. Start the Python Gateway Server:
+```
+denoptim -r PY4J
+```
+
+   This will hold the shell until the server is no longer needed and the user
+   kills the server, for example with `ctrl+C`.
+2. While the server is running, start Python and create a client gateway that reads data from a   file, for example, `my_file_with_a_graph.sdf`:
+```
+from py4j.java_gateway import JavaGateway  
+gateway = JavaGateway()  
+data = gateway.entry_point.loadData("my_file_with_a_graph.sdf")
+```
+3. Now `data` contains the graph imported from the file. From now, the content of `data` can be manipulated in Python as any other python object. To see what you can do with it, type `data.` and hit `<tab>`. This generates the list of methods that can be called. For example, `data.getGraphId()` return the identifier of the graph stored in the file (i.e., the integer 123 in the example below).
+```
+>>> data.getGraphId()
+123
+```
+
+
 # Keywords {#Keywords}
 
 When preparing an input file remember these underlying conventions:
@@ -437,7 +467,7 @@ When preparing an input file remember these underlying conventions:
 
 The following tables list all the keywords grouped according to the main functionality affected by the use of a keyword. Unless otherwise specified, the use of the keywords is optional as most parameters have a default value. Since the settings are reported in the beginning of the log file, the default value of a specific keyword can be found in the log file of a run performed without providing that specific keyword in the input file.
 
-  
+
 
 ## Definition of the Space of Graph Building Blocks (BB Space) {#BBSpace}
 | Keyword | Description |
@@ -457,11 +487,11 @@ The following tables list all the keywords grouped according to the main functio
 |`FS-EnforceSymmetry`| Requires to introduce constitutional symmetry whenever possible. Corresponds to setting the symmetric substitution probability to 100%.|
 |`FS-ConstrainSymmetry`| Introduces a constraint in the symmetric substitution probability. Requires two arguments: the attachment point class to constrain (string), and the imposed value of the symmetric substitution probability (double 0.0-1.0). The constraints defined by this keyword overwrite the symmetric substitution probability defined by GA parameters, and the requirement of the `FS-EnforceSymmetry` keyword.<br><br>Multiple constraints can be defined one by one. <br> <br>Example: <br><br>`FS-ConstrainSymmetry=apClassA:0 0.25`<br>    `FS-ConstrainSymmetry=apClassB:1 0.0`|
 
-  
+
 
 ## Ring-Closing machinery
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
@@ -477,7 +507,7 @@ The following tables list all the keywords grouped according to the main functio
 |`RC-EvaluationClosabilityMode`| Defined the closability condition's evaluation mode:<br><br> 0.  only constitution of candidate ring,<br> 1.  only closability of 3D chain,<br> 2.  both 0 and 1.|
 |`RC-RequiredElementInRings`| Specifies the elemental symbol that has to be contained in all acceptable rings of fragments. The shortest path is used to evaluate this ring closing condition.|
 |`RC-ClosableRingSMARTS`| Specifies a single constitutional ring closability condition by a single SMARTS string. This keyword may be used multiple times to provide a list of constitutional ring closability conditions. <br><br> Example:<br><br> `RC-ClosableRingSMARTS=C1CCCCC1`<br><br> `RC-ClosableRingSMARTS=C1CCCCCC1`|
-|`RC-RingSizeBias`| Specifies the bias associated to a given ring size when selecting the combination of rings (i.e., RCAs) for a given graph.<br><br> The syntax is:<br><br>`RC-RingSizeBias=<size> <bias>`<br><br> Multiple occurrence of this keyword can be used.<br><br> Example: the following lines give to all 6-member rings a probability of being formed that is twice that given to all 5-member rings. Instead 7-membered rings will never be formed.<br><br> `RC-RingSizeBias=5 1`<br><br> `RC-RingSizeBias=6 2` <br><br> `RC-RingSizeBias=7 0`<br><br> 
+|`RC-RingSizeBias`| Specifies the bias associated to a given ring size when selecting the combination of rings (i.e., RCAs) for a given graph.<br><br> The syntax is:<br><br>`RC-RingSizeBias=<size> <bias>`<br><br> Multiple occurrence of this keyword can be used.<br><br> Example: the following lines give to all 6-member rings a probability of being formed that is twice that given to all 5-member rings. Instead 7-membered rings will never be formed.<br><br> `RC-RingSizeBias=5 1`<br><br> `RC-RingSizeBias=6 2` <br><br> `RC-RingSizeBias=7 0`<br><br>
 |`RC-MaxSizeNewRings`| Specifies the maximum number of ring members for rings created from scratch. |
 |`RC-CheckInterdependentChains`| Requires evaluation of interdependent closability condition. WARNING: this function require exhaustive conformational search, which is very time consuming.|
 |__Search for ring closing conformations in 3D__||
@@ -492,11 +522,11 @@ The following tables list all the keywords grouped according to the main functio
 |`RC-DistanceToleranceFactor`| Specifies the absolute normal deviation of the ideal value (a value between 0.0 and 1.0) that is considered acceptable for distances when evaluating the 3D ring closability of a conformation.|
 |`RC-ExtraDistanceToleranceFactor`| Specifies the factor multiplying the tolerance for inter-atomic distances when evaluating the closability of a chain by a discrete (vs. continuous) exploration of torsional space.|
 
-  
+
 
 ## GA Runner
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
@@ -530,71 +560,71 @@ The following tables list all the keywords grouped according to the main functio
 |`GA-MultiSiteMutationWeights`| Specifies the relative weight of multi-site mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutated again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the addition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.<br><br>Provide values in a comma- or space-separated list. The first value is the weight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,<br><br>GA-MultiSiteMutationWeights=10, 1<br><br>enables up to two-sites mutation and with a weight that is 1/10 of the single-site mutation.
 |`GA-ConstructionWeight`| Specifies the relative weight of construction from scratch when generating new candidate population members.|
 |`GA-SymmetryProbability`| Specifies the unspecific symmetric substitution probability. Attachment point-class specific values are defined in the definition of the space of graph building blocks.|
-|`GA-ReplacementStrategy`| Specifies the population members replacement strategy: `ELITIST` for the elitist scheme (survival of the fittest), use `NONE` for no replacement (all candidates become member of the population, which keeps growing).| 
+|`GA-ReplacementStrategy`| Specifies the population members replacement strategy: `ELITIST` for the elitist scheme (survival of the fittest), use `NONE` for no replacement (all candidates become member of the population, which keeps growing).|
 |`GA-KeepNewRingSystemVertexes`| Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) as templates in the library of general-purpose building blocks. No new template will include a scaffold vertex or be used as scaffold. See `GA-KeepNewRingSystemScaffolds` to enable the latter possibilities.|
-|`GA-KeepNewRingSystemScaffolds`| Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) that contain any scaffold vertex as template scaffolds.| 
+|`GA-KeepNewRingSystemScaffolds`| Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) that contain any scaffold vertex as template scaffolds.|
 |`GA-KeepNewRingSystemFitnessTrsh`| Specified a percentage of the current population fitness range in the form of %/100 double (i.e., a value between 0 and 1). This value represents a threshold limiting the possibility to store a newly encountered ring system only to those candidate items having a fitness that in in the best fraction of the instantaneous population range. For example, giving a value of 0.10 will make denoptim store new ring systems only from newly encountered candidates that are among the best 10% of the population in the moment each of these candidates is considered as a potential population member.|
-|__Interface__|| 
-|`GA-InitPoplnFile`| Specifies the pathname of a file (can be an SDF file or a text file where each line containing the pathname to a single-molecule SDF file) containing previously evaluated individuals to be added to the initial population. If the number of individuals is lower than the specified population side, DENOPTIM will create additional individuals.| 
-|`GA-UIDFileIn`| Specifies the pathname of a text file collecting the list of unique individual identification strings (UID; one UID each line) that are to be considered as previously evaluated individuals. DENOPTIM will ignore individuals for which the UID is found in the file. This applies also to the members of the initial population provided by the user (see `GA-InitPoplnFile` keyword).| 
-|`GA-UIDFileOut`| Specifies the pathname of the file, i.e., the UIDFileOut, collecting the list of unique individual identification strings(UID) encountered during an evolutionary experiment. If no pathname is given, a new UID file is generated under the work space of the experiment. UIDs from individuals found in an initial population file, and those specified via the `GA-UIDFile`. In keyword are collected in the `UIDFileOut` file.| 
+|__Interface__||
+|`GA-InitPoplnFile`| Specifies the pathname of a file (can be an SDF file or a text file where each line containing the pathname to a single-molecule SDF file) containing previously evaluated individuals to be added to the initial population. If the number of individuals is lower than the specified population side, DENOPTIM will create additional individuals.|
+|`GA-UIDFileIn`| Specifies the pathname of a text file collecting the list of unique individual identification strings (UID; one UID each line) that are to be considered as previously evaluated individuals. DENOPTIM will ignore individuals for which the UID is found in the file. This applies also to the members of the initial population provided by the user (see `GA-InitPoplnFile` keyword).|
+|`GA-UIDFileOut`| Specifies the pathname of the file, i.e., the UIDFileOut, collecting the list of unique individual identification strings(UID) encountered during an evolutionary experiment. If no pathname is given, a new UID file is generated under the work space of the experiment. UIDs from individuals found in an initial population file, and those specified via the `GA-UIDFile`. In keyword are collected in the `UIDFileOut` file.|
 |__Parallelization__||
 |`GA-NumParallelTasks`| Specifies the maximum number of parallel tasks to be performed.|
 |`GA-Parallelization`| Specifies the parallelization scheme: `synchronous` if parallel tasks are submitted in batches, thus no new task is submitted until the last of the previous tasks is completed, or `asynchronous` if a new parallel tasks is submitted as soon as any of the previous task is completed.|
 
-  
+
 
 ## 3D Molecular Models Builder
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
 |__General__  ||
 |`3DB-WorkDir`| Specifies the pathname of the directory where files will be created. **\[REQUIRED\]**|
-|`3DB-InpSDF`| Specifies the pathname to the input SDF file that must contain graph representation of the chemical object. __[REQUIRED]__| 
-|`3DB-OutSDF`| Specifies the pathname of the output SDF file that will contain the generated conformation. __[REQUIRED]__| 
-|`3DB-KeepDummyAtoms`| Dummy atoms are used to handle linearities and multi-hapto bonds. By default all dummy atoms are removed before returning the final structure. This keyword prevents removal of the dummy atoms. No value needed.| 
-|`3DB-Verbosity`| Specifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.| 
+|`3DB-InpSDF`| Specifies the pathname to the input SDF file that must contain graph representation of the chemical object. __[REQUIRED]__|
+|`3DB-OutSDF`| Specifies the pathname of the output SDF file that will contain the generated conformation. __[REQUIRED]__|
+|`3DB-KeepDummyAtoms`| Dummy atoms are used to handle linearities and multi-hapto bonds. By default all dummy atoms are removed before returning the final structure. This keyword prevents removal of the dummy atoms. No value needed.|
+|`3DB-Verbosity`| Specifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
 |__Interface__||
-|`3DB-ToolPSSROT`| Specifies the pathname of Tinker’s `pssrot` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__| 
-|`3DB-ToolXYZINT`| Specifies the pathname of Tinker’s `xyzint` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__| 
-|`3DB-ToolINTXYZ`| Specifies the pathname of Tinker’s `intxyz` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__| 
+|`3DB-ToolPSSROT`| Specifies the pathname of Tinker’s `pssrot` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
+|`3DB-ToolXYZINT`| Specifies the pathname of Tinker’s `xyzint` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
+|`3DB-ToolINTXYZ`| Specifies the pathname of Tinker’s `intxyz` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
 |`3DB-ForceFieldFile`| Specifies the pathname of the file that defines Tinker’s force field parameters (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/uff\_vdw.prm __[REQUIRED]__|
-|`3DB-KeyFile`| Specifies the pathname of the file with Tinker’s keywords (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/build\_uff.key __[REQUIRED]__| 
+|`3DB-KeyFile`| Specifies the pathname of the file with Tinker’s keywords (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/build\_uff.key __[REQUIRED]__|
 |`3DB-RCKeyFile`| Specifies the pathname of the Tinker’s keywords used in ring-closing conformational searches (see [_J. Chem. Inf. Model._ **2015**, 55, 9 1844-1856](https://doi.org/10.1021/acs.jcim.5b00424))|
 |`3DB-PSSROTParams`| Specifies the pathname of a text file with the command line arguments for standard conformational search with Tinker’s `pssrot`. An example is available at `src/main/resources/data/submit_pssrot` __[REQUIRED]__|
 |`3DB-RCPSSROTParams`| Specifies the pathname of a text file with the command line arguments for ring-closing conformational search with Tinker’s `pssrot` (see [_J. Chem. Inf. Model._ **2015**, 55, 9 1844-1856](https://doi.org/10.1021/acs.jcim.5b00424)).|
 
-  
+
 
 ## FragmentSpaceExplorer
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
 |__General__  ||
 |`FSE-WorkDir`| Specifies the pathname of the directory where files will be created.|
 |`FSE-MaxLevel`| Specifies the maximum number of layers of fragments to consider. Note that the root (i.e., scaffold or root graph) is considered to belong to level = -1 according to DENOPTIM's practice (see Figure 6). Therefore, when setting FSE-MAXLEVEL=3 at most 4 layers of fragments will be used (namely levels = 0, 1, 2, and 3).|
-|`FSE-UIDFile`| Specifies the pathname of the file with unique chemical entity IDs.| 
+|`FSE-UIDFile`| Specifies the pathname of the file with unique chemical entity IDs.|
 |`FSE-DBRootFolder`| Specifies the pathname of the directory where to place the folder tree of generated graphs.|
-|`FSE-MaxWait`| Specifies the wall time limit (in seconds) for waiting for completion of one or more tasks. Accepts only integer numbers.| 
+|`FSE-MaxWait`| Specifies the wall time limit (in seconds) for waiting for completion of one or more tasks. Accepts only integer numbers.|
 |`FSE-WaitStep`| Specifies the sleeping time (or time step, in seconds) between checks for completion of one or more tasks. Accepts only integer numbers.|
 |`FSE-NumOfProcessors`| Specifies the number of asynchronous processes that can be run in parallel. Usually this corresponds to the number of slave cores, if 1 such core corresponds to 1 external task.|
-|`FSE-Verbosity`| Specifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.| 
+|`FSE-Verbosity`| Specifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
 |__Definition of the root graphs (i.e., starting point of combinatorial exploration)__||
-|`FSE-RootGraphs`| Specifies the pathname of a file containing the list of root graphs.| 
+|`FSE-RootGraphs`| Specifies the pathname of a file containing the list of root graphs.|
 |`FSE-RootGraphsFormat`| Specifies the format of the root graphs. Acceptable values are 'STRING' for human readable graphs as those reported by DENOPTIM tools in SDF files (default), or 'BYTE' for serialized graphs stored in binary files.|
 |__Restart from checkpoint file__||
 |`FSE-CheckPointStepLength`| Specifies the distance between two subsequent updates of the checkpoint information as a number of generated graphs.|
 |`FSE-RestartFromCheckpoint`| Specifies the pathname of the checkpoint file and makes FragSpaceExplorer restart from such file.|
 
-  
+
 
 ## Fitness Provider
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
@@ -607,16 +637,16 @@ The following tables list all the keywords grouped according to the main functio
 |`FP-Source`| Specifies the pathname of the executable to run to evaluate the fitness.|
 |`FP-Interpreter`| Specifies the interpreter to use when running the external fitness provider source file.|
 
-  
+
 
 ## Fragmenter
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
 |__General__  ||
-|`FRG-WORKDIR`| A pathname where all files related to the execution of the fragmenter will be placed.| 
+|`FRG-WORKDIR`| A pathname where all files related to the execution of the fragmenter will be placed.|
 |`FRG-STRUCTURESFILE`| The pathname to the SDF file containing the input to be processed. Depending on the task, this keyword is used to specify where to take molecular structured to be fragmented or fragments to be filtered or clustered.|
 |`FRG-PARALLELTASKS`| Specifies the number (integer) of parallel threads when performing parallelizable tasks such as fragmentation or analysis of isomorphic fragment families.|
 |`FRG-VERBOSITY`| Specifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
@@ -627,11 +657,11 @@ The following tables list all the keywords grouped according to the main functio
 |__Fragmentation__||
 |`FRG-CUTTINGRULESFILE`| The pathname to the file defining cutting rules (see [Cutting rules file](#CuttingRules)).|
 |__Post-Fragmentation Filtering__||
-|`FRG-IGNORABLEFRAGMENTS`| The pathname to a file containing fragments that can be ignored. Any fragment isomorphic to any of the ignorable fragments will be rejected.| 
-|`FRG-TARGETFRAGMENTS`| The pathname to fragments to be collected. Only fragment isomorphic to any of the target fragments will be kept.| 
-|`FRG-ISOMORPHICSAMPLESIZE`| Specifies the number (integer) of isomorphic fragments to collect. Isomorphic versions of any fragment for which this number of versions has already been collected will be rejected.| 
+|`FRG-IGNORABLEFRAGMENTS`| The pathname to a file containing fragments that can be ignored. Any fragment isomorphic to any of the ignorable fragments will be rejected.|
+|`FRG-TARGETFRAGMENTS`| The pathname to fragments to be collected. Only fragment isomorphic to any of the target fragments will be kept.|
+|`FRG-ISOMORPHICSAMPLESIZE`| Specifies the number (integer) of isomorphic fragments to collect. Isomorphic versions of any fragment for which this number of versions has already been collected will be rejected.|
 |`FRG-REMOVEDUPLICATES`| Use this keyword (no value needed) to request that any fragment that is isomorphic to a fragment already found should be rejected. Corresponds to setting FRG-ISOMORPHICSAMPLESIZE=1|
-|`FRG-MWSLOTSIZE`| Specifies the size (integer) of the slots used to collect fragment by molecular weight when indexing fragments to facilitate fast comparison against the bulk of generated fragments. Small value make search for duplicate fragments fast, but increase the number of stored files.| 
+|`FRG-MWSLOTSIZE`| Specifies the size (integer) of the slots used to collect fragment by molecular weight when indexing fragments to facilitate fast comparison against the bulk of generated fragments. Small value make search for duplicate fragments fast, but increase the number of stored files.|
 |`FRG-REJECTMINORISOTOPES`| Use this keyword (no value needed) to request the removal of any fragment containing isotopes different from the major isotope of a specific element (e.g., 13C, 2H)|
 |`FRG-REJECTELEMENT`| Specifies an elemental symbol. Any fragment containing such element will be rejected. This keyword can be used multiple times to define more than one criterion.|
 |`FRG-REJFORMULALESSTHAN`| Specifies the minimum molecular formula of any fragment (Example of format `C6 H12 O6`). Requires that all fragments have at least at least the given molecular formula. Only one such keyword can be used.|
@@ -639,21 +669,21 @@ The following tables list all the keywords grouped according to the main functio
 |`FRG-REJECTAPCLASS`| Specifies a string that identifies the beginning of APClasses leading to rejection of fragments. For example, using `myClass` as value of this keyword will cause rejection of fragment holding attachment points of APClass `myClassA:0`, `myClassA:1`, or `myClassB:0`.|
 |`FRG-REJECTAPCLASSCOMBINATION`| Specifies a set of string where each string identifies the beginning of APClasses. Causes the rejection of fragments holding at least one attachment point matching each string.|
 |`FRG-MAXFRAGSIZE`| Specified the maximum number (integer) of non-hydrogen atom. Fragments with more atoms will be rejected.|
-|`FRG-MINFRAGSIZE`| Specified the minimum number (integer) of non-hydrogen atom. Fragments with less atoms will be rejected.| 
-|`FRG-REJECTSMARTS`| Specifies a SMARTS query for substructures leading to rejection of fragments. This keyword can be used multiple times. Fragments matching any of the given SMARTS will be rejected.| 
+|`FRG-MINFRAGSIZE`| Specified the minimum number (integer) of non-hydrogen atom. Fragments with less atoms will be rejected.|
+|`FRG-REJECTSMARTS`| Specifies a SMARTS query for substructures leading to rejection of fragments. This keyword can be used multiple times. Fragments matching any of the given SMARTS will be rejected.|
 |`FRG-RETAINSMARTS`| Specifies a SMARTS query for substructures leading to retention of fragments. This keyword can be used multiple times. Fragments not matching any of the given SMARTS will be rejected.|
 |__Analysis of Isomorphic Fragments__||
 |`FRG-CLUSTERIZEANDCOLLECT`| This keyword requests the clustering of isomorphic fragments by RMSD upon frozen geometry superposition, and the identification of the most representative geometry of each cluster. Use this keyword with value equal to either `CENTROIDS`, to collect the cluster centroid as the most representative geometry for each cluster, or `MOSTCENTRAL` to choose the actual fragment that is closest (smallest RMSD upon superposition) to the cluster centroid.|
-|`FRG-SAVECLUSTERS`| Use this keyword (with no value) to request the generation of one file collecting all members of a cluster of geometries for isomorphic fragments. This will generate one file for each cluster.| 
+|`FRG-SAVECLUSTERS`| Use this keyword (with no value) to request the generation of one file collecting all members of a cluster of geometries for isomorphic fragments. This will generate one file for each cluster.|
 |`FRG-SIZEUNIMODALPOPULATION`| Specifies the number of geometries (integer) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.|
 |`FRG-MAXNOISEUNIMODALPOPULATION`| Specified the maximum amount of noise (double, in angstrom) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.|
 |`FRG-SDWEIGHTUNIMODALPOPULATION`| Specifies the weight (double) of the standard deviation when calculating the threshold RMSD value for distinguishing geometries. The threshold is calculated as<br><br>threshold\_RMSD = mean\_RMSD + factor \* standard\_deviation\_RMSD|
 
-  
+
 
 ## Stand-alone Graph Editor
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
@@ -664,23 +694,23 @@ The following tables list all the keywords grouped according to the main functio
 |`GRAPHEDIT-OutpotGraphsFormat`| Format of the output. Can be SDF or JSON.|
 |`GRAPHEDIT-EnforceSymmetry`| Use y/yes to enforce the application of symmetry whenever possible.|
 
-  
+
 
 ## Stand-alone Fitness Runner
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
 |`FR-Input`| Pathname to the file containing the graph for which the fitness has to be calculated.|
 |`FR-Output`|Pathname where results will be saved (see [Fitness Files](#FitnessFiles))|
-|`FR-ExtractTemplates`| Add this keyword to request the extraction of template vertex from the result of the fitness evaluation process. This keyword is meant for testing purposes.| 
+|`FR-ExtractTemplates`| Add this keyword to request the extraction of template vertex from the result of the fitness evaluation process. This keyword is meant for testing purposes.|
 
-  
+
 
 ## Stand-alone Graph Isomorphism Analyzer
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
@@ -689,12 +719,12 @@ The following tables list all the keywords grouped according to the main functio
 
 ## Stand-alone Graph List Comparator
 
- 
+
 
 | Keyword | Description |
 | :------- | :----------- |
 |`GRAPHLISTS-InputGraphs-A`| Pathname to the file containing the first list of graphs.|
-|`GRAPHLISTS-InputGraphs-B`| Pathname to the file containing the second list of graphs.| 
+|`GRAPHLISTS-InputGraphs-B`| Pathname to the file containing the second list of graphs.|
 
 * * *
 
@@ -803,9 +833,9 @@ Example of a compatibility matrix file:
     RCN apclass1:0 apclass1:1,apclass2:0,apclass2:1
     RCN apclass1:1 apclass1:0
     RCN apclass2:0 apclass2:1
-    # Note that any class name not found in the library of fragments can be used to impose that no fragment (excluding 
+    # Note that any class name not found in the library of fragments can be used to impose that no fragment (excluding
     # capping groups) is attached on APs of a specific class.
-    # In this example, no fragment will be attached to APs of class apclass2:1 
+    # In this example, no fragment will be attached to APs of class apclass2:1
     RCN apclass2:1 none
     …
     # Capping groups
@@ -848,9 +878,9 @@ SDF format files used to store the final results for an evaluated chemical entit
         > <Mol\_ERROR>
         #Keyword identifying error1: details characterizing the error1
         #Keyword identifying error2: details characterizing the error2
-        
+
         …
-    
+
 *   `<FITNESS>` tag specifying the numerical value of the fitness (NB: ensure is not NaN!)
 
 Additional tag defining an unique identifier of the entity (i.e., `> <UID>`) is also needed.
