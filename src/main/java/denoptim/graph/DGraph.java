@@ -5130,9 +5130,12 @@ public class DGraph implements Cloneable
                         if (MoleculeUtils.getSymbolOrLabel(atm).equals(rcaTyp))
                         {
                             nThisType++;
-                        }
-                        else if (MoleculeUtils.getSymbolOrLabel(atm).equals(
+                        } else if (MoleculeUtils.getSymbolOrLabel(atm).equals(
                                 rcaTypes.get(rcaTyp)))
+                        {
+                            nCompType++;
+                        } 
+                        if (rcaTyp.equals(rcaTypes.get(rcaTyp)))
                         {
                             nCompType++;
                         }
