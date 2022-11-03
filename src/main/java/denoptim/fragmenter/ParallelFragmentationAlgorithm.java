@@ -20,7 +20,6 @@ package denoptim.fragmenter;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,16 +33,15 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.io.DenoptimIO;
+import denoptim.io.IteractingAtomContainerReader;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.ParallelAsynchronousTaskExecutor;
@@ -296,13 +294,12 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
         int maxBuffersSize = 50000;
         int numBatches = settings.getNumTasks();
         
-        IteratingSDFReader reader;
+        IteractingAtomContainerReader reader;
         try
         {
-            reader = new IteratingSDFReader(
-                    new FileInputStream(settings.getStructuresFile()), 
-                    DefaultChemObjectBuilder.getInstance());
-        } catch (FileNotFoundException e1)
+           reader =  new IteractingAtomContainerReader(
+                   new File(settings.getStructuresFile()));
+        } catch (IOException | CDKException e1)
         {
             // Cannot happen: we ensured the file exist, but it might have been 
             // removed after the check

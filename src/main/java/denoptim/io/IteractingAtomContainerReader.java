@@ -14,10 +14,14 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.FormatFactory;
 import org.openscience.cdk.io.formats.IChemFormat;
+import org.openscience.cdk.io.formats.INChIPlainTextFormat;
 import org.openscience.cdk.io.formats.MDLV2000Format;
 import org.openscience.cdk.io.formats.MDLV3000Format;
+import org.openscience.cdk.io.formats.SMILESFIXFormat;
+import org.openscience.cdk.io.formats.SMILESFormat;
 import org.openscience.cdk.io.iterator.DefaultIteratingChemObjectReader;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
+import org.openscience.cdk.io.iterator.IteratingSMILESReader;
 
 /**
  * An iterator that take {@link IAtomContainer}s from a file, possibly using
@@ -69,7 +73,10 @@ public class IteractingAtomContainerReader implements Iterator<IAtomContainer>
     public IteractingAtomContainerReader(File input) 
             throws FileNotFoundException, IOException, CDKException
     {
-        IChemFormat chemFormat = new FormatFactory().guessFormat(
+        FormatFactory factory = new FormatFactory();
+        factory.registerFormat(new SMILESListFormat());
+        
+        IChemFormat chemFormat = factory.guessFormat(
                 new BufferedReader(new FileReader(input)));
         if (chemFormat instanceof MDLV2000Format
                 || chemFormat instanceof MDLV3000Format)
@@ -78,10 +85,16 @@ public class IteractingAtomContainerReader implements Iterator<IAtomContainer>
             fileIterator = new IteratingSDFReader(fis, 
                     DefaultChemObjectBuilder.getInstance());
             usingIteratingReader = true;
-        } else {
+        } else if (chemFormat instanceof SMILESListFormat) {
+
+            FileInputStream fis = new FileInputStream(input);
+            fileIterator = new IteratingSMILESReader(fis,
+                    DefaultChemObjectBuilder.getInstance());
+            usingIteratingReader = true;
+        } else { 
             results = DenoptimIO.readAllAtomContainers(input);
             listIterator = results.iterator();
-        }
+        } 
     }
 
 //------------------------------------------------------------------------------
