@@ -116,7 +116,7 @@ candIdTo40="M00000025"
 # defined further below (i.e., see $newCandSrc)
 triggerRemovalAndAddition="Gen10"
 # This is the generation where we'll ask denoptim to stop.
-triggerStop="Gen15" 
+triggerStop="Gen20" 
 
 # NB: you might need to change these numbers as a consequence of a change in 
 # the algorithms that makes the exact sequence of candidates not reproducible
