@@ -222,7 +222,7 @@ Crossover involves the swapping of one subgraph from each of the parents to the 
 
 The generation of very large graphs or graphs with too many incident edges on a single vertex can be reduced by tuning the so-called substitution probability: the probability of appending a vertex on to a free AP. The substitution probability (_P_) results from the product of two components: the growth probability (_Pg_), and the crowding probability (_Pc_). The growth probability (_Pg_) limits the growth of an entity. This limit can be expressed in terms of graph deepness (i.e., using the _level_ of a vertex to determine the likeliness of further graph extension on that vertex, see Figure 4) or in terms of molecular size (i.e., number of heavy atoms, irrespectively of graph size).
 
-![Figure 4: identification of levels in a graph. Each label Lx identifies the shell of vertexes of level X. Red, dashed lines represent the border between levels. Yellow circles represent free APs. Squares of different color represent vertexes of different kind (scaffold, normal vertex, or capping group). To illustrate, vertex 1 is the scaffold vertex (i.e., represented by a red square) and is in level -1 (L\-1), vertexes 2 (normal vertex represented by blue square), 3 (another normal vertex), and 5 (a capping group represented by a green square) are at level 0 (L0), and so on.](figures/graph_levels.png)
+![Figure 4: identification of levels in a graph. Each label Lx identifies the shell of vertexes of level X. Red, dashed lines represent the border between levels. Yellow circles represent free APs. Squares of different color represent vertexes of different kind (scaffold, normal vertex, or capping group). To illustrate, vertex 1 is the scaffold vertex (i.e., represented by a red square) and is in level -1 (L-1), vertexes 2 (normal vertex represented by blue square), 3 (another normal vertex), and 5 (a capping group represented by a green square) are at level 0 (L0), and so on.](figures/graph_levels.png)
 
 
 
@@ -255,7 +255,7 @@ An important aspect of any evolutionary algorithm is that of selection of the be
 *   **Random**: In this scheme, chromosomes are randomly selected.
 *   **Tournament (TS)**: In this scheme, a group of size n (typically 2) is randomly chosen from the current population. The fittest from the group is then added to the mating pool.
 *   **RouletteWheel (RW)**: In this sampling scheme, each chromosome is assigned a portion/slice of the roulette wheel, the area of the portion being proportional to its fitness. The wheel is then spun a number of times and the chromosome corresponding to the slice that comes under the wheel marker is added to the pool.
-*   **Stochastic universal sampling (SUS)**: differs from RW in that it uses _N_ (number of selections required) equally spaced pointers. The population is shuffled randomly and a single random number _r_ in the range \[0, _1/N_\] is generated. The _N_ individuals are then chosen by generating the _N_ pointers, starting with _r_ and spaced by _1/N_, and selecting the individuals whose fitness spans the positions of the pointers. Because the individuals are selected entirely based on their positions in the population, SUS has zero bias.
+*   **Stochastic universal sampling (SUS)**: differs from RW in that it uses _N_ (number of selections required) equally spaced pointers. The population is shuffled randomly and a single random number _r_ in the range [0, _1/N_] is generated. The _N_ individuals are then chosen by generating the _N_ pointers, starting with _r_ and spaced by _1/N_, and selecting the individuals whose fitness spans the positions of the pointers. Because the individuals are selected entirely based on their positions in the population, SUS has zero bias.
 
 ### GA Parallelization Schemes
 
@@ -497,7 +497,7 @@ The following tables list all the keywords grouped according to the main functio
 | :------- | :----------- |
 |__General__  ||
 |`RC-CloseRings`| Requires the possibility of closing rings of fragments to be evaluated for all graph containing ring closing vertices. Also requires chemical structures to be generated accordingly. No value needed.|
-|`RC-Verbosity`| nSpecifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
+|`RC-Verbosity`| nSpecifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
 | __Ring related graph filtering criteria__ ||
 |`RC-MinNumberOfRingClosures`| Specifies the minimum number of rings to be closed in order to accept a candidate graph.|
 |`RC-MaxNumberRingClosures`| Specifies the maximum number of ring closures per graph.|
@@ -585,7 +585,7 @@ The following tables list all the keywords grouped according to the main functio
 |`3DB-InpSDF`| Specifies the pathname to the input SDF file that must contain graph representation of the chemical object. __[REQUIRED]__|
 |`3DB-OutSDF`| Specifies the pathname of the output SDF file that will contain the generated conformation. __[REQUIRED]__|
 |`3DB-KeepDummyAtoms`| Dummy atoms are used to handle linearities and multi-hapto bonds. By default all dummy atoms are removed before returning the final structure. This keyword prevents removal of the dummy atoms. No value needed.|
-|`3DB-Verbosity`| Specifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
+|`3DB-Verbosity`| Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
 |__Interface__||
 |`3DB-ToolPSSROT`| Specifies the pathname of Tinker’s `pssrot` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
 |`3DB-ToolXYZINT`| Specifies the pathname of Tinker’s `xyzint` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
@@ -612,7 +612,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FSE-MaxWait`| Specifies the wall time limit (in seconds) for waiting for completion of one or more tasks. Accepts only integer numbers.|
 |`FSE-WaitStep`| Specifies the sleeping time (or time step, in seconds) between checks for completion of one or more tasks. Accepts only integer numbers.|
 |`FSE-NumOfProcessors`| Specifies the number of asynchronous processes that can be run in parallel. Usually this corresponds to the number of slave cores, if 1 such core corresponds to 1 external task.|
-|`FSE-Verbosity`| Specifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
+|`FSE-Verbosity`| Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
 |__Definition of the root graphs (i.e., starting point of combinatorial exploration)__||
 |`FSE-RootGraphs`| Specifies the pathname of a file containing the list of root graphs.|
 |`FSE-RootGraphsFormat`| Specifies the format of the root graphs. Acceptable values are 'STRING' for human readable graphs as those reported by DENOPTIM tools in SDF files (default), or 'BYTE' for serialized graphs stored in binary files.|
@@ -631,8 +631,8 @@ The following tables list all the keywords grouped according to the main functio
 |__General__  ||
 |`FP-No3dTreeModel`| Prevents reporting candidates using a three-dimensional molecular model that is built by aligning each building block to the attachment point vector of its parent building block. Such "three-dimensional tree" (3d-tree) structure is not refined in any way, and is only meant to provide a somewhat preliminary geometry to be further refined. Using this keyword prevents the generation of such 3d-trees, and makes denoptim build a molecular model that uses original Cartesian coordinates of the building blocks as provided in the libraries of scaffolds, fragments and capping groups.|
 |__Internal Fitness Provider__||
-|`FP-Equation`| Specifies the expression to be used for calculation of the fitness value from available descriptors (i.e., from CDK library). Descriptor values, i.e., variables, and numerical constants can be combined using operators such as +, -, \*, /, % (Modulo/remainder), and parenthesis. The expression must start with `${` and end with `}`. For example,<br><br>    ${0.23*nBase - 1.1*naAromAtom + myVariable}<br><br>is a valid expression where `nBase` and `naAromAtom` are the names of molecular descriptors implemented in the CDK library, and `myVariable` is the name of a user-defined variable. The latter is defined by meas of a `FP-DescriptorSpecs` keyword, see below.|
-|`FP-DescriptorSpecs`| Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax:<br><br>    ${atomSpecific('<variableName>','<descriptor_name>','<SMARTS>')}<br><br>where: <br> *   `<variableName>` is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the `FP-Equation` keyword,<br> *   `<descriptor_name>`, is the name of the descriptor in the CDK implementation, <br> *   `<SMARTS>` is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.|
+|`FP-Equation`| Specifies the expression to be used for calculation of the fitness value from available descriptors (i.e., from CDK library). Descriptor values, i.e., variables, and numerical constants can be combined using operators such as +, -, *, /, % (Modulo/remainder), and parenthesis. The expression must start with `${` and end with `}`. For example,<br><br>    ${0.23*nBase - 1.1*naAromAtom + myVariable}<br><br>is a valid expression where `nBase` and `naAromAtom` are the names of molecular descriptors implemented in the CDK library, and `myVariable` is the name of a user-defined variable. The latter is defined by meas of a `FP-DescriptorSpecs` keyword, see below.|
+|`FP-DescriptorSpecs`| Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax:<br><br>    ${atomSpecific("<variableName>","<descriptor_name>","<SMARTS>")}<br><br>where: <br> *   `<variableName>` is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the `FP-Equation` keyword,<br> *   `<descriptor_name>`, is the name of the descriptor in the CDK implementation, <br> *   `<SMARTS>` is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.|
 |__External Fitness Provider__||
 |`FP-Source`| Specifies the pathname of the executable to run to evaluate the fitness.|
 |`FP-Interpreter`| Specifies the interpreter to use when running the external fitness provider source file.|
@@ -649,7 +649,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FRG-WORKDIR`| A pathname where all files related to the execution of the fragmenter will be placed.|
 |`FRG-STRUCTURESFILE`| The pathname to the SDF file containing the input to be processed. Depending on the task, this keyword is used to specify where to take molecular structured to be fragmented or fragments to be filtered or clustered.|
 |`FRG-PARALLELTASKS`| Specifies the number (integer) of parallel threads when performing parallelizable tasks such as fragmentation or analysis of isomorphic fragment families.|
-|`FRG-VERBOSITY`| Specifies the verbosity level and an integer \[-3, ..., 0, ..., 3\] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
+|`FRG-VERBOSITY`| Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
 |__Pre-Fragmentation Operation__||
 |`FRG-FORMULATXTFILE`| The pathname to a TXT file (see [Formula file](#FormulaFile)) containing the molecular formulae for the structures to be fragmented. Use this keyword to enable detection of missing atoms by checking the consistency between declared molecular formula (reported in the pathname given here) and actual molecular formula found in the structure file. Molecules with missing atoms are not fragmented.|
 |`FRG-PREFILTERSMARTS`| Specifies the SMARTS query to filter structure before fragmentation. Any input molecule matching the SMARTS query will not be fragmented. This keyword can be used multiple times to define more than one pre-filtering SMARTS criterion.|
@@ -738,11 +738,11 @@ SDF file format are best suited for vertices that contain molecular fragments be
 
 The requirement for the chemical representation contained in an SDF file to be perceived as a vertex is the presence of associated data (also called tags, fields, or properties) that define the attachment points, i.e., the `<ATTACHMENT_POINT>` property. The value of this property must reflect the following syntax convention. For a single attachment point rooted on an atom (square brackets indicate optional components):
 
-n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>[:bt<sub>A</sub>][:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>]
+n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>[:bt<sub>A</sub>][:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>]  
 
 For multiple attachment points rooted on the same atom (square brackets indicate optional components):
 
-n<sub>2</sub>`#`c<sub>B</sub>:sc<sub>B</sub>[:bt<sub>B</sub>][:x<sub>B</sub>%y<sub>B</sub>%z<sub>B</sub>],c<sub>C</sub>:sc<sub>C</sub>[:bt<sub>C</sub>][:x<sub>C</sub>%y<sub>C</sub>%z<sub>C</sub>]</pre>
+n<sub>2</sub>`#`c<sub>B</sub>:sc<sub>B</sub>[:bt<sub>B</sub>][:x<sub>B</sub>%y<sub>B</sub>%z<sub>B</sub>],c<sub>C</sub>:sc<sub>C</sub>[:bt<sub>C</sub>][:x<sub>C</sub>%y<sub>C</sub>%z<sub>C</sub>]
 
 where:
 
@@ -771,9 +771,9 @@ Additional fields can be present in SDF files saved by DENOPTIM. In particular, 
 
 ## Cutting rules file {#CuttingRules}
 
-The file defining cutting rules is a text file with keyword-labelled lines. Each line starting with the `CTR` keyword defines the specifics for a single cutting rule acoording to the following syntax:
+The file defining cutting rules is a text file with keyword-labelled lines. Each line starting with the `CTR` keyword defines the specifics for a single cutting rule according to the following syntax:
 
-`CTR rulename priority 1st_atm_SMARTS 2nd_atm_SMARTS bnd_SMARTS \[options\]
+`CTR rulename priority 1st_atm_SMARTS 2nd_atm_SMARTS bnd_SMARTS [options]
 
 Where:
 
@@ -996,7 +996,7 @@ The currently available graph editing tasks are:
 
 The graph edit tasks can be more than one. A sequence of graph editing tasks is defining using JSON syntax as following:
 
-    \[
+    [
     {
         "task": "REPLACECHILD",
         "vertexQuery": {...}
@@ -1005,6 +1005,6 @@ The graph edit tasks can be more than one. A sequence of graph editing tasks is 
         "task": ...,
         "vertexQuery": {...}
     }
-    \]
+    ]
 
 * * *
