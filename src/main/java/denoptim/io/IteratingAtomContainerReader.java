@@ -34,7 +34,7 @@ import org.openscience.cdk.io.iterator.IteratingSMILESReader;
  * 
  * @author Marco Foscato
  */
-public class IteractingAtomContainerReader implements Iterator<IAtomContainer>
+public class IteratingAtomContainerReader implements Iterator<IAtomContainer>
 {
 
     /**
@@ -70,7 +70,7 @@ public class IteractingAtomContainerReader implements Iterator<IAtomContainer>
      * @throws IOException
      * @throws CDKException
      */
-    public IteractingAtomContainerReader(File input) 
+    public IteratingAtomContainerReader(File input) 
             throws FileNotFoundException, IOException, CDKException
     {
         FormatFactory factory = new FormatFactory();
@@ -134,4 +134,14 @@ public class IteractingAtomContainerReader implements Iterator<IAtomContainer>
   
 //------------------------------------------------------------------------------
     
+    /**
+     * @return the class of the iterator defined upon creating a reader
+     */
+    public Class<?> getIteratorType()
+    {
+        if (usingIteratingReader)
+            return fileIterator.getClass();
+        else
+            return listIterator.getClass();
+    }
 }
