@@ -1,3 +1,5 @@
+[TOC]
+
 # DENOPTIM Developer's Manual
 
 This manual integrates the [JavaDoc](annotated.html) to provide an overview on the software logic and facilitate understanding, development, and debug of the code. It is a manual meant for developers, not for users. If you are looking for information on how to use DENOPTIM, check the [user's manual](user_manual.md).
