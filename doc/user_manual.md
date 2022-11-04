@@ -415,7 +415,7 @@ where `input_parameters_file` is a text parameters file with the [Keywords](#Key
 
 ## Graph List Comparator
 
-This program compares lists of graphs seeking for "DENOPTIM-isomorphic" graphs (see [here](denoptim-isomorhic link) for the definition of "DENOPTIM-isomorphic").
+This program compares lists of graphs seeking for "DENOPTIM-isomorphic" graphs (see [here](#GraphIsomorphism) for the definition of "DENOPTIM-isomorphic").
 
 This program can be run with this command:
 
@@ -738,19 +738,19 @@ SDF file format are best suited for vertices that contain molecular fragments be
 
 The requirement for the chemical representation contained in an SDF file to be perceived as a vertex is the presence of associated data (also called tags, fields, or properties) that define the attachment points, i.e., the `<ATTACHMENT_POINT>` property. The value of this property must reflect the following syntax convention. For a single attachment point rooted on an atom (square brackets indicate optional components):
 
-n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>[:bt<sub>A</sub>][:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>]  
+n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>[:bt<sub>A</sub>][:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>]
 
 For multiple attachment points rooted on the same atom (square brackets indicate optional components):
 
-n<sub>2</sub>`#`c<sub>B</sub>:sc<sub>B</sub>[:bt<sub>B</sub>][:x<sub>B</sub>%y<sub>B</sub>%z<sub>B</sub>],c<sub>C</sub>:sc<sub>C</sub>[:bt<sub>C</sub>][:x<sub>C</sub>%y<sub>C</sub>%z<sub>C</sub>]
+n<sub>2</sub>`#`c<sub>B</sub>:sc<sub>B</sub>[:bt<sub>B</sub>][:x<sub>B</sub>`%`y<sub>B</sub>`%`z<sub>B</sub>],c<sub>C</sub>:sc<sub>C</sub>[:bt<sub>C</sub>][:x<sub>C</sub>`%`y<sub>C</sub>`%`z<sub>C</sub>]
 
 where:
 
-*   n1 is the 1-based index of the atom/pseudo-atom on which attachment point _A_ is rooted, while n2 is the 1-based index of the atom/pseudo-atom on which both attachment point _B_ and _C_ are rooted.
-*   _ci_ is the first part (i.e., the so-called "rule") of the APClass of attachment point _i_.
-*   _sci_ is the second part (i.e., the so-called "subclass") of the APClass of attachment point _i_.
-*   _bti_ defined the bond type of the APClass of attachment point _i_. Possible values are `NONE`, `SINGLE`, `DOUBLE`, `TRIPLE`, `QUADRUPLE`, `ANY`, and `UNDEFINED`.
-*   _xi_, _yi_, and _zi_ are Cartesian coordinates defining the "AP vector". For APs rooted on atoms (the source atoms) the AP vector defines the ideal position where the atom that can be connected with the source atom should be placed upon formation of the bond.
+*   <i>n<sub>1</sub></i> is the 1-based index of the atom/pseudo-atom on which attachment point _A_ is rooted, while <i>n<sub>2</sub></i> is the 1-based index of the atom/pseudo-atom on which both attachment point _B_ and _C_ are rooted.
+*   <i>c<sub>i</sub></i> is the first part (i.e., the so-called "rule") of the APClass of attachment point _i_.
+*   <i>sc<sub>i</sub></i> is the second part (i.e., the so-called "subclass") of the APClass of attachment point _i_.
+*   <i>bt<sub>i</sub></i> defines the bond type of the APClass of attachment point _i_. Possible values are `NONE`, `SINGLE`, `DOUBLE`, `TRIPLE`, `QUADRUPLE`, `ANY`, and `UNDEFINED`.
+*   <i>x<sub>i</sub></i>, <i>y<sub>i</sub></i>, and <i>z<sub>i</sub></i> are Cartesian coordinates defining the "AP vector". For APs rooted on atoms (the source atoms) the AP vector defines the ideal position where the atom that can be connected with the source atom should be placed upon formation of the bond.
 
 In the SDF file strings pertaining a single source atom are separated by spaces. So the overall result is the following:
 
@@ -763,9 +763,9 @@ n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub>:x<sub>A</sub>`%`y<su
 
 Considering the optional components, the following alternatives are also recognized and used for APs that do not define bond types (NB: they accept the default bond type, i.e., `SINGLE`) and/or AP vectors.
 
-*   `n1#cA:csA:btA`
-*   `n1#cA:csA:xA%yA%zA`
-*   `n1#cA:csA`
+*   n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub>
+*   n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>
+*   n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>
 
 Additional fields can be present in SDF files saved by DENOPTIM. In particular, DENOPTIM new version always saves the JSON format as one of the properties of the SDF file format.
 
@@ -773,7 +773,7 @@ Additional fields can be present in SDF files saved by DENOPTIM. In particular, 
 
 The file defining cutting rules is a text file with keyword-labelled lines. Each line starting with the `CTR` keyword defines the specifics for a single cutting rule according to the following syntax:
 
-`CTR rulename priority 1st_atm_SMARTS 2nd_atm_SMARTS bnd_SMARTS [options]
+`CTR rulename priority 1st_atm_SMARTS 2nd_atm_SMARTS bnd_SMARTS [options]`
 
 Where:
 
@@ -784,8 +784,8 @@ Where:
 *   `bnd_SMARTS` is a bond component of the SMARTS query matching the bond between the atoms identified above. The complete bond SMARTS is built by merging the three components in the order `1st_atm_SMARTS + bnd_SMARTS + 2nd_atm_SMARTS`
 *   `options` is an optional list of settings that apply to the cutting rule. For a candidate bond to be considered a true match, all optional conditions must be satisfied simultaneously (i.e., logical AND).
     *   `HAPTO` specifies that the bond matched by the cutting rule has to be part of multihapto system. Use of this option is not compatible with RING and OMRING options.
-    *   `RING>n` (where n is an integer) specifies that the target bond, if part of an organic ring (i.e., not containing any metal atoms), is considered a true match only if the number of ring members is greater than `n`.
-    *   `OMRING>n` (where n is an integer) works like RING>n but is restricted to rings involving one or more metals.
+    *   `RING>n` (where `n` is an integer) specifies that the target bond, if part of an organic ring (i.e., not containing any metal atoms), is considered a true match only if the number of ring members is greater than `n`.
+    *   `OMRING>n` (where `n` is an integer) works like `RING>n` but is restricted to rings involving one or more metals.
 
 Here is an example of the content of a cutting rule file:
 
@@ -798,7 +798,7 @@ A file with a complete set of cutting rules is available under the `test/functio
 
 ## Formula file {#FormulaFile}
 
-The file collecting molecular formulae for chemical structures provided in an associated SDF file is a text file with keyword-labelled lines. Each entry, i.e., each structure, is associated with a group of lines starting with the keyword `REFCODE:`. The group of line must contain the keyword `Formula:` which identifies the line containing the actual molecular formula. The molecular formula can include multiple molecules, and variable stoichiometric factors. Example of valid formulae are:
+The file collecting molecular formulae for chemical structures provided in an associated SDF file is a text file with keyword-labelled lines. Each entry, i.e., each structure, is associated with a group of lines starting with the keyword `REFCODE`. The group of line must contain the keyword `Formula` which identifies the line containing the actual molecular formula. The molecular formula can include multiple molecules, and variable stoichiometric factors. Example of valid formulae are:
 
 *   `C6 H12 O6`
 *   `(C18 V2 H16)n,2n(H2 O1),Cl 1-`
@@ -997,14 +997,14 @@ The currently available graph editing tasks are:
 The graph edit tasks can be more than one. A sequence of graph editing tasks is defining using JSON syntax as following:
 
     [
-    {
-        "task": "REPLACECHILD",
-        "vertexQuery": {...}
-    }
-    {
-        "task": ...,
-        "vertexQuery": {...}
-    }
+        {
+            "task": "REPLACECHILD",
+            "vertexQuery": {...}
+        }
+        {
+            "task": ...,
+            "vertexQuery": {...}
+        }
     ]
 
 * * *
