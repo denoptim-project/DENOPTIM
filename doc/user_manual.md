@@ -12,7 +12,11 @@ DENOPTIM is an open source software suite for the _de novo_ design of chemical e
 
 ## How To Cite
 
-To cite DENOPTIM, please cite [_J. Chem. Inf. Model._ **2019**, 59, 10, 4077–4082](https://doi.org/10.1021/acs.jcim.9b00516)
+Please cite [_J. Chem. Inf. Model._ **2019**, 59, 10, 4077–4082](https://doi.org/10.1021/acs.jcim.9b00516)
+
+## Documentation
+
+You are now reading the user's manual, which provides information on how to install and use DENOPTIM. Technical documentation on the software architecture and logic is available in the [developer's manual](developer_manual.md). The latter includes also the JavaDoc and links to the source code.
 
 * * *
 
@@ -21,14 +25,18 @@ To cite DENOPTIM, please cite [_J. Chem. Inf. Model._ **2019**, 59, 10, 4077–4
 
 ## Install From Conda (recommended)
 
-DENOPTIM can be installed on using conda package manager from the command line on Linux/MacOS. On Windows this can be done on the Anaconda prompt or by using [Git Bash](<code>DENOPTIM_HOME</code>) terminal:
-
-    conda install -c denoptim-project denoptim
-
+DENOPTIM can be installed on using Conda package manager from the command line on Linux/MacOS. On Windows this can be done on the Anaconda prompt or by using [Git Bash](https://gitforwindows.org/) terminal. DENOPTIM is available on two channels: [conda-forge](https://anaconda.org/conda-forge/denoptim), and the channel of the [denoptim-project](https://anaconda.org/denoptim-project/denoptim). So, to install run either of the following commands:
+```
+conda install -c conda-forge denoptim
+```
+or
+```
+conda install -c denoptim-project denoptim
+```
 You should now have the `denoptim` command available. Run the following and verify you get a help message:
-
-    denoptim -h
-
+```
+denoptim -h
+```
 The installation from conda has been completed.
 
 ## Build From Source
@@ -40,38 +48,32 @@ First, download the [latest release](https://github.com/denoptim-project/DENOPTI
 Extract the zip/tar.gz archive you have downloaded to generate a folder we'll call `DENOPTIM_HOME`. In the following, remember to replace `$DENOPTIM_HOME` with the pathname of the extracted DENOPTIM's distribution folder on your system.
 
 Make sure you have an environment that includes JAVA and Maven. Such environment can be created by manual installation of both JAVA and Maven, or it can be created using conda:
-
-    cd $DENOPTIM_HOME
-    conda env create -f environment.yml
-    conda activate dnp_devel
-
+```
+cd $DENOPTIM_HOME
+conda env create -f environment.yml
+conda activate dnp_devel
+```
 Verify the requirements by running the two commands: Both should return a message declaring the respective versions.
-
-    javac -version
-    mvn -version
-
+```
+javac -version
+mvn -version
+```
 Now, you can build DENOPTIM with
-
-    mvn package
-
+```
+mvn package
+```
 Once maven has finished, you can create call DENOPTIM using a command like the following (NB: replace $DENOPTIM_HOME and ${VERSION} as with the values that apply to your installation):
 
 On Linux/Mac and GitBash on Windows:
-
-    java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar
-
+```
+java -jar $DENOPTIM_HOME/target/denoptim-${VERSION}-jar-with-dependencies.jar
+```
 On Windows Anaconda prompt:
-
-    java -jar $DENOPTIM_HOME\target\denoptim-${VERSION}-jar-with-dependencies.jar
-
+```
+java -jar $DENOPTIM_HOME\target\denoptim-${VERSION}-jar-with-dependencies.jar
+```
 The installation from source has been completed.
 
-* * *
-# Documentation
-
-We invite the reader to go through the following introduction to learn the fundamentals of DENOPTIM, its methods and terminology.
-It follows the user's manual of the software, which is meant to elucidate the programs DENOPTIM can run and explain their use.
-Throughout the manual there are also several references to the [developer's manual](developer_manual.md) which is meant instead to elucidate aspects more related to DENOPTIM's software architecture and its algorithms programming.
 
 * * *
 # Introduction to DENOPTIM
@@ -163,23 +165,23 @@ Fitness providers can be of two types:
 The graphical user interface (GUI) is the main interface used for preparing and inspecting DENOPTIM files and experiments. To launch the GUI, you can chose one of the following:
 
 *   if you installed via conda (recommended), you can run the command following command.
-
-        denoptim
-
+```
+denoptim
+```
 *   alternatively, double click on the `denoptim-${PKG_VERSION}-jar-with-dependencies.jar` file, the location of which depends on how you have installed DENOPTIM: this file will be under `target` subfolder of the DENOPTIM distribution folder (the folder downloaded to install the release) if you have built DENOPTIM from source, of it will be under the `${path_to_active_env_location}/lib/` for installation via conda.
 *   another alternative is to run the following command, again the `${path_to_denoptim_jar}` depends on how you have installed DENOPTIM (see previous point):
-
-         java -jar ${path_to_denoptim_jar}/denoptim-${PKG_VERSION}-jar-with-dependencies.jar
-
+```
+java -jar ${path_to_denoptim_jar}/denoptim-${PKG_VERSION}-jar-with-dependencies.jar
+```
 
 For installation via conda, remember to activate the appropriate conda environment before issuing any of the above command.
 
 The GUI provides instruction to itself in the form of tool tip messages (hold the cursor still over a button or plot to get a short message explaining what is the functionality of that component) and question-mark-buttons ("?") that can be clicked to display more detailed instructions.
 
 The GUI can be used to open files directly from the command line:
-
-    denoptim path/to/file1 path/to/file2 path/to/file3
-
+```
+denoptim path/to/file1 path/to/file2 path/to/file3
+```
 The above command will open the three files if their format is recognized as one of the file formats DENOPTIM's gui can open. These include:
 
 *   SDF and JSON files containing vertices, graphs or candidate entities
@@ -220,10 +222,11 @@ Crossover involves the swapping of one subgraph from each of the parents to the 
 
 ### Substitution Probability {#SubstitutionProbability}
 
-The generation of very large graphs or graphs with too many incident edges on a single vertex can be reduced by tuning the so-called substitution probability: the probability of appending a vertex on to a free AP. The substitution probability (_P_) results from the product of two components: the growth probability (_Pg_), and the crowding probability (_Pc_). The growth probability (_Pg_) limits the growth of an entity. This limit can be expressed in terms of graph deepness (i.e., using the _level_ of a vertex to determine the likeliness of further graph extension on that vertex, see Figure 4) or in terms of molecular size (i.e., number of heavy atoms, irrespectively of graph size).
+The generation of very large graphs or graphs with too many incident edges on a single vertex can be reduced by tuning the so-called substitution probability: the probability of appending a vertex on to a free AP. The substitution probability (<i>P</i>) results from the product of two components: the growth probability (<i>P<sub>g</sub></i>), and the crowding probability (<i>P<sub>c</sub></i>). The growth probability (<i>P<sub>g</sub></i>) limits the growth of an entity. This limit can be expressed in terms of graph deepness (i.e., using the _level_ of a vertex to determine the likeliness of further graph extension on that vertex, see Figure 4) or in terms of molecular size (i.e., number of heavy atoms, irrespectively of graph size).
 
-![Figure 4: identification of levels in a graph. Each label Lx identifies the shell of vertexes of level X. Red, dashed lines represent the border between levels. Yellow circles represent free APs. Squares of different color represent vertexes of different kind (scaffold, normal vertex, or capping group). To illustrate, vertex 1 is the scaffold vertex (i.e., represented by a red square) and is in level -1 (L-1), vertexes 2 (normal vertex represented by blue square), 3 (another normal vertex), and 5 (a capping group represented by a green square) are at level 0 (L0), and so on.](figures/graph_levels.png)
+![Figure 4: identification of levels in a graph. Each label Lx identifies the shell of vertexes of level X. Red, dashed lines represent the border between levels. Yellow circles represent free APs. Squares of different color represent vertexes of different kind (scaffold, normal vertex, or capping group).](figures/graph_levels.png)
 
+To illustrate, vertex 1 in Figure 4 is the scaffold vertex (i.e., represented by a red square) and is in level -1 (<i>L<sub>-1</sub></i>), vertexes 2 (normal vertex represented by blue square), 3 (another normal vertex), and 5 (a capping group represented by a green square) are at level 0 (<i>L<sub>-0</sub></i>), and so on.
 
 
 The __growth probability__ can be controlled by one of the following schemes (where _L_ is either the vertex _level_ or the number of heavy atoms):
@@ -242,11 +245,11 @@ The __growth probability__ can be controlled by one of the following schemes (wh
 
 *   **UNRESTRICTED**: This scheme allows for unrestricted growth (_p = 1_ at all levels).
 
-The **crowding probability** is meant to reduce the likeliness of adding incident edges to a vertex that is already using one or more APs rooted on the same source atom that holds the AP for which we are evaluating the substitution probability. Practically, for a free AP (_APi_) we define the _crowdedness_ (_CAPi_) as the number of non-free APs that are rooted on the same source atom holding _APi_.
+The **crowding probability** is meant to reduce the likeliness of adding incident edges to a vertex that is already using one or more APs rooted on the same source atom that holds the AP for which we are evaluating the substitution probability. Practically, for a free AP (<i>APi</i>) we define the _crowdedness_ (<i>C<sub>APi</sub></i>) as the number of non-free APs that are rooted on the same source atom holding (<i>APi</i>).
 
-For example, we consider vertex 3 in Figure 4 (i.e., the blue square at the center of the figure), and assume that the molecular representation of this vertex consists of a single atom holding four attachment points. To calculate the crowdedness of _AP2_ (i.e., the yellow circle located below the blue square representing vertex 3) we count the number of APs that i) share the same source atom of _AP2_, and ii) are used to form edges with vertices that are not capping groups. While condition _i_ is satisfied by all four APs of the vertex, only two APs satisfy condition _ii_. The crowdedness of _AP2_ is thus _CAP2 = 2_.
+For example, we consider vertex 3 in Figure 4 (i.e., the blue square at the center of the figure), and assume that the molecular representation of this vertex consists of a single atom holding four attachment points. To calculate the crowdedness of <i>AP2</i> (i.e., the yellow circle located below the blue square representing vertex 3) we count the number of APs that i) share the same source atom of <i>AP2</i>, and ii) are used to form edges with vertices that are not capping groups. While condition _i_ is satisfied by all four APs of the vertex, only two APs satisfy condition _ii_. The crowdedness of <i>AP2</i> is thus <i>C<sub>APi</sub></i> = 2.
 
-The crowding probability for _APi_ is then calculated using the crowdedness _CAPi_ according to any of the schemes presented above (**EXP_DIFF**, **TANH**, **SIGMA**, **UNRESTRICTED**) using _CAPi_ in place of _L_.
+The crowding probability for <i>APi</i> is then calculated using the crowdedness <i>C<sub>APi</sub></i> according to any of the schemes presented above (**EXP_DIFF**, **TANH**, **SIGMA**, **UNRESTRICTED**) using <i>C<sub>APi</sub></i> in place of _L_.
 
 ### Parents Selection Strategies
 
@@ -266,9 +269,9 @@ To remove this waiting time, the second scheme (SCH-2) enables continuous submis
 ### GA Run Input
 
 A GA run can be performed either by defining the input in the GUI and running the experiment from the gui, or by issuing this command:
-
-    denoptim -r GA input_parameters_file
-
+```
+denoptim -r GA input_parameters_file
+```
 where `input_parameters_file` is a text file collecting the configuration parameters for the GA program. Such file can have any name and contains one input parameter per line. The `#` character is used to denote a comment, and lines starting with this character are not processed. Each input parameter is specified by means of a keyword. The complete list of keywords is available in the [Keywords](#Keywords) section. Examples of input files can be found in the test folder. Note that `input_parameters_file` file can be generated with the GUI from "New Evolutionary De Novo Design" button.
 
 ### GA Run Output {#GARunOutput}
@@ -277,12 +280,12 @@ The program outputs a number of files during its execution. At the beginning of 
 
 ![Figure 5: Directory structure resulting from a GA run.](/figures/ga_folders.png)
 
-
 Once a generation is completed, the software creates a summary of the current population. For instance, the summary for generation `N`, where `N` is an integer number, is available as a TXT file (`GenN/GenN.txt`).
 
 The output from an ongoing or completes GA experiment can be inspected with the GUI:
-
-    denoptim /path/to/RUNYYYYMMDDHHMMSS
+```
+denoptim /path/to/RUNYYYYMMDDHHMMSS
+```
 
 ### Interacting with Ongoing GA Runs {#GAInteract}
 
@@ -305,7 +308,6 @@ A set of initial graphs (from now on referred as the roots) can be given as inpu
 ![Figure 6: Numbering of the levels (L) in FragSpaceExplorer.](figures/fse_levels.png){html: width=25%, height=25%}
 
 
-
 The exploration terminates with the exhaustion of the combinatorial space or with the completion of the maximum allowed level set by the user (see [Keywords](#Keywords)).
 
 All graphs are complete (i.e., no capping groups needed, no forbidden free AP found) and acceptable (i.e., respecting all constraints imposed by the user; for instance max. number of heavy atoms, max. molecular weight, etc.) can be sent to a fitness evaluation task performed by an internal or external fitness provider. For example, the external subtask may include 3D model construction and property evaluation, or calculation of a fitness. Such fitness is recorded for each candidate, but is not used to guide the combinatorial search in any way.
@@ -313,9 +315,9 @@ All graphs are complete (i.e., no capping groups needed, no forbidden free AP fo
 ### FragSpaceExplorer Input
 
 A FragSpaceExplorer run (or FSE run) can be performed either by defining the input in the GUI and running the experiment from the gui, or by issuing this command:
-
-    denoptim -r FSE input_parameters_file
-
+```
+denoptim -r FSE input_parameters_file
+```
 where `input_parameters_file` is a text file collecting the configuration parameters for the FragSpaceExplorer program. In particular, the only required input is the [definition of the BB Space](#BBSpace). The `input_parameters_file` file can have any name, and contains one input parameter per line. The `#` character is used to denote a comment and lines starting with this character are not processed. Each input parameter is specified by means of a keyword. The complete list of keywords is available in the [Keywords](#Keywords) section. Examples of input files can be found in the test folder. Note that `input_parameters_file` file can be generated with the GUI from "New Virtual Screening" button.
 
 ### FragSpaceExplorer Output {#FragSpaceExplorerOutput}
@@ -333,8 +335,9 @@ The output generated by FragSpaceExplorer is structured as the following folder 
     *   … other `FSE-Level-` folders
 
 The output from an ongoing or completes FSE experiment can be inspected with the GUI:
-
-    denoptim /path/to/FSEYYYYMMDDHHMMSS
+```
+denoptim /path/to/FSEYYYYMMDDHHMMSS
+```
 
 ### Restart FragSpaceExplorer from Checkpoint file
 
@@ -347,9 +350,9 @@ Fragmenter is a program that performs fragmentation of molecules and management 
 Fragmenter can also filter fragments according to criteria based on fragment's molecular formula, number of non-Hydrogen atoms, substructures (by SMARTS), and pool of attachment points. Moreover, graph-isomorphic fragments (i.e., fragments that have the same topological structure of atoms, bonds, and attachment points, but possibly different geometry) can be collected and analyzed by Fragmenter to identify clusters of geometries and extract the most representative geometry for each cluster. Both filtration and clustering are tasks that can be performed during the fragmentation of molecules or in a standalone fashion.
 
 The Fragmenter can be run with this command:
-
-    denoptim -r FRG input_parameters_file
-
+```
+denoptim -r FRG input_parameters_file
+```
 where `input_parameters_file` is a text parameters file with the [keywords](#Keywords) providing all input parameters and settings.
 
 ## Graph Editor
@@ -357,9 +360,9 @@ where `input_parameters_file` is a text parameters file with the [keywords](#Key
 Graph Editor is a program for editing graphs from the command line. This allows embedding a graph edit task in any work flow external to denoptim. For example, in the fitness evaluation work flow of an external provider.
 
 The graph editor can be run with this command:
-
-    denoptim -r GE input_parameters_file
-
+```
+denoptim -r GE input_parameters_file
+```
 where `input_parameters_file` is a text parameters file with the [keywords](#Keywords) providing all input parameters. Among these settings there is a text-based definition of the graph editing task. See [Graph Editing Task Files](#GraphEditingTaskFiles).
 
 ## Genetic Operator
@@ -367,19 +370,19 @@ where `input_parameters_file` is a text parameters file with the [keywords](#Key
 This is a program for performing genetic operations from the command line.
 
 This program can be run with this command:
-
-    denoptim -r GO input_parameters_file
-
+```
+denoptim -r GO input_parameters_file
+```
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
 ## Fitness Provider Runner
 
-This is a program to launch a fitness provider (internal or external), in the same way it is done within GA or FSE runs, but straight from the command line-
+This is a program to launch a fitness provider (internal or external), in the same way it is done within GA or FSE runs, but straight from the command line.
 
 This program can be run with this command:
-
-    denoptim -r FIT input_parameters_file
-
+```
+denoptim -r FIT input_parameters_file
+```
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
 ## 3D Molecular Models Builder {#ThreeDBuilder}
@@ -387,9 +390,9 @@ where `input_parameters_file` is a text parameters file with the [Keywords](#Key
 This is a program for converting graph representation into a 3D chemical representation by exploring the 3D features of building blocks and, if needed, perform a ring-closing conformational search (see [_J. Chem. Inf. Model._ **2015**, 55, 9 1844-1856](https://doi.org/10.1021/acs.jcim.5b00424)).
 
 This program can be run with this command:
-
-    denoptim -r B3D input_parameters_file
-
+```
+denoptim -r B3D input_parameters_file
+```
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
 **WARNING:** This program requires [Tinker Molecular Modeling software](https://dasher.wustl.edu/tinker/) to be installed on the system. The user is responsible for installing Tinker in accordance with its license terms. Furthermore, the ring-closing conformational search requires a customized version of Tinker. Contact [denoptim.project@gmail.com](mailto:denoptim.project@gmail.com) for instructions on how to modify Tinker and use the customized version in accordance with Tinker license's terms.
@@ -408,9 +411,9 @@ This method makes use of the Vento-Foggia VF2 algorithm (see [DOI:10.1109/TPAMI.
 **WARNING:** Detection of isomorphism can be very slow for pathological cases and for graphs with large symmetric systems!
 
 The Graph Isomorphism Analyzer program can be run with this command:
-
-    denoptim -r GI input_parameters_file
-
+```
+denoptim -r GI input_parameters_file
+```
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
 ## Graph List Comparator
@@ -418,9 +421,9 @@ where `input_parameters_file` is a text parameters file with the [Keywords](#Key
 This program compares lists of graphs seeking for "DENOPTIM-isomorphic" graphs (see [here](#GraphIsomorphism) for the definition of "DENOPTIM-isomorphic").
 
 This program can be run with this command:
-
-    denoptim -r CGL input_parameters_file
-
+```
+denoptim -r CGL input_parameters_file
+```
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
 ## Python Gateway Server
@@ -506,8 +509,8 @@ The following tables list all the keywords grouped according to the main functio
 |__Ring Closability Conditions__||
 |`RC-EvaluationClosabilityMode`| Defined the closability condition's evaluation mode:<br><br> 0.  only constitution of candidate ring,<br> 1.  only closability of 3D chain,<br> 2.  both 0 and 1.|
 |`RC-RequiredElementInRings`| Specifies the elemental symbol that has to be contained in all acceptable rings of fragments. The shortest path is used to evaluate this ring closing condition.|
-|`RC-ClosableRingSMARTS`| Specifies a single constitutional ring closability condition by a single SMARTS string. This keyword may be used multiple times to provide a list of constitutional ring closability conditions. <br><br> Example:<br><br> `RC-ClosableRingSMARTS=C1CCCCC1`<br><br> `RC-ClosableRingSMARTS=C1CCCCCC1`|
-|`RC-RingSizeBias`| Specifies the bias associated to a given ring size when selecting the combination of rings (i.e., RCAs) for a given graph.<br><br> The syntax is:<br><br>`RC-RingSizeBias=<size> <bias>`<br><br> Multiple occurrence of this keyword can be used.<br><br> Example: the following lines give to all 6-member rings a probability of being formed that is twice that given to all 5-member rings. Instead 7-membered rings will never be formed.<br><br> `RC-RingSizeBias=5 1`<br><br> `RC-RingSizeBias=6 2` <br><br> `RC-RingSizeBias=7 0`<br><br>
+|`RC-ClosableRingSMARTS`| Specifies a single constitutional ring closability condition by a single SMARTS string. This keyword may be used multiple times to provide a list of constitutional ring closability conditions. <br><br> Example:<br><br> `RC-ClosableRingSMARTS=C1CCCCC1`<br> `RC-ClosableRingSMARTS=C1CCCCCC1`|
+|`RC-RingSizeBias`| Specifies the bias associated to a given ring size when selecting the combination of rings (i.e., RCAs) for a given graph.<br><br> The syntax is:<br><br>`RC-RingSizeBias=<size> <bias>`<br><br> Multiple occurrence of this keyword can be used.<br><br> Example: the following lines give to all 6-member rings a probability of being formed that is twice that given to all 5-member rings. Instead 7-membered rings will never be formed.<br><br> `RC-RingSizeBias=5 1`<br> `RC-RingSizeBias=6 2` <br>`RC-RingSizeBias=7 0`<br>
 |`RC-MaxSizeNewRings`| Specifies the maximum number of ring members for rings created from scratch. |
 |`RC-CheckInterdependentChains`| Requires evaluation of interdependent closability condition. WARNING: this function require exhaustive conformational search, which is very time consuming.|
 |__Search for ring closing conformations in 3D__||
@@ -773,7 +776,9 @@ Additional fields can be present in SDF files saved by DENOPTIM. In particular, 
 
 The file defining cutting rules is a text file with keyword-labelled lines. Each line starting with the `CTR` keyword defines the specifics for a single cutting rule according to the following syntax:
 
-`CTR rulename priority 1st_atm_SMARTS 2nd_atm_SMARTS bnd_SMARTS [options]`
+```
+CTR rulename priority 1st_atm_SMARTS 2nd_atm_SMARTS bnd_SMARTS [options]
+```
 
 Where:
 
@@ -789,12 +794,14 @@ Where:
 
 Here is an example of the content of a cutting rule file:
 
-    …
-    CTR sArAlkM 2 [$(C([#1])(C)C)] [$(cCC)] -!@  
-    CTR MAlkene -1 [Pt] [$([#6;X4]1~[#6;X4][Pt]1)] - HAPTO
-    …
+```
+…
+CTR sArAlkM 2 [$(C([#1])(C)C)] [$(cCC)] -!@  
+CTR MAlkene -1 [Pt] [$([#6;X4]1~[#6;X4][Pt]1)] - HAPTO
+…
+```
 
-A file with a complete set of cutting rules is available under the `test/functional_tests/t30/data` folder of the distribution folder.
+A file with a complete set of cutting rules is available under `src/main/resources/data/` in the distribution folder.
 
 ## Formula file {#FormulaFile}
 
@@ -808,17 +815,19 @@ The file collecting molecular formulae for chemical structures provided in an as
 
 Here is an example of the content of a formula file containing the molecular formula for multiple structure. Each structure is identified by the `REFCODE` identifier.
 
+```
+…
+REFCODE: ABCDEF
     …
-    REFCODE: ABCDEF
-        …
-        Formula:      C6 H12 O6
-        …
+    Formula:      C6 H12 O6
+    …
 
-    REFCODE: GHIJKL
-        …
-        Formula:      (H2 O), C2 H6 O
-        …
+REFCODE: GHIJKL
     …
+    Formula:      (H2 O), C2 H6 O
+    …
+…
+```
 
 ## Compatibility Matrix file {#CompatibilityMatrixfile}
 
@@ -830,30 +839,34 @@ The compatibility matrix file is a text file that includes blocks of information
 
 Example of a compatibility matrix file:
 
-    # Comment line
-    RCN apclass1:0 apclass1:1,apclass2:0,apclass2:1
-    RCN apclass1:1 apclass1:0
-    RCN apclass2:0 apclass2:1
-    # Note that any class name not found in the library of fragments can be used to impose that no fragment (excluding
-    # capping groups) is attached on APs of a specific class.
-    # In this example, no fragment will be attached to APs of class apclass2:1
-    RCN apclass2:1 none
-    …
-    # Capping groups
-    CAP apclass1:0 cap1:0
-    CAP apclass1:0 cap2:0
-    …
-    # Forbidden ends
-    DEL apclass1:0
+```
+# Comment line
+RCN apclass1:0 apclass1:1,apclass2:0,apclass2:1
+RCN apclass1:1 apclass1:0
+RCN apclass2:0 apclass2:1
+# Note that any class name not found in the library of fragments can be used to impose that no fragment (excluding
+# capping groups) is attached on APs of a specific class.
+# In this example, no fragment will be attached to APs of class apclass2:1
+RCN apclass2:1 none
+…
+# Capping groups
+CAP apclass1:0 cap1:0
+CAP apclass1:0 cap2:0
+…
+# Forbidden ends
+DEL apclass1:0
+```
 
 ## Ring Closures Compatibility Matrix file
 
 The ring closures (RC) compatibility matrix file specifies the pairs of AP classes that are allowed to form ring-closing bonds. Note that, contrary to the standard compatibility matrix, the RC compatibility matrix is symmetric. The syntax is the same as for a general-purpose compatibility matrix.
 
-    # Comment line
-    RCN apclass1:0 apclass1:1,apclass2:0,
-    RCN apclass1:1 apclass1:0
-    …
+```
+# Comment line
+RCN apclass1:0 apclass1:1,apclass2:0,
+RCN apclass1:1 apclass1:0
+…
+```
 
 ## Initial Population File
 
@@ -874,14 +887,14 @@ DENOPTIM programs output a non-optimized 3D-structure of the chemical entity in 
 SDF format files used to store the final results for an evaluated chemical entity and to receive the fitness value from any external fitness provider. These files must contain one of these two tags:
 
 *   `<MOL_ERROR>` tag specifying that the candidate entity cannot be coupled with a fitness value. The content of this field is used to report details on the reasons leading to this result. The following syntax must be used:   
+```
+…
+> <Mol_ERROR>
+#Keyword identifying error1: details characterizing the error1
+#Keyword identifying error2: details characterizing the error2
 
-        …
-        > <Mol_ERROR>
-        #Keyword identifying error1: details characterizing the error1
-        #Keyword identifying error2: details characterizing the error2
-
-        …
-
+…
+```
 *   `<FITNESS>` tag specifying the numerical value of the fitness (NB: ensure is not NaN!)
 
 Additional tag defining an unique identifier of the entity (i.e., `> <UID>`) is also needed.
@@ -890,63 +903,70 @@ Any type and number of descriptors and properties can be included in the SDF fil
 
 Example of a fitness file with properly terminated calculation of the fitness value:
 
-    Mol_000027 
-      CDK     1101131251 
+```
+Mol_000027 
+  CDK     1101131251 
 
-    126128  0  0  0  0  0  0  0  0999 V2000 
-        0.5414   -0.1399   -0.2777 C   0  0  0  0  0  0  0  0  0  0  0  0 
-    …
-        4.0589   -3.8870  -13.3457 H   0  0  0  0  0  0  0  0  0  0  0  0 
-      5  8  1  0  0  0  0 
-    …
-     43 89  1  0  0  0  0 
-    M  END 
-    > <cdk:Title> 
-    Mol_000027 
+126128  0  0  0  0  0  0  0  0999 V2000 
+    0.5414   -0.1399   -0.2777 C   0  0  0  0  0  0  0  0  0  0  0  0 
+…
+    4.0589   -3.8870  -13.3457 H   0  0  0  0  0  0  0  0  0  0  0  0 
+  5  8  1  0  0  0  0 
+…
+ 43 89  1  0  0  0  0 
+M  END 
+> <cdk:Title> 
+Mol_000027 
 
-    > <GraphJson> 
-    …
+> <GraphJson> 
+…
 
-    > <Descriptors1>
-    2.322 
+> <Descriptors1>
+2.322 
 
-    > <Descriptors2>
-    3.452 
+> <Descriptors2>
+3.452 
 
-    > <FITNESS>
-    -10.096
+> <FITNESS>
+-10.096
 
-    $$$$
+$$S$
+```
+(**NB**: the last line should contain 4 dollar signs <tt>$$$$</tt>, the "S" is used here to bypass a [bug in Doxygen](https://github.com/doxygen/doxygen/issues/9378))
+
 
 Example of an SDF file with error due to violation of constraints:
 
-    Mol_000027 
-      CDK     1101131251 
+```
+Mol_000027 
+  CDK     1101131251 
 
-    126128  0  0  0  0  0  0  0  0999 V2000 
-        0.5414   -0.1399   -0.2777 C   0  0  0  0  0  0  0  0  0  0  0  0 
-    …
-        4.0589   -3.8870  -13.3457 H   0  0  0  0  0  0  0  0  0  0  0  0 
-      5  8  1  0  0  0  0 
-    …
-     43 89  1  0  0  0  0 
-    M  END 
-    > <cdk:Title> 
-    Mol_000027 
+126128  0  0  0  0  0  0  0  0999 V2000 
+    0.5414   -0.1399   -0.2777 C   0  0  0  0  0  0  0  0  0  0  0  0 
+…
+    4.0589   -3.8870  -13.3457 H   0  0  0  0  0  0  0  0  0  0  0  0 
+  5  8  1  0  0  0  0 
+…
+ 43 89  1  0  0  0  0 
+M  END 
+> <cdk:Title> 
+Mol_000027 
 
-    > <GraphJson> 
-    …
+> <GraphJson> 
+…
 
-    > <Descriptors1>
-    2.322 
+> <Descriptors1>
+2.322 
 
-    > <Descriptors2>
-    3.452 
+> <Descriptors2>
+3.452 
 
-    > <MOL_ERROR>
-    #ViolationOfConstraint:  Minimum non-bonded distance threshold violated. 2.766890
+> <MOL_ERROR>
+#ViolationOfConstraint:  Minimum non-bonded distance threshold violated. 2.766890
 
-    $$$$
+$$S$
+```
+(**NB**: the last line should contain 4 dollar signs <tt>$$$$</tt>, the "S" is used here to bypass a [bug in Doxygen](https://github.com/doxygen/doxygen/issues/9378))
 
 ## Graph Editing Task Files {#GraphEditingTaskFiles}
 
@@ -954,35 +974,39 @@ Example of JSON syntax for defining the most detailed vertex query and the editi
 
 In the vertex query (see example below), any of the fields can be removed. For example, removing the line with `"vertexId"` will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining `"incomingEdgeQuery"` (i.e., all the lines included in the curly brackets immediately following `"incomingEdgeQuery"`) will make the vertex query match any vertex irrespectively of the properties of the edge that connects such vertex to its parent vertex (if any).
 
-    "vertexQuery": {
-        "vertexId": 1,
-        "buildingBlockId": 4,
-        "buildingBlockType": "FRAGMENT",
-        "vertexType": "MolecularFragment",
-        "level": 2,
-        "incomingEdgeQuery": {
-        "srcVertexId": 1,
-        "trgVertexId": 2,
-        "srcAPID": 3,
-        "trgAPID": 4,
-        "bondType": "DOUBLE",
-        "srcAPC": {
-            "rule": "s",
-            "subClass": 0
-        },
-        "trgAPC": {
-            "rule": "t",
-            "subClass": 0
-        }
-        },
-        "outgoingEdgeQuery": {SAME SYNTAX of "incomingEdgeQuery"}
+```
+"vertexQuery": {
+    "vertexId": 1,
+    "buildingBlockId": 4,
+    "buildingBlockType": "FRAGMENT",
+    "vertexType": "MolecularFragment",
+    "level": 2,
+    "incomingEdgeQuery": {
+    "srcVertexId": 1,
+    "trgVertexId": 2,
+    "srcAPID": 3,
+    "trgAPID": 4,
+    "bondType": "DOUBLE",
+    "srcAPC": {
+        "rule": "s",
+        "subClass": 0
+    },
+    "trgAPC": {
+        "rule": "t",
+        "subClass": 0
     }
+    },
+    "outgoingEdgeQuery": {SAME SYNTAX of "incomingEdgeQuery"}
+}
+```
 
 The above is a complete list of fields that can be used to define a vertex query, but a valid query can include any of those fields from none (i.e., a query that matches everything) to all of them (i.e., the most detailed query possible). For example, the following is a vertex query meant to match only vertices in level 2:
 
-    "vertexQuery": {
-        "level": 2
-    }
+```
+"vertexQuery": {
+    "level": 2
+}
+```
 
 The currently available graph editing tasks are:
 
@@ -996,15 +1020,17 @@ The currently available graph editing tasks are:
 
 The graph edit tasks can be more than one. A sequence of graph editing tasks is defining using JSON syntax as following:
 
-    [
-        {
-            "task": "REPLACECHILD",
-            "vertexQuery": {...}
-        }
-        {
-            "task": ...,
-            "vertexQuery": {...}
-        }
-    ]
+```
+[
+    {
+        "task": "REPLACECHILD",
+        "vertexQuery": {...}
+    }
+    {
+        "task": ...,
+        "vertexQuery": {...}
+    }
+]
+```
 
 * * *
