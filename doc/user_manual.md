@@ -931,10 +931,8 @@ Mol_000027 
 > <FITNESS>
 -10.096
 
-$$S$
+$$$$
 ```
-(**NB**: the last line should contain 4 dollar signs <tt>$$$$</tt>, the "S" is used here to bypass a [bug in Doxygen](https://github.com/doxygen/doxygen/issues/9378))
-
 
 Example of an SDF file with error due to violation of constraints:
 
@@ -965,9 +963,8 @@ Mol_000027 
 > <MOL_ERROR>
 #ViolationOfConstraint:  Minimum non-bonded distance threshold violated. 2.766890
 
-$$S$
+$$$$
 ```
-(**NB**: the last line should contain 4 dollar signs <tt>$$$$</tt>, the "S" is used here to bypass a [bug in Doxygen](https://github.com/doxygen/doxygen/issues/9378))
 
 ## Graph Editing Task Files {#GraphEditingTaskFiles}
 
