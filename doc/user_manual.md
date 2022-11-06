@@ -634,8 +634,8 @@ The following tables list all the keywords grouped according to the main functio
 |__General__  ||
 |`FP-No3dTreeModel`| Prevents reporting candidates using a three-dimensional molecular model that is built by aligning each building block to the attachment point vector of its parent building block. Such "three-dimensional tree" (3d-tree) structure is not refined in any way, and is only meant to provide a somewhat preliminary geometry to be further refined. Using this keyword prevents the generation of such 3d-trees, and makes denoptim build a molecular model that uses original Cartesian coordinates of the building blocks as provided in the libraries of scaffolds, fragments and capping groups.|
 |__Internal Fitness Provider__||
-|`FP-Equation`| Specifies the expression to be used for calculation of the fitness value from available descriptors (i.e., from CDK library). Descriptor values, i.e., variables, and numerical constants can be combined using operators such as +, -, *, /, % (Modulo/remainder), and parenthesis. The expression must start with `${` and end with `}`. For example,<br><br>    ${0.23*nBase - 1.1*naAromAtom + myVariable}<br><br>is a valid expression where `nBase` and `naAromAtom` are the names of molecular descriptors implemented in the CDK library, and `myVariable` is the name of a user-defined variable. The latter is defined by meas of a `FP-DescriptorSpecs` keyword, see below.|
-|`FP-DescriptorSpecs`| Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax:<br><br>    ${atomSpecific("<variableName>","<descriptor_name>","<SMARTS>")}<br><br>where: <br> *   `<variableName>` is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the `FP-Equation` keyword,<br> *   `<descriptor_name>`, is the name of the descriptor in the CDK implementation, <br> *   `<SMARTS>` is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.|
+|`FP-Equation`| Specifies the expression to be used for calculation of the fitness value from available descriptors (i.e., from CDK library). Descriptor values, i.e., variables, and numerical constants can be combined using operators such as +, -, *, /, % (Modulo/remainder), and parenthesis. The expression must start with `${` and end with `}`. For example,<br><br>    ${0.23*nBase - 1.1*naAromAtom + myVariable}<br><br>is a valid expression where `nBase` and `naAromAtom` are the names of molecular descriptors implemented in the CDK library, and `myVariable` is the name of a user-defined variable. The latter is defined by means of a `FP-DescriptorSpecs` keyword, see below.|
+|`FP-DescriptorSpecs`| Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax:<br><br>  ${atomSpecific('&lt;variableName&gt;','&lt;descriptor_name&gt;','&lt;SMARTS&gt;')} <br><br>where: <br> *   `<variableName>` is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the `FP-Equation` keyword,<br> *   `<descriptor_name>`, is the name of the descriptor in the CDK implementation, <br> *   `<SMARTS>` is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.|
 |__External Fitness Provider__||
 |`FP-Source`| Specifies the pathname of the executable to run to evaluate the fitness.|
 |`FP-Interpreter`| Specifies the interpreter to use when running the external fitness provider source file.|
@@ -739,36 +739,37 @@ Vertices can be defined in files with two different formats: the [SDF](https://e
 
 SDF file format are best suited for vertices that contain molecular fragments because they can be opened by most molecular visualization packages. Still, SDF format can be used with any type of vertex.
 
-The requirement for the chemical representation contained in an SDF file to be perceived as a vertex is the presence of associated data (also called tags, fields, or properties) that define the attachment points, i.e., the `<ATTACHMENT_POINT>` property. The value of this property must reflect the following syntax convention. For a single attachment point rooted on an atom (square brackets indicate optional components):
+The requirement for the chemical representation contained in an SDF file to be perceived as a vertex is the presence of associated data (also called tags, fields, or properties) that define the attachment points, i.e., the `<ATTACHMENT_POINT>` property. The value of this property must reflect the following syntax convention. For a single attachment point, which we'll call attachment point _A_ (square brackets indicate optional components):
 
-n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>[:bt<sub>A</sub>][:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>]
+\c N_1\#CL_A:SC_A\c [\c :BT_A\c ]\c [\c :X_A\%Y_A\%Z_A\c ]
 
-For multiple attachment points rooted on the same atom (square brackets indicate optional components):
+For multiple attachment points, which we'll refer to as attachment points _B_ and _C_, that are rooted on the same atom (square brackets indicate optional components):
 
-n<sub>2</sub>`#`c<sub>B</sub>:sc<sub>B</sub>[:bt<sub>B</sub>][:x<sub>B</sub>`%`y<sub>B</sub>`%`z<sub>B</sub>],c<sub>C</sub>:sc<sub>C</sub>[:bt<sub>C</sub>][:x<sub>C</sub>`%`y<sub>C</sub>`%`z<sub>C</sub>]
+\c N_2\#CL_B:SC_B\c [\c :BT_B\c ]\c [\c :X_B\%Y_B\%Z_B\c ]\c ,CL_C:SC_C\c [\c :BT_C\c ]\c [\c :X_C\%Y_C\%Z_C\c ]
 
 where:
 
-*   <i>n<sub>1</sub></i> is the 1-based index of the atom/pseudo-atom on which attachment point _A_ is rooted, while <i>n<sub>2</sub></i> is the 1-based index of the atom/pseudo-atom on which both attachment point _B_ and _C_ are rooted.
-*   <i>c<sub>i</sub></i> is the first part (i.e., the so-called "rule") of the APClass of attachment point _i_.
-*   <i>sc<sub>i</sub></i> is the second part (i.e., the so-called "subclass") of the APClass of attachment point _i_.
-*   <i>bt<sub>i</sub></i> defines the bond type of the APClass of attachment point _i_. Possible values are `NONE`, `SINGLE`, `DOUBLE`, `TRIPLE`, `QUADRUPLE`, `ANY`, and `UNDEFINED`.
-*   <i>x<sub>i</sub></i>, <i>y<sub>i</sub></i>, and <i>z<sub>i</sub></i> are Cartesian coordinates defining the "AP vector". For APs rooted on atoms (the source atoms) the AP vector defines the ideal position where the atom that can be connected with the source atom should be placed upon formation of the bond.
+*   \c N_1 is the 1-based index of the atom/pseudo-atom on which attachment point _A_ is rooted, while \c N_2 is the 1-based index of the atom/pseudo-atom on which both attachment point _B_ and _C_ are rooted.
+*   \c CL_i is the first part (i.e., the string called "rule") of the APClass of attachment point _i_.
+*   \c SC_i is the second part (i.e., the integer called "subclass") of the APClass of attachment point _i_.
+*   \c BT_i defines the bond type of the APClass of attachment point _i_. Possible values are `NONE`, `SINGLE`, `DOUBLE`, `TRIPLE`, `QUADRUPLE`, `ANY`, and `UNDEFINED`.
+*   \c X_i and \c Y_i and \c Z_i are the Cartesian coordinates defining the "AP vector". For APs rooted on atoms (the source atoms) the AP vector defines the ideal position where the atom that can be connected with the source atom should be placed upon formation of the bond.
 
-In the SDF file strings pertaining a single source atom are separated by spaces. So the overall result is the following:
+In the SDF file, each string pertaining to a single source atom is separated by a single space from the next string. So, the overall result is the following:
 
-
+<span style="display: inline-block; color: black; background-color: #F0F8FF;">
 …  
-`>` <ATTACHMENT_POINTS>     
-n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub>:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>&nbsp;n<sub>2</sub>`#`c<sub>B</sub>:sc<sub>B</sub>:bt<sub>B</sub>:x<sub>B</sub>`%`y<sub>B</sub>`%`z<sub>B</sub>,c<sub>C</sub>:sc<sub>C</sub>:bt<sub>C</sub>:x<sub>C</sub>`%`y<sub>C</sub>`%`z<sub>C</sub>  
-…
+&gt; &lt;ATTACHMENT_POINTS&gt;     
+\c N_1\#CL_A:SC_A\c :BT_A\c :X_A\%Y_A\%Z_A&nbsp;N_2\#CL_B:SC_B\c :BT_B\c :X_B\%Y_B\%Z_B\c ,CL_C:SC_C\c :BT_C\c :X_C\%Y_C\%Z_C    
+…  
 
+</span>
 
 Considering the optional components, the following alternatives are also recognized and used for APs that do not define bond types (NB: they accept the default bond type, i.e., `SINGLE`) and/or AP vectors.
 
-*   n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>:bt<sub>A</sub>
-*   n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>:x<sub>A</sub>`%`y<sub>A</sub>`%`z<sub>A</sub>
-*   n<sub>1</sub>`#`c<sub>A</sub>:cs<sub>A</sub>
+*   <span style="display: inline-block; color: black; background-color: #F0F8FF;">\c N_1\#CL_A:SC_A\c :BT_A</span>
+*   <span style="display: inline-block; color: black; background-color: #F0F8FF;">\c N_1\#CL_A:SC_A\c :X_A\%Y_A\%Z_A</span>
+*   <span style="display: inline-block; color: black; background-color: #F0F8FF;">\c N_1\#CL_A:SC_A</span>
 
 Additional fields can be present in SDF files saved by DENOPTIM. In particular, DENOPTIM new version always saves the JSON format as one of the properties of the SDF file format.
 
