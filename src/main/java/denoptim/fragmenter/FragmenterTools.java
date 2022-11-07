@@ -14,6 +14,10 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
+import org.jgrapht.Graph;
+import org.jgrapht.alg.clique.BronKerboschCliqueFinder;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
@@ -339,28 +343,53 @@ public class FragmenterTools
         Map<String, ArrayList<MatchedBond>> matchingbonds = 
                 FragmenterTools.getMatchingBondsAllInOne(fragsMol,rules,logger);
         
-        // Select bonds to cut and what rule to use for cutting them
-        for (CuttingRule rule : rules) // NB: iterator follows rule's priority
+        // New Implementation
+     // Extract independent sets of cliques
+        ArrayList<MatchedBond> AllMatchedBonds = new ArrayList<MatchedBond>();
+        for (String key : matchingbonds.keySet())
         {
-            String ruleName = rule.getName();
-
-            // Skip unmatched rules
-            if (!matchingbonds.keySet().contains(ruleName))
-                continue;
-
-            for (MatchedBond tb: matchingbonds.get(ruleName)) 
+            AllMatchedBonds.addAll(matchingbonds.get(key));
+        }
+        // Gets all possible combination of cuts (aka cliques)       
+        // ArrayList<ArrayList<Integer>> cliques = null;
+       
+        Graph<Integer,DefaultEdge> bondsGraph = buildBondsGraph(fragsMol, 
+                AllMatchedBonds);
+        
+        // BronKerbosch Algorithm to define all possible cliques
+        BronKerboschCliqueFinder<Integer,DefaultEdge> cliqueFinder = 
+                new BronKerboschCliqueFinder<Integer, DefaultEdge>(bondsGraph);
+        cliqueFinder.iterator();
+        
+       
+        ArrayList<Fragment> fragmentsSets = new ArrayList<Fragment>();
+        ArrayList<Vertex>  fragments = new ArrayList<Vertex>();
+        
+     // Cycle over all cuts combinations 
+        for (Set<Integer> clique : cliqueFinder)
+        {   
+            ArrayList<IBond> cutList = new ArrayList<IBond>();
+            
+            Fragment tempFrag = masterFrag.clone();
+            IAtomContainer tempFragsMol = tempFrag.getIAtomContainer();
+            
+            // Select one combination of cuts
+            for (int c : clique)
             {
-                IAtom atmA = tb.getAtmSubClass0();
-                IAtom atmB = tb.getAtmSubClass1();
+                MatchedBond tb = AllMatchedBonds.get(c);
+                IAtom atmA = tempFragsMol.getAtom(tb.getAtmSubClass0().
+                        getIndex());
+                IAtom atmB = tempFragsMol.getAtom(tb.getAtmSubClass1().
+                        getIndex());
 
                 //ignore if bond already broken
-                if (!fragsMol.getConnectedAtomsList(atmA).contains(atmB))
+                if (!tempFragsMol.getConnectedAtomsList(atmA).contains(atmB))
                 { 
                     continue;
                 }
 
                 //treatment of n-hapto ligands
-                if (rule.isHAPTO())
+                if (tb.getRule().isHAPTO())
                 {
                     // Get central atom (i.e., the "mono-hapto" side, 
                     // typically the metal)
@@ -370,7 +399,8 @@ public class FragmenterTools
                     // Get list of candidates for hapto-system: 
                     // they have same cutting Rule and central metal
                     ArrayList<IAtom> candidatesForHapto = new ArrayList<IAtom>();
-                    for (MatchedBond tbForHapto : matchingbonds.get(ruleName))
+                    for (MatchedBond tbForHapto : matchingbonds.get(tb.getRule()
+                            .getName()))
                     {
                         //Consider only bond involving same central atom
                         if (tbForHapto.getAtmSubClass0() == centralAtm)
@@ -381,8 +411,8 @@ public class FragmenterTools
                     // same type of bond with the same central atom.
                     Set<IAtom> atmsInHapto = new HashSet<IAtom>();
                     atmsInHapto.add(tb.getAtmSubClass1());
-                    atmsInHapto = exploreHapticity(tb.getAtmSubClass1(), 
-                            centralAtm, candidatesForHapto, fragsMol);
+                    atmsInHapto = exploreHapticity(atmB, 
+                            centralAtm, candidatesForHapto, tempFragsMol);
                     if (atmsInHapto.size() == 1)
                     {
                         logger.log(Level.WARNING,"Unable to find more than one "
@@ -396,7 +426,7 @@ public class FragmenterTools
                     for (IAtom ligAtm : atmsInHapto)
                     {
                         List<IAtom> nbrsOfLigAtm = 
-                                fragsMol.getConnectedAtomsList(ligAtm);
+                                tempFragsMol.getConnectedAtomsList(ligAtm);
                         if (!nbrsOfLigAtm.contains(centralAtm))
                         {
                             isSystemIntact = false;
@@ -427,7 +457,7 @@ public class FragmenterTools
                     //Add Dummy atom to molecular object
                     //if no other Du is already in the same position
                     IAtom dummyAtm = null;
-                    for (IAtom oldDu : fragsMol.atoms())
+                    for (IAtom oldDu : tempFragsMol.atoms())
                     {
                         if (MoleculeUtils.getSymbolOrLabel(oldDu) 
                                 == DENOPTIMConstants.DUMMYATMSYMBOL)
@@ -445,7 +475,7 @@ public class FragmenterTools
                     {
                         dummyAtm = new PseudoAtom(DENOPTIMConstants.DUMMYATMSYMBOL);
                         dummyAtm.setPoint3d(dummyP3d);
-                        fragsMol.addAtom(dummyAtm);
+                        tempFragsMol.addAtom(dummyAtm);
                     }
 
                     // Modify connectivity of atoms involved in high-hapticity 
@@ -455,67 +485,78 @@ public class FragmenterTools
                     
                     for (IAtom ligAtm : atmsInHapto)
                     {
-                        List<IAtom> nbrsOfDu = fragsMol.getConnectedAtomsList(
+                        List<IAtom> nbrsOfDu = tempFragsMol.getConnectedAtomsList(
                                 dummyAtm);
                         if (!nbrsOfDu.contains(ligAtm))
                         {
                             // Add bond with dummy
                             Bond bnd = new Bond(dummyAtm,ligAtm,border);
-                            fragsMol.addBond(bnd);
+                            tempFragsMol.addBond(bnd);
                         }
                         // Remove bonds between central and coordinating atoms
-                        IBond oldBnd = fragsMol.getBond(centralAtm,ligAtm);
-                        fragsMol.removeBond(oldBnd);
+                        IBond oldBnd = tempFragsMol.getBond(centralAtm,ligAtm);
+                        tempFragsMol.removeBond(oldBnd);
                     }
                     
                     // NB: by convention the "first" class (i.e., the ???:0 class)
                     // is always  on the central atom.
-                    masterFrag.addAPOnAtom(centralAtm, rule.getAPClass0(), 
+                    tempFrag.addAPOnAtom(centralAtm, tb.getRule().getAPClass0(), 
                             MoleculeUtils.getPoint3d(dummyAtm));
-                    masterFrag.addAPOnAtom(dummyAtm, rule.getAPClass1(), 
+                    tempFrag.addAPOnAtom(dummyAtm, tb.getRule().getAPClass1(), 
                             MoleculeUtils.getPoint3d(centralAtm));
                 } else {
                     //treatment of mono-hapto ligands
-                    IBond bnd = fragsMol.getBond(atmA,atmB);
-                    fragsMol.removeBond(bnd);
-
-                    masterFrag.addAPOnAtom(atmA, rule.getAPClass0(), 
+                    IBond bnd = tempFragsMol.getBond(atmA,atmB);
+                    cutList.add(bnd);
+                    // Insert all the Attachment Points
+                    tempFrag.addAPOnAtom(atmA, tb.getRule().getAPClass0(), 
                             MoleculeUtils.getPoint3d(atmB));
-                    masterFrag.addAPOnAtom(atmB, rule.getAPClass1(), 
+                    tempFrag.addAPOnAtom(atmB, tb.getRule().getAPClass1(), 
                             MoleculeUtils.getPoint3d(atmA));
                 } //end of if (hapticity>1)
-            } //end of loop over matching bonds
-        } //end of loop over rules
+            } //end of loop over clique
+            // Remove all cuts simultaneously
+            for (IBond cut : cutList)
+            {
+                tempFragsMol.removeBond(cut);   
+            }
+            // Collect the fragmented molecule
+            fragmentsSets.add(tempFrag);
+ 
+        } //end of loop over all cliques
         
         // Extract isolated fragments
-        ArrayList<Vertex>  fragments = new ArrayList<Vertex>();
-        Set<Integer> doneAlready = new HashSet<Integer>();
-        for (int idx=0 ; idx<masterFrag.getAtomCount(); idx++)
+        for (Fragment fragMol : fragmentsSets)
         {
-            if (doneAlready.contains(idx))
-                continue;
             
-            Fragment cloneOfMaster = masterFrag.clone();
-            IAtomContainer iac = cloneOfMaster.getIAtomContainer();
-            Set<IAtom> atmsToKeep = exploreConnectivity(iac.getAtom(idx), iac);
-            atmsToKeep.stream().forEach(atm -> doneAlready.add(iac.indexOf(atm)));
-            
-            Set<IAtom> atmsToRemove = new HashSet<IAtom>();
-            for (IAtom atm : cloneOfMaster.atoms())
+            Set<Integer> doneAlready = new HashSet<Integer>();
+            for (int idx=0 ; idx<fragMol.getAtomCount(); idx++)
             {
-                if (!atmsToKeep.contains(atm))
+                if (doneAlready.contains(idx))
+                    continue;
+                
+                Set<IAtom> atmsToKeep = exploreConnectivity(fragMol.getAtom(idx),
+                        fragMol.getIAtomContainer());
+                atmsToKeep.stream().forEach(atm -> doneAlready.add(
+                        fragMol.indexOf(atm)));
+                
+                Set<IAtom> atmsToRemove = new HashSet<IAtom>();
+                for (IAtom atm : fragMol.atoms())
                 {
-                    atmsToRemove.add(atm);
+                    if (!atmsToKeep.contains(atm))
+                    {
+                        atmsToRemove.add(atm);
+                    }
                 }
+                fragMol.removeAtoms(atmsToRemove);
+                if (fragMol.getAttachmentPoints().size()>0)
+                    fragments.add(fragMol);
             }
-            cloneOfMaster.removeAtoms(atmsToRemove);
-            if (cloneOfMaster.getAttachmentPoints().size()>0)
-                fragments.add(cloneOfMaster);
         }
-        
-        return fragments;
+         return fragments;
     }
     
+   
 //------------------------------------------------------------------------------
     /**
      * Identifies non-central atoms involved in the same n-hapto ligand as 
@@ -721,6 +762,104 @@ public class FragmenterTools
     
 //------------------------------------------------------------------------------
     
+private static Graph<Integer, DefaultEdge> buildBondsGraph(
+            IAtomContainer fragsMol, ArrayList<MatchedBond> allMatchedBonds)
+    {
+    Graph<Integer,DefaultEdge> bondsGraph = 
+            new SimpleGraph<>(DefaultEdge.class);
+   ;
+    boolean isCleaved = false;
+    // Add vertices (Matched Bonds) to the graph if they satisfy the minimum
+    // size requirement
+    for (int i = 0; i < allMatchedBonds.size(); i++) 
+    {
+        IAtom atom1 = allMatchedBonds.get(i).getAtmSubClass0();
+        IAtom atom2 = allMatchedBonds.get(i).getAtmSubClass1();
+        // cleave the bond //TODO remove hard coding parameter
+        isCleaved = isCleavableBond(fragsMol, atom1, atom2, 2);
+        if (isCleaved) 
+        {
+            bondsGraph.addVertex(i);  
+        } else {
+            continue;
+        }
+        
+    }
+    // process each bonds
+    for (int i : bondsGraph.vertexSet()) 
+    {
+      // get the bond atoms
+        IAtom atom1 = allMatchedBonds.get(i).getAtmSubClass0();
+        IAtom atom2 = allMatchedBonds.get(i).getAtmSubClass1();
+        // cleave the bond
+        IBond bnd = fragsMol.getBond(atom1,atom2);
+        isCleaved = isCleavableBond(fragsMol, atom1, atom2, 2);
+        if (isCleaved) 
+        {
+            fragsMol.removeBond(bnd);  
+        } else {
+            continue;
+        }
+      
+      for (int j : bondsGraph.vertexSet()) 
+      {
+          if (i == j)
+              continue;
+          else
+           // get the bond atoms
+              atom1 = allMatchedBonds.get(j).getAtmSubClass0();
+              atom2 = allMatchedBonds.get(j).getAtmSubClass1();
+              
+              // attempt to cleave
+              isCleaved = isCleavableBond(fragsMol, atom1, atom2, 10);
+              
+              // fill in the dependency matrix
+              if (isCleaved) 
+                  
+              {
+                  bondsGraph.addEdge(i,j);
+              }
+            }
+            fragsMol.addBond(bnd);
+    }
+    return bondsGraph;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * the examined bond if and only if both the potential fragments 
+     * generated satisfy the minimum size requirement
+     * @param mol
+     * @param atom1
+     * @param atom2
+     * @param i
+     * @return
+     */
+    static boolean isCleavableBond(IAtomContainer mol, IAtom atom1,
+        IAtom atom2, int i)
+{
+        IBond bnd = mol.getBond(atom1,atom2);
+        if (bnd == null)
+        {
+            return false;
+        } else {
+            mol.removeBond(bnd);
+        }
+        
+        Set<IAtom> FragmentSize = exploreConnectivity(atom1, mol);
+        Set<IAtom> FragmentSize1 = exploreConnectivity(atom2, mol);
+        
+        long n = MoleculeUtils.countAtomsExcludingElement(FragmentSize, "H");
+        long n1 = MoleculeUtils.countAtomsExcludingElement(FragmentSize1, "H");
+        
+        // restore molecule
+        mol.addBond(bnd);
+        // make sure that both fragments are not too small
+        return (n >= i && n1 >= i);
+}
+    
+//------------------------------------------------------------------------------
     /**
      * Management of fragments: includes application of fragment filters, 
      * rejection rules, and collection rules (also of isomorphic fragments, thus

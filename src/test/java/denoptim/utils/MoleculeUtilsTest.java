@@ -19,14 +19,19 @@ package denoptim.utils;
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import static denoptim.utils.MoleculeUtils.getPoint3d;
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
@@ -41,6 +46,22 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 public class MoleculeUtilsTest
 {
     private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+    
+//------------------------------------------------------------------------------
+    
+    @Test 
+    public void testCountAtomsExcludingElement() throws Exception
+    {
+        Set<IAtom> set = new HashSet<IAtom>();
+        set.add(new Atom("C"));
+        set.add(new Atom("H"));
+        set.add(new Atom("C"));
+        set.add(new Atom("N"));
+        set.add(new PseudoAtom("pseudo"));
+        set.add(new Atom("H"));
+        set.add(new Atom("S"));
+        assertEquals(4L, MoleculeUtils.countAtomsExcludingElement(set, "H"));
+    }
     
 //------------------------------------------------------------------------------
     

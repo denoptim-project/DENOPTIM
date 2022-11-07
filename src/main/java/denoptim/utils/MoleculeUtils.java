@@ -1264,6 +1264,23 @@ public class MoleculeUtils
         else
             return not2or3D;
     }
+    
+//------------------------------------------------------------------------------
+    /**
+     * Counts the number of atoms in the set excluding atoms that are not 
+     * elements and those with the given symbol 
+     * @param set
+     * @param symbol
+     * @return
+     */
+    public static long countAtomsExcludingElement(Set<IAtom> set,
+            String symbol)
+    {
+        return set.stream()
+                .filter(atm -> MoleculeUtils.isElement(atm))
+                .filter(atm -> !atm.getSymbol().equals(symbol))
+                .count();
+    }
 
 //------------------------------------------------------------------------------
 

@@ -42,7 +42,54 @@ public class FragmenterToolsTest
      * Private builder of atom containers
      */
     private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
-    
+   
+    @Test 
+    public void testIsCleavableBond() throws Exception
+    {
+        IAtomContainer mol = builder.newAtomContainer();
+        mol.addAtom(new Atom("H")); // 0
+        mol.addAtom(new Atom("C")); // 1
+        mol.addAtom(new Atom("C")); // 2
+        mol.addAtom(new Atom("O")); // 3
+        mol.addAtom(new Atom("O")); // 4
+        mol.addAtom(new Atom("C")); // 5
+        mol.addAtom(new Atom("S")); // 6
+        mol.addAtom(new Atom("O")); // 7
+        mol.addAtom(new Atom("H")); // 8
+        mol.addBond(0, 1, IBond.Order.SINGLE);
+        mol.addBond(1, 2, IBond.Order.TRIPLE);
+        mol.addBond(2, 3, IBond.Order.SINGLE);
+        mol.addBond(3, 4, IBond.Order.SINGLE);
+        mol.addBond(4, 5, IBond.Order.SINGLE);
+        mol.addBond(5, 6, IBond.Order.SINGLE);
+        mol.addBond(6, 7, IBond.Order.SINGLE);
+        mol.addBond(7, 8, IBond.Order.SINGLE);
+        
+        assertTrue(FragmenterTools.isCleavableBond(mol, mol.getAtom(3), 
+                mol.getAtom(4), 3));
+        
+        mol = builder.newAtomContainer();
+        mol.addAtom(new Atom("H")); // 0
+        mol.addAtom(new Atom("C")); // 1
+        mol.addAtom(new Atom("O")); // 2
+        mol.addAtom(new Atom("O")); // 3
+        mol.addAtom(new Atom("C")); // 4
+        mol.addAtom(new Atom("S")); // 5
+        mol.addAtom(new Atom("O")); // 6
+        mol.addAtom(new Atom("H")); // 7
+        mol.addBond(0, 1, IBond.Order.SINGLE);
+        mol.addBond(1, 2, IBond.Order.TRIPLE);
+        mol.addBond(2, 3, IBond.Order.SINGLE);
+        mol.addBond(3, 4, IBond.Order.SINGLE);
+        mol.addBond(4, 5, IBond.Order.SINGLE);
+        mol.addBond(5, 6, IBond.Order.SINGLE);
+        mol.addBond(6, 7, IBond.Order.SINGLE);
+        
+        assertFalse(FragmenterTools.isCleavableBond(mol, mol.getAtom(2), 
+                mol.getAtom(3), 3));
+        
+        
+    }
 //-----------------------------------------------------------------------------
 
     @Test
