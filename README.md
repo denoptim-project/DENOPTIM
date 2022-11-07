@@ -1,8 +1,7 @@
 # DENOPTIM
 
 ![Anaconda_Platforms](https://anaconda.org/denoptim-project/denoptim/badges/platforms.svg) ![Anaconda_License](https://anaconda.org/denoptim-project/denoptim/badges/license.svg) ![Anaconda_Version](https://anaconda.org/denoptim-project/denoptim/badges/version.svg) ![Anaconda_last](
-https://anaconda.org/denoptim-project/denoptim/badges/latest_release_date.svg) ![Anaconda_Installer](https://anaconda.org/denoptim-project/denoptim/badges/installer/conda.svg) ![Anaconda_Downloads](
-https://anaconda.org/denoptim-project/denoptim/badges/downloads.svg)
+https://anaconda.org/denoptim-project/denoptim/badges/latest_release_date.svg) ![Anaconda_Installer](https://anaconda.org/denoptim-project/denoptim/badges/installer/conda.svg) ![Anaconda_Downloads](https://anaconda.org/denoptim-project/denoptim/badges/downloads.svg)
 
 ## Introduction
 DENOPTIM (De Novo OPTimization of In/organic Molecules) is a software meant for <i>de novo</i> design and virtual screening of functional compounds. In practice, DENOPTIM builds chemical entities by assembling building blocks (i.e., fragments), analyzes each chemical entity as to produce its figure of merit (i.e., fitness), and designs new entities based on the properties of known entities.
@@ -92,7 +91,7 @@ For example, this command
 ```
 denoptim -r GA input_parameters
 ```
-starts an artificial evolution experiment using the genetic algorithm and parameters specified in the <code>&lt;input_parameters&gt;</code> file, which is a text file containing [parameters and keywords](https://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html#Toc35546_1191730726).
+starts an artificial evolution experiment using the genetic algorithm and parameters specified in the <code>&lt;input_parameters&gt;</code> file, which is a text file containing [parameters and keywords](https://denoptim-project.github.io/DENOPTIM/#Keywords).
 
 ### Pre-configured Examples
 Complete examples pre-configured to run DENOPTIM experiments on your local client can be found under the [test](./test) folder. Each of these test will run a short experiments and collect the output in a folder that can be inspected with the GUI (see below).
