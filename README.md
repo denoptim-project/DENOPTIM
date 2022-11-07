@@ -17,8 +17,15 @@ You can either get latest version of DENOPTIM from the <a href="https://repo.ana
 ### Install From Conda (recommended)
 
 ```
+conda install -c conda-forge  denoptim
+```
+
+or
+
+```
 conda install -c denoptim-project  denoptim
 ```
+
 
 ### Build From Source
 Download and extract the <a href="https://github.com/denoptim-project/DENOPTIM/releases/latest">latest release</a> to create a folder we'll call `DENOPTIM_HOME`. In the following, remember to replace `$DENOPTIM_HOME` with the pathname of the extracted DENOPTIM's distribution folder on your system.
