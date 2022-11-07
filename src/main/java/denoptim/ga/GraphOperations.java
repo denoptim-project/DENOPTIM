@@ -1943,9 +1943,9 @@ public class GraphOperations
 //------------------------------------------------------------------------------
     
     /**
-     * Tries to do mutate the given vertex. We assume the vertex to belong to a 
+     * Tries to do mutate the given vertex. We assume the vertex belongs to a 
      * graph, if not no mutation is done. The mutation type is
-     * chosen randomly according the the possibilities declared by the vertex.
+     * chosen randomly according to the possibilities declared by the vertex.
      * The graph that owns the vertex will be altered and
      * the original structure and content of the graph will be lost.
      * @param vertex the vertex to mutate.

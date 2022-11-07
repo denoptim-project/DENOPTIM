@@ -117,7 +117,7 @@ public class FileUtils
      * spaces, and with the content of each 
      * line in the file, so this is rather slow.
      * @param query the string to search for and possibly add to the file.
-     * @param file the text file to analyse.
+     * @param file the text file to analyze.
      * @param add if <code>true</code> then we add the query if it was not found.
      * @return <code>true</code> is the query was found in the file. Note that 
      * when <code>add</code> is <code>true</code>
@@ -387,8 +387,8 @@ public class FileUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Inspects a file/folder and tries to detect if the it is one of
-     * the data sources that is recognised by DENOPTIM.
+     * Inspects a file/folder and tries to detect if there is one of
+     * the data sources that is recognized by DENOPTIM.
      * @param inFile the file to inspect
      * @return a string informing on the detected file format, or null.
      * @throws UndetectedFileFormatException when the format of the file could
@@ -480,7 +480,7 @@ public class FileUtils
 
     /**
      * Detect the content of a json file.
-     * @param fileName file to analyse.
+     * @param fileName file to analyze.
      * @return the format of that file or null.
      * @throws IOException
      */

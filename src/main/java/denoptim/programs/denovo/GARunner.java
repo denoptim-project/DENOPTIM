@@ -1,7 +1,7 @@
 /*
  *   DENOPTIM
  *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
- * 
+ *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published
  *   by the Free Software Foundation, either version 3 of the License, or
@@ -31,8 +31,8 @@ import denoptim.ga.ExternalCmdsListener;
 import denoptim.task.ProgramTask;
 
 /**
- * Programs that runs de novo design by a genetic algorithms.
- * 
+ * Programs that runs de novo design by a genetic algorithm.
+ *
  * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
@@ -47,20 +47,20 @@ public class GARunner extends ProgramTask
      * The service that listens for commands from outside the JVM.
      */
     private ExternalCmdsListener ecl = null;
-    
+
     /**
      * Executor of the service that listens for commands.
      */
     private ExecutorService executor = null;
-    
+
     /**
      * Pending tasks of the service listening for commands.
      */
     private Future<?> futureWatchers = null;
-    
+
 
 //------------------------------------------------------------------------------
-    
+
     /**
      * Creates and configures the program task.
      * @param configFile the file containing the configuration parameters.
@@ -70,7 +70,7 @@ public class GARunner extends ProgramTask
     {
         super(configFile,workDir);
     }
-    
+
 //------------------------------------------------------------------------------
 
     @Override
@@ -81,19 +81,19 @@ public class GARunner extends ProgramTask
         {
             settings.setWorkingDirectory(workDir.getAbsolutePath());
         }
-        
+
         settings.readParameterFile(configFilePathName.getAbsolutePath());
         settings.checkParameters();
         settings.processParameters();
         settings.startProgramSpecificLogger(loggerIdentifier);
         settings.printParameters();
-        
+
         ecl = new ExternalCmdsListener(Paths.get(settings.getInterfaceDir()),
                 settings.getLogger());
         executor = Executors.newSingleThreadExecutor();
         futureWatchers = executor.submit(ecl);
         executor.shutdown();
-        
+
         ea = new EvolutionaryAlgorithm(settings, ecl);
         ea.run();
 
@@ -112,16 +112,16 @@ public class GARunner extends ProgramTask
         stopExternalCmdListener();
         super.handleThrowable();
     }
-    
+
 //------------------------------------------------------------------------------
-    
+
     /**
      * Stop the service that waits for instructions from the outside world.
      * @param ecl
      * @param executor
      * @param futureWatchers
      */
-	private void stopExternalCmdListener() 
+	private void stopExternalCmdListener()
 	{
         if (executor != null)
         {
@@ -139,7 +139,7 @@ public class GARunner extends ProgramTask
             executor = null;
         }
 	}
-    
-//------------------------------------------------------------------------------        
+
+//------------------------------------------------------------------------------
 
 }

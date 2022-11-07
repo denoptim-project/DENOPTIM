@@ -284,16 +284,16 @@ public class Ring
 //------------------------------------------------------------------------------
     
     /**
-     * Adds a vertex to the ring, and in between two defined vertexes.
+     * Adds a vertex to the ring, and in between two defined vertices.
      * @param newLink vertex to add to this ring.
-     * @param vA one of the vertexes in between which the new vertex should
+     * @param vA one of the vertices in between which the new vertex should
      * in inserted.
-     * @param vB one of the vertexes in between which the new vertex should
+     * @param vB one of the vertices in between which the new vertex should
      * in inserted.
      * @return <code>true</code> if the vertex is inserted, or 
      * <code>false</code> if the operation cannot be performed for any reason,
      * e.g., the vertex is already contained in this ring, or either of the two
-     * reference vertexes are not themselves contained here.
+     * reference vertices are not themselves contained here.
      */
     public boolean insertVertex(Vertex newLink, Vertex vA,
             Vertex vB)
@@ -316,10 +316,10 @@ public class Ring
 
     /**
      * Measures how many edges there are between two edges along the sequence of
-     * vertexes that defined this fundamental ring.
+     * vertices that defined this fundamental ring.
      * @param v1
      * @param v2
-     * @return the distance between the vertexes (i.e., number of edges).
+     * @return the distance between the vertices (i.e., number of edges).
      * @throws DENOPTIMException if either vertex is not part of this ring.
      */
     public int getDistance(Vertex v1, Vertex v2) throws DENOPTIMException
@@ -340,7 +340,7 @@ public class Ring
 //------------------------------------------------------------------------------
     
     /**
-     * Chooses among the two given vertexes the one that is closer to the 
+     * Chooses among the two given vertices the one that is closer to the 
      * head vertex.
      * @param vA first candidate.
      * @param vB second candidate
@@ -354,7 +354,7 @@ public class Ring
 //------------------------------------------------------------------------------
 
     /**
-     * Chooses among the two given vertexes the one that is closer to the 
+     * Chooses among the two given vertices the one that is closer to the 
      * tail vertex.
      * @param vA first candidate.
      * @param vB second candidate
@@ -368,7 +368,7 @@ public class Ring
 //------------------------------------------------------------------------------
     
     /**
-     * Chooses among the two given vertexes the one that is closer to the 
+     * Chooses among the two given vertices the one that is closer to the 
      * target vertex.
      * @param vA first candidate.
      * @param vB second candidate.

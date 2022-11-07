@@ -21,7 +21,7 @@ package denoptim.files;
 import java.io.File;
 
 /**
- * Exception thrown when the format of a file is not recognised.
+ * Exception thrown when the format of a file is not recognized.
  */
 
 public class UndetectedFileFormatException extends Exception

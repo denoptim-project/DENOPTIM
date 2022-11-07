@@ -46,7 +46,7 @@ import denoptim.utils.FormulaUtils;
 
 
 /**
- * Parameters controlling execution of the frqgmenter.
+ * Parameters controlling execution of the fragmenter.
  * 
  * @author Marco Foscato
  */
@@ -226,12 +226,12 @@ public class FragmenterParameters extends RunTimeParameters
      * duplicate fragments. This is needed if 
      * we want to identify isomorphic fragments and keep only one 
      * isomorphic fragment (i.e.,
-     * remove all duplicate fragments), or more then more isomorphic fragment. 
+     * remove all duplicate fragments), or more then one isomorphic fragment. 
      * In the latter case, we essentially want to sample the isomorphic family.
      * The extent of this, i.e., the size of the sample is controlled by
      * {@link #isomorphicSampleSize}).</p>
      * <p>Also, if we run multiple threads and want to remove duplicate fragments
-     * , each of thread may generate a new fragment 
+     * , each thread may generate a new fragment 
      * that the others have not yet found. Thus, the existence of the new 
      * fragment must be communicated to the other threads avoiding concurrent
      * generation of the same fragment from different threads.</p>
@@ -312,7 +312,7 @@ public class FragmenterParameters extends RunTimeParameters
     /**
      * Size of on-the-fly generated, normally distributed noise-distorted 
      * population of geometries used to determine properties of unimodal 
-     * population of distorted of points around an N-dimensional point. Used
+     * population of distorted points around an N-dimensional point. Used
      * by {@link FragmentClusterer}.
      */
     private int sizeUnimodalPop = 20;
@@ -346,7 +346,7 @@ public class FragmenterParameters extends RunTimeParameters
     private boolean saveClustersOfConformerToFile = false;
     
     /**
-     * Flag requesting to run fragment clusterer in standalone fashion
+     * Flag requesting to run fragment clusterer in stand-alone fashion
      */
     private boolean isStandaloneFragmentClustering = false;
     
@@ -450,10 +450,9 @@ public class FragmenterParameters extends RunTimeParameters
     
     /**
      * @return <code>true</code> if we are asked to perform the comparison of
-     * about of atoms for each element (i.e., elemental analysis) present in the
+     * each element (i.e., elemental analysis) present in the
      * structure file ({@link #structuresFile}) against that of a given 
-     * molecular formula, which comes
-     * from the {@link #formulaeFile}.
+     * molecular formula, which comes from the {@link #formulaeFile}.
      */
     public boolean doCheckFormula()
     {

@@ -87,7 +87,7 @@ public class FragsCombinationIterator
     private ArrayList<Integer> totCandsPerAP = new ArrayList<Integer>();
 
     /**
-     * Total number for combinations
+     * Total number of combinations
      */
     private int totCombs = 0;
 
@@ -115,9 +115,9 @@ public class FragsCombinationIterator
     
     //TODO-V3+: this usage of the getBuildingBlockId recorded inside the
     // vertex means that any change to the space of building blocks
-    // that alter the list of the BBs before the value returnes by 
-    // getBuildingBlockId has the pitential of generating a mistmatch 
-    // between the apId in the graph and those obrained from the library.
+    // that alter the list of the BBs before the value returns by 
+    // getBuildingBlockId has the potential of generating a mismatch 
+    // between the apId in the graph and those obtained from the library.
 
     public FragsCombinationIterator(FragmentSpaceParameters settings,
             DGraph rootGraph) throws DENOPTIMException

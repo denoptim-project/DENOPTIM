@@ -313,7 +313,7 @@ public class GAParameters extends RunTimeParameters
     protected double saveRingSystemsFitnessThreshold = 0.10;
 
     /**
-     * The weights of multisite mutations
+     * The weights of multi-site mutations
      */
     private double[] mutliSiteMutationWeights = new double[]{0,10,1};
 

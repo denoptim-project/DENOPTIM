@@ -44,7 +44,7 @@ public class GraphEdit
     /**
      * Query identifying the vertex that is the center of our attention when
      * performing the graph editing task. 
-     * Depending on the type of task the vertex in
+     * Depending on the type of task the vertex it
      * may or may not be altered. For example, if the task is 
      * {@link EditTask#DELETEVERTEX}, then the vertex in focus is the vertex 
      * that will be deleted.

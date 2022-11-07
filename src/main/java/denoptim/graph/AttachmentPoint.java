@@ -100,7 +100,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * @param owner the vertex that holds the attachment point under creation.
      */
     
-    //TODO: since APs can be on any vertex, and vertexes are not required to
+    //TODO: since APs can be on any vertex, and vertices are not required to
     // contain atoms, the information of which atom is an AP rooted should be
     // stored and managed by the implementation of vertex that do contain atoms.
     // The DENOPTIMFragment should thus be charged with keeping the reference to
@@ -911,11 +911,11 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
 //-----------------------------------------------------------------------------
     
     /**
-     * For vertexes that are templates this method returns the attachment point
+     * For vertices that are templates this method returns the attachment point
      * that is embedded in the template's inner graph. Effectively, it returns
      * the original object of which this object is a projection on the templates
      * surface.
-     * @return this attachment point (for vertexes that are no templates) or
+     * @return this attachment point (for vertices that are no templates) or
      * the original attachment point this is a projection of (for templates).
      */
     public AttachmentPoint getEmbeddedAP()

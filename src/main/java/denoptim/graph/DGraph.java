@@ -327,10 +327,10 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * @param v the vertex for which we want the list of symmetric vertexes.
+     * @param v the vertex for which we want the list of symmetric vertices.
      * @return a list that includes v but can be empty.
      */
-    public ArrayList<Vertex> getSymVertexesForVertex(Vertex v)
+    public ArrayList<Vertex> getSymVerticesForVertex(Vertex v)
     {
         ArrayList<Vertex> lst = new ArrayList<Vertex>();
         for (SymmetricSet ss : symVertices)
@@ -564,9 +564,9 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the list of rings that include the given list of vertexes in their 
+     * Returns the list of rings that include the given list of vertices in their 
      * fundamental cycle.
-     * @param vs the collection of vertexes to search for.
+     * @param vs the collection of vertices to search for.
      * @return the list of rings of an empty list.
      */
     public ArrayList<Ring> getRingsInvolvingVertex(Vertex[] vs)
@@ -881,7 +881,7 @@ public class DGraph implements Cloneable
             this.removeEdge(e);
         }
 
-        // delete the removed vertex from symmetric sets, but leave other vrtxs
+        //delete the removed vertex from symmetric sets, but leave other vertices
         ArrayList<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
         for (SymmetricSet ss : symVertices)
         {
@@ -927,7 +927,7 @@ public class DGraph implements Cloneable
             return false;
         }
         
-        ArrayList<Vertex> symSites = getSymVertexesForVertex(vertex);
+        ArrayList<Vertex> symSites = getSymVerticesForVertex(vertex);
         if (symSites.size() == 0)
         {
             symSites.add(vertex);
@@ -1152,8 +1152,8 @@ public class DGraph implements Cloneable
         
         // Update pointers in symmetric sets in this graph level
         // NB: this deals only with the symmetric relations of the removed vertex
-        // The symm. relations of other removed child vertexes are dealt with
-        // when removing those vertexes.
+        // The symm. relations of other removed child vertices are dealt with
+        // when removing those vertices.
         int oldVrtxId = vertex.getVertexId();
         ArrayList<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
         Iterator<SymmetricSet> ssIter = getSymSetsIterator();
@@ -1245,7 +1245,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Removes unused ring-closing vertexes. 
+     * Removes unused ring-closing vertices. 
      * If the resulting free AP needs to be capped, then the proper
      * capping group is places where a ring-closing vertex once stood.
      * @param fragSpace the fragment space defining how capping is configured.
@@ -1287,8 +1287,8 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Marks the vertexes of this graph with a string that is consistent for all
-     * vertexes that belong to symmetric sets. All vertexes will get a label,
+     * Marks the vertices of this graph with a string that is consistent for all
+     * vertices that belong to symmetric sets. All vertices will get a label,
      * whether they belong to a symmetric set or not. The label is places in the
      * vertex property {@link DENOPTIMConstants#VRTSYMMSETID}.
      * Any previous labeling is ignored and overwritten.
@@ -1349,12 +1349,12 @@ public class DGraph implements Cloneable
         
         for (String label : collectedLabels.keySet())
         {
-            List<Vertex> symmVertexes = collectedLabels.get(label);
+            List<Vertex> symmvertices = collectedLabels.get(label);
             
-            if (symmVertexes.size()>1)
+            if (symmvertices.size()>1)
             {
                 SymmetricSet ss = null;
-                for (Vertex v : symmVertexes)
+                for (Vertex v : symmvertices)
                 {
                     if (hasSymmetryInvolvingVertex(v))
                     {
@@ -1365,12 +1365,12 @@ public class DGraph implements Cloneable
                 
                 if (ss != null)
                 {
-                    for (Vertex v : symmVertexes)
+                    for (Vertex v : symmvertices)
                         ss.add(v.getVertexId());
                     
                 } else {
                     ss = new SymmetricSet();
-                    for (Vertex v : symmVertexes)
+                    for (Vertex v : symmvertices)
                         ss.add(v.getVertexId());
                     try
                     {
@@ -1388,22 +1388,22 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Replaced the subgraph represented by a given collection of vertexes that
+     * Replaced the subgraph represented by a given collection of vertices that
      * belong to this graph. 
      * This method reproduces the change of vertex on all symmetric sites, where
      * a site is identified by a symmetrically identified reflection of the 
      * subgraph to replace, which are identified using symmetric sets.
-     * @param subGrpVrtxs the vertexes currently belonging to this graph and to  
-     * be replaced. We assume these collection of vertexes is a connected graph,
-     * i.e., all vertexes are reachable by one single vertex via a directed path
+     * @param subGrpVrtxs the vertices currently belonging to this graph and to  
+     * be replaced. We assume these collection of vertices is a connected graph,
+     * i.e., all vertices are reachable by one single vertex via a directed path
      * that does not involve any other vertex not included in this collections.
      * @param newSubGraph the graph that will be used to create the new branch 
-     * replacing the old one. Vertexes of such branch will be cloned to create
-     * the new vertexes to be added to this graph.
+     * replacing the old one. Vertices of such branch will be cloned to create
+     * the new vertices to be added to this graph.
      * @param apMap mapping of attachment points belonging to any vertex in
      * <code>subGrpVrtxs</code> to attachment points in <code>newSubGraph</code>.
      * @return <code>true</code> if the substitution is successful.
-     * @throws DENOPTIMException is capping groups are the only vertexes in the
+     * @throws DENOPTIMException is capping groups are the only vertices in the
      * subgraph.
      */
     public boolean replaceSubGraph(List<Vertex> subGrpVrtxs, 
@@ -1435,8 +1435,8 @@ public class DGraph implements Cloneable
         
         GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
         
-        // Verify that also the surrounding of vertexes in the lists is 
-        // consistent between subGrpVrtxs and vertexesToRemove. Even if the
+        // Verify that also the surrounding of vertices in the lists is 
+        // consistent between subGrpVrtxs and verticesToRemove. Even if the
         // two are consistent, there can still be differences in the childs.
         List<List<Vertex>> compatibleSymSubGrps = new ArrayList<List<Vertex>>();
         for (List<Vertex> symmetricSubGrpVrtx : getSymmetricSubGraphs(subGrpVrtxs))
@@ -1469,7 +1469,7 @@ public class DGraph implements Cloneable
                     // We have already checked those in the subgraph
                     if (subGrpVrtxs.contains(oriVsChildren.get(ic)))
                         continue;
-                    // We do allow the two child to be different vertexes, but
+                    // We do allow the two child to be different vertices, but
                     // we avoid having one CAP and one not. this because it will
                     // lead to having free APs on the parent of the first and
                     // busy APs on the parent of the second. This prevents 
@@ -1488,7 +1488,7 @@ public class DGraph implements Cloneable
         if (compatibleSymSubGrps.size()==0)
             throw new DENOPTIMException("Failed to detect autosymmetry.");
         
-        for (List<Vertex> vertexesToRemove : compatibleSymSubGrps)
+        for (List<Vertex> verticesToRemove : compatibleSymSubGrps)
         {
             // Prepare incoming graph
             DGraph graphToAdd = incomingGraph.clone();
@@ -1497,18 +1497,18 @@ public class DGraph implements Cloneable
                     graphToAdd.gVertices);
             
             // Prepare subgraph (it already does not contain caps)
-            removeCappingGroupsFromChilds(vertexesToRemove);
+            removeCappingGroupsFromChilds(verticesToRemove);
             
             // Prepare AP mapping projecting the one for subGrpVrtxs
             LinkedHashMap<AttachmentPoint,AttachmentPoint> localApMap = 
                     new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
             for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMap.entrySet())
             {
-                // WARNING! Assumption that subGrpVrtxs and vertexesToRemove
+                // WARNING! Assumption that subGrpVrtxs and verticesToRemove
                 // are sorted accordingly to symmetry, which should be the case.
                 int vrtPosOnOld = subGrpVrtxs.indexOf(e.getKey().getOwner());
                 int apPosOnOld = e.getKey().getIndexInOwner();
-                AttachmentPoint apOnOld = vertexesToRemove.get(
+                AttachmentPoint apOnOld = verticesToRemove.get(
                         vrtPosOnOld).getAP(apPosOnOld); 
                 
                 int vrtPosOnNew = incomingGraph.indexOf(e.getValue().getOwner());
@@ -1518,7 +1518,7 @@ public class DGraph implements Cloneable
                 localApMap.put(apOnOld,apOnNew);
             }
             
-            if (!replaceSingleSubGraph(vertexesToRemove, graphToAdd, localApMap))
+            if (!replaceSingleSubGraph(verticesToRemove, graphToAdd, localApMap))
             {
                 return false;
             }
@@ -1535,10 +1535,10 @@ public class DGraph implements Cloneable
      * By contract, the source of the symmetric subgraph's spanning tree is 
      * always the first vertex in each returned list. Also, note that symmetry
      * does not pertain capping groups, so capping groups are not expected to be
-     * among the vertexes in the given list and will not be present in the 
+     * among the vertices in the given list and will not be present in the 
      * resulting subgraphs.
      * @param subGrpVrtxs
-     * @return a collection of subgraphs, each represented by a list of vertexes
+     * @return a collection of subgraphs, each represented by a list of vertices
      * belonging to it.
      * @throws DENOPTIMException if capping groups are present in the list.
      */
@@ -1553,7 +1553,7 @@ public class DGraph implements Cloneable
         
         if (subGrpVrtxs.size()==1)
         {
-            for (Vertex sv : getSymVertexesForVertex(subGrpVrtxs.get(0)))
+            for (Vertex sv : getSymVerticesForVertex(subGrpVrtxs.get(0)))
             {
                 ArrayList<Vertex> lst = new ArrayList<Vertex>();
                 lst.add(sv);
@@ -1579,7 +1579,7 @@ public class DGraph implements Cloneable
                     + "parent.");
         }
         Vertex sourceOfSubGraph = thoseWithoutParent.get(0);
-        int numSymmetricSubGraphs = getSymVertexesForVertex(sourceOfSubGraph).size();
+        int numSymmetricSubGraphs = getSymVerticesForVertex(sourceOfSubGraph).size();
         if (numSymmetricSubGraphs==0)
         {
             symSites.add(subGrpVrtxs);
@@ -1603,16 +1603,16 @@ public class DGraph implements Cloneable
         Set<Vertex> doneBySymmetry = new HashSet<Vertex>();
         for (Vertex upperLimit : thoseWithoutChildren)
         {
-            // We need to understand how many symmetric vertexes are already
+            // We need to understand how many symmetric vertices are already
             // within the subgraph
             int numInSubGraphReplicas = 1;
             
             if (doneBySymmetry.contains(upperLimit))
                 continue;
             
-            // These are symmetric vertexes that do belong to the subgraph
+            // These are symmetric vertices that do belong to the subgraph
             Set<Vertex> symmSitesOnBranch = new HashSet<Vertex>(
-                    getSymVertexesForVertex(upperLimit));
+                    getSymVerticesForVertex(upperLimit));
             symmSitesOnBranch.retainAll(subGrpVrtxs);
             if (symmSitesOnBranch.size()>0)
             {
@@ -1620,7 +1620,7 @@ public class DGraph implements Cloneable
                 doneBySymmetry.addAll(symmSitesOnBranch);
             }
             
-            List<Vertex> lst = getSymVertexesForVertex(upperLimit);
+            List<Vertex> lst = getSymVerticesForVertex(upperLimit);
             if (lst.size() != numInSubGraphReplicas*numSymmetricSubGraphs)
             {
                 // The subgraph is not symmetrically reproduced.
@@ -1630,7 +1630,7 @@ public class DGraph implements Cloneable
             upperLimits.addAll(lst);
         }
         
-        for (Vertex symSources : getSymVertexesForVertex(sourceOfSubGraph))
+        for (Vertex symSources : getSymVerticesForVertex(sourceOfSubGraph))
         {
             List<Vertex> symSubGraph = new ArrayList<Vertex>();
             // The source of the symmetric subgraph is always the first!
@@ -1653,7 +1653,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Replaced the subgraph represented by a given collection of vertexes that
+     * Replaced the subgraph represented by a given collection of vertices that
      * belong to this graph. 
      * This method does not project the 
      * change of vertex on symmetric sites, and does not alter the symmetric 
@@ -1663,17 +1663,17 @@ public class DGraph implements Cloneable
      * {@link DGraph#convertSymmetricLabelsToSymmetricSets()} on this
      * graph.
      * This strategy reflects the fact that multiple sub-graph replacements can
-     * introduce vertexes that are symmetric throughout these newly inserted
+     * introduce vertices that are symmetric throughout these newly inserted
      * subgraphs, thus a single subgraph replacement cannot know the complete
-     * list of symmetric vertexes. 
+     * list of symmetric vertices. 
      * Therefore, the handling of the symmetry is left outside of the
      * subgraph replacement operation.
-     * @param subGrpVrtxs the vertexes currently belonging to this graph and to be 
-     * replaced. We assume these collection of vertexes is a connected subgraph,
-     * i.e., all vertexes are reachable by one single vertex via a directed path
+     * @param subGrpVrtxs the vertices currently belonging to this graph and to be 
+     * replaced. We assume these collection of vertices is a connected subgraph,
+     * i.e., all vertices are reachable by one single vertex via a directed path
      * that does not involve any other vertex not included in this collections.
      * @param newSubGraph the graph that will be attached on this graph. 
-     * No copying or cloning: such graph contains the actual vertexes that will 
+     * No copying or cloning: such graph contains the actual vertices that will 
      * become part of <i>this</i> graph.
      * @param apMap mapping of attachment points belonging to any vertex in
      * <code>subGrpVrtxs</code> to attachment points in <code>newSubGraph</code>.
@@ -1692,10 +1692,10 @@ public class DGraph implements Cloneable
         }
         
         // Identify vertex that will be added
-        ArrayList<Vertex> newVertexes = new ArrayList<Vertex>();
-        newVertexes.addAll(newSubGraph.getVertexList());
+        ArrayList<Vertex> newvertices = new ArrayList<Vertex>();
+        newvertices.addAll(newSubGraph.getVertexList());
         
-        // Collect APs from the vertexes that will be removed, and that might
+        // Collect APs from the vertices that will be removed, and that might
         // be reflected onto the jacket template or used to make links to the 
         // rest of the graph.
         List<AttachmentPoint> interfaceApsOnOldBranch = 
@@ -1799,7 +1799,7 @@ public class DGraph implements Cloneable
             }
         }
         
-        // Identify rings that are affected by the change of vertexes
+        // Identify rings that are affected by the change of vertices
         Map<Ring,List<Vertex>> ringsOverSubGraph = 
                 new HashMap<Ring,List<Vertex>>();
         for (int iA=0; iA<interfaceApsOnOldBranch.size(); iA++)
@@ -1836,10 +1836,10 @@ public class DGraph implements Cloneable
         {
             List<Vertex> vPair = ringsOverSubGraph.get(r);
             PathSubGraph path = new PathSubGraph(vPair.get(0),vPair.get(1),this);
-            List<Vertex> vertexesInPath = path.getVertecesPath();
-            for (int i=1; i<(vertexesInPath.size()-1); i++)
+            List<Vertex> verticesInPath = path.getVertecesPath();
+            for (int i=1; i<(verticesInPath.size()-1); i++)
             {
-                r.removeVertex(vertexesInPath.get(i));
+                r.removeVertex(verticesInPath.get(i));
             }
         }
         
@@ -1853,11 +1853,11 @@ public class DGraph implements Cloneable
         // remove the vertex from the graph
         for (Vertex vToDel : subGrpVrtxs)
         {
-            // WARNING! This removes rings involving these vertexes. 
+            // WARNING! This removes rings involving these vertices. 
             removeVertex(vToDel);
         }
         
-        // finally introduce the new vertexes from incoming graph into this graph
+        // finally introduce the new vertices from incoming graph into this graph
         for (Vertex incomingVrtx : newSubGraph.getVertexList())
         {
             addVertex(incomingVrtx);
@@ -1920,14 +1920,14 @@ public class DGraph implements Cloneable
             List<Vertex> vPair = ringsOverSubGraph.get(r);
             PathSubGraph path = new PathSubGraph(vPair.get(0),vPair.get(1),this);
             int initialInsertPoint = r.getPositionOf(vPair.get(0));
-            List<Vertex> vertexesInPath = path.getVertecesPath();
-            for (int i=1; i<(vertexesInPath.size()-1); i++)
+            List<Vertex> verticesInPath = path.getVertecesPath();
+            for (int i=1; i<(verticesInPath.size()-1); i++)
             {
-                r.insertVertex(initialInsertPoint+i, vertexesInPath.get(i));
+                r.insertVertex(initialInsertPoint+i, verticesInPath.get(i));
             }
         }
         
-        // update the mapping of this vertexes' APs in the jacket template
+        // update the mapping of this vertices' APs in the jacket template
         if (templateJacket != null)
         {
             templateJacket.clearIAtomContainer();
@@ -1960,7 +1960,7 @@ public class DGraph implements Cloneable
         for (Vertex vOld : subGrpVrtxs)
             if (this.containsVertex(vOld))
                 return false;
-        for (Vertex vNew : newVertexes)
+        for (Vertex vNew : newvertices)
             if (!this.containsVertex(vNew))
                 return false;
         return true;
@@ -2021,7 +2021,7 @@ public class DGraph implements Cloneable
         ArrayList<Vertex> symSites = new ArrayList<Vertex>();
         if (symmetry)
         {
-            symSites = getSymVertexesForVertex(vertex);
+            symSites = getSymVerticesForVertex(vertex);
         }
         if (symSites.size() == 0)
         {
@@ -2064,7 +2064,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Inserts a given vertex in between two vertexes connected by the given
+     * Inserts a given vertex in between two vertices connected by the given
      * edge. This method reproduces the 
      * change of vertex on all symmetric sites.
      * @param edge the edge where to insert the new vertex.
@@ -2099,14 +2099,14 @@ public class DGraph implements Cloneable
         ArrayList<Edge> symSites = new ArrayList<Edge> ();
         ArrayList<LinkedHashMap<AttachmentPoint,Integer>> symApMaps = 
                 new ArrayList<LinkedHashMap<AttachmentPoint,Integer>>();
-        ArrayList<Vertex> symTrgVertexes = getSymVertexesForVertex(
+        ArrayList<Vertex> symTrgvertices = getSymVerticesForVertex(
                 edge.getTrgAP().getOwner());
-        if (symTrgVertexes.size() == 0)
+        if (symTrgvertices.size() == 0)
         {
             symSites.add(edge);
             symApMaps.add(apMap);
         } else {
-            for (Vertex trgVrtx : symTrgVertexes)
+            for (Vertex trgVrtx : symTrgvertices)
             {
                 Edge symEdge = trgVrtx.getEdgeToParent();
                 symSites.add(symEdge);
@@ -2150,7 +2150,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Inserts a given vertex in between two vertexes connected by the given
+     * Inserts a given vertex in between two vertices connected by the given
      * edge. This method reproduces the 
      * change of vertex on all symmetric sites.
      * @param edge the edge where to insert the new vertex.
@@ -2235,7 +2235,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the vertex that is in the given position of the list of vertexes 
+     * Returns the vertex that is in the given position of the list of vertices 
      * belonging to this graph.
      * @param pos the position in the list.
      * @return the vertex in the given position.
@@ -2316,7 +2316,7 @@ public class DGraph implements Cloneable
     /**
      * Returns the position of the first vertex that has the given ID.
      * @param vid the vertedID of the vertex we are looking for.
-     * @return the index in the list of vertexes.
+     * @return the index in the list of vertices.
      */
     public int indexOfVertexWithID(int vid)
     {
@@ -2511,7 +2511,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Gets all the children of the current vertex recursively. All vertexes 
+     * Gets all the children of the current vertex recursively. All vertices 
      * belonging to the children tree can be labelled by a property that 
      * identifies
      * which branches they belong to ({@link DENOPTIMConstants.GRAPHBRANCHID}).
@@ -2520,7 +2520,7 @@ public class DGraph implements Cloneable
      * @param vertex the vertex whose children are to be located
      * @param children list containing the references to all the children
      * @param markBranches <code>true</code> to set the 
-     * {@link DENOPTIMConstants.GRAPHBRANCHID} property to vertexes, including 
+     * {@link DENOPTIMConstants.GRAPHBRANCHID} property to vertices, including 
      * the initial one.
      * <code>vertex</code> belongs.
      */
@@ -2570,7 +2570,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Gets all the children of the current vertex recursively. All vertexes 
+     * Gets all the children of the current vertex recursively. All vertices 
      * belonging to the children tree are labelled by a property that identifies
      * which branches they belong to ({@link DENOPTIMConstants.GRAPHBRANCHID}).
      * This method does not cross template 
@@ -2624,7 +2624,7 @@ public class DGraph implements Cloneable
      * vertex that we want to consider before stopping. If this value is 2, we 
      * will explore three layers: the seed, and two more layers away from it.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
-     * each branch stop before including ring closing vertexes.
+     * each branch stop before including ring closing vertices.
      */
     public void getChildrenTree(Vertex vertex,
             List<Vertex> children, int numLayers, boolean stopBeforeRCVs) 
@@ -2659,7 +2659,7 @@ public class DGraph implements Cloneable
      * @return the branch identifier or <code>null</code> if such property is
      * not available. In such case, you should run 
      * {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} on any of 
-     * the parent vertexes.
+     * the parent vertices.
      */
     public List<Integer> getBranchIdOfVertexAtPosition(int i)
     {
@@ -2675,7 +2675,7 @@ public class DGraph implements Cloneable
      * belong to this graph or if such property is
      * not available. In the latter case, you should run 
      * {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} on any of 
-     * the parent vertexes.
+     * the parent vertices.
      */
     @SuppressWarnings("unchecked")
     public List<Integer> getBranchIdOfVertex(Vertex v)
@@ -2696,7 +2696,7 @@ public class DGraph implements Cloneable
      * belong to this graph or if such property is
      * not available. In the latter case, you should run 
      * {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} on any of 
-     * the parent vertexes.
+     * the parent vertices.
      */
     public String getBranchIdOfVertexAsStr(Vertex v)
     {
@@ -2710,7 +2710,7 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Uses branch identifiers to define is two vertexes are in such a relation 
+     * Uses branch identifiers to define is two vertices are in such a relation 
      * that allows the drawing of a directed path from one to the other.
      * You must run {@link #getChildrenTree(Vertex, List, AtomicInteger, List)} 
      * on any parent of either graph to generate the bran branch labeling.
@@ -2746,7 +2746,7 @@ public class DGraph implements Cloneable
      * @param vertex the vertex whose children are to be located
      * @param children list containing the references to all the children
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
-     * each branch stop before including ring closing vertexes.
+     * each branch stop before including ring closing vertices.
      */
     public void getChildTreeLimited(Vertex vertex,
             List<Vertex> children, boolean stopBeforeRCVs) 
@@ -2773,12 +2773,12 @@ public class DGraph implements Cloneable
     
     /**
      * Gets all the children of the current vertex recursively until it 
-     * finds one of the vertexes listed as limit.
+     * finds one of the vertices listed as limit.
      * This method does not cross template 
      * boundaries, thus all children belong to the same graph.
      * @param vertex the vertex whose children are to be located
      * @param children list containing the references to all the children
-     * @param limits the list of vertexes where exploration should stop.
+     * @param limits the list of vertices where exploration should stop.
      */
     public void getChildTreeLimited(Vertex vertex,
             List<Vertex> children, Set<Vertex> limits)
@@ -2803,14 +2803,14 @@ public class DGraph implements Cloneable
 
     /**
      * Gets all the children of the current vertex recursively until it 
-     * finds one of the vertexes listed as limit.
+     * finds one of the vertices listed as limit.
      * This method does not cross template 
      * boundaries, thus all children belong to the same graph.
      * @param vertex the vertex whose children are to be located
      * @param children list containing the references to all the children
-     * @param limitsInClone the list of vertexes where exploration should stop.
+     * @param limitsInClone the list of vertices where exploration should stop.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
-     * each branch stop before including ring closing vertexes.
+     * each branch stop before including ring closing vertices.
      */
     public void getChildTreeLimited(Vertex vertex,
             List<Vertex> children, List<Vertex> limitsInClone, 
@@ -2839,7 +2839,7 @@ public class DGraph implements Cloneable
     
     /**
      * Identify the oldest ancestor (i.e., most great grandparent) in the given
-     * collection. In case of two vertexes being at the same level, this returns
+     * collection. In case of two vertices being at the same level, this returns
      * the first.
      * @return the vertex that has the shortest path to the source.
      */
@@ -3151,12 +3151,12 @@ public class DGraph implements Cloneable
      * In general, graph are considered undirected when evaluating
      * DENOPTIM-isomorphism. 
      * Next, since a graph is effectively 
-     * a spanning tree (ST_i={{vertexes}, {acyclic edges}}) 
+     * a spanning tree (ST_i={{vertices}, {acyclic edges}}) 
      * with a set of fundamental cycles (FC_i={C_1, C_2,...C_n}), 
      * any graph G={ST_i,FC_i} that contains one or more cycles 
      * can be represented in multiple
      * ways, G={ST_j,FC_j} or G={ST_k,FC_k}, that differ by the position of the
-     * chord/s and by the corresponding pair of ring-closing vertexes between
+     * chord/s and by the corresponding pair of ring-closing vertices between
      * which each chord is defined.
      * The DENOPTIM-isomorphism for two graph G1 and G2 
      * is given by the common graph theory isomorphism between 
@@ -3165,16 +3165,16 @@ public class DGraph implements Cloneable
      * {@link GraphConversionTool#getJGraphFromGraph(DGraph)}.
      * Finally,
      * <ul>
-     * <li>vertexes are compared excluding their vertex ID, i.e., 
+     * <li>vertices are compared excluding their vertex ID, i.e., 
      * {@link Vertex#sameAs()}</li>
      * <li>edges are considered undirected and compared considering the 
      * {@link BondType} and the 
      * identity of the attachment points connected thereby. This latter point
-     * has an important implication: two apparently equal graphs (same vertexes
+     * has an important implication: two apparently equal graphs (same vertices
      * that are connected to each other forming the same vertex-chains) can be 
-     * non-isomorphic when the APs used to connect two vertexes are not the
+     * non-isomorphic when the APs used to connect two vertices are not the
      * same. Chemically, this means the stereochemistry around one or both
-     * vertexes, is different in the two graphs. Therefore two otherwise 
+     * vertices, is different in the two graphs. Therefore two otherwise 
      * equal-looking graphs can very well be, de facto, not isomorphic.</li>
      * </ul>
      * <p>
@@ -3228,7 +3228,7 @@ public class DGraph implements Cloneable
             @Override
             public int compare(Vertex v1, Vertex v2) {
                 
-                // exploit symmetric relations between vertexes
+                // exploit symmetric relations between vertices
                 if (symmetryShortCuts.containsKey(v1) 
                         && symmetryShortCuts.get(v1).contains(v2))
                 {
@@ -3319,10 +3319,10 @@ public class DGraph implements Cloneable
      * Checks if this graph is "DENOPTIM-isostructural" to the other one given. 
      * "DENOPTIM-isostructural" means that the two graphs are isomorfic when:
      * <ul>
-     * <li>the comparison of the vertexes considers any implementation of 
-     * {@link Vertex} equals to itself unless two vertexes differ by the
+     * <li>the comparison of the vertices considers any implementation of 
+     * {@link Vertex} equals to itself unless two vertices differ by the
      * return value of {@link Vertex#isRCV()},</li>
-     * <li>the comparison of the vertexes considers only the type of bond the 
+     * <li>the comparison of the vertices considers only the type of bond the 
      * edge corresponds to (if any),</li>
      * <li>free {@link AttachmentPoint}s that are marked as required
      * in either graph are reflected in the other.</li>
@@ -3348,7 +3348,7 @@ public class DGraph implements Cloneable
             @Override
             public int compare(Node v1, Node v2) {
                 
-                // exploit symmetric relations between vertexes
+                // exploit symmetric relations between vertices
                 if (symmetryShortCuts.containsKey(v1) 
                         && symmetryShortCuts.get(v1).contains(v2))
                 {
@@ -3840,7 +3840,7 @@ public class DGraph implements Cloneable
 
     /**
      * Remove capping groups that belong to this graph and are in the given list.
-     * @param lstVerts the list of vertexes to analyze.
+     * @param lstVerts the list of vertices to analyze.
      */
 
     public void removeCappingGroups(List<Vertex> lstVerts)
@@ -3908,14 +3908,14 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Add a capping group on the given vertexes, if needed. The need for such 
+     * Add a capping group on the given vertices, if needed. The need for such 
      * groups is manifest when an attachment point that is not used in this
      * or any embedding lever (i.e., attachment point is 
      * {@link AttachmentPoint#isAvailableThroughout()}) has and 
      * {@link APClass} that demands to be capped.
      * Addition of Capping groups does not update the symmetry table
      * for a symmetric graph.
-     * @param vertexAddedToThis list of vertexes to operate on. They must belong to this
+     * @param vertexAddedToThis list of vertices to operate on. They must belong to this
      * graph.
      * @throws DENOPTIMException if the addition of capping groups cannot be 
      * performed.
@@ -3982,7 +3982,7 @@ public class DGraph implements Cloneable
      * are considered part of
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
-     * @param index the position of the seed vertex in the list of vertexes of this graph.
+     * @param index the position of the seed vertex in the list of vertices of this graph.
      * @return a new graph that corresponds to the subgraph of this graph.
      */
 
@@ -4027,7 +4027,7 @@ public class DGraph implements Cloneable
      * vertex that we want to consider before stopping. If this value is 2, we 
      * will explore three layers: the seed, and two more layers away from it.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
-     * each branch stop before including ring closing vertexes.
+     * each branch stop before including ring closing vertices.
      * @return a new graph that corresponds to the subgraph of this graph.
      */
 
@@ -4068,7 +4068,7 @@ public class DGraph implements Cloneable
     /**
      * Creates a new graph that corresponds to the subgraph of this graph 
      * when exploring the spanning tree from a given seed vertex and 
-     * stopping the exploration at the given end vertexes (i.e., limits).
+     * stopping the exploration at the given end vertices (i.e., limits).
      * Optionally, you can ask to stop the
      * exploration of a branch before including any ring-closing vertex.
      * Only the seed vertex and all child vertices (and further successors)
@@ -4076,10 +4076,10 @@ public class DGraph implements Cloneable
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
      * @param seed the vertex from which the extraction has to start.
-     * @param limits the vertexes playing the role of subgraph end-points that 
+     * @param limits the vertices playing the role of subgraph end-points that 
      * stop the exploration of the graph.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
-     * each branch stop before including ring closing vertexes.
+     * each branch stop before including ring closing vertices.
      * @return a new graph that corresponds to the subgraph of this graph.
      */
     public DGraph extractSubgraph(Vertex seed, 
@@ -4139,7 +4139,7 @@ public class DGraph implements Cloneable
      * rings that include vertices not belonging to the subgraph are lost.
      * @param seed the vertex from which the extraction has to start.
      * @param stopBeforeRCVs set <code>true</code> to make the exploration of
-     * each branch stop before including ring closing vertexes.
+     * each branch stop before including ring closing vertices.
      * @return a new graph that corresponds to the subgraph of this graph.
      */
     public DGraph extractSubgraph(Vertex seed, boolean stopBeforeRCVs) 
@@ -4180,8 +4180,8 @@ public class DGraph implements Cloneable
     /**
      * Creates a new graph that corresponds to the subgraph of this graph 
      * and that includes only the members corresponding to the given list of 
-     * vertexes belonging to this graph.
-     * @param members the vertexes belonging to the subgraph. 
+     * vertices belonging to this graph.
+     * @param members the vertices belonging to the subgraph. 
      * @return a new graph that corresponds to the subgraph of this graph.
      */
     public DGraph extractSubgraph(List<Vertex> members) 
@@ -4490,7 +4490,7 @@ public class DGraph implements Cloneable
             }
         }
         
-        // Find out where branching vertexes are along the frame ring
+        // Find out where branching vertices are along the frame ring
         boolean frameHasBranching = false;
         List<Integer> branchingPositions = new ArrayList<Integer>();
         int posOfFocusVrtInRing = frame.getPositionOf(v);
@@ -4547,7 +4547,7 @@ public class DGraph implements Cloneable
             }
         }
         
-        // Now, collect the vertexes along the ring based on whether they
+        // Now, collect the vertices along the ring based on whether they
         // will be removed or remain (possible with a change of edge direction
         // and replacement of an RCV pair by edge)
         List<Vertex> remainingChain = new ArrayList<Vertex>();
@@ -4710,7 +4710,7 @@ public class DGraph implements Cloneable
                         // never happen.
                         String debugFile = "debug_"+v.getVertexId()+".json";
                         DenoptimIO.writeGraphToJSON(new File(debugFile), this);
-                        throw new DENOPTIMException("Unconnected vertexes "  
+                        throw new DENOPTIMException("Unconnected vertices "  
                                 + vHere.getVertexId() + " and "
                                 + vPrev.getVertexId() + ". Unable to deal with "
                                 + "removal of " + v + " from ring " + frame 
@@ -4782,10 +4782,10 @@ public class DGraph implements Cloneable
         }
         
         // Symmetry relation need to be compared with the change of topology.
-        // The worst that can happen is that two vertexes that are
+        // The worst that can happen is that two vertices that are
         // listed as symmetric are, instead, one the (grand)parent of 
         // the other. This is inconsistent with the expectations when
-        // dealing with any operation with symmetric vertexes.
+        // dealing with any operation with symmetric vertices.
         // A different level does NOT imply a parent-child relation,
         // but is a sign that the topology has changed substantially,
         // and that the symmetric relation is, most likely, not sensible
@@ -4868,10 +4868,10 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * Reassign vertex IDs to all vertexes of this graph. The old IDs are stored 
+     * Reassign vertex IDs to all vertices of this graph. The old IDs are stored 
      * in the vertex property {@link DENOPTIMConstants#STOREDVID}.
      * @throws DENOPTIMException if there are inconsistencies in the vertex IDs
-     * used to refer to this graph's vertexes.
+     * used to refer to this graph's vertices.
      */
 
     public void renumberGraphVertices() throws DENOPTIMException
@@ -4886,7 +4886,7 @@ public class DGraph implements Cloneable
      * in the vertex property {@link DENOPTIMConstants#STOREDVID}.
      * @return map with old IDs as key and new IDs as values.
      * @throws DENOPTIMException if there are inconsistencies in the vertex IDs
-     * used to refer to this graph's vertexes.
+     * used to refer to this graph's vertices.
      */
 
     public Map<Integer,Integer> renumberVerticesGetMap() throws DENOPTIMException 
@@ -5378,7 +5378,7 @@ public class DGraph implements Cloneable
 
     /**
      * Append a vertex to this graph: adds the new vertex to the list of 
-     * vertexes belonging to the graph, and adds the resulting edge to the graph.
+     * vertices belonging to the graph, and adds the resulting edge to the graph.
      * Does not clone the incoming vertex.
      * Does not project on symmetrically related vertices or
      * attachment points. No change in symmetric sets, apart from importing
@@ -5449,7 +5449,7 @@ public class DGraph implements Cloneable
                 bndType);
         addEdge(edge);
         
-        //Import vertexes
+        //Import vertices
         for (Vertex incomingVrtx : incomingGraph.getVertexList())
         {
             addVertex(incomingVrtx);
@@ -5683,7 +5683,7 @@ public class DGraph implements Cloneable
      * vertex. Always removed symmetry-redundant matches.
      * @param vrtxQuery the query defining what is that we want to find.
      * @param logger manager of log
-     * @return the list of vertexes that match the query.
+     * @return the list of vertices that match the query.
      */
 
     public ArrayList<Vertex> findVertices(VertexQuery vrtxQuery, Logger logger)
@@ -5700,7 +5700,7 @@ public class DGraph implements Cloneable
      * @param purgeSym use <code>true</code> to remove symmetrically redundant 
      * matches.
      * @param logger manager of log
-     * @return the list of vertexes that match the query.
+     * @return the list of vertices that match the query.
      */
 
     public ArrayList<Vertex> findVertices(VertexQuery vrtxQuery, 
@@ -6012,7 +6012,7 @@ public class DGraph implements Cloneable
 
     /**
      * Remove all but one of the symmetry-related partners in a list of 
-     * vertexes. The vertices must belong to this graph.
+     * vertices. The vertices must belong to this graph.
      * @param list vertices to be purged.
      */
 
@@ -6074,7 +6074,7 @@ public class DGraph implements Cloneable
      * assumes the vertex IDs are unique.
      * @param edits the list of edit tasks.
      * @param symmetry if <code>true</code> the same operation is performed on
-     * vertexes related by symmetry.
+     * vertices related by symmetry.
      * @param fragSpace the space of building blocks needed to perform the 
      * graph editing tasks. It may or may not be the space that generated the 
      * original version of the graph to edit.
@@ -6249,7 +6249,7 @@ public class DGraph implements Cloneable
 
     /**
      * A list of mutation sites from within this graph.
-     * @return the list of vertexes that allow any mutation type.
+     * @return the list of vertices that allow any mutation type.
      */
     public List<Vertex> getMutableSites()
     {
@@ -6266,10 +6266,10 @@ public class DGraph implements Cloneable
 
     /**
      * A list of mutation sites from within this graph.
-     * @param ignoredTypes a collection of mutation types to ignore. Vertexes
+     * @param ignoredTypes a collection of mutation types to ignore. vertices
      * that allow only ignored types of mutation will
      * not be considered mutation sites.
-     * @return the list of vertexes that allow any non-ignored mutation type.
+     * @return the list of vertices that allow any non-ignored mutation type.
      */
     public List<Vertex> getMutableSites(List<MutationType> ignoredTypes)
     {
@@ -6621,8 +6621,8 @@ public class DGraph implements Cloneable
     /**
      * Finds the AP that is on the first given parameter and that is used to 
      * make a connection to the second vertex, no matter the direction of the 
-     * edge. If the two vertexes are connected by a chord, i.e., there is a pair 
-     * of RCVs in between the two vertexes, we still work out the AP on 
+     * edge. If the two vertices are connected by a chord, i.e., there is a pair 
+     * of RCVs in between the two vertices, we still work out the AP on 
      * the vertex on the left, even if in the graph it is actually used to bind 
      * the RCV that defines the chord and that eventually connects the 
      * vertex on the left with that on the right.
@@ -6646,7 +6646,7 @@ public class DGraph implements Cloneable
             return v1.getEdgeToParent().getTrgAP();
         }
         
-        // At this point the two vertexes are not directly connected, but there 
+        // At this point the two vertices are not directly connected, but there 
         // could still be a chord between them. Here, we check for chords:
         /*
         for (DENOPTIMRing r : getRingsInvolvingVertex(v1))
@@ -6675,7 +6675,7 @@ public class DGraph implements Cloneable
      * Checks is the every edge in the graph can be defined in the opposite 
      * direction according to the {@link APClass} compatibility rules. Note that
      * the reversions operation on a branched subgraph generates a graph with 
-     * multiple source vertexes, which is not allowed. Yet, the reversion is
+     * multiple source vertices, which is not allowed. Yet, the reversion is
      * formally possible.
      * @return <code>true</code> if the all edges can be reverted and retain
      * consistency with {@link APClass} compatibility rules.
@@ -6733,10 +6733,10 @@ public class DGraph implements Cloneable
 
     /**
      * Searches for all {@link AttachmentPoint}s that represent the
-     * interface between a subgraph, identified by the given list of vertexes,
+     * interface between a subgraph, identified by the given list of vertices,
      * and any other vertex, i.e., either belonging to the same graph but
      * not to the same <i>sub</i>graph, or belonging to an outer embedding level.
-     * @param subGraphB list of vertexes belonging to the subgraph.
+     * @param subGraphB list of vertices belonging to the subgraph.
      * @return the list of attachment points at the interface of the subgraph.
      */
     public List<AttachmentPoint> getInterfaceAPs(List<Vertex> subGraphB)
@@ -6769,9 +6769,9 @@ public class DGraph implements Cloneable
 
     /**
      * Searches for all {@link AttachmentPoint}s that are owned by 
-     * vertexes in a subgraph but either available or used by vertexes that do 
+     * vertices in a subgraph but either available or used by vertices that do 
      * not belong to the subgraph.
-     * @param subGraphB list of vertexes belonging to the subgraph.
+     * @param subGraphB list of vertices belonging to the subgraph.
      * @return the list of attachment points originating from the subgraph.
      */
     public List<AttachmentPoint> getSubgraphAPs(

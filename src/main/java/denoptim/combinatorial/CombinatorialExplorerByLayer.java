@@ -345,7 +345,7 @@ public class CombinatorialExplorerByLayer
                   + "All graphs with ID higher than "
                   + chk.getLatestSafelyCompletedGraphId()
                   + " are now being re-generated. Be aware that this "
-                  + "incluses graphs managed either by "
+                  + "includes graphs managed either by "
                   + "partially executed or completed tasks of the previous "
                   + "run. "
                   + DENOPTIMConstants.EOL
@@ -549,8 +549,8 @@ public class CombinatorialExplorerByLayer
 //------------------------------------------------------------------------------
 
     /**
-     * Generate graphs by exploring all combination of fragments an a given
-     * level of a growing graph. Note that in this context the 'level' is a 
+     * Generate graphs by exploring all combination of fragments at a given
+     * level of a growing graph. Note that in this context the 'level'
      * is related to the initial root graph, which is considered to be level -1
      * no matter its size.
      * @param level the current relative level

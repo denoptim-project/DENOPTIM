@@ -656,7 +656,7 @@ public abstract class Vertex implements Cloneable
                 return false;
             }
         }
-        // The following fails for vertexes v1 and v2 like these:
+        // The following fails for vertices v1 and v2 like these:
         // (APC_A)<--v1-->(APC_A)
         // (APC_A)<--v2-->(APC_A)
         // Because the AP0 on v1 will be compared to AP1 on v2 and their 
@@ -788,7 +788,7 @@ public abstract class Vertex implements Cloneable
 
     /**
      * A list of mutation sites from within this vertex.
-     * @return the list of vertexes that allow any mutation type.
+     * @return the list of vertices that allow any mutation type.
      */
     public List<Vertex> getMutationSites()
     {
@@ -799,10 +799,10 @@ public abstract class Vertex implements Cloneable
 
     /**
      * A list of mutation sites from within this vertex.
-     * @param ignoredTypes a collection of mutation types to ignore. Vertexes
+     * @param ignoredTypes a collection of mutation types to ignore. vertices
      * that allow only ignored types of mutation will
      * not be considered mutation sites.
-     * @return the list of vertexes that allow any non-ignored mutation type.
+     * @return the list of vertices that allow any non-ignored mutation type.
      */
     public abstract List<Vertex> getMutationSites(
             List<MutationType> ignoredTypes);
@@ -996,7 +996,7 @@ public abstract class Vertex implements Cloneable
 
     /**
      * Looks into the edges that use any of the APs that belong to 
-     * this vertex and returns the list of attachment point on child vertexes 
+     * this vertex and returns the list of attachment point on child vertices 
      * that form an edge with any of the APs of this vertex.
      * Searches also beyond template boundaries, i.e., an AP can be free in the 
      * graph owning this vertex and be projected of the surface of the template
@@ -1088,7 +1088,7 @@ public abstract class Vertex implements Cloneable
     
     /**
      * Add the given key among the properties that are checked for equality when
-     * comparing vertexes with the 
+     * comparing vertices with the 
      * {@link Vertex#sameAs(Vertex, StringBuilder)} method.
      * @param key
      */
@@ -1358,7 +1358,7 @@ public abstract class Vertex implements Cloneable
     
     /**
      * Checks if this and another vertex are directly connected by an edge 
-     * within the same graph recursion level, i.e., both vertexes must belong
+     * within the same graph recursion level, i.e., both vertices must belong
      * to the same graph.
      * @param other 
      * @return <code>true</code>

@@ -6,3 +6,5 @@ dependencies:
   - maven
   - python
   - py4j
+  - doxygen
+  - graphviz

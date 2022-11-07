@@ -116,7 +116,7 @@ public class Template extends Vertex
         FIXED,
         
         /**
-         * Inner graph keep the same structure, but the identify of vertexes
+         * Inner graph keep the same structure, but the identify of vertices
          * can change. 
          * Effectively this contract allows only CHANGELINK mutation.
          */
@@ -513,7 +513,7 @@ public class Template extends Vertex
                 }
             }
             
-            List<Vertex> symVrtxs = innerGraph.getSymVertexesForVertex(vrtx);
+            List<Vertex> symVrtxs = innerGraph.getSymVerticesForVertex(vrtx);
             for (Vertex symVrtx : symVrtxs)
             {
                 //NB: we assume that this is the same vertex type as vrtx, but 
@@ -542,8 +542,8 @@ public class Template extends Vertex
                 } else {
                     // We need to add the AP at innerAPIdx anyway because even
                     // it it does not have symmetric APs on its vertex owner it
-                    // is symmetric to the vrtx by means of the two vertexes 
-                    // being members of the same symmetric set of vertexes.
+                    // is symmetric to the vrtx by means of the two vertices 
+                    // being members of the same symmetric set of vertices.
                     if (innerToOuterAPs.containsKey(innerApOnSymVrtx))
                     {
                         symSetForThisAP.add(getIndexOfInnerAP(innerApOnSymVrtx));
@@ -599,7 +599,7 @@ public class Template extends Vertex
     public boolean containsAtoms()
     {
         //NB: the mol!=null allows templates read-in from file to be displayed
-        // even if their graph's vertexes are empty because they were 
+        // even if their graph's vertices are empty because they were 
         // deserialized from json. Another good reason for having atoms defined
         // the json format...
         return mol!=null 
@@ -873,13 +873,13 @@ public class Template extends Vertex
 
     /**
      * A list of mutation sites from within this vertex. This method sets the 
-     * mutation sites of the embedded vertexes according to the 
+     * mutation sites of the embedded vertices according to the 
      * {@link Template#contractLevel} of
      * this template.
-     * @param ignoredTypes a collection of mutation types to ignore. Vertexes
+     * @param ignoredTypes a collection of mutation types to ignore. vertices
      * that allow only ignored types of mutation will
      * not be considered mutation sites.
-     * @return the list of vertexes that allow any non-ignored mutation type.
+     * @return the list of vertices that allow any non-ignored mutation type.
      */
     
     @Override
@@ -1040,7 +1040,7 @@ public class Template extends Vertex
         
         // This deserializes many "easy" fields, but not the embedded graph
         // which is not "easy" as it need its own deserializer to 
-        // recreate all the references to APs/edges/vertexes.
+        // recreate all the references to APs/edges/vertices.
         Template t = gson.fromJson(json, Template.class);
         
         // Now, recover the missing bits (if present) from the original string

@@ -1,6 +1,9 @@
 test/functional_tests/t6/data/prev_dbRoot/F*
 test/functional_tests/t6/data/oldCheckPoint.chk
 test/functional_tests/t7/data/*.ser
+doc/_build
+doc/.DS_Store
+.DS_Store
 build/*.jar
 build/manifest.mf
 build/lib
