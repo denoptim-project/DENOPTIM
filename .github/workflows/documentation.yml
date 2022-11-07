@@ -3,7 +3,7 @@ name: 'Doxygen Documentation'
 on:
   push:
     branches:
-      - 'devel_docs'
+      - 'master'
 
 jobs:
   documentation:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          ref: devel_docs
+          ref: master
 
       - name: Doxygen Action
         uses: mattnotmitt/doxygen-action@1.9.4
