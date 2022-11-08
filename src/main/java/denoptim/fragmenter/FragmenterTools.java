@@ -344,7 +344,7 @@ public class FragmenterTools
                 FragmenterTools.getMatchingBondsAllInOne(fragsMol,rules,logger);
         
         // New Implementation
-     // Extract independent sets of cliques
+        // Extract independent sets of cliques
         ArrayList<MatchedBond> AllMatchedBonds = new ArrayList<MatchedBond>();
         for (String key : matchingbonds.keySet())
         {
@@ -410,7 +410,7 @@ public class FragmenterTools
                     // Select atoms in n-hapto system: contiguous neighbors with  
                     // same type of bond with the same central atom.
                     Set<IAtom> atmsInHapto = new HashSet<IAtom>();
-                    atmsInHapto.add(tb.getAtmSubClass1());
+                    atmsInHapto.add(atmB);
                     atmsInHapto = exploreHapticity(atmB, 
                             centralAtm, candidatesForHapto, tempFragsMol);
                     if (atmsInHapto.size() == 1)
@@ -761,68 +761,75 @@ public class FragmenterTools
     }
     
 //------------------------------------------------------------------------------
-    
-private static Graph<Integer, DefaultEdge> buildBondsGraph(
+    /**
+     * Builds the graph expressing the dependency among all the 
+     * {@link MatchedBond}; the dependency is determined by the minimum size 
+     * a fragment can have.
+     * @param fragsMol
+     * @param AllMatchedBonds
+     * @return
+     */
+    private static Graph<Integer, DefaultEdge> buildBondsGraph(
             IAtomContainer fragsMol, ArrayList<MatchedBond> allMatchedBonds)
     {
-    Graph<Integer,DefaultEdge> bondsGraph = 
+        Graph<Integer,DefaultEdge> bondsGraph = 
             new SimpleGraph<>(DefaultEdge.class);
-   ;
-    boolean isCleaved = false;
-    // Add vertices (Matched Bonds) to the graph if they satisfy the minimum
-    // size requirement
-    for (int i = 0; i < allMatchedBonds.size(); i++) 
-    {
-        IAtom atom1 = allMatchedBonds.get(i).getAtmSubClass0();
-        IAtom atom2 = allMatchedBonds.get(i).getAtmSubClass1();
-        // cleave the bond //TODO remove hard coding parameter
-        isCleaved = isCleavableBond(fragsMol, atom1, atom2, 2);
-        if (isCleaved) 
+   
+        boolean isCleaved = false;
+        // Add vertices (Matched Bonds) to the graph if they satisfy the minimum
+        // size requirement
+        for (int i = 0; i < allMatchedBonds.size(); i++) 
         {
-            bondsGraph.addVertex(i);  
-        } else {
-            continue;
-        }
-        
-    }
-    // process each bonds
-    for (int i : bondsGraph.vertexSet()) 
-    {
-      // get the bond atoms
-        IAtom atom1 = allMatchedBonds.get(i).getAtmSubClass0();
-        IAtom atom2 = allMatchedBonds.get(i).getAtmSubClass1();
-        // cleave the bond
-        IBond bnd = fragsMol.getBond(atom1,atom2);
-        isCleaved = isCleavableBond(fragsMol, atom1, atom2, 2);
-        if (isCleaved) 
-        {
-            fragsMol.removeBond(bnd);  
-        } else {
-            continue;
-        }
-      
-      for (int j : bondsGraph.vertexSet()) 
-      {
-          if (i == j)
-              continue;
-          else
-           // get the bond atoms
-              atom1 = allMatchedBonds.get(j).getAtmSubClass0();
-              atom2 = allMatchedBonds.get(j).getAtmSubClass1();
-              
-              // attempt to cleave
-              isCleaved = isCleavableBond(fragsMol, atom1, atom2, 10);
-              
-              // fill in the dependency matrix
-              if (isCleaved) 
-                  
-              {
-                  bondsGraph.addEdge(i,j);
-              }
+            IAtom atom1 = allMatchedBonds.get(i).getAtmSubClass0();
+            IAtom atom2 = allMatchedBonds.get(i).getAtmSubClass1();
+            // cleave the bond //TODO remove hard coding parameter
+            isCleaved = isCleavableBond(fragsMol, atom1, atom2, 2);
+            if (isCleaved) 
+            {
+                bondsGraph.addVertex(i);  
+            } else {
+                continue;
             }
-            fragsMol.addBond(bnd);
-    }
-    return bondsGraph;
+            
+        }
+        // process each bonds
+        for (int i : bondsGraph.vertexSet()) 
+        {
+          // get the bond atoms
+            IAtom atom1 = allMatchedBonds.get(i).getAtmSubClass0();
+            IAtom atom2 = allMatchedBonds.get(i).getAtmSubClass1();
+            // cleave the bond
+            IBond bnd = fragsMol.getBond(atom1,atom2);
+            isCleaved = isCleavableBond(fragsMol, atom1, atom2, 2);
+            if (isCleaved) 
+            {
+                fragsMol.removeBond(bnd);  
+            } else {
+                continue;
+            }
+          
+          for (int j : bondsGraph.vertexSet()) 
+          {
+              if (i == j)
+                  continue;
+              else
+               // get the bond atoms
+                  atom1 = allMatchedBonds.get(j).getAtmSubClass0();
+                  atom2 = allMatchedBonds.get(j).getAtmSubClass1();
+                  
+                  // attempt to cleave
+                  isCleaved = isCleavableBond(fragsMol, atom1, atom2, 10);
+                  
+                  // fill in the dependency matrix
+                  if (isCleaved) 
+                      
+                  {
+                      bondsGraph.addEdge(i,j);
+                  }
+                }
+                fragsMol.addBond(bnd);
+        }
+        return bondsGraph;
     }
 
 //------------------------------------------------------------------------------
