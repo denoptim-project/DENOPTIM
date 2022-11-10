@@ -93,6 +93,7 @@ public class ParallelFragmentationAlgorithmTest
         IteratingAtomContainerReader reader = new IteratingAtomContainerReader
                         (new File(settings.getStructuresFile()));
         ParallelFragmentationAlgorithm.splitInputForThreads(settings, reader);
+        reader.close();
         
         int[] expectedEntries = {3, 2, 2};
         for (int i=0; i<3; i++)
