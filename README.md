@@ -1,8 +1,9 @@
 # DENOPTIM
 
-![Anaconda_Platforms](https://anaconda.org/denoptim-project/denoptim/badges/platforms.svg) ![Anaconda_License](https://anaconda.org/denoptim-project/denoptim/badges/license.svg) ![Anaconda_Version](https://anaconda.org/denoptim-project/denoptim/badges/version.svg) ![Anaconda_last](
-https://anaconda.org/denoptim-project/denoptim/badges/latest_release_date.svg) ![Anaconda_Installer](https://anaconda.org/denoptim-project/denoptim/badges/installer/conda.svg) ![Anaconda_Downloads](
-https://anaconda.org/denoptim-project/denoptim/badges/downloads.svg)
+
+
+
+![Anaconda_Platforms](https://anaconda.org/conda-forge/denoptim/badges/platforms.svg) ![Anaconda_License](https://anaconda.org/conda-forge/denoptim/badges/license.svg) ![Anaconda_Version](https://anaconda.org/conda-forge/denoptim/badges/version.svg) ![Anaconda_last](https://anaconda.org/conda-forge/denoptim/badges/latest_release_date.svg) ![Anaconda_Downloads](https://anaconda.org/conda-forge/denoptim/badges/downloads.svg)
 
 ## Introduction
 DENOPTIM (De Novo OPTimization of In/organic Molecules) is a software meant for <i>de novo</i> design and virtual screening of functional compounds. In practice, DENOPTIM builds chemical entities by assembling building blocks (i.e., fragments), analyzes each chemical entity as to produce its figure of merit (i.e., fitness), and designs new entities based on the properties of known entities.
@@ -12,13 +13,20 @@ DENOPTIM is cross-platform, i.e., runs on Windows, Linux, and MacOS, and comes w
 ![Figure 1](./doc/figures/gui_snapshots.png)
 
 ## Installation
-You can either get latest version of DENOPTIM from the <a href="https://repo.anaconda.com/">Anaconda repository</a>, or you can built DENOPTIM from source code.
+You can either get latest version of DENOPTIM from the [conda-forge](https://anaconda.org/conda-forge/denoptim), or our [own denoptim-project Anaconda channel](https://anaconda.org/denoptim-project/denoptim). Alternatively, you can built DENOPTIM from source, see below.
 
 ### Install From Conda (recommended)
 
 ```
+conda install -c conda-forge  denoptim
+```
+
+or
+
+```
 conda install -c denoptim-project  denoptim
 ```
+
 
 ### Build From Source
 Download and extract the <a href="https://github.com/denoptim-project/DENOPTIM/releases/latest">latest release</a> to create a folder we'll call `DENOPTIM_HOME`. In the following, remember to replace `$DENOPTIM_HOME` with the pathname of the extracted DENOPTIM's distribution folder on your system.
@@ -65,12 +73,11 @@ bash runAllTests.sh
 ```
 The results will be collected in a temporary folder (typically `/tmp/denoptim_test`).
 
-
 ## User Manual
-The complete user manual is available [on line](http://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html). Alternatively, you can download the HTML file that can be viewed with any Firefox/Safari/Edge/Chrome or any Internet browser.
+The complete user manual is available [on line](https://denoptim-project.github.io/DENOPTIM).
 
 ## Tutorials
-See the [tutirials page](https://denoptim-project.github.io/tutorials).
+See the [tutorials page](https://denoptim-project.github.io/tutorials).
 
 ## Quick Start
 The entry point of any DENOPTIM activity is the command `denoptim`, which results from the [installation](#installation).
@@ -86,7 +93,7 @@ For example, this command
 ```
 denoptim -r GA input_parameters
 ```
-starts an artificial evolution experiment using the genetic algorithm and parameters specified in the <code>&lt;input_parameters&gt;</code> file, which is a text file containing [parameters and keywords](https://htmlpreview.github.io/?https://github.com/denoptim-project/DENOPTIM/blob/master/doc/user_manual.html#Toc35546_1191730726).
+starts an artificial evolution experiment using the genetic algorithm and parameters specified in the <code>&lt;input_parameters&gt;</code> file, which is a text file containing [parameters and keywords](https://denoptim-project.github.io/DENOPTIM/#Keywords).
 
 ### Pre-configured Examples
 Complete examples pre-configured to run DENOPTIM experiments on your local client can be found under the [test](./test) folder. Each of these test will run a short experiments and collect the output in a folder that can be inspected with the GUI (see below).

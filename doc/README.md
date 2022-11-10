@@ -2,7 +2,7 @@ HTML Documentation
 ==================
 
 ## Online Documentation
-An online version of the documentation is available at this [link](https://marcellocostamagna.github.io/DENOPTIM_documentation/).
+An online version of the documentation is available at this [link](https://denoptim-project.github.io/DENOPTIM/).
 
 
 ## Offline Documentation
@@ -17,8 +17,6 @@ To build the html pages of the documentation run the following command from with
 
 
 ### Usage
-Once you have built the local documentation, its entry point will be file ./html/index.html. You can open such file with any browser, double click on it or open it from the command line. For example, 
+Once you have built the local documentation, its entry point will be file ./html/index.html. You can open such file with any browser, double click on it or open it from the command line. For example,
 
   firefox ./html/index.html
-
-
