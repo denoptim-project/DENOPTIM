@@ -35,6 +35,9 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.io.DenoptimIO;
 import denoptim.io.IteratingAtomContainerReader;
 import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.fragmenter.ParallelFragmentationAlgorithm;
+
+
 
 /**
  * Unit test for fparallel ragmentation algorithm components.
@@ -93,13 +96,12 @@ public class ParallelFragmentationAlgorithmTest
         IteratingAtomContainerReader reader = new IteratingAtomContainerReader
                         (new File(settings.getStructuresFile()));
         ParallelFragmentationAlgorithm.splitInputForThreads(settings, reader);
-        reader.close();
+        reader = null;
         
         int[] expectedEntries = {3, 2, 2};
         for (int i=0; i<3; i++)
         {
-            String newStructureFile = ParallelFragmentationAlgorithm
-                    .getStructureFileNameBatch(settings, i);
+            String newStructureFile = ParallelFragmentationAlgorithm.getStructureFileNameBatch(settings, i);
             File structFile = new File(newStructureFile);
             assertTrue(newStructureFile.contains(tempDir.getAbsolutePath()));
             assertTrue(structFile.exists());
