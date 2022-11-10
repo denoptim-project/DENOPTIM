@@ -31,6 +31,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.io.DenoptimIO;
 import denoptim.io.IteratingAtomContainerReader;
@@ -97,6 +98,7 @@ public class ParallelFragmentationAlgorithmTest
                         (new File(settings.getStructuresFile()));
         ParallelFragmentationAlgorithm.splitInputForThreads(settings, reader);
         reader = null;
+        System.gc();
         
         int[] expectedEntries = {3, 2, 2};
         for (int i=0; i<3; i++)
