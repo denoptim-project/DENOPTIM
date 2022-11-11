@@ -76,8 +76,10 @@ public class IteratingAtomContainerReader implements Iterator<IAtomContainer>
         FormatFactory factory = new FormatFactory();
         factory.registerFormat(new SMILESListFormat());
         
-        IChemFormat chemFormat = factory.guessFormat(
-                new BufferedReader(new FileReader(input)));
+        BufferedReader headReader = new BufferedReader(new FileReader(input));
+        IChemFormat chemFormat = factory.guessFormat(headReader);
+        headReader.close();
+        
         if (chemFormat instanceof MDLV2000Format
                 || chemFormat instanceof MDLV3000Format)
         {
