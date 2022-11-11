@@ -1,0 +1,5 @@
+#
+# This is the parameter file for test t30-20
+#
+FRG-STRUCTURESFILE=mols-20.smi
+FRG-CUTTINGRULESFILE=cutting_rules

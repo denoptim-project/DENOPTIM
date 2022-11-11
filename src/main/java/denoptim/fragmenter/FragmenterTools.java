@@ -37,7 +37,7 @@ import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
-import denoptim.io.IteractingAtomContainerReader;
+import denoptim.io.IteratingAtomContainerReader;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.fragmenter.MatchedBond;
@@ -239,8 +239,8 @@ public class FragmenterTools
             File output, Logger logger) throws CDKException, IOException, 
     DENOPTIMException, IllegalArgumentException, UndetectedFileFormatException
     {
-        IteractingAtomContainerReader iterator = 
-                new IteractingAtomContainerReader(input);
+        IteratingAtomContainerReader iterator = 
+                new IteratingAtomContainerReader(input);
 
         int totalProd = 0;
         int totalKept = 0;
@@ -927,23 +927,27 @@ public class FragmenterTools
                     + smb + "'");
             return false;
         }
-        // Incomplete fragmentation: an atom has the same coords of an AP.
-        for (AttachmentPoint ap : frag.getAttachmentPoints())
-        {
-            Point3d ap3d = ap.getDirectionVector();
-            if (ap3d!=null)
+
+        if (settings.isWorkingIn3D()) 
+        {   
+            // Incomplete 3D fragmentation: an atom has the same coords of an AP.
+            for (AttachmentPoint ap : frag.getAttachmentPoints())
             {
-                for (IAtom atm : frag.atoms())
+                Point3d ap3d = ap.getDirectionVector();
+                if (ap3d!=null)
                 {
-                    Point3d atm3d = MoleculeUtils.getPoint3d(atm);
-                    double dist = ap3d.distance(atm3d);
-                    if (dist < 0.0002)
+                    for (IAtom atm : frag.atoms())
                     {
-                        logger.log(Level.FINE,"Removing fragment with AP" 
-                                + frag.getIAtomContainer().indexOf(atm)
-                                + " and atom " + MoleculeUtils.getSymbolOrLabel(atm) 
-                                + " coincide.");
-                        return false;
+                        Point3d atm3d = MoleculeUtils.getPoint3d(atm);
+                        double dist = ap3d.distance(atm3d);
+                        if (dist < 0.0002)
+                        {
+                            logger.log(Level.FINE,"Removing fragment with AP"
+                            + frag.getIAtomContainer().indexOf(atm)
+                            + " and atom " + MoleculeUtils.getSymbolOrLabel(atm)
+                            + " coincide.");
+                            return false;
+                        }   
                     }
                 }
             }

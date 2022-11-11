@@ -1,0 +1,7 @@
+#
+# This is the parameter file for test t30-21
+#
+FRG-STRUCTURESFILE=mols-21.smi
+FRG-CUTTINGRULESFILE=cutting_rules
+FRG-REMOVEDUPLICATES
+FRG-VERBOSITY=4

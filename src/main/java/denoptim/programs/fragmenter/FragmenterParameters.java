@@ -350,6 +350,11 @@ public class FragmenterParameters extends RunTimeParameters
      */
     private boolean isStandaloneFragmentClustering = false;
     
+    /**
+     * Flag activating operations depending on 3D structure
+     */
+    private boolean workingIn3D = true;
+    
     
 //------------------------------------------------------------------------------
     
@@ -1430,5 +1435,23 @@ public class FragmenterParameters extends RunTimeParameters
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     *
+     * @return <code>true</code> if we are dealing with 3D structures
+     */
+    public boolean isWorkingIn3D()
+    {
+        return workingIn3D;
+    }
+//------------------------------------------------------------------------------    
 
+    /**
+     * Sets boolean variable workingIn3D
+     * @param workingIn3D
+     */
+    public void setWorkingIn3D(boolean workingIn3D)
+    {
+        this.workingIn3D = workingIn3D;
+    }
 }

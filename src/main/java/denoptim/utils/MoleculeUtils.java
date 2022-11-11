@@ -702,6 +702,17 @@ public class MoleculeUtils
     }
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * Converts all the implicit hydrogens to explicit
+     */
+    public static void explicitHydrogens(IAtomContainer mol)
+    {
+        AtomContainerManipulator.convertImplicitToExplicitHydrogens(mol);
+    
+    }
+    
+//------------------------------------------------------------------------------    
 
     /**
      * Sets bond order = single to all otherwise unset bonds. In case of failed 
