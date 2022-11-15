@@ -447,8 +447,7 @@ public class DenoptimIOTest
 		frags.add(frag);
 		frags.add(frag2);
 
-		String tmpFile = FileUtils.getTempFolder()
-				+ System.getProperty("file.separator") + "frag.sdf";
+		String tmpFile = tempDir.getAbsolutePath() + SEP + "frags.sdf";
 		DenoptimIO.writeVertexesToSDF(new File(tmpFile), frags, false);
 
 		Set<APClass> allAPC = DenoptimIO.readAllAPClasses(new File(tmpFile));
