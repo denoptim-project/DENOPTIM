@@ -74,7 +74,7 @@ bash runAllTests.sh
 The results will be collected in a temporary folder (typically `/tmp/denoptim_test`).
 
 ## User Manual
-The complete user manual is available [on line](https://denoptim-project.github.io/DENOPTIM).
+The complete user manual is available [online](https://denoptim-project.github.io/DENOPTIM).
 
 ## Tutorials
 See the [tutorials page](https://denoptim-project.github.io/tutorials).
