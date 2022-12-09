@@ -1,7 +1,4 @@
-# DENOPTIM
-
-
-
+![](./doc/figures/logo_header.png)
 
 ![Anaconda_Platforms](https://anaconda.org/conda-forge/denoptim/badges/platforms.svg) ![Anaconda_License](https://anaconda.org/conda-forge/denoptim/badges/license.svg) ![Anaconda_Version](https://anaconda.org/conda-forge/denoptim/badges/version.svg) ![Anaconda_last](https://anaconda.org/conda-forge/denoptim/badges/latest_release_date.svg) ![Anaconda_Downloads](https://anaconda.org/conda-forge/denoptim/badges/downloads.svg)
 
