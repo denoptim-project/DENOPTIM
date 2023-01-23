@@ -774,7 +774,9 @@ public class FragmenterTools
     {
         Graph<Integer,DefaultEdge> bondsGraph = 
             new SimpleGraph<>(DefaultEdge.class);
-   
+        
+        int fragSize = FragmenterParameters.getMinFragHeavyAtomCount();
+        
         boolean isCleaved = false;
         // Add vertices (Matched Bonds) to the graph if they satisfy the minimum
         // size requirement
@@ -783,7 +785,7 @@ public class FragmenterTools
             IAtom atom1 = allMatchedBonds.get(i).getAtmSubClass0();
             IAtom atom2 = allMatchedBonds.get(i).getAtmSubClass1();
             // cleave the bond //TODO remove hard coding parameter
-            isCleaved = isCleavableBond(fragsMol, atom1, atom2, 2);
+            isCleaved = isCleavableBond(fragsMol, atom1, atom2, fragSize);
             if (isCleaved) 
             {
                 bondsGraph.addVertex(i);  
@@ -800,7 +802,7 @@ public class FragmenterTools
             IAtom atom2 = allMatchedBonds.get(i).getAtmSubClass1();
             // cleave the bond
             IBond bnd = fragsMol.getBond(atom1,atom2);
-            isCleaved = isCleavableBond(fragsMol, atom1, atom2, 2);
+            isCleaved = isCleavableBond(fragsMol, atom1, atom2, fragSize);
             if (isCleaved) 
             {
                 fragsMol.removeBond(bnd);  
@@ -818,7 +820,7 @@ public class FragmenterTools
                   atom2 = allMatchedBonds.get(j).getAtmSubClass1();
                   
                   // attempt to cleave
-                  isCleaved = isCleavableBond(fragsMol, atom1, atom2, 10);
+                  isCleaved = isCleavableBond(fragsMol, atom1, atom2, fragSize);
                   
                   // fill in the dependency matrix
                   if (isCleaved) 

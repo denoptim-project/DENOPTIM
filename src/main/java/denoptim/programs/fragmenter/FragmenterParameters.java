@@ -174,7 +174,7 @@ public class FragmenterParameters extends RunTimeParameters
      * Lower limit for number of non-H atoms in fragments. Negative number is
      * used to disable checking of the number of atoms.
      */
-    private int minFragHeavyAtomCount = -1;
+    private static int minFragHeavyAtomCount = -1;
     
     /**
      * SMARTS leading to rejection of a fragment.
@@ -597,7 +597,7 @@ public class FragmenterParameters extends RunTimeParameters
     /**
      * @return the min number of heavy atoms to retain a fragment.
      */
-    public int getMinFragHeavyAtomCount()
+    public static int getMinFragHeavyAtomCount()
     {
         return minFragHeavyAtomCount;
     }
