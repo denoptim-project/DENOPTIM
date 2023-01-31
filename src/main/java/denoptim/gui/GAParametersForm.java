@@ -1844,6 +1844,45 @@ public class GAParametersForm extends ParametersForm
             localBlockLvlProbAll.setVisible(false);
             localBlockMolSzAll.setVisible(true);
         }
+        
+        switch (ProbabilityFuncitonShape.valueOf(
+                cmbParCrowd1.getSelectedItem().toString()))
+        {
+            case EXP_DIFF:
+                updateCrowdProbDataset();
+                localBlockCrowd3.setVisible(true);
+                localBlockCrowd4.setVisible(false);
+                localBlockCrowdGraph.setVisible(true);
+                break;
+                
+            case TANH:
+                updateCrowdProbDataset();
+                localBlockCrowd3.setVisible(true);
+                localBlockCrowd4.setVisible(false);  
+                localBlockCrowdGraph.setVisible(true);
+                break;
+                
+            case SIGMA:
+                updateCrowdProbDataset();
+                localBlockCrowd3.setVisible(false);
+                localBlockCrowd4.setVisible(true);
+                localBlockCrowdGraph.setVisible(true);
+                break;
+                
+            case UNRESTRICTED:
+                updateCrowdProbDataset();
+                localBlockCrowd3.setVisible(false);
+                localBlockCrowd4.setVisible(false);
+                localBlockCrowdGraph.setVisible(true);
+                break;
+                
+            default:
+                localBlockCrowd3.setVisible(false);
+                localBlockCrowd4.setVisible(false); 
+                localBlockCrowdGraph.setVisible(false);
+                break;
+        }
+        
 		advOptsBlock.setVisible(true);
     }
 
@@ -1863,13 +1902,14 @@ public class GAParametersForm extends ParametersForm
   		else
   		{
 			JOptionPane.showMessageDialog(this,
-					"<html>Parameter '" + key + "' is not recognized<br> and will be ignored.</html>",
+					"<html>Parameter '" + key + "' is not recognized<br> "
+					        + "and will be ignored.</html>",
 	                "WARNING",
 	                JOptionPane.WARNING_MESSAGE,
 	                UIManager.getIcon("OptionPane.errorIcon"));
 			return;
   		}
-    
+  		
  		switch (valueFieldClass)
  		{				
  			case "class javax.swing.JTextField":
@@ -1881,7 +1921,15 @@ public class GAParametersForm extends ParametersForm
  				break;
  				
  			case "class javax.swing.JComboBox":
- 				((JComboBox<String>) valueField).setSelectedItem(value);
+ 			    if (valueField==cmbParMolSz1 || valueField==cmbParCrowd1 ||
+ 			           valueField==cmbPar11)
+ 			    {
+                    ((JComboBox<ProbabilityFuncitonShape>) valueField)
+                        .setSelectedItem(
+                                ProbabilityFuncitonShape.valueOf(value));
+ 			    } else {
+ 			        ((JComboBox<String>) valueField).setSelectedItem(value);
+ 			    }
  				break;
  				
  			case "class javax.swing.table.DefaultTableModel":
