@@ -3,8 +3,8 @@
   <groupId>org.denoptim</groupId>
   <artifactId>denoptim</artifactId>
 
-  <version>3.2.3</version>
-  <!-- WARNING: the vesion must be changes also in doc/user_manual.html-->
+  <version>3.2.4</version>
+  <!-- WARNING: the vesion must be changes also in doc/user_manual.md-->
 
   <name>denoptim</name>
 
