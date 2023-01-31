@@ -242,8 +242,7 @@ public class GAParameters extends RunTimeParameters
     /**
      * Crossover parents selection strategy: string
      */
-    protected String strXoverSelectionMode =
-            "STOCHASTIC UNIVERSAL SAMPLING";
+    protected String strXoverSelectionMode = xoverSelectionMode+"";
 
     /**
      * Mutation types that are excluded everywhere.
@@ -1106,21 +1105,22 @@ public class GAParameters extends RunTimeParameters
                     {
                         xoverSelectionMode = 1;
                         strXoverSelectionMode = "TOURNAMENT";
-                    }
-                    if (value.compareToIgnoreCase("RWS") == 0)
+                    } else if (value.compareToIgnoreCase("RW") == 0)
                     {
                         xoverSelectionMode = 2;
                         strXoverSelectionMode = "ROULETTE WHEEL";
-                    }
-                    if (value.compareToIgnoreCase("SUS") == 0)
+                    } else if (value.compareToIgnoreCase("SUS") == 0)
                     {
                         xoverSelectionMode = 3;
                         strXoverSelectionMode = "STOCHASTIC UNIVERSAL SAMPLING";
-                    }
-                    if (value.compareToIgnoreCase("RANDOM") == 0)
+                    } else if (value.compareToIgnoreCase("RANDOM") == 0)
                     {
                         xoverSelectionMode = 4;
                         strXoverSelectionMode = "RANDOM";
+                    } else {
+                        throw new DENOPTIMException("ERROR! String '"
+                                + value + "' cannot be interpreted as a "
+                                + "parent selection strategy.");
                     }
                 }
                 break;
