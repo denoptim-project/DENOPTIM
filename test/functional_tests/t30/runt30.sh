@@ -8,12 +8,12 @@ mv data/* "$wrkDir"
 rm -rf data
 
 # Here we define the expected results
-#           sub test ID: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21
-expctdNoMissingAtomMols=(9  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)
-    expectedPreFiltered=(0  0  2  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)  
-      expectedFragments=(0  0  0 20 12  8  6 11 70  0  0  0  0  0  9  0  4  2  7  7  3)
-expectedIsomorphicFrags=(0  0  0  0  0  0 30 11  0  0  0  0  0  0 96  0  0  0  0  0  0)
-        expectedResults=(9  1  2  0  0  0  0  0  0  4  2  2  2  3  0  2  0  0  0  0  0)
+#           sub test ID: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+expctdNoMissingAtomMols=(9  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)
+    expectedPreFiltered=(0  0  2  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0) 
+      expectedFragments=(0  0  0 20 12  8  6 11 70  0  0  0  0  0  9  0  4  2  7  3  3  3  3)
+expectedIsomorphicFrags=(0  0  0  0  0  0 30 11  0  0  0  0  0  0 96  0  0  0  0  0  0  0  0)
+        expectedResults=(9  1  2  0  0  0  0  0  0  4  2  2  2  3  0  2  0  0  0  0  0  0  0)
 
 nSubTests=${#expctdNoMissingAtomMols[@]}
 
@@ -81,6 +81,18 @@ do
         if [ "$n" -ne ${expectedResults[$i-1]} ]
         then
             echo "Test 't30' NOT PASSED (symptom: wrong number of structures in 'Results' file: $n vs. ${expectedResults[$i-1]}. Strp $i"
+            exit -1
+        fi
+    fi
+
+    #
+    # From here its tests-specific checks
+    #
+    if [ 22 -eq "$i" ] || [ 23 -eq "$i" ] ; then
+        nH=$(grep " H "  "$output"/Fragments.sdf | wc -l)
+        if [ "$nH" -ne 8 ]
+        then
+            echo "Test 't30' NOT PASSED (symptom: wrong number of hydrogen atoms in results: $nH vs. 8. Strp $i (see $output)"
             exit -1
         fi
     fi

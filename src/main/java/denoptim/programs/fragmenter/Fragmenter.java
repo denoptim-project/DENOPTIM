@@ -69,7 +69,6 @@ public class Fragmenter extends ProgramTask
         
         if (settings.isStandaloneFragmentClustering())
         {
-
             List<Vertex> fragments = DenoptimIO.readVertexes(
                     new File(settings.getStructuresFile()), BBType.UNDEFINED);
             ConformerExtractorTask cet = new ConformerExtractorTask(fragments,

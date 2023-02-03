@@ -1,0 +1,10 @@
+#
+# This is the parameter file for test t30-22
+#
+# Start with H-depleted input, add H, and use cutting rules assuming explicit H
+# All in one thread
+FRG-STRUCTURESFILE=mols-22.smi
+FRG-CUTTINGRULESFILE=cutting_rules
+FRG-REMOVEDUPLICATES
+FRG-ADDEXPLICITHYDROGEN
+FRG-VERBOSITY=4

@@ -106,13 +106,15 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
         // the input structures for each thread.
         structures = new File[settings.getNumTasks()];
         structures[0] = new File(settings.getStructuresFile());
-        if (settings.getNumTasks()>1 || settings.doCheckFormula())
+        
+        // WARNING while splitting the molecules we also do the preprocessing of
+        // the molecules. This to avoid having to read them once again. Yet,
+        // if we have no checks to be done, we are effectively copy-pasting
+        // the file with the list of molecules to chop.
+        splitInputForThreads(settings, reader);
+        for (int i=0; i<settings.getNumTasks(); i++)
         {
-            splitInputForThreads(settings, reader);
-            for (int i=0; i<settings.getNumTasks(); i++)
-            {
-                structures[i] = new File(getStructureFileNameBatch(settings, i));
-            }
+            structures[i] = new File(getStructureFileNameBatch(settings, i));
         }
         return true;
     }
@@ -340,8 +342,12 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
                 // expected to be found (but CSD uses them...)
                 try
                 {
-                    // MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
-                    MoleculeUtils.explicitHydrogens(mol);
+                    if (settings.addExplicitH())
+                    {
+                        MoleculeUtils.explicitHydrogens(mol);
+                    } else {
+                        MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+                    }
                     MoleculeUtils.ensureNoUnsetBondOrders(mol);
                 } catch (CDKException e)
                 {

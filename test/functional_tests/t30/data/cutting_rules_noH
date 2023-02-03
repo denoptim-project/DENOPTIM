@@ -1,0 +1,14 @@
+###############################################################################
+###############################################################################
+##
+## Cutting Rules for structures without H (i.e., implicit H)
+##
+## The following rules are just an example of rules that do not assume the 
+## presence of all atom in explicit way.
+##
+###############################################################################
+#
+CTR acEst   0 [$(C(=O)[O;X2][#6]);!$(C(=O)OC=O)] [$(CC(=O)O)] -!@
+CTR alcohES 1 [O;X2;$(OC(=O)[#6])] [$(CO);!$(C=O)] -!@
+#
+################################################

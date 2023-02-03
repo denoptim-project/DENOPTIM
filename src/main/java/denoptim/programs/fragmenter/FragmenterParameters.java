@@ -102,6 +102,11 @@ public class FragmenterParameters extends RunTimeParameters
     private boolean acceptUnsetToSingeBOApprox = false;
     
     /**
+     * Flag requesting to add explicit H atoms.
+     */
+    private boolean addExplicitH = false;
+    
+    /**
      * Fag requesting the pre-fragmentation filtering of the structures.
      */
     private boolean preFilter = false;
@@ -869,6 +874,16 @@ public class FragmenterParameters extends RunTimeParameters
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we are asked to add explicit H atoms.
+     */
+    public boolean addExplicitH()
+    {
+        return addExplicitH;
+    }
+    
+//------------------------------------------------------------------------------
 
     /**
      * @return <code>true</code> if we are want to ignore the fact we have 
@@ -914,6 +929,10 @@ public class FragmenterParameters extends RunTimeParameters
             case "CUTTINGRULESFILE=":
                 doFragmentation = true;
                 cutRulesFile = value;
+                break;
+                
+            case "ADDEXPLICITHYDROGEN":
+                addExplicitH = true;
                 break;
                 
             case "UNSETTOSINGLEBO":
