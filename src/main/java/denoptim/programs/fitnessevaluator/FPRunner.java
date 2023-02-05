@@ -61,7 +61,7 @@ public class FPRunner
     /**
      * Storage of references to the submitted subtasks.
      */
-    final ArrayList<FitnessTask> submitted;
+    final List<FitnessTask> submitted;
 
     /**
      * Asynchronous tasks manager 
@@ -73,6 +73,12 @@ public class FPRunner
      */
     private FRParameters settings;
 
+    
+    /**
+     * Number of parallel fitness evaluations we run
+     */
+    // TODO: use getNumCPU from GAParameters to launch fitness evaluations in parallel.
+    private int numThreads = 1;
 
 //-----------------------------------------------------------------------------
 
@@ -86,8 +92,8 @@ public class FPRunner
         futures = new ArrayList<>(1);
         submitted = new ArrayList<>(1);
 
-        tpe = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.NANOSECONDS,
-                                       new ArrayBlockingQueue<Runnable>(1));
+        tpe = new ThreadPoolExecutor(numThreads, numThreads, Long.MAX_VALUE, 
+                TimeUnit.NANOSECONDS, new ArrayBlockingQueue<Runnable>(1));
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -191,6 +197,10 @@ public class FPRunner
             submitted.add(task);
             futures.add(tpe.submit(task));
             evaluationCount++;
+            if (evaluationCount>(numThreads*2))
+            {
+                cleanupCompleted(futures, submitted);
+            }
         }
         
         // wait a bit for pending tasks to finish
@@ -219,6 +229,29 @@ public class FPRunner
                 + "FitnessRunner run completed." + DENOPTIMConstants.EOL;
         StaticLogger.appLogger.log(Level.INFO, msg);
     }
+        
+//------------------------------------------------------------------------------
+
+    /**
+     * Removes only tasks that are marked as completed.
+     */
+    private void cleanupCompleted(List<Future<Object>> futures, 
+            List<FitnessTask> submitted)
+    {
+        ArrayList<FitnessTask> completed = new ArrayList<FitnessTask>();
+
+        for (FitnessTask t : submitted)
+        {
+            if (t.isCompleted())
+                completed.add(t);
+        }
+
+        for (FitnessTask t : completed)
+        {
+            submitted.remove(t);
+            //NB: futures should be cleaned by garbage collection
+        }
+    }
 
 //------------------------------------------------------------------------------
 
@@ -227,7 +260,7 @@ public class FPRunner
      */
 
     private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
-                            ArrayList<FitnessTask> submitted)
+                            List<FitnessTask> submitted)
     {
         for (Future<Object> f : futures)
         {
