@@ -129,7 +129,7 @@ public class EvolutionaryAlgorithm
      * Temporary storage of fitness evaluation tasks just submitted to asynchronous 
      * Parallelization scheme.
      */
-    private ArrayList<FitnessTask> submitted;
+    private List<FitnessTask> submitted;
     
     /**
      * Execution service used in asynchronous parallelization scheme.
@@ -488,6 +488,13 @@ public class EvolutionaryAlgorithm
                 {
                     submitted.add(task);
                     futures.add(tpe.submit(task));
+                    // We keep some memory but of previous tasks, but must
+                    // avoid memory leak due to storage of too many references 
+                    // to submitted tasks.
+                    if (submitted.size() > 2*settings.getNumberOfCPU())
+                    {
+                        cleanupCompleted(tpe, futures, submitted);
+                    }
                 } else {
                     tasks.add(task);
                     if (tasks.size() >= Math.abs(
@@ -722,6 +729,13 @@ public class EvolutionaryAlgorithm
                 {
                     submitted.add(task);
                     futures.add(tpe.submit(task));
+                    // We keep some memory but of previous tasks, but must
+                    // avoid memory leak due to storage of too many references 
+                    // to submitted tasks.
+                    if (submitted.size() > 2*settings.getNumberOfCPU())
+                    {
+                        cleanupCompleted(tpe, futures, submitted);
+                    }
                 } else {
                     syncronisedTasks.add(task);
                     if (syncronisedTasks.size() 
@@ -822,7 +836,7 @@ public class EvolutionaryAlgorithm
      * Removes all tasks whether they are completed or not.
      */
     private void cleanupAsync(ThreadPoolExecutor executor, 
-            List<Future<Object>> futures, ArrayList<FitnessTask> submitted)
+            List<Future<Object>> futures, List<FitnessTask> submitted)
     {
         for (Future<Object> f : futures)
         {
@@ -843,7 +857,7 @@ public class EvolutionaryAlgorithm
      * Removes only tasks that are marked as completed.
      */
     private void cleanupCompleted(ThreadPoolExecutor tcons,
-            List<Future<Object>> futures, ArrayList<FitnessTask> submitted)
+            List<Future<Object>> futures, List<FitnessTask> submitted)
     {
         ArrayList<FitnessTask> completed = new ArrayList<FitnessTask>();
 
