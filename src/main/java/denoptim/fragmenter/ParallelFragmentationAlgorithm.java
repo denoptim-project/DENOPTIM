@@ -157,7 +157,7 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
                 throw new Error("Could not extract the most common conformer. "
                         + e.getMessage(), e);
             }
-            for (String pathname : extractor.results)
+            for (String pathname : extractor.getResults())
             {
                 resultFiles.add(new File(pathname));
             }
@@ -168,18 +168,15 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
                 resultFiles = getFilesCollectingIsomorphicFamilyChampions(
                         new File(settings.getWorkDirectory()));
             } else if (settings.getNumTasks()>1) {
-                resultFiles = submitted.stream()
-                        .filter(task -> task instanceof FragmenterTask)
-                        .map(task -> (FragmenterTask) task)
-                        .map(FragmenterTask::getResultFile)
+                resultFiles = results.stream()
+                        .map(obj -> (String) obj)
                         .map(pathname -> new File(pathname))
                         .collect(Collectors.toList());
             } else if (settings.getNumTasks()==1) {
                 // We should be here only when we run on single thread with no
                 // handling of isomorphic families (i.e., no removal of 
                 // duplicates)
-                resultFiles.add(new File (((FragmenterTask) 
-                        submitted.get(0)).results));
+                resultFiles.add(new File ((String) results.get(0)));
             }
         }
         
@@ -526,31 +523,6 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
             }
         }
         return relyingOnListSize;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * clean all reference to submitted tasks
-     */
-
-    @SuppressWarnings("unused")
-    private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
-                            ArrayList<FragmenterTask> submitted)
-    {
-        for (Future<Object> f : futures)
-        {
-            f.cancel(true);
-        }
-
-        for (FragmenterTask tsk: submitted)
-        {
-            tsk.stopTask();
-        }
-
-        submitted.clear();
-
-        tpe.getQueue().clear();
     }
 
 //------------------------------------------------------------------------------    

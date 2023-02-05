@@ -46,14 +46,6 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
      */
     private FragmenterParameters settings = null;
     
-    /**
-     * List of pathnames collecting the most representative conformers, 
-     * as defined
-     * by the settings (i.e., either cluster centroids or fragment closest to
-     * the centroids).
-     */
-    protected List<String> results = new ArrayList<String>();
-
     
 //-----------------------------------------------------------------------------
 
@@ -91,7 +83,6 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
                         BBType.UNDEFINED);
             } catch (Throwable e)
             {
-                
                 throw new Error("Unable to extract representative "
                         + "conformations. Problems opening file '"
                         + mwSlotFile + "'.", e);
@@ -115,13 +106,25 @@ public class ParallelConformerExtractionAlgorithm extends ParallelAsynchronousTa
 
     protected boolean doPostFlightOperations()
     {
-        for (Task t : submitted)
-        {
-            results.add(((ConformerExtractorTask)t).getResultFile());
-        }
         return true;
     }
  
+//------------------------------------------------------------------------------
+    
+
+    /**
+     * Returns the list of pathnames collecting the most representative 
+     * conformers, as defined by the settings (i.e., either cluster centroids or
+     * fragment closest to the centroids).
+     * @return the list of patnames where results are collected.
+     */
+    public List<String> getResults()
+    {
+        List<String> pathnames = new ArrayList<String>();
+        results.stream().forEach(o -> pathnames.add((String) o));
+        return pathnames;
+    }
+    
 //------------------------------------------------------------------------------    
 
 }

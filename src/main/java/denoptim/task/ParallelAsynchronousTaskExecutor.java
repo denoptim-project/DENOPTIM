@@ -20,8 +20,11 @@ package denoptim.task;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -44,14 +47,23 @@ import denoptim.exception.DENOPTIMException;
 abstract public class ParallelAsynchronousTaskExecutor
 {
     /**
-     * Storage of references to the submitted subtasks as <code>Future</code>
+     * Storage of references to the submitted subtasks and their future returned
+     * value.
+     * This is cleaned up every now and then, to avoid memory leak, but we keep 
+     * the object returned by the future task in the results list.
      */
-    protected final List<Future<Object>> futures;
+    private final Map<Task,Future<Object>> futures;
 
     /**
-     * Storage of references to the submitted subtasks.
+     * Storage of references to the submitted subtasks. This is cleaned up every
+     * now and then, to avoid memory leak.
      */
-    protected final ArrayList<Task> submitted;
+    private final List<Task> submitted;
+    
+    /**
+     * List of object returned by completed tasks.
+     */
+    protected final List<Object> results;
 
     /**
      * Asynchronous tasks manager 
@@ -67,6 +79,11 @@ abstract public class ParallelAsynchronousTaskExecutor
      * Logger
      */
     private Logger logger;
+    
+    /**
+     * Numner of threads run in parallel
+     */
+    private int numThreads = 1;
 
     
 //-----------------------------------------------------------------------------
@@ -78,11 +95,13 @@ abstract public class ParallelAsynchronousTaskExecutor
     public ParallelAsynchronousTaskExecutor(int numberOfTasks, Logger logger)
     {
         this.logger = logger;
-        futures = new ArrayList<>();
+        futures = new HashMap<Task,Future<Object>>();
         submitted = new ArrayList<>();
+        results = new ArrayList<>();
+        numThreads = numberOfTasks;
 
-        tpe = new ThreadPoolExecutor(numberOfTasks,
-                numberOfTasks,
+        tpe = new ThreadPoolExecutor(numThreads,
+                numThreads,
                 Long.MAX_VALUE,
                 TimeUnit.NANOSECONDS,
                 new ArrayBlockingQueue<Runnable>(1));
@@ -108,7 +127,8 @@ abstract public class ParallelAsynchronousTaskExecutor
                 }
                 catch (InterruptedException ie)
                 {
-                    cleanup(tpe, futures, submitted);
+                    cleanupCompleted();
+                    cleanup();
                     // (Re-)Cancel if current thread also interrupted
                     tpe.shutdownNow();
                     // Preserve interrupt status
@@ -146,7 +166,8 @@ abstract public class ParallelAsynchronousTaskExecutor
      */
     public void stopRun()
     {
-        cleanup(tpe, futures, submitted);
+        cleanupCompleted();
+        cleanup();
         tpe.shutdown();
     }
 
@@ -242,6 +263,9 @@ abstract public class ParallelAsynchronousTaskExecutor
             //Do nothing
         }
         
+        // This collects also the results and frees-up memory
+        cleanupCompleted();
+        
         if (!doPostFlightOperations())
             return;
         
@@ -259,12 +283,18 @@ abstract public class ParallelAsynchronousTaskExecutor
     protected void submitTask(Task task, String logFilePathname)
     {
         submitted.add(task);
-        futures.add(tpe.submit(task));
+        futures.put(task, tpe.submit(task));
         String msg = task.getClass().getSimpleName() + " "
                 + task.getId() + " submitted.";
         if (logFilePathname!=null && !logFilePathname.isBlank())
+        {
             msg = msg + " Log file: " + logFilePathname;
+        }
         logger.log(Level.INFO, msg);
+        if (submitted.size()>numThreads*2)
+        {
+            cleanupCompleted();
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -285,21 +315,54 @@ abstract public class ParallelAsynchronousTaskExecutor
     abstract protected boolean doPreFlightOperations();
 
 //------------------------------------------------------------------------------
+
+    /**
+     * Removes only tasks that are marked as completed.
+     */
+    private void cleanupCompleted()
+    {
+        List<Task> completed = new ArrayList<Task>();
+
+        for (Task t : submitted)
+        {
+            if (t.isCompleted())
+                completed.add(t);
+        }
+
+        for (Task t : completed)
+        {
+            try
+            {
+                results.add(futures.get(t).get());
+            } catch (InterruptedException | ExecutionException e)
+            {
+                e.printStackTrace();
+                String msg = "EXCEPTION upon retrieving results from completed "
+                        + "task. The result from task '" + t.toString() + "' "
+                        + "are lost.";
+                logger.log(Level.WARNING,msg);
+            }
+            submitted.remove(t);
+            futures.get(t).cancel(true);
+            futures.remove(t);
+        }
+    }
+    
+//------------------------------------------------------------------------------
     
     /**
      * clean all reference to submitted tasks
      */
-    private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
-                            ArrayList<Task> submitted)
+    private void cleanup()
     {
-        for (Future<Object> f : futures)
-        {
-            f.cancel(true);
-        }
-
-        for (Task tsk: submitted)
+        for (Task tsk : submitted)
         {
             tsk.stopTask();
+        }
+        for (Task tsk : futures.keySet())
+        {
+            futures.get(tsk).cancel(true);
+            futures.remove(tsk);
         }
         submitted.clear();
         tpe.getQueue().clear();
