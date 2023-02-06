@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 3.2.4, Jan 2023_
+_Version 3.2.5, Feb 2023_
 
 [TOC]
 
@@ -657,6 +657,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FRG-FORMULATXTFILE`| The pathname to a TXT file (see [Formula file](#FormulaFile)) containing the molecular formulae for the structures to be fragmented. Use this keyword to enable detection of missing atoms by checking the consistency between declared molecular formula (reported in the pathname given here) and actual molecular formula found in the structure file. Molecules with missing atoms are not fragmented.|
 |`FRG-PREFILTERSMARTS`| Specifies the SMARTS query to filter structure before fragmentation. Any input molecule matching the SMARTS query will not be fragmented. This keyword can be used multiple times to define more than one pre-filtering SMARTS criterion.|
 |`FRG-UNSETTOSINGLEBO`| Use this keyword (no value needed) to request the conversion of all UNSET bond types to SINGLE bond types in any molecule to be fragmented.|
+|`FRG-ADDEXPLICITHYDROGEN`| Requests addition of explicit H atoms on any atom up to satisfation of the valence. This procedure is sufficiently accurate only for standard organic molecules. Tautomers are not explored.|
 |__Fragmentation__||
 |`FRG-CUTTINGRULESFILE`| The pathname to the file defining cutting rules (see [Cutting rules file](#CuttingRules)).|
 |__Post-Fragmentation Filtering__||
