@@ -36,7 +36,14 @@ export denoptimJar=$(find "$DENOPTIM_HOME/target" -name "denoptim*-jar-with-depe
 
 if [ ! -f "$denoptimJar" ]
 then
-    echo "Cannot find DENOPTIM's jar. Make sure you have built the project by running 'mvn package' and ensuring its successful completion."
+    nFound=$(find "$DENOPTIM_HOME/target" -name "denoptim*-jar-with-dependencies.jar" | wc -l)
+    if [ "$nFound" -eq 0 ] ; then
+        echo "Cannot find DENOPTIM's jar. Make sure you have built the project by running 'mvn package' and ensuring its successful completion."
+    elif [ "$nFound" -gt 1 ] ; then
+        echo "Found multiple versions of DENOPTIM's jar. Make sure you do 'mvn clean' before running 'mvn package' and ensuring its successful completion."
+    else
+        echo "Cannot interprete this string as a list of jar files: $denoptimJar"
+    fi
     exit -1
 fi
 echo "Using DENOPTIM jar: $denoptimJar"
