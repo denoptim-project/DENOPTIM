@@ -20,7 +20,9 @@ package denoptim.programs.fitnessevaluator;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -54,9 +56,9 @@ import denoptim.task.FitnessTask;
 public class FPRunner
 {
     /**
-     * Storage of references to the submitted subtasks as <code>Future</code>
+     * Storage of references to the submitted subtasks as <code>Future</code>.
      */
-    final List<Future<Object>> futures;
+    final Map<FitnessTask,Future<Object>> futures;
 
     /**
      * Storage of references to the submitted subtasks.
@@ -89,8 +91,8 @@ public class FPRunner
     public FPRunner(FRParameters settings)
     {
         this.settings = settings;
-        futures = new ArrayList<>(1);
-        submitted = new ArrayList<>(1);
+        futures = new HashMap<FitnessTask,Future<Object>>();
+        submitted = new ArrayList<>(numThreads);
 
         tpe = new ThreadPoolExecutor(numThreads, numThreads, Long.MAX_VALUE, 
                 TimeUnit.NANOSECONDS, new ArrayBlockingQueue<Runnable>(1));
@@ -116,7 +118,7 @@ public class FPRunner
                 }
                 catch (InterruptedException ie)
                 {
-                    cleanup(tpe, futures, submitted);
+                    cleanup();
                     // (Re-)Cancel if current thread also interrupted
                     tpe.shutdownNow();
                     // Preserve interrupt status
@@ -155,7 +157,7 @@ public class FPRunner
 
     public void stopRun()
     {
-        cleanup(tpe, futures, submitted);
+        cleanup();
         tpe.shutdown();
     }
 
@@ -195,11 +197,11 @@ public class FPRunner
                     settings.getOutputFile().getAbsolutePath()+"_"+i);
 
             submitted.add(task);
-            futures.add(tpe.submit(task));
+            futures.put(task,tpe.submit(task));
             evaluationCount++;
             if (evaluationCount>(numThreads*2))
             {
-                cleanupCompleted(futures, submitted);
+                cleanupCompleted();
             }
         }
         
@@ -235,10 +237,9 @@ public class FPRunner
     /**
      * Removes only tasks that are marked as completed.
      */
-    private void cleanupCompleted(List<Future<Object>> futures, 
-            List<FitnessTask> submitted)
+    private void cleanupCompleted()
     {
-        ArrayList<FitnessTask> completed = new ArrayList<FitnessTask>();
+        List<FitnessTask> completed = new ArrayList<FitnessTask>();
 
         for (FitnessTask t : submitted)
         {
@@ -249,7 +250,8 @@ public class FPRunner
         for (FitnessTask t : completed)
         {
             submitted.remove(t);
-            //NB: futures should be cleaned by garbage collection
+            futures.get(t).cancel(true);
+            futures.remove(t);
         }
     }
 
@@ -259,18 +261,17 @@ public class FPRunner
      * clean all reference to submitted tasks
      */
 
-    private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
-                            List<FitnessTask> submitted)
+    private void cleanup()
     {
-        for (Future<Object> f : futures)
-        {
-            f.cancel(true);
-        }
-
         for (FitnessTask tsk: submitted)
         {
             tsk.stopTask();
         }
+        for (FitnessTask tsk : futures.keySet())
+        {
+            futures.get(tsk).cancel(true);
+        }
+        futures.clear();
         submitted.clear();
         tpe.getQueue().clear();
     }

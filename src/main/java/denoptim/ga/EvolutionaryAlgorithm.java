@@ -21,8 +21,10 @@ package denoptim.ga;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
@@ -123,7 +125,7 @@ public class EvolutionaryAlgorithm
      * Temporary storage of future results produced by fitness evaluation tasks
      * submitted to asynchronous parallelization scheme.
      */
-    private List<Future<Object>> futures;
+    private Map<FitnessTask,Future<Object>> futures;
     
     /**
      * Temporary storage of fitness evaluation tasks just submitted to asynchronous 
@@ -176,7 +178,7 @@ public class EvolutionaryAlgorithm
             
         } else {
             isAsync = true;
-            futures = new ArrayList<>();
+            futures = new HashMap<FitnessTask,Future<Object>>();
             submitted = new ArrayList<>();
             
             tpe = new ThreadPoolExecutor(settings.getNumberOfCPU(),
@@ -204,7 +206,7 @@ public class EvolutionaryAlgorithm
                     }
                     catch (InterruptedException ie)
                     {
-                        cleanupAsync(tpe, futures, submitted);
+                        cleanupAsync();
                         // (Re-)Cancel if current thread also interrupted
                         tpe.shutdownNow();
                         // Preserve interrupt status
@@ -487,13 +489,13 @@ public class EvolutionaryAlgorithm
                 if (isAsync)
                 {
                     submitted.add(task);
-                    futures.add(tpe.submit(task));
+                    futures.put(task,tpe.submit(task));
                     // We keep some memory but of previous tasks, but must
                     // avoid memory leak due to storage of too many references 
                     // to submitted tasks.
                     if (submitted.size() > 2*settings.getNumberOfCPU())
                     {
-                        cleanupCompleted(tpe, futures, submitted);
+                        cleanupCompleted();
                     }
                 } else {
                     tasks.add(task);
@@ -521,7 +523,7 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupAsync(tpe, futures, submitted);
+                cleanupAsync();
                 tpe.shutdown();
             }
             throw dex;
@@ -530,7 +532,7 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupAsync(tpe, futures, submitted);
+                cleanupAsync();
                 tpe.shutdown();
             }
             ex.printStackTrace();
@@ -544,7 +546,7 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupCompleted(tpe, futures, submitted);
+                cleanupCompleted();
                 stopRun();
             }
             logger.log(Level.SEVERE,
@@ -728,13 +730,13 @@ public class EvolutionaryAlgorithm
                 if (isAsync)
                 {
                     submitted.add(task);
-                    futures.add(tpe.submit(task));
+                    futures.put(task, tpe.submit(task));
                     // We keep some memory but of previous tasks, but must
                     // avoid memory leak due to storage of too many references 
                     // to submitted tasks.
                     if (submitted.size() > 2*settings.getNumberOfCPU())
                     {
-                        cleanupCompleted(tpe, futures, submitted);
+                        cleanupCompleted();
                     }
                 } else {
                     syncronisedTasks.add(task);
@@ -762,7 +764,7 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupAsync(tpe, futures, submitted);
+                cleanupAsync();
                 tpe.shutdown();
             }
             dex.printStackTrace();
@@ -772,7 +774,7 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupAsync(tpe, futures, submitted);
+                cleanupAsync();
                 tpe.shutdown();
             }
             ex.printStackTrace();
@@ -786,7 +788,7 @@ public class EvolutionaryAlgorithm
         {
             if (isAsync)
             {
-                cleanupCompleted(tpe, futures, submitted);
+                cleanupCompleted();
                 stopRun();
             }
             logger.log(Level.WARNING,
@@ -824,7 +826,7 @@ public class EvolutionaryAlgorithm
     {
         if (isAsync)
         {
-            cleanupAsync(tpe, futures, submitted);
+            cleanupAsync();
             tpe.shutdown();
         }
         stopped = true;
@@ -835,20 +837,19 @@ public class EvolutionaryAlgorithm
     /**
      * Removes all tasks whether they are completed or not.
      */
-    private void cleanupAsync(ThreadPoolExecutor executor, 
-            List<Future<Object>> futures, List<FitnessTask> submitted)
+    private void cleanupAsync()
     {
-        for (Future<Object> f : futures)
-        {
-            f.cancel(true);
-        }
-
         for (FitnessTask tsk: submitted)
         {
             tsk.stopTask();
         }
+        for (FitnessTask tsk : futures.keySet())
+        {
+            futures.get(tsk).cancel(true);
+        }
+        futures.clear();
         submitted.clear();
-        executor.getQueue().clear();
+        tpe.getQueue().clear();
     }
     
 //------------------------------------------------------------------------------
@@ -856,10 +857,9 @@ public class EvolutionaryAlgorithm
     /**
      * Removes only tasks that are marked as completed.
      */
-    private void cleanupCompleted(ThreadPoolExecutor tcons,
-            List<Future<Object>> futures, List<FitnessTask> submitted)
+    private void cleanupCompleted()
     {
-        ArrayList<FitnessTask> completed = new ArrayList<FitnessTask>();
+        List<FitnessTask> completed = new ArrayList<FitnessTask>();
 
         for (FitnessTask t : submitted)
         {
@@ -870,7 +870,8 @@ public class EvolutionaryAlgorithm
         for (FitnessTask t : completed)
         {
             submitted.remove(t);
-            //NB: futures should be cleaned by garbage collection
+            futures.get(t).cancel(true);
+            futures.remove(t);
         }
     }
 
