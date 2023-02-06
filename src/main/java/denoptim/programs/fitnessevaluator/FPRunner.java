@@ -20,7 +20,9 @@ package denoptim.programs.fitnessevaluator;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -54,14 +56,14 @@ import denoptim.task.FitnessTask;
 public class FPRunner
 {
     /**
-     * Storage of references to the submitted subtasks as <code>Future</code>
+     * Storage of references to the submitted subtasks as <code>Future</code>.
      */
-    final List<Future<Object>> futures;
+    final Map<FitnessTask,Future<Object>> futures;
 
     /**
      * Storage of references to the submitted subtasks.
      */
-    final ArrayList<FitnessTask> submitted;
+    final List<FitnessTask> submitted;
 
     /**
      * Asynchronous tasks manager 
@@ -73,6 +75,12 @@ public class FPRunner
      */
     private FRParameters settings;
 
+    
+    /**
+     * Number of parallel fitness evaluations we run
+     */
+    // TODO: use getNumCPU from GAParameters to launch fitness evaluations in parallel.
+    private int numThreads = 1;
 
 //-----------------------------------------------------------------------------
 
@@ -83,11 +91,11 @@ public class FPRunner
     public FPRunner(FRParameters settings)
     {
         this.settings = settings;
-        futures = new ArrayList<>(1);
-        submitted = new ArrayList<>(1);
+        futures = new HashMap<FitnessTask,Future<Object>>();
+        submitted = new ArrayList<>(numThreads);
 
-        tpe = new ThreadPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.NANOSECONDS,
-                                       new ArrayBlockingQueue<Runnable>(1));
+        tpe = new ThreadPoolExecutor(numThreads, numThreads, Long.MAX_VALUE, 
+                TimeUnit.NANOSECONDS, new ArrayBlockingQueue<Runnable>(1));
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -110,7 +118,7 @@ public class FPRunner
                 }
                 catch (InterruptedException ie)
                 {
-                    cleanup(tpe, futures, submitted);
+                    cleanup();
                     // (Re-)Cancel if current thread also interrupted
                     tpe.shutdownNow();
                     // Preserve interrupt status
@@ -149,7 +157,7 @@ public class FPRunner
 
     public void stopRun()
     {
-        cleanup(tpe, futures, submitted);
+        cleanup();
         tpe.shutdown();
     }
 
@@ -189,8 +197,12 @@ public class FPRunner
                     settings.getOutputFile().getAbsolutePath()+"_"+i);
 
             submitted.add(task);
-            futures.add(tpe.submit(task));
+            futures.put(task,tpe.submit(task));
             evaluationCount++;
+            if (evaluationCount>(numThreads*2))
+            {
+                cleanupCompleted();
+            }
         }
         
         // wait a bit for pending tasks to finish
@@ -219,6 +231,29 @@ public class FPRunner
                 + "FitnessRunner run completed." + DENOPTIMConstants.EOL;
         StaticLogger.appLogger.log(Level.INFO, msg);
     }
+        
+//------------------------------------------------------------------------------
+
+    /**
+     * Removes only tasks that are marked as completed.
+     */
+    private void cleanupCompleted()
+    {
+        List<FitnessTask> completed = new ArrayList<FitnessTask>();
+
+        for (FitnessTask t : submitted)
+        {
+            if (t.isCompleted())
+                completed.add(t);
+        }
+
+        for (FitnessTask t : completed)
+        {
+            submitted.remove(t);
+            futures.get(t).cancel(true);
+            futures.remove(t);
+        }
+    }
 
 //------------------------------------------------------------------------------
 
@@ -226,18 +261,17 @@ public class FPRunner
      * clean all reference to submitted tasks
      */
 
-    private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
-                            ArrayList<FitnessTask> submitted)
+    private void cleanup()
     {
-        for (Future<Object> f : futures)
-        {
-            f.cancel(true);
-        }
-
         for (FitnessTask tsk: submitted)
         {
             tsk.stopTask();
         }
+        for (FitnessTask tsk : futures.keySet())
+        {
+            futures.get(tsk).cancel(true);
+        }
+        futures.clear();
         submitted.clear();
         tpe.getQueue().clear();
     }

@@ -212,6 +212,7 @@ public class StaticTaskManager
     {
     	subtractDoneTasks(1);
     }
+    
 //------------------------------------------------------------------------------
     
     public static void subtractDoneTasks(int doneTasksCount)
@@ -270,7 +271,7 @@ public class StaticTaskManager
     	addTodoTask();
     	Future<?> future = tpe.submit(task);
     	subToFutureMap.put(task,future);
-    	//TODO: check how we can remove terminated tasks from the map
+    	//TODO-gg: check how we can remove terminated tasks from the map
     }
     
 //------------------------------------------------------------------------------

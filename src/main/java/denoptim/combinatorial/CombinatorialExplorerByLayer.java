@@ -22,8 +22,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -59,16 +61,17 @@ import denoptim.utils.GraphUtils;
 
 public class CombinatorialExplorerByLayer
 {
+    
     /**
-     * Storage of references to the submitted subtasks as <code>Future</code>
+     * Submitted subtasks and their futures
      */
-    final List<Future<Object>> futures;
+    final Map<GraphBuildingTask,Future<Object>> submittedAndFutures;
 
     /**
-     * Storage of references to the submitted subtasks.
+     * Sorted list of subtasks
      */
-    final ArrayList<GraphBuildingTask> submitted;
-
+    final List<GraphBuildingTask> submitted;
+    
     /**
      * Asynchronous tasks manager 
      */
@@ -89,6 +92,11 @@ public class CombinatorialExplorerByLayer
      * upon restart from checkpoint file
      */
     private int serFromChkRestart = 0;
+    
+    /**
+     * Number of tasks submitted directly of by subtasks
+     */
+    private int totSubmittedTasks = 0;
 
     /**
      * If any, here we stores the exception returned by a subtask
@@ -130,8 +138,8 @@ public class CombinatorialExplorerByLayer
                     ParametersType.FS_PARAMS);
         }
         
-        futures = new ArrayList<>();
-        submitted = new ArrayList<>();
+        submittedAndFutures = new HashMap<GraphBuildingTask,Future<Object>>();
+        submitted = new ArrayList<GraphBuildingTask>();
 
         tpe = new ThreadPoolExecutor(settings.getNumberOfCPU(),
                 settings.getNumberOfCPU(),
@@ -160,7 +168,7 @@ public class CombinatorialExplorerByLayer
                 }
                 catch (InterruptedException ie)
                 {
-                    cleanup(tpe, futures, submitted);
+                    cleanup();
                     // (Re-)Cancel if current thread also interrupted
                     tpe.shutdownNow();
                     // Preserve interrupt status
@@ -202,7 +210,7 @@ public class CombinatorialExplorerByLayer
 
     public void stopRun()
     {
-        cleanup(tpe, futures, submitted);
+        cleanup();
         tpe.shutdown();
     }
 
@@ -270,7 +278,7 @@ public class CombinatorialExplorerByLayer
             {
                 if (submitted.get(i-1).isCompleted())
                 {
-                    // The last completed task preceeding the first uncompleted
+                    // The last completed task preceding the first uncompleted
                     idToChkPt = i-1;
                     storeChkPt = true;
                 }
@@ -295,6 +303,23 @@ public class CombinatorialExplorerByLayer
                 break;
             }
         }
+        
+        //Clean up list of submitted tasks
+        List<GraphBuildingTask> completed = new ArrayList<GraphBuildingTask>();
+        for (GraphBuildingTask tsk : submitted)
+        {
+            if (tsk.isCompleted())
+            {
+                totSubmittedTasks = totSubmittedTasks + tsk.getNumberOfSubTasks();
+                completed.add(tsk);
+            }
+        }
+        submitted.removeAll(completed);
+        for (GraphBuildingTask removable : completed)
+        {
+            submittedAndFutures.get(removable).cancel(true);
+            submittedAndFutures.remove(removable);
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -307,12 +332,12 @@ public class CombinatorialExplorerByLayer
 
     private int countSubTasks()
     {
-        int tot = 0;
+        int tot = totSubmittedTasks;
+        //We add those that have not being counted yet.
         for (GraphBuildingTask tsk : submitted)
         {
             tot = tot + tsk.getNumberOfSubTasks();
         }
-
         return tot;
     }
 
@@ -476,7 +501,7 @@ public class CombinatorialExplorerByLayer
             }
 
             // Clean queue
-            cleanup(tpe, futures, submitted);
+            cleanup();
 
             // Level and all tasks completed
             if (interrupted)
@@ -700,8 +725,9 @@ public class CombinatorialExplorerByLayer
                     ArrayList<Integer> nextIds = fcf.getNextIds();
                     task.setNextIds(nextIds);
 
+                    submittedAndFutures.put(task, tpe.submit(task));
                     submitted.add(task);
-                    futures.add(tpe.submit(task));
+                    
                     numSubTasks++;
                     if (itersFromChkPt >= settings.getCheckPointStep())
                     {
@@ -787,13 +813,13 @@ public class CombinatorialExplorerByLayer
             }
             catch (DENOPTIMException dex)
             {
-                cleanup(tpe, futures, submitted);
+                cleanup();
                 tpe.shutdown();
                 throw dex;
             }
             catch (Exception ex)
             {
-                cleanup(tpe, futures, submitted);
+                cleanup();
                 tpe.shutdown();
                 throw new DENOPTIMException(ex);
             }
@@ -858,17 +884,13 @@ public class CombinatorialExplorerByLayer
      * clean all reference to submitted tasks
      */
 
-    private void cleanup(ThreadPoolExecutor tpe, List<Future<Object>> futures,
-                            ArrayList<GraphBuildingTask> submitted)
+    private void cleanup()
     {
-        for (Future<Object> f : futures)
-        {
-            f.cancel(true);
-        }
-
         for (GraphBuildingTask tsk: submitted)
         {
             tsk.stopTask();
+            submittedAndFutures.get(tsk).cancel(true);
+            submittedAndFutures.remove(tsk);
         }
 
         submitted.clear();
