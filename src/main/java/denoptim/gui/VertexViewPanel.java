@@ -42,6 +42,7 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
+import denoptim.utils.MoleculeUtils;
 
 
 /**
@@ -73,16 +74,19 @@ public class VertexViewPanel extends JPanel
     private JLabel labTitle;
     private JButton btnSwitchToNodeViewer;
     private JButton btnSwitchToMolViewer;
+    private JButton btnSwitchTo2DViewer;
     
     private JPanel centralPanel;
 	
     private JPanel emptyViewerCard;
 	private FragmentViewPanel fragViewer;
 	private VertexAsGraphViewPanel graphNodeViewer;
+	private VertexAsTwoDimStructureViewPanel twoDimViewer;
 	private IVertexAPSelection activeViewer;
     protected final String EMPTYCARDNAME = "emptyCard";
     protected final String GRAPHVIEWERCARDNAME = "emptyVertesCard";
     protected final String MOLVIEWERCARDNAME = "fragViewerCard";
+    protected final String TWODVIEWERCARDNAME = "twoDimViewerCard";
 	    
 	private boolean editableAPTable = false;
 	
@@ -129,8 +133,8 @@ public class VertexViewPanel extends JPanel
         btnSwitchToNodeViewer.setEnabled(false);
         titlePanel.add(btnSwitchToNodeViewer);
         
-        btnSwitchToMolViewer = new JButton("Molecule View");
-        btnSwitchToMolViewer.setToolTipText("Switch to molecular depiction "
+        btnSwitchToMolViewer = new JButton("3D Molecule View");
+        btnSwitchToMolViewer.setToolTipText("Switch to 3D molecular depiction "
                 + "of this vertex.");
         btnSwitchToMolViewer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -139,6 +143,17 @@ public class VertexViewPanel extends JPanel
         });
         btnSwitchToMolViewer.setEnabled(false);
         titlePanel.add(btnSwitchToMolViewer);
+        
+        btnSwitchTo2DViewer = new JButton("2D Molecular Structure");
+        btnSwitchTo2DViewer.setToolTipText("Switch to 2D molecular depiction "
+                + "of this vertex.");
+        btnSwitchTo2DViewer.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                switchTo2DViewer();
+            }
+        });
+        btnSwitchTo2DViewer.setEnabled(false);
+        titlePanel.add(btnSwitchTo2DViewer);
         
         this.add(titlePanel, BorderLayout.NORTH);
         
@@ -171,6 +186,21 @@ public class VertexViewPanel extends JPanel
             }
         });
         centralPanel.add(fragViewer, MOLVIEWERCARDNAME);
+        
+        twoDimViewer = new VertexAsTwoDimStructureViewPanel(editableAPTable);
+        twoDimViewer.addPropertyChangeListener(
+                IVertexAPSelection.APDATACHANGEEVENT, 
+                new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                alteredAPData = true;
+                firePropertyChange(IVertexAPSelection.APDATACHANGEEVENT, false, 
+                        true);          
+            }
+        });
+        centralPanel.add(twoDimViewer, TWODVIEWERCARDNAME);
+        
+        
         switchToEmptyCard();
 	}
 	
@@ -212,9 +242,11 @@ public class VertexViewPanel extends JPanel
     	    {
     	        btnSwitchToMolViewer.setEnabled(true);
     	        btnSwitchToNodeViewer.setEnabled(true);
+                btnSwitchTo2DViewer.setEnabled(true);
     	    } else {
     	        btnSwitchToMolViewer.setEnabled(false);
     	        btnSwitchToNodeViewer.setEnabled(false);
+                btnSwitchTo2DViewer.setEnabled(false);
     	    }
 	    }
 	}
@@ -225,6 +257,7 @@ public class VertexViewPanel extends JPanel
 	{
         btnSwitchToMolViewer.setEnabled(false);
         btnSwitchToNodeViewer.setEnabled(false);
+        btnSwitchTo2DViewer.setEnabled(false);
 	    ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
 	            EMPTYCARDNAME);
 	    activeViewer = null;
@@ -247,7 +280,16 @@ public class VertexViewPanel extends JPanel
                 MOLVIEWERCARDNAME);
         activeViewer = fragViewer;
     }
-
+    
+//-----------------------------------------------------------------------------
+    
+    private void switchTo2DViewer()
+    {
+        ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
+                TWODVIEWERCARDNAME);
+        activeViewer = twoDimViewer;
+    }
+    
 //-----------------------------------------------------------------------------
 	
 	/**
@@ -347,6 +389,7 @@ public class VertexViewPanel extends JPanel
     {
         btnSwitchToMolViewer.setEnabled(false);
         btnSwitchToNodeViewer.setEnabled(false);
+        btnSwitchTo2DViewer.setEnabled(false);
         graphNodeViewer.loadVertexToViewer(ev);
         switchToGraphNodeViewer();
         switchbleByVertexType = false;
@@ -363,13 +406,20 @@ public class VertexViewPanel extends JPanel
 	 * @param frag the fragment to visualize
 	 */
 	private void loadFragmentToViewer(Fragment frag)
-	{		
-		fragViewer.loadFragmentToViewer(frag);
+	{
         btnSwitchToMolViewer.setEnabled(true);
         btnSwitchToNodeViewer.setEnabled(true);
+        btnSwitchTo2DViewer.setEnabled(true);
+		fragViewer.loadFragmentToViewer(frag);
         graphNodeViewer.loadVertexToViewer(frag);
+        twoDimViewer.loadVertexToViewer(frag);
         switchbleByVertexType = true;
-		switchToMolecularViewer();
+        if (frag.is3D())
+		{
+            switchToMolecularViewer();
+		} else {
+		    switchTo2DViewer();
+		}
 	}
 
 //-----------------------------------------------------------------------------
@@ -391,6 +441,8 @@ public class VertexViewPanel extends JPanel
                 loadFragmentToViewer(frag);
                 btnSwitchToMolViewer.setEnabled(true);
                 btnSwitchToNodeViewer.setEnabled(true);
+                //TODO: maybe one day we'll enable looking at the 2D of the whole template
+                btnSwitchTo2DViewer.setEnabled(false);
                 switchbleByVertexType = true;
             } catch (DENOPTIMException e)
             {
