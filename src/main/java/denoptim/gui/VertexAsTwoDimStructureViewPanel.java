@@ -24,6 +24,9 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Graphics2D;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +44,6 @@ import javax.swing.table.JTableHeader;
 
 import org.openscience.cdk.AtomRef;
 import org.openscience.cdk.PseudoAtom;
-import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -54,18 +56,11 @@ import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
 import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
-import org.openscience.cdk.renderer.generators.BasicAtomGenerator.AtomColor;
-import org.openscience.cdk.renderer.generators.BasicAtomGenerator.AtomColorer;
-import org.openscience.cdk.renderer.generators.BasicAtomGenerator.ColorByType;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
-import org.openscience.cdk.templates.MoleculeFactory;
 
-import denoptim.exception.DENOPTIMException;
 import denoptim.graph.AttachmentPoint;
-import denoptim.graph.DGraph;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
-import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.utils.MoleculeUtils;
 
@@ -100,6 +95,7 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 	 */
 	public boolean alteredAPData = false;
 	
+    private JScrollPane viewPanel;
 	private JPanel twoDimView;
 	private JScrollPane tabPanel;
 	protected DefaultTableModel apTabModel;
@@ -117,10 +113,13 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
     /**
      * Panel dealing with the painting of 2D chemical representation.
      */
-    class TwoDimStructurePanel extends JPanel 
+    class TwoDimStructurePanel extends JPanel implements MouseWheelListener
     {
         IAtomContainer mol;
         AtomContainerRenderer renderer;
+
+        private double zoom = 1;
+        private boolean zooming = false;
 
         public TwoDimStructurePanel(Vertex vertex) 
         {
@@ -143,7 +142,6 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
                 sdg.generateCoordinates();
             } catch (Exception e)
             {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 renderer = null;
                 return;
@@ -157,6 +155,8 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
             generators.add(new BasicBondGenerator());
             generators.add(new AtomOrAPGenerator());
             renderer = new AtomContainerRenderer(generators, new AWTFontManager());
+            
+            addMouseWheelListener(this);
         }
 
         public void paint(Graphics graphics) 
@@ -169,8 +169,43 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
             // paint the background
             graphics.setColor(Color.WHITE);
             graphics.fillRect(0, 0, getWidth(), getHeight());
-
-            renderer.paint(mol, new AWTDrawVisitor((Graphics2D)graphics));
+            
+            Graphics2D g2d = (Graphics2D) graphics;
+            
+            if (zooming)
+            {    
+                double width = getWidth();
+                double height = getHeight();
+               
+    
+                double zoomWidth = width * zoom;
+                double zoomHeight = height * zoom;
+    
+                double offSetX = (zoomWidth-width);
+                double offSetY = (zoomHeight-height);
+    
+                AffineTransform at = new AffineTransform();
+                at.translate(-offSetX, -offSetY);
+                at.scale(g2d.getTransform().getScaleX()*zoom, 
+                        g2d.getTransform().getScaleY()*zoom);
+                g2d.setTransform(at);
+                
+                zooming = false;
+            }
+            renderer.paint(mol, new AWTDrawVisitor(g2d));
+        }
+        
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e)
+        {   
+            if (e.getWheelRotation() < 0) {
+                zoom *= 1.1;
+            }
+            if (e.getWheelRotation() > 0) {
+                zoom /= 1.1;
+            }
+            zooming = true;
+            repaint();
         }
 
     }
@@ -328,7 +363,8 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
     {
         twoDimView = new JPanel(new BorderLayout());
         twoDimView.add(new JLabel("Not available"));
-        this.setTopComponent(twoDimView);
+        viewPanel = new JScrollPane(twoDimView);
+        this.setTopComponent(viewPanel);
     }
 	
 //-----------------------------------------------------------------------------
@@ -508,19 +544,11 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 					apTabModel.getTableModelListeners()[0];
     	    l.setActive(var);
 		} catch (Throwable t) {
-			//t.printStackTrace();
 			System.out.println("Bad attempt to contro listener: " 
 					+ t.getMessage());
 			System.out.println(t.getCause());
 		}
     }
-
-//-----------------------------------------------------------------------------
-    
-	public void dispose() 
-	{
-	    //TODO-gg? twoDimViewe.dispose();
-	}
 
 //-----------------------------------------------------------------------------
 	   
