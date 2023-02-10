@@ -39,15 +39,24 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import org.openscience.cdk.AtomRef;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
+import org.openscience.cdk.renderer.RendererModel;
+import org.openscience.cdk.renderer.color.IAtomColorer;
 import org.openscience.cdk.renderer.font.AWTFontManager;
 import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
 import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
+import org.openscience.cdk.renderer.generators.BasicAtomGenerator.AtomColor;
+import org.openscience.cdk.renderer.generators.BasicAtomGenerator.AtomColorer;
+import org.openscience.cdk.renderer.generators.BasicAtomGenerator.ColorByType;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.templates.MoleculeFactory;
 
@@ -118,7 +127,19 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
             StructureDiagramGenerator sdg = new StructureDiagramGenerator();
             try
             {
-                sdg.setMolecule(MoleculeUtils.makeSameAs(vertex.getIAtomContainer()));
+                IAtomContainer extendedMol = MoleculeUtils.makeSameAs(
+                        vertex.getIAtomContainer());
+                int apId = 0;
+                int numAtoms = extendedMol.getAtomCount();
+                for (AttachmentPoint ap : vertex.getAttachmentPoints())
+                {
+                    extendedMol.addAtom(new PseudoAtom(""+(apId+1)));
+                    extendedMol.addBond(ap.getAtomPositionNumber(), 
+                            apId+numAtoms, IBond.Order.SINGLE);
+                    apId++;
+                }
+                
+                sdg.setMolecule(extendedMol);
                 sdg.generateCoordinates();
             } catch (Exception e)
             {
@@ -134,7 +155,7 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
                   new ArrayList<IGenerator<IAtomContainer>>();
             generators.add(new BasicSceneGenerator());
             generators.add(new BasicBondGenerator());
-            generators.add(new BasicAtomGenerator());
+            generators.add(new AtomOrAPGenerator());
             renderer = new AtomContainerRenderer(generators, new AWTFontManager());
         }
 
@@ -152,6 +173,44 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
             renderer.paint(mol, new AWTDrawVisitor((Graphics2D)graphics));
         }
 
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    class AtomOrAPGenerator extends BasicAtomGenerator
+    {
+        /**
+         * Chooses default colors from CDK2DAtomColor for all but 
+         * {@link PseudoAtom}s which we expect to be placeholder for
+         * {@link AttachmentPoint}s. Such atoms are colored .
+         */
+        @Override
+        protected Color getAtomColor(IAtom atom, RendererModel model) 
+        {
+            Color atomColor = model.get(AtomColor.class);
+            if ((Boolean) model.get(ColorByType.class)) 
+            {
+                boolean changeColor = false;
+                IAtom a = null;
+                if (atom instanceof AtomRef) 
+                {
+                    a = ((AtomRef) atom).deref();
+                    if (a instanceof PseudoAtom)
+                        changeColor = true;
+                } else if (atom instanceof PseudoAtom)
+                {
+                    changeColor = true;
+                }
+                if (changeColor)
+                {
+                    atomColor = new Color(0xFF00FF);
+                } else {
+                    atomColor = ((IAtomColorer) model.get(AtomColorer.class))
+                            .getAtomColor(atom);
+                }
+            }
+            return atomColor;
+        }
     }
 	
 //-----------------------------------------------------------------------------
