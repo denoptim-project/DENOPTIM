@@ -21,7 +21,6 @@ import java.net.BindException;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.io.DenoptimIO;
-
 import py4j.GatewayServer;
 import py4j.Py4JNetworkException;
 

@@ -1,8 +1,8 @@
 package denoptim.io;
 
 import java.util.List;
+
 import org.openscience.cdk.io.formats.IChemFormatMatcher;
-import org.openscience.cdk.io.formats.IChemFormatMatcher.MatchResult;
 import org.openscience.cdk.tools.DataFeatures;
 
 /**

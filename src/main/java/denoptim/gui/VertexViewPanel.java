@@ -42,7 +42,6 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
-import denoptim.utils.MoleculeUtils;
 
 
 /**

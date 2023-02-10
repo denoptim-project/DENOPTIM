@@ -28,7 +28,6 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.ParallelAsynchronousTaskExecutor;
-import denoptim.task.Task;
 
 
 /**
