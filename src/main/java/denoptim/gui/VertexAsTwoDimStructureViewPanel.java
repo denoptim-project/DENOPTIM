@@ -20,13 +20,18 @@ package denoptim.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +46,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.vecmath.Point2d;
 
 import org.openscience.cdk.AtomRef;
 import org.openscience.cdk.PseudoAtom;
@@ -113,13 +119,21 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
     /**
      * Panel dealing with the painting of 2D chemical representation.
      */
-    class TwoDimStructurePanel extends JPanel implements MouseWheelListener
+    class TwoDimStructurePanel extends JPanel implements MouseWheelListener, 
+    MouseListener, MouseMotionListener
     {
         IAtomContainer mol;
         AtomContainerRenderer renderer;
 
         private double zoom = 1;
-        private boolean zooming = false;
+        private boolean zoomingOrPanning = false;
+        AffineTransform initialTransform;
+        AffineTransform at;   
+        Point2D XFormedPoint;
+        double referenceX;
+        double referenceY;
+        double translateX = 0;
+        double translateY = 0;
 
         public TwoDimStructurePanel(Vertex vertex) 
         {
@@ -157,6 +171,8 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
             renderer = new AtomContainerRenderer(generators, new AWTFontManager());
             
             addMouseWheelListener(this);
+            addMouseListener(this);
+            addMouseMotionListener(this);
         }
 
         public void paint(Graphics graphics) 
@@ -171,28 +187,27 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
             graphics.fillRect(0, 0, getWidth(), getHeight());
             
             Graphics2D g2d = (Graphics2D) graphics;
-            
-            if (zooming)
-            {    
-                double width = getWidth();
-                double height = getHeight();
-               
+
+            AffineTransform saveTransform = g2d.getTransform();
+            at = new AffineTransform(saveTransform);
+            if (zoomingOrPanning)
+            {
+                at.translate(getWidth()/2, getHeight()/2);
+                at.scale(zoom,zoom);
+                at.translate(-getWidth()/2, -getHeight()/2);
+                at.translate(translateX, translateY);
     
-                double zoomWidth = width * zoom;
-                double zoomHeight = height * zoom;
-    
-                double offSetX = (zoomWidth-width);
-                double offSetY = (zoomHeight-height);
-    
-                AffineTransform at = new AffineTransform();
-                at.translate(-offSetX, -offSetY);
-                at.scale(g2d.getTransform().getScaleX()*zoom, 
-                        g2d.getTransform().getScaleY()*zoom);
                 g2d.setTransform(at);
-                
-                zooming = false;
             }
+                
             renderer.paint(mol, new AWTDrawVisitor(g2d));
+                
+            if (zoomingOrPanning)
+            {
+                // Is this needed? yes!
+                g2d.setTransform(saveTransform);
+                zoomingOrPanning = false;
+            }
         }
         
         @Override
@@ -204,10 +219,62 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
             if (e.getWheelRotation() > 0) {
                 zoom /= 1.1;
             }
-            zooming = true;
+            zoomingOrPanning = true;
             repaint();
         }
 
+        @Override
+        public void mousePressed(MouseEvent e)
+        {
+            // first transform the mouse point to the pan and zoom
+            // coordinates
+            try {
+                XFormedPoint = at.inverseTransform(e.getPoint(), null);
+            }
+            catch (Exception te) {
+                te.printStackTrace();
+            }
+
+            // save the transformed starting point and the initial
+            // transform
+            referenceX = XFormedPoint.getX();
+            referenceY = XFormedPoint.getY();
+            initialTransform = at;
+        }
+        
+        @Override
+        public void mouseDragged(MouseEvent e)
+        {
+            try {
+                XFormedPoint = initialTransform.inverseTransform(e.getPoint(), 
+                        null);
+            }
+            catch (Exception te) {
+                te.printStackTrace();
+            }
+            double deltaX = XFormedPoint.getX() - referenceX;
+            double deltaY = XFormedPoint.getY() - referenceY; 
+            referenceX = XFormedPoint.getX();
+            referenceY = XFormedPoint.getY();
+            
+            translateX += deltaX;
+            translateY += deltaY;
+     
+            // schedule a repaint.
+            zoomingOrPanning = true;
+            repaint();
+        }
+        
+        @Override
+        public void mouseClicked(MouseEvent e) {}
+        @Override
+        public void mouseReleased(MouseEvent e) {}
+        @Override
+        public void mouseEntered(MouseEvent e) {}
+        @Override
+        public void mouseExited(MouseEvent e) {}
+        @Override
+        public void mouseMoved(MouseEvent e) {}
     }
     
 //-----------------------------------------------------------------------------
