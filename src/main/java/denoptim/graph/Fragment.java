@@ -44,6 +44,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
 import denoptim.json.DENOPTIMgson;
+import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
 import denoptim.utils.Randomizer;
@@ -162,8 +163,7 @@ public class Fragment extends Vertex
 
 //------------------------------------------------------------------------------
 
-    public Fragment(int vertexId, IAtomContainer mol, BBType bbt,
-                            boolean isRCV)
+    public Fragment(int vertexId, IAtomContainer mol, BBType bbt, boolean isRCV)
             throws DENOPTIMException {
         this(vertexId, mol, bbt);
         this.setAsRCV(isRCV);
@@ -183,6 +183,42 @@ public class Fragment extends Vertex
             throws DENOPTIMException
     {    	
     	this(-1,mol,bbt);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks if atoms and APs contained in this fragment have non-zero 3D 
+     * coordinates.
+     */
+    public boolean is3D()
+    {
+        double maxDist = 0.0;
+        Point3d origin = new Point3d(0,0,0);
+        for (IAtom atm : atoms())
+        {
+            Point3d p = atm.getPoint3d();
+            if (p==null)
+                return false;
+            double dist = MathUtils.distance(origin, p);
+            if (dist > maxDist)
+            {
+                maxDist = dist;
+            }
+        }
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            Point3d p = ap.getDirectionVector();
+            if (p==null)
+                return false;
+            double dist = MathUtils.distance(origin, p);
+            if (dist > maxDist)
+            {
+                maxDist = dist;
+            }
+        }
+        
+        return maxDist > 0.001;
     }
     
 //------------------------------------------------------------------------------

@@ -51,7 +51,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 

@@ -36,7 +36,6 @@ import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
-import denoptim.programs.RunTimeParameters.ParametersType;
 
 
 /**
