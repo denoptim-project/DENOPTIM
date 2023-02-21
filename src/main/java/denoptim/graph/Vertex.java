@@ -501,6 +501,18 @@ public abstract class Vertex implements Cloneable
         }
         return false;
     }
+    
+//------------------------------------------------------------------------------
+    
+    protected int getUniqueAPIndex()
+    {
+        if (owner == null)
+        {
+            return getNumberOfAPs();
+        } else {
+            return owner.getUniqueAPIndex();
+        }
+    }
 
 //------------------------------------------------------------------------------
 

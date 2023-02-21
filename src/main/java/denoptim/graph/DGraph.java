@@ -160,6 +160,11 @@ public class DGraph implements Cloneable
      * Identifier for the format of string representations of a graph
      */
     public enum StringFormat {JSON, GRAPHENC}
+    
+    /**
+     * Generator of unique AP identifiers within this graph
+     */
+    private AtomicInteger apCounter = new AtomicInteger(1);
 
 
 //------------------------------------------------------------------------------
@@ -3784,6 +3789,13 @@ public class DGraph implements Cloneable
         }
         return ap;
     }
+    
+//------------------------------------------------------------------------------
+    
+    protected int getUniqueAPIndex()
+    {
+        return apCounter.getAndIncrement();
+    }
 
 //------------------------------------------------------------------------------
 
@@ -6287,66 +6299,23 @@ public class DGraph implements Cloneable
      * Produces a string that represents this graph and that adheres to the
      * JSON format.
      * @return the JSON format as a single string
-     * @throws DENOPTIMException if the graph contains non-unique vertex IDs or
-     * AP IDs. Uniqueness of identifiers is required to restore references upon
-     * deserialization.
      */
 
-    public String toJson() throws DENOPTIMException
+    public String toJson()
     {
-        //TODO: vertexID uniqueness should be guaranteed by the addVertex method
-        // Therefore, this check should not be needed. Consider removal.
-        //TODO: then the addVertex method should ensure also AP ID uniqueness.
-        
-        // Check for uniqueness of vertexIDs and APIDs within the
-        // graph (ignore nested graphs).
-        boolean regenerateVrtxID = false;
-        boolean regenerateAP = false;
-        Set<Integer> unqVrtxIDs = new HashSet<Integer>();
-        Set<Integer> unqApIDs = new HashSet<Integer>();
-        for (Vertex v : gVertices)
-        {
-            if (!unqVrtxIDs.add(v.getVertexId()))
-            {
-                regenerateVrtxID = true;
-                /*
-                throw new DENOPTIMException("Duplicate vertex ID '"
-                        + v.getVertexId()
-                        + "'. Cannot generate JSON string for graph: " + this);
-                        */
-            }
-            for (AttachmentPoint ap : v.getAttachmentPoints())
-            {
-                if (!unqApIDs.add(ap.getID()))
-                {
-                    regenerateAP = true;
-                    break;
-                    /*
-                    throw new DENOPTIMException("Duplicate attachment point ID "
-                            + "'" + ap.getID() + "'. "
-                            + "Cannot generate JSON string for graph: " + this);
-                            */
-                }
-            }
-        }
-        if (regenerateVrtxID)
-        {
-            this.renumberGraphVertices();
-        }
-        if (regenerateAP)
-        {
-            for (Vertex v : gVertices)
-            {
-                for (AttachmentPoint ap : v.getAttachmentPoints())
-                {
-                    ap.setID(GraphUtils.getUniqueAPIndex());
-                }
-            }
-        }
-
         Gson gson = DENOPTIMgson.getWriter();
         String jsonOutput = gson.toJson(this);
         return jsonOutput;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    protected void ensureUniqueApIDs()
+    {
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            ap.setID(apCounter.getAndIncrement());
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -6382,14 +6351,51 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * We expect unique IDs for vertices and attachment points.
+     * We expect unique IDs for vertices
      */
     public static class DENOPTIMGraphSerializer
     implements JsonSerializer<DGraph>
     {
         @Override
         public JsonElement serialize(DGraph g, Type typeOfSrc,
-                JsonSerializationContext context) {
+                JsonSerializationContext context) 
+        {
+            boolean regenerateVrtxID = false;
+            boolean regenerateAP = false;
+            Set<Integer> unqVrtxIDs = new HashSet<Integer>();
+            Set<Integer> unqApIDs = new HashSet<Integer>();
+            for (Vertex v : g.getVertexList())
+            {
+                if (!unqVrtxIDs.add(v.getVertexId()))
+                {
+                    regenerateVrtxID = true;
+                }
+                for (AttachmentPoint ap : v.getAttachmentPoints())
+                {
+                    if (!unqApIDs.add(ap.getID()))
+                    {
+                        regenerateAP = true;
+                        break;
+                    }
+                }
+            }
+            if (regenerateVrtxID)
+            {
+                try
+                {
+                    g.renumberGraphVertices();
+                } catch (DENOPTIMException e)
+                {
+                    // TODO-gg remove once sync between vertex IDs and symmetric 
+                    // map is guaranteed by avoiding IDs in symmetri map.
+                    e.printStackTrace();
+                }
+            }
+            if (regenerateAP)
+            {
+                g.ensureUniqueApIDs();
+            }
+            
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("graphId", g.graphId);
             jsonObject.add("gVertices", context.serialize(g.gVertices));
@@ -6400,8 +6406,7 @@ public class DGraph implements Cloneable
         }
     }
 
-
-    //------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public static class DENOPTIMGraphDeserializer
     implements JsonDeserializer<DGraph>

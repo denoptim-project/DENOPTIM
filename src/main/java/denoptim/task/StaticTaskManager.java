@@ -271,7 +271,6 @@ public class StaticTaskManager
     	addTodoTask();
     	Future<?> future = tpe.submit(task);
     	subToFutureMap.put(task,future);
-    	//TODO-gg: check how we can remove terminated tasks from the map
     }
     
 //------------------------------------------------------------------------------

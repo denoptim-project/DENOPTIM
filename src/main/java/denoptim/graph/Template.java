@@ -1020,7 +1020,12 @@ public class Template extends Vertex
      */
     
     public String toJson()
-    {    
+    {
+        // To serialize mapping of APs (i.e., innerToOuterAPs) we must ensure 
+        // the uniqueness of AP's IDs in the inner graph
+        if (innerGraph!=null)
+            innerGraph.ensureUniqueApIDs();
+        
         Gson gson = DENOPTIMgson.getWriter();
         String jsonOutput = gson.toJson(this);
         return jsonOutput;

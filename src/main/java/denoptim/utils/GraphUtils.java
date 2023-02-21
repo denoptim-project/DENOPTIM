@@ -37,7 +37,6 @@ import denoptim.graph.Vertex;
  */
 public class GraphUtils
 {
-    private static AtomicInteger apCounter = new AtomicInteger(1);
     public static AtomicInteger vertexCounter = new AtomicInteger(1);
     private static AtomicInteger graphCounter = new AtomicInteger(1);
     private static AtomicInteger molCounter = new AtomicInteger(1);
@@ -187,50 +186,6 @@ public class GraphUtils
                     + "Molecule identifier. Please contact the authors to "
                     + "request use of 'long' IDs.");
         return molCounter.getAndIncrement();
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Reset the unique attachment point counter to the given value.
-     *  In order to keep the
-     * uniqueness on the index, this method accepts only reset values
-     * that are higher that the current one. Attempts to reset to lower values 
-     * return an exception.
-     * @param val the new value for the counter. This value will be given to
-     * next call of the getUniqueAPIndex method.
-     * @throws DENOPTIMException if the reset value is lower than the current
-     * value of the index.
-     */
-
-    public static synchronized void resetUniqueAPCounter(int val)
-            throws DENOPTIMException
-    {
-        if (apCounter.get() >= val)
-        {
-            String msg = "Attempt to reset the unique vertex ID using "
-                         + val + " while the current value is "
-                         + apCounter.get();
-            throw new DENOPTIMException(msg);
-        }
-        apCounter = new AtomicInteger(val);
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Unique counter for the number of molecules generated.
-     * @return the new molecule id (number)
-     * @throws DENOPTIMException 
-     */
-
-    public static synchronized int getUniqueAPIndex()
-    {
-        if (apCounter.get() >= Integer.MAX_VALUE-10)
-            throw new Error("Reached maximum value for "
-                    + "AP identifier. Please contact the authors to "
-                    + "request use of 'long' IDs.");
-        return apCounter.getAndIncrement();
     }
   
 //------------------------------------------------------------------------------

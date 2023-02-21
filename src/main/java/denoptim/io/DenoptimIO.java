@@ -2069,7 +2069,7 @@ public class DenoptimIO
     {
         ArrayList<DGraph> graphs = new ArrayList<DGraph>();
         graphs.add(graph);
-        writeGraphsToJSON(file,graphs);
+        writeGraphsToJSON(file, graphs);
     }
     
 //------------------------------------------------------------------------------

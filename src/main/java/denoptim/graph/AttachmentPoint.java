@@ -99,17 +99,9 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * Constructor for undefined DENOPTIMAttachmentPoint
      * @param owner the vertex that holds the attachment point under creation.
      */
-    
-    //TODO: since APs can be on any vertex, and vertices are not required to
-    // contain atoms, the information of which atom is an AP rooted should be
-    // stored and managed by the implementation of vertex that do contain atoms.
-    // The DENOPTIMFragment should thus be charged with keeping the reference to
-    // the atom that holds the AP.
-    
     public AttachmentPoint(Vertex owner) 
     {
-        this.owner = owner;
-        id = GraphUtils.getUniqueAPIndex();
+        this(owner, -1, null, null);
     }
 
 //------------------------------------------------------------------------------
@@ -121,8 +113,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      */
     public AttachmentPoint(Vertex owner, int atomPositionNumber) 
     {
-        this(owner);
-        this.atomPositionNumber = atomPositionNumber;
+        this(owner, atomPositionNumber, null, null);
     }
     
 //------------------------------------------------------------------------------
@@ -134,14 +125,10 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * @param dirVec the AP direction vector end (the beginning are the
      * coords of the source atom). This array must have 3 entries.
      */
-    private AttachmentPoint(Vertex owner, int atomPositionNumber,
+    private AttachmentPoint(Vertex owner, int atomPositionNumber, 
             Point3d dirVec) 
     {
-        this(owner, atomPositionNumber);
-        if (dirVec != null)
-        {
-            this.dirVec = new Point3d(dirVec.x, dirVec.y, dirVec.z);
-        }
+        this(owner, atomPositionNumber, dirVec, null);
     }
 
 //------------------------------------------------------------------------------
@@ -152,11 +139,19 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * @param atomPosNum the index of the source atom (0-based)
      * @param apClass the APClass
      */
-    public AttachmentPoint(Vertex owner, int atomPosNum,
-                                   APClass apClass) {
+    
+
+    //TODO: since APs can be on any vertex, and vertices are not required to
+    // contain atoms, the information of which atom is an AP rooted should be
+    // stored and managed by the implementation of vertex that do contain atoms.
+    // The DENOPTIMFragment should thus be charged with keeping the reference to
+    // the atom that holds the AP.
+    
+    
+    public AttachmentPoint(Vertex owner, int atomPosNum, APClass apClass) 
+    {
         this(owner, atomPosNum, null, apClass);
     }
-
     
 //------------------------------------------------------------------------------
     
@@ -168,11 +163,24 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * coordinates of the source atom). This must array have 3 entries.
      * @param apClass the APClass
      */
-    public AttachmentPoint(Vertex owner, int atomPosNum, 
-            Point3d dirVec, APClass apClass) 
+    
+    //TODO: since APs can be on any vertex, and vertices are not required to
+    // contain atoms, the information of which atom is an AP rooted should be
+    // stored and managed by the implementation of vertex that do contain atoms.
+    // The DENOPTIMFragment should thus be charged with keeping the reference to
+    // the atom that holds the AP.
+    
+    public AttachmentPoint(Vertex owner, int atomPosNum, Point3d dirVec, 
+            APClass apClass) 
     {
-        this(owner, atomPosNum, dirVec);
+        this.owner = owner;
+        id = owner.getUniqueAPIndex();
+        this.atomPositionNumber = atomPosNum;
         this.apClass = apClass;
+        if (dirVec != null)
+        {
+            this.dirVec = new Point3d(dirVec.x, dirVec.y, dirVec.z);
+        }
     }
     
 //------------------------------------------------------------------------------

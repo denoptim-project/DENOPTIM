@@ -282,7 +282,7 @@ public class EmptyVertex extends Vertex
 //------------------------------------------------------------------------------
 
     /**
-     * Adds an attachment point with a no {@link APClass} or other attribute.
+     * Adds an attachment point with no {@link APClass} or other attribute.
      * This is used only for testing purposes.
      */
     public void addAP() {

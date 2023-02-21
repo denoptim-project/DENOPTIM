@@ -57,6 +57,7 @@ import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.PathSubGraph;
+import denoptim.io.DenoptimIO;
 import denoptim.utils.MutationType;
 
 

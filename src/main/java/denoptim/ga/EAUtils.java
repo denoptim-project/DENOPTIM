@@ -277,7 +277,7 @@ public class EAUtils
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
      * @param choiceOfOffstring index dictating which among the available two
-     * offspring (at most two, for now) if returned as result. 
+     * offspring (at most two, for now) is returned as result. 
      * This avoids randomized 
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
