@@ -54,6 +54,7 @@ import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
+import denoptim.graph.SymmetricAPs;
 import denoptim.graph.SymmetricSet;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
@@ -286,9 +287,9 @@ public class FragmentSpaceTest
         Map<APClass,Integer> expectedCount = new HashMap<APClass,Integer>();
         expectedCount.put(APC4, 2);
         expectedCount.put(APC5, 3);
-        for (SymmetricSet ss : v.getSymmetricAPSets())
+        for (SymmetricAPs ss : v.getSymmetricAPSets())
         {
-            APClass apc = v.getAP(ss.get(0)).getAPClass();
+            APClass apc = ss.get(0).getAPClass();
             assertEquals(expectedCount.get(apc),ss.size(), 
                     "Number of APs in symmetric set for APClass "+apc);
         }

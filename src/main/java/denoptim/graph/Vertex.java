@@ -246,7 +246,7 @@ public abstract class Vertex implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public abstract ArrayList<AttachmentPoint> getAttachmentPoints();
+    public abstract List<AttachmentPoint> getAttachmentPoints();
 
 //------------------------------------------------------------------------------
     
@@ -308,11 +308,15 @@ public abstract class Vertex implements Cloneable
     
 //------------------------------------------------------------------------------
 
-    protected abstract void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs);
+    protected abstract void setSymmetricAPSets(List<SymmetricAPs> sAPs);
+    
+//------------------------------------------------------------------------------
+
+    protected abstract void addSymmetricAPSet(SymmetricAPs symAPs);
 
 //------------------------------------------------------------------------------
 
-    public abstract ArrayList<SymmetricSet> getSymmetricAPSets();
+    public abstract List<SymmetricAPs> getSymmetricAPSets();
 
 //------------------------------------------------------------------------------
 
@@ -325,15 +329,16 @@ public abstract class Vertex implements Cloneable
      * <code>apIdx</code> or <code>null</code> if no partners present
      */
 
-    public SymmetricSet getSymmetricAPs(int apIdx)
+    public SymmetricAPs getSymmetricAPs(AttachmentPoint ap)
     {
-        for (SymmetricSet symmetricSet : getSymmetricAPSets()) 
+        for (SymmetricAPs symmetricSet : getSymmetricAPSets()) 
         {
-            if (symmetricSet.contains(apIdx))
+            if (symmetricSet.contains(ap))
             {
                 return symmetricSet;
             }
         }
+        //TODO-gg should return empty set
         return null;
     }
 
@@ -936,6 +941,23 @@ public abstract class Vertex implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
+     * Get attachment point that has the given identifier, or null.
+     * @param i the identifier of the attachment point to fetch.
+     * @return the attachment point with the given ID, or null
+     */
+    public AttachmentPoint getAPWithId(int i) 
+    {
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            if (ap.getID()==i)
+                return ap;
+        }
+        return null;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Returns the position of the given AP in the list of APs of this vertex
      * @param ap the AP to find in the list of APs
      * @return the index (0-n) of <code>ap</code> or -1 if that AP does not 
@@ -1240,27 +1262,25 @@ public abstract class Vertex implements Cloneable
             // Deseralization differs for the types of vertices
             VertexType vt = context.deserialize(jsonObject.get("vertexType"),
                     VertexType.class);
+            Vertex v = null;
             switch (vt)
             {
                 case Template:
                 {
-                    Template t = Template.fromJson(
-                            jsonObject.toString());
-                    return t;
+                    v = Template.fromJson(jsonObject.toString());
+                    break;
                 }
                 
                 case MolecularFragment:
                 {
-                    Fragment f = Fragment.fromJson(
-                            jsonObject.toString());
-                    return f;
+                    v = Fragment.fromJson(jsonObject.toString());
+                    break;
                 }
                 
                 case EmptyVertex:
                 {
-                    EmptyVertex ev = EmptyVertex.fromJson(
-                            jsonObject.toString());
-                    return ev;
+                    v = EmptyVertex.fromJson(jsonObject.toString());
+                    break;
                 }
                 
                 default:
@@ -1268,6 +1288,22 @@ public abstract class Vertex implements Cloneable
                     return null;
                 }
             }
+            
+            if (jsonObject.has("lstSymAPs"))
+            {
+                for (JsonElement elSet : jsonObject.get("lstSymAPs").getAsJsonArray())
+                {
+                    List<AttachmentPoint> aps = new ArrayList<AttachmentPoint>();
+                    for (JsonElement elId : elSet.getAsJsonArray())
+                    {
+                        int id = context.deserialize(elId, Integer.class);
+                        aps.add(v.getAPWithId(id));
+                    }
+                    v.addSymmetricAPSet(new SymmetricAPs(aps));
+                }                
+            }
+            
+            return v;
         }
     }
 
@@ -1342,7 +1378,7 @@ public abstract class Vertex implements Cloneable
         {
             Object json = mol.getProperty(DENOPTIMConstants.VERTEXJSONTAG);
             if (json != null) {
-                v = reader.fromJson(json.toString(),Vertex.class);
+                v = reader.fromJson(json.toString(), Vertex.class);
             } else {
                 json = mol.getProperty(DENOPTIMConstants.GRAPHJSONTAG);
                 if (json != null)

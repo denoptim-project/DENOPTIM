@@ -70,6 +70,37 @@ public class VertexTest
         Vertex t2 = Vertex.fromJson(tStr);
         assertTrue(t2 instanceof Template);
     }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFromToJSON_withSymmetricAPs() throws Exception 
+    {   
+        EmptyVertex ev = new EmptyVertex();
+        ev.addAP(APClass.make("TT:1"));
+        ev.addAP(APClass.make("TT:0"));
+        ev.addAP(APClass.make("TT:0"));
+        ev.addAP(APClass.make("TT:1"));
+        ev.addAP(APClass.make("TT:2"));
+        SymmetricAPs ss1 = new SymmetricAPs();
+        ss1.add(ev.getAP(0));
+        ss1.add(ev.getAP(3));
+        SymmetricAPs ss2 = new SymmetricAPs();
+        ss2.add(ev.getAP(2));
+        ss2.add(ev.getAP(1));
+        ev.addSymmetricAPSet(ss1);
+        ev.addSymmetricAPSet(ss2);
+        String evStr = ev.toJson();
+        Vertex ev2 = Vertex.fromJson(evStr);
+        assertTrue(ev2 instanceof EmptyVertex);
+        assertEquals(2, ev2.getSymmetricAPSets().size());
+        SymmetricAPs rebuilt1 = ev2.getSymmetricAPSets().get(0);
+        SymmetricAPs rebuilt2 = ev2.getSymmetricAPSets().get(1);
+        assertTrue(rebuilt1.contains(ev2.getAP(3)));
+        assertTrue(rebuilt1.contains(ev2.getAP(0)));
+        assertTrue(rebuilt2.contains(ev2.getAP(1)));
+        assertTrue(rebuilt2.contains(ev2.getAP(2)));
+    }
 	
 //------------------------------------------------------------------------------
 	

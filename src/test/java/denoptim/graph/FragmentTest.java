@@ -143,10 +143,14 @@ public class FragmentTest
         assertEquals(3,frg2.getAPCountOnAtom(2),"#APs in frg2 atm2");
         assertEquals(2,frg1.getSymmetricAPSets().size(),"#SymmAPSets in frg1");
         assertEquals(2,frg2.getSymmetricAPSets().size(),"#SymmAPSets in frg2");
-        assertTrue(frg1.getSymmetricAPs(0).contains(4),"SymmSet [0,4] in frg1");
-        assertTrue(frg2.getSymmetricAPs(0).contains(4),"SymmSet [0,4] in frg2");
-        assertTrue(frg1.getSymmetricAPs(1).contains(5),"SymmSet [1,5] in frg1");
-        assertTrue(frg2.getSymmetricAPs(1).contains(5),"SymmSet [1,5] in frg2");
+        assertTrue(frg1.getSymmetricAPs(frg1.getAP(0)).contains(frg1.getAP(4)),
+                "SymmSet [0,4] in frg1");
+        assertTrue(frg2.getSymmetricAPs(frg2.getAP(0)).contains(frg2.getAP(4)),
+                "SymmSet [0,4] in frg2");
+        assertTrue(frg1.getSymmetricAPs(frg1.getAP(1)).contains(frg1.getAP(5)),
+                "SymmSet [1,5] in frg1");
+        assertTrue(frg2.getSymmetricAPs(frg2.getAP(1)).contains(frg2.getAP(5)),
+                "SymmSet [1,5] in frg2");
     }
     
 //------------------------------------------------------------------------------
@@ -171,9 +175,12 @@ public class FragmentTest
         v.addAPOnAtom(a1, APClass.make(APCLASS),
                 new Point3d(new double[]{3.0, 0.0, 3.3}));
         
-        ArrayList<SymmetricSet> ssaps = new ArrayList<SymmetricSet>();
-        ssaps.add(new SymmetricSet(new ArrayList<Integer>(
-                Arrays.asList(0,1,2)))); 
+        ArrayList<SymmetricAPs> ssaps = new ArrayList<SymmetricAPs>();
+        SymmetricAPs ss = new SymmetricAPs();
+        ss.add(v.getAP(0));
+        ss.add(v.getAP(1));
+        ss.add(v.getAP(2));
+        ssaps.add(ss); 
         //NB: customised symmetry set that does not correspond to the
         // definition of symmetry as perceived automatically by
         // DENOPTIMFragment.identifySymmetryRelatedAPSets

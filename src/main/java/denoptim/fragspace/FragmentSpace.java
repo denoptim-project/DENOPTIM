@@ -1779,8 +1779,7 @@ public class FragmentSpace
             getMapAPClassesPerFragment().put(fragId,lstAPC);
             
     	    // Classify according to AP-Classes
-            ArrayList<AttachmentPoint> lstAPs = 
-                    frg.getAttachmentPoints();
+            List<AttachmentPoint> lstAPs = frg.getAttachmentPoints();
             
     	    for (int j=0; j<lstAPs.size(); j++)
     	    {

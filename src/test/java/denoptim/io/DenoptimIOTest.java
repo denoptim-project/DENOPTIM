@@ -62,6 +62,7 @@ import denoptim.graph.Fragment;
 import denoptim.graph.FragmentTest;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricSet;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.TemplateTest;
 import denoptim.graph.Vertex;
@@ -390,13 +391,19 @@ public class DenoptimIOTest
 		graph.addRing(new Ring(new ArrayList<>(
 				Arrays.asList(v6, v0, v4, v7))));
 
-		graph.addSymmetricSetOfVertices(new SymmetricSet(
-				new ArrayList<>(Arrays.asList(3, 5))));
+		SymmetricVertexes ss1 = new SymmetricVertexes();
+		ss1.add(v3);
+		ss1.add(v5);
+		graph.addSymmetricSetOfVertices(ss1);
 
-		graph.addSymmetricSetOfVertices(new SymmetricSet(
-				new ArrayList<>(Arrays.asList(6, 7))));
+        SymmetricVertexes ss2 = new SymmetricVertexes();
+        ss2.add(v6);
+        ss2.add(v7);
+		graph.addSymmetricSetOfVertices(ss2);
         
-		DenoptimIO.writeData(jsonFile, graph.toJson(), false);
+		String json = graph.toJson();
+		
+		DenoptimIO.writeData(jsonFile, json, false);
 		DGraph graphJ = DenoptimIO.readDENOPTIMGraphsFromJSONFile(
 		        jsonFile).get(0);
 		assertNotNull(graphJ,"Graph read from JSON file is null");

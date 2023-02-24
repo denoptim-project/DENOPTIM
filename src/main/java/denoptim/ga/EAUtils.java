@@ -1890,12 +1890,12 @@ public class EAUtils
     protected static boolean foundForbiddenEnd(DGraph molGraph,
             FragmentSpaceParameters fsParams)
     {
-        ArrayList<Vertex> vertices = molGraph.getVertexList();
+        List<Vertex> vertices = molGraph.getVertexList();
         Set<APClass> classOfForbEnds = fsParams.getFragmentSpace()
                 .getForbiddenEndList();
         for (Vertex vtx : vertices)
         {
-            ArrayList<AttachmentPoint> daps = vtx.getAttachmentPoints();
+            List<AttachmentPoint> daps = vtx.getAttachmentPoints();
             for (AttachmentPoint dp : daps)
             {
                 if (dp.isAvailable())

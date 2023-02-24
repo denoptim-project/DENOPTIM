@@ -46,13 +46,13 @@ public class EmptyVertex extends Vertex
     /**
      * Attachment points on this vertex
      */
-    private ArrayList<AttachmentPoint> lstAPs;
+    private List<AttachmentPoint> lstAPs;
 
     /**
      * List of AP sets that are related to each other, so that we
      * call them "symmetric" (though symmetry is a fuzzy concept here).
      */
-    private ArrayList<SymmetricSet> lstSymAPs;
+    private List<SymmetricAPs> lstSymAPs;
 
 //------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ public class EmptyVertex extends Vertex
     {
         super(VertexType.EmptyVertex, GraphUtils.getUniqueVertexIndex());
         lstAPs = new ArrayList<AttachmentPoint>();
-        lstSymAPs = new ArrayList<SymmetricSet>();
+        lstSymAPs = new ArrayList<SymmetricAPs>();
     }
 
 //------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ public class EmptyVertex extends Vertex
       {
           super(VertexType.EmptyVertex);
           lstAPs = new ArrayList<AttachmentPoint>();
-          lstSymAPs = new ArrayList<SymmetricSet>();
+          lstSymAPs = new ArrayList<SymmetricAPs>();
           buildingBlockType = type;
       }
     
@@ -96,7 +96,7 @@ public class EmptyVertex extends Vertex
     {
         super(VertexType.EmptyVertex, id);
         lstAPs = new ArrayList<AttachmentPoint>();
-        lstSymAPs = new ArrayList<SymmetricSet>();
+        lstSymAPs = new ArrayList<SymmetricAPs>();
     }
 
 //------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ public class EmptyVertex extends Vertex
      * ring-closing vertex.
      */
     public EmptyVertex(int id, ArrayList<AttachmentPoint> lstAPs,
-            ArrayList<SymmetricSet> lstSymAPs, boolean isRCV)
+            ArrayList<SymmetricAPs> lstSymAPs, boolean isRCV)
     {
         super(VertexType.EmptyVertex, id);
         this.lstAPs = lstAPs;
@@ -121,21 +121,21 @@ public class EmptyVertex extends Vertex
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<AttachmentPoint> getAttachmentPoints()
+    public List<AttachmentPoint> getAttachmentPoints()
     {
         return lstAPs;
     }
 
 //------------------------------------------------------------------------------
 
-    public void setSymmetricAP(ArrayList<SymmetricSet> sAPs)
+    public void setSymmetricAP(List<SymmetricAPs> sAPs)
     {
         lstSymAPs = sAPs;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<SymmetricSet> getSymmetricAP()
+    public List<SymmetricAPs> getSymmetricAP()
     {
         return lstSymAPs;
     }
@@ -145,18 +145,18 @@ public class EmptyVertex extends Vertex
     /**
      * For the given attachment point index locate the symmetric partners
      * i.e. those with similar environments and class types.
-     * @param apIdx index of the attachment point which we want to get
+     * @param ap index of the attachment point which we want to get
      * the symmetrically related partners of.
      * @return the list of attachment point IDs, which include
      * <code>apIdx</code> or <code>null</code> if no partners present
      */
 
     @Override
-    public SymmetricSet getSymmetricAPs(int apIdx)
+    public SymmetricAPs getSymmetricAPs(AttachmentPoint ap)
     {
-        for (SymmetricSet symmetricSet : lstSymAPs)
+        for (SymmetricAPs symmetricSet : lstSymAPs)
         {
-            if (symmetricSet.contains(apIdx))
+            if (symmetricSet.contains(ap))
             {
                 return symmetricSet;
             }
@@ -267,11 +267,17 @@ public class EmptyVertex extends Vertex
             c.addAP(ap.getAPClass());
         }
 
-        ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
-        for (SymmetricSet ss : lstSymAPs)
+        List<SymmetricAPs> cLstSymAPs = new ArrayList<SymmetricAPs>();
+        for (SymmetricAPs symAPs : lstSymAPs)
         {
-            cLstSymAPs.add(ss.clone());
+            SymmetricAPs cSymAPs = new SymmetricAPs();
+            for (AttachmentPoint ap : symAPs)
+            {
+                cSymAPs.add(c.getAP(ap.getIndexInOwner()));
+            }
+            cLstSymAPs.add(cSymAPs);
         }
+        
         c.setSymmetricAPSets(cLstSymAPs);
         c.setProperties(this.copyStringBasedProperties());
         if (uniquefyingPropertyKeys!=null)
@@ -438,15 +444,27 @@ public class EmptyVertex extends Vertex
 //-----------------------------------------------------------------------------
 
     @Override
-    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
+    protected void setSymmetricAPSets(List<SymmetricAPs> sAPs)
     {
         this.lstSymAPs = sAPs;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    @Override
+    protected void addSymmetricAPSet(SymmetricAPs symAPs)
+    {
+        if (this.lstSymAPs==null)
+        {
+            this.lstSymAPs = new ArrayList<SymmetricAPs>();
+        }
+        this.lstSymAPs.add(symAPs);
     }
 
 //-----------------------------------------------------------------------------
 
     @Override
-    public ArrayList<SymmetricSet> getSymmetricAPSets()
+    public List<SymmetricAPs> getSymmetricAPSets()
     {
         return lstSymAPs;
     }
