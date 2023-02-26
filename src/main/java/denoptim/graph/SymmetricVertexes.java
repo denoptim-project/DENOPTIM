@@ -34,6 +34,22 @@ public class SymmetricVertexes extends SymmetricSet<Vertex>
   
 //------------------------------------------------------------------------------
 
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SymmetricVertexes [");
+        for (int i=0; i<this.size(); i++)
+        {
+            sb.append(this.get(i).getVertexId());
+            if (i<(this.size()-1))
+                sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    
+//------------------------------------------------------------------------------
+
     public static class SymmetricVertexesSerializer
     implements JsonSerializer<SymmetricVertexes>
     {

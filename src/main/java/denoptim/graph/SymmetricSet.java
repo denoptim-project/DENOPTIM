@@ -86,14 +86,4 @@ public class SymmetricSet<T> extends ArrayList<T> implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public String toString()
-    {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("SymmetricSet [symIds=");
-    	sb.append(this.toString()).append("]");
-    	return sb.toString();
-    }
-
-//------------------------------------------------------------------------------
-
 }

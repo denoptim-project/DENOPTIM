@@ -35,6 +35,22 @@ public class SymmetricAPs extends SymmetricSet<AttachmentPoint>
     
 //------------------------------------------------------------------------------
 
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SymmetricAPs [");
+        for (int i=0; i<this.size(); i++)
+        {
+            sb.append(this.get(i).getID());
+            if (i<(this.size()-1))
+                sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    
+//------------------------------------------------------------------------------
+
     public static class SymmetricAPsSerializer
     implements JsonSerializer<SymmetricAPs>
     {

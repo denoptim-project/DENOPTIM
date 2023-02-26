@@ -714,7 +714,7 @@ public class CombinatorialExplorerByLayer
                     }
 
                     FragsCombination fragsToAdd = fcf.next();
-
+                    
                     GraphBuildingTask task = new GraphBuildingTask(
                             settings,
                     		rootGraph, fragsToAdd, level,

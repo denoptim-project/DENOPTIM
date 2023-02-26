@@ -6347,10 +6347,6 @@ public class DGraph implements Cloneable
             JsonObject partialJsonObj = new JsonObject();
             partialJsonObj.add("graphId", jsonObject.get("graphId"));
             partialJsonObj.add("gVertices", jsonObject.get("gVertices"));
-            // Eventually, also the sym sets will become references... so
-            // also for symVertices we'll have to go through the list and
-            // rebuild the references.
-            partialJsonObj.add("symVertices", jsonObject.get("symVertices"));
 
             Gson gson = new GsonBuilder()
                 .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())

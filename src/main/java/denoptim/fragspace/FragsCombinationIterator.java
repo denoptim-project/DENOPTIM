@@ -134,7 +134,6 @@ public class FragsCombinationIterator
         for (Vertex v : this.rootGraph.getVertexList())
         {
             int vIdx = v.getVertexId();
-
             int vMolId = v.getBuildingBlockId();
             Vertex.BBType vMolTyp = v.getBuildingBlockType();
            
@@ -174,7 +173,8 @@ public class FragsCombinationIterator
                 if (!ap.isAvailable())
                     continue;
                 
-                int apIdx = v.getIndexOfAP(ap);
+                // NB: index not ID!!!
+                int apIdx = v.getIndexOfAP(ap); 
                 // deal with symmetric sets of APs on this vertex
                 boolean keepThisAP = true;
                 if ((settings.enforceSymmetry() 
@@ -229,20 +229,20 @@ public class FragsCombinationIterator
 
             // Create data structure for candidates 
             ArrayList<IdFragmentAndAP> candsForThisSrc = 
-                                               new ArrayList<IdFragmentAndAP>();
+                    new ArrayList<IdFragmentAndAP>();
 
             // Get all compatible fragments
             ArrayList<IdFragmentAndAP> compatFragAps = 
                     settings.getFragmentSpace().getFragAPsCompatibleWithClass(
                             srcApCls);
-
+            
             for (IdFragmentAndAP compatApId : compatFragAps)
             {
                 int vid = GraphUtils.getUniqueVertexIndex();
                 IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid, //vertexId
                 		            compatApId.getVertexMolId(), //MolId,
                                     Vertex.BBType.FRAGMENT,
-                                    compatApId.getApId(), //ApId
+                                    compatApId.getApId(), //Ap index
 							        -1, //noVSym
 							        -1);//noAPSym
 
@@ -268,7 +268,7 @@ public class FragsCombinationIterator
                     IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid,//vertxId
                                                                     i,//MolId,
                                                                     Vertex.BBType.CAP,
-                                                                    0,//ApId
+                                                                    0,//AP index
                                 								   -1,//noVSym
                                 								   -1);//noAPSym
                     candsForThisSrc.add(trgFrgAp);
@@ -294,7 +294,7 @@ public class FragsCombinationIterator
                 actvSrcAps.add(candSrcAp);
 
                 // Store the reference to the candidates
-                candFragsPerAP.put(candSrcAp,candsForThisSrc);
+                candFragsPerAP.put(candSrcAp, candsForThisSrc);
 
                 // Store the size of the set of candidates
                 totCandsPerAP.add(candFragsPerAP.get(candSrcAp).size());
@@ -537,7 +537,7 @@ public class FragsCombinationIterator
             for (IdFragmentAndAP srcFrgAp : currentComb.keySet())
             {
                 int srcVrtId = srcFrgAp.getVertexId();
-                int srcApId = srcFrgAp.getApId();;
+                int srcApId = srcFrgAp.getApId();
                 Vertex v = this.rootGraph.getVertexWithId(srcVrtId);
                 AttachmentPoint srcAP = v.getAttachmentPoints().get(srcApId);
                 if (!v.hasSymmetricAP())
@@ -546,7 +546,7 @@ public class FragsCombinationIterator
                 }
                 for (SymmetricAPs ss : v.getSymmetricAPSets())
                 {
-                    if (ss.contains(srcFrgAp))
+                    if (ss.contains(srcAP))
                     {
                         if (!settings.getFragmentSpace()
                                 .imposeSymmetryOnAPsOfClass(srcAP.getAPClass()))
@@ -562,10 +562,11 @@ public class FragsCombinationIterator
                             {
                                 continue;
                             }
-
+                            
                             IdFragmentAndAP symSrcFrgAp = new IdFragmentAndAP(
                                     srcVrtId, v.getBuildingBlockId(),
-                                    v.getBuildingBlockType(), symmSrcAP.getID(),
+                                    v.getBuildingBlockType(), 
+                                    symmSrcAP.getIndexInOwner(),
                                     srcFrgAp.getVrtSymSetId(),
                                     -1);
 

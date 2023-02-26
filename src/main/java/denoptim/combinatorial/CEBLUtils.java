@@ -157,7 +157,7 @@ public class CEBLUtils
             ArrayList<DGraph> lstGraphs, int level) throws DENOPTIMException
     {
         for (DGraph g : lstGraphs)
-              {
+        {
       	    //NOTE: the arraylist is supposed to hold the indeces used to 
       	    //      create the next combination of fragments, but this method
       	    //      is used only for graphs built with the base scaffolds or 
