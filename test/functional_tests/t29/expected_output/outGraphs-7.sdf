@@ -68,7 +68,7 @@ M  END
 40
 
 > <GraphENC>
-40 2028_1_0,2034_17_1,2044_84_1,2051_28_1,2054_28_1,2063_40_1,2067_40_1, 2028_2_2034_0_SINGLE_RuL:0_MImidazolylidene:1,2028_0_2044_0_SINGLE_RuX:0_RuCl:1,2034_2_2051_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_3_2054_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_1_2063_0_SINGLE_LImidazolylideneSubNL:0_NCarbeneSubNAlkS:1,2034_4_2067_0_SINGLE_LImidazolylideneSubNL:0_NCarbeneSubNAlkS:1, SymmetricSet [symIds=[2051, 2054]] SymmetricSet [symIds=[2063, 2067]] 
+40 2028_1_0,2034_17_1,2044_84_1,2051_28_1,2054_28_1,2063_40_1,2067_40_1, 2028_2_2034_0_SINGLE_RuL:0_MImidazolylidene:1,2028_0_2044_0_SINGLE_RuX:0_RuCl:1,2034_2_2051_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_3_2054_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_1_2063_0_SINGLE_LImidazolylideneSubNL:0_NCarbeneSubNAlkS:1,2034_4_2067_0_SINGLE_LImidazolylideneSubNL:0_NCarbeneSubNAlkS:1, SymmetricVertexes [symIds=[2051, 2054]] SymmetricVertexes [symIds=[2063, 2067]] 
 
 > <GraphJson>
 {
@@ -123,12 +123,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          1,
+          2
+        ]
       ],
       "mol": {
         "atoms": [
@@ -241,18 +239,14 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            1,
-            4
-          ]
-        },
-        {
-          "symIds": [
-            2,
-            3
-          ]
-        }
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          7
+        ]
       ],
       "mol": {
         "atoms": [
@@ -916,18 +910,14 @@ M  END
   ],
   "gRings": [],
   "symVertices": [
-    {
-      "symIds": [
-        2051,
-        2054
-      ]
-    },
-    {
-      "symIds": [
-        2063,
-        2067
-      ]
-    }
+    [
+      2051,
+      2054
+    ],
+    [
+      2063,
+      2067
+    ]
   ]
 }
 

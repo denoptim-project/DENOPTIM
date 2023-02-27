@@ -26,7 +26,7 @@ M  END
 1
 
 > <GraphENC>
-1 1_1_1,2_3_1,3_6_1,5_1_2,6_3_1,7_7_1, 1_1_2_0_SINGLE_n:0_c:0,2_1_3_0_SINGLE_c:0_ATplus:0,1_2_5_0_SINGLE_n:0_hyd:1,1_0_6_0_SINGLE_n:0_c:0,6_1_7_0_SINGLE_c:0_ATminus:0, DENOPTIMRing [vertices=[7_7_1, 6_3_1, 1_1_1, 2_3_1, 3_6_1]] SymmetricSet [symIds=[2, 6]] 
+1 1_1_1,2_3_1,3_6_1,5_1_2,6_3_1,7_7_1, 1_1_2_0_SINGLE_n:0_c:0,2_1_3_0_SINGLE_c:0_ATplus:0,1_2_5_0_SINGLE_n:0_hyd:1,1_0_6_0_SINGLE_n:0_c:0,6_1_7_0_SINGLE_c:0_ATminus:0, DENOPTIMRing [vertices=[7_7_1, 6_3_1, 1_1_1, 2_3_1, 3_6_1]] SymmetricVertexes [symIds=[2, 6]] 
 
 > <GraphJson>
 {
@@ -81,13 +81,11 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1,
-            2
-          ]
-        }
+        [
+          670,
+          671,
+          672
+        ]
       ],
       "mol": {
         "atoms": [
@@ -150,12 +148,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          981,
+          982
+        ]
       ],
       "mol": {
         "atoms": [
@@ -319,7 +315,7 @@ M  END
             "bndTyp": "SINGLE"
           },
           "dirVec": {
-            "x": 5.139152129541918E-4,
+            "x": 0.0005139152129541918,
             "y": 0.038547655934163226,
             "z": 0.06744638406373359
           }
@@ -341,12 +337,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          2954,
+          2955
+        ]
       ],
       "mol": {
         "atoms": [
@@ -493,12 +487,10 @@ M  END
     }
   ],
   "symVertices": [
-    {
-      "symIds": [
-        2,
-        6
-      ]
-    }
+    [
+      2,
+      6
+    ]
   ]
 }
 

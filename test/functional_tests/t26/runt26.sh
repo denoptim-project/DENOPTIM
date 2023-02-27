@@ -71,14 +71,14 @@ do
     # Check of graph features
     g=$(grep -A 1 "GraphENC" "graph_mut-$i.sdf" | tail -n 1)
     gRef=$(grep -A 1 "GraphENC" "expected_output/graph_mut-$i.sdf" | tail -n 1)
-    string=('DENOPTIMRing' 'SymmetricSet')
+    string=('DENOPTIMRing' 'SymmetricVertexes')
     for s in "${string[@]}"
     do
         ng=$(echo "$g" | grep -c "$s")
         ngRef=$(echo "$gRef" | grep -c "$s")
         if [ "$ng" -ne "$ngRef" ]
         then
-            echo "Test 't26' NOT PASSED (sympton: wrong number of $s in step $i)"
+            echo "Test 't26' NOT PASSED (sympton: wrong number of $s in step $i: expected=$ngRef, actual=$ng)"
             exit -1
         fi
     done

@@ -56,7 +56,7 @@ do
     # Check of graph features
     g=$(grep -A 1 "GraphENC" "outGraphs-$i.sdf" | tail -n 1)
     gRef=$(grep -A 1 "GraphENC" "expected_output/outGraphs-$i.sdf" | tail -n 1)
-    string=('DENOPTIMRing' 'SymmetricSet')
+    string=('DENOPTIMRing' 'SymmetricVertexes')
     for s in "${string[@]}"
     do
         ng=$(echo "$g" | grep -c "$s")
