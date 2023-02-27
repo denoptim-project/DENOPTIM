@@ -1,10 +1,14 @@
 [
   {
-    "task": "REPLACECHILD",
+    "task": "CHANGEVERTEX",
     "vertexQuery": {
-      "vertexId": 2067
+      "incomingEdgeQuery": {
+        "srcAPC": {
+          "rule": "RuX",
+          "subClass": 0
+        }
+      }
     },
-    "idAPOnIncomingGraph": 736,
     "incomingGraph": {
       "graphId": 1,
       "gVertices": [
@@ -57,10 +61,12 @@
             }
           ],
           "lstSymAPs": [
-            [
-              736,
-              737
-            ]
+            {
+              "symIds": [
+                0,
+                1
+              ]
+            }
           ],
           "mol": {
             "atoms": [
@@ -128,10 +134,12 @@
             }
           ],
           "lstSymAPs": [
-            [
-              946,
-              947
-            ]
+            {
+              "symIds": [
+                0,
+                1
+              ]
+            }
           ],
           "mol": {
             "atoms": [
@@ -230,10 +238,12 @@
             }
           ],
           "lstSymAPs": [
-            [
-              948,
-              949
-            ]
+            {
+              "symIds": [
+                0,
+                1
+              ]
+            }
           ],
           "mol": {
             "atoms": [
@@ -362,11 +372,13 @@
             }
           ],
           "lstSymAPs": [
-            [
-              1231,
-              1232,
-              1233
-            ]
+            {
+              "symIds": [
+                0,
+                1,
+                2
+              ]
+            }
           ],
           "mol": {
             "atoms": [
@@ -544,6 +556,9 @@
         }
       ],
       "symVertices": []
-    }
+    },
+    "incomingAPMap": {
+      "0": 0
+    } 
   }
 ]

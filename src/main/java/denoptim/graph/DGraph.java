@@ -5619,7 +5619,7 @@ public class DGraph implements Cloneable
         return matches;
     }
 
-  //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
     /**
      * Filters a list of vertices according to a query.

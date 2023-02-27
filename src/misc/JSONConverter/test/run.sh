@@ -11,11 +11,15 @@
 #
 ##############################################################################
 
-testNames=('graph_w_vertex_w_sym_APs.json' 'graphs_w_vertex_w_sym_APs.sdf' )
+testNames=('graph_w_vertex_w_sym_APs.json' 'graphs_w_vertex_w_sym_APs.sdf' 'graphs_w_sym_APs_and_sym_vertexes.sdf' 'vertex_w_template_w_sym_APs.sdf' 'graph_w_template_w_sym_APs.sdf' 'editing_task' 'vertex_w_sym_APs.sdf')
+
 for testName in ${testNames[@]}
 do
   pathname="${testName%.*}"
-  extension=".${testName##*.}"
+  extension=""
+  if [[ "$testName" == *.* ]]; then
+    extension=".${testName##*.}"
+  fi
   
   # Run the conversion of this test case
   python ../convert_symmetric_sets_in_JSON.py -i "${testName}" -o "${pathname}_ACTUAL${extension}"

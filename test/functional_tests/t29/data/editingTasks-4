@@ -1,18 +1,18 @@
 [
   {
-     "task": "CHANGEVERTEX",
-     "vertexQuery": {
-        "incomingEdgeQuery": {
-           "srcAPC": {
-              "rule": "RuX",
-              "subClass": 0
-           }
+    "task": "CHANGEVERTEX",
+    "vertexQuery": {
+      "incomingEdgeQuery": {
+        "srcAPC": {
+          "rule": "RuX",
+          "subClass": 0
         }
-     },
+      }
+    },
     "incomingBBId": 0,
-    "incomingBBTyp": FRAGMENT,
+    "incomingBBTyp": "FRAGMENT",
     "incomingAPMap": {
-      0: 0
+      "0": 0
     }
   }
 ]

@@ -1471,6 +1471,10 @@ public class DenoptimIO
                 GraphEdit graphEditTask = reader.fromJson(br,
                         GraphEdit.class);
                 graphEditTasks.add(graphEditTask);
+            } else {
+                jse.printStackTrace();
+                throw new DENOPTIMException("ERROR! Unable to read JSON file "
+                        + "that defines a graph enditing task.",jse);
             }
         }
         finally 
@@ -1794,6 +1798,9 @@ public class DenoptimIO
                 }
                 Vertex v = reader.fromJson(br,Vertex.class);
                 result.add(v);
+            } else {
+                throw new DENOPTIMException("ERROR! Unable to read vertex from '"
+                        + fileName + "'.", jse);
             }
         }
         finally 
@@ -1814,7 +1821,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <{@link DGraph}s from a JSON file.
+     * Reads a list of {@link DGraph}s from a JSON file.
      * @param fileName the pathname of the file to read
      * @return the list of graphs
      * @throws DENOPTIMException
@@ -1857,6 +1864,9 @@ public class DenoptimIO
                 }
                 DGraph g = reader.fromJson(br,DGraph.class);
                 list_of_graphs.add(g);
+            } else {
+                throw new DENOPTIMException("ERROR! Unable to read graph from "
+                        + "JSON '" + fileName + "'", jse);
             }
         }
         finally 

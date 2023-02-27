@@ -1,13 +1,13 @@
 [
   {
-     "task": "CHANGEVERTEX",
-     "vertexQuery": {
-        "vertexId": 2041
-     },
+    "task": "CHANGEVERTEX",
+    "vertexQuery": {
+      "vertexId": 2041
+    },
     "incomingBBId": 0,
-    "incomingBBTyp": FRAGMENT,
+    "incomingBBTyp": "FRAGMENT",
     "incomingAPMap": {
-      0: 0
+      "0": 0
     }
   }
 ]

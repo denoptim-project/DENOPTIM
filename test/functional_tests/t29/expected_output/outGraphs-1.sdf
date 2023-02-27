@@ -119,7 +119,7 @@ M  END
 39
 
 > <GraphENC>
-39 1993_5_1,1999_84_1,2002_84_1,2021_39_1,2026_1_0, 1993_0_2021_0_SINGLE_LIsoindolylideneSubNL:0_NCarbeneSubNAlkS:1,2026_0_1999_0_SINGLE_RuX:0_RuCl:1,2026_1_2002_0_SINGLE_RuX:0_RuCl:1,2026_2_1993_3_SINGLE_RuL:0_MIsoindolylidene:1, SymmetricSet [symIds=[1999, 2002]] 
+39 1993_5_1,1999_84_1,2002_84_1,2021_39_1,2026_1_0, 1993_0_2021_0_SINGLE_LIsoindolylideneSubNL:0_NCarbeneSubNAlkS:1,2026_0_1999_0_SINGLE_RuX:0_RuCl:1,2026_1_2002_0_SINGLE_RuX:0_RuCl:1,2026_2_1993_3_SINGLE_RuL:0_MIsoindolylidene:1, SymmetricVertexes [symIds=[1999, 2002]] 
 
 > <GraphJson>
 {
@@ -189,12 +189,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            1,
-            2
-          ]
-        }
+        [
+          11,
+          12
+        ]
       ],
       "mol": {
         "atoms": [
@@ -806,12 +804,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          20,
+          21
+        ]
       ],
       "mol": {
         "atoms": [
@@ -1246,12 +1242,10 @@ M  END
   ],
   "gRings": [],
   "symVertices": [
-    {
-      "symIds": [
-        1999,
-        2002
-      ]
-    }
+    [
+      1999,
+      2002
+    ]
   ]
 }
 

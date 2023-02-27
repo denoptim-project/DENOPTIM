@@ -101,11 +101,13 @@ M  END
           }
         ],
         "lstSymAPs": [
-          [
-            80,
-            81,
-            82
-          ]
+          {
+            "symIds": [
+              0,
+              1,
+              2
+            ]
+          }
         ],
         "mol": {
           "atoms": [
@@ -165,10 +167,12 @@ M  END
           }
         ],
         "lstSymAPs": [
-          [
-            87,
-            88
-          ]
+          {
+            "symIds": [
+              0,
+              1
+            ]
+          }
         ],
         "mol": {
           "atoms": [
@@ -240,7 +244,7 @@ M  END
   "requiredAPs": [],
   "innerToOuterAPs": {
     "80": {
-      "id": 50,
+      "id": 44,
       "atomPositionNumber": 0,
       "atomPositionNumberInMol": 0,
       "apClass": {
@@ -255,7 +259,7 @@ M  END
       }
     },
     "82": {
-      "id": 51,
+      "id": 45,
       "atomPositionNumber": 0,
       "atomPositionNumberInMol": 0,
       "apClass": {
@@ -270,7 +274,7 @@ M  END
       }
     },
     "88": {
-      "id": 52,
+      "id": 46,
       "atomPositionNumber": 1,
       "atomPositionNumberInMol": 0,
       "apClass": {
@@ -285,7 +289,7 @@ M  END
       }
     }
   },
-  "vertexId": 37,
+  "vertexId": 33,
   "buildingBlockId": -99,
   "buildingBlockType": "UNDEFINED",
   "isRCV": false,
@@ -371,11 +375,13 @@ M  END
           }
         ],
         "lstSymAPs": [
-          [
-            113,
-            114,
-            115
-          ]
+          {
+            "symIds": [
+              0,
+              1,
+              2
+            ]
+          }
         ],
         "mol": {
           "atoms": [
@@ -435,10 +441,12 @@ M  END
           }
         ],
         "lstSymAPs": [
-          [
-            120,
-            121
-          ]
+          {
+            "symIds": [
+              0,
+              1
+            ]
+          }
         ],
         "mol": {
           "atoms": [
@@ -510,7 +518,7 @@ M  END
   "requiredAPs": [],
   "innerToOuterAPs": {
     "113": {
-      "id": 58,
+      "id": 52,
       "atomPositionNumber": 0,
       "atomPositionNumberInMol": 0,
       "apClass": {
@@ -525,7 +533,7 @@ M  END
       }
     },
     "115": {
-      "id": 59,
+      "id": 53,
       "atomPositionNumber": 0,
       "atomPositionNumberInMol": 0,
       "apClass": {
@@ -540,7 +548,7 @@ M  END
       }
     },
     "121": {
-      "id": 60,
+      "id": 54,
       "atomPositionNumber": 1,
       "atomPositionNumberInMol": 0,
       "apClass": {
@@ -555,7 +563,7 @@ M  END
       }
     }
   },
-  "vertexId": 48,
+  "vertexId": 44,
   "buildingBlockId": -99,
   "buildingBlockType": "UNDEFINED",
   "isRCV": false,
@@ -570,45 +578,5 @@ M  END
   ],
   "vertexType": "Template"
 }
-
-$$$$
-
-  CDK     02102218203D
-
-  1  0  0  0  0  0  0  0  0  0999 V2000
-    0.0004    0.0099    0.0006 ATP 0  0  0  0  0  0  0  0  0  0  0  0
-M  END
-> <ATTACHMENT_POINTS>
-1#ATplus:0:ANY:-0.0087%-0.0070%-0.0079 
-
-$$$$
-
-  CDK     02102218203D
-
-  1  0  0  0  0  0  0  0  0  0999 V2000
-   -0.0096    0.0045   -0.0011 ATM 0  0  0  0  0  0  0  0  0  0  0  0
-M  END
-> <ATTACHMENT_POINTS>
-1#ATminus:0:ANY:0.0109%-0.0071%0.0026 
-
-$$$$
-
-  CDK     02102218203D
-
-  1  0  0  0  0  0  0  0  0  0999 V2000
-   -0.6550    0.0000    0.0001 C   0  0  0  0  0  0  0  0  0  0  0  0
-M  END
-> <ATTACHMENT_POINTS>
-1#c:0:SINGLE:-1.1950%-0.9353%-0.0009,c:0:SINGLE:-1.1950%0.9353%0.0014,c2:0:DOUBLE:0.6550%0.0000%-0.0004 
-
-$$$$
-
-  CDK     02102218203D
-
-  1  0  0  0  0  0  0  0  0  0999 V2000
-    0.0004    0.0099    0.0006 ATN 0  0  0  0  0  0  0  0  0  0  0  0
-M  END
-> <ATTACHMENT_POINTS>
-1#ATneutral:0:ANY:-0.0087%-0.0070%-0.0079 
 
 $$$$
