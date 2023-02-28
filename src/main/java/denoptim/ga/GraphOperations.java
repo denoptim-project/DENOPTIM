@@ -79,7 +79,10 @@ public class GraphOperations
      * possible crossover sites without falling into combinatorial explosion.
      * @param gA one of the parent graphs.
      * @param gB the other of the parent graphs.
-     * TODO-gg
+     * @param fragSpace the space of building blocks defining how to generate
+     * graphs.
+     * @param maxSizeXoverSubGraph the limit to the size of subgraphs that can
+     * can be exchanged by crossover.
      * @return the list of pairs of crossover sites.
      * @throws DENOPTIMException 
      */
@@ -1125,7 +1128,7 @@ public class GraphOperations
                     settings.getSymmetryProbability(),
                     fsParams.getRandomizer());
             SymmetricAPs symAPs = new SymmetricAPs();
-            if (curVrtx.getSymmetricAPs(ap)!=null 
+            if (curVrtx.getSymmetricAPs(ap).size()!=0
                     && (cpOnSymAPs || symmetryOnAps)
                     && !allowOnlyRingClosure)
             {

@@ -506,7 +506,7 @@ public class Template extends Vertex
             Vertex vrtx = innerAP.getOwner();
             int innerAPIdx = innerAP.getIndexInOwner();
             SymmetricAPs sAPsOnVrtx = vrtx.getSymmetricAPs(innerAP);
-            if (sAPsOnVrtx!=null)
+            if (sAPsOnVrtx.size()!=0)
             {
                 for (AttachmentPoint symInnerAP : sAPsOnVrtx)
                 {
@@ -531,7 +531,7 @@ public class Template extends Vertex
                     continue;
                 
                 SymmetricAPs sAPsOnSymVrtx = symVrtx.getSymmetricAPs(innerAP);
-                if (sAPsOnSymVrtx!=null)
+                if (sAPsOnSymVrtx.size()!=0)
                 {
                     for (AttachmentPoint symInnerAPOnSymVrtx : sAPsOnSymVrtx)
                     {

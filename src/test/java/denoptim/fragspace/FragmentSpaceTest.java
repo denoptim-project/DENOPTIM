@@ -499,15 +499,7 @@ public class FragmentSpaceTest
         List<DGraph> sameGraphs = IntStream
                 .range(0, TRY_ADDING)
                 .mapToObj(i -> testCase.graph.clone())
-                .peek(t -> {
-                    try
-                    {
-                        t.renumberGraphVertices();
-                    } catch (DENOPTIMException e)
-                    {
-                        e.printStackTrace();
-                    }
-                })
+                .peek(t -> t.renumberGraphVertices())
                 .collect(Collectors.toList());
 
         List<Vertex> fragLib = fs.getFragmentLibrary();

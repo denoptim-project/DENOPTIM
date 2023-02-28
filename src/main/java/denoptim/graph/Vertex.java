@@ -326,7 +326,7 @@ public abstract class Vertex implements Cloneable
      * @param apIdx index of the attachment point which we want to get
      * the symmetrically related partners of.
      * @return the list of attachment point IDs, which include 
-     * <code>apIdx</code> or <code>null</code> if no partners present
+     * <code>apIdx</code> or an empty list if no partners present
      */
 
     public SymmetricAPs getSymmetricAPs(AttachmentPoint ap)
@@ -338,8 +338,7 @@ public abstract class Vertex implements Cloneable
                 return symmetricSet;
             }
         }
-        //TODO-gg should return empty set
-        return null;
+        return new SymmetricAPs();
     }
 
 //------------------------------------------------------------------------------

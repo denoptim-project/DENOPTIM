@@ -4840,11 +4840,9 @@ public class DGraph implements Cloneable
     /**
      * Reassign vertex IDs to all vertices of this graph. The old IDs are stored 
      * in the vertex property {@link DENOPTIMConstants#STOREDVID}.
-     * @throws DENOPTIMException if there are inconsistencies in the vertex IDs
-     * used to refer to this graph's vertices.
      */
 
-    public void renumberGraphVertices() throws DENOPTIMException
+    public void renumberGraphVertices()
     {
         renumberVerticesGetMap();
     }
@@ -4855,11 +4853,9 @@ public class DGraph implements Cloneable
      * Reassign vertex IDs to a graph. The old IDs are stored 
      * in the vertex property {@link DENOPTIMConstants#STOREDVID}.
      * @return map with old IDs as key and new IDs as values.
-     * @throws DENOPTIMException if there are inconsistencies in the vertex IDs
-     * used to refer to this graph's vertices.
      */
 
-    public Map<Integer,Integer> renumberVerticesGetMap() throws DENOPTIMException 
+    public Map<Integer,Integer> renumberVerticesGetMap()
     {
         Map<Integer, Integer> nmap = new HashMap<>();
 
@@ -5323,8 +5319,6 @@ public class DGraph implements Cloneable
                     subGraph, childVertex, childAPIdx, bndType,
                     newSymSets, onAllSymmAPs);
         }
-        
-        //TODO-gg: add setting of Symmetry?
     }
     
 //------------------------------------------------------------------------------
@@ -5570,7 +5564,6 @@ public class DGraph implements Cloneable
      * the AP indicated in the list.
      */
 
-    //TOGO-gg use reference for AP
     public void appendGraphOnGraph(Vertex parentVertex,
                                    int parentAPIdx, DGraph subGraph,
                                    Vertex childVertex, int childAPIdx,
@@ -5579,10 +5572,9 @@ public class DGraph implements Cloneable
                                    boolean onAllSymmAPs)
                                            throws DENOPTIMException
     {
-        //TODO-gg simplify by using reference
         SymmetricAPs symAPs = parentVertex.getSymmetricAPs(
                 parentVertex.getAP(parentAPIdx));
-        if (symAPs != null && onAllSymmAPs)
+        if (symAPs.size()!=0 && onAllSymmAPs)
         {
             for (AttachmentPoint symAP : symAPs) 
             {
@@ -6307,15 +6299,7 @@ public class DGraph implements Cloneable
             }
             if (regenerateVrtxID)
             {
-                try
-                {
-                    g.renumberGraphVertices();
-                } catch (DENOPTIMException e)
-                {
-                    // TODO-gg remove once sync between vertex IDs and symmetric 
-                    // map is guaranteed by avoiding IDs in symmetri map.
-                    e.printStackTrace();
-                }
+                g.renumberGraphVertices();
             }
             if (regenerateAP)
             {

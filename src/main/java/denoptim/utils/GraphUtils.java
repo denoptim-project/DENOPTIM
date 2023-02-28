@@ -91,7 +91,6 @@ public class GraphUtils
     /**
      * Unique counter for the number of graph vertices generated.
      * @return the new vertex id (number)
-     * @throws DENOPTIMException 
      */
 
     public static synchronized int getUniqueVertexIndex()
