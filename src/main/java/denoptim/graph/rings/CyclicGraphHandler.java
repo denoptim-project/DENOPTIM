@@ -380,7 +380,7 @@ public class CyclicGraphHandler
 
         // Generate all combinations of compatible, closable paths
         ArrayList<ObjectPair> lstPairs = new ArrayList<ObjectPair>();
-        ArrayList<Integer> usedId = new ArrayList<Integer>();
+        ArrayList<Long> usedId = new ArrayList<Long>();
         ArrayList<Vertex> sortedKeys = new ArrayList<Vertex>();
         for (Vertex keyVert : compatMap.keySet())
         {
@@ -413,7 +413,7 @@ public class CyclicGraphHandler
                        ArrayList<Vertex> sortedKeys,
                        Map<Vertex,ArrayList<Vertex>> compatMap,
                        ArrayList<ObjectPair> lstPairs,
-                       ArrayList<Integer> usedId,
+                       ArrayList<Long> usedId,
                        Map<ObjectPair,PathSubGraph> allGoodPaths,
                        Map<IBond,List<PathSubGraph>> interdepPaths,
                        ArrayList<List<Ring>> allCombsOfRings)
@@ -441,7 +441,7 @@ public class CyclicGraphHandler
         for (int ii=ii0; ii<sortedKeys.size(); ii++)
         {
             Vertex vi = sortedKeys.get(ii);
-            int vIdI = vi.getVertexId();
+            long vIdI = vi.getVertexId();
 
             logger.log(Level.FINEST, objId+"-"+recLab+"> vIdI= "+vIdI);
 
@@ -452,7 +452,7 @@ public class CyclicGraphHandler
 
             for (Vertex vj : compatMap.get(vi))
             {
-                int vIdJ = vj.getVertexId();
+                long vIdJ = vj.getVertexId();
 
                 logger.log(Level.FINEST, objId+"-"+recLab+"> vIdJ= "+vIdJ);
 
@@ -1695,8 +1695,7 @@ public class CyclicGraphHandler
      * @return <code>true</code> it this system is a good candidate
      */
 
-    public boolean checkChelatesGraph(DGraph molGraph,
-                                      List<Ring> ringsSet)
+    public boolean checkChelatesGraph(DGraph molGraph, List<Ring> ringsSet)
     {
         logger.log(Level.FINE, "Checking conditions for chelates");
 
@@ -1708,7 +1707,7 @@ public class CyclicGraphHandler
 
         for (Vertex vert : molGraph.getVertexList())
         {
-            int vId = vert.getVertexId();
+            long vId = vert.getVertexId();
             
             Fragment vertFrag = null;
             if (vert instanceof Fragment)

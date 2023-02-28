@@ -849,7 +849,7 @@ public class GraphOperations
         }
 
         // vertex id of the parent
-        int pvid = e.getSrcVertex();
+        long pvid = e.getSrcVertex();
         Vertex parentVrt = g.getVertexWithId(pvid);
 
         // Need to remember symmetry because we are deleting the symm. vertices
@@ -876,7 +876,7 @@ public class GraphOperations
     protected static boolean deleteFragment(Vertex vertex)
             throws DENOPTIMException
     {
-        int vid = vertex.getVertexId();
+        long vid = vertex.getVertexId();
         DGraph molGraph = vertex.getGraphOwner();
 
         if (molGraph.hasSymmetryInvolvingVertex(vertex))
@@ -916,7 +916,7 @@ public class GraphOperations
     protected static boolean deleteChain(Vertex vertex, Monitor mnt,
             FragmentSpace fragSpace) throws DENOPTIMException
     {
-        int vid = vertex.getVertexId();
+        long vid = vertex.getVertexId();
         DGraph molGraph = vertex.getGraphOwner();
 
         if (molGraph.hasSymmetryInvolvingVertex(vertex))
@@ -1028,7 +1028,7 @@ public class GraphOperations
         DGraph molGraph = curVrtx.getGraphOwner();
         int lvl = molGraph.getLevel(curVrtx);
 
-        ArrayList<Integer> addedVertices = new ArrayList<>();
+        ArrayList<Long> addedVertices = new ArrayList<>();
 
         List<AttachmentPoint> lstDaps = curVrtx.getAttachmentPoints();
         List<AttachmentPoint> toDoAPs = new ArrayList<AttachmentPoint>();
@@ -1219,7 +1219,7 @@ public class GraphOperations
                 }
 
                 // Finally add the fragment on a symmetric AP
-                int newVrtId = GraphUtils.getUniqueVertexIndex();
+                long newVrtId = GraphUtils.getUniqueVertexIndex();
                 Vertex fragVertex = Vertex.newVertexFromLibrary(newVrtId, 
                                 chosenFrgAndAp.getVertexMolId(), 
                                 BBType.FRAGMENT,
@@ -1245,7 +1245,7 @@ public class GraphOperations
             // attempt to further extend each of the newly added vertices
             for (int i=0; i<addedVertices.size(); i++)
             {
-                int vid = addedVertices.get(i);
+                long vid = addedVertices.get(i);
                 Vertex v = molGraph.getVertexWithId(vid);
                 extendGraph(v, extend, symmetryOnAps, settings);
             }
@@ -1385,7 +1385,7 @@ public class GraphOperations
 
     protected static boolean attachFragmentInClosableChain(
             Vertex curVertex, int dapidx, DGraph molGraph,
-            ArrayList<Integer> addedVertices, GAParameters settings)
+            ArrayList<Long> addedVertices, GAParameters settings)
                     throws DENOPTIMException
     {
         boolean res = false;
@@ -1420,7 +1420,7 @@ public class GraphOperations
             int dapNewFrag = newFragIds.get(2);
             if (molIdNewFrag != -1)
             {
-                int newvid = GraphUtils.getUniqueVertexIndex();
+                long newvid = GraphUtils.getUniqueVertexIndex();
                 Vertex newVrtx = Vertex.newVertexFromLibrary(
                         newvid, molIdNewFrag, typeNewFrag, 
                         fsParams.getFragmentSpace());

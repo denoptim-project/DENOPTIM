@@ -92,7 +92,7 @@ public class EmptyVertex extends Vertex
      * {@link GraphUtils#getUniqueVertexIndex()} or use constructor
      * {@link EmptyVertex()}.
      */
-    public EmptyVertex(int id)
+    public EmptyVertex(long id)
     {
         super(VertexType.EmptyVertex, id);
         lstAPs = new ArrayList<AttachmentPoint>();
@@ -110,7 +110,7 @@ public class EmptyVertex extends Vertex
      * @param isRCV set <code>true</code> to mark this vertex as a 
      * ring-closing vertex.
      */
-    public EmptyVertex(int id, ArrayList<AttachmentPoint> lstAPs,
+    public EmptyVertex(long id, ArrayList<AttachmentPoint> lstAPs,
             ArrayList<SymmetricAPs> lstSymAPs, boolean isRCV)
     {
         super(VertexType.EmptyVertex, id);

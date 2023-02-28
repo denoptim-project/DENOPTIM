@@ -241,12 +241,12 @@ public class GraphBuildingTask extends FitnessTask
                     new HashMap<Integer, SymmetricVertexes>();
             for (IdFragmentAndAP srcAp : fragsToAdd.keySet())
             {
-                int sVId = srcAp.getVertexId();
+                long sVId = srcAp.getVertexId();
                 int sApId = srcAp.getApId();
                 Vertex srcVrtx = dGraph.getVertexWithId(sVId);
     
                 IdFragmentAndAP trgAp = fragsToAdd.get(srcAp);
-                int tVId = trgAp.getVertexId();
+                long tVId = trgAp.getVertexId();
                 int tFId = trgAp.getVertexMolId();
                 Vertex.BBType tFTyp = trgAp.getVertexMolType(); 
                 int tApId = trgAp.getApId();

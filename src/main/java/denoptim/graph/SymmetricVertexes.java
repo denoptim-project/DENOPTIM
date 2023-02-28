@@ -57,7 +57,7 @@ public class SymmetricVertexes extends SymmetricSet<Vertex>
         public JsonElement serialize(SymmetricVertexes list, Type typeOfSrc,
               JsonSerializationContext context)
         {
-            List<Integer> vertexIDs = new ArrayList<Integer>();
+            List<Long> vertexIDs = new ArrayList<Long>();
             for (Vertex v : list)
             {
                 vertexIDs.add(v.getVertexId());

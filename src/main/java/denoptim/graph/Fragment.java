@@ -103,7 +103,7 @@ public class Fragment extends Vertex
      * @param vertexId unique identified of the vertex
      */
 
-    public Fragment(int vertexId)
+    public Fragment(long vertexId)
     {
         super(VertexType.MolecularFragment, vertexId);
         this.lstAPs = new ArrayList<AttachmentPoint>();
@@ -121,15 +121,15 @@ public class Fragment extends Vertex
      * if present.
      * WARNING: other properties of the atom container
      * are not imported!
-     * @param vertexId the identifier of the vertex to construct
+     * @param l the identifier of the vertex to construct
      * @param mol the molecular representation
      * @throws DENOPTIMException 
      */
     
-    public Fragment(int vertexId, IAtomContainer mol, BBType bbt)
+    public Fragment(long l, IAtomContainer mol, BBType bbt)
             throws DENOPTIMException
     {     
-        super (VertexType.MolecularFragment, vertexId);
+        super (VertexType.MolecularFragment, l);
         
         this.setBuildingBlockType(bbt);
         
@@ -163,7 +163,7 @@ public class Fragment extends Vertex
 
 //------------------------------------------------------------------------------
 
-    public Fragment(int vertexId, IAtomContainer mol, BBType bbt, boolean isRCV)
+    public Fragment(long vertexId, IAtomContainer mol, BBType bbt, boolean isRCV)
             throws DENOPTIMException {
         this(vertexId, mol, bbt);
         this.setAsRCV(isRCV);

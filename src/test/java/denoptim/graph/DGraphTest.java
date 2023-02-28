@@ -1507,7 +1507,7 @@ public class DGraphTest
         {
             origSS.add(v);
         }
-        Set<Integer> oldVertexIds = new HashSet<Integer>();
+        Set<Long> oldVertexIds = new HashSet<Long>();
         for (Vertex v : g2.getVertexList())
             oldVertexIds.add(v.getVertexId());
         

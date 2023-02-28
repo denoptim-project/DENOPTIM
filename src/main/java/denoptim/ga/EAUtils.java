@@ -1273,7 +1273,7 @@ public class EAUtils
     protected static void setVertexCounterValue(Population population) 
             throws DENOPTIMException
     {
-        int val = Integer.MIN_VALUE;
+        long val = Long.MIN_VALUE;
         for (Candidate popln1 : population)
         {
             DGraph g = popln1.getGraph();

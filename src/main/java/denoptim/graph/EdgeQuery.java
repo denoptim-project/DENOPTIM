@@ -30,12 +30,12 @@ public class EdgeQuery
     /**
      * The vertex id of the source fragment
      */
-    private Integer srcVertexId = null; 
+    private Long srcVertexId = null; 
     
     /**
      * the vertex id of the destination fragment
      */
-    private Integer trgVertexId = null; 
+    private Long trgVertexId = null; 
     
     /**
      * The index of the attachment point in the list of DAPs associated
@@ -80,7 +80,7 @@ public class EdgeQuery
      * @param trgAPC the {@link APClass} on the target 
      * {@link AttachmentPoint} .
      */
-    public EdgeQuery(Integer srcVertexId, Integer trgVertexId, 
+    public EdgeQuery(Long srcVertexId, Long trgVertexId, 
             Integer srcAPID, Integer trgAPID, 
             BondType bt, APClass srcAPC, APClass trgAPC)
     {
@@ -95,7 +95,7 @@ public class EdgeQuery
     
 //------------------------------------------------------------------------------
 
-    public Integer getSourceVertexId()
+    public Long getSourceVertexId()
     {
         return srcVertexId;
     }
@@ -116,7 +116,7 @@ public class EdgeQuery
 
 //------------------------------------------------------------------------------
 
-    public Integer getTargetVertexId()
+    public Long getTargetVertexId()
     {
         return trgVertexId;
     }

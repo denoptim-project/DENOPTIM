@@ -59,7 +59,7 @@ public class TinkerAtom implements Cloneable
     /*
      * the vertex id with which the IC fragment is associated with
      */
-    private int vtxId;
+    private long vtxId;
 
 //------------------------------------------------------------------------------
 
@@ -235,14 +235,14 @@ public class TinkerAtom implements Cloneable
 
 //------------------------------------------------------------------------------
      
-     public void setVertexId(int vtxId)
+     public void setVertexId(long vidx)
      {
-         this.vtxId = vtxId;
+         this.vtxId = vidx;
      }     
      
 //------------------------------------------------------------------------------     
      
-     public int getVertexId()
+     public long getVertexId()
      {
          return this.vtxId;
      }

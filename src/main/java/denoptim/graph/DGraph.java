@@ -827,7 +827,7 @@ public class DGraph implements Cloneable
         }
 
         vertex.resetGraphOwner();
-        int vid = vertex.getVertexId();
+        long vid = vertex.getVertexId();
 
         // delete also any ring involving the removed vertex
         if (isVertexInRing(vertex))
@@ -2276,7 +2276,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public Vertex getVertexWithId(int vid)
+    public Vertex getVertexWithId(long vid)
     {
         Vertex v = null;
         int idx = indexOfVertexWithID(vid);
@@ -2292,7 +2292,7 @@ public class DGraph implements Cloneable
      * @param vid the vertedID of the vertex we are looking for.
      * @return the index in the list of vertices.
      */
-    public int indexOfVertexWithID(int vid)
+    public int indexOfVertexWithID(long vid)
     {
         int idx = -1;
         for (int i=0; i<gVertices.size(); i++)
@@ -2428,8 +2428,8 @@ public class DGraph implements Cloneable
             Edge edge = getEdgeList().get(i);
 
             // get the vertex ids
-            int v1_id = edge.getSrcVertex();
-            int v2_id = edge.getTrgVertex();
+            long v1_id = edge.getSrcVertex();
+            long v2_id = edge.getTrgVertex();
 
             int dap_idx_v1 = edge.getSrcAPID();
 
@@ -2875,30 +2875,6 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * @param vid the vertex id for which the child vertices need to be found
-     * @return Arraylist containing the vertex ids of the child vertices
-     * @deprecated depends on vertedID
-     */
-
-    @Deprecated
-    public ArrayList<Integer> getChildVertices(int vid)
-    {
-        ArrayList<Integer> lst = new ArrayList<>();
-        Vertex v = getVertexWithId(vid);
-        for (AttachmentPoint ap : v.getAttachmentPoints())
-        {
-            Edge e = ap.getEdgeUser();
-            if (e != null && e.getTrgVertex()!=vid)
-            {
-                lst.add(e.getTrgVertex());
-            }
-        }
-        return lst;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Returns almost "deep-copy" of this graph. Only the APCLass members of
      * member of this class should remain references to the original APClasses.
      * The vertex IDs are not changed, so you might want to renumber the graph.
@@ -2909,8 +2885,7 @@ public class DGraph implements Cloneable
         // When cloning, the VertexID remains the same so we'll have two
         // deep-copies of the same vertex having the same VertexID
         ArrayList<Vertex> cListVrtx = new ArrayList<>();
-        Map<Integer,Vertex> vidsInClone =
-                new HashMap<Integer,Vertex>();
+        Map<Long, Vertex> vidsInClone = new HashMap<Long, Vertex>();
         for (Vertex vOrig : gVertices)
         {
             Vertex vClone = vOrig.clone();
@@ -2921,11 +2896,11 @@ public class DGraph implements Cloneable
         ArrayList<Edge> cListEdges = new ArrayList<>();
         for (Edge e : gEdges)
         {
-            int srcVrtxId = e.getSrcVertex();
+            long srcVrtxId = e.getSrcVertex();
             int srcApId = this.getVertexWithId(srcVrtxId).getIndexOfAP(
                     e.getSrcAP());
 
-            int trgVrtxId = e.getTrgVertex();
+            long trgVrtxId = e.getTrgVertex();
             int trgApId = this.getVertexWithId(trgVrtxId).getIndexOfAP(
                     e.getTrgAP());
 
@@ -2988,13 +2963,13 @@ public class DGraph implements Cloneable
 
     /**
      * Looks for an edge that points to a vertex with the given vertex id.
-     * @param vid
+     * @param l
      * @return the edge whose target vertex has ID same as vid, or null
      */
 
-    public Edge getEdgeWithParent(int vid)
+    public Edge getEdgeWithParent(long l)
     {
-        Vertex v = getVertexWithId(vid);
+        Vertex v = getVertexWithId(l);
         if (v == null)
         {
             return null;
@@ -3053,9 +3028,9 @@ public class DGraph implements Cloneable
     /**
      * @return the maximum value of vertex Id found in this graph.
      */
-    public int getMaxVertexId()
+    public long getMaxVertexId()
     {
-        int mval = Integer.MIN_VALUE;
+        long mval = Long.MIN_VALUE;
         for (Vertex v : gVertices) {
             mval = Math.max(mval, v.getVertexId());
         }
@@ -3068,12 +3043,12 @@ public class DGraph implements Cloneable
      * Checks if a number is already used as VertexIDs within the graph.
      * @return <code>true</code> if the number is already used.
      */
-    public boolean containsVertexID(int id)
+    public boolean containsVertexID(long l)
     {
         boolean result = false;
         for (Vertex v : gVertices) 
         {
-            if (id == v.getVertexId())
+            if (l == v.getVertexId())
             {
                 result = true;
                 break;
@@ -3812,7 +3787,7 @@ public class DGraph implements Cloneable
 
     public void removeCappingGroups(List<Vertex> lstVerts)
     {
-        ArrayList<Integer> rvids = new ArrayList<>();
+        List<Long> rvids = new ArrayList<>();
         for (int i=0; i<lstVerts.size(); i++)
         {
             Vertex vtx = lstVerts.get(i);
@@ -3831,7 +3806,7 @@ public class DGraph implements Cloneable
         // remove the vids from the vertex lst
         for (int i=0; i<rvids.size(); i++)
         {
-            int vid = rvids.get(i);
+            long vid = rvids.get(i);
             removeVertex(getVertexWithId(vid));
         }
     }
@@ -4287,7 +4262,7 @@ public class DGraph implements Cloneable
      * @param v current vertex
      */
     private static void fixEdgeDirections(Vertex v, 
-            Set<Integer> visited) 
+            Set<Long> visited) 
     {
         visited.add(v.getVertexId());
         int visitedVertexEncounters = 0;
@@ -4295,9 +4270,8 @@ public class DGraph implements Cloneable
             AttachmentPoint ap = v.getAP(i);
             Edge edge = ap.getEdgeUser();
             if (edge != null) {
-                int srcVertex = edge.getSrcVertex();
-                boolean srcIsVisited =
-                        srcVertex != v.getVertexId() 
+                long srcVertex = edge.getSrcVertex();
+                boolean srcIsVisited = srcVertex != v.getVertexId() 
                         && visited.contains(srcVertex);
 
                 visitedVertexEncounters += srcIsVisited ? 1 : 0;
@@ -4796,11 +4770,11 @@ public class DGraph implements Cloneable
     @Deprecated
     public void changeSignOfVertexID()
     {
-        HashMap<Integer, Integer> nmap = new HashMap<>();
+        HashMap<Long, Long> nmap = new HashMap<>();
         for (int i=0; i<getVertexCount(); i++)
         {
-            int vid = getVertexList().get(i).getVertexId();
-            int nvid = -vid;
+            long vid = getVertexList().get(i).getVertexId();
+            long nvid = -vid;
             nmap.put(vid, nvid);
 
             getVertexList().get(i).setVertexId(nvid);
@@ -4838,16 +4812,16 @@ public class DGraph implements Cloneable
      * @return map with old IDs as key and new IDs as values.
      */
 
-    public Map<Integer,Integer> renumberVerticesGetMap()
+    public Map<Long,Long> renumberVerticesGetMap()
     {
-        Map<Integer, Integer> nmap = new HashMap<>();
+        Map<Long, Long> nmap = new HashMap<>();
 
         // for the vertices in the graph, get new vertex ids
         for (int i=0; i<getVertexCount(); i++)
         {
             Vertex v = getVertexList().get(i);
-            int vid = v.getVertexId();
-            int nvid = GraphUtils.getUniqueVertexIndex();
+            long vid = v.getVertexId();
+            long nvid = GraphUtils.getUniqueVertexIndex();
 
             nmap.put(vid, nvid);
 
@@ -5195,7 +5169,7 @@ public class DGraph implements Cloneable
             // clone root graph
             DGraph newGraph = this.clone();
 
-            Map<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
+            Map<Long,Long> vRenum = newGraph.renumberVerticesGetMap();
             newGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
             // add rings
@@ -5204,8 +5178,8 @@ public class DGraph implements Cloneable
                 Ring newRing = new Ring();
                 for (int i=0; i<oldRing.getSize(); i++)
                 {
-                    int oldVId = oldRing.getVertexAtPosition(i).getVertexId();
-                    int newVId = vRenum.get(oldVId);
+                    long oldVId = oldRing.getVertexAtPosition(i).getVertexId();
+                    long newVId = vRenum.get(oldVId);
                     newRing.addVertex(newGraph.getVertexWithId(newVId));
                 }
                 newRing.setBondType(oldRing.getBondType());
@@ -5584,9 +5558,9 @@ public class DGraph implements Cloneable
      * @param logger manager of log
      * @return the list of matches
      */
-    public List<Integer> findVerticesIds(VertexQuery query, Logger logger)
+    public List<Long> findVerticesIds(VertexQuery query, Logger logger)
     {
-        List<Integer> matches = new ArrayList<>();
+        List<Long> matches = new ArrayList<>();
         for (Vertex v : findVertices(query, logger))
         {
             matches.add(v.getVertexId());
@@ -5629,7 +5603,7 @@ public class DGraph implements Cloneable
         logger.log(Level.FINE, "Candidates: " + matches);
 
         //Check condition vertex ID
-        Integer vidQuery = vrtxQuery.getVertexIDQuery();
+        Long vidQuery = vrtxQuery.getVertexIDQuery();
         if (vidQuery != null)
         {
             ArrayList<Vertex> newLst = new ArrayList<>();
@@ -5774,7 +5748,7 @@ public class DGraph implements Cloneable
             
             if (i==0)
             {
-                Integer eSrcVrtID = edgeQuery.getSourceVertexId();
+                Long eSrcVrtID = edgeQuery.getSourceVertexId();
                 if (eSrcVrtID != null)
                 {
                     ArrayList<Vertex> newLst = new ArrayList<>();
@@ -5794,7 +5768,7 @@ public class DGraph implements Cloneable
                                 + " edge src VertexID filter: " + matches);
                 }
             } else if (i==1) {
-                Integer eTrgVrtID = edgeQuery.getTargetVertexId();
+                Long eTrgVrtID = edgeQuery.getTargetVertexId();
                 if (eTrgVrtID != null)
                 {
                     ArrayList<Vertex> newLst = new ArrayList<>();
@@ -5968,9 +5942,9 @@ public class DGraph implements Cloneable
      * @param list the list of vertex IDs to be purged.
      */
 
-    public void removeSymmetryRedundantIds(ArrayList<Integer> list) {
+    public void removeSymmetryRedundantIds(ArrayList<Long> list) {
         ArrayList<Vertex> vList = new ArrayList<>();
-        for (int vid : list) {
+        for (long vid : list) {
             vList.add(getVertexWithId(vid));
         }
         removeSymmetryRedundance(vList);
@@ -6263,7 +6237,7 @@ public class DGraph implements Cloneable
         {
             boolean regenerateVrtxID = false;
             boolean regenerateAP = false;
-            Set<Integer> unqVrtxIDs = new HashSet<Integer>();
+            Set<Long> unqVrtxIDs = new HashSet<Long>();
             Set<Integer> unqApIDs = new HashSet<Integer>();
             for (Vertex v : g.getVertexList())
             {
@@ -6408,7 +6382,7 @@ public class DGraph implements Cloneable
     public static void setScaffold(Vertex v) {
         ArrayList<Vertex> newVertexList = new ArrayList<>();
 
-        Set<Integer> visited = new HashSet<>();
+        Set<Long> visited = new HashSet<>();
         Queue<Vertex> currLevel = new ArrayDeque<>();
         Queue<Vertex> nextLevel = new ArrayDeque<>();
         currLevel.add(v);
@@ -6416,7 +6390,7 @@ public class DGraph implements Cloneable
         while (!currLevel.isEmpty()) {
             Vertex currVertex = currLevel.poll();
 
-            int currId = currVertex.getVertexId();
+            long currId = currVertex.getVertexId();
             if (!visited.contains(currId)) {
                 visited.add(currId);
 
@@ -6542,15 +6516,15 @@ public class DGraph implements Cloneable
      * the vertex on the left, even if in the graph it is actually used to bind 
      * the RCV that defines the chord and that eventually connects the 
      * vertex on the left with that on the right.
-     * @param vid1 vertex ID of one vertex.
-     * @param vid2 vertex ID of another vertex.
+     * @param nbrVid vertex ID of one vertex.
+     * @param vid vertex ID of another vertex.
      * @return the {@link AttachmentPoint} or null is the two vertex IDs
      * are not connected in this graph.
      */
-    public AttachmentPoint getAPOnLeftVertexID(int vid1, int vid2)
+    public AttachmentPoint getAPOnLeftVertexID(long nbrVid, long vid)
     {
-        Vertex v1 = getVertexWithId(vid1);
-        Vertex v2 = getVertexWithId(vid2);
+        Vertex v1 = getVertexWithId(nbrVid);
+        Vertex v2 = getVertexWithId(vid);
         if ( v1== null || v2 == null)
             return null;
         

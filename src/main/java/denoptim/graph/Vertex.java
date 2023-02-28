@@ -66,7 +66,7 @@ public abstract class Vertex implements Cloneable
     /**
      * Unique identifier associated with the vertex instance
      */
-    private int vertexId;
+    private long vertexId;
     
     /**
      * Index of this building block in the library of building blocks, or
@@ -195,7 +195,7 @@ public abstract class Vertex implements Cloneable
      * {@link GraphUtils#getUniqueVertexIndex()} or use constructor
      * {@link DENOPTIMVertex()}.
      */
-    public Vertex(VertexType vertexType, int id)
+    public Vertex(VertexType vertexType, long id)
     {
         this(vertexType);
         vertexId = id;
@@ -227,7 +227,7 @@ public abstract class Vertex implements Cloneable
      * @param bbt the type of building block
      * @throws DENOPTIMException when index is not within the range.
      */
-    public static Vertex newVertexFromLibrary(int vertexId, int bbId, 
+    public static Vertex newVertexFromLibrary(long vertexId, int bbId, 
             Vertex.BBType bbt, FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {   
@@ -257,14 +257,14 @@ public abstract class Vertex implements Cloneable
     
 //------------------------------------------------------------------------------
 
-    public void setVertexId(int id)
+    public void setVertexId(long vertexId2)
     {
-        this.vertexId = id;
+        this.vertexId = vertexId2;
     }
 
 //------------------------------------------------------------------------------
 
-    public int getVertexId()
+    public long getVertexId()
     {
         return vertexId;
     }

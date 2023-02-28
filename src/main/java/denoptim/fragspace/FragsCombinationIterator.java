@@ -133,7 +133,7 @@ public class FragsCombinationIterator
         // in a vertex
         for (Vertex v : this.rootGraph.getVertexList())
         {
-            int vIdx = v.getVertexId();
+            long vIdx = v.getVertexId();
             int vMolId = v.getBuildingBlockId();
             Vertex.BBType vMolTyp = v.getBuildingBlockType();
            
@@ -238,7 +238,7 @@ public class FragsCombinationIterator
             
             for (IdFragmentAndAP compatApId : compatFragAps)
             {
-                int vid = GraphUtils.getUniqueVertexIndex();
+                long vid = GraphUtils.getUniqueVertexIndex();
                 IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid, //vertexId
                 		            compatApId.getVertexMolId(), //MolId,
                                     Vertex.BBType.FRAGMENT,
@@ -264,7 +264,7 @@ public class FragsCombinationIterator
                             .getCappingGroupsWithAPClass(capApCls);
                 for (Integer i : capGrpIds)
                 {
-                    int vid = GraphUtils.getUniqueVertexIndex();
+                    long vid = GraphUtils.getUniqueVertexIndex();
                     IdFragmentAndAP trgFrgAp = new IdFragmentAndAP(vid,//vertxId
                                                                     i,//MolId,
                                                                     Vertex.BBType.CAP,
@@ -536,7 +536,7 @@ public class FragsCombinationIterator
             // deal with symmetric APs within the same vertex
             for (IdFragmentAndAP srcFrgAp : currentComb.keySet())
             {
-                int srcVrtId = srcFrgAp.getVertexId();
+                long srcVrtId = srcFrgAp.getVertexId();
                 int srcApId = srcFrgAp.getApId();
                 Vertex v = this.rootGraph.getVertexWithId(srcVrtId);
                 AttachmentPoint srcAP = v.getAttachmentPoints().get(srcApId);
@@ -598,7 +598,7 @@ public class FragsCombinationIterator
             {
                 for (IdFragmentAndAP srcFrgAp : currentComb.keySet())
                 {
-                    int srcVrtId = srcFrgAp.getVertexId();
+                    long srcVrtId = srcFrgAp.getVertexId();
                     Vertex srcVrt = this.rootGraph.getVertexWithId(srcVrtId);
                     Iterator<SymmetricVertexes> it = 
                             this.rootGraph.getSymSetsIterator();

@@ -46,7 +46,7 @@ public class CheckPoint
     /** 
      * Unique vertex index
      */
-    protected int unqVrtId = -1;
+    protected long unqVrtId = -1L;
 
     /**
      * Unique graph index
@@ -90,7 +90,7 @@ public class CheckPoint
 
 //-----------------------------------------------------------------------------
 
-    public int getUnqVrtId()
+    public long getUnqVrtId()
     {
         return unqVrtId;
     }
@@ -180,9 +180,9 @@ public class CheckPoint
      * Set the restart value for the unique vertex ID
      */
 
-    public void setUnqVrtId(int val)
+    public void setUnqVrtId(long l)
     {
-        unqVrtId = val;
+        unqVrtId = l;
     }
 
 //-----------------------------------------------------------------------------

@@ -312,7 +312,7 @@ public class GraphConversionTool
         // update bond type of chords
         for (Ring r : rings)
         {
-            int vid = r.getHeadVertex().getVertexId();
+            long vid = r.getHeadVertex().getVertexId();
             for (Edge e : edges)
             {
                 if (e.getTrgVertex() == vid || e.getSrcVertex() == vid)
