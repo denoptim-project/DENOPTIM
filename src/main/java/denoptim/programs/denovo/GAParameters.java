@@ -362,6 +362,11 @@ public class GAParameters extends RunTimeParameters
      */
     public boolean buildAnewFailureTolerant = true;
     
+    /**
+     * Limit to the size of subgraphs that are exchanged during crossover.
+     */
+    public int maxXOverableSubGraphSize = 20;
+    
 
 //------------------------------------------------------------------------------
     
@@ -1153,6 +1158,15 @@ public class GAParameters extends RunTimeParameters
             case "BUILDFAILURETOLERANT=":
             {
                 buildAnewFailureTolerant = readYesNoTrueFalse(value);
+                break;
+            }
+            
+            case "MAXXOVERSUBGRAPHSIZE=":
+            {
+                if (value.length() > 0)
+                {
+                    maxXOverableSubGraphSize = Integer.parseInt(value);
+                }
                 break;
             }
             

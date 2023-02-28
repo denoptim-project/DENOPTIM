@@ -79,11 +79,13 @@ public class GraphOperations
      * possible crossover sites without falling into combinatorial explosion.
      * @param gA one of the parent graphs.
      * @param gB the other of the parent graphs.
+     * TODO-gg
      * @return the list of pairs of crossover sites.
      * @throws DENOPTIMException 
      */
     public static List<XoverSite> locateCompatibleXOverPoints(
-            DGraph graphA, DGraph graphB, FragmentSpace fragSpace) 
+            DGraph graphA, DGraph graphB, FragmentSpace fragSpace, 
+            int maxSizeXoverSubGraph) 
                     throws DENOPTIMException
     {
         // First, we identify all the edges that allow crossover, and collect
@@ -137,17 +139,21 @@ public class GraphOperations
             {
                 DGraph subGraph1 = test1.extractSubgraph(gA.indexOf(vA));
                 DGraph subGraph2 = test2.extractSubgraph(gB.indexOf(vB));
-                if (!subGraph1.isIsomorphicTo(subGraph2))
+                if (maxSizeXoverSubGraph >= Math.max(subGraph1.getVertexCount(), 
+                        subGraph2.getVertexCount()))
                 {
-                    List<Vertex> branchOnVA = new ArrayList<Vertex>();
-                    branchOnVA.add(vA);
-                    branchOnVA.addAll(descendantsA);
-                    List<Vertex> branchOnVB = new ArrayList<Vertex>();
-                    branchOnVB.add(vB);
-                    branchOnVB.addAll(descendantsB);
-                    
-                    checkAndAddXoverSites(fragSpace, branchOnVA, branchOnVB, 
-                            CrossoverType.BRANCH, sites);
+                    if (!subGraph1.isIsomorphicTo(subGraph2))
+                    {
+                        List<Vertex> branchOnVA = new ArrayList<Vertex>();
+                        branchOnVA.add(vA);
+                        branchOnVA.addAll(descendantsA);
+                        List<Vertex> branchOnVB = new ArrayList<Vertex>();
+                        branchOnVB.add(vB);
+                        branchOnVB.addAll(descendantsB);
+                        
+                        checkAndAddXoverSites(fragSpace, branchOnVA, branchOnVB, 
+                                CrossoverType.BRANCH, sites);
+                    }
                 }
             } catch (DENOPTIMException e)
             {
@@ -255,6 +261,7 @@ public class GraphOperations
             List<List<Vertex[]>> preCombsOfEnds = Generator.cartesianProduct(
                     fewestBranchesSide.values())
                     .stream()
+                    .limit(100000) //Prevent explosion!!!
                     .collect(Collectors.<List<Vertex[]>>toList());
             
             // Remove the 'null,null' place holders that indicate the use of no
@@ -313,7 +320,8 @@ public class GraphOperations
                     continue;
                 
                 for (XoverSite xos : locateCompatibleXOverPoints(
-                        tA.getInnerGraph(), tB.getInnerGraph(), fragSpace))
+                        tA.getInnerGraph(), tB.getInnerGraph(), fragSpace,
+                        maxSizeXoverSubGraph))
                 {
                     if (!sites.contains(xos))
                         sites.add(xos);

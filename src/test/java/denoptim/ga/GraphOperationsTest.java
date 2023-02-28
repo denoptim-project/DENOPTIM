@@ -516,7 +516,7 @@ public class GraphOperationsTest {
             
             List<XoverSite> xoverSites = 
                     GraphOperations.locateCompatibleXOverPoints(graphA, graphB, 
-                            fragSpace);
+                            fragSpace, 100);
             
             assertEquals(expectedNumberOfSites.get(i), xoverSites.size());
     
