@@ -35,7 +35,7 @@ import java.util.List;
  * @author Marco Foscato
  */
 
-public class SymmetricSet<T> extends ArrayList<T> implements Cloneable
+public class SymmetricSet<T> extends ArrayList<T>
 {
 
 //------------------------------------------------------------------------------
@@ -54,34 +54,6 @@ public class SymmetricSet<T> extends ArrayList<T> implements Cloneable
     	} else {
     	    return false;
     	}
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Removes the given item from the list
-     * @param i the identifiers to be removed
-     */
-    //TODO-gg remove method
-    public void remove(Integer i)
-    {
-        super.remove(i);
-        while (contains(i))
-        {
-            remove(i);
-        }
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Returns a deep-copy of this set.
-     * @return a deep-copy.
-     */
-    //TODO-gg del
-    public SymmetricSet clone()
-    {
-        throw new Error("We shoulnd not be creating a deep-clone od symmetric sets");
     }
 
 //------------------------------------------------------------------------------

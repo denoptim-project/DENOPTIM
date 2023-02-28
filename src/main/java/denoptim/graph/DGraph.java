@@ -365,23 +365,6 @@ public class DGraph implements Cloneable
         }
         return new SymmetricVertexes();
     }
-    
-//------------------------------------------------------------------------------
-
-    //TODO-gg del
-    @Deprecated
-    public SymmetricVertexes getSymSetForVertexID(int vid)
-    {
-        for (SymmetricVertexes ss : symVertices)
-        {
-            for (Vertex v : ss)
-            {
-                if (v.getVertexId() == vid)
-                    return ss;
-            }
-        }
-        return new SymmetricVertexes();
-    }
 
 //------------------------------------------------------------------------------
 
