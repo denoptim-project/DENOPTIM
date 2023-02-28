@@ -157,7 +157,7 @@ public class GraphViewerPanel extends JPanel
          */
         public JVertex(AttachmentPoint ap) {
             this.ap = ap;
-            idStr = Integer.toString(ap.getOwner().getVertexId()) 
+            idStr = Long.toString(ap.getOwner().getVertexId()) 
                     + Integer.toString(ap.getID());
             //NB: in the GUI (like in the SDF files) we use 1-based indexing
             label = Integer.toString(ap.getIndexInOwner()+1);
@@ -171,8 +171,8 @@ public class GraphViewerPanel extends JPanel
         public JVertex(Vertex v) {
             this.dnpVertex = v;
             this.expandable = true;
-            idStr = Integer.toString(v.getVertexId());
-            label = Integer.toString(v.getVertexId());
+            idStr = Long.toString(v.getVertexId());
+            label = Long.toString(v.getVertexId());
             switch (v.getBuildingBlockType())
             {
                 case SCAFFOLD:

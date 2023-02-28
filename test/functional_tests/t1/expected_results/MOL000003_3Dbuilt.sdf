@@ -38,133 +38,131 @@ M  END
 
 > <GraphJson>
 {
-"graphId": 1,
-"gVertices": [
-{
-"lstAPs": [
-{
-"id": 628,
-"atomPositionNumber": 12,
-"atomPositionNumberInMol": 12,
-"apClass": {
-"rule": "MAreneM",
-"subClass": 1
-},
-"dirVec": {
-"x": -0.5621,
-"y": 5.1953,
-"z": 1.0082
-}
-},
-{
-"id": 629,
-"atomPositionNumber": 12,
-"atomPositionNumberInMol": 12,
-"apClass": {
-"rule": "MAreneM",
-"subClass": 1
-},
-"dirVec": {
-"x": 0.5809,
-"y": 2.7129,
-"z": -1.019
-}
-}
-],
-"lstSymAPs": [
-{
-"symIds": [
-0,
-1
-]
-}
-],
-"vertexId": 1,
-"buildingBlockId": 56,
-"buildingBlockType": "FRAGMENT",
-"isRCV": false,
-"allowedMutationTypes": [
-"DELETE",
-"EXTEND",
-"CHANGEBRANCH",
-"CHANGELINK",
-"ADDLINK",
-"DELETELINK",
-"DELETECHAIN"
-],
-"vertexType": "MolecularFragment"
-},
-{
-"lstAPs": [
-{
-"id": 632,
-"atomPositionNumber": -1,
-"atomPositionNumberInMol": 19,
-"apClass": {
-"rule": "MAreneM",
-"subClass": 0
-}
-}
-],
-"lstSymAPs": [],
-"vertexId": 2,
-"buildingBlockId": -99,
-"buildingBlockType": "UNDEFINED",
-"isRCV": false,
-"allowedMutationTypes": [
-"DELETE",
-"EXTEND",
-"CHANGEBRANCH",
-"CHANGELINK",
-"ADDLINK",
-"DELETELINK",
-"DELETECHAIN"
-],
-"vertexType": "EmptyVertex"
-},
-{
-"lstAPs": [
-{
-"id": 633,
-"atomPositionNumber": -1,
-"atomPositionNumberInMol": 19,
-"apClass": {
-"rule": "MAreneM",
-"subClass": 0
-}
-}
-],
-"lstSymAPs": [],
-"vertexId": 3,
-"buildingBlockId": -99,
-"buildingBlockType": "UNDEFINED",
-"isRCV": false,
-"allowedMutationTypes": [
-"DELETE",
-"EXTEND",
-"CHANGEBRANCH",
-"CHANGELINK",
-"ADDLINK",
-"DELETELINK",
-"DELETECHAIN"
-],
-"vertexType": "EmptyVertex"
-}
-],
-"gEdges": [
-{
-"srcAPID": 629,
-"trgAPID": 632,
-"bondType": "SINGLE"
-},
-{
-"srcAPID": 628,
-"trgAPID": 633,
-"bondType": "SINGLE"
-}
-],
-"gRings": [],
-"symVertices": []
+  "graphId": 1,
+  "gVertices": [
+    {
+      "lstAPs": [
+        {
+          "id": 628,
+          "atomPositionNumber": 12,
+          "atomPositionNumberInMol": 12,
+          "apClass": {
+            "rule": "MAreneM",
+            "subClass": 1
+          },
+          "dirVec": {
+            "x": -0.5621,
+            "y": 5.1953,
+            "z": 1.0082
+          }
+        },
+        {
+          "id": 629,
+          "atomPositionNumber": 12,
+          "atomPositionNumberInMol": 12,
+          "apClass": {
+            "rule": "MAreneM",
+            "subClass": 1
+          },
+          "dirVec": {
+            "x": 0.5809,
+            "y": 2.7129,
+            "z": -1.019
+          }
+        }
+      ],
+      "lstSymAPs": [
+        [
+          628,
+          629
+        ]
+      ],
+      "vertexId": 1,
+      "buildingBlockId": 56,
+      "buildingBlockType": "FRAGMENT",
+      "isRCV": false,
+      "allowedMutationTypes": [
+        "DELETE",
+        "EXTEND",
+        "CHANGEBRANCH",
+        "CHANGELINK",
+        "ADDLINK",
+        "DELETELINK",
+        "DELETECHAIN"
+      ],
+      "vertexType": "MolecularFragment"
+    },
+    {
+      "lstAPs": [
+        {
+          "id": 632,
+          "atomPositionNumber": -1,
+          "atomPositionNumberInMol": 19,
+          "apClass": {
+            "rule": "MAreneM",
+            "subClass": 0
+          }
+        }
+      ],
+      "lstSymAPs": [],
+      "vertexId": 2,
+      "buildingBlockId": -99,
+      "buildingBlockType": "UNDEFINED",
+      "isRCV": false,
+      "allowedMutationTypes": [
+        "DELETE",
+        "EXTEND",
+        "CHANGEBRANCH",
+        "CHANGELINK",
+        "ADDLINK",
+        "DELETELINK",
+        "DELETECHAIN"
+      ],
+      "vertexType": "EmptyVertex"
+    },
+    {
+      "lstAPs": [
+        {
+          "id": 633,
+          "atomPositionNumber": -1,
+          "atomPositionNumberInMol": 19,
+          "apClass": {
+            "rule": "MAreneM",
+            "subClass": 0
+          }
+        }
+      ],
+      "lstSymAPs": [],
+      "vertexId": 3,
+      "buildingBlockId": -99,
+      "buildingBlockType": "UNDEFINED",
+      "isRCV": false,
+      "allowedMutationTypes": [
+        "DELETE",
+        "EXTEND",
+        "CHANGEBRANCH",
+        "CHANGELINK",
+        "ADDLINK",
+        "DELETELINK",
+        "DELETECHAIN"
+      ],
+      "vertexType": "EmptyVertex"
+    }
+  ],
+  "gEdges": [
+    {
+      "srcAPID": 629,
+      "trgAPID": 632,
+      "bondType": "SINGLE"
+    },
+    {
+      "srcAPID": 628,
+      "trgAPID": 633,
+      "bondType": "SINGLE"
+    }
+  ],
+  "gRings": [],
+  "symVertices": []
 }
 
 > <DENOPTIMVertexID>

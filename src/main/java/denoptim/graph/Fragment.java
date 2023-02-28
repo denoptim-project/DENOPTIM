@@ -61,13 +61,13 @@ public class Fragment extends Vertex
     /**
      * attachment points on this vertex
      */
-    private ArrayList<AttachmentPoint> lstAPs;
+    private List<AttachmentPoint> lstAPs;
 
     /**
      * List of AP sets that are related to each other, so that we
      * call them "symmetric" (though symmetry is a fuzzy concept here).
      */
-    private ArrayList<SymmetricSet> lstSymAPs;
+    private List<SymmetricAPs> lstSymAPs;
     
 	/**
 	 * Molecular representation of this fragment
@@ -91,7 +91,7 @@ public class Fragment extends Vertex
     {
         super(VertexType.MolecularFragment);
         this.lstAPs = new ArrayList<AttachmentPoint>();
-        this.lstSymAPs = new ArrayList<SymmetricSet>();
+        this.lstSymAPs = new ArrayList<SymmetricAPs>();
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
         this.mol = builder.newAtomContainer();
     }
@@ -103,11 +103,11 @@ public class Fragment extends Vertex
      * @param vertexId unique identified of the vertex
      */
 
-    public Fragment(int vertexId)
+    public Fragment(long vertexId)
     {
         super(VertexType.MolecularFragment, vertexId);
         this.lstAPs = new ArrayList<AttachmentPoint>();
-        this.lstSymAPs = new ArrayList<SymmetricSet>();
+        this.lstSymAPs = new ArrayList<SymmetricAPs>();
         IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
         this.mol = builder.newAtomContainer();
     }
@@ -121,20 +121,20 @@ public class Fragment extends Vertex
      * if present.
      * WARNING: other properties of the atom container
      * are not imported!
-     * @param vertexId the identifier of the vertex to construct
+     * @param l the identifier of the vertex to construct
      * @param mol the molecular representation
      * @throws DENOPTIMException 
      */
     
-    public Fragment(int vertexId, IAtomContainer mol, BBType bbt)
+    public Fragment(long l, IAtomContainer mol, BBType bbt)
             throws DENOPTIMException
     {     
-        super (VertexType.MolecularFragment, vertexId);
+        super (VertexType.MolecularFragment, l);
         
         this.setBuildingBlockType(bbt);
         
         this.lstAPs = new ArrayList<AttachmentPoint>();
-        this.lstSymAPs = new ArrayList<SymmetricSet>();
+        this.lstSymAPs = new ArrayList<SymmetricAPs>();
         
         this.mol = MoleculeUtils.makeSameAs(mol);
         MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(this.mol);
@@ -145,7 +145,7 @@ public class Fragment extends Vertex
             projectPropertyToAP(prop.toString());
         }
         
-        ArrayList<SymmetricSet> simAP = identifySymmetryRelatedAPSets(this.mol, 
+        List<SymmetricAPs> simAP = identifySymmetryRelatedAPSets(this.mol, 
                 getAttachmentPoints());
         setSymmetricAPSets(simAP);
         
@@ -163,7 +163,7 @@ public class Fragment extends Vertex
 
 //------------------------------------------------------------------------------
 
-    public Fragment(int vertexId, IAtomContainer mol, BBType bbt, boolean isRCV)
+    public Fragment(long vertexId, IAtomContainer mol, BBType bbt, boolean isRCV)
             throws DENOPTIMException {
         this(vertexId, mol, bbt);
         this.setAsRCV(isRCV);
@@ -235,21 +235,20 @@ public class Fragment extends Vertex
     
 //------------------------------------------------------------------------------
     
-    private static ArrayList<SymmetricSet> identifySymmetryRelatedAPSets(
-            IAtomContainer mol,
-            ArrayList<AttachmentPoint> daps)
+    private static List<SymmetricAPs> identifySymmetryRelatedAPSets(
+            IAtomContainer mol, List<AttachmentPoint> daps)
     {
-        ArrayList<SymmetricSet> lstCompatible = new ArrayList<>();
+        List<SymmetricAPs> lstCompatible = new ArrayList<>();
         for (int i=0; i<daps.size()-1; i++)
         {
-            ArrayList<Integer> lst = new ArrayList<>();
-            Integer i1 = i;
-            lst.add(i1);
+            AttachmentPoint apI = daps.get(i);
+            SymmetricAPs ss = new SymmetricAPs();
+            ss.add(apI);
             
             boolean alreadyFound = false;
-            for (SymmetricSet previousSS : lstCompatible)
+            for (SymmetricAPs previousSS : lstCompatible)
             {
-                if (previousSS.contains(i1))
+                if (previousSS.contains(apI))
                 {
                     alreadyFound = true;
                     break;
@@ -260,26 +259,24 @@ public class Fragment extends Vertex
                 continue;
             }
         
-            AttachmentPoint d1 = daps.get(i);
             for (int j=i+1; j<daps.size(); j++)
             {
-                AttachmentPoint d2 = daps.get(j);
-                if (atomsAreCompatible(mol, d1.getAtomPositionNumber(),
-                                    d2.getAtomPositionNumber()))
+                AttachmentPoint apJ = daps.get(j);
+                if (atomsAreCompatible(mol, apI.getAtomPositionNumber(),
+                                    apJ.getAtomPositionNumber()))
                 {
                     // check if reactions are compatible w.r.t. symmetry
-                    if (d1.getAPClass()!=null && d2.getAPClass()!=null 
-                            && d1.getAPClass().compareTo(d2.getAPClass()) == 0)
+                    if (apI.getAPClass()!=null && apJ.getAPClass()!=null 
+                            && apI.getAPClass().compareTo(apJ.getAPClass()) == 0)
                     {
-                        Integer i2 = j;
-                        lst.add(i2);
+                        ss.add(apJ);
                     }
                 }
             }
             
-            if (lst.size() > 1)
+            if (ss.size() > 1)
             {
-                lstCompatible.add(new SymmetricSet(lst));
+                lstCompatible.add(ss);
             }
         }
         
@@ -543,7 +540,7 @@ public class Fragment extends Vertex
      * in the atom list!
      */
     
-    public ArrayList<AttachmentPoint> getCurrentAPs()
+    public List<AttachmentPoint> getCurrentAPs()
     {
     	updateAPs();
     	
@@ -731,8 +728,7 @@ public class Fragment extends Vertex
 //-----------------------------------------------------------------------------
 
     /**
-     * Returns a deep copy of this fragments
-     * @throws CloneNotSupportedException 
+     * Returns a deep copy of this fragments.
      */
     
     @Override
@@ -763,13 +759,19 @@ public class Fragment extends Vertex
 		clone.setBuildingBlockType(this.getBuildingBlockType());
 
         clone.setMutationTypes(this.getUnfilteredMutationTypes());
-		
-		ArrayList<SymmetricSet> cLstSymAPs = new ArrayList<SymmetricSet>();
-        for (SymmetricSet ss : this.getSymmetricAPSets())
+        
+        List<SymmetricAPs> cLstSymAPs = new ArrayList<SymmetricAPs>();
+        for (SymmetricAPs symAPs : this.getSymmetricAPSets())
         {
-            cLstSymAPs.add(ss.clone());
+            SymmetricAPs cSymAPs = new SymmetricAPs();
+            for (AttachmentPoint ap : symAPs)
+            {
+                cSymAPs.add(clone.getAP(ap.getIndexInOwner()));
+            }
+            cLstSymAPs.add(cSymAPs);
         }
         clone.setSymmetricAPSets(cLstSymAPs);
+        
         clone.setAsRCV(this.isRCV());
         clone.setProperties(this.copyStringBasedProperties());
         if (uniquefyingPropertyKeys!=null)
@@ -1112,7 +1114,7 @@ public class Fragment extends Vertex
 //------------------------------------------------------------------------------
 
     @Override
-    public ArrayList<AttachmentPoint> getAttachmentPoints()
+    public List<AttachmentPoint> getAttachmentPoints()
     {
         return lstAPs;
     }
@@ -1120,15 +1122,27 @@ public class Fragment extends Vertex
 //------------------------------------------------------------------------------
 
     @Override
-    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
+    protected void setSymmetricAPSets(List<SymmetricAPs> sAPs)
     {
         this.lstSymAPs = sAPs;
+    }
+  
+//-----------------------------------------------------------------------------
+
+    @Override
+    protected void addSymmetricAPSet(SymmetricAPs symAPs)
+    {
+        if (this.lstSymAPs==null)
+        {
+            this.lstSymAPs = new ArrayList<SymmetricAPs>();
+        }
+        this.lstSymAPs.add(symAPs);
     }
     
 //------------------------------------------------------------------------------
 
     @Override
-    public ArrayList<SymmetricSet> getSymmetricAPSets()
+    public List<SymmetricAPs> getSymmetricAPSets()
     {
         return lstSymAPs;
     }

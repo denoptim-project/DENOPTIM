@@ -132,6 +132,11 @@ public class FragmentSpace
     private HashMap<APClass, ArrayList<ArrayList<Integer>>> fragsApsPerApClass;
     
     /**
+     * Lock for synchronizing tasks
+     */
+    private final Object LOCK = new Object();
+    
+    /**
      * APclass-specific constraints to constitutional symmetry
      */
     private HashMap<APClass, Double> symmConstraints;
@@ -927,13 +932,6 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public HashMap<Integer, ArrayList<APClass>> getMapAPClassesPerFragment()
-    {
-        return apClassesPerFrag;
-    }
-
-//------------------------------------------------------------------------------
-
     /**
      * Returns the APclasses associated with a given fragment.
      * 
@@ -943,14 +941,10 @@ public class FragmentSpace
 
     public ArrayList<APClass> getAPClassesPerFragment(int fragId)
     {
-        return apClassesPerFrag.get(fragId);
-    }
-
-//------------------------------------------------------------------------------
-
-    public HashMap<APClass, ArrayList<ArrayList<Integer>>> getMapFragsAPsPerAPClass()
-    {
-        return fragsApsPerApClass;
+        synchronized (LOCK)
+        {
+            return apClassesPerFrag.get(fragId);
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -969,16 +963,19 @@ public class FragmentSpace
     {
         ArrayList<IdFragmentAndAP> lst = new ArrayList<IdFragmentAndAP>();
 
-        if (fragsApsPerApClass.containsKey(apc))
+        synchronized (LOCK)
         {
-            for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+            if (fragsApsPerApClass.containsKey(apc))
             {
-                IdFragmentAndAP apId = new IdFragmentAndAP(-1, // vertexId
-                        idxs.get(0), // MolId,
-                        BBType.FRAGMENT, idxs.get(1), // ApId
-                        -1, // noVSym
-                        -1);// noAPSym
-                lst.add(apId);
+                for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+                {
+                    IdFragmentAndAP apId = new IdFragmentAndAP(-1, // vertexId
+                            idxs.get(0), // MolId,
+                            BBType.FRAGMENT, idxs.get(1), // ApId
+                            -1, // noVSym
+                            -1);// noAPSym
+                    lst.add(apId);
+                }
             }
         }
         return lst;
@@ -996,12 +993,15 @@ public class FragmentSpace
     {
         ArrayList<Vertex> lst = new ArrayList<Vertex>();
         
-        if (fragsApsPerApClass.containsKey(apc))
+        synchronized (LOCK)
         {
-            for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+            if (fragsApsPerApClass.containsKey(apc))
             {
-                Vertex v = fragmentLib.get(idxs.get(0));
-                lst.add(v);
+                for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+                {
+                    Vertex v = fragmentLib.get(idxs.get(0));
+                    lst.add(v);
+                }
             }
         }
         return lst;
@@ -1354,22 +1354,6 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public void setFragsApsPerApClass(HashMap<APClass, 
-            ArrayList<ArrayList<Integer>>> map)
-    {
-        fragsApsPerApClass = map;
-    }
-
-//------------------------------------------------------------------------------
-
-    public void setAPClassesPerFrag(
-            HashMap<Integer, ArrayList<APClass>> map)
-    {
-        apClassesPerFrag = map;
-    }
-
-//------------------------------------------------------------------------------
-
     public void setSymmConstraints(HashMap<APClass, Double> map)
     {
         symmConstraints = map;
@@ -1541,7 +1525,7 @@ public class FragmentSpace
             ArrayList<Vertex> library = type == BBType.FRAGMENT ?
                     fragmentLib : scaffoldLib;
             
-            synchronized (library)
+            synchronized (LOCK)
             {
                 if (!hasIsomorph(g, type)) 
                 {   
@@ -1754,7 +1738,7 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     
-    public void classifyFragment(Vertex frg,int fragId)
+    public void classifyFragment(Vertex frg, int fragId)
     {   
     	// Classify according to number of APs
         int nAps = frg.getFreeAPCount();
@@ -1776,11 +1760,13 @@ public class FragmentSpace
     	{
     	    // Collect classes per fragment
     	    ArrayList<APClass> lstAPC = frg.getAllAPClasses();
-            getMapAPClassesPerFragment().put(fragId,lstAPC);
+    	    synchronized (LOCK)
+            {
+    	        apClassesPerFrag.put(fragId,lstAPC);
+            }
             
     	    // Classify according to AP-Classes
-            ArrayList<AttachmentPoint> lstAPs = 
-                    frg.getAttachmentPoints();
+            List<AttachmentPoint> lstAPs = frg.getAttachmentPoints();
             
     	    for (int j=0; j<lstAPs.size(); j++)
     	    {
@@ -1795,17 +1781,18 @@ public class FragmentSpace
     			    continue;
     			}
     			
-    		    if (getMapFragsAPsPerAPClass().containsKey(cls))
-    			{
-    			    getMapFragsAPsPerAPClass().get(cls).add(apId);
-    			}
-    			else
-    			{
-    			    ArrayList<ArrayList<Integer>> outLst = 
-    						    new ArrayList<ArrayList<Integer>>();
-    			    outLst.add(apId);
-    			    getMapFragsAPsPerAPClass().put(cls,outLst);
-    			}
+    			synchronized (LOCK)
+                {
+        		    if (fragsApsPerApClass.containsKey(cls))
+        			{
+        		        fragsApsPerApClass.get(cls).add(apId);
+        			} else {
+        			    ArrayList<ArrayList<Integer>> outLst = 
+        						    new ArrayList<ArrayList<Integer>>();
+        			    outLst.add(apId);
+        			    fragsApsPerApClass.put(cls,outLst);
+        			}
+        	    }
     	    }
     	    
     	    if (frg.isRCV())
@@ -1828,9 +1815,15 @@ public class FragmentSpace
     	setFragPoolPerNumAP(new HashMap<Integer,ArrayList<Integer>>());
     	if (apClassBasedApproch)
     	{
-    	    setFragsApsPerApClass(
-    	            new HashMap<APClass,ArrayList<ArrayList<Integer>>>());
-    	    setAPClassesPerFrag(new HashMap<Integer,ArrayList<APClass>>());
+    	    synchronized (LOCK)
+            {
+    	        fragsApsPerApClass = new HashMap<APClass,ArrayList<
+    	            ArrayList<Integer>>>();
+            }
+    	    synchronized (LOCK)
+            {
+    	        apClassesPerFrag = new HashMap<Integer,ArrayList<APClass>>();
+            }
     	}
     	for (int j=0; j<getFragmentLibrary().size(); j++)
     	{

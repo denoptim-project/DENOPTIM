@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -788,7 +789,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		clearAPTable();
 		mapAPs = new HashMap<Integer,AttachmentPoint>();
 		
-		ArrayList<AttachmentPoint> lstAPs = fragment.getCurrentAPs();		
+		List<AttachmentPoint> lstAPs = fragment.getCurrentAPs();		
         if (lstAPs.size() == 0)
         {
 			return;

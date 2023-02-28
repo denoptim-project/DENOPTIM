@@ -43,7 +43,9 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
+import denoptim.graph.SymmetricAPs;
 import denoptim.graph.SymmetricSet;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -77,11 +79,16 @@ public class GraphOperations
      * possible crossover sites without falling into combinatorial explosion.
      * @param gA one of the parent graphs.
      * @param gB the other of the parent graphs.
+     * @param fragSpace the space of building blocks defining how to generate
+     * graphs.
+     * @param maxSizeXoverSubGraph the limit to the size of subgraphs that can
+     * can be exchanged by crossover.
      * @return the list of pairs of crossover sites.
      * @throws DENOPTIMException 
      */
     public static List<XoverSite> locateCompatibleXOverPoints(
-            DGraph graphA, DGraph graphB, FragmentSpace fragSpace) 
+            DGraph graphA, DGraph graphB, FragmentSpace fragSpace, 
+            int maxSizeXoverSubGraph) 
                     throws DENOPTIMException
     {
         // First, we identify all the edges that allow crossover, and collect
@@ -135,17 +142,21 @@ public class GraphOperations
             {
                 DGraph subGraph1 = test1.extractSubgraph(gA.indexOf(vA));
                 DGraph subGraph2 = test2.extractSubgraph(gB.indexOf(vB));
-                if (!subGraph1.isIsomorphicTo(subGraph2))
+                if (maxSizeXoverSubGraph >= Math.max(subGraph1.getVertexCount(), 
+                        subGraph2.getVertexCount()))
                 {
-                    List<Vertex> branchOnVA = new ArrayList<Vertex>();
-                    branchOnVA.add(vA);
-                    branchOnVA.addAll(descendantsA);
-                    List<Vertex> branchOnVB = new ArrayList<Vertex>();
-                    branchOnVB.add(vB);
-                    branchOnVB.addAll(descendantsB);
-                    
-                    checkAndAddXoverSites(fragSpace, branchOnVA, branchOnVB, 
-                            CrossoverType.BRANCH, sites);
+                    if (!subGraph1.isIsomorphicTo(subGraph2))
+                    {
+                        List<Vertex> branchOnVA = new ArrayList<Vertex>();
+                        branchOnVA.add(vA);
+                        branchOnVA.addAll(descendantsA);
+                        List<Vertex> branchOnVB = new ArrayList<Vertex>();
+                        branchOnVB.add(vB);
+                        branchOnVB.addAll(descendantsB);
+                        
+                        checkAndAddXoverSites(fragSpace, branchOnVA, branchOnVB, 
+                                CrossoverType.BRANCH, sites);
+                    }
                 }
             } catch (DENOPTIMException e)
             {
@@ -253,6 +264,7 @@ public class GraphOperations
             List<List<Vertex[]>> preCombsOfEnds = Generator.cartesianProduct(
                     fewestBranchesSide.values())
                     .stream()
+                    .limit(100000) //Prevent explosion!!!
                     .collect(Collectors.<List<Vertex[]>>toList());
             
             // Remove the 'null,null' place holders that indicate the use of no
@@ -311,7 +323,8 @@ public class GraphOperations
                     continue;
                 
                 for (XoverSite xos : locateCompatibleXOverPoints(
-                        tA.getInnerGraph(), tB.getInnerGraph(), fragSpace))
+                        tA.getInnerGraph(), tB.getInnerGraph(), fragSpace,
+                        maxSizeXoverSubGraph))
                 {
                     if (!sites.contains(xos))
                         sites.add(xos);
@@ -836,7 +849,7 @@ public class GraphOperations
         }
 
         // vertex id of the parent
-        int pvid = e.getSrcVertex();
+        long pvid = e.getSrcVertex();
         Vertex parentVrt = g.getVertexWithId(pvid);
 
         // Need to remember symmetry because we are deleting the symm. vertices
@@ -861,24 +874,17 @@ public class GraphOperations
      */
     
     protected static boolean deleteFragment(Vertex vertex)
-                                                    throws DENOPTIMException
+            throws DENOPTIMException
     {
-        int vid = vertex.getVertexId();
+        long vid = vertex.getVertexId();
         DGraph molGraph = vertex.getGraphOwner();
 
         if (molGraph.hasSymmetryInvolvingVertex(vertex))
         {
-            ArrayList<Integer> toRemove = new ArrayList<Integer>();
-            for (int i=0; i<molGraph.getSymSetForVertexID(vid).size(); i++)
+            List<Vertex> toRemove = new ArrayList<Vertex>();
+            toRemove.addAll(molGraph.getSymSetForVertex(vertex));
+            for (Vertex v : toRemove)
             {
-                int svid = molGraph.getSymSetForVertexID(vid).getList().get(i); 
-                toRemove.add(svid);
-            }
-            for (Integer svid : toRemove)
-            {
-                Vertex v = molGraph.getVertexWithId(svid);
-                if (v == null)
-                    continue;
                 molGraph.removeBranchStartingAt(v);
             }
         }
@@ -910,21 +916,16 @@ public class GraphOperations
     protected static boolean deleteChain(Vertex vertex, Monitor mnt,
             FragmentSpace fragSpace) throws DENOPTIMException
     {
-        int vid = vertex.getVertexId();
+        long vid = vertex.getVertexId();
         DGraph molGraph = vertex.getGraphOwner();
 
         if (molGraph.hasSymmetryInvolvingVertex(vertex))
         {
-            ArrayList<Integer> toRemove = new ArrayList<Integer>();
-            for (int i=0; i<molGraph.getSymSetForVertexID(vid).size(); i++)
+            List<Vertex> toRemove = new ArrayList<Vertex>();
+            toRemove.addAll(molGraph.getSymSetForVertex(vertex));
+            for (Vertex v : toRemove)
             {
-                int svid = molGraph.getSymSetForVertexID(vid).getList().get(i);
-                toRemove.add(svid);
-            }
-            for (Integer svid : toRemove)
-            {
-                Vertex v = molGraph.getVertexWithId(svid);
-                if (v == null || !v.getMutationTypes(new ArrayList<MutationType>())
+                if (!v.getMutationTypes(new ArrayList<MutationType>())
                         .contains(MutationType.DELETECHAIN))
                     continue;
                 molGraph.removeChainUpToBranching(v, fragSpace);
@@ -1024,13 +1025,12 @@ public class GraphOperations
             return status;
         }
         
-        int curVrtId = curVrtx.getVertexId();
         DGraph molGraph = curVrtx.getGraphOwner();
         int lvl = molGraph.getLevel(curVrtx);
 
-        ArrayList<Integer> addedVertices = new ArrayList<>();
+        ArrayList<Long> addedVertices = new ArrayList<>();
 
-        ArrayList<AttachmentPoint> lstDaps = curVrtx.getAttachmentPoints();
+        List<AttachmentPoint> lstDaps = curVrtx.getAttachmentPoints();
         List<AttachmentPoint> toDoAPs = new ArrayList<AttachmentPoint>();
         toDoAPs.addAll(lstDaps);
         for (int i=0; i<lstDaps.size(); i++)
@@ -1127,17 +1127,18 @@ public class GraphOperations
                             ap.getAPClass()),
                     settings.getSymmetryProbability(),
                     fsParams.getRandomizer());
-            SymmetricSet symAPs = curVrtx.getSymmetricAPs(apId);
-            if (symAPs!=null 
+            SymmetricAPs symAPs = new SymmetricAPs();
+            if (curVrtx.getSymmetricAPs(ap).size()!=0
                     && (cpOnSymAPs || symmetryOnAps)
                     && !allowOnlyRingClosure)
             {
+                symAPs.addAll(curVrtx.getSymmetricAPs(ap));
+                
                 // Are symmetric APs rooted on same atom?
                 boolean allOnSameSrc = true;
-                for (Integer symApId : symAPs.getList())
+                for (AttachmentPoint symAP : symAPs)
                 {
-                    if (!curVrtx.getAttachmentPoints().get(symApId)
-                            .hasSameSrcAtom(ap))
+                    if (!symAP.hasSameSrcAtom(ap))
                     {
                         allOnSameSrc = false;
                         break;
@@ -1152,10 +1153,10 @@ public class GraphOperations
                     
                     int crowdedness = EAUtils.getCrowdedness(ap);
                     
-                    SymmetricSet toKeep = new SymmetricSet();
+                    SymmetricAPs toKeep = new SymmetricAPs();
                     
                     // Start by keeping "ap"
-                    toKeep.add(apId);
+                    toKeep.add(ap);
                     crowdedness = crowdedness + 1;
                     
                     // Pick the accepted value once (used to decide how much
@@ -1163,9 +1164,9 @@ public class GraphOperations
                     double shot = settings.getRandomizer().nextDouble();
                     
                     // Keep as many as allowed by the crowdedness decision
-                    for (Integer symApId : symAPs.getList())
+                    for (AttachmentPoint symAP : symAPs)
                     {
-                        if (symApId.compareTo(apId) == 0)
+                        if (symAP == ap)
                             continue;
                         
                         double crowdProb = EAUtils.getCrowdingProbability(
@@ -1174,7 +1175,7 @@ public class GraphOperations
                         if (shot > crowdProb)
                             break;
                         
-                        toKeep.add(symApId);
+                        toKeep.add(symAP);
                         crowdedness = crowdedness + 1;
                     }
                     
@@ -1182,20 +1183,20 @@ public class GraphOperations
                     symAPs = toKeep;
                 }
             } else {
-                symAPs = new SymmetricSet();
-                symAPs.add(apId);
+                symAPs = new SymmetricAPs();
+                symAPs.add(ap);
             }
 
             // ...and inherit symmetry from previous levels
             boolean cpOnSymVrts = molGraph.hasSymmetryInvolvingVertex(curVrtx);
-            SymmetricSet symVerts = new SymmetricSet();
+            SymmetricVertexes symVerts = new SymmetricVertexes();
             if (cpOnSymVrts)
             {
-                symVerts = molGraph.getSymSetForVertexID(curVrtId);
+                symVerts = molGraph.getSymSetForVertex(curVrtx);
             }
             else
             {
-                symVerts.add(curVrtId);
+                symVerts.add(curVrtx);
             }
             
             // Consider size after application of symmetry
@@ -1209,36 +1210,27 @@ public class GraphOperations
             GraphUtils.ensureVertexIDConsistency(molGraph.getMaxVertexId());
 
             // loop on all symmetric vertices, but can be only one.
-            SymmetricSet newSymSetOfVertices = new SymmetricSet();
-            for (Integer parVrtId : symVerts.getList())
+            SymmetricVertexes newSymSetOfVertices = new SymmetricVertexes();
+            for (AttachmentPoint symAP : symAPs)
             {
-                Vertex parVrt = molGraph.getVertexWithId(parVrtId);
-                
-                for (int si=0; si<symAPs.size(); si++)
+                if (!symAP.isAvailable())
                 {
-                    int symApId = symAPs.get(si);
-                    AttachmentPoint symAP = parVrt.getAttachmentPoints()
-                            .get(symApId);
-                    
-                    if (!symAP.isAvailable())
-                    {
-                        continue;
-                    }
-
-                    // Finally add the fragment on a symmetric AP
-                    int newVrtId = GraphUtils.getUniqueVertexIndex();
-                    Vertex fragVertex = Vertex.newVertexFromLibrary(newVrtId, 
-                                    chosenFrgAndAp.getVertexMolId(), 
-                                    BBType.FRAGMENT,
-                                    fsParams.getFragmentSpace());
-                    AttachmentPoint trgAP = fragVertex.getAP(
-                            chosenFrgAndAp.getApId());
-                    
-                    molGraph.appendVertexOnAP(symAP, trgAP);
-                    
-                    addedVertices.add(newVrtId);
-                    newSymSetOfVertices.add(newVrtId);
+                    continue;
                 }
+
+                // Finally add the fragment on a symmetric AP
+                long newVrtId = GraphUtils.getUniqueVertexIndex();
+                Vertex fragVertex = Vertex.newVertexFromLibrary(newVrtId, 
+                                chosenFrgAndAp.getVertexMolId(), 
+                                BBType.FRAGMENT,
+                                fsParams.getFragmentSpace());
+                AttachmentPoint trgAP = fragVertex.getAP(
+                        chosenFrgAndAp.getApId());
+                
+                molGraph.appendVertexOnAP(symAP, trgAP);
+                
+                addedVertices.add(newVrtId);
+                newSymSetOfVertices.add(fragVertex);
             }
 
             // If any, store symmetry of new vertices in the graph
@@ -1253,7 +1245,7 @@ public class GraphOperations
             // attempt to further extend each of the newly added vertices
             for (int i=0; i<addedVertices.size(); i++)
             {
-                int vid = addedVertices.get(i);
+                long vid = addedVertices.get(i);
                 Vertex v = molGraph.getVertexWithId(vid);
                 extendGraph(v, extend, symmetryOnAps, settings);
             }
@@ -1307,7 +1299,7 @@ public class GraphOperations
             int dapidx, int chosenVrtxIdx, int chosenApId, 
             FragmentSpace fragSpace) throws DENOPTIMException
     {
-        ArrayList<AttachmentPoint> lstDaps = curVertex.getAttachmentPoints();
+        List<AttachmentPoint> lstDaps = curVertex.getAttachmentPoints();
         AttachmentPoint curDap = lstDaps.get(dapidx);
 
         // Initialize with an empty pointer
@@ -1321,7 +1313,7 @@ public class GraphOperations
         }
         else
         {
-            ArrayList<IdFragmentAndAP> candidates = 
+            List<IdFragmentAndAP> candidates = 
                     fragSpace.getFragAPsCompatibleWithClass(
                     curDap.getAPClass());
             if (candidates.size() > 0)
@@ -1393,7 +1385,7 @@ public class GraphOperations
 
     protected static boolean attachFragmentInClosableChain(
             Vertex curVertex, int dapidx, DGraph molGraph,
-            ArrayList<Integer> addedVertices, GAParameters settings)
+            ArrayList<Long> addedVertices, GAParameters settings)
                     throws DENOPTIMException
     {
         boolean res = false;
@@ -1428,7 +1420,7 @@ public class GraphOperations
             int dapNewFrag = newFragIds.get(2);
             if (molIdNewFrag != -1)
             {
-                int newvid = GraphUtils.getUniqueVertexIndex();
+                long newvid = GraphUtils.getUniqueVertexIndex();
                 Vertex newVrtx = Vertex.newVertexFromLibrary(
                         newvid, molIdNewFrag, typeNewFrag, 
                         fsParams.getFragmentSpace());

@@ -1,8 +1,8 @@
 [
   {
-     "task": "DELETEVERTEX",
-     "vertexQuery": {
-        "vertexId": 2041
-     }
+    "task": "DELETEVERTEX",
+    "vertexQuery": {
+      "vertexId": 2041
+    }
   }
 ]

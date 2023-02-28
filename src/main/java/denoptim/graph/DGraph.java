@@ -99,22 +99,22 @@ public class DGraph implements Cloneable
     /**
      * The vertices belonging to this graph.
      */
-    ArrayList<Vertex> gVertices;
+    List<Vertex> gVertices;
 
     /**
      * The edges belonging to this graph.
      */
-    ArrayList<Edge> gEdges;
+    List<Edge> gEdges;
 
     /**
      * The rings defined in this graph.
      */
-    ArrayList<Ring> gRings;
+    List<Ring> gRings;
 
     /**
      * The potentially closable chains of vertices.
      */
-    ArrayList<ClosableChain> closableChains;
+    List<ClosableChain> closableChains;
 
     /*
      * Unique graph id
@@ -125,7 +125,7 @@ public class DGraph implements Cloneable
      * store the set of symmetric vertex ids at each level. This is only
      * applicable for symmetric graphs
      */
-    ArrayList<SymmetricSet> symVertices;
+    List<SymmetricVertexes> symVertices;
 
     /**
      * A free-format string used to record simple properties in the graph. For
@@ -160,12 +160,16 @@ public class DGraph implements Cloneable
      * Identifier for the format of string representations of a graph
      */
     public enum StringFormat {JSON, GRAPHENC}
+    
+    /**
+     * Generator of unique AP identifiers within this graph
+     */
+    private AtomicInteger apCounter = new AtomicInteger(1);
 
 
 //------------------------------------------------------------------------------
 
-    public DGraph(ArrayList<Vertex> gVertices,
-                            ArrayList<Edge> gEdges)
+    public DGraph(List<Vertex> gVertices, List<Edge> gEdges)
     {
         this.gVertices = gVertices;
         for (Vertex v : this.gVertices)
@@ -179,9 +183,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DGraph(ArrayList<Vertex> gVertices,
-                            ArrayList<Edge> gEdges,
-                            ArrayList<Ring> gRings)
+    public DGraph(List<Vertex> gVertices, List<Edge> gEdges, List<Ring> gRings)
     {
         this(gVertices, gEdges);
         this.gRings = gRings;
@@ -192,24 +194,20 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public DGraph(ArrayList<Vertex> gVertices,
-                            ArrayList<Edge> gEdges,
-                            ArrayList<Ring> gRings,
-                            ArrayList<SymmetricSet> symVertices)
+    public DGraph(List<Vertex> gVertices, List<Edge> gEdges, List<Ring> gRings,
+            List<SymmetricVertexes> symSets)
     {
         this(gVertices, gEdges, gRings);
         closableChains = new ArrayList<>();
-        this.symVertices = symVertices;
+        this.symVertices = symSets;
         localMsg = "";
     }
 
 //------------------------------------------------------------------------------
 
-    public DGraph(ArrayList<Vertex> gVertices,
-                            ArrayList<Edge> gEdges,
-                            ArrayList<Ring> gRings,
-                            ArrayList<ClosableChain> closableChains,
-                            ArrayList<SymmetricSet> symVertices)
+    public DGraph(List<Vertex> gVertices, List<Edge> gEdges, List<Ring> gRings,
+            List<ClosableChain> closableChains, 
+            List<SymmetricVertexes> symVertices)
     {
         this(gVertices, gEdges, gRings, symVertices);
         this.closableChains = closableChains;
@@ -291,9 +289,9 @@ public class DGraph implements Cloneable
     public boolean hasSymmetryInvolvingVertex(Vertex v)
     {
         boolean res = false;
-        for (SymmetricSet ss : symVertices)
+        for (SymmetricVertexes ss : symVertices)
         {
-            if (ss.contains(v.getVertexId()))
+            if (ss.contains(v))
             {
                 res = true;
                 break;
@@ -319,7 +317,7 @@ public class DGraph implements Cloneable
      * Get an iterator for the sets of symmetrically related vertices.
      */
 
-    public Iterator<SymmetricSet> getSymSetsIterator()
+    public Iterator<SymmetricVertexes> getSymSetsIterator()
     {
         return symVertices.iterator();
     }
@@ -330,17 +328,14 @@ public class DGraph implements Cloneable
      * @param v the vertex for which we want the list of symmetric vertices.
      * @return a list that includes v but can be empty.
      */
-    public ArrayList<Vertex> getSymVerticesForVertex(Vertex v)
+    public List<Vertex> getSymVerticesForVertex(Vertex v)
     {
-        ArrayList<Vertex> lst = new ArrayList<Vertex>();
-        for (SymmetricSet ss : symVertices)
+        List<Vertex> lst = new ArrayList<Vertex>();
+        for (SymmetricVertexes ss : symVertices)
         {
-            if (ss.contains(v.getVertexId()))
+            if (ss.contains(v))
             {
-                for (Integer vid : ss.getList())
-                {
-                    lst.add(this.getVertexWithId(vid));
-                }
+                ss.stream().forEach(i -> lst.add((Vertex) i));
             }
         }
         return lst;
@@ -352,42 +347,28 @@ public class DGraph implements Cloneable
      * Removed the given symmetric set, if present.
      * @param ss the symmetric relation to be removed.
      */
-    public void removeSymmetrySet(SymmetricSet ss)
+    public void removeSymmetrySet(SymmetricVertexes ss)
     {
         symVertices.remove(ss); 
     }
     
 //------------------------------------------------------------------------------
 
-    public SymmetricSet getSymSetForVertex(Vertex v)
+    public SymmetricVertexes getSymSetForVertex(Vertex v)
     {
-        for (SymmetricSet ss : symVertices)
+        for (SymmetricVertexes ss : symVertices)
         {
-            if (ss.contains(v.getVertexId()))
+            if (ss.contains(v))
             {
                 return ss;
             }
         }
-        return new SymmetricSet();
-    }
-    
-//------------------------------------------------------------------------------
-
-    public SymmetricSet getSymSetForVertexID(int vid)
-    {
-        for (SymmetricSet ss : symVertices)
-        {
-            if (ss.contains(vid))
-            {
-                return ss;
-            }
-        }
-        return new SymmetricSet();
+        return new SymmetricVertexes();
     }
 
 //------------------------------------------------------------------------------
 
-    public void setSymmetricVertexSets(ArrayList<SymmetricSet> symVertices)
+    public void setSymmetricVertexSets(List<SymmetricVertexes> symVertices)
     {
         this.symVertices.clear();
         this.symVertices.addAll(symVertices);
@@ -401,19 +382,16 @@ public class DGraph implements Cloneable
      * @throws DENOPTIMException is the symmetric set being added contains
      * an id that is already contained in another set already present.
      */
-    public void addSymmetricSetOfVertices(SymmetricSet symSet)
-                                                        throws DENOPTIMException
+    public void addSymmetricSetOfVertices(SymmetricVertexes symSet)
+            throws DENOPTIMException
     {
-        for (SymmetricSet oldSS : symVertices)
+        for (SymmetricVertexes oldSS : symVertices)
         {
-            for (Integer vid : symSet.getList())
+            if (!Collections.disjoint(oldSS, symSet))
             {
-                if (oldSS.contains(vid))
-                {
-                    throw new DENOPTIMException("Adding " + symSet + " while "
-                                                + "there is already " + oldSS
-                                                + " that contains " + vid);
-                }
+                throw new DENOPTIMException("Adding " + symSet + " while "
+                        + "there is already  that contains soem of the same "
+                        + "items");
             }
         }
         symVertices.add(symSet);
@@ -455,14 +433,14 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<ClosableChain> getClosableChains()
+    public List<ClosableChain> getClosableChains()
     {
         return closableChains;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<Vertex> getVertexList()
+    public List<Vertex> getVertexList()
     {
         return gVertices;
     }
@@ -507,14 +485,14 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<Edge> getEdgeList()
+    public List<Edge> getEdgeList()
     {
         return gEdges;
     }
 
 //------------------------------------------------------------------------------
 
-    public ArrayList<Ring> getRings()
+    public List<Ring> getRings()
     {
         return gRings;
     }
@@ -527,9 +505,9 @@ public class DGraph implements Cloneable
      * @param v the given vertex.
      * @return the list of edges departing from the given vertex.
      */
-    public ArrayList<Edge> getEdgesWithSrc(Vertex v)
+    public List<Edge> getEdgesWithSrc(Vertex v)
     {
-    	ArrayList<Edge> edges = new ArrayList<Edge>();
+    	List<Edge> edges = new ArrayList<Edge>();
     	for (Edge e : this.getEdgeList())
     	{
     		if (e.getSrcAP().getOwner() == v)
@@ -849,7 +827,7 @@ public class DGraph implements Cloneable
         }
 
         vertex.resetGraphOwner();
-        int vid = vertex.getVertexId();
+        long vid = vertex.getVertexId();
 
         // delete also any ring involving the removed vertex
         if (isVertexInRing(vertex))
@@ -882,10 +860,10 @@ public class DGraph implements Cloneable
         }
 
         //delete the removed vertex from symmetric sets, but leave other vertices
-        ArrayList<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
-        for (SymmetricSet ss : symVertices)
+        List<SymmetricVertexes> ssToRemove = new ArrayList<SymmetricVertexes>();
+        for (SymmetricVertexes ss : symVertices)
         {
-            if (ss.contains(vid))
+            if (ss.contains(vertex))
             {
                 if (ss.size() < 3)
                 {
@@ -893,9 +871,7 @@ public class DGraph implements Cloneable
                 }
                 else
                 {
-                    // NB: casting needed to remove the object Integer 'vid'
-                    // from the list instead of entry number 'vid'
-                    ss.remove((Integer) vid);
+                    ss.remove(vertex);
                 }
             }
         }
@@ -927,7 +903,7 @@ public class DGraph implements Cloneable
             return false;
         }
         
-        ArrayList<Vertex> symSites = getSymVerticesForVertex(vertex);
+        List<Vertex> symSites = getSymVerticesForVertex(vertex);
         if (symSites.size() == 0)
         {
             symSites.add(vertex);
@@ -1154,15 +1130,14 @@ public class DGraph implements Cloneable
         // NB: this deals only with the symmetric relations of the removed vertex
         // The symm. relations of other removed child vertices are dealt with
         // when removing those vertices.
-        int oldVrtxId = vertex.getVertexId();
-        ArrayList<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
-        Iterator<SymmetricSet> ssIter = getSymSetsIterator();
+        List<SymmetricVertexes> ssToRemove = new ArrayList<SymmetricVertexes>();
+        Iterator<SymmetricVertexes> ssIter = getSymSetsIterator();
         while (ssIter.hasNext())
         {
-            SymmetricSet ss = ssIter.next();
-            if (ss.contains(oldVrtxId))
+            SymmetricVertexes ss = ssIter.next();
+            if (ss.contains(vertex))
             {
-                ss.remove((Integer) oldVrtxId);
+                ss.remove(vertex);
             }
             if (ss.size() < 2)
                 ssToRemove.add(ss);
@@ -1299,16 +1274,15 @@ public class DGraph implements Cloneable
         for (Vertex v : gVertices)
             v.removeProperty(DENOPTIMConstants.VRTSYMMSETID);
         
-        Iterator<SymmetricSet> ssIter = getSymSetsIterator();
+        Iterator<SymmetricVertexes> ssIter = getSymSetsIterator();
         int i = 0;
         while (ssIter.hasNext())
         {
-            SymmetricSet ss = ssIter.next();
+            SymmetricVertexes ss = ssIter.next();
             String symmLabel = ss.hashCode() + "-" + i;
-            for (Integer vid : ss.getList())
+            for (Vertex v : ss)
             {
-                getVertexWithId(vid).setProperty(DENOPTIMConstants.VRTSYMMSETID,
-                        symmLabel);
+                v.setProperty(DENOPTIMConstants.VRTSYMMSETID, symmLabel);
             }
             i++;
         }
@@ -1353,7 +1327,7 @@ public class DGraph implements Cloneable
             
             if (symmvertices.size()>1)
             {
-                SymmetricSet ss = null;
+                SymmetricVertexes ss = null;
                 for (Vertex v : symmvertices)
                 {
                     if (hasSymmetryInvolvingVertex(v))
@@ -1366,12 +1340,12 @@ public class DGraph implements Cloneable
                 if (ss != null)
                 {
                     for (Vertex v : symmvertices)
-                        ss.add(v.getVertexId());
+                        ss.add(v);
                     
                 } else {
-                    ss = new SymmetricSet();
+                    ss = new SymmetricVertexes();
                     for (Vertex v : symmvertices)
-                        ss.add(v.getVertexId());
+                        ss.add(v);
                     try
                     {
                         addSymmetricSetOfVertices(ss);
@@ -2018,7 +1992,7 @@ public class DGraph implements Cloneable
             return false;
         }
         
-        ArrayList<Vertex> symSites = new ArrayList<Vertex>();
+        List<Vertex> symSites = new ArrayList<Vertex>();
         if (symmetry)
         {
             symSites = getSymVerticesForVertex(vertex);
@@ -2096,10 +2070,10 @@ public class DGraph implements Cloneable
             return false;
         }
         
-        ArrayList<Edge> symSites = new ArrayList<Edge> ();
-        ArrayList<LinkedHashMap<AttachmentPoint,Integer>> symApMaps = 
+        List<Edge> symSites = new ArrayList<Edge> ();
+        List<LinkedHashMap<AttachmentPoint,Integer>> symApMaps = 
                 new ArrayList<LinkedHashMap<AttachmentPoint,Integer>>();
-        ArrayList<Vertex> symTrgvertices = getSymVerticesForVertex(
+        List<Vertex> symTrgvertices = getSymVerticesForVertex(
                 edge.getTrgAP().getOwner());
         if (symTrgvertices.size() == 0)
         {
@@ -2119,7 +2093,7 @@ public class DGraph implements Cloneable
             }
         }
         
-        SymmetricSet newSS = new SymmetricSet();
+        SymmetricVertexes newSS = new SymmetricVertexes();
         for (int i=0; i<symSites.size(); i++)
         {
             Edge symEdge = symSites.get(i);
@@ -2128,7 +2102,7 @@ public class DGraph implements Cloneable
             GraphUtils.ensureVertexIDConsistency(this.getMaxVertexId());
             Vertex newLink = Vertex.newVertexFromLibrary(
                     GraphUtils.getUniqueVertexIndex(), bbId, bbt, fragSpace);
-            newSS.add(newLink.getVertexId());
+            newSS.add(newLink);
             LinkedHashMap<AttachmentPoint,AttachmentPoint> apToApMap =
                     new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
             for (AttachmentPoint apOnGraph : locApMap.keySet())
@@ -2302,7 +2276,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
-    public Vertex getVertexWithId(int vid)
+    public Vertex getVertexWithId(long vid)
     {
         Vertex v = null;
         int idx = indexOfVertexWithID(vid);
@@ -2318,7 +2292,7 @@ public class DGraph implements Cloneable
      * @param vid the vertedID of the vertex we are looking for.
      * @return the index in the list of vertices.
      */
-    public int indexOfVertexWithID(int vid)
+    public int indexOfVertexWithID(long vid)
     {
         int idx = -1;
         for (int i=0; i<gVertices.size(); i++)
@@ -2454,8 +2428,8 @@ public class DGraph implements Cloneable
             Edge edge = getEdgeList().get(i);
 
             // get the vertex ids
-            int v1_id = edge.getSrcVertex();
-            int v2_id = edge.getTrgVertex();
+            long v1_id = edge.getSrcVertex();
+            long v2_id = edge.getTrgVertex();
 
             int dap_idx_v1 = edge.getSrcAPID();
 
@@ -2901,30 +2875,6 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * @param vid the vertex id for which the child vertices need to be found
-     * @return Arraylist containing the vertex ids of the child vertices
-     * @deprecated depends on vertedID
-     */
-
-    @Deprecated
-    public ArrayList<Integer> getChildVertices(int vid)
-    {
-        ArrayList<Integer> lst = new ArrayList<>();
-        Vertex v = getVertexWithId(vid);
-        for (AttachmentPoint ap : v.getAttachmentPoints())
-        {
-            Edge e = ap.getEdgeUser();
-            if (e != null && e.getTrgVertex()!=vid)
-            {
-                lst.add(e.getTrgVertex());
-            }
-        }
-        return lst;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
      * Returns almost "deep-copy" of this graph. Only the APCLass members of
      * member of this class should remain references to the original APClasses.
      * The vertex IDs are not changed, so you might want to renumber the graph.
@@ -2935,23 +2885,22 @@ public class DGraph implements Cloneable
         // When cloning, the VertexID remains the same so we'll have two
         // deep-copies of the same vertex having the same VertexID
         ArrayList<Vertex> cListVrtx = new ArrayList<>();
-        Map<Integer,Vertex> vidsInClone =
-                new HashMap<Integer,Vertex>();
+        Map<Long, Vertex> vidsInClone = new HashMap<Long, Vertex>();
         for (Vertex vOrig : gVertices)
         {
             Vertex vClone = vOrig.clone();
             cListVrtx.add(vClone);
-            vidsInClone.put(vClone.getVertexId(),vClone);
+            vidsInClone.put(vClone.getVertexId(), vClone);
         }
 
         ArrayList<Edge> cListEdges = new ArrayList<>();
         for (Edge e : gEdges)
         {
-            int srcVrtxId = e.getSrcVertex();
+            long srcVrtxId = e.getSrcVertex();
             int srcApId = this.getVertexWithId(srcVrtxId).getIndexOfAP(
                     e.getSrcAP());
 
-            int trgVrtxId = e.getTrgVertex();
+            long trgVrtxId = e.getTrgVertex();
             int trgApId = this.getVertexWithId(trgVrtxId).getIndexOfAP(
                     e.getTrgAP());
 
@@ -2991,14 +2940,19 @@ public class DGraph implements Cloneable
         }
         clone.setCandidateClosableChains(cListClosableChains);
 
-        // Each "set" is a list of Integer, but SymmetricSet.clone takes care
-        ArrayList<SymmetricSet> cSymVertices = new ArrayList<>();
-        for (SymmetricSet ss : symVertices)
+        
+        List<SymmetricVertexes> cSymVertices = new ArrayList<>();
+        for (SymmetricVertexes ss : symVertices)
         {
-            cSymVertices.add(ss.clone());
+            SymmetricVertexes clonedSS = new SymmetricVertexes();
+            for (Vertex origVrt : ss)
+            {
+                clonedSS.add(clone.gVertices.get(gVertices.indexOf(origVrt)));
+            }
+            cSymVertices.add(clonedSS);
         }
         clone.setSymmetricVertexSets(cSymVertices);
-
+        
         clone.setGraphId(graphId);
         clone.setLocalMsg(localMsg);
 
@@ -3009,13 +2963,13 @@ public class DGraph implements Cloneable
 
     /**
      * Looks for an edge that points to a vertex with the given vertex id.
-     * @param vid
+     * @param l
      * @return the edge whose target vertex has ID same as vid, or null
      */
 
-    public Edge getEdgeWithParent(int vid)
+    public Edge getEdgeWithParent(long l)
     {
-        Vertex v = getVertexWithId(vid);
+        Vertex v = getVertexWithId(l);
         if (v == null)
         {
             return null;
@@ -3074,9 +3028,9 @@ public class DGraph implements Cloneable
     /**
      * @return the maximum value of vertex Id found in this graph.
      */
-    public int getMaxVertexId()
+    public long getMaxVertexId()
     {
-        int mval = Integer.MIN_VALUE;
+        long mval = Long.MIN_VALUE;
         for (Vertex v : gVertices) {
             mval = Math.max(mval, v.getVertexId());
         }
@@ -3089,12 +3043,12 @@ public class DGraph implements Cloneable
      * Checks if a number is already used as VertexIDs within the graph.
      * @return <code>true</code> if the number is already used.
      */
-    public boolean containsVertexID(int id)
+    public boolean containsVertexID(long l)
     {
         boolean result = false;
         for (Vertex v : gVertices) 
         {
-            if (id == v.getVertexId())
+            if (l == v.getVertexId())
             {
                 result = true;
                 break;
@@ -3241,19 +3195,9 @@ public class DGraph implements Cloneable
                 if (v1.sameAs(v2, sb)) 
                 {
                     Set<Vertex> symToV2 = new HashSet<Vertex>();
-                    SymmetricSet ssV2 = v2.getGraphOwner().getSymSetForVertex(v2);
-                    for (Integer sVrtId : ssV2.getList())
-                    {
-                        symToV2.add(v2.getGraphOwner().getVertexWithId(sVrtId));
-                    }
-                    
+                    symToV2.addAll(v2.getGraphOwner().getSymSetForVertex(v2));
                     Set<Vertex> symToV1 = new HashSet<Vertex>();
-                    SymmetricSet ssV1 = v1.getGraphOwner().getSymSetForVertex(v1);
-                    for (Integer sVrtId : ssV1.getList())
-                    {
-                        symToV1.add(v1.getGraphOwner().getVertexWithId(sVrtId));
-                    }
-                    
+                    symToV1.addAll(v1.getGraphOwner().getSymSetForVertex(v1));
                     for (Vertex v1s : symToV1)
                     {
                         if (symmetryShortCuts.containsKey(v1s))
@@ -3366,23 +3310,15 @@ public class DGraph implements Cloneable
                     }
                     
                     Set<Node> symToV2 = new HashSet<Node>();
-                    SymmetricSet ssV2 = dv2.getGraphOwner()
-                            .getSymSetForVertex(dv2);
-                    for (Integer sVrtId : ssV2.getList())
+                    for (Vertex sv : dv2.getGraphOwner().getSymSetForVertex(dv2))
                     {
-                        Vertex sv = dv2.getGraphOwner()
-                                .getVertexWithId(sVrtId);
                         symToV2.add((Node) sv.getProperty(
                                 Node.REFTOVERTEXKERNEL));
                     }
                     
                     Set<Node> symToV1 = new HashSet<Node>();
-                    SymmetricSet ssV1 = dv1.getGraphOwner()
-                            .getSymSetForVertex(dv1);
-                    for (Integer sVrtId : ssV1.getList())
+                    for (Vertex sv :  dv1.getGraphOwner().getSymSetForVertex(dv1))
                     {
-                        Vertex sv = dv1.getGraphOwner()
-                                .getVertexWithId(sVrtId);
                         symToV1.add((Node) sv.getProperty(
                                 Node.REFTOVERTEXKERNEL));
                     }
@@ -3477,40 +3413,39 @@ public class DGraph implements Cloneable
 		}
 
     	//Check Symmetric sets
-    	Iterator<SymmetricSet> ssIter = this.getSymSetsIterator();
+    	Iterator<SymmetricVertexes> ssIter = this.getSymSetsIterator();
     	while (ssIter.hasNext())
     	{
-    		SymmetricSet ssT = ssIter.next();
-    		int vIdT = ssT.get(0);
+    	    SymmetricVertexes ssT = ssIter.next();
 
-    		SymmetricSet ssO = other.getSymSetForVertexID(
-    				vertexMap.get(this.getVertexWithId(vIdT)).getVertexId());
+    	    SymmetricVertexes ssO = other.getSymSetForVertex(
+    				vertexMap.get(ssT.get(0)));
     		if (ssO.size() == 0)
     		{
     			// ssO is empty because no SymmetricSet was found that
-    			// contains the given vertexID. This means the two graphs
+    			// contains the given vertex. This means the two graphs
     			// are different
-    			reason.append("Symmetric set not found for vertex ("+vIdT+")");
+    			reason.append("Symmetric set not found for vertex (" 
+    			        + ssT.get(0) + ")");
     			return false;
     		}
 
     		if (ssT.size() != ssO.size())
     		{
-    			reason.append("Different number of symmetric sets on vertex " + vIdT
-    						+ "("+ssT.size()+":"+ssO.size()+")");
+    			reason.append("Different number of symmetric sets on vertex " 
+    			        + ssT.get(0) + "("+ssT.size()+":"+ssO.size()+")");
     			return false;
     		}
 
-    		for (int it=0; it<ssT.size(); it++)
-    		{
-    			int svIdT = ssT.get(it);
-    			if (!ssO.contains(vertexMap.get(this.getVertexWithId(svIdT))
-    					.getVertexId()))
-    			{
-    				reason.append("Difference in symmetric set ("+svIdT
-    							+" not in other)");
-    				return false;
-    			}
+    		Set<Vertex> mappedVrtxFromThis = new HashSet<>();
+    		ssT.stream().forEach(v -> mappedVrtxFromThis.add(vertexMap.get(v)));
+
+            Set<Vertex> vrtxFromOther = new HashSet<>();
+            ssO.stream().forEach(v -> vrtxFromOther.add(v));
+            if (!vrtxFromOther.equals(mappedVrtxFromThis))
+            {
+				reason.append("Difference in symmetric set " + ssT + " vs " + ssO);
+				return false;
     		}
     	}
 
@@ -3619,8 +3554,8 @@ public class DGraph implements Cloneable
     		return false;
     	}
 
-    	ArrayList<Edge> edgesFromThis = gA.getEdgesWithSrc(seedOnA);
-    	ArrayList<Edge> edgesFromOther = gB.getEdgesWithSrc(seedOnB);
+    	List<Edge> edgesFromThis = gA.getEdgesWithSrc(seedOnA);
+    	List<Edge> edgesFromOther = gB.getEdgesWithSrc(seedOnB);
     	if (edgesFromThis.size() != edgesFromOther.size())
     	{
     		reason.append("Different number of edges from vertex "+seedOnA+" ("
@@ -3784,6 +3719,13 @@ public class DGraph implements Cloneable
         }
         return ap;
     }
+    
+//------------------------------------------------------------------------------
+    
+    protected int getUniqueAPIndex()
+    {
+        return apCounter.getAndIncrement();
+    }
 
 //------------------------------------------------------------------------------
 
@@ -3845,7 +3787,7 @@ public class DGraph implements Cloneable
 
     public void removeCappingGroups(List<Vertex> lstVerts)
     {
-        ArrayList<Integer> rvids = new ArrayList<>();
+        List<Long> rvids = new ArrayList<>();
         for (int i=0; i<lstVerts.size(); i++)
         {
             Vertex vtx = lstVerts.get(i);
@@ -3864,7 +3806,7 @@ public class DGraph implements Cloneable
         // remove the vids from the vertex lst
         for (int i=0; i<rvids.size(); i++)
         {
-            int vid = rvids.get(i);
+            long vid = rvids.get(i);
             removeVertex(getVertexWithId(vid));
         }
     }
@@ -4320,7 +4262,7 @@ public class DGraph implements Cloneable
      * @param v current vertex
      */
     private static void fixEdgeDirections(Vertex v, 
-            Set<Integer> visited) 
+            Set<Long> visited) 
     {
         visited.add(v.getVertexId());
         int visitedVertexEncounters = 0;
@@ -4328,9 +4270,8 @@ public class DGraph implements Cloneable
             AttachmentPoint ap = v.getAP(i);
             Edge edge = ap.getEdgeUser();
             if (edge != null) {
-                int srcVertex = edge.getSrcVertex();
-                boolean srcIsVisited =
-                        srcVertex != v.getVertexId() 
+                long srcVertex = edge.getSrcVertex();
+                boolean srcIsVisited = srcVertex != v.getVertexId() 
                         && visited.contains(srcVertex);
 
                 visitedVertexEncounters += srcIsVisited ? 1 : 0;
@@ -4369,13 +4310,7 @@ public class DGraph implements Cloneable
         boolean res = true;
         if (hasSymmetryInvolvingVertex(v) && symmetry)
         {
-            ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
-            for (int i=0; i<getSymSetForVertexID(v.getVertexId()).size(); i++)
-            {
-                int svid = getSymSetForVertexID(v.getVertexId()).getList().get(i);
-                toRemove.add(getVertexWithId(svid));
-            }
-            for (Vertex sv : toRemove)
+            for (Vertex sv : getSymSetForVertex(v))
             {
                 boolean res2 = removeBranchStartingAt(sv);
                 if (!res2)
@@ -4790,19 +4725,19 @@ public class DGraph implements Cloneable
         // but is a sign that the topology has changed substantially,
         // and that the symmetric relation is, most likely, not sensible
         // anymore.
-        List<SymmetricSet> ssToRemove = new ArrayList<SymmetricSet>();
-        Iterator<SymmetricSet> ssIter = getSymSetsIterator();
+        List<SymmetricVertexes> ssToRemove = new ArrayList<SymmetricVertexes>();
+        Iterator<SymmetricVertexes> ssIter = getSymSetsIterator();
         while (ssIter.hasNext())
         {
-            SymmetricSet ss = ssIter.next();
+            SymmetricVertexes ss = ssIter.next();
             int level = -2;
-            for (Integer vid : ss.getList())
+            for (Vertex vrt : ss)
             {
                 if (level==-2)
                 {
-                    level = getLevel(getVertexWithId(vid));
+                    level = getLevel(vrt);
                 } else {
-                    if (level != getLevel(getVertexWithId(vid)))
+                    if (level != getLevel(vrt))
                     {
                         ssToRemove.add(ss);
                         break;
@@ -4810,7 +4745,7 @@ public class DGraph implements Cloneable
                 }
             }
         }
-        for (SymmetricSet ss : ssToRemove)
+        for (SymmetricVertexes ss : ssToRemove)
             removeSymmetrySet(ss);
         
         // The free-ed up APs need to be projected to template's surface
@@ -4832,13 +4767,14 @@ public class DGraph implements Cloneable
      * if the vertex ID is 12 this method changes it into -12.
      */
 
+    @Deprecated
     public void changeSignOfVertexID()
     {
-        HashMap<Integer, Integer> nmap = new HashMap<>();
+        HashMap<Long, Long> nmap = new HashMap<>();
         for (int i=0; i<getVertexCount(); i++)
         {
-            int vid = getVertexList().get(i).getVertexId();
-            int nvid = -vid;
+            long vid = getVertexList().get(i).getVertexId();
+            long nvid = -vid;
             nmap.put(vid, nvid);
 
             getVertexList().get(i).setVertexId(nvid);
@@ -4854,15 +4790,6 @@ public class DGraph implements Cloneable
                 }
             }
         }
-        Iterator<SymmetricSet> iter = getSymSetsIterator();
-        while (iter.hasNext())
-        {
-            SymmetricSet ss = iter.next();
-            for (int i=0; i<ss.getList().size(); i++)
-            {
-                ss.getList().set(i,nmap.get(ss.getList().get(i)));
-            }
-        }
     }
 
 //------------------------------------------------------------------------------
@@ -4870,11 +4797,9 @@ public class DGraph implements Cloneable
     /**
      * Reassign vertex IDs to all vertices of this graph. The old IDs are stored 
      * in the vertex property {@link DENOPTIMConstants#STOREDVID}.
-     * @throws DENOPTIMException if there are inconsistencies in the vertex IDs
-     * used to refer to this graph's vertices.
      */
 
-    public void renumberGraphVertices() throws DENOPTIMException
+    public void renumberGraphVertices()
     {
         renumberVerticesGetMap();
     }
@@ -4885,46 +4810,25 @@ public class DGraph implements Cloneable
      * Reassign vertex IDs to a graph. The old IDs are stored 
      * in the vertex property {@link DENOPTIMConstants#STOREDVID}.
      * @return map with old IDs as key and new IDs as values.
-     * @throws DENOPTIMException if there are inconsistencies in the vertex IDs
-     * used to refer to this graph's vertices.
      */
 
-    public Map<Integer,Integer> renumberVerticesGetMap() throws DENOPTIMException 
+    public Map<Long,Long> renumberVerticesGetMap()
     {
-        Map<Integer, Integer> nmap = new HashMap<>();
+        Map<Long, Long> nmap = new HashMap<>();
 
         // for the vertices in the graph, get new vertex ids
         for (int i=0; i<getVertexCount(); i++)
         {
             Vertex v = getVertexList().get(i);
-            int vid = v.getVertexId();
-            int nvid = GraphUtils.getUniqueVertexIndex();
+            long vid = v.getVertexId();
+            long nvid = GraphUtils.getUniqueVertexIndex();
 
             nmap.put(vid, nvid);
 
             v.setVertexId(nvid);
             v.setProperty(DENOPTIMConstants.STOREDVID, vid);
         }
-
-        // Update the sets of symmetric vertex IDs
-        Iterator<SymmetricSet> iter = getSymSetsIterator();
-        while (iter.hasNext())
-        {
-            SymmetricSet ss = iter.next();
-            for (int i=0; i<ss.getList().size(); i++)
-            {
-                if (!nmap.containsKey(ss.getList().get(i)))
-                {
-                    DENOPTIMException e = new DENOPTIMException("Assumption "
-                            + "violated: vertex IDs in "
-                            + "symmetric set are out of sync w.r.t. actual "
-                            + "vertex IDs. Report bug!");
-                    throw e;
-                }
-                ss.getList().set(i,nmap.get(ss.getList().get(i)));
-            }
-        }
-
+        
         return nmap;
     }
     
@@ -5265,7 +5169,7 @@ public class DGraph implements Cloneable
             // clone root graph
             DGraph newGraph = this.clone();
 
-            Map<Integer,Integer> vRenum = newGraph.renumberVerticesGetMap();
+            Map<Long,Long> vRenum = newGraph.renumberVerticesGetMap();
             newGraph.setGraphId(GraphUtils.getUniqueGraphIndex());
 
             // add rings
@@ -5274,8 +5178,8 @@ public class DGraph implements Cloneable
                 Ring newRing = new Ring();
                 for (int i=0; i<oldRing.getSize(); i++)
                 {
-                    int oldVId = oldRing.getVertexAtPosition(i).getVertexId();
-                    int newVId = vRenum.get(oldVId);
+                    long oldVId = oldRing.getVertexAtPosition(i).getVertexId();
+                    long newVId = vRenum.get(oldVId);
                     newRing.addVertex(newGraph.getVertexWithId(newVId));
                 }
                 newRing.setBondType(oldRing.getBondType());
@@ -5300,13 +5204,13 @@ public class DGraph implements Cloneable
 
     public boolean hasForbiddenEnd(FragmentSpaceParameters fsSettings)
     {
-        ArrayList<Vertex> vertices = getVertexList();
+        List<Vertex> vertices = getVertexList();
         Set<APClass> classOfForbEnds = 
                 fsSettings.getFragmentSpace().getForbiddenEndList();
         boolean found = false;
         for (Vertex vtx : vertices)
         {
-            ArrayList<AttachmentPoint> daps = vtx.getAttachmentPoints();
+            List<AttachmentPoint> daps = vtx.getAttachmentPoints();
             for (AttachmentPoint dp : daps)
             {
                 if (dp.isAvailable())
@@ -5355,15 +5259,15 @@ public class DGraph implements Cloneable
      * the AP indicated in the list.
      */
 
-    public void appendGraphOnGraph(ArrayList<Vertex> parentVertices,
-                                   ArrayList<Integer> parentAPIdx,
+    public void appendGraphOnGraph(List<Vertex> parentVertices,
+                                   List<Integer> parentAPIdx,
                                    DGraph subGraph,
                                    Vertex childVertex, int childAPIdx,
                                    BondType bndType, boolean onAllSymmAPs) 
                                            throws DENOPTIMException
     {
         // Collector for symmetries created by appending copies of subGraph
-        Map<Integer,SymmetricSet> newSymSets = new HashMap<>();
+        Map<Vertex, SymmetricVertexes> newSymSets = new HashMap<>();
 
         // Repeat append for each parent vertex while collecting symmetries
         for (int i=0; i<parentVertices.size(); i++)
@@ -5496,7 +5400,7 @@ public class DGraph implements Cloneable
                                 DGraph subGraph,
                                 Vertex childVertex, int childAPIdx,
                                 BondType bndType,
-                                Map<Integer,SymmetricSet> newSymSets)
+                                Map<Vertex, SymmetricVertexes> newSymSets)
                                         throws DENOPTIMException
     {
         // Clone and renumber the subgraph to ensure uniqueness
@@ -5524,31 +5428,26 @@ public class DGraph implements Cloneable
             // no difference between doing it on sgClone or subGraph.
             if (subGraph.hasSymmetryInvolvingVertex(origV))
             {
-                if (newSymSets.containsKey(origV.getVertexId()))
+                if (newSymSets.containsKey(origV))
                 {
-                    newSymSets.get(origV.getVertexId()).add(
-                            clonV.getVertexId());
+                    newSymSets.get(origV).add(clonV);
                 }
                 else
                 {
-                    newSymSets.put(origV.getVertexId(),
-                            sgClone.getSymSetForVertexID(
-                                    sgClone.getVertexList().get(i)
-                                    .getVertexId()));
+                    newSymSets.put(origV, sgClone.getSymSetForVertex(clonV));
                 }
             }
             else
             {
-                if (newSymSets.containsKey(origV.getVertexId()))
+                if (newSymSets.containsKey(origV))
                 {
-                    newSymSets.get(origV.getVertexId()).add(
-                            clonV.getVertexId());
+                    newSymSets.get(origV).add(clonV);
                 }
                 else
                 {
-                    SymmetricSet ss = new SymmetricSet();
-                    ss.add(clonV.getVertexId());
-                    newSymSets.put(origV.getVertexId(),ss);
+                    SymmetricVertexes ss = new SymmetricVertexes();
+                    ss.add(clonV);
+                    newSymSets.put(origV, ss);
                 }
             }
         }
@@ -5564,10 +5463,10 @@ public class DGraph implements Cloneable
         }
 
         // project tmp symmetric set into final symmetric sets
-        Set<SymmetricSet> doneTmpSymSets = new HashSet<SymmetricSet>();
-        for (Map.Entry<Integer,SymmetricSet> e : newSymSets.entrySet())
+        Set<SymmetricVertexes> doneTmpSymSets = new HashSet<SymmetricVertexes>();
+        for (Map.Entry<Vertex, SymmetricVertexes> e : newSymSets.entrySet())
         {
-            SymmetricSet tmpSS = e.getValue();
+            SymmetricVertexes tmpSS = e.getValue();
             if (doneTmpSymSets.contains(tmpSS))
             {
                 continue;
@@ -5575,19 +5474,15 @@ public class DGraph implements Cloneable
             doneTmpSymSets.add(tmpSS);
             boolean done = false;
             // NB: no need to check all entries of tmpSS: the first is enough
-            SymmetricSet oldSS;
-            Iterator<SymmetricSet> iter = getSymSetsIterator();
+            SymmetricVertexes oldSS;
+            Iterator<SymmetricVertexes> iter = getSymSetsIterator();
             while (iter.hasNext())
             {
                 oldSS = iter.next();
-                if (oldSS.contains(tmpSS.getList().get(0)))
+                if (oldSS.contains(tmpSS.get(0)))
                 {
+                    oldSS.addAll(tmpSS);
                     done = true;
-                    for (Integer symVrtID : tmpSS.getList())
-                    {
-                        // NB this adds only if not already contained
-                        oldSS.add(symVrtID);
-                    }
                     break;
                 }
             }
@@ -5595,15 +5490,12 @@ public class DGraph implements Cloneable
             {
                 if (tmpSS.size() <= 1)
                 {
-                    // tmpSS has always at least one entry: the initial vrtId
+                    // tmpSS has always at least one entry: the initial vrtx
                     continue;
                 }
                 //Move tmpSS into a new SS on molGraph
-                SymmetricSet newSS = new SymmetricSet();
-                for (Integer symVrtID : tmpSS.getList())
-                {
-                    newSS.add(symVrtID);
-                }
+                SymmetricVertexes newSS = new SymmetricVertexes();
+                newSS.addAll(tmpSS);
                 addSymmetricSetOfVertices(newSS);
             }
         }
@@ -5633,25 +5525,25 @@ public class DGraph implements Cloneable
                                    int parentAPIdx, DGraph subGraph,
                                    Vertex childVertex, int childAPIdx,
                                    BondType bndType,
-                                   Map<Integer,SymmetricSet> newSymSets,
+                                   Map<Vertex, SymmetricVertexes> newSymSets,
                                    boolean onAllSymmAPs)
                                            throws DENOPTIMException
     {
-        SymmetricSet symAPs = parentVertex.getSymmetricAPs(parentAPIdx);
-        if (symAPs != null && onAllSymmAPs)
+        SymmetricAPs symAPs = parentVertex.getSymmetricAPs(
+                parentVertex.getAP(parentAPIdx));
+        if (symAPs.size()!=0 && onAllSymmAPs)
         {
-            ArrayList<Integer> apLst = symAPs.getList();
-            for (int idx : apLst) {
-                if (!parentVertex.getAttachmentPoints().get(idx).isAvailable())
+            for (AttachmentPoint symAP : symAPs) 
+            {
+                if (!symAP.isAvailable())
                 {
                     continue;
                 }
-                appendGraphOnAP(parentVertex, idx, subGraph, childVertex,
+                appendGraphOnAP(parentVertex, symAP.getIndexInOwner(), 
+                        subGraph, childVertex,
                         childAPIdx, bndType, newSymSets);
             }
-        }
-        else
-        {
+        } else {
             appendGraphOnAP(parentVertex, parentAPIdx, subGraph, childVertex,
                     childAPIdx, bndType, newSymSets);
         }
@@ -5666,9 +5558,9 @@ public class DGraph implements Cloneable
      * @param logger manager of log
      * @return the list of matches
      */
-    public ArrayList<Integer> findVerticesIds(VertexQuery query, Logger logger)
+    public List<Long> findVerticesIds(VertexQuery query, Logger logger)
     {
-        ArrayList<Integer> matches = new ArrayList<>();
+        List<Long> matches = new ArrayList<>();
         for (Vertex v : findVertices(query, logger))
         {
             matches.add(v.getVertexId());
@@ -5676,7 +5568,7 @@ public class DGraph implements Cloneable
         return matches;
     }
 
-  //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
     /**
      * Filters a list of vertices according to a query.
@@ -5711,7 +5603,7 @@ public class DGraph implements Cloneable
         logger.log(Level.FINE, "Candidates: " + matches);
 
         //Check condition vertex ID
-        Integer vidQuery = vrtxQuery.getVertexIDQuery();
+        Long vidQuery = vrtxQuery.getVertexIDQuery();
         if (vidQuery != null)
         {
             ArrayList<Vertex> newLst = new ArrayList<>();
@@ -5856,7 +5748,7 @@ public class DGraph implements Cloneable
             
             if (i==0)
             {
-                Integer eSrcVrtID = edgeQuery.getSourceVertexId();
+                Long eSrcVrtID = edgeQuery.getSourceVertexId();
                 if (eSrcVrtID != null)
                 {
                     ArrayList<Vertex> newLst = new ArrayList<>();
@@ -5876,7 +5768,7 @@ public class DGraph implements Cloneable
                                 + " edge src VertexID filter: " + matches);
                 }
             } else if (i==1) {
-                Integer eTrgVrtID = edgeQuery.getTargetVertexId();
+                Long eTrgVrtID = edgeQuery.getTargetVertexId();
                 if (eTrgVrtID != null)
                 {
                     ArrayList<Vertex> newLst = new ArrayList<>();
@@ -6016,28 +5908,23 @@ public class DGraph implements Cloneable
      * @param list vertices to be purged.
      */
 
-    public void removeSymmetryRedundance(ArrayList<Vertex> list) {
-        ArrayList<Vertex> symRedundant = new ArrayList<>();
-        Iterator<SymmetricSet> itSymm = getSymSetsIterator();
+    public void removeSymmetryRedundance(List<Vertex> list) 
+    {
+        List<Vertex> symRedundant = new ArrayList<>();
+        Iterator<SymmetricVertexes> itSymm = getSymSetsIterator();
         while (itSymm.hasNext())
         {
-            SymmetricSet ss = itSymm.next();
+            SymmetricVertexes ss = itSymm.next();
             for (Vertex v : list)
             {
-                int vid = v.getVertexId();
                 if (symRedundant.contains(v))
                 {
                     continue;
                 }
-                if (ss.contains(vid))
+                if (ss.contains(v))
                 {
-                    for (Integer idVrtInSS : ss.getList())
-                    {
-                        if (idVrtInSS != vid)
-                        {
-                            symRedundant.add(getVertexWithId(idVrtInSS));
-                        }
-                    }
+                    symRedundant.addAll(ss);
+                    symRedundant.remove(v);
                 }
             }
         }
@@ -6055,9 +5942,9 @@ public class DGraph implements Cloneable
      * @param list the list of vertex IDs to be purged.
      */
 
-    public void removeSymmetryRedundantIds(ArrayList<Integer> list) {
+    public void removeSymmetryRedundantIds(ArrayList<Long> list) {
         ArrayList<Vertex> vList = new ArrayList<>();
-        for (int vid : list) {
+        for (long vid : list) {
             vList.add(getVertexWithId(vid));
         }
         removeSymmetryRedundance(vList);
@@ -6167,7 +6054,7 @@ public class DGraph implements Cloneable
                         
                         modGraph.appendGraphOnGraph(parent, srcApId, inGraph,
                                 rootOfInGraph, idAPOnInGraph, bondType, 
-                                new HashMap<Integer,SymmetricSet>(), symmetry);
+                                new HashMap<Vertex, SymmetricVertexes>(), symmetry);
                     }
                     break;
                 }
@@ -6287,66 +6174,23 @@ public class DGraph implements Cloneable
      * Produces a string that represents this graph and that adheres to the
      * JSON format.
      * @return the JSON format as a single string
-     * @throws DENOPTIMException if the graph contains non-unique vertex IDs or
-     * AP IDs. Uniqueness of identifiers is required to restore references upon
-     * deserialization.
      */
 
-    public String toJson() throws DENOPTIMException
+    public String toJson()
     {
-        //TODO: vertexID uniqueness should be guaranteed by the addVertex method
-        // Therefore, this check should not be needed. Consider removal.
-        //TODO: then the addVertex method should ensure also AP ID uniqueness.
-        
-        // Check for uniqueness of vertexIDs and APIDs within the
-        // graph (ignore nested graphs).
-        boolean regenerateVrtxID = false;
-        boolean regenerateAP = false;
-        Set<Integer> unqVrtxIDs = new HashSet<Integer>();
-        Set<Integer> unqApIDs = new HashSet<Integer>();
-        for (Vertex v : gVertices)
-        {
-            if (!unqVrtxIDs.add(v.getVertexId()))
-            {
-                regenerateVrtxID = true;
-                /*
-                throw new DENOPTIMException("Duplicate vertex ID '"
-                        + v.getVertexId()
-                        + "'. Cannot generate JSON string for graph: " + this);
-                        */
-            }
-            for (AttachmentPoint ap : v.getAttachmentPoints())
-            {
-                if (!unqApIDs.add(ap.getID()))
-                {
-                    regenerateAP = true;
-                    break;
-                    /*
-                    throw new DENOPTIMException("Duplicate attachment point ID "
-                            + "'" + ap.getID() + "'. "
-                            + "Cannot generate JSON string for graph: " + this);
-                            */
-                }
-            }
-        }
-        if (regenerateVrtxID)
-        {
-            this.renumberGraphVertices();
-        }
-        if (regenerateAP)
-        {
-            for (Vertex v : gVertices)
-            {
-                for (AttachmentPoint ap : v.getAttachmentPoints())
-                {
-                    ap.setID(GraphUtils.getUniqueAPIndex());
-                }
-            }
-        }
-
         Gson gson = DENOPTIMgson.getWriter();
         String jsonOutput = gson.toJson(this);
         return jsonOutput;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    protected void ensureUniqueApIDs()
+    {
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            ap.setID(apCounter.getAndIncrement());
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -6382,14 +6226,43 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * We expect unique IDs for vertices and attachment points.
+     * We expect unique IDs for vertices
      */
     public static class DENOPTIMGraphSerializer
     implements JsonSerializer<DGraph>
     {
         @Override
         public JsonElement serialize(DGraph g, Type typeOfSrc,
-                JsonSerializationContext context) {
+                JsonSerializationContext context) 
+        {
+            boolean regenerateVrtxID = false;
+            boolean regenerateAP = false;
+            Set<Long> unqVrtxIDs = new HashSet<Long>();
+            Set<Integer> unqApIDs = new HashSet<Integer>();
+            for (Vertex v : g.getVertexList())
+            {
+                if (!unqVrtxIDs.add(v.getVertexId()))
+                {
+                    regenerateVrtxID = true;
+                }
+                for (AttachmentPoint ap : v.getAttachmentPoints())
+                {
+                    if (!unqApIDs.add(ap.getID()))
+                    {
+                        regenerateAP = true;
+                        break;
+                    }
+                }
+            }
+            if (regenerateVrtxID)
+            {
+                g.renumberGraphVertices();
+            }
+            if (regenerateAP)
+            {
+                g.ensureUniqueApIDs();
+            }
+            
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("graphId", g.graphId);
             jsonObject.add("gVertices", context.serialize(g.gVertices));
@@ -6400,8 +6273,7 @@ public class DGraph implements Cloneable
         }
     }
 
-
-    //------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     public static class DENOPTIMGraphDeserializer
     implements JsonDeserializer<DGraph>
@@ -6416,10 +6288,6 @@ public class DGraph implements Cloneable
             JsonObject partialJsonObj = new JsonObject();
             partialJsonObj.add("graphId", jsonObject.get("graphId"));
             partialJsonObj.add("gVertices", jsonObject.get("gVertices"));
-            // Eventually, also the sym sets will become references... so
-            // also for symVertices we'll have to go through the list and
-            // rebuild the references.
-            partialJsonObj.add("symVertices", jsonObject.get("symVertices"));
 
             Gson gson = new GsonBuilder()
                 .setExclusionStrategies(new DENOPTIMExclusionStrategyNoAPMap())
@@ -6429,8 +6297,7 @@ public class DGraph implements Cloneable
                 .setPrettyPrinting()
                 .create();
 
-            DGraph graph = gson.fromJson(partialJsonObj,
-                    DGraph.class);
+            DGraph graph = gson.fromJson(partialJsonObj, DGraph.class);
 
             // Refresh APs
             for (Vertex v : graph.getVertexList())
@@ -6475,6 +6342,29 @@ public class DGraph implements Cloneable
                         BondType.class));
                 graph.addRing(ring);
             }
+            
+            //and symmetry relations between vertexes
+            if (jsonObject.has("symVertices"))
+            {
+                for (JsonElement elSet : jsonObject.get("symVertices").getAsJsonArray())
+                {
+                    SymmetricVertexes ss = new SymmetricVertexes();
+                    for (JsonElement elId : elSet.getAsJsonArray())
+                    {
+                        int id = context.deserialize(elId, Integer.class);
+                        ss.add(graph.getVertexWithId(id));
+                    }
+                    try
+                    {
+                        graph.addSymmetricSetOfVertices(ss);
+                    } catch (DENOPTIMException e1)
+                    {
+                        e1.printStackTrace();
+                        throw new Error("Vertex listed in multiple symmetric "
+                                + "sets. Check this: " + elSet);
+                    }
+                }                
+            }
 
             return graph;
         }
@@ -6492,7 +6382,7 @@ public class DGraph implements Cloneable
     public static void setScaffold(Vertex v) {
         ArrayList<Vertex> newVertexList = new ArrayList<>();
 
-        Set<Integer> visited = new HashSet<>();
+        Set<Long> visited = new HashSet<>();
         Queue<Vertex> currLevel = new ArrayDeque<>();
         Queue<Vertex> nextLevel = new ArrayDeque<>();
         currLevel.add(v);
@@ -6500,7 +6390,7 @@ public class DGraph implements Cloneable
         while (!currLevel.isEmpty()) {
             Vertex currVertex = currLevel.poll();
 
-            int currId = currVertex.getVertexId();
+            long currId = currVertex.getVertexId();
             if (!visited.contains(currId)) {
                 visited.add(currId);
 
@@ -6626,15 +6516,15 @@ public class DGraph implements Cloneable
      * the vertex on the left, even if in the graph it is actually used to bind 
      * the RCV that defines the chord and that eventually connects the 
      * vertex on the left with that on the right.
-     * @param vid1 vertex ID of one vertex.
-     * @param vid2 vertex ID of another vertex.
+     * @param nbrVid vertex ID of one vertex.
+     * @param vid vertex ID of another vertex.
      * @return the {@link AttachmentPoint} or null is the two vertex IDs
      * are not connected in this graph.
      */
-    public AttachmentPoint getAPOnLeftVertexID(int vid1, int vid2)
+    public AttachmentPoint getAPOnLeftVertexID(long nbrVid, long vid)
     {
-        Vertex v1 = getVertexWithId(vid1);
-        Vertex v2 = getVertexWithId(vid2);
+        Vertex v1 = getVertexWithId(nbrVid);
+        Vertex v2 = getVertexWithId(vid);
         if ( v1== null || v2 == null)
             return null;
         

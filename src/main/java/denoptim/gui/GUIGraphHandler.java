@@ -68,6 +68,7 @@ import denoptim.graph.DGraph;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.SymmetricSet;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -634,7 +635,7 @@ public class GUIGraphHandler extends GUICardPanel
         btnAddSymSet.setEnabled(false);
         btnAddSymSet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ArrayList<Vertex> selVrtxs =
+                List<Vertex> selVrtxs =
                         visualPanel.getSelectedNodesInViewer();
                 if (selVrtxs.size() < 2)
                 {
@@ -649,11 +650,10 @@ public class GUIGraphHandler extends GUICardPanel
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
                 }
-                ArrayList<Integer> symIDs = new ArrayList<Integer>();
-                selVrtxs.stream().forEach(v -> symIDs.add(v.getVertexId()));
                 try
                 {
-                    dnGraph.addSymmetricSetOfVertices(new SymmetricSet(symIDs));
+                    dnGraph.addSymmetricSetOfVertices(
+                            new SymmetricVertexes(selVrtxs));
                 } catch (DENOPTIMException e1)
                 {
                     JOptionPane.showMessageDialog(btnAddSymSet,

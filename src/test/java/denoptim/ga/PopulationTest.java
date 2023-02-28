@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 
@@ -1115,15 +1117,15 @@ public class PopulationTest
      * where template T1 is
      * <pre>
      *                     
-     *    (A)-v0-(A)--(A)-v1-(B)--(B)-v2-(C)
+     *    (A)-v0-(A)--(A)-v4-(B)--(B)-v6-(C)
      *         |           |
      *        (A)         (A)--(A)-v5
      *         |                    |
      *         |                   chord
      *         |                    |
-     *        (A)         (A)--(A)-v6
+     *        (A)         (A)--(A)-v3
      *         |           |
-     *        v3-(A)--(A)-v4-(B)
+     *        v1-(A)--(A)-v2-(B)
      * </pre>
      * 
      * The second Graph structure:
@@ -1158,6 +1160,8 @@ public class PopulationTest
     public static DGraph[] getPairOfTestGraphsBxoxo() throws Exception
     {   
         // Prepare special building block: template T1
+        // In the template we want APS in this order: 
+        // A(from v0), B(from v2), C(from v6)
 
         EmptyVertex v0 = new EmptyVertex(0);
         v0.addAP(APCA);
@@ -1168,48 +1172,45 @@ public class PopulationTest
         EmptyVertex v1 = new EmptyVertex(1);
         v1.addAP(APCA);
         v1.addAP(APCA);
-        v1.addAP(APCB);
         v1.setProperty("Label", "tv1");
+
+        EmptyVertex v2 = new EmptyVertex(2);
+        v2.addAP(APCA);
+        v2.addAP(APCB);
+        v2.addAP(APCA);
+        v2.setProperty("Label", "tv2");
         
         EmptyVertex v3 = new EmptyVertex(3);
         v3.addAP(APCA);
-        v3.addAP(APCA);
         v3.setProperty("Label", "tv3");
-
+        v3.setAsRCV(true);
+        
         EmptyVertex v4 = new EmptyVertex(4);
         v4.addAP(APCA);
-        v4.addAP(APCB);
         v4.addAP(APCA);
+        v4.addAP(APCB);
         v4.setProperty("Label", "tv4");
-        
-        // v2 is created after v4 to get a specific order of APs in the template
-        // In the template we want APS in this order: 
-        // A(from v0), B(from v4), C(from v2)
-        EmptyVertex v2 = new EmptyVertex(2);
-        v2.addAP(APCB);
-        v2.addAP(APCC);
-        v2.setProperty("Label", "tv2");
         
         EmptyVertex v5 = new EmptyVertex(5);
         v5.addAP(APCA);
         v5.setProperty("Label", "tv5");
         v5.setAsRCV(true);
-        
+
         EmptyVertex v6 = new EmptyVertex(6);
-        v6.addAP(APCA);
+        v6.addAP(APCB);
+        v6.addAP(APCC);
         v6.setProperty("Label", "tv6");
-        v6.setAsRCV(true);
         
         DGraph g = new DGraph();
         g.addVertex(v0);
         g.setGraphId(-1);
-        g.appendVertexOnAP(v0.getAP(1), v1.getAP(0));
-        g.appendVertexOnAP(v1.getAP(2), v2.getAP(0));
-        g.appendVertexOnAP(v1.getAP(1), v5.getAP(0));
-        g.appendVertexOnAP(v0.getAP(0), v3.getAP(0));
-        g.appendVertexOnAP(v3.getAP(1), v4.getAP(0));
+        g.appendVertexOnAP(v0.getAP(0), v1.getAP(0));
+        g.appendVertexOnAP(v1.getAP(1), v2.getAP(0));
+        g.appendVertexOnAP(v2.getAP(2), v3.getAP(0));
+        g.appendVertexOnAP(v0.getAP(1), v4.getAP(0));
         g.appendVertexOnAP(v4.getAP(2), v6.getAP(0));
-        g.addRing(v5, v6, BondType.SINGLE);
+        g.appendVertexOnAP(v4.getAP(1), v5.getAP(0));
+        g.addRing(v5, v3, BondType.SINGLE);
         
         Template t1 = new Template(BBType.NONE);
         t1.setInnerGraph(g);

@@ -111,7 +111,7 @@ public class AttachmentPointTest
         vA1.addAP();
         vA1.addAP();
         vA1.addAP();
-        ArrayList<AttachmentPoint> deepAPs1 = vA1.getAttachmentPoints();
+        List<AttachmentPoint> deepAPs1 = vA1.getAttachmentPoints();
         EmptyVertex vB1 = new EmptyVertex(1);
         vB1.addAP();
         
@@ -185,7 +185,7 @@ public class AttachmentPointTest
         vA2.addAP();
         vA2.addAP();
         vA2.addAP();
-        ArrayList<AttachmentPoint> deepAPs2 = vA2.getAttachmentPoints();
+        List<AttachmentPoint> deepAPs2 = vA2.getAttachmentPoints();
         EmptyVertex vB2 = new EmptyVertex(1);
         vB2.addAP();
         
@@ -259,7 +259,7 @@ public class AttachmentPointTest
 //-----------------------------------------------------------------------------
     
     private void checkIdentityOfEmbeddedAP(int expectedMAtches,
-            ArrayList<AttachmentPoint> deepAPs, Vertex v)
+            List<AttachmentPoint> deepAPs, Vertex v)
     {
         int nfound=0;
         for (AttachmentPoint outAP : v.getAttachmentPoints())
@@ -526,8 +526,7 @@ public class AttachmentPointTest
 				APClass.make(APCLASS));
 		AttachmentPoint ap6 = dummyVertex.getAP(5);
 
-    	ArrayList<AttachmentPoint> list =
-				dummyVertex.getAttachmentPoints();
+    	List<AttachmentPoint> list = dummyVertex.getAttachmentPoints();
     	
     	list.sort(new AttachmentPointComparator());
     	

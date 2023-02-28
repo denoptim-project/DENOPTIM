@@ -277,7 +277,7 @@ public class EAUtils
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
      * @param choiceOfOffstring index dictating which among the available two
-     * offspring (at most two, for now) if returned as result. 
+     * offspring (at most two, for now) is returned as result. 
      * This avoids randomized 
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
@@ -1273,7 +1273,7 @@ public class EAUtils
     protected static void setVertexCounterValue(Population population) 
             throws DENOPTIMException
     {
-        int val = Integer.MIN_VALUE;
+        long val = Long.MIN_VALUE;
         for (Candidate popln1 : population)
         {
             DGraph g = popln1.getGraph();
@@ -1890,12 +1890,12 @@ public class EAUtils
     protected static boolean foundForbiddenEnd(DGraph molGraph,
             FragmentSpaceParameters fsParams)
     {
-        ArrayList<Vertex> vertices = molGraph.getVertexList();
+        List<Vertex> vertices = molGraph.getVertexList();
         Set<APClass> classOfForbEnds = fsParams.getFragmentSpace()
                 .getForbiddenEndList();
         for (Vertex vtx : vertices)
         {
-            ArrayList<AttachmentPoint> daps = vtx.getAttachmentPoints();
+            List<AttachmentPoint> daps = vtx.getAttachmentPoints();
             for (AttachmentPoint dp : daps)
             {
                 if (dp.isAvailable())

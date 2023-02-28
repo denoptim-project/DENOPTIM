@@ -64,7 +64,7 @@ M  END
 40
 
 > <GraphENC>
-40 2028_1_0,2034_17_1,2041_84_1,2044_84_1,2051_28_1,2054_28_1,29_1_1,30_68_1,31_68_1,32_39_1,33_80_1,34_81_1,41_1_1,42_68_1,43_68_1,44_39_1,45_80_1,46_81_1, 2028_2_2034_0_SINGLE_RuL:0_MImidazolylidene:1,2028_1_2041_0_SINGLE_RuX:0_RuCl:1,2028_0_2044_0_SINGLE_RuX:0_RuCl:1,2034_2_2051_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_3_2054_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_1_29_0_SINGLE_LImidazolylideneSubNL:0_c:0,29_2_30_0_SINGLE_MX:1_bridge:0,29_1_31_0_SINGLE_c:0_bridge:0,31_1_32_0_SINGLE_bridge:0_LPhosphineSubMSym:0,32_1_33_0_SINGLE_LPhosphineSubMSym:0_ATplus:0,30_1_34_0_SINGLE_bridge:0_ATminus:0,2034_4_41_0_SINGLE_LImidazolylideneSubNL:0_c:0,41_2_42_0_SINGLE_MX:1_bridge:0,41_1_43_0_SINGLE_c:0_bridge:0,43_1_44_0_SINGLE_bridge:0_LPhosphineSubMSym:0,44_1_45_0_SINGLE_LPhosphineSubMSym:0_ATplus:0,42_1_46_0_SINGLE_bridge:0_ATminus:0, DENOPTIMRing [vertices=[33_80_1, 32_39_1, 31_68_1, 29_1_1, 30_68_1, 34_81_1]] DENOPTIMRing [vertices=[45_80_1, 44_39_1, 43_68_1, 41_1_1, 42_68_1, 46_81_1]] SymmetricSet [symIds=[2041, 2044]] SymmetricSet [symIds=[2051, 2054]] SymmetricSet [symIds=[29, 41]] SymmetricSet [symIds=[30, 42]] SymmetricSet [symIds=[31, 43]] SymmetricSet [symIds=[32, 44]] SymmetricSet [symIds=[33, 45]] SymmetricSet [symIds=[34, 46]] 
+40 2028_1_0,2034_17_1,2041_84_1,2044_84_1,2051_28_1,2054_28_1,29_1_1,30_68_1,31_68_1,32_39_1,33_80_1,34_81_1,41_1_1,42_68_1,43_68_1,44_39_1,45_80_1,46_81_1, 2028_2_2034_0_SINGLE_RuL:0_MImidazolylidene:1,2028_1_2041_0_SINGLE_RuX:0_RuCl:1,2028_0_2044_0_SINGLE_RuX:0_RuCl:1,2034_2_2051_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_3_2054_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_1_29_0_SINGLE_LImidazolylideneSubNL:0_c:0,29_2_30_0_SINGLE_MX:1_bridge:0,29_1_31_0_SINGLE_c:0_bridge:0,31_1_32_0_SINGLE_bridge:0_LPhosphineSubMSym:0,32_1_33_0_SINGLE_LPhosphineSubMSym:0_ATplus:0,30_1_34_0_SINGLE_bridge:0_ATminus:0,2034_4_41_0_SINGLE_LImidazolylideneSubNL:0_c:0,41_2_42_0_SINGLE_MX:1_bridge:0,41_1_43_0_SINGLE_c:0_bridge:0,43_1_44_0_SINGLE_bridge:0_LPhosphineSubMSym:0,44_1_45_0_SINGLE_LPhosphineSubMSym:0_ATplus:0,42_1_46_0_SINGLE_bridge:0_ATminus:0, DENOPTIMRing [vertices=[33_80_1, 32_39_1, 31_68_1, 29_1_1, 30_68_1, 34_81_1]] DENOPTIMRing [vertices=[45_80_1, 44_39_1, 43_68_1, 41_1_1, 42_68_1, 46_81_1]] SymmetricVertexes [symIds=[2041, 2044]] SymmetricVertexes [symIds=[2051, 2054]] SymmetricVertexes [symIds=[29, 41]] SymmetricVertexes [symIds=[30, 42]] SymmetricVertexes [symIds=[31, 43]] SymmetricVertexes [symIds=[32, 44]] SymmetricVertexes [symIds=[33, 45]] SymmetricVertexes [symIds=[34, 46]] 
 
 > <GraphJson>
 {
@@ -119,12 +119,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          1,
+          2
+        ]
       ],
       "mol": {
         "atoms": [
@@ -237,18 +235,14 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            1,
-            4
-          ]
-        },
-        {
-          "symIds": [
-            2,
-            3
-          ]
-        }
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          7
+        ]
       ],
       "mol": {
         "atoms": [
@@ -603,12 +597,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          15,
+          16
+        ]
       ],
       "mol": {
         "atoms": [
@@ -677,12 +669,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          18,
+          19
+        ]
       ],
       "mol": {
         "atoms": [
@@ -782,12 +772,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          20,
+          21
+        ]
       ],
       "mol": {
         "atoms": [
@@ -917,13 +905,11 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1,
-            2
-          ]
-        }
+        [
+          22,
+          23,
+          24
+        ]
       ],
       "mol": {
         "atoms": [
@@ -1111,12 +1097,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          28,
+          29
+        ]
       ],
       "mol": {
         "atoms": [
@@ -1185,12 +1169,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          31,
+          32
+        ]
       ],
       "mol": {
         "atoms": [
@@ -1290,12 +1272,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          33,
+          34
+        ]
       ],
       "mol": {
         "atoms": [
@@ -1425,13 +1405,11 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1,
-            2
-          ]
-        }
+        [
+          35,
+          36,
+          37
+        ]
       ],
       "mol": {
         "atoms": [
@@ -1683,54 +1661,38 @@ M  END
     }
   ],
   "symVertices": [
-    {
-      "symIds": [
-        2041,
-        2044
-      ]
-    },
-    {
-      "symIds": [
-        2051,
-        2054
-      ]
-    },
-    {
-      "symIds": [
-        29,
-        41
-      ]
-    },
-    {
-      "symIds": [
-        30,
-        42
-      ]
-    },
-    {
-      "symIds": [
-        31,
-        43
-      ]
-    },
-    {
-      "symIds": [
-        32,
-        44
-      ]
-    },
-    {
-      "symIds": [
-        33,
-        45
-      ]
-    },
-    {
-      "symIds": [
-        34,
-        46
-      ]
-    }
+    [
+      2041,
+      2044
+    ],
+    [
+      2051,
+      2054
+    ],
+    [
+      29,
+      41
+    ],
+    [
+      30,
+      42
+    ],
+    [
+      31,
+      43
+    ],
+    [
+      32,
+      44
+    ],
+    [
+      33,
+      45
+    ],
+    [
+      34,
+      46
+    ]
   ]
 }
 

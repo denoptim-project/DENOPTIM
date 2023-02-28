@@ -385,7 +385,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             try
             {
                 List<XoverSite> xoverSites = GraphOperations
-                        .locateCompatibleXOverPoints(gA, gB, fragSpace);
+                        .locateCompatibleXOverPoints(gA, gB, fragSpace, 
+                                settings.maxXOverableSubGraphSize);
                 xoverCompatibilities.put(memberA, memberB, xoverSites);
             } catch (DENOPTIMException e)
             {
@@ -410,8 +411,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * @param parentB
      * @return the list crossover sites.
      */
-    public List<XoverSite> getXoverSites(Candidate parentA,
-            Candidate parentB)
+    public List<XoverSite> getXoverSites(Candidate parentA, Candidate parentB)
     {
         return xoverCompatibilities.get(parentA,parentB);
     }

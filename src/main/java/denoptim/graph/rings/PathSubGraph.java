@@ -380,9 +380,9 @@ public class PathSubGraph
      * @return the path of APs from vertex from to vertex to.
      */
     private static Iterable<AttachmentPoint> findPath(
-            Vertex from, Vertex to, Set<Integer> visited) {
+            Vertex from, Vertex to, Set<Long> visited) {
 
-        int fromId = from.getVertexId();
+        long fromId = from.getVertexId();
         if (visited.contains(fromId)) {
             return new ArrayList<>();
         }
@@ -463,8 +463,8 @@ public class PathSubGraph
         IAtom e1 = null;
         for (IAtom atm : mol.atoms())
         {
-            int vrtId = (Integer) atm.getProperty(
-                                            DENOPTIMConstants.ATMPROPVERTEXID);
+            long vrtId = (Long) atm.getProperty(
+                    DENOPTIMConstants.ATMPROPVERTEXID);
             if (vrtId == vertPathVAVB.get(0).getVertexId())
                 e0 = atm;
                       
@@ -489,9 +489,9 @@ public class PathSubGraph
         List<IAtom> pathInFullMol = new ArrayList<IAtom>();
         try {
             IAtom currentAtm = null;
-            int prevAtmInPathVID = -1;
-            int currAtmInPathVID = -1;
-            int nextAtmInPathVID = -1;
+            long prevAtmInPathVID = -1;
+            long currAtmInPathVID = -1;
+            long nextAtmInPathVID = -1;
             List<IAtom> candidates = new ArrayList<IAtom>();
             for (int i=1; i<(atomsPathVAVB.size()); i++)
             {
@@ -543,7 +543,7 @@ public class PathSubGraph
                                     || candidates.contains(nbrNbr))
                                 continue;
                             
-                            int vid = getVertexIdInPath(nbrNbr);
+                            long vid = getVertexIdInPath(nbrNbr);
                             if (vid == nextAtmInPathVID 
                                     && currAtmInPathVID!=nextAtmInPathVID)
                             {
@@ -578,7 +578,7 @@ public class PathSubGraph
 
             }
         } catch (Throwable t) {
-            throw new DENOPTIMException("PathTools Exception: " + t);
+            throw new DENOPTIMException("PathTools Exception: " + t, t);
         }
         if (pathInFullMol.size() != atomsPathVAVB.size())
         {
@@ -614,10 +614,10 @@ public class PathSubGraph
             IAtom a1 = atomsPathVAVB.get(it-2);
             IAtom a2 = atomsPathVAVB.get(it-1);
             IAtom a3 = atomsPathVAVB.get(it);
-            int vIdA0 = (Integer) a0.getProperty(keyPropVrtID);
-            int vIdA1 = (Integer) a1.getProperty(keyPropVrtID);
-            int vIdA2 = (Integer) a2.getProperty(keyPropVrtID);
-            int vIdA3 = (Integer) a3.getProperty(keyPropVrtID);
+            long vIdA0 = a0.getProperty(keyPropVrtID);
+            long vIdA1 = a1.getProperty(keyPropVrtID);
+            long vIdA2 = a2.getProperty(keyPropVrtID);
+            long vIdA3 = a3.getProperty(keyPropVrtID);
             IBond bndA1A2 = iacPathVAVB.getBond(a1,a2);
 
             // trivial for points 1 and 2
@@ -733,10 +733,10 @@ public class PathSubGraph
     
 //-----------------------------------------------------------------------------
     
-    private int getVertexIdInPath(IAtom a)
+    private long getVertexIdInPath(IAtom a)
     {
-        return a.getProperty(DENOPTIMConstants.ATMPROPVERTEXID,Integer.class)
-                .intValue();
+        return a.getProperty(DENOPTIMConstants.ATMPROPVERTEXID, Long.class)
+                .longValue();
     }
 
 //-----------------------------------------------------------------------------

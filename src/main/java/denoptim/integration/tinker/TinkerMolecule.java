@@ -223,7 +223,7 @@ public class TinkerMolecule implements Cloneable
             double[] oDiAng = oTa.getDistAngle();
             double[] nDiAng = new double[] {oDiAng[0], oDiAng[1], oDiAng[2]};
 	    TinkerAtom nTa = new TinkerAtom(ia+1,str,at,nXyz,nNBnd,nDiAng);
-	    int vId = oTa.getVertexId();
+	    long vId = oTa.getVertexId();
 	    nTa.setVertexId(vId);
 	    atms.add(nTa);
 	}

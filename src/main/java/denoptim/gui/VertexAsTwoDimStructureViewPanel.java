@@ -467,8 +467,7 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 		clearAPTable();
 		mapAPs = new HashMap<Integer,AttachmentPoint>();
 		
-		ArrayList<AttachmentPoint> lstAPs = 
-		        vertex.getAttachmentPoints();		
+		List<AttachmentPoint> lstAPs = vertex.getAttachmentPoints();		
         if (lstAPs.size() == 0)
         {
 			return;
