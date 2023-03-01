@@ -3,7 +3,7 @@
   <groupId>org.denoptim</groupId>
   <artifactId>denoptim</artifactId>
 
-  <version>4.0.0</version>
+  <version>4.0.1</version>
   <!-- WARNING: the vesion must be changes also in doc/user_manual.md-->
 
   <name>denoptim</name>
