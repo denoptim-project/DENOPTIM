@@ -1925,10 +1925,11 @@ public class GAParametersForm extends ParametersForm
  			           valueField==cmbPar11)
  			    {
                     ((JComboBox<ProbabilityFuncitonShape>) valueField)
-                        .setSelectedItem(
-                                ProbabilityFuncitonShape.valueOf(value));
+                        .setSelectedItem(ProbabilityFuncitonShape.valueOf(
+                                value.toUpperCase()));
  			    } else {
- 			        ((JComboBox<String>) valueField).setSelectedItem(value);
+ 			        ((JComboBox<String>) valueField).setSelectedItem(
+ 			                value.toUpperCase());
  			    }
  				break;
  				
