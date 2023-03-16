@@ -1121,7 +1121,7 @@ public class GUIInspectGARun extends GUICardPanel
                                 + "Therefore, the definition of candidates "
                                 + "encountered during the evolution is not "
                                 + "present on disk. "
-                                + "We'll only how the trace of such "
+                                + "We'll show only how the trace of such "
                                 + "candidates in the evolution. You may try "
                                 + "to inspect the final generation, "
                                 + "if present, by clicking on '" 
