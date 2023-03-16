@@ -30,6 +30,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
+import denoptim.combinatorial.GraphBuildingTask;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
@@ -158,7 +159,8 @@ public abstract class FitnessTask extends Task
         
         // Write the FIT file
         result.setChemicalRepresentation(fitProvMol);
-        if (fitnessSettings.writeCandidatesOnDisk())
+        if (this instanceof GraphBuildingTask 
+                || fitnessSettings.writeCandidatesOnDisk())
         {
             DenoptimIO.writeCandidateToFile(new File(fitProvOutFile), result, 
                     false);
