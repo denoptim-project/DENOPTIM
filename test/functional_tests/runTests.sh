@@ -286,6 +286,11 @@ runTest "t12b"
 runTest "t12c"
 
 #
+# t12d: Genetic algorithms without writing the candidates from intermediate generations. Writes only final results.
+#
+runTest "t12d"
+
+#
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation
 #
 runTest "t13"

@@ -302,16 +302,13 @@ implements IMolecularDescriptor, IDenoptimDescriptor
                         answer.get(KEYJSONMEMBERSCORE).toString());
                 result = new DoubleResult(value);
             } else if (answer.has(KEYJSONMEMBERERR)) {
-                //TODO-gg use log
                 //System.err.println(KEYJSONMEMBERERR + " from socket server.");
                 result = new DoubleResult(Double.NaN);
             } else {
-                //TODO-gg use log
-                /*
-                System.err.println("Socket server replied without providing "
-                        + "neither " + KEYJSONMEMBERSCORE + " nor "
-                        + KEYJSONMEMBERERR + " member.");
-                */
+                System.err.println("WARNING: Socket server replied without "
+                        + "providing either " + KEYJSONMEMBERSCORE + " or "
+                        + KEYJSONMEMBERERR + " member. Setting desctriptor "
+                        + "'" + NAMES[0] + "'to NaN.");
                 result = new DoubleResult(Double.NaN);
             }
         } catch (JsonSyntaxException | IOException e) {

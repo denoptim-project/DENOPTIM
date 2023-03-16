@@ -158,7 +158,11 @@ public abstract class FitnessTask extends Task
         
         // Write the FIT file
         result.setChemicalRepresentation(fitProvMol);
-        DenoptimIO.writeCandidateToFile(new File(fitProvOutFile), result, false);
+        if (fitnessSettings.writeCandidatesOnDisk())
+        {
+            DenoptimIO.writeCandidateToFile(new File(fitProvOutFile), result, 
+                    false);
+        }
         
         // Optional image creation
         if (status && fitnessSettings.makePictures())
@@ -412,13 +416,8 @@ public abstract class FitnessTask extends Task
 
         if (Double.isNaN(fitVal))
         {
-            
-            //synchronized (lock)
-            //{
-            //    hasException = true;
-                msg = "Fitness value is NaN for " + result.getName();
-                errMsg = msg;
-            //}
+            msg = "Fitness value is NaN for " + result.getName();
+            errMsg = msg;
             fitnessSettings.getLogger().severe(msg);
             
             fitProvMol.removeProperty(DENOPTIMConstants.FITNESSTAG);

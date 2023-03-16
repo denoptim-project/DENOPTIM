@@ -267,8 +267,12 @@ public class EvolutionaryAlgorithm
                     e);
         }
         initializePopulation(population);
+        
+        boolean writeCandsOnDisk = ((FitnessParameters) settings.getParameters(
+                ParametersType.FIT_PARAMS)).writeCandidatesOnDisk();
         EAUtils.outputPopulationDetails(population, 
-                EAUtils.getPathNameToGenerationDetailsFile(0, settings), settings);
+                EAUtils.getPathNameToGenerationDetailsFile(0, settings), 
+                settings, writeCandsOnDisk);
         
         // Ensure that there is some variability in fitness values
         double sdev = EAUtils.getPopulationSD(population);
@@ -313,7 +317,7 @@ public class EvolutionaryAlgorithm
                     + NL, genId);
             EAUtils.outputPopulationDetails(population, 
                     EAUtils.getPathNameToGenerationDetailsFile(genId, settings),
-                    settings);
+                    settings, writeCandsOnDisk);
             
             if (stopped)
             {

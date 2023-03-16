@@ -49,6 +49,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.fitness.FitnessParameters;
 import denoptim.ga.EAUtils;
 import denoptim.ga.Population;
 import denoptim.graph.APClass;
@@ -235,6 +236,7 @@ public class DenoptimIOTest
         GAParameters settings = new GAParameters();
         settings.setPopulationSize(2);
         settings.setWorkingDirectory(tempDir.getAbsolutePath());
+        settings.setParameters(new FitnessParameters());
         
         String genDir = EAUtils.getPathNameToGenerationFolder(26,settings);
         FileUtils.createDirectory(genDir);
@@ -259,7 +261,7 @@ public class DenoptimIOTest
         pop.add(c1);
         pop.add(c2);
         String summary = EAUtils.getPathNameToGenerationDetailsFile(26,settings);
-        EAUtils.outputPopulationDetails(pop, summary, settings);
+        EAUtils.outputPopulationDetails(pop, summary, settings, true);
         
         List<Candidate> cands = DenoptimIO.readGenerationFromSummary(
                 new File(summary));

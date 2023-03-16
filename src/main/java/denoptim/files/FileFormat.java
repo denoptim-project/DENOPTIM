@@ -220,6 +220,10 @@ public enum FileFormat {
         GENSUMMARY.extension = "txt";
         GENSUMMARY.definingRegex = new HashSet<String>(Arrays.asList(
                 "^" + DENOPTIMConstants.GAGENSUMMARYHEADER + ".*"));
+        // WARNING: format of the GENSUMMARY is expected by methods such as 
+        // DenoptimIO.readPopulationMembersTraces
+        // Any change of format should could cause the need to change those 
+        // methods.
     }
     
     /**

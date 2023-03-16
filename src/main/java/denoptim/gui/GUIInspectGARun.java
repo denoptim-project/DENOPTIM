@@ -125,6 +125,7 @@ public class GUIInspectGARun extends GUICardPanel
 	
 	private ArrayList<CandidateLW> allIndividuals;
 	private int molsWithFitness = 0;
+	private boolean warnedAboutMissingCandFiles = false;
 	private JLabel lblTotItems;
 	private Map<Integer,CandidateLW> candsWithFitnessMap;
 	
@@ -178,6 +179,12 @@ public class GUIInspectGARun extends GUICardPanel
      * at a given time (i.e., generation).
      */
     private JButton openGeneratinGraphs;
+    
+    /**
+     * Button offering the possibility to load the graphs of the final 
+     * population.
+     */
+    private JButton openFinalPopGraphs;
     
     /**
      * Pathways of population members collected by generation id. This info
@@ -362,6 +369,7 @@ public class GUIInspectGARun extends GUICardPanel
         });
         ctrlPanelRow2Left.add(openSingleGraph);
         
+        
         openGeneratinGraphs = new JButton("Open Population Graphs");
         openGeneratinGraphs.setToolTipText(String.format(
                 "<html><body width='%1s'>Open a "
@@ -444,6 +452,82 @@ public class GUIInspectGARun extends GUICardPanel
             }
         });
         ctrlPanelRow2Left.add(openGeneratinGraphs);
+        
+        
+        openFinalPopGraphs = new JButton("Open Final Pop Graphs");
+        openFinalPopGraphs.setToolTipText(String.format(
+                "<html><body width='%1s'>Open a "
+                + "new tab for inspecting the graph representation of all "
+                + "members of the final population. ",300));
+        openFinalPopGraphs.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Collect population
+                String pathtoTmpFile = Utils.getTempFile("final_population.sdf");
+                File finalPopFolder = new File(srcFolder,"Final");
+                if (!finalPopFolder.exists())
+                {
+                    JOptionPane.showMessageDialog(openGeneratinGraphs,
+                            String.format("<html><body width='%1s'>" 
+                                    + "Cannot find folder '" + finalPopFolder 
+                                    + "'. Final population not found.", 300),
+                                    "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    mainPanel.setCursor(Cursor.getPredefinedCursor(
+                            Cursor.DEFAULT_CURSOR));
+                    return;
+                }
+                mainPanel.setCursor(Cursor.getPredefinedCursor(
+                        Cursor.WAIT_CURSOR));
+                List<String> filesToMerge = new ArrayList<String>();
+                for (File fitFile : finalPopFolder.listFiles(new FileFilter() {
+                    
+                    @Override
+                    public boolean accept(File pathname) {
+                        if (pathname.getName().endsWith(
+                               DENOPTIMConstants.FITFILENAMEEXTOUT))
+                        {
+                            return true;
+                        }
+                        return false;
+                    }
+                }))
+                {
+                    filesToMerge.add(fitFile.getAbsolutePath());
+                }
+       
+                try
+                {
+                    FileUtils.mergeIntoOneFile(pathtoTmpFile, filesToMerge);
+                    mainPanel.setCursor(Cursor.getPredefinedCursor(
+                            Cursor.DEFAULT_CURSOR));
+                } catch (IOException e1)
+                {
+                    e1.printStackTrace();
+                    JOptionPane.showMessageDialog(openGeneratinGraphs,
+                            String.format("<html><body width='%1s'>" 
+                                    + "List of members of final population "
+                                    + " could not be collected. Hint: "
+                                    + e1.getMessage(), 400),
+                            "Error",
+                            JOptionPane.PLAIN_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    mainPanel.setCursor(Cursor.getPredefinedCursor(
+                            Cursor.DEFAULT_CURSOR));
+                    return;
+                }
+                
+                // Launch the GUI component to visualize population
+                GUIGraphHandler graphPanel = new GUIGraphHandler(mainPanel);
+                mainPanel.add(graphPanel);
+                graphPanel.importGraphsFromFile(new File(pathtoTmpFile));
+                
+                //Log
+                System.out.println("File collecting members of the final "
+                        + "population: "+ pathtoTmpFile);
+            }
+        });
+        ctrlPanelRow2Left.add(openFinalPopGraphs);
         
 
         ctrlPanelRow1 = new JPanel();
@@ -611,6 +695,7 @@ public class GUIInspectGARun extends GUICardPanel
 		candsPerGeneration = new HashMap<Integer,List<String>>();
 		Map<Integer,double[]> popProperties = new HashMap<Integer,double[]>();
 		allIndividuals = new ArrayList<CandidateLW>();
+		int largestGenId = -1;
 		for (File genFolder : file.listFiles(new FileFilter() {
 			
 			@Override
@@ -623,93 +708,15 @@ public class GUIInspectGARun extends GUICardPanel
 				return false;
 			}
 		}))
-		{			
-			//WARNING: assuming folders are named "Gen.*"
-			int genId = Integer.parseInt(genFolder.getName().substring(3));
-			int padSize = genFolder.getName().substring(3).length();
-			
-			String zeroedGenId = GeneralUtils.getPaddedString(padSize,genId);
-			
-			// Read Generation summaries
-			File genSummary = new File(genFolder 
-					+ System.getProperty("file.separator") 
-					+ "Gen" + zeroedGenId + ".txt");
-			
-			System.out.println("Reading "+genSummary);
-			boolean readPopMembers = false;
-			try {
-				popProperties.put(genId, DenoptimIO.readPopulationProps(
-						genSummary));
-				readPopMembers = true;
-			} catch (DENOPTIMException e2) {
-				JOptionPane.showMessageDialog(parent,
-		                "<html>File '" + genSummary + "' not found!<br>"
-		                + "There will be holes in the min/max/mean profile."
-		                + "</html>",
-		                "Error",
-		                JOptionPane.PLAIN_MESSAGE,
-		                UIManager.getIcon("OptionPane.errorIcon"));
-				popProperties.put(genId, new double[] {
-						Double.NaN, Double.NaN, Double.NaN, Double.NaN});
-			}
-			
-			// Read candidates
-			for (File fitFile : genFolder.listFiles(new FileFilter() {
-				
-				@Override
-				public boolean accept(File pathname) {
-					if (pathname.getName().endsWith(
-					       DENOPTIMConstants.FITFILENAMEEXTOUT))
-					{
-						return true;
-					}
-					return false;
-				}
-			}))
-			{
-				CandidateLW one;
-				try {
-				    //WARNING: here we assume one candidate per file
-					one = DenoptimIO.readLightWeightCandidate(fitFile).get(0);
-				} catch (DENOPTIMException e1) {
-					e1.printStackTrace();
-					JOptionPane.showMessageDialog(parent,
-			                "Could not read data from to '" + fitFile + "'! "
-			                + NL + e1.getMessage(),
-			                "Error",
-			                JOptionPane.PLAIN_MESSAGE,
-			                UIManager.getIcon("OptionPane.errorIcon"));
-					return;
-				}
-				if (one.hasFitness())
-				{
-					molsWithFitness++;
-				}
-				one.setGeneration(genId);
-				allIndividuals.add(one);
-			}
-			
-			//Read population members from summary
-			if (readPopMembers)
-			{
-                try
-                {
-                    List<String> membersPathnames = new ArrayList<String>(
-                            DenoptimIO.readPopulationMemberPathnames(genSummary));
-                    candsPerGeneration.put(genId, membersPathnames);
-                } catch (DENOPTIMException e1)
-                {
-                    e1.printStackTrace();
-                    JOptionPane.showMessageDialog(parent,
-                            String.format("<html><body width='%1s'>"
-                                + "File '" + genSummary + "' has been found, "
-                                + "but pathnames to population members could "
-                                + "not be read.</html>", 400),
-                            "Error",
-                            JOptionPane.PLAIN_MESSAGE,
-                            UIManager.getIcon("OptionPane.errorIcon"));
-                }
-			}
+		{
+            //WARNING: assuming folders are named "Gen.*"
+            int genId = Integer.parseInt(genFolder.getName().substring(3));
+            int padSize = genFolder.getName().substring(3).length();
+	        String zeroedGenId = GeneralUtils.getPaddedString(padSize, genId);
+		    readOneGeneration(genFolder, "Gen" + zeroedGenId + ".txt", 
+		            genId, parent, popProperties);
+		    if (genId>largestGenId)
+		        largestGenId = genId;
 		}
 		
 		System.out.println("Imported "+allIndividuals.size()+" individuals.");
@@ -1038,7 +1045,152 @@ public class GUIInspectGARun extends GUICardPanel
 	
 //------------------------------------------------------------------------------
 
-	/**
+	private void readOneGeneration(File genFolder, String summaryName,
+	        int genId,
+	        Component parent, 
+	        Map<Integer,double[]> popProperties)
+    {
+        // Read Generation summary file
+        File genSummary = new File(genFolder, summaryName);
+        System.out.println("Reading "+genSummary);
+        boolean readPopMembers = false;
+        try {
+            popProperties.put(genId, DenoptimIO.readPopulationProps(
+                    genSummary));
+            readPopMembers = true;
+        } catch (DENOPTIMException e2) {
+            JOptionPane.showMessageDialog(parent,
+                    "<html>File '" + genSummary + "' not found!<br>"
+                    + "There will be holes in the min/max/mean profile."
+                    + "</html>",
+                    "Error",
+                    JOptionPane.PLAIN_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            popProperties.put(genId, new double[] {
+                    Double.NaN, Double.NaN, Double.NaN, Double.NaN});
+        }
+        
+        // Read candidates from file (if present)
+        boolean foundCandidateFilesInThisGen = false;
+        for (File fitFile : genFolder.listFiles(new FileFilter() {
+            
+            @Override
+            public boolean accept(File pathname) {
+                if (pathname.getName().endsWith(
+                       DENOPTIMConstants.FITFILENAMEEXTOUT))
+                {
+                    return true;
+                }
+                return false;
+            }
+        }))
+        {
+            CandidateLW one;
+            try {
+                //WARNING: here we assume one candidate per file
+                one = DenoptimIO.readLightWeightCandidate(fitFile).get(0);
+            } catch (DENOPTIMException e1) {
+                e1.printStackTrace();
+                JOptionPane.showMessageDialog(parent,
+                        "Could not read data from to '" + fitFile + "'! "
+                        + NL + e1.getMessage(),
+                        "Error",
+                        JOptionPane.PLAIN_MESSAGE,
+                        UIManager.getIcon("OptionPane.errorIcon"));
+                return;
+            }
+            if (one.hasFitness())
+            {
+                molsWithFitness++;
+            }
+            one.setGeneration(genId);
+            allIndividuals.add(one);
+            foundCandidateFilesInThisGen = true;
+        }
+        
+        // Read traces of candidates if candidate's files are not present
+        if (!foundCandidateFilesInThisGen)
+        {
+            if (!warnedAboutMissingCandFiles)
+            {
+                JOptionPane.showMessageDialog(parent,
+                        String.format("<html><body width='%1s'>"
+                                + "This evolutionary experiment seems to "
+                                + "have been run with the "
+                                + "'FP-DontWriteCandidatesOnDisk' option. "
+                                + "Therefore, the definition of candidates "
+                                + "encountered during the evolution is not "
+                                + "present on disk. "
+                                + "We'll only how the trace of such "
+                                + "candidates in the evolution. You may try "
+                                + "to inspect the final generation, "
+                                + "if present, by clicking on '" 
+                                + openFinalPopGraphs.getText() + "'"
+                                + "</html>", 400),
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE,
+                        UIManager.getIcon("OptionPane.errorIcon"));
+                warnedAboutMissingCandFiles = true;
+            }
+            readPopMembers = false;
+            try
+            {
+                for (CandidateLW cand : 
+                    DenoptimIO.readPopulationMembersTraces(genSummary))
+                {
+                    // We keep only the oldest version of a candidate.
+                    // To this end, note that the equality of CandidateLW
+                    // considers only name and UID.
+                    if (allIndividuals.contains(cand))
+                    {
+                        CandidateLW otherTracePfCand = allIndividuals.get(
+                                allIndividuals.indexOf(cand));
+                        if (otherTracePfCand.getGeneration() > genId)
+                        {
+                            allIndividuals.remove(otherTracePfCand);
+                            molsWithFitness--;
+                        } else {
+                            continue;
+                        }
+                    }
+                    cand.setGeneration(genId);
+                    molsWithFitness++;
+                    allIndividuals.add(cand);
+                }
+            } catch (DENOPTIMException e1)
+            {
+                // Should never happen unless the file becomes unreadable
+                // between the previous read and this one.
+                e1.printStackTrace();
+            }
+        }
+        
+        //Read population members from summary
+        if (readPopMembers)
+        {
+            try
+            {
+                List<String> membersPathnames = new ArrayList<String>(
+                        DenoptimIO.readPopulationMemberPathnames(genSummary));
+                candsPerGeneration.put(genId, membersPathnames);
+            } catch (DENOPTIMException e1)
+            {
+                e1.printStackTrace();
+                JOptionPane.showMessageDialog(parent,
+                        String.format("<html><body width='%1s'>"
+                            + "File '" + genSummary + "' has been found, "
+                            + "but pathnames to population members could "
+                            + "not be read.</html>", 400),
+                        "Error",
+                        JOptionPane.PLAIN_MESSAGE,
+                        UIManager.getIcon("OptionPane.errorIcon"));
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------
+	
+    /**
      * Modal dialog to display visual examples of line colors and strokes
      */
 	/*

@@ -38,6 +38,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
@@ -810,14 +811,15 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Write out summary for the current GA population
+     * Write out summary for the current GA population.
      * @param population
      * @param filename
      * @throws DENOPTIMException
      */
 
     public static void outputPopulationDetails(Population population, 
-            String filename, GAParameters settings) throws DENOPTIMException
+            String filename, GAParameters settings, boolean printpathNames) 
+                    throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
         sb.append(DENOPTIMConstants.GAGENSUMMARYHEADER);
@@ -844,7 +846,12 @@ public class EAUtils
                             mol.getGraph().getGraphId()));
                     sb.append(String.format("%-30s", mol.getUID()));
                     sb.append(df.format(mol.getFitness()));
-                    sb.append("    ").append(mol.getSDFFile());
+                    
+                    if (printpathNames)
+                    {
+                        sb.append("    ").append(mol.getSDFFile());
+                    }
+                    
                     sb.append(System.getProperty("line.separator"));
                 }
             }
@@ -1086,55 +1093,17 @@ public class EAUtils
             .append(FSEP).append("Final.txt");
         return sb.toString();
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Simply copies the files from the previous directories into the specified
-     * folder.
-     * @param popln the final list of best molecules
-     * @param destDir the name of the output directory
-     */
-
-    protected static void outputFinalResults(Population popln,
-            String destDir, GAParameters settings) throws DENOPTIMException
-    {
-        String genOutfile = destDir + System.getProperty("file.separator") +
-                                "Final.txt";
-
-        File fileDir = new File(destDir);
-
-        try
-        {
-            for (int i=0; i<settings.getPopulationSize(); i++)
-            {
-                String sdfile = popln.get(i).getSDFFile();
-                String imgfile = popln.get(i).getImageFile();
-
-                if (sdfile != null)
-                {
-                    FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
-                }
-                if (imgfile != null)
-                {
-                    FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
-                }
-            }
-            outputPopulationDetails(popln, genOutfile, settings);
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
-        }
-    }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Simply copies the files from the previous directories into the specified
-     * folder.
+     * Saves the final results to disk. If the files for each candidate have 
+     * been saved on disk along the way, then it copies them from their location
+     * into the folder for final results, which is defined based on the 
+     * GA settings.
      * @param popln the final list of best molecules
-     * @param destDir the name of the output directory
+     * @param settings the GS settings containing defaults and parameters given 
+     * by the user.
      */
 
     protected static void outputFinalResults(Population popln, 
@@ -1143,6 +1112,10 @@ public class EAUtils
         String dirName = EAUtils.getPathNameToFinalPopulationFolder(settings);
         denoptim.files.FileUtils.createDirectory(dirName);
         File fileDir = new File(dirName);
+        
+        boolean intermediateCandidatesAreOnDisk = 
+                ((FitnessParameters) settings.getParameters(
+                ParametersType.FIT_PARAMS)).writeCandidatesOnDisk();
 
         for (int i=0; i<popln.size(); i++)
         {
@@ -1150,17 +1123,22 @@ public class EAUtils
             String sdfile = c.getSDFFile();
             String imgfile = c.getImageFile();
 
-            if (sdfile != null)
-            {
-                try {
+            try {
+                if (intermediateCandidatesAreOnDisk && sdfile!=null)
+                {
                     FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
-                } catch (IOException ioe) {
-                    throw new DENOPTIMException("Failed to copy file '" 
-                            + sdfile + "' to '" + fileDir + "' for candidate "
-                            + c.getName(), ioe);
+                } else {
+                    File candFile = new File(fileDir, c.getName() 
+                            + DENOPTIMConstants.FITFILENAMEEXTOUT);
+                    c.setSDFFile(candFile.getAbsolutePath());
+                    DenoptimIO.writeCandidateToFile(candFile, c, false);
                 }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException("Failed to copy file '" 
+                        + sdfile + "' to '" + fileDir + "' for candidate "
+                        + c.getName(), ioe);
             }
-            if (imgfile != null)
+            if (imgfile != null && intermediateCandidatesAreOnDisk)
             {
                 try {
                     FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
@@ -1173,7 +1151,7 @@ public class EAUtils
         }
         outputPopulationDetails(popln,
                 EAUtils.getPathNameToFinalPopulationDetailsFile(settings),
-                settings);        
+                settings, true);        
     }
 
 //------------------------------------------------------------------------------

@@ -901,6 +901,52 @@ public class DenoptimIO
         }
         return vals;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Read the minimal info that can be found in a
+     * {@link FileFormat#GENSUMMARY} file about the members of a population.
+     *
+     * @param fileName  the pathname to the {@link FileFormat#GENSUMMARY} file 
+     * to read.
+     * @return list of population members defined to the extent that information
+     * is available in the {@link FileFormat#GENSUMMARY} file.
+     * @throws DENOPTIMException if the file cannot be read.
+     */
+    
+    public static List<CandidateLW> readPopulationMembersTraces(File file) 
+           throws DENOPTIMException 
+    {
+        List<CandidateLW> members = new ArrayList<CandidateLW>();
+        List<String> txt = readList(file.getAbsolutePath());
+        
+        // Skip the header, i.e., the first line
+        for (int i=1; i<txt.size(); i++) 
+        {
+            String line = txt.get(i);
+            
+            // WARNING: here we set strong expectation on the format of the 
+            // gensummary files!
+            
+            if (line.startsWith("#"))
+                break;
+            
+            if (line.isBlank())
+                continue;
+           
+            String[] words = line.trim().split("\\s+");
+            String pathname = "nofile";
+            if (words.length >= 5)
+            {
+                pathname = words[4];
+            }
+            CandidateLW member = new CandidateLW(words[2], words[0], pathname);
+            member.setFitness(Double.parseDouble(words[3]));
+            members.add(member);
+        }
+        return members;
+   }
 
 //------------------------------------------------------------------------------
 
