@@ -11,7 +11,7 @@ rm -rf data
 "$javaDENOPTIM" -jar "$denoptimJar" -r PY4J &
 SERVER_PID=$!
 
-# Wait for the se er to be replying
+# Wait for the server to be replying
 for i in 1, 2, 3, 4, 5
 do
   sleep 0.5
