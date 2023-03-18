@@ -711,7 +711,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FR-Input`| Pathname to the file containing the graph for which the fitness has to be calculated.|
 |`FR-Output`|Pathname where results will be saved (see [Fitness Files](#FitnessFiles))|
 |`FR-ExtractTemplates`| Add this keyword to request the extraction of template vertex from the result of the fitness evaluation process. This keyword is meant for testing purposes.|
-
+|`FR-WallTime`|Wall time (number of secods) the fitness runner waits for a response from the fitness provider.|
 
 
 ## Stand-alone Graph Isomorphism Analyzer
