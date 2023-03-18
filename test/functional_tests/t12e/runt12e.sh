@@ -34,7 +34,11 @@ runFolder=$(basename $(ls -lrtd "$wrkDir"/RUN*/ | tail -n 1 | awk '{print $NF}')
 genSummaryFiles=()
 while IFS=  read -r -d $'\0'; do
     genSummaryFiles+=("$REPLY")
-done < <(find "$runFolder" -name "Gen*.txt" -print0)
+done < <(find "$wrkDir/$runFolder" -name "Gen*.txt" -print0)
+numFromXover=0
+numFromMutXover=0
+numFromMut=0
+numNew=0
 for i in $(seq 0 $((${#genSummaryFiles[@]}-2)))
 do
     membersGenJ=$(grep "M00" ${genSummaryFiles[$((i+1))]} | cut -c 1-17)
@@ -45,7 +49,37 @@ do
             exit -1
         fi
     done 
+    for memberinGenI in $(grep "M00" ${genSummaryFiles[$i]} | awk '{print $5}');
+    do
+        provenance=$(grep -A 1 "Provenance" "$memberinGenI" | tail -n 1 | awk '{print $1}')
+        if [[ "Xover:" == "$provenance" ]]; then
+           ((numFromXover++))
+        elif [[ "MutationOnXover:" == "$provenance" ]]; then
+           ((numFromMutXover++))
+        elif [[ "Mutation:" == "$provenance" ]]; then
+           ((numFromMut++))
+        elif [[ "NEW" == "$provenance" ]]; then
+           ((numNew++))
+        fi
+    done
 done
+
+if [ $numFromXover -ne 23 ]; then
+    echo "NOT PASSED (sympton: wrong number of Xover: $numFromXover)"
+    exit -1
+fi
+if [ $numFromMutXover -ne 7 ]; then
+    echo "NOT PASSED (sympton: wrong number of Mut+Xover: $numFromMutXover)"
+    exit -1
+fi
+if [ $numFromMut -ne 0 ]; then
+    echo "NOT PASSED (sympton: wrong number of Mutation: $numFromMut)"
+    exit -1
+fi
+if [ $numNew -ne 6 ]; then
+    echo "NOT PASSED (sympton: wrong number of new canddiates: $numNew)"
+    exit -1
+fi
 
 grep -q 'DENOPTIM EA run completed' "$wrkDir"/$runFolder.log
 if [[ $? != 0 ]]
