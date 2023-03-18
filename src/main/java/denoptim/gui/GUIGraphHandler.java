@@ -1804,7 +1804,7 @@ public class GUIGraphHandler extends GUICardPanel
 		    if (mol != null)
 		    {
                 molLibrary.set(currGrphIdx, mol);
-                mol.setProperty(DENOPTIMConstants.GMSGTAG,
+                mol.setProperty(DENOPTIMConstants.PROVENANCE,
                         "ManuallyBuilt");
         	} else {
         	    // Logging done within visualPanel

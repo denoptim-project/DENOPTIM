@@ -66,7 +66,7 @@ public class GUIPreferences {
 		defualtSDFTags.put(DENOPTIMConstants.FITNESSTAG,"Fitness");
 		defualtSDFTags.put(DENOPTIMConstants.MOLERRORTAG,"Error");
 		defualtSDFTags.put("Generation","Generation");
-		defualtSDFTags.put(DENOPTIMConstants.GMSGTAG,"Origin");
+		defualtSDFTags.put(DENOPTIMConstants.PROVENANCE,"Origin");
 		for (String s : defualtSDFTags.keySet())
 		{
 			chosenSDFTags.add(s);

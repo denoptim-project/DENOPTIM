@@ -776,7 +776,7 @@ public class DenoptimIO
         List<String> optionalPropNames = new ArrayList<String>(Arrays.asList(
                 DENOPTIMConstants.FITNESSTAG,
                 DENOPTIMConstants.MOLERRORTAG,
-                DENOPTIMConstants.GMSGTAG,
+                DENOPTIMConstants.PROVENANCE,
                 DENOPTIMConstants.GRAPHLEVELTAG
                 ));
         propNames.addAll(optionalPropNames);
@@ -816,7 +816,7 @@ public class DenoptimIO
                             item.setError(obj.toString());
                             break;
                         
-                        case DENOPTIMConstants.GMSGTAG:
+                        case DENOPTIMConstants.PROVENANCE:
                             item.setGeneratingSource(obj.toString());
                             break;
                             

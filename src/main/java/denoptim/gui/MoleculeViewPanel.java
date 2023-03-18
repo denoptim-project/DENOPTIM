@@ -410,7 +410,7 @@ public class MoleculeViewPanel extends JSplitPane
 		fromDnMol.add(DENOPTIMConstants.FITNESSTAG);
 		fromDnMol.add(DENOPTIMConstants.MOLERRORTAG);
 		fromDnMol.add("Generation");
-		fromDnMol.add(DENOPTIMConstants.GMSGTAG);
+		fromDnMol.add(DENOPTIMConstants.PROVENANCE);
 		
 		TreeSet<String> chosen = GUIPreferences.chosenSDFTags;
 		Map<String,String> defPropMap = GUIPreferences.defualtSDFTags;
@@ -452,10 +452,10 @@ public class MoleculeViewPanel extends JSplitPane
 					item.getGeneration() });
 		}
 		if (item.getComments() != null && chosen.contains(
-				DENOPTIMConstants.GMSGTAG)) 
+				DENOPTIMConstants.PROVENANCE)) 
 		{
 			dataTabModel.addRow(new Object[] {
-					defPropMap.get(DENOPTIMConstants.GMSGTAG),
+					defPropMap.get(DENOPTIMConstants.PROVENANCE),
 					item.getComments() });
 		}
 		

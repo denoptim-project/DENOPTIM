@@ -135,11 +135,11 @@ public abstract class FitnessTask extends Task
             fitProvMol = t3d.convertGraphTo3DAtomContainer(dGraph,true);
     	}
         
-        if (fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG) == null ||
+        if (fitProvMol.getProperty(DENOPTIMConstants.PROVENANCE) == null ||
         		fitProvMol.getProperty(
-        		        DENOPTIMConstants.GMSGTAG).toString().equals(""))
+        		        DENOPTIMConstants.PROVENANCE).toString().equals(""))
         {
-        	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
+        	fitProvMol.removeProperty(DENOPTIMConstants.PROVENANCE);
         }
         
         // Run fitness provider

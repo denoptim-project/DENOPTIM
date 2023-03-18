@@ -201,7 +201,7 @@ public class GraphUtils
         if (g.getLocalMsg() != null
                 && !g.getLocalMsg().toString().equals(""))
         {
-            iac.setProperty(DENOPTIMConstants.GMSGTAG,g.getLocalMsg());
+            iac.setProperty(DENOPTIMConstants.PROVENANCE,g.getLocalMsg());
         }
     }
     

@@ -298,9 +298,9 @@ public final class DENOPTIMConstants
     public static final String VERTEXJSONTAG = "VertexJson";
     
     /**
-     * SDF tag containing metadata on graph
+     * SDF tag containing provenance data for a graph
      */
-    public static final String GMSGTAG = "GraphMsg";
+    public static final String PROVENANCE = "Provenance";
 
     /**
      * SDF tag defining attachment points
