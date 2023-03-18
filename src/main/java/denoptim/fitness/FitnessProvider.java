@@ -58,9 +58,11 @@ import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 
 /**
- * DENOPTIM's (internal) fitness provider class calculates descriptors for a 
- * given chemical thing, and combines the descriptors to calculate a single
- * numerical results (i.e., the fitness) according to an equation.
+ * DENOPTIM's (internal) fitness provider calculates the value of 
+ * {@link Variable}s that are used in an expression for calculating a single
+ * numerical results, i.e., the fitness. Each the value of each {@link Variable} 
+ * derived from the calculation of {@link DescriptorForFitness} for a specific
+ * chemical object.
  * 
  * @author Marco Foscato
  */
@@ -73,7 +75,7 @@ public class FitnessProvider
 	protected DescriptorEngine engine;
 	
 	/**
-	 * The collection of descriptors to consider
+	 * The collection of descriptors to consider.
 	 */
 	private List<DescriptorForFitness> descriptors;
 	
@@ -122,11 +124,10 @@ public class FitnessProvider
 		{
 			DescriptorForFitness dff = descriptors.get(i);
 			classnames.add(dff.getClassName());
-			//TODO consider using dff.makeCopy()
 			this.descriptors.add(dff.cloneAllButImpl());
 		}
 		// Instantiate new instances of the descriptors implementations
-		engine = new DescriptorEngine(classnames,null);
+		engine = new DescriptorEngine(classnames, null);
 		List<IDescriptor> newInstances = engine.getDescriptorInstances();
 		
 		for (int i=0; i<this.descriptors.size(); i++)
@@ -162,7 +163,7 @@ public class FitnessProvider
 	
 	public double getFitness(IAtomContainer iac) throws Exception 
 	{
-		if (engine == null)
+	    if (engine == null)
 		{
 			throw new DENOPTIMException("Internal fitness provider has not been"
 					+ " configured.");
@@ -190,6 +191,17 @@ public class FitnessProvider
                 + engine.getDescriptorInstances().size());
 		
 		// Collect numerical values needed to calculate the fitness
+
+        // Just to simplify retrieval of the values
+        HashMap<String, Double> valuesMap = new HashMap<String,Double>();
+        // first we initialize them to null
+        for (DescriptorForFitness d : this.descriptors)
+        {
+            for (Variable v : d.getVariables())
+            {
+                valuesMap.put(v.getName(), null);
+            }
+        }
 		for (int i=0; i<engine.getDescriptorInstances().size(); i++)
         {
         	DescriptorForFitness descriptor = descriptors.get(i);
@@ -249,9 +261,9 @@ public class FitnessProvider
             		value = (DescriptorValue) iac.getProperty(descSpec);
             		double val = processValue(descName, descriptor, desc, 
             		        descSpec, value, varName, iac);
-            		variable.value = val;
+            		valuesMap.put(varName, val);
                     iac.setProperty(varName,val);
-        	    }
+                }
         	} else if (desc instanceof IAtomicDescriptor) {
         	    for (Variable variable : descriptor.getVariables())
                 {
@@ -262,7 +274,7 @@ public class FitnessProvider
         				String msg = "No hits for SMARTS of " + varName + ": "
         						+ "setting variable value to 0.0";
         				logger.log(Level.WARNING ,msg);
-        				variable.value = 0.0;
+                        valuesMap.put(varName, 0.0);
         				continue;
         			}
         			logger.log(Level.FINE, "-AtomIDs contributing to " 
@@ -298,7 +310,7 @@ public class FitnessProvider
                     logger.log(Level.FINE, "-Values contributing to " 
                             + varName + ": " + vals);
                     double overallValue = MathUtils.mean(vals);
-                    variable.value = overallValue;
+                    valuesMap.put(varName, overallValue);
                     iac.setProperty(varName,overallValue);
         		}
         	} else if (desc instanceof IBondDescriptor) {
@@ -311,7 +323,7 @@ public class FitnessProvider
         				String msg = "No hits for SMARTS of " + varName + ": "
         						+ "setting variable value to 0.0";
         				logger.log(Level.WARNING, msg);
-        				variable.value = 0.0;
+                        valuesMap.put(varName, 0.0);
         				continue;
         			}
         			logger.log(Level.FINE, "-AtomIDs contributing to " 
@@ -346,7 +358,7 @@ public class FitnessProvider
                     logger.log(Level.FINE, "-Values contributing to " 
                             + varName + ": "+vals);
                     double overallValue = MathUtils.mean(vals);
-                    variable.value = overallValue;
+                    valuesMap.put(varName, overallValue);
                     iac.setProperty(varName,overallValue);
         		}
         	} else if (desc instanceof IAtomPairDescriptor) {
@@ -359,18 +371,7 @@ public class FitnessProvider
         				+ "as molecular, atomic, or bond descriptor.");
         	}
         }
-        
-		// Just to simplify retrieval of the values
-        HashMap<String,Double> valuesMap = new HashMap<String,Double>();
-        for (DescriptorForFitness d : this.descriptors)
-        {
-            for (Variable v : d.getVariables())
-            {
-                valuesMap.put(v.getName(), v.value);
-            }
-        }
         logger.log(Level.FINE, "VARIABLES: "+valuesMap);
-    
 
         // Calculate the fitness from the expression and descriptor values
         ExpressionFactory expFactory = ExpressionFactory.newInstance();
@@ -474,7 +475,6 @@ public class FitnessProvider
         ValueExpression ve = expFactory.createValueExpression(ncc, expression, 
                 Double.class);
         double fitness = (double) ve.getValue(ncc);
-		
 		iac.setProperty(DENOPTIMConstants.FITNESSTAG,fitness);
 		return fitness;
 	}

@@ -123,7 +123,7 @@ public abstract class FitnessTask extends Task
      * @return the object with data obtained from the fitness provider.
      * @throws DENOPTIMException
      */
-    protected Candidate runFitnessProvider() throws DENOPTIMException
+    protected void runFitnessProvider() throws DENOPTIMException
     {
     	// Ensure these two variables have been set
         result.setSDFFile(fitProvOutFile);
@@ -132,7 +132,7 @@ public abstract class FitnessTask extends Task
             ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(
                     fitnessSettings.getLogger(),
                     fitnessSettings.getRandomizer());
-            fitProvMol = t3d.convertGraphTo3DAtomContainer(dGraph,true);
+            fitProvMol = t3d.convertGraphTo3DAtomContainer(dGraph, true);
     	}
         
         if (fitProvMol.getProperty(DENOPTIMConstants.PROVENANCE) == null ||
@@ -182,8 +182,6 @@ public abstract class FitnessTask extends Task
                     "Unable to create image. {0}", ex.getMessage());
             }
         }
-        
-        return result;
     }
     
 //------------------------------------------------------------------------------

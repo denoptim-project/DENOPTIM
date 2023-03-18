@@ -131,9 +131,8 @@ public class OffspringEvaluationTask extends FitnessTask
             	// we need to get it back. Thus, for the moment I do not see
             	// a reason for keeping them in the molecular representation,
             	// but potential down-stream effects have to be evaluated.
-                IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(
+                fitProvMol = tb3d.convertGraphTo3DAtomContainer(
                         gWithNoRCVs,true);
-                fitProvMol = mol;
         	} catch (Throwable t) {
         		//we have it already from before
         	}
@@ -141,15 +140,14 @@ public class OffspringEvaluationTask extends FitnessTask
         fitProvMol.setProperty(CDKConstants.TITLE, molName);
         fitProvMol.setProperty(DENOPTIMConstants.SMILESTAG, result.getSmiles());
         fitProvMol.setProperty(DENOPTIMConstants.INCHIKEYTAG, result.getUID());
-        fitProvMol.setProperty(DENOPTIMConstants.GCODETAG, 
-        		dGraph.getGraphId());
-        fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, 
-        		result.getUID());
+        fitProvMol.setProperty(DENOPTIMConstants.GCODETAG, dGraph.getGraphId());
+        fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, dGraph.toJson());
         if (dGraph.getLocalMsg() != null)
         {
-        	fitProvMol.setProperty(DENOPTIMConstants.PROVENANCE, dGraph.getLocalMsg());
+        	fitProvMol.setProperty(DENOPTIMConstants.PROVENANCE, 
+        	        dGraph.getLocalMsg());
         }
         
         // Run the fitness provider, whatever that is (internal or external)

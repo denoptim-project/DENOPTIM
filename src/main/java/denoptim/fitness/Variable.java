@@ -62,11 +62,6 @@ public class Variable
      */
     protected String[] params;
     
-    /**
-     * The value computed
-     */
-    protected Double value;
-    
 //------------------------------------------------------------------------------
     
     /**

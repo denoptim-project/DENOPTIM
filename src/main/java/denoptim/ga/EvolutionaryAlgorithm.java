@@ -487,14 +487,14 @@ public class EvolutionaryAlgorithm
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
                         settings,
                         candidate, 
-                        EAUtils.getPathNameToGenerationFolder(0,settings), 
+                        EAUtils.getPathNameToGenerationFolder(0, settings), 
                         population, mnt, settings.getUIDFileOut());
                 
                 // Submission is dependent on the parallelisation scheme
                 if (isAsync)
                 {
                     submitted.add(task);
-                    futures.put(task,tpe.submit(task));
+                    futures.put(task, tpe.submit(task));
                     // We keep some memory but of previous tasks, but must
                     // avoid memory leak due to storage of too many references 
                     // to submitted tasks.
