@@ -358,8 +358,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * parents. 
      * @return the list of crossover-compatible population members.
      */
-    public ArrayList<Candidate> getXoverPartners(Candidate memberA,
-            ArrayList<Candidate> eligibleParents, FragmentSpace fragSpace)
+    public List<Candidate> getXoverPartners(Candidate memberA,
+            List<Candidate> eligibleParents, FragmentSpace fragSpace)
     {   
         DGraph gA = memberA.getGraph();
         

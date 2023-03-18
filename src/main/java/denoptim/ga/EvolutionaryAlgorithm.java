@@ -586,7 +586,7 @@ public class EvolutionaryAlgorithm
         
         // Take a snapshot of the initial population members. This to exclude
         // that offsprings of this generation become parents in this generation.
-        ArrayList<Candidate> eligibleParents = new ArrayList<Candidate>();
+        List<Candidate> eligibleParents = new ArrayList<Candidate>();
         int populationVersion = -1;
         synchronized (population)
         {
@@ -601,7 +601,7 @@ public class EvolutionaryAlgorithm
                 + eligibleParents.size();
         
         int i=0;
-        ArrayList<Task> syncronisedTasks = new ArrayList<>();
+        List<Task> syncronisedTasks = new ArrayList<>();
         Monitor mnt = new Monitor("MonitorGen", genId, 
                 settings.getMonitorFile(),settings.getMonitorDumpStep(), 
                 settings.dumpMonitor(), settings.getLogger());
@@ -652,59 +652,34 @@ public class EvolutionaryAlgorithm
                 
                 File srcOfCandidate = null;
                 Candidate candidate = null;
-                CandidateSource src = CandidateSource.CONSTRUCTION;
+                
                 synchronized (candidatesToAdd)
                 {
                     if (candidatesToAdd.size()>0)
                     {
-                        src = CandidateSource.MANUAL;
                         srcOfCandidate = new File(candidatesToAdd.get(0));
                         candidatesToAdd.remove(0);
-                    } else {
-                        src = EAUtils.chooseGenerationMethod(settings);
-                    }
-                }
-                
-                switch (src)
-                {
-                    case MANUAL:
-                    {
                         candidate = EAUtils.readCandidateFromFile(
                                 srcOfCandidate, mnt, settings);
                         if (candidate == null)
                             continue;
-                        break;
-                    }
-                    case CROSSOVER:
-                    {
-                        candidate = EAUtils.buildCandidateByXOver(
-                                eligibleParents, population, mnt, settings);
-                        if (candidate == null)
-                            continue;
-                        break;
-                    }
-                        
-                    case MUTATION:
-                    {
-                        candidate = EAUtils.buildCandidateByMutation(
-                                eligibleParents, mnt, settings);
-                        if (candidate == null)
-                            continue;
-                        break;
-                    }
-                        
-                    case CONSTRUCTION:
-                    {
-                        candidate = EAUtils.buildCandidateFromScratch(mnt,
-                                settings);
-                        if (candidate == null)
-                            continue;
-                        break;
                     }
                 }
                 
-                if (candidate == null)
-                    continue;
+                if (candidate==null)
+                {
+                    //TODO-gg
+                    if (true)
+                    {    
+                        candidate = makeOffspringA(eligibleParents, population,
+                                mnt);
+                        if (candidate==null)
+                            continue;
+                    } else {
+                        //TODO-gg
+                        //candidate = makeOffSpringB();
+                    }
+                }
                 
                 candidate.setGeneration(genId);
                     
@@ -824,6 +799,54 @@ public class EvolutionaryAlgorithm
         return populationVersion != newPopulationVersion;
     }
     
+//------------------------------------------------------------------------------
+
+    /**
+     * Generates one offspring according to the method where crossover and 
+     * mutation are decoupled, i.e., we can do mutation without doing crossover.
+     * Besides crossover and mutation, this offspring generation method includes
+     * also construction from scratch, which corresponds to mutation of 
+     * everything. The operation chosen to try to generate the offspring is 
+     * given by the weights of the respective strategies in the genetic 
+     * algorithm settings.
+     * Since it is possible that there is no pair of population members that
+     * allows to do crossover, it is possible that this method has no way to
+     * produce an offspring, in which case it returns <code>null</code>.
+     * @return the new offspring if it could be made or null.
+     * @throws DENOPTIMException 
+     */
+    private Candidate makeOffspringA(List<Candidate> eligibleParents, 
+            Population population, Monitor mnt) throws DENOPTIMException
+    {
+        CandidateSource src = EAUtils.chooseGenerationMethod(settings);
+    
+        Candidate candidate = null;
+        switch (src)
+        {
+            case CROSSOVER:
+            {
+                candidate = EAUtils.buildCandidateByXOver(
+                        eligibleParents, population, mnt, settings);
+                break;
+            }
+                
+            case MUTATION:
+            {
+                candidate = EAUtils.buildCandidateByMutation(
+                        eligibleParents, mnt, settings);
+                break;
+            }
+                
+            case CONSTRUCTION:
+            {
+                candidate = EAUtils.buildCandidateFromScratch(mnt,
+                        settings);
+                break;
+            }
+        }
+        return candidate;
+    }
+
 //------------------------------------------------------------------------------
 
     public void stopRun()

@@ -166,6 +166,9 @@ public class EAUtils
      * Choose one of the methods to make new {@link Candidate}s. 
      * The choice is biased
      * by the weights of the methods as defined in the {@link GAParameters}.
+     * @param the genetic algorithm settings
+     * @return one among the possible {@link CandidateSource} excluding
+     * {@value CandidateSource#MANUAL}.
      */
     protected static CandidateSource chooseGenerationMethod(GAParameters settings)
     {
@@ -220,7 +223,8 @@ public class EAUtils
      * members.
      * @param mutWeight weight of mutation of existing population members.
      * @param newWeight weight of construction from scratch.
-     * @return
+     * @return one among the possible {@link CandidateSource} excluding
+     * {@value CandidateSource#MANUAL}.
      */
     public static CandidateSource pickNewCandidateGenerationMode(
             double xoverWeight, double mutWeight, double newWeight,
@@ -252,7 +256,7 @@ public class EAUtils
      * @return a candidate chosen in a stochastic manner.
      */
     protected static Candidate buildCandidateByXOver(
-            ArrayList<Candidate> eligibleParents, Population population, 
+            List<Candidate> eligibleParents, Population population, 
             Monitor mnt, GAParameters settings) throws DENOPTIMException
     {
         return buildCandidateByXOver(eligibleParents, population, mnt, 
@@ -286,7 +290,7 @@ public class EAUtils
      * @throws DENOPTIMException
      */
     protected static Candidate buildCandidateByXOver(
-            ArrayList<Candidate> eligibleParents, Population population, 
+            List<Candidate> eligibleParents, Population population, 
             Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
             int choiceOfOffstring, GAParameters settings) throws DENOPTIMException 
     {
@@ -526,7 +530,7 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     protected static Candidate buildCandidateByMutation(
-            ArrayList<Candidate> eligibleParents, Monitor mnt, 
+            List<Candidate> eligibleParents, Monitor mnt, 
             GAParameters settings) throws DENOPTIMException
     {
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
@@ -928,29 +932,29 @@ public class EAUtils
      * Selects a number of members from the given population. 
      * The selection method is what specified by the
      * configuration of the genetic algorithm ({@link GAParameters}).
-     * @param candidates the list of candidates to chose from.
+     * @param eligibleParents the list of candidates to chose from.
      * @param number how many candidate to pick.
      * @return indexes of the selected members of the given population.
      */
 
     protected static Candidate[] selectBasedOnFitness(
-            ArrayList<Candidate> candidates, int number, GAParameters settings)
+            List<Candidate> eligibleParents, int number, GAParameters settings)
     {
         Candidate[] mates = new Candidate[number];
         switch (settings.getSelectionStrategyType())
         {
         case 1:
-            mates = SelectionHelper.performTournamentSelection(candidates, 
+            mates = SelectionHelper.performTournamentSelection(eligibleParents, 
                     number, settings);
             break;
         case 2:
-            mates = SelectionHelper.performRWS(candidates, number, settings);
+            mates = SelectionHelper.performRWS(eligibleParents, number, settings);
             break;
         case 3:
-            mates = SelectionHelper.performSUS(candidates, number, settings);
+            mates = SelectionHelper.performSUS(eligibleParents, number, settings);
             break;
         case 4:
-            mates = SelectionHelper.performRandomSelection(candidates, number, 
+            mates = SelectionHelper.performRandomSelection(eligibleParents, number, 
                     settings);
             break;
         }
@@ -991,7 +995,7 @@ public class EAUtils
      */
 
     protected static XoverSite performFBCC(
-            ArrayList<Candidate> eligibleParents, Population population, 
+            List<Candidate> eligibleParents, Population population, 
             int[] choiceOfParents, int choiceOfXOverSites, GAParameters settings)
     {
         Candidate parentA = null;
@@ -1010,7 +1014,7 @@ public class EAUtils
                     ParametersType.FS_PARAMS);
         }
         FragmentSpace fragSpace = fsParams.getFragmentSpace();
-        ArrayList<Candidate> matesCompatibleWithFirst = 
+        List<Candidate> matesCompatibleWithFirst = 
                 population.getXoverPartners(parentA, eligibleParents, fragSpace);
         if (matesCompatibleWithFirst.size() == 0)
             return null;
