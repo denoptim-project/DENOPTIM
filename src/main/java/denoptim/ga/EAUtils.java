@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -242,6 +243,27 @@ public class EAUtils
             return CandidateSource.CONSTRUCTION;
         }
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Generates a pair of new offspring by performing a crossover operation.
+     * @param eligibleParents candidates that can be used as parents of the 
+     * offspring.
+     * @param population the collection of candidates where eligible candidates
+     * are hosted.
+     * @param mnt monitoring tool used to record events during the run of the
+     * evolutionary algorithm.
+     * @param settings the settings of the genetic algorithm.
+     * @return a candidate chosen in a stochastic manner.
+     */
+    protected static List<Candidate> buildCandidatesByXOver(
+            List<Candidate> eligibleParents, Population population, 
+            Monitor mnt, GAParameters settings) throws DENOPTIMException
+    {
+        return buildCandidatesByXOver(eligibleParents, population, mnt, 
+                null, -1, -1, settings, settings.maxOffsprintFromXover());
+    }
 
 //------------------------------------------------------------------------------
 
@@ -286,14 +308,60 @@ public class EAUtils
      * This avoids randomized 
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
-     * @return the candidate
+     * @return the candidate or null if none was produced.
      * @throws DENOPTIMException
      */
     protected static Candidate buildCandidateByXOver(
             List<Candidate> eligibleParents, Population population, 
             Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
-            int choiceOfOffstring, GAParameters settings) throws DENOPTIMException 
+            int choiceOfOffstring, GAParameters settings) 
+                    throws DENOPTIMException 
     {
+        List<Candidate> cands = buildCandidatesByXOver(eligibleParents, 
+                population, mnt, 
+                choiceOfParents, choiceOfXOverSites, choiceOfOffstring, 
+                settings, 1);
+        if (cands.size()>0)
+            return cands.get(0);
+        else
+            return null;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Generates up to a pair of new offspring by performing a crossover 
+     * operation.
+     * @param eligibleParents candidates that can be used as parents of the 
+     * offspring.
+     * @param population the collection of candidates where eligible candidates
+     * are hosted.
+     * @param mnt monitoring tool used to record events during the run of the
+     * evolutionary algorithm.
+     * @param choiceOfParents a pair of indexes dictating which ones among the 
+     * eligible parents we should use as parents. This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param choiceOfXOverSites index indicating which crossover site to use.
+     * This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param choiceOfOffstring index dictating which among the available two
+     * offspring (at most two, for now) is returned as result. 
+     * This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param maxCandidatesToReturn the number of offspring to return in the 
+     * list. Up to 2.
+     * @return the list of candidates, or an empty list.
+     * @throws DENOPTIMException
+     */
+    protected static List<Candidate> buildCandidatesByXOver(
+            List<Candidate> eligibleParents, Population population, 
+            Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
+            int choiceOfOffstring, GAParameters settings, 
+            int maxCandidatesToReturn) throws DENOPTIMException 
+    {   
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
         {
@@ -352,7 +420,7 @@ public class EAUtils
         {
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS_FINDPARENTS);
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            return new ArrayList<Candidate>();
         }
         
         Candidate cA = null, cB = null;
@@ -380,7 +448,7 @@ public class EAUtils
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-                return null;
+                return new ArrayList<Candidate>();
             }
         } catch (Throwable t) {
             if (!settings.xoverFailureTolerant)
@@ -399,7 +467,7 @@ public class EAUtils
             }
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            return new ArrayList<Candidate>();
         }
         gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
@@ -510,21 +578,32 @@ public class EAUtils
         if (validOffspring.size() == 0)
         {
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            return new ArrayList<Candidate>();
         }
         
-        Candidate chosenOffspring = null;
-        if (choiceOfOffstring<0)
+        if (maxCandidatesToReturn==1)
         {
-            chosenOffspring = settings.getRandomizer().randomlyChooseOne(
-                    validOffspring);
-            chosenOffspring.setName("M" + GeneralUtils.getPaddedString(
-                    DENOPTIMConstants.MOLDIGITS,
-                    GraphUtils.getUniqueMoleculeIndex()));
+            Candidate chosenOffspring = null;
+            if (choiceOfOffstring<0)
+            {
+                chosenOffspring = settings.getRandomizer().randomlyChooseOne(
+                        validOffspring);
+                chosenOffspring.setName("M" + GeneralUtils.getPaddedString(
+                        DENOPTIMConstants.MOLDIGITS,
+                        GraphUtils.getUniqueMoleculeIndex()));
+            } else {
+                chosenOffspring = validOffspring.get(choiceOfOffstring);
+            }
+            validOffspring.retainAll(Arrays.asList(chosenOffspring));
         } else {
-            chosenOffspring = validOffspring.get(choiceOfOffstring);
+            for (Candidate cand : validOffspring)
+            {
+                cand.setName("M" + GeneralUtils.getPaddedString(
+                        DENOPTIMConstants.MOLDIGITS,
+                        GraphUtils.getUniqueMoleculeIndex()));
+            }
         }
-        return chosenOffspring;
+        return validOffspring;
     }
     
 //------------------------------------------------------------------------------

@@ -113,7 +113,6 @@ public class EvolutionaryAlgorithm
      * List of IDs of candidates to be evaluated upon request from the user.
      * These candidates might or might not end up in the populations depending
      * on their performance. This list is cleared once its content has been 
-     * processed.
      */
     private List<String> candidatesToAdd = new ArrayList<String>();
 
@@ -651,6 +650,7 @@ public class EvolutionaryAlgorithm
                     }
                 }
                 
+                //TODO-gg make optional based on algorithm
                 synchronized (population)
                 {
                     if (population.size() >= newPopSize)
@@ -658,7 +658,7 @@ public class EvolutionaryAlgorithm
                 }
                 
                 File srcOfCandidate = null;
-                Candidate candidate = null;
+                List<Candidate> candidatesToEvaluate = new ArrayList<>();
                 
                 synchronized (candidatesToAdd)
                 {
@@ -666,81 +666,86 @@ public class EvolutionaryAlgorithm
                     {
                         srcOfCandidate = new File(candidatesToAdd.get(0));
                         candidatesToAdd.remove(0);
-                        candidate = EAUtils.readCandidateFromFile(
+                        Candidate candidate = EAUtils.readCandidateFromFile(
                                 srcOfCandidate, mnt, settings);
                         if (candidate == null)
                             continue;
+                        else
+                            candidatesToEvaluate.add(candidate);
                     }
                 }
                 
-                if (candidate==null)
+                if (candidatesToEvaluate.size()==0)
                 {
                     if (settings.coupleMutationAndCrossover())
                     {
-                        candidate = makeOffspringB(eligibleParents, population,
-                                mnt);
+                        candidatesToEvaluate.addAll(makeOffspringB(
+                                eligibleParents, population, mnt));
                     } else {    
-                        candidate = makeOffspringA(eligibleParents, population,
-                                mnt);
+                        candidatesToEvaluate.addAll(makeOffspringA(
+                                eligibleParents, population, mnt));
                     }
-                    if (candidate==null)
-                        continue;
                 }
+                if (candidatesToEvaluate.size()==0)
+                    continue;
                 
-                candidate.setGeneration(genId);
-                    
-                if (((FitnessParameters)settings.getParameters(
-                        ParametersType.FIT_PARAMS)).checkPreFitnessUID())
+                for (Candidate candidate : candidatesToEvaluate)
                 {
-                    try
+                    candidate.setGeneration(genId);
+                    
+                    if (((FitnessParameters)settings.getParameters(
+                            ParametersType.FIT_PARAMS)).checkPreFitnessUID())
                     {
-                        if (!scs.addNewUniqueEntry(candidate.getUID()))
+                        try
                         {
-                            mnt.increase(CounterID.DUPLICATEPREFITNESS);
+                            if (!scs.addNewUniqueEntry(candidate.getUID()))
+                            {
+                                mnt.increase(CounterID.DUPLICATEPREFITNESS);
+                                continue;
+                            }
+                        } catch (Exception e) {
+                            mnt.increase(
+                                    CounterID.FAILEDDUPLICATEPREFITNESSDETECTION);
                             continue;
                         }
-                    } catch (Exception e) {
-                        mnt.increase(
-                                CounterID.FAILEDDUPLICATEPREFITNESSDETECTION);
-                        continue;
                     }
-                }
                 
-                OffspringEvaluationTask task = new OffspringEvaluationTask(
-                        settings,
-                        candidate, 
-                        EAUtils.getPathNameToGenerationFolder(genId, settings), 
-                        population, mnt, settings.getUIDFileOut());
-                
-                if (isAsync)
-                {
-                    submitted.add(task);
-                    futures.put(task, tpe.submit(task));
-                    // We keep some memory but of previous tasks, but must
-                    // avoid memory leak due to storage of too many references 
-                    // to submitted tasks.
-                    if (submitted.size() > 2*settings.getNumberOfCPU())
+                    OffspringEvaluationTask task = new OffspringEvaluationTask(
+                            settings,
+                            candidate, 
+                            EAUtils.getPathNameToGenerationFolder(genId, settings), 
+                            population, mnt, settings.getUIDFileOut());
+                    
+                    if (isAsync)
                     {
-                        cleanupCompleted();
-                    }
-                } else {
-                    syncronisedTasks.add(task);
-                    if (syncronisedTasks.size() 
-                            >= Math.abs(population.size() - newPopSize)
-                            ||
-                            //This to avoid the fixed batch size to block the
-                            //generation of new candidates for too long
-                            i >= (0.1 * settings.getPopulationSize() *
-                                    settings.getMaxTriesFactor()))
-                    {
-                        // Now we have as many tasks as are needed to fill up 
-                        // the population, or we got sick to wait.
-                        // TasksBatchManager takes the collection of tasks and
-                        // runs them in batches of N, where N is given by the
-                        // second argument.
-                        tbm.executeTasks(syncronisedTasks,
-                                settings.getNumberOfCPU());
-                        syncronisedTasks.clear();
+                        submitted.add(task);
+                        futures.put(task, tpe.submit(task));
+                        // We keep some memory of previous tasks, but must
+                        // avoid memory leak due to storage of too many references 
+                        // to submitted tasks.
+                        if (submitted.size() > 2*settings.getNumberOfCPU())
+                        {
+                            cleanupCompleted();
+                        }
+                    } else {
+                        syncronisedTasks.add(task);
+                        if (syncronisedTasks.size() 
+                                >= Math.abs(population.size() - newPopSize)
+                                ||
+                                //This to avoid the fixed batch size to block the
+                                //generation of new candidates for too long
+                                i >= (0.1 * settings.getPopulationSize() *
+                                        settings.getMaxTriesFactor()))
+                        {
+                            // Now we have as many tasks as are needed to fill up 
+                            // the population, or we got sick to wait.
+                            // TasksBatchManager takes the collection of tasks and
+                            // runs them in batches of N, where N is given by the
+                            // second argument.
+                            tbm.executeTasks(syncronisedTasks,
+                                    settings.getNumberOfCPU());
+                            syncronisedTasks.clear();
+                        }
                     }
                 }
             }
@@ -827,37 +832,41 @@ public class EvolutionaryAlgorithm
      * @throws DENOPTIMException 
      */
     @SuppressWarnings("incomplete-switch")
-    private Candidate makeOffspringA(List<Candidate> eligibleParents, 
+    private List<Candidate> makeOffspringA(List<Candidate> eligibleParents, 
             Population population, Monitor mnt) throws DENOPTIMException
     {
         CandidateSource src = EAUtils.chooseGenerationMethod(settings);
     
-        Candidate candidate = null;
+        List<Candidate> candidates = new ArrayList<Candidate>();
         switch (src)
         {
             // MANUAL is not a valid choice here
             case CROSSOVER:
             {
-                candidate = EAUtils.buildCandidateByXOver(
-                        eligibleParents, population, mnt, settings);
+                candidates.addAll(EAUtils.buildCandidatesByXOver(
+                        eligibleParents, population, mnt, settings));
                 break;
             }
                 
             case MUTATION:
             {
-                candidate = EAUtils.buildCandidateByMutation(
+                Candidate candidate = EAUtils.buildCandidateByMutation(
                         eligibleParents, mnt, settings);
+                if (candidate!=null)
+                    candidates.add(candidate);
                 break;
             }
                 
             case CONSTRUCTION:
             {
-                candidate = EAUtils.buildCandidateFromScratch(mnt,
+                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
                         settings);
+                if (candidate!=null)
+                    candidates.add(candidate);
                 break;
             }
         }
-        return candidate;
+        return candidates;
     }
     
 //------------------------------------------------------------------------------
@@ -884,7 +893,7 @@ public class EvolutionaryAlgorithm
      * @throws DENOPTIMException 
      */
     @SuppressWarnings("incomplete-switch")
-    private Candidate makeOffspringB(List<Candidate> eligibleParents, 
+    private List<Candidate> makeOffspringB(List<Candidate> eligibleParents, 
             Population population, Monitor mnt) throws DENOPTIMException
     {
         CandidateSource src = EAUtils.pickNewCandidateGenerationMode(
@@ -893,39 +902,47 @@ public class EvolutionaryAlgorithm
                 settings.getConstructionWeight(),
                 settings.getRandomizer());
     
-        Candidate candidate = null;
+        List<Candidate> candidates = new ArrayList<Candidate>();
         switch (src)
         {   
             case CROSSOVER:
             {
-                candidate = EAUtils.buildCandidateByXOver(
+                Candidate candidate = EAUtils.buildCandidateByXOver(
                         eligibleParents, population, mnt, settings);
+                if (candidate!=null)
+                    candidates.add(candidate);
                 break;
             }
             
             case MUTATION:
             {
-                Candidate parent = EAUtils.buildCandidateByXOver(
+                List<Candidate> parents = EAUtils.buildCandidatesByXOver(
                         eligibleParents, population, mnt, settings);
-                String provenanceMsg = parent.getGraph().getLocalMsg();
-                candidate = EAUtils.buildCandidateByMutation(
-                        Arrays.asList(parent), mnt, settings);
-                if (candidate!=null)
+                for (Candidate parent : parents)
                 {
-                    candidate.getGraph().setLocalMsg("MutationOn" + 
-                            provenanceMsg);
+                    String provenanceMsg = parent.getGraph().getLocalMsg();
+                    Candidate candidate = EAUtils.buildCandidateByMutation(
+                            Arrays.asList(parent), mnt, settings);
+                    if (candidate!=null)
+                    {
+                        candidate.getGraph().setLocalMsg("MutationOn" + 
+                                provenanceMsg);
+                        candidates.add(candidate);
+                    }
                 }
                 break;
             }
                 
             case CONSTRUCTION:
             {
-                candidate = EAUtils.buildCandidateFromScratch(mnt,
+                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
                         settings);
+                if (candidate!=null)
+                    candidates.add(candidate);
                 break;
             }
         }
-        return candidate;
+        return candidates;
     }
 
 //------------------------------------------------------------------------------

@@ -260,6 +260,11 @@ public class GAParameters extends RunTimeParameters
      * Crossover parents selection strategy: string
      */
     protected String strXoverSelectionMode = xoverSelectionMode+"";
+    
+    /**
+     * Number of offspring that a single crossover operation can produce.
+     */
+    protected int maxOffsprintFromXover = 1;
 
     /**
      * Mutation types that are excluded everywhere.
@@ -659,6 +664,17 @@ public class GAParameters extends RunTimeParameters
     public double getCrossoverWeight()
     {
         return crossoverWeight;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the maximum number of offspring produced by a single crossover
+     * operation.
+     */
+    public int maxOffsprintFromXover()
+    {
+        return maxOffsprintFromXover;
     }
 
 //------------------------------------------------------------------------------
