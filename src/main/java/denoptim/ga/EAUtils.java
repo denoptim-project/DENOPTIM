@@ -1014,8 +1014,8 @@ public class EAUtils
                     ParametersType.FS_PARAMS);
         }
         FragmentSpace fragSpace = fsParams.getFragmentSpace();
-        List<Candidate> matesCompatibleWithFirst = 
-                population.getXoverPartners(parentA, eligibleParents, fragSpace);
+        List<Candidate> matesCompatibleWithFirst = population.getXoverPartners(
+                parentA, eligibleParents, fragSpace);
         if (matesCompatibleWithFirst.size() == 0)
             return null;
         

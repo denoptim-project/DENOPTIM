@@ -144,6 +144,15 @@ public class Population extends ArrayList<Candidate> implements Cloneable
 //------------------------------------------------------------------------------
     
     @Override
+    public void clear()
+    {
+        populationUpdate.getAndIncrement();
+        super.clear();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
     public boolean retainAll(Collection<?> c)
     {
         boolean result = super.retainAll(c);

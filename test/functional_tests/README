@@ -33,19 +33,11 @@ p6: preparation of files for t6.
 
 t6: Restart exploration of fragment space from checkpoint file.
 
-p7: preparation of files for t7.
-
-t7: Test "SerConverter", which parses a serialized graph. NB: this test need a serialized file generated with the same version of DENOPTIM.
-
-t8: Test "CheckpointReader", which reads a checkpoint file.
-
-t9: Exploration of fragment space with symmetry constraints.
-
 t10: Exploration of fragment space with enforced symmetry.
 
 t11: Evolution with enforced symmetry.
 
-t12: Evolution with symmetry constraints.
+t12: Evolutionary experiments
 
 t13: Preserve symmetry sets found in initial molecules throughout evolution.
 

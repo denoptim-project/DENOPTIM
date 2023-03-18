@@ -589,17 +589,23 @@ public class EvolutionaryAlgorithm
         // that offsprings of this generation become parents in this generation.
         List<Candidate> eligibleParents = new ArrayList<Candidate>();
         int populationVersion = -1;
+        int newPopSize = -1;
         synchronized (population)
         {
             for (Candidate c : population)
             {
                 eligibleParents.add(c);
             }
+            if (settings.parentsSurvive())
+            {
+                newPopSize = settings.getNumberOfChildren() 
+                        + eligibleParents.size();
+            } else {
+                population.clear();
+                newPopSize = settings.getPopulationSize();
+            }
             populationVersion = population.getVersionID();
         }
-        
-        int newPopSize = settings.getNumberOfChildren() 
-                + eligibleParents.size();
         
         int i=0;
         List<Task> syncronisedTasks = new ArrayList<>();
@@ -670,11 +676,11 @@ public class EvolutionaryAlgorithm
                 if (candidate==null)
                 {
                     if (settings.coupleMutationAndCrossover())
-                    {    
-                        candidate = makeOffspringA(eligibleParents, population,
-                                mnt);
-                    } else {
+                    {
                         candidate = makeOffspringB(eligibleParents, population,
+                                mnt);
+                    } else {    
+                        candidate = makeOffspringA(eligibleParents, population,
                                 mnt);
                     }
                     if (candidate==null)
@@ -904,7 +910,11 @@ public class EvolutionaryAlgorithm
                 String provenanceMsg = parent.getGraph().getLocalMsg();
                 candidate = EAUtils.buildCandidateByMutation(
                         Arrays.asList(parent), mnt, settings);
-                candidate.getGraph().setLocalMsg("MutOn" + provenanceMsg);
+                if (candidate!=null)
+                {
+                    candidate.getGraph().setLocalMsg("MutationOn" + 
+                            provenanceMsg);
+                }
                 break;
             }
                 

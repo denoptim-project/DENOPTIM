@@ -127,9 +127,18 @@ public class GAParameters extends RunTimeParameters
 
     /**
      * Replacement strategy: 1) replace worst individuals with new ones that are
-     * better than the worst, 2) no replacement (the population keeps growing)
+     * better than the worst, 2) no replacement (the population keeps growing).
+     * Obviously, with strategy 2 we consume a lot of resources.
      */
     protected int replacementStrategy = 1;
+    
+    /**
+     * Flag defining if population members can survive multiple generations 
+     * (when this variable is <code>true</code>) or
+     * the population is refreshed at every generation (when this variable is
+     * <code>false</code>). 
+     */
+    protected boolean parentsSurvive = true;
 
     /**
      * Definition of the growth probability function:
@@ -492,6 +501,17 @@ public class GAParameters extends RunTimeParameters
     public int getReplacementStrategy()
     {
         return replacementStrategy;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the flag controlling if parents are allowed to survive multiple
+     * generation or not.
+     */
+    public boolean parentsSurvive()
+    {
+        return parentsSurvive;
     }
 
 //------------------------------------------------------------------------------
@@ -1031,9 +1051,21 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
-            case "COUPLEMUTATIONTOCROSSOVER":
+            case "COUPLEMUTATIONTOCROSSOVER=":
             {
-                coupleMutationAndCrossover = true;
+                if (value.length() > 0)
+                {
+                    coupleMutationAndCrossover = Boolean.parseBoolean(value);
+                }
+                break;
+            }
+            
+            case "PARENTSSURVIVE=":
+            {
+                if (value.length() > 0)
+                {
+                    parentsSurvive = Boolean.parseBoolean(value);
+                }
                 break;
             }
             
