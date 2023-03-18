@@ -633,6 +633,11 @@ public class Candidate implements Comparable<Candidate>, Cloneable
             return 1;
         else if (this.fitness < other.fitness)
             return -1;
+        
+        if (this.graph.graphId < other.graph.graphId)
+            return 1;
+        else if (this.graph.graphId > other.graph.graphId)
+            return -1;
         return 0;
     }
 
