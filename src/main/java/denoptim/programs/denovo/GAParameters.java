@@ -225,6 +225,14 @@ public class GAParameters extends RunTimeParameters
     protected double mutationWeight = 1.0;
     
     /**
+     * Flag defining if we want mutation to occur on offspring that
+     * result from crossover (i.e., mutation and crossover are coupled), 
+     * otherwise we want to mutate population members irrespectively on 
+     * crossover.
+     */
+    protected boolean coupleMutationAndCrossover = false;
+    
+    /**
      * The relative weight at which construction from scratch is performed
      */
     protected double builtAnewWeight = 1.0;
@@ -728,6 +736,19 @@ public class GAParameters extends RunTimeParameters
 //-----------------------------------------------------------------------------
 
     /**
+     * @return <code>true</code> if we want mutation to occur on offspring that
+     * result from crossover, 
+     * otherwise we want to mutate population members irrespectively on 
+     * crossover.
+     */
+    public boolean coupleMutationAndCrossover()
+    {
+        return coupleMutationAndCrossover;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Processes a keyword/value pair and assign the related parameters.
      * @param key the keyword as string
      * @param value the value as a string
@@ -1007,6 +1028,12 @@ public class GAParameters extends RunTimeParameters
                 {
                     mutationWeight = Double.parseDouble(value);
                 }
+                break;
+            }
+            
+            case "COUPLEMUTATIONTOCROSSOVER":
+            {
+                coupleMutationAndCrossover = true;
                 break;
             }
             

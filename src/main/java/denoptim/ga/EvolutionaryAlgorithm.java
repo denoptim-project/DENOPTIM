@@ -20,6 +20,7 @@ package denoptim.ga;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -668,17 +669,16 @@ public class EvolutionaryAlgorithm
                 
                 if (candidate==null)
                 {
-                    //TODO-gg
-                    if (true)
+                    if (settings.coupleMutationAndCrossover())
                     {    
                         candidate = makeOffspringA(eligibleParents, population,
                                 mnt);
-                        if (candidate==null)
-                            continue;
                     } else {
-                        //TODO-gg
-                        //candidate = makeOffSpringB();
+                        candidate = makeOffspringB(eligibleParents, population,
+                                mnt);
                     }
+                    if (candidate==null)
+                        continue;
                 }
                 
                 candidate.setGeneration(genId);
@@ -806,7 +806,12 @@ public class EvolutionaryAlgorithm
      * mutation are decoupled, i.e., we can do mutation without doing crossover.
      * Besides crossover and mutation, this offspring generation method includes
      * also construction from scratch, which corresponds to mutation of 
-     * everything. The operation chosen to try to generate the offspring is 
+     * everything. Effectively, these are the alternative possibilities: <ul>
+     * <li>Crossover between selected population members.</li>
+     * <li>Mutation of a selected population member.</li>
+     * <li>Construction from scratch.</li>
+     * </ul>
+     * The operation chosen to try to generate the offspring is 
      * given by the weights of the respective strategies in the genetic 
      * algorithm settings.
      * Since it is possible that there is no pair of population members that
@@ -815,6 +820,7 @@ public class EvolutionaryAlgorithm
      * @return the new offspring if it could be made or null.
      * @throws DENOPTIMException 
      */
+    @SuppressWarnings("incomplete-switch")
     private Candidate makeOffspringA(List<Candidate> eligibleParents, 
             Population population, Monitor mnt) throws DENOPTIMException
     {
@@ -823,6 +829,7 @@ public class EvolutionaryAlgorithm
         Candidate candidate = null;
         switch (src)
         {
+            // MANUAL is not a valid choice here
             case CROSSOVER:
             {
                 candidate = EAUtils.buildCandidateByXOver(
@@ -834,6 +841,70 @@ public class EvolutionaryAlgorithm
             {
                 candidate = EAUtils.buildCandidateByMutation(
                         eligibleParents, mnt, settings);
+                break;
+            }
+                
+            case CONSTRUCTION:
+            {
+                candidate = EAUtils.buildCandidateFromScratch(mnt,
+                        settings);
+                break;
+            }
+        }
+        return candidate;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Generates one offspring according to the method where crossover and 
+     * mutation are coupled, i.e., we do mutation only on offsprings that come 
+     * from a successful crossover.
+     * Besides crossover, this offspring generation method includes
+     * also construction from scratch, which corresponds to mutation of 
+     * everything. Effectively, these are the alternative possibilities: <ul>
+     * <li>Crossover between selected population members.</li>
+     * <li>Crossover between selected population members followed by 
+     * mutation.</li>
+     * <li>Construction from scratch.</li>
+     * </ul>
+     * The weights of the respective operation defined in the 
+     * genetic algorithm settings define which way we try to generate the
+     * offspring.
+     * Since it is possible that there is no pair of population members that
+     * allows to do crossover, it is possible that this method has no way to
+     * produce an offspring, in which case it returns <code>null</code>.
+     * @return the new offspring if it could be made or null.
+     * @throws DENOPTIMException 
+     */
+    @SuppressWarnings("incomplete-switch")
+    private Candidate makeOffspringB(List<Candidate> eligibleParents, 
+            Population population, Monitor mnt) throws DENOPTIMException
+    {
+        CandidateSource src = EAUtils.pickNewCandidateGenerationMode(
+                settings.getCrossoverWeight(), 
+                settings.getMutationWeight(),
+                settings.getConstructionWeight(),
+                settings.getRandomizer());
+    
+        Candidate candidate = null;
+        switch (src)
+        {   
+            case CROSSOVER:
+            {
+                candidate = EAUtils.buildCandidateByXOver(
+                        eligibleParents, population, mnt, settings);
+                break;
+            }
+            
+            case MUTATION:
+            {
+                Candidate parent = EAUtils.buildCandidateByXOver(
+                        eligibleParents, population, mnt, settings);
+                String provenanceMsg = parent.getGraph().getLocalMsg();
+                candidate = EAUtils.buildCandidateByMutation(
+                        Arrays.asList(parent), mnt, settings);
+                candidate.getGraph().setLocalMsg("MutOn" + provenanceMsg);
                 break;
             }
                 
