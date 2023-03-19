@@ -189,15 +189,15 @@ public class PopulationTest
         Candidate c5 = new Candidate("C5",g5);
         pop.add(c5);
         
-        ArrayList<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
+        List<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
-        ArrayList<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
+        List<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
-        ArrayList<Candidate> partnersForC3 = pop.getXoverPartners(c3, 
+        List<Candidate> partnersForC3 = pop.getXoverPartners(c3, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
-        ArrayList<Candidate> partnersForC4 = pop.getXoverPartners(c4, 
+        List<Candidate> partnersForC4 = pop.getXoverPartners(c4, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
-        ArrayList<Candidate> partnersForC5 = pop.getXoverPartners(c5, 
+        List<Candidate> partnersForC5 = pop.getXoverPartners(c5, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
 
         Map<Candidate,Map<Candidate,Integer>> expected = 
@@ -257,9 +257,9 @@ public class PopulationTest
         g2.getVertexAtPosition(1).setUniquefyingProperty(k);
         g2.getVertexAtPosition(1).setProperty(k, 456);
         
-        ArrayList<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
+        List<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2)), fs);
-        ArrayList<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
+        List<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2)), fs);
         
         Map<Candidate,Map<Candidate,Integer>> expected = 
@@ -298,7 +298,7 @@ public class PopulationTest
     
     private void compareSizeOfSites(Candidate parentA,
             Map<Candidate, Integer> expectedForC1, 
-            ArrayList<Candidate> partnersForC1, Population pop)
+            List<Candidate> partnersForC1, Population pop)
     {
         for (Candidate c : expectedForC1.keySet())
         {

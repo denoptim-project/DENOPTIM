@@ -312,7 +312,7 @@ public class DenoptimIOTest
         iac.setProperty(CDKConstants.TITLE, name);
         iac.setProperty(DENOPTIMConstants.FITNESSTAG, fitness);
         iac.setProperty(DENOPTIMConstants.MOLERRORTAG, err);
-        iac.setProperty(DENOPTIMConstants.GMSGTAG, msg);
+        iac.setProperty(DENOPTIMConstants.PROVENANCE, msg);
         iac.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         
         DenoptimIO.writeSDFFile(pathName, iac, false);
@@ -329,7 +329,7 @@ public class DenoptimIOTest
         iac2.setProperty(CDKConstants.TITLE, name2);
         iac2.setProperty(DENOPTIMConstants.FITNESSTAG, fitness2);
         iac2.setProperty(DENOPTIMConstants.MOLERRORTAG, err2);
-        iac2.setProperty(DENOPTIMConstants.GMSGTAG, msg2);
+        iac2.setProperty(DENOPTIMConstants.PROVENANCE, msg2);
         iac2.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level2);
         
         DenoptimIO.writeSDFFile(pathName, iac2, true);

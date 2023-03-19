@@ -553,7 +553,7 @@ public class Main
     {
         if (behavior.helpMsg!=null)
             System.out.println(behavior.helpMsg);
-        reportError(behavior.errorMsg,behavior.exitStatus);
+        reportError(behavior.errorMsg, behavior.exitStatus);
     }
     
 //------------------------------------------------------------------------------

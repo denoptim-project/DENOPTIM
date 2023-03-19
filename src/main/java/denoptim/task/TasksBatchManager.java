@@ -38,7 +38,7 @@ import denoptim.graph.Candidate;
  */
 public class TasksBatchManager
 {
-    private ArrayList<Task> taskList;
+    private List<Task> taskList;
     private ExecutorService eservice;
     private List<Future<Object>> futures;
 
@@ -55,16 +55,16 @@ public class TasksBatchManager
 
     /**
      * Execute the list of tasks
-     * @param tasks
+     * @param syncronisedTasks
      * @param numOfProcessors
      * @return if successful return the list of molecules with fitness
      * @throws DENOPTIMException
      */
-    public ArrayList<Candidate> executeTasks(ArrayList<Task> tasks, 
+    public List<Candidate> executeTasks(List<Task> syncronisedTasks, 
             int numOfProcessors) throws DENOPTIMException
     {
-        taskList = tasks;
-        int numOfJobs = tasks.size();
+        taskList = syncronisedTasks;
+        int numOfJobs = syncronisedTasks.size();
 
         int n = Math.min(numOfJobs, numOfProcessors);
 
@@ -80,7 +80,7 @@ public class TasksBatchManager
 
         for (int i=0; i<numOfJobs; i++)
         {
-            futures.add(cservice.submit(tasks.get(i)));
+            futures.add(cservice.submit(syncronisedTasks.get(i)));
         }
 
         Thread shutDownHook = new Thread()
@@ -104,12 +104,12 @@ public class TasksBatchManager
                 }
                 catch (InterruptedException ie)
                 {
-                    for (Task tsk : tasks)
+                    for (Task tsk : syncronisedTasks)
                     {
                         tsk.stopTask();
                     }
                     
-                    tasks.clear();
+                    syncronisedTasks.clear();
 
                     for (Future<Object> f : futures)
                     {
@@ -129,7 +129,7 @@ public class TasksBatchManager
         ArrayList<Candidate> results = new ArrayList<>();
         try
         {
-            for (int i=0; i<tasks.size(); i++)
+            for (int i=0; i<syncronisedTasks.size(); i++)
             {
                 Candidate taskResult = (Candidate) cservice.take().get();
                 results.add(taskResult);
@@ -155,7 +155,7 @@ public class TasksBatchManager
         }
         
         // Cleanup
-        tasks.clear();
+        syncronisedTasks.clear();
         for (Future<Object> f : futures)
         {
             f.cancel(true);
