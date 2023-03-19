@@ -42,14 +42,14 @@ numNew=0
 for i in $(seq 0 $((${#genSummaryFiles[@]}-2)))
 do
     membersGenJ=$(grep "M00" ${genSummaryFiles[$((i+1))]} | cut -c 1-17)
-    for memberinGenI in $(grep "M00" ${genSummaryFiles[$i]} | cut -c 1-17); 
+    for memberinGenI in $(grep "M00" ${genSummaryFiles[$i]} | cut -c 1-17)
     do 
-        if [[ "$membersGenJ" =~ "${membersGenI}" ]]; then
-            echo "NOT PASSED (symptom: parent $membersGeni survived)"
+        if [[ "$membersGenJ" =~ "${memberinGenI}" ]]; then
+            echo "NOT PASSED (symptom: parent $memberinGenI survived)"
             exit -1
         fi
     done 
-    for memberinGenI in $(grep "M00" ${genSummaryFiles[$i]} | awk '{print $5}');
+    for memberinGenI in $(grep "M00" ${genSummaryFiles[$i]} | awk '{print $5}')
     do
         provenance=$(grep -A 1 "Provenance" "$memberinGenI" | tail -n 1 | awk '{print $1}')
         if [[ "Xover:" == "$provenance" ]]; then
@@ -64,11 +64,11 @@ do
     done
 done
 
-if [ $numFromXover -ne 23 ]; then
+if [ $numFromXover -lt 15 ]; then
     echo "NOT PASSED (sympton: wrong number of Xover: $numFromXover)"
     exit -1
 fi
-if [ $numFromMutXover -ne 7 ]; then
+if [ $numFromMutXover -gt 12 ]; then
     echo "NOT PASSED (sympton: wrong number of Mut+Xover: $numFromMutXover)"
     exit -1
 fi

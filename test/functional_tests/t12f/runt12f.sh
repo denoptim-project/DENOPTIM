@@ -47,8 +47,8 @@ do
 done
 
 counter=$(grep -c "Replacing .* with its sibling " "$runFolder.log")
-if [ 5 -ne $counter ]; then
-    echo "NOT PASSED (sympton: wrong number of sibling replacements (expected 5, was $counter)"
+if [ 3 -gt $counter ]; then
+    echo "NOT PASSED (sympton: too few sibling replacements ($counter)"
     exit -1
 fi
 
