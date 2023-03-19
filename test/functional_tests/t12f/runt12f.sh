@@ -32,10 +32,8 @@ exec 1>&6 6>&-
 #Check outcome
 runFolder=$(basename $(ls -lrtd "$wrkDir"/RUN*/ | tail -n 1 | awk '{print $NF}'))
 
-counter=0
 grep "Replacing .* with its sibling " "$runFolder.log" | awk '{print $3" "$7}' | while read pair 
 do
-    counter=$((counter+1))
     molI=$(echo $pair | awk '{print $1}')
     molJ=$(echo $pair | awk '{print $2}')
     fileI=$(find "$runFolder"/Gen* -name "${molI}_out.sdf")
@@ -48,8 +46,9 @@ do
     fi
 done
 
-if [ 3 -eq "$counter" ]; then
-    echo "NOT PASSED (sympton: wrong number of sibling replacements (expected 3, was $counter)"
+counter=$(grep -c "Replacing .* with its sibling " "$runFolder.log")
+if [ 5 -ne $counter ]; then
+    echo "NOT PASSED (sympton: wrong number of sibling replacements (expected 5, was $counter)"
     exit -1
 fi
 

@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -186,9 +185,9 @@ public class OffspringEvaluationTask extends FitnessTask
         	{
 	            synchronized (population)
 	            {
-	                // If the sibling already entered the population, we keep
-	                // only the best. This could become optional.
-	                if (population.contains(sibling))
+	                // Optionally keep the best of sibling
+	                if (population.contains(sibling) 
+	                        && gaSettings.keepBestSibling())
 	                {
 	                    if (result.getFitness()>sibling.getFitness())
 	                    {

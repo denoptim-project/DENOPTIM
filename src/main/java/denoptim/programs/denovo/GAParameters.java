@@ -265,6 +265,11 @@ public class GAParameters extends RunTimeParameters
      * Number of offspring that a single crossover operation can produce.
      */
     protected int maxOffsprintFromXover = 1;
+    
+    /**
+     * Flag controlling if we choose the best sibling out of crossover.
+     */
+    protected boolean keepBestSibling = false;
 
     /**
      * Mutation types that are excluded everywhere.
@@ -676,6 +681,17 @@ public class GAParameters extends RunTimeParameters
     {
         return maxOffsprintFromXover;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we want to keep only the best among the two 
+     * sibling that result from a single crossover.
+     */
+    public boolean keepBestSibling()
+    {
+        return keepBestSibling;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -1071,7 +1087,7 @@ public class GAParameters extends RunTimeParameters
             {
                 if (value.length() > 0)
                 {
-                    coupleMutationAndCrossover = Boolean.parseBoolean(value);
+                    coupleMutationAndCrossover = readYesNoTrueFalse(value);
                 }
                 break;
             }
@@ -1080,7 +1096,7 @@ public class GAParameters extends RunTimeParameters
             {
                 if (value.length() > 0)
                 {
-                    parentsSurvive = Boolean.parseBoolean(value);
+                    parentsSurvive = readYesNoTrueFalse(value);
                 }
                 break;
             }
@@ -1216,6 +1232,12 @@ public class GAParameters extends RunTimeParameters
                                 + "up to 2 offspring from crossover, but you "
                                 + "required " + maxOffsprintFromXover);
                 }
+                break;
+            }
+            
+            case "KEEPBESTSIBLING=":
+            {
+                keepBestSibling = readYesNoTrueFalse(value);
                 break;
             }
             

@@ -918,10 +918,8 @@ public class EvolutionaryAlgorithm
         {   
             case CROSSOVER:
             {
-                Candidate candidate = EAUtils.buildCandidateByXOver(
-                        eligibleParents, population, mnt, settings);
-                if (candidate!=null)
-                    candidates.add(candidate);
+                candidates.addAll(EAUtils.buildCandidatesByXOver(
+                        eligibleParents, population, mnt, settings));
                 break;
             }
             
