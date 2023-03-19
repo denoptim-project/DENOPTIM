@@ -486,6 +486,7 @@ public class EvolutionaryAlgorithm
                 OffspringEvaluationTask task = new OffspringEvaluationTask(
                         settings,
                         candidate, 
+                        null,
                         EAUtils.getPathNameToGenerationFolder(0, settings), 
                         population, mnt, settings.getUIDFileOut());
                 
@@ -650,7 +651,6 @@ public class EvolutionaryAlgorithm
                     }
                 }
                 
-                //TODO-gg make optional based on algorithm
                 synchronized (population)
                 {
                     if (population.size() >= newPopSize)
@@ -689,8 +689,18 @@ public class EvolutionaryAlgorithm
                 if (candidatesToEvaluate.size()==0)
                     continue;
                 
-                for (Candidate candidate : candidatesToEvaluate)
+                // NB: for now we assume there can be up to two siblings
+                for (int iSibling=0; iSibling<candidatesToEvaluate.size(); iSibling++)
                 {
+                    Candidate candidate = candidatesToEvaluate.get(iSibling);
+                    int jSibling = 1;
+                    if (iSibling==1)
+                        jSibling = 0;
+                    
+                    Candidate sibling = null;
+                    if (candidatesToEvaluate.size()>1)
+                        sibling = candidatesToEvaluate.get(jSibling);
+                    
                     candidate.setGeneration(genId);
                     
                     if (((FitnessParameters)settings.getParameters(
@@ -712,7 +722,8 @@ public class EvolutionaryAlgorithm
                 
                     OffspringEvaluationTask task = new OffspringEvaluationTask(
                             settings,
-                            candidate, 
+                            candidate,
+                            sibling,
                             EAUtils.getPathNameToGenerationFolder(genId, settings), 
                             population, mnt, settings.getUIDFileOut());
                     

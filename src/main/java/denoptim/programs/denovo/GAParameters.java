@@ -1206,6 +1206,19 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "NUMOFFSPRINGFROMXOVER=":
+            {
+                if (value.length() > 0)
+                {
+                    maxOffsprintFromXover = Integer.parseInt(value);
+                    if (maxOffsprintFromXover>2)
+                        throw new DENOPTIMException("ERROR! Can only generate "
+                                + "up to 2 offspring from crossover, but you "
+                                + "required " + maxOffsprintFromXover);
+                }
+                break;
+            }
+            
             case "MUTATEDGRAPHCHECKFAILTOLERANT=":
             {
                 mutatedGraphFailedEvalTolerant = readYesNoTrueFalse(value);

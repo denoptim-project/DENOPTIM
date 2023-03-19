@@ -60,10 +60,15 @@ public class OffspringEvaluationTask extends FitnessTask
      */
     private FragmentSpace fragSpace;
     
+    /**
+     * The sibling of this offspring.
+     */
+    private Candidate sibling;
+    
 //------------------------------------------------------------------------------
     
     public OffspringEvaluationTask(GAParameters gaSettings, 
-            Candidate offspring, String workDir,
+            Candidate offspring, Candidate sibling, String workDir,
             Population popln, Monitor mnt, String fileUID)
     {
         super(((FitnessParameters) gaSettings.getParameters(
@@ -81,6 +86,7 @@ public class OffspringEvaluationTask extends FitnessTask
         this.fitProvMol = offspring.getChemicalRepresentation();
         this.population = popln;
         this.mnt = mnt;
+        this.sibling = sibling;
         
         result.setName(this.molName);
         result.setUID(offspring.getUID());
@@ -174,23 +180,43 @@ public class OffspringEvaluationTask extends FitnessTask
 
         if (result.hasFitness())
         {
+            boolean addthisToPop = false;
             boolean isWithinBestPrcentile = false;
         	if (population != null)
         	{
 	            synchronized (population)
 	            {
-	                gaSettings.getLogger().log(Level.INFO, 
-	            			"Adding {0} to population", molName);
-	                population.add(result);
-	                isWithinBestPrcentile = population.isWithinPercentile(
-                            result.getFitness(),
-                            gaSettings.getSaveRingSystemsFitnessThreshold());
+	                // If the sibling already entered the population, we keep
+	                // only the best. This could become optional.
+	                if (population.contains(sibling))
+	                {
+	                    if (result.getFitness()>sibling.getFitness())
+	                    {
+	                        addthisToPop = true;
+	                        population.remove(sibling);
+	                        gaSettings.getLogger().log(Level.INFO, "Replacing "
+	                                + sibling.getName() + " with its sibling "
+	                                + molName + " in population");
+	                    }
+	                } else {
+	                    addthisToPop = true;
+                        gaSettings.getLogger().log(Level.INFO, 
+                                "Adding {0} to population", molName);
+	                }
+	                
+	                if (addthisToPop)
+	                {
+    	                population.add(result);
+    	                isWithinBestPrcentile = population.isWithinPercentile(
+                                result.getFitness(),
+                                gaSettings.getSaveRingSystemsFitnessThreshold());
+	                }
                 }
         	}
 
         	if ((gaSettings.getSaveRingSystemsAsTemplatesNonScaff()
         	        || gaSettings.getSaveRingSystemsAsTemplatesScaff())
-        	    && isWithinBestPrcentile)
+        	    && isWithinBestPrcentile && addthisToPop)
         	{   
         	    fragSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
                         gaSettings.getSaveRingSystemsAsTemplatesScaff(),

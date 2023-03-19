@@ -296,6 +296,11 @@ runTest "t12d"
 runTest "t12e"
 
 #
+# t12e: Genetic algorithms with generation of two offspring from crossover and selection of the best sibling as member of the population.
+#
+runTest "t12f"
+
+#
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation
 #
 runTest "t13"
