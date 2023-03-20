@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## From 4.0 to 4.1.1
+* Introduced ultrafast communication via sockets to retrieve descriptor scores/fitness from external tools (e.g., python libraries)
+* Extended the functionality of the genetic algorithm by adding optional behavior.
+* Minor debugs.
+
+## From 3.x to 4.0.0
+* Removel limitation to max number fo AP and vertex indexes. Now AP and vertex I
+Ds are unique only within a graph.
+* It is now possible to control the maximum size of the subgraphs that the crossover operation can swap. See keyword GA-MaxXoverSubGraphSize.
+* Simplified format of symmetric objects inf JSON strings. See src/misc/JSONConverter/convert\_symmetric\_sets\_in\_JSON.py for upgradinf existing files.
+* Several minor debugs
+
 ## From 2.x to 3.0.0
 * Use of Maven to build and test.
 * Command line build and test on Windows.

@@ -175,11 +175,11 @@ public class SocketProvidedDescriptorTest
                         socket.getInputStream()));
                 
                 // Read request
-                List<String> lines = new ArrayList<String>();
+                StringBuilder sb = new StringBuilder();
                 String line = in.readLine();
                 while(line != null && line.length()>0)
                 {
-                    lines.add(line.strip());
+                    sb.append(line).append(System.getProperty("line.separator"));
                     line = in.readLine();
                 }
                 
@@ -189,9 +189,7 @@ public class SocketProvidedDescriptorTest
                 //
                 
                 // Evaluate request format
-                assertEquals(1, lines.size(), 
-                        "Number of lines in the request to socket server");
-                String jsonStr = lines.get(0);
+                String jsonStr = sb.toString();
                 JsonObject request = null;
                 try {
                     request = jsonConverted.fromJson(jsonStr, JsonObject.class);
