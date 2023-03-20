@@ -49,6 +49,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.fitness.FitnessParameters;
 import denoptim.ga.EAUtils;
 import denoptim.ga.Population;
 import denoptim.graph.APClass;
@@ -235,6 +236,7 @@ public class DenoptimIOTest
         GAParameters settings = new GAParameters();
         settings.setPopulationSize(2);
         settings.setWorkingDirectory(tempDir.getAbsolutePath());
+        settings.setParameters(new FitnessParameters());
         
         String genDir = EAUtils.getPathNameToGenerationFolder(26,settings);
         FileUtils.createDirectory(genDir);
@@ -259,7 +261,7 @@ public class DenoptimIOTest
         pop.add(c1);
         pop.add(c2);
         String summary = EAUtils.getPathNameToGenerationDetailsFile(26,settings);
-        EAUtils.outputPopulationDetails(pop, summary, settings);
+        EAUtils.outputPopulationDetails(pop, summary, settings, true);
         
         List<Candidate> cands = DenoptimIO.readGenerationFromSummary(
                 new File(summary));
@@ -310,7 +312,7 @@ public class DenoptimIOTest
         iac.setProperty(CDKConstants.TITLE, name);
         iac.setProperty(DENOPTIMConstants.FITNESSTAG, fitness);
         iac.setProperty(DENOPTIMConstants.MOLERRORTAG, err);
-        iac.setProperty(DENOPTIMConstants.GMSGTAG, msg);
+        iac.setProperty(DENOPTIMConstants.PROVENANCE, msg);
         iac.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level);
         
         DenoptimIO.writeSDFFile(pathName, iac, false);
@@ -327,7 +329,7 @@ public class DenoptimIOTest
         iac2.setProperty(CDKConstants.TITLE, name2);
         iac2.setProperty(DENOPTIMConstants.FITNESSTAG, fitness2);
         iac2.setProperty(DENOPTIMConstants.MOLERRORTAG, err2);
-        iac2.setProperty(DENOPTIMConstants.GMSGTAG, msg2);
+        iac2.setProperty(DENOPTIMConstants.PROVENANCE, msg2);
         iac2.setProperty(DENOPTIMConstants.GRAPHLEVELTAG, level2);
         
         DenoptimIO.writeSDFFile(pathName, iac2, true);

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
@@ -165,6 +167,9 @@ public class EAUtils
      * Choose one of the methods to make new {@link Candidate}s. 
      * The choice is biased
      * by the weights of the methods as defined in the {@link GAParameters}.
+     * @param the genetic algorithm settings
+     * @return one among the possible {@link CandidateSource} excluding
+     * {@value CandidateSource#MANUAL}.
      */
     protected static CandidateSource chooseGenerationMethod(GAParameters settings)
     {
@@ -219,7 +224,8 @@ public class EAUtils
      * members.
      * @param mutWeight weight of mutation of existing population members.
      * @param newWeight weight of construction from scratch.
-     * @return
+     * @return one among the possible {@link CandidateSource} excluding
+     * {@value CandidateSource#MANUAL}.
      */
     public static CandidateSource pickNewCandidateGenerationMode(
             double xoverWeight, double mutWeight, double newWeight,
@@ -237,6 +243,27 @@ public class EAUtils
             return CandidateSource.CONSTRUCTION;
         }
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Generates a pair of new offspring by performing a crossover operation.
+     * @param eligibleParents candidates that can be used as parents of the 
+     * offspring.
+     * @param population the collection of candidates where eligible candidates
+     * are hosted.
+     * @param mnt monitoring tool used to record events during the run of the
+     * evolutionary algorithm.
+     * @param settings the settings of the genetic algorithm.
+     * @return a candidate chosen in a stochastic manner.
+     */
+    protected static List<Candidate> buildCandidatesByXOver(
+            List<Candidate> eligibleParents, Population population, 
+            Monitor mnt, GAParameters settings) throws DENOPTIMException
+    {
+        return buildCandidatesByXOver(eligibleParents, population, mnt, 
+                null, -1, -1, settings, settings.maxOffsprintFromXover());
+    }
 
 //------------------------------------------------------------------------------
 
@@ -251,7 +278,7 @@ public class EAUtils
      * @return a candidate chosen in a stochastic manner.
      */
     protected static Candidate buildCandidateByXOver(
-            ArrayList<Candidate> eligibleParents, Population population, 
+            List<Candidate> eligibleParents, Population population, 
             Monitor mnt, GAParameters settings) throws DENOPTIMException
     {
         return buildCandidateByXOver(eligibleParents, population, mnt, 
@@ -281,14 +308,60 @@ public class EAUtils
      * This avoids randomized 
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
-     * @return the candidate
+     * @return the candidate or null if none was produced.
      * @throws DENOPTIMException
      */
     protected static Candidate buildCandidateByXOver(
-            ArrayList<Candidate> eligibleParents, Population population, 
+            List<Candidate> eligibleParents, Population population, 
             Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
-            int choiceOfOffstring, GAParameters settings) throws DENOPTIMException 
+            int choiceOfOffstring, GAParameters settings) 
+                    throws DENOPTIMException 
     {
+        List<Candidate> cands = buildCandidatesByXOver(eligibleParents, 
+                population, mnt, 
+                choiceOfParents, choiceOfXOverSites, choiceOfOffstring, 
+                settings, 1);
+        if (cands.size()>0)
+            return cands.get(0);
+        else
+            return null;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Generates up to a pair of new offspring by performing a crossover 
+     * operation.
+     * @param eligibleParents candidates that can be used as parents of the 
+     * offspring.
+     * @param population the collection of candidates where eligible candidates
+     * are hosted.
+     * @param mnt monitoring tool used to record events during the run of the
+     * evolutionary algorithm.
+     * @param choiceOfParents a pair of indexes dictating which ones among the 
+     * eligible parents we should use as parents. This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param choiceOfXOverSites index indicating which crossover site to use.
+     * This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param choiceOfOffstring index dictating which among the available two
+     * offspring (at most two, for now) is returned as result. 
+     * This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param maxCandidatesToReturn the number of offspring to return in the 
+     * list. Up to 2.
+     * @return the list of candidates, or an empty list.
+     * @throws DENOPTIMException
+     */
+    protected static List<Candidate> buildCandidatesByXOver(
+            List<Candidate> eligibleParents, Population population, 
+            Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
+            int choiceOfOffstring, GAParameters settings, 
+            int maxCandidatesToReturn) throws DENOPTIMException 
+    {   
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
         {
@@ -347,7 +420,7 @@ public class EAUtils
         {
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS_FINDPARENTS);
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            return new ArrayList<Candidate>();
         }
         
         Candidate cA = null, cB = null;
@@ -375,7 +448,7 @@ public class EAUtils
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-                return null;
+                return new ArrayList<Candidate>();
             }
         } catch (Throwable t) {
             if (!settings.xoverFailureTolerant)
@@ -394,7 +467,7 @@ public class EAUtils
             }
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            return new ArrayList<Candidate>();
         }
         gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
@@ -505,27 +578,38 @@ public class EAUtils
         if (validOffspring.size() == 0)
         {
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            return new ArrayList<Candidate>();
         }
         
-        Candidate chosenOffspring = null;
-        if (choiceOfOffstring<0)
+        if (maxCandidatesToReturn==1)
         {
-            chosenOffspring = settings.getRandomizer().randomlyChooseOne(
-                    validOffspring);
-            chosenOffspring.setName("M" + GeneralUtils.getPaddedString(
-                    DENOPTIMConstants.MOLDIGITS,
-                    GraphUtils.getUniqueMoleculeIndex()));
+            Candidate chosenOffspring = null;
+            if (choiceOfOffstring<0)
+            {
+                chosenOffspring = settings.getRandomizer().randomlyChooseOne(
+                        validOffspring);
+                chosenOffspring.setName("M" + GeneralUtils.getPaddedString(
+                        DENOPTIMConstants.MOLDIGITS,
+                        GraphUtils.getUniqueMoleculeIndex()));
+            } else {
+                chosenOffspring = validOffspring.get(choiceOfOffstring);
+            }
+            validOffspring.retainAll(Arrays.asList(chosenOffspring));
         } else {
-            chosenOffspring = validOffspring.get(choiceOfOffstring);
+            for (Candidate cand : validOffspring)
+            {
+                cand.setName("M" + GeneralUtils.getPaddedString(
+                        DENOPTIMConstants.MOLDIGITS,
+                        GraphUtils.getUniqueMoleculeIndex()));
+            }
         }
-        return chosenOffspring;
+        return validOffspring;
     }
     
 //------------------------------------------------------------------------------
 
     protected static Candidate buildCandidateByMutation(
-            ArrayList<Candidate> eligibleParents, Monitor mnt, 
+            List<Candidate> eligibleParents, Monitor mnt, 
             GAParameters settings) throws DENOPTIMException
     {
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
@@ -810,14 +894,15 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Write out summary for the current GA population
+     * Write out summary for the current GA population.
      * @param population
      * @param filename
      * @throws DENOPTIMException
      */
 
     public static void outputPopulationDetails(Population population, 
-            String filename, GAParameters settings) throws DENOPTIMException
+            String filename, GAParameters settings, boolean printpathNames) 
+                    throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
         sb.append(DENOPTIMConstants.GAGENSUMMARYHEADER);
@@ -844,7 +929,12 @@ public class EAUtils
                             mol.getGraph().getGraphId()));
                     sb.append(String.format("%-30s", mol.getUID()));
                     sb.append(df.format(mol.getFitness()));
-                    sb.append("    ").append(mol.getSDFFile());
+                    
+                    if (printpathNames)
+                    {
+                        sb.append("    ").append(mol.getSDFFile());
+                    }
+                    
                     sb.append(System.getProperty("line.separator"));
                 }
             }
@@ -921,29 +1011,29 @@ public class EAUtils
      * Selects a number of members from the given population. 
      * The selection method is what specified by the
      * configuration of the genetic algorithm ({@link GAParameters}).
-     * @param candidates the list of candidates to chose from.
+     * @param eligibleParents the list of candidates to chose from.
      * @param number how many candidate to pick.
      * @return indexes of the selected members of the given population.
      */
 
     protected static Candidate[] selectBasedOnFitness(
-            ArrayList<Candidate> candidates, int number, GAParameters settings)
+            List<Candidate> eligibleParents, int number, GAParameters settings)
     {
         Candidate[] mates = new Candidate[number];
         switch (settings.getSelectionStrategyType())
         {
         case 1:
-            mates = SelectionHelper.performTournamentSelection(candidates, 
+            mates = SelectionHelper.performTournamentSelection(eligibleParents, 
                     number, settings);
             break;
         case 2:
-            mates = SelectionHelper.performRWS(candidates, number, settings);
+            mates = SelectionHelper.performRWS(eligibleParents, number, settings);
             break;
         case 3:
-            mates = SelectionHelper.performSUS(candidates, number, settings);
+            mates = SelectionHelper.performSUS(eligibleParents, number, settings);
             break;
         case 4:
-            mates = SelectionHelper.performRandomSelection(candidates, number, 
+            mates = SelectionHelper.performRandomSelection(eligibleParents, number, 
                     settings);
             break;
         }
@@ -984,7 +1074,7 @@ public class EAUtils
      */
 
     protected static XoverSite performFBCC(
-            ArrayList<Candidate> eligibleParents, Population population, 
+            List<Candidate> eligibleParents, Population population, 
             int[] choiceOfParents, int choiceOfXOverSites, GAParameters settings)
     {
         Candidate parentA = null;
@@ -1003,8 +1093,8 @@ public class EAUtils
                     ParametersType.FS_PARAMS);
         }
         FragmentSpace fragSpace = fsParams.getFragmentSpace();
-        ArrayList<Candidate> matesCompatibleWithFirst = 
-                population.getXoverPartners(parentA, eligibleParents, fragSpace);
+        List<Candidate> matesCompatibleWithFirst = population.getXoverPartners(
+                parentA, eligibleParents, fragSpace);
         if (matesCompatibleWithFirst.size() == 0)
             return null;
         
@@ -1086,55 +1176,17 @@ public class EAUtils
             .append(FSEP).append("Final.txt");
         return sb.toString();
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Simply copies the files from the previous directories into the specified
-     * folder.
-     * @param popln the final list of best molecules
-     * @param destDir the name of the output directory
-     */
-
-    protected static void outputFinalResults(Population popln,
-            String destDir, GAParameters settings) throws DENOPTIMException
-    {
-        String genOutfile = destDir + System.getProperty("file.separator") +
-                                "Final.txt";
-
-        File fileDir = new File(destDir);
-
-        try
-        {
-            for (int i=0; i<settings.getPopulationSize(); i++)
-            {
-                String sdfile = popln.get(i).getSDFFile();
-                String imgfile = popln.get(i).getImageFile();
-
-                if (sdfile != null)
-                {
-                    FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
-                }
-                if (imgfile != null)
-                {
-                    FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
-                }
-            }
-            outputPopulationDetails(popln, genOutfile, settings);
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
-        }
-    }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Simply copies the files from the previous directories into the specified
-     * folder.
+     * Saves the final results to disk. If the files for each candidate have 
+     * been saved on disk along the way, then it copies them from their location
+     * into the folder for final results, which is defined based on the 
+     * GA settings.
      * @param popln the final list of best molecules
-     * @param destDir the name of the output directory
+     * @param settings the GS settings containing defaults and parameters given 
+     * by the user.
      */
 
     protected static void outputFinalResults(Population popln, 
@@ -1143,6 +1195,10 @@ public class EAUtils
         String dirName = EAUtils.getPathNameToFinalPopulationFolder(settings);
         denoptim.files.FileUtils.createDirectory(dirName);
         File fileDir = new File(dirName);
+        
+        boolean intermediateCandidatesAreOnDisk = 
+                ((FitnessParameters) settings.getParameters(
+                ParametersType.FIT_PARAMS)).writeCandidatesOnDisk();
 
         for (int i=0; i<popln.size(); i++)
         {
@@ -1150,17 +1206,22 @@ public class EAUtils
             String sdfile = c.getSDFFile();
             String imgfile = c.getImageFile();
 
-            if (sdfile != null)
-            {
-                try {
+            try {
+                if (intermediateCandidatesAreOnDisk && sdfile!=null)
+                {
                     FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
-                } catch (IOException ioe) {
-                    throw new DENOPTIMException("Failed to copy file '" 
-                            + sdfile + "' to '" + fileDir + "' for candidate "
-                            + c.getName(), ioe);
+                } else {
+                    File candFile = new File(fileDir, c.getName() 
+                            + DENOPTIMConstants.FITFILENAMEEXTOUT);
+                    c.setSDFFile(candFile.getAbsolutePath());
+                    DenoptimIO.writeCandidateToFile(candFile, c, false);
                 }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException("Failed to copy file '" 
+                        + sdfile + "' to '" + fileDir + "' for candidate "
+                        + c.getName(), ioe);
             }
-            if (imgfile != null)
+            if (imgfile != null && intermediateCandidatesAreOnDisk)
             {
                 try {
                     FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
@@ -1173,7 +1234,7 @@ public class EAUtils
         }
         outputPopulationDetails(popln,
                 EAUtils.getPathNameToFinalPopulationDetailsFile(settings),
-                settings);        
+                settings, true);        
     }
 
 //------------------------------------------------------------------------------

@@ -690,7 +690,7 @@ public class Template extends Vertex
         
         mol.removeProperty(DENOPTIMConstants.GRAPHJSONTAG);
         mol.removeProperty(DENOPTIMConstants.GRAPHTAG);
-        mol.removeProperty(DENOPTIMConstants.GMSGTAG);
+        mol.removeProperty(DENOPTIMConstants.PROVENANCE);
         mol.removeProperty(DENOPTIMConstants.GCODETAG);
         
         this.mol = mol;
@@ -783,7 +783,7 @@ public class Template extends Vertex
             
             iac.removeProperty(DENOPTIMConstants.GRAPHJSONTAG);
             iac.removeProperty(DENOPTIMConstants.GRAPHTAG);
-            iac.removeProperty(DENOPTIMConstants.GMSGTAG);
+            iac.removeProperty(DENOPTIMConstants.PROVENANCE);
             iac.removeProperty(DENOPTIMConstants.GCODETAG);
             
             // We store the result in a field of this instance

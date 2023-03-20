@@ -1,0 +1,29 @@
+#
+# This is the parameter file for test t12d
+#
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+
+# Use internal firness provider
+FP-EQUATION=${3*Zagreb - 0.2*nAtom}
+FP-DontWriteCandidatesOnDisk
+
+# Genetic Algorithm parameters
+GA-randomSeed=8572368003836
+GA-Parallelization=asynchronous
+GA-numParallelTasks=OTF_PROCS
+GA-populationSize=5
+GA-numChildren=5
+GA-numGenerations=5
+GA-numConvGen=5
+GA-XOverSelectionMode=TS
+GA-crossoverWeight=0.750
+GA-mutationWeight=0.750
+GA-ConstructionWeight=0.2
+GA-LevelGrowthProbScheme=sigma
+GA-LevelGrowthSigmaSteepness=1.0
+GA-LevelGrowthSigmaMiddle=1.0

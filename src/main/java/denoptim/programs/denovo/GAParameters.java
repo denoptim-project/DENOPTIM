@@ -127,9 +127,18 @@ public class GAParameters extends RunTimeParameters
 
     /**
      * Replacement strategy: 1) replace worst individuals with new ones that are
-     * better than the worst, 2) no replacement (the population keeps growing)
+     * better than the worst, 2) no replacement (the population keeps growing).
+     * Obviously, with strategy 2 we consume a lot of resources.
      */
     protected int replacementStrategy = 1;
+    
+    /**
+     * Flag defining if population members can survive multiple generations 
+     * (when this variable is <code>true</code>) or
+     * the population is refreshed at every generation (when this variable is
+     * <code>false</code>). 
+     */
+    protected boolean parentsSurvive = true;
 
     /**
      * Definition of the growth probability function:
@@ -225,6 +234,14 @@ public class GAParameters extends RunTimeParameters
     protected double mutationWeight = 1.0;
     
     /**
+     * Flag defining if we want mutation to occur on offspring that
+     * result from crossover (i.e., mutation and crossover are coupled), 
+     * otherwise we want to mutate population members irrespectively on 
+     * crossover.
+     */
+    protected boolean coupleMutationAndCrossover = false;
+    
+    /**
      * The relative weight at which construction from scratch is performed
      */
     protected double builtAnewWeight = 1.0;
@@ -243,6 +260,16 @@ public class GAParameters extends RunTimeParameters
      * Crossover parents selection strategy: string
      */
     protected String strXoverSelectionMode = xoverSelectionMode+"";
+    
+    /**
+     * Number of offspring that a single crossover operation can produce.
+     */
+    protected int maxOffsprintFromXover = 1;
+    
+    /**
+     * Flag controlling if we choose the best sibling out of crossover.
+     */
+    protected boolean keepBestSibling = false;
 
     /**
      * Mutation types that are excluded everywhere.
@@ -485,6 +512,17 @@ public class GAParameters extends RunTimeParameters
     {
         return replacementStrategy;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the flag controlling if parents are allowed to survive multiple
+     * generation or not.
+     */
+    public boolean parentsSurvive()
+    {
+        return parentsSurvive;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -632,6 +670,28 @@ public class GAParameters extends RunTimeParameters
     {
         return crossoverWeight;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the maximum number of offspring produced by a single crossover
+     * operation.
+     */
+    public int maxOffsprintFromXover()
+    {
+        return maxOffsprintFromXover;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we want to keep only the best among the two 
+     * sibling that result from a single crossover.
+     */
+    public boolean keepBestSibling()
+    {
+        return keepBestSibling;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -726,6 +786,19 @@ public class GAParameters extends RunTimeParameters
     }
     
 //-----------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if we want mutation to occur on offspring that
+     * result from crossover, 
+     * otherwise we want to mutate population members irrespectively on 
+     * crossover.
+     */
+    public boolean coupleMutationAndCrossover()
+    {
+        return coupleMutationAndCrossover;
+    }
+
+//------------------------------------------------------------------------------
 
     /**
      * Processes a keyword/value pair and assign the related parameters.
@@ -1010,6 +1083,24 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "COUPLEMUTATIONTOCROSSOVER=":
+            {
+                if (value.length() > 0)
+                {
+                    coupleMutationAndCrossover = readYesNoTrueFalse(value);
+                }
+                break;
+            }
+            
+            case "PARENTSSURVIVE=":
+            {
+                if (value.length() > 0)
+                {
+                    parentsSurvive = readYesNoTrueFalse(value);
+                }
+                break;
+            }
+            
             case "EXCLUDEMUTATIONTYPE=":
             {
                 if (value.length() > 0)
@@ -1128,6 +1219,25 @@ public class GAParameters extends RunTimeParameters
                                 + "parent selection strategy.");
                     }
                 }
+                break;
+            }
+            
+            case "NUMOFFSPRINGFROMXOVER=":
+            {
+                if (value.length() > 0)
+                {
+                    maxOffsprintFromXover = Integer.parseInt(value);
+                    if (maxOffsprintFromXover>2)
+                        throw new DENOPTIMException("ERROR! Can only generate "
+                                + "up to 2 offspring from crossover, but you "
+                                + "required " + maxOffsprintFromXover);
+                }
+                break;
+            }
+            
+            case "KEEPBESTSIBLING=":
+            {
+                keepBestSibling = readYesNoTrueFalse(value);
                 break;
             }
             

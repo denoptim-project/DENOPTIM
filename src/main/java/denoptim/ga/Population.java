@@ -144,6 +144,15 @@ public class Population extends ArrayList<Candidate> implements Cloneable
 //------------------------------------------------------------------------------
     
     @Override
+    public void clear()
+    {
+        populationUpdate.getAndIncrement();
+        super.clear();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
     public boolean retainAll(Collection<?> c)
     {
         boolean result = super.retainAll(c);
@@ -358,8 +367,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * parents. 
      * @return the list of crossover-compatible population members.
      */
-    public ArrayList<Candidate> getXoverPartners(Candidate memberA,
-            ArrayList<Candidate> eligibleParents, FragmentSpace fragSpace)
+    public List<Candidate> getXoverPartners(Candidate memberA,
+            List<Candidate> eligibleParents, FragmentSpace fragSpace)
     {   
         DGraph gA = memberA.getGraph();
         

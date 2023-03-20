@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.logging.Level;
 
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -60,10 +59,15 @@ public class OffspringEvaluationTask extends FitnessTask
      */
     private FragmentSpace fragSpace;
     
+    /**
+     * The sibling of this offspring.
+     */
+    private Candidate sibling;
+    
 //------------------------------------------------------------------------------
     
     public OffspringEvaluationTask(GAParameters gaSettings, 
-            Candidate offspring, String workDir,
+            Candidate offspring, Candidate sibling, String workDir,
             Population popln, Monitor mnt, String fileUID)
     {
         super(((FitnessParameters) gaSettings.getParameters(
@@ -81,6 +85,7 @@ public class OffspringEvaluationTask extends FitnessTask
         this.fitProvMol = offspring.getChemicalRepresentation();
         this.population = popln;
         this.mnt = mnt;
+        this.sibling = sibling;
         
         result.setName(this.molName);
         result.setUID(offspring.getUID());
@@ -131,9 +136,8 @@ public class OffspringEvaluationTask extends FitnessTask
             	// we need to get it back. Thus, for the moment I do not see
             	// a reason for keeping them in the molecular representation,
             	// but potential down-stream effects have to be evaluated.
-                IAtomContainer mol = tb3d.convertGraphTo3DAtomContainer(
+                fitProvMol = tb3d.convertGraphTo3DAtomContainer(
                         gWithNoRCVs,true);
-                fitProvMol = mol;
         	} catch (Throwable t) {
         		//we have it already from before
         	}
@@ -141,15 +145,14 @@ public class OffspringEvaluationTask extends FitnessTask
         fitProvMol.setProperty(CDKConstants.TITLE, molName);
         fitProvMol.setProperty(DENOPTIMConstants.SMILESTAG, result.getSmiles());
         fitProvMol.setProperty(DENOPTIMConstants.INCHIKEYTAG, result.getUID());
-        fitProvMol.setProperty(DENOPTIMConstants.GCODETAG, 
-        		dGraph.getGraphId());
-        fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, 
-        		result.getUID());
+        fitProvMol.setProperty(DENOPTIMConstants.GCODETAG, dGraph.getGraphId());
+        fitProvMol.setProperty(DENOPTIMConstants.UNIQUEIDTAG, result.getUID());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHTAG, dGraph.toString());
         fitProvMol.setProperty(DENOPTIMConstants.GRAPHJSONTAG, dGraph.toJson());
         if (dGraph.getLocalMsg() != null)
         {
-        	fitProvMol.setProperty(DENOPTIMConstants.GMSGTAG, dGraph.getLocalMsg());
+        	fitProvMol.setProperty(DENOPTIMConstants.PROVENANCE, 
+        	        dGraph.getLocalMsg());
         }
         
         // Run the fitness provider, whatever that is (internal or external)
@@ -176,23 +179,43 @@ public class OffspringEvaluationTask extends FitnessTask
 
         if (result.hasFitness())
         {
+            boolean addthisToPop = false;
             boolean isWithinBestPrcentile = false;
         	if (population != null)
         	{
 	            synchronized (population)
 	            {
-	                gaSettings.getLogger().log(Level.INFO, 
-	            			"Adding {0} to population", molName);
-	                population.add(result);
-	                isWithinBestPrcentile = population.isWithinPercentile(
-                            result.getFitness(),
-                            gaSettings.getSaveRingSystemsFitnessThreshold());
+	                // Optionally keep the best of sibling
+	                if (population.contains(sibling) 
+	                        && gaSettings.keepBestSibling())
+	                {
+	                    if (result.getFitness()>sibling.getFitness())
+	                    {
+	                        addthisToPop = true;
+	                        population.remove(sibling);
+	                        gaSettings.getLogger().log(Level.INFO, "Replacing "
+	                                + sibling.getName() + " with its sibling "
+	                                + molName + " in population");
+	                    }
+	                } else {
+	                    addthisToPop = true;
+                        gaSettings.getLogger().log(Level.INFO, 
+                                "Adding {0} to population", molName);
+	                }
+	                
+	                if (addthisToPop)
+	                {
+    	                population.add(result);
+    	                isWithinBestPrcentile = population.isWithinPercentile(
+                                result.getFitness(),
+                                gaSettings.getSaveRingSystemsFitnessThreshold());
+	                }
                 }
         	}
 
         	if ((gaSettings.getSaveRingSystemsAsTemplatesNonScaff()
         	        || gaSettings.getSaveRingSystemsAsTemplatesScaff())
-        	    && isWithinBestPrcentile)
+        	    && isWithinBestPrcentile && addthisToPop)
         	{   
         	    fragSpace.addFusedRingsToFragmentLibrary(result.getGraph(),
                         gaSettings.getSaveRingSystemsAsTemplatesScaff(),

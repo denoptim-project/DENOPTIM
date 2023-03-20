@@ -18,12 +18,14 @@
 
 package denoptim.graph;
 
+
 /**
  * A light-weight candidate is a very low-demanding collection of data upon
  * a specific candidate item. This does NOT include the {@link DGraph}
  * or any molecular representation. The purpose of this class is to encapsulate 
  * only the lowest possible amount of information needed manipulate the item
  * in a larger list of items (e.g., when plotting evolution plots).
+ * Note that only the name and UID are used to check for equality.
  */
 
 public class CandidateLW
@@ -184,6 +186,32 @@ public class CandidateLW
 	public int getLevel() 
 	{
 		return level;
+	}
+	
+//------------------------------------------------------------------------------
+	
+	@Override
+	public boolean equals(Object o)
+	{
+	    if (o== null)
+            return false;
+        
+        if (o == this)
+            return true;
+        
+        if (o.getClass() != getClass())
+            return false;
+         
+        CandidateLW other = (CandidateLW) o;
+        
+
+        if (!this.name.equals(other.name))
+            return false;
+        
+        if (!this.uid.equals(other.uid))
+            return false;
+        
+        return true;
 	}
 
 //------------------------------------------------------------------------------        

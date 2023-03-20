@@ -20,6 +20,7 @@ package denoptim.ga;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import denoptim.graph.Candidate;
 import denoptim.programs.RunTimeParameters;
@@ -42,21 +43,21 @@ public class SelectionHelper
      * thus increasing genetic diversity.
      * Note: this implementation is based on the WATCHMAKER framework
      * http://watchmaker.uncommons.org/
-     * @param population the ensemble of individuals to choose from
+     * @param eligibleParents the ensemble of individuals to choose from
      * @param sz number of individuals to select
      * @param settings the program-specific settings.
      * @return list of selected individuals 
      */
 
     protected static Candidate[] performTournamentSelection(
-            ArrayList<Candidate> population, int sz, RunTimeParameters settings)
+            List<Candidate> eligibleParents, int sz, RunTimeParameters settings)
     {
         Candidate[] selection = new Candidate[sz];
         for (int i=0; i<sz; i++)
         {
             // Pick two candidates at random.
-            Candidate p1 = settings.getRandomizer().randomlyChooseOne(population);
-            Candidate p2 = settings.getRandomizer().randomlyChooseOne(population);
+            Candidate p1 = settings.getRandomizer().randomlyChooseOne(eligibleParents);
+            Candidate p2 = settings.getRandomizer().randomlyChooseOne(eligibleParents);
 
             // Use a random value to decide weather to select the fitter individual
             // or the weaker one.
@@ -86,7 +87,7 @@ public class SelectionHelper
      * @return list of indices of individuals in the population.
      */
     protected static Candidate[] performRandomSelection(
-            ArrayList<Candidate> population, int sz, RunTimeParameters settings)
+            List<Candidate> population, int sz, RunTimeParameters settings)
     {
         Candidate[] selection = new Candidate[sz];
         for (int i=0; i<sz; i++)
@@ -106,7 +107,7 @@ public class SelectionHelper
      * @param settings the program-specific settings.
      * @return list of indices of individuals in the population.
      */
-    protected static Candidate[] performSUS(ArrayList<Candidate> population, 
+    protected static Candidate[] performSUS(List<Candidate> population, 
             int sz, RunTimeParameters settings)
     {
         int k = population.size();
@@ -163,7 +164,7 @@ public class SelectionHelper
      * @return list of indices of individuals in the population.
      */
 
-    protected static Candidate[] performRWS(ArrayList<Candidate> population,
+    protected static Candidate[] performRWS(List<Candidate> population,
             int sz, RunTimeParameters settings)
     {
         int k = population.size();

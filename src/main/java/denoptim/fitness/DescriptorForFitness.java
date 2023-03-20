@@ -225,11 +225,10 @@ public class DescriptorForFitness
 //------------------------------------------------------------------------------
 	
 	/**
-	 * This is a sort of cloning that returns a new DescriptorForFitness 
+	 * This is a sort of cloning that returns a new {@link DescriptorForFitness} 
 	 * with the same field content of this one (i.e., deep copy), 
 	 * but a shallow copy of the list of variables, and a null implementation.
-	 * The latter will have to be instantiated 
-	 * elsewhere.
+	 * The latter will have to be instantiated elsewhere.
 	 * @return a clone with null descriptor implementation
 	 */
 

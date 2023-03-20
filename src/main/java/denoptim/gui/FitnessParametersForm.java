@@ -1193,7 +1193,8 @@ public class FitnessParametersForm extends ParametersForm
                     {
                         result = null;
                     } else {
-                        String line = "${parametrized('" + txtVarName.getText() 
+                        String line = "${Variable.parametrized('" 
+                    + txtVarName.getText() 
                                 + "','" + txtDescName.getText() + "','";
                         // First check that all parameters were given
                         boolean quit = false;

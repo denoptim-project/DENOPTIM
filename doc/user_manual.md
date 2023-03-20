@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.0.1, March 2023_
+_Version 4.1.1, March 2023_
 
 [TOC]
 
@@ -557,17 +557,21 @@ The following tables list all the keywords grouped according to the main functio
 |`GA-CrowdMultiplier`| Specifies the value of the factor λ used in crowding probability schemes `EXP_DIFF`, and `TANH`.|
 |`GA-CrowdSigmaSteepness`| Specifies the value of parameter σ1 used in crowding probability scheme `SIGMA`.|
 |`GA-CrowdSigmaMiddle`| Specifies the value of parameter σ2 used in crowding probability scheme `SIGMA`.|
+|`GA-ParentsSurvive`| Use `true` to allow members of the population to remain part of the population for any number of generations. Use `false` to change all members of the population in every generation. Default is `true`.|
 |`GA-XOverSelectionMode`| Specifies the strategy for selecting crossover partners. Acceptable values are: `RANDOM`, `TS`, `RW`, and `SUS`.See Genetic Operations.|
 |`GA-CrossoverWeight`| Specifies the relative weight of crossover when generating new candidate population members.|
+|`GA-NumOffspringFromXover`| Specifies how many offstring (1 or 2) should result from a single crossover operation. When 2 offspring are produced, you can choose to keep only the fittest offspring in the population by using `GA-KeepBestSibling=true`.|
+|`GA-KeepBestSibling`| Use `true` to require that only the best of two sibling produced by a single crossover operation enters the population.|
 |`GA-MutationWeight`| Specifies the relative weight of mutation when generating new candidate population members.|
-|`GA-MultiSiteMutationWeights`| Specifies the relative weight of multi-site mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutated again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the addition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.<br><br>Provide values in a comma- or space-separated list. The first value is the weight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,<br><br>`GA-MultiSiteMutationWeights=10, 1`<br><br>enables up to two-sites mutation and with a weight that is 1/10 of the single-site mutation.
+|`GA-MultiSiteMutationWeights`| Specifies the relative weight of multi-site mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutated again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the addition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.<br><br>Provide values in a comma- or space-separated list. The first value is the weight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,<br><br>`GA-MultiSiteMutationWeights=10, 1`<br><br>enables up to two-sites mutation and with a weight that is 1/10 of the single-site mutation.|
+|`GA-CoupleMutationToCrossover`| Use `true` to require that mutation is performed only following crossover and with a frequency controlled by the relation between mutation and crossover weights. Use `false` to allow mutation to operate on population members irrespectively on crossover. Default is `false`.|
 |`GA-ConstructionWeight`| Specifies the relative weight of construction from scratch when generating new candidate population members.|
 |`GA-SymmetryProbability`| Specifies the unspecific symmetric substitution probability. Attachment point-class specific values are defined in the definition of the space of graph building blocks.|
 |`GA-ReplacementStrategy`| Specifies the population members replacement strategy: `ELITIST` for the elitist scheme (survival of the fittest), use `NONE` for no replacement (all candidates become member of the population, which keeps growing).|
 |`GA-KeepNewRingSystemVertexes`| Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) as templates in the library of general-purpose building blocks. No new template will include a scaffold vertex or be used as scaffold. See `GA-KeepNewRingSystemScaffolds` to enable the latter possibilities.|
 |`GA-KeepNewRingSystemScaffolds`| Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) that contain any scaffold vertex as template scaffolds.|
 |`GA-KeepNewRingSystemFitnessTrsh`| Specified a percentage of the current population fitness range in the form of %/100 double (i.e., a value between 0 and 1). This value represents a threshold limiting the possibility to store a newly encountered ring system only to those candidate items having a fitness that in in the best fraction of the instantaneous population range. For example, giving a value of 0.10 will make denoptim store new ring systems only from newly encountered candidates that are among the best 10% of the population in the moment each of these candidates is considered as a potential population member.|
-|`GA-MaxXoverSubGraphSixe`| Specifies the maximum number of vertices that can be exchanged by a single crossover event.|
+|`GA-MaxXoverSubGraphSize`| Specifies the maximum number of vertices that can be exchanged by a single crossover event.|
 |__Interface__||
 |`GA-InitPoplnFile`| Specifies the pathname of a file (can be an SDF file or a text file where each line containing the pathname to a single-molecule SDF file) containing previously evaluated individuals to be added to the initial population. If the number of individuals is lower than the specified population side, DENOPTIM will create additional individuals.|
 |`GA-UIDFileIn`| Specifies the pathname of a text file collecting the list of unique individual identification strings (UID; one UID each line) that are to be considered as previously evaluated individuals. DENOPTIM will ignore individuals for which the UID is found in the file. This applies also to the members of the initial population provided by the user (see `GA-InitPoplnFile` keyword).|
@@ -637,6 +641,7 @@ The following tables list all the keywords grouped according to the main functio
 |__Internal Fitness Provider__||
 |`FP-Equation`| Specifies the expression to be used for calculation of the fitness value from available descriptors (i.e., from CDK library). Descriptor values, i.e., variables, and numerical constants can be combined using operators such as +, -, *, /, % (Modulo/remainder), and parenthesis. The expression must start with `${` and end with `}`. For example,<br><br>    ${0.23*nBase - 1.1*naAromAtom + myVariable}<br><br>is a valid expression where `nBase` and `naAromAtom` are the names of molecular descriptors implemented in the CDK library, and `myVariable` is the name of a user-defined variable. The latter is defined by means of a `FP-DescriptorSpecs` keyword, see below.|
 |`FP-DescriptorSpecs`| Defines a custom descriptors and variable to be used in the expression for the calculation of the fitness value. Examples of custom variables are atom-specific descriptors that are calculated only on a user-defined subset of atoms. To define such atom-specific descriptors use this syntax:<br><br>  ${atomSpecific('&lt;variableName&gt;','&lt;descriptor_name&gt;','&lt;SMARTS&gt;')} <br><br>where: <br> *   `<variableName>` is a string (without spaces) that identifies the custom descriptor in the expression of the fitness given by the `FP-Equation` keyword,<br> *   `<descriptor_name>`, is the name of the descriptor in the CDK implementation, <br> *   `<SMARTS>` is a SMARTS string that specifies which atoms will contribute. If the SMARTS matches multiple atoms, the value of the custom descriptor is calculated as the average of the values for all atoms that match the SMARTS query.|
+|`FP-DontWriteCandidatesOnDisk`| Makes GA runs write only the final population on disk, not the candidates generated during an evolutionary experiment. Note that when using this option, only very little information (i.e., name, unique identifier, and fitness value) can be recovered for any candidate that is evantually excluded from the final population. Therefore, use this option only if you are not interested in exploring the evolutation itself, but you are only interested in the final population.|
 |__External Fitness Provider__||
 |`FP-Source`| Specifies the pathname of the executable to run to evaluate the fitness.|
 |`FP-Interpreter`| Specifies the interpreter to use when running the external fitness provider source file.|
@@ -710,7 +715,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FR-Input`| Pathname to the file containing the graph for which the fitness has to be calculated.|
 |`FR-Output`|Pathname where results will be saved (see [Fitness Files](#FitnessFiles))|
 |`FR-ExtractTemplates`| Add this keyword to request the extraction of template vertex from the result of the fitness evaluation process. This keyword is meant for testing purposes.|
-
+|`FR-WallTime`|Wall time (number of secods) the fitness runner waits for a response from the fitness provider.|
 
 
 ## Stand-alone Graph Isomorphism Analyzer

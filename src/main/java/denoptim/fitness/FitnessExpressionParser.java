@@ -111,7 +111,7 @@ public class FitnessExpressionParser
             // such interpretation of \ (or '\\' as it is actually returned
             // from the System.getProperty("file.separator") method) makes
             // parsing of pathnames as expression components completely wrong.
-            // Below we re-intriduce Windows separators, if we need to.
+            // Below we re-introduce Windows separators, if we need to.
             boolean useWindowsFileSeparator = variableDefinition.contains("\\");
             String modVarDef = variableDefinition;
             if (useWindowsFileSeparator)
