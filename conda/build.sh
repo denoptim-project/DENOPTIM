@@ -1,5 +1,11 @@
 #!/bin/bash -euo
 
+# Assert version is set
+if [ "None" == "$PKG_VERSION" ]; then
+  echo "PKG_VERSION=$PKG_VERSION"
+  exit 1
+fi
+
 # Build
 cd "$SRC_DIR"
 mkdir -p "$PREFIX/lib" "$PREFIX/bin"
