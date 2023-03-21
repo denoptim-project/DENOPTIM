@@ -13,7 +13,7 @@ mvn clean package
 cp "$SRC_DIR/target/denoptim-$PKG_VERSION-jar-with-dependencies.jar" "$PREFIX/lib"
 
 cd "$SRC_DIR/src/main/python"
-$PYTHON -m pip install .
+$PYTHON -m pip install --no-deps .
 
 cd "$SRC_DIR"
 echo '#!/bin/bash' > "$PREFIX/bin/denoptim"
