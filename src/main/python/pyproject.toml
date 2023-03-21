@@ -11,7 +11,6 @@ authors = [
     {name = "Marco Foscato"},
     {name = "Marcello Costamagna"},
 ]
-requires-python = ">=3.8"
 license = {text = "AGPL-3.0-only"}
 classifiers = [
     "Programming Language :: Python :: 3",
