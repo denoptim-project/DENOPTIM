@@ -28,7 +28,7 @@ if [ $nDots -ne 2 ]; then
 fi
 
 # Build the package
-DENOPTIM_VERSION="$pkgVersion" conda build . --no-anaconda-upload -q
+DENOPTIM_VERSION="$pkgVersion" conda build . --no-anaconda-upload
 if [ $? -ne 0 ]; then 
   echo "ERROR: Non-zero exit status from conda"
   exit -1

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "denoptim"
+version = "4.1.1"
+description = "Python utilities for working with DENOPTIM (https://github.com/denoptim-project/DENOPTIM)"
+authors = [
+    {name = "David Grellscheid"},
+    {name = "Marco Foscato"},
+    {name = "Marcello Costamagna"},
+]
+requires-python = ">=3.8"
+license = {text = "AGPL-3.0-only"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Source = "https://github.com/denoptim-project/DENOPTIM" 
+Documentation = "https://denoptim-project.github.io/DENOPTIM/"
+

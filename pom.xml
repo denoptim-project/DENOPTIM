@@ -5,6 +5,8 @@
 
   <version>4.1.1</version>
   <!-- WARNING: the vesion must be changes also in doc/user_manual.md-->
+  <!-- WARNING: the vesion must be changes also in src/main/python/pyproject.toml -->
+
 
   <name>denoptim</name>
 

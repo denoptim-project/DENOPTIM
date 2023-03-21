@@ -6,13 +6,16 @@ if [ "None" == "$PKG_VERSION" ]; then
   exit 1
 fi
 
-# Build
 cd "$SRC_DIR"
 mkdir -p "$PREFIX/lib" "$PREFIX/bin"
 
 mvn clean package 
 cp "$SRC_DIR/target/denoptim-$PKG_VERSION-jar-with-dependencies.jar" "$PREFIX/lib"
 
+cd "$SRC_DIR/src/main/python"
+$PYTHON -m pip install .
+
+cd "$SRC_DIR"
 echo '#!/bin/bash' > "$PREFIX/bin/denoptim"
 echo '"'$JAVA_HOME'/bin/java" -jar "'$PREFIX'/lib/denoptim-'$PKG_VERSION'-jar-with-dependencies.jar" "$@"' >> "$PREFIX/bin/denoptim"
 
