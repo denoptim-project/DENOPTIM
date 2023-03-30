@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.exception.ExceptionUtils;
@@ -429,7 +431,10 @@ public class EvolutionaryAlgorithm
                 settings.getMonitorDumpStep(), settings.dumpMonitor(),
                 settings.getLogger());
         
-        // Loop creation of candidates until we have created enough new valid 
+        Iterator<IAtomContainer> iterMolsToFragment = 
+                settings.getInitialMolsToFragment().iterator();
+        
+        // Loop for creation of candidates until we have created enough new valid 
         // candidates or we have reached the max number of attempts.
         int i=0;
         ArrayList<Task> tasks = new ArrayList<>();
@@ -458,8 +463,14 @@ public class EvolutionaryAlgorithm
                         break;
                 }
                 
-                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
-                        settings);
+                Candidate candidate = null;
+                if (iterMolsToFragment.hasNext())
+                {
+                    candidate = EAUtils.buildCandidateByFragmentingMolecule(
+                            iterMolsToFragment.next(), mnt, settings);
+                } else {
+                    candidate = EAUtils.buildCandidateFromScratch(mnt,settings);
+                }
                   
                 if (candidate == null)
                     continue;

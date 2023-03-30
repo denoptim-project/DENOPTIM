@@ -259,7 +259,7 @@ public class FragmenterTools
                     molName = mol.getTitle();
                 
                 // Generate the fragments
-                ArrayList<Vertex> fragments = fragmentation(mol, 
+                List<Vertex> fragments = fragmentation(mol, 
                         settings.getCuttingRules(), 
                         logger);
                 if (logger!=null)
@@ -270,7 +270,7 @@ public class FragmenterTools
                 totalProd += fragments.size();
                 
                 // Post-fragmentation processing of fragments
-                ArrayList<Vertex> keptFragments = new ArrayList<Vertex>();
+                List<Vertex> keptFragments = new ArrayList<Vertex>();
                 int fragCounter = 0;
                 for (Vertex frag : fragments)
                 {
@@ -326,10 +326,10 @@ public class FragmenterTools
      * @param mol
      * @param rules
      * @param logger
-     * @return
+     * @return the list of fragments
      * @throws DENOPTIMException 
      */
-    public static ArrayList<Vertex> fragmentation(IAtomContainer mol, 
+    public static List<Vertex> fragmentation(IAtomContainer mol, 
             List<CuttingRule> rules, Logger logger) throws DENOPTIMException
     {   
         Fragment masterFrag = new Fragment(mol,BBType.UNDEFINED);

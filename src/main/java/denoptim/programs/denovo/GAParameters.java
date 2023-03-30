@@ -24,11 +24,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
+
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
@@ -64,6 +68,17 @@ public class GAParameters extends RunTimeParameters
      * a list of pathnames
      */
     protected String initPoplnFile = "";
+    
+    /**
+     * Pathname to the file collecting molecules to fragment to generate initial
+     * population.
+     */
+    protected String initMolsToFragmentFile = "";
+    
+    /**
+     * Collection of molecules to convert into candidates by fragmentation
+     */
+    protected List<IAtomContainer> initMolsToFragment = new ArrayList<>();
 
     /**
      * Pathname of the file with the list of individuals unique identifiers that
@@ -721,6 +736,26 @@ public class GAParameters extends RunTimeParameters
         return initPoplnFile;
     }
     
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the pathname to the file defining molecules to convert into 
+     * candidates by fragmentation.
+     */
+    public String getInitMolsToFragmentFile()
+    {
+        return initMolsToFragmentFile;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the list of molecules to convert into candidates by fragmentation
+     */
+    public List<IAtomContainer> getInitialMolsToFragment()
+    {
+        return initMolsToFragment;
+    }
 
 //------------------------------------------------------------------------------
       
@@ -918,6 +953,15 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     initPoplnFile = value;
+                }
+                break;
+            }
+            
+            case "INITMOLSTOFRAGMENTFILE=":
+            {
+                if (value.length() > 0)
+                {
+                    initMolsToFragmentFile = value;
                 }
                 break;
             }
@@ -1369,6 +1413,11 @@ public class GAParameters extends RunTimeParameters
             numParallelTasks = nproc;
         }
         
+        if (initMolsToFragmentFile.length()>0)
+        {
+            initMolsToFragment = DenoptimIO.readSDFFile(initMolsToFragmentFile);
+        }
+        
         processOtherParameters();
         
         if (isMaster)
@@ -1436,6 +1485,15 @@ public class GAParameters extends RunTimeParameters
             {
                 error = "Cannot find initial population data: " + initPoplnFile;
                 throw new DENOPTIMException(error);
+            }
+        }
+        
+        if (initMolsToFragmentFile.length() > 0)
+        {
+            if (!denoptim.files.FileUtils.checkExists(initMolsToFragmentFile))
+            {
+                throw new DENOPTIMException("Cannot find initial molecules to "
+                        + "fragment: " + initMolsToFragmentFile);
             }
         }
 
