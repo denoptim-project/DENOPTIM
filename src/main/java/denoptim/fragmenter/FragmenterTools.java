@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
+import org.junit.jupiter.api.Test;
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
@@ -22,9 +24,11 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.isomorphism.Mappings;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -336,10 +340,11 @@ public class FragmenterTools
         IAtomContainer fragsMol = masterFrag.getIAtomContainer();
         
         // Identify bonds
-        Map<String, ArrayList<MatchedBond>> matchingbonds = 
+        Map<String, List<MatchedBond>> matchingbonds = 
                 FragmenterTools.getMatchingBondsAllInOne(fragsMol,rules,logger);
         
         // Select bonds to cut and what rule to use for cutting them
+        int cutId = -1;
         for (CuttingRule rule : rules) // NB: iterator follows rule's priority
         {
             String ruleName = rule.getName();
@@ -470,19 +475,31 @@ public class FragmenterTools
                     
                     // NB: by convention the "first" class (i.e., the ???:0 class)
                     // is always  on the central atom.
-                    masterFrag.addAPOnAtom(centralAtm, rule.getAPClass0(), 
+                    AttachmentPoint apA = masterFrag.addAPOnAtom(centralAtm, 
+                            rule.getAPClass0(), 
                             MoleculeUtils.getPoint3d(dummyAtm));
-                    masterFrag.addAPOnAtom(dummyAtm, rule.getAPClass1(), 
+                    AttachmentPoint apB = masterFrag.addAPOnAtom(dummyAtm, 
+                            rule.getAPClass1(), 
                             MoleculeUtils.getPoint3d(centralAtm));
+
+                    cutId++;
+                    apA.setCutId(cutId);
+                    apB.setCutId(cutId);
                 } else {
                     //treatment of mono-hapto ligands
                     IBond bnd = fragsMol.getBond(atmA,atmB);
                     fragsMol.removeBond(bnd);
 
-                    masterFrag.addAPOnAtom(atmA, rule.getAPClass0(), 
+                    AttachmentPoint apA = masterFrag.addAPOnAtom(atmA, 
+                            rule.getAPClass0(), 
                             MoleculeUtils.getPoint3d(atmB));
-                    masterFrag.addAPOnAtom(atmB, rule.getAPClass1(), 
+                    AttachmentPoint apB = masterFrag.addAPOnAtom(atmB, 
+                            rule.getAPClass1(), 
                             MoleculeUtils.getPoint3d(atmA));
+
+                    cutId++;
+                    apA.setCutId(cutId);
+                    apB.setCutId(cutId);
                 } //end of if (hapticity>1)
             } //end of loop over matching bonds
         } //end of loop over rules
@@ -605,7 +622,7 @@ public class FragmenterTools
      * @return the list of matches.
      */
 
-    static Map<String, ArrayList<MatchedBond>> getMatchingBondsAllInOne(
+    static Map<String, List<MatchedBond>> getMatchingBondsAllInOne(
             IAtomContainer mol, List<CuttingRule> rules, Logger logger)
     {
         // Collect all SMARTS queries
@@ -616,8 +633,8 @@ public class FragmenterTools
         }
 
         // Prepare a data structure for the return value
-        Map<String, ArrayList<MatchedBond>> bondsMatchingRules = 
-                new HashMap<String, ArrayList<MatchedBond>>();
+        Map<String, List<MatchedBond>> bondsMatchingRules = 
+                new HashMap<String, List<MatchedBond>>();
 
         // Get all the matches to the SMARTS queries
         ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
@@ -1203,6 +1220,31 @@ public class FragmenterTools
         double mw = AtomContainerManipulator.getMass(frag.getIAtomContainer());
         int slotNum = (int) (mw / (Double.valueOf(slotSize)));
         return slotNum*slotSize + "-" + (slotNum+1)*slotSize;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static Vertex getRCPForAP(AttachmentPoint ap, APClass rcvApClass) 
+            throws DENOPTIMException
+    {
+        IAtomContainer mol = SilentChemObjectBuilder.getInstance()
+                .newAtomContainer();
+        Point3d apv = ap.getDirectionVector();
+        mol.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(rcvApClass), 
+                new Point3d(
+                    Double.valueOf(apv.x),
+                    Double.valueOf(apv.y),
+                    Double.valueOf(apv.z))));
+        
+        Fragment rcv = new Fragment(mol, BBType.FRAGMENT);
+
+        Point3d aps = ap.getOwner().getIAtomContainer().getAtom(
+                ap.getAtomPositionNumber()).getPoint3d();
+        rcv.addAP(0, rcvApClass, new Point3d(
+                Double.valueOf(aps.x),
+                Double.valueOf(aps.y),
+                Double.valueOf(aps.z)));
+        return rcv;
     }
     
 //------------------------------------------------------------------------------

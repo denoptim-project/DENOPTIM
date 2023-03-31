@@ -745,14 +745,18 @@ public class Fragment extends Vertex
             e1.printStackTrace();
         }
     	
+    	// WARNING: here we are not recovering all info from APs: we take only
+    	// some info. This can be improved...
         for (AttachmentPoint ap : lstAPs)
         {
             AttachmentPoint cAp = new AttachmentPoint(clone,
                     ap.getAtomPositionNumber(),
                     ap.getDirectionVector(),
                     ap.getAPClass());
+            cAp.setCutId(ap.getCutId());
             clone.lstAPs.add(cAp);
         }
+        
         clone.projectListAPToAtomProperties();
         
 		clone.setBuildingBlockId(this.getBuildingBlockId());

@@ -21,8 +21,10 @@ package denoptim.graph;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.JsonDeserializationContext;
@@ -93,7 +95,28 @@ public class APClass implements Cloneable,Comparable<APClass>
                     uniqueAPClasses.add(c);
                 }
                 }};
-    
+
+    /**
+     * Conventional pseudoatom labels for RingClosingAttractor
+     */
+    public static final HashMap<APClass,String> RCALABELPERAPCLASS = 
+            new HashMap<APClass,String>(){
+                /**
+                 * Version ID
+                 */
+                private static final long serialVersionUID = 1L;
+
+            {
+                try {
+                    put(APClass.make("ATplus", 0, BondType.ANY),"ATP");
+                    put(APClass.make("ATMinus", 0, BondType.ANY),"ATM");
+                    put(APClass.make("ATneutral", 0, BondType.ANY),"ATN");
+                } catch (Throwable t)
+                {
+                    //Will not happen
+                }
+            }};
+            
     /**
      * Bond type to use when converting edge users into formal bonds
      */

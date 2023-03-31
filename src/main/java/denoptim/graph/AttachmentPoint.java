@@ -87,12 +87,18 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * The edge that is using this AP, if any
      */
     private Edge user;
+   
+    /**
+     * Identifier of the cut operation that generated this AP
+     */
+    private int cutId;
     
     /**
      * Map of customisable properties
      */
     private Map<Object, Object> properties;
-
+    
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -459,6 +465,26 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
 //------------------------------------------------------------------------------
 
     /**
+     * @return the identifier of the cut operation that generated this AP.
+     */
+    public int getCutId()
+    {
+        return cutId;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @param id the identifier of the cut operation that generated this AP.
+     */
+    public void setCutId(int id)
+    {
+        this.cutId = id;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Check availability of this attachment point. Does not account for
      * embedding of the vertex in a template, i.e., this AP can be available
      * in the graph owning the vertex this AP belongs to, but if the graph is 
@@ -693,16 +719,17 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
     
     public AttachmentPoint clone()
     {   
+        AttachmentPoint ap;
         if (apClass == null)
         {
             if (dirVec == null)
             {
-                return new AttachmentPoint(
+                ap =new AttachmentPoint(
                         getOwner(),
                         atomPositionNumber
                 );
             } else {
-                return new AttachmentPoint(
+                ap = new AttachmentPoint(
                         getOwner(),
                         atomPositionNumber,
                         dirVec
@@ -710,18 +737,38 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
             }
         } else {
             if (dirVec == null) {
-                return new AttachmentPoint(
+                ap = new AttachmentPoint(
                         getOwner(),
                         atomPositionNumber,
                         apClass.clone()
                 );
             }
-            return new AttachmentPoint(
+            ap = new AttachmentPoint(
                     getOwner(),
                     atomPositionNumber,
                     dirVec,
                     apClass.clone());
         }
+        
+        if (properties != null)
+        {
+            for (Object key : properties.keySet())
+            {
+                Object value = properties.get(key);
+                if (!(key instanceof String) || !(value instanceof String))
+                {
+                    throw new IllegalArgumentException("Unable to clone "
+                            + "non-string "
+                            + "property of attachment point (key: '" + key 
+                            + "'). Implement deep cloning of property " 
+                            + properties.get(key).getClass().getName());
+                }
+                String keyStr = ((String) key) + "";
+                String valueStr = ((String) value) + "";
+                ap.setProperty(keyStr, valueStr);
+            }
+        }
+        return ap;
     }
 
 //------------------------------------------------------------------------------
@@ -1132,6 +1179,13 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
         }
         return false;
     }
+
+//------------------------------------------------------------------------------
+    
+    public Map<Object,Object> getProperties()
+    {
+        return properties;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -1145,7 +1199,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
         }
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setProperty(Object key, Object property)
     {
@@ -1156,7 +1210,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
         properties.put(key, property);
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * Prepares the two strings that can be used to define 

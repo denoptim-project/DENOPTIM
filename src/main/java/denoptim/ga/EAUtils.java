@@ -42,6 +42,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragmenter.FragmenterTools;
 import denoptim.fragspace.FragmentSpace;
@@ -56,6 +57,7 @@ import denoptim.graph.Ring;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.RingClosureParameters;
@@ -985,18 +987,84 @@ public class EAUtils
         List<Vertex> fragments = FragmenterTools.fragmentation(mol, 
                 cuttingRules, logger);
         
+        DGraph graph = new DGraph();
+        int vId = -1;
+        for (int i=0; i<fragments.size(); i++)
+        {
+            Vertex fragI = fragments.get(i);
+            if (!graph.containsVertex(fragI))
+            {
+                vId++;
+                fragI.setBuildingBlockType(BBType.FRAGMENT);
+                fragI.setVertexId(vId);
+                graph.addVertex(fragI);
+            }
+            for (AttachmentPoint apI : fragI.getAttachmentPoints())
+            {
+                for (int j=i; j<fragments.size(); j++)
+                {
+                    Vertex fragJ = fragments.get(j);
+                    
+                    boolean ringClosure = false;
+                    if (graph.containsVertex(fragJ))
+                    {   
+                        ringClosure = true;
+                    }
+                    for (AttachmentPoint apJ : fragJ.getAttachmentPoints())
+                    {
+                        if (apI==apJ)
+                            continue;
+                        
+                        if (apI.getCutId()==apJ.getCutId())
+                        {
+                            if (ringClosure)
+                            {
+                                Vertex rcvI = FragmenterTools.getRCPForAP(apI,
+                                        APClass.make("ATplus", 0, BondType.ANY));
+                                vId++;
+                                rcvI.setBuildingBlockType(BBType.FRAGMENT);
+                                rcvI.setVertexId(vId);
+                                graph.appendVertexOnAP(apI, rcvI.getAP(0));
+                                
+                                Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
+                                        APClass.make("ATminus", 0, BondType.ANY));
+                                vId++;
+                                rcvJ.setBuildingBlockType(BBType.FRAGMENT);
+                                rcvJ.setVertexId(vId);
+                                graph.appendVertexOnAP(apJ, rcvJ.getAP(0));
+                                graph.addRing(rcvI, rcvJ);
+                            } else {
+                                vId++;
+                                fragJ.setBuildingBlockType(BBType.FRAGMENT);
+                                fragJ.setVertexId(vId);
+                                graph.appendVertexOnAP(apI, apJ);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         // Identify templates
         //TODO-gg look for APs resulting from cyclic bonds
         
         //Choose a scaffold
+        /*
         Vertex scaffold = fragments.stream()
                 .max(Comparator.comparing(Vertex::getHeavyAtomsCount))
                 .orElse(fragments.get(0));
+        */
+        
+        // TODO del
+        ArrayList<DGraph> graphs = new ArrayList<DGraph>();
+        graphs.add(graph);
+        DenoptimIO.writeGraphsToJSON(new File("/tmp/graph.json"), graphs, false);
+        DenoptimIO.writeVertexesToFile(new File("/tmp/frags.sdf"), FileFormat.VRTXSDF, fragments);
         
         // Build graph
         //TODO-gg follow AP pair identifiers
         
-        return null; //throw exception is something goes wrong.
+        return graph;
     }
 
 //------------------------------------------------------------------------------  
