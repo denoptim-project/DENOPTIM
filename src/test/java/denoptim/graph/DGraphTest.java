@@ -18,12 +18,14 @@
 
 package denoptim.graph;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.vecmath.Point3d;
 
@@ -1096,6 +1099,133 @@ public class DGraphTest
         List<Vertex> symB = new ArrayList<Vertex>();
         symB.add(v1a_2);
         symB.add(v1a_2_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symB));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+     *        (C)-(C)-v6-(D)--(B)-v7
+     *        /                    |
+     *       /                   chord
+     *      |                      |
+     *      | (B)-(C)-v6-(D)--(B)-v7
+     *      |/
+     *  (A)-v1-(B)
+     *       |
+     *      0(A)
+     *       |
+     *      2(A)
+     *       |
+     *   (B)-v1-(C)-v6-(D)--(B)-v7
+     *       |                  |
+     *      0(A)                 |
+     *       |                chord
+     *      (A)                 |
+     *    v1_scaffold(D)-------(B)-v7
+     *      (A)
+     *       |
+     *      0(A)
+     *       |
+     *      v1
+     *       |
+     *      2(A)
+     *       |
+     *      0(A)
+     *       |
+     * 2(A)-v1-1(B)-(B)-v2
+     *      |\
+     *      | 3(B)-(B)-v2
+     *      \
+     *       4(C)-(C)-v3
+     *   </pre>
+     *   
+     */
+    private DGraph makeTestGraphL(FragmentSpace fs) 
+            throws DENOPTIMException
+    {
+        DGraph graph = new DGraph();
+        Vertex s = Vertex.newVertexFromLibrary(1,
+                BBType.SCAFFOLD, fs);
+        graph.addVertex(s);
+        Vertex v1a = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1a);
+        Vertex v6a = Vertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v6a);
+        Vertex v6a_bis = Vertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v6a_bis);
+        Vertex v6a_tris = Vertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v6a_tris);
+        Vertex v7a = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a);
+        Vertex v7a_bis = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a_bis);
+        Vertex v7a_tris = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a_tris);
+        
+        Vertex v7a_quat = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a_quat);
+        
+        Vertex v1d = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1d);
+        
+        Vertex v1c = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1c);
+        
+        Vertex v1b = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1b);
+        Vertex v2b = Vertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v2b);
+        Vertex v2b_bis = Vertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v2b_bis);
+        Vertex v3b = Vertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v3b);
+        graph.addEdge(new Edge(s.getAP(0), v1d.getAP(0)));
+        graph.addEdge(new Edge(v1d.getAP(2), v1a.getAP(0)));
+        graph.addEdge(new Edge(v1d.getAP(1), v6a.getAP(0)));
+        graph.addEdge(new Edge(v1a.getAP(3), v6a_bis.getAP(0)));
+        graph.addEdge(new Edge(v1a.getAP(4), v6a_tris.getAP(0)));
+        graph.addEdge(new Edge(v6a.getAP(1), v7a.getAP(0)));
+        graph.addEdge(new Edge(v6a_bis.getAP(1), v7a_bis.getAP(0)));
+        graph.addEdge(new Edge(v6a_tris.getAP(1), v7a_tris.getAP(0)));
+        graph.addEdge(new Edge(s.getAP(2), v7a_quat.getAP(0)));
+        graph.addEdge(new Edge(s.getAP(1), v1c.getAP(0)));
+        graph.addEdge(new Edge(v1c.getAP(2), v1b.getAP(0)));
+        graph.addEdge(new Edge(v1b.getAP(1), v2b.getAP(0)));
+        graph.addEdge(new Edge(v1b.getAP(3), v2b_bis.getAP(0)));
+        graph.addEdge(new Edge(v1b.getAP(4), v3b.getAP(0)));
+        
+        graph.addRing(v7a, v7a_quat);
+        graph.addRing(v7a_bis, v7a_tris);
+        
+        List<Vertex> symA = new ArrayList<Vertex>();
+        symA.add(v6a_bis);
+        symA.add(v6a_tris);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symA));
+        
+        List<Vertex> symB = new ArrayList<Vertex>();
+        symB.add(v7a_bis);
+        symB.add(v7a_tris);
         graph.addSymmetricSetOfVertices(new SymmetricVertexes(symB));
         
         graph.renumberGraphVertices();
@@ -2901,6 +3031,64 @@ public class DGraphTest
         assertTrue(graph.isIsomorphicTo(graphOriginal), 
                 "Original stays the same");
 	}
+	
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testExtractSubgraphFromCollection() throws Exception 
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphD(fs);
+        
+        Set<Vertex> targetVertexes = new HashSet<>();
+        targetVertexes.add(graph.getVertexAtPosition(1));
+        targetVertexes.add(graph.getVertexAtPosition(3));
+        
+        DGraph subGraph = graph.extractSubgraph(targetVertexes);
+        
+        assertEquals(targetVertexes.size(), subGraph.getVertexCount());
+        for (Vertex vInTarget : targetVertexes)
+        {
+            assertNotNull(subGraph.getVertexWithId(vInTarget.getVertexId()));
+        }
+        
+        Set<Edge> connectionToSubgraph = new HashSet<Edge>();
+        Set<Edge> connectionFromSubgraph = new HashSet<Edge>();
+        subGraph = graph.extractSubgraph(targetVertexes,
+                connectionToSubgraph, connectionFromSubgraph);
+        
+        assertEquals(1, connectionToSubgraph.size());
+        assertEquals(3, connectionFromSubgraph.size());
+
+        // NB: the subgraph contains clones, but the lists of edges contain
+        // references to the original graph
+        
+        boolean found0 = false;
+        for (Edge e : connectionToSubgraph)
+        {
+            Vertex inResults = e.getSrcAP().getOwner();
+            if (graph.getVertexAtPosition(0) == inResults)
+                found0 = true;
+        }
+        assertTrue(found0);
+        
+        boolean found2 = false;
+        boolean found4 = false;
+        boolean found6 = false;
+        for (Edge e : connectionFromSubgraph)
+        {
+            Vertex inResults = e.getTrgAP().getOwner();
+            if (graph.getVertexAtPosition(2) == inResults)
+                found2 = true;
+            if (graph.getVertexAtPosition(4) == inResults)
+                found4 = true;
+            if (graph.getVertexAtPosition(6) == inResults)
+                found6 = true;
+        }
+        assertTrue(found2);
+        assertTrue(found4);
+        assertTrue(found6);
+    }
 
 //-----------------------------------------------------------------------------
 	
@@ -3618,6 +3806,55 @@ public class DGraphTest
         DGraph gisB = pair[1];
         assertFalse(gisA.isIsomorphicTo(gisB));
         assertTrue(gisA.isIsostructuralTo(gisB));
+    }
+
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetEdgesWithSrcOrTrg() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphF(fs);
+        Vertex v = graph.getVertexAtPosition(5);
+        
+        List<Edge> egdesFrom = graph.getEdgesWithSrc(v);
+        assertEquals(2, egdesFrom.size());
+        assertTrue(graph.getVertexAtPosition(6) == 
+                egdesFrom.get(0).getTrgAP().getOwner());
+        assertTrue(graph.getVertexAtPosition(7) == 
+                egdesFrom.get(1).getTrgAP().getOwner());
+
+        List<Edge> egdesTo = graph.getEdgesWithTrg(v);
+        assertEquals(1, egdesTo.size());
+        assertTrue(graph.getVertexAtPosition(0) == 
+                egdesTo.get(0).getSrcAP().getOwner());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testEmbedPatternsInTemplates() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphL(fs);
+        
+        DGraph graphWithTmpls = graph.embedPatternsInTemplates(
+                GraphPattern.RING, fs);
+        
+        assertEquals(7, graphWithTmpls.getVertexCount());
+        assertEquals(6, graphWithTmpls.getEdgeCount());
+        assertEquals(0, graphWithTmpls.getRingCount());
+        List<Vertex> templates = graphWithTmpls.getVertexList()
+                .stream()
+                .filter(v -> v instanceof Template)
+                .collect(Collectors.toList());
+        assertEquals(2, templates.size());
+        assertEquals(1, templates.stream()
+                .filter(t -> t.getBuildingBlockType() == BBType.SCAFFOLD)
+                .count());
+        assertEquals(1, templates.stream()
+                .filter(t -> t.getBuildingBlockType() == BBType.FRAGMENT)
+                .count());
     }
     
 //------------------------------------------------------------------------------

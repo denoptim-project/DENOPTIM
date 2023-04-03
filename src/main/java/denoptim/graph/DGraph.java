@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,6 +65,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass.APClassDeserializer;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.DENOPTIMVertexDeserializer;
 import denoptim.graph.Vertex.VertexType;
@@ -86,6 +88,7 @@ import denoptim.utils.GraphEdit;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
+import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
 
 
@@ -516,6 +519,27 @@ public class DGraph implements Cloneable
     		}
     	}
     	return edges;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of edges that arrive from the given vertex, i.e., edges
+     * where the trgAP is owned by the given vertex.
+     * @param v the given vertex.
+     * @return the list of edges arriving to the given vertex.
+     */
+    public List<Edge> getEdgesWithTrg(Vertex v)
+    {
+        List<Edge> edges = new ArrayList<Edge>();
+        for (Edge e : this.getEdgeList())
+        {
+            if (e.getTrgAP().getOwner() == v)
+            {
+                edges.add(e);
+            }
+        }
+        return edges;
     }
 
 //------------------------------------------------------------------------------
@@ -2276,6 +2300,12 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Searches for a vertex with the given identifier.
+     * @param vid the identifier
+     * @return the first vertex found with such identifier, or null if no such 
+     * identifier is found.
+     */
     public Vertex getVertexWithId(long vid)
     {
         Vertex v = null;
@@ -3924,7 +3954,8 @@ public class DGraph implements Cloneable
      * are considered part of
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
-     * @param index the position of the seed vertex in the list of vertices of this graph.
+     * @param index the position of the seed vertex in the list of vertices of
+     *  this graph.
      * @return a new graph that corresponds to the subgraph of this graph.
      */
 
@@ -4116,56 +4147,50 @@ public class DGraph implements Cloneable
         
         return subGraph;
     }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Creates a new graph that corresponds to the subgraph of this graph 
-     * and that includes only the members corresponding to the given list of 
-     * vertices belonging to this graph.
-     * @param members the vertices belonging to the subgraph. 
-     * @return a new graph that corresponds to the subgraph of this graph.
-     */
-    public DGraph extractSubgraph(List<Vertex> members) 
-    {
-        if (members.size()==0)
-            return null;
-        
-        DGraph subGraph = this.clone();
-        
-        List<Vertex> subGrpVrtxs =  new ArrayList<Vertex>();
-        for (Vertex v : members)
-        {
-            subGrpVrtxs.add(subGraph.getVertexAtPosition(this.indexOf(v)));
-        }
-        
-        ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
-        for (Vertex v : subGraph.gVertices)
-        {
-            if (!subGrpVrtxs.contains(v))
-            {
-                toRemove.add(v);
-            }
-        }
-        for (Vertex v : toRemove)
-        {
-            subGraph.removeVertex(v);
-        }
-        
-        return subGraph;
-    }
-
+  
 //------------------------------------------------------------------------------
 
     /**
      * Extracts subgraphs that match the provided pattern.
      * @param pattern to match against.
-     * @return The subgraphs matching the provided pattern.
+     * @return The subgraphs matching the provided pattern. These contain clones 
+     * of the vertexes in this graph.
      * @throws DENOPTIMException 
      */
       
     public List<DGraph> extractPattern(GraphPattern pattern) 
             throws DENOPTIMException 
+    {
+        return extractPattern(pattern, false).keySet().stream().collect(
+                Collectors.toList());
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Extracts subgraphs that match the provided pattern. This method offers
+     * the possibility to record the connections that cross the border of each
+     * subgraph. 
+     * @param pattern to match against.
+     * @param recordConnectivity if <code>true</code> makes this method 
+     * collect the edges of this graph that cross the subgraph borders. 
+     * If <code>false</code> the resulting map will have only keys and 
+     * <code>null</code> values.
+     * @return The subgraphs matching the provided pattern. Each such subgraph
+     * contains clones of the vertexes in this graph. Each value of the 
+     * returned map contains two lists defining which edges cross the subgraph
+     * border: first, the list of incoming edges (i.e., the source 
+     * {@link AttachmentPoint} belongs to a vertex that does not belong the
+     * subgraph), second, the list of outgoing edges (i.e., the source 
+     * {@link AttachmentPoint} belongs to a vertex that does belong the
+     * subgraph). Note that the owners of the {@link AttachmentPoint}s are NOT
+     * the {@link Vertex} instances that are container in the map's key, but 
+     * are their clones.
+     * @throws DENOPTIMException 
+     */
+      
+    public Map<DGraph,ObjectPair> extractPattern(GraphPattern pattern, 
+            boolean recordConnectivity) throws DENOPTIMException 
     {
         if (pattern != GraphPattern.RING) {
             throw new IllegalArgumentException("Graph pattern " + pattern +
@@ -4181,32 +4206,64 @@ public class DGraph implements Cloneable
 
         GeneralUtils.unionOfIntersectingSets(disjointMultiCycleVertices);
 
-        List<DGraph> subgraphs = new ArrayList<>();
+        Map<DGraph,ObjectPair> subGraphsAndConnections = new LinkedHashMap<>();
         for (Set<Vertex> fusedRing : disjointMultiCycleVertices) {
-            subgraphs.add(extractSubgraph(fusedRing));
+            if (recordConnectivity)
+            {
+                Set<Edge> connectionToSubgraph = new HashSet<Edge>();
+                Set<Edge> connectionFromSubgraph = new HashSet<Edge>();
+                DGraph subGraph = extractSubgraph(fusedRing, connectionToSubgraph, 
+                        connectionFromSubgraph);
+                ObjectPair connections = new ObjectPair(connectionToSubgraph, 
+                        connectionFromSubgraph);
+                subGraphsAndConnections.put(subGraph, connections);
+            } else {
+                DGraph subGraph = extractSubgraph(fusedRing);
+                subGraphsAndConnections.put(subGraph, null);
+            }
         }
           
-        for (DGraph g : subgraphs) {
+        for (DGraph g : subGraphsAndConnections.keySet()) {
             g.storeCurrentVertexIDs();
             g.renumberGraphVertices();
             reorderVertexList(g);
         }
 
-        return subgraphs;
+        return subGraphsAndConnections;
+    }
+
+  //------------------------------------------------------------------------------
+
+    /**
+     * Returns a clone of the subgraph defined by the a collection of 
+     * vertices belonging to this graph.
+     * @param definedOn Set of vertices that defined the subgraph.
+     * @return a clone of the subgraph of this graph.
+     */
+    public DGraph extractSubgraph(Collection<Vertex> definedOn) 
+    {
+        DGraph subgraph = extractSubgraph(definedOn, null, null);
+        return subgraph;
     }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the subgraph in the graph defined on the a set of vertices.
-     * The graph is cloned before the subgraph is extracted.
-     * @param graph To extract subgraph from.
-     * @param definedOn Set of vertices in the graph that the subgraph is
-     *                  defined on.
+     * Returns a clone of the subgraph defined by the a collection of 
+     * vertices belonging to this graph. It also collects which {@link Edge}s
+     * exists between the subgraph and the rest of the graph.
+     * @param definedOn Set of vertices that defined the subgraph.
+     * @param connectionToSubgraph container for the collection of edges that 
+     * arrive at the subgraph.
+     * @param connectionFromSubgraph container for the collection of edges that 
+     * depart from the subgraph.
      * @return Subgraph of graph defined on set of vertices.
      */
-    private DGraph extractSubgraph(Set<Vertex> definedOn) 
+    public DGraph extractSubgraph(Collection<Vertex> definedOn, 
+            Set<Edge> connectionToSubgraph, 
+            Set<Edge> connectionFromSubgraph) 
     {
+        
         DGraph subgraph = this.clone();
 
         Set<Vertex> complement = subgraph
@@ -4216,15 +4273,122 @@ public class DGraph implements Cloneable
                         .stream()
                         .allMatch(v -> v.getVertexId() != u.getVertexId())
                 ).collect(Collectors.toSet());
-
+        
+        Set<Long> vrtxIDsInComplement = complement.stream()
+                .map(v -> v.getVertexId())
+                .collect(Collectors.toSet());
+        
+        if (connectionToSubgraph!=null && connectionFromSubgraph!=null)
+        {
+            for (Vertex v : definedOn) 
+            {
+                for (Edge e : this.getEdgeList())
+                {
+                    if (e.getSrcAP().getOwner() == v && 
+                            vrtxIDsInComplement.contains(e.getTrgVertex()))
+                    {
+                        connectionFromSubgraph.add(e);
+                    }
+                    
+                    if (e.getTrgAP().getOwner() == v && 
+                            vrtxIDsInComplement.contains(e.getSrcVertex()))
+                    {
+                        connectionToSubgraph.add(e);
+                    }
+                }
+            }
+        }
+        
         for (Vertex v : complement) {
             subgraph.removeVertex(v);
         }
+        
         return subgraph;
     }
     
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for the given pattern type and generated a new graph where each 
+     * set of (clones of) vertexes that define one such patterns is embedded in 
+     * a single template.
+     * @param pattern type of pattern to embed in template.
+     * @return a new graph where the vertexes defining each pattern are replaced
+     * by a template that embeds the subgraph of the pattern. All vertexes.
+     * @throws DENOPTIMException
+     */
+    public DGraph embedPatternsInTemplates(GraphPattern pattern, 
+            FragmentSpace fragSpace) throws DENOPTIMException
+    {
+        // We will return a modified clone of this graph
+        DGraph graph = this.clone();
+        // We use IDs to find the mapping of APs between cloned graphs. So, must
+        // ensure the IDs of APs are unique within the graph.
+        graph.ensureUniqueApIDs();
+        
+        // Identify the subgraphs to be replaced by templates
+        Map<DGraph,ObjectPair> subGraphsAndLinks = graph.extractPattern(
+                pattern, true);
+        
+        // Replace the subgraphs with the templates
+        for (Map.Entry<DGraph,ObjectPair> entry : subGraphsAndLinks.entrySet())
+        {
+            // WARNING: while the subgraph is a clone of 'graph', the sets
+            // contain referenced to the edges of 'graph'.
+            DGraph subGraph = entry.getKey();
+            
+            // Make template
+            BBType tmplType = subGraph.hasScaffoldTypeVertex() ? 
+                    BBType.SCAFFOLD :
+                        BBType.FRAGMENT;
+            Template tmpl = new Template(tmplType);
+            tmpl.setInnerGraph(subGraph);
+            //TODO: we may want to control which contract we assign to the template
+            tmpl.setContractLevel(ContractLevel.FREE);
 
-  //------------------------------------------------------------------------------
+            // Recover info on which APs of the original subgraph (i.e., APs in
+            // 'graph') correspond to APs on the template.
+            LinkedHashMap<AttachmentPoint, AttachmentPoint> apMapOrigToTmpl = 
+                    new LinkedHashMap<AttachmentPoint, AttachmentPoint>();
+            @SuppressWarnings("unchecked")
+            Set<Edge> edsToSubgrph = (Set<Edge>) entry.getValue().getFirst();
+            for (Edge e : edsToSubgrph)
+            {
+                AttachmentPoint apOnOrig = e.getTrgAP();
+                AttachmentPoint apOnTmpl = tmpl.getOuterAPFromInnerAP(
+                       subGraph.getAPWithId(apOnOrig.getID()));
+                apMapOrigToTmpl.put(apOnOrig, apOnTmpl);
+            }
+            @SuppressWarnings("unchecked")
+            Set<Edge> edsFromSubGrph = (Set<Edge>) entry.getValue().getSecond();
+            for (Edge e : edsFromSubGrph)
+            {
+                AttachmentPoint apOnOrig = e.getSrcAP();
+                AttachmentPoint apOnTmpl = tmpl.getOuterAPFromInnerAP(
+                        subGraph.getAPWithId(apOnOrig.getID()));
+                apMapOrigToTmpl.put(apOnOrig, apOnTmpl);
+            }
+            
+            // Identify the vertexes in the subgraph replaced by the template
+            List<Vertex> toReplaceByTemplate = new ArrayList<>();
+            for (Vertex embeddedVrtx : subGraph.gVertices)
+            {
+                long vIdInThis = (long) embeddedVrtx.getProperty(
+                        DENOPTIMConstants.STOREDVID);
+                toReplaceByTemplate.add(graph.getVertexWithId(vIdInThis));
+            }
+            
+            // Do the actual replacement of original subgraph with the template
+            DGraph singleVertedGraph = new DGraph();
+            singleVertedGraph.addVertex(tmpl);
+            graph.replaceSubGraph(toReplaceByTemplate, singleVertedGraph, 
+                    apMapOrigToTmpl, fragSpace);
+        }
+        
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
 
       /**
        * Sets the vertex at the lowest level as the scaffold, changes the  

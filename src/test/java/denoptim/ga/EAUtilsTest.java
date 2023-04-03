@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -38,6 +39,8 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
+import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.EAUtils.CandidateSource;
@@ -48,6 +51,7 @@ import denoptim.graph.DGraph;
 import denoptim.graph.DGraphTest;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
+import denoptim.graph.GraphPattern;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -827,10 +831,31 @@ public class EAUtilsTest
                 new ArrayList<String>()));
         
         DGraph graph = EAUtils.makeGraphFromFragmentationOfMol(mol,
-                cuttingRules, settings.getLogger()); 
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT);
         
-        //TODO-gg add assertions
-        //assertTrue(false);
+        assertEquals(16, graph.getVertexCount());
+        assertEquals(15, graph.getEdgeCount());
+        assertEquals(2, graph.getRingCount());
+        assertEquals(0, graph.getVertexList()
+                .stream()
+                .filter(v -> v instanceof Template)
+                .count());
+        
+        DGraph graphWithTemplate = graph.embedPatternsInTemplates(
+                GraphPattern.RING, new FragmentSpace());
+        
+        assertEquals(7, graphWithTemplate.getVertexCount());
+        assertEquals(6, graphWithTemplate.getEdgeCount());
+        assertEquals(0, graphWithTemplate.getRingCount());
+        List<Vertex> templates = graphWithTemplate.getVertexList()
+                .stream()
+                .filter(v -> v instanceof Template)
+                .collect(Collectors.toList());
+        assertEquals(1, templates.size());
+        Template tmpl = (Template) templates.get(0);
+        assertEquals(BBType.SCAFFOLD, tmpl.getBuildingBlockType());
+        assertEquals(2, tmpl.getInnerGraph().getRingCount());
     }
     
 //------------------------------------------------------------------------------

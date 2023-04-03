@@ -37,6 +37,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fragmenter.FragmentClusterer;
+import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
@@ -359,6 +360,12 @@ public class FragmenterParameters extends RunTimeParameters
      * Flag activating operations depending on 3D structure
      */
     private boolean workingIn3D = true;
+
+    /**
+     * The policy for defining the scaffold vertex in a graph that does 
+     * not have such a {@link BBType}.
+     */
+    private ScaffoldingPolicy scaffoldingPolicy;
     
     
 //------------------------------------------------------------------------------
@@ -1463,6 +1470,7 @@ public class FragmenterParameters extends RunTimeParameters
     {
         return workingIn3D;
     }
+    
 //------------------------------------------------------------------------------    
 
     /**
@@ -1473,4 +1481,18 @@ public class FragmenterParameters extends RunTimeParameters
     {
         this.workingIn3D = workingIn3D;
     }
+
+//------------------------------------------------------------------------------    
+
+    /**
+     * @return the policy for defining the scaffold vertex in a graph that does 
+     * not have such a {@link BBType}.
+     */
+    public ScaffoldingPolicy getScaffoldingPolicy()
+    {
+        return scaffoldingPolicy;
+    }
+    
+//------------------------------------------------------------------------------    
+
 }

@@ -25,6 +25,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,12 +39,14 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.forester.application.annotator;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.fitness.FitnessParameters;
+import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragmenter.FragmenterTools;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -940,7 +943,8 @@ public class EAUtils
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
         DGraph graph = makeGraphFromFragmentationOfMol(mol, 
-                frgParams.getCuttingRules(), settings.getLogger());
+                frgParams.getCuttingRules(), settings.getLogger(),
+                frgParams.getScaffoldingPolicy());
         if (graph == null)
         {
             //TODO-gg mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
@@ -981,11 +985,66 @@ public class EAUtils
      * @throws DENOPTIMException 
      */
     public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
-            List<CuttingRule> cuttingRules, Logger logger) 
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy) 
                     throws DENOPTIMException
     {
         List<Vertex> fragments = FragmenterTools.fragmentation(mol, 
                 cuttingRules, logger);
+        
+        // Define which fragment is the scaffold
+        switch (scaffoldingPolicy)
+        {
+            case ELEMENT:
+            {
+                for (Vertex v : fragments)
+                {
+                    if (v instanceof Fragment)
+                    {
+                        boolean setAsScaffold = false;
+                        IAtomContainer iac = v.getIAtomContainer();
+                        for (IAtom atm : iac.atoms())
+                        {
+                            if (scaffoldingPolicy.label.equals(
+                                    MoleculeUtils.getSymbolOrLabel(atm)))
+                            {
+                                setAsScaffold = true;
+                                break;
+                            }
+                        }
+                        if (setAsScaffold)
+                        {
+                            v.setBuildingBlockType(BBType.SCAFFOLD);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+
+            default:
+            case LARGEST_FRAGMENT:
+            {
+                fragments.stream()
+                        .max(Comparator.comparing(Vertex::getHeavyAtomsCount))
+                        .get()
+                        .setBuildingBlockType(BBType.SCAFFOLD);
+                break;
+            }
+        }
+        
+        Collections.sort(fragments, new Comparator<Vertex>() {
+            @Override
+            public int compare(Vertex o1, Vertex o2)
+            {
+                if (o1.getBuildingBlockType() == BBType.SCAFFOLD)
+                    return -1;
+                else if (o2.getBuildingBlockType() == BBType.SCAFFOLD)
+                    return 1;
+                else
+                    return 0;
+            }
+        });
         
         DGraph graph = new DGraph();
         int vId = -1;
@@ -995,7 +1054,10 @@ public class EAUtils
             if (!graph.containsVertex(fragI))
             {
                 vId++;
-                fragI.setBuildingBlockType(BBType.FRAGMENT);
+                if (fragI.getBuildingBlockType()!=BBType.SCAFFOLD)
+                {
+                    fragI.setBuildingBlockType(BBType.FRAGMENT);
+                }
                 fragI.setVertexId(vId);
                 graph.addVertex(fragI);
             }
@@ -1020,14 +1082,16 @@ public class EAUtils
                             if (ringClosure)
                             {
                                 Vertex rcvI = FragmenterTools.getRCPForAP(apI,
-                                        APClass.make("ATplus", 0, BondType.ANY));
+                                        APClass.make("ATplus", 0, 
+                                                BondType.ANY));
                                 vId++;
                                 rcvI.setBuildingBlockType(BBType.FRAGMENT);
                                 rcvI.setVertexId(vId);
                                 graph.appendVertexOnAP(apI, rcvI.getAP(0));
                                 
                                 Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
-                                        APClass.make("ATminus", 0, BondType.ANY));
+                                        APClass.make("ATminus", 0, 
+                                                BondType.ANY));
                                 vId++;
                                 rcvJ.setBuildingBlockType(BBType.FRAGMENT);
                                 rcvJ.setVertexId(vId);
@@ -1044,25 +1108,6 @@ public class EAUtils
                 }
             }
         }
-        
-        // Identify templates
-        //TODO-gg look for APs resulting from cyclic bonds
-        
-        //Choose a scaffold
-        /*
-        Vertex scaffold = fragments.stream()
-                .max(Comparator.comparing(Vertex::getHeavyAtomsCount))
-                .orElse(fragments.get(0));
-        */
-        
-        // TODO del
-        ArrayList<DGraph> graphs = new ArrayList<DGraph>();
-        graphs.add(graph);
-        DenoptimIO.writeGraphsToJSON(new File("/tmp/graph.json"), graphs, false);
-        DenoptimIO.writeVertexesToFile(new File("/tmp/frags.sdf"), FileFormat.VRTXSDF, fragments);
-        
-        // Build graph
-        //TODO-gg follow AP pair identifiers
         
         return graph;
     }

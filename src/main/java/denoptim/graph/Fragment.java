@@ -754,6 +754,7 @@ public class Fragment extends Vertex
                     ap.getDirectionVector(),
                     ap.getAPClass());
             cAp.setCutId(ap.getCutId());
+            cAp.setID(ap.getID());
             clone.lstAPs.add(cAp);
         }
         
