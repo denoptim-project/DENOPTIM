@@ -365,7 +365,8 @@ public class FragmenterParameters extends RunTimeParameters
      * The policy for defining the scaffold vertex in a graph that does 
      * not have such a {@link BBType}.
      */
-    private ScaffoldingPolicy scaffoldingPolicy;
+    private ScaffoldingPolicy scaffoldingPolicy = 
+            ScaffoldingPolicy.LARGEST_FRAGMENT;
     
     
 //------------------------------------------------------------------------------
@@ -1102,6 +1103,28 @@ public class FragmenterParameters extends RunTimeParameters
 
             case "SDWEIGHTUNIMODALPOPULATION=":
                 factorForSDOnStatsOfUnimodalPop = Double.parseDouble(value);
+                break;
+                
+            case "SCAFFOLDINGPOLICY=":
+                String[] words = value.split("\\s+");
+                try {
+                    scaffoldingPolicy = ScaffoldingPolicy.valueOf(words[0]);
+                    if (ScaffoldingPolicy.ELEMENT.equals(scaffoldingPolicy))
+                    {
+                        if (words.length<2)
+                        {
+                            throw new DENOPTIMException("Expected elemental "
+                                    + "symbol after '" 
+                                    + ScaffoldingPolicy.ELEMENT+ "', but none "
+                                    + "found");
+                        }
+                        scaffoldingPolicy.label = words[1];
+                    }
+                } catch (Throwable t)
+                {
+                    msg = "Unable to parse value of " + key + ": '" + value + "'";
+                    throw new DENOPTIMException(msg);
+                }
                 break;
                 
 /*
