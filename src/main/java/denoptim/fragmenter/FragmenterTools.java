@@ -1238,8 +1238,9 @@ public class FragmenterTools
         
         Fragment rcv = new Fragment(mol, BBType.FRAGMENT);
 
-        Point3d aps = ap.getOwner().getIAtomContainer().getAtom(
-                ap.getAtomPositionNumber()).getPoint3d();
+        Point3d aps = MoleculeUtils.getPoint3d(
+                ap.getOwner().getIAtomContainer().getAtom(
+                        ap.getAtomPositionNumber()));
         rcv.addAP(0, rcvApClass, new Point3d(
                 Double.valueOf(aps.x),
                 Double.valueOf(aps.y),

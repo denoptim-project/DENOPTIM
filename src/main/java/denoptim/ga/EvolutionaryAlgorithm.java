@@ -19,6 +19,8 @@
 package denoptim.ga;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,17 +39,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.io.iterator.IteratingSMILESReader;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.exception.ExceptionUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.ga.EAUtils.CandidateSource;
 import denoptim.graph.Candidate;
+import denoptim.io.IteratingAtomContainerReader;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
+import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.FitnessTask;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
@@ -431,8 +437,27 @@ public class EvolutionaryAlgorithm
                 settings.getMonitorDumpStep(), settings.dumpMonitor(),
                 settings.getLogger());
         
-        Iterator<IAtomContainer> iterMolsToFragment = 
-                settings.getInitialMolsToFragment().iterator();
+        IteratingAtomContainerReader iterMolsToFragment;
+        try
+        {
+            iterMolsToFragment = new IteratingAtomContainerReader(new File(
+                    settings.getInitMolsToFragmentFile()));
+            if (iterMolsToFragment.getIteratorType().equals(
+                    IteratingSMILESReader.class))
+            {
+                FragmenterParameters frgParams = new FragmenterParameters();
+                if (settings.containsParameters(ParametersType.FRG_PARAMS))
+                {
+                    frgParams = (FragmenterParameters) settings.getParameters(
+                            ParametersType.FRG_PARAMS);
+                }
+                frgParams.setWorkingIn3D(false);
+            }
+        } catch (Exception e1)
+        {
+            throw new DENOPTIMException("Could not set reader on file ''"
+                    + settings.getInitMolsToFragmentFile() + ".", ex);
+        }
         
         // Loop for creation of candidates until we have created enough new valid 
         // candidates or we have reached the max number of attempts.

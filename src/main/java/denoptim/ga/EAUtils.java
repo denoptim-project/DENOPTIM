@@ -943,12 +943,28 @@ public class EAUtils
                     ParametersType.FRG_PARAMS);
         }
         
+        if (frgParams.getCuttingRules()==null 
+                || frgParams.getCuttingRules().isEmpty())
+        {
+            throw new DENOPTIMException("Request to generate candidates by "
+                    + "fragmentation but no cutting rules provided. Please,"
+                    + "add FRG-CUTTINGRULESFILE=path/to/your/file to the "
+                    + "input.");
+        }
         mnt.increase(CounterID.CONVERTBYFRAGATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
-        DGraph graph = makeGraphFromFragmentationOfMol(mol, 
-                frgParams.getCuttingRules(), settings.getLogger(),
-                frgParams.getScaffoldingPolicy());
+        DGraph graph = null;
+        try {
+            graph = makeGraphFromFragmentationOfMol(mol, 
+                    frgParams.getCuttingRules(), settings.getLogger(),
+                    frgParams.getScaffoldingPolicy());
+        } catch (DENOPTIMException de)
+        {
+            String msg = "Unable to convert molecule (" + mol.getAtomCount() 
+                + " atoms) to DENPTIM graph. " + de.getMessage();
+            settings.getLogger().log(Level.WARNING, msg);
+        }
         if (graph == null)
         {
             mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
@@ -1014,6 +1030,11 @@ public class EAUtils
             // This is done to set the symmetry relations in each vertex
             ((Fragment) v).updateAPs();
         }
+        if (fragments.size()==0)
+        {
+            throw new DENOPTIMException("Fragmentation of molecule with "
+                    + mol.getAtomCount() + " atoms produced 0 fragments.");
+        }
         
         // Define which fragment is the scaffold
         Vertex scaffold = null;
@@ -1049,9 +1070,16 @@ public class EAUtils
             default:
             case LARGEST_FRAGMENT:
             {
-                scaffold = fragments.stream()
-                        .max(Comparator.comparing(Vertex::getHeavyAtomsCount))
-                        .get();
+                try {
+                    scaffold = fragments.stream()
+                            .max(Comparator.comparing(
+                                    Vertex::getHeavyAtomsCount))
+                            .get();
+                } catch (Exception e)
+                {
+                    throw new DENOPTIMException("Cannot get largest fragment "
+                            + "among " + fragments.size() + " fragments.", e);
+                }
                 break;
             }
         }

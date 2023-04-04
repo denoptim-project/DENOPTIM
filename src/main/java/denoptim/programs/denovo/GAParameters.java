@@ -78,11 +78,6 @@ public class GAParameters extends RunTimeParameters
     protected String initMolsToFragmentFile = "";
     
     /**
-     * Collection of molecules to convert into candidates by fragmentation
-     */
-    protected List<IAtomContainer> initMolsToFragment = new ArrayList<>();
-
-    /**
      * Pathname of the file with the list of individuals unique identifiers that
      * are initially known.
      */
@@ -759,16 +754,6 @@ public class GAParameters extends RunTimeParameters
     public String getInitMolsToFragmentFile()
     {
         return initMolsToFragmentFile;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * @return the list of molecules to convert into candidates by fragmentation
-     */
-    public List<IAtomContainer> getInitialMolsToFragment()
-    {
-        return initMolsToFragment;
     }
 
 //------------------------------------------------------------------------------
@@ -1462,11 +1447,6 @@ public class GAParameters extends RunTimeParameters
         if (numParallelTasks == 0)
         {
             numParallelTasks = nproc;
-        }
-        
-        if (initMolsToFragmentFile.length()>0)
-        {
-            initMolsToFragment = DenoptimIO.readSDFFile(initMolsToFragmentFile);
         }
         
         processOtherParameters();
