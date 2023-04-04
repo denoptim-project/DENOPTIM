@@ -75,7 +75,7 @@ public class GAParameters extends RunTimeParameters
      * Pathname to the file collecting molecules to fragment to generate initial
      * population.
      */
-    protected String initMolsToFragmentFile = "";
+    protected String initMolsToFragmentFile = null;
     
     /**
      * Pathname of the file with the list of individuals unique identifiers that
@@ -1519,7 +1519,7 @@ public class GAParameters extends RunTimeParameters
             }
         }
         
-        if (initMolsToFragmentFile.length() > 0)
+        if (initMolsToFragmentFile!=null && initMolsToFragmentFile.length() > 0)
         {
             if (!denoptim.files.FileUtils.checkExists(initMolsToFragmentFile))
             {

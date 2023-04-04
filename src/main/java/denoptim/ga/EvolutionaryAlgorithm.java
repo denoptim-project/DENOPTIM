@@ -437,26 +437,30 @@ public class EvolutionaryAlgorithm
                 settings.getMonitorDumpStep(), settings.dumpMonitor(),
                 settings.getLogger());
         
-        IteratingAtomContainerReader iterMolsToFragment;
-        try
+        IteratingAtomContainerReader iterMolsToFragment = null;
+        if (settings.getInitMolsToFragmentFile()!=null)
         {
-            iterMolsToFragment = new IteratingAtomContainerReader(new File(
-                    settings.getInitMolsToFragmentFile()));
-            if (iterMolsToFragment.getIteratorType().equals(
-                    IteratingSMILESReader.class))
+            try
             {
-                FragmenterParameters frgParams = new FragmenterParameters();
-                if (settings.containsParameters(ParametersType.FRG_PARAMS))
+                iterMolsToFragment = new IteratingAtomContainerReader(new File(
+                        settings.getInitMolsToFragmentFile()));
+                if (iterMolsToFragment.getIteratorType().equals(
+                        IteratingSMILESReader.class))
                 {
-                    frgParams = (FragmenterParameters) settings.getParameters(
-                            ParametersType.FRG_PARAMS);
+                    FragmenterParameters frgParams = new FragmenterParameters();
+                    if (settings.containsParameters(ParametersType.FRG_PARAMS))
+                    {
+                        frgParams = (FragmenterParameters) 
+                                settings.getParameters(
+                                        ParametersType.FRG_PARAMS);
+                    }
+                    frgParams.setWorkingIn3D(false);
                 }
-                frgParams.setWorkingIn3D(false);
+            } catch (Exception e1)
+            {
+                throw new DENOPTIMException("Could not set reader on file ''"
+                        + settings.getInitMolsToFragmentFile() + ".", ex);
             }
-        } catch (Exception e1)
-        {
-            throw new DENOPTIMException("Could not set reader on file ''"
-                    + settings.getInitMolsToFragmentFile() + ".", ex);
         }
         
         // Loop for creation of candidates until we have created enough new valid 
@@ -489,7 +493,7 @@ public class EvolutionaryAlgorithm
                 }
                 
                 Candidate candidate = null;
-                if (iterMolsToFragment.hasNext())
+                if (iterMolsToFragment!=null && iterMolsToFragment.hasNext())
                 {
                     candidate = EAUtils.buildCandidateByFragmentingMolecule(
                             iterMolsToFragment.next(), mnt, settings);
