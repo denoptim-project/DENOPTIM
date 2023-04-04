@@ -32,6 +32,8 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
+import denoptim.graph.DGraph;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.logging.StaticLogger;
@@ -408,6 +410,18 @@ public class GAParameters extends RunTimeParameters
      * Limit to the size of subgraphs that are exchanged during crossover.
      */
     public int maxXOverableSubGraphSize = 20;
+    
+    /**
+     * Flag that enables the embedding of rings in templates upon conversion of
+     * molecules into {@link DGraph} when importing candidates.
+     */
+    protected boolean embedRingsInTemplate = false;
+    
+    /**
+     * Type of constrain defined for any template generated upon conversion of 
+     * molecules into {@link DGraph} when importing candidates.
+     */
+    protected ContractLevel embeddedRingsContract = ContractLevel.FREE;
     
 
 //------------------------------------------------------------------------------
@@ -832,6 +846,28 @@ public class GAParameters extends RunTimeParameters
     {
         return coupleMutationAndCrossover;
     }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the flag that enables the embedding of rings in templates upon 
+     * conversion of molecules into {@link DGraph} when importing candidates.
+     */
+    public boolean embedRingsInTemplate()
+    {
+        return embedRingsInTemplate;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the type of constrain defined for any template generated upon 
+     * conversion of molecules into {@link DGraph} when importing candidates.
+     */
+    public ContractLevel getEmbeddedRingsContract()
+    {
+        return embeddedRingsContract;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -962,6 +998,21 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     initMolsToFragmentFile = value;
+                }
+                break;
+            }
+            
+            case "EMBEDRINGSINTEMPLATES=":
+            {
+                embedRingsInTemplate = readYesNoTrueFalse(value);
+                break;
+            }
+            
+            case "RINGEMBEDDINGCONTRACT=":
+            {
+                if (value.length() > 0)
+                {
+                    embeddedRingsContract = ContractLevel.valueOf(value);
                 }
                 break;
             }

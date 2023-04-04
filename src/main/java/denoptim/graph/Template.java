@@ -104,13 +104,13 @@ public class Template extends Vertex
     public enum ContractLevel {
         /**
          * Inner graphs are free to change within 
-         * the confines of the required APs
+         * the confines of the required {@link AttachmentPoint}s.
          */
         FREE,
         
         /**
          * Inner graphs are effectively equivalent 
-         * to the DENOPTIMFragment class, as no change in the inner structure is
+         * to the {@link Fragment} class, as no change in the inner structure is
          * allowed.
          */
         FIXED,
@@ -118,7 +118,8 @@ public class Template extends Vertex
         /**
          * Inner graph keep the same structure, but the identify of vertices
          * can change. 
-         * Effectively this contract allows only CHANGELINK mutation.
+         * Effectively this contract allows only 
+         * {@value MutationType#CHANGELINK} mutation.
          */
         FIXED_STRUCT
     }

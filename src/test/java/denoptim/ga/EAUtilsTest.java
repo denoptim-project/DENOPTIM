@@ -852,7 +852,7 @@ public class EAUtilsTest
                 .count());
         
         DGraph graphWithTemplate = graph.embedPatternsInTemplates(
-                GraphPattern.RING, new FragmentSpace());
+                GraphPattern.RING, new FragmentSpace(), ContractLevel.FIXED);
         
         assertEquals(7, graphWithTemplate.getVertexCount());
         assertEquals(6, graphWithTemplate.getEdgeCount());
@@ -864,6 +864,7 @@ public class EAUtilsTest
         assertEquals(1, templates.size());
         Template tmpl = (Template) templates.get(0);
         assertEquals(BBType.SCAFFOLD, tmpl.getBuildingBlockType());
+        assertEquals(ContractLevel.FIXED, tmpl.getContractLevel());
         assertEquals(2, tmpl.getInnerGraph().getRingCount());
     }
     

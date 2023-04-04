@@ -4305,7 +4305,7 @@ public class DGraph implements Cloneable
         
         return subgraph;
     }
-    
+
 //------------------------------------------------------------------------------
     
     /**
@@ -4314,11 +4314,33 @@ public class DGraph implements Cloneable
      * a single template.
      * @param pattern type of pattern to embed in template.
      * @return a new graph where the vertexes defining each pattern are replaced
-     * by a template that embeds the subgraph of the pattern. All vertexes.
+     * by a template that embeds the subgraph of the pattern.
      * @throws DENOPTIMException
      */
     public DGraph embedPatternsInTemplates(GraphPattern pattern, 
             FragmentSpace fragSpace) throws DENOPTIMException
+    {
+        return embedPatternsInTemplates(pattern, fragSpace, ContractLevel.FREE);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for the given pattern type and generated a new graph where each 
+     * set of (clones of) vertexes that define one such patterns is embedded in 
+     * a single template.
+     * @param pattern type of pattern to embed in template.
+     * @param fragSpace the fragment space that defines how we manipulate
+     * fragments.
+     * @param contract the level of constraint to set for any template that
+     * embeds one of the patterns.
+     * @return a new graph where the vertexes defining each pattern are replaced
+     * by a template that embeds the subgraph of the pattern.
+     * @throws DENOPTIMException
+     */
+    public DGraph embedPatternsInTemplates(GraphPattern pattern, 
+            FragmentSpace fragSpace, ContractLevel contract) 
+                    throws DENOPTIMException
     {
         // We will return a modified clone of this graph
         DGraph graph = this.clone();
@@ -4343,8 +4365,7 @@ public class DGraph implements Cloneable
                         BBType.FRAGMENT;
             Template tmpl = new Template(tmplType);
             tmpl.setInnerGraph(subGraph);
-            //TODO: we may want to control which contract we assign to the template
-            tmpl.setContractLevel(ContractLevel.FREE);
+            tmpl.setContractLevel(contract);
 
             // Recover info on which APs of the original subgraph (i.e., APs in
             // 'graph') correspond to APs on the template.

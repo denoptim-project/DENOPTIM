@@ -57,6 +57,7 @@ import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
+import denoptim.graph.GraphPattern;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
 import denoptim.graph.SymmetricVertexes;
@@ -942,7 +943,7 @@ public class EAUtils
                     ParametersType.FRG_PARAMS);
         }
         
-        //TODO-gg  mnt.increase(CounterID.CONVERTBYFRAGATTEMPTS);
+        mnt.increase(CounterID.CONVERTBYFRAGATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
         DGraph graph = makeGraphFromFragmentationOfMol(mol, 
@@ -950,20 +951,33 @@ public class EAUtils
                 frgParams.getScaffoldingPolicy());
         if (graph == null)
         {
-            //TODO-gg mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
-            //TODO-gg mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
             return null;
         }
+
+        if (settings.embedRingsInTemplate())
+        {
+            try {
+                graph = graph.embedPatternsInTemplates(GraphPattern.RING, 
+                        fragSpace, settings.getEmbeddedRingsContract());
+            } catch (DENOPTIMException e) {
+                graph.cleanup();
+                mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING);
+                return null;
+            }
+        }
+        
         graph.setLocalMsg("INITIAL_MOL_FRAGMENTED");
         
         Object[] res = graph.checkConsistency(settings);
         if (res == null)
         {
             graph.cleanup();
-            //TODO-gg mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_EVAL);
             return null;
         }
-
+        
         Candidate candidate = new Candidate(graph);
         candidate.setUID(res[0].toString().trim());
         candidate.setSmiles(res[1].toString().trim());
