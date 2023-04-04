@@ -16,7 +16,6 @@ FP-CheckUidBeforeFitness=yes
 
 # Genetic Algorithm parameters
 GA-InitMolsToFragmentFile=OTF_WDIR/molsToFragment.sdf
-#GA-EmbedRingsInTemplates=no
 FRG-CuttingRulesFile=OTF_WDIR/cutting_rules
 #
 GA-randomSeed=8572368003836

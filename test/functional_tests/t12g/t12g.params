@@ -16,8 +16,8 @@ FP-CheckUidBeforeFitness=yes
 
 # Genetic Algorithm parameters
 GA-InitMolsToFragmentFile=OTF_WDIR/molsToFragment.smi
-GA-EmbedRingsInTemplates=yes
-GA-RingEmbeddingContract=FIXED_STRUCT
+FRG-EmbedRingsInTemplates=yes
+FRG-RingEmbeddingContract=FIXED_STRUCT
 FRG-CuttingRulesFile=OTF_WDIR/cutting_rules
 FRG-ScaffoldingPolicy=ELEMENT C
 #

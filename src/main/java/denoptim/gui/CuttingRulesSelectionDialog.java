@@ -44,6 +44,7 @@ import java.util.Vector;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -51,6 +52,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
@@ -85,6 +87,12 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
      */
     private static final long serialVersionUID = 1L;
     
+    /**
+     * The panel in the central part of the dialog. This is where main content
+     * goes.
+     */
+    protected JPanel centralPanel = new JPanel(new BorderLayout()); 
+    
     private JRadioButton rdbUseDefault;
     private JRadioButton rdbUseCustom;
     
@@ -110,9 +118,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
 //-----------------------------------------------------------------------------
     
     /**
-     * Constructor
-     * @param defaultCuttingRules 
-     * @param lastUsedCutRulFile 
+     * Constructor 
      * @throws DENOPTIMException 
      */
     public CuttingRulesSelectionDialog(List<CuttingRule> defaultCuttingRules,
@@ -301,6 +307,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                 try
                 {
                     DenoptimIO.readCuttingRules(cutRulFile, customCuttingRules);
+                    lastUsedCutRulFile = cutRulFile;
                 } catch (DENOPTIMException e1)
                 {
                     JOptionPane.showMessageDialog(btnImportRules,String.format(
@@ -331,7 +338,8 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                 {
                     for (int i=0; i<customRulesTabModel.getRowCount(); i++) 
                     {
-                        Vector rowdat = customRulesTabModel.getDataVector().elementAt(i);
+                        Vector rowdat = customRulesTabModel.getDataVector()
+                                .elementAt(i);
                         try
                         {
                             String optsStr = (String) rowdat.elementAt(5);
@@ -359,7 +367,8 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                                     UIManager.getIcon("OptionPane.errorIcon"));
                             continue;
                         }
-                        String name = (String) customRulesTabModel.getValueAt(i, 0);
+                        String name = (String) customRulesTabModel
+                                .getValueAt(i, 0);
                         System.out.println("Name: "+name);
                     }
                 }
@@ -391,7 +400,6 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                         fileAndFormat.format);
             }
         });
-        
         
         
         JScrollPane customRulesScrollPane = new JScrollPane(customRulesTable);
@@ -433,7 +441,13 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         masterPane.setTopComponent(defaultRulesPanel);
         masterPane.setBottomComponent(customRulesPanel);
         
-        addToCentralPane(masterPane);
+        // This is a further level of embedding created so that we can add stuff
+        // in addition to what is already in the masterPane
+        centralPanel.setLayout(new BoxLayout(centralPanel, 
+                BoxLayout.Y_AXIS));
+        appendToCentralPanel(masterPane);
+        
+        addToCentralPane(centralPanel);
         
         btnDone.setText("Start Fragmentation");
         btnDone.setToolTipText(String.format("<html><body width='%1s'>"
@@ -546,6 +560,18 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         this.btnCanc.setToolTipText("Exit without running fragmentation.");
     }
     
+//-----------------------------------------------------------------------------
+
+    /**
+     * Method to append a panel to the bottom of the central panel.
+     * @param panel
+     */
+    protected void appendToCentralPanel(JComponent panel)
+    {
+        panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centralPanel.add(panel); 
+    }
+
 //-----------------------------------------------------------------------------
     
     /**

@@ -406,18 +406,6 @@ public class GAParameters extends RunTimeParameters
      */
     public int maxXOverableSubGraphSize = 20;
     
-    /**
-     * Flag that enables the embedding of rings in templates upon conversion of
-     * molecules into {@link DGraph} when importing candidates.
-     */
-    protected boolean embedRingsInTemplate = false;
-    
-    /**
-     * Type of constrain defined for any template generated upon conversion of 
-     * molecules into {@link DGraph} when importing candidates.
-     */
-    protected ContractLevel embeddedRingsContract = ContractLevel.FREE;
-    
 
 //------------------------------------------------------------------------------
     
@@ -831,28 +819,6 @@ public class GAParameters extends RunTimeParameters
     {
         return coupleMutationAndCrossover;
     }
-    
-//-----------------------------------------------------------------------------
-
-    /**
-     * @return the flag that enables the embedding of rings in templates upon 
-     * conversion of molecules into {@link DGraph} when importing candidates.
-     */
-    public boolean embedRingsInTemplate()
-    {
-        return embedRingsInTemplate;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * @return the type of constrain defined for any template generated upon 
-     * conversion of molecules into {@link DGraph} when importing candidates.
-     */
-    public ContractLevel getEmbeddedRingsContract()
-    {
-        return embeddedRingsContract;
-    }
 
 //------------------------------------------------------------------------------
 
@@ -983,21 +949,6 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     initMolsToFragmentFile = value;
-                }
-                break;
-            }
-            
-            case "EMBEDRINGSINTEMPLATES=":
-            {
-                embedRingsInTemplate = readYesNoTrueFalse(value);
-                break;
-            }
-            
-            case "RINGEMBEDDINGCONTRACT=":
-            {
-                if (value.length() > 0)
-                {
-                    embeddedRingsContract = ContractLevel.valueOf(value);
                 }
                 break;
             }

@@ -38,7 +38,9 @@ import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fragmenter.FragmentClusterer;
 import denoptim.fragmenter.ScaffoldingPolicy;
+import denoptim.graph.DGraph;
 import denoptim.graph.Vertex;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
@@ -367,6 +369,18 @@ public class FragmenterParameters extends RunTimeParameters
      */
     private ScaffoldingPolicy scaffoldingPolicy = 
             ScaffoldingPolicy.LARGEST_FRAGMENT;
+
+    /**
+     * Flag that enables the embedding of rings in templates upon conversion of
+     * molecules into {@link DGraph}.
+     */
+    protected boolean embedRingsInTemplate = false;
+    
+    /**
+     * Type of constrain defined for any template generated upon conversion of 
+     * molecules into {@link DGraph}.
+     */
+    protected ContractLevel embeddedRingsContract = ContractLevel.FREE;
     
     
 //------------------------------------------------------------------------------
@@ -447,11 +461,21 @@ public class FragmenterParameters extends RunTimeParameters
 //------------------------------------------------------------------------------
 
     /**
-     * @return the cutting rules loaded from the input.
+     * @return the cutting rules currently configured in this set of parameters.
      */
     public List<CuttingRule> getCuttingRules()
     {
         return cuttingRules;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Assigns the cutting rules loaded from the input.
+     */
+    public void setCuttingRules(List<CuttingRule> cuttingRules)
+    {
+        this.cuttingRules = cuttingRules;
     }
 
 //------------------------------------------------------------------------------
@@ -901,7 +925,74 @@ public class FragmenterParameters extends RunTimeParameters
     {
         return acceptUnsetToSingeBOApprox;
     }
+    
+//-----------------------------------------------------------------------------
 
+    /**
+     * @param embedRingsInTemplate the flag that enables the embedding of rings 
+     * in templates upon conversion of molecules into {@link DGraph} .
+     */
+    public void setEmbedRingsInTemplate(boolean embedRingsInTemplate)
+    {
+        this.embedRingsInTemplate = embedRingsInTemplate;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the flag that enables the embedding of rings in templates upon 
+     * conversion of molecules into {@link DGraph} .
+     */
+    public boolean embedRingsInTemplate()
+    {
+        return embedRingsInTemplate;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @param embeddedRingsContract the type of constrain defined for any 
+     * template generated upon 
+     * conversion of molecules into {@link DGraph}.
+     */
+    public void setEmbeddedRingsContract(ContractLevel embeddedRingsContract)
+    {
+        this.embeddedRingsContract = embeddedRingsContract;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the type of constrain defined for any template generated upon 
+     * conversion of molecules into {@link DGraph}.
+     */
+    public ContractLevel getEmbeddedRingsContract()
+    {
+        return embeddedRingsContract;
+    }
+
+//------------------------------------------------------------------------------    
+
+    /**
+     * @param sp the policy for defining the scaffold vertex in a graph that does 
+     * not have such a {@link BBType}.
+     */
+    public void setScaffoldingPolicy(ScaffoldingPolicy sp)
+    {
+        this.scaffoldingPolicy = sp;
+    }
+    
+//------------------------------------------------------------------------------    
+
+    /**
+     * @return the policy for defining the scaffold vertex in a graph that does 
+     * not have such a {@link BBType}.
+     */
+    public ScaffoldingPolicy getScaffoldingPolicy()
+    {
+        return scaffoldingPolicy;
+    }
+      
 //------------------------------------------------------------------------------
     
     /**
@@ -1126,6 +1217,21 @@ public class FragmenterParameters extends RunTimeParameters
                     throw new DENOPTIMException(msg);
                 }
                 break;
+
+            case "EMBEDRINGSINTEMPLATES=":
+            {
+                embedRingsInTemplate = readYesNoTrueFalse(value);
+                break;
+            }
+            
+            case "RINGEMBEDDINGCONTRACT=":
+            {
+                if (value.length() > 0)
+                {
+                    embeddedRingsContract = ContractLevel.valueOf(value);
+                }
+                break;
+            }
                 
 /*
             case "=":
@@ -1503,17 +1609,6 @@ public class FragmenterParameters extends RunTimeParameters
     public void setWorkingIn3D(boolean workingIn3D)
     {
         this.workingIn3D = workingIn3D;
-    }
-
-//------------------------------------------------------------------------------    
-
-    /**
-     * @return the policy for defining the scaffold vertex in a graph that does 
-     * not have such a {@link BBType}.
-     */
-    public ScaffoldingPolicy getScaffoldingPolicy()
-    {
-        return scaffoldingPolicy;
     }
     
 //------------------------------------------------------------------------------    

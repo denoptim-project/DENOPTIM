@@ -972,11 +972,11 @@ public class EAUtils
             return null;
         }
 
-        if (settings.embedRingsInTemplate())
+        if (frgParams.embedRingsInTemplate())
         {
             try {
                 graph = graph.embedPatternsInTemplates(GraphPattern.RING, 
-                        fragSpace, settings.getEmbeddedRingsContract());
+                        fragSpace, frgParams.getEmbeddedRingsContract());
             } catch (DENOPTIMException e) {
                 graph.cleanup();
                 mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING);
@@ -1029,6 +1029,16 @@ public class EAUtils
         {
             // This is done to set the symmetry relations in each vertex
             ((Fragment) v).updateAPs();
+            
+            //TODO-gg
+            // Add linearity-breaking dummy atoms
+            /*
+            for (Vertex frag : fragments)
+            {
+                DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
+                        settings.getLinearAngleLimit());
+            }
+            */
         }
         if (fragments.size()==0)
         {
@@ -1082,6 +1092,12 @@ public class EAUtils
                 }
                 break;
             }
+        }
+        if (scaffold==null)
+        {
+            throw new DENOPTIMException("No fragment matches criteria to be "
+                    + "identified as the " 
+                    + BBType.SCAFFOLD.toString().toLowerCase() + ".");
         }
         scaffold.setVertexId(0);
         scaffold.setBuildingBlockType(BBType.SCAFFOLD);

@@ -26,12 +26,15 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
@@ -52,8 +55,11 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.io.iterator.IteratingSMILESReader;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -62,11 +68,15 @@ import denoptim.files.FileAndFormat;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.fragmenter.FragmenterTools;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.ga.EAUtils;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
+import denoptim.graph.Fragment;
+import denoptim.graph.GraphPattern;
 import denoptim.graph.SymmetricSet;
 import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
@@ -75,7 +85,13 @@ import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
+import denoptim.io.IteratingAtomContainerReader;
+import denoptim.logging.CounterID;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.DummyAtomHandler;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 
@@ -203,6 +219,19 @@ public class GUIGraphHandler extends GUICardPanel
 	private boolean painted;
 	
 	/**
+     * File storing the latest version of modified cutting rules used to do 
+     * fragmentation, or null if no fragmentation has been done using cutting 
+     * rules, or we has so far only used default cutting rules.
+     */
+    private File lastUsedCutRulFile = null;
+    
+    /**
+     * Flag indicating whether to preselect the default or the custom list of 
+     * cutting rules next time we are asked to display the dialog.
+     */
+    private boolean useDefaulCutRulestNextTime = true;
+	
+	/**
 	 * The fragment space this handler works with
 	 */
 	private FragmentSpace fragSpace = null;
@@ -273,17 +302,20 @@ public class GUIGraphHandler extends GUICardPanel
 				+ "list of graphs.");
 		btnAddGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] options = new String[]{"Build", "File", "Cancel"};
+				String[] options = new String[]{"Build", "Convert", "File", 
+				        "Cancel"};
 				int res = JOptionPane.showOptionDialog(btnAddGraph,
 		                "<html>Please choose whether to start creations "
-		                + "of a new graph (Build), "
-		                + "or import graph from file.</html>",
+		                + "of a new graph (Build), <br>"
+		                + "use fragmentation to convert molecules from a "
+		                + "file (Convert), <br>"
+		                + "or import graph from file (File).</html>",
 		                "Specify source of new graph",
 		                JOptionPane.DEFAULT_OPTION,
 		                JOptionPane.QUESTION_MESSAGE,
 		                UIManager.getIcon("OptionPane.warningIcon"),
 		                options,
-		                options[2]);
+		                options[3]);
 				switch (res)
 				{
 					case 0:
@@ -322,8 +354,40 @@ public class GUIGraphHandler extends GUICardPanel
                             return;
                         }
 						break;
+					    
+                    case 1:
+                    {
+                        File inFile = GUIFileOpener.pickFile(btnAddGraph);
+                        if (inFile == null 
+                                || inFile.getAbsolutePath().equals(""))
+                        {
+                            return;
+                        }
+                        
+                        // All settings of the process are defined in the dialog 
+                        // and collected in the FragmenterParameters
+                        FragmenterParameters settings = new FragmenterParameters();
+                        Object[] result = 
+                                GUIVertexInspector.dialogToDefineCuttingRules(
+                                settings, this.getClass().getClassLoader(), 
+                                btnAddGraph, 
+                                lastUsedCutRulFile, useDefaulCutRulestNextTime,
+                                true);
+                        if (result==null)
+                            return;
+                        
+                        useDefaulCutRulestNextTime = Boolean.parseBoolean(
+                                result[0].toString());
+                        if (result[1]!=null)
+                            lastUsedCutRulFile = (File) result[1];
+                        
+                        appendGraphsFromConvertingMolecule(inFile, settings, 
+                                btnAddGraph);
+                        break;
+				    }
 					
-					case 1:
+					case 2:
+					{
 						File inFile = GUIFileOpener.pickFileWithGraph(
 						        btnAddGraph);
 						if (inFile == null 
@@ -333,6 +397,7 @@ public class GUIGraphHandler extends GUICardPanel
 						}
 						appendGraphsFromFile(inFile);
 						break;
+					}
 				}
 			}
 		});
@@ -1464,6 +1529,129 @@ public class GUIGraphHandler extends GUICardPanel
 		
 		loadCurrentGraphIdxToViewer(false);
 		updateGraphListSpinner();
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void appendGraphsFromConvertingMolecule(File file, 
+	        FragmenterParameters frgParams, Component parent)
+	{
+	    // Reading molecules is format-agnostic manner
+	    List<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+	    boolean make2D = false;
+        StructureDiagramGenerator sdg = null;
+	    IteratingAtomContainerReader iterMolsToFragment = null;
+        try
+        {
+            iterMolsToFragment = new IteratingAtomContainerReader(file);
+            if (iterMolsToFragment.getIteratorType().equals(
+                    IteratingSMILESReader.class))
+            {
+                frgParams.setWorkingIn3D(false);
+                make2D = true;
+                sdg = new StructureDiagramGenerator();
+            }
+        } catch (Exception e1)
+        {
+            String msg = "<html><body width='%1s'>Could not read molecules "
+                    + "from '" + file.getAbsolutePath() + "' and convert them "
+                            + "to graphs.</html>";
+            JOptionPane.showMessageDialog(parent, String.format(msg,400),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            return;
+        }
+        
+        // Read and convert molecules one by one
+        List<DGraph> graphs = new ArrayList<DGraph>();
+        int i=0;
+        while (iterMolsToFragment.hasNext())
+        {
+            i++;
+            IAtomContainer mol = iterMolsToFragment.next();
+            if (make2D)
+            {
+                try
+                {
+                    sdg.generateCoordinates(mol);
+                } catch (CDKException e)
+                {
+                    // Ignore
+                    e.printStackTrace();
+                }
+            }
+            DGraph graph = null;
+            try {
+                graph = EAUtils.makeGraphFromFragmentationOfMol(mol, 
+                        frgParams.getCuttingRules(), frgParams.getLogger(),
+                        frgParams.getScaffoldingPolicy());
+            } catch (DENOPTIMException de)
+            {
+                String msg = "<html><body width='%1s'>Unable to convert "
+                        + "molecule " + i + " (" + mol.getAtomCount() 
+                        + " atoms) to DENOPTIM graph. " + de.getMessage()
+                        + "</html>";
+                JOptionPane.showMessageDialog(parent, String.format(msg,400),
+                        "Error",
+                        JOptionPane.WARNING_MESSAGE,
+                        UIManager.getIcon("OptionPane.warningIcon"));
+                continue;
+            }
+            
+            if (frgParams.embedRingsInTemplate())
+            {
+                if (fragSpace==null)
+                {
+                    fragSpace = new FragmentSpace();
+                }
+                try {
+                    DGraph modGraph = graph.embedPatternsInTemplates(
+                            GraphPattern.RING, 
+                            fragSpace, frgParams.getEmbeddedRingsContract());
+                    graph = modGraph;
+                } catch (DENOPTIMException e) {
+                    String msg = "<html><body width='%1s'>Unable to embed "
+                            + "ring systems of molecule " + i 
+                            + " (" + mol.getAtomCount() 
+                            + " atoms) into Templates. Returning graph without "
+                            + "embedding of rings. " + e.getMessage()
+                            + "</html>";
+                    JOptionPane.showMessageDialog(parent, String.format(msg,400),
+                            "Error",
+                            JOptionPane.WARNING_MESSAGE,
+                            UIManager.getIcon("OptionPane.warningIcon"));
+                }
+            }
+            
+            graphs.add(graph);
+            mols.add(mol);
+        }
+        
+        // Signal no result obtained
+        if (graphs.size() < 1)
+        {
+            JOptionPane.showMessageDialog(parent,
+                    "<html>Conversion produced no graphs!</html>",
+                    "Error",
+                    JOptionPane.WARNING_MESSAGE,
+                    UIManager.getIcon("OptionPane.warningIcon"));
+            return;
+        }
+        
+        // 
+        int oldSize = dnGraphLibrary.size();
+        if (graphs.size() > 0)
+        {
+            dnGraphLibrary.addAll(graphs);
+            molLibrary.addAll(mols);
+            
+            // WE choose to display the first of the imported ones
+            currGrphIdx = oldSize;
+            
+            loadCurrentGraphIdxToViewer(false);
+            updateGraphListSpinner();
+        }
 	}
 
 //-----------------------------------------------------------------------------
