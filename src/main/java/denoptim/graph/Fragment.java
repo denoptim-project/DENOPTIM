@@ -517,7 +517,7 @@ public class Fragment extends Vertex
             IAtom srcAtm = mol.getAtom(atmId);
             if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-            	ArrayList<AttachmentPoint> apsOnAtm = getAPsFromAtom(srcAtm);
+            	List<AttachmentPoint> apsOnAtm = getAPsFromAtom(srcAtm);
 	            for (int i = 0; i < apsOnAtm.size(); i++)
 	            {
 	                AttachmentPoint ap = apsOnAtm.get(i);

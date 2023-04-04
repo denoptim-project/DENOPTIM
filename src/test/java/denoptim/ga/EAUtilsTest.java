@@ -19,6 +19,7 @@
 package denoptim.ga;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -53,6 +55,7 @@ import denoptim.graph.DGraphTest;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.GraphPattern;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -867,12 +870,13 @@ public class EAUtilsTest
 //------------------------------------------------------------------------------
     
     @Test
-    public void testScaffoldingPolicy() throws Exception
+    public void testMakeGraphFromFragmentationOfMol_ScaffoldingPolicy() 
+            throws Exception
     {
         SmilesParser p = new SmilesParser(builder);
         IAtomContainer mol = p.parseSmiles("c1ccccc1OCN(CC)(C)[Ru](N)(N)C#O");
 
-        // Use this to make the molecule 3D so it is easy to visualize it.
+        // Use this to make the molecule 2D for an easy visual inspection.
         /*
         StructureDiagramGenerator sdg = new StructureDiagramGenerator();
         sdg.generateCoordinates(mol);
@@ -922,6 +926,108 @@ public class EAUtilsTest
         iacScaffold = scaffold.getIAtomContainer();
         assertEquals(1, iacScaffold.getAtomCount());
         assertEquals("Ru", iacScaffold.getAtom(0).getSymbol());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testMakeGraphFromFragmentationOfMol_Symmetry() throws Exception
+    {
+        SmilesParser p = new SmilesParser(builder);
+        IAtomContainer mol = p.parseSmiles(
+                "Oc1cc(O)cc(O)c1CN(CC)(CC)[Ru](N)(Nc1c(F)cc(F)cc1(Cl))C#O");
+
+        // Use this to make the molecule 2D for an easy visual inspection.
+        /*
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        */
+        
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("C-F", "[#6]", "[#9]", "-", 1, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-O", "[#6]", "[#8]", "-", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("N-C", "[#7]", "[#6]", "-", 5, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("Ru-Any", "[Ru]", "[$([*])]", "~", 5, 
+                new ArrayList<String>()));
+        
+        DGraph graph1 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT);
+        
+        assertEquals(14, graph1.getVertexCount());
+        assertEquals(13, graph1.getEdgeCount());
+        assertEquals(0, graph1.getRingCount());
+        assertEquals(2, graph1.getSymmetricSetCount());
+        boolean foundO = false;
+        boolean foundF = false;
+        Iterator<SymmetricVertexes> iter = graph1.getSymSetsIterator();
+        while (iter.hasNext())
+        {
+            SymmetricVertexes ss = iter.next();
+            String el = ss.get(0).getIAtomContainer().getAtom(0).getSymbol();
+            if ("O".equals(el))
+                foundO = true;
+            else if ("F".equals(el))
+                foundF = true;
+        }
+        assertTrue(foundO);
+        assertTrue(foundF);
+        
+        ScaffoldingPolicy policy = ScaffoldingPolicy.ELEMENT;
+        policy.label = "Cl";
+        
+        DGraph graph2 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), policy);
+        
+        assertEquals(14, graph2.getVertexCount());
+        assertEquals(13, graph2.getEdgeCount());
+        assertEquals(0, graph2.getRingCount());
+        assertEquals(2, graph2.getSymmetricSetCount());
+        foundO = false;
+        foundF = false;
+        iter = graph2.getSymSetsIterator();
+        while (iter.hasNext())
+        {
+            SymmetricVertexes ss = iter.next();
+            String el = ss.get(0).getIAtomContainer().getAtom(0).getSymbol();
+            if ("O".equals(el))
+                foundO = true;
+            else if ("F".equals(el))
+                foundF = true;
+        }
+        assertTrue(foundO);
+        assertTrue(foundF);
+        
+
+        policy = ScaffoldingPolicy.ELEMENT;
+        policy.label = "F";
+        
+        DGraph graph3 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), policy);
+
+        assertEquals(14, graph3.getVertexCount());
+        assertEquals(13, graph3.getEdgeCount());
+        assertEquals(0, graph3.getRingCount());
+        assertEquals(1, graph3.getSymmetricSetCount());
+        foundO = false;
+        foundF = false;
+        iter = graph3.getSymSetsIterator();
+        while (iter.hasNext())
+        {
+            SymmetricVertexes ss = iter.next();
+            String el = ss.get(0).getIAtomContainer().getAtom(0).getSymbol();
+            if ("O".equals(el))
+                foundO = true;
+            else if ("F".equals(el))
+                foundF = true;
+        }
+        assertTrue(foundO);
+        assertFalse(foundF);
     }
     
 //------------------------------------------------------------------------------

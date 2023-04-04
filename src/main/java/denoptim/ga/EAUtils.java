@@ -58,6 +58,8 @@ import denoptim.graph.DGraph;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
+import denoptim.graph.SymmetricAPs;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -990,8 +992,14 @@ public class EAUtils
             ScaffoldingPolicy scaffoldingPolicy) 
                     throws DENOPTIMException
     {
+        // We expect only Fragments here.
         List<Vertex> fragments = FragmenterTools.fragmentation(mol, 
                 cuttingRules, logger);
+        for (Vertex v : fragments)
+        {
+            // This is done to set the symmetry relations in each vertex
+            ((Fragment) v).updateAPs();
+        }
         
         // Define which fragment is the scaffold
         Vertex scaffold = null;
@@ -1036,6 +1044,7 @@ public class EAUtils
         scaffold.setVertexId(0);
         scaffold.setBuildingBlockType(BBType.SCAFFOLD);
         
+        // Build the graph
         DGraph graph = new DGraph();
         graph.addVertex(scaffold);
         AtomicInteger vId = new AtomicInteger(1);
@@ -1044,6 +1053,58 @@ public class EAUtils
             appendVertexesToGraphFollowingEdges(graph, vId, fragments);
         }
         
+        // Set symmetry relations
+        for (Vertex v : graph.getVertexList())
+        {
+            for (SymmetricAPs symAPs : v.getSymmetricAPSets())
+            {
+                AttachmentPoint firstAp = symAPs.get(0);
+                // NB: we should check for all APs to be used, but in this 
+                // method all APs come from fragmentation, so they are all used.
+                AttachmentPoint apUserOfFirst = firstAp.getLinkedAPThroughout();
+                // WARNING: assumption all vertexes are fragments. They come
+                // from fragmentation, so it is safe to assume so.
+                Fragment userOfFirst = (Fragment) apUserOfFirst.getOwner();
+                
+                boolean setSymmetryRelation = symAPs.size()>1 ? true : false;
+                List<Vertex> symVertexes = new ArrayList<Vertex>();
+                symVertexes.add(userOfFirst);
+                for (AttachmentPoint ap : symAPs)
+                {
+                    if (firstAp==ap)
+                        continue;
+
+                    AttachmentPoint apUserOfAp = ap.getLinkedAPThroughout();
+                    if (!apUserOfFirst.sameAs(apUserOfAp))
+                    {
+                        setSymmetryRelation = false;
+                        break;
+                    }
+                    
+                    // WARNING: assumption all vertexes are fragments. They come
+                    // from fragmentation, so it is safe to assume so.
+                    Fragment userOfAp = (Fragment) apUserOfAp.getOwner();
+                    if (!userOfFirst.getBuildingBlockType().equals(
+                            userOfAp.getBuildingBlockType()))
+                    {
+                        setSymmetryRelation = false;
+                        break;
+                    }
+                    if (!userOfFirst.isIsomorphicTo(userOfAp))
+                    {
+                        setSymmetryRelation = false;
+                        break;
+                    }
+                    symVertexes.add(userOfAp);
+                }
+                
+                if (setSymmetryRelation)
+                {
+                    graph.addSymmetricSetOfVertices(
+                            new SymmetricVertexes(symVertexes));
+                }
+            }
+        }
         return graph;
     }
     
