@@ -1188,14 +1188,14 @@ public class EAUtils
                         if (ringClosure)
                         {
                             Vertex rcvI = FragmenterTools.getRCPForAP(apI,
-                                    APClass.make("ATplus", 0, 
+                                    APClass.make(APClass.ATPLUS, 0, 
                                             BondType.ANY));
                             rcvI.setBuildingBlockType(BBType.FRAGMENT);
                             rcvI.setVertexId(vId.getAndIncrement());
                             graph.appendVertexOnAP(apI, rcvI.getAP(0));
                             
                             Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
-                                    APClass.make("ATminus", 0, 
+                                    APClass.make(APClass.ATMINUS, 0, 
                                             BondType.ANY));
                             rcvJ.setBuildingBlockType(BBType.FRAGMENT);
                             rcvJ.setVertexId(vId.getAndIncrement());

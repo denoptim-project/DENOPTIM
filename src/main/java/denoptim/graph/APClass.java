@@ -58,11 +58,26 @@ public class APClass implements Cloneable,Comparable<APClass>
     public static Set<APClass> uniqueAPClasses = new HashSet<APClass>();
     
     /**
-     * Synchronisation lock. Used to guard alteration of the set of unique
+     * Synchronization lock. Used to guard alteration of the set of unique
      * APClasses.
      */
     private final static Object uniqueAPClassesLock = new Object();
 
+    /**
+     * String defining a conventional APClass
+     */
+    public static final String ATPLUS = "ATplus";
+    
+    /**
+     * String defining a conventional APClass
+     */
+    public static final String ATMINUS = "ATminus";
+    
+    /**
+     * String defining a conventional APClass
+     */
+    public static final String ATNEUTRAL = "ATneutral";
+    
     /**
      * Recognized attachment point classes of RingClosingAttractor
      */
@@ -74,21 +89,21 @@ public class APClass implements Cloneable,Comparable<APClass>
                 private static final long serialVersionUID = 1L;
 
             {
-    	        APClass a = getUnique("ATplus", 0, BondType.ANY);
+    	        APClass a = getUnique(ATPLUS, 0, BondType.ANY);
     	        add(a);
     	        synchronized (uniqueAPClassesLock)
                 {
     	            uniqueAPClasses.add(a);
                 }
     	        
-    	        APClass b = getUnique("ATminus", 0, BondType.ANY);
+    	        APClass b = getUnique(ATMINUS, 0, BondType.ANY);
                 add(b);
                 synchronized (uniqueAPClassesLock)
                 {
                     uniqueAPClasses.add(b);
                 }
                 
-                APClass c = getUnique("ATneutral", 0, BondType.ANY);
+                APClass c = getUnique(ATNEUTRAL, 0, BondType.ANY);
                 add(c);
                 synchronized (uniqueAPClassesLock)
                 {
@@ -108,9 +123,9 @@ public class APClass implements Cloneable,Comparable<APClass>
 
             {
                 try {
-                    put(APClass.make("ATplus", 0, BondType.ANY),"ATP");
-                    put(APClass.make("ATMinus", 0, BondType.ANY),"ATM");
-                    put(APClass.make("ATneutral", 0, BondType.ANY),"ATN");
+                    put(APClass.make(ATPLUS, 0, BondType.ANY), "ATP");
+                    put(APClass.make(ATMINUS, 0, BondType.ANY), "ATM");
+                    put(APClass.make(ATNEUTRAL, 0, BondType.ANY), "ATN");
                 } catch (Throwable t)
                 {
                     //Will not happen
