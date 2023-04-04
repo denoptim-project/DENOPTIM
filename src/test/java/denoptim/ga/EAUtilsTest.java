@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
@@ -76,6 +77,11 @@ public class EAUtilsTest
 
     private static final String SEP = System.getProperty("file.separator");
     private static final String NL = System.getProperty("line.separator");
+    
+    /**
+     * Private builder of atom containers
+     */
+    private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
 
     @TempDir 
     static File tempDir;
@@ -856,6 +862,66 @@ public class EAUtilsTest
         Template tmpl = (Template) templates.get(0);
         assertEquals(BBType.SCAFFOLD, tmpl.getBuildingBlockType());
         assertEquals(2, tmpl.getInnerGraph().getRingCount());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testScaffoldingPolicy() throws Exception
+    {
+        SmilesParser p = new SmilesParser(builder);
+        IAtomContainer mol = p.parseSmiles("c1ccccc1OCN(CC)(C)[Ru](N)(N)C#O");
+
+        // Use this to make the molecule 3D so it is easy to visualize it.
+        /*
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        */
+        
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("C-O", "[#6]", "[#8]", "-", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("N-C", "[#7]", "[#6]", "-", 5, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("Ru-Any", "[Ru]", "[$([*])]", "~", 5, 
+                new ArrayList<String>()));
+        
+        DGraph graph1 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT);
+        
+        assertEquals(10, graph1.getVertexCount());
+        assertEquals(9, graph1.getEdgeCount());
+        assertEquals(0, graph1.getRingCount());
+        List<Vertex> scaffolds = graph1.getVertexList()
+                .stream()
+                .filter(v -> BBType.SCAFFOLD == v.getBuildingBlockType())
+                .collect(Collectors.toList());
+        assertEquals(1, scaffolds.size());
+        Vertex scaffold = scaffolds.get(0);
+        IAtomContainer iacScaffold = scaffold.getIAtomContainer();
+        assertEquals(6, iacScaffold.getAtomCount());
+        
+        ScaffoldingPolicy policy = ScaffoldingPolicy.ELEMENT;
+        policy.label = "Ru";
+        
+        DGraph graph2 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), policy);
+        
+        assertEquals(10, graph2.getVertexCount());
+        assertEquals(9, graph2.getEdgeCount());
+        assertEquals(0, graph2.getRingCount());
+        scaffolds = graph2.getVertexList()
+                .stream()
+                .filter(v -> BBType.SCAFFOLD == v.getBuildingBlockType())
+                .collect(Collectors.toList());
+        assertEquals(1, scaffolds.size());
+        scaffold = scaffolds.get(0);
+        iacScaffold = scaffold.getIAtomContainer();
+        assertEquals(1, iacScaffold.getAtomCount());
+        assertEquals("Ru", iacScaffold.getAtom(0).getSymbol());
     }
     
 //------------------------------------------------------------------------------

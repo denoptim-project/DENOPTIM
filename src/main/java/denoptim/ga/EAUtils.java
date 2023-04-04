@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -993,6 +994,7 @@ public class EAUtils
                 cuttingRules, logger);
         
         // Define which fragment is the scaffold
+        Vertex scaffold = null;
         switch (scaffoldingPolicy)
         {
             case ELEMENT:
@@ -1014,7 +1016,7 @@ public class EAUtils
                         }
                         if (setAsScaffold)
                         {
-                            v.setBuildingBlockType(BBType.SCAFFOLD);
+                            scaffold = v;
                             break;
                         }
                     }
@@ -1025,91 +1027,91 @@ public class EAUtils
             default:
             case LARGEST_FRAGMENT:
             {
-                fragments.stream()
+                scaffold = fragments.stream()
                         .max(Comparator.comparing(Vertex::getHeavyAtomsCount))
-                        .get()
-                        .setBuildingBlockType(BBType.SCAFFOLD);
+                        .get();
                 break;
             }
         }
-        
-        Collections.sort(fragments, new Comparator<Vertex>() {
-            @Override
-            public int compare(Vertex o1, Vertex o2)
-            {
-                if (o1.getBuildingBlockType() == BBType.SCAFFOLD)
-                    return -1;
-                else if (o2.getBuildingBlockType() == BBType.SCAFFOLD)
-                    return 1;
-                else
-                    return 0;
-            }
-        });
+        scaffold.setVertexId(0);
+        scaffold.setBuildingBlockType(BBType.SCAFFOLD);
         
         DGraph graph = new DGraph();
-        int vId = -1;
-        for (int i=0; i<fragments.size(); i++)
+        graph.addVertex(scaffold);
+        AtomicInteger vId = new AtomicInteger(1);
+        for (int i=1; i<fragments.size(); i++)
         {
-            Vertex fragI = fragments.get(i);
-            if (!graph.containsVertex(fragI))
+            appendVertexesToGraphFollowingEdges(graph, vId, fragments);
+        }
+        
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static void appendVertexesToGraphFollowingEdges(DGraph graph,
+            AtomicInteger vId, List<Vertex> vertexes) throws DENOPTIMException
+    {
+        // We seek for  the last and non-RCV vertex added to the graph
+        Vertex lastlyAdded = null;
+        for (int i=-1; i>-4; i--)
+        {
+            lastlyAdded = graph.getVertexList().get(
+                    graph.getVertexList().size()+i);
+            if (!lastlyAdded.isRCV())
+                break;
+        }
+        for (AttachmentPoint apI : lastlyAdded.getAttachmentPoints())
+        {
+            if (!apI.isAvailable())
+                continue;
+            
+            for (int j=0; j<vertexes.size(); j++)
             {
-                vId++;
-                if (fragI.getBuildingBlockType()!=BBType.SCAFFOLD)
-                {
-                    fragI.setBuildingBlockType(BBType.FRAGMENT);
+                Vertex fragJ = vertexes.get(j);
+                
+                boolean ringClosure = false;
+                if (graph.containsVertex(fragJ))
+                {   
+                    ringClosure = true;
                 }
-                fragI.setVertexId(vId);
-                graph.addVertex(fragI);
-            }
-            for (AttachmentPoint apI : fragI.getAttachmentPoints())
-            {
-                for (int j=i; j<fragments.size(); j++)
+                for (AttachmentPoint apJ : fragJ.getAttachmentPoints())
                 {
-                    Vertex fragJ = fragments.get(j);
+                    if (apI==apJ)
+                        continue;
                     
-                    boolean ringClosure = false;
-                    if (graph.containsVertex(fragJ))
-                    {   
-                        ringClosure = true;
-                    }
-                    for (AttachmentPoint apJ : fragJ.getAttachmentPoints())
+                    if (apI.getCutId()==apJ.getCutId())
                     {
-                        if (apI==apJ)
-                            continue;
-                        
-                        if (apI.getCutId()==apJ.getCutId())
+                        if (ringClosure)
                         {
-                            if (ringClosure)
-                            {
-                                Vertex rcvI = FragmenterTools.getRCPForAP(apI,
-                                        APClass.make("ATplus", 0, 
-                                                BondType.ANY));
-                                vId++;
-                                rcvI.setBuildingBlockType(BBType.FRAGMENT);
-                                rcvI.setVertexId(vId);
-                                graph.appendVertexOnAP(apI, rcvI.getAP(0));
-                                
-                                Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
-                                        APClass.make("ATminus", 0, 
-                                                BondType.ANY));
-                                vId++;
-                                rcvJ.setBuildingBlockType(BBType.FRAGMENT);
-                                rcvJ.setVertexId(vId);
-                                graph.appendVertexOnAP(apJ, rcvJ.getAP(0));
-                                graph.addRing(rcvI, rcvJ);
-                            } else {
-                                vId++;
-                                fragJ.setBuildingBlockType(BBType.FRAGMENT);
-                                fragJ.setVertexId(vId);
-                                graph.appendVertexOnAP(apI, apJ);
-                            }
+                            Vertex rcvI = FragmenterTools.getRCPForAP(apI,
+                                    APClass.make("ATplus", 0, 
+                                            BondType.ANY));
+                            rcvI.setBuildingBlockType(BBType.FRAGMENT);
+                            rcvI.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apI, rcvI.getAP(0));
+                            
+                            Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
+                                    APClass.make("ATminus", 0, 
+                                            BondType.ANY));
+                            rcvJ.setBuildingBlockType(BBType.FRAGMENT);
+                            rcvJ.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apJ, rcvJ.getAP(0));
+                            graph.addRing(rcvI, rcvJ);
+                        } else {
+                            fragJ.setBuildingBlockType(BBType.FRAGMENT);
+                            fragJ.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apI, apJ);
+                            
+                            // Recursion into the branch of the graph that is
+                            // rooted onto the lastly added vertex
+                            appendVertexesToGraphFollowingEdges(graph, vId, 
+                                    vertexes);
                         }
                     }
                 }
             }
         }
-        
-        return graph;
     }
 
 //------------------------------------------------------------------------------  
