@@ -155,19 +155,6 @@ public class GUIVertexInspector extends GUICardPanel
 	
 	private JPanel pnlSaveEdits;
 	private JButton btnSaveEdits;
-	
-	/**
-	 * File storing the latest version of modified cutting rules used to do 
-	 * fragmentation, or null if no fragmentation has been done using cutting 
-	 * rules, or we has so far only used default cutting rules.
-	 */
-	private File lastUsedCutRulFile = null;
-	
-    /**
-     * Flag indicating whether to preselect the default or the custom list of 
-     * cutting rules next time we are asked to display the dialog.
-     */
-    private boolean useDefaultNextTime = true;
 
 	
 //-----------------------------------------------------------------------------
@@ -531,15 +518,22 @@ public class GUIVertexInspector extends GUICardPanel
                 }
                 
                 FragmenterParameters settings = new FragmenterParameters();
-                Object[] result = dialogToDefineCuttingRules(
-                        settings, this.getClass().getClassLoader(), 
-                        btnChop, lastUsedCutRulFile, useDefaultNextTime, 
+                boolean result = dialogToDefineCuttingRules(
+                        settings, 
+                        this.getClass().getClassLoader(), 
+                        btnChop, 
                         false);
-                if (result==null)
+                if (!result)
                     return;
-                useDefaultNextTime = Boolean.parseBoolean(result[0].toString());
-                if (result[1]!=null)
-                    lastUsedCutRulFile = (File) result[1];
+                
+                String pathnameLastUsedCutRules = 
+                        settings.getCuttingRulesFilePathname();
+                if (pathnameLastUsedCutRules != null 
+                        && !pathnameLastUsedCutRules.isBlank())
+                {
+                    GUIPreferences.lastCutRulesFile = 
+                            new File(pathnameLastUsedCutRules);
+                }
                 
                 // Now chop the structure to produce fragments
                 List<Vertex> fragments;
@@ -832,22 +826,14 @@ public class GUIVertexInspector extends GUICardPanel
 	 * @param settings where settings will be stored
 	 * @param classLoader used to find resources
 	 * @param parent used to place dialog windows in the relevant position.
-	 * @param lastUsedCutRulFile the file with last used cutting rules.
-	 * @param useDefaultNextTime flag defining if we should use default cutting
-	 * rules.
 	 * @param setMolToGraphSettings if <code>true</code> enabled the setting of
 	 * parameters that make sense only when we convert molecules to 
 	 * {@link DGraph}s.
-	 * @return an array with two entries: the first is the updated 
-	 * boolean flag defining 
-	 * whether we should use default cutting rules next time we try to do
-	 * on-the-fly fragmentation, and the second is the
-	 * updated {@link File} with the last used cutting rules.
+	 * @return <code>true</code> if it all went well.
 	 */
-	public static Object[] dialogToDefineCuttingRules(
+	public static boolean dialogToDefineCuttingRules(
 	        FragmenterParameters settings, ClassLoader classLoader,
 	        Component parent,
-	        File lastUsedCutRulFile, boolean useDefaultNextTime,
 	        boolean setMolToGraphSettings)
 	{
         settings.startConsoleLogger("GUI-controlledFragmenterLogger");
@@ -878,29 +864,33 @@ public class GUIVertexInspector extends GUICardPanel
                     "Error",
                     JOptionPane.ERROR_MESSAGE,
                     UIManager.getIcon("OptionPane.errorIcon"));
-            return null;
+            return false;
         }
      
         // Read last used cutting rules
-        List<CuttingRule> customCuttingRules = 
-                new ArrayList<CuttingRule>();
+        List<CuttingRule> customCuttingRules = new ArrayList<CuttingRule>();
+        boolean useDefaultCuttingRules = true;
         try
         {
-            if (lastUsedCutRulFile!=null)
-                DenoptimIO.readCuttingRules(lastUsedCutRulFile, 
+            if (GUIPreferences.lastCutRulesFile!=null)
+            {
+                DenoptimIO.readCuttingRules(
+                        GUIPreferences.lastCutRulesFile, 
                         customCuttingRules);
+                useDefaultCuttingRules = false;
+            }
         } catch (DENOPTIMException e)
         {
             JOptionPane.showMessageDialog(parent,String.format(
                     "<html><body width='%1s'"
                     + "Could not read last-used cutting rules from '"
-                    + lastUsedCutRulFile + "'. "
+                    + GUIPreferences.lastCutRulesFile + "'. "
                     + "Hint: "
                     + e.getMessage() + "</html>", 400),
                     "Error",
                     JOptionPane.ERROR_MESSAGE,
                     UIManager.getIcon("OptionPane.errorIcon"));
-            return null;
+            return false;
         }
         
         // Build a dialog that offers the possibility to see and edit 
@@ -910,36 +900,26 @@ public class GUIVertexInspector extends GUICardPanel
         {
             crs = new MolToGraphParametersDialog(
                 defaultCuttingRules, customCuttingRules, 
-                useDefaultNextTime, parent);
+                useDefaultCuttingRules, parent, settings);
         } else {
             crs = new CuttingRulesSelectionDialog(
                 defaultCuttingRules, customCuttingRules, 
-                useDefaultNextTime, parent);
+                useDefaultCuttingRules, parent, settings);
         }
         crs.pack();
         crs.setVisible(true);
-        @SuppressWarnings("unchecked")
-        List<CuttingRule> cuttingRules = (List<CuttingRule>) crs.result;
-        if (cuttingRules==null)
-            return null;
         
-        settings.setCuttingRules(cuttingRules);
-        if (setMolToGraphSettings)
+        if (crs.result==null)
+            return false;
+        
+        String pathnameLastUsedCutRules = settings.getCuttingRulesFilePathname();
+        if (pathnameLastUsedCutRules != null 
+                && !pathnameLastUsedCutRules.isBlank())
         {
-            MolToGraphParametersDialog mtg = (MolToGraphParametersDialog) crs;
-            settings.setEmbedRingsInTemplate(mtg.getEmbedRingsInTemplate());
-            settings.setScaffoldingPolicy(mtg.getScaffoldingPolicy());
-            settings.setEmbeddedRingsContract(mtg.getEmbeddedRingsContract());
+            GUIPreferences.lastCutRulesFile = new File(pathnameLastUsedCutRules);
         }
         
-        Object[] results = new Object[2];
-        
-        if (crs.lastUsedCutRulFile != null)
-            results[1] = crs.lastUsedCutRulFile;
-        
-        results[0] = crs.useDefaultNextTime;
-        
-	    return results;
+	    return true;
 	}
 
 //-----------------------------------------------------------------------------

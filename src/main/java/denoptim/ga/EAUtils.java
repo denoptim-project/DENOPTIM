@@ -74,6 +74,7 @@ import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
@@ -955,7 +956,8 @@ public class EAUtils
         try {
             graph = makeGraphFromFragmentationOfMol(mol, 
                     frgParams.getCuttingRules(), settings.getLogger(),
-                    frgParams.getScaffoldingPolicy());
+                    frgParams.getScaffoldingPolicy(),
+                    frgParams.getLinearAngleLimit());
         } catch (DENOPTIMException de)
         {
             String msg = "Unable to convert molecule (" + mol.getAtomCount() 
@@ -1002,6 +1004,29 @@ public class EAUtils
         
         return candidate;
     }
+
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy) 
+                    throws DENOPTIMException
+    {
+        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
+                scaffoldingPolicy, 190); 
+        // NB: and angle of 190 means we are not adding Du on linearities
+    }
     
 //------------------------------------------------------------------------------  
     
@@ -1011,12 +1036,16 @@ public class EAUtils
      * @param mol the molecule to convert
      * @param cuttingRules the cutting rules defining how to do fragmentation.
      * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @param linearAngleLimit the max bond angle before we start considering 
+     * the angle linear and add a linearity-breaking dummy atom.
      * @return the graph.
      * @throws DENOPTIMException 
      */
     public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
             List<CuttingRule> cuttingRules, Logger logger, 
-            ScaffoldingPolicy scaffoldingPolicy) 
+            ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit) 
                     throws DENOPTIMException
     {
         // We expect only Fragments here.
@@ -1024,18 +1053,13 @@ public class EAUtils
                 cuttingRules, logger);
         for (Vertex v : fragments)
         {
-            // This is done to set the symmetry relations in each vertex
-            ((Fragment) v).updateAPs();
+            Fragment frag = (Fragment) v;
             
-            //TODO-gg
+            // This is done to set the symmetry relations in each vertex
+            frag.updateAPs();
+            
             // Add linearity-breaking dummy atoms
-            /*
-            for (Vertex frag : fragments)
-            {
-                DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
-                        settings.getLinearAngleLimit());
-            }
-            */
+            DummyAtomHandler.addDummiesOnLinearities(frag, linearAngleLimit);
         }
         if (fragments.size()==0)
         {

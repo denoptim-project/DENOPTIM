@@ -33,11 +33,14 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
@@ -60,6 +63,7 @@ import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
 /**
@@ -1025,6 +1029,95 @@ public class EAUtilsTest
         }
         assertTrue(foundO);
         assertFalse(foundF);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testMakeGraphFromFragmentationOfMol_linearities() 
+            throws Exception
+    {
+        SmilesParser p = new SmilesParser(builder);
+        IAtomContainer mol = p.parseSmiles("C#C-C#C-C#N");
+
+        // 2D is enough to get linearities. No need to wast time getting 3D
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("C-C", "[#6]", "[#6]", "-", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-X", "[#6]", "[#9,#17,#35,#53]", "~",
+                3, new ArrayList<String>()));
+        
+        // Must add du on linearities
+        DGraph graph = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT, 170);
+        
+        assertEquals(3, graph.getVertexCount());
+        assertEquals(2, graph.getEdgeCount());
+        assertEquals(0, graph.getRingCount());
+        int duAtmCount = 0;
+        for (Vertex v : graph.getVertexList())
+        {
+            for (IAtom a : v.getIAtomContainer().atoms())
+            {
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(
+                        MoleculeUtils.getSymbolOrLabel(a)))
+                    duAtmCount++;
+            }
+             
+        }
+        assertEquals(4, duAtmCount);
+        
+        // Without linearities
+        IAtomContainer molNonLinear = p.parseSmiles("C(Cl)(F)Br");
+        sdg.generateCoordinates(molNonLinear);
+        
+        DGraph graph1 = EAUtils.makeGraphFromFragmentationOfMol(molNonLinear,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT, 160);
+        
+        assertEquals(4, graph1.getVertexCount());
+        assertEquals(3, graph1.getEdgeCount());
+        assertEquals(0, graph1.getRingCount());
+        duAtmCount = 0;
+        for (Vertex v : graph1.getVertexList())
+        {
+            for (IAtom a : v.getIAtomContainer().atoms())
+            {
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(
+                        MoleculeUtils.getSymbolOrLabel(a)))
+                    duAtmCount++;
+            }
+             
+        }
+        assertEquals(0, duAtmCount);
+        
+        // there are linearities but we do not want Du on linearities
+        DGraph graph2 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT); 
+        // By default we do not add Du on linearities
+        
+        assertEquals(3, graph2.getVertexCount());
+        assertEquals(2, graph2.getEdgeCount());
+        assertEquals(0, graph2.getRingCount());
+        duAtmCount = 0;
+        for (Vertex v : graph2.getVertexList())
+        {
+            for (IAtom a : v.getIAtomContainer().atoms())
+            {
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(
+                        MoleculeUtils.getSymbolOrLabel(a)))
+                    duAtmCount++;
+            }
+             
+        }
+        assertEquals(0, duAtmCount);
     }
     
 //------------------------------------------------------------------------------

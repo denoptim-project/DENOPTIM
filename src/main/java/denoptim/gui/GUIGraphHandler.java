@@ -209,19 +209,6 @@ public class GUIGraphHandler extends GUICardPanel
 	private boolean painted;
 	
 	/**
-     * File storing the latest version of modified cutting rules used to do 
-     * fragmentation, or null if no fragmentation has been done using cutting 
-     * rules, or we has so far only used default cutting rules.
-     */
-    private File lastUsedCutRulFile = null;
-    
-    /**
-     * Flag indicating whether to preselect the default or the custom list of 
-     * cutting rules next time we are asked to display the dialog.
-     */
-    private boolean useDefaulCutRulestNextTime = true;
-	
-	/**
 	 * The fragment space this handler works with
 	 */
 	private FragmentSpace fragSpace = null;
@@ -357,19 +344,23 @@ public class GUIGraphHandler extends GUICardPanel
                         // All settings of the process are defined in the dialog 
                         // and collected in the FragmenterParameters
                         FragmenterParameters settings = new FragmenterParameters();
-                        Object[] result = 
+                        boolean result = 
                                 GUIVertexInspector.dialogToDefineCuttingRules(
-                                settings, this.getClass().getClassLoader(), 
-                                btnAddGraph, 
-                                lastUsedCutRulFile, useDefaulCutRulestNextTime,
-                                true);
-                        if (result==null)
+                                    settings, 
+                                    this.getClass().getClassLoader(), 
+                                    btnAddGraph, 
+                                    true);
+                        if (!result)
                             return;
-                        
-                        useDefaulCutRulestNextTime = Boolean.parseBoolean(
-                                result[0].toString());
-                        if (result[1]!=null)
-                            lastUsedCutRulFile = (File) result[1];
+
+                        String pathnameLastUsedCutRules = 
+                                settings.getCuttingRulesFilePathname();
+                        if (pathnameLastUsedCutRules != null 
+                                && !pathnameLastUsedCutRules.isBlank())
+                        {
+                            GUIPreferences.lastCutRulesFile = 
+                                    new File(pathnameLastUsedCutRules);
+                        }
                         
                         appendGraphsFromConvertingMolecule(inFile, settings, 
                                 btnAddGraph);
@@ -1616,7 +1607,8 @@ public class GUIGraphHandler extends GUICardPanel
             try {
                 graph = EAUtils.makeGraphFromFragmentationOfMol(mol, 
                         frgParams.getCuttingRules(), frgParams.getLogger(),
-                        frgParams.getScaffoldingPolicy());
+                        frgParams.getScaffoldingPolicy(),
+                        frgParams.getLinearAngleLimit());
             } catch (DENOPTIMException de)
             {
                 String msg = "<html><body width='%1s'>Unable to convert "

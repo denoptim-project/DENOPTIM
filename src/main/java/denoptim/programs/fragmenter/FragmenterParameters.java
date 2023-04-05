@@ -477,6 +477,26 @@ public class FragmenterParameters extends RunTimeParameters
     {
         this.cuttingRules = cuttingRules;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Assigns the pathname to the cutting rules file.
+     */
+    public void setCuttingRulesFilePathname(String pathname)
+    {
+        this.cutRulesFile = pathname;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the pathname to the cutting rules file.
+     */
+    public String getCuttingRulesFilePathname()
+    {
+        return cutRulesFile;
+    }
 
 //------------------------------------------------------------------------------
 

@@ -2011,7 +2011,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            ArrayList<DGraph> graphs, Logger logger, Randomizer randomizer) 
+            List<DGraph> graphs, Logger logger, Randomizer randomizer) 
                     throws DENOPTIMException
     {
         writeGraphsToSDF(file, graphs, false, logger, randomizer);
@@ -2032,7 +2032,7 @@ public class DenoptimIO
             boolean append, boolean make3D, Logger logger, Randomizer randomizer)
                     throws DENOPTIMException
     {
-        ArrayList<DGraph> lst = new ArrayList<>(1);
+        List<DGraph> lst = new ArrayList<>(1);
         lst.add(graph);
         writeGraphsToSDF(file, lst, append, make3D, logger, randomizer);
     }
@@ -2067,7 +2067,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            ArrayList<DGraph> graphs, boolean append,
+            List<DGraph> graphs, boolean append,
             Logger logger, Randomizer randomizer) throws DENOPTIMException
     {
         writeGraphsToSDF(file, graphs, append, false, logger, randomizer);

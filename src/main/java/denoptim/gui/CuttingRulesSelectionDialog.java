@@ -36,6 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,14 +46,17 @@ import java.util.Vector;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
@@ -64,6 +69,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileAndFormat;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.fragmenter.ScaffoldingPolicy;
+import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
@@ -106,13 +113,34 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
     /**
      * The file where we will save next edited list of cutting rules
      */
-    protected File nextWrittenCutRulFile = null;
+    private File nextWrittenCutRulFile = null;
     
     /**
-     * Flag indicating whether to preselect the default or the custom list of 
-     * cutting rules next time we are asked to display the dialog.
+     * Default text field height
      */
-    protected boolean useDefaultNextTime = true;
+    protected final int preferredHeight = 
+            (int) (new JTextField()).getPreferredSize().getHeight();
+
+    /**
+     * Default sizes for mid-long text
+     */
+    protected final Dimension strFieldSize = new Dimension(200, preferredHeight);
+    
+    /**
+     * User-controlled definition of the linearity limit.
+     */
+    protected JTextField txtLinearity;
+    
+    /**
+     * Chosen set of rules
+     */
+    protected List<CuttingRule> chosenOnes;
+    
+    /**
+     * Parameter storage were we store parameters
+     */
+    protected FragmenterParameters frgParams;
+
     
 //-----------------------------------------------------------------------------
     
@@ -122,9 +150,10 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
      */
     public CuttingRulesSelectionDialog(List<CuttingRule> defaultCuttingRules,
             List<CuttingRule> customCuttingRules, boolean preselectDefault,
-            Component refForPlacement) 
+            Component refForPlacement, FragmenterParameters settings) 
     {
         super(refForPlacement);
+        this.frgParams = settings;
         setTitle("Choose Cutting Rules");
         
         rdbUseDefault = new JRadioButton("Use default cutting rules.");
@@ -448,6 +477,29 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         
         addToCentralPane(centralPanel);
         
+        appendToCentralPanel(new JSeparator());
+        
+        String toolTipLinearity = String.format("<html><body width='%1s'>"
+                + "Defines the max bond angle before considering the bond "
+                + "angle close to linear and, thus, adding a "
+                + "linearity-breaking dummy atom. Setting a value larger than "
+                + "180 prevents addition of any linearity-breaking dummy atom."
+                + "</html>", 400);
+        JPanel lineLinearity = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel lblLinearity = new JLabel(
+                "Non-linearity limit for bond angles (DEG): ");
+        lblLinearity.setToolTipText(toolTipLinearity);
+        NumberFormat formatter = new DecimalFormat("#0.00"); 
+        txtLinearity = new JTextField(
+                formatter.format(frgParams.getLinearAngleLimit()));
+        txtLinearity.setPreferredSize(strFieldSize);
+        txtLinearity.setToolTipText(toolTipLinearity);
+        lineLinearity.setToolTipText(toolTipLinearity);
+        lineLinearity.add(lblLinearity);
+        lineLinearity.add(txtLinearity);
+        appendToCentralPanel(lineLinearity);
+        
+        
         btnDone.setText("Start Fragmentation");
         btnDone.setToolTipText(String.format("<html><body width='%1s'>"
                 + "Uses the selected rules to produce fragments.</html>",400));
@@ -466,7 +518,7 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                 
                 boolean setOfCuttingRulesHasBeenModified = false;
                     
-                List<CuttingRule> chosenOnes = new ArrayList<CuttingRule>();
+                chosenOnes = new ArrayList<CuttingRule>();
                 for (int iRow=0; iRow<chosenTab.getRowCount(); iRow++)
                 {
                     String[] values = new String[5];
@@ -531,7 +583,6 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                 }
                 
                 //Store a copy of the modified/customized rules
-                useDefaultNextTime = false;
                 if (setOfCuttingRulesHasBeenModified)
                 {
                     try
@@ -545,12 +596,10 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
                     {
                         e1.printStackTrace();
                     }
-                } else {
-                    if (rdbUseDefault.isSelected())
-                        useDefaultNextTime = true;
                 }
                 
-                result = chosenOnes;
+                saveResults();
+                
                 close();
             }
         });
@@ -559,6 +608,21 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         this.btnCanc.setToolTipText("Exit without running fragmentation.");
     }
     
+//-----------------------------------------------------------------------------
+
+    protected void saveResults()
+    {
+        result = chosenOnes;
+        if (lastUsedCutRulFile!=null)
+        {
+            frgParams.setCuttingRulesFilePathname(
+                lastUsedCutRulFile.getAbsolutePath());
+        }
+        frgParams.setCuttingRules(chosenOnes);
+        frgParams.setLinearAngleLimit(
+                Double.parseDouble(txtLinearity.getText()));
+    }
+
 //-----------------------------------------------------------------------------
 
     /**

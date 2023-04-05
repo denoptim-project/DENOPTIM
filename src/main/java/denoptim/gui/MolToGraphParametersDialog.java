@@ -18,6 +18,7 @@ import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.programs.fragmenter.FragmenterParameters;
 
 public class MolToGraphParametersDialog extends CuttingRulesSelectionDialog
 {
@@ -39,25 +40,14 @@ public class MolToGraphParametersDialog extends CuttingRulesSelectionDialog
     private JLabel lblTemplateContract;
     private JComboBox<String> cmbTemplateContract;
     
-    /**
-     * Default text field height
-     */
-    private final int preferredHeight = 
-            (int) (new JTextField()).getPreferredSize().getHeight();
-
-    /**
-     * Default sizes for mid-long text
-     */
-    private final Dimension strFieldSize = new Dimension(200, preferredHeight);
-    
 //------------------------------------------------------------------------------
 
     public MolToGraphParametersDialog(List<CuttingRule> defaultCuttingRules,
             List<CuttingRule> customCuttingRules, boolean preselectDefault,
-            Component refForPlacement)
+            Component refForPlacement, FragmenterParameters settings)
     {
         super(defaultCuttingRules, customCuttingRules, preselectDefault,
-                refForPlacement);
+                refForPlacement, settings);
 
         setTitle("Settings for Converting Molecules to Graphs");
         
@@ -149,6 +139,17 @@ public class MolToGraphParametersDialog extends CuttingRulesSelectionDialog
         lineTemplateContract.add(lblTemplateContract);
         lineTemplateContract.add(cmbTemplateContract);
         appendToCentralPanel(lineTemplateContract);
+    }
+    
+//-----------------------------------------------------------------------------
+
+    @Override
+    protected void saveResults()
+    {
+        super.saveResults();
+        frgParams.setEmbedRingsInTemplate(getEmbedRingsInTemplate());
+        frgParams.setScaffoldingPolicy(getScaffoldingPolicy());
+        frgParams.setEmbeddedRingsContract(getEmbeddedRingsContract());
     }
     
 //------------------------------------------------------------------------------
