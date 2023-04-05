@@ -128,8 +128,7 @@ public class APMapFinder
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
         this.fragSpace = fragSpace;
-        List<AttachmentPoint> needyAPsA = 
-                new ArrayList<AttachmentPoint>();
+        List<AttachmentPoint> needyAPsA = new ArrayList<AttachmentPoint>();
         if (vA.getGraphOwner()!=null)
         {
             List<Vertex> subgraph = new ArrayList<Vertex>();

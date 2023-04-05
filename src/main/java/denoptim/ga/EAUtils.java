@@ -906,7 +906,7 @@ public class EAUtils
         candidate.setName("M" + GeneralUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
-        
+            
         return candidate;
     }
     
