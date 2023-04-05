@@ -14,8 +14,6 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
-import org.junit.jupiter.api.Test;
-import org.openscience.cdk.Atom;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
@@ -24,7 +22,6 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.isomorphism.Mappings;

@@ -21,7 +21,6 @@ package denoptim.graph;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Class representing a list of references pointing to instances that are 
@@ -38,6 +37,11 @@ import java.util.List;
 public class SymmetricSet<T> extends ArrayList<T>
 {
 
+    /**
+     * Version ID
+     */
+    private static final long serialVersionUID = 4L;
+    
 //------------------------------------------------------------------------------
 
     /**

@@ -24,17 +24,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
-
-import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
-import denoptim.graph.DGraph;
-import denoptim.graph.Template.ContractLevel;
-import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;

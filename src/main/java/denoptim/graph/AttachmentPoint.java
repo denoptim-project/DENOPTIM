@@ -33,7 +33,6 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
 import denoptim.utils.GeneralUtils;
-import denoptim.utils.GraphUtils;
 
 /**
  * An attachment point (AP) is a possibility to attach a {@link Vertex} 

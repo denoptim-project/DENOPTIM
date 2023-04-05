@@ -44,7 +44,6 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.SymmetricAPs;
-import denoptim.graph.SymmetricSet;
 import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;

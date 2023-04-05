@@ -17,6 +17,11 @@ import com.google.gson.JsonSerializer;
  */
 public class SymmetricAPs extends SymmetricSet<AttachmentPoint>
 {
+
+    /**
+     * Version ID
+     */
+    private static final long serialVersionUID = 4L;
     
 //------------------------------------------------------------------------------
     

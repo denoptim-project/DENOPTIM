@@ -25,7 +25,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,22 +38,21 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.forester.application.annotator;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.files.FileFormat;
 import denoptim.fitness.FitnessParameters;
-import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragmenter.FragmenterTools;
+import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
@@ -64,7 +62,6 @@ import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
-import denoptim.graph.Edge.BondType;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.RingClosureParameters;
@@ -1295,15 +1292,7 @@ public class EAUtils
 
     private static String getSummaryStatistics(Population popln, 
             GAParameters settings)
-    {
-        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
-        if (settings.containsParameters(ParametersType.FS_PARAMS))
-        {
-            fsParams = (FragmentSpaceParameters)settings.getParameters(
-                    ParametersType.FS_PARAMS);
-        }
-        FragmentSpace fragSpace = fsParams.getFragmentSpace();
-        
+    {   
         double[] fitness = getFitnesses(popln);
         double sdev = StatUtils.stddev(fitness, true);
         String res = "";
