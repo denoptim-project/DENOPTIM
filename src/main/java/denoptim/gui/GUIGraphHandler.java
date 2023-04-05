@@ -264,8 +264,8 @@ public class GUIGraphHandler extends GUICardPanel
 
         // Controls to navigate the list of dnGraphs
         graphNavigPane = new JPanel();
-        JLabel navigationLabel1 = new JLabel("Graph # ");
-        JLabel navigationLabel2 = new JLabel("Current graphs library size: ");
+        JLabel navigationLabel1 = new JLabel("Graph ");
+        JLabel navigationLabel2 = new JLabel("Number of loaded graphs: ");
         totalGraphsLabel = new JLabel("0");
         
 		graphNavigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
@@ -755,13 +755,13 @@ public class GUIGraphHandler extends GUICardPanel
 		pnlShowLabels = new JPanel();
 		JLabel lblShowHideLabels = new JLabel("Show/Hide labels:");
 		
-		btnLabAPC = new JButton("APC");
+		btnLabAPC = new JButton("APClass");
 		btnLabAPC.addActionListener(new showHideLabelsListener(btnLabAPC,
 		        LabelType.APC));
 		btnLabAPC.setEnabled(false);
         btnLabAPC.setToolTipText("Show/Hide attachment point class labels.");
         
-        btnLabBT = new JButton("Bnd");
+        btnLabBT = new JButton("BndTyp");
         btnLabBT.addActionListener(new showHideLabelsListener(btnLabBT,
                 LabelType.BT));
         btnLabBT.setEnabled(false);
@@ -780,17 +780,14 @@ public class GUIGraphHandler extends GUICardPanel
         lyoShowAttr.setHorizontalGroup(lyoShowAttr.createParallelGroup(
                         GroupLayout.Alignment.CENTER)
                         .addComponent(lblShowHideLabels)
-                        .addGroup(lyoShowAttr.createSequentialGroup()
-                            .addComponent(btnLabAPC)
-                            .addComponent(btnLabBT)
-                            .addComponent(btnLabBB)));
+                        .addComponent(btnLabAPC)
+                        .addComponent(btnLabBT)
+                        .addComponent(btnLabBB));
         lyoShowAttr.setVerticalGroup(lyoShowAttr.createSequentialGroup()
 		                .addComponent(lblShowHideLabels)
-                        .addGroup(lyoShowAttr.createParallelGroup(
-                            GroupLayout.Alignment.CENTER)
-                            .addComponent(btnLabAPC)
-                            .addComponent(btnLabBT)
-                            .addComponent(btnLabBB)));
+                        .addComponent(btnLabAPC)
+                        .addComponent(btnLabBT)
+                        .addComponent(btnLabBB));
         graphCtrlPane.add(pnlShowLabels);
         
         graphCtrlPane.add(new JSeparator());
