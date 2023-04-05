@@ -288,7 +288,7 @@ public class GUIGraphHandler extends GUICardPanel
         // Controls to navigate the list of dnGraphs
         graphNavigPane = new JPanel();
         JLabel navigationLabel1 = new JLabel("Graph # ");
-        JLabel navigationLabel2 = new JLabel("Current library size: ");
+        JLabel navigationLabel2 = new JLabel("Current graphs library size: ");
         totalGraphsLabel = new JLabel("0");
         
 		graphNavigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
@@ -297,7 +297,7 @@ public class GUIGraphHandler extends GUICardPanel
 		graphNavigSpinner.setMaximumSize(new Dimension(75,20));
 		graphNavigSpinner.addChangeListener(graphSpinnerListener);
         
-		btnAddGraph = new JButton("Add");
+		btnAddGraph = new JButton("Add Graphs");
 		btnAddGraph.setToolTipText("Append a graph to the currently loaded "
 				+ "list of graphs.");
 		btnAddGraph.addActionListener(new ActionListener() {
@@ -516,7 +516,7 @@ public class GUIGraphHandler extends GUICardPanel
             }
         });
         
-		btnAddLibVrtx = new JButton("Add Vertex from BB Space");
+		btnAddLibVrtx = new JButton("Add Vertex from BBSpace");
 		btnAddLibVrtx.setToolTipText("<html>Choose a new vertex from the "
 		        + "loaded space of building blocks and<br>"
 		        + "append it to the "
@@ -774,19 +774,19 @@ public class GUIGraphHandler extends GUICardPanel
 		pnlShowLabels = new JPanel();
 		JLabel lblShowHideLabels = new JLabel("Show/Hide labels:");
 		
-		btnLabAPC = new JButton("APClass");
+		btnLabAPC = new JButton("APC");
 		btnLabAPC.addActionListener(new showHideLabelsListener(btnLabAPC,
 		        LabelType.APC));
 		btnLabAPC.setEnabled(false);
         btnLabAPC.setToolTipText("Show/Hide attachment point class labels.");
         
-        btnLabBT = new JButton("Bnd Typ");
+        btnLabBT = new JButton("Bnd");
         btnLabBT.addActionListener(new showHideLabelsListener(btnLabBT,
                 LabelType.BT));
         btnLabBT.setEnabled(false);
-        btnLabBT.setToolTipText("Show/Hide bond type ID labels.");
+        btnLabBT.setToolTipText("Show/Hide bond type labels.");
         
-        btnLabBB = new JButton("BB ID");
+        btnLabBB = new JButton("BBID");
         btnLabBB.addActionListener(new showHideLabelsListener(btnLabBB,
                 LabelType.BBID));
         btnLabBB.setEnabled(false);
@@ -799,14 +799,17 @@ public class GUIGraphHandler extends GUICardPanel
         lyoShowAttr.setHorizontalGroup(lyoShowAttr.createParallelGroup(
                         GroupLayout.Alignment.CENTER)
                         .addComponent(lblShowHideLabels)
-                        .addComponent(btnLabAPC)
-                        .addComponent(btnLabBT)
-                        .addComponent(btnLabBB));
+                        .addGroup(lyoShowAttr.createSequentialGroup()
+                            .addComponent(btnLabAPC)
+                            .addComponent(btnLabBT)
+                            .addComponent(btnLabBB)));
         lyoShowAttr.setVerticalGroup(lyoShowAttr.createSequentialGroup()
 		                .addComponent(lblShowHideLabels)
-                        .addComponent(btnLabAPC)
-                        .addComponent(btnLabBT)
-                        .addComponent(btnLabBB));
+                        .addGroup(lyoShowAttr.createParallelGroup(
+                            GroupLayout.Alignment.CENTER)
+                            .addComponent(btnLabAPC)
+                            .addComponent(btnLabBT)
+                            .addComponent(btnLabBB)));
         graphCtrlPane.add(pnlShowLabels);
         
         graphCtrlPane.add(new JSeparator());
@@ -831,7 +834,7 @@ public class GUIGraphHandler extends GUICardPanel
 		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenGraphs = new JButton("Load Library of Graphs");
+		btnOpenGraphs = new JButton("Import Graphs");
 		btnOpenGraphs.setToolTipText("Reads graphs or structures from file.");
 		btnOpenGraphs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -845,7 +848,7 @@ public class GUIGraphHandler extends GUICardPanel
 		});
 		commandsPane.add(btnOpenGraphs);
 		  
-        JButton btnSaveGraphs = new JButton("Save Library of Graphs");
+        JButton btnSaveGraphs = new JButton("Export Graphs");
         btnSaveGraphs.setToolTipText("Write all graphs to a file.");
         btnSaveGraphs.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -878,8 +881,46 @@ public class GUIGraphHandler extends GUICardPanel
             }
         });
         commandsPane.add(btnSaveGraphs);
+        
+        JButton btnSaveVrtxs = new JButton("Export Vertexes");
+        btnSaveVrtxs.setToolTipText("Write all graphs to a file.");
+        btnSaveVrtxs.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                FileAndFormat fileAndFormat = 
+                        GUIFileSaver.pickFileForSavingVertexes(btnSaveVrtxs);
+                if (fileAndFormat == null)
+                {
+                    return;
+                }
+                File outFile = fileAndFormat.file;
+                try
+                {
+                    List<Vertex> vertexes = new ArrayList<Vertex>();
+                    for (DGraph graph : dnGraphLibrary)
+                    {
+                        vertexes.addAll(graph.getVertexList());
+                    }
+                    outFile = DenoptimIO.writeVertexesToFile(outFile, 
+                            fileAndFormat.format, vertexes, false);
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(btnSaveVrtxs,
+                            "Could not write to '" + outFile + "'!",
+                            "Error",
+                            JOptionPane.PLAIN_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                deprotectEditedSystem();
+                unsavedChanges = false;
+                FileUtils.addToRecentFiles(outFile, fileAndFormat.format);
+            }
+        });
+        commandsPane.add(btnSaveVrtxs);
 		
-		JButton btnSaveTmpl = new JButton("Save Library of Templates");
+		JButton btnSaveTmpl = new JButton("Export Templates");
 		btnSaveTmpl.setToolTipText("Make templates from the graphs and same "
 		        + "them to file");
 		btnSaveTmpl.addActionListener(new ActionListener() {
