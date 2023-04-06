@@ -346,24 +346,53 @@ public class DGraph implements Cloneable
     
 //------------------------------------------------------------------------------
     
-    //TODO-gg
+    /**
+     * Tries to determine the set of symmetric vertices in this graph based on
+     * finding compatible {@link Vertex}es that are either using symmetric 
+     * {@link AttachmentPoint}s (NB: all symmetric APs must be in use by 
+     * vertexes that are compatible with each other) 
+     * or that are downstream (i.e., according to edge 
+     * direction) w.r.t {@link Vertex}es that are using symmetric 
+     * {@link AttachmentPoint}s.The compatibility of the vertexes is determined 
+     * by these criteria:<ul>
+     * <li>the AP used to link the parent vertex must have the same features
+     * as defined by the {@link AttachmentPoint#sameAs(Vertex)} method.</li>
+     * <li>the vertex must have the same features
+     * as defined by the {@link Vertex#sameAs(Vertex)} method. Effectively,
+     * this means they are instances of the same building block in the fragment
+     * space, or are graph building blocks that are not part of the fragment 
+     * space, in which case the last condition applies,</li>
+     * <li>vertexes have same features and isomorphic internal structure as 
+     * from the {@link Fragment#isIsomorphicTo(Vertex)} method.</li>
+     * </ul>
+     * @return <code>true</code> if some symmetric set of vertex has been found.
+     * @throws DENOPTIMException
+     */
     public boolean detectSymVertexSets() throws DENOPTIMException
     {
+        int initialSize = symVertices.size();
+        
         // This is do hold vertexes in a staging area (symVrtxsFromAnyBranch)
         // without adding them to a SymmetricVertexes right away. 
-        // TODO-gg: Is it really needed? 
         Set<Vertex> alreadyAssignedVrtxs = new HashSet<Vertex>();
+
+        // The sym vertexes on vrtx can have sym counterpart
+        // that are attached to vertexes sym to vrtx. Prepare a storage to
+        // collect all sym counterparts from any of vertexes sym to vrtx
+        Map<SymmetricAPs,List<Vertex>> symVrtxsFromAnyBranch =
+             new HashMap<SymmetricAPs,List<Vertex>>();
         for (Vertex vrtx : getVertexList())
         {
-            // The sym vertexes on vrtx can have sym counterpart
-            // that are attached to vertexes sym to vrtx. Prepare a storage to
-            // collect all sym counterparts from any of vertexes sym to vrtx
-            Map<SymmetricAPs,List<Vertex>> symVrtxsFromAnyBranch =
-                 new HashMap<SymmetricAPs,List<Vertex>>();
-
-            // NB: if there is a symmetric relation involving vrts, then 
-            // vrtx is in the set returned by getSymVerticesForVertex
-            List<Vertex> vrtxsSymToVrtx = getSymVerticesForVertex(vrtx);
+            // NB: if there is a symmetric relation involving vrtx, then 
+            // vrtx is in the set returned by the following lines
+            List<Vertex> vrtxsSymToVrtx = new ArrayList<Vertex>();
+            for (List<Vertex> tmpSymSets : symVrtxsFromAnyBranch.values())
+            {
+                if (tmpSymSets.contains(vrtx))
+                {
+                    vrtxsSymToVrtx.addAll(tmpSymSets);
+                }
+            }
             if (vrtxsSymToVrtx.size()==0)
                 vrtxsSymToVrtx.add(vrtx);
                 
@@ -375,14 +404,29 @@ public class DGraph implements Cloneable
                 
                 for (SymmetricAPs key : symChildenSetsOnSymToVrtxs.keySet())
                 {
-                    // Find mapping with previously recorded SymmetricAPs
-                    SymmetricAPs keyOnMaster = key.getSameAs( 
-                            symVrtxsFromAnyBranch.keySet());
-                    if (keyOnMaster!=null)
+                    // Find any mapping with previously recorded SymmetricAPs
+                    boolean foundSymmetricBranch = false;
+                    for (SymmetricAPs keyOnMaster : key.getAllSameAs( 
+                            symVrtxsFromAnyBranch.keySet()))
                     {
-                        symVrtxsFromAnyBranch.get(keyOnMaster).addAll(
-                                symChildenSetsOnSymToVrtxs.get(key));
-                    } else {
+                        foundSymmetricBranch = true;
+                        // Here we must NOT consider the already assigned ones!
+                        if (areApsUsedBySymmetricUsers(key.get(0),
+                                keyOnMaster.get(0), new HashSet<Vertex>()))
+                        {
+                            // the previously recorded branch and 
+                            // this one are consistent
+                            symVrtxsFromAnyBranch.get(keyOnMaster).addAll(
+                                    symChildenSetsOnSymToVrtxs.get(key));
+                        } else {
+                            // branches correspond to two different sets of
+                            // symmetric vertexes. So, we treat the new branch
+                            // independently
+                            foundSymmetricBranch = false;
+                        }
+                    } 
+                    if (!foundSymmetricBranch)
+                    {
                         // Effectively, in the first iteration of the loop
                         // we will always end up here
                         List<Vertex> lst = new ArrayList<Vertex>();
@@ -391,14 +435,22 @@ public class DGraph implements Cloneable
                     }
                 }
             }
-            
-            for (List<Vertex> symVertexes : symVrtxsFromAnyBranch.values())
-            {
-                alreadyAssignedVrtxs.addAll(symVertexes);
-                addSymmetricSetOfVertices(new SymmetricVertexes(symVertexes));
-            }
         }
-        return symVertices.size()>0;
+        
+        for (List<Vertex> symVertexes : symVrtxsFromAnyBranch.values())
+        {
+            if (symVertexes.size()<2)
+            {
+                // We get rid of placeholders for vertexes that use APs that 
+                // are not part of a symmetriAPs, but could have been part 
+                // of symmetric subgraphs
+                continue;
+            }
+            alreadyAssignedVrtxs.addAll(symVertexes);
+            addSymmetricSetOfVertices(new SymmetricVertexes(symVertexes));
+        }
+        
+        return (symVertices.size()-initialSize)>0;
     }
 
 //------------------------------------------------------------------------------
@@ -408,6 +460,8 @@ public class DGraph implements Cloneable
     {
         Map<SymmetricAPs,List<Vertex>> symSetsOfChildVrtxs = 
                 new HashMap<SymmetricAPs,List<Vertex>>();
+        
+        Set<AttachmentPoint> doneAPs = new HashSet<AttachmentPoint>();
         for (SymmetricAPs symAPs : vrtx.getSymmetricAPSets())
         {   
             // First condition: all symmetric APs must be in use
@@ -425,66 +479,24 @@ public class DGraph implements Cloneable
             
             // Now consider what vertex is attached to the symmetric APs
             AttachmentPoint firstAp = symAPs.get(0);
-            AttachmentPoint apUserOfFirst = firstAp.getLinkedAPThroughout();
-            Vertex userOfFirst = apUserOfFirst.getOwner();
-            boolean userOfFirstIsFragment = 
-                    userOfFirst.getClass().isInstance(Fragment.class);
             
             boolean setSymmetryRelation = true;
             List<Vertex> symVertexes = new ArrayList<Vertex>();
-            symVertexes.add(userOfFirst);
+            symVertexes.add(firstAp.getLinkedAPThroughout().getOwner());
             for (AttachmentPoint ap : symAPs)
             {
+                doneAPs.add(ap);
+                
                 if (firstAp==ap)
                     continue;
+                
+                setSymmetryRelation = areApsUsedBySymmetricUsers(firstAp, ap,
+                        alreadyAssignedVrtxs);
+                if (!setSymmetryRelation)
+                    break;
 
-                // Second condition: (fast failing) the linked AP must have 
-                // the same features. This is faster than checking vertex
-                // isomorphism.
-                AttachmentPoint apUserOfAp = ap.getLinkedAPThroughout();
-                if (!apUserOfFirst.sameAs(apUserOfAp))
-                {
-                    setSymmetryRelation = false;
-                    break;
-                }
-                
-                // Third condition: (fast-failing) the linked vertexes
-                // must be unassigned
-                Vertex userOfAp = apUserOfAp.getOwner();
-                if (alreadyAssignedVrtxs.contains(userOfAp))
-                {
-                    setSymmetryRelation = false;
-                    break;
-                }
-                
-                // Fourth condition: (not fast, not too slow) the linked
-                // vertexes must be two instances of the same vertex for 
-                // them to be symmetric.
-                if (!userOfAp.sameAs(userOfFirst))
-                {
-                    setSymmetryRelation = false;
-                    break;
-                }
-
-                // Fifth condition: (slow) the linked vertexes
-                // are fragments that have been generated on the fly, so 
-                // they do not have an assigned building block ID. We must
-                // therefore compare their internal structure.
-                if (userOfFirstIsFragment)
-                {
-                    // At this point we know the two vertexes are instances 
-                    // of the same class. 
-                    Fragment frgUserOfFirst = (Fragment) userOfFirst;
-                    Fragment frgUserOfAp = (Fragment) userOfAp;
-                    if (!frgUserOfFirst.isIsomorphicTo(frgUserOfAp))
-                    {
-                        setSymmetryRelation = false;
-                        break;
-                    }
-                }
-                
                 // OK: this user of AP is symmetric to the user on firstAP
-                symVertexes.add(userOfAp);
+                symVertexes.add(ap.getLinkedAPThroughout().getOwner());
             }
             
             if (setSymmetryRelation)
@@ -493,11 +505,92 @@ public class DGraph implements Cloneable
                 alreadyAssignedVrtxs.addAll(symVertexes);
             }
         }
+        
+        // Here we account for the possibility that  vertex without sym APs
+        // is part of a subgraph the is symmetrically reproduced elsewhere.
+        // This is a common pattern in chemistry.
+        // To this end we create dummy symmetric sets of APs that contain 
+        // only one APs, and use them as placeholder in case the same AP-user
+        // is found on symmetric branches.
+        for (AttachmentPoint ap : vrtx.getAttachmentPoints())
+        {
+            if (doneAPs.contains(ap) || ap.isAvailableThroughout())
+                continue;            
+         
+            Vertex user = ap.getLinkedAPThroughout().getOwner();
+            if (alreadyAssignedVrtxs.contains(user))
+                continue;
+            
+            // Create an artifact of SymmetricAPs that contains one entry
+            SymmetricAPs soloSymAps = new SymmetricAPs();
+            soloSymAps.add(ap);
+
+            // Well, this contains only one entry, but for consistency we still
+            // use a list.
+            List<Vertex> symVertexes = new ArrayList<Vertex>();
+            symVertexes.add(user);
+            
+            symSetsOfChildVrtxs.put(soloSymAps,symVertexes);
+            alreadyAssignedVrtxs.addAll(symVertexes);
+        }
         return symSetsOfChildVrtxs;
     }
     
 //------------------------------------------------------------------------------
 
+    private boolean areApsUsedBySymmetricUsers(AttachmentPoint firstAp,
+            AttachmentPoint ap, Set<Vertex> alreadyAssignedVrtxs)
+    {
+        AttachmentPoint apUserOfFirst = firstAp.getLinkedAPThroughout();
+        Vertex userOfFirst = apUserOfFirst.getOwner();
+        boolean userOfFirstIsFragment = 
+                userOfFirst.getClass().isInstance(Fragment.class);
+        
+        // Second condition: (fast failing) the linked AP must have 
+        // the same features. This is faster than checking vertex
+        // isomorphism.
+        AttachmentPoint apUserOfAp = ap.getLinkedAPThroughout();
+        if (!apUserOfFirst.sameAs(apUserOfAp))
+        {
+            return false;
+        }
+        
+        // Third condition: (fast-failing) the linked vertexes
+        // must be unassigned
+        Vertex userOfAp = apUserOfAp.getOwner();
+        if (alreadyAssignedVrtxs.contains(userOfAp))
+        {
+            return false;
+        }
+        
+        // Fourth condition: (not fast, not too slow) the linked
+        // vertexes must be two instances of the same vertex for 
+        // them to be symmetric.
+        if (!userOfAp.sameAs(userOfFirst))
+        {
+            return false;
+        }
+
+        // Fifth condition: (slow) the linked vertexes
+        // are fragments that have been generated on the fly, so 
+        // they do not have an assigned building block ID. We must
+        // therefore compare their internal structure.
+        if (userOfFirstIsFragment)
+        {
+            // At this point we know the two vertexes are instances 
+            // of the same class. 
+            Fragment frgUserOfFirst = (Fragment) userOfFirst;
+            Fragment frgUserOfAp = (Fragment) userOfAp;
+            if (!frgUserOfFirst.isIsomorphicTo(frgUserOfAp))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+//------------------------------------------------------------------------------
+    
     /**
      * Removed the given symmetric set, if present.
      * @param ss the symmetric relation to be removed.
@@ -509,6 +602,12 @@ public class DGraph implements Cloneable
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns the set of vertexes symmetric to the given one.
+     * @param v the vertex for which we seek the symmetric vertexes.
+     * @return either the collector of vertexes symmetric to the given one, 
+     * which also includes the given one, or an empty collector.
+     */
     public SymmetricVertexes getSymSetForVertex(Vertex v)
     {
         for (SymmetricVertexes ss : symVertices)
@@ -545,7 +644,7 @@ public class DGraph implements Cloneable
             if (!Collections.disjoint(oldSS, symSet))
             {
                 throw new DENOPTIMException("Adding " + symSet + " while "
-                        + "there is already  that contains soem of the same "
+                        + "there is already one that contains some of the same "
                         + "items");
             }
         }

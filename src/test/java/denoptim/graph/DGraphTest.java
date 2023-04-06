@@ -3968,6 +3968,16 @@ public class DGraphTest
                 graph.findSymmetrySetsOfChildVertexes(focusVrtx, 
                         alreadyAssignedVrtxs);
         
+        Set<SymmetricAPs> keysToRemove = new HashSet<SymmetricAPs>();
+        for (Map.Entry<SymmetricAPs,List<Vertex>> e : 
+            symChildenSetsOnSymToVrtxs.entrySet())
+        {
+            if (e.getValue().size()<2)
+                keysToRemove.add(e.getKey());
+        }
+        for (SymmetricAPs key : keysToRemove)
+            symChildenSetsOnSymToVrtxs.remove(key);
+        
         assertEquals(1, symChildenSetsOnSymToVrtxs.size());
         
         List<Vertex> foundVrtxs = symChildenSetsOnSymToVrtxs.get(
@@ -3987,6 +3997,16 @@ public class DGraphTest
         alreadyAssignedVrtxs = new HashSet<Vertex>();
         symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
                 focusVrtx, alreadyAssignedVrtxs);
+        
+        keysToRemove = new HashSet<SymmetricAPs>();
+        for (Map.Entry<SymmetricAPs,List<Vertex>> e : 
+            symChildenSetsOnSymToVrtxs.entrySet())
+        {
+            if (e.getValue().size()<2)
+                keysToRemove.add(e.getKey());
+        }
+        for (SymmetricAPs key : keysToRemove)
+            symChildenSetsOnSymToVrtxs.remove(key);
         
         assertEquals(2, symChildenSetsOnSymToVrtxs.size());
 
@@ -4084,7 +4104,7 @@ public class DGraphTest
         g.appendVertexOnAP(v1.getAP(3), v5.getAP(0));
         g.appendVertexOnAP(v2.getAP(0), v6.getAP(0));
         g.appendVertexOnAP(v2.getAP(2), v7.getAP(0));
-        // Warning added here just to avoid messing the order of vertexers
+        // Warning added here just to avoid messing the order of vertexes
         g.appendVertexOnAP(v0.getAP(1), v9.getAP(1));
         
         return g;

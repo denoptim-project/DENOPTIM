@@ -2,6 +2,7 @@ package denoptim.graph;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -74,6 +75,26 @@ public class SymmetricAPs extends SymmetricSet<AttachmentPoint>
             if (sameAs(other))
                 return other;
         return null;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Identifies any set of symmetric APs that, although it contains references 
+     * to different instances of {@link AttachmentPoint}s, it is analogous to 
+     * this one in the sense defined by 
+     * {@link SymmetricAPs#sameAs(SymmetricAPs)} method.
+     * @param others
+     * @return the first found {@link SymmetricAPs} that is same as this one or 
+     * <code>null</code> if no such object is found in the given set.
+     */
+    public Set<SymmetricAPs> getAllSameAs(Set<SymmetricAPs> others)
+    {
+        Set<SymmetricAPs> result = new HashSet<SymmetricAPs>();
+        for (SymmetricAPs other : others)
+            if (sameAs(other))
+                result.add(other);
+        return result;
     }
     
 //------------------------------------------------------------------------------

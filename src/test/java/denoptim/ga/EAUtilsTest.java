@@ -25,10 +25,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -1118,6 +1120,73 @@ public class EAUtilsTest
              
         }
         assertEquals(0, duAtmCount);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Test the detection of "some" symmetry.: a topology that would result in
+     * something close to a C3 point group geometry. Three symmetric branches
+     * that form a three-cyclic system. This method tests the capacity to 
+     * detect that vertexes that have no sym set of APs but can be flagged as 
+     * symmetric because they are part of a chain rooted on a vertex with sym 
+     * APs (i.e., the bridge head).
+     */
+    @Test
+    public void testMakeGraphFromFragmentationOfMol_symmetry() throws Exception
+    {
+        SmilesParser p = new SmilesParser(builder);
+        IAtomContainer mol = p.parseSmiles(
+                "P123C(OC[SiH2]O1)(OC[SiH2]O2)OC[SiH2]O3");
+
+        /*
+        // In case you need to visualize, but note: two branches overlap in 2D!
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        */
+        
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("PC-O", "[$(CP)]", "[O]", "-", -1, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-O", "[C]", "[O]", "-", 0, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-Si", "[C]", "[Si]", "-", 1, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("Si-O", "[Si]", "[O]", "-", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("P-C", "[P]", "[C]", "-", 3, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("P-O", "[P]", "[O]", "-", 4, 
+                new ArrayList<String>()));
+        
+        ScaffoldingPolicy scaffoldOnP = ScaffoldingPolicy.ELEMENT;
+        scaffoldOnP.label = "P";
+        DGraph graph = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                scaffoldOnP, 170);
+        
+        assertEquals(6, graph.getSymmetricSetCount());
+        List<List<Integer>> expected = new ArrayList<List<Integer>>();
+        expected.add(Arrays.asList(2, 8, 14));
+        expected.add(Arrays.asList(3, 9, 15));
+        expected.add(Arrays.asList(4, 10, 16));
+        expected.add(Arrays.asList(5, 11, 17));
+        expected.add(Arrays.asList(6, 12, 18));
+        expected.add(Arrays.asList(7, 13, 19));
+        for (List<Integer> vrtxIDs : expected)
+        {
+            SymmetricVertexes sv0 = graph.getSymSetForVertex(
+                    graph.getVertexWithId(vrtxIDs.get(0)));
+            assertFalse(sv0.isEmpty());
+            for (int i=1; i<vrtxIDs.size(); i++)
+            {
+                SymmetricVertexes svI = graph.getSymSetForVertex(
+                        graph.getVertexWithId(vrtxIDs.get(i)));
+                assertTrue(sv0 == svI);
+            }
+        }
     }
     
 //------------------------------------------------------------------------------
