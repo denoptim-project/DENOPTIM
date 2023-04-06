@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,18 +49,26 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.ga.EAUtils;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.PathSubGraph;
+import denoptim.io.DenoptimIO;
+import denoptim.programs.denovo.GAParameters;
+import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.utils.MutationType;
+import denoptim.utils.Randomizer;
 
 
 /**
@@ -73,6 +82,7 @@ public class DGraphTest
     
     private static APClass APCA, APCB, APCC, APCD, CAPP;
     private static String a="A", b="B", c="C", d="D", cap="cap";
+    
     
 //------------------------------------------------------------------------------
     
@@ -3853,6 +3863,331 @@ public class DGraphTest
         assertEquals(1, templates.stream()
                 .filter(t -> t.getBuildingBlockType() == BBType.FRAGMENT)
                 .count());
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns a graph with definition of symmetric vertexes and symmetric APs
+     * meant for testing purposes.
+     * Before running this you must run {@link DGraphTest#prepare()}
+     * 
+     * This is the graph we return (symmetric APs are marked by s and s'):
+     * 
+     *              
+     * <pre>
+     *               s(B)-(B)-v3
+     *              / 
+     *        (A)-v1-s(B)-(B)-v4
+     *        /     \
+     *       /       s(B)-(B)-v5
+     *      /
+     *   s(A)  s'(B)-v9  
+     *  /     /
+     * v0==== 
+     *  \     \
+     *   s(A)   s'(B)-v10
+     *     |
+     *      \        s(B)-(B)-v6
+     *       \      / 
+     *        (A)-v2-s(B)-(B)-v7
+     *              \
+     *               s(B)-(B)-v8
+     * </pre>
+     */
+    public static DGraph makeTestGraphM() throws DENOPTIMException
+    {
+        EmptyVertex v0 = new EmptyVertex(0);
+        v0.addAP(APCA);
+        v0.addAP(APCB);
+        v0.addAP(APCA);
+        v0.addAP(APCB);
+        v0.addSymmetricAPSet(new SymmetricAPs(
+                Arrays.asList(v0.getAP(0), v0.getAP(2))));
+        v0.addSymmetricAPSet(new SymmetricAPs(
+                Arrays.asList(v0.getAP(1), v0.getAP(3))));
+
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(APCB);
+        v1.addAP(APCA);
+        v1.addAP(APCB);
+        v1.addAP(APCB);
+        v1.addSymmetricAPSet(new SymmetricAPs(
+                Arrays.asList(v1.getAP(0), v1.getAP(2), v1.getAP(3))));
+        
+        EmptyVertex v2 = v1.clone();
+        v2.setVertexId(2);
+        
+        EmptyVertex v3 = new EmptyVertex(3);
+        v3.addAP(APCB);
+        
+        EmptyVertex v4 = v3.clone();
+        EmptyVertex v5 = v3.clone();
+        EmptyVertex v6 = v3.clone();
+        EmptyVertex v7 = v3.clone();
+        EmptyVertex v8 = v3.clone();
+        EmptyVertex v9 = v3.clone();
+        EmptyVertex v10 = v3.clone();
+        v4.setVertexId(4);
+        v5.setVertexId(5);
+        v6.setVertexId(6);
+        v7.setVertexId(7);
+        v8.setVertexId(8);
+        v9.setVertexId(9);
+        v10.setVertexId(10);
+        
+        DGraph g = new DGraph();
+        g.addVertex(v0);
+        g.appendVertexOnAP(v0.getAP(0), v1.getAP(1));
+        g.appendVertexOnAP(v0.getAP(2), v2.getAP(1));
+        g.appendVertexOnAP(v1.getAP(0), v3.getAP(0));
+        g.appendVertexOnAP(v1.getAP(2), v4.getAP(0));
+        g.appendVertexOnAP(v1.getAP(3), v5.getAP(0));
+        g.appendVertexOnAP(v2.getAP(0), v6.getAP(0));
+        g.appendVertexOnAP(v2.getAP(2), v7.getAP(0));
+        g.appendVertexOnAP(v2.getAP(3), v8.getAP(0));
+        g.appendVertexOnAP(v0.getAP(1), v9.getAP(0));
+        g.appendVertexOnAP(v0.getAP(3), v10.getAP(0));
+        
+        return g;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testFindSymmetrySetsOfChildVertexes() throws Exception
+    {
+        prepare();
+        DGraph graph = makeTestGraphM();
+
+        Set<Vertex> alreadyAssignedVrtxs = new HashSet<Vertex>();
+        
+        Vertex focusVrtx = graph.getVertexAtPosition(1);
+        
+        Map<SymmetricAPs,List<Vertex>> symChildenSetsOnSymToVrtxs = 
+                graph.findSymmetrySetsOfChildVertexes(focusVrtx, 
+                        alreadyAssignedVrtxs);
+        
+        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
+        
+        List<Vertex> foundVrtxs = symChildenSetsOnSymToVrtxs.get(
+                focusVrtx.getSymmetricAPSets().get(0));
+        
+        assertEquals(3, foundVrtxs.size());
+        List<Vertex> expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(3));
+        expected.add(graph.getVertexAtPosition(4));
+        expected.add(graph.getVertexAtPosition(5));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+        
+        
+        focusVrtx = graph.getVertexAtPosition(0);
+        
+        alreadyAssignedVrtxs = new HashSet<Vertex>();
+        symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
+                focusVrtx, alreadyAssignedVrtxs);
+        
+        assertEquals(2, symChildenSetsOnSymToVrtxs.size());
+
+        foundVrtxs = symChildenSetsOnSymToVrtxs.get(
+                focusVrtx.getSymmetricAPSets().get(0));
+        
+        assertEquals(2, foundVrtxs.size());
+        expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(1));
+        expected.add(graph.getVertexAtPosition(2));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+        
+        foundVrtxs = symChildenSetsOnSymToVrtxs.get(
+                focusVrtx.getSymmetricAPSets().get(1));
+        
+        assertEquals(2, foundVrtxs.size());
+        expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(9));
+        expected.add(graph.getVertexAtPosition(10));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+    }
+    
+  //------------------------------------------------------------------------------
+
+    /**
+     * Returns a graph with peculiar definition of symmetric vertexes and 
+     * symmetric APs meant for testing purposes.
+     * Before running this you must run {@link DGraphTest#prepare()}
+     * 
+     * This is the graph we return (symmetric APs are marked by s and s'):
+     * 
+     *              
+     * <pre>
+     *               s(B)-(B)-v3
+     *              / 
+     *        (B)s-v1-s(B)-(B)-v4
+     *        /     \
+     *       /       s(B)-(B)-v5                     s(B)     
+     *      /                                       /
+     *   s(B)  s(B)---------------------------(B)s-v9-s(B)  
+     *  /     /                                     \
+     * v0====        (v0 is SCAFFOLD!)               s(B)  
+     *  \     \
+     *   s(B)  s(B)
+     *     |
+     *      \        s(B)-(B)-v6
+     *       \      / 
+     *        (B)s-v2-s(B)-(B)-v7
+     *              \
+     *               s(B)
+     * </pre>
+     */
+    public static DGraph makeTestGraphN() throws DENOPTIMException
+    {
+        EmptyVertex v0 = new EmptyVertex(0);
+        v0.addAP(APCB);
+        v0.addAP(APCB);
+        v0.addAP(APCB);
+        v0.addAP(APCB);
+        v0.addSymmetricAPSet(new SymmetricAPs(Arrays.asList(
+                v0.getAP(0), v0.getAP(1), v0.getAP(2), v0.getAP(3))));
+        
+        EmptyVertex v1 = v0.clone();
+        EmptyVertex v2 = v0.clone();
+        EmptyVertex v9 = v0.clone();
+        v1.setVertexId(1);
+        v2.setVertexId(2);
+        v9.setVertexId(9);
+        
+        v0.setBuildingBlockType(BBType.SCAFFOLD);
+        v1.setBuildingBlockType(BBType.FRAGMENT);
+        v2.setBuildingBlockType(BBType.FRAGMENT);
+        v9.setBuildingBlockType(BBType.FRAGMENT);
+        
+        EmptyVertex v3 = new EmptyVertex(3);
+        v3.addAP(APCB);
+        
+        EmptyVertex v4 = v3.clone();
+        EmptyVertex v5 = v3.clone();
+        EmptyVertex v6 = v3.clone();
+        EmptyVertex v7 = v3.clone();
+        v4.setVertexId(4);
+        v5.setVertexId(5);
+        v6.setVertexId(6);
+        v7.setVertexId(7);;
+        
+        DGraph g = new DGraph();
+        g.addVertex(v0);
+        g.appendVertexOnAP(v0.getAP(0), v1.getAP(1));
+        g.appendVertexOnAP(v0.getAP(2), v2.getAP(1));
+        g.appendVertexOnAP(v1.getAP(0), v3.getAP(0));
+        g.appendVertexOnAP(v1.getAP(2), v4.getAP(0));
+        g.appendVertexOnAP(v1.getAP(3), v5.getAP(0));
+        g.appendVertexOnAP(v2.getAP(0), v6.getAP(0));
+        g.appendVertexOnAP(v2.getAP(2), v7.getAP(0));
+        // Warning added here just to avoid messing the order of vertexers
+        g.appendVertexOnAP(v0.getAP(1), v9.getAP(1));
+        
+        return g;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /*
+    @Test
+    public void testFindSymmetrySetsOfChildVertexes_partFilledAps() 
+            throws Exception
+    {
+        prepare();
+        DGraph graph = makeTestGraphN();
+        
+        Vertex focusVrtx = graph.getVertexAtPosition(1);
+
+        Set<Vertex> alreadyAssignedVrtxs = new HashSet<Vertex>();
+        Map<SymmetricAPs,List<Vertex>> symChildenSetsOnSymToVrtxs = 
+                graph.findSymmetrySetsOfChildVertexes(focusVrtx, 
+                        alreadyAssignedVrtxs);
+        
+        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
+        Iterator<List<Vertex>> iter = symChildenSetsOnSymToVrtxs.values().iterator();
+        List<Vertex> foundVrtxs = iter.next(); // there is only one
+        assertEquals(3, foundVrtxs.size());
+        List<Vertex> expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(3));
+        expected.add(graph.getVertexAtPosition(4));
+        expected.add(graph.getVertexAtPosition(5));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+        
+        
+        focusVrtx = graph.getVertexAtPosition(0);
+        
+        alreadyAssignedVrtxs = new HashSet<Vertex>();
+        symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
+                focusVrtx, alreadyAssignedVrtxs);
+        
+        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
+        iter = symChildenSetsOnSymToVrtxs.values().iterator();
+        foundVrtxs = iter.next(); // there is only one
+        assertEquals(3, foundVrtxs.size());
+        expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(1));
+        expected.add(graph.getVertexAtPosition(2));
+        expected.add(graph.getVertexAtPosition(8)); // this is v9
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+        
+
+        focusVrtx = graph.getVertexAtPosition(2);
+        
+        alreadyAssignedVrtxs = new HashSet<Vertex>();
+        symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
+                focusVrtx, alreadyAssignedVrtxs);
+        
+        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
+        iter = symChildenSetsOnSymToVrtxs.values().iterator();
+        foundVrtxs = iter.next(); // there is only one
+        assertEquals(2, foundVrtxs.size());
+        expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(6));
+        expected.add(graph.getVertexAtPosition(7));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+    }
+    */
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testDetectSymVertexSets() throws Exception
+    {
+        prepare();
+        DGraph graph = makeTestGraphM();
+        
+        assertTrue(graph.detectSymVertexSets());
+        assertEquals(3, graph.getSymmetricSetCount());
+        
+        SymmetricVertexes symVrtxs = graph.getSymSetForVertex(
+                graph.getVertexAtPosition(0));
+        assertEquals(0, symVrtxs.size());
+        
+        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(1));
+        assertEquals(2, symVrtxs.size());
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(1)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(2)));
+        
+        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(3));
+        assertEquals(6, symVrtxs.size());
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(3)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(4)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(5)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(6)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(7)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(8)));
+        
+        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(9));
+        assertEquals(2, symVrtxs.size());
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(9)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(10)));
     }
     
 //------------------------------------------------------------------------------

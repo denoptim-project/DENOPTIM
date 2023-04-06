@@ -1132,58 +1132,9 @@ public class EAUtils
             appendVertexesToGraphFollowingEdges(graph, vId, fragments);
         }
         
-        // Set symmetry relations
-        for (Vertex v : graph.getVertexList())
-        {
-            for (SymmetricAPs symAPs : v.getSymmetricAPSets())
-            {
-                AttachmentPoint firstAp = symAPs.get(0);
-                // NB: we should check for all APs to be used, but in this 
-                // method all APs come from fragmentation, so they are all used.
-                AttachmentPoint apUserOfFirst = firstAp.getLinkedAPThroughout();
-                // WARNING: assumption all vertexes are fragments. They come
-                // from fragmentation, so it is safe to assume so.
-                Fragment userOfFirst = (Fragment) apUserOfFirst.getOwner();
-                
-                boolean setSymmetryRelation = symAPs.size()>1 ? true : false;
-                List<Vertex> symVertexes = new ArrayList<Vertex>();
-                symVertexes.add(userOfFirst);
-                for (AttachmentPoint ap : symAPs)
-                {
-                    if (firstAp==ap)
-                        continue;
-
-                    AttachmentPoint apUserOfAp = ap.getLinkedAPThroughout();
-                    if (!apUserOfFirst.sameAs(apUserOfAp))
-                    {
-                        setSymmetryRelation = false;
-                        break;
-                    }
-                    
-                    // WARNING: assumption all vertexes are fragments. They come
-                    // from fragmentation, so it is safe to assume so.
-                    Fragment userOfAp = (Fragment) apUserOfAp.getOwner();
-                    if (!userOfFirst.getBuildingBlockType().equals(
-                            userOfAp.getBuildingBlockType()))
-                    {
-                        setSymmetryRelation = false;
-                        break;
-                    }
-                    if (!userOfFirst.isIsomorphicTo(userOfAp))
-                    {
-                        setSymmetryRelation = false;
-                        break;
-                    }
-                    symVertexes.add(userOfAp);
-                }
-                
-                if (setSymmetryRelation)
-                {
-                    graph.addSymmetricSetOfVertices(
-                            new SymmetricVertexes(symVertexes));
-                }
-            }
-        }
+        // Set symmetry relations: these depend on which scaffold we have chosen
+        graph.detectSymVertexSets();
+        
         return graph;
     }
     

@@ -34,6 +34,8 @@ import java.util.Collection;
  * @author Marco Foscato
  */
 
+// NB: keep it a List, not a Set: having the order helps comparison.
+
 public class SymmetricSet<T> extends ArrayList<T>
 {
 
