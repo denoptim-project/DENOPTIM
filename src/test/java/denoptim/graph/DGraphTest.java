@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,26 +48,18 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
-import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.ga.EAUtils;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.PathSubGraph;
-import denoptim.io.DenoptimIO;
-import denoptim.programs.denovo.GAParameters;
-import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.utils.MutationType;
-import denoptim.utils.Randomizer;
 
 
 /**
