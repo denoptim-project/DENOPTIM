@@ -185,7 +185,7 @@
     <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>batik-swing</artifactId>
-        <version>1.14</version>
+        <version>1.16</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/net.sf.py4j/py4j -->
     <dependency>
