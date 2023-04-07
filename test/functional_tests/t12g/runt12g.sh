@@ -5,6 +5,10 @@ logFile="t12g.log"
 paramFile="t12g.params"
 
 wdToDenoptim="$wrkDir/"
+if [[ "$(uname)" == CYGWIN* ]] || [[ "$(uname)" == MINGW* ]] || [[ "$(uname)" == MSYS* ]]
+then
+    wdToDenoptim="$(cd "$wrkDir" ; pwd -W | sed 's/\//\\\\/g')\\\\"
+fi
 
 mv data/* "$wrkDir"
 rm -rf data
