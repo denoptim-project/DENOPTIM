@@ -1,7 +1,7 @@
 package denoptim.programs.fragmenter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,7 +70,7 @@ public class CuttingRule
     /**
      * Additional Options
      */
-    private ArrayList<String> opts;
+    private List<String> opts;
 
 
 //------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ public class CuttingRule
      * @throws DENOPTIMException 
      */
     public CuttingRule(String ruleName, String smartsAtm0, String smartsAtm1, 
-            String smartsBnd, int priority, ArrayList<String> opts)
+            String smartsBnd, int priority, List<String> opts)
     {
         this.ruleName = ruleName;
         if (ruleName.isEmpty() || ruleName.isBlank())
@@ -265,7 +265,7 @@ public class CuttingRule
     /**
      * Returns the list of options.
      */
-    public ArrayList<String> getOptions()
+    public List<String> getOptions()
     {
         return opts;
     }

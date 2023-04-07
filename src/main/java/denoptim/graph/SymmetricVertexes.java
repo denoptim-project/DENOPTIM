@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
@@ -17,6 +16,12 @@ import com.google.gson.JsonSerializer;
  */
 public class SymmetricVertexes extends SymmetricSet<Vertex>
 {
+
+    /**
+     * Version ID
+     */
+    private static final long serialVersionUID = 4L;
+    
 //------------------------------------------------------------------------------
     
     public SymmetricVertexes()

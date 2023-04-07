@@ -65,8 +65,8 @@ public class ThreeDimTreeBuilderTest
         APClass a0 = APClass.make("a",0,BondType.SINGLE);
         APClass b0 = APClass.make("b",0,BondType.SINGLE);
         APClass h0 = APClass.make("h",0,BondType.SINGLE);
-        APClass ap0 = APClass.make("ATplus:0");
-        APClass am0 = APClass.make("ATminus:0");
+        APClass ap0 = APClass.make(APClass.ATPLUS,0);
+        APClass am0 = APClass.make(APClass.ATMINUS,0);
         
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();

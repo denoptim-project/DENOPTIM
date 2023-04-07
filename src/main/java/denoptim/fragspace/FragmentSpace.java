@@ -1532,7 +1532,7 @@ public class FragmentSpace
                     //TODO: try to transform the template into its isomorphic
                     // with highest symmetry, and define the symmetric sets. 
                     // Such enhancement would facilitate the creation of 
-                    // ymmetric graphs from templates generated on the fly.
+                    // symmetric graphs from templates generated on the fly.
                     
                     Template t = new Template(type);
                     t.setInnerGraph(g);

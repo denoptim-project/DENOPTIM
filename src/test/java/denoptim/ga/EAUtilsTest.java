@@ -19,6 +19,7 @@
 package denoptim.ga;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,11 +28,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.EAUtils.CandidateSource;
@@ -42,6 +55,8 @@ import denoptim.graph.DGraph;
 import denoptim.graph.DGraphTest;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
+import denoptim.graph.GraphPattern;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -49,6 +64,8 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.programs.denovo.GAParameters;
+import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
 /**
@@ -62,6 +79,17 @@ public class EAUtilsTest
     
     private static APClass APCA, APCB, APCC;
     private static String a="A", b="B", c="C";
+
+    private static final String SEP = System.getProperty("file.separator");
+    private static final String NL = System.getProperty("line.separator");
+    
+    /**
+     * Private builder of atom containers
+     */
+    private IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+
+    @TempDir 
+    static File tempDir;
     
 //------------------------------------------------------------------------------
     
@@ -711,6 +739,454 @@ public class EAUtilsTest
         assertEquals(1,EAUtils.chooseNumberOfSitesToMutate(weights,0.200001));
         assertEquals(0,EAUtils.chooseNumberOfSitesToMutate(weights,0.199999));
         assertEquals(0,EAUtils.chooseNumberOfSitesToMutate(weights,0.000001));
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testMakeGraphFromFragmentationOfMol() throws Exception
+    {
+        // We use a hard-coded molecule to ensure the 3D geometry is fixed
+        assertTrue(tempDir.isDirectory(),"Should be a directory ");
+        String structureFile = tempDir.getAbsolutePath() + SEP + "mol.sdf";
+        DenoptimIO.writeData(structureFile,
+                "" + NL
+                + " OpenBabel03302310043D" + NL
+                + "" + NL
+                + " 33 35  0  0  0  0  0  0  0  0999 V2000" + NL
+                + "   -1.5455    1.4965    3.4529 O   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -1.1783    1.0876    2.3182 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -1.8597   -0.0221    1.6796 N   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -3.0535   -0.6083    2.2978 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    0.0153    1.7383    1.6547 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -0.1038    1.5947    0.1342 C   0  0  1  0  0  0  0  0  0  0  0  0" + NL
+                + "    0.9646    2.2439   -0.5585 O   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    2.0315    1.3700   -0.8940 C   0  0  2  0  0  0  0  0  0  0  0  0" + NL
+                + "    3.0842    2.1330   -1.6910 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    3.5659    3.1894   -0.9391 F   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    4.1344    1.2898   -2.0067 F   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    2.5295    2.6237   -2.8597 F   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    1.5529    0.2692   -1.6691 O   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    0.4699   -0.4528   -1.1881 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -0.3192    0.1414   -0.2151 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -1.2683   -0.6053    0.4932 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -1.5222   -1.9320    0.0906 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -0.8092   -2.5038   -0.9766 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -1.1169   -3.8201   -1.3518 O   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -0.4725   -4.5263   -2.4070 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    0.2040   -1.7556   -1.6127 C   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -3.7666   -0.9444    1.5155 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -3.5865    0.1389    2.9228 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -2.7606   -1.4709    2.9321 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    0.9449    1.2474    2.0144 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    0.0550    2.8163    1.9227 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -1.0337    2.1265   -0.1667 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    2.5075    0.9860    0.0372 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -2.2462   -2.5403    0.6157 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -0.6162   -3.9902   -3.3689 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "   -0.9204   -5.5374   -2.4930 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    0.6107   -4.6349   -2.1878 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "    0.8117   -2.1861   -2.3969 H   0  0  0  0  0  0  0  0  0  0  0  0" + NL
+                + "  1  2  2  0  0  0  0" + NL
+                + "  2  3  1  0  0  0  0" + NL
+                + "  2  5  1  0  0  0  0" + NL
+                + "  3  4  1  0  0  0  0" + NL
+                + "  4 22  1  0  0  0  0" + NL
+                + "  4 23  1  0  0  0  0" + NL
+                + "  4 24  1  0  0  0  0" + NL
+                + "  5  6  1  0  0  0  0" + NL
+                + "  5 25  1  0  0  0  0" + NL
+                + "  5 26  1  0  0  0  0" + NL
+                + "  6  7  1  0  0  0  0" + NL
+                + "  6 27  1  6  0  0  0" + NL
+                + "  7  8  1  0  0  0  0" + NL
+                + "  8  9  1  0  0  0  0" + NL
+                + "  8 13  1  0  0  0  0" + NL
+                + "  8 28  1  1  0  0  0" + NL
+                + "  9 10  1  0  0  0  0" + NL
+                + "  9 11  1  0  0  0  0" + NL
+                + "  9 12  1  0  0  0  0" + NL
+                + " 13 14  1  0  0  0  0" + NL
+                + " 14 15  2  0  0  0  0" + NL
+                + " 15 16  1  0  0  0  0" + NL
+                + " 15  6  1  0  0  0  0" + NL
+                + " 16 17  2  0  0  0  0" + NL
+                + " 16  3  1  0  0  0  0" + NL
+                + " 17 18  1  0  0  0  0" + NL
+                + " 17 29  1  0  0  0  0" + NL
+                + " 18 19  1  0  0  0  0" + NL
+                + " 18 21  2  0  0  0  0" + NL
+                + " 19 20  1  0  0  0  0" + NL
+                + " 20 30  1  0  0  0  0" + NL
+                + " 20 31  1  0  0  0  0" + NL
+                + " 20 32  1  0  0  0  0" + NL
+                + " 21 14  1  0  0  0  0" + NL
+                + " 21 33  1  0  0  0  0" + NL
+                + "M  END" + NL
+                + "$$$$", false);
+        IAtomContainer mol = DenoptimIO.readSDFFile(structureFile).get(0);
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("cC", "[c]", "[C]", "~", 0, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("cN", "[c]", "[#7]", "~", 1, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("cO", "[c]", "[#8]", "~", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("OC", "[O]", "[C]", "-", 3, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("CF", "[C]", "[F]", "-", 4, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("NC", "[N]", "[C]", "-", 5, 
+                new ArrayList<String>()));
+        
+        DGraph graph = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT);
+        
+        assertEquals(16, graph.getVertexCount());
+        assertEquals(15, graph.getEdgeCount());
+        assertEquals(2, graph.getRingCount());
+        assertEquals(0, graph.getVertexList()
+                .stream()
+                .filter(v -> v instanceof Template)
+                .count());
+        
+        DGraph graphWithTemplate = graph.embedPatternsInTemplates(
+                GraphPattern.RING, new FragmentSpace(), ContractLevel.FIXED);
+        
+        assertEquals(7, graphWithTemplate.getVertexCount());
+        assertEquals(6, graphWithTemplate.getEdgeCount());
+        assertEquals(0, graphWithTemplate.getRingCount());
+        List<Vertex> templates = graphWithTemplate.getVertexList()
+                .stream()
+                .filter(v -> v instanceof Template)
+                .collect(Collectors.toList());
+        assertEquals(1, templates.size());
+        Template tmpl = (Template) templates.get(0);
+        assertEquals(BBType.SCAFFOLD, tmpl.getBuildingBlockType());
+        assertEquals(ContractLevel.FIXED, tmpl.getContractLevel());
+        assertEquals(2, tmpl.getInnerGraph().getRingCount());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testMakeGraphFromFragmentationOfMol_ScaffoldingPolicy() 
+            throws Exception
+    {
+        SmilesParser p = new SmilesParser(builder);
+        IAtomContainer mol = p.parseSmiles("c1ccccc1OCN(CC)(C)[Ru](N)(N)C#O");
+
+        // Use this to make the molecule 2D for an easy visual inspection.
+        /*
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        */
+        
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("C-O", "[#6]", "[#8]", "-", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("N-C", "[#7]", "[#6]", "-", 5, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("Ru-Any", "[Ru]", "[$([*])]", "~", 5, 
+                new ArrayList<String>()));
+        
+        DGraph graph1 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT);
+        
+        assertEquals(10, graph1.getVertexCount());
+        assertEquals(9, graph1.getEdgeCount());
+        assertEquals(0, graph1.getRingCount());
+        List<Vertex> scaffolds = graph1.getVertexList()
+                .stream()
+                .filter(v -> BBType.SCAFFOLD == v.getBuildingBlockType())
+                .collect(Collectors.toList());
+        assertEquals(1, scaffolds.size());
+        Vertex scaffold = scaffolds.get(0);
+        IAtomContainer iacScaffold = scaffold.getIAtomContainer();
+        assertEquals(6, iacScaffold.getAtomCount());
+        
+        ScaffoldingPolicy policy = ScaffoldingPolicy.ELEMENT;
+        policy.label = "Ru";
+        
+        DGraph graph2 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), policy);
+        
+        assertEquals(10, graph2.getVertexCount());
+        assertEquals(9, graph2.getEdgeCount());
+        assertEquals(0, graph2.getRingCount());
+        scaffolds = graph2.getVertexList()
+                .stream()
+                .filter(v -> BBType.SCAFFOLD == v.getBuildingBlockType())
+                .collect(Collectors.toList());
+        assertEquals(1, scaffolds.size());
+        scaffold = scaffolds.get(0);
+        iacScaffold = scaffold.getIAtomContainer();
+        assertEquals(1, iacScaffold.getAtomCount());
+        assertEquals("Ru", iacScaffold.getAtom(0).getSymbol());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testMakeGraphFromFragmentationOfMol_Symmetry() throws Exception
+    {
+        SmilesParser p = new SmilesParser(builder);
+        IAtomContainer mol = p.parseSmiles(
+                "Oc1cc(O)cc(O)c1CN(CC)(CC)[Ru](N)(Nc1c(F)cc(F)cc1(Cl))C#O");
+
+        // Use this to make the molecule 2D for an easy visual inspection.
+        /*
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        */
+        
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("C-F", "[#6]", "[#9]", "-", 1, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-O", "[#6]", "[#8]", "-", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("N-C", "[#7]", "[#6]", "-", 5, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("Ru-Any", "[Ru]", "[$([*])]", "~", 5, 
+                new ArrayList<String>()));
+        
+        DGraph graph1 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT);
+        
+        assertEquals(14, graph1.getVertexCount());
+        assertEquals(13, graph1.getEdgeCount());
+        assertEquals(0, graph1.getRingCount());
+        assertEquals(2, graph1.getSymmetricSetCount());
+        boolean foundO = false;
+        boolean foundF = false;
+        Iterator<SymmetricVertexes> iter = graph1.getSymSetsIterator();
+        while (iter.hasNext())
+        {
+            SymmetricVertexes ss = iter.next();
+            String el = ss.get(0).getIAtomContainer().getAtom(0).getSymbol();
+            if ("O".equals(el))
+                foundO = true;
+            else if ("F".equals(el))
+                foundF = true;
+        }
+        assertTrue(foundO);
+        assertTrue(foundF);
+        
+        ScaffoldingPolicy policy = ScaffoldingPolicy.ELEMENT;
+        policy.label = "Cl";
+        
+        DGraph graph2 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), policy);
+        
+        assertEquals(14, graph2.getVertexCount());
+        assertEquals(13, graph2.getEdgeCount());
+        assertEquals(0, graph2.getRingCount());
+        assertEquals(2, graph2.getSymmetricSetCount());
+        foundO = false;
+        foundF = false;
+        iter = graph2.getSymSetsIterator();
+        while (iter.hasNext())
+        {
+            SymmetricVertexes ss = iter.next();
+            String el = ss.get(0).getIAtomContainer().getAtom(0).getSymbol();
+            if ("O".equals(el))
+                foundO = true;
+            else if ("F".equals(el))
+                foundF = true;
+        }
+        assertTrue(foundO);
+        assertTrue(foundF);
+        
+
+        policy = ScaffoldingPolicy.ELEMENT;
+        policy.label = "F";
+        
+        DGraph graph3 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), policy);
+
+        assertEquals(14, graph3.getVertexCount());
+        assertEquals(13, graph3.getEdgeCount());
+        assertEquals(0, graph3.getRingCount());
+        assertEquals(1, graph3.getSymmetricSetCount());
+        foundO = false;
+        foundF = false;
+        iter = graph3.getSymSetsIterator();
+        while (iter.hasNext())
+        {
+            SymmetricVertexes ss = iter.next();
+            String el = ss.get(0).getIAtomContainer().getAtom(0).getSymbol();
+            if ("O".equals(el))
+                foundO = true;
+            else if ("F".equals(el))
+                foundF = true;
+        }
+        assertTrue(foundO);
+        assertFalse(foundF);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testMakeGraphFromFragmentationOfMol_linearities() 
+            throws Exception
+    {
+        SmilesParser p = new SmilesParser(builder);
+        IAtomContainer mol = p.parseSmiles("C#C-C#C-C#N");
+
+        // 2D is enough to get linearities. No need to wast time getting 3D
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("C-C", "[#6]", "[#6]", "-", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-X", "[#6]", "[#9,#17,#35,#53]", "~",
+                3, new ArrayList<String>()));
+        
+        // Must add du on linearities
+        DGraph graph = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT, 170);
+        
+        assertEquals(3, graph.getVertexCount());
+        assertEquals(2, graph.getEdgeCount());
+        assertEquals(0, graph.getRingCount());
+        int duAtmCount = 0;
+        for (Vertex v : graph.getVertexList())
+        {
+            for (IAtom a : v.getIAtomContainer().atoms())
+            {
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(
+                        MoleculeUtils.getSymbolOrLabel(a)))
+                    duAtmCount++;
+            }
+             
+        }
+        assertEquals(4, duAtmCount);
+        
+        // Without linearities
+        IAtomContainer molNonLinear = p.parseSmiles("C(Cl)(F)Br");
+        sdg.generateCoordinates(molNonLinear);
+        
+        DGraph graph1 = EAUtils.makeGraphFromFragmentationOfMol(molNonLinear,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT, 160);
+        
+        assertEquals(4, graph1.getVertexCount());
+        assertEquals(3, graph1.getEdgeCount());
+        assertEquals(0, graph1.getRingCount());
+        duAtmCount = 0;
+        for (Vertex v : graph1.getVertexList())
+        {
+            for (IAtom a : v.getIAtomContainer().atoms())
+            {
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(
+                        MoleculeUtils.getSymbolOrLabel(a)))
+                    duAtmCount++;
+            }
+             
+        }
+        assertEquals(0, duAtmCount);
+        
+        // there are linearities but we do not want Du on linearities
+        DGraph graph2 = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT); 
+        // By default we do not add Du on linearities
+        
+        assertEquals(3, graph2.getVertexCount());
+        assertEquals(2, graph2.getEdgeCount());
+        assertEquals(0, graph2.getRingCount());
+        duAtmCount = 0;
+        for (Vertex v : graph2.getVertexList())
+        {
+            for (IAtom a : v.getIAtomContainer().atoms())
+            {
+                if (DENOPTIMConstants.DUMMYATMSYMBOL.equals(
+                        MoleculeUtils.getSymbolOrLabel(a)))
+                    duAtmCount++;
+            }
+             
+        }
+        assertEquals(0, duAtmCount);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Test the detection of "some" symmetry.: a topology that would result in
+     * something close to a C3 point group geometry. Three symmetric branches
+     * that form a three-cyclic system. This method tests the capacity to 
+     * detect that vertexes that have no sym set of APs but can be flagged as 
+     * symmetric because they are part of a chain rooted on a vertex with sym 
+     * APs (i.e., the bridge head).
+     */
+    @Test
+    public void testMakeGraphFromFragmentationOfMol_symmetry() throws Exception
+    {
+        SmilesParser p = new SmilesParser(builder);
+        IAtomContainer mol = p.parseSmiles(
+                "P123C(OC[SiH2]O1)(OC[SiH2]O2)OC[SiH2]O3");
+
+        /*
+        // In case you need to visualize, but note: two branches overlap in 2D!
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        */
+        
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("PC-O", "[$(CP)]", "[O]", "-", -1, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-O", "[C]", "[O]", "-", 0, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-Si", "[C]", "[Si]", "-", 1, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("Si-O", "[Si]", "[O]", "-", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("P-C", "[P]", "[C]", "-", 3, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("P-O", "[P]", "[O]", "-", 4, 
+                new ArrayList<String>()));
+        
+        ScaffoldingPolicy scaffoldOnP = ScaffoldingPolicy.ELEMENT;
+        scaffoldOnP.label = "P";
+        DGraph graph = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                scaffoldOnP, 170);
+        
+        assertEquals(6, graph.getSymmetricSetCount());
+        List<List<Integer>> expected = new ArrayList<List<Integer>>();
+        expected.add(Arrays.asList(2, 8, 14));
+        expected.add(Arrays.asList(3, 9, 15));
+        expected.add(Arrays.asList(4, 10, 16));
+        expected.add(Arrays.asList(5, 11, 17));
+        expected.add(Arrays.asList(6, 12, 18));
+        expected.add(Arrays.asList(7, 13, 19));
+        for (List<Integer> vrtxIDs : expected)
+        {
+            SymmetricVertexes sv0 = graph.getSymSetForVertex(
+                    graph.getVertexWithId(vrtxIDs.get(0)));
+            assertFalse(sv0.isEmpty());
+            for (int i=1; i<vrtxIDs.size(); i++)
+            {
+                SymmetricVertexes svI = graph.getSymSetForVertex(
+                        graph.getVertexWithId(vrtxIDs.get(i)));
+                assertTrue(sv0 == svI);
+            }
+        }
     }
     
 //------------------------------------------------------------------------------

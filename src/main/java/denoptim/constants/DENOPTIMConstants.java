@@ -400,7 +400,7 @@ public final class DENOPTIMConstants
     /**
      * Property of a {@link IAtom} representing a {@link RingClosingAttractor}. 
      * This property records the {@link APClass} of the 
-     * {@link AttachmentPoint} on which the attractor is attached  the graph.
+     * {@link AttachmentPoint} on which the attractor is attached to the graph.
      */
     public static final Object RCAPROPAPCTORCA = "RCAPROPAPCTORCA";
     
@@ -487,7 +487,7 @@ public final class DENOPTIMConstants
     public static final Object LINKAPS = "LINKTOGRAPHSAP";
 
     /**
-     * Property of AP where we save the original length of the AP vector.
+     * Key of AP property where we save the original length of the AP vector.
      */
     public static final Object APORIGINALLENGTH = "ORIGINALLENGTH";
     

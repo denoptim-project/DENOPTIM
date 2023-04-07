@@ -584,6 +584,19 @@ public abstract class Vertex implements Cloneable
     
     @Override
     public abstract Vertex clone();
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Compares this and another vertex ignoring vertex IDs.
+     * @param other
+     * @return <code>true</code> if the two vertices represent the same graph
+     * node even if the vertex IDs are different.
+     */
+    public boolean sameAs(Vertex other)
+    {
+        return sameAs(other, new StringBuilder());
+    }
     
 //------------------------------------------------------------------------------
     
@@ -627,8 +640,7 @@ public abstract class Vertex implements Cloneable
      * @return <code>true</code> if the two vertices represent the same graph
      * node even if the vertex IDs are different.
      */
-    public boolean sameVertexFeatures(Vertex other, 
-            StringBuilder reason)
+    public boolean sameVertexFeatures(Vertex other, StringBuilder reason)
     {	
         if (this.getBuildingBlockType() != other.getBuildingBlockType())
         {
@@ -642,14 +654,6 @@ public abstract class Vertex implements Cloneable
         {
             reason.append("Different molID ("+this.getBuildingBlockId()+":"
                     + other.getBuildingBlockId()+"); ");
-            return false;
-        }
-        
-        if (this.getFreeAPCount() != other.getFreeAPCount())
-        {
-            reason.append("Different number of free APs ("
-                    +this.getFreeAPCount()+":"
-                    +other.getFreeAPCount()+"); ");
             return false;
         }
         
@@ -672,30 +676,6 @@ public abstract class Vertex implements Cloneable
                 return false;
             }
         }
-        // The following fails for vertices v1 and v2 like these:
-        // (APC_A)<--v1-->(APC_A)
-        // (APC_A)<--v2-->(APC_A)
-        // Because the AP0 on v1 will be compared to AP1 on v2 and their 
-        // different position in the list of APs will make them be non-same.
-        /*
-        for (DENOPTIMAttachmentPoint apT : this.getAttachmentPoints())
-        {
-            boolean found = false;
-            for (DENOPTIMAttachmentPoint apO : other.getAttachmentPoints())
-            {
-                if (apT.sameAs(apO))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                reason.append("No corresponding AP for "+apT);
-                return false;
-            }
-        }
-        */
     	
     	return true;
     }

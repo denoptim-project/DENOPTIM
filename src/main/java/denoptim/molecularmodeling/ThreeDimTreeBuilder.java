@@ -833,9 +833,9 @@ public class ThreeDimTreeBuilder
                 // Get two points defining the src AP vector in 3D
                 Point3d trgNextApA = new Point3d(
                         nextEdge.getSrcAP().getDirectionVector());
-                Point3d srcNextApA = new Point3d(inFrag.getAtom(
-                        nextEdge.getSrcAP().getAtomPositionNumber())
-                        .getPoint3d());
+                Point3d srcNextApA = new Point3d(MoleculeUtils.getPoint3d(
+                        inFrag.getAtom(
+                        nextEdge.getSrcAP().getAtomPositionNumber())));
     
                 // Append fragment on AP-vector and start recursion
                 append3DFragmentsViaEdges(mol, graph,
