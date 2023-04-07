@@ -74,6 +74,7 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.GeneralUtils;
 
 
 
@@ -488,10 +489,10 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         JPanel lineLinearity = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblLinearity = new JLabel(
                 "Non-linearity limit for bond angles (DEG): ");
-        lblLinearity.setToolTipText(toolTipLinearity);
-        NumberFormat formatter = new DecimalFormat("#0.00"); 
-        txtLinearity = new JTextField(
-                formatter.format(frgParams.getLinearAngleLimit()));
+        lblLinearity.setToolTipText(toolTipLinearity); 
+        txtLinearity = new JTextField(GeneralUtils.getEnglishFormattedDecimal(
+                "###.#",
+                frgParams.getLinearAngleLimit()));
         txtLinearity.setPreferredSize(strFieldSize);
         txtLinearity.setToolTipText(toolTipLinearity);
         lineLinearity.setToolTipText(toolTipLinearity);
