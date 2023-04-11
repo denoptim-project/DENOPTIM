@@ -20,6 +20,7 @@ package denoptim.ga;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.lang.Math;
 
@@ -115,9 +116,15 @@ public class SelectionHelper
         Candidate[] selection = new Candidate[sz];
         // Calculate the sum of all fitness values.
         double aggregateFitness = 0;
+        List<Double> fitnesses = new ArrayList<>();
         
-        // Get module of the lowest fitness (last candidate's fitness)
-        double offSet = Math.abs(population.get(k-1).getFitness());
+        
+        // Get module of the lowest fitness
+        for (int i=0; i<k; i++)
+        {
+            fitnesses.add(population.get(i).getFitness());
+        }
+        double offSet = Math.abs(Collections.min(fitnesses));
          
         // Sum all candidates' fitness translated by the offSet
         // to ensure feasibility also with negative values
