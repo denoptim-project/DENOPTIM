@@ -264,7 +264,11 @@ public class EmptyVertex extends Vertex
         
         for (AttachmentPoint ap : lstAPs)
         {
-            c.addAP(ap.getAPClass());
+            AttachmentPoint cAp = new AttachmentPoint(c, -1, null, 
+                    ap.getAPClass());
+            cAp.setCutId(ap.getCutId());
+            cAp.setID(ap.getID());
+            c.lstAPs.add(cAp);
         }
 
         List<SymmetricAPs> cLstSymAPs = new ArrayList<SymmetricAPs>();

@@ -37,6 +37,9 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.fragmenter.FragmentClusterer;
+import denoptim.fragmenter.ScaffoldingPolicy;
+import denoptim.graph.DGraph;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
@@ -359,6 +362,25 @@ public class FragmenterParameters extends RunTimeParameters
      * Flag activating operations depending on 3D structure
      */
     private boolean workingIn3D = true;
+
+    /**
+     * The policy for defining the scaffold vertex in a graph that does 
+     * not have such a {@link BBType}.
+     */
+    private ScaffoldingPolicy scaffoldingPolicy = 
+            ScaffoldingPolicy.LARGEST_FRAGMENT;
+
+    /**
+     * Flag that enables the embedding of rings in templates upon conversion of
+     * molecules into {@link DGraph}.
+     */
+    protected boolean embedRingsInTemplate = false;
+    
+    /**
+     * Type of constrain defined for any template generated upon conversion of 
+     * molecules into {@link DGraph}.
+     */
+    protected ContractLevel embeddedRingsContract = ContractLevel.FREE;
     
     
 //------------------------------------------------------------------------------
@@ -439,11 +461,41 @@ public class FragmenterParameters extends RunTimeParameters
 //------------------------------------------------------------------------------
 
     /**
-     * @return the cutting rules loaded from the input.
+     * @return the cutting rules currently configured in this set of parameters.
      */
     public List<CuttingRule> getCuttingRules()
     {
         return cuttingRules;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Assigns the cutting rules loaded from the input.
+     */
+    public void setCuttingRules(List<CuttingRule> cuttingRules)
+    {
+        this.cuttingRules = cuttingRules;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Assigns the pathname to the cutting rules file.
+     */
+    public void setCuttingRulesFilePathname(String pathname)
+    {
+        this.cutRulesFile = pathname;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the pathname to the cutting rules file.
+     */
+    public String getCuttingRulesFilePathname()
+    {
+        return cutRulesFile;
     }
 
 //------------------------------------------------------------------------------
@@ -893,7 +945,74 @@ public class FragmenterParameters extends RunTimeParameters
     {
         return acceptUnsetToSingeBOApprox;
     }
+    
+//-----------------------------------------------------------------------------
 
+    /**
+     * @param embedRingsInTemplate the flag that enables the embedding of rings 
+     * in templates upon conversion of molecules into {@link DGraph} .
+     */
+    public void setEmbedRingsInTemplate(boolean embedRingsInTemplate)
+    {
+        this.embedRingsInTemplate = embedRingsInTemplate;
+    }
+    
+//-----------------------------------------------------------------------------
+
+    /**
+     * @return the flag that enables the embedding of rings in templates upon 
+     * conversion of molecules into {@link DGraph} .
+     */
+    public boolean embedRingsInTemplate()
+    {
+        return embedRingsInTemplate;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @param embeddedRingsContract the type of constrain defined for any 
+     * template generated upon 
+     * conversion of molecules into {@link DGraph}.
+     */
+    public void setEmbeddedRingsContract(ContractLevel embeddedRingsContract)
+    {
+        this.embeddedRingsContract = embeddedRingsContract;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the type of constrain defined for any template generated upon 
+     * conversion of molecules into {@link DGraph}.
+     */
+    public ContractLevel getEmbeddedRingsContract()
+    {
+        return embeddedRingsContract;
+    }
+
+//------------------------------------------------------------------------------    
+
+    /**
+     * @param sp the policy for defining the scaffold vertex in a graph that does 
+     * not have such a {@link BBType}.
+     */
+    public void setScaffoldingPolicy(ScaffoldingPolicy sp)
+    {
+        this.scaffoldingPolicy = sp;
+    }
+    
+//------------------------------------------------------------------------------    
+
+    /**
+     * @return the policy for defining the scaffold vertex in a graph that does 
+     * not have such a {@link BBType}.
+     */
+    public ScaffoldingPolicy getScaffoldingPolicy()
+    {
+        return scaffoldingPolicy;
+    }
+      
 //------------------------------------------------------------------------------
     
     /**
@@ -1096,6 +1215,43 @@ public class FragmenterParameters extends RunTimeParameters
             case "SDWEIGHTUNIMODALPOPULATION=":
                 factorForSDOnStatsOfUnimodalPop = Double.parseDouble(value);
                 break;
+                
+            case "SCAFFOLDINGPOLICY=":
+                String[] words = value.split("\\s+");
+                try {
+                    scaffoldingPolicy = ScaffoldingPolicy.valueOf(words[0]);
+                    if (ScaffoldingPolicy.ELEMENT.equals(scaffoldingPolicy))
+                    {
+                        if (words.length<2)
+                        {
+                            throw new DENOPTIMException("Expected elemental "
+                                    + "symbol after '" 
+                                    + ScaffoldingPolicy.ELEMENT+ "', but none "
+                                    + "found");
+                        }
+                        scaffoldingPolicy.label = words[1];
+                    }
+                } catch (Throwable t)
+                {
+                    msg = "Unable to parse value of " + key + ": '" + value + "'";
+                    throw new DENOPTIMException(msg);
+                }
+                break;
+
+            case "EMBEDRINGSINTEMPLATES=":
+            {
+                embedRingsInTemplate = readYesNoTrueFalse(value);
+                break;
+            }
+            
+            case "RINGEMBEDDINGCONTRACT=":
+            {
+                if (value.length() > 0)
+                {
+                    embeddedRingsContract = ContractLevel.valueOf(value);
+                }
+                break;
+            }
                 
 /*
             case "=":
@@ -1463,6 +1619,7 @@ public class FragmenterParameters extends RunTimeParameters
     {
         return workingIn3D;
     }
+    
 //------------------------------------------------------------------------------    
 
     /**
@@ -1473,4 +1630,7 @@ public class FragmenterParameters extends RunTimeParameters
     {
         this.workingIn3D = workingIn3D;
     }
+    
+//------------------------------------------------------------------------------    
+
 }

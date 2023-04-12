@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.vecmath.Point3d;
 
@@ -183,7 +182,7 @@ public class FragmentTest
         ssaps.add(ss); 
         //NB: customised symmetry set that does not correspond to the
         // definition of symmetry as perceived automatically by
-        // DENOPTIMFragment.identifySymmetryRelatedAPSets
+        // Fragment.identifySymmetryRelatedAPSets
         // This because we want to test if the symmetric set is properly
         // serialized/deserialized.
         v.setSymmetricAPSets(ssaps);

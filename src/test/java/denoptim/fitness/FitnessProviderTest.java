@@ -63,7 +63,7 @@ public class FitnessProviderTest
     private Logger logger;
     
     @BeforeEach
-    private void setUp()
+    void setUp()
     {
         assertTrue(tempDir.isDirectory(),"Should be a directory ");
         sp = new SmilesParser(SilentChemObjectBuilder.getInstance());

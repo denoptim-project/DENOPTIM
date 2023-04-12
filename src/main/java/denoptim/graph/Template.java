@@ -104,13 +104,13 @@ public class Template extends Vertex
     public enum ContractLevel {
         /**
          * Inner graphs are free to change within 
-         * the confines of the required APs
+         * the confines of the required {@link AttachmentPoint}s.
          */
         FREE,
         
         /**
          * Inner graphs are effectively equivalent 
-         * to the DENOPTIMFragment class, as no change in the inner structure is
+         * to the {@link Fragment} class, as no change in the inner structure is
          * allowed.
          */
         FIXED,
@@ -118,7 +118,8 @@ public class Template extends Vertex
         /**
          * Inner graph keep the same structure, but the identify of vertices
          * can change. 
-         * Effectively this contract allows only CHANGELINK mutation.
+         * Effectively this contract allows only 
+         * {@value MutationType#CHANGELINK} mutation.
          */
         FIXED_STRUCT
     }
@@ -501,6 +502,7 @@ public class Template extends Vertex
             if (doneAPs.contains(innerAP))
                 continue;
             
+            // Must contain outer APs!
             SymmetricAPs symSetForThisAP = new SymmetricAPs();
             
             Vertex vrtx = innerAP.getOwner();
@@ -514,7 +516,7 @@ public class Template extends Vertex
                         continue;
                     if (innerToOuterAPs.containsKey(symInnerAP))
                     {
-                        symSetForThisAP.add(symInnerAP);
+                        symSetForThisAP.add(innerToOuterAPs.get(symInnerAP));
                         doneAPs.add(symInnerAP);
                     }
                 }
@@ -530,7 +532,8 @@ public class Template extends Vertex
                 if (doneAPs.contains(innerApOnSymVrtx))
                     continue;
                 
-                SymmetricAPs sAPsOnSymVrtx = symVrtx.getSymmetricAPs(innerAP);
+                SymmetricAPs sAPsOnSymVrtx = symVrtx.getSymmetricAPs(
+                        innerApOnSymVrtx);
                 if (sAPsOnSymVrtx.size()!=0)
                 {
                     for (AttachmentPoint symInnerAPOnSymVrtx : sAPsOnSymVrtx)
@@ -539,23 +542,25 @@ public class Template extends Vertex
                             continue;
                         if (innerToOuterAPs.containsKey(symInnerAPOnSymVrtx))
                         {
-                            symSetForThisAP.add(symInnerAPOnSymVrtx);
+                            symSetForThisAP.add(innerToOuterAPs.get(
+                                    symInnerAPOnSymVrtx));
                             doneAPs.add(symInnerAPOnSymVrtx);
                         }
                     }
                 } else {
                     // We need to add the AP at innerAPIdx anyway because even
-                    // it it does not have symmetric APs on its vertex owner it
+                    // if it does not have symmetric APs on its vertex owner it
                     // is symmetric to the vrtx by means of the two vertices 
                     // being members of the same symmetric set of vertices.
                     if (innerToOuterAPs.containsKey(innerApOnSymVrtx))
                     {
-                        symSetForThisAP.add(innerApOnSymVrtx);
+                        symSetForThisAP.add(innerToOuterAPs.get(
+                                innerApOnSymVrtx));
                         doneAPs.add(innerApOnSymVrtx);
                     }
                     if (!doneAPs.contains(innerAP))
                     {
-                        symSetForThisAP.add(innerAP);
+                        symSetForThisAP.add(innerToOuterAPs.get(innerAP));
                         doneAPs.add(innerAP);
                     }
                 }

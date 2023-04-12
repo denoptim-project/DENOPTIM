@@ -154,6 +154,10 @@ public class DENOPTIMgson
                     && field.getName().equals("user")) {
                 return true;
             }
+            if (field.getDeclaringClass() == AttachmentPoint.class
+                    && field.getName().equals("cutId")) {
+                return true;
+            }
             if (field.getDeclaringClass() == Vertex.class
                     && field.getName().equals("owner")) {
                 return true;
@@ -192,6 +196,10 @@ public class DENOPTIMgson
             }
             if (field.getDeclaringClass() == AttachmentPoint.class
                    && field.getName().equals("user")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == AttachmentPoint.class
+                    && field.getName().equals("cutId")) {
                 return true;
             }
             if (field.getDeclaringClass() == Vertex.class

@@ -36,7 +36,6 @@ import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
-import denoptim.graph.SymmetricSet;
 import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Vertex;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;

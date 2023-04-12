@@ -36,16 +36,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.openscience.cdk.io.iterator.IteratingSMILESReader;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.exception.ExceptionUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.ga.EAUtils.CandidateSource;
 import denoptim.graph.Candidate;
+import denoptim.io.IteratingAtomContainerReader;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
+import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.FitnessTask;
 import denoptim.task.Task;
 import denoptim.task.TasksBatchManager;
@@ -429,7 +432,33 @@ public class EvolutionaryAlgorithm
                 settings.getMonitorDumpStep(), settings.dumpMonitor(),
                 settings.getLogger());
         
-        // Loop creation of candidates until we have created enough new valid 
+        IteratingAtomContainerReader iterMolsToFragment = null;
+        if (settings.getInitMolsToFragmentFile()!=null)
+        {
+            try
+            {
+                iterMolsToFragment = new IteratingAtomContainerReader(new File(
+                        settings.getInitMolsToFragmentFile()));
+                if (iterMolsToFragment.getIteratorType().equals(
+                        IteratingSMILESReader.class))
+                {
+                    FragmenterParameters frgParams = new FragmenterParameters();
+                    if (settings.containsParameters(ParametersType.FRG_PARAMS))
+                    {
+                        frgParams = (FragmenterParameters) 
+                                settings.getParameters(
+                                        ParametersType.FRG_PARAMS);
+                    }
+                    frgParams.setWorkingIn3D(false);
+                }
+            } catch (Exception e1)
+            {
+                throw new DENOPTIMException("Could not set reader on file ''"
+                        + settings.getInitMolsToFragmentFile() + ".", ex);
+            }
+        }
+        
+        // Loop for creation of candidates until we have created enough new valid 
         // candidates or we have reached the max number of attempts.
         int i=0;
         ArrayList<Task> tasks = new ArrayList<>();
@@ -458,8 +487,14 @@ public class EvolutionaryAlgorithm
                         break;
                 }
                 
-                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
-                        settings);
+                Candidate candidate = null;
+                if (iterMolsToFragment!=null && iterMolsToFragment.hasNext())
+                {
+                    candidate = EAUtils.buildCandidateByFragmentingMolecule(
+                            iterMolsToFragment.next(), mnt, settings);
+                } else {
+                    candidate = EAUtils.buildCandidateFromScratch(mnt,settings);
+                }
                   
                 if (candidate == null)
                     continue;

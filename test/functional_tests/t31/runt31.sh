@@ -23,13 +23,13 @@ do
   fi
 done
 
+kill "$SERVER_PID"
+
 if [ "$ES" -ne 0 ]
 then
     echo "Test 't31' NOT PASSED (symptom: non-zero exit status from python)"
     exit -1
 fi
 
-kill "$SERVER_PID"
-  
 echo "Test 't31' PASSED"
 exit 0

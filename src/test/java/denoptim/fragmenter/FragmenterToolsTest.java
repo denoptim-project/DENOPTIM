@@ -84,7 +84,7 @@ public class FragmenterToolsTest
         Set<String> anyAtomSMARTS = new HashSet<String>();
         anyAtomSMARTS.add("[$([*;!#1])]");
         
-        Map<String, ArrayList<MatchedBond>> matches = 
+        Map<String, List<MatchedBond>> matches = 
                 FragmenterTools.getMatchingBondsAllInOne(mol, rules, null);
         
         assertEquals(matches.get("RuleA").size(),2);
