@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.bcel.generic.RETURN;
 import org.apache.commons.lang3.time.StopWatch;
 import org.openscience.cdk.io.iterator.IteratingSMILESReader;
 
@@ -410,6 +411,7 @@ public class EvolutionaryAlgorithm
         		return;
         	}
         	
+        	// Keep only the best candidates if there are too many.
             Collections.sort(population, Collections.reverseOrder());
             if (settings.getReplacementStrategy() == 1 && 
                     population.size() > settings.getPopulationSize())
@@ -423,6 +425,7 @@ public class EvolutionaryAlgorithm
                     .clear();
             }
         }
+        // NB: pop size cannot be > because it has been just trimmed
         if (population.size() == settings.getPopulationSize())
         {
             return;
@@ -432,9 +435,10 @@ public class EvolutionaryAlgorithm
                 settings.getMonitorDumpStep(), settings.dumpMonitor(),
                 settings.getLogger());
         
-        IteratingAtomContainerReader iterMolsToFragment = null;
+        // Screen molecules (these can be very many!)
         if (settings.getInitMolsToFragmentFile()!=null)
         {
+            IteratingAtomContainerReader iterMolsToFragment = null;
             try
             {
                 iterMolsToFragment = new IteratingAtomContainerReader(new File(
@@ -456,12 +460,82 @@ public class EvolutionaryAlgorithm
                 throw new DENOPTIMException("Could not set reader on file ''"
                         + settings.getInitMolsToFragmentFile() + ".", ex);
             }
+            
+            // This is very similar to the standard population initialization 
+            // async loop, but it allows to screen many more candidates because
+            // it keeps only best N, where N is the size of the population.
+            // Yet, there is plenty of repeated code, which is suboptimal.
+            int i=0;
+            int excessCandidates=0;
+            List<Task> batchOfSyncParallelTasks = new ArrayList<>();
+            try 
+            {
+                while (iterMolsToFragment.hasNext()) 
+                {
+                    i++;
+                    if (population.size() >= settings.getPopulationSize())
+                        excessCandidates++;
+                    
+                    if (stopped)
+                    {
+                        break;
+                    }
+                    
+                    if (checkForException())
+                    {
+                        stopRun();
+                        throw new DENOPTIMException("Errors found during sub "
+                                + "tasks execution.", ex);
+                    }
+                    
+                    // We trim the population every so-and-so-many candidates to 
+                    // prevent memory overload.
+                    synchronized (population)
+                    {
+                        if (excessCandidates > 100)
+                        {
+                            //TODO-gg trim population
+                        }
+                    }
+                    
+                    Candidate candidate = 
+                            EAUtils.buildCandidateByFragmentingMolecule(
+                                iterMolsToFragment.next(), mnt, settings);
+
+                    i = processInitialPopCandidate(candidate, population, mnt, 
+                            batchOfSyncParallelTasks, i);
+                }
+                // We still need to submit the possibly partially-filled last batch
+                if (batchOfSyncParallelTasks.size()>0)
+                    submitSyncParallelBatch(batchOfSyncParallelTasks);
+            } catch (DENOPTIMException dex)
+            {
+                if (isAsync)
+                {
+                    cleanupAsync();
+                    tpe.shutdown();
+                }
+                throw dex;
+            }
+            catch (Exception ex)
+            {
+                if (isAsync)
+                {
+                    cleanupAsync();
+                    tpe.shutdown();
+                }
+                ex.printStackTrace();
+                throw new DENOPTIMException(ex);
+            }
         }
+        
         
         // Loop for creation of candidates until we have created enough new valid 
         // candidates or we have reached the max number of attempts.
+        // WARNING: careful about the duplication of code in this loop and in 
+        // the one above (with iterMolsToFragment)
         int i=0;
-        ArrayList<Task> tasks = new ArrayList<>();
+        List<Task> tasks = new ArrayList<>();
         try 
         {
             while (i < settings.getPopulationSize() *
@@ -487,77 +561,11 @@ public class EvolutionaryAlgorithm
                         break;
                 }
                 
-                Candidate candidate = null;
-                if (iterMolsToFragment!=null && iterMolsToFragment.hasNext())
-                {
-                    candidate = EAUtils.buildCandidateByFragmentingMolecule(
-                            iterMolsToFragment.next(), mnt, settings);
-                } else {
-                    candidate = EAUtils.buildCandidateFromScratch(mnt,settings);
-                }
-                  
-                if (candidate == null)
-                    continue;
-
-                candidate.setGeneration(0);
+                Candidate candidate = EAUtils.buildCandidateFromScratch(mnt,
+                        settings);
                 
-                if (((FitnessParameters)settings.getParameters(
-                        ParametersType.FIT_PARAMS)).checkPreFitnessUID())
-                {
-                    try
-                    {
-                        if (!scs.addNewUniqueEntry(candidate.getUID()))
-                        {
-                            mnt.increase(CounterID.DUPLICATEPREFITNESS);
-                            continue;
-                        }
-                    } catch (Exception e) {
-                        mnt.increase(
-                                CounterID.FAILEDDUPLICATEPREFITNESSDETECTION);
-                        continue;
-                    }
-                }
-               
-                OffspringEvaluationTask task = new OffspringEvaluationTask(
-                        settings,
-                        candidate, 
-                        null,
-                        EAUtils.getPathNameToGenerationFolder(0, settings), 
-                        population, mnt, settings.getUIDFileOut());
-                
-                // Submission is dependent on the parallelisation scheme
-                if (isAsync)
-                {
-                    submitted.add(task);
-                    futures.put(task, tpe.submit(task));
-                    // We keep some memory but of previous tasks, but must
-                    // avoid memory leak due to storage of too many references 
-                    // to submitted tasks.
-                    if (submitted.size() > 2*settings.getNumberOfCPU())
-                    {
-                        cleanupCompleted();
-                    }
-                } else {
-                    tasks.add(task);
-                    if (tasks.size() >= Math.abs(
-                            population.size() - settings.getPopulationSize())
-                            ||
-                            //This to avoid the fixed batch size to block the
-                            //generation of new candidates for too long
-                            i >= (0.1 * settings.getPopulationSize() *
-                                    settings.getMaxTriesFactor()))
-                    {
-                        // Now we have as many tasks as are needed to fill up the 
-                        // population. Therefore we can run the execution service.
-                        // TasksBatchManager takes the collection of tasks and runs
-                        // them in batches of N, where N is given by the
-                        // second argument.
-                        tbm.executeTasks(tasks, settings.getNumberOfCPU());
-                        tasks.clear();
-                    } else {
-                        i = 0;
-                    }
-                }
+                i = processInitialPopCandidate(candidate, population, mnt, 
+                        tasks, i);
             }
         } catch (DENOPTIMException dex)
         {
@@ -603,6 +611,97 @@ public class EvolutionaryAlgorithm
             population.trimToSize();
             Collections.sort(population, Collections.reverseOrder());
         }
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * @param candidate the candidate to process.
+     * @param population the population where the candidate may enter.
+     * @param mnt the monitor of events.
+     * @param batchOfSyncParallelTasks used only in synchronous parallelization.
+     * @param attemptsToFillBatch counter of attempts to fill a sync parallel
+     * batch of tasks.
+     * @return the update number of attemptsToFillBatch, if it needs to be 
+     * updated.
+     * @throws DENOPTIMException
+     */
+    private int processInitialPopCandidate(Candidate candidate, 
+            Population population, Monitor mnt,
+            List<Task> batchOfSyncParallelTasks, int attemptsToFillBatch)
+                    throws DENOPTIMException
+    {
+        if (candidate == null)
+            return attemptsToFillBatch;
+
+        candidate.setGeneration(0);
+        
+        if (((FitnessParameters)settings.getParameters(
+                ParametersType.FIT_PARAMS)).checkPreFitnessUID())
+        {
+            try
+            {
+                if (!scs.addNewUniqueEntry(candidate.getUID()))
+                {
+                    mnt.increase(CounterID.DUPLICATEPREFITNESS);
+                    return attemptsToFillBatch;
+                }
+            } catch (Exception e) {
+                mnt.increase(CounterID.FAILEDDUPLICATEPREFITNESSDETECTION);
+                return attemptsToFillBatch;
+            }
+        }
+       
+        OffspringEvaluationTask task = new OffspringEvaluationTask(
+                settings,
+                candidate, 
+                null,
+                EAUtils.getPathNameToGenerationFolder(0, settings), 
+                population, mnt, settings.getUIDFileOut());
+        
+        // Submission is dependent on the parallelization scheme
+        if (isAsync)
+        {
+            submitted.add(task);
+            futures.put(task, tpe.submit(task));
+            // We keep some memory but of previous tasks, but must
+            // avoid memory leak due to storage of too many references 
+            // to submitted tasks.
+            if (submitted.size() > 2*settings.getNumberOfCPU())
+            {
+                cleanupCompleted();
+            }
+        } else {
+            batchOfSyncParallelTasks.add(task);
+            if (batchOfSyncParallelTasks.size() >= Math.abs(
+                    population.size() - settings.getPopulationSize())
+                    ||
+                    //This to avoid the fixed batch size to block the
+                    //generation of new candidates for too long
+                    attemptsToFillBatch >= (0.1 * settings.getPopulationSize() *
+                            settings.getMaxTriesFactor()))
+            {
+                // Now we have as many tasks as are needed to fill up the 
+                // population. Therefore we can run the execution service.
+                // TasksBatchManager takes the collection of tasks and runs
+                // them in batches of N, where N is given by the
+                // second argument.
+                submitSyncParallelBatch(batchOfSyncParallelTasks);
+            } else {
+                attemptsToFillBatch = 0;
+            }
+        }
+        return attemptsToFillBatch;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private void submitSyncParallelBatch(List<Task> batchOfSyncParallelTasks) 
+            throws DENOPTIMException
+    {
+        tbm.executeTasks(batchOfSyncParallelTasks, 
+                settings.getNumberOfCPU());
+        batchOfSyncParallelTasks.clear();
     }
 
 //------------------------------------------------------------------------------
@@ -788,9 +887,7 @@ public class EvolutionaryAlgorithm
                             // TasksBatchManager takes the collection of tasks and
                             // runs them in batches of N, where N is given by the
                             // second argument.
-                            tbm.executeTasks(syncronisedTasks,
-                                    settings.getNumberOfCPU());
-                            syncronisedTasks.clear();
+                            submitSyncParallelBatch(syncronisedTasks);
                         }
                     }
                 }

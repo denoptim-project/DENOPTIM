@@ -1556,7 +1556,7 @@ public class EAUtils
             String genDir, GAParameters settings) 
                     throws DENOPTIMException, IOException
     {
-        ArrayList<Candidate> candidates = DenoptimIO.readCandidates(
+        List<Candidate> candidates = DenoptimIO.readCandidates(
                 new File(filename), true);
         if (candidates.size() == 0)
         {
