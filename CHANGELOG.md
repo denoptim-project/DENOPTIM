@@ -5,6 +5,7 @@
 * Conversion of molecular representation into DENOPTIM graphs by on-the-fly fragmentation (via GUI or in GA run)
 * Extended the functionality of the genetic algorithm by adding optional behavior.
 * Generalized SUS selection strategy
+* GUI can now handle also settings not directly defined in GUI's forms.
 * Minor debugs.
 
 ## From 3.x to 4.0.0
