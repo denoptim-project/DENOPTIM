@@ -38,7 +38,7 @@ if [[ 34 -ne "$nFromFragmentation" ]]; then
 fi
 
 maxFitness=$(grep "^MAX:" "$wrkDir/"RUN*/Gen0/Gen0.txt | awk '{print $2}')
-if [[ "$maxFitness" != "58"* ]]; then
+if [[ "$maxFitness" != "59"* ]]; then
    echo " "
    echo "Test 't12g' NOT PASSED (Max fitness in Gen0 is $maxFitness instead of 58*)"
    exit 1

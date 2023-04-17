@@ -20,6 +20,8 @@ FRG-EmbedRingsInTemplates=yes
 FRG-RingEmbeddingContract=FIXED_STRUCT
 FRG-CuttingRulesFile=OTF_WDIR/cutting_rules
 FRG-ScaffoldingPolicy=ELEMENT C
+FRG-ADDEXPLICITHYDROGEN
+FRG-UNSETTOSINGLEBO
 #
 GA-randomSeed=8572368003836
 GA-Parallelization=synchronous
