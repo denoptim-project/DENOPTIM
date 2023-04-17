@@ -565,6 +565,9 @@ public class FSEParametersForm extends ParametersForm
         sb.append(getStringIfNotEmpty(keyPar6,txtPar6));
         sb.append(getStringIfNotEmpty(keyPar11,txtPar11));
         sb.append(getStringIfNotEmpty(keyPar12,txtPar12));
+
+        sb.append(getTextForUnformattedSettings()).append(NL);
+        
         //HEREGOESPRINT this is only to facilitate automated insertion of code        
     }
 }

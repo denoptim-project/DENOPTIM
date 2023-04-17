@@ -237,6 +237,8 @@ public class GUIPrepareFitnessRunner extends GUIPrepare
             sb.append(getStringIfNotEmpty(keyInFile,txtInFile));
             sb.append(getStringIfNotEmpty(keyOutFile,txtOutFile));
             sb.append(NL);
+
+            sb.append(getTextForUnformattedSettings()).append(NL);
         }
 	}
 	

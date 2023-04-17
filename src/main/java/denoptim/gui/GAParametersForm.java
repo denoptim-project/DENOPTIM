@@ -2177,6 +2177,9 @@ public class GAParametersForm extends ParametersForm
         {
             sb.append(getStringForKVLine(keyRingSysTmplTrhld,spnRingSysTmpl));
         }
+        
+        sb.append(getTextForUnformattedSettings()).append(NL);
+        
         //HEREGOESPRINT this is only to facilitate automated insertion of code        
     }
 }

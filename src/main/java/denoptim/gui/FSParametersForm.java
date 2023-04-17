@@ -1394,6 +1394,9 @@ public class FSParametersForm extends ParametersForm
         			break;
     		}
         }
+
+        sb.append(getTextForUnformattedSettings()).append(NL);
+        
         //HEREGOESPRINT this is only to facilitate automated insertion of code  
     }
 }

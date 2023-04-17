@@ -1115,6 +1115,9 @@ public class FitnessParametersForm extends ParametersForm
         } else {
             sb.append(keyPreFitnessUIDCheck).append("=NO").append(NL);
         }
+        
+        sb.append(getTextForUnformattedSettings()).append(NL);
+        
         //HEREGOESPRINT this is only to facilitate automated insertion of code       
     }
     

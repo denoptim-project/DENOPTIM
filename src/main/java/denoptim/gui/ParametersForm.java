@@ -699,6 +699,13 @@ public class ParametersForm extends JPanel implements IParametersForm
     
 //-----------------------------------------------------------------------------
     
+    protected String getTextForUnformattedSettings()
+    {
+        return txtUnformattedInput.getText();
+    }
+    
+//-----------------------------------------------------------------------------
+    
     private void showPromptIfEmpty()
     {
         String txt = txtUnformattedInput.getText();
