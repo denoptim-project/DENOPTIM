@@ -19,20 +19,33 @@
 package denoptim.gui;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BoxLayout;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -40,6 +53,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.files.FileUtils;
 
 
@@ -115,6 +129,22 @@ public class ParametersForm extends JPanel implements IParametersForm
 	 * found (at the beginning of a line) in the parameters file, or not.
 	 */
 	protected Map<String,Boolean> checkedFlags = new HashMap<String,Boolean>();
+
+    /**
+     * Storage of unformatted text for input files.
+     */
+    protected JTextArea txtUnformattedInput = new JTextArea(5,20);
+    
+    /**
+     * Flag recording we have imported text containing a line that is not 
+     * interpreted as a GUI-controllable parameter.
+     */
+    protected boolean foundCLIOnlyContent = false;
+    
+    private final String UNSETUNFORMATTEDINPUTTXT = 
+            "Write additional text for the input file here...";
+    private final Color UNSETUNFORMATTEDINPUTTXTCOLOR = Color.GRAY;
+    private final Color SETUNFORMATTEDINPUTTXTCOLOR = Color.BLACK;
     
 //-----------------------------------------------------------------------------
     
@@ -575,6 +605,122 @@ public class ParametersForm extends JPanel implements IParametersForm
 			unsavedChanges = true;
 		}
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Shown a warning dialog that informs the user about having found
+	 * text that is not present in the {@link ParametersForm}
+	 * implementation and is treated as free text.
+	 * @param parent component used to place the dialog on screen.
+	 * @param paramType the kind of parameter collector.
+	 */
+	public void showUnknownKeyWarning(Component parent, String paramType)
+	{
+	    if (foundCLIOnlyContent)
+	    {
+            JOptionPane.showMessageDialog(parent,
+                    String.format("<html><body width='%1s'>"
+                            + "Found text that is either not recognized "
+                            + " as " + paramType + " parameters "
+                            + "or pertains settings that cannot yet be "
+                            + "controlled from the GUI. "
+                            + "You can edit/delete this content in the "
+                            + "parameter editor located at the bottom of the "
+                            + "parameter's form. <br>"
+                            + "Content of the unformatted content:"
+                            + "</body></html>", 400)
+                    + DENOPTIMConstants.EOL
+                    + txtUnformattedInput.getText(),
+                    "WARNING",
+                    JOptionPane.WARNING_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+	    }
+	}
+	
+//------------------------------------------------------------------------------
+	
+	protected void addToUnformattedTxt(String key, String value)
+	{
+        foundCLIOnlyContent = true;
+        if (txtUnformattedInput.getText().equals(UNSETUNFORMATTEDINPUTTXT)) 
+        {
+            txtUnformattedInput.setText(key + "=" + value);
+        } else {
+            txtUnformattedInput.append(DENOPTIMConstants.EOL + key + "=" + value);
+        }
+        txtUnformattedInput.setForeground(SETUNFORMATTEDINPUTTXTCOLOR);
+	}
+
+//------------------------------------------------------------------------------
+    
+    protected JPanel getPanelForUnformattedInput()
+    {
+        JPanel blockUnformatted = new JPanel();
+        blockUnformatted.setLayout(new BoxLayout(blockUnformatted, 
+                SwingConstants.VERTICAL));
+        blockUnformatted.add(new JSeparator());
+        String toolTip = String.format(
+                "<html><body width='%1s'>Here you can find/write any "
+                + "further text lines that can be written/found in the "
+                + "parameter's file. Such text may contain comments (i.e., "
+                + "start with '#') and any keyword that is not controllable by "
+                + "the GUI.</body></html>", 400);
+        blockUnformatted.setToolTipText(toolTip);
+        JPanel lineHeader = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel lbl = new JLabel(
+                "Additional input file content not controlled by GUI", 
+                SwingConstants.LEFT);
+        lineHeader.add(lbl);
+        blockUnformatted.add(lineHeader);
+        txtUnformattedInput.setToolTipText(toolTip);
+        txtUnformattedInput.setText(UNSETUNFORMATTEDINPUTTXT);
+        txtUnformattedInput.setForeground(UNSETUNFORMATTEDINPUTTXTCOLOR);
+        txtUnformattedInput.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                showPromptIfEmpty();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e)
+            {
+                showPromptIfEmpty();
+            }
+            
+        });
+        JScrollPane scroller = new JScrollPane(txtUnformattedInput); 
+        blockUnformatted.add(scroller);
+        
+        return blockUnformatted;
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    private void showPromptIfEmpty()
+    {
+        String txt = txtUnformattedInput.getText();
+        if (txt.equals(UNSETUNFORMATTEDINPUTTXT)) 
+        {
+            txtUnformattedInput.setText("");
+            txtUnformattedInput.setForeground(SETUNFORMATTEDINPUTTXTCOLOR);
+        } else if (txt.isBlank()) {
+            txtUnformattedInput.setText(UNSETUNFORMATTEDINPUTTXT);
+            txtUnformattedInput.setForeground(UNSETUNFORMATTEDINPUTTXTCOLOR);
+        } else {
+            txtUnformattedInput.setForeground(SETUNFORMATTEDINPUTTXTCOLOR);
+        }
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    protected void clearUnformattedTxtArea()
+    {
+        txtUnformattedInput.setText(UNSETUNFORMATTEDINPUTTXT);
+        txtUnformattedInput.setForeground(UNSETUNFORMATTEDINPUTTXTCOLOR);
+    }
 	
 //-----------------------------------------------------------------------------
 

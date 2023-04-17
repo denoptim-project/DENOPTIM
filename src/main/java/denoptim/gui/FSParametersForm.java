@@ -1207,6 +1207,8 @@ public class FSParametersForm extends ParametersForm
 
         //HEREGOESADVIMPLEMENTATION this is only to facilitate automated insertion of code    
         
+        block.add(super.getPanelForUnformattedInput());
+        
         this.add(scrollablePane);
     }
    
@@ -1222,6 +1224,7 @@ public class FSParametersForm extends ParametersForm
     @Override
     public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
     {
+        clearUnformattedTxtArea();
     	importParametersFromDenoptimParamsFile(fileName,"FS-");
 		importParametersFromDenoptimParamsFile(fileName,"RC-");
 		
@@ -1249,6 +1252,7 @@ public class FSParametersForm extends ParametersForm
     			localBlock5.setVisible(true);   
     			break;
 		}
+        showUnknownKeyWarning(this, "Fragment Space");
     }
     
 //-----------------------------------------------------------------------------
@@ -1266,12 +1270,7 @@ public class FSParametersForm extends ParametersForm
   		}
   		else
   		{
-			JOptionPane.showMessageDialog(this,
-					"<html>Parameter '" + key 
-					+ "' is not recognized.<br>Ignoring line.</html>",
-	                "WARNING",
-	                JOptionPane.WARNING_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
+  		    addToUnformattedTxt(key, value);
 			return;
   		}
  		

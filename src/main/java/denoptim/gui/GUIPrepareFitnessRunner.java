@@ -166,6 +166,8 @@ public class GUIPrepareFitnessRunner extends GUIPrepare
 
             block.add(LineOutFile);
             
+            block.add(super.getPanelForUnformattedInput());
+            
             this.add(scrollablePane);
         }
         
@@ -182,7 +184,9 @@ public class GUIPrepareFitnessRunner extends GUIPrepare
         public void importParametersFromDenoptimParamsFile(String fileName) 
                 throws Exception
         {
+            clearUnformattedTxtArea();
             importParametersFromDenoptimParamsFile(fileName,"FR-");
+            showUnknownKeyWarning(this, "Fitness Runner");
         }
         
     //--------------------------------------------------------------------------
@@ -201,12 +205,7 @@ public class GUIPrepareFitnessRunner extends GUIPrepare
             }
             else
             {
-                JOptionPane.showMessageDialog(this,
-                        "<html>Parameter '" + key + "' is not recognized<br> "
-                                + "and will be ignored.</html>",
-                        "WARNING",
-                        JOptionPane.WARNING_MESSAGE,
-                        UIManager.getIcon("OptionPane.errorIcon"));
+                addToUnformattedTxt(key, value);
                 return;
             }
             

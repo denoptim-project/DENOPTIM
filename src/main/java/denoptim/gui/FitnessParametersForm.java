@@ -178,6 +178,8 @@ public class FitnessParametersForm extends ParametersForm
         
     String NL = System.getProperty("line.separator");
     
+//------------------------------------------------------------------------------
+    
     public FitnessParametersForm(Dimension d)
     {
     	mapKeyFieldToValueField = new HashMap<String,Object>();
@@ -896,6 +898,8 @@ public class FitnessParametersForm extends ParametersForm
         block.add(advOptsBlock);  
         */
         
+        block.add(super.getPanelForUnformattedInput());
+        
         this.add(scrollablePane);
     }
     
@@ -982,6 +986,7 @@ public class FitnessParametersForm extends ParametersForm
     @Override
     public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
     {
+        clearUnformattedTxtArea();
     	importParametersFromDenoptimParamsFile(fileName,"FP-");
     	
     	rdbSrcOrNew.setSelected(false);
@@ -997,6 +1002,7 @@ public class FitnessParametersForm extends ParametersForm
 			localBlock3.setVisible(false);
 			localBlock4.setVisible(true);
 		}
+        showUnknownKeyWarning(this, "Fitness Provider");
     }
 
 //-----------------------------------------------------------------------------
@@ -1014,12 +1020,7 @@ public class FitnessParametersForm extends ParametersForm
   		}
   		else
   		{
-			JOptionPane.showMessageDialog(this,
-					"<html>Parameter '" + key + "' is not recognized<br> and "
-							+ "will be ignored.</html>",
-	                "WARNING",
-	                JOptionPane.WARNING_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
+  		    addToUnformattedTxt(key, value);
 			return;
   		}
   		
