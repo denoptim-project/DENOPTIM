@@ -39,6 +39,7 @@ import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.io.DenoptimIO;
 import denoptim.io.IteratingAtomContainerReader;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.fragmenter.MatchedBond;
@@ -128,6 +129,77 @@ public class FragmenterTools
             DenoptimIO.writeSDFFile(output.getAbsolutePath(), buffer, true);
             buffer.clear();
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+
+    /** 
+     * Do any pre-processing on a {@link IAtomContainer} meant to be fragmented.
+     * These are DENOPTIM specific manipulations, in particular meant to
+     * comply to requirements to write SDF files: unset bond orders 
+     * can only be used in query-type files. So types 4 and 8 are not
+     * expected to be found (but CSD uses them...).
+     * Also, it deals with implicit H formalism according to the given settings.
+     * 
+     * @param mol the system that this method prepares to fragmentation.
+     * @param settings the settings controlling how the molecule is prepared.
+     * @param index identifies the given {@link IAtomContainer} in a collection
+     * of systems to work on. This is used only for logging.
+     */
+    public static boolean prepareMolToFragmentation(IAtomContainer mol, 
+            FragmenterParameters settings, int index)
+    {
+        try
+        {
+            if (settings.addExplicitH())
+            {
+                MoleculeUtils.explicitHydrogens(mol);
+            } else {
+                MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+            }
+            MoleculeUtils.ensureNoUnsetBondOrders(mol);
+        } catch (CDKException e)
+        {
+            if (!settings.acceptUnsetToSingeBO())
+            {
+                settings.getLogger().log(Level.WARNING,"Some bond order "
+                        + "are unset and attempt to kekulize the "
+                        + "system has failed "
+                        + "for structure " + index + "."
+                        + "This hampers use of SMARTS queries, which "
+                        + "may very "
+                        + "not work as expected. Structure " + index 
+                        + " will "
+                        + "be rejected. You can avoid rejection by using "
+                        + "keyword " 
+                        + ParametersType.FRG_PARAMS.getKeywordRoot() 
+                        + "UNSETTOSINGLEBO, but you'll "
+                        + "still be using a peculiar connectivity "
+                        + "table were"
+                        + "many bonds are artificially markes as "
+                        + "single to "
+                        + "avoid use of 'UNSET' bond order. "
+                        + "Further details on the problem: " 
+                        + e.getMessage());
+                return false;
+            } else {
+                settings.getLogger().log(Level.WARNING,"Failed "
+                        + "kekulization "
+                        + "for structure " + index 
+                        + " but UNSETTOSINGLEBO "
+                        + "keyword used. Forcing use of single bonds to "
+                        + "replace bonds with unset order.");
+                for (IBond bnd : mol.bonds())
+                {
+                    if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+                    {
+                        bnd.setOrder(IBond.Order.SINGLE);
+                    }
+                }
+            }
+        }
+        return true;
     }
     
 //------------------------------------------------------------------------------

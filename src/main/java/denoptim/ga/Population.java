@@ -282,9 +282,9 @@ public class Population extends ArrayList<Candidate> implements Cloneable
          * @param cA the item that is looking for a crossover partner.
          * @return the list of crossover-compatible items.
          */
-        public ArrayList<Candidate> getMembersCompatibleWith(Candidate cA)
+        public List<Candidate> getMembersCompatibleWith(Candidate cA)
         {
-            ArrayList<Candidate> compatibleMembers = new ArrayList<Candidate>();
+            List<Candidate> compatibleMembers = new ArrayList<Candidate>();
             if (data.keySet().contains(cA))
             {
                 for (Candidate cB : data.get(cA).keySet())
@@ -428,7 +428,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Removes all the elements exceeding the given size.
+     * Removes all the elements exceeding the given size. Does not reorder the
+     * population prior to trimming!
      * @param populationSize size to trim down to.
      */
     public void trim(int populationSize)
@@ -445,14 +446,26 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     
     /**
      * Gets the minimum value of the fitness in this population.
-     * @return the minimum fitness value in this population
+     * @return the minimum fitness value in this population, or the 
+     * {@link Double#MIN_VALUE}
      */
     public double getMinFitness()
     {
+        return getMinFitnessMember().getFitness();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Gets the {@link Candidate} with minimum value of the fitness in this 
+     * population.
+     * @return the population member with minimum fitness value.
+     */
+    public Candidate getMinFitnessMember()
+    {
         return this.stream()
                 .min(Comparator.comparing(Candidate::getFitness))
-                .orElse(null)
-                .getFitness();
+                .orElse(null);
     }
     
 //------------------------------------------------------------------------------

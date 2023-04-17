@@ -36,6 +36,11 @@ import denoptim.utils.TaskUtils;
  * structured to be chopped, chops them, and post-process the resulting 
  * fragments. Each of the steps may or may not be part of the actual workflow,
  * depending on the configurations given upon construction of the task.
+ * Note that preliminary adaptation of the molecular representations is
+ * expected to be done before calling this task. So the systems to fragment
+ * should have been already be processed by 
+ * {@link FragmenterTools#prepareMolToFragmentation(org.openscience.cdk.interfaces.IAtomContainer, FragmenterParameters, int)}
+ * before starting this task.
  */
 
 public class FragmenterTask extends Task

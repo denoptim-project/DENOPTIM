@@ -919,10 +919,12 @@ public class EAUtils
      * @param cutRules the cutting rules to use in the fragmentation.
      * @param mnt the tool monitoring events for logging purposes.
      * @param settings GA settings.
+     * @param index identifies the given IAtomContainer in a collection of 
+     * systems to work on. This is used only for logging.
      * @throws DENOPTIMException 
      */
     public static Candidate buildCandidateByFragmentingMolecule(IAtomContainer mol,
-            Monitor mnt, GAParameters settings) throws DENOPTIMException
+            Monitor mnt, GAParameters settings, int index) throws DENOPTIMException
     {
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
@@ -950,6 +952,11 @@ public class EAUtils
         mnt.increase(CounterID.CONVERTBYFRAGATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
+        // Adjust molecular representation to our settings
+        if (!FragmenterTools.prepareMolToFragmentation(mol, frgParams, index))
+            return null;
+
+        // Do actual fragmentation
         DGraph graph = null;
         try {
             graph = makeGraphFromFragmentationOfMol(mol, 
@@ -1556,7 +1563,7 @@ public class EAUtils
             String genDir, GAParameters settings) 
                     throws DENOPTIMException, IOException
     {
-        ArrayList<Candidate> candidates = DenoptimIO.readCandidates(
+        List<Candidate> candidates = DenoptimIO.readCandidates(
                 new File(filename), true);
         if (candidates.size() == 0)
         {
