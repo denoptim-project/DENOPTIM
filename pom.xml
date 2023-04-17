@@ -161,7 +161,7 @@
     <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
-        <version>6.0.7</version>
+        <version>6.0.8</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.github.dpaukov/combinatoricslib3 -->
     <dependency>
