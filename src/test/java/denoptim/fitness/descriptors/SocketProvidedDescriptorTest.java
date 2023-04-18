@@ -54,6 +54,8 @@ public class SocketProvidedDescriptorTest
     private MySocketServer server;
     private Gson jsonConverted;
     
+    private static final String HOSTNAME = "localhost";
+    
 
 //------------------------------------------------------------------------------
     
@@ -70,7 +72,7 @@ public class SocketProvidedDescriptorTest
         Constructor<SocketProvidedDescriptor> defaultConstructor = 
                 SocketProvidedDescriptor.class.getConstructor();
         this.descriptor = defaultConstructor.newInstance();
-        this.descriptor.setParameters(new Object[] {"localhost", port});
+        this.descriptor.setParameters(new Object[] {HOSTNAME, port});
     }
 
 //------------------------------------------------------------------------------
@@ -224,9 +226,9 @@ public class SocketProvidedDescriptorTest
                 out.println(jsonConverted.toJson(jsonAnswer));
                 out.flush();
                 
-                // Close our connection
-                in.close();
-                out.close();
+                // Do not close our connection: we'll be reusing it
+                //in.close();
+                //out.close();
             }
             catch (Exception e)
             {
