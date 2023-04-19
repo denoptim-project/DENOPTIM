@@ -308,7 +308,8 @@ public class GUIGraphHandler extends GUICardPanel
 				                + "you can still build<br>"
 				                + "graphs made of empty vertexes (i.e., "
 				                + "vertexes contain<br>"
-				                + "no atoms, but only attachment points).</html>",
+				                + "no atoms, but only attachment points)."
+				                + "</html>",
 				                "WARNING",
 				                JOptionPane.WARNING_MESSAGE,
 				                UIManager.getIcon("OptionPane.warningIcon"));

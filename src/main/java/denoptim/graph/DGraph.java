@@ -410,6 +410,7 @@ public class DGraph implements Cloneable
                             symVrtxsFromAnyBranch.keySet()))
                     {
                         foundSymmetricBranch = true;
+                        
                         // Here we must NOT consider the already assigned ones!
                         if (areApsUsedBySymmetricUsers(key.get(0),
                                 keyOnMaster.get(0), new HashSet<Vertex>()))
@@ -538,50 +539,70 @@ public class DGraph implements Cloneable
     
 //------------------------------------------------------------------------------
 
-    private boolean areApsUsedBySymmetricUsers(AttachmentPoint firstAp,
-            AttachmentPoint ap, Set<Vertex> alreadyAssignedVrtxs)
+    /**
+     * Checks if the {@link Vertex}s that are attached to two given 
+     * {@link AttachmentPoint}s apA and apB satisfy these conditions:
+     * <ul>
+     * <li>the linked APs must return true from 
+     * {@link AttachmentPoint#sameAs(AttachmentPoint)}</li>
+     * <li>the {@link Vertex} owner of apB is not contained in the set of
+     * already-assigned vertexes (the 3rd argument)</li>
+     * <li>the {@link Vertex}a attached to apA andapB must be return satisfy
+     * {@link Vertex#sameAs(Vertex)}</li>
+     * <li>if such vertexes are instances of {@link Fragment}, then they must  
+     * satisfy {@link Fragment#isIsomorphicTo(Vertex)}.</li>
+     * </ul>
+     * These conditions, when satisfied for a pair of used and symmetric
+     * {@link AttachmentPoint}s apA and apB should suffice to assign the
+     * two user {@link Vertex}s to the same {@link SymmetricVertexes} set.
+     * @param apA one attachment point in the pair.
+     * @param apB the other attachment point in the pair.
+     * @param alreadyAssignedVrtxs a set of vertexes that have been already
+     * assigned to {@link SymmetricVertexes} set.
+     * @return
+     */
+    public static boolean areApsUsedBySymmetricUsers(AttachmentPoint apA,
+            AttachmentPoint apB, Set<Vertex> alreadyAssignedVrtxs)
     {
-        AttachmentPoint apUserOfFirst = firstAp.getLinkedAPThroughout();
-        Vertex userOfFirst = apUserOfFirst.getOwner();
-        boolean userOfFirstIsFragment = 
-                userOfFirst.getClass().isInstance(Fragment.class);
+        AttachmentPoint apUserOfApA = apA.getLinkedAPThroughout();
+        Vertex userOfApA = apUserOfApA.getOwner();
+        boolean userOfApAIsFragment = Fragment.class.isInstance(userOfApA);
         
-        // Second condition: (fast failing) the linked AP must have 
+        // 1st condition: (fast failing) the linked AP must have 
         // the same features. This is faster than checking vertex
         // isomorphism.
-        AttachmentPoint apUserOfAp = ap.getLinkedAPThroughout();
-        if (!apUserOfFirst.sameAs(apUserOfAp))
+        AttachmentPoint apUserOfApB = apB.getLinkedAPThroughout();
+        if (!apUserOfApA.sameAs(apUserOfApB))
         {
             return false;
         }
         
-        // Third condition: (fast-failing) the linked vertexes
+        // 2nd condition: (fast-failing) the linked vertexes
         // must be unassigned
-        Vertex userOfAp = apUserOfAp.getOwner();
-        if (alreadyAssignedVrtxs.contains(userOfAp))
+        Vertex userOfApB = apUserOfApB.getOwner();
+        if (alreadyAssignedVrtxs.contains(userOfApB))
         {
             return false;
         }
         
-        // Fourth condition: (not fast, not too slow) the linked
-        // vertexes must be two instances of the same vertex for 
-        // them to be symmetric.
-        if (!userOfAp.sameAs(userOfFirst))
+        // 3rd condition: (not fast, not too slow) the linked
+        // vertexes must be have same features
+        if (!userOfApB.sameAs(userOfApA))
         {
             return false;
         }
 
-        // Fifth condition: (slow) the linked vertexes
+        // 4th condition: (slow) the linked vertexes
         // are fragments that have been generated on the fly, so 
         // they do not have an assigned building block ID. We must
         // therefore compare their internal structure.
-        if (userOfFirstIsFragment)
+        if (userOfApAIsFragment)
         {
             // At this point we know the two vertexes are instances 
             // of the same class. 
-            Fragment frgUserOfFirst = (Fragment) userOfFirst;
-            Fragment frgUserOfAp = (Fragment) userOfAp;
-            if (!frgUserOfFirst.isIsomorphicTo(frgUserOfAp))
+            Fragment frgUserOfApA = (Fragment) userOfApA;
+            Fragment frgUserOfApB = (Fragment) userOfApB;
+            if (!frgUserOfApA.isIsomorphicTo(frgUserOfApB))
             {
                 return false;
             }
