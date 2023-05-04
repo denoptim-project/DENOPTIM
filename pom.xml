@@ -3,7 +3,7 @@
   <groupId>org.denoptim</groupId>
   <artifactId>denoptim</artifactId>
 
-  <version>4.1.1</version>
+  <version>4.2.2</version>
   <!-- WARNING: the vesion must be changes also in doc/user_manual.md-->
   <!-- WARNING: the vesion must be changes also in src/main/python/pyproject.toml -->
 
