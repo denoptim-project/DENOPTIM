@@ -517,7 +517,7 @@ public class Fragment extends Vertex
             IAtom srcAtm = mol.getAtom(atmId);
             if (srcAtm.getProperty(DENOPTIMConstants.ATMPROPAPS) != null)
             {
-            	ArrayList<AttachmentPoint> apsOnAtm = getAPsFromAtom(srcAtm);
+            	List<AttachmentPoint> apsOnAtm = getAPsFromAtom(srcAtm);
 	            for (int i = 0; i < apsOnAtm.size(); i++)
 	            {
 	                AttachmentPoint ap = apsOnAtm.get(i);
@@ -745,14 +745,19 @@ public class Fragment extends Vertex
             e1.printStackTrace();
         }
     	
+    	// WARNING: here we are not recovering all info from APs: we take only
+    	// some info. This can be improved...
         for (AttachmentPoint ap : lstAPs)
         {
             AttachmentPoint cAp = new AttachmentPoint(clone,
                     ap.getAtomPositionNumber(),
                     ap.getDirectionVector(),
                     ap.getAPClass());
+            cAp.setCutId(ap.getCutId());
+            cAp.setID(ap.getID());
             clone.lstAPs.add(cAp);
         }
+        
         clone.projectListAPToAtomProperties();
         
 		clone.setBuildingBlockId(this.getBuildingBlockId());

@@ -992,7 +992,7 @@ public class MoleculeUtils
                 {
                     s = ((PseudoAtom) a).getLabel();
                 } else {
-                    // WARNING: we fall back to standard behaviour, but there
+                    // WARNING: we fall back to standard behavior, but there
                     // could still be cases where this is not good...
                     s = a.getSymbol();
                 }
@@ -1000,7 +1000,7 @@ public class MoleculeUtils
             {
                 s = ((PseudoAtom) atm).getLabel();
             }
-        }       
+        }      
         return s;
     }
     

@@ -53,7 +53,7 @@ public class FitnessExpressionParserTest
     static File tempDir;
     
     @BeforeEach
-    private void setUp()
+    void setUp()
     {
         assertTrue(tempDir.isDirectory(),"Should be a directory ");
         sp = new SmilesParser(SilentChemObjectBuilder.getInstance());

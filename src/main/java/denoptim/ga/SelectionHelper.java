@@ -20,7 +20,9 @@ package denoptim.ga;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.lang.Math;
 
 import denoptim.graph.Candidate;
 import denoptim.programs.RunTimeParameters;
@@ -114,30 +116,39 @@ public class SelectionHelper
         Candidate[] selection = new Candidate[sz];
         // Calculate the sum of all fitness values.
         double aggregateFitness = 0;
-
+        List<Double> fitnesses = new ArrayList<>();
+        
+        
+        // Get module of the lowest fitness
         for (int i=0; i<k; i++)
         {
-            aggregateFitness += population.get(i).getFitness();
+            fitnesses.add(population.get(i).getFitness());
+        }
+        double offSet = Math.abs(Collections.min(fitnesses));
+         
+        // Sum all candidates' fitness translated by the offSet
+        // to ensure feasibility also with negative values
+        for (int i=0; i<k; i++)
+        {
+            aggregateFitness += population.get(i).getFitness() + offSet;
         }
 
-
-        // Pick a random offset between 0 and 1 as the starting point for selection.
-        double startOffset = settings.getRandomizer().nextDouble();
+        // Pick a random pointer between 0 and 1 as the starting point for selection.
+        double randomPointer = settings.getRandomizer().nextDouble();
         double cumulativeExpectation = 0;
         int index = 0;
         int c = 0;
         for (int i=0; i<k; i++)
         {
-            // Calculate the number of times this candidate is expected to
-            // be selected on average and add it to the cumulative total
-            // of expected frequencies.
-            cumulativeExpectation += population.get(i).getFitness()
+            
+            // Calculate the probability of the i-th candidate to be selected and 
+            // sum it to the previous values
+            cumulativeExpectation += (population.get(i).getFitness() + offSet)
                                     / aggregateFitness * sz;
 
-            // If f is the expected frequency, the candidate will be selected at
-            // least as often as floor(f) and at most as often as ceil(f). The
-            // actual count depends on the random starting offset.
-            while (cumulativeExpectation > startOffset + index)
+            // Select the candidate i if the randomPointer falls in the values spanned
+            // by the cumulative probabilities 
+            while (cumulativeExpectation > randomPointer + index)
             {
                 selection[c] = population.get(i);
                 c++;

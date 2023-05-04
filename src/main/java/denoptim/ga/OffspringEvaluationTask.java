@@ -49,6 +49,8 @@ public class OffspringEvaluationTask extends FitnessTask
     private volatile Population population;
     private volatile Monitor mnt;
     
+    private final boolean replaceWorstPopMember;
+    
     /**
      * Parameters controlling GA experiments
      */
@@ -68,7 +70,8 @@ public class OffspringEvaluationTask extends FitnessTask
     
     public OffspringEvaluationTask(GAParameters gaSettings, 
             Candidate offspring, Candidate sibling, String workDir,
-            Population popln, Monitor mnt, String fileUID)
+            Population popln, Monitor mnt, String fileUID,
+            boolean replaceWorstPopMember)
     {
         super(((FitnessParameters) gaSettings.getParameters(
                 ParametersType.FIT_PARAMS)), offspring);
@@ -86,6 +89,7 @@ public class OffspringEvaluationTask extends FitnessTask
         this.population = popln;
         this.mnt = mnt;
         this.sibling = sibling;
+        this.replaceWorstPopMember = replaceWorstPopMember;
         
         result.setName(this.molName);
         result.setUID(offspring.getUID());
@@ -198,13 +202,32 @@ public class OffspringEvaluationTask extends FitnessTask
 	                                + molName + " in population");
 	                    }
 	                } else {
-	                    addthisToPop = true;
-                        gaSettings.getLogger().log(Level.INFO, 
-                                "Adding {0} to population", molName);
+	                    if (population.size()>gaSettings.getPopulationSize()
+	                            && replaceWorstPopMember)
+	                    {
+	                        if (result.getFitness()>population.getMinFitness())
+	                        {
+	                            addthisToPop = true;
+	                        } else {
+	                            gaSettings.getLogger().log(Level.WARNING, 
+	                                    "Candidate {0} is worse than the worst "
+	                                    + "population member and does not "
+	                                    + "enter the population.", molName);
+	                        }
+	                    } else {
+    	                    addthisToPop = true;
+                            gaSettings.getLogger().log(Level.INFO, 
+                                    "Adding {0} to population", molName);
+	                    }
 	                }
 	                
 	                if (addthisToPop)
 	                {
+                        if (population.size()>=gaSettings.getPopulationSize()
+                                && replaceWorstPopMember)
+                        {
+                            population.remove(population.getMinFitnessMember());
+                        }
     	                population.add(result);
     	                isWithinBestPrcentile = population.isWithinPercentile(
                                 result.getFitness(),

@@ -20,9 +20,9 @@ package denoptim.ga;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,7 +45,6 @@ import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 
@@ -563,6 +562,7 @@ public class PopulationTest
     @Test
     public void testGetMinMax() throws Exception
     {
+        double trsh = 0.001;
         GAParameters gaparams = prepare();
         Population pop = new Population(gaparams);
         
@@ -591,7 +591,6 @@ public class PopulationTest
         c5.setFitness(-0.5);
         pop.add(c5);
         
-        double trsh = 0.001;
         assertTrue(Math.abs(pop.getMinFitness()-(-1.0)) < trsh, 
                 "getting min fitness");
         assertTrue(Math.abs(pop.getMaxFitness()-(2.0)) < trsh, 

@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.1.1, March 2023_
+_Version 4.1.2, April 2023_
 
 [TOC]
 
@@ -258,7 +258,7 @@ An important aspect of any evolutionary algorithm is that of selection of the be
 *   **Random**: In this scheme, chromosomes are randomly selected.
 *   **Tournament (TS)**: In this scheme, a group of size n (typically 2) is randomly chosen from the current population. The fittest from the group is then added to the mating pool.
 *   **RouletteWheel (RW)**: In this sampling scheme, each chromosome is assigned a portion/slice of the roulette wheel, the area of the portion being proportional to its fitness. The wheel is then spun a number of times and the chromosome corresponding to the slice that comes under the wheel marker is added to the pool.
-*   **Stochastic universal sampling (SUS)**: differs from RW in that it uses _N_ (number of selections required) equally spaced pointers. The population is shuffled randomly and a single random number _r_ in the range [0, _1/N_] is generated. The _N_ individuals are then chosen by generating the _N_ pointers, starting with _r_ and spaced by _1/N_, and selecting the individuals whose fitness spans the positions of the pointers. Because the individuals are selected entirely based on their positions in the population, SUS has zero bias.
+*   **Stochastic universal sampling (SUS)**: differs from RW in that it uses _N_ (number of selections required) equally spaced pointers. The population is shuffled randomly and a single random number _r_ in the range [0, 1] is generated. The _N_ individuals are then chosen by generating the _N_ pointers, starting with _r_ and spaced by _1_, and selecting the individuals whose fitness spans the positions of the pointers. Because the individuals are selected entirely based on their positions in the population and with only one randomly generated number, SUS has zero bias.
 
 ### GA Parallelization Schemes
 
@@ -560,7 +560,7 @@ The following tables list all the keywords grouped according to the main functio
 |`GA-ParentsSurvive`| Use `true` to allow members of the population to remain part of the population for any number of generations. Use `false` to change all members of the population in every generation. Default is `true`.|
 |`GA-XOverSelectionMode`| Specifies the strategy for selecting crossover partners. Acceptable values are: `RANDOM`, `TS`, `RW`, and `SUS`.See Genetic Operations.|
 |`GA-CrossoverWeight`| Specifies the relative weight of crossover when generating new candidate population members.|
-|`GA-NumOffspringFromXover`| Specifies how many offstring (1 or 2) should result from a single crossover operation. When 2 offspring are produced, you can choose to keep only the fittest offspring in the population by using `GA-KeepBestSibling=true`.|
+|`GA-NumOffspringFromXover`| Specifies how many offspring (1 or 2) should result from a single crossover operation. When 2 offspring are produced, you can choose to keep only the fittest offspring in the population by using `GA-KeepBestSibling=true`.|
 |`GA-KeepBestSibling`| Use `true` to require that only the best of two sibling produced by a single crossover operation enters the population.|
 |`GA-MutationWeight`| Specifies the relative weight of mutation when generating new candidate population members.|
 |`GA-MultiSiteMutationWeights`| Specifies the relative weight of multi-site mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutated again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the addition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.<br><br>Provide values in a comma- or space-separated list. The first value is the weight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,<br><br>`GA-MultiSiteMutationWeights=10, 1`<br><br>enables up to two-sites mutation and with a weight that is 1/10 of the single-site mutation.|
@@ -573,6 +573,7 @@ The following tables list all the keywords grouped according to the main functio
 |`GA-KeepNewRingSystemFitnessTrsh`| Specified a percentage of the current population fitness range in the form of %/100 double (i.e., a value between 0 and 1). This value represents a threshold limiting the possibility to store a newly encountered ring system only to those candidate items having a fitness that in in the best fraction of the instantaneous population range. For example, giving a value of 0.10 will make denoptim store new ring systems only from newly encountered candidates that are among the best 10% of the population in the moment each of these candidates is considered as a potential population member.|
 |`GA-MaxXoverSubGraphSize`| Specifies the maximum number of vertices that can be exchanged by a single crossover event.|
 |__Interface__||
+|`GA-InitMolsToFragmentFile`| Specifies the pathname of a file containing molecules to be considered individuals for the initial population. Each molecule is converted to a candidate by fragmentation and assembling of a DENOPTIM's graph representation. The candidate is then sent to the fitness provider. Note that the graph's first vertex, i.e., the scaffold is assigned on-the-fly according to the `FRG-ScaffoldingPolicy`. See also `FRG-EmbedRingsInTemplates` and `FRG-RingEmbeddingContract`. If the number of molecules is lower than the size of the populationDENOPTIM will create additional individuals.|
 |`GA-InitPoplnFile`| Specifies the pathname of a file (can be an SDF file or a text file where each line containing the pathname to a single-molecule SDF file) containing previously evaluated individuals to be added to the initial population. If the number of individuals is lower than the specified population side, DENOPTIM will create additional individuals.|
 |`GA-UIDFileIn`| Specifies the pathname of a text file collecting the list of unique individual identification strings (UID; one UID each line) that are to be considered as previously evaluated individuals. DENOPTIM will ignore individuals for which the UID is found in the file. This applies also to the members of the initial population provided by the user (see `GA-InitPoplnFile` keyword).|
 |`GA-UIDFileOut`| Specifies the pathname of the file, i.e., the UIDFileOut, collecting the list of unique individual identification strings(UID) encountered during an evolutionary experiment. If no pathname is given, a new UID file is generated under the work space of the experiment. UIDs from individuals found in an initial population file, and those specified via the `GA-UIDFile`. In keyword are collected in the `UIDFileOut` file.|
@@ -627,7 +628,6 @@ The following tables list all the keywords grouped according to the main functio
 |__Restart from checkpoint file__||
 |`FSE-CheckPointStepLength`| Specifies the distance between two subsequent updates of the checkpoint information as a number of generated graphs.|
 |`FSE-RestartFromCheckpoint`| Specifies the pathname of the checkpoint file and makes FragSpaceExplorer restart from such file.|
-
 
 
 ## Fitness Provider
@@ -688,6 +688,10 @@ The following tables list all the keywords grouped according to the main functio
 |`FRG-SIZEUNIMODALPOPULATION`| Specifies the number of geometries (integer) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.|
 |`FRG-MAXNOISEUNIMODALPOPULATION`| Specified the maximum amount of noise (double, in angstrom) to generate with normally distributed noise around a centroid when calculating the threshold RMSD value for distinguishing geometries.|
 |`FRG-SDWEIGHTUNIMODALPOPULATION`| Specifies the weight (double) of the standard deviation when calculating the threshold RMSD value for distinguishing geometries. The threshold is calculated as <br> threshold_RMSD = mean_RMSD + factor * standard_deviation_RMSD|
+|__Mol-to-Graph Fragmentation__||
+|`FRG-ScaffoldingPolicy`| Defines the policy for identifying the scaffold vertex. Acceptable values are `ELEMENT <label>`, for choosing as scaffold the first fragment containing atom with the elemental symbol defined by the `<label>` string, and `LARGEST_FRAGMENT`, for choosing the fragment with the largest number of heavy atoms. |
+|`FRG-EmbedRingsInTemplates`| Use `true` to request the embedding of ring systems into templates upon conversion of molecules into graphs. Use `false` to prevent such embedding. Default is `true`|
+|`FRG-RingEmbeddingContract`| Specifies the type of constrain to assign to templates generated by embedding of ring system upon conversion of molecules into graphs. Acceptable values are: `FREE` (topology and vertices of the embedded graph can change), `FIXED` (neither topology not vetices of the embedded graph can change), `FIXED_STRUCT` (allows to change vertexes but not the topology of the embedded graph). Default is `FREE`, i.e., no constrain is applied. |
 
 
 

@@ -1,0 +1,9 @@
+#
+# Cutting rules for t12g
+#
+# NB: these rules are only meant for testing purposes
+#
+CTR A 1 [#6] [#7] ~
+CTR B 2 [#6] [#8] ~
+CTR C 3 [#6] [#9] ~
+CTR D 4 [#6] [#17] ~

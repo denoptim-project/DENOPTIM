@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,6 +65,7 @@ import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass.APClassDeserializer;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.DENOPTIMVertexDeserializer;
 import denoptim.graph.Vertex.VertexType;
@@ -86,6 +88,7 @@ import denoptim.utils.GraphEdit;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.MutationType;
+import denoptim.utils.ObjectPair;
 import denoptim.utils.RotationalSpaceUtils;
 
 
@@ -125,7 +128,7 @@ public class DGraph implements Cloneable
      * store the set of symmetric vertex ids at each level. This is only
      * applicable for symmetric graphs
      */
-    List<SymmetricVertexes> symVertices;
+    private List<SymmetricVertexes> symVertices;
 
     /**
      * A free-format string used to record simple properties in the graph. For
@@ -344,6 +347,272 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
+     * Tries to determine the set of symmetric vertices in this graph based on
+     * finding compatible {@link Vertex}es that are either using symmetric 
+     * {@link AttachmentPoint}s (NB: all symmetric APs must be in use by 
+     * vertexes that are compatible with each other) 
+     * or that are downstream (i.e., according to edge 
+     * direction) w.r.t {@link Vertex}es that are using symmetric 
+     * {@link AttachmentPoint}s.The compatibility of the vertexes is determined 
+     * by these criteria:<ul>
+     * <li>the AP used to link the parent vertex must have the same features
+     * as defined by the {@link AttachmentPoint#sameAs(Vertex)} method.</li>
+     * <li>the vertex must have the same features
+     * as defined by the {@link Vertex#sameAs(Vertex)} method. Effectively,
+     * this means they are instances of the same building block in the fragment
+     * space, or are graph building blocks that are not part of the fragment 
+     * space, in which case the last condition applies,</li>
+     * <li>vertexes have same features and isomorphic internal structure as 
+     * from the {@link Fragment#isIsomorphicTo(Vertex)} method.</li>
+     * </ul>
+     * @return <code>true</code> if some symmetric set of vertex has been found.
+     * @throws DENOPTIMException
+     */
+    public boolean detectSymVertexSets() throws DENOPTIMException
+    {
+        int initialSize = symVertices.size();
+        
+        // This is do hold vertexes in a staging area (symVrtxsFromAnyBranch)
+        // without adding them to a SymmetricVertexes right away. 
+        Set<Vertex> alreadyAssignedVrtxs = new HashSet<Vertex>();
+
+        // The sym vertexes on vrtx can have sym counterpart
+        // that are attached to vertexes sym to vrtx. Prepare a storage to
+        // collect all sym counterparts from any of vertexes sym to vrtx
+        Map<SymmetricAPs,List<Vertex>> symVrtxsFromAnyBranch =
+             new HashMap<SymmetricAPs,List<Vertex>>();
+        for (Vertex vrtx : getVertexList())
+        {
+            // NB: if there is a symmetric relation involving vrtx, then 
+            // vrtx is in the set returned by the following lines
+            List<Vertex> vrtxsSymToVrtx = new ArrayList<Vertex>();
+            for (List<Vertex> tmpSymSets : symVrtxsFromAnyBranch.values())
+            {
+                if (tmpSymSets.contains(vrtx))
+                {
+                    vrtxsSymToVrtx.addAll(tmpSymSets);
+                }
+            }
+            if (vrtxsSymToVrtx.size()==0)
+                vrtxsSymToVrtx.add(vrtx);
+                
+            for (Vertex symToVrtx : vrtxsSymToVrtx)
+            {   
+                Map<SymmetricAPs,List<Vertex>> symChildenSetsOnSymToVrtxs = 
+                        findSymmetrySetsOfChildVertexes(symToVrtx, 
+                                alreadyAssignedVrtxs);
+                
+                for (SymmetricAPs key : symChildenSetsOnSymToVrtxs.keySet())
+                {
+                    // Find any mapping with previously recorded SymmetricAPs
+                    boolean foundSymmetricBranch = false;
+                    for (SymmetricAPs keyOnMaster : key.getAllSameAs( 
+                            symVrtxsFromAnyBranch.keySet()))
+                    {
+                        foundSymmetricBranch = true;
+                        
+                        // Here we must NOT consider the already assigned ones!
+                        if (areApsUsedBySymmetricUsers(key.get(0),
+                                keyOnMaster.get(0), new HashSet<Vertex>()))
+                        {
+                            // the previously recorded branch and 
+                            // this one are consistent
+                            symVrtxsFromAnyBranch.get(keyOnMaster).addAll(
+                                    symChildenSetsOnSymToVrtxs.get(key));
+                        } else {
+                            // branches correspond to two different sets of
+                            // symmetric vertexes. So, we treat the new branch
+                            // independently
+                            foundSymmetricBranch = false;
+                        }
+                    } 
+                    if (!foundSymmetricBranch)
+                    {
+                        // Effectively, in the first iteration of the loop
+                        // we will always end up here
+                        List<Vertex> lst = new ArrayList<Vertex>();
+                        lst.addAll(symChildenSetsOnSymToVrtxs.get(key));
+                        symVrtxsFromAnyBranch.put(key, lst);
+                    }
+                }
+            }
+        }
+        
+        for (List<Vertex> symVertexes : symVrtxsFromAnyBranch.values())
+        {
+            if (symVertexes.size()<2)
+            {
+                // We get rid of placeholders for vertexes that use APs that 
+                // are not part of a symmetriAPs, but could have been part 
+                // of symmetric subgraphs
+                continue;
+            }
+            alreadyAssignedVrtxs.addAll(symVertexes);
+            addSymmetricSetOfVertices(new SymmetricVertexes(symVertexes));
+        }
+        
+        return (symVertices.size()-initialSize)>0;
+    }
+
+//------------------------------------------------------------------------------
+    
+    Map<SymmetricAPs, List<Vertex>> findSymmetrySetsOfChildVertexes(
+            Vertex vrtx, Set<Vertex> alreadyAssignedVrtxs)
+    {
+        Map<SymmetricAPs,List<Vertex>> symSetsOfChildVrtxs = 
+                new HashMap<SymmetricAPs,List<Vertex>>();
+        
+        Set<AttachmentPoint> doneAPs = new HashSet<AttachmentPoint>();
+        for (SymmetricAPs symAPs : vrtx.getSymmetricAPSets())
+        {   
+            // First condition: all symmetric APs must be in use
+            boolean addSymAPsAreUsed = true;
+            for (AttachmentPoint ap : symAPs)
+            {
+                if (ap.isAvailableThroughout())
+                {
+                    addSymAPsAreUsed = false;
+                    break;
+                }
+            }
+            if (!addSymAPsAreUsed)
+                continue;
+            
+            // Now consider what vertex is attached to the symmetric APs
+            AttachmentPoint firstAp = symAPs.get(0);
+            
+            boolean setSymmetryRelation = true;
+            List<Vertex> symVertexes = new ArrayList<Vertex>();
+            symVertexes.add(firstAp.getLinkedAPThroughout().getOwner());
+            for (AttachmentPoint ap : symAPs)
+            {
+                doneAPs.add(ap);
+                
+                if (firstAp==ap)
+                    continue;
+                
+                setSymmetryRelation = areApsUsedBySymmetricUsers(firstAp, ap,
+                        alreadyAssignedVrtxs);
+                if (!setSymmetryRelation)
+                    break;
+
+                // OK: this user of AP is symmetric to the user on firstAP
+                symVertexes.add(ap.getLinkedAPThroughout().getOwner());
+            }
+            
+            if (setSymmetryRelation)
+            {
+                symSetsOfChildVrtxs.put(symAPs,symVertexes);
+                alreadyAssignedVrtxs.addAll(symVertexes);
+            }
+        }
+        
+        // Here we account for the possibility that  vertex without sym APs
+        // is part of a subgraph the is symmetrically reproduced elsewhere.
+        // This is a common pattern in chemistry.
+        // To this end we create dummy symmetric sets of APs that contain 
+        // only one APs, and use them as placeholder in case the same AP-user
+        // is found on symmetric branches.
+        for (AttachmentPoint ap : vrtx.getAttachmentPoints())
+        {
+            if (doneAPs.contains(ap) || ap.isAvailableThroughout())
+                continue;            
+         
+            Vertex user = ap.getLinkedAPThroughout().getOwner();
+            if (alreadyAssignedVrtxs.contains(user))
+                continue;
+            
+            // Create an artifact of SymmetricAPs that contains one entry
+            SymmetricAPs soloSymAps = new SymmetricAPs();
+            soloSymAps.add(ap);
+
+            // Well, this contains only one entry, but for consistency we still
+            // use a list.
+            List<Vertex> symVertexes = new ArrayList<Vertex>();
+            symVertexes.add(user);
+            
+            symSetsOfChildVrtxs.put(soloSymAps,symVertexes);
+            alreadyAssignedVrtxs.addAll(symVertexes);
+        }
+        return symSetsOfChildVrtxs;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if the {@link Vertex}s that are attached to two given 
+     * {@link AttachmentPoint}s apA and apB satisfy these conditions:
+     * <ul>
+     * <li>the linked APs must return true from 
+     * {@link AttachmentPoint#sameAs(AttachmentPoint)}</li>
+     * <li>the {@link Vertex} owner of apB is not contained in the set of
+     * already-assigned vertexes (the 3rd argument)</li>
+     * <li>the {@link Vertex}a attached to apA andapB must be return satisfy
+     * {@link Vertex#sameAs(Vertex)}</li>
+     * <li>if such vertexes are instances of {@link Fragment}, then they must  
+     * satisfy {@link Fragment#isIsomorphicTo(Vertex)}.</li>
+     * </ul>
+     * These conditions, when satisfied for a pair of used and symmetric
+     * {@link AttachmentPoint}s apA and apB should suffice to assign the
+     * two user {@link Vertex}s to the same {@link SymmetricVertexes} set.
+     * @param apA one attachment point in the pair.
+     * @param apB the other attachment point in the pair.
+     * @param alreadyAssignedVrtxs a set of vertexes that have been already
+     * assigned to {@link SymmetricVertexes} set.
+     * @return
+     */
+    public static boolean areApsUsedBySymmetricUsers(AttachmentPoint apA,
+            AttachmentPoint apB, Set<Vertex> alreadyAssignedVrtxs)
+    {
+        AttachmentPoint apUserOfApA = apA.getLinkedAPThroughout();
+        Vertex userOfApA = apUserOfApA.getOwner();
+        boolean userOfApAIsFragment = Fragment.class.isInstance(userOfApA);
+        
+        // 1st condition: (fast failing) the linked AP must have 
+        // the same features. This is faster than checking vertex
+        // isomorphism.
+        AttachmentPoint apUserOfApB = apB.getLinkedAPThroughout();
+        if (!apUserOfApA.sameAs(apUserOfApB))
+        {
+            return false;
+        }
+        
+        // 2nd condition: (fast-failing) the linked vertexes
+        // must be unassigned
+        Vertex userOfApB = apUserOfApB.getOwner();
+        if (alreadyAssignedVrtxs.contains(userOfApB))
+        {
+            return false;
+        }
+        
+        // 3rd condition: (not fast, not too slow) the linked
+        // vertexes must be have same features
+        if (!userOfApB.sameAs(userOfApA))
+        {
+            return false;
+        }
+
+        // 4th condition: (slow) the linked vertexes
+        // are fragments that have been generated on the fly, so 
+        // they do not have an assigned building block ID. We must
+        // therefore compare their internal structure.
+        if (userOfApAIsFragment)
+        {
+            // At this point we know the two vertexes are instances 
+            // of the same class. 
+            Fragment frgUserOfApA = (Fragment) userOfApA;
+            Fragment frgUserOfApB = (Fragment) userOfApB;
+            if (!frgUserOfApA.isIsomorphicTo(frgUserOfApB))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
      * Removed the given symmetric set, if present.
      * @param ss the symmetric relation to be removed.
      */
@@ -354,6 +623,12 @@ public class DGraph implements Cloneable
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns the set of vertexes symmetric to the given one.
+     * @param v the vertex for which we seek the symmetric vertexes.
+     * @return either the collector of vertexes symmetric to the given one, 
+     * which also includes the given one, or an empty collector.
+     */
     public SymmetricVertexes getSymSetForVertex(Vertex v)
     {
         for (SymmetricVertexes ss : symVertices)
@@ -390,7 +665,7 @@ public class DGraph implements Cloneable
             if (!Collections.disjoint(oldSS, symSet))
             {
                 throw new DENOPTIMException("Adding " + symSet + " while "
-                        + "there is already  that contains soem of the same "
+                        + "there is already one that contains some of the same "
                         + "items");
             }
         }
@@ -516,6 +791,27 @@ public class DGraph implements Cloneable
     		}
     	}
     	return edges;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of edges that arrive from the given vertex, i.e., edges
+     * where the trgAP is owned by the given vertex.
+     * @param v the given vertex.
+     * @return the list of edges arriving to the given vertex.
+     */
+    public List<Edge> getEdgesWithTrg(Vertex v)
+    {
+        List<Edge> edges = new ArrayList<Edge>();
+        for (Edge e : this.getEdgeList())
+        {
+            if (e.getTrgAP().getOwner() == v)
+            {
+                edges.add(e);
+            }
+        }
+        return edges;
     }
 
 //------------------------------------------------------------------------------
@@ -2276,6 +2572,12 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Searches for a vertex with the given identifier.
+     * @param vid the identifier
+     * @return the first vertex found with such identifier, or null if no such 
+     * identifier is found.
+     */
     public Vertex getVertexWithId(long vid)
     {
         Vertex v = null;
@@ -3924,7 +4226,8 @@ public class DGraph implements Cloneable
      * are considered part of
      * the subgraph, which includes also rings and symmetric sets. All
      * rings that include vertices not belonging to the subgraph are lost.
-     * @param index the position of the seed vertex in the list of vertices of this graph.
+     * @param index the position of the seed vertex in the list of vertices of
+     *  this graph.
      * @return a new graph that corresponds to the subgraph of this graph.
      */
 
@@ -4116,56 +4419,50 @@ public class DGraph implements Cloneable
         
         return subGraph;
     }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Creates a new graph that corresponds to the subgraph of this graph 
-     * and that includes only the members corresponding to the given list of 
-     * vertices belonging to this graph.
-     * @param members the vertices belonging to the subgraph. 
-     * @return a new graph that corresponds to the subgraph of this graph.
-     */
-    public DGraph extractSubgraph(List<Vertex> members) 
-    {
-        if (members.size()==0)
-            return null;
-        
-        DGraph subGraph = this.clone();
-        
-        List<Vertex> subGrpVrtxs =  new ArrayList<Vertex>();
-        for (Vertex v : members)
-        {
-            subGrpVrtxs.add(subGraph.getVertexAtPosition(this.indexOf(v)));
-        }
-        
-        ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
-        for (Vertex v : subGraph.gVertices)
-        {
-            if (!subGrpVrtxs.contains(v))
-            {
-                toRemove.add(v);
-            }
-        }
-        for (Vertex v : toRemove)
-        {
-            subGraph.removeVertex(v);
-        }
-        
-        return subGraph;
-    }
-
+  
 //------------------------------------------------------------------------------
 
     /**
      * Extracts subgraphs that match the provided pattern.
      * @param pattern to match against.
-     * @return The subgraphs matching the provided pattern.
+     * @return The subgraphs matching the provided pattern. These contain clones 
+     * of the vertexes in this graph.
      * @throws DENOPTIMException 
      */
       
     public List<DGraph> extractPattern(GraphPattern pattern) 
             throws DENOPTIMException 
+    {
+        return extractPattern(pattern, false).keySet().stream().collect(
+                Collectors.toList());
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Extracts subgraphs that match the provided pattern. This method offers
+     * the possibility to record the connections that cross the border of each
+     * subgraph. 
+     * @param pattern to match against.
+     * @param recordConnectivity if <code>true</code> makes this method 
+     * collect the edges of this graph that cross the subgraph borders. 
+     * If <code>false</code> the resulting map will have only keys and 
+     * <code>null</code> values.
+     * @return The subgraphs matching the provided pattern. Each such subgraph
+     * contains clones of the vertexes in this graph. Each value of the 
+     * returned map contains two lists defining which edges cross the subgraph
+     * border: first, the list of incoming edges (i.e., the source 
+     * {@link AttachmentPoint} belongs to a vertex that does not belong the
+     * subgraph), second, the list of outgoing edges (i.e., the source 
+     * {@link AttachmentPoint} belongs to a vertex that does belong the
+     * subgraph). Note that the owners of the {@link AttachmentPoint}s are NOT
+     * the {@link Vertex} instances that are container in the map's key, but 
+     * are their clones.
+     * @throws DENOPTIMException 
+     */
+      
+    public Map<DGraph,ObjectPair> extractPattern(GraphPattern pattern, 
+            boolean recordConnectivity) throws DENOPTIMException 
     {
         if (pattern != GraphPattern.RING) {
             throw new IllegalArgumentException("Graph pattern " + pattern +
@@ -4181,32 +4478,64 @@ public class DGraph implements Cloneable
 
         GeneralUtils.unionOfIntersectingSets(disjointMultiCycleVertices);
 
-        List<DGraph> subgraphs = new ArrayList<>();
+        Map<DGraph,ObjectPair> subGraphsAndConnections = new LinkedHashMap<>();
         for (Set<Vertex> fusedRing : disjointMultiCycleVertices) {
-            subgraphs.add(extractSubgraph(fusedRing));
+            if (recordConnectivity)
+            {
+                Set<Edge> connectionToSubgraph = new HashSet<Edge>();
+                Set<Edge> connectionFromSubgraph = new HashSet<Edge>();
+                DGraph subGraph = extractSubgraph(fusedRing, connectionToSubgraph, 
+                        connectionFromSubgraph);
+                ObjectPair connections = new ObjectPair(connectionToSubgraph, 
+                        connectionFromSubgraph);
+                subGraphsAndConnections.put(subGraph, connections);
+            } else {
+                DGraph subGraph = extractSubgraph(fusedRing);
+                subGraphsAndConnections.put(subGraph, null);
+            }
         }
           
-        for (DGraph g : subgraphs) {
+        for (DGraph g : subGraphsAndConnections.keySet()) {
             g.storeCurrentVertexIDs();
             g.renumberGraphVertices();
             reorderVertexList(g);
         }
 
-        return subgraphs;
+        return subGraphsAndConnections;
+    }
+
+  //------------------------------------------------------------------------------
+
+    /**
+     * Returns a clone of the subgraph defined by the a collection of 
+     * vertices belonging to this graph.
+     * @param definedOn Set of vertices that defined the subgraph.
+     * @return a clone of the subgraph of this graph.
+     */
+    public DGraph extractSubgraph(Collection<Vertex> definedOn) 
+    {
+        DGraph subgraph = extractSubgraph(definedOn, null, null);
+        return subgraph;
     }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the subgraph in the graph defined on the a set of vertices.
-     * The graph is cloned before the subgraph is extracted.
-     * @param graph To extract subgraph from.
-     * @param definedOn Set of vertices in the graph that the subgraph is
-     *                  defined on.
+     * Returns a clone of the subgraph defined by the a collection of 
+     * vertices belonging to this graph. It also collects which {@link Edge}s
+     * exists between the subgraph and the rest of the graph.
+     * @param definedOn Set of vertices that defined the subgraph.
+     * @param connectionToSubgraph container for the collection of edges that 
+     * arrive at the subgraph.
+     * @param connectionFromSubgraph container for the collection of edges that 
+     * depart from the subgraph.
      * @return Subgraph of graph defined on set of vertices.
      */
-    private DGraph extractSubgraph(Set<Vertex> definedOn) 
+    public DGraph extractSubgraph(Collection<Vertex> definedOn, 
+            Set<Edge> connectionToSubgraph, 
+            Set<Edge> connectionFromSubgraph) 
     {
+        
         DGraph subgraph = this.clone();
 
         Set<Vertex> complement = subgraph
@@ -4216,15 +4545,143 @@ public class DGraph implements Cloneable
                         .stream()
                         .allMatch(v -> v.getVertexId() != u.getVertexId())
                 ).collect(Collectors.toSet());
-
+        
+        Set<Long> vrtxIDsInComplement = complement.stream()
+                .map(v -> v.getVertexId())
+                .collect(Collectors.toSet());
+        
+        if (connectionToSubgraph!=null && connectionFromSubgraph!=null)
+        {
+            for (Vertex v : definedOn) 
+            {
+                for (Edge e : this.getEdgeList())
+                {
+                    if (e.getSrcAP().getOwner() == v && 
+                            vrtxIDsInComplement.contains(e.getTrgVertex()))
+                    {
+                        connectionFromSubgraph.add(e);
+                    }
+                    
+                    if (e.getTrgAP().getOwner() == v && 
+                            vrtxIDsInComplement.contains(e.getSrcVertex()))
+                    {
+                        connectionToSubgraph.add(e);
+                    }
+                }
+            }
+        }
+        
         for (Vertex v : complement) {
             subgraph.removeVertex(v);
         }
+        
         return subgraph;
     }
-    
 
-  //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for the given pattern type and generated a new graph where each 
+     * set of (clones of) vertexes that define one such patterns is embedded in 
+     * a single template.
+     * @param pattern type of pattern to embed in template.
+     * @return a new graph where the vertexes defining each pattern are replaced
+     * by a template that embeds the subgraph of the pattern.
+     * @throws DENOPTIMException
+     */
+    public DGraph embedPatternsInTemplates(GraphPattern pattern, 
+            FragmentSpace fragSpace) throws DENOPTIMException
+    {
+        return embedPatternsInTemplates(pattern, fragSpace, ContractLevel.FREE);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for the given pattern type and generated a new graph where each 
+     * set of (clones of) vertexes that define one such patterns is embedded in 
+     * a single template.
+     * @param pattern type of pattern to embed in template.
+     * @param fragSpace the fragment space that defines how we manipulate
+     * fragments.
+     * @param contract the level of constraint to set for any template that
+     * embeds one of the patterns.
+     * @return a new graph where the vertexes defining each pattern are replaced
+     * by a template that embeds the subgraph of the pattern.
+     * @throws DENOPTIMException
+     */
+    public DGraph embedPatternsInTemplates(GraphPattern pattern, 
+            FragmentSpace fragSpace, ContractLevel contract) 
+                    throws DENOPTIMException
+    {
+        // We will return a modified clone of this graph
+        DGraph graph = this.clone();
+        // We use IDs to find the mapping of APs between cloned graphs. So, must
+        // ensure the IDs of APs are unique within the graph.
+        graph.ensureUniqueApIDs();
+        
+        // Identify the subgraphs to be replaced by templates
+        Map<DGraph,ObjectPair> subGraphsAndLinks = graph.extractPattern(
+                pattern, true);
+        
+        // Replace the subgraphs with the templates
+        for (Map.Entry<DGraph,ObjectPair> entry : subGraphsAndLinks.entrySet())
+        {
+            // WARNING: while the subgraph is a clone of 'graph', the sets
+            // contain referenced to the edges of 'graph'.
+            DGraph subGraph = entry.getKey();
+            
+            // Make template
+            BBType tmplType = subGraph.hasScaffoldTypeVertex() ? 
+                    BBType.SCAFFOLD :
+                        BBType.FRAGMENT;
+            Template tmpl = new Template(tmplType);
+            tmpl.setInnerGraph(subGraph);
+            tmpl.setContractLevel(contract);
+
+            // Recover info on which APs of the original subgraph (i.e., APs in
+            // 'graph') correspond to APs on the template.
+            LinkedHashMap<AttachmentPoint, AttachmentPoint> apMapOrigToTmpl = 
+                    new LinkedHashMap<AttachmentPoint, AttachmentPoint>();
+            @SuppressWarnings("unchecked")
+            Set<Edge> edsToSubgrph = (Set<Edge>) entry.getValue().getFirst();
+            for (Edge e : edsToSubgrph)
+            {
+                AttachmentPoint apOnOrig = e.getTrgAP();
+                AttachmentPoint apOnTmpl = tmpl.getOuterAPFromInnerAP(
+                       subGraph.getAPWithId(apOnOrig.getID()));
+                apMapOrigToTmpl.put(apOnOrig, apOnTmpl);
+            }
+            @SuppressWarnings("unchecked")
+            Set<Edge> edsFromSubGrph = (Set<Edge>) entry.getValue().getSecond();
+            for (Edge e : edsFromSubGrph)
+            {
+                AttachmentPoint apOnOrig = e.getSrcAP();
+                AttachmentPoint apOnTmpl = tmpl.getOuterAPFromInnerAP(
+                        subGraph.getAPWithId(apOnOrig.getID()));
+                apMapOrigToTmpl.put(apOnOrig, apOnTmpl);
+            }
+            
+            // Identify the vertexes in the subgraph replaced by the template
+            List<Vertex> toReplaceByTemplate = new ArrayList<>();
+            for (Vertex embeddedVrtx : subGraph.gVertices)
+            {
+                long vIdInThis = (long) embeddedVrtx.getProperty(
+                        DENOPTIMConstants.STOREDVID);
+                toReplaceByTemplate.add(graph.getVertexWithId(vIdInThis));
+            }
+            
+            // Do the actual replacement of original subgraph with the template
+            DGraph singleVertedGraph = new DGraph();
+            singleVertedGraph.addVertex(tmpl);
+            graph.replaceSubGraph(toReplaceByTemplate, singleVertedGraph, 
+                    apMapOrigToTmpl, fragSpace);
+        }
+        
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
 
       /**
        * Sets the vertex at the lowest level as the scaffold, changes the  

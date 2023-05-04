@@ -296,9 +296,19 @@ runTest "t12d"
 runTest "t12e"
 
 #
-# t12e: Genetic algorithms with generation of two offspring from crossover and selection of the best sibling as member of the population.
+# t12f: Genetic algorithms with generation of two offspring from crossover and selection of the best sibling as member of the population.
 #
 runTest "t12f"
+
+#
+# t12g: Initial population given as molecules to fragment from SMILES
+#
+runTest "t12g"
+
+#
+# t12h: Initial population given as molecules to fragment from SDF file
+#
+runTest "t12h"
 
 #
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation

@@ -62,7 +62,6 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.FragmentTest;
 import denoptim.graph.Ring;
-import denoptim.graph.SymmetricSet;
 import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.TemplateTest;

@@ -25,29 +25,37 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
+import denoptim.fragmenter.FragmenterTools;
+import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
+import denoptim.graph.GraphPattern;
 import denoptim.graph.Ring;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
@@ -62,6 +70,9 @@ import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
+import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
@@ -128,7 +139,7 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Reads unique identifiers and initial population files according to the
+     * Reads unique identifiers and initial population file according to the
      * {@link GAParameters}.
      * @throws IOException 
      */
@@ -138,6 +149,7 @@ public class EAUtils
     {
         Population population = new Population(settings);
 
+        // Read existing or previously visited UIDs
         HashSet<String> lstUID = new HashSet<>(1024);
         if (!settings.getUIDFileIn().equals(""))
         {
@@ -149,15 +161,20 @@ public class EAUtils
             settings.getLogger().log(Level.INFO, "Read " + lstUID.size() 
                 + " known UIDs from " + settings.getUIDFileIn());
         }
-        String inifile = settings.getInitialPopulationFile();
-        if (inifile.length() > 0)
+        
+        // Read existing graphs
+        int numFromInitGraphs = 0;
+        String initPopFile = settings.getInitialPopulationFile();
+        if (initPopFile.length() > 0)
         {
-            EAUtils.getPopulationFromFile(inifile, population, uniqueIDsSet, 
+            EAUtils.getPopulationFromFile(initPopFile, population, uniqueIDsSet, 
                     EAUtils.getPathNameToGenerationFolder(0, settings),
                     settings);
-            settings.getLogger().log(Level.INFO, "Read " + population.size() 
-                + " molecules from " + inifile);
+            numFromInitGraphs = population.size();
+            settings.getLogger().log(Level.INFO, "Imported " + numFromInitGraphs
+                + " candidates (as graphs) from " + initPopFile);
         }
+        
         return population;
     }
     
@@ -887,12 +904,314 @@ public class EAUtils
         candidate.setName("M" + GeneralUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
-        
+            
         return candidate;
     }
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Generates a candidate by fragmenting a molecule and generating the graph
+     * that reconnects all fragments to reform the original molecule. 
+     * Essentially, it converts an {@link IAtomContainer} into a
+     * {@link DGraph} and makes a {@link Candidate} out of it.
+     * @param mol the molecule to convert.
+     * @param cutRules the cutting rules to use in the fragmentation.
+     * @param mnt the tool monitoring events for logging purposes.
+     * @param settings GA settings.
+     * @param index identifies the given IAtomContainer in a collection of 
+     * systems to work on. This is used only for logging.
+     * @throws DENOPTIMException 
+     */
+    public static Candidate buildCandidateByFragmentingMolecule(IAtomContainer mol,
+            Monitor mnt, GAParameters settings, int index) throws DENOPTIMException
+    {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters) settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        
+        FragmenterParameters frgParams = new FragmenterParameters();
+        if (settings.containsParameters(ParametersType.FRG_PARAMS))
+        {
+            frgParams = (FragmenterParameters) settings.getParameters(
+                    ParametersType.FRG_PARAMS);
+        }
+        
+        if (frgParams.getCuttingRules()==null 
+                || frgParams.getCuttingRules().isEmpty())
+        {
+            throw new DENOPTIMException("Request to generate candidates by "
+                    + "fragmentation but no cutting rules provided. Please,"
+                    + "add FRG-CUTTINGRULESFILE=path/to/your/file to the "
+                    + "input.");
+        }
+        mnt.increase(CounterID.CONVERTBYFRAGATTEMPTS);
+        mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
+
+        // Adjust molecular representation to our settings
+        if (!FragmenterTools.prepareMolToFragmentation(mol, frgParams, index))
+            return null;
+
+        // Do actual fragmentation
+        DGraph graph = null;
+        try {
+            graph = makeGraphFromFragmentationOfMol(mol, 
+                    frgParams.getCuttingRules(), settings.getLogger(),
+                    frgParams.getScaffoldingPolicy(),
+                    frgParams.getLinearAngleLimit());
+        } catch (DENOPTIMException de)
+        {
+            String msg = "Unable to convert molecule (" + mol.getAtomCount() 
+                + " atoms) to DENPTIM graph. " + de.getMessage();
+            settings.getLogger().log(Level.WARNING, msg);
+        }
+        if (graph == null)
+        {
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
+            return null;
+        }
+
+        if (frgParams.embedRingsInTemplate())
+        {
+            try {
+                graph = graph.embedPatternsInTemplates(GraphPattern.RING, 
+                        fragSpace, frgParams.getEmbeddedRingsContract());
+            } catch (DENOPTIMException e) {
+                graph.cleanup();
+                mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING);
+                return null;
+            }
+        }
+        
+        graph.setLocalMsg("INITIAL_MOL_FRAGMENTED");
+        
+        Object[] res = graph.checkConsistency(settings);
+        if (res == null)
+        {
+            graph.cleanup();
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_EVAL);
+            return null;
+        }
+        
+        Candidate candidate = new Candidate(graph);
+        candidate.setUID(res[0].toString().trim());
+        candidate.setSmiles(res[1].toString().trim());
+        candidate.setChemicalRepresentation((IAtomContainer) res[2]);
+        
+        candidate.setName("M" + GeneralUtils.getPaddedString(
+                DENOPTIMConstants.MOLDIGITS,
+                GraphUtils.getUniqueMoleculeIndex()));
+        
+        return candidate;
+    }
+
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy) 
+                    throws DENOPTIMException
+    {
+        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
+                scaffoldingPolicy, 190); 
+        // NB: and angle of 190 means we are not adding Du on linearities
+    }
+    
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @param linearAngleLimit the max bond angle before we start considering 
+     * the angle linear and add a linearity-breaking dummy atom.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit) 
+                    throws DENOPTIMException
+    {
+        // We expect only Fragments here.
+        List<Vertex> fragments = FragmenterTools.fragmentation(mol, 
+                cuttingRules, logger);
+        for (Vertex v : fragments)
+        {
+            Fragment frag = (Fragment) v;
+            
+            // This is done to set the symmetry relations in each vertex
+            frag.updateAPs();
+            
+            // Add linearity-breaking dummy atoms
+            DummyAtomHandler.addDummiesOnLinearities(frag, linearAngleLimit);
+        }
+        if (fragments.size()==0)
+        {
+            throw new DENOPTIMException("Fragmentation of molecule with "
+                    + mol.getAtomCount() + " atoms produced 0 fragments.");
+        }
+        
+        // Define which fragment is the scaffold
+        Vertex scaffold = null;
+        switch (scaffoldingPolicy)
+        {
+            case ELEMENT:
+            {
+                for (Vertex v : fragments)
+                {
+                    if (v instanceof Fragment)
+                    {
+                        boolean setAsScaffold = false;
+                        IAtomContainer iac = v.getIAtomContainer();
+                        for (IAtom atm : iac.atoms())
+                        {
+                            if (scaffoldingPolicy.label.equals(
+                                    MoleculeUtils.getSymbolOrLabel(atm)))
+                            {
+                                setAsScaffold = true;
+                                break;
+                            }
+                        }
+                        if (setAsScaffold)
+                        {
+                            scaffold = v;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+
+            default:
+            case LARGEST_FRAGMENT:
+            {
+                try {
+                    scaffold = fragments.stream()
+                            .max(Comparator.comparing(
+                                    Vertex::getHeavyAtomsCount))
+                            .get();
+                } catch (Exception e)
+                {
+                    throw new DENOPTIMException("Cannot get largest fragment "
+                            + "among " + fragments.size() + " fragments.", e);
+                }
+                break;
+            }
+        }
+        if (scaffold==null)
+        {
+            throw new DENOPTIMException("No fragment matches criteria to be "
+                    + "identified as the " 
+                    + BBType.SCAFFOLD.toString().toLowerCase() + ".");
+        }
+        scaffold.setVertexId(0);
+        scaffold.setBuildingBlockType(BBType.SCAFFOLD);
+        
+        // Build the graph
+        DGraph graph = new DGraph();
+        graph.addVertex(scaffold);
+        AtomicInteger vId = new AtomicInteger(1);
+        for (int i=1; i<fragments.size(); i++)
+        {
+            appendVertexesToGraphFollowingEdges(graph, vId, fragments);
+        }
+        
+        // Set symmetry relations: these depend on which scaffold we have chosen
+        graph.detectSymVertexSets();
+        
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static void appendVertexesToGraphFollowingEdges(DGraph graph,
+            AtomicInteger vId, List<Vertex> vertexes) throws DENOPTIMException
+    {
+        // We seek for  the last and non-RCV vertex added to the graph
+        Vertex lastlyAdded = null;
+        for (int i=-1; i>-4; i--)
+        {
+            lastlyAdded = graph.getVertexList().get(
+                    graph.getVertexList().size()+i);
+            if (!lastlyAdded.isRCV())
+                break;
+        }
+        for (AttachmentPoint apI : lastlyAdded.getAttachmentPoints())
+        {
+            if (!apI.isAvailable())
+                continue;
+            
+            for (int j=0; j<vertexes.size(); j++)
+            {
+                Vertex fragJ = vertexes.get(j);
+                
+                boolean ringClosure = false;
+                if (graph.containsVertex(fragJ))
+                {   
+                    ringClosure = true;
+                }
+                for (AttachmentPoint apJ : fragJ.getAttachmentPoints())
+                {
+                    if (apI==apJ)
+                        continue;
+                    
+                    if (apI.getCutId()==apJ.getCutId())
+                    {
+                        if (ringClosure)
+                        {
+                            Vertex rcvI = FragmenterTools.getRCPForAP(apI,
+                                    APClass.make(APClass.ATPLUS, 0, 
+                                            BondType.ANY));
+                            rcvI.setBuildingBlockType(BBType.FRAGMENT);
+                            rcvI.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apI, rcvI.getAP(0));
+                            
+                            Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
+                                    APClass.make(APClass.ATMINUS, 0, 
+                                            BondType.ANY));
+                            rcvJ.setBuildingBlockType(BBType.FRAGMENT);
+                            rcvJ.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apJ, rcvJ.getAP(0));
+                            graph.addRing(rcvI, rcvJ);
+                        } else {
+                            fragJ.setBuildingBlockType(BBType.FRAGMENT);
+                            fragJ.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apI, apJ);
+                            
+                            // Recursion into the branch of the graph that is
+                            // rooted onto the lastly added vertex
+                            appendVertexesToGraphFollowingEdges(graph, vId, 
+                                    vertexes);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------  
+    
     /**
      * Write out summary for the current GA population.
      * @param population
@@ -953,15 +1272,7 @@ public class EAUtils
 
     private static String getSummaryStatistics(Population popln, 
             GAParameters settings)
-    {
-        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
-        if (settings.containsParameters(ParametersType.FS_PARAMS))
-        {
-            fsParams = (FragmentSpaceParameters)settings.getParameters(
-                    ParametersType.FS_PARAMS);
-        }
-        FragmentSpace fragSpace = fsParams.getFragmentSpace();
-        
+    {   
         double[] fitness = getFitnesses(popln);
         double sdev = StatUtils.stddev(fitness, true);
         String res = "";
@@ -1252,7 +1563,7 @@ public class EAUtils
             String genDir, GAParameters settings) 
                     throws DENOPTIMException, IOException
     {
-        ArrayList<Candidate> candidates = DenoptimIO.readCandidates(
+        List<Candidate> candidates = DenoptimIO.readCandidates(
                 new File(filename), true);
         if (candidates.size() == 0)
         {

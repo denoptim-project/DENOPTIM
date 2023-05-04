@@ -18,7 +18,6 @@
 
 package denoptim.fitness.descriptors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,8 +28,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,6 +54,8 @@ public class SocketProvidedDescriptorTest
     private MySocketServer server;
     private Gson jsonConverted;
     
+    private static final String HOSTNAME = "localhost";
+    
 
 //------------------------------------------------------------------------------
     
@@ -73,7 +72,7 @@ public class SocketProvidedDescriptorTest
         Constructor<SocketProvidedDescriptor> defaultConstructor = 
                 SocketProvidedDescriptor.class.getConstructor();
         this.descriptor = defaultConstructor.newInstance();
-        this.descriptor.setParameters(new Object[] {"localhost", port});
+        this.descriptor.setParameters(new Object[] {HOSTNAME, port});
     }
 
 //------------------------------------------------------------------------------
@@ -227,9 +226,9 @@ public class SocketProvidedDescriptorTest
                 out.println(jsonConverted.toJson(jsonAnswer));
                 out.flush();
                 
-                // Close our connection
-                in.close();
-                out.close();
+                // Do not close our connection: we'll be reusing it
+                //in.close();
+                //out.close();
             }
             catch (Exception e)
             {

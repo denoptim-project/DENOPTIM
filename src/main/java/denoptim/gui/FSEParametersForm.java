@@ -459,6 +459,8 @@ public class FSEParametersForm extends ParametersForm
         localBlock2.add(advOptsController);
         localBlock2.add(advOptsBlock);      
         
+        block.add(super.getPanelForUnformattedInput());
+        
         this.add(scrollablePane);
     }
     
@@ -476,12 +478,15 @@ public class FSEParametersForm extends ParametersForm
     @Override
     public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
     {
+        clearUnformattedTxtArea();
     	importParametersFromDenoptimParamsFile(fileName,"FSE-");
     	
     	rdbSrcOrNew.setSelected(false);
     	localBlock1.setVisible(false);
 		localBlock2.setVisible(true);		
 		advOptsBlock.setVisible(true);
+		
+        showUnknownKeyWarning(this, "FragSpaceExplorer");
     }
 
 //-----------------------------------------------------------------------------
@@ -499,11 +504,7 @@ public class FSEParametersForm extends ParametersForm
   		}
   		else
   		{
-			JOptionPane.showMessageDialog(this,
-					"<html>Parameter '" + key + "' is not recognized<br> and will be ignored.</html>",
-	                "WARNING",
-	                JOptionPane.WARNING_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
+  		    addToUnformattedTxt(key, value);
 			return;
   		}
     
@@ -564,6 +565,9 @@ public class FSEParametersForm extends ParametersForm
         sb.append(getStringIfNotEmpty(keyPar6,txtPar6));
         sb.append(getStringIfNotEmpty(keyPar11,txtPar11));
         sb.append(getStringIfNotEmpty(keyPar12,txtPar12));
+
+        sb.append(getTextForUnformattedSettings()).append(NL);
+        
         //HEREGOESPRINT this is only to facilitate automated insertion of code        
     }
 }

@@ -64,7 +64,13 @@ public class GAParameters extends RunTimeParameters
      * a list of pathnames
      */
     protected String initPoplnFile = "";
-
+    
+    /**
+     * Pathname to the file collecting molecules to fragment to generate initial
+     * population.
+     */
+    protected String initMolsToFragmentFile = null;
+    
     /**
      * Pathname of the file with the list of individuals unique identifiers that
      * are initially known.
@@ -721,6 +727,16 @@ public class GAParameters extends RunTimeParameters
         return initPoplnFile;
     }
     
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the pathname to the file defining molecules to convert into 
+     * candidates by fragmentation.
+     */
+    public String getInitMolsToFragmentFile()
+    {
+        return initMolsToFragmentFile;
+    }
 
 //------------------------------------------------------------------------------
       
@@ -918,6 +934,15 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     initPoplnFile = value;
+                }
+                break;
+            }
+            
+            case "INITMOLSTOFRAGMENTFILE=":
+            {
+                if (value.length() > 0)
+                {
+                    initMolsToFragmentFile = value;
                 }
                 break;
             }
@@ -1436,6 +1461,15 @@ public class GAParameters extends RunTimeParameters
             {
                 error = "Cannot find initial population data: " + initPoplnFile;
                 throw new DENOPTIMException(error);
+            }
+        }
+        
+        if (initMolsToFragmentFile!=null && initMolsToFragmentFile.length() > 0)
+        {
+            if (!denoptim.files.FileUtils.checkExists(initMolsToFragmentFile))
+            {
+                throw new DENOPTIMException("Cannot find initial molecules to "
+                        + "fragment: " + initMolsToFragmentFile);
             }
         }
 

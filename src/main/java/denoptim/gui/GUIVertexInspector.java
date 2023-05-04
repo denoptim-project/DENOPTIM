@@ -20,6 +20,7 @@ package denoptim.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -67,6 +68,7 @@ import denoptim.files.FileUtils;
 import denoptim.fragmenter.FragmenterTools;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.DGraph;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
@@ -153,19 +155,6 @@ public class GUIVertexInspector extends GUICardPanel
 	
 	private JPanel pnlSaveEdits;
 	private JButton btnSaveEdits;
-	
-	/**
-	 * File storing the latest version of modified cutting rules used to do 
-	 * fragmentation, or null if no fragmentation has been done using cutting 
-	 * rules, or we has so far only used default cutting rules.
-	 */
-	private File lastUsedCutRulFile = null;
-	
-    /**
-     * Flag indicating whether to preselect the default or the custom list of 
-     * cutting rules next time we are asked to display the dialog.
-     */
-    private boolean useDefaultNextTime = true;
 
 	
 //-----------------------------------------------------------------------------
@@ -528,87 +517,31 @@ public class GUIVertexInspector extends GUICardPanel
                     return;
                 }
                 
-                // This gives us the possibility to control the fragmentation
                 FragmenterParameters settings = new FragmenterParameters();
-                settings.startConsoleLogger("GUI-controlledFragmenterLogger");
-                
-                List<CuttingRule> defaultCuttingRules = 
-                        new ArrayList<CuttingRule>();
-                BufferedReader reader = null;
-                try
-                {
-                    try {
-                        reader = new BufferedReader(
-                                new InputStreamReader(getClass()
-                                        .getClassLoader().getResourceAsStream(
-                                                "data/cutting_rules")));
-                        DenoptimIO.readCuttingRules(reader, defaultCuttingRules, 
-                                "bundled jar");
-                    } finally {
-                        if (reader!=null)
-                            reader.close();
-                    }
-                } catch (Exception e )
-                {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(btnChop,String.format(
-                            "<html><body width='%1s'>"
-                            + "Could not read default cutting rules from "
-                            + "bundled jar. "
-                            + "Hint: "
-                            + e.getMessage() + "</html>", 400),
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE,
-                            UIManager.getIcon("OptionPane.errorIcon"));
+                boolean result = dialogToDefineCuttingRules(
+                        settings, 
+                        this.getClass().getClassLoader(), 
+                        btnChop, 
+                        false);
+                if (!result)
                     return;
+                
+                String pathnameLastUsedCutRules = 
+                        settings.getCuttingRulesFilePathname();
+                if (pathnameLastUsedCutRules != null 
+                        && !pathnameLastUsedCutRules.isBlank())
+                {
+                    GUIPreferences.lastCutRulesFile = 
+                            new File(pathnameLastUsedCutRules);
                 }
-             
-                // Read last used cutting rules
-                List<CuttingRule> customCuttingRules = 
-                        new ArrayList<CuttingRule>();
-                try
-                {
-                    if (lastUsedCutRulFile!=null)
-                        DenoptimIO.readCuttingRules(lastUsedCutRulFile, 
-                                customCuttingRules);
-                } catch (DENOPTIMException e)
-                {
-                    JOptionPane.showMessageDialog(btnChop,String.format(
-                            "<html><body width='%1s'"
-                            + "Could not read last-used cutting rules from '"
-                            + lastUsedCutRulFile + "'. "
-                            + "Hint: "
-                            + e.getMessage() + "</html>", 400),
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE,
-                            UIManager.getIcon("OptionPane.errorIcon"));
-                    return;
-                }
-                
-                // Build a dialog that offers the possibility to see and edit 
-                // default cutting rules, and to define custom ones from scratch
-                CuttingRulesSelectionDialog crs = new CuttingRulesSelectionDialog(
-                        defaultCuttingRules, customCuttingRules, 
-                        useDefaultNextTime, btnChop);
-                crs.pack();
-                crs.setVisible(true);
-                @SuppressWarnings("unchecked")
-                List<CuttingRule> cuttingRules = 
-                        (List<CuttingRule>) crs.result;
-                if (cuttingRules==null)
-                    return;
-                
-                if (crs.lastUsedCutRulFile != null)
-                    lastUsedCutRulFile = crs.lastUsedCutRulFile;
-                
-                useDefaultNextTime = crs.useDefaultNextTime;
                 
                 // Now chop the structure to produce fragments
                 List<Vertex> fragments;
                 try
                 {
                     fragments = FragmenterTools.fragmentation(
-                            vertex.getIAtomContainer(), cuttingRules, 
+                            vertex.getIAtomContainer(), 
+                            settings.getCuttingRules(), 
                             settings.getLogger());
                 } catch (DENOPTIMException e)
                 {
@@ -884,6 +817,109 @@ public class GUIVertexInspector extends GUICardPanel
 			}
 		});
 		commandsPane.add(btnHelp);
+	}
+	
+//-----------------------------------------------------------------------------
+	
+	/**
+	 * Starts a dialog to define the on-the-fly fragmentation settings.
+	 * @param settings where settings will be stored
+	 * @param classLoader used to find resources
+	 * @param parent used to place dialog windows in the relevant position.
+	 * @param setMolToGraphSettings if <code>true</code> enabled the setting of
+	 * parameters that make sense only when we convert molecules to 
+	 * {@link DGraph}s.
+	 * @return <code>true</code> if it all went well.
+	 */
+	public static boolean dialogToDefineCuttingRules(
+	        FragmenterParameters settings, ClassLoader classLoader,
+	        Component parent,
+	        boolean setMolToGraphSettings)
+	{
+        settings.startConsoleLogger("GUI-controlledFragmenterLogger");
+        
+        List<CuttingRule> defaultCuttingRules = new ArrayList<CuttingRule>();
+        BufferedReader reader = null;
+        try
+        {
+            try {
+                reader = new BufferedReader(
+                        new InputStreamReader(classLoader.getResourceAsStream(
+                                        "data/cutting_rules")));
+                DenoptimIO.readCuttingRules(reader, defaultCuttingRules, 
+                        "bundled jar");
+            } finally {
+                if (reader!=null)
+                    reader.close();
+            }
+        } catch (Exception e )
+        {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(parent,String.format(
+                    "<html><body width='%1s'>"
+                    + "Could not read default cutting rules from "
+                    + "bundled jar. "
+                    + "Hint: "
+                    + e.getMessage() + "</html>", 400),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            return false;
+        }
+     
+        // Read last used cutting rules
+        List<CuttingRule> customCuttingRules = new ArrayList<CuttingRule>();
+        boolean useDefaultCuttingRules = true;
+        try
+        {
+            if (GUIPreferences.lastCutRulesFile!=null)
+            {
+                DenoptimIO.readCuttingRules(
+                        GUIPreferences.lastCutRulesFile, 
+                        customCuttingRules);
+                useDefaultCuttingRules = false;
+            }
+        } catch (DENOPTIMException e)
+        {
+            JOptionPane.showMessageDialog(parent,String.format(
+                    "<html><body width='%1s'"
+                    + "Could not read last-used cutting rules from '"
+                    + GUIPreferences.lastCutRulesFile + "'. "
+                    + "Hint: "
+                    + e.getMessage() + "</html>", 400),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            return false;
+        }
+        
+        // Build a dialog that offers the possibility to see and edit 
+        // default cutting rules, and to define custom ones from scratch
+        CuttingRulesSelectionDialog crs = null;
+        if (setMolToGraphSettings)
+        {
+            crs = new MolToGraphParametersDialog(
+                defaultCuttingRules, customCuttingRules, 
+                useDefaultCuttingRules, parent, settings);
+        } else {
+            crs = new CuttingRulesSelectionDialog(
+                defaultCuttingRules, customCuttingRules, 
+                useDefaultCuttingRules, parent, settings);
+        }
+        crs.pack();
+        crs.setVisible(true);
+        
+        if (crs.result==null)
+            return false;
+        
+        String pathnameLastUsedCutRules = settings.getCuttingRulesFilePathname();
+        if (pathnameLastUsedCutRules != null 
+                && !pathnameLastUsedCutRules.isBlank())
+        {
+            GUIPreferences.lastCutRulesFile = new File(pathnameLastUsedCutRules);
+        }
+        
+	    return true;
 	}
 
 //-----------------------------------------------------------------------------

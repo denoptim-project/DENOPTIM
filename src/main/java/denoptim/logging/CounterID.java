@@ -71,6 +71,12 @@ public enum CounterID
     FAILEDMANUALADDATTEMPTS, 
     FAILEDMANUALADDATTEMPTS_EVAL, 
     
+    CONVERTBYFRAGATTEMPTS,
+    FAILEDCONVERTBYFRAGATTEMPTS,
+    FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION,
+    FAILEDCONVERTBYFRAGATTEMPTS_EVAL,
+    FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING,
+    
     FITNESSEVALS, FAILEDFITNESSEVALS,
     
     DUPLICATEPREFITNESS,
@@ -158,14 +164,29 @@ public enum CounterID
         FAILEDBUILDATTEMPTS_SETUPRINGS.description = "Failed attempt to setup "
                 + "rings in a newly generated graph";
         FAILEDBUILDATTEMPTS_FORBIDENDS.description = "Construction of new "
-                + "graphs that ped to forbidden ends";
+                + "graphs that led to forbidden ends";
         
         MANUALADDATTEMPTS.description = "Number of attempts to provide a "
-                + "manually bilt candidate";
+                + "manually built candidate";
         FAILEDMANUALADDATTEMPTS.description = "Failed attempts to import "
                 + "a manually built cadidate";
         FAILEDMANUALADDATTEMPTS_EVAL.description = "Failed attempts to pass "
                 + "graph evaluation test from manually added candidates";
+        
+        CONVERTBYFRAGATTEMPTS.description = "Number of attempts to import a "
+                + "candidate by converting a given molecule into a graph";
+        FAILEDCONVERTBYFRAGATTEMPTS.description = "Failed attempts to import "
+                + "a cadidate by converting a given molecule into a graph";
+        FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION.description = "Failed "
+                + "attempts to do fragmentation while generating a candidate "
+                + "by conversion of molecules to graphs";
+        FAILEDCONVERTBYFRAGATTEMPTS_EVAL.description = "Failed attempts to "
+                + "pass graph evaluation test from candidates imported from "
+                + "conversion of molecules to graphs";
+        FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING.description = "Failed "
+                + "attempts to "
+                + "embedd patterns in templates while generating candidates "
+                + "by conversion of molecules to graphs";
         
         FITNESSEVALS.description = "Number of fitness evaluations";
         FAILEDFITNESSEVALS.description = "Number of failed fitness evaluations";
@@ -264,6 +285,17 @@ public enum CounterID
                 "#Failed Manual Add";
         FAILEDMANUALADDATTEMPTS_EVAL.prettyName =
                 "#Failed Manual Add_Eval";
+        
+        CONVERTBYFRAGATTEMPTS.prettyName =
+                "#MolToGraph Add";
+        FAILEDCONVERTBYFRAGATTEMPTS.prettyName =
+                "#Failed MolToGraph Add";
+        FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION.prettyName =
+                "#Failed MolToGraph Add_Frag";
+        FAILEDCONVERTBYFRAGATTEMPTS_EVAL.prettyName =
+                "#Failed MolToGraph Add_Eval";
+        FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING.prettyName =
+                "#Failed MolToGraph Add_TmplEmbed";
 
         FITNESSEVALS.prettyName =
                 "#Fitness";
@@ -275,7 +307,7 @@ public enum CounterID
         FAILEDDUPLICATEPREFITNESSDETECTION.prettyName =
                 "#Failed Duplicate Pre-Fitness Detection";
     }
-    
+
 //------------------------------------------------------------------------------
     
     /**
@@ -299,4 +331,6 @@ public enum CounterID
         return prettyName;
     }
     
+//------------------------------------------------------------------------------
+      
 }

@@ -22,7 +22,7 @@ import java.util.Objects;
 
 /**
  * This class is the equivalent of the Pair data structure used in C++
- * Although <code>AbstractMap.SimpleImmutableEntry<K,V>>/code> is available
+ * Although <code>AbstractMap.SimpleImmutableEntry<K,V>></code> is available
  * it does not have a setValue method. 
  * @author Vishwesh Venkatraman
  */
