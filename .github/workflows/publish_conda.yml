@@ -3,7 +3,8 @@ name: 'Publish Conda Package'
 on:
   push:
     tags:
-      - v[0-9]+.[0-9]+.[0-9]+
+      #TODO: temove 'todo_reactivate_'
+      - todo_reactivate_v[0-9]+.[0-9]+.[0-9]+
 
 env:
   ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
