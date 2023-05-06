@@ -1426,12 +1426,12 @@ public class DenoptimIO
     /**
      * Writes candidate items to file. Always overwrites.
      * @param file the file where to print.
-     * @param candidates the list of candidates to print to file.
+     * @param popMembers the list of candidates to print to file.
      * @param append use <code>true</code> to append if the file exist
      * @throws DENOPTIMException
      */
     public static void writeCandidatesToFile(File file, 
-            ArrayList<Candidate> candidates, boolean append) 
+            List<Candidate> popMembers, boolean append) 
                     throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
@@ -1440,7 +1440,7 @@ public class DenoptimIO
                     + FileFormat.CANDIDATESDF.getExtension());
         }
         ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
-        for (Candidate g : candidates) 
+        for (Candidate g : popMembers) 
         {
             lst.add(g.getFitnessProviderOutputRepresentation());
         }
