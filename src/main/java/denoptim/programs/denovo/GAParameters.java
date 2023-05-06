@@ -400,6 +400,11 @@ public class GAParameters extends RunTimeParameters
      */
     public int maxXOverableSubGraphSize = 20;
     
+    /**
+     * Flag requesting to write a SDF file that collects all the population 
+     * members each time we report the population details on file.
+     */
+    protected boolean writePopOnDisk = false;
 
 //------------------------------------------------------------------------------
     
@@ -1305,6 +1310,11 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "WRITEPOPULATIONTOFILE":
+            {
+                writePopOnDisk = true;
+                break;
+            }
             
             default:
                 msg = "Keyword " + key + " is not a known GeneticAlgorithm-" 
@@ -1522,6 +1532,17 @@ public class GAParameters extends RunTimeParameters
             sb.append(otherCollector.getPrintedList());
         }
         return sb.toString();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we are configures to save all population
+     * members each time we report the population details on file.
+     */
+    public boolean savePopFile()
+    {
+        return writePopOnDisk;
     }
 
 //------------------------------------------------------------------------------

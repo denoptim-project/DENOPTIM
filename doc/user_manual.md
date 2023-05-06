@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.1.2, April 2023_
+_Version 4.1.3, May 2023_
 
 [TOC]
 
@@ -577,6 +577,7 @@ The following tables list all the keywords grouped according to the main functio
 |`GA-InitPoplnFile`| Specifies the pathname of a file (can be an SDF file or a text file where each line containing the pathname to a single-molecule SDF file) containing previously evaluated individuals to be added to the initial population. If the number of individuals is lower than the specified population side, DENOPTIM will create additional individuals.|
 |`GA-UIDFileIn`| Specifies the pathname of a text file collecting the list of unique individual identification strings (UID; one UID each line) that are to be considered as previously evaluated individuals. DENOPTIM will ignore individuals for which the UID is found in the file. This applies also to the members of the initial population provided by the user (see `GA-InitPoplnFile` keyword).|
 |`GA-UIDFileOut`| Specifies the pathname of the file, i.e., the UIDFileOut, collecting the list of unique individual identification strings(UID) encountered during an evolutionary experiment. If no pathname is given, a new UID file is generated under the work space of the experiment. UIDs from individuals found in an initial population file, and those specified via the `GA-UIDFile`. In keyword are collected in the `UIDFileOut` file.|
+|`GA-WritePopulationToFile`| Requests to save a file with all the population members every time the details of the population are reported (i.e., typically, each time a generation has been completed)|
 |__Parallelization__||
 |`GA-NumParallelTasks`| Specifies the maximum number of parallel tasks to be performed.|
 |`GA-Parallelization`| Specifies the parallelization scheme: `synchronous` if parallel tasks are submitted in batches, thus no new task is submitted until the last of the previous tasks is completed, or `asynchronous` if a new parallel tasks is submitted as soon as any of the previous task is completed.|

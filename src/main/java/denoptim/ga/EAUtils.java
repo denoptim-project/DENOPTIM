@@ -21,6 +21,7 @@ package denoptim.ga;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -1215,7 +1216,10 @@ public class EAUtils
     /**
      * Write out summary for the current GA population.
      * @param population
-     * @param filename
+     * @param filename the pathname of the file where we write the details of 
+     * the population. If required by the {@link GAParameters}, we use this
+     * also to define a pathname where to write all the members of the 
+     * population.
      * @throws DENOPTIMException
      */
 
@@ -1235,9 +1239,11 @@ public class EAUtils
         String stats = "";
         synchronized (population)
         {
+            List<Candidate> popMembers = new ArrayList<Candidate>();
             for (int i=0; i<settings.getPopulationSize(); i++)
             {
                 Candidate mol = population.get(i);
+                popMembers.add(mol);
                 if (mol != null)
                 {
                     String mname = new File(mol.getSDFFile()).getName();
@@ -1260,6 +1266,12 @@ public class EAUtils
     
             // calculate descriptive statistics for the population
             stats = getSummaryStatistics(population, settings);
+            
+            if (settings.savePopFile())
+            {
+                File dest = new File(filename.replaceAll("\\.txt$", ".sdf"));
+                DenoptimIO.writeCandidatesToFile(dest, popMembers, false);
+            }
         }
         if (stats.trim().length() > 0)
             sb.append(stats);
