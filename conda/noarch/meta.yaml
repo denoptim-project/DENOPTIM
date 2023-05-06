@@ -5,7 +5,7 @@ package:
   version: {{ environ.get('DENOPTIM_VERSION', '') }}
 
 source:
-  path: ..
+  path: ../..
 
 build:
   noarch: generic
