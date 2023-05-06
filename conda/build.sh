@@ -17,6 +17,6 @@ $PYTHON -m pip install --no-deps .
 
 cd "$SRC_DIR"
 echo '#!/bin/bash' > "$PREFIX/bin/denoptim"
-echo '"'$JAVA_HOME'/bin/java" -jar "'$PREFIX'/lib/denoptim-'$PKG_VERSION'-jar-with-dependencies.jar" "$@"' >> "$PREFIX/bin/denoptim"
+echo 'java -jar "'$PREFIX'/lib/denoptim-'$PKG_VERSION'-jar-with-dependencies.jar" "$@"' >> "$PREFIX/bin/denoptim"
 
 chmod +x "${PREFIX}/bin/denoptim"
