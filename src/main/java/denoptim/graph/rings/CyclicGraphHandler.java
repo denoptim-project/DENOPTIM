@@ -117,6 +117,16 @@ public class CyclicGraphHandler
     }
     
 //-----------------------------------------------------------------------------
+    
+    //TODO-gg
+    /*
+     * 1) make method that returns an iterator over random sets
+     * 2) make method that cals the iterator an evaluates the candidate set of rings
+     * according to to customizable criteria (set of classis along ring? number of closed rings?)
+     * and picks the best in a sample of tuneable sie.
+     */
+    
+//-----------------------------------------------------------------------------
 
     /**
      * Identifies a random combination of ring closing paths and returns it as 

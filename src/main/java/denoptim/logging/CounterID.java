@@ -55,6 +55,7 @@ public enum CounterID
     FAILEDMUTATTEMTS_PERFORM_NOADDLINK_FIND,
     FAILEDMUTATTEMTS_PERFORM_NOADDLINK_EDIT,
     FAILEDMUTATTEMTS_PERFORM_NOEXTEND,
+    FAILEDMUTATTEMTS_PERFORM_NOADDRING,
     FAILEDMUTATTEMTS_PERFORM_NODELETE,
     FAILEDMUTATTEMTS_SETUPRINGS, 
     FAILEDMUTATTEMTS_EVAL, 
@@ -143,6 +144,8 @@ public enum CounterID
                 + "replace edge with with new vertex and edges";
         FAILEDMUTATTEMTS_PERFORM_NOEXTEND.description = "Mutation did not "
                 + "extend the graph";
+        FAILEDMUTATTEMTS_PERFORM_NOADDRING.description = "Mutation did not "
+                + "close a ring in the graph";
         FAILEDMUTATTEMTS_PERFORM_NODELETE.description = "Mutation did not "
                 + "delete vertex";
         FAILEDMUTATTEMTS_SETUPRINGS.description = "Failed attempts to setup "
@@ -257,6 +260,8 @@ public enum CounterID
                 "#Failed Mut Add Link_Edit";
         FAILEDMUTATTEMTS_PERFORM_NOEXTEND.prettyName =
                 "#Failed Mut Extend";
+        FAILEDMUTATTEMTS_PERFORM_NOADDRING.prettyName =
+                "#Failed Mut AddRing";
         FAILEDMUTATTEMTS_PERFORM_NODELETE.prettyName =
                 "#Failed Mut Delete";
         FAILEDMUTATTEMTS_SETUPRINGS.prettyName =

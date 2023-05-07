@@ -29,9 +29,11 @@ import java.util.logging.Level;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
+import denoptim.graph.rings.RingClosureParameters;
 import denoptim.logging.Monitor;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.MutationType;
 
 
@@ -1405,6 +1407,16 @@ public class GAParameters extends RunTimeParameters
         }
         
         processOtherParameters();
+        
+        if (containsParameters(ParametersType.RC_PARAMS))
+        {
+            RingClosureParameters rcParams = (RingClosureParameters) 
+                    getParameters(ParametersType.RC_PARAMS);
+            if (!rcParams.allowRingClosures())
+            {
+                excludedMutationTypes.add(MutationType.ADDRING);
+            }
+        }
         
         if (isMaster)
         {    

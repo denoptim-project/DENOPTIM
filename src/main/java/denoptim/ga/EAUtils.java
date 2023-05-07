@@ -58,6 +58,7 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
 import denoptim.graph.Ring;
+import denoptim.graph.SymmetricAPs;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -2311,6 +2312,16 @@ public class EAUtils
         for (String str:lst)
             lstInchi.add(str);
         lst.clear();
+    }
+
+//------------------------------------------------------------------------------
+
+    public static AttachmentPoint searchForApSuitableToRingClosure(
+            AttachmentPoint apA, SymmetricAPs symAPsA, GAParameters settings)
+    {
+        
+        // TODO Auto-generated method stub
+        return null;
     }
     
 //------------------------------------------------------------------------------    

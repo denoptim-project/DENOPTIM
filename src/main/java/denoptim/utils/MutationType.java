@@ -54,6 +54,11 @@ public enum MutationType {
     ADDLINK,
     
     /**
+     * Creates a ring-closure to add a ring.
+     */
+    ADDRING,
+    
+    /**
      * Removes a vertex from a tree and merges remaining branches into the
      * remaining trunk.
      */

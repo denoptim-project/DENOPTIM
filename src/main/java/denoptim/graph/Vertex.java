@@ -873,7 +873,10 @@ public abstract class Vertex implements Cloneable
             // Cannot extend vertex that has no truly free AP, but can do it
             // on APs that are used by capping groups.
             if ((getFreeAPCountThroughout() + getCappedAPs().size()) == 0)
+            {
                 filteredTypes.remove(MutationType.EXTEND);
+                filteredTypes.remove(MutationType.ADDRING);
+            }
             
             // Cannot remove the only vertex of a graph
             if (owner.getVertexCount()==0)
