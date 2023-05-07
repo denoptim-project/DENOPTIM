@@ -28,7 +28,7 @@ outputs:
       commands:
         - denoptim -v
 
-  - name: denoptim-noarch
+  - name: denoptim      
     build:
       noarch: generic
     test:
