@@ -8,7 +8,6 @@ source:
   path: ..
 
 build:
-  noarch: generic
   number: 1
 
 requirements:
@@ -23,9 +22,18 @@ requirements:
     - python
     - py4j
 
-#test:
-#  commands:
-#    - denoptim -v
+outputs:
+  - name: denoptim
+    test:
+      commands:
+        - denoptim -v
+
+  - name: denoptim-noarch
+    build:
+      noarch: generic
+    test:
+      commands:
+        - denoptim -v
 
 about:
   home: https://github.com/denoptim-project/DENOPTIM
