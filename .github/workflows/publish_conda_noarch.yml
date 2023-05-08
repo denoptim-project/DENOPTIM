@@ -9,7 +9,7 @@ env:
   ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
 
 jobs:
-  build-and-publish:
+  build-and-publish-platform-specific:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -40,6 +40,37 @@ jobs:
       run: |
         conda config --set anaconda_upload yes
         conda build -c conda-forge  .
+      env:
+        DENOPTIM_VERSION: ${{ steps.get_version.outputs.VERSION }}
+
+  build-and-publish-noarch:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@master
+
+    - name: Get version identifier
+      id: get_version
+      run: |
+        echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
+        echo ${GITHUB_REF#refs/tags/v}
+
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        auto-activate-base: false
+        activate-environment: anaconda-client-env
+        environment-file: conda/environment.yml
+
+    - name: Build package and publish
+      run: |
+        conda config --set anaconda_upload yes
+        conda build -c conda-forge  .  --variants "{'arch': 'noarch'}"
       env:
         DENOPTIM_VERSION: ${{ steps.get_version.outputs.VERSION }}
 
