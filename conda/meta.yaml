@@ -8,23 +8,21 @@ source:
   path: ..
 
 build:
+  noarch: generic # [ arch=='noarch' and linux ]
   number: 1
 
 requirements:
   build:
     - openjdk =={{ openjdk_version }}
     - maven
-    - python
-    - python-build
-    - setuptools
   run:
     - openjdk =={{ openjdk_version }}
     - python
     - py4j
 
-#test:
-#  commands:
-#    - denoptim -v
+test:
+  commands:
+    - denoptim -v
 
 about:
   home: https://github.com/denoptim-project/DENOPTIM
