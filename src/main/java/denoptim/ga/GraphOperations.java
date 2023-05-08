@@ -965,6 +965,16 @@ public class GraphOperations
         }
         DGraph graph = vertex.getGraphOwner();
         
+        
+        //TODO-gg abandon ols approach!!!!
+        // I need to 
+        // 1) clone the graph
+        // 2) ass RCVs on the vertex's chosen AP
+        // 3) sprinkle RCVs on a set of randomly chosen APs compatible with ring closure
+        // 4) get a few random combination of rings and rank them
+        // 5) Project the best combination of rings into the graph owning vertex
+        
+        
         List<AttachmentPoint> lstDaps = vertex.getFreeAPThroughout();
         List<AttachmentPoint> toDoAPs = new ArrayList<AttachmentPoint>();
         toDoAPs.addAll(lstDaps);
