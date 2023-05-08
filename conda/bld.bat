@@ -5,12 +5,6 @@ cmd.exe /c mvn --batch-mode package || echo ""
 
 copy "%SRC_DIR%\target\denoptim-%PKG_VERSION%-jar-with-dependencies.jar" "%LIBRARY_LIB%\"
 
-cd "%SRC_DIR%\src\main\python"
-"%PYTHON%" -m pip install --no-deps .
-exit %errorlevel%
-
-cd "%SRC_DIR%"
-
 md "%SCRIPTS%\"
 
 echo @echo off > "%SCRIPTS%\denoptim.cmd"

@@ -15,9 +15,6 @@ requirements:
   build:
     - openjdk =={{ openjdk_version }}
     - maven
-    - python
-    - python-build
-    - setuptools
   run:
     - openjdk =={{ openjdk_version }}
     - python
