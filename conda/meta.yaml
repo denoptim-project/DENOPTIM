@@ -8,6 +8,7 @@ source:
   path: ..
 
 build:
+  noarch: generic # [ arch=='noarch' and linux ]
   number: 1
 
 requirements:
