@@ -40,6 +40,29 @@ if [ 5 -ne "$numFitFiles" ]; then
     exit 1
 fi
 
+numPopSDFiles=$(find "$runFolder" -type f -name "Gen*.sdf" | wc -l)
+if [ 6 -ne "$numPopSDFiles" ]; then
+    echo " "
+    echo "Test 't12d' NOT PASSED (symptom: expecting 6 Gen*sdf files, found $numPopSDFiles)"
+    exit 1
+fi
+
+find "$runFolder" -type f -name "Gen*.sdf" | while read file ; do
+    numItems=$(grep -c "FITNESS" "$file" )
+    if [ 5 -ne "$numItems" ]; then
+        echo " "
+        echo "Test 't12d' NOT PASSED (symptom: expecting 5 items in $file, found $numItems)"
+        exit 1
+    fi
+done
+
+numFinalPopSDFiles=$(find "$runFolder" -type f -name "Final*.sdf" | wc -l)
+if [ 1 -ne "$numFinalPopSDFiles" ]; then
+    echo " "
+    echo "Test 't12d' NOT PASSED (symptom: expecting 1 Final*sdf file, found $numFinalPopSDFiles)"
+    exit 1
+fi
+
 numFitFiles=$(find "$runFolder/Final" -type f -name "*_out.sdf" | wc -l)
 if [ 5 -ne "$numFitFiles" ]; then
     echo " "
