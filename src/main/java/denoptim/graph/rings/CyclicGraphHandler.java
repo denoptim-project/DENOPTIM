@@ -118,33 +118,6 @@ public class CyclicGraphHandler
     }
     
 //-----------------------------------------------------------------------------
-    
-    //TODO-gg
-    /*
-     * 1) make method that returns an iterator over random sets
-     * 2) make method that cals the iterator an evaluates the candidate set of rings
-     * according to to customizable criteria (set of classis along ring? number of closed rings?)
-     * and picks the best in a sample of tuneable sie.
-     */
-
-    /**
-     * Return iterator over random combination of ring closing paths.
-     * @param inMol the molecular representation of the object represented by 
-     * the graph
-     * @param molGraph the graph representation of the object.
-     * @param maxRingClosures maximum number of ring closures to perform.
-     * @return the selected combination of closable paths 
-     */
-/*
-    public Iterator<List<Ring>> getIteratorOverRandomCombinationOfRings(
-            IAtomContainer inMol, DGraph molGraph, int maxRingClosures) 
-                    throws DENOPTIMException
-    {
-        
-    }
-    */
-    
-//-----------------------------------------------------------------------------
 
     /**
      * Identifies a random combination of ring closing paths and returns it as 
@@ -158,86 +131,10 @@ public class CyclicGraphHandler
     public List<Ring> getRandomCombinationOfRings(IAtomContainer inMol,
             DGraph molGraph, int maxRingClosures) throws DENOPTIMException
     {
-        // Prepare molecular representation with no dummy atoms
-        // NOTE: the connectivity of this molecule is going to be edited 
-        // as we identify new candidate DENOPTIMRings. This is done to
-        // calculate ring size as if the DENOPTIMRings were closed
-        IAtomContainer mol;
-        try
-        {
-            mol = (IAtomContainer) inMol.clone();
-        }
-        catch (Throwable t)
-        {
-            throw new DENOPTIMException(t);
-        }
-
-        // Get manager of ring size problems
-        RingSizeManager rsm = new RingSizeManager(fragSpace, settings);
-        rsm.initialize(mol, molGraph);
-
-        // Get weighted list of RCVs
-        ArrayList<Vertex> wLstVrtI = rsm.getRSBiasedListOfCandidates();
-        
-        // Randomly choose the compatible combinations of RCAs and store them
-        // as DENOPTIMRings. 
-        List<Ring> combOfRings = new ArrayList<Ring>();
-        while (wLstVrtI.size() > 0)
-        {
-            // Termination criterion based on maximum number of rings per graph
-            if (combOfRings.size() >= maxRingClosures)
-                break;
-            
-            int vIdI = settings.getRandomizer().nextInt(wLstVrtI.size());
-            Vertex vI = wLstVrtI.get(vIdI);
-            wLstVrtI.removeAll(Collections.singleton(vI));
-
-            // Create vector of possible choices for second RCV
-            ArrayList<Vertex> wLstVrtJ = rsm.getRSBiasedListOfCandidates(vI); 
-            while (wLstVrtJ.size() > 0)
-            {
-                int vIdJ = settings.getRandomizer().nextInt(wLstVrtJ.size());
-                Vertex vJ = wLstVrtJ.get(vIdJ);
-                wLstVrtJ.removeAll(Collections.singleton(vJ));
-
-                PathSubGraph path = new PathSubGraph(vI,vJ,molGraph);
-                if (PathClosabilityTools.isCloseable(path, inMol, settings))
-                {
-                    ArrayList<Vertex> arrLst = new ArrayList<Vertex>();
-                    arrLst.addAll(path.getVertecesPath());                    
-                    Ring ring = new Ring(arrLst);
-
-                    BondType bndTypI = vI.getEdgeToParent().getBondType();
-                    BondType bndTypJ = vJ.getEdgeToParent().getBondType();
-                    if (bndTypI != bndTypJ)
-                    {
-                        String s = "Attempt to close rings is not compatible "
-                        + "to the different bond type specified by the "
-                        + "head and tail APs: (" + bndTypI + "!=" 
-                        + bndTypJ + " for vertices " + vI + " " 
-                        + vJ + ")";
-                        throw new DENOPTIMException(s);
-                    }
-                    ring.setBondType(bndTypI);
-
-                    combOfRings.add(ring);
-
-                    wLstVrtI.removeAll(Collections.singleton(vJ));
-
-                    // Update ring sizes according to the newly added bond
-                    if (vI instanceof Fragment && vJ instanceof Fragment)
-                    {
-                        rsm.addRingClosingBond(vI,vJ);
-                    }
-                    rsm.setVertexAsDone(vJ);
-                    break;
-                }
-            }
-            rsm.setVertexAsDone(vI);
-        }
-
+        RandomCombOfRingsIterator iter = new RandomCombOfRingsIterator(inMol,
+                molGraph, maxRingClosures, fragSpace, settings);
+        List<Ring> combOfRings = iter.next();
         logger.log(Level.FINE,"Random combOfRings: "+combOfRings);
-        
         return combOfRings;
     }
 
@@ -251,6 +148,8 @@ public class CyclicGraphHandler
      * @return the candidate closable paths in the given graph
      */
 
+    //TODO: this should use most of the same code of RandomCombOfRingsIterator
+    
     public ArrayList<List<Ring>> getPossibleCombinationOfRings(
             IAtomContainer mol, DGraph molGraph)
                     throws DENOPTIMException

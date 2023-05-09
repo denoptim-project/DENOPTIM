@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BoxLayout;
@@ -804,7 +805,7 @@ public class FSParametersForm extends ParametersForm
         tabModPar22.addRow(new Object[]{"<html><b>Ring Size</b></html>", 
                 "<html><b>Bias (int)</b></html>"});
         RingClosureParameters rcParamsDefault = new RingClosureParameters();
-        ArrayList<Integer> ringSizeBias = rcParamsDefault.getRingSizeBias();
+        List<Integer> ringSizeBias = rcParamsDefault.getRingSizeBias();
         for (int ib=0; ib<ringSizeBias.size(); ib++)
         {
         	int w = ringSizeBias.get(ib);
