@@ -343,6 +343,25 @@ public class RingClosureParameters extends RunTimeParameters
     {
         return ringClosabCondAsSMARTS;
     }
+    
+//----------------------------------------------------------------------------
+
+    /**
+     * Sets the list of constitutions that can be formed by ring closure. 
+     * SMARTS are used to define such constitutions. Note that the ring-closing
+     * attractors are not considered in the definition of the constitution of the
+     * ring. 
+     * @param ringClosabCondAsSMARTS a map where each entry is a rule that 
+     * defined constitutions that can be formed. In each entry, 
+     * the key is the name of the rule and is used only for logging, 
+     * and the value is the SMARTS query that must be matched for a candidate 
+     * ring to be accepted.
+     */
+    public void setConstitutionalClosabilityConds(
+            Map<String,String> ringClosabCondAsSMARTS)
+    {
+        this.ringClosabCondAsSMARTS = ringClosabCondAsSMARTS;
+    }
 
 //----------------------------------------------------------------------------
 

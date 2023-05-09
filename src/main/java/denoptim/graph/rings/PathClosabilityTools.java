@@ -230,19 +230,17 @@ public class PathClosabilityTools
             atomsPath = new ArrayList<IAtom>(Arrays.asList(sp.atomsTo(srcT)));
 
             // Look for the required elements
-            String missingEl = "";
             for (String el : reqRingEl)
             {
-                missingEl = el;
                 for (IAtom a : atomsPath)
                 {
-                    if (a.getSymbol().equals(el))
+                    if (MoleculeUtils.getSymbolOrLabel(a).equals(el))
                     {
                         spanRequiredEls = true;
                         break;
                     }
                 }
-                if (!spanRequiredEls)
+                if (spanRequiredEls)
                 {
                     break;
                 }
@@ -250,7 +248,8 @@ public class PathClosabilityTools
             if (!spanRequiredEls)
             {
                 settings.getLogger().log(Level.FINER, 
-                        "Candidate ring doesn't involve " + missingEl);
+                        "Candidate ring doesn't involve any among the required "
+                        + "elements.");
                 return false;
             }
             closable = true;

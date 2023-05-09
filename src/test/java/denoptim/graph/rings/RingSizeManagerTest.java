@@ -53,7 +53,7 @@ import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.Randomizer;
 
 /**
- * Unit test for PathSubGraph
+ * Unit test for ring size manager.
  * 
  * @author Marco Foscato
  */
