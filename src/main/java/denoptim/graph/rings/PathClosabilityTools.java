@@ -85,7 +85,6 @@ public class PathClosabilityTools
 
     public static boolean isCloseable(PathSubGraph subGraph,
             IAtomContainer mol, RingClosureParameters settings) 
-                    throws DENOPTIMException
     {
         boolean closable = false;
         switch (settings.getClosabilityEvalMode())
@@ -107,7 +106,7 @@ public class PathClosabilityTools
                 break;
             default:
                 String s = "Unrecognized closability evaluation mode";
-                throw new DENOPTIMException(s);
+                throw new IllegalArgumentException(s);
         }
         return closable;
     }
@@ -117,13 +116,18 @@ public class PathClosabilityTools
     /**
      * Method to evaluate the closability of a single path considering only
      * its constitution.
-     * @param subGraph the subgraph representing the path in the graph
+     * @param subGraph the subgraph representing the path in the graph.
+     * @param iac the molecular representation. 
+     * This is only used to provide the molecular
+     * constitution and does not require 3D coordinates. 
+     * This will not be altered.
+     * @param settings the parameters pertaining ring closures.
      * @return <code>true</code> is the path is constitutionally closable
      */
 
     private static boolean evaluateConstitutionalClosability(
-            PathSubGraph subGraph, IAtomContainer inMol, 
-            RingClosureParameters settings) throws DENOPTIMException
+            PathSubGraph subGraph, IAtomContainer iac, 
+            RingClosureParameters settings)
     {
         settings.getLogger().log(Level.FINE, "Evaluating constitutional "
                 + "closability of path: " + subGraph.getVertecesPath());
@@ -133,11 +137,11 @@ public class PathClosabilityTools
         IAtomContainer mol = builder.newAtomContainer();
         try
         {
-            mol = inMol.clone();
+            mol = iac.clone();
         }
         catch (CloneNotSupportedException e)
         {
-            throw new DENOPTIMException(e);
+            throw new IllegalArgumentException(e);
         }
         MoleculeUtils.removeRCA(mol);
         
@@ -222,12 +226,8 @@ public class PathClosabilityTools
         {
             // Prepare shortest atom path 
             List<IAtom> atomsPath = new ArrayList<IAtom>();
-            try {
-                ShortestPaths sp = new ShortestPaths(mol, srcH);
-                atomsPath = new ArrayList<IAtom>(Arrays.asList(sp.atomsTo(srcT)));
-            } catch (Throwable t) {
-                throw new DENOPTIMException("PathTools Exception: " + t);
-            }
+            ShortestPaths sp = new ShortestPaths(mol, srcH);
+            atomsPath = new ArrayList<IAtom>(Arrays.asList(sp.atomsTo(srcT)));
 
             // Look for the required elements
             String missingEl = "";
@@ -294,16 +294,18 @@ public class PathClosabilityTools
      * representing a molecule. Since this is a computationally demanding
      * task, this method makes use of serialized data that is updated 
      * on the fly.
-     * @param subGraph the subgraph representing the path in the graph
-     * @param mol the molecule corresponding to the graph. This
-     * <code>IAtomContainer</code> is only used to provide the molecular
-     * constitution and does not require 3D coordinates.
+     * @param subGraph the subgraph representing the path in the graph.
+     * @param mol the molecular representation of the system represented by
+     * the whole graph, not by the subgraph. 
+     * This is only used to provide the molecular
+     * constitution and does not require 3D coordinates. 
+     * This will not be altered.
+     * @param settings the parameters pertaining ring closures.
      * @return <code>true</code> is the path corresponds to a closable chain
      */
 
     private static boolean evaluate3DPathClosability(PathSubGraph subGraph, 
             IAtomContainer mol, RingClosureParameters settings) 
-                    throws DENOPTIMException
     {
         String chainId = subGraph.getChainID();
         settings.getLogger().log(Level.FINE, 
@@ -324,16 +326,34 @@ public class PathClosabilityTools
             if (settings.checkInterdependentChains() 
                     && settings.doExhaustiveConfSrch())
             {
-                subGraph.makeMolecularRepresentation(mol, false,
-                        settings.getLogger(), settings.getRandomizer());
+                try
+                {
+                    subGraph.makeMolecularRepresentation(mol, false,
+                            settings.getLogger(), settings.getRandomizer());
+                } catch (DENOPTIMException e)
+                {
+                    settings.getLogger().warning("Could not create 3D model "
+                            + "for potentially closeable path that will be "
+                            + "considered not ring-closable.");
+                    return false;
+                }
                 subGraph.setRCC(rcc);        
             }
         }
         else
         {
             // Need to generate 3D molecular representation
-            subGraph.makeMolecularRepresentation(mol, true,
-                settings.getLogger(), settings.getRandomizer());
+            try {
+                subGraph.makeMolecularRepresentation(mol, true,
+                    settings.getLogger(), settings.getRandomizer());
+            } catch (DENOPTIMException e)
+            {
+                settings.getLogger().warning("Could not create 3D model "
+                        + "for potentially closeable path that will be "
+                        + "considered not ring-closable.");
+                return false;
+            }
+            
             List<IAtom> atomsPath = subGraph.getAtomPath();
             List<IBond> bondsPath = subGraph.getBondPath();
 
@@ -364,7 +384,7 @@ public class PathClosabilityTools
                                                subGraph.getDihedralRefPoints();
             if (dihRefs.size() != rotatability.size()-2)
             {
-                throw new DENOPTIMException("Number of bonds and number of "
+                throw new IllegalStateException("Number of bonds and number of "
                         + "dihidrals angles are inconsistent in PathSubGraph."
                         + " Contact the author.");
             }

@@ -2,6 +2,7 @@ package denoptim.graph.rings;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,14 +65,14 @@ class RingSizeManager
      * List of weight factors used to control the likeliness of choosing 
      * rings of a given size for the current system
      */
-    private ArrayList<Double> weigths;
+    private List<Double> weigths;
 
     /**
      * List of flags defining if an RCA has been "used", i.e., not used to
      * make an actual chord, but used to make a plan to make a chord and
      * update the molecular representation accordingly.
      */
-    private ArrayList<Boolean> done;
+    private List<Boolean> done;
 
     /**
      * Map linking the list of vertices and atoms
@@ -81,7 +82,7 @@ class RingSizeManager
     /**
      * Parameters setting the bias for selecting rings of given size
      */
-    private ArrayList<Integer> ringSizeBias;
+    private List<Integer> ringSizeBias; //TODO-gg this or weights?
     
     /**
      * Definition of the fragment space
@@ -130,15 +131,12 @@ class RingSizeManager
      * @throws DENOPTIMException
      */
     public void initialize(IAtomContainer origMol, DGraph graph)
-            throws DENOPTIMException
     {
         try
         {
             mol = (IAtomContainer) origMol.clone();
-        }
-        catch (Throwable t)
-        {
-            throw new DENOPTIMException(t);
+        } catch (Throwable t) {
+            throw new IllegalArgumentException(t);
         }
 
         // Get the list of available RCAs
@@ -146,7 +144,7 @@ class RingSizeManager
         sz = lstVert.size();
 
         // Define link between list of vertices and list of atoms
-        vIdToAtmId = MoleculeUtils.getVertexToAtomIdMap(lstVert,mol);
+        vIdToAtmId = MoleculeUtils.getVertexToAtomIdMap(lstVert, mol);
 
         // Build topological matrix
         fillTopologicalMatrix(); 
@@ -198,7 +196,7 @@ class RingSizeManager
     // NOTE: this method considers the ring size bias and sets also 
     // the weight factors
 
-    private void calculateCompatibilityOfAllRCAPairs() throws DENOPTIMException
+    private void calculateCompatibilityOfAllRCAPairs()
     {
         weigths = new ArrayList<Double>(Collections.nCopies(sz, 0.0));
         compatibilityOfPairs = new boolean[sz][sz];
@@ -221,7 +219,7 @@ class RingSizeManager
                 {
                     String s = "Attempt to evaluate RCA pair compatibility "
                                + "with a non-RCA end (" + atmI + ").";
-                    throw new DENOPTIMException(s);
+                    throw new IllegalStateException(s);
                 }
             }   
             
@@ -240,7 +238,7 @@ class RingSizeManager
                     {
                         String s = "Attempt to evaluate RCA pair compatibility "
                                    + "with a non-RCA end (" + atmJ + ").";
-                        throw new DENOPTIMException(s);
+                        throw new IllegalStateException(s);
                     }
                 }
                 
@@ -317,7 +315,6 @@ class RingSizeManager
 
     private boolean evaluateRCVPair(Vertex vI, Vertex vJ, 
             FragmentSpace fragSpace)
-                    throws DENOPTIMException
     {
         String s = "Evaluation of RCV pair " + vI + " " + vJ + ": ";
 
@@ -391,9 +388,9 @@ class RingSizeManager
 
 //-----------------------------------------------------------------------------
 
-    public ArrayList<Vertex> getRSBiasedListOfCandidates()
+    public List<Vertex> getRSBiasedListOfCandidates()
     {
-        ArrayList<Vertex> wLst = new ArrayList<Vertex>();
+        List<Vertex> wLst = new ArrayList<Vertex>();
         for (int i=0; i<sz; i++)
         {
             if (done.get(i))
@@ -414,10 +411,10 @@ class RingSizeManager
 
 //-----------------------------------------------------------------------------
 
-    public ArrayList<Vertex> getRSBiasedListOfCandidates(Vertex vI)
+    public List<Vertex> getRSBiasedListOfCandidates(Vertex vI)
     {
         int i = lstVert.indexOf(vI);
-        ArrayList<Vertex> wLst = new ArrayList<Vertex>();
+        List<Vertex> wLst = new ArrayList<Vertex>();
         for (int j=0; j<sz; j++)
         {
             if (done.get(j) || !compatibilityOfPairs[i][j])
@@ -436,7 +433,7 @@ class RingSizeManager
             int ringSize = topoMat[vIdToAtmId.get(vI).get(0)]
                                   [vIdToAtmId.get(vJ).get(0)] - 1;
             
-            // The likeliness of picking this RCS is given by the ring-size
+            // The likeliness of picking this RCV is given by the ring-size
             // factor, which accounts for the requested bias towards specific
             // ring sizes. The larger the bias, the higher the number of
             // slots occupied by vJ in the list of possible partners, thus
@@ -467,16 +464,15 @@ class RingSizeManager
 //-----------------------------------------------------------------------------
 
     public void addRingClosingBond(Vertex vI, Vertex vJ)
-            throws DENOPTIMException
     {
         // Check validity of assumption: RCV contain only one IAtom
         if (vIdToAtmId.get(vI).size()!=1 || vIdToAtmId.get(vJ).size()!=1)
         {
             String s = "Attempt to make ring closing bond between "
                        + "multi-atom Ring Closing Vertices (RCV). "
-                       + "For now only single-atom RCVs are expected in "
+                       + "For now, only single-atom RCVs are expected in "
                        + "this implementation.";
-            throw new DENOPTIMException(s);
+            throw new IllegalStateException(s);
         }
 
         // Identify atoms to be bound and make the ring closing bond

@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -161,7 +162,7 @@ public class RingClosureParameters extends RunTimeParameters
      * Relative weight of ring sizes to bias the selection of a ring 
      * combination among the various alternatives.
      */
-    protected ArrayList<Integer> ringSizeBias = new ArrayList<Integer>()
+    protected List<Integer> ringSizeBias = new ArrayList<Integer>()
         {
             /**
              * Version ID
@@ -172,15 +173,16 @@ public class RingClosureParameters extends RunTimeParameters
                 {
                     add(0);
                 }
-    	    if (maxRingSize>=7)
-    	    {
-                    // WARNING: if the default value of maxRingSize is changed
-                    // also the default content of this array has to change
-                    set(5,2);
-                    set(6,4);
-                    set(7,1);
-    	    }
-        }};
+        	    if (maxRingSize>=7)
+        	    {
+                        // WARNING: if the default value of maxRingSize is changed
+                        // also the default content of this array has to change
+                        set(5,2);
+                        set(6,4);
+                        set(7,1);
+        	    }
+            }
+        };
 
     /**
      * SMARTS defining the constitution-based ring closability condition.
@@ -269,9 +271,28 @@ public class RingClosureParameters extends RunTimeParameters
 
 //----------------------------------------------------------------------------
 
-    public ArrayList<Integer> getRingSizeBias()
+    /**
+     * @return the list of biases for ring size. Each value is the weight of 
+     * the preference for rings of the size equal to the index of the value 
+     * in the list.
+     */
+    public List<Integer> getRingSizeBias()
     {
         return ringSizeBias;
+    }
+    
+//----------------------------------------------------------------------------
+
+    /**
+     * Sets the preference for certain ring sizes or the prohibition to 
+     * generate certain rings (i.e., weight = 0).
+     * @param biases the list of biases for ring size. Each value is the weight  
+     * of the preference for rings of the size equal to the index of the value 
+     * in the list.
+     */
+    public void setRingSizeBias(List<Integer> biases)
+    {
+        ringSizeBias = biases;
     }
 
 //------------------------------------------------------------------------------
