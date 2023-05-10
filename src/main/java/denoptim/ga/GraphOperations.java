@@ -957,14 +957,53 @@ public class GraphOperations
             FragmentSpace fragSpace, GAParameters settings) 
                     throws DENOPTIMException
     {
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        
         List<AttachmentPoint> freeeAPs = vertex.getFreeAPThroughout();
         if (freeeAPs.size()==0)
         {
             //TODO-gg add increase counter event
             return false;
         }
-        DGraph graph = vertex.getGraphOwner();
+        DGraph originalGraph = vertex.getGraphOwner();
+        DGraph tmpGraph = originalGraph.clone();
         
+        Vertex headVrtx = tmpGraph.getVertexAtPosition(originalGraph.indexOf(
+                vertex));
+        
+        for (AttachmentPoint srcAP : headVrtx.getFreeAPThroughout())
+        {
+            APClass apc = srcAP.getAPClass();
+            
+            // Skip if the APClass is not allowed to form ring closures
+            if (!fragSpace.getRCCompatibilityMatrix().containsKey(apc))
+            {
+                continue;
+            }
+            
+            // NB: we may or may not have a specific RCV for this APClass
+            if (fragSpace.getCompatibilityMatrix().containsKey(apc))
+            {
+                List<Vertex> candidateRCVs = new ArrayList<>
+                List<APClass> apcsCompatWithSrcAP = 
+                        fragSpace.getCompatibilityMatrix().get(apc);
+                for (Vertex rcv : fragSpace.getRCVs())
+                {
+                    if (apcsCompatWithSrcAP.contains(rcv.getAP(0).getAPClass()))
+                    {
+                        fragSpace.getAPsCompatibleWithClass(apc)
+                    }
+                }
+            } else {
+                
+            }
+        }
         
         //TODO-gg abandon ols approach!!!!
         // I need to 

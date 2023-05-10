@@ -523,8 +523,8 @@ public class FragmentSpace
      * example, any of the indexes is out of range.
      */
 
-    public Vertex getVertexFromLibrary(
-            Vertex.BBType bbType, int bbIdx) throws DENOPTIMException
+    public Vertex getVertexFromLibrary(Vertex.BBType bbType, int bbIdx) 
+            throws DENOPTIMException
     {
         String msg = "";
         switch (bbType)
@@ -1044,6 +1044,46 @@ public class FragmentSpace
             }
         }
         return compatFrags;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for all building blocks that are ring-closing vertexes and are 
+     * compatible with the given list of APs.
+     * 
+     * @param apc the class of the attachment point meant to hold the RCV.
+     * @return a list of vertexes ready to be used (i.e., clones of the vertexes
+     * stored in the library). The list can be empty. 
+     */
+    public List<Vertex> getRCVsForAPClass(APClass apc) 
+    {
+        List<Vertex> chosenRCVs = new ArrayList<Vertex>();
+        if (!getCompatibilityMatrix().containsKey(apc))
+        {
+            return chosenRCVs;
+        }
+        List<APClass> apcsCompatWithSrcAP = getCompatibilityMatrix().get(apc);
+        for (Vertex rcv : getRCVs())
+        {
+            // NB: RCVs must have only one attachment point
+            if (apcsCompatWithSrcAP.contains(rcv.getAP(0).getAPClass()))
+            {
+                Vertex copyOfRCV = null;
+                try
+                {
+                    copyOfRCV = getVertexFromLibrary(rcv.getBuildingBlockType(),
+                            rcv.getBuildingBlockId());
+                    chosenRCVs.add(copyOfRCV);
+                } catch (DENOPTIMException e)
+                {
+                    // This should never happen because we have already taken 
+                    // the BB from BBSpace.
+                    e.printStackTrace();
+                }
+            }
+        }
+        return chosenRCVs;
     }
     
 //------------------------------------------------------------------------------
