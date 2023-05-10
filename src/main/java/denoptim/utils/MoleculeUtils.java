@@ -77,6 +77,7 @@ import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import io.github.dan2097.jnainchi.InchiFlag;
@@ -192,7 +193,7 @@ public class MoleculeUtils
         for (IAtom a : mol.atoms())
         {
             boolean isRca = false;
-            Set<String> rcaElSymbols = DENOPTIMConstants.RCATYPEMAP.keySet();
+            Set<String> rcaElSymbols = RingClosingAttractor.RCATYPEMAP.keySet();
             for (String rcaEl : rcaElSymbols)
             {
                 if (MoleculeUtils.getSymbolOrLabel(a).equals(rcaEl))

@@ -43,6 +43,7 @@ import com.google.gson.Gson;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
@@ -150,7 +151,7 @@ public class Fragment extends Vertex
         setSymmetricAPSets(simAP);
         
         this.setAsRCV(getNumberOfAPs() == 1
-                && APClass.RCAAPCLASSSET.contains(
+                && RingClosingAttractor.RCAAPCLASSSET.contains(
                         getAttachmentPoints().get(0).getAPClass()));
         
         Object isomorph = mol.getProperty(DENOPTIMConstants.ISOMORPHICFAMILYID);

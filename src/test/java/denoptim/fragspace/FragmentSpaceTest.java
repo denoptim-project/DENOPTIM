@@ -58,6 +58,7 @@ import denoptim.graph.SymmetricAPs;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.GraphUtils;
@@ -416,8 +417,8 @@ public class FragmentSpaceTest
     @Test
     public void testGetRCVsForAPClass() throws Exception
     {
-        APClass rcvP = APClass.make(APClass.ATPLUS,0);
-        APClass rcvM = APClass.make(APClass.ATMINUS,0);
+        APClass rcvP = APClass.RCACLASSPLUS;
+        APClass rcvM = APClass.RCACLASSMINUS;
         
         APClass apcA = APClass.make("A",0);
         APClass apcB = APClass.make("B",0);
@@ -451,7 +452,7 @@ public class FragmentSpaceTest
         fragments.add(frg2);
         
         Fragment rcv1 = new Fragment();
-        Atom at1 = new PseudoAtom(APClass.RCALABELPERAPCLASS.get(rcvP), 
+        Atom at1 = new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(rcvP), 
                 new Point3d());
         rcv1.addAtom(at1);
         rcv1.addAP(0, rcvP, new Point3d(1.0, 0, 0));
@@ -459,7 +460,7 @@ public class FragmentSpaceTest
         fragments.add(rcv1);
         
         Fragment rcv2 = new Fragment();
-        Atom at2 = new PseudoAtom(APClass.RCALABELPERAPCLASS.get(rcvM), 
+        Atom at2 = new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(rcvM), 
                 new Point3d());
         rcv2.addAtom(at2);
         rcv2.addAP(0, rcvM, new Point3d(-1.0, 0, 0));
@@ -467,7 +468,7 @@ public class FragmentSpaceTest
         fragments.add(rcv2);
 
         Fragment rcv3 = new Fragment();
-        Atom at3 = new PseudoAtom(APClass.RCALABELPERAPCLASS.get(rcvM), 
+        Atom at3 = new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(rcvM), 
                 new Point3d());
         rcv3.addAtom(at3);
         rcv3.addAP(0, rcvM, new Point3d(-2.0, 0, 0));
@@ -545,7 +546,7 @@ public class FragmentSpaceTest
         fragments.add(frg2);
         
         Fragment rcv1 = new Fragment();
-        Atom at1 = new PseudoAtom(APClass.RCALABELPERAPCLASS.get(rcvP), 
+        Atom at1 = new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(rcvP), 
                 new Point3d());
         rcv1.addAtom(at1);
         rcv1.addAP(0, rcvP, new Point3d(1.0, 0, 0));
@@ -553,7 +554,7 @@ public class FragmentSpaceTest
         fragments.add(rcv1);
         
         Fragment rcv2 = new Fragment();
-        Atom at2 = new PseudoAtom(APClass.RCALABELPERAPCLASS.get(rcvM), 
+        Atom at2 = new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(rcvM), 
                 new Point3d());
         rcv2.addAtom(at2);
         rcv2.addAP(0, rcvM, new Point3d(-1.0, 0, 0));

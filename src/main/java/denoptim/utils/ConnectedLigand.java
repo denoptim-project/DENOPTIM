@@ -21,6 +21,7 @@ package denoptim.utils;
 import org.openscience.cdk.interfaces.IAtom;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.graph.rings.RingClosingAttractor;
 
 /**
  * A ConnectedLigand is just an atom with an explicit field reporting the number
@@ -44,7 +45,7 @@ public class ConnectedLigand
         this.seed = seed;
         this.connections = connections;
         String symbol = seed.getSymbol();
-        boolean isRCA = DENOPTIMConstants.RCATYPEMAP.containsKey(symbol);
+        boolean isRCA = RingClosingAttractor.RCATYPEMAP.containsKey(symbol);
         this.isDu = symbol.equals(DENOPTIMConstants.DUMMYATMSYMBOL) || isRCA ||
                 !DENOPTIMConstants.ALL_ELEMENTS.contains(symbol);
     }

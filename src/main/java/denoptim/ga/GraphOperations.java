@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import org.apache.http.TruncatedChunkException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.paukov.combinatorics3.Generator;
 
@@ -55,6 +56,7 @@ import denoptim.graph.rings.ChainLink;
 import denoptim.graph.rings.ClosableChain;
 import denoptim.graph.rings.PathSubGraph;
 import denoptim.graph.rings.RandomCombOfRingsIterator;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
@@ -947,15 +949,19 @@ public class GraphOperations
 //------------------------------------------------------------------------------
 
     /**
-     * Tries to use any free AP of the given vertex to form a ring in the graph.
+     * Tries to use any free AP of the given vertex to close ring in the graph 
+     * by adding a chord.
      * @param vertex the vertex on which we start to close a the ring.
      * @param mnt monitoring tool to keep count of events.
-     * @return <code>true</code> if formation of ring is successful
+     * @param force use <code>true</code> to by-pass random decisions and force
+     * the creation of rings.
+     * @param fragSpace the fragment space controlling how we put together
+     * building blocks.
+     * @param settings the GA settings controlling how we work.
+     * @return <code>true</code> when at least one ring was added to the graph.
      * @throws DENOPTIMException
      * 
      */
-    
-    //TODO-gg doc
     
     protected static boolean addRing(Vertex vertex, Monitor mnt, boolean force,
             FragmentSpace fragSpace, GAParameters settings) 
@@ -973,7 +979,7 @@ public class GraphOperations
         List<AttachmentPoint> freeeAPs = vertex.getFreeAPThroughout();
         if (freeeAPs.size()==0)
         {
-            //TODO-gg add increase counter event
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
             return false;
         }
         DGraph originalGraph = vertex.getGraphOwner();
@@ -1049,7 +1055,7 @@ public class GraphOperations
                             trgAP.getAPClass());
                     if (candRCVs.size()>0)
                     {
-                        APClass requiredAPC = DENOPTIMConstants.RCAAPCMAP.get(
+                        APClass requiredAPC = RingClosingAttractor.RCAAPCMAP.get(
                                         rcvOnSrcAP.getAP(0).getAPClass());
                         List<Vertex> keptRCVs = new ArrayList<Vertex>();
                         for (Vertex rcv : candRCVs)
@@ -1077,7 +1083,8 @@ public class GraphOperations
             }
             if (rcvAddedToGraph.size() < 2)
             {
-                // TODO-gg: could consider counting these to see what is the most frequent cause of this mutation to fail
+                // TODO: we could consider counting these to see what is the 
+                // most frequent cause of this mutation to fail
                 continue;
             }
             
@@ -1089,7 +1096,7 @@ public class GraphOperations
             RandomCombOfRingsIterator rCombIter = new RandomCombOfRingsIterator(
                     mol,
                     tmpGraph, 
-                    2, //TODO-gg make tuneable from parameters
+                    settings.getMaxRingsAddedByMutation(),
                     fragSpace, rcParams);
             
             //TODO: possibility to generate multiple combinations, rank them,  
@@ -1105,6 +1112,11 @@ public class GraphOperations
             // Cleanup before starting new iteration
             for (Vertex toRemove : rcvAddedToGraph)
                 tmpGraph.removeVertex(toRemove);
+        }
+        if (setOfRingsOnTmpGraph.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NORINGCOMB);
+            return false;
         }
         
         // Project rings into the actual graph
@@ -1141,92 +1153,6 @@ public class GraphOperations
         }
         
         return done;
-    }
-
-//------------------------------------------------------------------------------
-
-    private static SymmetricAPs pickSymAPsForRC(AttachmentPoint apA,
-            GAParameters settings, boolean force)
-    {
-        Vertex vertex = apA.getOwner();
-        DGraph graph = vertex.getGraphOwner();
-        SymmetricAPs symAPsA = new SymmetricAPs();
-        if (vertex.getSymmetricAPs(apA).size()!=0)
-        {
-            symAPsA.addAll(vertex.getSymmetricAPs(apA));
-        } else {
-            symAPsA.add(apA); 
-        }
-        
-        // Decide if formation of new bond is permitted by crowdedness
-        int crowdedness = EAUtils.getCrowdedness(apA);
-        // Pick the accepted value once (used to decide how much
-        // crowdedness we accept on this ap and on any sym AP)
-        double shot = settings.getRandomizer().nextDouble();
-        double crowdProb = EAUtils.getCrowdingProbability(
-                crowdedness, settings);
-        if (!force && shot > crowdProb)
-        {
-            // we decided to not add the bond due to crowdedness
-            // so, we are done.
-            return new SymmetricAPs();
-        }
-        
-        // Are symmetric APs rooted on same atom?
-        boolean allOnSameSrc = true;
-        for (AttachmentPoint symAPA : symAPsA)
-        {
-            if (!symAPA.hasSameSrcAtom(apA))
-            {
-                allOnSameSrc = false;
-                break;
-            }
-        }
-        if (allOnSameSrc) // one or more AP
-        {
-            // If the APs are rooted on the same src atom, we want to
-            // apply the crowdedness probability to avoid over crowded
-            // atoms
-            SymmetricAPs toKeep = new SymmetricAPs();
-            // We have already decided to use 'ap'
-            toKeep.add(apA);
-            crowdedness = crowdedness + 1;
-            
-            // Keep as many as allowed by the crowdedness decision
-            for (AttachmentPoint symAP : symAPsA)
-            {
-                // We have already decided to use 'ap'
-                if (symAP == apA)
-                    continue;
-                
-                crowdProb = EAUtils.getCrowdingProbability(
-                        crowdedness, settings);
-                
-                if (!force && shot > crowdProb)
-                    break;
-                
-                toKeep.add(symAP);
-                crowdedness = crowdedness + 1;
-            }
-            
-            // Adjust the list of symmetric APs to work with
-            symAPsA = toKeep;
-        }
-
-        // ...and inherit symmetry from previous levels
-        boolean cpOnSymVrts = graph.hasSymmetryInvolvingVertex(vertex);
-        SymmetricVertexes symVerts = new SymmetricVertexes();
-        if (cpOnSymVrts)
-        {
-            symVerts = graph.getSymSetForVertex(vertex);
-        } else {
-            symVerts.add(vertex);
-        }
-        
-        //TODO-gg we should add the APs from symVerts in symAPs
-        // TODO Auto-generated method stub
-        
-        return symAPsA;
     }
 
 //------------------------------------------------------------------------------

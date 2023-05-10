@@ -37,6 +37,7 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.io.DenoptimIO;
 import denoptim.io.IteratingAtomContainerReader;
 import denoptim.programs.RunTimeParameters.ParametersType;
@@ -1299,7 +1300,7 @@ public class FragmenterTools
         IAtomContainer mol = SilentChemObjectBuilder.getInstance()
                 .newAtomContainer();
         Point3d apv = ap.getDirectionVector();
-        mol.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(rcvApClass), 
+        mol.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(rcvApClass), 
                 new Point3d(
                     Double.valueOf(apv.x),
                     Double.valueOf(apv.y),

@@ -122,10 +122,10 @@ public class RingSizeManagerTest
         vN.addAP(0, new Point3d(2,0,0), apc);
         vN.addAP(0, new Point3d(0,1,0), apc);
         
-        APClass atMinus = APClass.make(APClass.ATMINUS, 0);
+        APClass atMinus = APClass.RCACLASSMINUS;
         
         IAtomContainer iacD = builder.newAtomContainer();
-        iacD.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(atMinus),
+        iacD.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(atMinus),
                 new Point3d(0,0,0)));
         Fragment rcvM = new Fragment(5, iacD,BBType.FRAGMENT);
         rcvM.addAP(0, new Point3d(-1,0,0), atMinus);
@@ -137,10 +137,10 @@ public class RingSizeManagerTest
         Fragment rcvM3 = rcvM.clone();
         rcvM3.setVertexId(7);
         
-        APClass atPlus = APClass.make(APClass.ATPLUS, 0);
+        APClass atPlus = APClass.RCACLASSPLUS;
         
         IAtomContainer iacE = builder.newAtomContainer();
-        iacE.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(atPlus),
+        iacE.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(atPlus),
                 new Point3d(0,0,0)));
         Fragment rcvP = new Fragment(8, iacE,BBType.FRAGMENT);
         rcvP.addAP(0, new Point3d(-1,0,0), atPlus);
@@ -220,10 +220,10 @@ public class RingSizeManagerTest
         vN.addAP(0, new Point3d(2,0,0), apc);
         vN.addAP(0, new Point3d(0,1,0), apc);
         
-        APClass atMinus = APClass.make(APClass.ATMINUS, 0);
+        APClass atMinus = APClass.RCACLASSMINUS;
         
         IAtomContainer iacD = builder.newAtomContainer();
-        iacD.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(atMinus),
+        iacD.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(atMinus),
                 new Point3d(0,0,0)));
         Fragment rcvM = new Fragment(5, iacD,BBType.FRAGMENT);
         rcvM.addAP(0, new Point3d(-1,0,0), atMinus);
@@ -235,10 +235,10 @@ public class RingSizeManagerTest
         Fragment rcvM3 = rcvM.clone();
         rcvM3.setVertexId(7);
         
-        APClass atPlus = APClass.make(APClass.ATPLUS, 0);
+        APClass atPlus = APClass.RCACLASSPLUS;
         
         IAtomContainer iacE = builder.newAtomContainer();
-        iacE.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(atPlus),
+        iacE.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(atPlus),
                 new Point3d(0,0,0)));
         Fragment rcvP = new Fragment(8, iacE,BBType.FRAGMENT);
         rcvP.addAP(0, new Point3d(-1,0,0), atPlus);

@@ -21,7 +21,6 @@ package denoptim.graph;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +35,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.rings.RingClosingAttractor;
 
 public class APClass implements Cloneable,Comparable<APClass>
 {
@@ -98,46 +98,6 @@ public class APClass implements Cloneable,Comparable<APClass>
     public static final APClass RCACLASSNEUTRAL = getUnique(ATNEUTRAL, 0, 
             BondType.ANY);
     
-    //TODO-gg use final static classes elsehere when ATx classes are used
-    
-    /**
-     * Recognized attachment point classes of RingClosingAttractor
-     */
-    public static final Set<APClass> RCAAPCLASSSET = 
-    	    new HashSet<APClass>(){
-                /**
-                 * Version ID
-                 */
-                private static final long serialVersionUID = 1L;
-
-                {
-                    add(RCACLASSPLUS);
-                    add(RCACLASSMINUS);
-                    add(RCACLASSNEUTRAL);
-                }};
-
-    //TODO-gg move to RCA?
-    /**
-     * Conventional pseudoatom labels for RingClosingAttractor
-     */
-    public static final HashMap<APClass,String> RCALABELPERAPCLASS = 
-            new HashMap<APClass,String>(){
-                /**
-                 * Version ID
-                 */
-                private static final long serialVersionUID = 1L;
-
-            {
-                try {
-                    put(RCACLASSPLUS, "ATP");
-                    put(RCACLASSMINUS, "ATM");
-                    put(RCACLASSNEUTRAL, "ATN");
-                } catch (Throwable t)
-                {
-                    //Will not happen
-                }
-            }};
-            
     /**
      * Bond type to use when converting edge users into formal bonds
      */
@@ -303,7 +263,7 @@ public class APClass implements Cloneable,Comparable<APClass>
             } else {
                 // NB: the default bond type for RCAs must not be changed, but
                 // For non-RCA APClasses we do update the bond type.
-                if (bt != newApc.bndTyp && !RCAAPCLASSSET.contains(newApc))
+                if (bt != newApc.bndTyp && !RingClosingAttractor.RCAAPCLASSSET.contains(newApc))
                 {
                     System.err.println("WARNING! Changing bond order of "
                             + "APClass " + newApc + ": " + newApc.bndTyp 

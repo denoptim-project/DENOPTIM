@@ -82,7 +82,7 @@ class RingSizeManager
     /**
      * Parameters setting the bias for selecting rings of given size
      */
-    private List<Integer> ringSizeBias; //TODO-gg this or weights?
+    private List<Integer> ringSizeBias;
     
     /**
      * Definition of the fragment space

@@ -1190,8 +1190,7 @@ public class EAUtils
                             graph.appendVertexOnAP(apI, rcvI.getAP(0));
                             
                             Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
-                                    APClass.make(APClass.ATMINUS, 0, 
-                                            BondType.ANY));
+                                    APClass.RCACLASSMINUS);
                             rcvJ.setBuildingBlockType(BBType.FRAGMENT);
                             rcvJ.setVertexId(vId.getAndIncrement());
                             graph.appendVertexOnAP(apJ, rcvJ.getAP(0));

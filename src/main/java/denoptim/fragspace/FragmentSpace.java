@@ -48,6 +48,7 @@ import denoptim.graph.GraphPattern;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
@@ -1928,7 +1929,7 @@ public class FragmentSpace
             apc = APClass.RCACLASSMINUS;
         
         Fragment rcv = new Fragment();
-        Atom atom = new PseudoAtom(APClass.RCALABELPERAPCLASS.get(apc), 
+        Atom atom = new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(apc), 
                 new Point3d());
         rcv.addAtom(atom);
         rcv.addAP(0, new Point3d(1.5, 0.0, 0.0), apc);

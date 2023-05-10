@@ -326,6 +326,11 @@ public class GAParameters extends RunTimeParameters
     protected double minFitnessSD = 0.000001;
     
     /**
+     * Maximum number of rings added by a single mutation operation
+     */
+    protected int maxRingsAddedByMutation = 1;
+    
+    /**
      * Flag controlling the possibility of collecting cyclic graph systems that 
      * include a scaffold and save them as new template scaffolds.
      */
@@ -1185,6 +1190,15 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "MAXRINGSADDEDBYMUTATION=":
+            {
+                if (value.length() > 0)
+                {
+                    maxRingsAddedByMutation = Integer.parseInt(value);
+                }
+                break;
+            }
+            
             case "KEEPNEWRINGSYSTEMVERTEXES":
             {
                 saveRingSystemsAsTemplatesNonScaff = true;
@@ -1196,7 +1210,6 @@ public class GAParameters extends RunTimeParameters
                 saveRingSystemsAsTemplatesScaffolds = true;
                 break;
             }
-            
             
             case "KEEPNEWRINGSYSTEMFITNESSTRSH=":
             {
@@ -1555,6 +1568,18 @@ public class GAParameters extends RunTimeParameters
     public boolean savePopFile()
     {
         return writePopOnDisk;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Return the value of the number of rings that we are allowed to add in a 
+     * single {@link MutationType#ADDRING} mutation.
+     * @return the maximum number of rings added in a single mutation.
+     */
+    public int getMaxRingsAddedByMutation()
+    {
+        return maxRingsAddedByMutation;
     }
 
 //------------------------------------------------------------------------------

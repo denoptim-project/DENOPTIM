@@ -64,6 +64,7 @@ import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
@@ -907,10 +908,10 @@ public class GraphOperationsTest {
         vN.addAP(0, new Point3d(2,0,0), apc);
         vN.addAP(0, new Point3d(0,1,0), apc);
         
-        APClass atMinus = APClass.make(APClass.ATMINUS, 0);
+        APClass atMinus = APClass.RCACLASSMINUS;
         
         IAtomContainer iacD = chemBuilder.newAtomContainer();
-        iacD.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(atMinus),
+        iacD.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(atMinus),
                 new Point3d(0,0,0)));
         Fragment rcvM = new Fragment(6, iacD,BBType.FRAGMENT);
         rcvM.addAP(0, new Point3d(-1,0,0), atMinus);
@@ -919,10 +920,10 @@ public class GraphOperationsTest {
         Fragment rcvM2 = rcvM.clone();
         rcvM2.setVertexId(7);
         
-        APClass atPlus = APClass.make(APClass.ATPLUS, 0);
+        APClass atPlus = APClass.RCACLASSPLUS;
         
         IAtomContainer iacE = chemBuilder.newAtomContainer();
-        iacE.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(atPlus),
+        iacE.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(atPlus),
                 new Point3d(0,0,0)));
         Fragment rcvP = new Fragment(8, iacE,BBType.FRAGMENT);
         rcvP.addAP(0, new Point3d(-1,0,0), atPlus);

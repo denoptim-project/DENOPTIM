@@ -72,6 +72,7 @@ import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.ClosableChain;
 import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.PathSubGraph;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.graph.simplified.Node;
 import denoptim.graph.simplified.NodeConnection;
@@ -5496,7 +5497,7 @@ public class DGraph implements Cloneable
             // Count rings and RCAs
             int nPossRings = 0;
             Set<String> doneType = new HashSet<>();
-            Map<String,String> rcaTypes = DENOPTIMConstants.RCATYPEMAP;
+            Map<String,String> rcaTypes = RingClosingAttractor.RCATYPEMAP;
             for (String rcaTyp : rcaTypes.keySet())
             {
                 if (doneType.contains(rcaTyp))
