@@ -504,6 +504,81 @@ public class FragmentSpaceTest
         List<Vertex> rcvs3 = fs.getRCVsForAPClass(APClass.make("C",0)); 
         assertEquals(0, rcvs3.size());
     }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetRCVsWithAPClass() throws Exception
+    {
+        APClass rcvP = APClass.RCACLASSPLUS;
+        APClass rcvM = APClass.RCACLASSMINUS;
+        
+        APClass apcA = APClass.make("A",0);
+        APClass apcB = APClass.make("B",0);
+        
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        lstA.add(rcvP);
+        cpMap.put(apcA, lstA);
+        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        lstB.add(rcvP);
+        lstB.add(rcvM);
+        cpMap.put(apcB, lstB);
+        
+        HashMap<APClass,ArrayList<APClass>> rcCPMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstC = new ArrayList<APClass>();
+        lstC.add(apcB);
+        rcCPMap.put(apcA, lstC);
+        
+        ArrayList<Vertex> fragments = new ArrayList<Vertex>();
+        
+        Fragment frg2 = new Fragment();
+        Atom a21 = new Atom("N", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a22 = new Atom("H", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        frg2.addAtom(a21);
+        frg2.addAtom(a22);
+        frg2.addBond(new Bond(a21, a22));
+        frg2.addAP(1, apcB, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg2.addAP(1, apcA, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        fragments.add(frg2);
+        
+        Fragment rcv1 = new Fragment();
+        Atom at1 = new PseudoAtom(APClass.RCALABELPERAPCLASS.get(rcvP), 
+                new Point3d());
+        rcv1.addAtom(at1);
+        rcv1.addAP(0, rcvP, new Point3d(1.0, 0, 0));
+        rcv1.setAsRCV(true);
+        fragments.add(rcv1);
+        
+        Fragment rcv2 = new Fragment();
+        Atom at2 = new PseudoAtom(APClass.RCALABELPERAPCLASS.get(rcvM), 
+                new Point3d());
+        rcv2.addAtom(at2);
+        rcv2.addAP(0, rcvM, new Point3d(-1.0, 0, 0));
+        rcv2.setAsRCV(true);
+        fragments.add(rcv2);
+        
+        HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
+        HashSet<APClass> forbEnds = new HashSet<APClass>();
+        
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(), // scaffolds
+                fragments,
+                new ArrayList<Vertex>(), // caps
+                cpMap, capMap, forbEnds, cpMap);
+        fs.setAPclassBasedApproach(true);
+        
+        List<Vertex> rcvs1 = fs.getRCVsWithAPClass(rcvP); 
+        assertEquals(1, rcvs1.size());
+        assertTrue(rcv1.sameAs(rcvs1.get(0)));
+        
+        List<Vertex> rcvs2 = fs.getRCVsWithAPClass(rcvM); 
+        assertEquals(1, rcvs2.size());
+        assertTrue(rcv2.sameAs(rcvs2.get(0)));
+    }
 
 //------------------------------------------------------------------------------
 

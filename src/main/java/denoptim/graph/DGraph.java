@@ -3997,6 +3997,29 @@ public class DGraph implements Cloneable
         }
         return lstFreeAPs;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of attachment points contained in this graph that are
+     * available throughout the template barrier, i.e., are free in this graph 
+     * an in any embedding graph that containing this one.
+     * @return list of attachment points.
+     */
+
+    public List<AttachmentPoint> getAvailableAPsThroughout()
+    {
+        ArrayList<AttachmentPoint> lstFreeAPs =
+                new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            if (ap.isAvailableThroughout())
+            {
+                lstFreeAPs.add(ap);
+            }
+        }
+        return lstFreeAPs;
+    }
 
 //------------------------------------------------------------------------------
 

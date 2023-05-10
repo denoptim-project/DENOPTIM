@@ -398,11 +398,9 @@ public class Fragment extends Vertex
      * the attachment point direction vector, or null. The coordinates must be
      * consistent with the coordinates of the atoms.
      * @param valence the valences used by this AP.
-     * @throws DENOPTIMException 
      */
 
     public void addAP(int srcAtmId, APClass apc, Point3d vector) 
-            throws DENOPTIMException
     {
         IAtom srcAtm = mol.getAtom(srcAtmId);
         addAPOnAtom(srcAtm, apc, vector);
@@ -420,11 +418,10 @@ public class Fragment extends Vertex
      * the attachment point direction vector, or null. The coordinates must be
      * consistent with the coordinates of the atoms.
      * @return the reference to the created AP.
-     * @throws DENOPTIMException 
      */
 
     public AttachmentPoint addAPOnAtom(IAtom srcAtm, APClass apc, 
-            Point3d vector) throws DENOPTIMException
+            Point3d vector)
     {
         int atmId = mol.indexOf(srcAtm);
         return this.addAP(atmId, new Point3d(vector.x, vector.y, vector.z), apc);

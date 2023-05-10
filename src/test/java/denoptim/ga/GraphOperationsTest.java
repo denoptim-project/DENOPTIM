@@ -21,6 +21,7 @@ package denoptim.ga;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -40,10 +42,13 @@ import javax.vecmath.Point3d;
 import org.jgrapht.alg.util.Pair;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -59,7 +64,13 @@ import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosureParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.Monitor;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.Randomizer;
 
 /**
  * Unit test
@@ -839,6 +850,136 @@ public class GraphOperationsTest {
         
         return fs;
     }
-
+    
 //------------------------------------------------------------------------------
+
+    @Test
+    public void testAddRing() throws Exception
+    {
+        /* This is the graph we work with
+         *      
+         *         *      *                   *     RCV_M
+         *         |      |                   |      |
+         * RCV_P--[O]----[C]--[C]--[C]--[C]--[C]----[N]--RCV_M
+         *        vO     vC   vC2  vC3  vC4  vC5    vN
+         *  
+         */
+        
+        APClass apc = APClass.make("A", 0);
+
+        IAtomContainer iacO = chemBuilder.newAtomContainer();
+        IAtom aO = new Atom("O",new Point3d(0,0,0));
+        iacO.addAtom(aO);
+        Fragment vO = new Fragment(0, iacO,BBType.FRAGMENT);
+        vO.addAP(0, new Point3d(0,-1,0), apc);
+        vO.addAP(0, new Point3d(2,0,0), apc);
+        vO.addAP(0, new Point3d(0,1,0), apc);
+        
+        IAtomContainer iacC = chemBuilder.newAtomContainer();
+        IAtom aC = new Atom("C",new Point3d(0,0,0));
+        iacC.addAtom(aC);
+        Fragment vC = new Fragment(1, iacC,BBType.FRAGMENT);
+        vC.addAP(0, new Point3d(0,-1,0), apc);
+        vC.addAP(0, new Point3d(2,0,0), apc);
+        vC.addAP(0, new Point3d(0,1,0), apc);
+        
+        IAtomContainer iacCd = chemBuilder.newAtomContainer();
+        IAtom aCd = new Atom("C",new Point3d(0,0,0));
+        iacCd.addAtom(aCd);
+        Fragment vC2 = new Fragment(2, iacCd,BBType.FRAGMENT);
+        vC2.addAP(0, new Point3d(0,-1,0), apc);
+        vC2.addAP(0, new Point3d(0,1,0), apc);
+        
+        Fragment vC3 = vC2.clone();
+        vC3.setVertexId(33);
+        
+        Fragment vC4 = vC2.clone();
+        vC4.setVertexId(34);
+        
+        Fragment vC5 = vC.clone();
+        vC5.setVertexId(3);
+        
+        IAtomContainer iacN = chemBuilder.newAtomContainer();
+        IAtom aN = new Atom("N",new Point3d(0,0,0));
+        iacN.addAtom(aN);
+        Fragment vN = new Fragment(4, iacN,BBType.FRAGMENT);
+        vN.addAP(0, new Point3d(0,-1,0), apc);
+        vN.addAP(0, new Point3d(2,0,0), apc);
+        vN.addAP(0, new Point3d(0,1,0), apc);
+        
+        APClass atMinus = APClass.make(APClass.ATMINUS, 0);
+        
+        IAtomContainer iacD = chemBuilder.newAtomContainer();
+        iacD.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(atMinus),
+                new Point3d(0,0,0)));
+        Fragment rcvM = new Fragment(6, iacD,BBType.FRAGMENT);
+        rcvM.addAP(0, new Point3d(-1,0,0), atMinus);
+        rcvM.setAsRCV(true);
+        
+        Fragment rcvM2 = rcvM.clone();
+        rcvM2.setVertexId(7);
+        
+        APClass atPlus = APClass.make(APClass.ATPLUS, 0);
+        
+        IAtomContainer iacE = chemBuilder.newAtomContainer();
+        iacE.addAtom(new PseudoAtom(APClass.RCALABELPERAPCLASS.get(atPlus),
+                new Point3d(0,0,0)));
+        Fragment rcvP = new Fragment(8, iacE,BBType.FRAGMENT);
+        rcvP.addAP(0, new Point3d(-1,0,0), atPlus);
+        rcvP.setAsRCV(true);
+    
+        DGraph graph = new DGraph();
+        graph.addVertex(vC);
+        graph.appendVertexOnAP(vC.getAP(0), vO.getAP(2));
+        graph.appendVertexOnAP(vO.getAP(1), rcvP.getAP(0));
+        graph.appendVertexOnAP(vC.getAP(2), vC2.getAP(1));
+        graph.appendVertexOnAP(vC2.getAP(0), vC3.getAP(0));
+        graph.appendVertexOnAP(vC3.getAP(1), vC4.getAP(0));
+        graph.appendVertexOnAP(vC4.getAP(1), vC5.getAP(0));
+        graph.appendVertexOnAP(vC5.getAP(2), vN.getAP(0));
+        graph.appendVertexOnAP(vN.getAP(1), rcvM.getAP(0));
+        graph.appendVertexOnAP(vN.getAP(2), rcvM2.getAP(0));
+        
+        // Prepare environment to run graph operation. First, a monitor of events
+        Monitor mnt = new Monitor();
+        
+        // Then, a fragment space that allows ring closures
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        lstA.add(apc);
+        cpMap.put(apc, lstA);
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(), 
+                cpMap, 
+                new HashMap<APClass,APClass>(), 
+                new HashSet<APClass>(),
+                cpMap);
+        fs.setAPclassBasedApproach(true);
+        
+        // Then, settings of ring-closing machinery
+        RingClosureParameters rcParams = new RingClosureParameters();
+        List<Integer> biases = new ArrayList<Integer>();
+        for (int i=0; i<rcParams.getMaxRingSize(); i++)
+        {
+            biases.add(0); // 0 means ring-closure not allowed
+        }
+        biases.set(5, 1);
+        rcParams.setRingSizeBias(biases);
+        
+        // Then, some GA-parameters
+        GAParameters gaParams = new GAParameters();
+        gaParams.setParameters(rcParams);
+        
+        // All ready, do the ring-adding mutation
+        assertEquals(0, graph.getRingCount());
+        GraphOperations.addRing(vC5, mnt, true, fs, gaParams);
+        assertEquals(1, graph.getRingCount());
+    }
+    
+//------------------------------------------------------------------------------
+    
 }

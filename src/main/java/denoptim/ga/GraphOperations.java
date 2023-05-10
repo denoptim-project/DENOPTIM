@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.paukov.combinatorics3.Generator;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -43,6 +44,7 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
+import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
 import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
@@ -52,10 +54,12 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.ChainLink;
 import denoptim.graph.rings.ClosableChain;
 import denoptim.graph.rings.PathSubGraph;
+import denoptim.graph.rings.RandomCombOfRingsIterator;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.CrossoverType;
@@ -964,6 +968,7 @@ public class GraphOperations
             rcParams = (RingClosureParameters)settings.getParameters(
                     ParametersType.RC_PARAMS);
         }
+        Randomizer rng = settings.getRandomizer();
         
         List<AttachmentPoint> freeeAPs = vertex.getFreeAPThroughout();
         if (freeeAPs.size()==0)
@@ -977,6 +982,8 @@ public class GraphOperations
         Vertex headVrtx = tmpGraph.getVertexAtPosition(originalGraph.indexOf(
                 vertex));
         
+        // Define the set of rings on the cloned (tmp) graph
+        List<Ring> setOfRingsOnTmpGraph = null;
         for (AttachmentPoint srcAP : headVrtx.getFreeAPThroughout())
         {
             APClass apc = srcAP.getAPClass();
@@ -986,110 +993,153 @@ public class GraphOperations
             {
                 continue;
             }
+            List<APClass> rcTrgAPCs = fragSpace.getRCCompatibilityMatrix().get(
+                    apc);
             
-            // NB: we may or may not have a specific RCV for this APClass
-            if (fragSpace.getCompatibilityMatrix().containsKey(apc))
+            // NB: the fragment space may or may not have a RCV for this AP
+            Vertex rcvOnSrcAP = null;
+            List<Vertex> candidateRCVs = fragSpace.getRCVsForAPClass(apc);
+            boolean rcvIsChosenArbitrarily = false;
+            if (candidateRCVs.size()>0)
             {
-                List<Vertex> candidateRCVs = new ArrayList<>
-                List<APClass> apcsCompatWithSrcAP = 
-                        fragSpace.getCompatibilityMatrix().get(apc);
-                for (Vertex rcv : fragSpace.getRCVs())
+                rcvOnSrcAP = rng.randomlyChooseOne(candidateRCVs);
+            } else {
+                rcvIsChosenArbitrarily = true;
+                rcvOnSrcAP = fragSpace.getPolarizedRCV(true);
+            }
+            
+            // Add the RCV on this AP
+            List<Vertex> rcvAddedToGraph = new ArrayList<Vertex>();
+            tmpGraph.appendVertexOnAP(srcAP, rcvOnSrcAP.getAP(0));
+            rcvAddedToGraph.add(rcvOnSrcAP);
+            
+            // Add a few RCVs in the rest of the system
+            // WARNING: hard-coded max number of attempts. It should not be too
+            // high to prevent combinatorial explosion.
+            for (int i=0; i<20; i++) 
+            {
+                // Do it only on APs that APClass-compatible with chord formation
+                List<AttachmentPoint> apsToTry = 
+                        tmpGraph.getAvailableAPsThroughout();
+                int numberOfAttempts = apsToTry.size();
+                AttachmentPoint trgAP = null;
+                for (int iap=0; iap<numberOfAttempts; iap++)
                 {
-                    if (apcsCompatWithSrcAP.contains(rcv.getAP(0).getAPClass()))
+                    AttachmentPoint candidate = rng.randomlyChooseOne(apsToTry);
+                    if (rcTrgAPCs.contains(candidate.getAPClass()))
                     {
-                        fragSpace.getAPsCompatibleWithClass(apc)
+                        trgAP = candidate;
+                        break;
+                    }
+                    apsToTry.remove(trgAP);
+                }
+                if (trgAP==null)
+                {
+                    // No more AP can be used to form rings with srcAP
+                    break;
+                }
+                
+                // Choose type of RCV
+                Vertex rcvOnTrgAP = null;
+                if (rcvIsChosenArbitrarily)
+                {
+                    rcvOnTrgAP = fragSpace.getPolarizedRCV(false);
+                } else {
+                    List<Vertex> candRCVs = fragSpace.getRCVsForAPClass(
+                            trgAP.getAPClass());
+                    if (candRCVs.size()>0)
+                    {
+                        APClass requiredAPC = DENOPTIMConstants.RCAAPCMAP.get(
+                                        rcvOnSrcAP.getAP(0).getAPClass());
+                        List<Vertex> keptRCVs = new ArrayList<Vertex>();
+                        for (Vertex rcv : candRCVs)
+                        {
+                            if (requiredAPC.equals(rcv.getAP(0).getAPClass()))
+                                keptRCVs.add(rcv);
+                        }
+                        rcvOnTrgAP = rng.randomlyChooseOne(keptRCVs);
+                        if (rcvOnTrgAP==null)
+                        {
+                            // no RCV is both usable and compatible with the
+                            // one already selected for srcAP
+                            continue;
+                        }
+                    } else {
+                        // The APClass settings and RCV compatibility rules
+                        // do not allow to identify a suitable RCV
+                        continue;
                     }
                 }
-            } else {
                 
+                // append RCV
+                tmpGraph.appendVertexOnAP(trgAP, rcvOnTrgAP.getAP(0));
+                rcvAddedToGraph.add(rcvOnTrgAP);
             }
-        }
-        
-        //TODO-gg abandon ols approach!!!!
-        // I need to 
-        // 1) clone the graph
-        // 2) ass RCVs on the vertex's chosen AP
-        // 3) sprinkle RCVs on a set of randomly chosen APs compatible with ring closure
-        // 4) get a few random combination of rings and rank them
-        // 5) Project the best combination of rings into the graph owning vertex
-        
-        
-        List<AttachmentPoint> lstDaps = vertex.getFreeAPThroughout();
-        List<AttachmentPoint> toDoAPs = new ArrayList<AttachmentPoint>();
-        toDoAPs.addAll(lstDaps);
-        boolean done = false;
-        for (int i=0; i<lstDaps.size(); i++)
-        {
-            // WARNING: randomization decouples 'i' from the index of the AP
-            // in the vertex's list of APs! So 'i' is just the i-th attempt on
-            // the curVertex.
-            
-            AttachmentPoint apA = settings.getRandomizer().randomlyChooseOne(
-                    toDoAPs);
-            toDoAPs.remove(apA);
-            
-            boolean cpOnSymAPs = applySymmetry(
-                    fragSpace.imposeSymmetryOnAPsOfClass(apA.getAPClass()),
-                    settings.getSymmetryProbability(),
-                    settings.getRandomizer());
-            
-            // Define one end of the chain/s that will become rings
-            SymmetricAPs symAPsA = new SymmetricAPs();
-            if (cpOnSymAPs)
-            {                
-                symAPsA = pickSymAPsForRC(apA, settings, force);
-            } else {
-                symAPsA.add(apA);
-            }
-            
-            // Define the other end of the chain/s that will become rings
-            AttachmentPoint apB = EAUtils.searchForApSuitableToRingClosure(apA, 
-                    symAPsA, settings);
-            SymmetricAPs symAPsB = new SymmetricAPs();
-            if (cpOnSymAPs)
-            {                
-                symAPsB = pickSymAPsForRC(apB, settings, force);
-            } else {
-                symAPsB.add(apB);
-            }
-            
-            GraphUtils.ensureVertexIDConsistency(graph.getMaxVertexId());
-    
-            Vertex rcvTmplA = getRCVForSrcAp(apA, fragSpace);
-            
-            // loop on all symmetric vertices, but can be only one.
-            SymmetricVertexes newSymSetOfVertices = new SymmetricVertexes();
-            for (AttachmentPoint symAPA : symAPsA)
+            if (rcvAddedToGraph.size() < 2)
             {
-                if (!symAPA.isAvailable())
-                {
-                    continue;
-                }
-                
-                // Finally add the fragment on a symmetric AP
-                long newVrtId = GraphUtils.getUniqueVertexIndex();
-                Vertex rcvA = Vertex.newVertexFromLibrary(newVrtId, 
-                        rcvTmplA.getBuildingBlockId(), 
-                        rcvTmplA.getBuildingBlockType(),
-                        fragSpace);
-                graph.appendVertexOnAP(symAPA, rcvA.getAP(0));
-                newSymSetOfVertices.add(rcvA);
-                
-                //TODO-gg make chord
-            }
-    
-            // If any, store symmetry of new vertices in the graph
-            if (newSymSetOfVertices.size() > 1)
-            {
-                graph.addSymmetricSetOfVertices(newSymSetOfVertices);
+                // TODO-gg: could consider counting these to see what is the most frequent cause of this mutation to fail
+                continue;
             }
             
-         
+            // Define rings to close in tmp graph
+            ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(
+                    settings.getLogger(), rng);
+            t3d.setAlignBBsIn3D(false); //3D not needed
+            IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(tmpGraph,true);
+            RandomCombOfRingsIterator rCombIter = new RandomCombOfRingsIterator(
+                    mol,
+                    tmpGraph, 
+                    2, //TODO-gg make tuneable from parameters
+                    fragSpace, rcParams);
             
+            //TODO: possibility to generate multiple combinations, rank them,  
+            // and pick the best one. Though definition of comparator is not
+            // unambiguous.
             
-            if (done)
+            setOfRingsOnTmpGraph = rCombIter.next();
+            
+            // Termination of search over trgAPs
+            if (setOfRingsOnTmpGraph.size()>0)
                 break;
+            
+            // Cleanup before starting new iteration
+            for (Vertex toRemove : rcvAddedToGraph)
+                tmpGraph.removeVertex(toRemove);
         }
+        
+        // Project rings into the actual graph
+        boolean done = false;
+        for (Ring rOnTmp : setOfRingsOnTmpGraph)
+        {
+            // Project head RCV and all info to attach it to original graph
+            Vertex vToHeadRCV = originalGraph.getVertexAtPosition(
+                    tmpGraph.indexOf(rOnTmp.getHeadVertex().getParent()));
+            AttachmentPoint apToHeadRCV = vToHeadRCV.getAP(
+                    rOnTmp.getHeadVertex().getEdgeToParent().getSrcAP()
+                    .getIndexInOwner());
+            Vertex headRCV = rOnTmp.getHeadVertex().clone();
+            headRCV.setVertexId(GraphUtils.getUniqueVertexIndex());
+            
+            // And append head RCV on original graph
+            originalGraph.appendVertexOnAP(apToHeadRCV, headRCV.getAP(0));
+            
+            // Project tail RCV and all info to attach it to original graph
+            Vertex vToTailRCV = originalGraph.getVertexAtPosition(
+                    tmpGraph.indexOf(rOnTmp.getTailVertex().getParent()));
+            AttachmentPoint apToTailRCV = vToTailRCV.getAP(
+                    rOnTmp.getTailVertex().getEdgeToParent().getSrcAP()
+                    .getIndexInOwner());
+            Vertex tailRCV = rOnTmp.getHeadVertex().clone();
+            tailRCV.setVertexId(GraphUtils.getUniqueVertexIndex());
+            
+            // And append tail RCV on original graph
+            originalGraph.appendVertexOnAP(apToTailRCV, tailRCV.getAP(0));
+            
+            // Add ring
+            originalGraph.addRing(headRCV, tailRCV);
+            done = true;
+        }
+        
         return done;
     }
 

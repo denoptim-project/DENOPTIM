@@ -379,11 +379,15 @@ public final class DENOPTIMConstants
      */
     public static final String BONDPROPROTATABLE = "DENOPTIMRotable";
 
+    //TODO-gg move to APClass or RCA
     /**
-     * Recognized types of {@link RingClosingAttractor} and compatible types
+     * Recognized types of {@link RingClosingAttractor} and compatible types.
+     * This is equivalent to 
+     * {@link DENOPTIMConstants#RCAAPCMAP} but is expressed in terms of 
+     *  pseudoatom label. instead of {@link APClass}.
      */
     public static final Map<String,String> RCATYPEMAP =
-		    new HashMap<String,String>() 
+            new HashMap<String,String>() 
     {
         /**
          *  Version identifier
@@ -391,9 +395,33 @@ public final class DENOPTIMConstants
         private static final long serialVersionUID = 3L;
 
         {
-            put("ATP", "ATM");
-            put("ATM", "ATP");
-            put("ATN", "ATN");
+            put(APClass.RCALABELPERAPCLASS.get(APClass.RCACLASSPLUS), 
+                    APClass.RCALABELPERAPCLASS.get(APClass.RCACLASSMINUS));
+            put(APClass.RCALABELPERAPCLASS.get(APClass.RCACLASSMINUS), 
+                    APClass.RCALABELPERAPCLASS.get(APClass.RCACLASSPLUS));
+            put(APClass.RCALABELPERAPCLASS.get(APClass.RCACLASSNEUTRAL), 
+                    APClass.RCALABELPERAPCLASS.get(APClass.RCACLASSNEUTRAL));
+        };
+    };
+    
+    /**
+     * Recognized {@link APClass}es on {@link RingClosingAttractor} and 
+     * compatible types. This is equivalent to 
+     * {@link DENOPTIMConstants#RCATYPEMAP} but is expressed in terms of 
+     * {@link APClass} instead of pseudoatom label.
+     */
+    public static final Map<APClass,APClass> RCAAPCMAP =
+            new HashMap<APClass,APClass>() 
+    {
+        /**
+         *  Version identifier
+         */
+        private static final long serialVersionUID = 3L;
+
+        {
+            put(APClass.RCACLASSPLUS, APClass.RCACLASSMINUS);
+            put(APClass.RCACLASSMINUS, APClass.RCACLASSPLUS);
+            put(APClass.RCACLASSNEUTRAL, APClass.RCACLASSNEUTRAL);
         };
     };
     

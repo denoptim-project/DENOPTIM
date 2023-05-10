@@ -18,7 +18,11 @@
 
 package denoptim.utils;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Point3d;
 
@@ -77,6 +81,35 @@ public class RandomizerTest
             assertTrue(maxVal >= Math.abs(p.y));
             assertTrue(maxVal >= Math.abs(p.z));
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test 
+    public void testRandomlyChooseOne() throws Exception
+    {
+        Randomizer rng = new Randomizer(123);
+        List<Integer> list = new ArrayList<Integer>();
+        
+        // On empty list
+        for (int i=0; i<3; i++)
+        {
+            assertNull(rng.randomlyChooseOne(list));
+        }
+        
+        // On filled list
+        for (int i=0; i<10; i++)
+        {
+            list.add(i);
+        }
+        for (int i=0; i<20; i++)
+        {
+            Integer chosen = rng.randomlyChooseOne(list);
+            assertTrue(chosen >= 0);
+            assertTrue(chosen < 10);
+        }
+        
+       
     }
     
 //------------------------------------------------------------------------------

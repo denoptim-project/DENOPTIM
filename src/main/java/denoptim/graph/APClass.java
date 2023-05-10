@@ -78,6 +78,29 @@ public class APClass implements Cloneable,Comparable<APClass>
     public static final String ATNEUTRAL = "ATneutral";
     
     /**
+     * Conventional class of attachment points on ring-closing vertexes.
+     * Polarized (+) case.
+     */
+    public static final APClass RCACLASSPLUS = getUnique(ATPLUS, 0, 
+            BondType.ANY);
+    
+    /**
+     * Conventional class of attachment points on ring-closing vertexes.
+     * Polarized (-) case.
+     */
+    public static final APClass RCACLASSMINUS = getUnique(ATMINUS, 0, 
+            BondType.ANY);
+    
+    /**
+     * Conventional class of attachment points on ring-closing vertexes.
+     * Unpolarized, neutral case.
+     */
+    public static final APClass RCACLASSNEUTRAL = getUnique(ATNEUTRAL, 0, 
+            BondType.ANY);
+    
+    //TODO-gg use final static classes elsehere when ATx classes are used
+    
+    /**
      * Recognized attachment point classes of RingClosingAttractor
      */
     public static final Set<APClass> RCAAPCLASSSET = 
@@ -87,29 +110,13 @@ public class APClass implements Cloneable,Comparable<APClass>
                  */
                 private static final long serialVersionUID = 1L;
 
-            {
-    	        APClass a = getUnique(ATPLUS, 0, BondType.ANY);
-    	        add(a);
-    	        synchronized (uniqueAPClassesLock)
                 {
-    	            uniqueAPClasses.add(a);
-                }
-    	        
-    	        APClass b = getUnique(ATMINUS, 0, BondType.ANY);
-                add(b);
-                synchronized (uniqueAPClassesLock)
-                {
-                    uniqueAPClasses.add(b);
-                }
-                
-                APClass c = getUnique(ATNEUTRAL, 0, BondType.ANY);
-                add(c);
-                synchronized (uniqueAPClassesLock)
-                {
-                    uniqueAPClasses.add(c);
-                }
+                    add(RCACLASSPLUS);
+                    add(RCACLASSMINUS);
+                    add(RCACLASSNEUTRAL);
                 }};
 
+    //TODO-gg move to RCA?
     /**
      * Conventional pseudoatom labels for RingClosingAttractor
      */
@@ -122,9 +129,9 @@ public class APClass implements Cloneable,Comparable<APClass>
 
             {
                 try {
-                    put(APClass.make(ATPLUS, 0, BondType.ANY), "ATP");
-                    put(APClass.make(ATMINUS, 0, BondType.ANY), "ATM");
-                    put(APClass.make(ATNEUTRAL, 0, BondType.ANY), "ATN");
+                    put(RCACLASSPLUS, "ATP");
+                    put(RCACLASSMINUS, "ATM");
+                    put(RCACLASSNEUTRAL, "ATN");
                 } catch (Throwable t)
                 {
                     //Will not happen

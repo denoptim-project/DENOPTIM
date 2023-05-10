@@ -41,6 +41,8 @@ import denoptim.utils.MoleculeUtils;
  * @author Marco Foscato 
  */
 
+//TODO: consider making subclass of Vertex?
+
 public class RingClosingAttractor
 {
     /**

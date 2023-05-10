@@ -216,15 +216,15 @@ public class RandomCombOfRingIteratorTest
         List<Integer> biases = new ArrayList<Integer>();
         for (int i=0; i<4; i++)
         {
-            biases.add(0); // 0 meand not allowed
+            biases.add(0); // 0 means ring-closure not allowed
         }
         for (int i=4; i<8; i++)
         {
-            biases.add(1); // 1 means allow with weight = 1
+            biases.add(1); // 1 means ring-closure allow with weight = 1
         }
         for (int i=8; i<10; i++)
         {
-            biases.add(0); // 0 meand not allowed
+            biases.add(0); // 0 means ring-closure not allowed
         }
         rcParams.setRingSizeBias(biases);
         
