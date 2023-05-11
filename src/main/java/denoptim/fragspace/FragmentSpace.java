@@ -1354,6 +1354,8 @@ public class FragmentSpace
 
     public boolean hasSymmetryConstrain(APClass apClass)
     {
+        if (symmConstraints==null)
+            return false;
         return symmConstraints.containsKey(apClass);
     }
 

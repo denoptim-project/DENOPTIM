@@ -1422,7 +1422,26 @@ public class GraphOperations
                 continue;
             }
             
-            //TODO-gg we should add the APs from symVerts in symAPs
+            // Collects all sym APs: within the vertex and outside it 
+            List<AttachmentPoint> allAPsFromSymVerts = new ArrayList<>();
+            for (Vertex symVrt : symVerts)
+            {
+                for (AttachmentPoint apOnVrt : symAPs)
+                {
+                    AttachmentPoint apOnSymVrt = symVrt.getAP(
+                            apOnVrt.getIndexInOwner());
+                    // This check is most often not needed, but it prevents that
+                    // misleading symmetry relations are used to break APClass
+                    // compatibility constraints
+                    if (apOnVrt.sameAs(apOnSymVrt)
+                            // Also ignore previously found APs
+                            && !symAPs.contains(apOnSymVrt))
+                    {
+                        allAPsFromSymVerts.add(apOnSymVrt);
+                    }
+                }
+            }
+            symAPs.addAll(allAPsFromSymVerts);
             
             GraphUtils.ensureVertexIDConsistency(molGraph.getMaxVertexId());
 

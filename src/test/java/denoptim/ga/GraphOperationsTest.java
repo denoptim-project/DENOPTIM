@@ -48,6 +48,7 @@ import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.Bond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.exception.DENOPTIMException;
@@ -60,6 +61,7 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
 import denoptim.graph.Ring;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -979,6 +981,143 @@ public class GraphOperationsTest {
         assertEquals(0, graph.getRingCount());
         GraphOperations.addRing(vC5, mnt, true, fs, gaParams);
         assertEquals(1, graph.getRingCount());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /*
+     * Here we test whether the method detects that extension should be done in 
+     * all symmetric location, including APs belonging to the same vertex and
+     * outside of it.
+     */
+    
+    @Test
+    public void testExtendGraph() throws Exception
+    {   
+        APClass APCA = APClass.make("A", 0);
+        APClass APCB = APClass.make("B", 0);
+        
+        Fragment vC1 = new Fragment();
+        Atom ac1 = new Atom("C", new Point3d());
+        vC1.addAtom(ac1);
+        vC1.addAP(0, APCB, new Point3d(1.1, 0.0, 0.0));
+        vC1.addAP(0, APCB, new Point3d(1.1, 1.0, 0.0));
+        vC1.addAP(0, APCB, new Point3d(1.1, 1.0, 2.0));
+        vC1.addAP(0, APCB, new Point3d(1.1,-1.0, 2.0));
+
+        Fragment vC3 = new Fragment();
+        Atom ac31 = new Atom("C", new Point3d(0.0, 2.0, 0.0));
+        Atom ac32 = new Atom("C", new Point3d(0.0, 0.0, 2.0));
+        Atom ac33 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
+        vC3.addAtom(ac31);
+        vC3.addAtom(ac32);
+        vC3.addAtom(ac33);
+        vC3.addBond(new Bond(ac31, ac32));
+        vC3.addBond(new Bond(ac32, ac33));
+        vC3.addBond(new Bond(ac33, ac31));
+        vC3.addAP(0, APCA, new Point3d(0.0, 2.0, -1.0));
+        vC3.addAP(1, APCA, new Point3d(-1.0,-1.0, 3.0));
+        vC3.addAP(1, APCA, new Point3d(1.0, -1.0, 3.0));
+        vC3.addAP(2, APCA, new Point3d(-1.0,-1.0, 1.0));
+        vC3.addAP(2, APCA, new Point3d(1.0, -1.0, 1.0));
+        
+        Fragment vCl = new Fragment();
+        Atom acl = new Atom("Cl", new Point3d());
+        vCl.addAtom(acl);
+        vCl.addAP(0, APCB, new Point3d(1.1, 0.0, 0.0));
+        
+        Fragment vN = new Fragment();
+        Atom aN = new Atom("N", new Point3d());
+        vN.addAtom(aN);
+        vN.addAP(0, APCB, new Point3d(1.1, 0.0, 0.0));
+        vN.addAP(0, APCA, new Point3d(1.1, 1.0, 0.0));
+        vN.addAP(0, APCB, new Point3d(1.1, 1.0, 2.0));
+        
+        ArrayList<Vertex> fragments = new ArrayList<Vertex>();
+        fragments.add(vC1);
+        fragments.add(vC3);
+        fragments.add(vCl);
+        fragments.add(vN);
+        
+        // Use clones of the vertexes to simulate the construction from BBSpace
+        Vertex cvC1a = vC1.clone();
+        cvC1a.setVertexId(1);
+        Vertex cvC1b = vC1.clone();
+        cvC1b.setVertexId(2);
+        Vertex cvC3a = vC3.clone();
+        cvC3a.setVertexId(3);
+        Vertex cvC3b = vC3.clone();
+        cvC3b.setVertexId(4);
+        Vertex cvN = vN.clone();
+        cvN.setVertexId(0);
+        
+        /* This is the graph we work with ('*' is a free AP)
+         *    
+         *      *   *
+         *     /   /
+         *  *-C---C-*
+         *     \ /
+         *      C
+         *     /           *
+         *    /           /
+         *   N(root)-----C-*
+         *    \           \    
+         *     \           *
+         *      C---C-*
+         *       \ / \
+         *        C   *
+         *       / \
+         *    *-C   *
+         *     / \
+         *    *   *
+         *    
+         */
+        
+        DGraph graph = new DGraph();
+        graph.addVertex(cvN);
+        graph.appendVertexOnAP(cvN.getAP(0), cvC3a.getAP(0));
+        graph.appendVertexOnAP(cvN.getAP(1), cvC1a.getAP(0));
+        graph.appendVertexOnAP(cvN.getAP(2), cvC3b.getAP(0));
+        graph.appendVertexOnAP(cvC3b.getAP(2), cvC1b.getAP(0));
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(Arrays.asList(
+                cvC3a, cvC3b)));
+        
+        //Logger logger = Logger.getLogger("DummyLogger");
+        //Randomizer rng = new Randomizer();
+        //DenoptimIO.writeGraphToSDF(new File("/tmp/graph.sdf"), graph, false, logger, rng);
+        
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        lstA.add(APCB);
+        cpMap.put(APCA, lstA);
+        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        lstA.add(APCA);
+        cpMap.put(APCB, lstB);
+        
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsParams,
+                new ArrayList<Vertex>(),
+                fragments,
+                new ArrayList<Vertex>(), 
+                cpMap, 
+                new HashMap<APClass,APClass>(),
+                new HashSet<APClass>(),
+                new HashMap<APClass,ArrayList<APClass>>());
+        fs.setAPclassBasedApproach(true);
+        
+        GAParameters gaParams = new GAParameters();
+        gaParams.setParameters(fsParams);
+
+        assertEquals(5, graph.getVertexCount());
+
+        GraphOperations.extendGraph(cvC3a, false, true, true, 2, 0, gaParams);
+        
+        assertEquals(12, graph.getVertexCount());
+        assertEquals(2, graph.getSymmetricSetCount());
+        assertEquals(2, graph.getSymVerticesForVertex(cvC3a).size());
+        assertEquals(7, graph.getSymVerticesForVertex(
+                graph.getVertexAtPosition(graph.getVertexCount()-1)).size());
     }
     
 //------------------------------------------------------------------------------
