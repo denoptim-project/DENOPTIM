@@ -976,6 +976,9 @@ public class GraphOperations
         }
         Randomizer rng = settings.getRandomizer();
         
+        // First of all we remove capping groups in the graph
+        vertex.getGraphOwner().removeCappingGroups();
+        
         List<AttachmentPoint> freeeAPs = vertex.getFreeAPThroughout();
         if (freeeAPs.size()==0)
         {
@@ -1113,7 +1116,7 @@ public class GraphOperations
             for (Vertex toRemove : rcvAddedToGraph)
                 tmpGraph.removeVertex(toRemove);
         }
-        if (setOfRingsOnTmpGraph.size()==0)
+        if (setOfRingsOnTmpGraph==null || setOfRingsOnTmpGraph.size()==0)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NORINGCOMB);
             return false;
@@ -1151,6 +1154,9 @@ public class GraphOperations
             originalGraph.addRing(headRCV, tailRCV);
             done = true;
         }
+        
+        // Restore capping groups
+        vertex.getGraphOwner().addCappingGroups(fragSpace);
         
         return done;
     }
@@ -1313,6 +1319,10 @@ public class GraphOperations
             IdFragmentAndAP chosenFrgAndAp = null;
             if (allowOnlyRingClosure)
             {
+                // NB: this works only for RCVs that are in the BBSpace, does 
+                // not generate a default RCV on-the-fly. So if no RCV is found
+                // we'll get a pointer to nothing, which is what we check in the 
+                // next IF-block.
                 chosenFrgAndAp = getRCVForSrcAp(curVrtx, apId, 
                         fsParams.getFragmentSpace());
             } else {
@@ -1325,11 +1335,13 @@ public class GraphOperations
                 continue;
             }
             
-            // Stop if graph is already too big
+            // Get the vertex that we'll add to the graph
             Vertex incomingVertex = Vertex.newVertexFromLibrary(-1, 
                             chosenFrgAndAp.getVertexMolId(), 
                             BBType.FRAGMENT, 
                             fsParams.getFragmentSpace());
+            
+            // Stop if graph is already too big
             if ((curVrtx.getGraphOwner().getHeavyAtomsCount() + 
                     incomingVertex.getHeavyAtomsCount()) > maxHeavyAtoms)
             {
@@ -1584,45 +1596,27 @@ public class GraphOperations
             int dapidx, FragmentSpace fragSpace) throws DENOPTIMException
     {
         AttachmentPoint ap = curVertex.getAP(dapidx);
-        Vertex chosen = getRCVForSrcAp(ap, fragSpace);
-        return new IdFragmentAndAP(-1, chosen.getBuildingBlockId(),
-                chosen.getBuildingBlockType(), 0, -1, -1);
-    }
-
-//------------------------------------------------------------------------------
-    
-    /**
-     * Select a compatible ring-closing vertex for the given attachment point.
-     * @param ap the attachment point where to attach the RCV.
-     * @param fragSpace the space of building blocks with all the settings.
-     * @return a clone of the RCV ready to be used in a graph.
-     * @throws DENOPTIMException
-     */
-
-    protected static Vertex getRCVForSrcAp(AttachmentPoint ap, 
-            FragmentSpace fragSpace) throws DENOPTIMException
-    {   
+        
+        Randomizer rng = fragSpace.getRandomizer();
         List<Vertex> rcvs = fragSpace.getRCVs();
         Vertex chosen = null;
         if (!fragSpace.useAPclassBasedApproach())
         {
-            chosen = fragSpace.getRandomizer().randomlyChooseOne(rcvs);
+            chosen = rng.randomlyChooseOne(rcvs);
         } else {
-            List<Vertex> candidates = new ArrayList<Vertex>();
-            for (Vertex v : rcvs)
-            {
-                if (ap.getAPClass().isCPMapCompatibleWith(
-                        v.getAP(0).getAPClass(), fragSpace))
-                {
-                    candidates.add(v);
-                }
-            }
+            List<Vertex> candidates = fragSpace.getRCVsForAPClass(
+                    ap.getAPClass());
             if (candidates.size() > 0)
             {
-                chosen = fragSpace.getRandomizer().randomlyChooseOne(candidates);
+                chosen = rng.randomlyChooseOne(candidates);
             }
         }
-        return chosen.clone();
+        
+        IdFragmentAndAP pointer = new IdFragmentAndAP();
+        if (chosen!=null)
+            pointer = new IdFragmentAndAP(-1, chosen.getBuildingBlockId(),
+                chosen.getBuildingBlockType(), 0, -1, -1);
+        return pointer;
     }
     
 //------------------------------------------------------------------------------
