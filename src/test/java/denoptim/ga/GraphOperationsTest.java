@@ -21,6 +21,7 @@ package denoptim.ga;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -40,10 +42,14 @@ import javax.vecmath.Point3d;
 import org.jgrapht.alg.util.Pair;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.silent.Bond;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -55,11 +61,19 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
 import denoptim.graph.Ring;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosingAttractor;
+import denoptim.graph.rings.RingClosureParameters;
+import denoptim.io.DenoptimIO;
+import denoptim.logging.Monitor;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.Randomizer;
 
 /**
  * Unit test
@@ -839,6 +853,273 @@ public class GraphOperationsTest {
         
         return fs;
     }
-
+    
 //------------------------------------------------------------------------------
+
+    @Test
+    public void testAddRing() throws Exception
+    {
+        /* This is the graph we work with
+         *      
+         *         *      *                   *     RCV_M
+         *         |      |                   |      |
+         * RCV_P--[O]----[C]--[C]--[C]--[C]--[C]----[N]--RCV_M
+         *        vO     vC   vC2  vC3  vC4  vC5    vN
+         *  
+         */
+        
+        APClass apc = APClass.make("A", 0);
+
+        IAtomContainer iacO = chemBuilder.newAtomContainer();
+        IAtom aO = new Atom("O",new Point3d(0,0,0));
+        iacO.addAtom(aO);
+        Fragment vO = new Fragment(0, iacO,BBType.FRAGMENT);
+        vO.addAP(0, new Point3d(0,-1,0), apc);
+        vO.addAP(0, new Point3d(2,0,0), apc);
+        vO.addAP(0, new Point3d(0,1,0), apc);
+        
+        IAtomContainer iacC = chemBuilder.newAtomContainer();
+        IAtom aC = new Atom("C",new Point3d(0,0,0));
+        iacC.addAtom(aC);
+        Fragment vC = new Fragment(1, iacC,BBType.FRAGMENT);
+        vC.addAP(0, new Point3d(0,-1,0), apc);
+        vC.addAP(0, new Point3d(2,0,0), apc);
+        vC.addAP(0, new Point3d(0,1,0), apc);
+        
+        IAtomContainer iacCd = chemBuilder.newAtomContainer();
+        IAtom aCd = new Atom("C",new Point3d(0,0,0));
+        iacCd.addAtom(aCd);
+        Fragment vC2 = new Fragment(2, iacCd,BBType.FRAGMENT);
+        vC2.addAP(0, new Point3d(0,-1,0), apc);
+        vC2.addAP(0, new Point3d(0,1,0), apc);
+        
+        Fragment vC3 = vC2.clone();
+        vC3.setVertexId(33);
+        
+        Fragment vC4 = vC2.clone();
+        vC4.setVertexId(34);
+        
+        Fragment vC5 = vC.clone();
+        vC5.setVertexId(3);
+        
+        IAtomContainer iacN = chemBuilder.newAtomContainer();
+        IAtom aN = new Atom("N",new Point3d(0,0,0));
+        iacN.addAtom(aN);
+        Fragment vN = new Fragment(4, iacN,BBType.FRAGMENT);
+        vN.addAP(0, new Point3d(0,-1,0), apc);
+        vN.addAP(0, new Point3d(2,0,0), apc);
+        vN.addAP(0, new Point3d(0,1,0), apc);
+        
+        APClass atMinus = APClass.RCACLASSMINUS;
+        
+        IAtomContainer iacD = chemBuilder.newAtomContainer();
+        iacD.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(atMinus),
+                new Point3d(0,0,0)));
+        Fragment rcvM = new Fragment(6, iacD,BBType.FRAGMENT);
+        rcvM.addAP(0, new Point3d(-1,0,0), atMinus);
+        rcvM.setAsRCV(true);
+        
+        Fragment rcvM2 = rcvM.clone();
+        rcvM2.setVertexId(7);
+        
+        APClass atPlus = APClass.RCACLASSPLUS;
+        
+        IAtomContainer iacE = chemBuilder.newAtomContainer();
+        iacE.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(atPlus),
+                new Point3d(0,0,0)));
+        Fragment rcvP = new Fragment(8, iacE,BBType.FRAGMENT);
+        rcvP.addAP(0, new Point3d(-1,0,0), atPlus);
+        rcvP.setAsRCV(true);
+    
+        DGraph graph = new DGraph();
+        graph.addVertex(vC);
+        graph.appendVertexOnAP(vC.getAP(0), vO.getAP(2));
+        graph.appendVertexOnAP(vO.getAP(1), rcvP.getAP(0));
+        graph.appendVertexOnAP(vC.getAP(2), vC2.getAP(1));
+        graph.appendVertexOnAP(vC2.getAP(0), vC3.getAP(0));
+        graph.appendVertexOnAP(vC3.getAP(1), vC4.getAP(0));
+        graph.appendVertexOnAP(vC4.getAP(1), vC5.getAP(0));
+        graph.appendVertexOnAP(vC5.getAP(2), vN.getAP(0));
+        graph.appendVertexOnAP(vN.getAP(1), rcvM.getAP(0));
+        graph.appendVertexOnAP(vN.getAP(2), rcvM2.getAP(0));
+        
+        // Prepare environment to run graph operation. First, a monitor of events
+        Monitor mnt = new Monitor();
+        
+        // Then, a fragment space that allows ring closures
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        lstA.add(apc);
+        cpMap.put(apc, lstA);
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(),
+                new ArrayList<Vertex>(), 
+                cpMap, 
+                new HashMap<APClass,APClass>(), 
+                new HashSet<APClass>(),
+                cpMap);
+        fs.setAPclassBasedApproach(true);
+        
+        // Then, settings of ring-closing machinery
+        RingClosureParameters rcParams = new RingClosureParameters();
+        List<Integer> biases = new ArrayList<Integer>();
+        for (int i=0; i<rcParams.getMaxRingSize(); i++)
+        {
+            biases.add(0); // 0 means ring-closure not allowed
+        }
+        biases.set(5, 1);
+        rcParams.setRingSizeBias(biases);
+        
+        // Then, some GA-parameters
+        GAParameters gaParams = new GAParameters();
+        gaParams.setParameters(rcParams);
+        
+        // All ready, do the ring-adding mutation
+        assertEquals(0, graph.getRingCount());
+        GraphOperations.addRing(vC5, mnt, true, fs, gaParams);
+        assertEquals(1, graph.getRingCount());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /*
+     * Here we test whether the method detects that extension should be done in 
+     * all symmetric location, including APs belonging to the same vertex and
+     * outside of it.
+     */
+    
+    @Test
+    public void testExtendGraph() throws Exception
+    {   
+        APClass APCA = APClass.make("A", 0);
+        APClass APCB = APClass.make("B", 0);
+        
+        Fragment vC1 = new Fragment();
+        Atom ac1 = new Atom("C", new Point3d());
+        vC1.addAtom(ac1);
+        vC1.addAP(0, APCB, new Point3d(1.1, 0.0, 0.0));
+        vC1.addAP(0, APCB, new Point3d(1.1, 1.0, 0.0));
+        vC1.addAP(0, APCB, new Point3d(1.1, 1.0, 2.0));
+        vC1.addAP(0, APCB, new Point3d(1.1,-1.0, 2.0));
+
+        Fragment vC3 = new Fragment();
+        Atom ac31 = new Atom("C", new Point3d(0.0, 2.0, 0.0));
+        Atom ac32 = new Atom("C", new Point3d(0.0, 0.0, 2.0));
+        Atom ac33 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
+        vC3.addAtom(ac31);
+        vC3.addAtom(ac32);
+        vC3.addAtom(ac33);
+        vC3.addBond(new Bond(ac31, ac32));
+        vC3.addBond(new Bond(ac32, ac33));
+        vC3.addBond(new Bond(ac33, ac31));
+        vC3.addAP(0, APCA, new Point3d(0.0, 2.0, -1.0));
+        vC3.addAP(1, APCA, new Point3d(-1.0,-1.0, 3.0));
+        vC3.addAP(1, APCA, new Point3d(1.0, -1.0, 3.0));
+        vC3.addAP(2, APCA, new Point3d(-1.0,-1.0, 1.0));
+        vC3.addAP(2, APCA, new Point3d(1.0, -1.0, 1.0));
+        
+        Fragment vCl = new Fragment();
+        Atom acl = new Atom("Cl", new Point3d());
+        vCl.addAtom(acl);
+        vCl.addAP(0, APCB, new Point3d(1.1, 0.0, 0.0));
+        
+        Fragment vN = new Fragment();
+        Atom aN = new Atom("N", new Point3d());
+        vN.addAtom(aN);
+        vN.addAP(0, APCB, new Point3d(1.1, 0.0, 0.0));
+        vN.addAP(0, APCA, new Point3d(1.1, 1.0, 0.0));
+        vN.addAP(0, APCB, new Point3d(1.1, 1.0, 2.0));
+        
+        ArrayList<Vertex> fragments = new ArrayList<Vertex>();
+        fragments.add(vC1);
+        fragments.add(vC3);
+        fragments.add(vCl);
+        fragments.add(vN);
+        
+        // Use clones of the vertexes to simulate the construction from BBSpace
+        Vertex cvC1a = vC1.clone();
+        cvC1a.setVertexId(1);
+        Vertex cvC1b = vC1.clone();
+        cvC1b.setVertexId(2);
+        Vertex cvC3a = vC3.clone();
+        cvC3a.setVertexId(3);
+        Vertex cvC3b = vC3.clone();
+        cvC3b.setVertexId(4);
+        Vertex cvN = vN.clone();
+        cvN.setVertexId(0);
+        
+        /* This is the graph we work with ('*' is a free AP)
+         *    
+         *      *   *
+         *     /   /
+         *  *-C---C-*
+         *     \ /
+         *      C
+         *     /           *
+         *    /           /
+         *   N(root)-----C-*
+         *    \           \    
+         *     \           *
+         *      C---C-*
+         *       \ / \
+         *        C   *
+         *       / \
+         *    *-C   *
+         *     / \
+         *    *   *
+         *    
+         */
+        
+        DGraph graph = new DGraph();
+        graph.addVertex(cvN);
+        graph.appendVertexOnAP(cvN.getAP(0), cvC3a.getAP(0));
+        graph.appendVertexOnAP(cvN.getAP(1), cvC1a.getAP(0));
+        graph.appendVertexOnAP(cvN.getAP(2), cvC3b.getAP(0));
+        graph.appendVertexOnAP(cvC3b.getAP(2), cvC1b.getAP(0));
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(Arrays.asList(
+                cvC3a, cvC3b)));
+        
+        //Logger logger = Logger.getLogger("DummyLogger");
+        //Randomizer rng = new Randomizer();
+        //DenoptimIO.writeGraphToSDF(new File("/tmp/graph.sdf"), graph, false, logger, rng);
+        
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        lstA.add(APCB);
+        cpMap.put(APCA, lstA);
+        ArrayList<APClass> lstB = new ArrayList<APClass>();
+        lstA.add(APCA);
+        cpMap.put(APCB, lstB);
+        
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsParams,
+                new ArrayList<Vertex>(),
+                fragments,
+                new ArrayList<Vertex>(), 
+                cpMap, 
+                new HashMap<APClass,APClass>(),
+                new HashSet<APClass>(),
+                new HashMap<APClass,ArrayList<APClass>>());
+        fs.setAPclassBasedApproach(true);
+        
+        GAParameters gaParams = new GAParameters();
+        gaParams.setParameters(fsParams);
+
+        assertEquals(5, graph.getVertexCount());
+
+        GraphOperations.extendGraph(cvC3a, false, true, true, 2, 0, gaParams);
+        
+        assertEquals(12, graph.getVertexCount());
+        assertEquals(2, graph.getSymmetricSetCount());
+        assertEquals(2, graph.getSymVerticesForVertex(cvC3a).size());
+        assertEquals(7, graph.getSymVerticesForVertex(
+                graph.getVertexAtPosition(graph.getVertexCount()-1)).size());
+    }
+    
+//------------------------------------------------------------------------------
+    
 }

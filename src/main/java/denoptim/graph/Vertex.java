@@ -43,6 +43,7 @@ import com.google.gson.JsonSyntaxException;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.json.DENOPTIMgson;
 import denoptim.logging.StaticLogger;
 import denoptim.utils.GraphUtils;
@@ -238,7 +239,7 @@ public abstract class Vertex implements Cloneable
         v.setVertexId(vertexId);
         
         v.setAsRCV(v.getNumberOfAPs() == 1
-                && APClass.RCAAPCLASSSET.contains(
+                && RingClosingAttractor.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));
         
         return v;
@@ -873,7 +874,10 @@ public abstract class Vertex implements Cloneable
             // Cannot extend vertex that has no truly free AP, but can do it
             // on APs that are used by capping groups.
             if ((getFreeAPCountThroughout() + getCappedAPs().size()) == 0)
+            {
                 filteredTypes.remove(MutationType.EXTEND);
+                filteredTypes.remove(MutationType.ADDRING);
+            }
             
             // Cannot remove the only vertex of a graph
             if (owner.getVertexCount()==0)
@@ -1333,7 +1337,7 @@ public abstract class Vertex implements Cloneable
     {
         Vertex v = new Fragment(iac, bbt);
         v.setAsRCV(v.getNumberOfAPs() == 1
-                && APClass.RCAAPCLASSSET.contains(
+                && RingClosingAttractor.RCAAPCLASSSET.contains(
                         v.getAttachmentPoints().get(0).getAPClass()));
         return v;
     }

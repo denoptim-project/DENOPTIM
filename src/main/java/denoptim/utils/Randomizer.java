@@ -293,10 +293,14 @@ public class Randomizer
      * experiments will produce the same numerical outcome, then the collection
      * must have a given order. A type <b>Set</b> is permitted by is not
      * compatible with the reproducibility requirement.
+     * @return the chosen item or null if the given list is empty.
      */
     
     public <T> T randomlyChooseOne(Collection<T> c)
     {
+        if (c.size() == 0)
+            return null;
+        
         int chosen = nextInt(c.size());
         int i=0;
         T chosenObj = null;

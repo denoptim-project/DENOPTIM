@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.1.3, May 2023_
+_Version 4.2.0, May 2023_
 
 [TOC]
 
@@ -564,6 +564,7 @@ The following tables list all the keywords grouped according to the main functio
 |`GA-KeepBestSibling`| Use `true` to require that only the best of two sibling produced by a single crossover operation enters the population.|
 |`GA-MutationWeight`| Specifies the relative weight of mutation when generating new candidate population members.|
 |`GA-MultiSiteMutationWeights`| Specifies the relative weight of multi-site mutations, i.e., mutations operations that involve multiple and independent mutations on a single graph. Since each mutation is completely independent, even a previously mutated site can be mutated again. Therefore, this can be seen an a multiple iteration mutation. A graph can be modified, for example, first by the addition of a link, and then by the change of a branch completely unrelated to the first addition. This would be referred as a two-sites mutation.<br><br>Provide values in a comma- or space-separated list. The first value is the weight of one-site mutation, the second the weight of two-sites mutation, and so on. The number of values given as argument determines the maximum number mutation iterations that can a single graph mutation operation perform. For example,<br><br>`GA-MultiSiteMutationWeights=10, 1`<br><br>enables up to two-sites mutation and with a weight that is 1/10 of the single-site mutation.|
+|`GA-MaxRingsAddedByMutation`| Specifies the number of chords that a single mutation event is allows to form, i.e., the number of fundamental rings that can be closed in a ring by a single rings-adding mutation event. Default is 1.|
 |`GA-CoupleMutationToCrossover`| Use `true` to require that mutation is performed only following crossover and with a frequency controlled by the relation between mutation and crossover weights. Use `false` to allow mutation to operate on population members irrespectively on crossover. Default is `false`.|
 |`GA-ConstructionWeight`| Specifies the relative weight of construction from scratch when generating new candidate population members.|
 |`GA-SymmetryProbability`| Specifies the unspecific symmetric substitution probability. Attachment point-class specific values are defined in the definition of the space of graph building blocks.|

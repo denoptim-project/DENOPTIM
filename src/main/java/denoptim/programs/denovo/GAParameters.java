@@ -29,9 +29,11 @@ import java.util.logging.Level;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
+import denoptim.graph.rings.RingClosureParameters;
 import denoptim.logging.Monitor;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.MutationType;
 
 
@@ -322,6 +324,11 @@ public class GAParameters extends RunTimeParameters
      * Minimal standard deviation accepted in the fitness values of the initial population
      */
     protected double minFitnessSD = 0.000001;
+    
+    /**
+     * Maximum number of rings added by a single mutation operation
+     */
+    protected int maxRingsAddedByMutation = 1;
     
     /**
      * Flag controlling the possibility of collecting cyclic graph systems that 
@@ -1183,6 +1190,15 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "MAXRINGSADDEDBYMUTATION=":
+            {
+                if (value.length() > 0)
+                {
+                    maxRingsAddedByMutation = Integer.parseInt(value);
+                }
+                break;
+            }
+            
             case "KEEPNEWRINGSYSTEMVERTEXES":
             {
                 saveRingSystemsAsTemplatesNonScaff = true;
@@ -1194,7 +1210,6 @@ public class GAParameters extends RunTimeParameters
                 saveRingSystemsAsTemplatesScaffolds = true;
                 break;
             }
-            
             
             case "KEEPNEWRINGSYSTEMFITNESSTRSH=":
             {
@@ -1406,6 +1421,16 @@ public class GAParameters extends RunTimeParameters
         
         processOtherParameters();
         
+        if (containsParameters(ParametersType.RC_PARAMS))
+        {
+            RingClosureParameters rcParams = (RingClosureParameters) 
+                    getParameters(ParametersType.RC_PARAMS);
+            if (!rcParams.allowRingClosures())
+            {
+                excludedMutationTypes.add(MutationType.ADDRING);
+            }
+        }
+        
         if (isMaster)
         {    
             StaticLogger.appLogger.log(Level.INFO, "Program log file: " 
@@ -1543,6 +1568,18 @@ public class GAParameters extends RunTimeParameters
     public boolean savePopFile()
     {
         return writePopOnDisk;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Return the value of the number of rings that we are allowed to add in a 
+     * single {@link MutationType#ADDRING} mutation.
+     * @return the maximum number of rings added in a single mutation.
+     */
+    public int getMaxRingsAddedByMutation()
+    {
+        return maxRingsAddedByMutation;
     }
 
 //------------------------------------------------------------------------------

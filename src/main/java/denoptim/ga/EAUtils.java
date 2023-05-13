@@ -58,6 +58,7 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
 import denoptim.graph.Ring;
+import denoptim.graph.SymmetricAPs;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -1189,8 +1190,7 @@ public class EAUtils
                             graph.appendVertexOnAP(apI, rcvI.getAP(0));
                             
                             Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
-                                    APClass.make(APClass.ATMINUS, 0, 
-                                            BondType.ANY));
+                                    APClass.RCACLASSMINUS);
                             rcvJ.setBuildingBlockType(BBType.FRAGMENT);
                             rcvJ.setVertexId(vId.getAndIncrement());
                             graph.appendVertexOnAP(apJ, rcvJ.getAP(0));
@@ -2311,6 +2311,16 @@ public class EAUtils
         for (String str:lst)
             lstInchi.add(str);
         lst.clear();
+    }
+
+//------------------------------------------------------------------------------
+
+    public static AttachmentPoint searchForApSuitableToRingClosure(
+            AttachmentPoint apA, SymmetricAPs symAPsA, GAParameters settings)
+    {
+        
+        // TODO Auto-generated method stub
+        return null;
     }
     
 //------------------------------------------------------------------------------    

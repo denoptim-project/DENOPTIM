@@ -21,7 +21,6 @@ package denoptim.graph;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +35,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.rings.RingClosingAttractor;
 
 public class APClass implements Cloneable,Comparable<APClass>
 {
@@ -78,59 +78,26 @@ public class APClass implements Cloneable,Comparable<APClass>
     public static final String ATNEUTRAL = "ATneutral";
     
     /**
-     * Recognized attachment point classes of RingClosingAttractor
+     * Conventional class of attachment points on ring-closing vertexes.
+     * Polarized (+) case.
      */
-    public static final Set<APClass> RCAAPCLASSSET = 
-    	    new HashSet<APClass>(){
-                /**
-                 * Version ID
-                 */
-                private static final long serialVersionUID = 1L;
-
-            {
-    	        APClass a = getUnique(ATPLUS, 0, BondType.ANY);
-    	        add(a);
-    	        synchronized (uniqueAPClassesLock)
-                {
-    	            uniqueAPClasses.add(a);
-                }
-    	        
-    	        APClass b = getUnique(ATMINUS, 0, BondType.ANY);
-                add(b);
-                synchronized (uniqueAPClassesLock)
-                {
-                    uniqueAPClasses.add(b);
-                }
-                
-                APClass c = getUnique(ATNEUTRAL, 0, BondType.ANY);
-                add(c);
-                synchronized (uniqueAPClassesLock)
-                {
-                    uniqueAPClasses.add(c);
-                }
-                }};
-
+    public static final APClass RCACLASSPLUS = getUnique(ATPLUS, 0, 
+            BondType.ANY);
+    
     /**
-     * Conventional pseudoatom labels for RingClosingAttractor
+     * Conventional class of attachment points on ring-closing vertexes.
+     * Polarized (-) case.
      */
-    public static final HashMap<APClass,String> RCALABELPERAPCLASS = 
-            new HashMap<APClass,String>(){
-                /**
-                 * Version ID
-                 */
-                private static final long serialVersionUID = 1L;
-
-            {
-                try {
-                    put(APClass.make(ATPLUS, 0, BondType.ANY), "ATP");
-                    put(APClass.make(ATMINUS, 0, BondType.ANY), "ATM");
-                    put(APClass.make(ATNEUTRAL, 0, BondType.ANY), "ATN");
-                } catch (Throwable t)
-                {
-                    //Will not happen
-                }
-            }};
-            
+    public static final APClass RCACLASSMINUS = getUnique(ATMINUS, 0, 
+            BondType.ANY);
+    
+    /**
+     * Conventional class of attachment points on ring-closing vertexes.
+     * Unpolarized, neutral case.
+     */
+    public static final APClass RCACLASSNEUTRAL = getUnique(ATNEUTRAL, 0, 
+            BondType.ANY);
+    
     /**
      * Bond type to use when converting edge users into formal bonds
      */
@@ -296,7 +263,7 @@ public class APClass implements Cloneable,Comparable<APClass>
             } else {
                 // NB: the default bond type for RCAs must not be changed, but
                 // For non-RCA APClasses we do update the bond type.
-                if (bt != newApc.bndTyp && !RCAAPCLASSSET.contains(newApc))
+                if (bt != newApc.bndTyp && !RingClosingAttractor.RCAAPCLASSSET.contains(newApc))
                 {
                     System.err.println("WARNING! Changing bond order of "
                             + "APClass " + newApc + ": " + newApc.bndTyp 

@@ -43,6 +43,7 @@ import com.google.gson.Gson;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.json.DENOPTIMgson;
 import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
@@ -150,7 +151,7 @@ public class Fragment extends Vertex
         setSymmetricAPSets(simAP);
         
         this.setAsRCV(getNumberOfAPs() == 1
-                && APClass.RCAAPCLASSSET.contains(
+                && RingClosingAttractor.RCAAPCLASSSET.contains(
                         getAttachmentPoints().get(0).getAPClass()));
         
         Object isomorph = mol.getProperty(DENOPTIMConstants.ISOMORPHICFAMILYID);
@@ -398,11 +399,9 @@ public class Fragment extends Vertex
      * the attachment point direction vector, or null. The coordinates must be
      * consistent with the coordinates of the atoms.
      * @param valence the valences used by this AP.
-     * @throws DENOPTIMException 
      */
 
     public void addAP(int srcAtmId, APClass apc, Point3d vector) 
-            throws DENOPTIMException
     {
         IAtom srcAtm = mol.getAtom(srcAtmId);
         addAPOnAtom(srcAtm, apc, vector);
@@ -420,11 +419,10 @@ public class Fragment extends Vertex
      * the attachment point direction vector, or null. The coordinates must be
      * consistent with the coordinates of the atoms.
      * @return the reference to the created AP.
-     * @throws DENOPTIMException 
      */
 
     public AttachmentPoint addAPOnAtom(IAtom srcAtm, APClass apc, 
-            Point3d vector) throws DENOPTIMException
+            Point3d vector)
     {
         int atmId = mol.indexOf(srcAtm);
         return this.addAP(atmId, new Point3d(vector.x, vector.y, vector.z), apc);

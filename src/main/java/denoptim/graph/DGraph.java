@@ -72,6 +72,7 @@ import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.ClosableChain;
 import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.PathSubGraph;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.graph.simplified.Node;
 import denoptim.graph.simplified.NodeConnection;
@@ -3997,6 +3998,29 @@ public class DGraph implements Cloneable
         }
         return lstFreeAPs;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of attachment points contained in this graph that are
+     * available throughout the template barrier, i.e., are free in this graph 
+     * an in any embedding graph that containing this one.
+     * @return list of attachment points.
+     */
+
+    public List<AttachmentPoint> getAvailableAPsThroughout()
+    {
+        ArrayList<AttachmentPoint> lstFreeAPs =
+                new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            if (ap.isAvailableThroughout())
+            {
+                lstFreeAPs.add(ap);
+            }
+        }
+        return lstFreeAPs;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -5473,7 +5497,7 @@ public class DGraph implements Cloneable
             // Count rings and RCAs
             int nPossRings = 0;
             Set<String> doneType = new HashSet<>();
-            Map<String,String> rcaTypes = DENOPTIMConstants.RCATYPEMAP;
+            Map<String,String> rcaTypes = RingClosingAttractor.RCATYPEMAP;
             for (String rcaTyp : rcaTypes.keySet())
             {
                 if (doneType.contains(rcaTyp))

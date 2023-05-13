@@ -380,24 +380,6 @@ public final class DENOPTIMConstants
     public static final String BONDPROPROTATABLE = "DENOPTIMRotable";
 
     /**
-     * Recognized types of {@link RingClosingAttractor} and compatible types
-     */
-    public static final Map<String,String> RCATYPEMAP =
-		    new HashMap<String,String>() 
-    {
-        /**
-         *  Version identifier
-         */
-        private static final long serialVersionUID = 3L;
-
-        {
-            put("ATP", "ATM");
-            put("ATM", "ATP");
-            put("ATN", "ATN");
-        };
-    };
-    
-    /**
      * Property of a {@link IAtom} representing a {@link RingClosingAttractor}. 
      * This property records the {@link APClass} of the 
      * {@link AttachmentPoint} on which the attractor is attached to the graph.
