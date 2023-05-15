@@ -3781,7 +3781,7 @@ public class DGraphTest
         assertTrue(g1.isIsostructuralTo(g2));
         
         // Change structure by adding a bifurcation
-        EmptyVertex v2 = new EmptyVertex(10002);
+        EmptyVertex v2 = new EmptyVertex(100002);
         v2.addAP(APCD);
         v2.addAP(APCC);
         v2.addAP(APCC);
