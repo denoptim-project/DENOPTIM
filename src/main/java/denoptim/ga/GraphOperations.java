@@ -21,6 +21,7 @@ package denoptim.ga;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,9 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.apache.http.TruncatedChunkException;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.isomorphism.Mappings;
 import org.paukov.combinatorics3.Generator;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -45,6 +48,7 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
+import denoptim.graph.RelatedAPPair;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
 import denoptim.graph.SymmetricVertexes;
@@ -64,9 +68,13 @@ import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
+import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.programs.fragmenter.MatchedBond;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MutationType;
+import denoptim.utils.ObjectPair;
 import denoptim.utils.Randomizer;
 
 /**
@@ -1152,6 +1160,270 @@ public class GraphOperations
             
             // Add ring
             originalGraph.addRing(headRCV, tailRCV);
+            done = true;
+        }
+        
+        // Restore capping groups
+        vertex.getGraphOwner().addCappingGroups(fragSpace);
+        
+        return done;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Tries to add a fused ring using a pair of free APs, one of which on the 
+     * given vertex.
+     * @param vertex the vertex on which we start to close a the ring.
+     * @param mnt monitoring tool to keep count of events.
+     * @param force use <code>true</code> to by-pass random decisions and force
+     * the creation of rings.
+     * @param fragSpace the fragment space controlling how we put together
+     * building blocks.
+     * @param settings the GA settings controlling how we work.
+     * @return <code>true</code> when at least one ring was added to the graph.
+     * @throws DENOPTIMException
+     * 
+     */
+    
+    protected static boolean addFusedRing(Vertex vertex, Monitor mnt, 
+            boolean force, FragmentSpace fragSpace, GAParameters settings) 
+                    throws DENOPTIMException
+    {
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        Randomizer rng = settings.getRandomizer();
+        
+        // First of all we remove capping groups in the graph
+        vertex.getGraphOwner().removeCappingGroups();
+        
+        List<AttachmentPoint> freeeAPs = vertex.getFreeAPThroughout();
+        if (freeeAPs.size()==0)
+        {
+            //TODO-gg use NOADDFUSEDRING
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
+            return false;
+        }
+        DGraph originalGraph = vertex.getGraphOwner();
+        DGraph tmpGraph = originalGraph.clone();
+        
+        // Get a molecular representation
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(
+                settings.getLogger(), rng);
+        t3d.setAlignBBsIn3D(false); //3D not needed
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(tmpGraph, true);
+        
+        // Search for potential half-ring environments, i.e., sets of atoms
+        // that belongs to a cyclic system and could hold a chord that would
+        // define the additional fused ring.
+        Map<String, String> smarts = new HashMap<String, String>();
+        // For aromatic rings we look at number of electrons to follow "4n+2" rule
+        smarts.put("2el2atm", "[$([#6,#7]);X2]~@[$([#6,#7]);X2]");
+        smarts.put("3el3atm", "[$([#6,#7]);X2]~@[$([#6,#7]~@[*]);X3]~@[$([#6,#7]);X2]");
+        smarts.put("4el3atm", "[$([#6,#7]);X2]~@[$([#7,#8,#16]);X2]~@[$([#6,#7]);X2]");
+        smarts.put("4el4atm", "[$([#6,#7]);X2]~@[$([#6,#7]~@[*]);X3]~@[$([#6,#7]~@[*]);X3]~@[$([#6,#7]);X2]");
+        ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
+        List<RelatedAPPair> bridgeHeadAPs = new ArrayList<RelatedAPPair>();
+        for (String ruleName : smarts.keySet())
+        {
+            if (msq.getNumMatchesOfQuery(ruleName) == 0)
+            {
+                continue;
+            }
+           
+            // Get bridge-head atoms
+            Mappings halfRingAtms = msq.getMatchesOfSMARTS(ruleName);
+            for (int[] ids : halfRingAtms) 
+            {
+                if (ids.length<2)
+                {
+                    throw new Error("SMARTS for matching half-ring pattern '" 
+                            + ruleName 
+                            + "' has identified " + ids.length + " atoms "
+                            + "instead of at least 2. Modify rule to make it "
+                            + "find 2 or more atoms.");
+                }
+                
+                // Potential bridge-head atoms
+                IAtom bhA = mol.getAtom(ids[0]);
+                IAtom bhB = mol.getAtom(ids[1]);
+                
+                // Bridge-head atoms must have attachment points
+                if (bhA.getProperty(DENOPTIMConstants.ATMPROPAPS)==null 
+                        || bhB.getProperty(DENOPTIMConstants.ATMPROPAPS)==null)
+                    continue;
+                
+                // Get the corresponding (free) APs in the graph
+                AttachmentPoint apA = null;
+                AttachmentPoint apB = null;
+                for (AttachmentPoint ap : tmpGraph.getAvailableAPsThroughout())
+                {
+                    if (ids[0]==ap.getAtomPositionNumberInMol())
+                    {
+                        apA = ap;
+                        continue;
+                    }
+                    if (ids[1]==ap.getAtomPositionNumberInMol())
+                    {
+                        apB = ap;
+                        continue;
+                    }
+                    if (apA!=null && apB!=null)
+                        break;
+                }
+                if (apA==null || apB==null)
+                    continue;
+                RelatedAPPair pair = new RelatedAPPair(apA, apB, ruleName);
+                bridgeHeadAPs.add(pair);
+            }
+        }
+        if (bridgeHeadAPs.size()==0)
+        {
+            //TODO-gg use NOADDFUSEDRING
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
+            return false;
+        } 
+
+        //TODO-gg do we limit to APs of this vertex (on one side to still allow forming bridges involving multiple vertexes)
+        //Vertex headVrtx = tmpGraph.getVertexAtPosition(originalGraph.indexOf(
+        //        vertex));
+        
+        //TODO-gg add filter by ring size bias
+        
+        List<List<RelatedAPPair>> bridgeHeadAPPairs = 
+                new ArrayList<List<RelatedAPPair>>();
+        for (RelatedAPPair pair : bridgeHeadAPs)
+        {
+            //TODO-gg deal with symmetry within vertex: use a set of RelatedAPPair
+            
+            
+            // If there is no symmetry just deal with the single pair of APs
+            List<RelatedAPPair> single = new ArrayList<RelatedAPPair>();
+            single.add(pair);
+            bridgeHeadAPPairs.add(single);
+        }
+        
+        List<RelatedAPPair> chosenPairsSet = rng.randomlyChooseOne(
+                bridgeHeadAPPairs);
+        
+        // Based on the chosen pair, decide on the number of electrons to use
+        // in the incoming fragment that will be used to close the ring
+        // the pairs are all the same kind of ring fusion, so just take the 1st
+        int elsInHalfFrag = Integer.parseInt(
+                chosenPairsSet.get(0).property.substring(0,1));
+        String elInIncomingFrag = "0el";
+        switch (elsInHalfFrag)
+        {
+            case 0:
+            case 1:
+                // no aromaticity to be retained: use non-aromatic chords
+                elInIncomingFrag = "0el";
+                break;
+                
+            case 2:
+                // Formally we can use any fragment delivering 4n electrons.
+                // Effectively, we have only 4-el fragments
+                elInIncomingFrag = "4el";
+                break;
+                
+            case 3:
+                // We could use a 5-el fragment, but the 8-el aromatic system is
+                // so rare that we avoid it. So, we can only use 3-el fragment 
+                elInIncomingFrag = "3el";
+                break;
+                
+            case 4:
+                // Effectively can only use 2-el fragments
+                elInIncomingFrag = "2el";
+                break;
+                
+            case 5:
+                // We could use a 3-el fragment, but the 8-el aromatic system is
+                // so rare that we avoid it.
+                break;
+            default:
+                throw new Error("Unknown number if electrons in fragment to be "
+                        + "used for ring fusion operation.");
+        }
+        
+        // Decide which fragment to use as ring-closing bridge
+        List<Vertex> usableBridges = 
+                fragSpace.getVerticesWithAPClassStartingWith(elInIncomingFrag);
+        if (usableBridges.size()==0)
+        {
+            //TODO-gg use NOADDFUSEDRING
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
+            return false;
+        }
+        Vertex incomingVertex = rng.randomlyChooseOne(usableBridges);
+        
+        // Decide which aps on the bridge are used as head/tail
+        List<AttachmentPoint> apsInFusion = new ArrayList<AttachmentPoint>();
+        apsInFusion.addAll(incomingVertex.getVerticesWithAPClassStartingWith(
+                elInIncomingFrag));
+        int[] idApOnBridge = new int[2];
+        if (rng.nextBoolean())
+        {
+            idApOnBridge[0] = apsInFusion.get(0).getIndexInOwner();
+            idApOnBridge[1] = apsInFusion.get(1).getIndexInOwner();
+        } else {
+            idApOnBridge[0] = apsInFusion.get(1).getIndexInOwner();
+            idApOnBridge[1] = apsInFusion.get(0).getIndexInOwner();
+        }
+
+        // Project ring fusions into the actual graph (considering symmetry)
+        List<AttachmentPoint> symHeadAPs = new ArrayList<AttachmentPoint>();
+        List<AttachmentPoint> symTailAPs = new ArrayList<AttachmentPoint>();
+        for (RelatedAPPair chosenPair : chosenPairsSet)
+        {
+            Vertex headVertexOnGraph = originalGraph.getVertexAtPosition(
+                    tmpGraph.indexOf(chosenPair.apA.getOwner()));
+            int apHeadID = chosenPair.apA.getIndexInOwner();
+            List<Vertex> symHeadVrts = originalGraph.getSymVerticesForVertex(
+                    headVertexOnGraph);
+            if (symHeadVrts.size()==0)
+                symHeadVrts.add(headVertexOnGraph);
+            for (Vertex symVrtx : symHeadVrts)
+            {
+                symHeadAPs.add(symVrtx.getAP(apHeadID));
+            }
+            
+            Vertex tailVertexOnGraph = originalGraph.getVertexAtPosition(
+                    tmpGraph.indexOf(chosenPair.apB.getOwner()));
+            int apTailID = chosenPair.apB.getIndexInOwner();
+            List<Vertex> symTailVrts = originalGraph.getSymVerticesForVertex(
+                    tailVertexOnGraph);
+            if (symTailVrts.size()==0)
+                symTailVrts.add(tailVertexOnGraph);
+            for (Vertex symVrtx : symTailVrts)
+            {
+                symTailAPs.add(symVrtx.getAP(apTailID));
+            }
+        }
+        
+        boolean done = false;
+        for (int idx=0; idx<symHeadAPs.size(); idx++)
+        {
+            AttachmentPoint apHead = symHeadAPs.get(idx);
+            AttachmentPoint apTail = symTailAPs.get(idx);
+            
+            Vertex bridgeClone = incomingVertex.clone();
+            
+            originalGraph.appendVertexOnAP(apHead, bridgeClone.getAP(
+                    idApOnBridge[0]));
+            
+            Vertex rcvBridge = fragSpace.getPolarizedRCV(true);
+            originalGraph.appendVertexOnAP(bridgeClone.getAP(idApOnBridge[1]),
+                    rcvBridge.getAP(0));
+            
+            Vertex rcvTail = fragSpace.getPolarizedRCV(false);
+            originalGraph.appendVertexOnAP(apTail, rcvTail.getAP(0));
+            originalGraph.addRing(rcvBridge, rcvTail);
             done = true;
         }
         

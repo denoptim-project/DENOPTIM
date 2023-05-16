@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.vecmath.Point3d;
 
@@ -236,6 +237,27 @@ public class VertexTest
         assertEquals(0,v.getMutationSites(new ArrayList<>(Arrays.asList(
                 MutationType.EXTEND))).size(), "Vertex that allows only "
                         + "ignored mutation types is not a mutable site");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetVerticesWithAPClassStartingWith() throws Exception
+    {
+        EmptyVertex ev = new EmptyVertex();
+        ev.addAP(APClass.make("Abc:1"));
+        ev.addAP(APClass.make("Abc:0"));
+        ev.addAP(APClass.make("TT:0"));
+        ev.addAP(APClass.make("AbT:1"));
+        ev.addAP(APClass.make("TT:2"));
+        
+        List<AttachmentPoint> aps = ev.getVerticesWithAPClassStartingWith("Ab");
+        assertEquals(3, aps.size());
+        
+        for (AttachmentPoint ap : aps)
+        {
+            assertTrue(ap.getAPClass().toString().startsWith("Ab"));
+        }
     }
     
 //------------------------------------------------------------------------------

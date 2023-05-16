@@ -86,8 +86,8 @@ public class FragmentSpaceTest
     private static final String RULAPC2 = "apc-2";
     private static final String RULAPC3 = "apc-3";
     private static final String RULAPC4 = "apc-4";
-    private static final String RULAPC5 = "apc-5";
-    private static final String RULAPC6 = "apc-6";
+    private static final String RULAPC5 = "a_p_c-5";
+    private static final String RULAPC6 = "a_p_c-6";
     private static final String RULAPCC1 = "cap-1";
     private static final String RULAPCC2 = "cap-2";
     
@@ -315,6 +315,47 @@ public class FragmentSpaceTest
     	    assertEquals(APC2, v.getAP(id.getApId()).getAPClass(),
     	            "APClass of "+i);
     	}
+    }
+    
+//-----------------------------------------------------------------------------     
+    
+    @Test
+    public void testGetVerticesWithAPClass() throws Exception
+    {
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpace fs = fsp.getFragmentSpace();
+        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        ArrayList<Vertex> lst = fs.getVerticesWithAPClass(APC2);
+        assertEquals(4,lst.size(),"Wrong size of AP IDs with given APClass.");
+
+        for (Vertex v : lst)
+        {
+            assertTrue( v.getAllAPClasses().contains(APC2));
+        }
+    }
+    
+//-----------------------------------------------------------------------------     
+    
+    @Test
+    public void testGetFragsWithAPClassStartingWith() throws Exception
+    {
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpace fs = fsp.getFragmentSpace();
+        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        List<Vertex> lst = fs.getVerticesWithAPClassStartingWith(
+                RULAPC5.substring(0, 4));
+        assertEquals(1, lst.size(),"Wrong size of AP IDs with given APClass.");
+
+        int counter = 0;
+        for (Vertex v : lst)
+        {
+            for (APClass apc : v.getAllAPClasses())
+            {
+                if (apc.toString().startsWith(RULAPC5.substring(0, 4)))
+                    counter++;
+            }
+        }
+        assertEquals(2, counter);
     }
 
 //-----------------------------------------------------------------------------    	

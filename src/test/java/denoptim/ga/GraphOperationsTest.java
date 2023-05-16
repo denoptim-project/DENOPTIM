@@ -47,9 +47,11 @@ import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.Bond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -57,6 +59,7 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
@@ -983,6 +986,150 @@ public class GraphOperationsTest {
         assertEquals(1, graph.getRingCount());
     }
     
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testAddFusedRings() throws Exception
+    { 
+        // PRepare a graph to work with
+        APClass apc = APClass.make("apc:1");
+        SmilesParser parser = new SmilesParser(chemBuilder);
+        IAtomContainer benzene = parser.parseSmiles("c1ccccc1");
+        Fragment benzeneScaffold = new Fragment(benzene, BBType.FRAGMENT);
+        for (int i= 0; i<6; i++)
+        {
+            benzeneScaffold.addAP(i, new Point3d(), apc);
+        }
+        benzeneScaffold.setVertexId(123);
+        
+        DGraph graph = new DGraph();
+        graph.addVertex(benzeneScaffold);
+        
+        // Prepare environment to run graph operation. First, a monitor of events
+        Monitor mnt = new Monitor();
+        
+        // Then, a fragment space that allows ring closures
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        ArrayList<APClass> lstA = new ArrayList<APClass>();
+        lstA.add(apc);
+        cpMap.put(apc, lstA);
+
+        ArrayList<Vertex> libFrags = new ArrayList<Vertex>();
+        APClass APC2EL = APClass.make("2el:0");
+        Fragment bridge2el = new Fragment(2);
+        IAtom a2_0 = new Atom("C", new Point3d());
+        IAtom a2_1 = new Atom("C", new Point3d());
+        bridge2el.addAtom(a2_0);
+        bridge2el.addAtom(a2_1);
+        bridge2el.addBond(new Bond(a2_0, a2_1, IBond.Order.DOUBLE));
+        bridge2el.addAP(0, new Point3d(), APC2EL);
+        bridge2el.addAP(1, new Point3d(), APC2EL);
+        bridge2el.addAP(0, new Point3d(), apc);
+        bridge2el.addAP(1, new Point3d(), apc);
+        libFrags.add(bridge2el);
+        
+        // We do not really need multiple fragments for each class, but
+        // these may turn out useful in the future.
+        Fragment bridge2elO = new Fragment(22);
+        IAtom a2O_0 = new Atom("O", new Point3d());
+        bridge2elO.addAtom(a2O_0);
+        bridge2elO.addAP(0, new Point3d(), APC2EL);
+        bridge2elO.addAP(0, new Point3d(), APC2EL);
+        libFrags.add(bridge2elO);
+        
+        APClass APC3EL = APClass.make("3el:0");
+        Fragment bridge3el = new Fragment(3);
+        IAtom a3_0 = new Atom("C", new Point3d());
+        IAtom a3_1 = new Atom("C", new Point3d());
+        IAtom a3_2 = new Atom("C", new Point3d());
+        bridge3el.addAtom(a3_0);
+        bridge3el.addAtom(a3_1);
+        bridge3el.addAtom(a3_2);
+        bridge3el.addBond(new Bond(a3_0, a3_1, IBond.Order.SINGLE));
+        bridge3el.addBond(new Bond(a3_1, a3_2, IBond.Order.DOUBLE));
+        bridge3el.addAP(0, new Point3d(), APC3EL);
+        bridge3el.addAP(2, new Point3d(), APC3EL);
+        bridge3el.addAP(0, new Point3d(), apc);
+        bridge3el.addAP(1, new Point3d(), apc);
+        bridge3el.addAP(2, new Point3d(), apc);
+        libFrags.add(bridge3el);
+        
+        // We do not really need multiple fragments for each class, but
+        // these may turn out useful in the future.
+        Fragment bridge3elN = new Fragment(33);
+        IAtom a3N_0 = new Atom("N", new Point3d());
+        IAtom a3N_1 = new Atom("N", new Point3d());
+        bridge3elN.addAtom(a3N_0);
+        bridge3elN.addAtom(a3N_1);
+        bridge3elN.addBond(new Bond(a3N_0, a3N_1, IBond.Order.SINGLE));
+        bridge3elN.addAP(0, new Point3d(), APC3EL);
+        bridge3elN.addAP(1, new Point3d(), APC3EL);
+        bridge3elN.addAP(0, new Point3d(), apc);
+        libFrags.add(bridge3elN);
+        
+        APClass APC4EL = APClass.make("4el:0");
+        Fragment bridge4el = new Fragment(4);
+        IAtom a4_0 = new Atom("C", new Point3d());
+        IAtom a4_1 = new Atom("C", new Point3d());
+        IAtom a4_2 = new Atom("C", new Point3d());
+        IAtom a4_3 = new Atom("C", new Point3d());
+        bridge4el.addAtom(a4_0);
+        bridge4el.addAtom(a4_1);
+        bridge4el.addAtom(a4_2);
+        bridge4el.addAtom(a4_3);
+        bridge4el.addBond(new Bond(a4_0, a4_1, IBond.Order.SINGLE));
+        bridge4el.addBond(new Bond(a4_1, a4_2, IBond.Order.DOUBLE));
+        bridge4el.addBond(new Bond(a4_2, a4_3, IBond.Order.SINGLE));
+        bridge4el.addAP(0, new Point3d(), APC4EL);
+        bridge4el.addAP(3, new Point3d(), APC4EL);
+        bridge4el.addAP(0, new Point3d(), apc);
+        bridge4el.addAP(1, new Point3d(), apc);
+        bridge4el.addAP(2, new Point3d(), apc);
+        bridge4el.addAP(3, new Point3d(), apc);
+        libFrags.add(bridge4el);
+        
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(),
+                libFrags,
+                new ArrayList<Vertex>(), 
+                cpMap, 
+                new HashMap<APClass,APClass>(), 
+                new HashSet<APClass>(),
+                cpMap);
+        fs.setAPclassBasedApproach(true);
+        
+        // Then, some GA-parameters
+        GAParameters gaParams = new GAParameters();
+        gaParams.setParameters(new RingClosureParameters());
+
+        assertEquals(0, graph.getRingCount());
+        GraphOperations.addFusedRing(benzeneScaffold, mnt, true, fs, gaParams);
+        
+
+        Logger logger = Logger.getLogger("DummyLogger");
+        Randomizer rng = new Randomizer();
+        DenoptimIO.writeGraphToSDF(new File("/tmp/fused_rings.sdf"), graph, false, true, logger, rng);
+        
+        assertEquals(1, graph.getRingCount());
+        
+        //TODO-gg try 3el and 4el
+        /*
+        SmilesParser parser = new SmilesParser(chemBuilder);
+        IAtomContainer benzene = parser.parseSmiles("c1ccccc1");
+        Fragment benzeneScaffold = new Fragment(benzene, BBType.FRAGMENT);
+        for (int i= 0; i<6; i++)
+        {
+            benzeneScaffold.addAP(i, new Point3d(), apc);
+        }
+        benzeneScaffold.setVertexId(123);
+        
+        DGraph graph = new DGraph();
+        graph.addVertex(benzeneScaffold);
+         */
+        
+    }
 //------------------------------------------------------------------------------
     
     /*

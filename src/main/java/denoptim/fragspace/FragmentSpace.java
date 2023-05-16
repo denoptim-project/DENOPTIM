@@ -986,7 +986,7 @@ public class FragmentSpace
         }
         return lst;
     }
-    
+
 //------------------------------------------------------------------------------
 
     /**
@@ -1003,10 +1003,33 @@ public class FragmentSpace
         {
             if (fragsApsPerApClass.containsKey(apc))
             {
-                for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+                for (List<Integer> idxs : fragsApsPerApClass.get(apc))
                 {
                     Vertex v = fragmentLib.get(idxs.get(0));
                     lst.add(v);
+                }
+            }
+        }
+        return lst;
+    }
+    
+    
+//------------------------------------------------------------------------------
+    
+    public List<Vertex> getVerticesWithAPClassStartingWith(String root)
+    {
+        List<Vertex> lst = new ArrayList<Vertex>();
+        synchronized (LOCK)
+        {
+            for (APClass apc : fragsApsPerApClass.keySet())
+            {
+                if (!apc.toString().startsWith(root))
+                    continue;
+                for (List<Integer> idxs : fragsApsPerApClass.get(apc))
+                {
+                    Vertex v = fragmentLib.get(idxs.get(0));
+                    if (!lst.contains(v))
+                        lst.add(v);
                 }
             }
         }

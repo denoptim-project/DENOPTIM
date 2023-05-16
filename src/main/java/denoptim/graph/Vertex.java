@@ -22,6 +22,7 @@ package denoptim.graph;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -248,6 +249,26 @@ public abstract class Vertex implements Cloneable
 //------------------------------------------------------------------------------
 
     public abstract List<AttachmentPoint> getAttachmentPoints();
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Finds only APs that have {@link APClass} starting with the given string.
+     * @param root the beginning of the {@link APClass} string to search for.
+     * @return a list of APs that belong to this vertex and have {@link APClass}
+     * starting with the given string.
+     */
+    public List<AttachmentPoint> getVerticesWithAPClassStartingWith(
+            String root)
+    {
+        List<AttachmentPoint> list = new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            if (ap.getAPClass().toString().startsWith(root))
+                list.add(ap);
+        }
+        return list;
+    }
 
 //------------------------------------------------------------------------------
     
