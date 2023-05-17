@@ -32,15 +32,19 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.isomorphism.Mappings;
+import org.paukov.combinatorics3.Generator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -57,6 +61,7 @@ import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
+import denoptim.graph.RelatedAPPair;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
 import denoptim.graph.Template;
@@ -77,6 +82,7 @@ import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 import denoptim.utils.RotationalSpaceUtils;
@@ -2315,12 +2321,270 @@ public class EAUtils
 
 //------------------------------------------------------------------------------
 
-    public static AttachmentPoint searchForApSuitableToRingClosure(
-            AttachmentPoint apA, SymmetricAPs symAPsA, GAParameters settings)
-    {
+    /**
+     * <p>Searches for combinations of {@link RelatedAPPair} where
+     * each such pair allows to expand a ring system by adding a fused ring 
+     * resulting by connecting the two {@link AttachmentPoint}s in the 
+     * {@link RelatedAPPair} by a non-empty bridge. 
+     * The tile of bridge can depend on the properties of
+     * the {@link RelatedAPPair}.
+     * </p>
+     * <p>The set of combinations is only a sample resulting by taking random 
+     * decisions that prevent combinatorial explosion.</p>
+     * 
+     * @param graph the definition of the system to work with
+     * @param projectOnSymmetricAPs use <code>true</code> to impose projection
+     * onto symmetric APs (within a vertex) and onto symmetric vertexes. When
+     * this is <code>true</code> the result will be a list of lists, where the 
+     * nested list may contain more than one item. Yet, each such item is
+     * symmetric projection of the other items.
+     * @param logger a tool to deal with log messages.
+     * @param rng a tool to deal with random decisions.
+     * @return the list of combinations of {@link RelatedAPPair}.
+     * @throws DENOPTIMException if the conversion into a molecular 
+     * representation fails.
+     */
+    public static List<List<RelatedAPPair>> searchForApPairsSuitableToRingFusion(
+            DGraph graph, boolean projectOnSymmetricAPs, 
+            Logger logger, Randomizer rng) throws DENOPTIMException
+    {   
+        // Prepare the empty collector of combinations
+        List<List<RelatedAPPair>> result = new ArrayList<List<RelatedAPPair>>();
         
-        // TODO Auto-generated method stub
-        return null;
+        // Most of the work is done on a clone to prevent any modification of the
+        // 3D molecular representation of the graph, which is here rebuilt in
+        // a crude way because we only need the connectivity.
+        DGraph tmpGraph = graph.clone();
+        
+        // Get a molecular representation
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(logger, rng);
+        t3d.setAlignBBsIn3D(false); //3D not needed
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(tmpGraph, true);
+        
+        // Search for potential half-ring environments, i.e., sets of atoms
+        // that belongs to a cyclic system and could hold a chord that would
+        // define the additional fused ring.
+        Map<String, String> smarts = new HashMap<String, String>();
+        // For aromatic rings we look at number of electrons to follow "4n+2" rule
+        smarts.put("2el2atm", "[$([#6,#7]);X2]~@[$([#6,#7]);X2]");
+        smarts.put("3el3atm", "[$([#6,#7]);X2]~@[$([#6,#7]~@[*]);X3]~@[$([#6,#7]);X2]");
+        smarts.put("4el3atm", "[$([#6,#7]);X2]~@[$([#7,#8,#16]);X2]~@[$([#6,#7]);X2]");
+        smarts.put("4el4atm", "[$([#6,#7]);X2]~@[$([#6,#7]~@[*]);X3]~@[$([#6,#7]~@[*]);X3]~@[$([#6,#7]);X2]");
+        ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
+        Map<SymmetricAPs,List<RelatedAPPair>> symmRelatedBridgeHeadAPs = 
+                new HashMap<SymmetricAPs,List<RelatedAPPair>>();
+        List<RelatedAPPair> asymBridgeHeadAPs = new ArrayList<RelatedAPPair>();
+        for (String ruleName : smarts.keySet())
+        {
+            if (msq.getNumMatchesOfQuery(ruleName) == 0)
+            {
+                continue;
+            }
+           
+            // Get bridge-head atoms
+            Mappings halfRingAtms = msq.getMatchesOfSMARTS(ruleName);
+            // We use a string to facilitate detection of pairs of ids
+            // irrespectively on the order of ids, i.e., 1-2 vs. 2-1.
+            Set<String> doneIdPairs = new HashSet<String>();
+            for (int[] ids : halfRingAtms) 
+            {
+                if (ids.length<2)
+                {
+                    throw new Error("SMARTS for matching half-ring pattern '" 
+                            + ruleName 
+                            + "' has identified " + ids.length + " atoms "
+                            + "instead of at least 2. Modify rule to make it "
+                            + "find 2 or more atoms.");
+                }
+                
+                // Potential bridge-head atoms
+                IAtom bhA = mol.getAtom(ids[0]);
+                IAtom bhB = mol.getAtom(ids[1]);
+                
+                // Avoid duplicate pairs with inverted AP identity
+                String idPairIdentifier = "";
+                if (ids[0]<ids[1])
+                    idPairIdentifier = ids[0]+"_"+ids[1];
+                else
+                    idPairIdentifier = ids[1]+"_"+ids[0];
+                if (doneIdPairs.contains(idPairIdentifier))
+                    continue;
+                doneIdPairs.add(idPairIdentifier);
+                
+                // Bridge-head atoms must have attachment points
+                if (bhA.getProperty(DENOPTIMConstants.ATMPROPAPS)==null 
+                        || bhB.getProperty(DENOPTIMConstants.ATMPROPAPS)==null)
+                    continue;
+                
+                // Get the corresponding (free) APs in the graph
+                AttachmentPoint apA = null;
+                AttachmentPoint apB = null;
+                //TODO-gg WARNING: assumption that only one AP for atom!!!!
+                //TODO-gg randomize choice of which one
+                for (AttachmentPoint ap : tmpGraph.getAvailableAPsThroughout())
+                {
+                    if (ids[0]==ap.getAtomPositionNumberInMol())
+                    {
+                        apA = ap;
+                        continue;
+                    }
+                    if (ids[1]==ap.getAtomPositionNumberInMol())
+                    {
+                        apB = ap;
+                        continue;
+                    }
+                    if (apA!=null && apB!=null)
+                        break;
+                }
+                if (apA==null || apB==null)
+                    continue;
+                RelatedAPPair pair = new RelatedAPPair(apA, apB, ruleName);
+                
+                //Record symmetric relations
+                SymmetricAPs symInA = apA.getOwner().getSymmetricAPs(apA);
+                SymmetricAPs symInB = apB.getOwner().getSymmetricAPs(apB);
+                if (symInA.size()!=0 && symInB.size()!=0)
+                {
+                    if (symInA==symInB)
+                    {
+                        if (symmRelatedBridgeHeadAPs.containsKey(symInA))
+                        {
+                            symmRelatedBridgeHeadAPs.get(symInA).add(pair);
+                        } else {
+                            List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
+                            lst.add(pair);
+                            symmRelatedBridgeHeadAPs.put(symInA, lst);
+                        }
+                    } else {
+                        if (symmRelatedBridgeHeadAPs.containsKey(symInA))
+                        {
+                            symmRelatedBridgeHeadAPs.get(symInA).add(pair);
+                        } else {
+                            List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
+                            lst.add(pair);
+                            symmRelatedBridgeHeadAPs.put(symInA, lst);
+                        }
+                        if (symmRelatedBridgeHeadAPs.containsKey(symInB))
+                        {
+                            symmRelatedBridgeHeadAPs.get(symInB).add(pair);
+                        } else {
+                            List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
+                            lst.add(pair);
+                            symmRelatedBridgeHeadAPs.put(symInB, lst);
+                        }
+                    }
+                } else {
+                    asymBridgeHeadAPs.add(pair);
+                }
+            }
+        }
+        if (asymBridgeHeadAPs.size()==0 && symmRelatedBridgeHeadAPs.size()==0)
+        {
+            return result;
+        }
+        
+        // Collect potential set of pairs of APs that can be used to create 
+        // fused ring systems accounting for symmetric AP relations.
+        List<List<RelatedAPPair>> candidateBridgeHeadAPPairs = 
+                new ArrayList<List<RelatedAPPair>>();
+        if (symmRelatedBridgeHeadAPs.size()>0 && projectOnSymmetricAPs)
+        {
+            // We choose one to reduce the combinatorial problem
+            List<RelatedAPPair> chosenSymSet = symmRelatedBridgeHeadAPs.get(
+                    rng.randomlyChooseOne(symmRelatedBridgeHeadAPs.keySet()));
+            
+            // We try to get the biggest combination (k is the size)
+            for (int k=chosenSymSet.size(); k>0; k--)
+            {
+                // Generate combinations that use non-overlapping pairs of APs
+                // NB: this combinatorial generator retains the 
+                // sequence of generated subsets (important for reproducibility)
+                List<List<RelatedAPPair>> comp = Generator.combination(
+                        chosenSymSet)
+                        .simple(k)
+                        .stream()
+                        .limit(100) //Prevent explosion!!! //TODO-gg make tuneable
+                        .filter(pair -> !apPairsAreOverlapping(pair))
+                        .collect(Collectors.<List<RelatedAPPair>>toList());
+                if (comp.size()>0)
+                {
+                    candidateBridgeHeadAPPairs.addAll(comp);
+                    break;
+                }
+            }
+        }
+        for (RelatedAPPair pair : asymBridgeHeadAPs)
+        {
+            List<RelatedAPPair> single = new ArrayList<RelatedAPPair>();
+            single.add(pair);
+            candidateBridgeHeadAPPairs.add(single);
+        }
+
+        //TODO-gg do we limit to APs of this vertex (on one side to still allow forming bridges involving multiple vertexes)
+        //Vertex headVrtx = tmpGraph.getVertexAtPosition(originalGraph.indexOf(
+        //        vertex));
+        
+        // Project ring fusions into the actual graph (considering symmetry)
+        for (List<RelatedAPPair> combOnTmpGraph : candidateBridgeHeadAPPairs)
+        {
+            List<RelatedAPPair> combOnOriginalGraph = 
+                    new ArrayList<RelatedAPPair>();
+            for (RelatedAPPair pairOnTmpGraph : combOnTmpGraph)
+            {   
+                Vertex headVertexOnGraph = graph.getVertexAtPosition(
+                        tmpGraph.indexOf(pairOnTmpGraph.apA.getOwner()));
+                int apHeadID = pairOnTmpGraph.apA.getIndexInOwner();
+                List<Vertex> symHeadVrts = graph.getSymVerticesForVertex(
+                        headVertexOnGraph);
+                if (symHeadVrts.size()==0)
+                    symHeadVrts.add(headVertexOnGraph);
+                
+                Vertex tailVertexOnGraph = graph.getVertexAtPosition(
+                        tmpGraph.indexOf(pairOnTmpGraph.apB.getOwner()));
+                int apTailID = pairOnTmpGraph.apB.getIndexInOwner();
+                List<Vertex> symTailVrts = graph.getSymVerticesForVertex(
+                        tailVertexOnGraph);
+                if (symTailVrts.size()==0)
+                    symTailVrts.add(tailVertexOnGraph);
+                
+                int numPairs = Math.min(symHeadVrts.size(), symTailVrts.size());
+                for (int iPair=0; iPair<numPairs; iPair++)
+                {
+                    RelatedAPPair pairOnOriginalGraph = new RelatedAPPair(
+                            symHeadVrts.get(iPair).getAP(apHeadID), 
+                            symTailVrts.get(iPair).getAP(apTailID),
+                            pairOnTmpGraph.property);
+                    combOnOriginalGraph.add(pairOnOriginalGraph);
+                }
+            }
+            result.add(combOnOriginalGraph);
+        }
+        return result;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Evaluates if any pair of {@link AttachmentPoint} pairs involve the 
+     * same {@link AttachmentPoint}, i.e., if there is overlap between any pair 
+     * of pairs.
+     * @param pairs the collection of pairs to evaluate for overlap.
+     * @return <code>true</code> if there is any {@link AttachmentPoint} that
+     * is present in more than one pair visited by the iterations.
+     */
+    public static Boolean apPairsAreOverlapping(Iterable<RelatedAPPair> pairs)
+    {
+        Set<AttachmentPoint> aps = new HashSet<AttachmentPoint>();
+        for (RelatedAPPair pair : pairs)
+        {
+            if (aps.contains(pair.apA) || aps.contains(pair.apB))
+            {
+                return true;
+            }
+            aps.add(pair.apA);
+            aps.add(pair.apB);
+        }
+        return false;
     }
     
 //------------------------------------------------------------------------------    
