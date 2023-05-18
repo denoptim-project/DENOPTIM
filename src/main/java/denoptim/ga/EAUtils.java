@@ -49,6 +49,7 @@ import org.paukov.combinatorics3.Generator;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
+import denoptim.fragmenter.BridgeHeadFindingRule;
 import denoptim.fragmenter.FragmenterTools;
 import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
@@ -64,6 +65,8 @@ import denoptim.graph.GraphPattern;
 import denoptim.graph.RelatedAPPair;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
+import denoptim.graph.SymmetricSet;
+import denoptim.graph.SymmetricSetWithMode;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -2322,7 +2325,8 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * <p>Searches for combinations of {@link RelatedAPPair} where
+     * <p>Searches for combinations of sites suitable for ring fusion, i.e., 
+     * combinations of {@link RelatedAPPair} where
      * each such pair allows to expand a ring system by adding a fused ring 
      * resulting by connecting the two {@link AttachmentPoint}s in the 
      * {@link RelatedAPPair} by a non-empty bridge. 
@@ -2344,8 +2348,12 @@ public class EAUtils
      * @throws DENOPTIMException if the conversion into a molecular 
      * representation fails.
      */
-    public static List<List<RelatedAPPair>> searchForApPairsSuitableToRingFusion(
-            DGraph graph, boolean projectOnSymmetricAPs, 
+    
+    //NB: we return a List to retain ordering of the items, but the list must
+    // not contain redundancies, i.e., lists of AP pairs that are make of the 
+    // same set of AP pairs.
+    public static List<List<RelatedAPPair>> searchRingFusionSites(
+            DGraph graph, FragmentSpace fragSpace, boolean projectOnSymmetricAPs, 
             Logger logger, Randomizer rng) throws DENOPTIMException
     {   
         // Prepare the empty collector of combinations
@@ -2356,6 +2364,23 @@ public class EAUtils
         // a crude way because we only need the connectivity.
         DGraph tmpGraph = graph.clone();
         
+        // Keep trak of which vertexes come from the original graph. We need
+        // to distinguish them from the capping groups we add here.
+        Set<Long> originalVertexIDs = new HashSet<Long>();
+        tmpGraph.getVertexList().stream()
+            .forEach(v -> originalVertexIDs.add(v.getVertexId()));
+        
+        // We add capping groups to facilitate the search for substructures
+        // otherwise we have to write SMARTS that match systems with potentially
+        // unsaturated valences, and that is a mess.
+        // Here we change both graph and molecular representation, but it all 
+        // happens on the tmp copy, so the original graph an mol representation 
+        // remain intact. Also, note that the order of atoms does not have a 
+        // role because we only use the position of the atom in the list of atoms
+        // within the tmp system, and then we use the reference to the
+        // AP to project the information back into the original system.
+        tmpGraph.addCappingGroups(fragSpace);
+        
         // Get a molecular representation
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(logger, rng);
         t3d.setAlignBBsIn3D(false); //3D not needed
@@ -2364,40 +2389,71 @@ public class EAUtils
         // Search for potential half-ring environments, i.e., sets of atoms
         // that belongs to a cyclic system and could hold a chord that would
         // define the additional fused ring.
+        //TODO-gg get from resources or custom input
+        List<BridgeHeadFindingRule> bridgeHeadFindingRUles = 
+                new ArrayList<BridgeHeadFindingRule>();
+
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "2el2atm",
+                "[a;D3]~[a;D3]",
+                new int[]{0,1}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "3el3atm",
+                "[a;D3]~[a;x3]~[a;D3]",
+                new int[]{0,2}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "4el4atm_6+6",
+                "[a;D3]1aaaaa1~a1[a;D3]aaaa1",
+                new int[]{0,7}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "4el4atm_6+5",
+                "[a;D3]1aaaaa1~a1[a;D3]aaa1",
+                new int[]{0,7}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "4el4atm_5+5",
+                "[a;D3]1aaaa1~a1[a;D3]aaa1",
+                new int[]{0,6}));
+
         Map<String, String> smarts = new HashMap<String, String>();
-        // For aromatic rings we look at number of electrons to follow "4n+2" rule
-        smarts.put("2el2atm", "[$([#6,#7]);X2]~@[$([#6,#7]);X2]");
-        smarts.put("3el3atm", "[$([#6,#7]);X2]~@[$([#6,#7]~@[*]);X3]~@[$([#6,#7]);X2]");
-        smarts.put("4el3atm", "[$([#6,#7]);X2]~@[$([#7,#8,#16]);X2]~@[$([#6,#7]);X2]");
-        smarts.put("4el4atm", "[$([#6,#7]);X2]~@[$([#6,#7]~@[*]);X3]~@[$([#6,#7]~@[*]);X3]~@[$([#6,#7]);X2]");
-        ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
-        Map<SymmetricAPs,List<RelatedAPPair>> symmRelatedBridgeHeadAPs = 
-                new HashMap<SymmetricAPs,List<RelatedAPPair>>();
-        List<RelatedAPPair> asymBridgeHeadAPs = new ArrayList<RelatedAPPair>();
-        for (String ruleName : smarts.keySet())
+        for (BridgeHeadFindingRule rule : bridgeHeadFindingRUles)
         {
-            if (msq.getNumMatchesOfQuery(ruleName) == 0)
+            smarts.put(rule.getName(), rule.getSMARTS());
+        }
+        
+        ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
+        Map<SymmetricSetWithMode,List<RelatedAPPair>> symmRelatedBridgeHeadAPs = 
+                new HashMap<SymmetricSetWithMode,List<RelatedAPPair>>();
+        List<RelatedAPPair> symBridgeHeadAPs = new ArrayList<RelatedAPPair>();
+        List<RelatedAPPair> asymBridgeHeadAPs = new ArrayList<RelatedAPPair>();
+        for (BridgeHeadFindingRule rule : bridgeHeadFindingRUles)
+        {
+            if (msq.getNumMatchesOfQuery(rule.getName()) == 0)
             {
                 continue;
             }
            
             // Get bridge-head atoms
-            Mappings halfRingAtms = msq.getMatchesOfSMARTS(ruleName);
+            Mappings halfRingAtms = msq.getMatchesOfSMARTS(rule.getName());
             // We use a string to facilitate detection of pairs of ids
             // irrespectively on the order of ids, i.e., 1-2 vs. 2-1.
             Set<String> doneIdPairs = new HashSet<String>();
-            for (int[] ids : halfRingAtms) 
+            for (int[] idSubstructure : halfRingAtms) 
             {
-                if (ids.length<2)
+                if (idSubstructure.length<2)
                 {
                     throw new Error("SMARTS for matching half-ring pattern '" 
-                            + ruleName 
-                            + "' has identified " + ids.length + " atoms "
+                            + rule.getName() 
+                            + "' has identified " + idSubstructure.length 
+                            + " atoms "
                             + "instead of at least 2. Modify rule to make it "
                             + "find 2 or more atoms.");
                 }
                 
                 // Potential bridge-head atoms
+                int[] ids = new int[] {
+                        idSubstructure[rule.getBridgeHeadPositions()[0]],
+                        idSubstructure[rule.getBridgeHeadPositions()[1]]};
+                
                 IAtom bhA = mol.getAtom(ids[0]);
                 IAtom bhB = mol.getAtom(ids[1]);
                 
@@ -2415,30 +2471,58 @@ public class EAUtils
                 if (bhA.getProperty(DENOPTIMConstants.ATMPROPAPS)==null 
                         || bhB.getProperty(DENOPTIMConstants.ATMPROPAPS)==null)
                     continue;
+                if (bhA.getProperty(DENOPTIMConstants.ATMPROPVERTEXID)==null 
+                        || bhB.getProperty(DENOPTIMConstants.ATMPROPVERTEXID)==null)
+                    throw new IllegalStateException("Atoms in 3d molecular "
+                            + "models of graph objects must have the "
+                            + DENOPTIMConstants.ATMPROPVERTEXID + " property.");
                 
-                // Get the corresponding (free) APs in the graph
-                AttachmentPoint apA = null;
-                AttachmentPoint apB = null;
+                //TODOgg deal with APClass compatibility
                 //TODO-gg WARNING: assumption that only one AP for atom!!!!
                 //TODO-gg randomize choice of which one
-                for (AttachmentPoint ap : tmpGraph.getAvailableAPsThroughout())
+                
+                long vrtxIdA = (Long)
+                        bhA.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+                long vrtxIdB = (Long)
+                        bhB.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+                int apIdA = -1;
+                for (AttachmentPoint ap : (List<AttachmentPoint>) bhA.getProperty(
+                        DENOPTIMConstants.ATMPROPAPS))
                 {
-                    if (ids[0]==ap.getAtomPositionNumberInMol())
+                    // AP is available or used by a capping group added in this method
+                    if (ap.isAvailableThroughout() ||
+                            !originalVertexIDs.contains(ap.getLinkedAPThroughout()
+                                    .getOwner().getVertexId()))
                     {
-                        apA = ap;
-                        continue;
-                    }
-                    if (ids[1]==ap.getAtomPositionNumberInMol())
-                    {
-                        apB = ap;
-                        continue;
-                    }
-                    if (apA!=null && apB!=null)
+                        apIdA = ap.getID();
                         break;
+                    }
                 }
+                int apIdB = -1;
+                for (AttachmentPoint ap : (List<AttachmentPoint>) bhB.getProperty(
+                        DENOPTIMConstants.ATMPROPAPS))
+                {
+                    // AP is available or used by a capping group added in this method
+                    if (ap.isAvailableThroughout() ||
+                            !originalVertexIDs.contains(ap.getLinkedAPThroughout()
+                                    .getOwner().getVertexId()))
+                    {
+                        apIdB = ap.getID();
+                        break;
+                    }
+                }
+                if (apIdA<0 || apIdB<0)
+                    continue;
+                
+                AttachmentPoint apA = tmpGraph.getVertexWithId(vrtxIdA)
+                        .getAPWithId(apIdA);
+                AttachmentPoint apB = tmpGraph.getVertexWithId(vrtxIdB)
+                        .getAPWithId(apIdB);
                 if (apA==null || apB==null)
                     continue;
-                RelatedAPPair pair = new RelatedAPPair(apA, apB, ruleName);
+                
+                // Now we have identified a pair of APs suitable to ring fusion
+                RelatedAPPair pair = new RelatedAPPair(apA, apB, rule.getName());
                 
                 //Record symmetric relations
                 SymmetricAPs symInA = apA.getOwner().getSymmetricAPs(apA);
@@ -2447,38 +2531,45 @@ public class EAUtils
                 {
                     if (symInA==symInB)
                     {
-                        if (symmRelatedBridgeHeadAPs.containsKey(symInA))
+                        SymmetricSetWithMode key = new SymmetricSetWithMode(
+                                symInA, pair.property);
+                        if (symmRelatedBridgeHeadAPs.containsKey(key))
                         {
-                            symmRelatedBridgeHeadAPs.get(symInA).add(pair);
+                            symmRelatedBridgeHeadAPs.get(key).add(pair);
                         } else {
                             List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
                             lst.add(pair);
-                            symmRelatedBridgeHeadAPs.put(symInA, lst);
+                            symmRelatedBridgeHeadAPs.put(key, lst);
                         }
                     } else {
-                        if (symmRelatedBridgeHeadAPs.containsKey(symInA))
+                        SymmetricSetWithMode keyA = new SymmetricSetWithMode(
+                                symInA, pair.property);
+                        if (symmRelatedBridgeHeadAPs.containsKey(keyA))
                         {
-                            symmRelatedBridgeHeadAPs.get(symInA).add(pair);
+                            symmRelatedBridgeHeadAPs.get(keyA).add(pair);
                         } else {
                             List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
                             lst.add(pair);
-                            symmRelatedBridgeHeadAPs.put(symInA, lst);
+                            symmRelatedBridgeHeadAPs.put(keyA, lst);
                         }
-                        if (symmRelatedBridgeHeadAPs.containsKey(symInB))
+                        SymmetricSetWithMode keyB = new SymmetricSetWithMode(
+                                symInB, pair.property);
+                        if (symmRelatedBridgeHeadAPs.containsKey(keyB))
                         {
-                            symmRelatedBridgeHeadAPs.get(symInB).add(pair);
+                            symmRelatedBridgeHeadAPs.get(keyB).add(pair);
                         } else {
                             List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
                             lst.add(pair);
-                            symmRelatedBridgeHeadAPs.put(symInB, lst);
+                            symmRelatedBridgeHeadAPs.put(keyB, lst);
                         }
                     }
+                    symBridgeHeadAPs.add(pair);
                 } else {
                     asymBridgeHeadAPs.add(pair);
                 }
             }
         }
-        if (asymBridgeHeadAPs.size()==0 && symmRelatedBridgeHeadAPs.size()==0)
+        if (asymBridgeHeadAPs.size()==0 && symBridgeHeadAPs.size()==0)
         {
             return result;
         }
@@ -2487,29 +2578,60 @@ public class EAUtils
         // fused ring systems accounting for symmetric AP relations.
         List<List<RelatedAPPair>> candidateBridgeHeadAPPairs = 
                 new ArrayList<List<RelatedAPPair>>();
-        if (symmRelatedBridgeHeadAPs.size()>0 && projectOnSymmetricAPs)
+        if (symmRelatedBridgeHeadAPs.size()>0)
         {
-            // We choose one to reduce the combinatorial problem
-            List<RelatedAPPair> chosenSymSet = symmRelatedBridgeHeadAPs.get(
-                    rng.randomlyChooseOne(symmRelatedBridgeHeadAPs.keySet()));
-            
-            // We try to get the biggest combination (k is the size)
-            for (int k=chosenSymSet.size(); k>0; k--)
+            if (projectOnSymmetricAPs)
             {
-                // Generate combinations that use non-overlapping pairs of APs
-                // NB: this combinatorial generator retains the 
-                // sequence of generated subsets (important for reproducibility)
-                List<List<RelatedAPPair>> comp = Generator.combination(
-                        chosenSymSet)
-                        .simple(k)
-                        .stream()
-                        .limit(100) //Prevent explosion!!! //TODO-gg make tuneable
-                        .filter(pair -> !apPairsAreOverlapping(pair))
-                        .collect(Collectors.<List<RelatedAPPair>>toList());
-                if (comp.size()>0)
+                for (SymmetricSetWithMode key : symmRelatedBridgeHeadAPs.keySet())
                 {
-                    candidateBridgeHeadAPPairs.addAll(comp);
-                    break;
+                    List<RelatedAPPair> chosenSymSet = 
+                            symmRelatedBridgeHeadAPs.get(key);
+                    
+                    // We try to get the biggest combination (k is the size)
+                    for (int k=chosenSymSet.size(); k>0; k--)
+                    {
+                        // Generate combinations that use non-overlapping pairs of APs
+                        // NB: this combinatorial generator retains the 
+                        // sequence of generated subsets (important for reproducibility)
+                        List<List<RelatedAPPair>> combs = Generator.combination(
+                                chosenSymSet)
+                                .simple(k)
+                                .stream()
+                                .limit(100) //Prevent explosion!!! //TODO-gg make tuneable
+                                .filter(pair -> !apPairsAreOverlapping(pair))
+                                .collect(Collectors.<List<RelatedAPPair>>toList());
+                        if (combs.size()>0)
+                        {
+                            // We keep only combinations that are not already 
+                            // among previously known ones
+                            for (List<RelatedAPPair> comb : combs)
+                            {
+                                boolean isNew = true;
+                                for (List<RelatedAPPair> knownComb : 
+                                    candidateBridgeHeadAPPairs)
+                                {
+                                    if (knownComb.containsAll(comb) 
+                                            && comb.containsAll(knownComb))
+                                    {
+                                        isNew = false;
+                                        break;
+                                    }
+                                }
+                                if (isNew)
+                                {
+                                    candidateBridgeHeadAPPairs.add(comb);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            } else {
+                for (RelatedAPPair pair : symBridgeHeadAPs)
+                {
+                    List<RelatedAPPair> single = new ArrayList<RelatedAPPair>();
+                    single.add(pair);
+                    candidateBridgeHeadAPPairs.add(single);
                 }
             }
         }
@@ -2560,7 +2682,7 @@ public class EAUtils
             result.add(combOnOriginalGraph);
         }
         return result;
-    }
+    } 
     
 //------------------------------------------------------------------------------
     

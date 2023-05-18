@@ -45,9 +45,35 @@ public class RelatedAPPair
 //------------------------------------------------------------------------------
 
     @Override
+    public boolean equals(Object o)
+    {
+        if (o == null)
+            return false;
+        
+        if (o == this)
+            return true;
+       
+        if (o.getClass() != getClass())
+        return false;
+        
+        RelatedAPPair other = (RelatedAPPair) o;
+        
+        if (!this.apA.equals(other.apA))
+            return false;
+        
+        if (!this.apB.equals(other.apB))
+            return false;
+        
+        return this.property.equals(other.property);
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Override
     public String toString()
     {
-        return apA.getAtomPositionNumberInMol()+"-"+apB.getAtomPositionNumberInMol();
+        return apA.getAtomPositionNumber()+"-"+apB.getAtomPositionNumber()
+        + ":"+property;
     }
     
 //------------------------------------------------------------------------------

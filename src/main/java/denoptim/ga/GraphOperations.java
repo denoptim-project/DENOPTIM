@@ -1224,7 +1224,7 @@ public class GraphOperations
         // symmetry, so they all correspond to the same kind of operation
         // performed on symmetry-related sites
         List<RelatedAPPair> chosenPairsSet = rng.randomlyChooseOne(
-                EAUtils.searchForApPairsSuitableToRingFusion(
+                EAUtils.searchRingFusionSites(
                         graph, 
                         rng.nextBoolean(settings.getSymmetryProbability()),
                         settings.getLogger(), rng));

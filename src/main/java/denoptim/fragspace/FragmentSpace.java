@@ -1947,7 +1947,7 @@ public class FragmentSpace
      * {@link APClass#ATMINUS}.
      * @return the ring-closing vertex.
      */
-    public Vertex getPolarizedRCV(boolean polarity)
+    public static Vertex getPolarizedRCV(boolean polarity)
     {   
         APClass apc = APClass.RCACLASSPLUS;
         if (!polarity)

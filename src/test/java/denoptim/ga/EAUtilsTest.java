@@ -30,14 +30,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import javax.vecmath.Point3d;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
+import org.openscience.cdk.silent.Bond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
@@ -54,12 +62,15 @@ import denoptim.graph.DGraph;
 import denoptim.graph.DGraphTest;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
+import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
+import denoptim.graph.RelatedAPPair;
 import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.programs.denovo.GAParameters;
@@ -1186,6 +1197,608 @@ public class EAUtilsTest
                 assertTrue(sv0 == svI);
             }
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testSearchForApPairsSuitableToRingFusion() throws Exception
+    {
+        APClass apcA = APClass.make("apcA:1");
+        APClass apcB = APClass.make("apcB:1");
+        APClass apcC = APClass.make("apcC:1");
+        APClass apcD = APClass.make("apcD:1");
+        APClass apcE = APClass.make("apcE:1");
+        APClass apcF = APClass.make("apcF:1");
+        APClass apcG = APClass.make("apcG:1");
+        APClass hyd = APClass.make("hyd:1");
+        
+        // Utilities
+        Logger logger = Logger.getLogger("DummyLogger");
+        Randomizer rng = new Randomizer();
+        
+        // Make a fragment space that saturates all valences
+        HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
+        capMap.put(apcA,hyd);
+        capMap.put(apcB,hyd);
+        capMap.put(apcC,hyd);
+        capMap.put(apcD,hyd);
+        capMap.put(apcE,hyd);
+        capMap.put(apcF,hyd);
+        capMap.put(apcG,hyd);
+        
+        ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
+        Fragment capH = new Fragment();
+        capH.addAtom(new Atom("H", new Point3d()));
+        capH.addAP(0, new Point3d(1.0, 0, 0), hyd);
+        cappingGroups.add(capH);
+        
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(), //no scaffolds
+                new ArrayList<Vertex>(), //no fragments
+                cappingGroups, //H as capping
+                new HashMap<APClass,ArrayList<APClass>>(), 
+                capMap, new HashSet<APClass>(), 
+                new HashMap<APClass,ArrayList<APClass>>());
+        fragSpace.setAPclassBasedApproach(true);
+        
+        
+        //
+        // Case 1: one benzene fragment with 6 APs all in same symmetric set, 
+        // but NO request to project on symmetric APs
+        //
+        SmilesParser parser = new SmilesParser(builder);
+        IAtomContainer mol = parser.parseSmiles("c1ccccc1");
+        MoleculeUtils.explicitHydrogens(mol);
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        Fragment frag = new Fragment(mol, BBType.FRAGMENT);
+        for (int i= 0; i<6; i++)
+        {
+            replaceHatomWithAP(frag, i, apcA);
+        }
+        DGraph graph = new DGraph();
+        graph.addVertex(frag);
+
+        List<List<RelatedAPPair>> combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, false, logger, rng);
+        
+        assertEquals(6, combinations.size());
+        Set<AttachmentPoint> involvedAPs = new HashSet<AttachmentPoint>();
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            assertEquals(1, comb.size());
+            RelatedAPPair pair = comb.get(0);
+            assertTrue(frag.getAttachmentPoints().contains(pair.apA));
+            assertTrue(frag.getAttachmentPoints().contains(pair.apB));
+            assertTrue(graph.getAttachmentPoints().contains(pair.apA));
+            assertTrue(graph.getAttachmentPoints().contains(pair.apB));
+            involvedAPs.add(pair.apA);
+            involvedAPs.add(pair.apB);
+        }
+        assertEquals(6, involvedAPs.size());
+        
+        
+        //
+        // Case 2: one benzene fragment with 6 APs all in same symmetric set, 
+        // and we do request projection on symmetric APs
+        //
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        
+        // we aim at the maximum symmetry, so we find two combinations that
+        // each accounts for 3 ring-fusion sites (i.e., pairs of APs that can 
+        // be used simultaneously to create each a fused ring)
+        assertEquals(2, combinations.size());
+        involvedAPs = new HashSet<AttachmentPoint>();
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            assertEquals(3, comb.size());
+            involvedAPs = new HashSet<AttachmentPoint>();
+            for (RelatedAPPair pair : comb)
+            {
+                involvedAPs.add(pair.apA);
+                involvedAPs.add(pair.apB);
+            }
+            // both combination must involve all APs due to symmetry
+            assertEquals(6, involvedAPs.size());
+        }
+       
+        //
+        // Case 3: Test handling of intra-fragment symmetry (i.e., symmetric APs)
+        // but NO request to project on symmetric APs
+        //
+//         This is the vertex we work with (NB: A, B, C are APClasses)
+//          
+//             B    A     H     C
+//              3--4      11--10    
+//             /    \     /    \
+//          A 2      5---6      9 C
+//             \    /     \    /
+//              1--0       7--8
+//             B    A     H    C
+//         
+        mol = parser.parseSmiles("c1ccccc1c1ccccc1");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 1, apcB);
+        replaceHatomWithAP(frag, 2, apcA);
+        replaceHatomWithAP(frag, 3, apcB);
+        replaceHatomWithAP(frag, 4, apcA);
+        replaceHatomWithAP(frag, 8, apcC);
+        replaceHatomWithAP(frag, 9, apcC);
+        replaceHatomWithAP(frag, 10, apcC);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, false, logger, rng);
+       
+        assertEquals(6, combinations.size());
+        int[] apUsageCounts = new int[8];
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            assertEquals(1, comb.size());
+            for (RelatedAPPair pair : comb)
+            {
+                apUsageCounts[pair.apA.getIndexInOwner()] = 
+                        apUsageCounts[pair.apA.getIndexInOwner()] + 1;
+                apUsageCounts[pair.apB.getIndexInOwner()] = 
+                        apUsageCounts[pair.apB.getIndexInOwner()] + 1;
+            }
+        }
+        assertEquals(1, apUsageCounts[0]);
+        assertEquals(2, apUsageCounts[1]);
+        assertEquals(2, apUsageCounts[2]);
+        assertEquals(2, apUsageCounts[3]);
+        assertEquals(1, apUsageCounts[4]);
+        assertEquals(1, apUsageCounts[5]);
+        assertEquals(2, apUsageCounts[6]);
+        assertEquals(1, apUsageCounts[7]);
+        
+        
+        //
+        // Case 4: as above but we do request to project on symmetric APs
+        //
+//         This is the vertex we work with (NB: A, B, C are APClasses)
+//          
+//             B    A     H     C
+//              3--4      11--10    
+//             /    \     /    \
+//          A 2      5---6      9 C
+//             \    /     \    /
+//              1--0       7--8
+//             B    A     H    C
+//         
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        
+        assertEquals(5, combinations.size());
+        apUsageCounts = new int[8];
+        int[] sizesCount = new int[4];
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            sizesCount[comb.size()] = sizesCount[comb.size()] +1;
+            for (RelatedAPPair pair : comb)
+            {
+                apUsageCounts[pair.apA.getIndexInOwner()] = 
+                        apUsageCounts[pair.apA.getIndexInOwner()] + 1;
+                apUsageCounts[pair.apB.getIndexInOwner()] = 
+                        apUsageCounts[pair.apB.getIndexInOwner()] + 1;
+            }
+        }
+        assertEquals(2, apUsageCounts[0]);
+        assertEquals(3, apUsageCounts[1]);
+        assertEquals(2, apUsageCounts[2]);
+        assertEquals(3, apUsageCounts[3]);
+        assertEquals(2, apUsageCounts[4]);
+        assertEquals(1, apUsageCounts[5]);
+        assertEquals(2, apUsageCounts[6]);
+        assertEquals(1, apUsageCounts[7]);
+        assertEquals(0, sizesCount[0]);
+        assertEquals(2, sizesCount[1]);
+        assertEquals(3, sizesCount[2]);
+        assertEquals(0, sizesCount[3]);
+        
+        //
+        // Case 5: mix symmetric and asymmetric and do request to project on symmetric APs
+        //
+//         This is the vertex we work with (NB: A, B, C are APClasses)
+//          
+//             B    A      C      D
+//              3--4        12--11    
+//             /    \       /    \
+//          A 2      5--6--7     10 E
+//             \    /       \    /
+//              1--0         8--9
+//             B    A       G    F
+//         
+        mol = parser.parseSmiles("c1ccccc1Oc1ccccc1");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 1, apcB);
+        replaceHatomWithAP(frag, 2, apcA);
+        replaceHatomWithAP(frag, 3, apcB);
+        replaceHatomWithAP(frag, 4, apcA);
+        replaceHatomWithAP(frag, 8, apcG);
+        replaceHatomWithAP(frag, 9, apcF);
+        replaceHatomWithAP(frag, 10, apcE);
+        replaceHatomWithAP(frag, 11, apcD);
+        replaceHatomWithAP(frag, 12, apcC);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        
+        assertEquals(7, combinations.size());
+        apUsageCounts = new int[11];
+        sizesCount = new int[4];
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            sizesCount[comb.size()] = sizesCount[comb.size()] +1;
+            for (RelatedAPPair pair : comb)
+            {
+                apUsageCounts[pair.apA.getIndexInOwner()] = 
+                        apUsageCounts[pair.apA.getIndexInOwner()] + 1;
+                apUsageCounts[pair.apB.getIndexInOwner()] = 
+                        apUsageCounts[pair.apB.getIndexInOwner()] + 1;
+            }
+        }
+        assertEquals(2, apUsageCounts[0]);
+        assertEquals(3, apUsageCounts[1]);
+        assertEquals(2, apUsageCounts[2]);
+        assertEquals(3, apUsageCounts[3]);
+        assertEquals(2, apUsageCounts[4]);
+        assertEquals(1, apUsageCounts[5]);
+        assertEquals(2, apUsageCounts[6]);
+        assertEquals(2, apUsageCounts[7]);
+        assertEquals(2, apUsageCounts[8]);
+        assertEquals(1, apUsageCounts[9]);
+        assertEquals(0, apUsageCounts[10]);
+        assertEquals(0, sizesCount[0]);
+        assertEquals(4, sizesCount[1]);
+        assertEquals(3, sizesCount[2]);
+        assertEquals(0, sizesCount[3]);
+        
+        
+        //
+        // Case 6: mix different types of ring fusion sites, some 4el, other 2el
+        // NO request to project on symmetric APs
+        //
+//         This is the vertex we work with (NB: A, B, C are APClasses)
+//          
+//             B    A     C     C
+//              3--4      11--10    
+//             /    \     /    \
+//          A 2      5---6      9 C
+//             \    /     \    /
+//              1--0       7--8
+//             B    A     C    C
+//         
+        mol = parser.parseSmiles("c1ccccc1c1ccccc1");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 1, apcB);
+        replaceHatomWithAP(frag, 2, apcA);
+        replaceHatomWithAP(frag, 3, apcB);
+        replaceHatomWithAP(frag, 4, apcA);
+        replaceHatomWithAP(frag, 7, apcC);
+        replaceHatomWithAP(frag, 8, apcC);
+        replaceHatomWithAP(frag, 9, apcC);
+        replaceHatomWithAP(frag, 10, apcC);
+        replaceHatomWithAP(frag, 11, apcC);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, false, logger, rng);
+        
+        assertEquals(12, combinations.size());
+        apUsageCounts = new int[10];
+        sizesCount = new int[4];
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            sizesCount[comb.size()] = sizesCount[comb.size()] +1;
+            for (RelatedAPPair pair : comb)
+            {
+                apUsageCounts[pair.apA.getIndexInOwner()] = 
+                        apUsageCounts[pair.apA.getIndexInOwner()] + 1;
+                apUsageCounts[pair.apB.getIndexInOwner()] = 
+                        apUsageCounts[pair.apB.getIndexInOwner()] + 1;
+            }
+        }
+        assertEquals(3, apUsageCounts[0]);
+        assertEquals(2, apUsageCounts[1]);
+        assertEquals(2, apUsageCounts[2]);
+        assertEquals(2, apUsageCounts[3]);
+        assertEquals(3, apUsageCounts[4]);
+        assertEquals(3, apUsageCounts[5]); // AP on atm 7
+        assertEquals(2, apUsageCounts[6]); // AP on atm 8
+        assertEquals(2, apUsageCounts[7]); // AP on atm 9
+        assertEquals(2, apUsageCounts[8]); // AP on atm 10
+        assertEquals(3, apUsageCounts[9]); // AP on atm 11
+        assertEquals(0, sizesCount[0]);
+        assertEquals(12, sizesCount[1]);
+        assertEquals(0, sizesCount[2]);
+        assertEquals(0, sizesCount[3]);
+        
+        
+        //
+        // Case 7: mix different types of ring fusion sites, some 4el, other 2el
+        // With request of exploiting symmetry
+        //
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        
+        assertEquals(8, combinations.size());
+        apUsageCounts = new int[10];
+        sizesCount = new int[4];
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            sizesCount[comb.size()] = sizesCount[comb.size()] +1;
+            for (RelatedAPPair pair : comb)
+            {
+                apUsageCounts[pair.apA.getIndexInOwner()] = 
+                        apUsageCounts[pair.apA.getIndexInOwner()] + 1;
+                apUsageCounts[pair.apB.getIndexInOwner()] = 
+                        apUsageCounts[pair.apB.getIndexInOwner()] + 1;
+            }
+        }
+        assertEquals(4, apUsageCounts[0]);
+        assertEquals(3, apUsageCounts[1]);
+        assertEquals(2, apUsageCounts[2]);
+        assertEquals(3, apUsageCounts[3]);
+        assertEquals(4, apUsageCounts[4]);
+        assertEquals(4, apUsageCounts[5]); // AP on atm 7
+        assertEquals(3, apUsageCounts[6]); // AP on atm 8
+        assertEquals(2, apUsageCounts[7]); // AP on atm 9
+        assertEquals(3, apUsageCounts[8]); // AP on atm 10
+        assertEquals(4, apUsageCounts[9]); // AP on atm 11
+        assertEquals(0, sizesCount[0]);
+        assertEquals(0, sizesCount[1]);
+        assertEquals(8, sizesCount[2]);
+        assertEquals(0, sizesCount[3]);
+       
+        
+        //
+        // Case 8: detect different types of ring fusion sites
+        //
+//         This is the vertex we work with (NB: A, B, C are APClasses)
+//
+//  [1,2] is a 2el2atm site
+//  [2,3] is a 2el2atm site
+//             [9,10] is a 2el2atm site
+//       [3,10] is a 4el4atm site
+// 
+//  A    A    A     A
+//   2--3      10--9           [9,11] is a 3el3atm site
+//   |   \     /    \    A
+//   |    4---5      8--11          [11,17] is 4el3atm site
+//   |   /     \    /    \     A
+//   1--0(O)    6--7   12[N+]--17           A    A                   A   A
+//  A          A    \    /      |        20-21    26-27          33--34    38--39
+//                  14--13      |       /    \    /    \        /     |   /     |
+//                  A    \      | _18--19    22-25     28--31--32    35--37     40
+//                       (N)15--16      \    /    \    /         \   /     \   /
+//                       A              24-23    30--29           36       41
+//            [6,14] is a 4el3atm site      A    A                 A        A 
+//
+//
+        mol = parser.parseSmiles("o1cccc1c1cc2c(cc1)c[n+]3c(c2)Nc(c3)[Ru]c1ccc(cc1)c1ccc(cc1)[Ru]c1ccc(N1)c1cnN(c1)");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 1, apcA);
+        replaceHatomWithAP(frag, 2, apcA);
+        replaceHatomWithAP(frag, 3, apcA);
+        replaceHatomWithAP(frag, 6, apcA);
+        replaceHatomWithAP(frag, 9, apcA);
+        replaceHatomWithAP(frag, 10, apcA);
+        replaceHatomWithAP(frag, 11, apcA);
+        replaceHatomWithAP(frag, 14, apcA);
+        replaceHatomWithAP(frag, 15, apcA);
+        replaceHatomWithAP(frag, 17, apcA);
+        replaceHatomWithAP(frag, 21, apcA);
+        replaceHatomWithAP(frag, 23, apcA);
+        replaceHatomWithAP(frag, 26, apcA);
+        replaceHatomWithAP(frag, 30, apcA);
+        replaceHatomWithAP(frag, 34, apcA);
+        replaceHatomWithAP(frag, 36, apcA);
+        replaceHatomWithAP(frag, 38, apcA);
+        replaceHatomWithAP(frag, 41, apcA);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+        //Just in case you need to look at the mol/fragment/graph
+        //DenoptimIO.writeSDFFile("/tmp/mol.sdf", mol);
+        //DenoptimIO.writeVertexToSDF("/tmp/frag.sdf", frag);
+        //DenoptimIO.writeGraphToSDF(new File("/tmp/graph.sdf"), graph, true,  true,  logger, rng);
+        
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, false, 
+                logger, rng);
+        
+        assertEquals(17, combinations.size());
+        apUsageCounts = new int[18];
+        sizesCount = new int[4];
+        Map<String,Integer> countTypes = new HashMap<String,Integer>();
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            sizesCount[comb.size()] = sizesCount[comb.size()] +1;
+            for (RelatedAPPair pair : comb)
+            {
+                apUsageCounts[pair.apA.getIndexInOwner()] = 
+                        apUsageCounts[pair.apA.getIndexInOwner()] + 1;
+                apUsageCounts[pair.apB.getIndexInOwner()] = 
+                        apUsageCounts[pair.apB.getIndexInOwner()] + 1;
+                if (countTypes.containsKey(pair.property))
+                    countTypes.put(pair.property, countTypes.get(pair.property)+1);
+                else 
+                    countTypes.put(pair.property, 1);
+            }
+        }
+        assertEquals(1, apUsageCounts[0]); // AP on atm 1
+        assertEquals(2, apUsageCounts[1]); // AP on atm 2
+        assertEquals(3, apUsageCounts[2]); // AP on atm 3
+        assertEquals(2, apUsageCounts[3]); // AP on atm 6
+        assertEquals(2, apUsageCounts[4]); // AP on atm 9
+        assertEquals(2, apUsageCounts[5]); // AP on atm 10
+        assertEquals(2, apUsageCounts[6]); // AP on atm 11
+        assertEquals(2, apUsageCounts[7]); // AP on atm 14
+        assertEquals(1, apUsageCounts[8]); // AP on atm 15
+        assertEquals(1, apUsageCounts[9]); // AP on atm 17
+        assertEquals(2, apUsageCounts[10]); // AP on atm 21
+        assertEquals(2, apUsageCounts[11]); // AP on atm 23
+        assertEquals(2, apUsageCounts[12]); // AP on atm 26
+        assertEquals(2, apUsageCounts[13]); // AP on atm 29
+        assertEquals(2, apUsageCounts[14]); // AP on atm 34
+        assertEquals(2, apUsageCounts[15]); // AP on atm 36
+        assertEquals(2, apUsageCounts[16]); // AP on atm 38
+        assertEquals(2, apUsageCounts[17]); // AP on atm 41
+        assertEquals(0, sizesCount[0]);
+        assertEquals(17, sizesCount[1]);
+        assertEquals(0, sizesCount[2]);
+        assertEquals(0, sizesCount[3]);
+        assertEquals(3, countTypes.get("2el2atm")); //WARNING: hard code type name!
+        assertEquals(4, countTypes.get("3el3atm")); //WARNING: hard code type name!
+        assertEquals(4, countTypes.get("4el4atm_6+6")); //WARNING: hard code type name!
+        assertEquals(2, countTypes.get("4el4atm_6+5")); //WARNING: hard code type name!
+        assertEquals(4, countTypes.get("4el4atm_5+5")); //WARNING: hard code type name!
+        
+        
+        //
+        // Case 9: fusion involves APs located on different vertexes. In this
+        // example each F# is a vertex.
+        // 
+        //                      \-3---2 
+        //    A    A      A    /      |
+        //     1--2       1---2   F3  1
+        //    /    \     /  F1 \     /  
+        //   0  F0  3-|-0       3-|-0
+        //    \    /     \  F2 /     A
+        //     5--4       /-0-\
+        //                  A
+        //
+        parser = new SmilesParser(builder);
+        IAtomContainer molF0 = parser.parseSmiles("c1ccccc1");
+        MoleculeUtils.explicitHydrogens(molF0);
+        sdg.generateCoordinates(molF0);
+        Fragment fragF0 = new Fragment(molF0, BBType.FRAGMENT);
+        replaceHatomWithAP(fragF0, 3, apcA);
+        replaceHatomWithAP(fragF0, 1, apcA);
+        replaceHatomWithAP(fragF0, 2, apcA);
+        fragF0.setVertexId(0);
+        
+        // NB: conformation will be
+        IAtomContainer molF1 = parser.parseSmiles("C=CC=C");
+        MoleculeUtils.explicitHydrogens(molF1);
+        sdg.generateCoordinates(molF1);
+        Fragment fragF1 = new Fragment(molF1, BBType.FRAGMENT);
+        replaceHatomWithAP(fragF1, 0, apcA); 
+        replaceHatomWithAP(fragF1, 0, apcA);
+        replaceHatomWithAP(fragF1, 1, apcA);
+        replaceHatomWithAP(fragF1, 2, apcA);
+        replaceHatomWithAP(fragF1, 3, apcA); // 4
+        replaceHatomWithAP(fragF1, 3, apcA);
+        fragF1.setVertexId(1);
+        
+        IAtomContainer molF2 = parser.parseSmiles("N");
+        MoleculeUtils.explicitHydrogens(molF2);
+        sdg.generateCoordinates(molF2);
+        Fragment fragF2 = new Fragment(molF2, BBType.FRAGMENT);
+        replaceHatomWithAP(fragF2, 0, apcA);
+        replaceHatomWithAP(fragF2, 0, apcA);
+        replaceHatomWithAP(fragF2, 0, apcA);
+        fragF2.setVertexId(2);
+        
+        IAtomContainer molF3 = parser.parseSmiles("C=CC=C");
+        MoleculeUtils.explicitHydrogens(molF3);
+        sdg.generateCoordinates(molF3);
+        Fragment fragF3 = new Fragment(molF1, BBType.FRAGMENT);
+        replaceHatomWithAP(fragF3, 0, apcA);
+        replaceHatomWithAP(fragF3, 0, apcA);
+        replaceHatomWithAP(fragF3, 3, apcA);
+        fragF3.setVertexId(3);
+        
+        Vertex rcvOnF1a = FragmentSpace.getPolarizedRCV(true);
+        Vertex rcvOnF2 = FragmentSpace.getPolarizedRCV(false);
+        Vertex rcvOnF1b = FragmentSpace.getPolarizedRCV(true);
+        Vertex rcvOnF3 = FragmentSpace.getPolarizedRCV(false);
+        
+        DGraph graphManyFrags = new DGraph();
+        graphManyFrags.addVertex(fragF0);
+        graphManyFrags.appendVertexOnAP(fragF0.getAP(0), fragF1.getAP(0));
+        graphManyFrags.appendVertexOnAP(fragF1.getAP(4), fragF2.getAP(0));
+        graphManyFrags.appendVertexOnAP(fragF1.getAP(1), rcvOnF1a.getAP(0));
+        graphManyFrags.appendVertexOnAP(fragF2.getAP(1), rcvOnF2.getAP(0));
+        graphManyFrags.appendVertexOnAP(fragF1.getAP(5), fragF3.getAP(0));
+        graphManyFrags.appendVertexOnAP(fragF1.getAP(3), rcvOnF1b.getAP(0));
+        graphManyFrags.appendVertexOnAP(fragF3.getAP(2), rcvOnF3.getAP(0));
+        graphManyFrags.addRing(rcvOnF1a, rcvOnF2);
+        graphManyFrags.addRing(rcvOnF1b, rcvOnF3);
+        
+        combinations = EAUtils.searchRingFusionSites(
+                graphManyFrags, fragSpace, false, logger, rng);
+        
+        assertEquals(4, combinations.size());
+        
+        Map<Long,Integer> vertexUsageCounts = new HashMap<Long,Integer>();
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            for (RelatedAPPair pair : comb)
+            {
+                long vIdA = pair.apA.getOwner().getVertexId();
+                if (vertexUsageCounts.containsKey(vIdA))
+                {
+                    vertexUsageCounts.put(vIdA, vertexUsageCounts.get(vIdA)+1);
+                } else {
+                    vertexUsageCounts.put(vIdA,1);
+                }
+                long vIdB = pair.apB.getOwner().getVertexId();
+                if (vertexUsageCounts.containsKey(vIdB))
+                {
+                    vertexUsageCounts.put(vIdB, vertexUsageCounts.get(vIdB)+1);
+                } else {
+                    vertexUsageCounts.put(vIdB,1);
+                }
+            }
+        }
+        assertTrue(vertexUsageCounts.containsKey(fragF0.getVertexId()));
+        // NB: the [1,2] counts double because both APs belong to fragF0
+        assertEquals(4, vertexUsageCounts.get(fragF0.getVertexId()));
+        assertTrue(vertexUsageCounts.containsKey(fragF1.getVertexId()));
+        assertEquals(1, vertexUsageCounts.get(fragF1.getVertexId()));
+        assertTrue(vertexUsageCounts.containsKey(fragF2.getVertexId()));
+        assertEquals(2, vertexUsageCounts.get(fragF2.getVertexId()));
+        assertTrue(vertexUsageCounts.containsKey(fragF3.getVertexId()));
+        assertEquals(1, vertexUsageCounts.get(fragF3.getVertexId()));
+    }
+
+//------------------------------------------------------------------------------
+
+    public static void replaceHatomWithAP(Fragment frag, int srcId, APClass apc)
+    {
+        boolean done = false;
+        for (IAtom atm : frag.getConnectedAtomsList(frag.getAtom(srcId)))
+        {
+            if ("H".equals(MoleculeUtils.getSymbolOrLabel(atm)))
+            {
+                frag.addAP(srcId, MoleculeUtils.getPoint3d(atm), apc);
+                frag.removeAtom(atm);
+                done = true;
+                break;
+            }
+        }
+        if (!done)
+            throw new IllegalStateException("No H found that could be changed "
+                    + "into an AP.");
     }
     
 //------------------------------------------------------------------------------
