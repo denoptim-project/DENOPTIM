@@ -1226,6 +1226,7 @@ public class GraphOperations
         List<RelatedAPPair> chosenPairsSet = rng.randomlyChooseOne(
                 EAUtils.searchRingFusionSites(
                         graph, 
+                        fragSpace,
                         rng.nextBoolean(settings.getSymmetryProbability()),
                         settings.getLogger(), rng));
 
@@ -1237,35 +1238,36 @@ public class GraphOperations
         // Based on the chosen pair, decide on the number of electrons to use
         // in the incoming fragment that will be used to close the ring
         // the pairs are all the same kind of ring fusion, so just take the 1st
-        int elsInHalfFrag = Integer.parseInt(
-                chosenPairsSet.get(0).property.substring(0,1));
+        String elsInHalfFrag = chosenPairsSet.get(0).property.substring(0,1);
+        if (elsInHalfFrag.matches("[a-zA-Z]"))
+            elsInHalfFrag = "0";
         String elInIncomingFrag = "0el";
         switch (elsInHalfFrag)
         {
-            case 0:
-            case 1:
+            case "0":
+            case "1":
                 // no aromaticity to be retained: use non-aromatic chords
                 elInIncomingFrag = "0el";
                 break;
                 
-            case 2:
+            case "2":
                 // Formally we can use any fragment delivering 4n electrons.
                 // Effectively, we have only 4-el fragments
                 elInIncomingFrag = "4el";
                 break;
                 
-            case 3:
+            case "3":
                 // We could use a 5-el fragment, but the 8-el aromatic system is
                 // so rare that we avoid it. So, we can only use 3-el fragment 
                 elInIncomingFrag = "3el";
                 break;
                 
-            case 4:
+            case "4":
                 // Effectively can only use 2-el fragments
                 elInIncomingFrag = "2el";
                 break;
                 
-            case 5:
+            case "5":
                 // We could use a 3-el fragment, but the 8-el aromatic system is
                 // so rare that we avoid it.
                 break;

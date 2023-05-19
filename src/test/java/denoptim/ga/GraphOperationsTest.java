@@ -49,6 +49,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.silent.Bond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
@@ -76,6 +77,7 @@ import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
 /**
@@ -992,80 +994,12 @@ public class GraphOperationsTest {
     public void testAddFusedRings() throws Exception
     {
         APClass apcA = APClass.make("apcA:1");
-        APClass apcB = APClass.make("apcB:1");
-        APClass apcC = APClass.make("apcC:1");
+        APClass hyd = APClass.make("hyd:1");
         
         // Prepare environment to run graph operation. First, a monitor of events
         Monitor mnt = new Monitor();
         
-        // Then, a fragment space that allows ring closures
-        HashMap<APClass,ArrayList<APClass>> cpMap = 
-                new HashMap<APClass,ArrayList<APClass>>();
-        ArrayList<APClass> lstA = new ArrayList<APClass>();
-        lstA.add(apcA);
-        cpMap.put(apcA, lstA);
-        //TODO-gg what about APClass compatibility
-        /*
-        ArrayList<APClass> lstB = new ArrayList<APClass>();
-        lstB.add(apcB);
-        cpMap.put(apcB, lstB);
-        ArrayList<APClass> lstC = new ArrayList<APClass>();
-        lstC.add(apcC);
-        cpMap.put(apcC, lstC);
-        */
-        
         ArrayList<Vertex> libFrags = new ArrayList<Vertex>();
-        APClass APC2EL = APClass.make("2el:0");
-        Fragment bridge2el = new Fragment(2);
-        IAtom a2_0 = new Atom("Si", new Point3d());
-        IAtom a2_1 = new Atom("Si", new Point3d());
-        bridge2el.addAtom(a2_0);
-        bridge2el.addAtom(a2_1);
-        bridge2el.addBond(new Bond(a2_0, a2_1, IBond.Order.DOUBLE));
-        bridge2el.addAP(0, new Point3d(), APC2EL);
-        bridge2el.addAP(1, new Point3d(), APC2EL);
-        bridge2el.addAP(0, new Point3d(), apcA);
-        bridge2el.addAP(1, new Point3d(), apcA);
-        libFrags.add(bridge2el);
-        
-        // We do not really need multiple fragments for each class, but
-        // these may turn out useful in the future.
-        Fragment bridge2elO = new Fragment(22);
-        IAtom a2O_0 = new Atom("O", new Point3d());
-        bridge2elO.addAtom(a2O_0);
-        bridge2elO.addAP(0, new Point3d(), APC2EL);
-        bridge2elO.addAP(0, new Point3d(), APC2EL);
-        libFrags.add(bridge2elO);
-        
-        APClass APC3EL = APClass.make("3el:0");
-        Fragment bridge3el = new Fragment(3);
-        IAtom a3_0 = new Atom("Si", new Point3d());
-        IAtom a3_1 = new Atom("Si", new Point3d());
-        IAtom a3_2 = new Atom("Si", new Point3d());
-        bridge3el.addAtom(a3_0);
-        bridge3el.addAtom(a3_1);
-        bridge3el.addAtom(a3_2);
-        bridge3el.addBond(new Bond(a3_0, a3_1, IBond.Order.SINGLE));
-        bridge3el.addBond(new Bond(a3_1, a3_2, IBond.Order.DOUBLE));
-        bridge3el.addAP(0, new Point3d(), APC3EL);
-        bridge3el.addAP(2, new Point3d(), APC3EL);
-        bridge3el.addAP(0, new Point3d(), apcA);
-        bridge3el.addAP(1, new Point3d(), apcA);
-        bridge3el.addAP(2, new Point3d(), apcA);
-        libFrags.add(bridge3el);
-        
-        // We do not really need multiple fragments for each class, but
-        // these may turn out useful in the future.
-        Fragment bridge3elN = new Fragment(33);
-        IAtom a3N_0 = new Atom("N", new Point3d());
-        IAtom a3N_1 = new Atom("N", new Point3d());
-        bridge3elN.addAtom(a3N_0);
-        bridge3elN.addAtom(a3N_1);
-        bridge3elN.addBond(new Bond(a3N_0, a3N_1, IBond.Order.SINGLE));
-        bridge3elN.addAP(0, new Point3d(), APC3EL);
-        bridge3elN.addAP(1, new Point3d(), APC3EL);
-        bridge3elN.addAP(0, new Point3d(), apcA);
-        libFrags.add(bridge3elN);
         
         APClass APC4EL = APClass.make("4el:0");
         Fragment bridge4el = new Fragment(4);
@@ -1088,31 +1022,45 @@ public class GraphOperationsTest {
         bridge4el.addAP(3, new Point3d(), apcA);
         libFrags.add(bridge4el);
         
+        HashMap<APClass,APClass> cappingRules = new HashMap<APClass,APClass>();
+        cappingRules.put(apcA, hyd);
+        
+        ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
+        Fragment capH = new Fragment();
+        capH.addAtom(new Atom("H", new Point3d()));
+        capH.addAP(0, new Point3d(1.0, 0, 0), hyd);
+        cappingGroups.add(capH);
+        
+        HashMap<APClass,ArrayList<APClass>> rcCpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        rcCpMap.put(apcA, new ArrayList<APClass>(Arrays.asList(APC4EL)));
+        
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
         FragmentSpace fs = new FragmentSpace(fsp,
                 new ArrayList<Vertex>(),
                 libFrags,
-                new ArrayList<Vertex>(), 
-                cpMap, 
-                new HashMap<APClass,APClass>(), 
+                cappingGroups, 
+                new HashMap<APClass,ArrayList<APClass>>(), 
+                cappingRules, 
                 new HashSet<APClass>(),
-                cpMap);
-        fs.setAPclassBasedApproach(true);
+                rcCpMap); 
+        //NB: a non-empty rcCpMap is enough to trigger the automated recognition
+        // that we are within the class-based approach.
         
         // Then, some GA-parameters
         GAParameters gaParams = new GAParameters();
         gaParams.setParameters(new RingClosureParameters());
         gaParams.setRandomizer(new Randomizer(1L));
         
-        //
-        // all aps are symmetric
-        //
         SmilesParser parser = new SmilesParser(chemBuilder);
         IAtomContainer benzene = parser.parseSmiles("c1ccccc1");
+        MoleculeUtils.explicitHydrogens(benzene);
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(benzene);
         Fragment benzeneScaffold = new Fragment(benzene, BBType.FRAGMENT);
         for (int i= 0; i<6; i++)
         {
-            benzeneScaffold.addAP(i, new Point3d(), apcA);
+            EAUtilsTest.replaceHatomWithAP(benzeneScaffold, i, apcA);
         }
         benzeneScaffold.setVertexId(123);
         DGraph graph = new DGraph();
@@ -1121,55 +1069,14 @@ public class GraphOperationsTest {
         assertEquals(0, graph.getRingCount());
         GraphOperations.addFusedRing(benzeneScaffold, mnt, true, fs, gaParams);
         
-        //TODO-gg del
-        Logger logger = Logger.getLogger("DummyLogger");
-        Randomizer rng = new Randomizer();
-        DenoptimIO.writeGraphToSDF(new File("/tmp/fused_rings.sdf"), graph, false, true, logger, rng);
-        
         assertEquals(3, graph.getRingCount());
-       
-       
-        //
-        // Test handling of intra-fragment symmetry (i.e., symmetric APs)
-        //
-        IAtomContainer naphtene = parser.parseSmiles("c1ccccc1c1ccccc1");
-        Fragment naphteneScaffold = new Fragment(naphtene, BBType.FRAGMENT);
-        naphteneScaffold.addAP(0, new Point3d(), apcA);
-        naphteneScaffold.addAP(1, new Point3d(), apcB);
-        naphteneScaffold.addAP(2, new Point3d(), apcA);
-        naphteneScaffold.addAP(3, new Point3d(), apcB);
-        naphteneScaffold.addAP(4, new Point3d(), apcA);
-        naphteneScaffold.addAP(8, new Point3d(), apcC);
-        naphteneScaffold.addAP(9, new Point3d(), apcC);
-        naphteneScaffold.addAP(10, new Point3d(), apcC);
-        naphteneScaffold.setVertexId(321);
-        graph = new DGraph();
-        graph.addVertex(naphteneScaffold);
-        
-        assertEquals(0, graph.getRingCount());
-        GraphOperations.addFusedRing(naphteneScaffold, mnt, true, fs, gaParams);
-        
-        //TODO-gg del
-        DenoptimIO.writeGraphToSDF(new File("/tmp/fused_rings.sdf"), graph, true, true, logger, rng);
-        
-        assertEquals(2, graph.getRingCount());
-       
-        
-        //TODO-gg try 3el and 4el
-        /*
-        SmilesParser parser = new SmilesParser(chemBuilder);
-        IAtomContainer benzene = parser.parseSmiles("c1ccccc1");
-        Fragment benzeneScaffold = new Fragment(benzene, BBType.FRAGMENT);
-        for (int i= 0; i<6; i++)
+        int numSiAtoms = 0;
+        for (Vertex v : graph.getVertexList())
         {
-            benzeneScaffold.addAP(i, new Point3d(), apc);
+            numSiAtoms = numSiAtoms + MoleculeUtils.countAtomsOfElement(
+                    v.getIAtomContainer(), "Si");
         }
-        benzeneScaffold.setVertexId(123);
-        
-        DGraph graph = new DGraph();
-        graph.addVertex(benzeneScaffold);
-         */
-        
+        assertEquals(12, numSiAtoms);
     }
     
 //------------------------------------------------------------------------------

@@ -424,7 +424,8 @@ public class FragmentSpace
         setFragmentLibrary(fragLib);
         setCappingLibrary(cappLib);
         setCompatibilityMatrix(cpMap);
-        apClassBasedApproch = cpMap.size()>0;
+        apClassBasedApproch = (cpMap!=null && cpMap.size()>0)
+                || (rcCpMap!=null && rcCpMap.size()>0);
         setCappingMap(capMap);
         setForbiddenEndList(forbEnds);
         setRCCompatibilityMatrix(rcCpMap);
