@@ -1326,6 +1326,7 @@ public class EAUtilsTest
             assertEquals(6, involvedAPs.size());
         }
        
+        
         //
         // Case 3: Test handling of intra-fragment symmetry (i.e., symmetric APs)
         // but NO request to project on symmetric APs
@@ -1422,6 +1423,7 @@ public class EAUtilsTest
         assertEquals(2, sizesCount[1]);
         assertEquals(3, sizesCount[2]);
         assertEquals(0, sizesCount[3]);
+        
         
         //
         // Case 5: mix symmetric and asymmetric and do request to project on symmetric APs
@@ -1798,38 +1800,166 @@ public class EAUtilsTest
         assertTrue(vertexUsageCounts.containsKey(fragF3.getVertexId()));
         assertEquals(1, vertexUsageCounts.get(fragF3.getVertexId()));
         
-        //TODO-gg add this when we'll be working also with non-aromatic systems
-        /*
+        
         //
-        // Case ?: multiple APs on a bridgehead
+        // Case 10: aliphatic ring fusion sites
         //
-//         This is the vertex we work with (NB: A, B, C are APClasses)
 //          
-//               A   A   A   A
-//                \ /     \ /     
-//              3--4       11-10    
-//             /    \     /    \
-//            2      5---6      9 
-//             \    /     \    /
-//              1--0       7--8
-//                           
-//         
-        mol = parser.parseSmiles("C1CCCC1C1CCCCC1");
+//               A   A   A   A                       25 
+//                \ /     \ /                       /   \
+//           (O)3--4       11-10    13==14(N) 18--19(O)  24
+//             /    \     /    \    /    \    /    |     |
+//            2      5---6      9--12    15--17    20   23
+//             \    /     \    /     \  /      \  / \   /
+//              1--0(S) (N)7--8       16       (N)21 22
+//                        /  / \      / \      /     / \
+//                       A  A   A     A  A    A     A   A
+////
+//                                                   A     A
+//                                                   41    44    46-47
+//      A   A   A   A                       25      / \   / \   /    \
+//       \ /     \ /                       /   \   39-40-42-43-45    48  52
+//  (O)3--4       11-10    13==14(N) 18--19(O) 24 /              \   /  / \
+//    /    \     /    \    /    \    /    |     |/                49---50-51-53-54
+//   2      5---6      9--12    15--17    20   23-26-27           A     A     |  |
+//    \    /     \    /     \  /      \  / \   /   |  |                      56-55
+//     1--0(S) (N)7--8       16       (N)21 22    29-28-30-31   35-36         A 
+//               /  / \      / \      /     / \    A     |  |  /    \
+//              A  A   A     A  A    A     A   A        33-32-34    37
+//                                                       A      \  /
+//                                                               38
+//                                                               A      
+//
+        
+        mol = parser.parseSmiles("S1CCOCC1C1NCC(CC1)C1C=NC(C1)C1CC2C(N1)CC(CC2)"
+                + "(C1CC(C1)C1CC(C1)C1CCCC1)" // branch with two 4-member rings
+                + "C1C(C1)C1C(C1)C1CCCC1C1C(C1)C1CCC1"); // branch with 3-member rings
         MoleculeUtils.explicitHydrogens(mol);
         sdg.generateCoordinates(mol);
         frag = new Fragment(mol, BBType.FRAGMENT);
         replaceHatomWithAP(frag, 4, apcA);
-        replaceHatomWithAP(frag, 4, apcB);
-        replaceHatomWithAP(frag,11, apcC);
-        replaceHatomWithAP(frag,11, apcC);
+        replaceHatomWithAP(frag, 4, apcA);
+        replaceHatomWithAP(frag, 7, apcA);
+        replaceHatomWithAP(frag, 8, apcA);
+        replaceHatomWithAP(frag, 8, apcA);
+        replaceHatomWithAP(frag, 11, apcA);
+        replaceHatomWithAP(frag, 11, apcA);
+        replaceHatomWithAP(frag, 16, apcA);
+        replaceHatomWithAP(frag, 16, apcA);
+        replaceHatomWithAP(frag, 21, apcA);
+        replaceHatomWithAP(frag, 22, apcA);
+        replaceHatomWithAP(frag, 22, apcA);
+        replaceHatomWithAP(frag, 29, apcA);
+        replaceHatomWithAP(frag, 33, apcA);
+        replaceHatomWithAP(frag, 38, apcA);
+        replaceHatomWithAP(frag, 41, apcA);
+        replaceHatomWithAP(frag, 44, apcA);
+        replaceHatomWithAP(frag, 49, apcA);
+        replaceHatomWithAP(frag, 50, apcA);
+        replaceHatomWithAP(frag, 56, apcA);
         frag.setVertexId(321);
         graph = new DGraph();
         graph.addVertex(frag);
         
         combinations = EAUtils.searchRingFusionSites(graph, fragSpace, false, logger, rng);
        
-        assertEquals(?, combinations.size());
-        */
+        assertEquals(25, combinations.size());
+        apUsageCounts = new int[20];
+        countTypes = new HashMap<String,Integer>();
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            for (RelatedAPPair pair : comb)
+            {
+                apUsageCounts[pair.apA.getIndexInOwner()] = 
+                        apUsageCounts[pair.apA.getIndexInOwner()] + 1;
+                apUsageCounts[pair.apB.getIndexInOwner()] = 
+                        apUsageCounts[pair.apB.getIndexInOwner()] + 1;
+                if (countTypes.containsKey(pair.property))
+                    countTypes.put(pair.property, countTypes.get(pair.property)+1);
+                else 
+                    countTypes.put(pair.property, 1);
+            }
+        }
+        
+        assertEquals(3, apUsageCounts[0]); // AP on atm 4
+        assertEquals(3, apUsageCounts[1]); // AP on atm 4
+        assertEquals(4, apUsageCounts[2]); // AP on atm 7
+        assertEquals(3, apUsageCounts[3]); // AP on atm 8
+        assertEquals(3, apUsageCounts[4]); // AP on atm 8
+        assertEquals(2, apUsageCounts[5]); // AP on atm 11
+        assertEquals(2, apUsageCounts[6]); // AP on atm 11
+        assertEquals(3, apUsageCounts[7]); // AP on atm 16
+        assertEquals(3, apUsageCounts[8]); // AP on atm 16
+        assertEquals(4, apUsageCounts[9]); // AP on atm 21
+        assertEquals(3, apUsageCounts[10]); // AP on atm 22
+        assertEquals(3, apUsageCounts[11]); // AP on atm 22
+        assertEquals(3, apUsageCounts[12]); // AP on atm 29
+        assertEquals(2, apUsageCounts[13]); // AP on atm 33
+        assertEquals(1, apUsageCounts[14]); // AP on atm 38
+        assertEquals(3, apUsageCounts[15]); // AP on atm 41
+        assertEquals(2, apUsageCounts[16]); // AP on atm 44
+        assertEquals(1, apUsageCounts[17]); // AP on atm 49 [49,50] is not a match because it is not -@
+        assertEquals(1, apUsageCounts[18]); // AP on atm 50
+        assertEquals(1, apUsageCounts[19]); // AP on atm 56
+        assertEquals(2, countTypes.get("aliph2atm")); //WARNING: hard code type name!
+        assertEquals(2, countTypes.get("aliph3atm")); //WARNING: hard code type name!
+        assertEquals(6, countTypes.get("aliph4atm_6+6")); //WARNING: hard code type name!
+        assertEquals(4, countTypes.get("aliph4atm_6+5")); //WARNING: hard code type name!
+        assertEquals(2, countTypes.get("aliph4atm_6+4")); //WARNING: hard code type name!
+        assertEquals(2, countTypes.get("aliph4atm_6+3")); //WARNING: hard code type name!
+        assertEquals(2, countTypes.get("aliph4atm_5+5")); //WARNING: hard code type name!
+        assertEquals(1, countTypes.get("aliph4atm_5+4")); //WARNING: hard code type name!
+        assertEquals(1, countTypes.get("aliph4atm_5+3")); //WARNING: hard code type name!
+        assertEquals(1, countTypes.get("aliph4atm_4+4")); //WARNING: hard code type name!
+        assertEquals(1, countTypes.get("aliph4atm_4+3")); //WARNING: hard code type name!
+        assertEquals(1, countTypes.get("aliph4atm_3+3")); //WARNING: hard code type name!
+        assertFalse(countTypes.containsKey("2el2atm")); //WARNING: hard code type name!
+        assertFalse(countTypes.containsKey("3el3atm")); //WARNING: hard code type name!
+        assertFalse(countTypes.containsKey("4el4atm_6+6")); //WARNING: hard code type name!
+        assertFalse(countTypes.containsKey("4el4atm_6+5")); //WARNING: hard code type name!
+        assertFalse(countTypes.containsKey("4el4atm_5+5")); //WARNING: hard code type name! 
+
+        
+        //
+        // Case 11: avoid combinatorial explosion
+        // We trigger combinatorial explosion by enabling symmetry in a system 
+        // with many symmetric APs.
+        //
+        mol = parser.parseSmiles("C1CCCCCCCCC1");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 1, apcA);
+        replaceHatomWithAP(frag, 2, apcA);
+        replaceHatomWithAP(frag, 3, apcA);
+        replaceHatomWithAP(frag, 4, apcA);
+        replaceHatomWithAP(frag, 5, apcA);
+        replaceHatomWithAP(frag, 6, apcA);
+        replaceHatomWithAP(frag, 7, apcA);
+        replaceHatomWithAP(frag, 8, apcA);
+        replaceHatomWithAP(frag, 9, apcA);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 1, apcA);
+        replaceHatomWithAP(frag, 2, apcA);
+        replaceHatomWithAP(frag, 3, apcA);
+        replaceHatomWithAP(frag, 4, apcA);
+        replaceHatomWithAP(frag, 5, apcA);
+        replaceHatomWithAP(frag, 6, apcA);
+        replaceHatomWithAP(frag, 7, apcA);
+        replaceHatomWithAP(frag, 8, apcA);
+        replaceHatomWithAP(frag, 9, apcA);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        
+        // NB: 50 is given by the hard-coded limit to the number of combinations
+        assertEquals(50, combinations.size());
+        // NB: 6 is given by the hard-coded limit to the max number of ring 
+        // fusions on a single vertex.
+        assertEquals(6, combinations.get(0).size());
     }
 
 //------------------------------------------------------------------------------

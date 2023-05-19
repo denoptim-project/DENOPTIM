@@ -2350,7 +2350,7 @@ public class EAUtils
      */
     
     //NB: we return a List to retain ordering of the items, but the list must
-    // not contain redundancies, i.e., lists of AP pairs that are make of the 
+    // not contain redundancies, i.e., lists of AP pairs that are made of the 
     // same set of AP pairs.
     public static List<List<RelatedAPPair>> searchRingFusionSites(
             DGraph graph, FragmentSpace fragSpace, boolean projectOnSymmetricAPs, 
@@ -2414,6 +2414,55 @@ public class EAUtils
                 "[a;D3]1aaaa1~a1[a;D3]aaa1",
                 new int[]{0,6}));
 
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph2atm",
+                "[A;R1]~@[A;R1]",
+                new int[]{0,1}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph3atm",
+                "[A;R1]~[*;R2]~[A;R1]",
+                new int[]{0,2}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_6+6",
+                "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~[*]~1",
+                new int[]{0,7}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_6+5",
+                "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~1",
+                new int[]{0,7}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_6+4",
+                "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
+                new int[]{0,7}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_6+3",
+                "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
+                new int[]{0,7}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_5+5",
+                "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~1",
+                new int[]{0,6}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_5+4",
+                "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
+                new int[]{0,6}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_5+3",
+                "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
+                new int[]{0,6}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_4+4",
+                "[A]~1[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
+                new int[]{0,5}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_4+3",
+                "[A]~1[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
+                new int[]{0,5}));
+        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
+                "aliph4atm_3+3",
+                "[A]~1[*]~[*]~1~[*]~1[A]~[*]~1",
+                new int[]{0,4}));
+
         Map<String, String> smarts = new HashMap<String, String>();
         for (BridgeHeadFindingRule rule : bridgeHeadFindingRUles)
         {
@@ -2421,6 +2470,10 @@ public class EAUtils
         }
         
         ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
+        if (msq.hasProblems())
+        {
+            throw new DENOPTIMException(msq.getMessage());
+        }
         Map<SymmetricSetWithMode,List<RelatedAPPair>> symmRelatedBridgeHeadAPs = 
                 new HashMap<SymmetricSetWithMode,List<RelatedAPPair>>();
         List<RelatedAPPair> symBridgeHeadAPs = new ArrayList<RelatedAPPair>();
@@ -2482,99 +2535,61 @@ public class EAUtils
                 long vrtxIdB = (Long)
                         bhB.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
                 
-                // Randomize selection of which AP until we get one we can use.
-                int apIdA = -1;
+                // Each AP on each side can be used
+                // NB: these are dummy copies stores in the atom properties
+                // for easy recovery independently on chances of atom list.
+                // Therefore, these APs are NOT the actual APs of the vertex!
                 @SuppressWarnings("unchecked")
-                List<AttachmentPoint> apsOnA = new ArrayList<AttachmentPoint>(
-                        (List<AttachmentPoint>) bhA.getProperty(
-                                DENOPTIMConstants.ATMPROPAPS));
-                int numberOfAPsOnA = apsOnA.size();
-                for (int iAPA=0; iAPA<numberOfAPsOnA; iAPA++)
-                {
-                    // NB: this is a dummy copy of the actual AP, not a 
-                    // reference to it!
-                    AttachmentPoint ap = apsOnA.get(rng.nextInt(apsOnA.size()));
-                    if (canBeUsedForRingFusion(ap, originalVertexIDs, fragSpace))
-                    {
-                        apIdA = ap.getID();
-                        break;
-                    }
-                    apsOnA.remove(ap);
-                }
-                int apIdB = -1; 
+                List<AttachmentPoint> apsOnA = (List<AttachmentPoint>) 
+                        bhA.getProperty(DENOPTIMConstants.ATMPROPAPS);
                 @SuppressWarnings("unchecked")
-                List<AttachmentPoint> apsOnB = new ArrayList<AttachmentPoint>(
-                        (List<AttachmentPoint>) bhB.getProperty(
-                                DENOPTIMConstants.ATMPROPAPS));
-                int numberOfAPsOnB = apsOnB.size();
-                for (int iAPB=0; iAPB<numberOfAPsOnB; iAPB++)
+                List<AttachmentPoint> apsOnB = (List<AttachmentPoint>) 
+                        bhB.getProperty(DENOPTIMConstants.ATMPROPAPS);
+                for (int iAPA=0; iAPA<apsOnA.size(); iAPA++)
                 {
-                    // NB: this is a dummy copy of the actual AP, not a 
-                    // reference to it!
-                    AttachmentPoint ap = apsOnB.get(rng.nextInt(apsOnB.size()));
-                    if (canBeUsedForRingFusion(ap, originalVertexIDs, fragSpace))
+                    AttachmentPoint copyOfApA = apsOnA.get(iAPA);
+                    if (!canBeUsedForRingFusion(copyOfApA, originalVertexIDs, 
+                            fragSpace))
+                        continue;
+                    for (int iAPB=0; iAPB<apsOnB.size(); iAPB++)
                     {
-                        apIdB = ap.getID();
-                        break;
-                    }
-                    apsOnB.remove(ap);
-                }
-                if (apIdA<0 || apIdB<0)
-                    continue;
+                        AttachmentPoint copyOfApB = apsOnB.get(iAPB);
+                        if (!canBeUsedForRingFusion(copyOfApB, originalVertexIDs, 
+                                fragSpace))
+                            continue;
+                        
+                        // Now take the references to the actual APs
+                        AttachmentPoint apA = tmpGraph.getVertexWithId(vrtxIdA)
+                                .getAPWithId(copyOfApA.getID());
+                        AttachmentPoint apB = tmpGraph.getVertexWithId(vrtxIdB)
+                                .getAPWithId(copyOfApB.getID());
+                        if (apA==null || apB==null)
+                            continue;
                 
-                // Now take the references to the actual APs
-                AttachmentPoint apA = tmpGraph.getVertexWithId(vrtxIdA)
-                        .getAPWithId(apIdA);
-                AttachmentPoint apB = tmpGraph.getVertexWithId(vrtxIdB)
-                        .getAPWithId(apIdB);
-                if (apA==null || apB==null)
-                    continue;
-                
-                // Now we have identified a pair of APs suitable to ring fusion
-                RelatedAPPair pair = new RelatedAPPair(apA, apB, rule.getName());
-                
-                //Record symmetric relations
-                SymmetricAPs symInA = apA.getOwner().getSymmetricAPs(apA);
-                SymmetricAPs symInB = apB.getOwner().getSymmetricAPs(apB);
-                if (symInA.size()!=0 && symInB.size()!=0)
-                {
-                    if (symInA==symInB)
-                    {
-                        SymmetricSetWithMode key = new SymmetricSetWithMode(
-                                symInA, pair.property);
-                        if (symmRelatedBridgeHeadAPs.containsKey(key))
+                        // Now we have identified a pair of APs suitable to ring fusion
+                        RelatedAPPair pair = new RelatedAPPair(apA, apB, 
+                                rule.getName());
+                        
+                        //Record symmetric relations
+                        SymmetricAPs symInA = apA.getOwner().getSymmetricAPs(apA);
+                        SymmetricAPs symInB = apB.getOwner().getSymmetricAPs(apB);
+                        if (symInA.size()!=0 && symInB.size()!=0)
                         {
-                            symmRelatedBridgeHeadAPs.get(key).add(pair);
+                            if (symInA==symInB)
+                            {
+                                storePairsSymmetricRelations(pair, symInA,
+                                        symmRelatedBridgeHeadAPs);
+                            } else {
+                                storePairsSymmetricRelations(pair, symInA,
+                                        symmRelatedBridgeHeadAPs);
+                                storePairsSymmetricRelations(pair, symInB,
+                                        symmRelatedBridgeHeadAPs);
+                            }
+                            symBridgeHeadAPs.add(pair);
                         } else {
-                            List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
-                            lst.add(pair);
-                            symmRelatedBridgeHeadAPs.put(key, lst);
-                        }
-                    } else {
-                        SymmetricSetWithMode keyA = new SymmetricSetWithMode(
-                                symInA, pair.property);
-                        if (symmRelatedBridgeHeadAPs.containsKey(keyA))
-                        {
-                            symmRelatedBridgeHeadAPs.get(keyA).add(pair);
-                        } else {
-                            List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
-                            lst.add(pair);
-                            symmRelatedBridgeHeadAPs.put(keyA, lst);
-                        }
-                        SymmetricSetWithMode keyB = new SymmetricSetWithMode(
-                                symInB, pair.property);
-                        if (symmRelatedBridgeHeadAPs.containsKey(keyB))
-                        {
-                            symmRelatedBridgeHeadAPs.get(keyB).add(pair);
-                        } else {
-                            List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
-                            lst.add(pair);
-                            symmRelatedBridgeHeadAPs.put(keyB, lst);
+                            asymBridgeHeadAPs.add(pair);
                         }
                     }
-                    symBridgeHeadAPs.add(pair);
-                } else {
-                    asymBridgeHeadAPs.add(pair);
                 }
             }
         }
@@ -2597,18 +2612,15 @@ public class EAUtils
                             symmRelatedBridgeHeadAPs.get(key);
                     
                     // We try to get the biggest combination (k is the size)
-                    for (int k=chosenSymSet.size(); k>0; k--)
+                    // but we do limit to avoid combinatorial explosion.
+                    //TODO: make limit to max number of ring closures per vertex tuneable?
+                    for (int k=Math.min(chosenSymSet.size(), 6); k>0; k--)
                     {
                         // Generate combinations that use non-overlapping pairs of APs
-                        // NB: this combinatorial generator retains the 
-                        // sequence of generated subsets (important for reproducibility)
-                        List<List<RelatedAPPair>> combs = Generator.combination(
-                                chosenSymSet)
-                                .simple(k)
-                                .stream()
-                                .limit(100) //Prevent explosion!!! //TODO-gg make tuneable
-                                .filter(pair -> !apPairsAreOverlapping(pair))
-                                .collect(Collectors.<List<RelatedAPPair>>toList());
+                        List<List<RelatedAPPair>> combs = combineRelatedAPPair(
+                                chosenSymSet, k, 50);
+                        //TODO: make limit of combinations tuneable?
+                        
                         if (combs.size()>0)
                         {
                             // We keep only combinations that are not already 
@@ -2650,10 +2662,6 @@ public class EAUtils
             single.add(pair);
             candidateBridgeHeadAPPairs.add(single);
         }
-
-        //TODO-gg do we limit to APs of this vertex (on one side to still allow forming bridges involving multiple vertexes)
-        //Vertex headVrtx = tmpGraph.getVertexAtPosition(originalGraph.indexOf(
-        //        vertex));
         
         // Project ring fusions into the actual graph (considering symmetry)
         for (List<RelatedAPPair> combOnTmpGraph : candidateBridgeHeadAPPairs)
@@ -2695,6 +2703,119 @@ public class EAUtils
     
 //------------------------------------------------------------------------------
     
+    private static List<List<RelatedAPPair>> combineRelatedAPPair(
+            List<RelatedAPPair> pool, int k, int limit)
+    {
+        List<RelatedAPPair> tmp = new ArrayList<RelatedAPPair>();
+        List<List<RelatedAPPair>> allCombs = new ArrayList<List<RelatedAPPair>>();
+        combineRelatedAPPairUtil(pool, 0, k, tmp, allCombs, limit);
+        return allCombs;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static void combineRelatedAPPairUtil(List<RelatedAPPair> pool, 
+            int left, int k, 
+            List<RelatedAPPair> tmp,
+            List<List<RelatedAPPair>> allCombs, int limit)
+    {
+        // PRevent combinatorial explosion: stop if the number of combinations
+        // grown above the limit
+        if (allCombs.size()>=limit)
+            return;
+        
+        // For last iteration: save answer
+        if (k == 0) 
+        {
+            if (!apPairsAreOverlapping(tmp))
+            {   
+                List<RelatedAPPair> oneComb = new ArrayList<RelatedAPPair>(tmp);
+                allCombs.add(oneComb);
+            }
+            return;
+        }
+        // In normal iteration, do recursion
+        for (int i=left; i<pool.size(); ++i)
+        {
+            RelatedAPPair next = pool.get(i);
+            if (shareAPs(next, tmp))
+            {
+                continue;
+            }
+            tmp.add(next);
+            combineRelatedAPPairUtil(pool, i + 1, k-1, tmp, allCombs, limit);
+            tmp.remove(tmp.size() - 1);
+        }
+    }
+    
+//------------------------------------------------------------------------------    
+
+    private static void storePairsSymmetricRelations(RelatedAPPair pair, 
+            SymmetricAPs symAPs, 
+            Map<SymmetricSetWithMode,List<RelatedAPPair>> storage)
+    {
+        SymmetricSetWithMode key = new SymmetricSetWithMode(symAPs, 
+                pair.property);
+        if (storage.containsKey(key))
+        {
+            storage.get(key).add(pair);
+        } else {
+            List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
+            lst.add(pair);
+            storage.put(key, lst);
+        }
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Evaluates if any pair of {@link AttachmentPoint} pairs involve the 
+     * same {@link AttachmentPoint}, i.e., if there is overlap between any pair 
+     * of pairs.
+     * @param pairs the collection of pairs to evaluate for overlap.
+     * @return <code>true</code> if there is any {@link AttachmentPoint} that
+     * is present in more than one pair visited by the iterations.
+     */
+    public static Boolean apPairsAreOverlapping(Iterable<RelatedAPPair> pairs)
+    {
+        Set<AttachmentPoint> aps = new HashSet<AttachmentPoint>();
+        
+        for (RelatedAPPair pair : pairs)
+        {
+            if (aps.contains(pair.apA) || aps.contains(pair.apB))
+            {
+                return true;
+            }
+            aps.add(pair.apA);
+            aps.add(pair.apB);
+        }
+        return false;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Evaluates if a {@link RelatedAPPair} involves the 
+     * same {@link AttachmentPoint} present in a collection.
+     * @param pairA the pair to test.
+     * @param lstB the collection.
+     * @return <code>true</code> if any {@link AttachmentPoint} of the given 
+     * pair is present in the collection.
+     */
+    public static Boolean shareAPs(RelatedAPPair pairA, 
+            Iterable<RelatedAPPair> lstB)
+    {
+        Set<AttachmentPoint> aps = new HashSet<AttachmentPoint>();
+        for (RelatedAPPair pairB : lstB)
+        {
+            aps.add(pairB.apA);
+            aps.add(pairB.apB);
+        }
+        return aps.contains(pairA.apA) || aps.contains(pairA.apB);
+    }
+    
+//------------------------------------------------------------------------------  
+    
     /**
      * Decides if an {@link AttachmentPoint} can be considered for making a
      * ring fusion operation,
@@ -2729,31 +2850,7 @@ public class EAUtils
         }               
         return false;
     }
-
-//------------------------------------------------------------------------------
+  
+//------------------------------------------------------------------------------  
     
-    /**
-     * Evaluates if any pair of {@link AttachmentPoint} pairs involve the 
-     * same {@link AttachmentPoint}, i.e., if there is overlap between any pair 
-     * of pairs.
-     * @param pairs the collection of pairs to evaluate for overlap.
-     * @return <code>true</code> if there is any {@link AttachmentPoint} that
-     * is present in more than one pair visited by the iterations.
-     */
-    public static Boolean apPairsAreOverlapping(Iterable<RelatedAPPair> pairs)
-    {
-        Set<AttachmentPoint> aps = new HashSet<AttachmentPoint>();
-        for (RelatedAPPair pair : pairs)
-        {
-            if (aps.contains(pair.apA) || aps.contains(pair.apB))
-            {
-                return true;
-            }
-            aps.add(pair.apA);
-            aps.add(pair.apB);
-        }
-        return false;
-    }
-    
-//------------------------------------------------------------------------------    
 }

@@ -72,8 +72,9 @@ public class RelatedAPPair
     @Override
     public String toString()
     {
-        return apA.getAtomPositionNumber()+"-"+apB.getAtomPositionNumber()
-        + ":"+property;
+        return apA.getAtomPositionNumber() + ":" + apA.getID() + "-" 
+                + apB.getAtomPositionNumber() + ":" + apB.getID()
+                + "_" + property;
     }
     
 //------------------------------------------------------------------------------
