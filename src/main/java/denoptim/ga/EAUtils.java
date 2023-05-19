@@ -2364,7 +2364,7 @@ public class EAUtils
         // a crude way because we only need the connectivity.
         DGraph tmpGraph = graph.clone();
         
-        // Keep trak of which vertexes come from the original graph. We need
+        // Keep track of which vertexes come from the original graph. We need
         // to distinguish them from the capping groups we add here.
         Set<Long> originalVertexIDs = new HashSet<Long>();
         tmpGraph.getVertexList().stream()
@@ -2477,43 +2477,52 @@ public class EAUtils
                             + "models of graph objects must have the "
                             + DENOPTIMConstants.ATMPROPVERTEXID + " property.");
                 
-                //TODOgg deal with APClass compatibility
-                //TODO-gg WARNING: assumption that only one AP for atom!!!!
-                //TODO-gg randomize choice of which one
-                
                 long vrtxIdA = (Long)
                         bhA.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
                 long vrtxIdB = (Long)
                         bhB.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+                
+                // Randomize selection of which AP until we get one we can use.
                 int apIdA = -1;
-                for (AttachmentPoint ap : (List<AttachmentPoint>) bhA.getProperty(
-                        DENOPTIMConstants.ATMPROPAPS))
+                @SuppressWarnings("unchecked")
+                List<AttachmentPoint> apsOnA = new ArrayList<AttachmentPoint>(
+                        (List<AttachmentPoint>) bhA.getProperty(
+                                DENOPTIMConstants.ATMPROPAPS));
+                int numberOfAPsOnA = apsOnA.size();
+                for (int iAPA=0; iAPA<numberOfAPsOnA; iAPA++)
                 {
-                    // AP is available or used by a capping group added in this method
-                    if (ap.isAvailableThroughout() ||
-                            !originalVertexIDs.contains(ap.getLinkedAPThroughout()
-                                    .getOwner().getVertexId()))
+                    // NB: this is a dummy copy of the actual AP, not a 
+                    // reference to it!
+                    AttachmentPoint ap = apsOnA.get(rng.nextInt(apsOnA.size()));
+                    if (canBeUsedForRingFusion(ap, originalVertexIDs, fragSpace))
                     {
                         apIdA = ap.getID();
                         break;
                     }
+                    apsOnA.remove(ap);
                 }
-                int apIdB = -1;
-                for (AttachmentPoint ap : (List<AttachmentPoint>) bhB.getProperty(
-                        DENOPTIMConstants.ATMPROPAPS))
+                int apIdB = -1; 
+                @SuppressWarnings("unchecked")
+                List<AttachmentPoint> apsOnB = new ArrayList<AttachmentPoint>(
+                        (List<AttachmentPoint>) bhB.getProperty(
+                                DENOPTIMConstants.ATMPROPAPS));
+                int numberOfAPsOnB = apsOnB.size();
+                for (int iAPB=0; iAPB<numberOfAPsOnB; iAPB++)
                 {
-                    // AP is available or used by a capping group added in this method
-                    if (ap.isAvailableThroughout() ||
-                            !originalVertexIDs.contains(ap.getLinkedAPThroughout()
-                                    .getOwner().getVertexId()))
+                    // NB: this is a dummy copy of the actual AP, not a 
+                    // reference to it!
+                    AttachmentPoint ap = apsOnB.get(rng.nextInt(apsOnB.size()));
+                    if (canBeUsedForRingFusion(ap, originalVertexIDs, fragSpace))
                     {
                         apIdB = ap.getID();
                         break;
                     }
+                    apsOnB.remove(ap);
                 }
                 if (apIdA<0 || apIdB<0)
                     continue;
                 
+                // Now take the references to the actual APs
                 AttachmentPoint apA = tmpGraph.getVertexWithId(vrtxIdA)
                         .getAPWithId(apIdA);
                 AttachmentPoint apB = tmpGraph.getVertexWithId(vrtxIdB)
@@ -2684,6 +2693,43 @@ public class EAUtils
         return result;
     } 
     
+//------------------------------------------------------------------------------
+    
+    /**
+     * Decides if an {@link AttachmentPoint} can be considered for making a
+     * ring fusion operation,
+     * i.e., attach a bridge on one AP and use another AP to close a ring.
+     * The condition to return <code>true</code> is that both these are 
+     * satisfied:
+     * <ul>
+     * <li>the AP is available (at any level of template embedding). This
+     * ignores any vertex that is added to saturate valences.</li>
+     * <li>the {@link APClass} of the AP allows ring closure, i.e., it is
+     * present in the ring-closing compatibility matrix.</li>
+     * </ul>
+     * @param ap the attachment point we want to analyze. Note this is 
+     * NOT the actual AP in the graph, but a copy of it that is stored
+     * in the IAtom properties!
+     * @param originalVertexIDs list of ID defining which vertex is from the 
+     * original graph. This is used to explode any vertex that has been 
+     * added on the graph to saturate valences.
+     * @param fs the fragment space containing the ring-closures compatibility 
+     * matrix.
+     * @return
+     */
+    private static boolean canBeUsedForRingFusion(AttachmentPoint ap,
+            Set<Long> originalVertexIDs, FragmentSpace fs)
+    {
+        if (ap.isAvailableThroughout()
+                || !originalVertexIDs.contains(
+                        ap.getLinkedAPThroughout().getOwner().getVertexId()))
+        {
+            if (fs.getRCCompatibilityMatrix().containsKey(ap.getAPClass()))
+                return true;
+        }               
+        return false;
+    }
+
 //------------------------------------------------------------------------------
     
     /**

@@ -888,12 +888,6 @@ public class EAUtilsTest
     {
         SmilesParser p = new SmilesParser(builder);
         IAtomContainer mol = p.parseSmiles("c1ccccc1OCN(CC)(C)[Ru](N)(N)C#O");
-
-        // Use this to make the molecule 2D for an easy visual inspection.
-        /*
-        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
-        sdg.generateCoordinates(mol);
-        */
         
         GAParameters settings = new GAParameters();
         
@@ -949,12 +943,6 @@ public class EAUtilsTest
         SmilesParser p = new SmilesParser(builder);
         IAtomContainer mol = p.parseSmiles(
                 "Oc1cc(O)cc(O)c1CN(CC)(CC)[Ru](N)(Nc1c(F)cc(F)cc1(Cl))C#O");
-
-        // Use this to make the molecule 2D for an easy visual inspection.
-        /*
-        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
-        sdg.generateCoordinates(mol);
-        */
         
         GAParameters settings = new GAParameters();
         
@@ -1148,13 +1136,6 @@ public class EAUtilsTest
         SmilesParser p = new SmilesParser(builder);
         IAtomContainer mol = p.parseSmiles(
                 "P123C(OC[SiH2]O1)(OC[SiH2]O2)OC[SiH2]O3");
-
-        /*
-        // In case you need to visualize, but note: two branches overlap in 2D!
-        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
-        sdg.generateCoordinates(mol);
-        */
-        
         GAParameters settings = new GAParameters();
         
         List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
@@ -1211,6 +1192,8 @@ public class EAUtilsTest
         APClass apcE = APClass.make("apcE:1");
         APClass apcF = APClass.make("apcF:1");
         APClass apcG = APClass.make("apcG:1");
+        APClass apcNotFusable = APClass.make("apcNotFusable:0");
+        APClass apcFusedBridge = APClass.make("apcFusedBridge:0");
         APClass hyd = APClass.make("hyd:1");
         
         // Utilities
@@ -1226,12 +1209,25 @@ public class EAUtilsTest
         capMap.put(apcE,hyd);
         capMap.put(apcF,hyd);
         capMap.put(apcG,hyd);
+        capMap.put(apcNotFusable,hyd);
         
         ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
         Fragment capH = new Fragment();
         capH.addAtom(new Atom("H", new Point3d()));
         capH.addAP(0, new Point3d(1.0, 0, 0), hyd);
         cappingGroups.add(capH);
+        
+        // Allows some ring closures via APClass compatibility
+        HashMap<APClass,ArrayList<APClass>> rcCMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        rcCMap.put(apcA, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
+        rcCMap.put(apcB, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
+        rcCMap.put(apcC, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
+        rcCMap.put(apcD, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
+        rcCMap.put(apcE, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
+        rcCMap.put(apcF, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
+        rcCMap.put(apcG, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
+        // NB: apcNotFusable is intentionally not added to RC-CPMap!
         
         FragmentSpaceParameters fsp = new FragmentSpaceParameters();
         FragmentSpace fragSpace = new FragmentSpace(fsp,
@@ -1240,13 +1236,12 @@ public class EAUtilsTest
                 cappingGroups, //H as capping
                 new HashMap<APClass,ArrayList<APClass>>(), 
                 capMap, new HashSet<APClass>(), 
-                new HashMap<APClass,ArrayList<APClass>>());
+                rcCMap);
         fragSpace.setAPclassBasedApproach(true);
         
         
         //
-        // Case 1: one benzene fragment with 6 APs all in same symmetric set, 
-        // but NO request to project on symmetric APs
+        // Case 0: APClass compatibility decides which APs can do ring fusion
         //
         SmilesParser parser = new SmilesParser(builder);
         IAtomContainer mol = parser.parseSmiles("c1ccccc1");
@@ -1254,14 +1249,41 @@ public class EAUtilsTest
         StructureDiagramGenerator sdg = new StructureDiagramGenerator();
         sdg.generateCoordinates(mol);
         Fragment frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 2, apcNotFusable);
+        replaceHatomWithAP(frag, 3, apcNotFusable);
+        replaceHatomWithAP(frag, 4, apcA);
+        replaceHatomWithAP(frag, 5, apcA);
+        DGraph graph = new DGraph();
+        graph.addVertex(frag);
+        
+        DenoptimIO.writeVertexToSDF("/tmp/frag.sdf", frag);
+
+        List<List<RelatedAPPair>> combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, false, logger, rng);
+        
+        assertEquals(1, combinations.size());
+        assertEquals(1, combinations.get(0).size());
+        assertEquals(2, combinations.get(0).get(0).apA.getIndexInOwner());
+        assertEquals(3, combinations.get(0).get(0).apB.getIndexInOwner());
+        
+        
+        //
+        // Case 1: one benzene fragment with 6 APs all in same symmetric set, 
+        // but NO request to project on symmetric APs
+        //
+        parser = new SmilesParser(builder);
+        mol = parser.parseSmiles("c1ccccc1");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
         for (int i= 0; i<6; i++)
         {
             replaceHatomWithAP(frag, i, apcA);
         }
-        DGraph graph = new DGraph();
+        graph = new DGraph();
         graph.addVertex(frag);
 
-        List<List<RelatedAPPair>> combinations = EAUtils.searchRingFusionSites(
+        combinations = EAUtils.searchRingFusionSites(
                 graph, fragSpace, false, logger, rng);
         
         assertEquals(6, combinations.size());
@@ -1320,7 +1342,6 @@ public class EAUtilsTest
 //         
         mol = parser.parseSmiles("c1ccccc1c1ccccc1");
         MoleculeUtils.explicitHydrogens(mol);
-        sdg = new StructureDiagramGenerator();
         sdg.generateCoordinates(mol);
         frag = new Fragment(mol, BBType.FRAGMENT);
         replaceHatomWithAP(frag, 0, apcA);
@@ -1417,7 +1438,6 @@ public class EAUtilsTest
 //         
         mol = parser.parseSmiles("c1ccccc1Oc1ccccc1");
         MoleculeUtils.explicitHydrogens(mol);
-        sdg = new StructureDiagramGenerator();
         sdg.generateCoordinates(mol);
         frag = new Fragment(mol, BBType.FRAGMENT);
         replaceHatomWithAP(frag, 0, apcA);
@@ -1482,7 +1502,6 @@ public class EAUtilsTest
 //         
         mol = parser.parseSmiles("c1ccccc1c1ccccc1");
         MoleculeUtils.explicitHydrogens(mol);
-        sdg = new StructureDiagramGenerator();
         sdg.generateCoordinates(mol);
         frag = new Fragment(mol, BBType.FRAGMENT);
         replaceHatomWithAP(frag, 0, apcA);
@@ -1592,7 +1611,6 @@ public class EAUtilsTest
 //
         mol = parser.parseSmiles("o1cccc1c1cc2c(cc1)c[n+]3c(c2)Nc(c3)[Ru]c1ccc(cc1)c1ccc(cc1)[Ru]c1ccc(N1)c1cnN(c1)");
         MoleculeUtils.explicitHydrogens(mol);
-        sdg = new StructureDiagramGenerator();
         sdg.generateCoordinates(mol);
         frag = new Fragment(mol, BBType.FRAGMENT);
         replaceHatomWithAP(frag, 1, apcA);
@@ -1779,6 +1797,39 @@ public class EAUtilsTest
         assertEquals(2, vertexUsageCounts.get(fragF2.getVertexId()));
         assertTrue(vertexUsageCounts.containsKey(fragF3.getVertexId()));
         assertEquals(1, vertexUsageCounts.get(fragF3.getVertexId()));
+        
+        //TODO-gg add this when we'll be working also with non-aromatic systems
+        /*
+        //
+        // Case ?: multiple APs on a bridgehead
+        //
+//         This is the vertex we work with (NB: A, B, C are APClasses)
+//          
+//               A   A   A   A
+//                \ /     \ /     
+//              3--4       11-10    
+//             /    \     /    \
+//            2      5---6      9 
+//             \    /     \    /
+//              1--0       7--8
+//                           
+//         
+        mol = parser.parseSmiles("C1CCCC1C1CCCCC1");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 4, apcA);
+        replaceHatomWithAP(frag, 4, apcB);
+        replaceHatomWithAP(frag,11, apcC);
+        replaceHatomWithAP(frag,11, apcC);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, false, logger, rng);
+       
+        assertEquals(?, combinations.size());
+        */
     }
 
 //------------------------------------------------------------------------------
