@@ -32,12 +32,14 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.ga.EAUtils;
 import denoptim.ga.GraphOperations;
 import denoptim.ga.XoverSite;
 import denoptim.graph.DGraph;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.io.DenoptimIO;
+import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
@@ -162,6 +164,7 @@ public class GeneOpsRunner extends ProgramTask
                     settings.getParameters(ParametersType.FS_PARAMS)));
         }
         
+        boolean done = false;
         if (mt != null)
         {
             Vertex v = getEmbeddedVertex(settings.mutationTarget,
@@ -169,7 +172,16 @@ public class GeneOpsRunner extends ProgramTask
             
             if (v == null)
             {
-                return;
+                List<Vertex> mutable = graph.getSelectedMutableSites(mt);
+                if (mutable.size()==0)
+                {
+                    logger.log(Level.INFO, "Graph has no mutable site of type '"
+                            + mt + "'. Mutation aborted.");
+                    return;
+                }
+                v = gaParams.getRandomizer().randomlyChooseOne(mutable);
+                logger.log(Level.INFO, "Randomly choosed vertex as target "
+                        + "for mutation '" + mt + "': " + v);
             }
              
             int apID = settings.idNewAP;
@@ -186,15 +198,18 @@ public class GeneOpsRunner extends ProgramTask
             v.setProperty(DENOPTIMConstants.STOREDVID, v.getVertexId());
             
             // NB: last boolean asks to ignore the growth probability
-            GraphOperations.performMutation(v,mt,true,
+            done = GraphOperations.performMutation(v, mt, true,
                     settings.idNewVrt, apID, new Monitor(), gaParams);
         } else {
             logger.log(Level.INFO, "Attempting mutation a random mutation on a "
                     + "random vertex");
-            GraphOperations.performMutation(graph,new Monitor(),gaParams);
+            done = GraphOperations.performMutation(graph, new Monitor(), gaParams);
         }
-        logger.log(Level.INFO, "Result of mutation:" + NL + graph.toString()+NL);
         
+        if (done)
+        {
+            logger.log(Level.INFO, "Result of mutation:" + NL + graph.toString()+NL);
+        } 
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(
                 settings.getLogger(),
                 settings.getRandomizer());
@@ -336,6 +351,11 @@ public class GeneOpsRunner extends ProgramTask
             }
             return outerVertex;
         } else {
+            if (embeddingPath==null)
+            {
+                logger.log(Level.INFO, "No mutation site specified.");
+                return null;
+            }
             int vid = embeddingPath[0];
             logger.log(Level.INFO, "Attempting '" + operation + "' on vertex " 
                     + embeddingPath[0]);

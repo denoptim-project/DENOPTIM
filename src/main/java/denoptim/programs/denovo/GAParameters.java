@@ -1428,6 +1428,7 @@ public class GAParameters extends RunTimeParameters
             if (!rcParams.allowRingClosures())
             {
                 excludedMutationTypes.add(MutationType.ADDRING);
+                excludedMutationTypes.add(MutationType.ADDFUSEDRING);
             }
         }
         

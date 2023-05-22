@@ -1239,6 +1239,7 @@ public class EAUtilsTest
                 rcCMap);
         fragSpace.setAPclassBasedApproach(true);
         
+        RingClosureParameters rcParams = new RingClosureParameters();
         
         //
         // Case 0: APClass compatibility decides which APs can do ring fusion
@@ -1255,11 +1256,9 @@ public class EAUtilsTest
         replaceHatomWithAP(frag, 5, apcA);
         DGraph graph = new DGraph();
         graph.addVertex(frag);
-        
-        DenoptimIO.writeVertexToSDF("/tmp/frag.sdf", frag);
 
         List<List<RelatedAPPair>> combinations = EAUtils.searchRingFusionSites(
-                graph, fragSpace, false, logger, rng);
+                graph, fragSpace, rcParams, false, logger, rng);
         
         assertEquals(1, combinations.size());
         assertEquals(1, combinations.get(0).size());
@@ -1284,7 +1283,7 @@ public class EAUtilsTest
         graph.addVertex(frag);
 
         combinations = EAUtils.searchRingFusionSites(
-                graph, fragSpace, false, logger, rng);
+                graph, fragSpace, rcParams, false, logger, rng);
         
         assertEquals(6, combinations.size());
         Set<AttachmentPoint> involvedAPs = new HashSet<AttachmentPoint>();
@@ -1306,7 +1305,7 @@ public class EAUtilsTest
         // Case 2: one benzene fragment with 6 APs all in same symmetric set, 
         // and we do request projection on symmetric APs
         //
-        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, rcParams, true, logger, rng);
         
         // we aim at the maximum symmetry, so we find two combinations that
         // each accounts for 3 ring-fusion sites (i.e., pairs of APs that can 
@@ -1357,7 +1356,7 @@ public class EAUtilsTest
         graph = new DGraph();
         graph.addVertex(frag);
         
-        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, false, logger, rng);
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, rcParams, false, logger, rng);
        
         assertEquals(6, combinations.size());
         int[] apUsageCounts = new int[8];
@@ -1395,7 +1394,7 @@ public class EAUtilsTest
 //              1--0       7--8
 //             B    A     H    C
 //         
-        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, rcParams, true, logger, rng);
         
         assertEquals(5, combinations.size());
         apUsageCounts = new int[8];
@@ -1455,7 +1454,7 @@ public class EAUtilsTest
         frag.setVertexId(321);
         graph = new DGraph();
         graph.addVertex(frag);
-        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, rcParams, true, logger, rng);
         
         assertEquals(7, combinations.size());
         apUsageCounts = new int[11];
@@ -1519,7 +1518,7 @@ public class EAUtilsTest
         frag.setVertexId(321);
         graph = new DGraph();
         graph.addVertex(frag);
-        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, false, logger, rng);
+        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, rcParams, false, logger, rng);
         
         assertEquals(12, combinations.size());
         apUsageCounts = new int[10];
@@ -1555,7 +1554,8 @@ public class EAUtilsTest
         // Case 7: mix different types of ring fusion sites, some 4el, other 2el
         // With request of exploiting symmetry
         //
-        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, true, logger, rng);
         
         assertEquals(8, combinations.size());
         apUsageCounts = new int[10];
@@ -1642,8 +1642,8 @@ public class EAUtilsTest
         //DenoptimIO.writeVertexToSDF("/tmp/frag.sdf", frag);
         //DenoptimIO.writeGraphToSDF(new File("/tmp/graph.sdf"), graph, true,  true,  logger, rng);
         
-        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, false, 
-                logger, rng);
+        combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, false, logger, rng);
         
         assertEquals(17, combinations.size());
         apUsageCounts = new int[18];
@@ -1765,7 +1765,7 @@ public class EAUtilsTest
         graphManyFrags.addRing(rcvOnF1b, rcvOnF3);
         
         combinations = EAUtils.searchRingFusionSites(
-                graphManyFrags, fragSpace, false, logger, rng);
+                graphManyFrags, fragSpace, rcParams, false, logger, rng);
         
         assertEquals(4, combinations.size());
         
@@ -1861,7 +1861,8 @@ public class EAUtilsTest
         graph = new DGraph();
         graph.addVertex(frag);
         
-        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, false, logger, rng);
+        combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, false, logger, rng);
        
         assertEquals(25, combinations.size());
         apUsageCounts = new int[20];
@@ -1953,7 +1954,8 @@ public class EAUtilsTest
         graph = new DGraph();
         graph.addVertex(frag);
         
-        combinations = EAUtils.searchRingFusionSites(graph, fragSpace, true, logger, rng);
+        combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, true, logger, rng);
         
         // NB: 50 is given by the hard-coded limit to the number of combinations
         assertEquals(50, combinations.size());

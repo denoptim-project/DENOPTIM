@@ -18,7 +18,10 @@
 
 package denoptim.graph.rings;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +33,9 @@ import java.util.logging.Level;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
+import denoptim.fragmenter.BridgeHeadFindingRule;
 import denoptim.graph.APClass;
+import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
 
@@ -149,7 +154,7 @@ public class RingClosureParameters extends RunTimeParameters
     /**
      * Maximum value of dot product between the normalized 
      * attachment point vectors at the head and tail of a candidate chain.
-     * Note that perfect alignement implies a dot product of -1.0.
+     * Note that perfect alignment implies a dot product of -1.0.
      */
     protected double rcMaxDot = -0.75;
 
@@ -230,11 +235,17 @@ public class RingClosureParameters extends RunTimeParameters
     protected boolean checkInterdepPaths = false;
 
     /**
-     * FLag controlling the serialization of the 
+     * Flag controlling the serialization of the 
      * <code>RingClosingConformations</code>. This flag is activated by the
      * keyword providing the pathname of the root folder of the RCCs archive
      */
     protected boolean serializeRCCs = false;
+    
+    /**
+     * Rules that identify the atoms that can become bridge heads to
+     * form fused rings.
+     */
+    protected List<BridgeHeadFindingRule> bridgeHeadFindingRules;
 
 //-----------------------------------------------------------------------------
     
@@ -246,6 +257,18 @@ public class RingClosureParameters extends RunTimeParameters
     {
         super(ParametersType.RC_PARAMS);
         rcArchive = new RingClosuresArchive();
+
+        try
+        {
+            bridgeHeadFindingRules = DenoptimIO.readBridgeHesFindingRules(
+                    new BufferedReader(new InputStreamReader(
+                            this.getClass().getClassLoader().getResourceAsStream(
+                                        "data/bridge-head_finding_rules.json"))));
+        } catch (IOException e)
+        {
+            // should never happen
+            e.printStackTrace();
+        }
     }
 
 //----------------------------------------------------------------------------
@@ -439,6 +462,13 @@ public class RingClosureParameters extends RunTimeParameters
     {
         return reqElInRings;
     }
+    
+//----------------------------------------------------------------------------
+
+    public List<BridgeHeadFindingRule> getBridgeHeadFindingRules()
+    {
+        return bridgeHeadFindingRules;
+    }
 
 //----------------------------------------------------------------------------
 
@@ -465,21 +495,21 @@ public class RingClosureParameters extends RunTimeParameters
 
     public boolean doExhaustiveConfSrch()
     {
-	return exhaustiveConfSrch;
+        return exhaustiveConfSrch;
     }
 
 //----------------------------------------------------------------------------
 
     public boolean serializeRCCs()
     {
-	return serializeRCCs;
+        return serializeRCCs;
     }
 
 //----------------------------------------------------------------------------
 
     public boolean checkInterdependentChains()
     {
-	return checkInterdepPaths;
+        return checkInterdepPaths;
     }
 
 //----------------------------------------------------------------------------
@@ -678,7 +708,7 @@ public class RingClosureParameters extends RunTimeParameters
                 String[] words = value.split("\\s+");
                 if (words.length != 2)
                 {
-                     msg = "Unable to read ring size and bias wevight from "
+                     msg = "Unable to read ring size and bias weight from "
                                  + "'" + value + "'. Expected syntax is: "
                                  + "'5 2' as to specify that 5-member rings "
                                  + "are given a weight of 2.";
@@ -724,26 +754,40 @@ public class RingClosureParameters extends RunTimeParameters
                     ringSizeBias.set(size,weight);
                 }
                 break;
+                
             case "CLOSABLERINGSMARTS=":
                 int id = ringClosabCondAsSMARTS.size();
                 ringClosabCondAsSMARTS.put("q"+id,value);
                 break;
+                
             case "REQUIREDELEMENTINRINGS=":
                 reqElInRings.add(value);
                 break;
+                
             case "RCCINDEX=":
                 rccIndex = value;
                 break;
+                
             case "RCCFOLDER=":
             	serializeRCCs = true;
                 rccFolder = value;
                 break;
+                
             case "EXHAUSTIVECONFSEARCH":
             	exhaustiveConfSrch = true;
             	break;
+            	
             case "CHECKINTERDEPENDENTCHAINS":
             	checkInterdepPaths = true;
             	break;
+            	
+            case "BRIDGEHEADFINDINGRULESFILE=":
+            {
+                bridgeHeadFindingRules = DenoptimIO.readBridgeHesFindingRules(
+                        value);
+                break;
+            }
+            	
             default:
                 msg = "Keyword '" + key + "' is not a known ring closure-"
                         + "related keyword. Check input files.";

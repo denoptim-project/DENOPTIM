@@ -1199,19 +1199,14 @@ public class GraphOperations
             rcParams = (RingClosureParameters)settings.getParameters(
                     ParametersType.RC_PARAMS);
         }
-        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
-        if (settings.containsParameters(ParametersType.FS_PARAMS))
-        {
-            fsParams = (FragmentSpaceParameters)settings.getParameters(
-                    ParametersType.FS_PARAMS);
-        }
+        
         Randomizer rng = settings.getRandomizer();
         
         // First of all we remove capping groups in the graph
         vertex.getGraphOwner().removeCappingGroups();
         
-        List<AttachmentPoint> freeeAPs = vertex.getFreeAPThroughout();
-        if (freeeAPs.size()==0)
+        List<AttachmentPoint> freeAPs = vertex.getFreeAPThroughout();
+        if (freeAPs.size()==0)
         {
             //TODO-gg use NOADDFUSEDRING
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
@@ -1227,6 +1222,7 @@ public class GraphOperations
                 EAUtils.searchRingFusionSites(
                         graph, 
                         fragSpace,
+                        rcParams,
                         rng.nextBoolean(settings.getSymmetryProbability()),
                         settings.getLogger(), rng));
 
@@ -2528,6 +2524,13 @@ public class GraphOperations
                 
             case ADDRING:
                 done = addRing(vertex, mnt, false, fsParams.getFragmentSpace(), 
+                        settings);
+                if (!done)
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING);
+                break;
+                
+            case ADDFUSEDRING:
+                done = addFusedRing(vertex, mnt, false, fsParams.getFragmentSpace(), 
                         settings);
                 if (!done)
                     mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING);

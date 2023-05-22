@@ -1,0 +1,13 @@
+TESTGENOPS-OP=MUTATION
+TESTGENOPS-inpFile=graph-30.sdf
+TESTGENOPS-outFile=graph_mut-30.sdf
+TESTGENOPS-MutationType=ADDFUSEDRING
+
+FS-scaffoldLibFile=lib_scaff.sdf
+FS-fragmentLibFile=lib_frags_t26-30.sdf
+FS-cappingFragmentLibFile=lib_cap.sdf
+FS-compMatrixFile=CPMap_t26-30.par
+FS-rcCompMatrixFile=RC-CPMap_t26-30.par
+
+RC-CLOSERINGS
+RC-BridgeHeadFindingRulesFile=bridge-head_finding_rules_t26-30.json

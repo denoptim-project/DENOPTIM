@@ -46,6 +46,8 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.Mappings;
 import org.paukov.combinatorics3.Generator;
 
+import com.google.gson.Gson;
+
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
@@ -75,6 +77,7 @@ import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.graph.rings.RingClosuresArchive;
 import denoptim.io.DenoptimIO;
+import denoptim.json.DENOPTIMgson;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
@@ -2353,7 +2356,8 @@ public class EAUtils
     // not contain redundancies, i.e., lists of AP pairs that are made of the 
     // same set of AP pairs.
     public static List<List<RelatedAPPair>> searchRingFusionSites(
-            DGraph graph, FragmentSpace fragSpace, boolean projectOnSymmetricAPs, 
+            DGraph graph, FragmentSpace fragSpace, 
+            RingClosureParameters rcParams, boolean projectOnSymmetricAPs, 
             Logger logger, Randomizer rng) throws DENOPTIMException
     {   
         // Prepare the empty collector of combinations
@@ -2388,83 +2392,9 @@ public class EAUtils
         
         // Search for potential half-ring environments, i.e., sets of atoms
         // that belongs to a cyclic system and could hold a chord that would
-        // define the additional fused ring.
-        //TODO-gg get from resources or custom input
-        List<BridgeHeadFindingRule> bridgeHeadFindingRUles = 
-                new ArrayList<BridgeHeadFindingRule>();
-
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "2el2atm",
-                "[a;D3]~[a;D3]",
-                new int[]{0,1}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "3el3atm",
-                "[a;D3]~[a;x3]~[a;D3]",
-                new int[]{0,2}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "4el4atm_6+6",
-                "[a;D3]1aaaaa1~a1[a;D3]aaaa1",
-                new int[]{0,7}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "4el4atm_6+5",
-                "[a;D3]1aaaaa1~a1[a;D3]aaa1",
-                new int[]{0,7}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "4el4atm_5+5",
-                "[a;D3]1aaaa1~a1[a;D3]aaa1",
-                new int[]{0,6}));
-
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph2atm",
-                "[A;R1]~@[A;R1]",
-                new int[]{0,1}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph3atm",
-                "[A;R1]~[*;R2]~[A;R1]",
-                new int[]{0,2}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_6+6",
-                "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~[*]~1",
-                new int[]{0,7}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_6+5",
-                "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~1",
-                new int[]{0,7}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_6+4",
-                "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
-                new int[]{0,7}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_6+3",
-                "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
-                new int[]{0,7}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_5+5",
-                "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~1",
-                new int[]{0,6}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_5+4",
-                "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
-                new int[]{0,6}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_5+3",
-                "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
-                new int[]{0,6}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_4+4",
-                "[A]~1[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
-                new int[]{0,5}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_4+3",
-                "[A]~1[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
-                new int[]{0,5}));
-        bridgeHeadFindingRUles.add(new BridgeHeadFindingRule(
-                "aliph4atm_3+3",
-                "[A]~1[*]~[*]~1~[*]~1[A]~[*]~1",
-                new int[]{0,4}));
-
+        // define the fused ring.
         Map<String, String> smarts = new HashMap<String, String>();
-        for (BridgeHeadFindingRule rule : bridgeHeadFindingRUles)
+        for (BridgeHeadFindingRule rule : rcParams.getBridgeHeadFindingRules())
         {
             smarts.put(rule.getName(), rule.getSMARTS());
         }
@@ -2478,7 +2408,7 @@ public class EAUtils
                 new HashMap<SymmetricSetWithMode,List<RelatedAPPair>>();
         List<RelatedAPPair> symBridgeHeadAPs = new ArrayList<RelatedAPPair>();
         List<RelatedAPPair> asymBridgeHeadAPs = new ArrayList<RelatedAPPair>();
-        for (BridgeHeadFindingRule rule : bridgeHeadFindingRUles)
+        for (BridgeHeadFindingRule rule : rcParams.getBridgeHeadFindingRules())
         {
             if (msq.getNumMatchesOfQuery(rule.getName()) == 0)
             {

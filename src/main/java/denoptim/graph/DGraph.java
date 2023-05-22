@@ -6648,6 +6648,28 @@ public class DGraph implements Cloneable
         }
         return mutableSites;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * A list of mutation sites from within this graph.
+     * @param requestedTypes a collection of mutation types to seek for. 
+     * Vertices that do not  allow only one of types of mutation types will
+     * not be considered mutation sites.
+     * @return the list of vertices that allow any specified mutation type.
+     */
+    public List<Vertex> getSelectedMutableSites(MutationType requestedType)
+    {
+        List<Vertex> mutableSites = new ArrayList<Vertex>();
+        for (Vertex v : gVertices)
+        {
+            v.getMutationSites()
+                .stream()
+                .filter(vrt -> vrt.getMutationTypes().contains(requestedType))
+                .forEach(vrt -> mutableSites.add(vrt));
+        }
+        return mutableSites;
+    }
 
 //------------------------------------------------------------------------------
 

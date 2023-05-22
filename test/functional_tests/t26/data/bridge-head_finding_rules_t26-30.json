@@ -1,0 +1,10 @@
+[
+  {
+    "ruleName": "4el4atm_6+5",
+    "smarts": "[a;D3]1aaaaa1~a1[a;D3]aaa1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ]
+  }
+]

@@ -1,0 +1,138 @@
+[
+  {
+    "ruleName": "2el2atm",
+    "smarts": "[a;D3]~[a;D3]",
+    "bridgeHeadPositions": [
+      0,
+      1
+    ]
+  },
+  {
+    "ruleName": "3el3atm",
+    "smarts": "[a;D3]~[a;x3]~[a;D3]",
+    "bridgeHeadPositions": [
+      0,
+      2
+    ]
+  },
+  {
+    "ruleName": "4el4atm_6+6",
+    "smarts": "[a;D3]1aaaaa1~a1[a;D3]aaaa1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ]
+  },
+  {
+    "ruleName": "4el4atm_6+5",
+    "smarts": "[a;D3]1aaaaa1~a1[a;D3]aaa1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ]
+  },
+  {
+    "ruleName": "4el4atm_5+5",
+    "smarts": "[a;D3]1aaaa1~a1[a;D3]aaa1",
+    "bridgeHeadPositions": [
+      0,
+      6
+    ]
+  },
+  {
+    "ruleName": "aliph2atm",
+    "smarts": "[A;R1]~@[A;R1]",
+    "bridgeHeadPositions": [
+      0,
+      1
+    ]
+  },
+  {
+    "ruleName": "aliph3atm",
+    "smarts": "[A;R1]~[*;R2]~[A;R1]",
+    "bridgeHeadPositions": [
+      0,
+      2
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_6+6",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_6+5",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_6+4",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_6+3",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_5+5",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      6
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_5+4",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      6
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_5+3",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      6
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_4+4",
+    "smarts": "[A]~1[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      5
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_4+3",
+    "smarts": "[A]~1[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      5
+    ]
+  },
+  {
+    "ruleName": "aliph4atm_3+3",
+    "smarts": "[A]~1[*]~[*]~1~[*]~1[A]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      4
+    ]
+  }
+]

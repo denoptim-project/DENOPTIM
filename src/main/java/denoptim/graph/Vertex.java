@@ -898,6 +898,7 @@ public abstract class Vertex implements Cloneable
             {
                 filteredTypes.remove(MutationType.EXTEND);
                 filteredTypes.remove(MutationType.ADDRING);
+                filteredTypes.remove(MutationType.ADDFUSEDRING);
             }
             
             // Cannot remove the only vertex of a graph
