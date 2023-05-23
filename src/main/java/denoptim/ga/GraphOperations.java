@@ -1218,18 +1218,27 @@ public class GraphOperations
         // Define where to add a bridge. Multiple sites are the result of
         // symmetry, so they all correspond to the same kind of operation
         // performed on symmetry-related sites
-        List<RelatedAPPair> chosenPairsSet = rng.randomlyChooseOne(
+        List<List<RelatedAPPair>> candidatePairsSets = 
                 EAUtils.searchRingFusionSites(
-                        graph, 
-                        fragSpace,
-                        rcParams,
-                        rng.nextBoolean(settings.getSymmetryProbability()),
-                        settings.getLogger(), rng));
+                    graph, 
+                    fragSpace,
+                    rcParams,
+                    rng.nextBoolean(settings.getSymmetryProbability()),
+                    settings.getLogger(), rng);
+        if (candidatePairsSets.size()==0)
+        {
+            //TODO-gg use NOADDFUSEDRING
+            //mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
+            return false;
+        }
+        List<RelatedAPPair> chosenPairsSet = rng.randomlyChooseOne(
+                candidatePairsSets);
 
         //TODO-gg add filter by ring size bias
         
         //TODO-gg
         System.out.println("chosenPairsSet: "+chosenPairsSet);
+        
         
         // Based on the chosen pair, decide on the number of electrons to use
         // in the incoming fragment that will be used to close the ring
@@ -2303,9 +2312,26 @@ public class GraphOperations
             GAParameters settings) throws DENOPTIMException
     {  
         // Get vertices that can be mutated: they can be part of subgraphs
-        // embedded in templates
+        // embedded in templates. Here, we consider only single-vertexes sites.
+        // So sites for ADDRINGFUSION mutation are not added here.
         List<Vertex> mutable = graph.getMutableSites(
                 settings.getExcludedMutationTypes());
+        // Now, add also the sites that involve multiple vertexes, such sites for
+        // ADDFUSEDRING mutation.
+        for (List<RelatedAPPair> siteCombination : EAUtils.searchRingFusionSites(
+                graph, settings))
+        {
+            for (RelatedAPPair site : siteCombination)
+            {
+                Vertex vA = site.apA.getOwner();
+                Vertex vB = site.apB.getOwner();
+                if (!mutable.contains(vA))
+                    mutable.add(vA);
+                if (!mutable.contains(vB))
+                    mutable.add(vB);
+            }
+        }
+        
         if (mutable.size() == 0)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOMUTSITE);

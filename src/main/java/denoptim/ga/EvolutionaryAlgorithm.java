@@ -581,7 +581,7 @@ public class EvolutionaryAlgorithm
                 stopRun();
             }
             logger.log(Level.SEVERE,
-                    "Unable to initialize molecules in {0} attempts."+NL, i);
+                    "Unable to initialize population in {0} attempts."+NL, i);
 
             throw new DENOPTIMException("Unable to initialize population in " 
                     + i + " attempts (Population size: " + population.size() 

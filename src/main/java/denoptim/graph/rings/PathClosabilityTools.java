@@ -87,6 +87,21 @@ public class PathClosabilityTools
             IAtomContainer mol, RingClosureParameters settings) 
     {
         boolean closable = false;
+        
+
+        
+        //TODO-gg 
+        // Exclude adding fused cycle of vertexes on already fused system.
+        // We can see if the vertexes in the path already belong to cycles of 
+        // vertexes. This is fast, so it might be better to do it even if acting 
+        // at the level of the molecular representation will deliver the same information.
+        
+
+        //TODO-gg 
+        // Exclude adding fused cycle of atoms on already fused system. Note 
+        // this case should regulate also ring-closures resulting from
+        // RCVs hosted by APs belonging to the same vertex.
+        
         switch (settings.getClosabilityEvalMode())
         {
             case -1:

@@ -311,6 +311,16 @@ runTest "t12g"
 runTest "t12h"
 
 #
+# t12i: Genetic algorithm using ADDRING mutation
+#
+runTest "t12i"
+
+#
+# t12j: Genetic algorithm using ADDFUSEDRING mutation
+#
+#runTest "t12j"
+
+#
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation
 #
 runTest "t13"

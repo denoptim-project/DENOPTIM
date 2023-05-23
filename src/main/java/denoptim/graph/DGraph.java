@@ -5698,7 +5698,7 @@ public class DGraph implements Cloneable
                 {
                     APClass apClass = dp.getAPClass();
                     if (classOfForbEnds.contains(apClass))
-                    {
+                    {   
                         found = true;
                         String msg = "Forbidden free AP for Vertex: "
                                 + vtx.getVertexId() + " "
@@ -6617,6 +6617,10 @@ public class DGraph implements Cloneable
 
     /**
      * A list of mutation sites from within this graph.
+     * This method does not consider {@link MutationType#ADDFUSEDRING} sited 
+     * because their identification is heavily dependent on settings that are
+     * beyond the {@link DGraph} class and pertain the 
+     * {@link RingClosureParameters}.
      * @return the list of vertices that allow any mutation type.
      */
     public List<Vertex> getMutableSites()
@@ -6633,8 +6637,12 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
-     * A list of mutation sites from within this graph.
-     * @param ignoredTypes a collection of mutation types to ignore. vertices
+     * A list of mutation sites from within this graph. 
+     * This method does not consider {@link MutationType#ADDFUSEDRING} sited 
+     * because their identification is heavily dependent on settings that are
+     * beyond the {@link DGraph} class and pertain the 
+     * {@link RingClosureParameters}.
+     * @param ignoredTypes a collection of mutation types to ignore. Vertices
      * that allow only ignored types of mutation will
      * not be considered mutation sites.
      * @return the list of vertices that allow any non-ignored mutation type.
@@ -6653,6 +6661,10 @@ public class DGraph implements Cloneable
 
     /**
      * A list of mutation sites from within this graph.
+     * This method does not consider {@link MutationType#ADDFUSEDRING} sited 
+     * because their identification is heavily dependent on settings that are
+     * beyond the {@link DGraph} class and pertain the 
+     * {@link RingClosureParameters}.
      * @param requestedTypes a collection of mutation types to seek for. 
      * Vertices that do not  allow only one of types of mutation types will
      * not be considered mutation sites.

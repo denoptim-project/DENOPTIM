@@ -682,7 +682,7 @@ public class EAUtils
                 + " Gen:" + parent.getGeneration() + " Cand:" + parentMolName 
                 + "|" + parentGraphId);
         
-        if (!GraphOperations.performMutation(graph,mnt,settings))
+        if (!GraphOperations.performMutation(graph, mnt, settings))
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
             mnt.increase(CounterID.FAILEDMUTATTEMTS);
@@ -2324,6 +2324,62 @@ public class EAUtils
             lstInchi.add(str);
         lst.clear();
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * <p>Searches for combinations of sites suitable for ring fusion, i.e., 
+     * combinations of {@link RelatedAPPair} where
+     * each such pair allows to expand a ring system by adding a fused ring 
+     * resulting by connecting the two {@link AttachmentPoint}s in the 
+     * {@link RelatedAPPair} by a non-empty bridge. 
+     * The tile of bridge can depend on the properties of
+     * the {@link RelatedAPPair}.
+     * </p>
+     * <p>The set of combinations is only a sample resulting by taking random 
+     * decisions that prevent combinatorial explosion.</p>
+     * 
+     * @param graph the definition of the system to work with
+     * @param projectOnSymmetricAPs use <code>true</code> to impose projection
+     * onto symmetric APs (within a vertex) and onto symmetric vertexes. When
+     * this is <code>true</code> the result will be a list of lists, where the 
+     * nested list may contain more than one item. Yet, each such item is
+     * symmetric projection of the other items.
+     * @param logger a tool to deal with log messages.
+     * @param rng a tool to deal with random decisions.
+     * @return the list of combinations of {@link RelatedAPPair}.
+     * @throws DENOPTIMException if the conversion into a molecular 
+     * representation fails.
+     */
+    
+    //NB: we return a List to retain ordering of the items, but the list must
+    // not contain redundancies, i.e., lists of AP pairs that are made of the 
+    // same set of AP pairs.
+    public static List<List<RelatedAPPair>> searchRingFusionSites(
+            DGraph graph, GAParameters gaParams) throws DENOPTIMException
+    { 
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (gaParams.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)gaParams.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (gaParams.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)gaParams.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        Randomizer rng = gaParams.getRandomizer();
+        boolean projectOnSymmetricAPs = rng.nextBoolean(
+                gaParams.getSymmetryProbability());
+        // NB: imposeSymmetryOnAPsOfClass is evaluated inside the  
+        // method searchRingFusionSites
+        Logger logger = gaParams.getLogger();
+        return searchRingFusionSites(graph, fragSpace, rcParams, 
+                projectOnSymmetricAPs, logger,  rng);
+    }
 
 //------------------------------------------------------------------------------
 
@@ -2534,6 +2590,12 @@ public class EAUtils
                 new ArrayList<List<RelatedAPPair>>();
         if (symmRelatedBridgeHeadAPs.size()>0)
         {
+            //TODO-gg
+            /*
+             *Use fsParams.getFragmentSpace().imposeSymmetryOnAPsOfClass(apc)
+             *
+             *move the if (projectOnSymmetricAPs) and couple it with imposeSymmetryOnAPsOfClass
+             */
             if (projectOnSymmetricAPs)
             {
                 for (SymmetricSetWithMode key : symmRelatedBridgeHeadAPs.keySet())
