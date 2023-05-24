@@ -1022,6 +1022,14 @@ public class GraphOperationsTest {
         bridge4el.addAP(3, new Point3d(), apcA);
         libFrags.add(bridge4el);
         
+        APClass APC1EL = APClass.make("1el:0");
+        Fragment bridge1el = new Fragment(1);
+        IAtom a1_0 = new Atom("N", new Point3d());
+        bridge1el.addAtom(a1_0);
+        bridge1el.addAP(0, new Point3d(), APC1EL);
+        bridge1el.addAP(0, new Point3d(), APC1EL);
+        libFrags.add(bridge1el);
+        
         HashMap<APClass,APClass> cappingRules = new HashMap<APClass,APClass>();
         cappingRules.put(apcA, hyd);
         
@@ -1077,6 +1085,27 @@ public class GraphOperationsTest {
                     v.getIAtomContainer(), "Si");
         }
         assertEquals(12, numSiAtoms);
+        
+        IAtomContainer arom = parser.parseSmiles("c1cccc(c12)ccc(c23)ccc(c34)cccc4");
+        MoleculeUtils.explicitHydrogens(arom);
+        sdg.generateCoordinates(arom);
+        Fragment frag = new Fragment(arom, BBType.FRAGMENT);
+        EAUtilsTest.replaceHatomWithAP(frag, 0, apcA);
+        EAUtilsTest.replaceHatomWithAP(frag, 17, apcA);
+        frag.setVertexId(123);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+
+        assertEquals(0, graph.getRingCount());
+        GraphOperations.addFusedRing(frag, mnt, true, fs, gaParams);
+        assertEquals(1, graph.getRingCount());
+        
+        //Just in case you need to look at the mol/fragment/graph
+        //DenoptimIO.writeSDFFile("/tmp/mol.sdf", mol);
+        //DenoptimIO.writeVertexToSDF("/tmp/frag.sdf", frag);
+        //DenoptimIO.writeGraphToSDF(new File("/tmp/graph.sdf"), graph, true,  true,  gaParams.getLogger(), gaParams.getRandomizer());
+        
     }
     
 //------------------------------------------------------------------------------

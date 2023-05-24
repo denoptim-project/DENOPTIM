@@ -1,7 +1,7 @@
 # Initial candidates converted from existing molecules
 #TODO-gg: do this, eventually
 #GA-InitMolsToFragmentFile=initial_pop.sdf
-#FRG-CuttingRulesFile=cutting_rules
+#RG-CuttingRulesFile=cutting_rules
 GA-InitPoplnFile=initial_pop.sdf
 
 # Definition of the Fragment Space

@@ -45,6 +45,12 @@ then
     exit 1
 fi
 
+if ! grep -q "1elAromBridge" "$wrkDir/$runFolder"/*/*sdf ; then
+    echo " "
+    echo "Test 't12i' NOT PASSED (symptom: no 1el aromatic bridge)"
+    exit 1
+fi
+
 if ! grep -q 'DENOPTIM EA run completed' "$wrkDir"/$runFolder.log
 then
     echo " "

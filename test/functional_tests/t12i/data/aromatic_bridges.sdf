@@ -4874,7 +4874,7 @@ $$$$
     0.9259    0.0000    0.0011 C   0  0  0  0  0 15  0  0  0  0  0  0
 M  END
 > <ATTACHMENT_POINTS>
-1#sArBridge:0:SINGLE:2.4329%0.0000%0.0011,1elAromBridge:0:DOUBLE:0.2347%1.1972%-0.0006,1elAromBridge:0:DOUBLE:0.2347%-1.1971%-0.0030 
+1#sArBridge:0:SINGLE:2.4329%0.0000%0.0011,1elAromBridge:0:SINGLE:0.2347%1.1972%-0.0006,1elAromBridge:0:SINGLE:0.2347%-1.1971%-0.0030 
 
 > <VertexJson>
 {
@@ -4901,7 +4901,7 @@ M  END
       "apClass": {
         "rule": "1elAromBridge",
         "subClass": 0,
-        "bndTyp": "DOUBLE"
+        "bndTyp": "SINGLE"
       },
       "dirVec": {
         "x": 0.23470000000000002,
@@ -4916,7 +4916,7 @@ M  END
       "apClass": {
         "rule": "1elAromBridge",
         "subClass": 0,
-        "bndTyp": "DOUBLE"
+        "bndTyp": "SINGLE"
       },
       "dirVec": {
         "x": 0.23470000000000002,
@@ -4949,7 +4949,7 @@ M  END
   "buildingBlockType": "FRAGMENT",
   "isRCV": false,
   "properties": {
-    "ATTACHMENT_POINTS": "1#sArBridge:0:SINGLE:2.4329%0.0000%0.0011,1elAromBridge:0:DOUBLE:0.2347%1.1972%-0.0006,1elAromBridge:0:DOUBLE:0.2347%-1.1971%-0.0030 "
+    "ATTACHMENT_POINTS": "1#sArBridge:0:SINGLE:2.4329%0.0000%0.0011,1elAromBridge:0:SINGLE:0.2347%1.1972%-0.0006,1elAromBridge:0:SINGLE:0.2347%-1.1971%-0.0030 "
   },
   "uniquefyingPropertyKeys": [],
   "allowedMutationTypes": [
@@ -4975,7 +4975,7 @@ $$$$
     0.0002   -1.3400   -0.0001 N   0  0  0  0  0 15  0  0  0  0  0  0
 M  END
 > <ATTACHMENT_POINTS>
-1#1elAromBridge:0:DOUBLE:-1.1517%-0.6980%0.0002,1elAromBridge:0:DOUBLE:1.1519%-0.6978%-0.0001 
+1#1elAromBridge:0:SINGLE:-1.1517%-0.6980%0.0002,1elAromBridge:0:SINGLE:1.1519%-0.6978%-0.0001 
 
 > <VertexJson>
 {
@@ -4987,7 +4987,7 @@ M  END
       "apClass": {
         "rule": "1elAromBridge",
         "subClass": 0,
-        "bndTyp": "DOUBLE"
+        "bndTyp": "SINGLE"
       },
       "dirVec": {
         "x": -1.1517,
@@ -5002,7 +5002,7 @@ M  END
       "apClass": {
         "rule": "1elAromBridge",
         "subClass": 0,
-        "bndTyp": "DOUBLE"
+        "bndTyp": "SINGLE"
       },
       "dirVec": {
         "x": 1.1519,
@@ -5035,7 +5035,7 @@ M  END
   "buildingBlockType": "FRAGMENT",
   "isRCV": false,
   "properties": {
-    "ATTACHMENT_POINTS": "1#1elAromBridge:0:DOUBLE:-1.1517%-0.6980%0.0002,1elAromBridge:0:DOUBLE:1.1519%-0.6978%-0.0001 "
+    "ATTACHMENT_POINTS": "1#1elAromBridge:0:SINGLE:-1.1517%-0.6980%0.0002,1elAromBridge:0:SINGLE:1.1519%-0.6978%-0.0001 "
   },
   "uniquefyingPropertyKeys": [],
   "allowedMutationTypes": [
