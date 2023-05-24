@@ -1278,7 +1278,8 @@ public class GraphOperations
                 
             case "5":
                 // We could use a 3-el fragment, but the 8-el aromatic system is
-                // so rare that we avoid it.
+                // so rare that we avoid it. This could become a tunable config
+                elInIncomingFrag = "1el";
                 break;
             default:
                 throw new Error("Unknown number if electrons in fragment to be "

@@ -1,11 +1,12 @@
 # Compatibility matrix data
-# Written by DENOPTIM-GUI on 23/05/23 15:26:00
-# APCLass Compatibility rules
-RCN sAr:0 sAr:0
+# NB: even if there is no compatibility, ring fusion on aromatic systems can still be done
+RCN sAr:0 none:0
+
 # Capping rules
 CAP nArom:0 hyd:1
 CAP sAr:0 hyd:1
 CAP sArBridge:0 hyd:1
+
 # Forbidden ends
 DEL 1elAromBridge:0
 DEL 2elAromBridge:0 
