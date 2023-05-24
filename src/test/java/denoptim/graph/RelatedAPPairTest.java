@@ -41,25 +41,38 @@ public class RelatedAPPairTest
         v.addAP(APClass.make("apc:0"));
         v.addAP(APClass.make("apc:1"));
         
-        RelatedAPPair pA = new RelatedAPPair(v.getAP(0), v.getAP(1), "prop");
-        RelatedAPPair pB = new RelatedAPPair(v.getAP(0), v.getAP(1), "prop");
+        Object prop = new String("prop");
+        
+        RelatedAPPair pA = new RelatedAPPair(v.getAP(0), v.getAP(1), prop, 
+                "propIDString");
+        RelatedAPPair pB = new RelatedAPPair(v.getAP(0), v.getAP(1), prop, 
+                "propIDString");
         
         assertTrue(pA.equals(pA));
         assertTrue(pA.equals(pB));
         assertTrue(pB.equals(pA));
         assertFalse(pA.equals(null));
         
-        pB = new RelatedAPPair(v.getAP(0), v.getAP(2), "prop");
+        pB = new RelatedAPPair(v.getAP(0), v.getAP(2), prop, 
+                "propIDString");
         assertTrue(pB.equals(pB));
         assertFalse(pA.equals(pB));
         assertFalse(pB.equals(pA));
         
-        pB = new RelatedAPPair(v.getAP(1), v.getAP(0), "prop");
+        pB = new RelatedAPPair(v.getAP(1), v.getAP(0), prop, 
+                "propIDString");
         assertTrue(pB.equals(pB));
         assertFalse(pA.equals(pB));
         assertFalse(pB.equals(pA));
         
-        pB = new RelatedAPPair(v.getAP(0), v.getAP(1), "different");
+        pB = new RelatedAPPair(v.getAP(0), v.getAP(1), "different", 
+                "propIDString");
+        assertTrue(pB.equals(pB));
+        assertFalse(pA.equals(pB));
+        assertFalse(pB.equals(pA));
+        
+        pB = new RelatedAPPair(v.getAP(0), v.getAP(1), prop, 
+                "different_IDString");
         assertTrue(pB.equals(pB));
         assertFalse(pA.equals(pB));
         assertFalse(pB.equals(pA));

@@ -38,9 +38,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.openscience.cdk.graph.ShortestPaths;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.Mappings;
@@ -2553,7 +2555,7 @@ public class EAUtils
                             continue;
                 
                         // Now we have identified a pair of APs suitable to ring fusion
-                        RelatedAPPair pair = new RelatedAPPair(apA, apB, 
+                        RelatedAPPair pair = new RelatedAPPair(apA, apB, rule,
                                 rule.getName());
                         
                         //Record symmetric relations
@@ -2684,7 +2686,8 @@ public class EAUtils
                     RelatedAPPair pairOnOriginalGraph = new RelatedAPPair(
                             symHeadVrts.get(iPair).getAP(apHeadID), 
                             symTailVrts.get(iPair).getAP(apTailID),
-                            pairOnTmpGraph.property);
+                            pairOnTmpGraph.property, 
+                            pairOnTmpGraph.propID);
                     combOnOriginalGraph.add(pairOnOriginalGraph);
                 }
             }
@@ -2746,8 +2749,7 @@ public class EAUtils
             SymmetricAPs symAPs, 
             Map<SymmetricSetWithMode,List<RelatedAPPair>> storage)
     {
-        SymmetricSetWithMode key = new SymmetricSetWithMode(symAPs, 
-                pair.property);
+        SymmetricSetWithMode key = new SymmetricSetWithMode(symAPs, pair.propID);
         if (storage.containsKey(key))
         {
             storage.get(key).add(pair);
@@ -2841,6 +2843,49 @@ public class EAUtils
                 return true;
         }               
         return false;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Finds all vertexes that can be used as aromatic bridge, i.e., can be used 
+     * to create an aromatic ring by fusion with another aromatic ring.
+     * @param elInIncomingFrag beginning of the {@link APClass} required on the
+     * aromatic bridge fragment. This is conventionally used to define the 
+     * number of electrons available to the aromatic system.
+     * @param allowedBridgeLength number of atoms.
+     * @param fragSpace the fragment space where to look for fragments.
+     * @return the list of usable fragments from the fragment space.
+     */
+    public static List<Vertex> getUsableAromaticBridges(
+            String elInIncomingFrag, int[] allowedLengths,
+            FragmentSpace fragSpace)
+    {
+        List<Vertex> usableBridges =
+                fragSpace.getVerticesWithAPClassStartingWith(elInIncomingFrag);
+                
+        List<Vertex> toRemove = new ArrayList<>();
+        final String rootAPC = elInIncomingFrag;
+        for (Vertex bridge : usableBridges)
+        {
+            IAtomContainer iacFrag = bridge.getIAtomContainer();
+            List<Integer> atomIDs = new ArrayList<Integer>();
+            bridge.getAttachmentPoints()
+                .stream()
+                .filter(ap -> ap.getAPClass().getRule().startsWith(
+                        rootAPC))
+                .forEach(ap -> atomIDs.add(ap.getAtomPositionNumber()));
+            ShortestPaths sp = new ShortestPaths(iacFrag, iacFrag.getAtom
+                    (atomIDs.get(0)));
+            List<IAtom> path = new ArrayList<IAtom>(Arrays.asList(
+                    sp.atomsTo(atomIDs.get(1))));
+            if (!IntStream.of(allowedLengths).anyMatch(x -> x == path.size()))
+            {
+                toRemove.add(bridge);
+            }
+        }
+        usableBridges.removeAll(toRemove);
+        return usableBridges;
     }
   
 //------------------------------------------------------------------------------  

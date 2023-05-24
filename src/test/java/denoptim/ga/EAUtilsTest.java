@@ -1658,10 +1658,10 @@ public class EAUtilsTest
                         apUsageCounts[pair.apA.getIndexInOwner()] + 1;
                 apUsageCounts[pair.apB.getIndexInOwner()] = 
                         apUsageCounts[pair.apB.getIndexInOwner()] + 1;
-                if (countTypes.containsKey(pair.property))
-                    countTypes.put(pair.property, countTypes.get(pair.property)+1);
+                if (countTypes.containsKey(pair.propID))
+                    countTypes.put(pair.propID, countTypes.get(pair.propID)+1);
                 else 
-                    countTypes.put(pair.property, 1);
+                    countTypes.put(pair.propID, 1);
             }
         }
         assertEquals(1, apUsageCounts[0]); // AP on atm 1
@@ -1687,7 +1687,8 @@ public class EAUtilsTest
         assertEquals(0, sizesCount[2]);
         assertEquals(0, sizesCount[3]);
         assertEquals(3, countTypes.get("2el2atm")); //WARNING: hard code type name!
-        assertEquals(4, countTypes.get("3el3atm")); //WARNING: hard code type name!
+        assertEquals(2, countTypes.get("3el3atm_6+5")); //WARNING: hard code type name!
+        assertEquals(2, countTypes.get("3el3atm_6+6")); //WARNING: hard code type name!
         assertEquals(4, countTypes.get("4el4atm_6+6")); //WARNING: hard code type name!
         assertEquals(2, countTypes.get("4el4atm_6+5")); //WARNING: hard code type name!
         assertEquals(4, countTypes.get("4el4atm_5+5")); //WARNING: hard code type name!
@@ -1716,7 +1717,7 @@ public class EAUtilsTest
         replaceHatomWithAP(fragF0, 2, apcA);
         fragF0.setVertexId(0);
         
-        // NB: conformation will be
+        // NB: conformation will be ignored
         IAtomContainer molF1 = parser.parseSmiles("C=CC=C");
         MoleculeUtils.explicitHydrogens(molF1);
         sdg.generateCoordinates(molF1);
@@ -1875,10 +1876,10 @@ public class EAUtilsTest
                         apUsageCounts[pair.apA.getIndexInOwner()] + 1;
                 apUsageCounts[pair.apB.getIndexInOwner()] = 
                         apUsageCounts[pair.apB.getIndexInOwner()] + 1;
-                if (countTypes.containsKey(pair.property))
-                    countTypes.put(pair.property, countTypes.get(pair.property)+1);
+                if (countTypes.containsKey(pair.propID))
+                    countTypes.put(pair.propID, countTypes.get(pair.propID)+1);
                 else 
-                    countTypes.put(pair.property, 1);
+                    countTypes.put(pair.propID, 1);
             }
         }
         
@@ -1915,7 +1916,7 @@ public class EAUtilsTest
         assertEquals(1, countTypes.get("aliph4atm_4+3")); //WARNING: hard code type name!
         assertEquals(1, countTypes.get("aliph4atm_3+3")); //WARNING: hard code type name!
         assertFalse(countTypes.containsKey("2el2atm")); //WARNING: hard code type name!
-        assertFalse(countTypes.containsKey("3el3atm")); //WARNING: hard code type name!
+        assertFalse(countTypes.containsKey("3el3atm_6+5")); //WARNING: hard code type name!
         assertFalse(countTypes.containsKey("4el4atm_6+6")); //WARNING: hard code type name!
         assertFalse(countTypes.containsKey("4el4atm_6+5")); //WARNING: hard code type name!
         assertFalse(countTypes.containsKey("4el4atm_5+5")); //WARNING: hard code type name! 
@@ -1962,6 +1963,214 @@ public class EAUtilsTest
         // NB: 6 is given by the hard-coded limit to the max number of ring 
         // fusions on a single vertex.
         assertEquals(6, combinations.get(0).size());
+        
+        
+        //
+        // Case 12: detect 5el sites
+        //     
+        //       
+        //    15--v16
+        //    |    |
+        //    14   11
+        //      \ /  \
+        //       10   12
+        //       |    |
+        //   0   9   13
+        //  / \ / \ /
+        // 5   1   8
+        // |   |   |
+        // 4   2   7
+        //  \ / \ /
+        //   3   6
+        //
+        //
+        //                        0       5      9      13
+        mol = parser.parseSmiles("c1c2c(ccc1)ccc3c2c(c1cc3)cNc1");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 3, apcA);
+        replaceHatomWithAP(frag, 6, apcA);
+        replaceHatomWithAP(frag, 13, apcA);
+        replaceHatomWithAP(frag, 14, apcA);
+        replaceHatomWithAP(frag, 16, apcA);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+        combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, false, logger, rng);
+        
+        assertEquals(2, combinations.size());
+        apUsageCounts = new int[6];
+        sizesCount = new int[3];
+        countTypes = new HashMap<String,Integer>();
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            sizesCount[comb.size()] = sizesCount[comb.size()] +1;
+            for (RelatedAPPair pair : comb)
+            {
+                apUsageCounts[pair.apA.getIndexInOwner()] = 
+                        apUsageCounts[pair.apA.getIndexInOwner()] + 1;
+                apUsageCounts[pair.apB.getIndexInOwner()] = 
+                        apUsageCounts[pair.apB.getIndexInOwner()] + 1;
+                if (countTypes.containsKey(pair.propID))
+                    countTypes.put(pair.propID, countTypes.get(pair.propID)+1);
+                else 
+                    countTypes.put(pair.propID, 1);
+            }
+        }
+        assertEquals(1, apUsageCounts[0]); // AP on atm 1
+        assertEquals(1, apUsageCounts[1]); // AP on atm 3
+        assertEquals(1, apUsageCounts[2]); // AP on atm 6
+        assertEquals(0, apUsageCounts[3]); // AP on atm 13
+        assertEquals(1, apUsageCounts[4]); // AP on atm 14
+        assertEquals(0, apUsageCounts[5]); // AP on atm 16
+        assertEquals(0, sizesCount[0]);
+        assertEquals(2, sizesCount[1]);
+        assertEquals(0, sizesCount[2]);
+        assertEquals(1, countTypes.get("3el3atm_6+6")); //WARNING: hard code type name!
+        assertEquals(1, countTypes.get("5el5atm_6+6+6")); //WARNING: hard code type name!
+        
+
+        //
+        // Case 13: ignore constrained 5el sites
+        //
+        //      15
+        //     /  \
+        //    14   16
+        //    |    |
+        //    13   11
+        //   A  \ /  \
+        //       10   12
+        //   A   |    /
+        //   0   9   /
+        //  / \ / \ /
+        // 5   1   8
+        // |   |   |
+        // 4   2   7
+        //  \ / \ /
+        //   3   6
+        //
+        //                        0       5      9     12
+        mol = parser.parseSmiles("c1c2c(ccc1)ccc3c2c(c1N3)cccc1");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 3, apcA);
+        replaceHatomWithAP(frag, 6, apcA);
+        replaceHatomWithAP(frag, 12, apcA);
+        replaceHatomWithAP(frag, 13, apcA);
+        replaceHatomWithAP(frag, 15, apcA);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+        combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, false, logger, rng);
+        
+        assertEquals(1, combinations.size());
+        assertEquals(1, combinations.get(0).size());
+        //WARNING: hard code type name!
+        assertEquals("3el3atm_6+6", combinations.get(0).get(0).propID); 
+        
+        
+        //
+        // Case 12: detect 5el sites
+        //     
+        //           A
+        //    13---14
+        //    |    |
+        //    12   10
+        //   A  \ /  \
+        //       11  9 
+        //   A   |   | 
+        //   0   6   8 A
+        //  / \ / \ /
+        // 5   1   7
+        // |   |   
+        // 4   2   
+        //  \ /  
+        //   3   
+        //
+        //
+        //                        0      5           
+        mol = parser.parseSmiles("c1c(cccc1)c1cccc2c1cNc2");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 8, apcA);
+        replaceHatomWithAP(frag, 12, apcA);
+        replaceHatomWithAP(frag, 14, apcA);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+        combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, false, logger, rng);
+        
+        assertEquals(1, combinations.size());
+        assertEquals(1, combinations.get(0).size());
+        //WARNING: hard code type name!
+        assertEquals("5el5atm_6-6*", combinations.get(0).get(0).propID); 
+
+        
+        //
+        // Case 13: detect 5el sites
+        //     
+        //       
+        //    13---12
+        //    |    |
+        //    14   11
+        //   A  \ /  
+        //       10   
+        //   A   |    
+        //   0   9   
+        //  / \ / \ A
+        // 5   1   8
+        // |   |   |
+        // 4   2   7
+        //  \ / \ /
+        //   3   6
+        //
+        //
+        //                        0       5     9      
+        mol = parser.parseSmiles("c1c2c(ccc1)cccc2c1cNcc1");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg.generateCoordinates(mol);
+        frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 8, apcA);
+        replaceHatomWithAP(frag, 11, apcA);
+        frag.setVertexId(321);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+        //Just in case you need to look at the mol/fragment/graph
+        //DenoptimIO.writeSDFFile("/tmp/mol.sdf", mol);
+        //DenoptimIO.writeVertexToSDF("/tmp/frag.sdf", frag);
+        //DenoptimIO.writeGraphToSDF(new File("/tmp/graph.sdf"), graph, true,  true,  logger, rng);
+        
+        combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, false, logger, rng);
+        
+        assertEquals(2, combinations.size());
+        boolean found4el = false;
+        boolean found5el = false;
+        for (List<RelatedAPPair> comb : combinations)
+        {
+            assertEquals(1, combinations.get(0).size());
+            RelatedAPPair pair = comb.get(0);
+            if ("4el4atm_6+5".equals(pair.propID))
+                found4el = true;
+            if ("5el5atm_66-*".equals(pair.propID))
+                found5el = true;
+        }
+        assertTrue(found4el);
+        assertTrue(found5el);
     }
 
 //------------------------------------------------------------------------------
@@ -1982,6 +2191,107 @@ public class EAUtilsTest
         if (!done)
             throw new IllegalStateException("No H found that could be changed "
                     + "into an AP.");
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testGetUsableAromaticBridges() throws Exception
+    {   
+        ArrayList<Vertex> libFrags = new ArrayList<Vertex>();
+
+        APClass apcA = APClass.make("apcA:1");
+        APClass APC2EL = APClass.make("2el:0");
+        APClass APC4EL = APClass.make("4el:0");
+        
+        Fragment bridge4elA = new Fragment(4);
+        IAtom a4elA_0 = new Atom("C", new Point3d());
+        IAtom a4elA_1 = new Atom("C", new Point3d());
+        IAtom a4elA_2 = new Atom("C", new Point3d());
+        IAtom a4elA_3 = new Atom("C", new Point3d());
+        bridge4elA.addAtom(a4elA_0);
+        bridge4elA.addAtom(a4elA_1);
+        bridge4elA.addAtom(a4elA_2);
+        bridge4elA.addAtom(a4elA_3);
+        bridge4elA.addBond(new Bond(a4elA_0, a4elA_1, IBond.Order.DOUBLE));
+        bridge4elA.addBond(new Bond(a4elA_1, a4elA_2, IBond.Order.SINGLE));
+        bridge4elA.addBond(new Bond(a4elA_2, a4elA_3, IBond.Order.DOUBLE));
+        bridge4elA.addAP(0, new Point3d(), APC4EL);
+        bridge4elA.addAP(3, new Point3d(), APC4EL);
+        bridge4elA.addAP(0, new Point3d(), apcA);
+        bridge4elA.addAP(1, new Point3d(), apcA);
+        bridge4elA.addAP(2, new Point3d(), apcA);
+        bridge4elA.addAP(3, new Point3d(), apcA);
+        libFrags.add(bridge4elA);
+        
+        Fragment bridge4elB = new Fragment(5);
+        IAtom a4elB_0 = new Atom("Si", new Point3d());
+        IAtom a4elB_1 = new Atom("Si", new Point3d());
+        IAtom a4elB_2 = new Atom("Si", new Point3d());
+        IAtom a4elB_3 = new Atom("Si", new Point3d());
+        bridge4elB.addAtom(a4elB_0);
+        bridge4elB.addAtom(a4elB_1);
+        bridge4elB.addAtom(a4elB_2);
+        bridge4elB.addAtom(a4elB_3);
+        bridge4elB.addBond(new Bond(a4elB_0, a4elB_1, IBond.Order.DOUBLE));
+        bridge4elB.addBond(new Bond(a4elB_1, a4elB_2, IBond.Order.SINGLE));
+        bridge4elB.addBond(new Bond(a4elB_2, a4elB_3, IBond.Order.DOUBLE));
+        bridge4elB.addAP(0, new Point3d(), APC4EL);
+        bridge4elB.addAP(3, new Point3d(), APC4EL);
+        libFrags.add(bridge4elB);
+        
+        Fragment bridge2elA = new Fragment(6);
+        IAtom a2elA_0 = new Atom("O", new Point3d());
+        bridge2elA.addAtom(a2elA_0);
+        bridge2elA.addAP(0, new Point3d(), APC2EL);
+        bridge2elA.addAP(0, new Point3d(), APC2EL);
+        libFrags.add(bridge2elA);
+        
+        Fragment bridge2elB = new Fragment(7);
+        IAtom a2elB_0 = new Atom("C", new Point3d());
+        IAtom a2elB_1 = new Atom("C", new Point3d());
+        bridge2elB.addAtom(a2elB_0);
+        bridge2elB.addAtom(a2elB_1);
+        bridge2elB.addBond(new Bond(a2elB_0, a2elB_1, IBond.Order.DOUBLE));
+        bridge2elB.addAP(0, new Point3d(), APC2EL);
+        bridge2elB.addAP(1, new Point3d(), APC2EL);
+        bridge2elB.addAP(0, new Point3d(), apcA);
+        bridge2elB.addAP(1, new Point3d(), apcA);
+        libFrags.add(bridge2elB);
+        
+        // Only to trigger class-based approach
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        cpMap.put(apcA, new ArrayList<APClass>());
+        
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(),
+                libFrags,
+                new ArrayList<Vertex>(), 
+                cpMap, 
+                new HashMap<APClass,APClass>(), 
+                new HashSet<APClass>(),
+                new HashMap<APClass,ArrayList<APClass>>()); 
+        
+        // Wrong size is enough to find no match
+        List<Vertex> lst = EAUtils.getUsableAromaticBridges("4el", new int[]{5},
+                fs);
+        assertEquals(0, lst.size());
+        
+        // Wrong number of electrons is enough to find no match
+        lst = EAUtils.getUsableAromaticBridges("19el", new int[]{4}, fs);
+        assertEquals(0, lst.size());
+        
+        // both #el and size need to be good
+        lst = EAUtils.getUsableAromaticBridges("4el", new int[]{4}, fs);
+        assertEquals(2, lst.size());
+        
+        lst = EAUtils.getUsableAromaticBridges("2el", new int[]{1}, fs);
+        assertEquals(1, lst.size());
+
+        lst = EAUtils.getUsableAromaticBridges("2el", new int[]{2}, fs);
+        assertEquals(1, lst.size());
     }
     
 //------------------------------------------------------------------------------

@@ -1,2 +1,2 @@
-RCN sAr:0 sAr:0,sArBridge:0
-RCN sArBridge:0 sArBridge:0,sAr:0
+RCN sAr:0 none:0
+RCN sArBridge:0 none:0

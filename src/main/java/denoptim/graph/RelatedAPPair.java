@@ -23,7 +23,13 @@ public class RelatedAPPair
     /**
      * The property defining the relation between the two APs.
      */
-    public String property;
+    public Object property;
+    
+    /**
+     * String-like version of the property for comparison purposes.
+     */
+    public String propID;
+    
     
 //------------------------------------------------------------------------------
     
@@ -35,11 +41,12 @@ public class RelatedAPPair
      * the two APS.
      */
     public RelatedAPPair(AttachmentPoint apA, AttachmentPoint apB, 
-            String property)
+            Object property, String propID)
     {
         this.apA = apA;
         this.apB = apB;
         this.property = property;
+        this.propID = propID;
     }
     
 //------------------------------------------------------------------------------
@@ -62,6 +69,9 @@ public class RelatedAPPair
             return false;
         
         if (!this.apB.equals(other.apB))
+            return false;
+
+        if (!this.propID.equals(other.propID))
             return false;
         
         return this.property.equals(other.property);

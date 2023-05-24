@@ -7,6 +7,7 @@ CAP nArom:0 hyd:1
 CAP sAr:0 hyd:1
 CAP sArBridge:0 hyd:1
 # Forbidden ends
+DEL 1elAromBridge:0
 DEL 2elAromBridge:0 
 DEL 3elAromBridge:0 
 DEL 4elAromBridge:0 

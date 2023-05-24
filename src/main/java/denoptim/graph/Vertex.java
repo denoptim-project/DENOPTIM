@@ -567,6 +567,42 @@ public abstract class Vertex implements Cloneable
             .stream()
             .anyMatch(apc -> APClass.APCAROMBRIDGES.contains(apc));
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if this vertex is connected to any vertex meant to be a piece of 
+     * an aromatic system. The connection may be direct or via a pair of 
+     * RCVs.
+     * @return <code>true</code> if this vertex has {@link AttachmentPoint}s
+     * linked to any other {@link AttachmentPoint}s with any {@link APClass} 
+     * reserved for aromatic system fragments. See
+     * {@link APClass#APCAROMBRIDGES}.
+     */
+
+    public boolean isConnectedToAromaticBridge()
+    {
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            if (ap.isAvailableThroughout())
+                continue;
+            
+            AttachmentPoint linkedAp = ap.getLinkedAPThroughout();
+            if (APClass.APCAROMBRIDGES.contains(linkedAp.getAPClass()))
+                return true;
+            Vertex rcv = linkedAp.getOwner();
+            if (rcv.isRCV)
+            {
+                if (getGraphOwner().getRingsInvolvingVertex(rcv).size()==0)
+                    continue;
+                // Since it is an RCV, there can be only one ring involved.
+                Ring r = getGraphOwner().getRingsInvolvingVertex(rcv).get(0);
+                return r.getVertexAtPosition(r.getSize()-2).isAromaticBridge()
+                        || r.getVertexAtPosition(1).isAromaticBridge();
+            }
+        }
+        return false;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -929,7 +965,7 @@ public abstract class Vertex implements Cloneable
                 filteredTypes.remove(MutationType.DELETECHAIN);
         }
         
-        if (isAromaticBridge())
+        if (isAromaticBridge() || isConnectedToAromaticBridge())
         {
             // So far we do not do any check to ensure that 
             // A) the change/additions/removal of a link retains aromaticity,
@@ -940,6 +976,7 @@ public abstract class Vertex implements Cloneable
             filteredTypes.remove(MutationType.ADDLINK);
             filteredTypes.remove(MutationType.DELETELINK);
             filteredTypes.remove(MutationType.CHANGELINK);
+            filteredTypes.remove(MutationType.CHANGEBRANCH);
         }
         
         if (getAttachmentPoints().size()-getFreeAPCountThroughout() < 2)

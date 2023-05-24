@@ -21,6 +21,7 @@ package denoptim.ga;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -31,8 +32,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.http.TruncatedChunkException;
+import org.openscience.cdk.graph.ShortestPaths;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.Mappings;
@@ -40,6 +43,7 @@ import org.paukov.combinatorics3.Generator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragmenter.BridgeHeadFindingRule;
 import denoptim.fragspace.APMapFinder;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -1243,7 +1247,7 @@ public class GraphOperations
         // Based on the chosen pair, decide on the number of electrons to use
         // in the incoming fragment that will be used to close the ring
         // the pairs are all the same kind of ring fusion, so just take the 1st
-        String elsInHalfFrag = chosenPairsSet.get(0).property.substring(0,1);
+        String elsInHalfFrag = chosenPairsSet.get(0).propID.substring(0,1);
         if (elsInHalfFrag.matches("[a-zA-Z]"))
             elsInHalfFrag = "0";
         String elInIncomingFrag = "0el";
@@ -1281,9 +1285,15 @@ public class GraphOperations
                         + "used for ring fusion operation.");
         }
         
-        // Decide which fragment to use as ring-closing bridge
-        List<Vertex> usableBridges = 
-                fragSpace.getVerticesWithAPClassStartingWith(elInIncomingFrag);
+        // Collect fragment that can be used as ring-closing bridge based on the
+        // number of aromatic electrons and number of atoms
+        BridgeHeadFindingRule bhfr = (BridgeHeadFindingRule) 
+                chosenPairsSet.get(0).property;
+        List<Vertex> usableBridges = EAUtils.getUsableAromaticBridges(
+                elInIncomingFrag,
+                bhfr.getAllowedBridgeLength(),
+                fragSpace);
+        
         if (usableBridges.size()==0)
         {
             //TODO-gg use NOADDFUSEDRING
@@ -2485,6 +2495,7 @@ public class GraphOperations
         // when reporting what vertex is being mutated. Also, note that the
         // identity of the candidate is already in the graph's local msg.
         String mutantOrigin = graph.getLocalMsg() + "|"
+                + mType + "|"
                 + vertex.getProperty(DENOPTIMConstants.STOREDVID) 
                 + " (" + positionOfVertex + ")";
         graph.setLocalMsg(mutantOrigin);

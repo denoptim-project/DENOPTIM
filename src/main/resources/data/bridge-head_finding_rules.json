@@ -5,30 +5,56 @@
     "bridgeHeadPositions": [
       0,
       1
+    ],
+    "allowedBridgeLength": [
+      3,
+      4
     ]
   },
   {
-    "ruleName": "3el3atm",
-    "smarts": "[a;D3]~[a;x3]~[a;D3]",
+    "ruleName": "3el3atm_6+6",
+    "smarts": "[a;D3]1a2a(aaa1)aaaa2",
     "bridgeHeadPositions": [
       0,
-      2
+      9
+    ],
+    "allowedBridgeLength": [
+      2,
+      3
+    ]
+  },
+  {
+    "ruleName": "3el3atm_6+5",
+    "smarts": "[a;D3]1a2a(aaa1)aaa2",
+    "bridgeHeadPositions": [
+      0,
+      8
+    ],
+    "allowedBridgeLength": [
+      3
     ]
   },
   {
     "ruleName": "4el4atm_6+6",
-    "smarts": "[a;D3]1aaaaa1~a1[a;D3]aaaa1",
+    "smarts": "[a;D3]1aaaa[a;r6]1~[a;r6]1[a;D3]aaaa1",
     "bridgeHeadPositions": [
       0,
       7
+    ],
+    "allowedBridgeLength": [
+      1,
+      2
     ]
   },
   {
     "ruleName": "4el4atm_6+5",
-    "smarts": "[a;D3]1aaaaa1~a1[a;D3;R1]aaa1",
+    "smarts": "[a;D3]1aaaa[a;r6]1~[a;r5]1[a;D3;R1]aaa1",
     "bridgeHeadPositions": [
       0,
       7
+    ],
+    "allowedBridgeLength": [
+      2
     ]
   },
   {
@@ -37,6 +63,42 @@
     "bridgeHeadPositions": [
       0,
       6
+    ],
+    "allowedBridgeLength": [
+      2
+    ]
+  },
+  {
+    "ruleName": "5el5atm_6-6*",
+    "smarts": "[a;D3]1a(aaaa1)~!@a1a(aaaa1)~[a;D3]",
+    "bridgeHeadPositions": [
+      0,
+      12
+    ],
+    "allowedBridgeLength": [
+      1
+    ]
+  },
+  {
+    "ruleName": "5el5atm_66-*",
+    "smarts": "[a;D3]1a2a(aaa1)aaaa2~!@a[a;D3]",
+    "bridgeHeadPositions": [
+      0,
+      11
+    ],
+    "allowedBridgeLength": [
+      1
+    ]
+  },
+  {
+    "ruleName": "5el5atm_6+6+6",
+    "smarts": "[a;D3]1a2a(aaa1)aaa3a2a([a;D3])aaa3",
+    "bridgeHeadPositions": [
+      0,
+      11
+    ],
+    "allowedBridgeLength": [
+      1
     ]
   },
   {

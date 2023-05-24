@@ -1,5 +1,5 @@
 # Initial candidates converted from existing molecules
-#TODO: to thid, eventually
+#TODO-gg: do this, eventually
 #GA-InitMolsToFragmentFile=initial_pop.sdf
 #FRG-CuttingRulesFile=cutting_rules
 GA-InitPoplnFile=initial_pop.sdf
@@ -32,10 +32,6 @@ GA-LevelGrowthProbScheme=sigma
 GA-LevelGrowthSigmaSteepness=1.0
 GA-LevelGrowthSigmaMiddle=1.0
 GA-EXCLUDEMUTATIONTYPE=EXTEND
-GA-EXCLUDEMUTATIONTYPE=CHANGEBRANCH
-GA-EXCLUDEMUTATIONTYPE=ADDRING
-#GA-EXCLUDEMUTATIONTYPE=CHANGELINK
-#GA-EXCLUDEMUTATIONTYPE=DELETELINK
 
 FP-equation=${MW}
 FP-CheckUidBeforeFitness=yes
