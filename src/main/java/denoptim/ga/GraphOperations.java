@@ -29,6 +29,8 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import org.apache.http.TruncatedChunkException;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.paukov.combinatorics3.Generator;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -43,7 +45,9 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
-import denoptim.graph.SymmetricSet;
+import denoptim.graph.Ring;
+import denoptim.graph.SymmetricAPs;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -51,10 +55,13 @@ import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.ChainLink;
 import denoptim.graph.rings.ClosableChain;
 import denoptim.graph.rings.PathSubGraph;
+import denoptim.graph.rings.RandomCombOfRingsIterator;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
+import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.CrossoverType;
@@ -77,11 +84,16 @@ public class GraphOperations
      * possible crossover sites without falling into combinatorial explosion.
      * @param gA one of the parent graphs.
      * @param gB the other of the parent graphs.
+     * @param fragSpace the space of building blocks defining how to generate
+     * graphs.
+     * @param maxSizeXoverSubGraph the limit to the size of subgraphs that can
+     * can be exchanged by crossover.
      * @return the list of pairs of crossover sites.
      * @throws DENOPTIMException 
      */
     public static List<XoverSite> locateCompatibleXOverPoints(
-            DGraph graphA, DGraph graphB, FragmentSpace fragSpace) 
+            DGraph graphA, DGraph graphB, FragmentSpace fragSpace, 
+            int maxSizeXoverSubGraph) 
                     throws DENOPTIMException
     {
         // First, we identify all the edges that allow crossover, and collect
@@ -135,17 +147,21 @@ public class GraphOperations
             {
                 DGraph subGraph1 = test1.extractSubgraph(gA.indexOf(vA));
                 DGraph subGraph2 = test2.extractSubgraph(gB.indexOf(vB));
-                if (!subGraph1.isIsomorphicTo(subGraph2))
+                if (maxSizeXoverSubGraph >= Math.max(subGraph1.getVertexCount(), 
+                        subGraph2.getVertexCount()))
                 {
-                    List<Vertex> branchOnVA = new ArrayList<Vertex>();
-                    branchOnVA.add(vA);
-                    branchOnVA.addAll(descendantsA);
-                    List<Vertex> branchOnVB = new ArrayList<Vertex>();
-                    branchOnVB.add(vB);
-                    branchOnVB.addAll(descendantsB);
-                    
-                    checkAndAddXoverSites(fragSpace, branchOnVA, branchOnVB, 
-                            CrossoverType.BRANCH, sites);
+                    if (!subGraph1.isIsomorphicTo(subGraph2))
+                    {
+                        List<Vertex> branchOnVA = new ArrayList<Vertex>();
+                        branchOnVA.add(vA);
+                        branchOnVA.addAll(descendantsA);
+                        List<Vertex> branchOnVB = new ArrayList<Vertex>();
+                        branchOnVB.add(vB);
+                        branchOnVB.addAll(descendantsB);
+                        
+                        checkAndAddXoverSites(fragSpace, branchOnVA, branchOnVB, 
+                                CrossoverType.BRANCH, sites);
+                    }
                 }
             } catch (DENOPTIMException e)
             {
@@ -253,6 +269,7 @@ public class GraphOperations
             List<List<Vertex[]>> preCombsOfEnds = Generator.cartesianProduct(
                     fewestBranchesSide.values())
                     .stream()
+                    .limit(100000) //Prevent explosion!!!
                     .collect(Collectors.<List<Vertex[]>>toList());
             
             // Remove the 'null,null' place holders that indicate the use of no
@@ -311,7 +328,8 @@ public class GraphOperations
                     continue;
                 
                 for (XoverSite xos : locateCompatibleXOverPoints(
-                        tA.getInnerGraph(), tB.getInnerGraph(), fragSpace))
+                        tA.getInnerGraph(), tB.getInnerGraph(), fragSpace,
+                        maxSizeXoverSubGraph))
                 {
                     if (!sites.contains(xos))
                         sites.add(xos);
@@ -649,7 +667,7 @@ public class GraphOperations
         {
             glf = new GraphLinkFinder(fragSpace, vertex);
         } else {
-            glf = new GraphLinkFinder(fragSpace, vertex,chosenVrtxIdx);
+            glf = new GraphLinkFinder(fragSpace, vertex, chosenVrtxIdx);
         }
         if (!glf.foundAlternativeLink())
         {
@@ -836,7 +854,7 @@ public class GraphOperations
         }
 
         // vertex id of the parent
-        int pvid = e.getSrcVertex();
+        long pvid = e.getSrcVertex();
         Vertex parentVrt = g.getVertexWithId(pvid);
 
         // Need to remember symmetry because we are deleting the symm. vertices
@@ -861,24 +879,17 @@ public class GraphOperations
      */
     
     protected static boolean deleteFragment(Vertex vertex)
-                                                    throws DENOPTIMException
+            throws DENOPTIMException
     {
-        int vid = vertex.getVertexId();
+        long vid = vertex.getVertexId();
         DGraph molGraph = vertex.getGraphOwner();
 
         if (molGraph.hasSymmetryInvolvingVertex(vertex))
         {
-            ArrayList<Integer> toRemove = new ArrayList<Integer>();
-            for (int i=0; i<molGraph.getSymSetForVertexID(vid).size(); i++)
+            List<Vertex> toRemove = new ArrayList<Vertex>();
+            toRemove.addAll(molGraph.getSymSetForVertex(vertex));
+            for (Vertex v : toRemove)
             {
-                int svid = molGraph.getSymSetForVertexID(vid).getList().get(i); 
-                toRemove.add(svid);
-            }
-            for (Integer svid : toRemove)
-            {
-                Vertex v = molGraph.getVertexWithId(svid);
-                if (v == null)
-                    continue;
                 molGraph.removeBranchStartingAt(v);
             }
         }
@@ -910,21 +921,16 @@ public class GraphOperations
     protected static boolean deleteChain(Vertex vertex, Monitor mnt,
             FragmentSpace fragSpace) throws DENOPTIMException
     {
-        int vid = vertex.getVertexId();
+        long vid = vertex.getVertexId();
         DGraph molGraph = vertex.getGraphOwner();
 
         if (molGraph.hasSymmetryInvolvingVertex(vertex))
         {
-            ArrayList<Integer> toRemove = new ArrayList<Integer>();
-            for (int i=0; i<molGraph.getSymSetForVertexID(vid).size(); i++)
+            List<Vertex> toRemove = new ArrayList<Vertex>();
+            toRemove.addAll(molGraph.getSymSetForVertex(vertex));
+            for (Vertex v : toRemove)
             {
-                int svid = molGraph.getSymSetForVertexID(vid).getList().get(i);
-                toRemove.add(svid);
-            }
-            for (Integer svid : toRemove)
-            {
-                Vertex v = molGraph.getVertexWithId(svid);
-                if (v == null || !v.getMutationTypes(new ArrayList<MutationType>())
+                if (!v.getMutationTypes(new ArrayList<MutationType>())
                         .contains(MutationType.DELETECHAIN))
                     continue;
                 molGraph.removeChainUpToBranching(v, fragSpace);
@@ -939,9 +945,224 @@ public class GraphOperations
             return true;
         return false;
     }
-
+    
 //------------------------------------------------------------------------------
 
+    /**
+     * Tries to use any free AP of the given vertex to close ring in the graph 
+     * by adding a chord.
+     * @param vertex the vertex on which we start to close a the ring.
+     * @param mnt monitoring tool to keep count of events.
+     * @param force use <code>true</code> to by-pass random decisions and force
+     * the creation of rings.
+     * @param fragSpace the fragment space controlling how we put together
+     * building blocks.
+     * @param settings the GA settings controlling how we work.
+     * @return <code>true</code> when at least one ring was added to the graph.
+     * @throws DENOPTIMException
+     * 
+     */
+    
+    protected static boolean addRing(Vertex vertex, Monitor mnt, boolean force,
+            FragmentSpace fragSpace, GAParameters settings) 
+                    throws DENOPTIMException
+    {
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        Randomizer rng = settings.getRandomizer();
+        
+        // First of all we remove capping groups in the graph
+        vertex.getGraphOwner().removeCappingGroups();
+        
+        List<AttachmentPoint> freeeAPs = vertex.getFreeAPThroughout();
+        if (freeeAPs.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
+            return false;
+        }
+        DGraph originalGraph = vertex.getGraphOwner();
+        DGraph tmpGraph = originalGraph.clone();
+        
+        Vertex headVrtx = tmpGraph.getVertexAtPosition(originalGraph.indexOf(
+                vertex));
+        
+        // Define the set of rings on the cloned (tmp) graph
+        List<Ring> setOfRingsOnTmpGraph = null;
+        for (AttachmentPoint srcAP : headVrtx.getFreeAPThroughout())
+        {
+            APClass apc = srcAP.getAPClass();
+            
+            // Skip if the APClass is not allowed to form ring closures
+            if (!fragSpace.getRCCompatibilityMatrix().containsKey(apc))
+            {
+                continue;
+            }
+            List<APClass> rcTrgAPCs = fragSpace.getRCCompatibilityMatrix().get(
+                    apc);
+            
+            // NB: the fragment space may or may not have a RCV for this AP
+            Vertex rcvOnSrcAP = null;
+            List<Vertex> candidateRCVs = fragSpace.getRCVsForAPClass(apc);
+            boolean rcvIsChosenArbitrarily = false;
+            if (candidateRCVs.size()>0)
+            {
+                rcvOnSrcAP = rng.randomlyChooseOne(candidateRCVs);
+            } else {
+                rcvIsChosenArbitrarily = true;
+                rcvOnSrcAP = fragSpace.getPolarizedRCV(true);
+            }
+            
+            // Add the RCV on this AP
+            List<Vertex> rcvAddedToGraph = new ArrayList<Vertex>();
+            tmpGraph.appendVertexOnAP(srcAP, rcvOnSrcAP.getAP(0));
+            rcvAddedToGraph.add(rcvOnSrcAP);
+            
+            // Add a few RCVs in the rest of the system
+            // WARNING: hard-coded max number of attempts. It should not be too
+            // high to prevent combinatorial explosion.
+            for (int i=0; i<20; i++) 
+            {
+                // Do it only on APs that APClass-compatible with chord formation
+                List<AttachmentPoint> apsToTry = 
+                        tmpGraph.getAvailableAPsThroughout();
+                int numberOfAttempts = apsToTry.size();
+                AttachmentPoint trgAP = null;
+                for (int iap=0; iap<numberOfAttempts; iap++)
+                {
+                    AttachmentPoint candidate = rng.randomlyChooseOne(apsToTry);
+                    if (rcTrgAPCs.contains(candidate.getAPClass()))
+                    {
+                        trgAP = candidate;
+                        break;
+                    }
+                    apsToTry.remove(trgAP);
+                }
+                if (trgAP==null)
+                {
+                    // No more AP can be used to form rings with srcAP
+                    break;
+                }
+                
+                // Choose type of RCV
+                Vertex rcvOnTrgAP = null;
+                if (rcvIsChosenArbitrarily)
+                {
+                    rcvOnTrgAP = fragSpace.getPolarizedRCV(false);
+                } else {
+                    List<Vertex> candRCVs = fragSpace.getRCVsForAPClass(
+                            trgAP.getAPClass());
+                    if (candRCVs.size()>0)
+                    {
+                        APClass requiredAPC = RingClosingAttractor.RCAAPCMAP.get(
+                                        rcvOnSrcAP.getAP(0).getAPClass());
+                        List<Vertex> keptRCVs = new ArrayList<Vertex>();
+                        for (Vertex rcv : candRCVs)
+                        {
+                            if (requiredAPC.equals(rcv.getAP(0).getAPClass()))
+                                keptRCVs.add(rcv);
+                        }
+                        rcvOnTrgAP = rng.randomlyChooseOne(keptRCVs);
+                        if (rcvOnTrgAP==null)
+                        {
+                            // no RCV is both usable and compatible with the
+                            // one already selected for srcAP
+                            continue;
+                        }
+                    } else {
+                        // The APClass settings and RCV compatibility rules
+                        // do not allow to identify a suitable RCV
+                        continue;
+                    }
+                }
+                
+                // append RCV
+                tmpGraph.appendVertexOnAP(trgAP, rcvOnTrgAP.getAP(0));
+                rcvAddedToGraph.add(rcvOnTrgAP);
+            }
+            if (rcvAddedToGraph.size() < 2)
+            {
+                // TODO: we could consider counting these to see what is the 
+                // most frequent cause of this mutation to fail
+                continue;
+            }
+            
+            // Define rings to close in tmp graph
+            ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(
+                    settings.getLogger(), rng);
+            t3d.setAlignBBsIn3D(false); //3D not needed
+            IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(tmpGraph,true);
+            RandomCombOfRingsIterator rCombIter = new RandomCombOfRingsIterator(
+                    mol,
+                    tmpGraph, 
+                    settings.getMaxRingsAddedByMutation(),
+                    fragSpace, rcParams);
+            
+            //TODO: possibility to generate multiple combinations, rank them,  
+            // and pick the best one. Though definition of comparator is not
+            // unambiguous.
+            
+            setOfRingsOnTmpGraph = rCombIter.next();
+            
+            // Termination of search over trgAPs
+            if (setOfRingsOnTmpGraph.size()>0)
+                break;
+            
+            // Cleanup before starting new iteration
+            for (Vertex toRemove : rcvAddedToGraph)
+                tmpGraph.removeVertex(toRemove);
+        }
+        if (setOfRingsOnTmpGraph==null || setOfRingsOnTmpGraph.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NORINGCOMB);
+            return false;
+        }
+        
+        // Project rings into the actual graph
+        boolean done = false;
+        for (Ring rOnTmp : setOfRingsOnTmpGraph)
+        {
+            // Project head RCV and all info to attach it to original graph
+            Vertex vToHeadRCV = originalGraph.getVertexAtPosition(
+                    tmpGraph.indexOf(rOnTmp.getHeadVertex().getParent()));
+            AttachmentPoint apToHeadRCV = vToHeadRCV.getAP(
+                    rOnTmp.getHeadVertex().getEdgeToParent().getSrcAP()
+                    .getIndexInOwner());
+            Vertex headRCV = rOnTmp.getHeadVertex().clone();
+            headRCV.setVertexId(GraphUtils.getUniqueVertexIndex());
+            
+            // And append head RCV on original graph
+            originalGraph.appendVertexOnAP(apToHeadRCV, headRCV.getAP(0));
+            
+            // Project tail RCV and all info to attach it to original graph
+            Vertex vToTailRCV = originalGraph.getVertexAtPosition(
+                    tmpGraph.indexOf(rOnTmp.getTailVertex().getParent()));
+            AttachmentPoint apToTailRCV = vToTailRCV.getAP(
+                    rOnTmp.getTailVertex().getEdgeToParent().getSrcAP()
+                    .getIndexInOwner());
+            Vertex tailRCV = rOnTmp.getHeadVertex().clone();
+            tailRCV.setVertexId(GraphUtils.getUniqueVertexIndex());
+            
+            // And append tail RCV on original graph
+            originalGraph.appendVertexOnAP(apToTailRCV, tailRCV.getAP(0));
+            
+            // Add ring
+            originalGraph.addRing(headRCV, tailRCV);
+            done = true;
+        }
+        
+        // Restore capping groups
+        vertex.getGraphOwner().addCappingGroups(fragSpace);
+        
+        return done;
+    }
+
+//------------------------------------------------------------------------------
+    
     /**
      * function that will keep extending the graph according to the 
      * growth/substitution probability.
@@ -1024,13 +1245,12 @@ public class GraphOperations
             return status;
         }
         
-        int curVrtId = curVrtx.getVertexId();
         DGraph molGraph = curVrtx.getGraphOwner();
         int lvl = molGraph.getLevel(curVrtx);
 
-        ArrayList<Integer> addedVertices = new ArrayList<>();
+        ArrayList<Long> addedVertices = new ArrayList<>();
 
-        ArrayList<AttachmentPoint> lstDaps = curVrtx.getAttachmentPoints();
+        List<AttachmentPoint> lstDaps = curVrtx.getAttachmentPoints();
         List<AttachmentPoint> toDoAPs = new ArrayList<AttachmentPoint>();
         toDoAPs.addAll(lstDaps);
         for (int i=0; i<lstDaps.size(); i++)
@@ -1050,6 +1270,7 @@ public class GraphOperations
                 continue;
             }
 
+            // NB: this is done also in addRing()
             // Ring closure does not change the size of the molecule, so we
             // give it an extra chance to occur irrespectively on molecular size
             // limit, while still subject of crowdedness probability.
@@ -1098,6 +1319,10 @@ public class GraphOperations
             IdFragmentAndAP chosenFrgAndAp = null;
             if (allowOnlyRingClosure)
             {
+                // NB: this works only for RCVs that are in the BBSpace, does 
+                // not generate a default RCV on-the-fly. So if no RCV is found
+                // we'll get a pointer to nothing, which is what we check in the 
+                // next IF-block.
                 chosenFrgAndAp = getRCVForSrcAp(curVrtx, apId, 
                         fsParams.getFragmentSpace());
             } else {
@@ -1110,11 +1335,13 @@ public class GraphOperations
                 continue;
             }
             
-            // Stop if graph is already too big
+            // Get the vertex that we'll add to the graph
             Vertex incomingVertex = Vertex.newVertexFromLibrary(-1, 
                             chosenFrgAndAp.getVertexMolId(), 
                             BBType.FRAGMENT, 
                             fsParams.getFragmentSpace());
+            
+            // Stop if graph is already too big
             if ((curVrtx.getGraphOwner().getHeavyAtomsCount() + 
                     incomingVertex.getHeavyAtomsCount()) > maxHeavyAtoms)
             {
@@ -1127,17 +1354,18 @@ public class GraphOperations
                             ap.getAPClass()),
                     settings.getSymmetryProbability(),
                     fsParams.getRandomizer());
-            SymmetricSet symAPs = curVrtx.getSymmetricAPs(apId);
-            if (symAPs!=null 
+            SymmetricAPs symAPs = new SymmetricAPs();
+            if (curVrtx.getSymmetricAPs(ap).size()!=0
                     && (cpOnSymAPs || symmetryOnAps)
                     && !allowOnlyRingClosure)
             {
+                symAPs.addAll(curVrtx.getSymmetricAPs(ap));
+                
                 // Are symmetric APs rooted on same atom?
                 boolean allOnSameSrc = true;
-                for (Integer symApId : symAPs.getList())
+                for (AttachmentPoint symAP : symAPs)
                 {
-                    if (!curVrtx.getAttachmentPoints().get(symApId)
-                            .hasSameSrcAtom(ap))
+                    if (!symAP.hasSameSrcAtom(ap))
                     {
                         allOnSameSrc = false;
                         break;
@@ -1152,10 +1380,10 @@ public class GraphOperations
                     
                     int crowdedness = EAUtils.getCrowdedness(ap);
                     
-                    SymmetricSet toKeep = new SymmetricSet();
+                    SymmetricAPs toKeep = new SymmetricAPs();
                     
                     // Start by keeping "ap"
-                    toKeep.add(apId);
+                    toKeep.add(ap);
                     crowdedness = crowdedness + 1;
                     
                     // Pick the accepted value once (used to decide how much
@@ -1163,9 +1391,9 @@ public class GraphOperations
                     double shot = settings.getRandomizer().nextDouble();
                     
                     // Keep as many as allowed by the crowdedness decision
-                    for (Integer symApId : symAPs.getList())
+                    for (AttachmentPoint symAP : symAPs)
                     {
-                        if (symApId.compareTo(apId) == 0)
+                        if (symAP == ap)
                             continue;
                         
                         double crowdProb = EAUtils.getCrowdingProbability(
@@ -1174,7 +1402,7 @@ public class GraphOperations
                         if (shot > crowdProb)
                             break;
                         
-                        toKeep.add(symApId);
+                        toKeep.add(symAP);
                         crowdedness = crowdedness + 1;
                     }
                     
@@ -1182,20 +1410,20 @@ public class GraphOperations
                     symAPs = toKeep;
                 }
             } else {
-                symAPs = new SymmetricSet();
-                symAPs.add(apId);
+                symAPs = new SymmetricAPs();
+                symAPs.add(ap);
             }
 
             // ...and inherit symmetry from previous levels
             boolean cpOnSymVrts = molGraph.hasSymmetryInvolvingVertex(curVrtx);
-            SymmetricSet symVerts = new SymmetricSet();
+            SymmetricVertexes symVerts = new SymmetricVertexes();
             if (cpOnSymVrts)
             {
-                symVerts = molGraph.getSymSetForVertexID(curVrtId);
+                symVerts = molGraph.getSymSetForVertex(curVrtx);
             }
             else
             {
-                symVerts.add(curVrtId);
+                symVerts.add(curVrtx);
             }
             
             // Consider size after application of symmetry
@@ -1206,39 +1434,51 @@ public class GraphOperations
                 continue;
             }
             
+            // Collects all sym APs: within the vertex and outside it 
+            List<AttachmentPoint> allAPsFromSymVerts = new ArrayList<>();
+            for (Vertex symVrt : symVerts)
+            {
+                for (AttachmentPoint apOnVrt : symAPs)
+                {
+                    AttachmentPoint apOnSymVrt = symVrt.getAP(
+                            apOnVrt.getIndexInOwner());
+                    // This check is most often not needed, but it prevents that
+                    // misleading symmetry relations are used to break APClass
+                    // compatibility constraints
+                    if (apOnVrt.sameAs(apOnSymVrt)
+                            // Also ignore previously found APs
+                            && !symAPs.contains(apOnSymVrt))
+                    {
+                        allAPsFromSymVerts.add(apOnSymVrt);
+                    }
+                }
+            }
+            symAPs.addAll(allAPsFromSymVerts);
+            
             GraphUtils.ensureVertexIDConsistency(molGraph.getMaxVertexId());
 
             // loop on all symmetric vertices, but can be only one.
-            SymmetricSet newSymSetOfVertices = new SymmetricSet();
-            for (Integer parVrtId : symVerts.getList())
+            SymmetricVertexes newSymSetOfVertices = new SymmetricVertexes();
+            for (AttachmentPoint symAP : symAPs)
             {
-                Vertex parVrt = molGraph.getVertexWithId(parVrtId);
-                
-                for (int si=0; si<symAPs.size(); si++)
+                if (!symAP.isAvailable())
                 {
-                    int symApId = symAPs.get(si);
-                    AttachmentPoint symAP = parVrt.getAttachmentPoints()
-                            .get(symApId);
-                    
-                    if (!symAP.isAvailable())
-                    {
-                        continue;
-                    }
-
-                    // Finally add the fragment on a symmetric AP
-                    int newVrtId = GraphUtils.getUniqueVertexIndex();
-                    Vertex fragVertex = Vertex.newVertexFromLibrary(newVrtId, 
-                                    chosenFrgAndAp.getVertexMolId(), 
-                                    BBType.FRAGMENT,
-                                    fsParams.getFragmentSpace());
-                    AttachmentPoint trgAP = fragVertex.getAP(
-                            chosenFrgAndAp.getApId());
-                    
-                    molGraph.appendVertexOnAP(symAP, trgAP);
-                    
-                    addedVertices.add(newVrtId);
-                    newSymSetOfVertices.add(newVrtId);
+                    continue;
                 }
+
+                // Finally add the fragment on a symmetric AP
+                long newVrtId = GraphUtils.getUniqueVertexIndex();
+                Vertex fragVertex = Vertex.newVertexFromLibrary(newVrtId, 
+                                chosenFrgAndAp.getVertexMolId(), 
+                                BBType.FRAGMENT,
+                                fsParams.getFragmentSpace());
+                AttachmentPoint trgAP = fragVertex.getAP(
+                        chosenFrgAndAp.getApId());
+                
+                molGraph.appendVertexOnAP(symAP, trgAP);
+                
+                addedVertices.add(newVrtId);
+                newSymSetOfVertices.add(fragVertex);
             }
 
             // If any, store symmetry of new vertices in the graph
@@ -1253,7 +1493,7 @@ public class GraphOperations
             // attempt to further extend each of the newly added vertices
             for (int i=0; i<addedVertices.size(); i++)
             {
-                int vid = addedVertices.get(i);
+                long vid = addedVertices.get(i);
                 Vertex v = molGraph.getVertexWithId(vid);
                 extendGraph(v, extend, symmetryOnAps, settings);
             }
@@ -1307,7 +1547,7 @@ public class GraphOperations
             int dapidx, int chosenVrtxIdx, int chosenApId, 
             FragmentSpace fragSpace) throws DENOPTIMException
     {
-        ArrayList<AttachmentPoint> lstDaps = curVertex.getAttachmentPoints();
+        List<AttachmentPoint> lstDaps = curVertex.getAttachmentPoints();
         AttachmentPoint curDap = lstDaps.get(dapidx);
 
         // Initialize with an empty pointer
@@ -1321,7 +1561,7 @@ public class GraphOperations
         }
         else
         {
-            ArrayList<IdFragmentAndAP> candidates = 
+            List<IdFragmentAndAP> candidates = 
                     fragSpace.getFragAPsCompatibleWithClass(
                     curDap.getAPClass());
             if (candidates.size() > 0)
@@ -1345,6 +1585,7 @@ public class GraphOperations
      * Select a compatible ring-closing vertex for the given attachment point.
      * @param curVertex the source graph vertex
      * @param dapidx the attachment point index on the src vertex
+     * @param fragSpace the space of building blocks with all the settings.
      * @return the vector of indeces identifying the molId (fragment index) 
      * of a fragment with a compatible attachment point, and the index of such 
      * attachment point.
@@ -1354,46 +1595,35 @@ public class GraphOperations
     protected static IdFragmentAndAP getRCVForSrcAp(Vertex curVertex, 
             int dapidx, FragmentSpace fragSpace) throws DENOPTIMException
     {
-        AttachmentPoint curDap = curVertex.getAP(dapidx);
-
-        // Initialize with an empty pointer
-        IdFragmentAndAP res = new IdFragmentAndAP(-1, -1, BBType.FRAGMENT, -1, 
-                -1, -1);
+        AttachmentPoint ap = curVertex.getAP(dapidx);
         
-        ArrayList<Vertex> rcvs = fragSpace.getRCVs();
+        Randomizer rng = fragSpace.getRandomizer();
+        List<Vertex> rcvs = fragSpace.getRCVs();
         Vertex chosen = null;
         if (!fragSpace.useAPclassBasedApproach())
         {
-            chosen = fragSpace.getRandomizer().randomlyChooseOne(rcvs);
-            res = new IdFragmentAndAP(-1,chosen.getBuildingBlockId(),
-                    chosen.getBuildingBlockType(),0,-1,-1);
-        }
-        else
-        {
-            ArrayList<IdFragmentAndAP> candidates = 
-                    new ArrayList<IdFragmentAndAP>();
-            for (Vertex v : rcvs)
-            {
-                if (curDap.getAPClass().isCPMapCompatibleWith(
-                        v.getAP(0).getAPClass(), fragSpace))
-                {
-                    candidates.add(new IdFragmentAndAP(-1,v.getBuildingBlockId(),
-                            v.getBuildingBlockType(),0,-1,-1));
-                }
-            }
+            chosen = rng.randomlyChooseOne(rcvs);
+        } else {
+            List<Vertex> candidates = fragSpace.getRCVsForAPClass(
+                    ap.getAPClass());
             if (candidates.size() > 0)
             {
-                res = fragSpace.getRandomizer().randomlyChooseOne(candidates);
+                chosen = rng.randomlyChooseOne(candidates);
             }
         }
-        return res;
+        
+        IdFragmentAndAP pointer = new IdFragmentAndAP();
+        if (chosen!=null)
+            pointer = new IdFragmentAndAP(-1, chosen.getBuildingBlockId(),
+                chosen.getBuildingBlockType(), 0, -1, -1);
+        return pointer;
     }
     
 //------------------------------------------------------------------------------
 
     protected static boolean attachFragmentInClosableChain(
             Vertex curVertex, int dapidx, DGraph molGraph,
-            ArrayList<Integer> addedVertices, GAParameters settings)
+            ArrayList<Long> addedVertices, GAParameters settings)
                     throws DENOPTIMException
     {
         boolean res = false;
@@ -1428,7 +1658,7 @@ public class GraphOperations
             int dapNewFrag = newFragIds.get(2);
             if (molIdNewFrag != -1)
             {
-                int newvid = GraphUtils.getUniqueVertexIndex();
+                long newvid = GraphUtils.getUniqueVertexIndex();
                 Vertex newVrtx = Vertex.newVertexFromLibrary(
                         newvid, molIdNewFrag, typeNewFrag, 
                         fsParams.getFragmentSpace());
@@ -1933,7 +2163,7 @@ public class GraphOperations
                 break;
             }
             Vertex v = settings.getRandomizer().randomlyChooseOne(mutable);
-            doneMutation = performMutation(v,mnt,settings);
+            doneMutation = performMutation(v, mnt, settings);
             if(!doneMutation)
                 break;
         }
@@ -2127,6 +2357,13 @@ public class GraphOperations
                 if (!done)
                     mnt.increase(
                             CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDLINK);
+                break;
+                
+            case ADDRING:
+                done = addRing(vertex, mnt, false, fsParams.getFragmentSpace(), 
+                        settings);
+                if (!done)
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING);
                 break;
                 
             case EXTEND:

@@ -36,7 +36,7 @@ import denoptim.fragspace.FragsCombination;
 import denoptim.fragspace.IdFragmentAndAP;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
-import denoptim.graph.SymmetricSet;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Vertex;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
@@ -236,16 +236,16 @@ public class GraphBuildingTask extends FitnessTask
             }
 
             // Extend graph as requested
-            Map<Integer,SymmetricSet> newSymSets = 
-                                            new HashMap<Integer,SymmetricSet>();
+            Map<Integer, SymmetricVertexes> newSymSets = 
+                    new HashMap<Integer, SymmetricVertexes>();
             for (IdFragmentAndAP srcAp : fragsToAdd.keySet())
             {
-                int sVId = srcAp.getVertexId();
+                long sVId = srcAp.getVertexId();
                 int sApId = srcAp.getApId();
                 Vertex srcVrtx = dGraph.getVertexWithId(sVId);
     
                 IdFragmentAndAP trgAp = fragsToAdd.get(srcAp);
-                int tVId = trgAp.getVertexId();
+                long tVId = trgAp.getVertexId();
                 int tFId = trgAp.getVertexMolId();
                 Vertex.BBType tFTyp = trgAp.getVertexMolType(); 
                 int tApId = trgAp.getApId();
@@ -256,22 +256,20 @@ public class GraphBuildingTask extends FitnessTask
                 {
                     continue;
                 }
-
+    
+                Vertex trgVrtx = Vertex.newVertexFromLibrary(
+                        tVId, tFId, tFTyp, fragSpace);
+                
                 // record symmetric relations between vertices
                 int tSymSetID = trgAp.getVrtSymSetId();
                 if (newSymSets.containsKey(tSymSetID))
                 {
-                    newSymSets.get(tSymSetID).add(tVId);
+                    newSymSets.get(tSymSetID).add(trgVrtx);
+                } else {
+                    SymmetricVertexes ss = new SymmetricVertexes();
+                    ss.add(trgVrtx);
+                    newSymSets.put(tSymSetID, ss);
                 }
-                else
-                {
-                    SymmetricSet ss = new SymmetricSet();
-                    ss.add(tVId);
-                    newSymSets.put(tSymSetID,ss);
-                }
-    
-                Vertex trgVrtx = Vertex.newVertexFromLibrary(
-                        tVId, tFId, tFTyp, fragSpace);
                 
                 dGraph.appendVertexOnAP(srcVrtx.getAP(sApId), 
                         trgVrtx.getAP(tApId));
@@ -280,7 +278,7 @@ public class GraphBuildingTask extends FitnessTask
             // Append new symmetric sets
             for (Integer ssId : newSymSets.keySet())
             {
-                SymmetricSet ss = newSymSets.get(ssId);
+                SymmetricVertexes ss = newSymSets.get(ssId);
                 if (ss.size() > 1)
                 {
                     dGraph.addSymmetricSetOfVertices(ss);

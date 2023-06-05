@@ -52,6 +52,12 @@ public class FRParameters extends RunTimeParameters
      */
     protected boolean addTemplatesToLibraries = false;
     
+    /**
+     * The maximum number of seconds we wait for the fitness provider to return
+     * a result.
+     */
+    private int walltime = 5;
+    
 //-----------------------------------------------------------------------------
     
     /**
@@ -100,6 +106,9 @@ public class FRParameters extends RunTimeParameters
 		    break;
         case "OUTPUT=":
             outFile = new File(value);
+            break;
+        case "WALLTIME=":
+            walltime = Integer.parseInt(value);
             break;
         case "EXTRACTTEMPLATES":
             addTemplatesToLibraries = true;
@@ -202,6 +211,18 @@ public class FRParameters extends RunTimeParameters
             sb.append(otherCollector.getPrintedList());
         }
         return sb.toString();
+    }
+
+//----------------------------------------------------------------------------
+
+    /**
+     * Returns the maximum number of seconds to wait for the fitness provider to 
+     * deliver a result.
+     * @return the wall time.
+     */
+    public long getWallTime()
+    {
+        return walltime;
     }
 
 //----------------------------------------------------------------------------

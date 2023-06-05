@@ -18,6 +18,7 @@
 
 package denoptim.graph;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -35,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.vecmath.Point3d;
 
@@ -71,6 +73,7 @@ public class DGraphTest
     
     private static APClass APCA, APCB, APCC, APCD, CAPP;
     private static String a="A", b="B", c="C", d="D", cap="cap";
+    
     
 //------------------------------------------------------------------------------
     
@@ -266,17 +269,17 @@ public class DGraphTest
         graph.addEdge(new Edge(v1b.getAP(3), v2b_bis.getAP(0)));
         graph.addEdge(new Edge(v1b.getAP(4), v3b.getAP(0)));
         
-        ArrayList<Integer> symA = new ArrayList<Integer>();
-        symA.add(v1a.getVertexId());
-        symA.add(v1b.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symA));
+        List<Vertex> symA = new ArrayList<Vertex>();
+        symA.add(v1a);
+        symA.add(v1b);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symA));
         
-        ArrayList<Integer> symB = new ArrayList<Integer>();
-        symB.add(v2a.getVertexId());
-        symB.add(v2a_bis.getVertexId());
-        symB.add(v2b.getVertexId());
-        symB.add(v2b_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        List<Vertex> symB = new ArrayList<Vertex>();
+        symB.add(v2a);
+        symB.add(v2a_bis);
+        symB.add(v2b);
+        symB.add(v2b_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symB));
         
         graph.renumberGraphVertices();
         return graph;
@@ -341,22 +344,22 @@ public class DGraphTest
                 BBType.FRAGMENT, fs);
         graph.appendVertexOnAP(v2b.getAP(2), v5b.getAP(0));
         
-        ArrayList<Integer> sym1 = new ArrayList<Integer>();
-        sym1.add(v1a.getVertexId());
-        sym1.add(v1b.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(sym1));
-        ArrayList<Integer> sym2 = new ArrayList<Integer>();
-        sym2.add(v2a.getVertexId());
-        sym2.add(v2b.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(sym2));
-        ArrayList<Integer> sym3 = new ArrayList<Integer>();
-        sym3.add(v3a.getVertexId());
-        sym3.add(v3b.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(sym3));
-        ArrayList<Integer> sym4 = new ArrayList<Integer>();
-        sym4.add(v4a.getVertexId());
-        sym4.add(v4b.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(sym4));
+        List<Vertex> sym1 = new ArrayList<Vertex>();
+        sym1.add(v1a);
+        sym1.add(v1b);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(sym1));
+        List<Vertex> sym2 = new ArrayList<Vertex>();
+        sym2.add(v2a);
+        sym2.add(v2b);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(sym2));
+        List<Vertex> sym3 = new ArrayList<Vertex>();
+        sym3.add(v3a);
+        sym3.add(v3b);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(sym3));
+        List<Vertex> sym4 = new ArrayList<Vertex>();
+        sym4.add(v4a);
+        sym4.add(v4b);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(sym4));
         
         graph.renumberGraphVertices();
         return graph;
@@ -464,15 +467,15 @@ public class DGraphTest
         graph.addRing(v7a, v7a_quat);
         graph.addRing(v7a_bis, v7a_tris);
         
-        ArrayList<Integer> symA = new ArrayList<Integer>();
-        symA.add(v1a.getVertexId());
-        symA.add(v1c.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symA));
+        List<Vertex> symA = new ArrayList<Vertex>();
+        symA.add(v1a);
+        symA.add(v1c);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symA));
         
-        ArrayList<Integer> symB = new ArrayList<Integer>();
-        symB.add(v2b.getVertexId());
-        symB.add(v2b_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        List<Vertex> symB = new ArrayList<Vertex>();
+        symB.add(v2b);
+        symB.add(v2b_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symB));
         
         graph.renumberGraphVertices();
         return graph;
@@ -569,10 +572,10 @@ public class DGraphTest
         graph.addEdge(new Edge(v1b.getAP(3), v2b_bis.getAP(0)));
         graph.addEdge(new Edge(v1b.getAP(4), v3b.getAP(0)));
         
-        ArrayList<Integer> symB = new ArrayList<Integer>();
-        symB.add(v2b.getVertexId());
-        symB.add(v2b_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        List<Vertex> symB = new ArrayList<Vertex>();
+        symB.add(v2b);
+        symB.add(v2b_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symB));
         
         graph.renumberGraphVertices();
         return graph;
@@ -636,15 +639,15 @@ public class DGraphTest
         graph.addEdge(new Edge(v2b_bis.getAP(1), v3b_3.getAP(2)));
         graph.addEdge(new Edge(v2b_bis.getAP(3), v3b_4.getAP(2)));
         
-        ArrayList<Integer> symFirstLayer = new ArrayList<Integer>();
-        symFirstLayer.add(v2b.getVertexId());
-        symFirstLayer.add(v2b_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symFirstLayer));
+        List<Vertex> symFirstLayer = new ArrayList<Vertex>();
+        symFirstLayer.add(v2b);
+        symFirstLayer.add(v2b_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symFirstLayer));
         
-        ArrayList<Integer> symSecondLayer = new ArrayList<Integer>();
-        symSecondLayer.add(v3b_1.getVertexId());
-        symSecondLayer.add(v3b_2.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symSecondLayer));
+        List<Vertex> symSecondLayer = new ArrayList<Vertex>();
+        symSecondLayer.add(v3b_1);
+        symSecondLayer.add(v3b_2);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symSecondLayer));
         
         graph.renumberGraphVertices();
         return graph;
@@ -715,15 +718,15 @@ public class DGraphTest
         
         graph.addRing(v7a, v7a_bis);
         
-        ArrayList<Integer> symA = new ArrayList<Integer>();
-        symA.add(v6a.getVertexId());
-        symA.add(v6a_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symA));
+        List<Vertex> symA = new ArrayList<Vertex>();
+        symA.add(v6a);
+        symA.add(v6a_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symA));
         
-        ArrayList<Integer> symB = new ArrayList<Integer>();
-        symB.add(v7a.getVertexId());
-        symB.add(v7a_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        List<Vertex> symB = new ArrayList<Vertex>();
+        symB.add(v7a);
+        symB.add(v7a_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symB));
         
         graph.renumberGraphVertices();
         return graph;
@@ -813,15 +816,15 @@ public class DGraphTest
         
         graph.addRing(v7a, v7a_bis);
         
-        ArrayList<Integer> symA = new ArrayList<Integer>();
-        symA.add(v6a.getVertexId());
-        symA.add(v6a_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symA));
+        List<Vertex> symA = new ArrayList<Vertex>();
+        symA.add(v6a);
+        symA.add(v6a_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symA));
         
-        ArrayList<Integer> symB = new ArrayList<Integer>();
-        symB.add(v7a.getVertexId());
-        symB.add(v7a_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        List<Vertex> symB = new ArrayList<Vertex>();
+        symB.add(v7a);
+        symB.add(v7a_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symB));
         
         // up to here it is graph F. Now come the pieces of graph D
         
@@ -880,11 +883,11 @@ public class DGraphTest
         graph.addRing(v7a_d, v7a_d_quat);
         graph.addRing(v7a_d_bis, v7a_d_tris);
 
-        ArrayList<Integer> symC = new ArrayList<Integer>();
-        symC.add(v2b_d.getVertexId());
-        symC.add(v2b_d_bis.getVertexId());
+        List<Vertex> symC = new ArrayList<Vertex>();
+        symC.add(v2b_d);
+        symC.add(v2b_d_bis);
         
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symC));
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symC));
         return graph;
     }
     
@@ -1087,15 +1090,142 @@ public class DGraphTest
         graph.addEdge(new Edge(v6a_bis.getAP(1), v1a_2_bis.getAP(1)));
         graph.addEdge(new Edge(v6a_tris.getAP(1), v1a_2_tris.getAP(1)));
         
-        ArrayList<Integer> symA = new ArrayList<Integer>();
-        symA.add(v6a.getVertexId());
-        symA.add(v6a_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symA));
+        List<Vertex> symA = new ArrayList<Vertex>();
+        symA.add(v6a);
+        symA.add(v6a_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symA));
         
-        ArrayList<Integer> symB = new ArrayList<Integer>();
-        symB.add(v1a_2.getVertexId());
-        symB.add(v1a_2_bis.getVertexId());
-        graph.addSymmetricSetOfVertices(new SymmetricSet(symB));
+        List<Vertex> symB = new ArrayList<Vertex>();
+        symB.add(v1a_2);
+        symB.add(v1a_2_bis);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symB));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     *  Creates a test graph that looks like this: 
+     * 
+     *  <pre>
+     *        (C)-(C)-v6-(D)--(B)-v7
+     *        /                    |
+     *       /                   chord
+     *      |                      |
+     *      | (B)-(C)-v6-(D)--(B)-v7
+     *      |/
+     *  (A)-v1-(B)
+     *       |
+     *      0(A)
+     *       |
+     *      2(A)
+     *       |
+     *   (B)-v1-(C)-v6-(D)--(B)-v7
+     *       |                  |
+     *      0(A)                 |
+     *       |                chord
+     *      (A)                 |
+     *    v1_scaffold(D)-------(B)-v7
+     *      (A)
+     *       |
+     *      0(A)
+     *       |
+     *      v1
+     *       |
+     *      2(A)
+     *       |
+     *      0(A)
+     *       |
+     * 2(A)-v1-1(B)-(B)-v2
+     *      |\
+     *      | 3(B)-(B)-v2
+     *      \
+     *       4(C)-(C)-v3
+     *   </pre>
+     *   
+     */
+    private DGraph makeTestGraphL(FragmentSpace fs) 
+            throws DENOPTIMException
+    {
+        DGraph graph = new DGraph();
+        Vertex s = Vertex.newVertexFromLibrary(1,
+                BBType.SCAFFOLD, fs);
+        graph.addVertex(s);
+        Vertex v1a = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1a);
+        Vertex v6a = Vertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v6a);
+        Vertex v6a_bis = Vertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v6a_bis);
+        Vertex v6a_tris = Vertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v6a_tris);
+        Vertex v7a = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a);
+        Vertex v7a_bis = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a_bis);
+        Vertex v7a_tris = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a_tris);
+        
+        Vertex v7a_quat = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a_quat);
+        
+        Vertex v1d = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1d);
+        
+        Vertex v1c = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1c);
+        
+        Vertex v1b = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1b);
+        Vertex v2b = Vertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v2b);
+        Vertex v2b_bis = Vertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v2b_bis);
+        Vertex v3b = Vertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v3b);
+        graph.addEdge(new Edge(s.getAP(0), v1d.getAP(0)));
+        graph.addEdge(new Edge(v1d.getAP(2), v1a.getAP(0)));
+        graph.addEdge(new Edge(v1d.getAP(1), v6a.getAP(0)));
+        graph.addEdge(new Edge(v1a.getAP(3), v6a_bis.getAP(0)));
+        graph.addEdge(new Edge(v1a.getAP(4), v6a_tris.getAP(0)));
+        graph.addEdge(new Edge(v6a.getAP(1), v7a.getAP(0)));
+        graph.addEdge(new Edge(v6a_bis.getAP(1), v7a_bis.getAP(0)));
+        graph.addEdge(new Edge(v6a_tris.getAP(1), v7a_tris.getAP(0)));
+        graph.addEdge(new Edge(s.getAP(2), v7a_quat.getAP(0)));
+        graph.addEdge(new Edge(s.getAP(1), v1c.getAP(0)));
+        graph.addEdge(new Edge(v1c.getAP(2), v1b.getAP(0)));
+        graph.addEdge(new Edge(v1b.getAP(1), v2b.getAP(0)));
+        graph.addEdge(new Edge(v1b.getAP(3), v2b_bis.getAP(0)));
+        graph.addEdge(new Edge(v1b.getAP(4), v3b.getAP(0)));
+        
+        graph.addRing(v7a, v7a_quat);
+        graph.addRing(v7a_bis, v7a_tris);
+        
+        List<Vertex> symA = new ArrayList<Vertex>();
+        symA.add(v6a_bis);
+        symA.add(v6a_tris);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symA));
+        
+        List<Vertex> symB = new ArrayList<Vertex>();
+        symB.add(v7a_bis);
+        symB.add(v7a_tris);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symB));
         
         graph.renumberGraphVertices();
         return graph;
@@ -1193,8 +1323,8 @@ public class DGraphTest
         APClass a0 = APClass.make("a",0,BondType.SINGLE);
         APClass b0 = APClass.make("b",0,BondType.SINGLE);
         APClass h0 = APClass.make("h",0,BondType.SINGLE);
-        APClass ap0 = APClass.make("ATplus",0);
-        APClass am0 = APClass.make("ATminus",0);
+        APClass ap0 = APClass.RCACLASSPLUS;
+        APClass am0 = APClass.RCACLASSMINUS;
         
         HashMap<APClass,ArrayList<APClass>> cpMap = 
                 new HashMap<APClass,ArrayList<APClass>>();
@@ -1501,8 +1631,12 @@ public class DGraphTest
         
         Vertex v2 = g2.getVertexAtPosition(2);
         
-        SymmetricSet origSS = g2.getSymSetForVertex(v2).clone();
-        Set<Integer> oldVertexIds = new HashSet<Integer>();
+        SymmetricVertexes origSS = new SymmetricVertexes();
+        for (Vertex v : g2.getSymSetForVertex(v2))
+        {
+            origSS.add(v);
+        }
+        Set<Long> oldVertexIds = new HashSet<Long>();
         for (Vertex v : g2.getVertexList())
             oldVertexIds.add(v.getVertexId());
         
@@ -1543,16 +1677,16 @@ public class DGraphTest
         assertEquals(2,g2.getSymmetricSetCount(),"Number of symmetric sets.");
         boolean found = false;
         boolean foundOldVertexId = false;
-        Iterator<SymmetricSet> iterSS = g2.getSymSetsIterator();
+        Iterator<SymmetricVertexes> iterSS = g2.getSymSetsIterator();
         while (iterSS.hasNext())
         {
-            SymmetricSet ss = iterSS.next();
+            SymmetricVertexes ss = iterSS.next();
             if (ss.size() == origSS.size())
             {
                 found = true;
-                for (Integer vid : ss.getList())
+                for (Vertex v : ss)
                 {
-                    if (oldVertexIds.contains(vid))
+                    if (oldVertexIds.contains(v.getVertexId()))
                         foundOldVertexId = true;
                 }
             }
@@ -1733,11 +1867,15 @@ public class DGraphTest
 		graph.addRing(new Ring(new ArrayList<>(
 				Arrays.asList(v6, v0, v4, v7))));
 
-		graph.addSymmetricSetOfVertices(new SymmetricSet(
-				new ArrayList<>(Arrays.asList(3, 5))));
+		SymmetricVertexes ss = new SymmetricVertexes();
+		ss.add(v3);
+		ss.add(v5);
+		graph.addSymmetricSetOfVertices(ss);
 
-		graph.addSymmetricSetOfVertices(new SymmetricSet(
-				new ArrayList<>(Arrays.asList(6, 7))));
+        SymmetricVertexes ss2 = new SymmetricVertexes();
+        ss2.add(v6);
+        ss2.add(v7);
+		graph.addSymmetricSetOfVertices(ss2);
 
 		// Current string encoding this graph is
 //    	  "0 0_1_0_0,1_1_1_0,2_1_1_0,3_1_1_0,4_1_1_0,5_1_1_0,"
@@ -1886,13 +2024,13 @@ public class DGraphTest
 		buildVertexAndConnectToGraph(v4, 2, graphA);
 		graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-		SymmetricSet ssA = new SymmetricSet();
-		ssA.add(1);
-		ssA.add(2);
+		SymmetricVertexes ssA = new SymmetricVertexes();
+		ssA.add(v1);
+		ssA.add(v2);
 		graphA.addSymmetricSetOfVertices(ssA);
-		SymmetricSet ssA2 = new SymmetricSet();
-		ssA2.add(3);
-		ssA2.add(4);
+		SymmetricVertexes ssA2 = new SymmetricVertexes();
+		ssA2.add(v3);
+		ssA2.add(v4);
 		graphA.addSymmetricSetOfVertices(ssA2);
 
 		// Other
@@ -1917,13 +2055,13 @@ public class DGraphTest
 		buildVertexAndConnectToGraph(v94, 2, graphB);
 		graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
 
-		SymmetricSet ssB2 = new SymmetricSet();
-		ssB2.add(93);
-		ssB2.add(94);
+		SymmetricVertexes ssB2 = new SymmetricVertexes();
+		ssB2.add(v93);
+		ssB2.add(v94);
 		graphB.addSymmetricSetOfVertices(ssB2);
-		SymmetricSet ssB = new SymmetricSet();
-		ssB.add(91);
-		ssB.add(92);
+		SymmetricVertexes ssB = new SymmetricVertexes();
+		ssB.add(v91);
+		ssB.add(v92);
 		graphB.addSymmetricSetOfVertices(ssB);
 
     	/*
@@ -1960,13 +2098,13 @@ public class DGraphTest
 		buildVertexAndConnectToGraph(v4, 2, graphA);
 		graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-		SymmetricSet ssA = new SymmetricSet();
-		ssA.add(1);                            //difference
-		ssA.add(2);                            //difference
+		SymmetricVertexes ssA = new SymmetricVertexes();
+		ssA.add(v1);                            //difference
+		ssA.add(v2);                            //difference
 		graphA.addSymmetricSetOfVertices(ssA);
-		SymmetricSet ssA2 = new SymmetricSet();
-		ssA2.add(3);                           //difference
-		ssA2.add(4);                           //difference
+		SymmetricVertexes ssA2 = new SymmetricVertexes();
+		ssA2.add(v3);                           //difference
+		ssA2.add(v4);                           //difference
 		graphA.addSymmetricSetOfVertices(ssA2);
 
 		// Other
@@ -1991,13 +2129,13 @@ public class DGraphTest
 		buildVertexAndConnectToGraph(v94, 2, graphB);
 		graphB.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-		SymmetricSet ssB = new SymmetricSet();
-		ssB.add(1);                           //difference
-		ssB.add(3);                           //difference
+		SymmetricVertexes ssB = new SymmetricVertexes();
+		ssB.add(v1);                           //difference
+		ssB.add(v3);                           //difference
 		graphB.addSymmetricSetOfVertices(ssB);
-		SymmetricSet ssB2 = new SymmetricSet();
-		ssB2.add(2);                           //difference
-		ssB2.add(4);                           //difference
+		SymmetricVertexes ssB2 = new SymmetricVertexes();
+		ssB2.add(v2);                           //difference
+		ssB2.add(v4);                           //difference
 		graphB.addSymmetricSetOfVertices(ssB2);
 
 		StringBuilder reason = new StringBuilder();
@@ -2305,11 +2443,15 @@ public class DGraphTest
 		graph.addRing(new Ring(new ArrayList<>(
 				Arrays.asList(v6, v0, v4, v7))));
 
-		graph.addSymmetricSetOfVertices(new SymmetricSet(
-				new ArrayList<>(Arrays.asList(3, 5))));
+		SymmetricVertexes ss1 = new SymmetricVertexes();
+		ss1.add(v3);
+        ss1.add(v5);
+		graph.addSymmetricSetOfVertices(ss1);
 
-		graph.addSymmetricSetOfVertices(new SymmetricSet(
-				new ArrayList<>(Arrays.asList(6, 7))));
+        SymmetricVertexes ss2 = new SymmetricVertexes();
+        ss2.add(v6);
+        ss2.add(v7);
+		graph.addSymmetricSetOfVertices(ss2);
 		
 		DGraph clone = graph.clone();
         
@@ -2766,12 +2908,16 @@ public class DGraphTest
 
         graph.addRing(new Ring(new ArrayList<>(
                 Arrays.asList(v6, v0, v4, v7))));
+        
+        SymmetricVertexes ss1 = new SymmetricVertexes();
+        ss1.add(v3);
+        ss1.add(v5);
+        graph.addSymmetricSetOfVertices(ss1);
 
-        graph.addSymmetricSetOfVertices(new SymmetricSet(
-                new ArrayList<>(Arrays.asList(3, 5))));
-
-        graph.addSymmetricSetOfVertices(new SymmetricSet(
-                new ArrayList<>(Arrays.asList(6, 7))));
+        SymmetricVertexes ss2 = new SymmetricVertexes();
+        ss2.add(v6);
+        ss2.add(v7);
+        graph.addSymmetricSetOfVertices(ss2);
         
         String json1 = graph.toJson();
         
@@ -2884,6 +3030,64 @@ public class DGraphTest
         assertTrue(graph.isIsomorphicTo(graphOriginal), 
                 "Original stays the same");
 	}
+	
+//-----------------------------------------------------------------------------
+    
+    @Test
+    public void testExtractSubgraphFromCollection() throws Exception 
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphD(fs);
+        
+        Set<Vertex> targetVertexes = new HashSet<>();
+        targetVertexes.add(graph.getVertexAtPosition(1));
+        targetVertexes.add(graph.getVertexAtPosition(3));
+        
+        DGraph subGraph = graph.extractSubgraph(targetVertexes);
+        
+        assertEquals(targetVertexes.size(), subGraph.getVertexCount());
+        for (Vertex vInTarget : targetVertexes)
+        {
+            assertNotNull(subGraph.getVertexWithId(vInTarget.getVertexId()));
+        }
+        
+        Set<Edge> connectionToSubgraph = new HashSet<Edge>();
+        Set<Edge> connectionFromSubgraph = new HashSet<Edge>();
+        subGraph = graph.extractSubgraph(targetVertexes,
+                connectionToSubgraph, connectionFromSubgraph);
+        
+        assertEquals(1, connectionToSubgraph.size());
+        assertEquals(3, connectionFromSubgraph.size());
+
+        // NB: the subgraph contains clones, but the lists of edges contain
+        // references to the original graph
+        
+        boolean found0 = false;
+        for (Edge e : connectionToSubgraph)
+        {
+            Vertex inResults = e.getSrcAP().getOwner();
+            if (graph.getVertexAtPosition(0) == inResults)
+                found0 = true;
+        }
+        assertTrue(found0);
+        
+        boolean found2 = false;
+        boolean found4 = false;
+        boolean found6 = false;
+        for (Edge e : connectionFromSubgraph)
+        {
+            Vertex inResults = e.getTrgAP().getOwner();
+            if (graph.getVertexAtPosition(2) == inResults)
+                found2 = true;
+            if (graph.getVertexAtPosition(4) == inResults)
+                found4 = true;
+            if (graph.getVertexAtPosition(6) == inResults)
+                found6 = true;
+        }
+        assertTrue(found2);
+        assertTrue(found4);
+        assertTrue(found6);
+    }
 
 //-----------------------------------------------------------------------------
 	
@@ -3198,10 +3402,10 @@ public class DGraphTest
         assertEquals(2,g.getSymmetricSetCount(),"number of sets");
         boolean foundA = false;
         boolean foundB = false;
-        Iterator<SymmetricSet> iter = g.getSymSetsIterator();
+        Iterator<SymmetricVertexes> iter = g.getSymSetsIterator();
         while (iter.hasNext())
         {
-            SymmetricSet ss = iter.next();
+            SymmetricVertexes ss = iter.next();
             if (ss.size() == 2)
                 foundA = true;
             if (ss.size() == 4)
@@ -3219,10 +3423,10 @@ public class DGraphTest
         g2.convertSymmetricLabelsToSymmetricSets();
         
         assertEquals(3,g2.getSymmetricSetCount(),"number of sets");
-        Iterator<SymmetricSet> iter2 = g2.getSymSetsIterator();
+        Iterator<SymmetricVertexes> iter2 = g2.getSymSetsIterator();
         while (iter2.hasNext())
         {
-            SymmetricSet ss = iter2.next();
+            SymmetricVertexes ss = iter2.next();
             assertEquals(2,ss.size(),"side of each symmetric sets.");
         }
     }
@@ -3577,7 +3781,7 @@ public class DGraphTest
         assertTrue(g1.isIsostructuralTo(g2));
         
         // Change structure by adding a bifurcation
-        EmptyVertex v2 = new EmptyVertex(10002);
+        EmptyVertex v2 = new EmptyVertex(100002);
         v2.addAP(APCD);
         v2.addAP(APCC);
         v2.addAP(APCC);
@@ -3601,6 +3805,400 @@ public class DGraphTest
         DGraph gisB = pair[1];
         assertFalse(gisA.isIsomorphicTo(gisB));
         assertTrue(gisA.isIsostructuralTo(gisB));
+    }
+
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetEdgesWithSrcOrTrg() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphF(fs);
+        Vertex v = graph.getVertexAtPosition(5);
+        
+        List<Edge> egdesFrom = graph.getEdgesWithSrc(v);
+        assertEquals(2, egdesFrom.size());
+        assertTrue(graph.getVertexAtPosition(6) == 
+                egdesFrom.get(0).getTrgAP().getOwner());
+        assertTrue(graph.getVertexAtPosition(7) == 
+                egdesFrom.get(1).getTrgAP().getOwner());
+
+        List<Edge> egdesTo = graph.getEdgesWithTrg(v);
+        assertEquals(1, egdesTo.size());
+        assertTrue(graph.getVertexAtPosition(0) == 
+                egdesTo.get(0).getSrcAP().getOwner());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testEmbedPatternsInTemplates() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphL(fs);
+        
+        DGraph graphWithTmpls = graph.embedPatternsInTemplates(
+                GraphPattern.RING, fs);
+        
+        assertEquals(7, graphWithTmpls.getVertexCount());
+        assertEquals(6, graphWithTmpls.getEdgeCount());
+        assertEquals(0, graphWithTmpls.getRingCount());
+        List<Vertex> templates = graphWithTmpls.getVertexList()
+                .stream()
+                .filter(v -> v instanceof Template)
+                .collect(Collectors.toList());
+        assertEquals(2, templates.size());
+        assertEquals(1, templates.stream()
+                .filter(t -> t.getBuildingBlockType() == BBType.SCAFFOLD)
+                .count());
+        assertEquals(1, templates.stream()
+                .filter(t -> t.getBuildingBlockType() == BBType.FRAGMENT)
+                .count());
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns a graph with definition of symmetric vertexes and symmetric APs
+     * meant for testing purposes.
+     * Before running this you must run {@link DGraphTest#prepare()}
+     * 
+     * This is the graph we return (symmetric APs are marked by s and s'):
+     * 
+     *              
+     * <pre>
+     *               s(B)-(B)-v3
+     *              / 
+     *        (A)-v1-s(B)-(B)-v4
+     *        /     \
+     *       /       s(B)-(B)-v5
+     *      /
+     *   s(A)  s'(B)-v9  
+     *  /     /
+     * v0==== 
+     *  \     \
+     *   s(A)   s'(B)-v10
+     *     |
+     *      \        s(B)-(B)-v6
+     *       \      / 
+     *        (A)-v2-s(B)-(B)-v7
+     *              \
+     *               s(B)-(B)-v8
+     * </pre>
+     */
+    public static DGraph makeTestGraphM() throws DENOPTIMException
+    {
+        EmptyVertex v0 = new EmptyVertex(0);
+        v0.addAP(APCA);
+        v0.addAP(APCB);
+        v0.addAP(APCA);
+        v0.addAP(APCB);
+        v0.addSymmetricAPSet(new SymmetricAPs(
+                Arrays.asList(v0.getAP(0), v0.getAP(2))));
+        v0.addSymmetricAPSet(new SymmetricAPs(
+                Arrays.asList(v0.getAP(1), v0.getAP(3))));
+
+        EmptyVertex v1 = new EmptyVertex(1);
+        v1.addAP(APCB);
+        v1.addAP(APCA);
+        v1.addAP(APCB);
+        v1.addAP(APCB);
+        v1.addSymmetricAPSet(new SymmetricAPs(
+                Arrays.asList(v1.getAP(0), v1.getAP(2), v1.getAP(3))));
+        
+        EmptyVertex v2 = v1.clone();
+        v2.setVertexId(2);
+        
+        EmptyVertex v3 = new EmptyVertex(3);
+        v3.addAP(APCB);
+        
+        EmptyVertex v4 = v3.clone();
+        EmptyVertex v5 = v3.clone();
+        EmptyVertex v6 = v3.clone();
+        EmptyVertex v7 = v3.clone();
+        EmptyVertex v8 = v3.clone();
+        EmptyVertex v9 = v3.clone();
+        EmptyVertex v10 = v3.clone();
+        v4.setVertexId(4);
+        v5.setVertexId(5);
+        v6.setVertexId(6);
+        v7.setVertexId(7);
+        v8.setVertexId(8);
+        v9.setVertexId(9);
+        v10.setVertexId(10);
+        
+        DGraph g = new DGraph();
+        g.addVertex(v0);
+        g.appendVertexOnAP(v0.getAP(0), v1.getAP(1));
+        g.appendVertexOnAP(v0.getAP(2), v2.getAP(1));
+        g.appendVertexOnAP(v1.getAP(0), v3.getAP(0));
+        g.appendVertexOnAP(v1.getAP(2), v4.getAP(0));
+        g.appendVertexOnAP(v1.getAP(3), v5.getAP(0));
+        g.appendVertexOnAP(v2.getAP(0), v6.getAP(0));
+        g.appendVertexOnAP(v2.getAP(2), v7.getAP(0));
+        g.appendVertexOnAP(v2.getAP(3), v8.getAP(0));
+        g.appendVertexOnAP(v0.getAP(1), v9.getAP(0));
+        g.appendVertexOnAP(v0.getAP(3), v10.getAP(0));
+        
+        return g;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testFindSymmetrySetsOfChildVertexes() throws Exception
+    {
+        prepare();
+        DGraph graph = makeTestGraphM();
+
+        Set<Vertex> alreadyAssignedVrtxs = new HashSet<Vertex>();
+        
+        Vertex focusVrtx = graph.getVertexAtPosition(1);
+        
+        Map<SymmetricAPs,List<Vertex>> symChildenSetsOnSymToVrtxs = 
+                graph.findSymmetrySetsOfChildVertexes(focusVrtx, 
+                        alreadyAssignedVrtxs);
+        
+        Set<SymmetricAPs> keysToRemove = new HashSet<SymmetricAPs>();
+        for (Map.Entry<SymmetricAPs,List<Vertex>> e : 
+            symChildenSetsOnSymToVrtxs.entrySet())
+        {
+            if (e.getValue().size()<2)
+                keysToRemove.add(e.getKey());
+        }
+        for (SymmetricAPs key : keysToRemove)
+            symChildenSetsOnSymToVrtxs.remove(key);
+        
+        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
+        
+        List<Vertex> foundVrtxs = symChildenSetsOnSymToVrtxs.get(
+                focusVrtx.getSymmetricAPSets().get(0));
+        
+        assertEquals(3, foundVrtxs.size());
+        List<Vertex> expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(3));
+        expected.add(graph.getVertexAtPosition(4));
+        expected.add(graph.getVertexAtPosition(5));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+        
+        
+        focusVrtx = graph.getVertexAtPosition(0);
+        
+        alreadyAssignedVrtxs = new HashSet<Vertex>();
+        symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
+                focusVrtx, alreadyAssignedVrtxs);
+        
+        keysToRemove = new HashSet<SymmetricAPs>();
+        for (Map.Entry<SymmetricAPs,List<Vertex>> e : 
+            symChildenSetsOnSymToVrtxs.entrySet())
+        {
+            if (e.getValue().size()<2)
+                keysToRemove.add(e.getKey());
+        }
+        for (SymmetricAPs key : keysToRemove)
+            symChildenSetsOnSymToVrtxs.remove(key);
+        
+        assertEquals(2, symChildenSetsOnSymToVrtxs.size());
+
+        foundVrtxs = symChildenSetsOnSymToVrtxs.get(
+                focusVrtx.getSymmetricAPSets().get(0));
+        
+        assertEquals(2, foundVrtxs.size());
+        expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(1));
+        expected.add(graph.getVertexAtPosition(2));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+        
+        foundVrtxs = symChildenSetsOnSymToVrtxs.get(
+                focusVrtx.getSymmetricAPSets().get(1));
+        
+        assertEquals(2, foundVrtxs.size());
+        expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(9));
+        expected.add(graph.getVertexAtPosition(10));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+    }
+    
+  //------------------------------------------------------------------------------
+
+    /**
+     * Returns a graph with peculiar definition of symmetric vertexes and 
+     * symmetric APs meant for testing purposes.
+     * Before running this you must run {@link DGraphTest#prepare()}
+     * 
+     * This is the graph we return (symmetric APs are marked by s and s'):
+     * 
+     *              
+     * <pre>
+     *               s(B)-(B)-v3
+     *              / 
+     *        (B)s-v1-s(B)-(B)-v4
+     *        /     \
+     *       /       s(B)-(B)-v5                     s(B)     
+     *      /                                       /
+     *   s(B)  s(B)---------------------------(B)s-v9-s(B)  
+     *  /     /                                     \
+     * v0====        (v0 is SCAFFOLD!)               s(B)  
+     *  \     \
+     *   s(B)  s(B)
+     *     |
+     *      \        s(B)-(B)-v6
+     *       \      / 
+     *        (B)s-v2-s(B)-(B)-v7
+     *              \
+     *               s(B)
+     * </pre>
+     */
+    public static DGraph makeTestGraphN() throws DENOPTIMException
+    {
+        EmptyVertex v0 = new EmptyVertex(0);
+        v0.addAP(APCB);
+        v0.addAP(APCB);
+        v0.addAP(APCB);
+        v0.addAP(APCB);
+        v0.addSymmetricAPSet(new SymmetricAPs(Arrays.asList(
+                v0.getAP(0), v0.getAP(1), v0.getAP(2), v0.getAP(3))));
+        
+        EmptyVertex v1 = v0.clone();
+        EmptyVertex v2 = v0.clone();
+        EmptyVertex v9 = v0.clone();
+        v1.setVertexId(1);
+        v2.setVertexId(2);
+        v9.setVertexId(9);
+        
+        v0.setBuildingBlockType(BBType.SCAFFOLD);
+        v1.setBuildingBlockType(BBType.FRAGMENT);
+        v2.setBuildingBlockType(BBType.FRAGMENT);
+        v9.setBuildingBlockType(BBType.FRAGMENT);
+        
+        EmptyVertex v3 = new EmptyVertex(3);
+        v3.addAP(APCB);
+        
+        EmptyVertex v4 = v3.clone();
+        EmptyVertex v5 = v3.clone();
+        EmptyVertex v6 = v3.clone();
+        EmptyVertex v7 = v3.clone();
+        v4.setVertexId(4);
+        v5.setVertexId(5);
+        v6.setVertexId(6);
+        v7.setVertexId(7);;
+        
+        DGraph g = new DGraph();
+        g.addVertex(v0);
+        g.appendVertexOnAP(v0.getAP(0), v1.getAP(1));
+        g.appendVertexOnAP(v0.getAP(2), v2.getAP(1));
+        g.appendVertexOnAP(v1.getAP(0), v3.getAP(0));
+        g.appendVertexOnAP(v1.getAP(2), v4.getAP(0));
+        g.appendVertexOnAP(v1.getAP(3), v5.getAP(0));
+        g.appendVertexOnAP(v2.getAP(0), v6.getAP(0));
+        g.appendVertexOnAP(v2.getAP(2), v7.getAP(0));
+        // Warning added here just to avoid messing the order of vertexes
+        g.appendVertexOnAP(v0.getAP(1), v9.getAP(1));
+        
+        return g;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /*
+    @Test
+    public void testFindSymmetrySetsOfChildVertexes_partFilledAps() 
+            throws Exception
+    {
+        prepare();
+        DGraph graph = makeTestGraphN();
+        
+        Vertex focusVrtx = graph.getVertexAtPosition(1);
+
+        Set<Vertex> alreadyAssignedVrtxs = new HashSet<Vertex>();
+        Map<SymmetricAPs,List<Vertex>> symChildenSetsOnSymToVrtxs = 
+                graph.findSymmetrySetsOfChildVertexes(focusVrtx, 
+                        alreadyAssignedVrtxs);
+        
+        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
+        Iterator<List<Vertex>> iter = symChildenSetsOnSymToVrtxs.values().iterator();
+        List<Vertex> foundVrtxs = iter.next(); // there is only one
+        assertEquals(3, foundVrtxs.size());
+        List<Vertex> expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(3));
+        expected.add(graph.getVertexAtPosition(4));
+        expected.add(graph.getVertexAtPosition(5));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+        
+        
+        focusVrtx = graph.getVertexAtPosition(0);
+        
+        alreadyAssignedVrtxs = new HashSet<Vertex>();
+        symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
+                focusVrtx, alreadyAssignedVrtxs);
+        
+        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
+        iter = symChildenSetsOnSymToVrtxs.values().iterator();
+        foundVrtxs = iter.next(); // there is only one
+        assertEquals(3, foundVrtxs.size());
+        expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(1));
+        expected.add(graph.getVertexAtPosition(2));
+        expected.add(graph.getVertexAtPosition(8)); // this is v9
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+        
+
+        focusVrtx = graph.getVertexAtPosition(2);
+        
+        alreadyAssignedVrtxs = new HashSet<Vertex>();
+        symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
+                focusVrtx, alreadyAssignedVrtxs);
+        
+        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
+        iter = symChildenSetsOnSymToVrtxs.values().iterator();
+        foundVrtxs = iter.next(); // there is only one
+        assertEquals(2, foundVrtxs.size());
+        expected = new ArrayList<Vertex>();
+        expected.add(graph.getVertexAtPosition(6));
+        expected.add(graph.getVertexAtPosition(7));
+        for (Vertex foundVrts : foundVrtxs)
+            assertTrue(expected.contains(foundVrts));
+    }
+    */
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testDetectSymVertexSets() throws Exception
+    {
+        prepare();
+        DGraph graph = makeTestGraphM();
+        
+        assertTrue(graph.detectSymVertexSets());
+        assertEquals(3, graph.getSymmetricSetCount());
+        
+        SymmetricVertexes symVrtxs = graph.getSymSetForVertex(
+                graph.getVertexAtPosition(0));
+        assertEquals(0, symVrtxs.size());
+        
+        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(1));
+        assertEquals(2, symVrtxs.size());
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(1)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(2)));
+        
+        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(3));
+        assertEquals(6, symVrtxs.size());
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(3)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(4)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(5)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(6)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(7)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(8)));
+        
+        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(9));
+        assertEquals(2, symVrtxs.size());
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(9)));
+        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(10)));
     }
     
 //------------------------------------------------------------------------------

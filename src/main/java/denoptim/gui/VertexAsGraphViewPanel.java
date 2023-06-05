@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JScrollPane;
@@ -233,8 +234,7 @@ public class VertexAsGraphViewPanel extends JSplitPane implements IVertexAPSelec
 		clearAPTable();
 		mapAPs = new HashMap<Integer,AttachmentPoint>();
 		
-		ArrayList<AttachmentPoint> lstAPs = 
-		        vertex.getAttachmentPoints();		
+		List<AttachmentPoint> lstAPs = vertex.getAttachmentPoints();		
         if (lstAPs.size() == 0)
         {
 			return;

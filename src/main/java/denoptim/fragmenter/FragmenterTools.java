@@ -25,6 +25,7 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.isomorphism.Mappings;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -36,8 +37,10 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.io.DenoptimIO;
 import denoptim.io.IteratingAtomContainerReader;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.fragmenter.MatchedBond;
@@ -127,6 +130,77 @@ public class FragmenterTools
             DenoptimIO.writeSDFFile(output.getAbsolutePath(), buffer, true);
             buffer.clear();
         }
+    }
+    
+//------------------------------------------------------------------------------
+    
+
+    /** 
+     * Do any pre-processing on a {@link IAtomContainer} meant to be fragmented.
+     * These are DENOPTIM specific manipulations, in particular meant to
+     * comply to requirements to write SDF files: unset bond orders 
+     * can only be used in query-type files. So types 4 and 8 are not
+     * expected to be found (but CSD uses them...).
+     * Also, it deals with implicit H formalism according to the given settings.
+     * 
+     * @param mol the system that this method prepares to fragmentation.
+     * @param settings the settings controlling how the molecule is prepared.
+     * @param index identifies the given {@link IAtomContainer} in a collection
+     * of systems to work on. This is used only for logging.
+     */
+    public static boolean prepareMolToFragmentation(IAtomContainer mol, 
+            FragmenterParameters settings, int index)
+    {
+        try
+        {
+            if (settings.addExplicitH())
+            {
+                MoleculeUtils.explicitHydrogens(mol);
+            } else {
+                MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+            }
+            MoleculeUtils.ensureNoUnsetBondOrders(mol);
+        } catch (CDKException e)
+        {
+            if (!settings.acceptUnsetToSingeBO())
+            {
+                settings.getLogger().log(Level.WARNING,"Some bond order "
+                        + "are unset and attempt to kekulize the "
+                        + "system has failed "
+                        + "for structure " + index + "."
+                        + "This hampers use of SMARTS queries, which "
+                        + "may very "
+                        + "not work as expected. Structure " + index 
+                        + " will "
+                        + "be rejected. You can avoid rejection by using "
+                        + "keyword " 
+                        + ParametersType.FRG_PARAMS.getKeywordRoot() 
+                        + "UNSETTOSINGLEBO, but you'll "
+                        + "still be using a peculiar connectivity "
+                        + "table were"
+                        + "many bonds are artificially markes as "
+                        + "single to "
+                        + "avoid use of 'UNSET' bond order. "
+                        + "Further details on the problem: " 
+                        + e.getMessage());
+                return false;
+            } else {
+                settings.getLogger().log(Level.WARNING,"Failed "
+                        + "kekulization "
+                        + "for structure " + index 
+                        + " but UNSETTOSINGLEBO "
+                        + "keyword used. Forcing use of single bonds to "
+                        + "replace bonds with unset order.");
+                for (IBond bnd : mol.bonds())
+                {
+                    if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+                    {
+                        bnd.setOrder(IBond.Order.SINGLE);
+                    }
+                }
+            }
+        }
+        return true;
     }
     
 //------------------------------------------------------------------------------
@@ -259,7 +333,7 @@ public class FragmenterTools
                     molName = mol.getTitle();
                 
                 // Generate the fragments
-                ArrayList<Vertex> fragments = fragmentation(mol, 
+                List<Vertex> fragments = fragmentation(mol, 
                         settings.getCuttingRules(), 
                         logger);
                 if (logger!=null)
@@ -270,7 +344,7 @@ public class FragmenterTools
                 totalProd += fragments.size();
                 
                 // Post-fragmentation processing of fragments
-                ArrayList<Vertex> keptFragments = new ArrayList<Vertex>();
+                List<Vertex> keptFragments = new ArrayList<Vertex>();
                 int fragCounter = 0;
                 for (Vertex frag : fragments)
                 {
@@ -326,20 +400,21 @@ public class FragmenterTools
      * @param mol
      * @param rules
      * @param logger
-     * @return
+     * @return the list of fragments
      * @throws DENOPTIMException 
      */
-    public static ArrayList<Vertex> fragmentation(IAtomContainer mol, 
+    public static List<Vertex> fragmentation(IAtomContainer mol, 
             List<CuttingRule> rules, Logger logger) throws DENOPTIMException
     {   
         Fragment masterFrag = new Fragment(mol,BBType.UNDEFINED);
         IAtomContainer fragsMol = masterFrag.getIAtomContainer();
         
         // Identify bonds
-        Map<String, ArrayList<MatchedBond>> matchingbonds = 
+        Map<String, List<MatchedBond>> matchingbonds = 
                 FragmenterTools.getMatchingBondsAllInOne(fragsMol,rules,logger);
         
         // Select bonds to cut and what rule to use for cutting them
+        int cutId = -1;
         for (CuttingRule rule : rules) // NB: iterator follows rule's priority
         {
             String ruleName = rule.getName();
@@ -470,19 +545,31 @@ public class FragmenterTools
                     
                     // NB: by convention the "first" class (i.e., the ???:0 class)
                     // is always  on the central atom.
-                    masterFrag.addAPOnAtom(centralAtm, rule.getAPClass0(), 
+                    AttachmentPoint apA = masterFrag.addAPOnAtom(centralAtm, 
+                            rule.getAPClass0(), 
                             MoleculeUtils.getPoint3d(dummyAtm));
-                    masterFrag.addAPOnAtom(dummyAtm, rule.getAPClass1(), 
+                    AttachmentPoint apB = masterFrag.addAPOnAtom(dummyAtm, 
+                            rule.getAPClass1(), 
                             MoleculeUtils.getPoint3d(centralAtm));
+
+                    cutId++;
+                    apA.setCutId(cutId);
+                    apB.setCutId(cutId);
                 } else {
                     //treatment of mono-hapto ligands
                     IBond bnd = fragsMol.getBond(atmA,atmB);
                     fragsMol.removeBond(bnd);
 
-                    masterFrag.addAPOnAtom(atmA, rule.getAPClass0(), 
+                    AttachmentPoint apA = masterFrag.addAPOnAtom(atmA, 
+                            rule.getAPClass0(), 
                             MoleculeUtils.getPoint3d(atmB));
-                    masterFrag.addAPOnAtom(atmB, rule.getAPClass1(), 
+                    AttachmentPoint apB = masterFrag.addAPOnAtom(atmB, 
+                            rule.getAPClass1(), 
                             MoleculeUtils.getPoint3d(atmA));
+
+                    cutId++;
+                    apA.setCutId(cutId);
+                    apB.setCutId(cutId);
                 } //end of if (hapticity>1)
             } //end of loop over matching bonds
         } //end of loop over rules
@@ -605,7 +692,7 @@ public class FragmenterTools
      * @return the list of matches.
      */
 
-    static Map<String, ArrayList<MatchedBond>> getMatchingBondsAllInOne(
+    static Map<String, List<MatchedBond>> getMatchingBondsAllInOne(
             IAtomContainer mol, List<CuttingRule> rules, Logger logger)
     {
         // Collect all SMARTS queries
@@ -616,8 +703,8 @@ public class FragmenterTools
         }
 
         // Prepare a data structure for the return value
-        Map<String, ArrayList<MatchedBond>> bondsMatchingRules = 
-                new HashMap<String, ArrayList<MatchedBond>>();
+        Map<String, List<MatchedBond>> bondsMatchingRules = 
+                new HashMap<String, List<MatchedBond>>();
 
         // Get all the matches to the SMARTS queries
         ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
@@ -1203,6 +1290,32 @@ public class FragmenterTools
         double mw = AtomContainerManipulator.getMass(frag.getIAtomContainer());
         int slotNum = (int) (mw / (Double.valueOf(slotSize)));
         return slotNum*slotSize + "-" + (slotNum+1)*slotSize;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    public static Vertex getRCPForAP(AttachmentPoint ap, APClass rcvApClass) 
+            throws DENOPTIMException
+    {
+        IAtomContainer mol = SilentChemObjectBuilder.getInstance()
+                .newAtomContainer();
+        Point3d apv = ap.getDirectionVector();
+        mol.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(rcvApClass), 
+                new Point3d(
+                    Double.valueOf(apv.x),
+                    Double.valueOf(apv.y),
+                    Double.valueOf(apv.z))));
+        
+        Fragment rcv = new Fragment(mol, BBType.FRAGMENT);
+
+        Point3d aps = MoleculeUtils.getPoint3d(
+                ap.getOwner().getIAtomContainer().getAtom(
+                        ap.getAtomPositionNumber()));
+        rcv.addAP(0, rcvApClass, new Point3d(
+                Double.valueOf(aps.x),
+                Double.valueOf(aps.y),
+                Double.valueOf(aps.z)));
+        return rcv;
     }
     
 //------------------------------------------------------------------------------

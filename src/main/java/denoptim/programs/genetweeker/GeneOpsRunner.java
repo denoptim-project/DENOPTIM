@@ -67,6 +67,11 @@ public class GeneOpsRunner extends ProgramTask
     private FragmentSpace fragSpace;
     
     /**
+     * Parameters for  genetic algorithm.
+     */
+    private GAParameters gaParams;
+    
+    /**
      * Program-specific logger
      */
     private Logger logger = null;
@@ -104,6 +109,13 @@ public class GeneOpsRunner extends ProgramTask
                     ParametersType.FS_PARAMS);
         }
         this.fragSpace = fsParams.getFragmentSpace();
+        if (settings.containsParameters(ParametersType.GA_PARAMS))
+        {
+            this.gaParams = (GAParameters) settings.getParameters(
+                    ParametersType.GA_PARAMS);
+        } else {
+            this.gaParams = new GAParameters();
+        }
         
         switch (goParams.operatorToTest)
         {
@@ -205,6 +217,7 @@ public class GeneOpsRunner extends ProgramTask
         } catch (Exception e)
         {
             e.printStackTrace();
+            return;
         }
 
         logger.log(Level.INFO, "Initial graphs: "+NL
@@ -245,9 +258,17 @@ public class GeneOpsRunner extends ProgramTask
         } else {
             logger.log(Level.INFO, "Attempting crossover on a site detected "
                     + "on-the-fly");
-            xos = settings.getRandomizer().randomlyChooseOne(
-                    GraphOperations.locateCompatibleXOverPoints(male, female, 
-                            fragSpace));
+            List<XoverSite> sites = GraphOperations.locateCompatibleXOverPoints(
+                    male, female, fragSpace, gaParams.maxXOverableSubGraphSize);
+            if (sites.isEmpty())
+            {
+                logger.log(Level.WARNING, "No crossover site detected.");
+                return;
+            } else {
+                logger.log(Level.INFO, "Randombly choosing among "
+                        + sites.size() + " xover sites.");
+            }
+            xos = settings.getRandomizer().randomlyChooseOne(sites);
         }
         
         GraphOperations.performCrossover(xos, fragSpace);

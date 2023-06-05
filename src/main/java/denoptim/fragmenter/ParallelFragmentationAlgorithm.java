@@ -296,7 +296,10 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
     /**
      * Splits the input data (from {@link FragmenterParameters}) into batches 
      * suitable for parallel batch processing. Since we have to read all the 
-     * atom containers, we use this chance to store the molecular formula in 
+     * atom containers, we use this chance to do any preparation of the 
+     * molecular representation (see 
+     * {@link FragmenterTools#prepareMolToFragmentation(IAtomContainer, FragmenterParameters, int)}) 
+     * and store the molecular formula in 
      * the property {@link DENOPTIMConstants#FORMULASTR}.
      * @throws DENOPTIMException
      * @throws FileNotFoundException
@@ -333,58 +336,10 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
                 buffersSize++;
                 IAtomContainer mol = reader.next();
                 
-                // Comply to requirements to write SDF files: unset bond orders 
-                // can only be used in query-type files. So types 4 and 8 are not
-                // expected to be found (but CSD uses them...)
-                try
-                {
-                    if (settings.addExplicitH())
-                    {
-                        MoleculeUtils.explicitHydrogens(mol);
-                    } else {
-                        MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
-                    }
-                    MoleculeUtils.ensureNoUnsetBondOrders(mol);
-                } catch (CDKException e)
-                {
-                    if (!settings.acceptUnsetToSingeBO())
-                    {
-                        settings.getLogger().log(Level.WARNING,"Some bond order "
-                                + "are unset and attempt to kekulize the "
-                                + "system has failed "
-                                + "for structure " + index + "."
-                                + "This hampers use of SMARTS queries, which "
-                                + "may very "
-                                + "not work as expected. Structure " + index 
-                                + " will "
-                                + "be rejected. You can avoid rejection by using "
-                                + "keyword " 
-                                + ParametersType.FRG_PARAMS.getKeywordRoot() 
-                                + "UNSETTOSINGLEBO, but you'll "
-                                + "still be using a peculiar connectivity "
-                                + "table were"
-                                + "many bonds are artificially markes as "
-                                + "single to "
-                                + "avoid use of 'UNSET' bond order. "
-                                + "Further details on the problem: " 
-                                + e.getMessage());
-                        continue;
-                    } else {
-                        settings.getLogger().log(Level.WARNING,"Failed "
-                                + "kekulization "
-                                + "for structure " + index 
-                                + " but UNSETTOSINGLEBO "
-                                + "keyword used. Forcing use of single bonds to "
-                                + "replace bonds with unset order.");
-                        for (IBond bnd : mol.bonds())
-                        {
-                            if (bnd.getOrder().equals(IBond.Order.UNSET)) 
-                            {
-                                bnd.setOrder(IBond.Order.SINGLE);
-                            }
-                        }
-                    }
-                }
+                // Adjust molecular representation to our settings
+                if (!FragmenterTools.prepareMolToFragmentation(mol, settings, 
+                        index))
+                    continue;
                 
                 // It is convenient to place the formula in the atom container
                 if (formulae!=null && settings.doCheckFormula())

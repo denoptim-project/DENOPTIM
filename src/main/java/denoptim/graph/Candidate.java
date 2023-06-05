@@ -275,10 +275,10 @@ public class Candidate implements Comparable<Candidate>, Cloneable
         	}
         }
         
-        if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
+        if (iac.getProperty(DENOPTIMConstants.PROVENANCE) != null)
         {
             this.comment = iac.getProperty(
-                    DENOPTIMConstants.GMSGTAG).toString();
+                    DENOPTIMConstants.PROVENANCE).toString();
         }
         
         this.graph = DenoptimIO.readGraphFromSDFileIAC(iac);
@@ -357,10 +357,10 @@ public class Candidate implements Comparable<Candidate>, Cloneable
             }
         }
         
-        if (iac.getProperty(DENOPTIMConstants.GMSGTAG) != null)
+        if (iac.getProperty(DENOPTIMConstants.PROVENANCE) != null)
         {
             cand.comment = iac.getProperty(
-                    DENOPTIMConstants.GMSGTAG).toString();
+                    DENOPTIMConstants.PROVENANCE).toString();
         }
         
         return cand;
@@ -413,7 +413,7 @@ public class Candidate implements Comparable<Candidate>, Cloneable
         iacForFitFile.setProperty(DENOPTIMConstants.GRAPHJSONTAG, graph.toJson());
         if (graph.getLocalMsg() != null && !graph.getLocalMsg().equals(""))
         {
-            iacForFitFile.setProperty(DENOPTIMConstants.GMSGTAG, graph.getLocalMsg());
+            iacForFitFile.setProperty(DENOPTIMConstants.PROVENANCE, graph.getLocalMsg());
         }
         iacForFitFile.setProperty(DENOPTIMConstants.SMILESTAG, smiles);
         iacForFitFile.setProperty(DENOPTIMConstants.UNIQUEIDTAG, uid);
@@ -632,6 +632,11 @@ public class Candidate implements Comparable<Candidate>, Cloneable
         if (this.fitness > other.fitness)
             return 1;
         else if (this.fitness < other.fitness)
+            return -1;
+        
+        if (this.graph.graphId < other.graph.graphId)
+            return 1;
+        else if (this.graph.graphId > other.graph.graphId)
             return -1;
         return 0;
     }

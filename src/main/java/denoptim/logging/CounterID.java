@@ -18,6 +18,8 @@
 
 package denoptim.logging;
 
+import denoptim.utils.MutationType;
+
 /**
  * Identifier of a counter. A printable description is given by method
  * {@link CounterID#getDescription()}.
@@ -55,6 +57,9 @@ public enum CounterID
     FAILEDMUTATTEMTS_PERFORM_NOADDLINK_FIND,
     FAILEDMUTATTEMTS_PERFORM_NOADDLINK_EDIT,
     FAILEDMUTATTEMTS_PERFORM_NOEXTEND,
+    FAILEDMUTATTEMTS_PERFORM_NOADDRING,
+    FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP,
+    FAILEDMUTATTEMTS_PERFORM_NOADDRING_NORINGCOMB,
     FAILEDMUTATTEMTS_PERFORM_NODELETE,
     FAILEDMUTATTEMTS_SETUPRINGS, 
     FAILEDMUTATTEMTS_EVAL, 
@@ -70,6 +75,12 @@ public enum CounterID
     MANUALADDATTEMPTS,
     FAILEDMANUALADDATTEMPTS, 
     FAILEDMANUALADDATTEMPTS_EVAL, 
+    
+    CONVERTBYFRAGATTEMPTS,
+    FAILEDCONVERTBYFRAGATTEMPTS,
+    FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION,
+    FAILEDCONVERTBYFRAGATTEMPTS_EVAL,
+    FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING,
     
     FITNESSEVALS, FAILEDFITNESSEVALS,
     
@@ -137,6 +148,15 @@ public enum CounterID
                 + "replace edge with with new vertex and edges";
         FAILEDMUTATTEMTS_PERFORM_NOEXTEND.description = "Mutation did not "
                 + "extend the graph";
+        FAILEDMUTATTEMTS_PERFORM_NOADDRING.description = "Mutation did not "
+                + "close a ring in the graph";
+        FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP.description = "Rings could"
+                + "not be closed by " + MutationType.ADDRING + " because of "
+                + "no free AP on selected mutation site";
+        FAILEDMUTATTEMTS_PERFORM_NOADDRING_NORINGCOMB.description = "Rings "
+                + "could not be closed by " + MutationType.ADDRING + " because "
+                + "no combination of rings could be fine involving the chosen "
+                + "mutation site";
         FAILEDMUTATTEMTS_PERFORM_NODELETE.description = "Mutation did not "
                 + "delete vertex";
         FAILEDMUTATTEMTS_SETUPRINGS.description = "Failed attempts to setup "
@@ -158,14 +178,29 @@ public enum CounterID
         FAILEDBUILDATTEMPTS_SETUPRINGS.description = "Failed attempt to setup "
                 + "rings in a newly generated graph";
         FAILEDBUILDATTEMPTS_FORBIDENDS.description = "Construction of new "
-                + "graphs that ped to forbidden ends";
+                + "graphs that led to forbidden ends";
         
         MANUALADDATTEMPTS.description = "Number of attempts to provide a "
-                + "manually bilt candidate";
+                + "manually built candidate";
         FAILEDMANUALADDATTEMPTS.description = "Failed attempts to import "
                 + "a manually built cadidate";
         FAILEDMANUALADDATTEMPTS_EVAL.description = "Failed attempts to pass "
                 + "graph evaluation test from manually added candidates";
+        
+        CONVERTBYFRAGATTEMPTS.description = "Number of attempts to import a "
+                + "candidate by converting a given molecule into a graph";
+        FAILEDCONVERTBYFRAGATTEMPTS.description = "Failed attempts to import "
+                + "a cadidate by converting a given molecule into a graph";
+        FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION.description = "Failed "
+                + "attempts to do fragmentation while generating a candidate "
+                + "by conversion of molecules to graphs";
+        FAILEDCONVERTBYFRAGATTEMPTS_EVAL.description = "Failed attempts to "
+                + "pass graph evaluation test from candidates imported from "
+                + "conversion of molecules to graphs";
+        FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING.description = "Failed "
+                + "attempts to "
+                + "embedd patterns in templates while generating candidates "
+                + "by conversion of molecules to graphs";
         
         FITNESSEVALS.description = "Number of fitness evaluations";
         FAILEDFITNESSEVALS.description = "Number of failed fitness evaluations";
@@ -236,6 +271,12 @@ public enum CounterID
                 "#Failed Mut Add Link_Edit";
         FAILEDMUTATTEMTS_PERFORM_NOEXTEND.prettyName =
                 "#Failed Mut Extend";
+        FAILEDMUTATTEMTS_PERFORM_NOADDRING.prettyName =
+                "#Failed Mut AddRing";
+        FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP.prettyName = 
+                "#Failed Mut AddRing BusyAPs";
+        FAILEDMUTATTEMTS_PERFORM_NOADDRING_NORINGCOMB.prettyName = 
+                "#Failed Mut AddRing Unclosable";
         FAILEDMUTATTEMTS_PERFORM_NODELETE.prettyName =
                 "#Failed Mut Delete";
         FAILEDMUTATTEMTS_SETUPRINGS.prettyName =
@@ -264,6 +305,17 @@ public enum CounterID
                 "#Failed Manual Add";
         FAILEDMANUALADDATTEMPTS_EVAL.prettyName =
                 "#Failed Manual Add_Eval";
+        
+        CONVERTBYFRAGATTEMPTS.prettyName =
+                "#MolToGraph Add";
+        FAILEDCONVERTBYFRAGATTEMPTS.prettyName =
+                "#Failed MolToGraph Add";
+        FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION.prettyName =
+                "#Failed MolToGraph Add_Frag";
+        FAILEDCONVERTBYFRAGATTEMPTS_EVAL.prettyName =
+                "#Failed MolToGraph Add_Eval";
+        FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING.prettyName =
+                "#Failed MolToGraph Add_TmplEmbed";
 
         FITNESSEVALS.prettyName =
                 "#Fitness";
@@ -275,7 +327,7 @@ public enum CounterID
         FAILEDDUPLICATEPREFITNESSDETECTION.prettyName =
                 "#Failed Duplicate Pre-Fitness Detection";
     }
-    
+
 //------------------------------------------------------------------------------
     
     /**
@@ -299,4 +351,6 @@ public enum CounterID
         return prettyName;
     }
     
+//------------------------------------------------------------------------------
+      
 }

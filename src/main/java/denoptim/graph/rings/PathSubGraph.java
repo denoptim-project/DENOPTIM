@@ -380,9 +380,9 @@ public class PathSubGraph
      * @return the path of APs from vertex from to vertex to.
      */
     private static Iterable<AttachmentPoint> findPath(
-            Vertex from, Vertex to, Set<Integer> visited) {
+            Vertex from, Vertex to, Set<Long> visited) {
 
-        int fromId = from.getVertexId();
+        long fromId = from.getVertexId();
         if (visited.contains(fromId)) {
             return new ArrayList<>();
         }
@@ -421,12 +421,11 @@ public class PathSubGraph
      * @param make3D if <code>true</code> makes the method generate the 3D
      * coordinates of the chain of fragments by rototranslation of the
      * 3D fragments so that to align the APvectors
-     * @throws DENOPTIMException
+     * @throws DENOPTIMException if we cannot make the molecular representation.
      */
 
     public void makeMolecularRepresentation(IAtomContainer mol, boolean make3D,
-            Logger logger, Randomizer randomizer)
-                                                       throws DENOPTIMException
+            Logger logger, Randomizer randomizer) throws DENOPTIMException
     {
         // Build molecular representation 
         ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
@@ -440,20 +439,16 @@ public class PathSubGraph
         {
     	    String f = "/tmp/pathSubGraph.sdf";
     	    System.out.println("Find SDF representation of path in: " + f);
-    	    DenoptimIO.writeSDFFile(f,iacPathVAVB,false);
-    	    DenoptimIO.writeSDFFile(f,mol,true);
+    	    try {
+        	    DenoptimIO.writeSDFFile(f,iacPathVAVB,false);
+        	    DenoptimIO.writeSDFFile(f,mol,true);
+    	    } catch (Throwable t) {
+    	        throw new Error("Could not save debug file '" + f + "'.");
+    	    }
     	}
 
         // Get shortest atom path between the two ends of the chain
-        atomsPathVAVB = new ArrayList<IAtom>();
-        try {
-            IAtom head = iacPathVAVB.getAtom(0);
-            IAtom tail = iacPathVAVB.getAtom(iacPathVAVB.getAtomCount()-1);
-            ShortestPaths sp = new ShortestPaths(iacPathVAVB, head);
-            atomsPathVAVB = new ArrayList<IAtom>(Arrays.asList(sp.atomsTo(tail)));
-        } catch (Throwable t) {
-            throw new DENOPTIMException("PathTools Exception: " + t);
-        }
+        atomsPathVAVB = findAtomPath(iacPathVAVB);
 
         // Identify which atoms in mol represent the RCA in the current chain.
         // Since we are looking for the verteces of the RCA atoms
@@ -463,8 +458,8 @@ public class PathSubGraph
         IAtom e1 = null;
         for (IAtom atm : mol.atoms())
         {
-            int vrtId = (Integer) atm.getProperty(
-                                            DENOPTIMConstants.ATMPROPVERTEXID);
+            long vrtId = (Long) atm.getProperty(
+                    DENOPTIMConstants.ATMPROPVERTEXID);
             if (vrtId == vertPathVAVB.get(0).getVertexId())
                 e0 = atm;
                       
@@ -487,104 +482,101 @@ public class PathSubGraph
         // Therefore, the actual identity of the bond doesn't matter in
         // this particular context.
         List<IAtom> pathInFullMol = new ArrayList<IAtom>();
-        try {
-            IAtom currentAtm = null;
-            int prevAtmInPathVID = -1;
-            int currAtmInPathVID = -1;
-            int nextAtmInPathVID = -1;
-            List<IAtom> candidates = new ArrayList<IAtom>();
-            for (int i=1; i<(atomsPathVAVB.size()); i++)
+        
+        IAtom currentAtm = null;
+        long prevAtmInPathVID = -1;
+        long currAtmInPathVID = -1;
+        long nextAtmInPathVID = -1;
+        List<IAtom> candidates = new ArrayList<IAtom>();
+        for (int i=1; i<(atomsPathVAVB.size()); i++)
+        {
+            //We have already found the atoms corresponding to the extremes
+            if (i==1)
             {
-                //We have already found the atoms corresponding to the extremes
-                if (i==1)
-                {
-                    currentAtm = ends.get(0);
-                    pathInFullMol.add(currentAtm);
-                    candidates.addAll(mol.getConnectedAtomsList(currentAtm));
-                } else if (i==(atomsPathVAVB.size()-1))
-                {
-                    pathInFullMol.add(ends.get(1));
-                    break;
-                }
-                
-                // Now, standard behaviour for all other non-extreme cases
-                prevAtmInPathVID = getVertexIdInPath(atomsPathVAVB.get(i-1));
-                currAtmInPathVID = getVertexIdInPath(atomsPathVAVB.get(i));
-                nextAtmInPathVID = getVertexIdInPath(atomsPathVAVB.get(i+1));
-                
-                if (prevAtmInPathVID != currAtmInPathVID)
-                {
-                    for (IAtom c : candidates)
-                    {
-                        if (getVertexIdInPath(c) == currAtmInPathVID)
-                        {
-                            currentAtm = c;
-                            pathInFullMol.add(currentAtm);
-                            candidates.clear();
-                            
-                            for (IAtom c2 : mol.getConnectedAtomsList(c))
-                            {
-                                if (!pathInFullMol.contains(c2))
-                                    candidates.add(c2);
-                            }
-                            break;
-                        }
-                    }
-                    continue;
-                } else {
-                    //NB:  currentAtm remains the same
-                    List<IAtom> newCandidates = new ArrayList<IAtom>(); 
-                    for (IAtom nbr : candidates)
-                    {
-                        boolean foundNextLevel = false;
-                        for (IAtom nbrNbr : mol.getConnectedAtomsList(nbr))
-                        {
-                            if (pathInFullMol.contains(nbrNbr)
-                                    || candidates.contains(nbrNbr))
-                                continue;
-                            
-                            int vid = getVertexIdInPath(nbrNbr);
-                            if (vid == nextAtmInPathVID 
-                                    && currAtmInPathVID!=nextAtmInPathVID)
-                            {
-                                ShortestPaths sp = new ShortestPaths(mol, 
-                                        currentAtm);
-                                List<IAtom> itnraVertPath = new ArrayList<IAtom>(
-                                        Arrays.asList(sp.atomsTo(nbr)));
-
-                                // currentAtm was already added: skip it
-                                for (int j=1; j<itnraVertPath.size(); j++)
-                                    pathInFullMol.add(itnraVertPath.get(j));
-                                
-                                currentAtm = nbr;
-                                newCandidates.clear();
-                                newCandidates.add(nbrNbr);
-                                foundNextLevel = true;
-                                break;
-                            } else {
-                                if (vid == currAtmInPathVID)
-                                {
-                                    newCandidates.add(nbrNbr);
-                                }
-                            }
-                        }
-                        if (foundNextLevel)
-                            break;
-                    }
-                    candidates.clear();
-                    candidates.addAll(newCandidates);
-                    continue;
-                } 
-
+                currentAtm = ends.get(0);
+                pathInFullMol.add(currentAtm);
+                candidates.addAll(mol.getConnectedAtomsList(currentAtm));
+            } else if (i==(atomsPathVAVB.size()-1))
+            {
+                pathInFullMol.add(ends.get(1));
+                break;
             }
-        } catch (Throwable t) {
-            throw new DENOPTIMException("PathTools Exception: " + t);
+            
+            // Now, standard behaviour for all other non-extreme cases
+            prevAtmInPathVID = getVertexIdInPath(atomsPathVAVB.get(i-1));
+            currAtmInPathVID = getVertexIdInPath(atomsPathVAVB.get(i));
+            nextAtmInPathVID = getVertexIdInPath(atomsPathVAVB.get(i+1));
+            
+            if (prevAtmInPathVID != currAtmInPathVID)
+            {
+                for (IAtom c : candidates)
+                {
+                    if (getVertexIdInPath(c) == currAtmInPathVID)
+                    {
+                        currentAtm = c;
+                        pathInFullMol.add(currentAtm);
+                        candidates.clear();
+                        
+                        for (IAtom c2 : mol.getConnectedAtomsList(c))
+                        {
+                            if (!pathInFullMol.contains(c2))
+                                candidates.add(c2);
+                        }
+                        break;
+                    }
+                }
+                continue;
+            } else {
+                //NB:  currentAtm remains the same
+                List<IAtom> newCandidates = new ArrayList<IAtom>(); 
+                for (IAtom nbr : candidates)
+                {
+                    boolean foundNextLevel = false;
+                    for (IAtom nbrNbr : mol.getConnectedAtomsList(nbr))
+                    {
+                        if (pathInFullMol.contains(nbrNbr)
+                                || candidates.contains(nbrNbr))
+                            continue;
+                        
+                        long vid = getVertexIdInPath(nbrNbr);
+                        if (vid == nextAtmInPathVID 
+                                && currAtmInPathVID!=nextAtmInPathVID)
+                        {
+                            ShortestPaths sp = new ShortestPaths(mol, 
+                                    currentAtm);
+                            List<IAtom> itnraVertPath = new ArrayList<IAtom>(
+                                    Arrays.asList(sp.atomsTo(nbr)));
+
+                            // currentAtm was already added: skip it
+                            for (int j=1; j<itnraVertPath.size(); j++)
+                                pathInFullMol.add(itnraVertPath.get(j));
+                            
+                            currentAtm = nbr;
+                            newCandidates.clear();
+                            newCandidates.add(nbrNbr);
+                            foundNextLevel = true;
+                            break;
+                        } else {
+                            if (vid == currAtmInPathVID)
+                            {
+                                newCandidates.add(nbrNbr);
+                            }
+                        }
+                    }
+                    if (foundNextLevel)
+                        break;
+                }
+                candidates.clear();
+                candidates.addAll(newCandidates);
+                continue;
+            } 
         }
         if (pathInFullMol.size() != atomsPathVAVB.size())
         {
-            throw new DENOPTIMException("Paths have different size! Unable to "
-                        + "proceed in the evaluation of ring closability. "
-                        + "Please report this to the author.");
+            throw new IllegalStateException("Paths have different size! "
+                    + "Unable to "
+                    + "proceed in the evaluation of ring closability. "
+                    + "Please report this to the author.");
         }
 
         // Identify the path of bonds between head and tail
@@ -614,10 +606,10 @@ public class PathSubGraph
             IAtom a1 = atomsPathVAVB.get(it-2);
             IAtom a2 = atomsPathVAVB.get(it-1);
             IAtom a3 = atomsPathVAVB.get(it);
-            int vIdA0 = (Integer) a0.getProperty(keyPropVrtID);
-            int vIdA1 = (Integer) a1.getProperty(keyPropVrtID);
-            int vIdA2 = (Integer) a2.getProperty(keyPropVrtID);
-            int vIdA3 = (Integer) a3.getProperty(keyPropVrtID);
+            long vIdA0 = a0.getProperty(keyPropVrtID);
+            long vIdA1 = a1.getProperty(keyPropVrtID);
+            long vIdA2 = a2.getProperty(keyPropVrtID);
+            long vIdA3 = a3.getProperty(keyPropVrtID);
             IBond bndA1A2 = iacPathVAVB.getBond(a1,a2);
 
             // trivial for points 1 and 2
@@ -733,10 +725,29 @@ public class PathSubGraph
     
 //-----------------------------------------------------------------------------
     
-    private int getVertexIdInPath(IAtom a)
+    /**
+     * Finds the shortest path of atoms between the first and last atom in the 
+     * given atom container.
+     * @param iac the atom container
+     * @return the path as a list of atoms where the first is the beginning and 
+     * the last is the end.
+     */
+    public static List<IAtom> findAtomPath(IAtomContainer iac)
     {
-        return a.getProperty(DENOPTIMConstants.ATMPROPVERTEXID,Integer.class)
-                .intValue();
+        IAtom head = iac.getAtom(0);
+        IAtom tail = iac.getAtom(iac.getAtomCount()-1);
+        ShortestPaths sp = new ShortestPaths(iac, head);
+        List<IAtom> path = new ArrayList<IAtom>(Arrays.asList(
+                sp.atomsTo(tail)));
+        return path;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    private long getVertexIdInPath(IAtom a)
+    {
+        return a.getProperty(DENOPTIMConstants.ATMPROPVERTEXID, Long.class)
+                .longValue();
     }
 
 //-----------------------------------------------------------------------------

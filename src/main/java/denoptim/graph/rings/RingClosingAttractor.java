@@ -19,7 +19,9 @@
 package denoptim.graph.rings;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -40,6 +42,8 @@ import denoptim.utils.MoleculeUtils;
  *
  * @author Marco Foscato 
  */
+
+//TODO: consider making subclass of Vertex?
 
 public class RingClosingAttractor
 {
@@ -162,6 +166,88 @@ public class RingClosingAttractor
      */ 
     private boolean used = false;
 
+    /**
+     * Conventional labels for attractor pseudoatom.
+     */
+    public static final HashMap<APClass,String> RCALABELPERAPCLASS = 
+            new HashMap<APClass,String>(){
+                /**
+                 * Version ID
+                 */
+                private static final long serialVersionUID = 1L;
+    
+            {
+                try {
+                    put(APClass.RCACLASSPLUS, "ATP");
+                    put(APClass.RCACLASSMINUS, "ATM");
+                    put(APClass.RCACLASSNEUTRAL, "ATN");
+                } catch (Throwable t)
+                {
+                    //Will not happen
+                }
+            }};
+
+    /**
+     * Recognized {@link APClass} for {@link RingClosingAttractor}.
+     */
+    public static final Set<APClass> RCAAPCLASSSET = 
+            new HashSet<APClass>(){
+                /**
+                 * Version ID
+                 */
+                private static final long serialVersionUID = 1L;
+    
+                {
+                    add(APClass.RCACLASSPLUS);
+                    add(APClass.RCACLASSMINUS);
+                    add(APClass.RCACLASSNEUTRAL);
+                }};
+
+    /**
+     * Recognized {@link APClass}es on {@link RingClosingAttractor} and 
+     * compatible types. This is equivalent to 
+     * {@link RCATYPEMAP} but is expressed in terms of 
+     * {@link APClass} instead of pseudoatom label.
+     */
+    public static final Map<APClass,APClass> RCAAPCMAP =
+            new HashMap<APClass,APClass>() 
+    {
+        /**
+         *  Version identifier
+         */
+        private static final long serialVersionUID = 3L;
+    
+        {
+            put(APClass.RCACLASSPLUS, APClass.RCACLASSMINUS);
+            put(APClass.RCACLASSMINUS, APClass.RCACLASSPLUS);
+            put(APClass.RCACLASSNEUTRAL, APClass.RCACLASSNEUTRAL);
+        };
+    };
+
+    /**
+     * Recognized types of {@link RingClosingAttractor} and compatible types.
+     * This is equivalent to 
+     * {@link RingClosingAttractor#RCAAPCMAP} but is expressed in terms of 
+     *  pseudoatom label. instead of {@link APClass}.
+     */
+    public static final Map<String,String> RCATYPEMAP =
+            new HashMap<String,String>() 
+    {
+        /**
+         *  Version identifier
+         */
+        private static final long serialVersionUID = 3L;
+    
+        {
+            put(RCALABELPERAPCLASS.get(APClass.RCACLASSPLUS), 
+                    RCALABELPERAPCLASS.get(APClass.RCACLASSMINUS));
+            put(RCALABELPERAPCLASS.get(APClass.RCACLASSMINUS), 
+                    RCALABELPERAPCLASS.get(APClass.RCACLASSPLUS));
+            put(RCALABELPERAPCLASS.get(APClass.RCACLASSNEUTRAL), 
+                    RCALABELPERAPCLASS.get(APClass.RCACLASSNEUTRAL));
+        };
+    };
+
 
 //-----------------------------------------------------------------------------
 
@@ -182,7 +268,7 @@ public class RingClosingAttractor
      * Note that any atom can be used to construct a 
      * {@link RingClosingAttractor},
      * but only the elemental symbol stored in 
-     * {@link DENOPTIMConstants#RCATYPEMAP} are recognized and trigger the 
+     * {@link RingClosingAttractor#RCATYPEMAP} are recognized and trigger the 
      * perception of the candidate atom as a {@link RingClosingAttractor}.
      * In which case the {@link #isAttractor()} method will return 
      * <code>true</code>.
@@ -193,7 +279,7 @@ public class RingClosingAttractor
     public RingClosingAttractor(IAtom atm, IAtomContainer mol)
     {
         this.atm = atm;
-        for (String atyp : DENOPTIMConstants.RCATYPEMAP.keySet())
+        for (String atyp : RingClosingAttractor.RCATYPEMAP.keySet())
         {
             if (MoleculeUtils.getSymbolOrLabel(atm).equals(atyp))
             {
@@ -246,7 +332,7 @@ public class RingClosingAttractor
 
     public boolean isCompatible(RingClosingAttractor other)
     {
-        return DENOPTIMConstants.RCATYPEMAP.get(this.attType).equals(
+        return RingClosingAttractor.RCATYPEMAP.get(this.attType).equals(
 								other.attType);
     }
 

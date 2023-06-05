@@ -52,8 +52,11 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.io.iterator.IteratingSMILESReader;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -63,18 +66,22 @@ import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
 import denoptim.fragspace.FragmentSpace;
+import denoptim.ga.EAUtils;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
-import denoptim.graph.SymmetricSet;
+import denoptim.graph.GraphPattern;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.gui.GraphViewerPanel.LabelType;
 import denoptim.io.DenoptimIO;
+import denoptim.io.IteratingAtomContainerReader;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.fragmenter.FragmenterParameters;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 
@@ -257,8 +264,8 @@ public class GUIGraphHandler extends GUICardPanel
 
         // Controls to navigate the list of dnGraphs
         graphNavigPane = new JPanel();
-        JLabel navigationLabel1 = new JLabel("Graph # ");
-        JLabel navigationLabel2 = new JLabel("Current library size: ");
+        JLabel navigationLabel1 = new JLabel("Graph ");
+        JLabel navigationLabel2 = new JLabel("Number of loaded graphs: ");
         totalGraphsLabel = new JLabel("0");
         
 		graphNavigSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 1));
@@ -267,22 +274,25 @@ public class GUIGraphHandler extends GUICardPanel
 		graphNavigSpinner.setMaximumSize(new Dimension(75,20));
 		graphNavigSpinner.addChangeListener(graphSpinnerListener);
         
-		btnAddGraph = new JButton("Add");
+		btnAddGraph = new JButton("Add Graphs");
 		btnAddGraph.setToolTipText("Append a graph to the currently loaded "
 				+ "list of graphs.");
 		btnAddGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] options = new String[]{"Build", "File", "Cancel"};
+				String[] options = new String[]{"Build", "Convert", "File", 
+				        "Cancel"};
 				int res = JOptionPane.showOptionDialog(btnAddGraph,
 		                "<html>Please choose whether to start creations "
-		                + "of a new graph (Build), "
-		                + "or import graph from file.</html>",
+		                + "of a new graph (Build), <br>"
+		                + "use fragmentation to convert molecules from a "
+		                + "file (Convert), <br>"
+		                + "or import graph from file (File).</html>",
 		                "Specify source of new graph",
 		                JOptionPane.DEFAULT_OPTION,
 		                JOptionPane.QUESTION_MESSAGE,
 		                UIManager.getIcon("OptionPane.warningIcon"),
 		                options,
-		                options[2]);
+		                options[3]);
 				switch (res)
 				{
 					case 0:
@@ -298,7 +308,8 @@ public class GUIGraphHandler extends GUICardPanel
 				                + "you can still build<br>"
 				                + "graphs made of empty vertexes (i.e., "
 				                + "vertexes contain<br>"
-				                + "no atoms, but only attachment points).</html>",
+				                + "no atoms, but only attachment points)."
+				                + "</html>",
 				                "WARNING",
 				                JOptionPane.WARNING_MESSAGE,
 				                UIManager.getIcon("OptionPane.warningIcon"));
@@ -321,8 +332,44 @@ public class GUIGraphHandler extends GUICardPanel
                             return;
                         }
 						break;
+					    
+                    case 1:
+                    {
+                        File inFile = GUIFileOpener.pickFile(btnAddGraph);
+                        if (inFile == null 
+                                || inFile.getAbsolutePath().equals(""))
+                        {
+                            return;
+                        }
+                        
+                        // All settings of the process are defined in the dialog 
+                        // and collected in the FragmenterParameters
+                        FragmenterParameters settings = new FragmenterParameters();
+                        boolean result = 
+                                GUIVertexInspector.dialogToDefineCuttingRules(
+                                    settings, 
+                                    this.getClass().getClassLoader(), 
+                                    btnAddGraph, 
+                                    true);
+                        if (!result)
+                            return;
+
+                        String pathnameLastUsedCutRules = 
+                                settings.getCuttingRulesFilePathname();
+                        if (pathnameLastUsedCutRules != null 
+                                && !pathnameLastUsedCutRules.isBlank())
+                        {
+                            GUIPreferences.lastCutRulesFile = 
+                                    new File(pathnameLastUsedCutRules);
+                        }
+                        
+                        appendGraphsFromConvertingMolecule(inFile, settings, 
+                                btnAddGraph);
+                        break;
+				    }
 					
-					case 1:
+					case 2:
+					{
 						File inFile = GUIFileOpener.pickFileWithGraph(
 						        btnAddGraph);
 						if (inFile == null 
@@ -332,6 +379,7 @@ public class GUIGraphHandler extends GUICardPanel
 						}
 						appendGraphsFromFile(inFile);
 						break;
+					}
 				}
 			}
 		});
@@ -450,7 +498,7 @@ public class GUIGraphHandler extends GUICardPanel
             }
         });
         
-		btnAddLibVrtx = new JButton("Add Vertex from BB Space");
+		btnAddLibVrtx = new JButton("Add Vertex from BBSpace");
 		btnAddLibVrtx.setToolTipText("<html>Choose a new vertex from the "
 		        + "loaded space of building blocks and<br>"
 		        + "append it to the "
@@ -634,7 +682,7 @@ public class GUIGraphHandler extends GUICardPanel
         btnAddSymSet.setEnabled(false);
         btnAddSymSet.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ArrayList<Vertex> selVrtxs =
+                List<Vertex> selVrtxs =
                         visualPanel.getSelectedNodesInViewer();
                 if (selVrtxs.size() < 2)
                 {
@@ -649,11 +697,10 @@ public class GUIGraphHandler extends GUICardPanel
                             UIManager.getIcon("OptionPane.errorIcon"));
                     return;
                 }
-                ArrayList<Integer> symIDs = new ArrayList<Integer>();
-                selVrtxs.stream().forEach(v -> symIDs.add(v.getVertexId()));
                 try
                 {
-                    dnGraph.addSymmetricSetOfVertices(new SymmetricSet(symIDs));
+                    dnGraph.addSymmetricSetOfVertices(
+                            new SymmetricVertexes(selVrtxs));
                 } catch (DENOPTIMException e1)
                 {
                     JOptionPane.showMessageDialog(btnAddSymSet,
@@ -715,13 +762,13 @@ public class GUIGraphHandler extends GUICardPanel
 		btnLabAPC.setEnabled(false);
         btnLabAPC.setToolTipText("Show/Hide attachment point class labels.");
         
-        btnLabBT = new JButton("Bnd Typ");
+        btnLabBT = new JButton("BndTyp");
         btnLabBT.addActionListener(new showHideLabelsListener(btnLabBT,
                 LabelType.BT));
         btnLabBT.setEnabled(false);
-        btnLabBT.setToolTipText("Show/Hide bond type ID labels.");
+        btnLabBT.setToolTipText("Show/Hide bond type labels.");
         
-        btnLabBB = new JButton("BB ID");
+        btnLabBB = new JButton("BBID");
         btnLabBB.addActionListener(new showHideLabelsListener(btnLabBB,
                 LabelType.BBID));
         btnLabBB.setEnabled(false);
@@ -766,7 +813,7 @@ public class GUIGraphHandler extends GUICardPanel
 		ButtonsBar commandsPane = new ButtonsBar();
 		super.add(commandsPane, BorderLayout.SOUTH);
 		
-		btnOpenGraphs = new JButton("Load Library of Graphs");
+		btnOpenGraphs = new JButton("Import Graphs");
 		btnOpenGraphs.setToolTipText("Reads graphs or structures from file.");
 		btnOpenGraphs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -780,7 +827,7 @@ public class GUIGraphHandler extends GUICardPanel
 		});
 		commandsPane.add(btnOpenGraphs);
 		  
-        JButton btnSaveGraphs = new JButton("Save Library of Graphs");
+        JButton btnSaveGraphs = new JButton("Export Graphs");
         btnSaveGraphs.setToolTipText("Write all graphs to a file.");
         btnSaveGraphs.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -813,8 +860,46 @@ public class GUIGraphHandler extends GUICardPanel
             }
         });
         commandsPane.add(btnSaveGraphs);
+        
+        JButton btnSaveVrtxs = new JButton("Export Vertexes");
+        btnSaveVrtxs.setToolTipText("Write all graphs to a file.");
+        btnSaveVrtxs.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                FileAndFormat fileAndFormat = 
+                        GUIFileSaver.pickFileForSavingVertexes(btnSaveVrtxs);
+                if (fileAndFormat == null)
+                {
+                    return;
+                }
+                File outFile = fileAndFormat.file;
+                try
+                {
+                    List<Vertex> vertexes = new ArrayList<Vertex>();
+                    for (DGraph graph : dnGraphLibrary)
+                    {
+                        vertexes.addAll(graph.getVertexList());
+                    }
+                    outFile = DenoptimIO.writeVertexesToFile(outFile, 
+                            fileAndFormat.format, vertexes, false);
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(btnSaveVrtxs,
+                            "Could not write to '" + outFile + "'!",
+                            "Error",
+                            JOptionPane.PLAIN_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                deprotectEditedSystem();
+                unsavedChanges = false;
+                FileUtils.addToRecentFiles(outFile, fileAndFormat.format);
+            }
+        });
+        commandsPane.add(btnSaveVrtxs);
 		
-		JButton btnSaveTmpl = new JButton("Save Library of Templates");
+		JButton btnSaveTmpl = new JButton("Export Templates");
 		btnSaveTmpl.setToolTipText("Make templates from the graphs and same "
 		        + "them to file");
 		btnSaveTmpl.addActionListener(new ActionListener() {
@@ -1465,6 +1550,130 @@ public class GUIGraphHandler extends GUICardPanel
 		loadCurrentGraphIdxToViewer(false);
 		updateGraphListSpinner();
 	}
+	
+//-----------------------------------------------------------------------------
+	
+	private void appendGraphsFromConvertingMolecule(File file, 
+	        FragmenterParameters frgParams, Component parent)
+	{
+	    // Reading molecules is format-agnostic manner
+	    List<IAtomContainer> mols = new ArrayList<IAtomContainer>();
+	    boolean make2D = false;
+        StructureDiagramGenerator sdg = null;
+	    IteratingAtomContainerReader iterMolsToFragment = null;
+        try
+        {
+            iterMolsToFragment = new IteratingAtomContainerReader(file);
+            if (iterMolsToFragment.getIteratorType().equals(
+                    IteratingSMILESReader.class))
+            {
+                frgParams.setWorkingIn3D(false);
+                make2D = true;
+                sdg = new StructureDiagramGenerator();
+            }
+        } catch (Exception e1)
+        {
+            String msg = "<html><body width='%1s'>Could not read molecules "
+                    + "from '" + file.getAbsolutePath() + "' and convert them "
+                            + "to graphs.</html>";
+            JOptionPane.showMessageDialog(parent, String.format(msg,400),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE,
+                    UIManager.getIcon("OptionPane.errorIcon"));
+            return;
+        }
+        
+        // Read and convert molecules one by one
+        List<DGraph> graphs = new ArrayList<DGraph>();
+        int i=0;
+        while (iterMolsToFragment.hasNext())
+        {
+            i++;
+            IAtomContainer mol = iterMolsToFragment.next();
+            if (make2D)
+            {
+                try
+                {
+                    sdg.generateCoordinates(mol);
+                } catch (CDKException e)
+                {
+                    // Ignore
+                    e.printStackTrace();
+                }
+            }
+            DGraph graph = null;
+            try {
+                graph = EAUtils.makeGraphFromFragmentationOfMol(mol, 
+                        frgParams.getCuttingRules(), frgParams.getLogger(),
+                        frgParams.getScaffoldingPolicy(),
+                        frgParams.getLinearAngleLimit());
+            } catch (DENOPTIMException de)
+            {
+                String msg = "<html><body width='%1s'>Unable to convert "
+                        + "molecule " + i + " (" + mol.getAtomCount() 
+                        + " atoms) to DENOPTIM graph. " + de.getMessage()
+                        + "</html>";
+                JOptionPane.showMessageDialog(parent, String.format(msg,400),
+                        "Error",
+                        JOptionPane.WARNING_MESSAGE,
+                        UIManager.getIcon("OptionPane.warningIcon"));
+                continue;
+            }
+            
+            if (frgParams.embedRingsInTemplate())
+            {
+                if (fragSpace==null)
+                {
+                    fragSpace = new FragmentSpace();
+                }
+                try {
+                    DGraph modGraph = graph.embedPatternsInTemplates(
+                            GraphPattern.RING, 
+                            fragSpace, frgParams.getEmbeddedRingsContract());
+                    graph = modGraph;
+                } catch (DENOPTIMException e) {
+                    String msg = "<html><body width='%1s'>Unable to embed "
+                            + "ring systems of molecule " + i 
+                            + " (" + mol.getAtomCount() 
+                            + " atoms) into Templates. Returning graph without "
+                            + "embedding of rings. " + e.getMessage()
+                            + "</html>";
+                    JOptionPane.showMessageDialog(parent, String.format(msg,400),
+                            "Error",
+                            JOptionPane.WARNING_MESSAGE,
+                            UIManager.getIcon("OptionPane.warningIcon"));
+                }
+            }
+            
+            graphs.add(graph);
+            mols.add(mol);
+        }
+        
+        // Signal no result obtained
+        if (graphs.size() < 1)
+        {
+            JOptionPane.showMessageDialog(parent,
+                    "<html>Conversion produced no graphs!</html>",
+                    "Error",
+                    JOptionPane.WARNING_MESSAGE,
+                    UIManager.getIcon("OptionPane.warningIcon"));
+            return;
+        }
+        
+        // 
+        int oldSize = dnGraphLibrary.size();
+        if (graphs.size() > 0)
+        {
+            dnGraphLibrary.addAll(graphs);
+            molLibrary.addAll(mols);
+            
+            // WE choose to display the first of the imported ones
+            currGrphIdx = oldSize;
+            
+            loadCurrentGraphIdxToViewer(false);
+            updateGraphListSpinner();
+        }
+	}
 
 //-----------------------------------------------------------------------------
 
@@ -1804,7 +2013,7 @@ public class GUIGraphHandler extends GUICardPanel
 		    if (mol != null)
 		    {
                 molLibrary.set(currGrphIdx, mol);
-                mol.setProperty(DENOPTIMConstants.GMSGTAG,
+                mol.setProperty(DENOPTIMConstants.PROVENANCE,
                         "ManuallyBuilt");
         	} else {
         	    // Logging done within visualPanel

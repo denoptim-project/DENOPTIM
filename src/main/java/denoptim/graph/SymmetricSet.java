@@ -20,157 +20,46 @@
 package denoptim.graph;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
- * Class representing a list of IDs pointing to instances that are related by
- * some conventional criterion that is referred as the "symmetry". 
+ * Class representing a list of references pointing to instances that are 
+ * related by some conventional criterion that is referred to as "symmetry
+ * relation". 
  * Note that the actual criterion that defined a "symmetry" relation is not 
  * defined here. So, this list does not know what is the criterion that puts
  * its entries in relation with each other. Moreover, the list does not know
- * what the entries are, just their numerical identifier.
+ * what the entries are.
  *
- * @author Vishwesh Venkatraman
  * @author Marco Foscato
  */
 
-public class SymmetricSet implements Cloneable
+// NB: keep it a List, not a Set: having the order helps comparison.
+
+public class SymmetricSet<T> extends ArrayList<T>
 {
-    private ArrayList<Integer> symIds;
-
-//------------------------------------------------------------------------------
 
     /**
-     * Constructor for an empty "set" (a list, actually).
+     * Version ID
      */
-    public SymmetricSet()
-    {
-        symIds = new ArrayList<Integer>();
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Constructor for a symmetric list of identifiers from the list itself.
-     * @param symIds the list of identifiers.
-     */
-    public SymmetricSet(ArrayList<Integer> symIds)
-    {       
-        this.symIds = new ArrayList<>(symIds);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Return the list of symmetric identifiers.
-     * @return the list of symmetric identifiers .
-     */
-    public ArrayList<Integer> getList()
-    {
-        return symIds;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Return a specific identifier contained in this "set" (a list in reality).
-     * @param i the desired entry number.
-     * @return the identifier.
-     */
-    public int get(int i)
-    {
-        return symIds.get(i);
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Checks whether the given identifiers is contained in this set.
-     * @param val the identifiers to look for.
-     * @return <code>true</code> if the identifiers is contained in this set.
-     */
-    public boolean contains(Integer val)
-    {
-        return symIds.contains(val);
-    }    
-
-//------------------------------------------------------------------------------
-
-    public int indexOf(Integer vid)
-    {
-        return symIds.indexOf(vid);
-    }
+    private static final long serialVersionUID = 4L;
     
 //------------------------------------------------------------------------------
 
-    public void set(int index, Integer element)
-    {
-        symIds.set(index, element);
-    }
-
-//------------------------------------------------------------------------------
-
     /**
-     * Adds an identifiers to this list.
-     * @param id the identifiers to add.
+     * Adds an item to this list, if not already present
+     * @param item the item to add.
+     * @return as for {@link Collection#add(Object)}
      */
-    public void add(int id)
+    @Override
+    public boolean add(T item)
     {
-    	if (!symIds.contains(id))
+    	if (!contains(item))
     	{
-    	    symIds.add(id);
+    	    return super.add(item);
+    	} else {
+    	    return false;
     	}
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Removes the given identifier from the list
-     * @param i the identifiers to be removed
-     */
-    public void remove(Integer i)
-    {
-        symIds.remove((Integer) i);
-        while (symIds.contains(i))
-        {
-            symIds.remove((Integer) i);
-        }
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Return the number of identifiers in this list.
-     * @return the number of identifiers in this list.
-     */
-    public int size()
-    {
-        return symIds.size();	
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
-     * Returns a deep-copy of this set.
-     * @return a deep-copy.
-     */
-    public SymmetricSet clone()
-    {
-        SymmetricSet c = new SymmetricSet();
-        for (Integer i : symIds)
-        {
-            c.add(Integer.parseInt(i.toString()));
-        }
-        return c;
-    }
-
-//------------------------------------------------------------------------------
-
-    public String toString()
-    {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("SymmetricSet [symIds=");
-    	sb.append(symIds.toString()).append("]");
-    	return sb.toString();
     }
 
 //------------------------------------------------------------------------------

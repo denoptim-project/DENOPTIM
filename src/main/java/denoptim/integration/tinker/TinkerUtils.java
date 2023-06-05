@@ -827,7 +827,7 @@ public class TinkerUtils
                                                                          nbrs,
                                                         new double[] {d,a,t});
 
-            int vidx = (Integer) atmI.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+            long vidx = atmI.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
             ta.setVertexId(vidx);
 
             if (debug)

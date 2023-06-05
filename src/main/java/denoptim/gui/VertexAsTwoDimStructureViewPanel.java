@@ -20,16 +20,15 @@ package denoptim.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -46,7 +45,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.vecmath.Point2d;
 
 import org.openscience.cdk.AtomRef;
 import org.openscience.cdk.PseudoAtom;
@@ -122,6 +120,11 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
     class TwoDimStructurePanel extends JPanel implements MouseWheelListener, 
     MouseListener, MouseMotionListener
     {
+        /**
+         * Version ID
+         */
+        private static final long serialVersionUID = 1L;
+        
         IAtomContainer mol;
         AtomContainerRenderer renderer;
 
@@ -467,8 +470,7 @@ public class VertexAsTwoDimStructureViewPanel extends JSplitPane
 		clearAPTable();
 		mapAPs = new HashMap<Integer,AttachmentPoint>();
 		
-		ArrayList<AttachmentPoint> lstAPs = 
-		        vertex.getAttachmentPoints();		
+		List<AttachmentPoint> lstAPs = vertex.getAttachmentPoints();		
         if (lstAPs.size() == 0)
         {
 			return;

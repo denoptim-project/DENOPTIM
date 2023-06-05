@@ -29,9 +29,11 @@ import java.util.logging.Level;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
+import denoptim.graph.rings.RingClosureParameters;
 import denoptim.logging.Monitor;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.MutationType;
 
 
@@ -64,7 +66,13 @@ public class GAParameters extends RunTimeParameters
      * a list of pathnames
      */
     protected String initPoplnFile = "";
-
+    
+    /**
+     * Pathname to the file collecting molecules to fragment to generate initial
+     * population.
+     */
+    protected String initMolsToFragmentFile = null;
+    
     /**
      * Pathname of the file with the list of individuals unique identifiers that
      * are initially known.
@@ -127,9 +135,18 @@ public class GAParameters extends RunTimeParameters
 
     /**
      * Replacement strategy: 1) replace worst individuals with new ones that are
-     * better than the worst, 2) no replacement (the population keeps growing)
+     * better than the worst, 2) no replacement (the population keeps growing).
+     * Obviously, with strategy 2 we consume a lot of resources.
      */
     protected int replacementStrategy = 1;
+    
+    /**
+     * Flag defining if population members can survive multiple generations 
+     * (when this variable is <code>true</code>) or
+     * the population is refreshed at every generation (when this variable is
+     * <code>false</code>). 
+     */
+    protected boolean parentsSurvive = true;
 
     /**
      * Definition of the growth probability function:
@@ -225,6 +242,14 @@ public class GAParameters extends RunTimeParameters
     protected double mutationWeight = 1.0;
     
     /**
+     * Flag defining if we want mutation to occur on offspring that
+     * result from crossover (i.e., mutation and crossover are coupled), 
+     * otherwise we want to mutate population members irrespectively on 
+     * crossover.
+     */
+    protected boolean coupleMutationAndCrossover = false;
+    
+    /**
      * The relative weight at which construction from scratch is performed
      */
     protected double builtAnewWeight = 1.0;
@@ -243,6 +268,16 @@ public class GAParameters extends RunTimeParameters
      * Crossover parents selection strategy: string
      */
     protected String strXoverSelectionMode = xoverSelectionMode+"";
+    
+    /**
+     * Number of offspring that a single crossover operation can produce.
+     */
+    protected int maxOffsprintFromXover = 1;
+    
+    /**
+     * Flag controlling if we choose the best sibling out of crossover.
+     */
+    protected boolean keepBestSibling = false;
 
     /**
      * Mutation types that are excluded everywhere.
@@ -289,6 +324,11 @@ public class GAParameters extends RunTimeParameters
      * Minimal standard deviation accepted in the fitness values of the initial population
      */
     protected double minFitnessSD = 0.000001;
+    
+    /**
+     * Maximum number of rings added by a single mutation operation
+     */
+    protected int maxRingsAddedByMutation = 1;
     
     /**
      * Flag controlling the possibility of collecting cyclic graph systems that 
@@ -362,6 +402,16 @@ public class GAParameters extends RunTimeParameters
      */
     public boolean buildAnewFailureTolerant = true;
     
+    /**
+     * Limit to the size of subgraphs that are exchanged during crossover.
+     */
+    public int maxXOverableSubGraphSize = 20;
+    
+    /**
+     * Flag requesting to write a SDF file that collects all the population 
+     * members each time we report the population details on file.
+     */
+    protected boolean writePopOnDisk = false;
 
 //------------------------------------------------------------------------------
     
@@ -479,6 +529,17 @@ public class GAParameters extends RunTimeParameters
     public int getReplacementStrategy()
     {
         return replacementStrategy;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the flag controlling if parents are allowed to survive multiple
+     * generation or not.
+     */
+    public boolean parentsSurvive()
+    {
+        return parentsSurvive;
     }
 
 //------------------------------------------------------------------------------
@@ -627,6 +688,28 @@ public class GAParameters extends RunTimeParameters
     {
         return crossoverWeight;
     }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the maximum number of offspring produced by a single crossover
+     * operation.
+     */
+    public int maxOffsprintFromXover()
+    {
+        return maxOffsprintFromXover;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we want to keep only the best among the two 
+     * sibling that result from a single crossover.
+     */
+    public boolean keepBestSibling()
+    {
+        return keepBestSibling;
+    }
 
 //------------------------------------------------------------------------------
 
@@ -656,6 +739,16 @@ public class GAParameters extends RunTimeParameters
         return initPoplnFile;
     }
     
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return the pathname to the file defining molecules to convert into 
+     * candidates by fragmentation.
+     */
+    public String getInitMolsToFragmentFile()
+    {
+        return initMolsToFragmentFile;
+    }
 
 //------------------------------------------------------------------------------
       
@@ -721,6 +814,19 @@ public class GAParameters extends RunTimeParameters
     }
     
 //-----------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if we want mutation to occur on offspring that
+     * result from crossover, 
+     * otherwise we want to mutate population members irrespectively on 
+     * crossover.
+     */
+    public boolean coupleMutationAndCrossover()
+    {
+        return coupleMutationAndCrossover;
+    }
+
+//------------------------------------------------------------------------------
 
     /**
      * Processes a keyword/value pair and assign the related parameters.
@@ -840,6 +946,15 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     initPoplnFile = value;
+                }
+                break;
+            }
+            
+            case "INITMOLSTOFRAGMENTFILE=":
+            {
+                if (value.length() > 0)
+                {
+                    initMolsToFragmentFile = value;
                 }
                 break;
             }
@@ -1005,6 +1120,24 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "COUPLEMUTATIONTOCROSSOVER=":
+            {
+                if (value.length() > 0)
+                {
+                    coupleMutationAndCrossover = readYesNoTrueFalse(value);
+                }
+                break;
+            }
+            
+            case "PARENTSSURVIVE=":
+            {
+                if (value.length() > 0)
+                {
+                    parentsSurvive = readYesNoTrueFalse(value);
+                }
+                break;
+            }
+            
             case "EXCLUDEMUTATIONTYPE=":
             {
                 if (value.length() > 0)
@@ -1057,6 +1190,15 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "MAXRINGSADDEDBYMUTATION=":
+            {
+                if (value.length() > 0)
+                {
+                    maxRingsAddedByMutation = Integer.parseInt(value);
+                }
+                break;
+            }
+            
             case "KEEPNEWRINGSYSTEMVERTEXES":
             {
                 saveRingSystemsAsTemplatesNonScaff = true;
@@ -1068,7 +1210,6 @@ public class GAParameters extends RunTimeParameters
                 saveRingSystemsAsTemplatesScaffolds = true;
                 break;
             }
-            
             
             case "KEEPNEWRINGSYSTEMFITNESSTRSH=":
             {
@@ -1126,6 +1267,25 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "NUMOFFSPRINGFROMXOVER=":
+            {
+                if (value.length() > 0)
+                {
+                    maxOffsprintFromXover = Integer.parseInt(value);
+                    if (maxOffsprintFromXover>2)
+                        throw new DENOPTIMException("ERROR! Can only generate "
+                                + "up to 2 offspring from crossover, but you "
+                                + "required " + maxOffsprintFromXover);
+                }
+                break;
+            }
+            
+            case "KEEPBESTSIBLING=":
+            {
+                keepBestSibling = readYesNoTrueFalse(value);
+                break;
+            }
+            
             case "MUTATEDGRAPHCHECKFAILTOLERANT=":
             {
                 mutatedGraphFailedEvalTolerant = readYesNoTrueFalse(value);
@@ -1156,6 +1316,20 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "MAXXOVERSUBGRAPHSIZE=":
+            {
+                if (value.length() > 0)
+                {
+                    maxXOverableSubGraphSize = Integer.parseInt(value);
+                }
+                break;
+            }
+            
+            case "WRITEPOPULATIONTOFILE":
+            {
+                writePopOnDisk = true;
+                break;
+            }
             
             default:
                 msg = "Keyword " + key + " is not a known GeneticAlgorithm-" 
@@ -1247,6 +1421,16 @@ public class GAParameters extends RunTimeParameters
         
         processOtherParameters();
         
+        if (containsParameters(ParametersType.RC_PARAMS))
+        {
+            RingClosureParameters rcParams = (RingClosureParameters) 
+                    getParameters(ParametersType.RC_PARAMS);
+            if (!rcParams.allowRingClosures())
+            {
+                excludedMutationTypes.add(MutationType.ADDRING);
+            }
+        }
+        
         if (isMaster)
         {    
             StaticLogger.appLogger.log(Level.INFO, "Program log file: " 
@@ -1314,6 +1498,15 @@ public class GAParameters extends RunTimeParameters
                 throw new DENOPTIMException(error);
             }
         }
+        
+        if (initMolsToFragmentFile!=null && initMolsToFragmentFile.length() > 0)
+        {
+            if (!denoptim.files.FileUtils.checkExists(initMolsToFragmentFile))
+            {
+                throw new DENOPTIMException("Cannot find initial molecules to "
+                        + "fragment: " + initMolsToFragmentFile);
+            }
+        }
 
         if (replacementStrategy < 0 || replacementStrategy > 2)
         {
@@ -1364,6 +1557,29 @@ public class GAParameters extends RunTimeParameters
             sb.append(otherCollector.getPrintedList());
         }
         return sb.toString();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * @return <code>true</code> if we are configures to save all population
+     * members each time we report the population details on file.
+     */
+    public boolean savePopFile()
+    {
+        return writePopOnDisk;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Return the value of the number of rings that we are allowed to add in a 
+     * single {@link MutationType#ADDRING} mutation.
+     * @return the maximum number of rings added in a single mutation.
+     */
+    public int getMaxRingsAddedByMutation()
+    {
+        return maxRingsAddedByMutation;
     }
 
 //------------------------------------------------------------------------------

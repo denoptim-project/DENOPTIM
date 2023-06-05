@@ -35,9 +35,14 @@ import denoptim.graph.DGraph.DENOPTIMGraphDeserializer;
 import denoptim.graph.DGraph.DENOPTIMGraphSerializer;
 import denoptim.graph.Edge;
 import denoptim.graph.Edge.DENOPTIMEdgeSerializer;
+import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
 import denoptim.graph.Ring.DENOPTIMRingSerializer;
+import denoptim.graph.SymmetricAPs;
+import denoptim.graph.SymmetricAPs.SymmetricAPsSerializer;
+import denoptim.graph.SymmetricVertexes;
+import denoptim.graph.SymmetricVertexes.SymmetricVertexesSerializer;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.DENOPTIMVertexDeserializer;
@@ -74,7 +79,14 @@ public class DENOPTIMgson
         // The registerTypeHierarchyAdapter is needed because of IAtomContainer is
         // an interface.
         .registerTypeHierarchyAdapter(IAtomContainer.class, 
-              new IAtomContainerSerializer())
+                new IAtomContainerSerializer())
+        // Custom serializer to make list of references to vertexes use IDs
+        .registerTypeAdapter(SymmetricVertexes.class, 
+                new SymmetricVertexesSerializer())
+        // Custom serializer to make list of references to APs use IDs
+        .registerTypeAdapter(SymmetricAPs.class, 
+                new SymmetricAPsSerializer())
+        
         .setPrettyPrinting()
         .create();
 
@@ -142,6 +154,10 @@ public class DENOPTIMgson
                     && field.getName().equals("user")) {
                 return true;
             }
+            if (field.getDeclaringClass() == AttachmentPoint.class
+                    && field.getName().equals("cutId")) {
+                return true;
+            }
             if (field.getDeclaringClass() == Vertex.class
                     && field.getName().equals("owner")) {
                 return true;
@@ -182,12 +198,32 @@ public class DENOPTIMgson
                    && field.getName().equals("user")) {
                 return true;
             }
+            if (field.getDeclaringClass() == AttachmentPoint.class
+                    && field.getName().equals("cutId")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == Vertex.class
+                    && field.getName().equals("owner")) {
+                return true;
+            }
             if (field.getDeclaringClass() == Vertex.class
                     && field.getName().equals("owner")) {
                 return true;
             }
             if (field.getDeclaringClass() == Fragment.class
                     && field.getName().equals("jGraphFragIsomorphism")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == Fragment.class
+                    && field.getName().equals("lstSymAPs")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == EmptyVertex.class
+                    && field.getName().equals("lstSymAPs")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == Template.class
+                    && field.getName().equals("lstSymAPs")) {
                 return true;
             }
             if (field.getDeclaringClass() == Template.class
@@ -200,6 +236,10 @@ public class DENOPTIMgson
             }
             if (field.getDeclaringClass() == Template.class
                     && field.getName().equals("mol")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == DGraph.class
+                    && field.getName().equals("symVertices")) {
                 return true;
             }
 

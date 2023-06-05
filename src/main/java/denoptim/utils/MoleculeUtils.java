@@ -77,6 +77,7 @@ import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.StaticLogger;
 import io.github.dan2097.jnainchi.InchiFlag;
@@ -192,7 +193,7 @@ public class MoleculeUtils
         for (IAtom a : mol.atoms())
         {
             boolean isRca = false;
-            Set<String> rcaElSymbols = DENOPTIMConstants.RCATYPEMAP.keySet();
+            Set<String> rcaElSymbols = RingClosingAttractor.RCATYPEMAP.keySet();
             for (String rcaEl : rcaElSymbols)
             {
                 if (MoleculeUtils.getSymbolOrLabel(a).equals(rcaEl))
@@ -596,7 +597,7 @@ public class MoleculeUtils
             IAtomContainer mol
     ) {
 
-        ArrayList<Integer> vertIDs = new ArrayList<>();
+        ArrayList<Long> vertIDs = new ArrayList<>();
         for (Vertex v : vertLst) {
             vertIDs.add(v.getVertexId());
         }
@@ -604,7 +605,7 @@ public class MoleculeUtils
         Map<Vertex,ArrayList<Integer>> map = new HashMap<>();
         for (IAtom atm : mol.atoms())
         {
-            int vID = Integer.parseInt(atm.getProperty(
+            long vID = Long.parseLong(atm.getProperty(
                                  DENOPTIMConstants.ATMPROPVERTEXID).toString());
             if (vertIDs.contains(vID))
             {
@@ -618,7 +619,7 @@ public class MoleculeUtils
                 {
                     ArrayList<Integer> atmLst = new ArrayList<>();
                     atmLst.add(atmID);
-                    map.put(v,atmLst);
+                    map.put(v, atmLst);
                 }
             }
         }
@@ -992,7 +993,7 @@ public class MoleculeUtils
                 {
                     s = ((PseudoAtom) a).getLabel();
                 } else {
-                    // WARNING: we fall back to standard behaviour, but there
+                    // WARNING: we fall back to standard behavior, but there
                     // could still be cases where this is not good...
                     s = a.getSymbol();
                 }
@@ -1000,7 +1001,7 @@ public class MoleculeUtils
             {
                 s = ((PseudoAtom) atm).getLabel();
             }
-        }       
+        }      
         return s;
     }
     
@@ -1062,8 +1063,8 @@ public class MoleculeUtils
     {
         IAtomContainer iac = makeSameAs(wholeIAC);
         
-        Set<Integer> wantedVIDs = new HashSet<Integer>();
-        Map<Integer,Vertex> wantedVertexesMap = new HashMap<>();
+        Set<Long> wantedVIDs = new HashSet<Long>();
+        Map<Long,Vertex> wantedVertexesMap = new HashMap<>();
         for (Vertex v : subGraph.getVertexList())
         {
             Object o = v.getProperty(DENOPTIMConstants.STOREDVID);
@@ -1074,8 +1075,8 @@ public class MoleculeUtils
                         + "vertex " + v + ", but is needed to extract "
                                 + "substructure.");
             }
-            wantedVIDs.add(((Integer) o).intValue());
-            wantedVertexesMap.put(((Integer) o).intValue(), v);
+            wantedVIDs.add(((Long) o).longValue());
+            wantedVertexesMap.put(((Long) o).longValue(), v);
         }
         
         // Identify the destiny of each atom: keep, remove, or make AP from it.
@@ -1097,7 +1098,7 @@ public class MoleculeUtils
                         + oriAtm.getSymbol() + wholeIAC.indexOf(oriAtm) 
                         + ", but is needed to extract substructure.");
             }
-            int vid = ((Integer) o).intValue();
+            long vid = ((Long) o).longValue();
             if (wantedVIDs.contains(vid))
             {
                 continue; //keep this atom cpAtm
@@ -1115,7 +1116,7 @@ public class MoleculeUtils
                             + nbr.getSymbol() + wholeIAC.indexOf(nbr) 
                             + ", but is needed to extract substructure.");
                 }
-                int nbrVid = ((Integer) oNbr).intValue();
+                long nbrVid = ((Long) oNbr).longValue();
                 if (wantedVIDs.contains(nbrVid))
                 {
                     // cpAtm is connected to an atom to keep and will therefore

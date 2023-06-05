@@ -21,6 +21,7 @@ package denoptim.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jgrapht.graph.DefaultUndirectedGraph;
@@ -34,7 +35,7 @@ import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
-import denoptim.graph.SymmetricSet;
+import denoptim.graph.SymmetricVertexes;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.simplified.Node;
@@ -281,7 +282,7 @@ public class GraphConversionTool
         }
 
 		// collect map of symmetric vertices
-        ArrayList<SymmetricSet> symSets = new ArrayList<SymmetricSet>();
+        List<SymmetricVertexes> symSets = new ArrayList<SymmetricVertexes>();
         String[] ss8 = sStr.split("SymmetricSet ");
         for (int i=1; i<ss8.length; i++)
         {
@@ -295,7 +296,13 @@ public class GraphConversionTool
             	symVrtxIds.add(Integer.parseInt(ss6[j]));
             }
 
-            SymmetricSet ss = new SymmetricSet(symVrtxIds);
+            SymmetricVertexes ss = new SymmetricVertexes();
+            for (Integer vid : symVrtxIds)
+            {
+                vertices.stream()
+                    .filter(v -> v.getVertexId()==vid)
+                    .forEach(v -> ss.add(v));
+            }
             symSets.add(ss);
         }
 	
@@ -304,7 +311,7 @@ public class GraphConversionTool
         // update bond type of chords
         for (Ring r : rings)
         {
-            int vid = r.getHeadVertex().getVertexId();
+            long vid = r.getHeadVertex().getVertexId();
             for (Edge e : edges)
             {
                 if (e.getTrgVertex() == vid || e.getSrcVertex() == vid)

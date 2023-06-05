@@ -244,7 +244,7 @@ public class ThreeDimTreeBuilder
         // WARNING: assumption that the graph is an healthy spanning tree, as
         // it should always be in DENOPTIM.
         Vertex rootVrtx = graph.getSourceVertex();
-        int idRootVrtx = rootVrtx.getVertexId();
+        long idRootVrtx = rootVrtx.getVertexId();
         
         IAtomContainer iacRootVrtx = null;
         if (rootVrtx.containsAtoms())
@@ -278,7 +278,7 @@ public class ThreeDimTreeBuilder
         }
         
         // Store APs in maps
-        Map<Integer,ArrayList<AttachmentPoint>> apsPerVertexId = new HashMap<>();
+        Map<Long,ArrayList<AttachmentPoint>> apsPerVertexId = new HashMap<>();
         Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge = new HashMap<>();
         Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom = new HashMap<>();
         Map<IBond,ArrayList<AttachmentPoint>> apsPerBond = new HashMap<>();
@@ -380,7 +380,7 @@ public class ThreeDimTreeBuilder
             
             sb.append("AP-per-VertexID"+NL);
             int i=0;
-            for (int v : apsPerVertexId.keySet())
+            for (long v : apsPerVertexId.keySet())
             {
                 ArrayList<AttachmentPoint> aps = apsPerVertexId.get(v);
                 for (AttachmentPoint ap : aps)
@@ -512,7 +512,7 @@ public class ThreeDimTreeBuilder
     private void append3DFragmentsViaEdges(IAtomContainer mol, DGraph graph,
             int idSrcAtmA, Point3d srcApA, Point3d trgApA, Edge edge, 
             boolean removeUsedRCAs, boolean rebuild,
-            Map<Integer,ArrayList<AttachmentPoint>> apsPerVertexId,
+            Map<Long, ArrayList<AttachmentPoint>> apsPerVertexId,
             Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge,
             Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom,
             Map<IBond,ArrayList<AttachmentPoint>> apsPerBond) 
@@ -526,7 +526,7 @@ public class ThreeDimTreeBuilder
         AttachmentPoint apB = edge.getTrgAP();
         
         //Used to keep track of which atom comes from which vertex
-        int idInVrx = inVtx.getVertexId();
+        long idInVrx = inVtx.getVertexId();
         
         logger.log(Level.FINE, "Incoming vertex : "+inVtx);
         
@@ -833,9 +833,9 @@ public class ThreeDimTreeBuilder
                 // Get two points defining the src AP vector in 3D
                 Point3d trgNextApA = new Point3d(
                         nextEdge.getSrcAP().getDirectionVector());
-                Point3d srcNextApA = new Point3d(inFrag.getAtom(
-                        nextEdge.getSrcAP().getAtomPositionNumber())
-                        .getPoint3d());
+                Point3d srcNextApA = new Point3d(MoleculeUtils.getPoint3d(
+                        inFrag.getAtom(
+                        nextEdge.getSrcAP().getAtomPositionNumber())));
     
                 // Append fragment on AP-vector and start recursion
                 append3DFragmentsViaEdges(mol, graph,

@@ -55,6 +55,11 @@ public class FragmentAlignement
         // Get lowest RMSD among all mappings
         Iterator<GraphMapping<FragIsomorphNode, FragIsomorphEdge>> 
             mapingIterator = fii.getMappings();
+        if (mapingIterator == null)
+        {
+            throw new DENOPTIMException("Mapping of isomorphism timed-out!");
+        }
+        
         while (mapingIterator.hasNext())
         {
             GraphMapping<FragIsomorphNode, FragIsomorphEdge> mapping = 

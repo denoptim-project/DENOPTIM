@@ -13,10 +13,13 @@ The directory where this README file is located contains all the source files ne
 
 To build the html pages of the documentation run the following command from within the `doc`
 
-  doxygen
-
+```
+doxygen
+```
 
 ### Usage
 Once you have built the local documentation, its entry point will be file ./html/index.html. You can open such file with any browser, double click on it or open it from the command line. For example,
 
-  firefox ./html/index.html
+```
+firefox ./html/index.html
+```

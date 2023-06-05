@@ -144,6 +144,15 @@ public class Population extends ArrayList<Candidate> implements Cloneable
 //------------------------------------------------------------------------------
     
     @Override
+    public void clear()
+    {
+        populationUpdate.getAndIncrement();
+        super.clear();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Override
     public boolean retainAll(Collection<?> c)
     {
         boolean result = super.retainAll(c);
@@ -273,9 +282,9 @@ public class Population extends ArrayList<Candidate> implements Cloneable
          * @param cA the item that is looking for a crossover partner.
          * @return the list of crossover-compatible items.
          */
-        public ArrayList<Candidate> getMembersCompatibleWith(Candidate cA)
+        public List<Candidate> getMembersCompatibleWith(Candidate cA)
         {
-            ArrayList<Candidate> compatibleMembers = new ArrayList<Candidate>();
+            List<Candidate> compatibleMembers = new ArrayList<Candidate>();
             if (data.keySet().contains(cA))
             {
                 for (Candidate cB : data.get(cA).keySet())
@@ -358,8 +367,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * parents. 
      * @return the list of crossover-compatible population members.
      */
-    public ArrayList<Candidate> getXoverPartners(Candidate memberA,
-            ArrayList<Candidate> eligibleParents, FragmentSpace fragSpace)
+    public List<Candidate> getXoverPartners(Candidate memberA,
+            List<Candidate> eligibleParents, FragmentSpace fragSpace)
     {   
         DGraph gA = memberA.getGraph();
         
@@ -385,7 +394,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             try
             {
                 List<XoverSite> xoverSites = GraphOperations
-                        .locateCompatibleXOverPoints(gA, gB, fragSpace);
+                        .locateCompatibleXOverPoints(gA, gB, fragSpace, 
+                                settings.maxXOverableSubGraphSize);
                 xoverCompatibilities.put(memberA, memberB, xoverSites);
             } catch (DENOPTIMException e)
             {
@@ -410,8 +420,7 @@ public class Population extends ArrayList<Candidate> implements Cloneable
      * @param parentB
      * @return the list crossover sites.
      */
-    public List<XoverSite> getXoverSites(Candidate parentA,
-            Candidate parentB)
+    public List<XoverSite> getXoverSites(Candidate parentA, Candidate parentB)
     {
         return xoverCompatibilities.get(parentA,parentB);
     }
@@ -419,7 +428,8 @@ public class Population extends ArrayList<Candidate> implements Cloneable
 //------------------------------------------------------------------------------
     
     /**
-     * Removes all the elements exceeding the given size.
+     * Removes all the elements exceeding the given size. Does not reorder the
+     * population prior to trimming!
      * @param populationSize size to trim down to.
      */
     public void trim(int populationSize)
@@ -436,14 +446,26 @@ public class Population extends ArrayList<Candidate> implements Cloneable
     
     /**
      * Gets the minimum value of the fitness in this population.
-     * @return the minimum fitness value in this population
+     * @return the minimum fitness value in this population, or the 
+     * {@link Double#MIN_VALUE}
      */
     public double getMinFitness()
     {
+        return getMinFitnessMember().getFitness();
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Gets the {@link Candidate} with minimum value of the fitness in this 
+     * population.
+     * @return the population member with minimum fitness value.
+     */
+    public Candidate getMinFitnessMember()
+    {
         return this.stream()
                 .min(Comparator.comparing(Candidate::getFitness))
-                .orElse(null)
-                .getFitness();
+                .orElse(null);
     }
     
 //------------------------------------------------------------------------------

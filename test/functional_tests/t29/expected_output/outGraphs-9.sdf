@@ -67,7 +67,7 @@ M  END
 40
 
 > <GraphENC>
-40 2028_1_0,2034_17_1,2041_84_1,2044_84_1,2051_28_1,2054_28_1,2063_40_1,29_1_1,30_68_1,31_68_1,32_39_1,33_80_1,34_81_1, 2028_2_2034_0_SINGLE_RuL:0_MImidazolylidene:1,2028_1_2041_0_SINGLE_RuX:0_RuCl:1,2028_0_2044_0_SINGLE_RuX:0_RuCl:1,2034_2_2051_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_3_2054_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_1_2063_0_SINGLE_LImidazolylideneSubNL:0_NCarbeneSubNAlkS:1,2034_4_29_0_SINGLE_LImidazolylideneSubNL:0_c:0,29_2_30_0_SINGLE_MX:1_bridge:0,29_1_31_0_SINGLE_c:0_bridge:0,31_1_32_0_SINGLE_bridge:0_LPhosphineSubMSym:0,32_1_33_0_SINGLE_LPhosphineSubMSym:0_ATplus:0,30_1_34_0_SINGLE_bridge:0_ATminus:0, DENOPTIMRing [vertices=[33_80_1, 32_39_1, 31_68_1, 29_1_1, 30_68_1, 34_81_1]] SymmetricSet [symIds=[2041, 2044]] SymmetricSet [symIds=[2051, 2054]] 
+40 2028_1_0,2034_17_1,2041_84_1,2044_84_1,2051_28_1,2054_28_1,2063_40_1,29_1_1,30_68_1,31_68_1,32_39_1,33_80_1,34_81_1, 2028_2_2034_0_SINGLE_RuL:0_MImidazolylidene:1,2028_1_2041_0_SINGLE_RuX:0_RuCl:1,2028_0_2044_0_SINGLE_RuX:0_RuCl:1,2034_2_2051_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_3_2054_0_SINGLE_LImidazolylideneSubCS:0_LImidazolylideneSubCS:1,2034_1_2063_0_SINGLE_LImidazolylideneSubNL:0_NCarbeneSubNAlkS:1,2034_4_29_0_SINGLE_LImidazolylideneSubNL:0_c:0,29_2_30_0_SINGLE_MX:1_bridge:0,29_1_31_0_SINGLE_c:0_bridge:0,31_1_32_0_SINGLE_bridge:0_LPhosphineSubMSym:0,32_1_33_0_SINGLE_LPhosphineSubMSym:0_ATplus:0,30_1_34_0_SINGLE_bridge:0_ATminus:0, DENOPTIMRing [vertices=[33_80_1, 32_39_1, 31_68_1, 29_1_1, 30_68_1, 34_81_1]] SymmetricVertexes [symIds=[2041, 2044]] SymmetricVertexes [symIds=[2051, 2054]] 
 
 > <GraphJson>
 {
@@ -122,12 +122,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          1,
+          2
+        ]
       ],
       "mol": {
         "atoms": [
@@ -240,18 +238,14 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            1,
-            4
-          ]
-        },
-        {
-          "symIds": [
-            2,
-            3
-          ]
-        }
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          7
+        ]
       ],
       "mol": {
         "atoms": [
@@ -793,12 +787,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          15,
+          16
+        ]
       ],
       "mol": {
         "atoms": [
@@ -867,12 +859,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          18,
+          19
+        ]
       ],
       "mol": {
         "atoms": [
@@ -972,12 +962,10 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1
-          ]
-        }
+        [
+          20,
+          21
+        ]
       ],
       "mol": {
         "atoms": [
@@ -1107,13 +1095,11 @@ M  END
         }
       ],
       "lstSymAPs": [
-        {
-          "symIds": [
-            0,
-            1,
-            2
-          ]
-        }
+        [
+          22,
+          23,
+          24
+        ]
       ],
       "mol": {
         "atoms": [
@@ -1329,18 +1315,14 @@ M  END
     }
   ],
   "symVertices": [
-    {
-      "symIds": [
-        2041,
-        2044
-      ]
-    },
-    {
-      "symIds": [
-        2051,
-        2054
-      ]
-    }
+    [
+      2041,
+      2044
+    ],
+    [
+      2051,
+      2054
+    ]
   ]
 }
 

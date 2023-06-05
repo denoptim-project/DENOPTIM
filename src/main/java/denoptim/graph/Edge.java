@@ -119,7 +119,7 @@ public class Edge
     
 //------------------------------------------------------------------------------
 
-    public int getSrcVertex()
+    public long getSrcVertex()
     {
         return srcAP.getOwner().getVertexId();
     }
@@ -140,7 +140,7 @@ public class Edge
 
 //------------------------------------------------------------------------------
 
-    public int getTrgVertex()
+    public long getTrgVertex()
     {
         return trgAP.getOwner().getVertexId();
     }

@@ -221,9 +221,9 @@ public class AtomOrganizer
             Object p = originalAtom.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
             if (p != null)
             {
-                atmPropVID = " " + ((Integer) p).intValue();
+                atmPropVID = " " + ((Long) p).longValue();
                 atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, 
-                        ((Integer) p).intValue());
+                        ((Long) p).longValue());
             }
             sbMolProp.append(atmPropVID);            
 

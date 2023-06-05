@@ -298,9 +298,9 @@ public final class DENOPTIMConstants
     public static final String VERTEXJSONTAG = "VertexJson";
     
     /**
-     * SDF tag containing metadata on graph
+     * SDF tag containing provenance data for a graph
      */
-    public static final String GMSGTAG = "GraphMsg";
+    public static final String PROVENANCE = "Provenance";
 
     /**
      * SDF tag defining attachment points
@@ -380,27 +380,9 @@ public final class DENOPTIMConstants
     public static final String BONDPROPROTATABLE = "DENOPTIMRotable";
 
     /**
-     * Recognized types of {@link RingClosingAttractor} and compatible types
-     */
-    public static final Map<String,String> RCATYPEMAP =
-		    new HashMap<String,String>() 
-    {
-        /**
-         *  Version identifier
-         */
-        private static final long serialVersionUID = 3L;
-
-        {
-            put("ATP", "ATM");
-            put("ATM", "ATP");
-            put("ATN", "ATN");
-        };
-    };
-    
-    /**
      * Property of a {@link IAtom} representing a {@link RingClosingAttractor}. 
      * This property records the {@link APClass} of the 
-     * {@link AttachmentPoint} on which the attractor is attached  the graph.
+     * {@link AttachmentPoint} on which the attractor is attached to the graph.
      */
     public static final Object RCAPROPAPCTORCA = "RCAPROPAPCTORCA";
     
@@ -487,7 +469,7 @@ public final class DENOPTIMConstants
     public static final Object LINKAPS = "LINKTOGRAPHSAP";
 
     /**
-     * Property of AP where we save the original length of the AP vector.
+     * Key of AP property where we save the original length of the AP vector.
      */
     public static final Object APORIGINALLENGTH = "ORIGINALLENGTH";
     

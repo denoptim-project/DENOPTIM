@@ -286,6 +286,31 @@ runTest "t12b"
 runTest "t12c"
 
 #
+# t12d: Genetic algorithms without writing the candidates from intermediate generations. Writes only final results.
+#
+runTest "t12d"
+
+#
+# t12e: Genetic algorithms without survival of parents and with mutation coupled to crossover.
+#
+runTest "t12e"
+
+#
+# t12f: Genetic algorithms with generation of two offspring from crossover and selection of the best sibling as member of the population.
+#
+runTest "t12f"
+
+#
+# t12g: Initial population given as molecules to fragment from SMILES
+#
+runTest "t12g"
+
+#
+# t12h: Initial population given as molecules to fragment from SDF file
+#
+runTest "t12h"
+
+#
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation
 #
 runTest "t13"

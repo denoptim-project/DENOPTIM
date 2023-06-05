@@ -33,7 +33,6 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
 import denoptim.utils.GeneralUtils;
-import denoptim.utils.GraphUtils;
 
 /**
  * An attachment point (AP) is a possibility to attach a {@link Vertex} 
@@ -87,29 +86,27 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * The edge that is using this AP, if any
      */
     private Edge user;
+   
+    /**
+     * Identifier of the cut operation that generated this AP
+     */
+    private int cutId;
     
     /**
      * Map of customisable properties
      */
     private Map<Object, Object> properties;
-
+    
+    
 //------------------------------------------------------------------------------
 
     /**
      * Constructor for undefined DENOPTIMAttachmentPoint
      * @param owner the vertex that holds the attachment point under creation.
      */
-    
-    //TODO: since APs can be on any vertex, and vertices are not required to
-    // contain atoms, the information of which atom is an AP rooted should be
-    // stored and managed by the implementation of vertex that do contain atoms.
-    // The DENOPTIMFragment should thus be charged with keeping the reference to
-    // the atom that holds the AP.
-    
     public AttachmentPoint(Vertex owner) 
     {
-        this.owner = owner;
-        id = GraphUtils.getUniqueAPIndex();
+        this(owner, -1, null, null);
     }
 
 //------------------------------------------------------------------------------
@@ -121,8 +118,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      */
     public AttachmentPoint(Vertex owner, int atomPositionNumber) 
     {
-        this(owner);
-        this.atomPositionNumber = atomPositionNumber;
+        this(owner, atomPositionNumber, null, null);
     }
     
 //------------------------------------------------------------------------------
@@ -134,14 +130,10 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * @param dirVec the AP direction vector end (the beginning are the
      * coords of the source atom). This array must have 3 entries.
      */
-    private AttachmentPoint(Vertex owner, int atomPositionNumber,
+    private AttachmentPoint(Vertex owner, int atomPositionNumber, 
             Point3d dirVec) 
     {
-        this(owner, atomPositionNumber);
-        if (dirVec != null)
-        {
-            this.dirVec = new Point3d(dirVec.x, dirVec.y, dirVec.z);
-        }
+        this(owner, atomPositionNumber, dirVec, null);
     }
 
 //------------------------------------------------------------------------------
@@ -152,11 +144,19 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * @param atomPosNum the index of the source atom (0-based)
      * @param apClass the APClass
      */
-    public AttachmentPoint(Vertex owner, int atomPosNum,
-                                   APClass apClass) {
+    
+
+    //TODO: since APs can be on any vertex, and vertices are not required to
+    // contain atoms, the information of which atom is an AP rooted should be
+    // stored and managed by the implementation of vertex that do contain atoms.
+    // The DENOPTIMFragment should thus be charged with keeping the reference to
+    // the atom that holds the AP.
+    
+    
+    public AttachmentPoint(Vertex owner, int atomPosNum, APClass apClass) 
+    {
         this(owner, atomPosNum, null, apClass);
     }
-
     
 //------------------------------------------------------------------------------
     
@@ -168,11 +168,24 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
      * coordinates of the source atom). This must array have 3 entries.
      * @param apClass the APClass
      */
-    public AttachmentPoint(Vertex owner, int atomPosNum, 
-            Point3d dirVec, APClass apClass) 
+    
+    //TODO: since APs can be on any vertex, and vertices are not required to
+    // contain atoms, the information of which atom is an AP rooted should be
+    // stored and managed by the implementation of vertex that do contain atoms.
+    // The DENOPTIMFragment should thus be charged with keeping the reference to
+    // the atom that holds the AP.
+    
+    public AttachmentPoint(Vertex owner, int atomPosNum, Point3d dirVec, 
+            APClass apClass) 
     {
-        this(owner, atomPosNum, dirVec);
+        this.owner = owner;
+        id = owner.getUniqueAPIndex();
+        this.atomPositionNumber = atomPosNum;
         this.apClass = apClass;
+        if (dirVec != null)
+        {
+            this.dirVec = new Point3d(dirVec.x, dirVec.y, dirVec.z);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -451,6 +464,26 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
 //------------------------------------------------------------------------------
 
     /**
+     * @return the identifier of the cut operation that generated this AP.
+     */
+    public int getCutId()
+    {
+        return cutId;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @param id the identifier of the cut operation that generated this AP.
+     */
+    public void setCutId(int id)
+    {
+        this.cutId = id;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Check availability of this attachment point. Does not account for
      * embedding of the vertex in a template, i.e., this AP can be available
      * in the graph owning the vertex this AP belongs to, but if the graph is 
@@ -685,16 +718,17 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
     
     public AttachmentPoint clone()
     {   
+        AttachmentPoint ap;
         if (apClass == null)
         {
             if (dirVec == null)
             {
-                return new AttachmentPoint(
+                ap =new AttachmentPoint(
                         getOwner(),
                         atomPositionNumber
                 );
             } else {
-                return new AttachmentPoint(
+                ap = new AttachmentPoint(
                         getOwner(),
                         atomPositionNumber,
                         dirVec
@@ -702,18 +736,38 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
             }
         } else {
             if (dirVec == null) {
-                return new AttachmentPoint(
+                ap = new AttachmentPoint(
                         getOwner(),
                         atomPositionNumber,
                         apClass.clone()
                 );
             }
-            return new AttachmentPoint(
+            ap = new AttachmentPoint(
                     getOwner(),
                     atomPositionNumber,
                     dirVec,
                     apClass.clone());
         }
+        
+        if (properties != null)
+        {
+            for (Object key : properties.keySet())
+            {
+                Object value = properties.get(key);
+                if (!(key instanceof String) || !(value instanceof String))
+                {
+                    throw new IllegalArgumentException("Unable to clone "
+                            + "non-string "
+                            + "property of attachment point (key: '" + key 
+                            + "'). Implement deep cloning of property " 
+                            + properties.get(key).getClass().getName());
+                }
+                String keyStr = ((String) key) + "";
+                String valueStr = ((String) value) + "";
+                ap.setProperty(keyStr, valueStr);
+            }
+        }
+        return ap;
     }
 
 //------------------------------------------------------------------------------
@@ -1124,6 +1178,13 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
         }
         return false;
     }
+
+//------------------------------------------------------------------------------
+    
+    public Map<Object,Object> getProperties()
+    {
+        return properties;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -1137,7 +1198,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
         }
     }
     
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     public void setProperty(Object key, Object property)
     {
@@ -1148,7 +1209,7 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
         properties.put(key, property);
     }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
     
     /**
      * Prepares the two strings that can be used to define 

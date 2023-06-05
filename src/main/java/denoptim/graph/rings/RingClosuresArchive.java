@@ -216,7 +216,7 @@ public class RingClosuresArchive
      */
 
     public void storeEntry(String chainId, boolean closable,
-            RingClosingConformations rcc) throws DENOPTIMException
+            RingClosingConformations rcc)
     {
     	String closability = "F";
     	if (closable)
@@ -306,7 +306,7 @@ public class RingClosuresArchive
         }
         catch (Throwable t)
         {
-             throw new DENOPTIMException("Exception while trying to store " 
+             throw new IllegalStateException("Exception while trying to store " 
                      + chainId,t);
         }
         finally
@@ -322,7 +322,7 @@ public class RingClosuresArchive
             }
             catch (Throwable t)
             {
-                throw new DENOPTIMException("RingClosuresArchive is unable "
+                throw new IllegalStateException("RingClosuresArchive is unable "
                         + "to unlock file '" 
             			+ settings.getRCCLibraryIndexFile() 
             			+ "'. " + t);
@@ -392,7 +392,6 @@ public class RingClosuresArchive
      */
 
     public RingClosingConformations getRCCsOfChain(String chainId)
-                                                     throws DENOPTIMException
     {
         ArrayList<String> rccRecord = rccsPerChainId.get(chainId);
         int rccId = Integer.parseInt(rccRecord.get(0));
@@ -428,7 +427,6 @@ public class RingClosuresArchive
      */
 
     public RingClosingConformations getRCCsFromArchive(int rccId)
-                                                     throws DENOPTIMException
     {
         RingClosingConformations rcc = new RingClosingConformations();
         
@@ -449,7 +447,7 @@ public class RingClosuresArchive
         }
         catch (Throwable t2)
         {
-            throw new DENOPTIMException(t2);
+            throw new IllegalStateException(t2);
         }
         finally
         {
@@ -459,13 +457,13 @@ public class RingClosuresArchive
             }
             catch (Throwable t)
             {
-                throw new DENOPTIMException(t);
+                throw new IllegalStateException(t);
             }
         }
         if (!recoveringDone)
         {
             String s = "Failed attempt to recover RCC. Check code.";
-            throw new DENOPTIMException(s);
+            throw new IllegalStateException(s);
         }
         return rcc;
     }

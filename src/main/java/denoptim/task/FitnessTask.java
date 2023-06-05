@@ -30,6 +30,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
+import denoptim.combinatorial.GraphBuildingTask;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
@@ -122,7 +123,7 @@ public abstract class FitnessTask extends Task
      * @return the object with data obtained from the fitness provider.
      * @throws DENOPTIMException
      */
-    protected Candidate runFitnessProvider() throws DENOPTIMException
+    protected void runFitnessProvider() throws DENOPTIMException
     {
     	// Ensure these two variables have been set
         result.setSDFFile(fitProvOutFile);
@@ -131,14 +132,14 @@ public abstract class FitnessTask extends Task
             ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(
                     fitnessSettings.getLogger(),
                     fitnessSettings.getRandomizer());
-            fitProvMol = t3d.convertGraphTo3DAtomContainer(dGraph,true);
+            fitProvMol = t3d.convertGraphTo3DAtomContainer(dGraph, true);
     	}
         
-        if (fitProvMol.getProperty(DENOPTIMConstants.GMSGTAG) == null ||
+        if (fitProvMol.getProperty(DENOPTIMConstants.PROVENANCE) == null ||
         		fitProvMol.getProperty(
-        		        DENOPTIMConstants.GMSGTAG).toString().equals(""))
+        		        DENOPTIMConstants.PROVENANCE).toString().equals(""))
         {
-        	fitProvMol.removeProperty(DENOPTIMConstants.GMSGTAG);
+        	fitProvMol.removeProperty(DENOPTIMConstants.PROVENANCE);
         }
         
         // Run fitness provider
@@ -158,7 +159,12 @@ public abstract class FitnessTask extends Task
         
         // Write the FIT file
         result.setChemicalRepresentation(fitProvMol);
-        DenoptimIO.writeCandidateToFile(new File(fitProvOutFile), result, false);
+        if (this instanceof GraphBuildingTask 
+                || fitnessSettings.writeCandidatesOnDisk())
+        {
+            DenoptimIO.writeCandidateToFile(new File(fitProvOutFile), result, 
+                    false);
+        }
         
         // Optional image creation
         if (status && fitnessSettings.makePictures())
@@ -176,8 +182,6 @@ public abstract class FitnessTask extends Task
                     "Unable to create image. {0}", ex.getMessage());
             }
         }
-        
-        return result;
     }
     
 //------------------------------------------------------------------------------
@@ -412,13 +416,8 @@ public abstract class FitnessTask extends Task
 
         if (Double.isNaN(fitVal))
         {
-            
-            //synchronized (lock)
-            //{
-            //    hasException = true;
-                msg = "Fitness value is NaN for " + result.getName();
-                errMsg = msg;
-            //}
+            msg = "Fitness value is NaN for " + result.getName();
+            errMsg = msg;
             fitnessSettings.getLogger().severe(msg);
             
             fitProvMol.removeProperty(DENOPTIMConstants.FITNESSTAG);

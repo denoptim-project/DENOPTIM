@@ -776,7 +776,7 @@ public class DenoptimIO
         List<String> optionalPropNames = new ArrayList<String>(Arrays.asList(
                 DENOPTIMConstants.FITNESSTAG,
                 DENOPTIMConstants.MOLERRORTAG,
-                DENOPTIMConstants.GMSGTAG,
+                DENOPTIMConstants.PROVENANCE,
                 DENOPTIMConstants.GRAPHLEVELTAG
                 ));
         propNames.addAll(optionalPropNames);
@@ -816,7 +816,7 @@ public class DenoptimIO
                             item.setError(obj.toString());
                             break;
                         
-                        case DENOPTIMConstants.GMSGTAG:
+                        case DENOPTIMConstants.PROVENANCE:
                             item.setGeneratingSource(obj.toString());
                             break;
                             
@@ -901,6 +901,52 @@ public class DenoptimIO
         }
         return vals;
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Read the minimal info that can be found in a
+     * {@link FileFormat#GENSUMMARY} file about the members of a population.
+     *
+     * @param fileName  the pathname to the {@link FileFormat#GENSUMMARY} file 
+     * to read.
+     * @return list of population members defined to the extent that information
+     * is available in the {@link FileFormat#GENSUMMARY} file.
+     * @throws DENOPTIMException if the file cannot be read.
+     */
+    
+    public static List<CandidateLW> readPopulationMembersTraces(File file) 
+           throws DENOPTIMException 
+    {
+        List<CandidateLW> members = new ArrayList<CandidateLW>();
+        List<String> txt = readList(file.getAbsolutePath());
+        
+        // Skip the header, i.e., the first line
+        for (int i=1; i<txt.size(); i++) 
+        {
+            String line = txt.get(i);
+            
+            // WARNING: here we set strong expectation on the format of the 
+            // gensummary files!
+            
+            if (line.startsWith("#"))
+                break;
+            
+            if (line.isBlank())
+                continue;
+           
+            String[] words = line.trim().split("\\s+");
+            String pathname = "nofile";
+            if (words.length >= 5)
+            {
+                pathname = words[4];
+            }
+            CandidateLW member = new CandidateLW(words[2], words[0], pathname);
+            member.setFitness(Double.parseDouble(words[3]));
+            members.add(member);
+        }
+        return members;
+   }
 
 //------------------------------------------------------------------------------
 
@@ -1380,12 +1426,12 @@ public class DenoptimIO
     /**
      * Writes candidate items to file. Always overwrites.
      * @param file the file where to print.
-     * @param candidates the list of candidates to print to file.
+     * @param popMembers the list of candidates to print to file.
      * @param append use <code>true</code> to append if the file exist
      * @throws DENOPTIMException
      */
     public static void writeCandidatesToFile(File file, 
-            ArrayList<Candidate> candidates, boolean append) 
+            List<Candidate> popMembers, boolean append) 
                     throws DENOPTIMException 
     {
         if (FilenameUtils.getExtension(file.getName()).equals(""))
@@ -1394,7 +1440,7 @@ public class DenoptimIO
                     + FileFormat.CANDIDATESDF.getExtension());
         }
         ArrayList<IAtomContainer> lst = new ArrayList<IAtomContainer>();
-        for (Candidate g : candidates) 
+        for (Candidate g : popMembers) 
         {
             lst.add(g.getFitnessProviderOutputRepresentation());
         }
@@ -1471,6 +1517,10 @@ public class DenoptimIO
                 GraphEdit graphEditTask = reader.fromJson(br,
                         GraphEdit.class);
                 graphEditTasks.add(graphEditTask);
+            } else {
+                jse.printStackTrace();
+                throw new DENOPTIMException("ERROR! Unable to read JSON file "
+                        + "that defines a graph enditing task.",jse);
             }
         }
         finally 
@@ -1794,6 +1844,9 @@ public class DenoptimIO
                 }
                 Vertex v = reader.fromJson(br,Vertex.class);
                 result.add(v);
+            } else {
+                throw new DENOPTIMException("ERROR! Unable to read vertex from '"
+                        + fileName + "'.", jse);
             }
         }
         finally 
@@ -1814,7 +1867,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <{@link DGraph}s from a JSON file.
+     * Reads a list of {@link DGraph}s from a JSON file.
      * @param fileName the pathname of the file to read
      * @return the list of graphs
      * @throws DENOPTIMException
@@ -1857,6 +1910,9 @@ public class DenoptimIO
                 }
                 DGraph g = reader.fromJson(br,DGraph.class);
                 list_of_graphs.add(g);
+            } else {
+                throw new DENOPTIMException("ERROR! Unable to read graph from "
+                        + "JSON '" + fileName + "'", jse);
             }
         }
         finally 
@@ -1955,7 +2011,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            ArrayList<DGraph> graphs, Logger logger, Randomizer randomizer) 
+            List<DGraph> graphs, Logger logger, Randomizer randomizer) 
                     throws DENOPTIMException
     {
         writeGraphsToSDF(file, graphs, false, logger, randomizer);
@@ -1976,7 +2032,7 @@ public class DenoptimIO
             boolean append, boolean make3D, Logger logger, Randomizer randomizer)
                     throws DENOPTIMException
     {
-        ArrayList<DGraph> lst = new ArrayList<>(1);
+        List<DGraph> lst = new ArrayList<>(1);
         lst.add(graph);
         writeGraphsToSDF(file, lst, append, make3D, logger, randomizer);
     }
@@ -2011,7 +2067,7 @@ public class DenoptimIO
      * @throws DENOPTIMException
      */
     public static void writeGraphsToSDF(File file,
-            ArrayList<DGraph> graphs, boolean append,
+            List<DGraph> graphs, boolean append,
             Logger logger, Randomizer randomizer) throws DENOPTIMException
     {
         writeGraphsToSDF(file, graphs, append, false, logger, randomizer);
@@ -2069,7 +2125,7 @@ public class DenoptimIO
     {
         ArrayList<DGraph> graphs = new ArrayList<DGraph>();
         graphs.add(graph);
-        writeGraphsToJSON(file,graphs);
+        writeGraphsToJSON(file, graphs);
     }
     
 //------------------------------------------------------------------------------

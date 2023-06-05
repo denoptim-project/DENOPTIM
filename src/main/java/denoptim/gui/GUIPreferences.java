@@ -18,6 +18,7 @@
 
 package denoptim.gui;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -66,7 +67,7 @@ public class GUIPreferences {
 		defualtSDFTags.put(DENOPTIMConstants.FITNESSTAG,"Fitness");
 		defualtSDFTags.put(DENOPTIMConstants.MOLERRORTAG,"Error");
 		defualtSDFTags.put("Generation","Generation");
-		defualtSDFTags.put(DENOPTIMConstants.GMSGTAG,"Origin");
+		defualtSDFTags.put(DENOPTIMConstants.PROVENANCE,"Origin");
 		for (String s : defualtSDFTags.keySet())
 		{
 			chosenSDFTags.add(s);
@@ -98,4 +99,10 @@ public class GUIPreferences {
      * Choice of displaying legend in monitor plot
      */
     protected static boolean showLegenInMonitorPlot = false;
+    
+    /**
+     * File with last used cutting rules
+     */
+    protected static File lastCutRulesFile;
+    
 }

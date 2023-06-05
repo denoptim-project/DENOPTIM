@@ -21,32 +21,44 @@ package denoptim.ga;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fitness.FitnessParameters;
+import denoptim.fragmenter.FragmenterTools;
+import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
+import denoptim.graph.GraphPattern;
 import denoptim.graph.Ring;
+import denoptim.graph.SymmetricAPs;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -60,6 +72,9 @@ import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
+import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.programs.fragmenter.FragmenterParameters;
+import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
@@ -126,7 +141,7 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Reads unique identifiers and initial population files according to the
+     * Reads unique identifiers and initial population file according to the
      * {@link GAParameters}.
      * @throws IOException 
      */
@@ -136,6 +151,7 @@ public class EAUtils
     {
         Population population = new Population(settings);
 
+        // Read existing or previously visited UIDs
         HashSet<String> lstUID = new HashSet<>(1024);
         if (!settings.getUIDFileIn().equals(""))
         {
@@ -147,15 +163,20 @@ public class EAUtils
             settings.getLogger().log(Level.INFO, "Read " + lstUID.size() 
                 + " known UIDs from " + settings.getUIDFileIn());
         }
-        String inifile = settings.getInitialPopulationFile();
-        if (inifile.length() > 0)
+        
+        // Read existing graphs
+        int numFromInitGraphs = 0;
+        String initPopFile = settings.getInitialPopulationFile();
+        if (initPopFile.length() > 0)
         {
-            EAUtils.getPopulationFromFile(inifile, population, uniqueIDsSet, 
+            EAUtils.getPopulationFromFile(initPopFile, population, uniqueIDsSet, 
                     EAUtils.getPathNameToGenerationFolder(0, settings),
                     settings);
-            settings.getLogger().log(Level.INFO, "Read " + population.size() 
-                + " molecules from " + inifile);
+            numFromInitGraphs = population.size();
+            settings.getLogger().log(Level.INFO, "Imported " + numFromInitGraphs
+                + " candidates (as graphs) from " + initPopFile);
         }
+        
         return population;
     }
     
@@ -165,6 +186,9 @@ public class EAUtils
      * Choose one of the methods to make new {@link Candidate}s. 
      * The choice is biased
      * by the weights of the methods as defined in the {@link GAParameters}.
+     * @param the genetic algorithm settings
+     * @return one among the possible {@link CandidateSource} excluding
+     * {@value CandidateSource#MANUAL}.
      */
     protected static CandidateSource chooseGenerationMethod(GAParameters settings)
     {
@@ -219,7 +243,8 @@ public class EAUtils
      * members.
      * @param mutWeight weight of mutation of existing population members.
      * @param newWeight weight of construction from scratch.
-     * @return
+     * @return one among the possible {@link CandidateSource} excluding
+     * {@value CandidateSource#MANUAL}.
      */
     public static CandidateSource pickNewCandidateGenerationMode(
             double xoverWeight, double mutWeight, double newWeight,
@@ -237,6 +262,27 @@ public class EAUtils
             return CandidateSource.CONSTRUCTION;
         }
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Generates a pair of new offspring by performing a crossover operation.
+     * @param eligibleParents candidates that can be used as parents of the 
+     * offspring.
+     * @param population the collection of candidates where eligible candidates
+     * are hosted.
+     * @param mnt monitoring tool used to record events during the run of the
+     * evolutionary algorithm.
+     * @param settings the settings of the genetic algorithm.
+     * @return a candidate chosen in a stochastic manner.
+     */
+    protected static List<Candidate> buildCandidatesByXOver(
+            List<Candidate> eligibleParents, Population population, 
+            Monitor mnt, GAParameters settings) throws DENOPTIMException
+    {
+        return buildCandidatesByXOver(eligibleParents, population, mnt, 
+                null, -1, -1, settings, settings.maxOffsprintFromXover());
+    }
 
 //------------------------------------------------------------------------------
 
@@ -251,7 +297,7 @@ public class EAUtils
      * @return a candidate chosen in a stochastic manner.
      */
     protected static Candidate buildCandidateByXOver(
-            ArrayList<Candidate> eligibleParents, Population population, 
+            List<Candidate> eligibleParents, Population population, 
             Monitor mnt, GAParameters settings) throws DENOPTIMException
     {
         return buildCandidateByXOver(eligibleParents, population, mnt, 
@@ -277,18 +323,64 @@ public class EAUtils
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
      * @param choiceOfOffstring index dictating which among the available two
-     * offspring (at most two, for now) if returned as result. 
+     * offspring (at most two, for now) is returned as result. 
      * This avoids randomized 
      * decision making in case of test that need to be reproducible, 
      * but can be <code>null</code> which means "use random choice".
-     * @return the candidate
+     * @return the candidate or null if none was produced.
      * @throws DENOPTIMException
      */
     protected static Candidate buildCandidateByXOver(
-            ArrayList<Candidate> eligibleParents, Population population, 
+            List<Candidate> eligibleParents, Population population, 
             Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
-            int choiceOfOffstring, GAParameters settings) throws DENOPTIMException 
+            int choiceOfOffstring, GAParameters settings) 
+                    throws DENOPTIMException 
     {
+        List<Candidate> cands = buildCandidatesByXOver(eligibleParents, 
+                population, mnt, 
+                choiceOfParents, choiceOfXOverSites, choiceOfOffstring, 
+                settings, 1);
+        if (cands.size()>0)
+            return cands.get(0);
+        else
+            return null;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Generates up to a pair of new offspring by performing a crossover 
+     * operation.
+     * @param eligibleParents candidates that can be used as parents of the 
+     * offspring.
+     * @param population the collection of candidates where eligible candidates
+     * are hosted.
+     * @param mnt monitoring tool used to record events during the run of the
+     * evolutionary algorithm.
+     * @param choiceOfParents a pair of indexes dictating which ones among the 
+     * eligible parents we should use as parents. This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param choiceOfXOverSites index indicating which crossover site to use.
+     * This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param choiceOfOffstring index dictating which among the available two
+     * offspring (at most two, for now) is returned as result. 
+     * This avoids randomized 
+     * decision making in case of test that need to be reproducible, 
+     * but can be <code>null</code> which means "use random choice".
+     * @param maxCandidatesToReturn the number of offspring to return in the 
+     * list. Up to 2.
+     * @return the list of candidates, or an empty list.
+     * @throws DENOPTIMException
+     */
+    protected static List<Candidate> buildCandidatesByXOver(
+            List<Candidate> eligibleParents, Population population, 
+            Monitor mnt, int[] choiceOfParents, int choiceOfXOverSites,
+            int choiceOfOffstring, GAParameters settings, 
+            int maxCandidatesToReturn) throws DENOPTIMException 
+    {   
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
         if (settings.containsParameters(ParametersType.FS_PARAMS))
         {
@@ -347,7 +439,7 @@ public class EAUtils
         {
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS_FINDPARENTS);
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            return new ArrayList<Candidate>();
         }
         
         Candidate cA = null, cB = null;
@@ -375,7 +467,7 @@ public class EAUtils
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-                return null;
+                return new ArrayList<Candidate>();
             }
         } catch (Throwable t) {
             if (!settings.xoverFailureTolerant)
@@ -394,7 +486,7 @@ public class EAUtils
             }
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            return new ArrayList<Candidate>();
         }
         gAClone.setGraphId(GraphUtils.getUniqueGraphIndex());
         gBClone.setGraphId(GraphUtils.getUniqueGraphIndex());
@@ -505,27 +597,38 @@ public class EAUtils
         if (validOffspring.size() == 0)
         {
             mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
-            return null;
+            return new ArrayList<Candidate>();
         }
         
-        Candidate chosenOffspring = null;
-        if (choiceOfOffstring<0)
+        if (maxCandidatesToReturn==1)
         {
-            chosenOffspring = settings.getRandomizer().randomlyChooseOne(
-                    validOffspring);
-            chosenOffspring.setName("M" + GeneralUtils.getPaddedString(
-                    DENOPTIMConstants.MOLDIGITS,
-                    GraphUtils.getUniqueMoleculeIndex()));
+            Candidate chosenOffspring = null;
+            if (choiceOfOffstring<0)
+            {
+                chosenOffspring = settings.getRandomizer().randomlyChooseOne(
+                        validOffspring);
+                chosenOffspring.setName("M" + GeneralUtils.getPaddedString(
+                        DENOPTIMConstants.MOLDIGITS,
+                        GraphUtils.getUniqueMoleculeIndex()));
+            } else {
+                chosenOffspring = validOffspring.get(choiceOfOffstring);
+            }
+            validOffspring.retainAll(Arrays.asList(chosenOffspring));
         } else {
-            chosenOffspring = validOffspring.get(choiceOfOffstring);
+            for (Candidate cand : validOffspring)
+            {
+                cand.setName("M" + GeneralUtils.getPaddedString(
+                        DENOPTIMConstants.MOLDIGITS,
+                        GraphUtils.getUniqueMoleculeIndex()));
+            }
         }
-        return chosenOffspring;
+        return validOffspring;
     }
     
 //------------------------------------------------------------------------------
 
     protected static Candidate buildCandidateByMutation(
-            ArrayList<Candidate> eligibleParents, Monitor mnt, 
+            List<Candidate> eligibleParents, Monitor mnt, 
             GAParameters settings) throws DENOPTIMException
     {
         FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
@@ -803,21 +906,326 @@ public class EAUtils
         candidate.setName("M" + GeneralUtils.getPaddedString(
                 DENOPTIMConstants.MOLDIGITS,
                 GraphUtils.getUniqueMoleculeIndex()));
-        
+            
         return candidate;
     }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Write out summary for the current GA population
+     * Generates a candidate by fragmenting a molecule and generating the graph
+     * that reconnects all fragments to reform the original molecule. 
+     * Essentially, it converts an {@link IAtomContainer} into a
+     * {@link DGraph} and makes a {@link Candidate} out of it.
+     * @param mol the molecule to convert.
+     * @param cutRules the cutting rules to use in the fragmentation.
+     * @param mnt the tool monitoring events for logging purposes.
+     * @param settings GA settings.
+     * @param index identifies the given IAtomContainer in a collection of 
+     * systems to work on. This is used only for logging.
+     * @throws DENOPTIMException 
+     */
+    public static Candidate buildCandidateByFragmentingMolecule(IAtomContainer mol,
+            Monitor mnt, GAParameters settings, int index) throws DENOPTIMException
+    {
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (settings.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters) settings.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        
+        FragmenterParameters frgParams = new FragmenterParameters();
+        if (settings.containsParameters(ParametersType.FRG_PARAMS))
+        {
+            frgParams = (FragmenterParameters) settings.getParameters(
+                    ParametersType.FRG_PARAMS);
+        }
+        
+        if (frgParams.getCuttingRules()==null 
+                || frgParams.getCuttingRules().isEmpty())
+        {
+            throw new DENOPTIMException("Request to generate candidates by "
+                    + "fragmentation but no cutting rules provided. Please,"
+                    + "add FRG-CUTTINGRULESFILE=path/to/your/file to the "
+                    + "input.");
+        }
+        mnt.increase(CounterID.CONVERTBYFRAGATTEMPTS);
+        mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
+
+        // Adjust molecular representation to our settings
+        if (!FragmenterTools.prepareMolToFragmentation(mol, frgParams, index))
+            return null;
+
+        // Do actual fragmentation
+        DGraph graph = null;
+        try {
+            graph = makeGraphFromFragmentationOfMol(mol, 
+                    frgParams.getCuttingRules(), settings.getLogger(),
+                    frgParams.getScaffoldingPolicy(),
+                    frgParams.getLinearAngleLimit());
+        } catch (DENOPTIMException de)
+        {
+            String msg = "Unable to convert molecule (" + mol.getAtomCount() 
+                + " atoms) to DENPTIM graph. " + de.getMessage();
+            settings.getLogger().log(Level.WARNING, msg);
+        }
+        if (graph == null)
+        {
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
+            return null;
+        }
+
+        if (frgParams.embedRingsInTemplate())
+        {
+            try {
+                graph = graph.embedPatternsInTemplates(GraphPattern.RING, 
+                        fragSpace, frgParams.getEmbeddedRingsContract());
+            } catch (DENOPTIMException e) {
+                graph.cleanup();
+                mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING);
+                return null;
+            }
+        }
+        
+        graph.setLocalMsg("INITIAL_MOL_FRAGMENTED");
+        
+        Object[] res = graph.checkConsistency(settings);
+        if (res == null)
+        {
+            graph.cleanup();
+            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_EVAL);
+            return null;
+        }
+        
+        Candidate candidate = new Candidate(graph);
+        candidate.setUID(res[0].toString().trim());
+        candidate.setSmiles(res[1].toString().trim());
+        candidate.setChemicalRepresentation((IAtomContainer) res[2]);
+        
+        candidate.setName("M" + GeneralUtils.getPaddedString(
+                DENOPTIMConstants.MOLDIGITS,
+                GraphUtils.getUniqueMoleculeIndex()));
+        
+        return candidate;
+    }
+
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy) 
+                    throws DENOPTIMException
+    {
+        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
+                scaffoldingPolicy, 190); 
+        // NB: and angle of 190 means we are not adding Du on linearities
+    }
+    
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @param linearAngleLimit the max bond angle before we start considering 
+     * the angle linear and add a linearity-breaking dummy atom.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit) 
+                    throws DENOPTIMException
+    {
+        // We expect only Fragments here.
+        List<Vertex> fragments = FragmenterTools.fragmentation(mol, 
+                cuttingRules, logger);
+        for (Vertex v : fragments)
+        {
+            Fragment frag = (Fragment) v;
+            
+            // This is done to set the symmetry relations in each vertex
+            frag.updateAPs();
+            
+            // Add linearity-breaking dummy atoms
+            DummyAtomHandler.addDummiesOnLinearities(frag, linearAngleLimit);
+        }
+        if (fragments.size()==0)
+        {
+            throw new DENOPTIMException("Fragmentation of molecule with "
+                    + mol.getAtomCount() + " atoms produced 0 fragments.");
+        }
+        
+        // Define which fragment is the scaffold
+        Vertex scaffold = null;
+        switch (scaffoldingPolicy)
+        {
+            case ELEMENT:
+            {
+                for (Vertex v : fragments)
+                {
+                    if (v instanceof Fragment)
+                    {
+                        boolean setAsScaffold = false;
+                        IAtomContainer iac = v.getIAtomContainer();
+                        for (IAtom atm : iac.atoms())
+                        {
+                            if (scaffoldingPolicy.label.equals(
+                                    MoleculeUtils.getSymbolOrLabel(atm)))
+                            {
+                                setAsScaffold = true;
+                                break;
+                            }
+                        }
+                        if (setAsScaffold)
+                        {
+                            scaffold = v;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+
+            default:
+            case LARGEST_FRAGMENT:
+            {
+                try {
+                    scaffold = fragments.stream()
+                            .max(Comparator.comparing(
+                                    Vertex::getHeavyAtomsCount))
+                            .get();
+                } catch (Exception e)
+                {
+                    throw new DENOPTIMException("Cannot get largest fragment "
+                            + "among " + fragments.size() + " fragments.", e);
+                }
+                break;
+            }
+        }
+        if (scaffold==null)
+        {
+            throw new DENOPTIMException("No fragment matches criteria to be "
+                    + "identified as the " 
+                    + BBType.SCAFFOLD.toString().toLowerCase() + ".");
+        }
+        scaffold.setVertexId(0);
+        scaffold.setBuildingBlockType(BBType.SCAFFOLD);
+        
+        // Build the graph
+        DGraph graph = new DGraph();
+        graph.addVertex(scaffold);
+        AtomicInteger vId = new AtomicInteger(1);
+        for (int i=1; i<fragments.size(); i++)
+        {
+            appendVertexesToGraphFollowingEdges(graph, vId, fragments);
+        }
+        
+        // Set symmetry relations: these depend on which scaffold we have chosen
+        graph.detectSymVertexSets();
+        
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static void appendVertexesToGraphFollowingEdges(DGraph graph,
+            AtomicInteger vId, List<Vertex> vertexes) throws DENOPTIMException
+    {
+        // We seek for  the last and non-RCV vertex added to the graph
+        Vertex lastlyAdded = null;
+        for (int i=-1; i>-4; i--)
+        {
+            lastlyAdded = graph.getVertexList().get(
+                    graph.getVertexList().size()+i);
+            if (!lastlyAdded.isRCV())
+                break;
+        }
+        for (AttachmentPoint apI : lastlyAdded.getAttachmentPoints())
+        {
+            if (!apI.isAvailable())
+                continue;
+            
+            for (int j=0; j<vertexes.size(); j++)
+            {
+                Vertex fragJ = vertexes.get(j);
+                
+                boolean ringClosure = false;
+                if (graph.containsVertex(fragJ))
+                {   
+                    ringClosure = true;
+                }
+                for (AttachmentPoint apJ : fragJ.getAttachmentPoints())
+                {
+                    if (apI==apJ)
+                        continue;
+                    
+                    if (apI.getCutId()==apJ.getCutId())
+                    {
+                        if (ringClosure)
+                        {
+                            Vertex rcvI = FragmenterTools.getRCPForAP(apI,
+                                    APClass.make(APClass.ATPLUS, 0, 
+                                            BondType.ANY));
+                            rcvI.setBuildingBlockType(BBType.FRAGMENT);
+                            rcvI.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apI, rcvI.getAP(0));
+                            
+                            Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
+                                    APClass.RCACLASSMINUS);
+                            rcvJ.setBuildingBlockType(BBType.FRAGMENT);
+                            rcvJ.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apJ, rcvJ.getAP(0));
+                            graph.addRing(rcvI, rcvJ);
+                        } else {
+                            fragJ.setBuildingBlockType(BBType.FRAGMENT);
+                            fragJ.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apI, apJ);
+                            
+                            // Recursion into the branch of the graph that is
+                            // rooted onto the lastly added vertex
+                            appendVertexesToGraphFollowingEdges(graph, vId, 
+                                    vertexes);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Write out summary for the current GA population.
      * @param population
-     * @param filename
+     * @param filename the pathname of the file where we write the details of 
+     * the population. If required by the {@link GAParameters}, we use this
+     * also to define a pathname where to write all the members of the 
+     * population.
      * @throws DENOPTIMException
      */
 
     public static void outputPopulationDetails(Population population, 
-            String filename, GAParameters settings) throws DENOPTIMException
+            String filename, GAParameters settings, boolean printpathNames) 
+                    throws DENOPTIMException
     {
         StringBuilder sb = new StringBuilder(512);
         sb.append(DENOPTIMConstants.GAGENSUMMARYHEADER);
@@ -831,9 +1239,11 @@ public class EAUtils
         String stats = "";
         synchronized (population)
         {
+            List<Candidate> popMembers = new ArrayList<Candidate>();
             for (int i=0; i<settings.getPopulationSize(); i++)
             {
                 Candidate mol = population.get(i);
+                popMembers.add(mol);
                 if (mol != null)
                 {
                     String mname = new File(mol.getSDFFile()).getName();
@@ -844,13 +1254,24 @@ public class EAUtils
                             mol.getGraph().getGraphId()));
                     sb.append(String.format("%-30s", mol.getUID()));
                     sb.append(df.format(mol.getFitness()));
-                    sb.append("    ").append(mol.getSDFFile());
+                    
+                    if (printpathNames)
+                    {
+                        sb.append("    ").append(mol.getSDFFile());
+                    }
+                    
                     sb.append(System.getProperty("line.separator"));
                 }
             }
     
             // calculate descriptive statistics for the population
             stats = getSummaryStatistics(population, settings);
+            
+            if (settings.savePopFile())
+            {
+                File dest = new File(filename.replaceAll("\\.txt$", ".sdf"));
+                DenoptimIO.writeCandidatesToFile(dest, popMembers, false);
+            }
         }
         if (stats.trim().length() > 0)
             sb.append(stats);
@@ -863,15 +1284,7 @@ public class EAUtils
 
     private static String getSummaryStatistics(Population popln, 
             GAParameters settings)
-    {
-        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
-        if (settings.containsParameters(ParametersType.FS_PARAMS))
-        {
-            fsParams = (FragmentSpaceParameters)settings.getParameters(
-                    ParametersType.FS_PARAMS);
-        }
-        FragmentSpace fragSpace = fsParams.getFragmentSpace();
-        
+    {   
         double[] fitness = getFitnesses(popln);
         double sdev = StatUtils.stddev(fitness, true);
         String res = "";
@@ -921,29 +1334,29 @@ public class EAUtils
      * Selects a number of members from the given population. 
      * The selection method is what specified by the
      * configuration of the genetic algorithm ({@link GAParameters}).
-     * @param candidates the list of candidates to chose from.
+     * @param eligibleParents the list of candidates to chose from.
      * @param number how many candidate to pick.
      * @return indexes of the selected members of the given population.
      */
 
     protected static Candidate[] selectBasedOnFitness(
-            ArrayList<Candidate> candidates, int number, GAParameters settings)
+            List<Candidate> eligibleParents, int number, GAParameters settings)
     {
         Candidate[] mates = new Candidate[number];
         switch (settings.getSelectionStrategyType())
         {
         case 1:
-            mates = SelectionHelper.performTournamentSelection(candidates, 
+            mates = SelectionHelper.performTournamentSelection(eligibleParents, 
                     number, settings);
             break;
         case 2:
-            mates = SelectionHelper.performRWS(candidates, number, settings);
+            mates = SelectionHelper.performRWS(eligibleParents, number, settings);
             break;
         case 3:
-            mates = SelectionHelper.performSUS(candidates, number, settings);
+            mates = SelectionHelper.performSUS(eligibleParents, number, settings);
             break;
         case 4:
-            mates = SelectionHelper.performRandomSelection(candidates, number, 
+            mates = SelectionHelper.performRandomSelection(eligibleParents, number, 
                     settings);
             break;
         }
@@ -984,7 +1397,7 @@ public class EAUtils
      */
 
     protected static XoverSite performFBCC(
-            ArrayList<Candidate> eligibleParents, Population population, 
+            List<Candidate> eligibleParents, Population population, 
             int[] choiceOfParents, int choiceOfXOverSites, GAParameters settings)
     {
         Candidate parentA = null;
@@ -1003,8 +1416,8 @@ public class EAUtils
                     ParametersType.FS_PARAMS);
         }
         FragmentSpace fragSpace = fsParams.getFragmentSpace();
-        ArrayList<Candidate> matesCompatibleWithFirst = 
-                population.getXoverPartners(parentA, eligibleParents, fragSpace);
+        List<Candidate> matesCompatibleWithFirst = population.getXoverPartners(
+                parentA, eligibleParents, fragSpace);
         if (matesCompatibleWithFirst.size() == 0)
             return null;
         
@@ -1086,55 +1499,17 @@ public class EAUtils
             .append(FSEP).append("Final.txt");
         return sb.toString();
     }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Simply copies the files from the previous directories into the specified
-     * folder.
-     * @param popln the final list of best molecules
-     * @param destDir the name of the output directory
-     */
-
-    protected static void outputFinalResults(Population popln,
-            String destDir, GAParameters settings) throws DENOPTIMException
-    {
-        String genOutfile = destDir + System.getProperty("file.separator") +
-                                "Final.txt";
-
-        File fileDir = new File(destDir);
-
-        try
-        {
-            for (int i=0; i<settings.getPopulationSize(); i++)
-            {
-                String sdfile = popln.get(i).getSDFFile();
-                String imgfile = popln.get(i).getImageFile();
-
-                if (sdfile != null)
-                {
-                    FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
-                }
-                if (imgfile != null)
-                {
-                    FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
-                }
-            }
-            outputPopulationDetails(popln, genOutfile, settings);
-        }
-        catch (IOException ioe)
-        {
-            throw new DENOPTIMException(ioe);
-        }
-    }
     
 //------------------------------------------------------------------------------
 
     /**
-     * Simply copies the files from the previous directories into the specified
-     * folder.
+     * Saves the final results to disk. If the files for each candidate have 
+     * been saved on disk along the way, then it copies them from their location
+     * into the folder for final results, which is defined based on the 
+     * GA settings.
      * @param popln the final list of best molecules
-     * @param destDir the name of the output directory
+     * @param settings the GS settings containing defaults and parameters given 
+     * by the user.
      */
 
     protected static void outputFinalResults(Population popln, 
@@ -1143,6 +1518,10 @@ public class EAUtils
         String dirName = EAUtils.getPathNameToFinalPopulationFolder(settings);
         denoptim.files.FileUtils.createDirectory(dirName);
         File fileDir = new File(dirName);
+        
+        boolean intermediateCandidatesAreOnDisk = 
+                ((FitnessParameters) settings.getParameters(
+                ParametersType.FIT_PARAMS)).writeCandidatesOnDisk();
 
         for (int i=0; i<popln.size(); i++)
         {
@@ -1150,17 +1529,22 @@ public class EAUtils
             String sdfile = c.getSDFFile();
             String imgfile = c.getImageFile();
 
-            if (sdfile != null)
-            {
-                try {
+            try {
+                if (intermediateCandidatesAreOnDisk && sdfile!=null)
+                {
                     FileUtils.copyFileToDirectory(new File(sdfile), fileDir);
-                } catch (IOException ioe) {
-                    throw new DENOPTIMException("Failed to copy file '" 
-                            + sdfile + "' to '" + fileDir + "' for candidate "
-                            + c.getName(), ioe);
+                } else {
+                    File candFile = new File(fileDir, c.getName() 
+                            + DENOPTIMConstants.FITFILENAMEEXTOUT);
+                    c.setSDFFile(candFile.getAbsolutePath());
+                    DenoptimIO.writeCandidateToFile(candFile, c, false);
                 }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException("Failed to copy file '" 
+                        + sdfile + "' to '" + fileDir + "' for candidate "
+                        + c.getName(), ioe);
             }
-            if (imgfile != null)
+            if (imgfile != null && intermediateCandidatesAreOnDisk)
             {
                 try {
                     FileUtils.copyFileToDirectory(new File(imgfile), fileDir);
@@ -1173,7 +1557,7 @@ public class EAUtils
         }
         outputPopulationDetails(popln,
                 EAUtils.getPathNameToFinalPopulationDetailsFile(settings),
-                settings);        
+                settings, true);        
     }
 
 //------------------------------------------------------------------------------
@@ -1191,7 +1575,7 @@ public class EAUtils
             String genDir, GAParameters settings) 
                     throws DENOPTIMException, IOException
     {
-        ArrayList<Candidate> candidates = DenoptimIO.readCandidates(
+        List<Candidate> candidates = DenoptimIO.readCandidates(
                 new File(filename), true);
         if (candidates.size() == 0)
         {
@@ -1273,7 +1657,7 @@ public class EAUtils
     protected static void setVertexCounterValue(Population population) 
             throws DENOPTIMException
     {
-        int val = Integer.MIN_VALUE;
+        long val = Long.MIN_VALUE;
         for (Candidate popln1 : population)
         {
             DGraph g = popln1.getGraph();
@@ -1890,12 +2274,12 @@ public class EAUtils
     protected static boolean foundForbiddenEnd(DGraph molGraph,
             FragmentSpaceParameters fsParams)
     {
-        ArrayList<Vertex> vertices = molGraph.getVertexList();
+        List<Vertex> vertices = molGraph.getVertexList();
         Set<APClass> classOfForbEnds = fsParams.getFragmentSpace()
                 .getForbiddenEndList();
         for (Vertex vtx : vertices)
         {
-            ArrayList<AttachmentPoint> daps = vtx.getAttachmentPoints();
+            List<AttachmentPoint> daps = vtx.getAttachmentPoints();
             for (AttachmentPoint dp : daps)
             {
                 if (dp.isAvailable())
@@ -1927,6 +2311,16 @@ public class EAUtils
         for (String str:lst)
             lstInchi.add(str);
         lst.clear();
+    }
+
+//------------------------------------------------------------------------------
+
+    public static AttachmentPoint searchForApSuitableToRingClosure(
+            AttachmentPoint apA, SymmetricAPs symAPsA, GAParameters settings)
+    {
+        
+        // TODO Auto-generated method stub
+        return null;
     }
     
 //------------------------------------------------------------------------------    

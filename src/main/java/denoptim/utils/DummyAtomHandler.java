@@ -142,7 +142,7 @@ public class DummyAtomHandler
 //------------------------------------------------------------------------------
     
     public IAtomContainer removeDummyInHapto(IAtomContainer mol) 
-                                                        throws DENOPTIMException
+            throws DENOPTIMException
     {   
         List<IAtom> dummiesList = new ArrayList<>();
         
@@ -156,9 +156,7 @@ public class DummyAtomHandler
                 {
                     dummiesList.add(atm);
                 }
-            } 
-            else 
-            {
+            } else {
                 if (symbol.equals(elm)) 
                 {
                     dummiesList.add(atm);

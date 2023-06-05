@@ -1,0 +1,41 @@
+#
+# This is the parameter file for test t12g
+#
+
+# Definition of the Fragment Space
+FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
+FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
+FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
+FS-compMatrixFile=OTF_WDIR/CPMap.par
+FS-ConstrainSymmetry=ch:0 1.0
+FS-ConstrainSymmetry=co:0 1.0
+
+# Use internal fitness provider
+FP-EQUATION=${nHBAcc + 0.2*nAtom + 3*Zagreb}
+FP-CheckUidBeforeFitness=yes
+
+# Genetic Algorithm parameters
+GA-InitMolsToFragmentFile=OTF_WDIR/molsToFragment.smi
+FRG-EmbedRingsInTemplates=yes
+FRG-RingEmbeddingContract=FIXED_STRUCT
+FRG-CuttingRulesFile=OTF_WDIR/cutting_rules
+FRG-ScaffoldingPolicy=ELEMENT C
+FRG-ADDEXPLICITHYDROGEN
+FRG-UNSETTOSINGLEBO
+#
+GA-randomSeed=8572368003836
+GA-Parallelization=synchronous
+GA-numParallelTasks=4
+GA-populationSize=10
+GA-numChildren=4
+GA-numGenerations=1
+GA-numConvGen=2
+GA-XOverSelectionMode=TS
+GA-crossoverWeight=0.750
+GA-mutationWeight=0.750
+GA-ConstructionWeight=0.2
+GA-symmetryProbability=0.0
+GA-LevelGrowthProbScheme=sigma
+GA-LevelGrowthSigmaSteepness=1.0
+GA-LevelGrowthSigmaMiddle=1.0
+GA-replacementStrategy=ELITIST

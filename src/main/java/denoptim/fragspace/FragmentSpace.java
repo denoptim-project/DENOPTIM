@@ -29,6 +29,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import javax.vecmath.Point3d;
+
+import org.openscience.cdk.Atom;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -39,10 +43,12 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
+import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.io.DenoptimIO;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
@@ -130,6 +136,11 @@ public class FragmentSpace
      * Clusters of fragments'AP based on AP classes
      */
     private HashMap<APClass, ArrayList<ArrayList<Integer>>> fragsApsPerApClass;
+    
+    /**
+     * Lock for synchronizing tasks
+     */
+    private final Object LOCK = new Object();
     
     /**
      * APclass-specific constraints to constitutional symmetry
@@ -518,8 +529,8 @@ public class FragmentSpace
      * example, any of the indexes is out of range.
      */
 
-    public Vertex getVertexFromLibrary(
-            Vertex.BBType bbType, int bbIdx) throws DENOPTIMException
+    public Vertex getVertexFromLibrary(Vertex.BBType bbType, int bbIdx) 
+            throws DENOPTIMException
     {
         String msg = "";
         switch (bbType)
@@ -927,13 +938,6 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public HashMap<Integer, ArrayList<APClass>> getMapAPClassesPerFragment()
-    {
-        return apClassesPerFrag;
-    }
-
-//------------------------------------------------------------------------------
-
     /**
      * Returns the APclasses associated with a given fragment.
      * 
@@ -943,14 +947,10 @@ public class FragmentSpace
 
     public ArrayList<APClass> getAPClassesPerFragment(int fragId)
     {
-        return apClassesPerFrag.get(fragId);
-    }
-
-//------------------------------------------------------------------------------
-
-    public HashMap<APClass, ArrayList<ArrayList<Integer>>> getMapFragsAPsPerAPClass()
-    {
-        return fragsApsPerApClass;
+        synchronized (LOCK)
+        {
+            return apClassesPerFrag.get(fragId);
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -969,16 +969,19 @@ public class FragmentSpace
     {
         ArrayList<IdFragmentAndAP> lst = new ArrayList<IdFragmentAndAP>();
 
-        if (fragsApsPerApClass.containsKey(apc))
+        synchronized (LOCK)
         {
-            for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+            if (fragsApsPerApClass.containsKey(apc))
             {
-                IdFragmentAndAP apId = new IdFragmentAndAP(-1, // vertexId
-                        idxs.get(0), // MolId,
-                        BBType.FRAGMENT, idxs.get(1), // ApId
-                        -1, // noVSym
-                        -1);// noAPSym
-                lst.add(apId);
+                for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+                {
+                    IdFragmentAndAP apId = new IdFragmentAndAP(-1, // vertexId
+                            idxs.get(0), // MolId,
+                            BBType.FRAGMENT, idxs.get(1), // ApId
+                            -1, // noVSym
+                            -1);// noAPSym
+                    lst.add(apId);
+                }
             }
         }
         return lst;
@@ -996,12 +999,15 @@ public class FragmentSpace
     {
         ArrayList<Vertex> lst = new ArrayList<Vertex>();
         
-        if (fragsApsPerApClass.containsKey(apc))
+        synchronized (LOCK)
         {
-            for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+            if (fragsApsPerApClass.containsKey(apc))
             {
-                Vertex v = fragmentLib.get(idxs.get(0));
-                lst.add(v);
+                for (ArrayList<Integer> idxs : fragsApsPerApClass.get(apc))
+                {
+                    Vertex v = fragmentLib.get(idxs.get(0));
+                    lst.add(v);
+                }
             }
         }
         return lst;
@@ -1044,6 +1050,81 @@ public class FragmentSpace
             }
         }
         return compatFrags;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for all building blocks that are ring-closing vertexes and hold
+     * an AP with the given class.
+     * 
+     * @param apc the desired class of the attachment point.
+     * @return a list of vertexes ready to be used (i.e., clones of the vertexes
+     * stored in the library). The list can be empty. 
+     */
+    public List<Vertex> getRCVsWithAPClass(APClass apc) 
+    {
+        List<Vertex> chosenRCVs = new ArrayList<Vertex>();
+        for (Vertex rcv : getRCVs())
+        {
+            // NB: RCVs must have only one attachment point
+            if (apc.equals(rcv.getAP(0).getAPClass()))
+            {
+                Vertex copyOfRCV = null;
+                try
+                {
+                    copyOfRCV = getVertexFromLibrary(rcv.getBuildingBlockType(),
+                            rcv.getBuildingBlockId());
+                    chosenRCVs.add(copyOfRCV);
+                } catch (DENOPTIMException e)
+                {
+                    // This should never happen because we have already taken 
+                    // the BB from BBSpace.
+                    e.printStackTrace();
+                }
+            }
+        }
+        return chosenRCVs;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Searches for all building blocks that are ring-closing vertexes and are 
+     * compatible with the given AP.
+     * 
+     * @param apc the class of the attachment point meant to hold the RCV.
+     * @return a list of vertexes ready to be used (i.e., clones of the vertexes
+     * stored in the library). The list can be empty. 
+     */
+    public List<Vertex> getRCVsForAPClass(APClass apc) 
+    {
+        List<Vertex> chosenRCVs = new ArrayList<Vertex>();
+        if (!getCompatibilityMatrix().containsKey(apc))
+        {
+            return chosenRCVs;
+        }
+        List<APClass> apcsCompatWithSrcAP = getCompatibilityMatrix().get(apc);
+        for (Vertex rcv : getRCVs())
+        {
+            // NB: RCVs must have only one attachment point
+            if (apcsCompatWithSrcAP.contains(rcv.getAP(0).getAPClass()))
+            {
+                Vertex copyOfRCV = null;
+                try
+                {
+                    copyOfRCV = getVertexFromLibrary(rcv.getBuildingBlockType(),
+                            rcv.getBuildingBlockId());
+                    chosenRCVs.add(copyOfRCV);
+                } catch (DENOPTIMException e)
+                {
+                    // This should never happen because we have already taken 
+                    // the BB from BBSpace.
+                    e.printStackTrace();
+                }
+            }
+        }
+        return chosenRCVs;
     }
     
 //------------------------------------------------------------------------------
@@ -1273,6 +1354,8 @@ public class FragmentSpace
 
     public boolean hasSymmetryConstrain(APClass apClass)
     {
+        if (symmConstraints==null)
+            return false;
         return symmConstraints.containsKey(apClass);
     }
 
@@ -1350,22 +1433,6 @@ public class FragmentSpace
             HashMap<Integer, ArrayList<Integer>> map)
     {
         fragPoolPerNumAP = map;
-    }
-
-//------------------------------------------------------------------------------
-
-    public void setFragsApsPerApClass(HashMap<APClass, 
-            ArrayList<ArrayList<Integer>>> map)
-    {
-        fragsApsPerApClass = map;
-    }
-
-//------------------------------------------------------------------------------
-
-    public void setAPClassesPerFrag(
-            HashMap<Integer, ArrayList<APClass>> map)
-    {
-        apClassesPerFrag = map;
     }
 
 //------------------------------------------------------------------------------
@@ -1541,14 +1608,14 @@ public class FragmentSpace
             ArrayList<Vertex> library = type == BBType.FRAGMENT ?
                     fragmentLib : scaffoldLib;
             
-            synchronized (library)
+            synchronized (LOCK)
             {
                 if (!hasIsomorph(g, type)) 
                 {   
                     //TODO: try to transform the template into its isomorphic
                     // with highest symmetry, and define the symmetric sets. 
                     // Such enhancement would facilitate the creation of 
-                    // ymmetric graphs from templates generated on the fly.
+                    // symmetric graphs from templates generated on the fly.
                     
                     Template t = new Template(type);
                     t.setInnerGraph(g);
@@ -1754,7 +1821,7 @@ public class FragmentSpace
      * @throws DENOPTIMException
      */
     
-    public void classifyFragment(Vertex frg,int fragId)
+    public void classifyFragment(Vertex frg, int fragId)
     {   
     	// Classify according to number of APs
         int nAps = frg.getFreeAPCount();
@@ -1776,11 +1843,13 @@ public class FragmentSpace
     	{
     	    // Collect classes per fragment
     	    ArrayList<APClass> lstAPC = frg.getAllAPClasses();
-            getMapAPClassesPerFragment().put(fragId,lstAPC);
+    	    synchronized (LOCK)
+            {
+    	        apClassesPerFrag.put(fragId,lstAPC);
+            }
             
     	    // Classify according to AP-Classes
-            ArrayList<AttachmentPoint> lstAPs = 
-                    frg.getAttachmentPoints();
+            List<AttachmentPoint> lstAPs = frg.getAttachmentPoints();
             
     	    for (int j=0; j<lstAPs.size(); j++)
     	    {
@@ -1795,24 +1864,24 @@ public class FragmentSpace
     			    continue;
     			}
     			
-    		    if (getMapFragsAPsPerAPClass().containsKey(cls))
-    			{
-    			    getMapFragsAPsPerAPClass().get(cls).add(apId);
-    			}
-    			else
-    			{
-    			    ArrayList<ArrayList<Integer>> outLst = 
-    						    new ArrayList<ArrayList<Integer>>();
-    			    outLst.add(apId);
-    			    getMapFragsAPsPerAPClass().put(cls,outLst);
-    			}
+    			synchronized (LOCK)
+                {
+        		    if (fragsApsPerApClass.containsKey(cls))
+        			{
+        		        fragsApsPerApClass.get(cls).add(apId);
+        			} else {
+        			    ArrayList<ArrayList<Integer>> outLst = 
+        						    new ArrayList<ArrayList<Integer>>();
+        			    outLst.add(apId);
+        			    fragsApsPerApClass.put(cls,outLst);
+        			}
+        	    }
     	    }
     	    
     	    if (frg.isRCV())
     	        registerRCV(frg);
     	}
     }
-
 
 //------------------------------------------------------------------------------
 
@@ -1828,15 +1897,46 @@ public class FragmentSpace
     	setFragPoolPerNumAP(new HashMap<Integer,ArrayList<Integer>>());
     	if (apClassBasedApproch)
     	{
-    	    setFragsApsPerApClass(
-    	            new HashMap<APClass,ArrayList<ArrayList<Integer>>>());
-    	    setAPClassesPerFrag(new HashMap<Integer,ArrayList<APClass>>());
+    	    synchronized (LOCK)
+            {
+    	        fragsApsPerApClass = new HashMap<APClass,ArrayList<
+    	            ArrayList<Integer>>>();
+            }
+    	    synchronized (LOCK)
+            {
+    	        apClassesPerFrag = new HashMap<Integer,ArrayList<APClass>>();
+            }
     	}
     	for (int j=0; j<getFragmentLibrary().size(); j++)
     	{
     		Vertex frag = getFragmentLibrary().get(j);
     	    classifyFragment(frag,j);
     	}
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns a newly-built vertex that can play the role of a ring-closing 
+     * vertex even when working with 3D building blocks.
+     * @param polarity use <code>true</code> to get an RCV with attachment 
+     * point class {@link APClass#ATPLUSS} and <code>false</code> to get
+     * {@link APClass#ATMINUS}.
+     * @return the ring-closing vertex.
+     */
+    public Vertex getPolarizedRCV(boolean polarity)
+    {   
+        APClass apc = APClass.RCACLASSPLUS;
+        if (!polarity)
+            apc = APClass.RCACLASSMINUS;
+        
+        Fragment rcv = new Fragment();
+        Atom atom = new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(apc), 
+                new Point3d());
+        rcv.addAtom(atom);
+        rcv.addAP(0, new Point3d(1.5, 0.0, 0.0), apc);
+        rcv.setAsRCV(true);
+        return rcv;
     }
 
 //------------------------------------------------------------------------------

@@ -104,13 +104,13 @@ public class Template extends Vertex
     public enum ContractLevel {
         /**
          * Inner graphs are free to change within 
-         * the confines of the required APs
+         * the confines of the required {@link AttachmentPoint}s.
          */
         FREE,
         
         /**
          * Inner graphs are effectively equivalent 
-         * to the DENOPTIMFragment class, as no change in the inner structure is
+         * to the {@link Fragment} class, as no change in the inner structure is
          * allowed.
          */
         FIXED,
@@ -118,7 +118,8 @@ public class Template extends Vertex
         /**
          * Inner graph keep the same structure, but the identify of vertices
          * can change. 
-         * Effectively this contract allows only CHANGELINK mutation.
+         * Effectively this contract allows only 
+         * {@value MutationType#CHANGELINK} mutation.
          */
         FIXED_STRUCT
     }
@@ -470,9 +471,17 @@ public class Template extends Vertex
      * defined yet.
      */
     @Override
-    protected void setSymmetricAPSets(ArrayList<SymmetricSet> sAPs)
+    protected void setSymmetricAPSets(List<SymmetricAPs> sAPs)
     {
         // Do nothing... for now.   
+    }
+    
+  //-----------------------------------------------------------------------------
+
+    @Override
+    protected void addSymmetricAPSet(SymmetricAPs symAPs)
+    {
+        // Do nothing... for now. 
     }
     
 //-----------------------------------------------------------------------------
@@ -483,9 +492,9 @@ public class Template extends Vertex
      * {@link #getAttachmentPoints()}.
      */
     @Override
-    public ArrayList<SymmetricSet> getSymmetricAPSets()
+    public List<SymmetricAPs> getSymmetricAPSets()
     {
-        ArrayList<SymmetricSet> allSymSets = new ArrayList<SymmetricSet>();
+        List<SymmetricAPs> allSymSets = new ArrayList<SymmetricAPs>();
         
         List<AttachmentPoint> doneAPs = new ArrayList<AttachmentPoint>();
         for (AttachmentPoint innerAP : innerToOuterAPs.keySet())
@@ -493,21 +502,21 @@ public class Template extends Vertex
             if (doneAPs.contains(innerAP))
                 continue;
             
-            SymmetricSet symSetForThisAP = new SymmetricSet();
+            // Must contain outer APs!
+            SymmetricAPs symSetForThisAP = new SymmetricAPs();
             
             Vertex vrtx = innerAP.getOwner();
             int innerAPIdx = innerAP.getIndexInOwner();
-            SymmetricSet sAPsOnVrtx = vrtx.getSymmetricAPs(innerAPIdx);
-            if (sAPsOnVrtx!=null)
+            SymmetricAPs sAPsOnVrtx = vrtx.getSymmetricAPs(innerAP);
+            if (sAPsOnVrtx.size()!=0)
             {
-                for (int apIdx : sAPsOnVrtx.getList())
+                for (AttachmentPoint symInnerAP : sAPsOnVrtx)
                 {
-                    AttachmentPoint symInnerAP = vrtx.getAP(apIdx);
                     if (doneAPs.contains(symInnerAP))
                         continue;
                     if (innerToOuterAPs.containsKey(symInnerAP))
                     {
-                        symSetForThisAP.add(getIndexOfInnerAP(symInnerAP));
+                        symSetForThisAP.add(innerToOuterAPs.get(symInnerAP));
                         doneAPs.add(symInnerAP);
                     }
                 }
@@ -523,35 +532,35 @@ public class Template extends Vertex
                 if (doneAPs.contains(innerApOnSymVrtx))
                     continue;
                 
-                SymmetricSet sAPsOnSymVrtx = symVrtx.getSymmetricAPs(innerAPIdx);
-                if (sAPsOnSymVrtx!=null)
+                SymmetricAPs sAPsOnSymVrtx = symVrtx.getSymmetricAPs(
+                        innerApOnSymVrtx);
+                if (sAPsOnSymVrtx.size()!=0)
                 {
-                    for (int apIdxOnSymVrtx : sAPsOnSymVrtx.getList())
+                    for (AttachmentPoint symInnerAPOnSymVrtx : sAPsOnSymVrtx)
                     {
-                        AttachmentPoint symInnerAPOnSymVrtx = symVrtx.getAP(
-                                apIdxOnSymVrtx);
                         if (doneAPs.contains(symInnerAPOnSymVrtx))
                             continue;
                         if (innerToOuterAPs.containsKey(symInnerAPOnSymVrtx))
                         {
-                            symSetForThisAP.add(getIndexOfInnerAP
-                                    (symInnerAPOnSymVrtx));
+                            symSetForThisAP.add(innerToOuterAPs.get(
+                                    symInnerAPOnSymVrtx));
                             doneAPs.add(symInnerAPOnSymVrtx);
                         }
                     }
                 } else {
                     // We need to add the AP at innerAPIdx anyway because even
-                    // it it does not have symmetric APs on its vertex owner it
+                    // if it does not have symmetric APs on its vertex owner it
                     // is symmetric to the vrtx by means of the two vertices 
                     // being members of the same symmetric set of vertices.
                     if (innerToOuterAPs.containsKey(innerApOnSymVrtx))
                     {
-                        symSetForThisAP.add(getIndexOfInnerAP(innerApOnSymVrtx));
+                        symSetForThisAP.add(innerToOuterAPs.get(
+                                innerApOnSymVrtx));
                         doneAPs.add(innerApOnSymVrtx);
                     }
                     if (!doneAPs.contains(innerAP))
                     {
-                        symSetForThisAP.add(getIndexOfInnerAP(innerAP));
+                        symSetForThisAP.add(innerToOuterAPs.get(innerAP));
                         doneAPs.add(innerAP);
                     }
                 }
@@ -560,29 +569,6 @@ public class Template extends Vertex
                 allSymSets.add(symSetForThisAP);
         }
         return allSymSets;
-    }
-    
-//-----------------------------------------------------------------------------
-    
-    /**
-     * Returns the index of the given AP in the sorted iterations over the
-     * keys of the mapping between inner and outer APs.
-     * The map is sorted, so the index should not change unless there are 
-     * changes in the list of APs.
-     */
-    private int getIndexOfInnerAP(AttachmentPoint ap)
-    {
-        int innerApIdx = -1;
-        for (AttachmentPoint innerAP : innerToOuterAPs.keySet())
-        {
-            innerApIdx++;
-            if (innerAP==ap)
-            {
-                return innerApIdx;
-            }
-            
-        }
-        return -1;
     }
 
 //-----------------------------------------------------------------------------
@@ -709,7 +695,7 @@ public class Template extends Vertex
         
         mol.removeProperty(DENOPTIMConstants.GRAPHJSONTAG);
         mol.removeProperty(DENOPTIMConstants.GRAPHTAG);
-        mol.removeProperty(DENOPTIMConstants.GMSGTAG);
+        mol.removeProperty(DENOPTIMConstants.PROVENANCE);
         mol.removeProperty(DENOPTIMConstants.GCODETAG);
         
         this.mol = mol;
@@ -802,7 +788,7 @@ public class Template extends Vertex
             
             iac.removeProperty(DENOPTIMConstants.GRAPHJSONTAG);
             iac.removeProperty(DENOPTIMConstants.GRAPHTAG);
-            iac.removeProperty(DENOPTIMConstants.GMSGTAG);
+            iac.removeProperty(DENOPTIMConstants.PROVENANCE);
             iac.removeProperty(DENOPTIMConstants.GCODETAG);
             
             // We store the result in a field of this instance
@@ -1020,7 +1006,12 @@ public class Template extends Vertex
      */
     
     public String toJson()
-    {    
+    {
+        // To serialize mapping of APs (i.e., innerToOuterAPs) we must ensure 
+        // the uniqueness of AP's IDs in the inner graph
+        if (innerGraph!=null)
+            innerGraph.ensureUniqueApIDs();
+        
         Gson gson = DENOPTIMgson.getWriter();
         String jsonOutput = gson.toJson(this);
         return jsonOutput;

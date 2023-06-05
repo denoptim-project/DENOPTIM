@@ -34,7 +34,7 @@ public class IdFragmentAndAP
     /**
      * the ID of the vertex containing the fragment.
      */
-    private int vId = -1;
+    private long vId = -1;
 
     /**
      * the index of the fragment in that library. 
@@ -69,10 +69,10 @@ public class IdFragmentAndAP
 
 //------------------------------------------------------------------------------
 
-    public IdFragmentAndAP(int vId, int molId, BBType molTyp, int apId,
+    public IdFragmentAndAP(long vIdx, int molId, BBType molTyp, int apId,
             int vSymSetId, int apSymSetId)
     {
-        this.vId = vId;
+        this.vId = vIdx;
         this.molId = molId;
         this.molTyp = molTyp;
         this.apId = apId;
@@ -82,7 +82,7 @@ public class IdFragmentAndAP
 
 //------------------------------------------------------------------------------
 
-    public int getVertexId()
+    public long getVertexId()
     {
         return vId;
     }

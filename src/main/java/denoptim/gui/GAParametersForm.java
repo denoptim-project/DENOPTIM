@@ -50,6 +50,8 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.jfree.chart.ChartFactory;
@@ -144,6 +146,23 @@ public class GAParametersForm extends ParametersForm
     JPanel linePar10;
     JLabel lblPar10;
     JTextField txtPar10;
+    
+    JPanel lineMolToGraph;
+    JLabel lblMolToGraph;
+    JTextField txtMolToGraph;
+    JButton btnMolToGraph;
+    String keyMolToGraph = "GA-InitMolsToFragmentFile";
+    
+    JPanel lineFrgMols;
+    JLabel lblFrgMols;
+    JTextField txtFrgMols;
+    JButton btnFrgMols;
+    String keyFrgMols = "FRG-CuttingRulesFile";
+    
+    JPanel lineAddH;
+    JLabel lblAddH;
+    JRadioButton rdbAddH;
+    String keyAddH = "FRG-AddExplicitHydrogen";
     
     JPanel lineGrowthPropMode;
     JLabel lblGrowthPropMode;
@@ -485,7 +504,7 @@ public class GAParametersForm extends ParametersForm
         
         //HEREGOESIMPLEMENTATION this is only to facilitate automated insertion of code
 
-        String toolTipPar6 = "Specifies the number of individuals in the initial population.";
+        String toolTipPar6 = "Specifies the number of individuals in the population.";
         linePar6 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar6 = new JLabel("Size of population:", SwingConstants.LEFT);
         lblPar6.setPreferredSize(fileLabelSize);
@@ -1315,7 +1334,107 @@ public class GAParametersForm extends ParametersForm
         linePar10.add(lblPar10);
         linePar10.add(txtPar10);
         advOptsBlock.add(linePar10);
+        
 
+        advOptsBlock.add(new JSeparator());
+        
+        
+        String toolMolToGraph = "<html>Specifies the pathname of a file containing molecules that should be screened to generate the initial population.<br> The file can be an SDF file or a text file where each line contains a SMILES.</html>";
+        lineMolToGraph = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblMolToGraph = new JLabel("Initial population from screening:", SwingConstants.LEFT);
+        lblMolToGraph.setPreferredSize(fileLabelSize);
+        lblMolToGraph.setToolTipText(toolMolToGraph);
+        txtMolToGraph = new JTextField();
+        txtMolToGraph.setToolTipText(toolMolToGraph);
+        txtMolToGraph.setPreferredSize(fileFieldSize);
+        txtMolToGraph.getDocument().addDocumentListener(fieldListener);
+        txtMolToGraph.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                if (txtMolToGraph.getText().isBlank())
+                {
+                    txtFrgMols.setEnabled(false);
+                    btnFrgMols.setEnabled(false);
+                    rdbAddH.setEnabled(false);
+                } else {
+                    txtFrgMols.setEnabled(true);
+                    btnFrgMols.setEnabled(true);
+                    rdbAddH.setEnabled(true);
+                }
+            }
+            public void removeUpdate(DocumentEvent e) {
+                if (txtMolToGraph.getText().isBlank())
+                {
+                    txtFrgMols.setEnabled(false);
+                    btnFrgMols.setEnabled(false);
+                    rdbAddH.setEnabled(false);
+                } else {
+                    txtFrgMols.setEnabled(true);
+                    btnFrgMols.setEnabled(true);
+                    rdbAddH.setEnabled(true);
+                }
+            }
+            public void insertUpdate(DocumentEvent e) {
+                if (txtMolToGraph.getText().isBlank())
+                {
+                    txtFrgMols.setEnabled(false);
+                    btnFrgMols.setEnabled(false);
+                    rdbAddH.setEnabled(false);
+                } else {
+                    txtFrgMols.setEnabled(true);
+                    btnFrgMols.setEnabled(true);
+                    rdbAddH.setEnabled(true);
+                }
+            }
+        });
+        mapKeyFieldToValueField.put(keyMolToGraph.toUpperCase(), txtMolToGraph);
+        btnMolToGraph = new JButton("Browse");
+        btnMolToGraph.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+                GUIFileOpener.pickFileForTxtField(txtMolToGraph,btnMolToGraph);
+           }
+        });
+        lineMolToGraph.add(lblMolToGraph);
+        lineMolToGraph.add(txtMolToGraph);
+        lineMolToGraph.add(btnMolToGraph);
+        advOptsBlock.add(lineMolToGraph);
+        
+        String toolFrgMols = "<html>Specifies the pathname of a file containing the cutting rules to apply when converting molecules into graphs</html>";
+        lineFrgMols = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblFrgMols = new JLabel("Mol-to-graph bond-cutting rules:", SwingConstants.LEFT);
+        lblFrgMols.setPreferredSize(fileLabelSize);
+        lblFrgMols.setToolTipText(toolFrgMols);
+        txtFrgMols = new JTextField();
+        txtFrgMols.setToolTipText(toolFrgMols);
+        txtFrgMols.setPreferredSize(fileFieldSize);
+        txtFrgMols.getDocument().addDocumentListener(fieldListener);
+        txtFrgMols.setEnabled(false);
+        mapKeyFieldToValueField.put(keyFrgMols.toUpperCase(), txtFrgMols);
+        btnFrgMols = new JButton("Browse");
+        btnFrgMols.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+                GUIFileOpener.pickFileForTxtField(txtFrgMols, btnFrgMols);
+           }
+        });
+        btnFrgMols.setEnabled(false);
+        lineFrgMols.add(lblFrgMols);
+        lineFrgMols.add(txtFrgMols);
+        lineFrgMols.add(btnFrgMols);
+        advOptsBlock.add(lineFrgMols);
+        
+        String toolAddH = "Specifies whether the to add explicit H atoms upon importing molecules to be fragmented.";
+        lineAddH = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rdbAddH = new JRadioButton("Add explicit H atoms");
+        rdbAddH.setToolTipText(toolAddH);
+        rdbAddH.addChangeListener(rdbFieldChange);
+        rdbAddH.setEnabled(false);
+        mapKeyFieldToValueField.put(keyAddH.toUpperCase(),rdbAddH);
+        lineAddH.add(rdbAddH);
+        advOptsBlock.add(lineAddH);
+
+        
+        advOptsBlock.add(new JSeparator());
+
+        
         String toolTipPar20 = "<html>Specifies the pathname of a file containing previously evaluated individuals to be added to the initial population.<br> The file can be an SDF file or a text file where each line containing the pathname to a single-molecule SDF file.</html>";
         linePar20 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar20 = new JLabel("Initial population file (SDF):", SwingConstants.LEFT);
@@ -1433,6 +1552,8 @@ public class GAParametersForm extends ParametersForm
         advOptsBlock.add(rdbRingTmplsFrags);
         advOptsBlock.add(rdbRingTmplsScaff);
         advOptsBlock.add(lineRingSysTmpl);
+        
+        advOptsBlock.add(super.getPanelForUnformattedInput());
         
 
         //HEREGOESADVIMPLEMENTATION this is only to facilitate automated insertion of code       
@@ -1780,10 +1901,14 @@ public class GAParametersForm extends ParametersForm
     @Override
     public void importParametersFromDenoptimParamsFile(String fileName) throws Exception
     {
+        clearUnformattedTxtArea();
         checkedFlags.clear();
         checkedFlags.put(keyPar11, false);
         
     	importParametersFromDenoptimParamsFile(fileName,"GA-");
+
+    	// We have also some fragmentation parameters in this form
+        importParametersFromDenoptimParamsFile(fileName,"FRG-");
     	
     	rdbSrcOrNew.setSelected(false);
     	localBlock1.setVisible(false);
@@ -1884,6 +2009,7 @@ public class GAParametersForm extends ParametersForm
         }
         
 		advOptsBlock.setVisible(true);
+        showUnknownKeyWarning(this, "Genetic Algorithm");
     }
 
 //-----------------------------------------------------------------------------
@@ -1901,12 +2027,7 @@ public class GAParametersForm extends ParametersForm
   		}
   		else
   		{
-			JOptionPane.showMessageDialog(this,
-					"<html>Parameter '" + key + "' is not recognized<br> "
-					        + "and will be ignored.</html>",
-	                "WARNING",
-	                JOptionPane.WARNING_MESSAGE,
-	                UIManager.getIcon("OptionPane.errorIcon"));
+            addToUnformattedTxt(key, value);
 			return;
   		}
   		
@@ -1925,10 +2046,11 @@ public class GAParametersForm extends ParametersForm
  			           valueField==cmbPar11)
  			    {
                     ((JComboBox<ProbabilityFuncitonShape>) valueField)
-                        .setSelectedItem(
-                                ProbabilityFuncitonShape.valueOf(value));
+                        .setSelectedItem(ProbabilityFuncitonShape.valueOf(
+                                value.toUpperCase()));
  			    } else {
- 			        ((JComboBox<String>) valueField).setSelectedItem(value);
+ 			        ((JComboBox<String>) valueField).setSelectedItem(
+ 			                value.toUpperCase());
  			    }
  				break;
  				
@@ -2038,6 +2160,11 @@ public class GAParametersForm extends ParametersForm
         sb.append(getStringIfNotEmpty(keyPar18,txtPar18));
         sb.append(keyPar19).append("=").append(cmbPar19.getSelectedItem())
         .append(NL);
+        
+        sb.append(getStringIfNotEmpty(keyMolToGraph,txtMolToGraph));
+        sb.append(getStringIfNotEmpty(keyFrgMols,txtFrgMols));
+        sb.append(getStringIfSelected(keyAddH,rdbAddH));
+        
         sb.append(getStringIfNotEmpty(keyPar20,txtPar20));
         sb.append(getStringIfNotEmpty(keyPar21,txtPar21));
         sb.append(getStringIfNotEmpty(keyPar22,txtPar22));
@@ -2050,6 +2177,9 @@ public class GAParametersForm extends ParametersForm
         {
             sb.append(getStringForKVLine(keyRingSysTmplTrhld,spnRingSysTmpl));
         }
+        
+        sb.append(getTextForUnformattedSettings()).append(NL);
+        
         //HEREGOESPRINT this is only to facilitate automated insertion of code        
     }
 }

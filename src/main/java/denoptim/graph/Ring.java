@@ -225,7 +225,7 @@ public class Ring
               JsonSerializationContext context)
         {
             JsonObject jsonObject = new JsonObject();
-            ArrayList<Integer> vertexIDs = new ArrayList<Integer>();
+            ArrayList<Long> vertexIDs = new ArrayList<Long>();
             for (int i=0; i<ring.getSize(); i++)
             {
                 Vertex v = ring.getVertexAtPosition(i);

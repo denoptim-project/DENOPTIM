@@ -20,6 +20,7 @@ package denoptim.ga;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -187,15 +188,15 @@ public class PopulationTest
         Candidate c5 = new Candidate("C5",g5);
         pop.add(c5);
         
-        ArrayList<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
+        List<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
-        ArrayList<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
+        List<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
-        ArrayList<Candidate> partnersForC3 = pop.getXoverPartners(c3, 
+        List<Candidate> partnersForC3 = pop.getXoverPartners(c3, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
-        ArrayList<Candidate> partnersForC4 = pop.getXoverPartners(c4, 
+        List<Candidate> partnersForC4 = pop.getXoverPartners(c4, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
-        ArrayList<Candidate> partnersForC5 = pop.getXoverPartners(c5, 
+        List<Candidate> partnersForC5 = pop.getXoverPartners(c5, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2,c3,c4,c5)), fs);
 
         Map<Candidate,Map<Candidate,Integer>> expected = 
@@ -255,9 +256,9 @@ public class PopulationTest
         g2.getVertexAtPosition(1).setUniquefyingProperty(k);
         g2.getVertexAtPosition(1).setProperty(k, 456);
         
-        ArrayList<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
+        List<Candidate> partnersForC1 = pop.getXoverPartners(c1, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2)), fs);
-        ArrayList<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
+        List<Candidate> partnersForC2 = pop.getXoverPartners(c2, 
                 new ArrayList<Candidate>(Arrays.asList(c1,c2)), fs);
         
         Map<Candidate,Map<Candidate,Integer>> expected = 
@@ -296,7 +297,7 @@ public class PopulationTest
     
     private void compareSizeOfSites(Candidate parentA,
             Map<Candidate, Integer> expectedForC1, 
-            ArrayList<Candidate> partnersForC1, Population pop)
+            List<Candidate> partnersForC1, Population pop)
     {
         for (Candidate c : expectedForC1.keySet())
         {
@@ -561,6 +562,7 @@ public class PopulationTest
     @Test
     public void testGetMinMax() throws Exception
     {
+        double trsh = 0.001;
         GAParameters gaparams = prepare();
         Population pop = new Population(gaparams);
         
@@ -589,7 +591,6 @@ public class PopulationTest
         c5.setFitness(-0.5);
         pop.add(c5);
         
-        double trsh = 0.001;
         assertTrue(Math.abs(pop.getMinFitness()-(-1.0)) < trsh, 
                 "getting min fitness");
         assertTrue(Math.abs(pop.getMaxFitness()-(2.0)) < trsh, 
@@ -1115,15 +1116,15 @@ public class PopulationTest
      * where template T1 is
      * <pre>
      *                     
-     *    (A)-v0-(A)--(A)-v1-(B)--(B)-v2-(C)
+     *    (A)-v0-(A)--(A)-v4-(B)--(B)-v6-(C)
      *         |           |
      *        (A)         (A)--(A)-v5
      *         |                    |
      *         |                   chord
      *         |                    |
-     *        (A)         (A)--(A)-v6
+     *        (A)         (A)--(A)-v3
      *         |           |
-     *        v3-(A)--(A)-v4-(B)
+     *        v1-(A)--(A)-v2-(B)
      * </pre>
      * 
      * The second Graph structure:
@@ -1158,6 +1159,8 @@ public class PopulationTest
     public static DGraph[] getPairOfTestGraphsBxoxo() throws Exception
     {   
         // Prepare special building block: template T1
+        // In the template we want APS in this order: 
+        // A(from v0), B(from v2), C(from v6)
 
         EmptyVertex v0 = new EmptyVertex(0);
         v0.addAP(APCA);
@@ -1168,48 +1171,45 @@ public class PopulationTest
         EmptyVertex v1 = new EmptyVertex(1);
         v1.addAP(APCA);
         v1.addAP(APCA);
-        v1.addAP(APCB);
         v1.setProperty("Label", "tv1");
+
+        EmptyVertex v2 = new EmptyVertex(2);
+        v2.addAP(APCA);
+        v2.addAP(APCB);
+        v2.addAP(APCA);
+        v2.setProperty("Label", "tv2");
         
         EmptyVertex v3 = new EmptyVertex(3);
         v3.addAP(APCA);
-        v3.addAP(APCA);
         v3.setProperty("Label", "tv3");
-
+        v3.setAsRCV(true);
+        
         EmptyVertex v4 = new EmptyVertex(4);
         v4.addAP(APCA);
-        v4.addAP(APCB);
         v4.addAP(APCA);
+        v4.addAP(APCB);
         v4.setProperty("Label", "tv4");
-        
-        // v2 is created after v4 to get a specific order of APs in the template
-        // In the template we want APS in this order: 
-        // A(from v0), B(from v4), C(from v2)
-        EmptyVertex v2 = new EmptyVertex(2);
-        v2.addAP(APCB);
-        v2.addAP(APCC);
-        v2.setProperty("Label", "tv2");
         
         EmptyVertex v5 = new EmptyVertex(5);
         v5.addAP(APCA);
         v5.setProperty("Label", "tv5");
         v5.setAsRCV(true);
-        
+
         EmptyVertex v6 = new EmptyVertex(6);
-        v6.addAP(APCA);
+        v6.addAP(APCB);
+        v6.addAP(APCC);
         v6.setProperty("Label", "tv6");
-        v6.setAsRCV(true);
         
         DGraph g = new DGraph();
         g.addVertex(v0);
         g.setGraphId(-1);
-        g.appendVertexOnAP(v0.getAP(1), v1.getAP(0));
-        g.appendVertexOnAP(v1.getAP(2), v2.getAP(0));
-        g.appendVertexOnAP(v1.getAP(1), v5.getAP(0));
-        g.appendVertexOnAP(v0.getAP(0), v3.getAP(0));
-        g.appendVertexOnAP(v3.getAP(1), v4.getAP(0));
+        g.appendVertexOnAP(v0.getAP(0), v1.getAP(0));
+        g.appendVertexOnAP(v1.getAP(1), v2.getAP(0));
+        g.appendVertexOnAP(v2.getAP(2), v3.getAP(0));
+        g.appendVertexOnAP(v0.getAP(1), v4.getAP(0));
         g.appendVertexOnAP(v4.getAP(2), v6.getAP(0));
-        g.addRing(v5, v6, BondType.SINGLE);
+        g.appendVertexOnAP(v4.getAP(1), v5.getAP(0));
+        g.addRing(v5, v3, BondType.SINGLE);
         
         Template t1 = new Template(BBType.NONE);
         t1.setInnerGraph(g);

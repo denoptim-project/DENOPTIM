@@ -20,6 +20,9 @@ package denoptim.ga;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.lang.Math;
 
 import denoptim.graph.Candidate;
 import denoptim.programs.RunTimeParameters;
@@ -42,21 +45,21 @@ public class SelectionHelper
      * thus increasing genetic diversity.
      * Note: this implementation is based on the WATCHMAKER framework
      * http://watchmaker.uncommons.org/
-     * @param population the ensemble of individuals to choose from
+     * @param eligibleParents the ensemble of individuals to choose from
      * @param sz number of individuals to select
      * @param settings the program-specific settings.
      * @return list of selected individuals 
      */
 
     protected static Candidate[] performTournamentSelection(
-            ArrayList<Candidate> population, int sz, RunTimeParameters settings)
+            List<Candidate> eligibleParents, int sz, RunTimeParameters settings)
     {
         Candidate[] selection = new Candidate[sz];
         for (int i=0; i<sz; i++)
         {
             // Pick two candidates at random.
-            Candidate p1 = settings.getRandomizer().randomlyChooseOne(population);
-            Candidate p2 = settings.getRandomizer().randomlyChooseOne(population);
+            Candidate p1 = settings.getRandomizer().randomlyChooseOne(eligibleParents);
+            Candidate p2 = settings.getRandomizer().randomlyChooseOne(eligibleParents);
 
             // Use a random value to decide weather to select the fitter individual
             // or the weaker one.
@@ -86,7 +89,7 @@ public class SelectionHelper
      * @return list of indices of individuals in the population.
      */
     protected static Candidate[] performRandomSelection(
-            ArrayList<Candidate> population, int sz, RunTimeParameters settings)
+            List<Candidate> population, int sz, RunTimeParameters settings)
     {
         Candidate[] selection = new Candidate[sz];
         for (int i=0; i<sz; i++)
@@ -106,37 +109,46 @@ public class SelectionHelper
      * @param settings the program-specific settings.
      * @return list of indices of individuals in the population.
      */
-    protected static Candidate[] performSUS(ArrayList<Candidate> population, 
+    protected static Candidate[] performSUS(List<Candidate> population, 
             int sz, RunTimeParameters settings)
     {
         int k = population.size();
         Candidate[] selection = new Candidate[sz];
         // Calculate the sum of all fitness values.
         double aggregateFitness = 0;
-
+        List<Double> fitnesses = new ArrayList<>();
+        
+        
+        // Get module of the lowest fitness
         for (int i=0; i<k; i++)
         {
-            aggregateFitness += population.get(i).getFitness();
+            fitnesses.add(population.get(i).getFitness());
+        }
+        double offSet = Math.abs(Collections.min(fitnesses));
+         
+        // Sum all candidates' fitness translated by the offSet
+        // to ensure feasibility also with negative values
+        for (int i=0; i<k; i++)
+        {
+            aggregateFitness += population.get(i).getFitness() + offSet;
         }
 
-
-        // Pick a random offset between 0 and 1 as the starting point for selection.
-        double startOffset = settings.getRandomizer().nextDouble();
+        // Pick a random pointer between 0 and 1 as the starting point for selection.
+        double randomPointer = settings.getRandomizer().nextDouble();
         double cumulativeExpectation = 0;
         int index = 0;
         int c = 0;
         for (int i=0; i<k; i++)
         {
-            // Calculate the number of times this candidate is expected to
-            // be selected on average and add it to the cumulative total
-            // of expected frequencies.
-            cumulativeExpectation += population.get(i).getFitness()
+            
+            // Calculate the probability of the i-th candidate to be selected and 
+            // sum it to the previous values
+            cumulativeExpectation += (population.get(i).getFitness() + offSet)
                                     / aggregateFitness * sz;
 
-            // If f is the expected frequency, the candidate will be selected at
-            // least as often as floor(f) and at most as often as ceil(f). The
-            // actual count depends on the random starting offset.
-            while (cumulativeExpectation > startOffset + index)
+            // Select the candidate i if the randomPointer falls in the values spanned
+            // by the cumulative probabilities 
+            while (cumulativeExpectation > randomPointer + index)
             {
                 selection[c] = population.get(i);
                 c++;
@@ -163,7 +175,7 @@ public class SelectionHelper
      * @return list of indices of individuals in the population.
      */
 
-    protected static Candidate[] performRWS(ArrayList<Candidate> population,
+    protected static Candidate[] performRWS(List<Candidate> population,
             int sz, RunTimeParameters settings)
     {
         int k = population.size();

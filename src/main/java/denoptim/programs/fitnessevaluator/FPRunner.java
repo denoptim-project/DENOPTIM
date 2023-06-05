@@ -207,18 +207,24 @@ public class FPRunner
         
         // wait a bit for pending tasks to finish
         tpe.shutdown();
-        tpe.awaitTermination(5, TimeUnit.SECONDS);
-        
+        tpe.awaitTermination(settings.getWallTime(), TimeUnit.SECONDS);
+        String collectiveOutput = settings.getOutputFile().getAbsolutePath();
         for (int i=0; i<graphs.size(); i++)
         {
-            String s = DenoptimIO.readText(
-                    settings.getOutputFile().getAbsolutePath()+"_"+i);
+            String tmpFileFromProvider = collectiveOutput + "_" + i;
+            File tmpFile = new File(tmpFileFromProvider);
+            if (!tmpFile.exists() || !tmpFile.canRead())
+            {
+                throw new Error("File '" + tmpFileFromProvider + "' should "
+                        + "have been procuded by fitness provider, but is not "
+                        + "found after " + settings.getWallTime() 
+                        + " seconds.");
+            }
+            String content = DenoptimIO.readText(tmpFileFromProvider);
             // Get rid of trailing newline character
-            s = s.substring(0, s.length()-1);
-            DenoptimIO.writeData(settings.getOutputFile().getAbsolutePath(), 
-                    s, true);
-            FileUtils.deleteQuietly(new File(
-                    settings.getOutputFile().getAbsolutePath()+"_"+i));
+            content = content.substring(0, content.length()-1);
+            DenoptimIO.writeData(collectiveOutput, content, true);
+            FileUtils.deleteQuietly(new File(tmpFileFromProvider));
         }
         
         watch.stop();

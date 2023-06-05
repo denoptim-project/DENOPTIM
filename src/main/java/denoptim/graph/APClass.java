@@ -35,6 +35,7 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Edge.BondType;
+import denoptim.graph.rings.RingClosingAttractor;
 
 public class APClass implements Cloneable,Comparable<APClass>
 {
@@ -56,43 +57,46 @@ public class APClass implements Cloneable,Comparable<APClass>
     public static Set<APClass> uniqueAPClasses = new HashSet<APClass>();
     
     /**
-     * Synchronisation lock. Used to guard alteration of the set of unique
+     * Synchronization lock. Used to guard alteration of the set of unique
      * APClasses.
      */
     private final static Object uniqueAPClassesLock = new Object();
 
     /**
-     * Recognized attachment point classes of RingClosingAttractor
+     * String defining a conventional APClass
      */
-    public static final Set<APClass> RCAAPCLASSSET = 
-    	    new HashSet<APClass>(){
-                /**
-                 * Version ID
-                 */
-                private static final long serialVersionUID = 1L;
-
-            {
-    	        APClass a = getUnique("ATplus", 0, BondType.ANY);
-    	        add(a);
-    	        synchronized (uniqueAPClassesLock)
-                {
-    	            uniqueAPClasses.add(a);
-                }
-    	        
-    	        APClass b = getUnique("ATminus", 0, BondType.ANY);
-                add(b);
-                synchronized (uniqueAPClassesLock)
-                {
-                    uniqueAPClasses.add(b);
-                }
-                
-                APClass c = getUnique("ATneutral", 0, BondType.ANY);
-                add(c);
-                synchronized (uniqueAPClassesLock)
-                {
-                    uniqueAPClasses.add(c);
-                }
-                }};
+    public static final String ATPLUS = "ATplus";
+    
+    /**
+     * String defining a conventional APClass
+     */
+    public static final String ATMINUS = "ATminus";
+    
+    /**
+     * String defining a conventional APClass
+     */
+    public static final String ATNEUTRAL = "ATneutral";
+    
+    /**
+     * Conventional class of attachment points on ring-closing vertexes.
+     * Polarized (+) case.
+     */
+    public static final APClass RCACLASSPLUS = getUnique(ATPLUS, 0, 
+            BondType.ANY);
+    
+    /**
+     * Conventional class of attachment points on ring-closing vertexes.
+     * Polarized (-) case.
+     */
+    public static final APClass RCACLASSMINUS = getUnique(ATMINUS, 0, 
+            BondType.ANY);
+    
+    /**
+     * Conventional class of attachment points on ring-closing vertexes.
+     * Unpolarized, neutral case.
+     */
+    public static final APClass RCACLASSNEUTRAL = getUnique(ATNEUTRAL, 0, 
+            BondType.ANY);
     
     /**
      * Bond type to use when converting edge users into formal bonds
@@ -259,7 +263,7 @@ public class APClass implements Cloneable,Comparable<APClass>
             } else {
                 // NB: the default bond type for RCAs must not be changed, but
                 // For non-RCA APClasses we do update the bond type.
-                if (bt != newApc.bndTyp && !RCAAPCLASSSET.contains(newApc))
+                if (bt != newApc.bndTyp && !RingClosingAttractor.RCAAPCLASSSET.contains(newApc))
                 {
                     System.err.println("WARNING! Changing bond order of "
                             + "APClass " + newApc + ": " + newApc.bndTyp 

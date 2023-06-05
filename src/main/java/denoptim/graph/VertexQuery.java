@@ -31,7 +31,7 @@ public class VertexQuery
     /**
      * Query on unique identifier or null.
      */
-    private Integer vertexId = null;
+    private Long vertexId = null;
     
     /**
      * Query on building block in the library of building blocks, or null.
@@ -80,7 +80,7 @@ public class VertexQuery
      * the candidate vertex if the target.
      */
 
-    public VertexQuery(Integer vID, VertexType vType, BBType bbType, 
+    public VertexQuery(Long vID, VertexType vType, BBType bbType, 
             Integer bbID, Integer level, EdgeQuery eIn)
     {
         this.vertexId = vID;
@@ -110,7 +110,7 @@ public class VertexQuery
      * the candidate vertex if the source.
      */
 
-    public VertexQuery(Integer vID, VertexType vType, BBType bbType, 
+    public VertexQuery(Long vID, VertexType vType, BBType bbType, 
             Integer bbID, Integer level, EdgeQuery eIn, EdgeQuery eOut)
     {
         this(vID, vType, bbType, bbID, level, eIn);
@@ -126,7 +126,7 @@ public class VertexQuery
     
 //------------------------------------------------------------------------------
 
-    public Integer getVertexIDQuery()
+    public Long getVertexIDQuery()
     {
         return vertexId;
     }
