@@ -223,7 +223,7 @@ public class GraphLinkFinderTest
 //------------------------------------------------------------------------------
 
     /**
-     *  Creates a test graph that looks like this: v0(A)-(A)v1(B)-(C)v2
+     *  Creates a test graph that looks like this: v0(A)-(A)v1(B)-(B)v2
      * @throws DENOPTIMException 
      *  
      */
@@ -300,10 +300,10 @@ public class GraphLinkFinderTest
         // vertexes that can be alternative links. 
         Map<Integer,Integer> expected = new HashMap<Integer,Integer>();
         expected.put(4, 4);
-        expected.put(5, 4);
+        expected.put(5, 4); 
         expected.put(9, 12);
-        expected.put(10, 6);
-        expected.put(11, 84);
+        expected.put(10, 6); 
+        expected.put(11, 84); 
         expected.put(13, 2);
         
         LinkedHashMap<Vertex, List<APMapping>> allAltLinks = 
