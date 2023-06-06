@@ -978,7 +978,8 @@ public class EAUtils
             graph = makeGraphFromFragmentationOfMol(mol, 
                     frgParams.getCuttingRules(), settings.getLogger(),
                     frgParams.getScaffoldingPolicy(),
-                    frgParams.getLinearAngleLimit());
+                    frgParams.getLinearAngleLimit(),
+                    fragSpace);
         } catch (DENOPTIMException de)
         {
             String msg = "Unable to convert molecule (" + mol.getAtomCount() 
@@ -1025,7 +1026,7 @@ public class EAUtils
         
         return candidate;
     }
-
+    
 //------------------------------------------------------------------------------  
     
     /**
@@ -1045,12 +1046,13 @@ public class EAUtils
                     throws DENOPTIMException
     {
         return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
-                scaffoldingPolicy, 190); 
+                scaffoldingPolicy, 190, new FragmentSpace()); 
         // NB: and angle of 190 means we are not adding Du on linearities
+        // because the max possible bond angle is 180.
     }
-    
+
 //------------------------------------------------------------------------------  
-    
+      
     /**
      * Converts a molecule into a {@link DGraph} by fragmentation and 
      * re-assembling of the fragments.
@@ -1067,6 +1069,59 @@ public class EAUtils
     public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
             List<CuttingRule> cuttingRules, Logger logger, 
             ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit) 
+                    throws DENOPTIMException
+    {
+        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
+                scaffoldingPolicy, linearAngleLimit, new FragmentSpace()); 
+    }
+      
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @param fragSpace the fragment space for defining things like, what
+     * capping groups we have.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy, FragmentSpace fragSpace) 
+                    throws DENOPTIMException
+    {
+        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
+                scaffoldingPolicy, 190, fragSpace); 
+        // NB: and angle of 190 means we are not adding Du on linearities
+        // because the max possible bond angle is 180.
+    }
+    
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @param linearAngleLimit the max bond angle before we start considering 
+     * the angle linear and add a linearity-breaking dummy atom.
+     * @param fragSpace the definition of the fragment space to consider when
+     * generating fragments.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit,
+            FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {
         // We expect only Fragments here.
@@ -1155,6 +1210,34 @@ public class EAUtils
         
         // Set symmetry relations: these depend on which scaffold we have chosen
         graph.detectSymVertexSets();
+        
+        // Identify capping groups, i.e., fragments that reflect the capping 
+        // groups found in the fragment space, if any.
+        if (fragSpace!=null && fragSpace.getCappingMap()!=null)
+        {
+            for (Vertex v : graph.getVertexList())
+            {
+                if (v.getAttachmentPoints().size()!=1 || v.isRCV())
+                    continue;
+                
+                APClass srcAPC = v.getAP(0).getLinkedAPThroughout().getAPClass();
+                APClass capAPC = fragSpace.getAPClassOfCappingVertex(srcAPC);
+                Vertex cap = fragSpace.getCappingVertexWithAPClass(capAPC);
+                if (cap==null)
+                    continue;
+                
+                if (!(v instanceof Fragment && cap instanceof Fragment))
+                    continue;
+                    
+                Fragment f = (Fragment) v;
+                // NB: here we ignore APClasses and Du atoms
+                if (f.isIsomorphicTo(cap, true))
+                {
+                    v.setBuildingBlockType(BBType.CAP);
+                    v.getAP(0).setAPClass(capAPC);
+                }
+            }
+        }
         
         return graph;
     }

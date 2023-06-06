@@ -1180,6 +1180,75 @@ public class EAUtilsTest
         }
     }
     
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testMakeGraphFromFragmentationOfMol_cappingGroups() 
+            throws Exception
+    {
+        SmilesParser p = new SmilesParser(builder);
+        IAtomContainer mol = p.parseSmiles("Cc1cnc(Cl)cc1O");
+        MoleculeUtils.explicitHydrogens(mol);
+
+        // 2D is enough to get linearities. No need to waste time getting 3D
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        
+        GAParameters settings = new GAParameters();
+        
+        List<CuttingRule> cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("sAr", "[c]", "[*]", "-", 2, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("Ox", "[O]", "[*]", "-", 3, 
+                new ArrayList<String>()));
+
+        APClass hyd1 = APClass.make("hyd:1");
+        APClass sAr0 = APClass.make("sAr:0");
+        APClass ox0 = APClass.make("Ox:0");
+        Fragment capH = new Fragment();
+        capH.addAtom(new Atom("H", new Point3d()));
+        capH.addAP(0, hyd1, new Point3d(1.0,0,0));
+        
+        ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
+        cappingGroups.add(capH);
+        
+        HashMap<APClass, APClass> capMap = new HashMap<APClass, APClass>();
+        capMap.put(sAr0, hyd1);
+        capMap.put(ox0, hyd1);
+        
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(), //no scaffolds
+                new ArrayList<Vertex>(), //no fragments
+                cappingGroups, //H as capping
+                new HashMap<APClass,ArrayList<APClass>>(), 
+                capMap, 
+                new HashSet<APClass>(), 
+                new HashMap<APClass,ArrayList<APClass>>());
+        fragSpace.setAPclassBasedApproach(true);
+        
+        settings.setParameters(fsp);
+        
+        // Without a fragment space we do not identify capping groups
+        DGraph graph = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT, 170);
+        assertEquals(7, graph.getVertexCount());
+        graph.removeCappingGroups();
+        assertEquals(7, graph.getVertexCount());
+        
+        graph = EAUtils.makeGraphFromFragmentationOfMol(mol,
+                cuttingRules, settings.getLogger(), 
+                ScaffoldingPolicy.LARGEST_FRAGMENT, 170, fragSpace);
+        assertEquals(7, graph.getVertexCount());
+        //In case you want to take a look ar the results
+        // DenoptimIO.writeGraphToSDF(new File("/tmp/graph.sdf"), graph, false,  
+        // true,  settings.getLogger(), settings.getRandomizer());
+        graph.removeCappingGroups();
+        assertEquals(4, graph.getVertexCount());
+    }
+    
 //------------------------------------------------------------------------------
     
     @Test
