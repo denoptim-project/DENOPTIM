@@ -936,6 +936,17 @@ public class FragmenterParameters extends RunTimeParameters
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * Give <code>true</code> to add explicit H atoms on all atoms. Useful,
+     * when importing molecules with implicit H notation.
+     */
+    public void setAddExplicitH(boolean addExplicitH)
+    {
+        this.addExplicitH = addExplicitH;
+    }
+    
+//------------------------------------------------------------------------------
 
     /**
      * @return <code>true</code> if we are want to ignore the fact we have 
