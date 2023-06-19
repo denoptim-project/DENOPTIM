@@ -2675,22 +2675,21 @@ public class EAUtils
                 new ArrayList<List<RelatedAPPair>>();
         if (symmRelatedBridgeHeadAPs.size()>0)
         {
-            //TODO-gg
-            /*
-             *Use fsParams.getFragmentSpace().imposeSymmetryOnAPsOfClass(apc)
-             *
-             *move the if (projectOnSymmetricAPs) and couple it with imposeSymmetryOnAPsOfClass
-             */
-            if (projectOnSymmetricAPs)
+            for (SymmetricSetWithMode key : symmRelatedBridgeHeadAPs.keySet())
             {
-                for (SymmetricSetWithMode key : symmRelatedBridgeHeadAPs.keySet())
+                List<RelatedAPPair> chosenSymSet = 
+                        symmRelatedBridgeHeadAPs.get(key);
+                
+                @SuppressWarnings("unchecked")
+                SymmetricSet<AttachmentPoint> symmRelatedAPs = 
+                        (SymmetricSet<AttachmentPoint>) key.getItems();
+                boolean apcImposedSymm = fragSpace.imposeSymmetryOnAPsOfClass(
+                        symmRelatedAPs.get(0).getAPClass());
+                
+                if (projectOnSymmetricAPs || apcImposedSymm)
                 {
-                    List<RelatedAPPair> chosenSymSet = 
-                            symmRelatedBridgeHeadAPs.get(key);
-                    
                     // We try to get the biggest combination (k is the size)
                     // but we do limit to avoid combinatorial explosion.
-                    //TODO: make limit to max number of ring closures per vertex tuneable?
                     for (int k=Math.min(chosenSymSet.size(), 6); k>0; k--)
                     {
                         // Generate combinations that use non-overlapping pairs of APs
@@ -2718,19 +2717,21 @@ public class EAUtils
                                 if (isNew)
                                 {
                                     candidateBridgeHeadAPPairs.add(comb);
+                                    for (RelatedAPPair pair : comb)
+                                        symBridgeHeadAPs.remove(pair);
                                 }
                             }
                             break;
                         }
                     }
                 }
-            } else {
-                for (RelatedAPPair pair : symBridgeHeadAPs)
-                {
-                    List<RelatedAPPair> single = new ArrayList<RelatedAPPair>();
-                    single.add(pair);
-                    candidateBridgeHeadAPPairs.add(single);
-                }
+            }
+            // Add left over pairs, if any.
+            for (RelatedAPPair pair : symBridgeHeadAPs)
+            {
+                List<RelatedAPPair> single = new ArrayList<RelatedAPPair>();
+                single.add(pair);
+                candidateBridgeHeadAPPairs.add(single);
             }
         }
         for (RelatedAPPair pair : asymBridgeHeadAPs)

@@ -1341,7 +1341,7 @@ public class FragmentSpace
      * FragmentSpace.
      * 
      * @param apClass the attachment point class
-     * @return <code>true<code> if symmetry has the applied on APs of the given
+     * @return <code>true</code> if symmetry has the applied on APs of the given
      *         class
      */
 

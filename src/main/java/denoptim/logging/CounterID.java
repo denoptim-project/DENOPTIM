@@ -60,6 +60,10 @@ public enum CounterID
     FAILEDMUTATTEMTS_PERFORM_NOADDRING,
     FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP,
     FAILEDMUTATTEMTS_PERFORM_NOADDRING_NORINGCOMB,
+    FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING,
+    FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOFREEAP,
+    FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOSITE,
+    FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE,
     FAILEDMUTATTEMTS_PERFORM_NODELETE,
     FAILEDMUTATTEMTS_SETUPRINGS, 
     FAILEDMUTATTEMTS_EVAL, 
@@ -156,7 +160,17 @@ public enum CounterID
         FAILEDMUTATTEMTS_PERFORM_NOADDRING_NORINGCOMB.description = "Rings "
                 + "could not be closed by " + MutationType.ADDRING + " because "
                 + "no combination of rings could be fine involving the chosen "
-                + "mutation site";
+                + "mutation site"; 
+        FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING.description = "Attempt to "
+                + "close rings by fusions was not successful.";
+        FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOFREEAP.description = 
+                "Not enough free APs to procede with ring  formation by ring "
+                + "fusion";
+        FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOSITE.description = "No site"
+                + "for fused ring formation found.";
+        FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE.description = "No "
+                + "ring-fusion bridge found.";
+        
         FAILEDMUTATTEMTS_PERFORM_NODELETE.description = "Mutation did not "
                 + "delete vertex";
         FAILEDMUTATTEMTS_SETUPRINGS.description = "Failed attempts to setup "
@@ -277,6 +291,16 @@ public enum CounterID
                 "#Failed Mut AddRing BusyAPs";
         FAILEDMUTATTEMTS_PERFORM_NOADDRING_NORINGCOMB.prettyName = 
                 "#Failed Mut AddRing Unclosable";
+    
+        FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING.prettyName = 
+                "#Failed ring fusion";
+        FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOFREEAP.prettyName = 
+                "#Failed ring fusion no_free_AP";
+        FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOSITE.prettyName = 
+                "#Failed ring fusion no_site_compatible";
+        FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE.prettyName =
+                "#Failed ring fusion no_bridge";
+                
         FAILEDMUTATTEMTS_PERFORM_NODELETE.prettyName =
                 "#Failed Mut Delete";
         FAILEDMUTATTEMTS_SETUPRINGS.prettyName =

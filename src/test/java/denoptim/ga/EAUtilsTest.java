@@ -2027,8 +2027,8 @@ public class EAUtilsTest
         combinations = EAUtils.searchRingFusionSites(
                 graph, fragSpace, rcParams, true, logger, rng);
         
-        // NB: 50 is given by the hard-coded limit to the number of combinations
-        assertEquals(50, combinations.size());
+        // NB: 66 is given by the hard-coded limit to the number of combinations
+        assertEquals(66, combinations.size());
         // NB: 6 is given by the hard-coded limit to the max number of ring 
         // fusions on a single vertex.
         assertEquals(6, combinations.get(0).size());
@@ -2240,6 +2240,92 @@ public class EAUtilsTest
         }
         assertTrue(found4el);
         assertTrue(found5el);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testFusionSiteDetection_ImposeSymmetry() throws Exception
+    {
+        APClass apcSymImposed = APClass.make("apcA:1");
+        APClass apcFree = APClass.make("apcB:1");
+        APClass apcFusedBridge = APClass.make("apcFusedBridge:0");
+        APClass hyd = APClass.make("hyd:1");
+        
+        // Utilities
+        Logger logger = Logger.getLogger("DummyLogger");
+        Randomizer rng = new Randomizer();
+        
+        // Make a fragment space that saturates all valences
+        HashMap<APClass,APClass> capMap = new HashMap<APClass,APClass>();
+        capMap.put(apcSymImposed, hyd);
+        capMap.put(apcFree, hyd);
+        
+        ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
+        Fragment capH = new Fragment();
+        capH.addAtom(new Atom("H", new Point3d()));
+        capH.addAP(0, new Point3d(1.0, 0, 0), hyd);
+        cappingGroups.add(capH);
+        
+        // Allows some ring closures via APClass compatibility
+        HashMap<APClass,ArrayList<APClass>> rcCMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        rcCMap.put(apcSymImposed, new ArrayList<APClass>(Arrays.asList(apcFusedBridge)));
+        // NB: apcNotFusable is intentionally not added to RC-CPMap!
+        
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fragSpace = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(), //no scaffolds
+                new ArrayList<Vertex>(), //no fragments
+                cappingGroups, //H as capping
+                new HashMap<APClass,ArrayList<APClass>>(), 
+                capMap, new HashSet<APClass>(), 
+                rcCMap);
+        fragSpace.setAPclassBasedApproach(true);
+        
+        /*
+        HashMap<APClass, Double> symmetryConstraints = 
+                new HashMap<APClass, Double>();
+        symmetryConstraints.put(apcSymImposed, 1.0);
+        fragSpace.setSymmConstraints(symmetryConstraints);
+        */
+        
+        RingClosureParameters rcParams = new RingClosureParameters();
+        
+        SmilesParser parser = new SmilesParser(builder);
+        IAtomContainer mol = parser.parseSmiles("c1ccccc1");
+        MoleculeUtils.explicitHydrogens(mol);
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(mol);
+        Fragment frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcSymImposed);
+        replaceHatomWithAP(frag, 1, apcSymImposed);
+        replaceHatomWithAP(frag, 2, apcFree);
+        replaceHatomWithAP(frag, 3, apcSymImposed);
+        replaceHatomWithAP(frag, 4, apcSymImposed);
+        replaceHatomWithAP(frag, 5, apcFree);
+        DGraph graph = new DGraph();
+        graph.addVertex(frag);
+
+        List<List<RelatedAPPair>> combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, false, logger, rng);
+        
+        // 0:1 and 3:4 taken independently
+        assertEquals(2, combinations.size());
+        
+        // Now apply symmetry constraint and do it again
+
+        HashMap<APClass, Double> symmetryConstraints = 
+                new HashMap<APClass, Double>();
+        symmetryConstraints.put(apcSymImposed, 1.0);
+        fragSpace.setSymmConstraints(symmetryConstraints);
+
+        combinations = EAUtils.searchRingFusionSites(
+                graph, fragSpace, rcParams, false, logger, rng);
+        
+        // 0:1 and 3:4 are part of the same combination of rings
+        assertEquals(1, combinations.size());
+        assertEquals(2, combinations.get(0).size());
     }
 
 //------------------------------------------------------------------------------

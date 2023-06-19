@@ -89,18 +89,17 @@ public class PathClosabilityTools
         boolean closable = false;
         
 
-        
-        //TODO-gg 
+        // Cases that we may want to exclude:
+        //
         // Exclude adding fused cycle of vertexes on already fused system.
-        // We can see if the vertexes in the path already belong to cycles of 
-        // vertexes. This is fast, so it might be better to do it even if acting 
-        // at the level of the molecular representation will deliver the same information.
+        // This can be achieved by controlling APClass compatibilities, if the
+        // APClasses are also chosen to describe the role of the vertex bearing 
+        // the AP in the system, e.g., its role in an aromatic system.
+        // Otherwise, we can see if the vertexes in the path already belong to 
+        // cycles: This is fast, so it might be better to do it even if acting 
+        // at the level of the molecular representation will deliver the same 
+        // information.
         
-
-        //TODO-gg 
-        // Exclude adding fused cycle of atoms on already fused system. Note 
-        // this case should regulate also ring-closures resulting from
-        // RCVs hosted by APs belonging to the same vertex.
         
         switch (settings.getClosabilityEvalMode())
         {

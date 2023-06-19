@@ -1212,8 +1212,7 @@ public class GraphOperations
         List<AttachmentPoint> freeAPs = vertex.getFreeAPThroughout();
         if (freeAPs.size()==0)
         {
-            //TODO-gg use NOADDFUSEDRING
-            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOFREEAP);
             return false;
         }
         
@@ -1231,8 +1230,7 @@ public class GraphOperations
                     settings.getLogger(), rng);
         if (candidatePairsSets.size()==0)
         {
-            //TODO-gg use NOADDFUSEDRING
-            //mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOSITE);
             return false;
         }
         List<RelatedAPPair> chosenPairsSet = rng.randomlyChooseOne(
@@ -1297,8 +1295,7 @@ public class GraphOperations
         
         if (usableBridges.size()==0)
         {
-            //TODO-gg use NOADDFUSEDRING
-            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING_NOFREEAP);
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE);
             return false;
         }
         Vertex incomingVertex = rng.randomlyChooseOne(usableBridges);

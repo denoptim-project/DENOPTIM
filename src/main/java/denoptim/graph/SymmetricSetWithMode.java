@@ -23,6 +23,16 @@ public class SymmetricSetWithMode
     }
     
 //------------------------------------------------------------------------------
+    
+    /**
+     * @return the symmetry-related items.
+     */
+    public SymmetricSet<?> getItems()
+    { 
+        return symItems;
+    }
+    
+//------------------------------------------------------------------------------
        
     @Override
     public boolean equals(Object o)
