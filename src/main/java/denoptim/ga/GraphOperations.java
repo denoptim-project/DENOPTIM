@@ -1233,14 +1233,51 @@ public class GraphOperations
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOSITE);
             return false;
         }
+        
+        // Bias by potential ring size considering the existing part of the
+        // to-be-created ring.
+        // NB: we have to do this twice because some sites may be used to 
+        // form rings with different sizes. So, see below for the second time...
+        List<List<RelatedAPPair>> szBiasedCandidatePairsSets = 
+                new ArrayList<List<RelatedAPPair>>();
+        for (List<RelatedAPPair> pairSet : candidatePairsSets)
+        {
+            BridgeHeadFindingRule bhfrOfPair = (BridgeHeadFindingRule) 
+                    pairSet.get(0).property;
+            int existingBridgeLength = bhfrOfPair.getExistingBridgeLength();
+            int[] allowedBridgeLengths = bhfrOfPair.getAllowedBridgeLength();
+            if (allowedBridgeLengths!=null)
+            {
+                for (int i=0; i<allowedBridgeLengths.length; i++)
+                {
+                    int allowedBridgeLength = allowedBridgeLengths[i];
+                    int possibleRingSize = allowedBridgeLength 
+                            + existingBridgeLength;
+                    int weight = 1; // weight of a ring size
+                    if (possibleRingSize < rcParams.getMaxRingSize())
+                    {
+                        weight = rcParams.getRingSizeBias().get(possibleRingSize);
+                    }
+                    
+                    // We add copies of the same set to the list of candidate 
+                    // sets, so when we randomly choose we are more likely to 
+                    // choose a set that leads to preferred ring sizes.
+                    for (int z=0; z<weight; z++)
+                    {
+                        szBiasedCandidatePairsSets.add(pairSet);
+                    }
+                }
+            }
+        }
+        if (szBiasedCandidatePairsSets.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOSITE);
+            return false;
+        }
+        
+        // Select one combination
         List<RelatedAPPair> chosenPairsSet = rng.randomlyChooseOne(
-                candidatePairsSets);
-
-        //TODO-gg add filter by ring size bias
-        
-        //TODO-gg
-        System.out.println("chosenPairsSet: "+chosenPairsSet);
-        
+                szBiasedCandidatePairsSets);
         
         // Based on the chosen pair, decide on the number of electrons to use
         // in the incoming fragment that will be used to close the ring
@@ -1288,6 +1325,7 @@ public class GraphOperations
         // number of aromatic electrons and number of atoms
         BridgeHeadFindingRule bhfr = (BridgeHeadFindingRule) 
                 chosenPairsSet.get(0).property;
+        //TODO-gg aromatic vs. aliphatic
         List<Vertex> usableBridges = EAUtils.getUsableAromaticBridges(
                 elInIncomingFrag,
                 bhfr.getAllowedBridgeLength(),
@@ -1298,7 +1336,39 @@ public class GraphOperations
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE);
             return false;
         }
-        Vertex incomingVertex = rng.randomlyChooseOne(usableBridges);
+        
+        // Select size of the incoming bridge based on ring-size biases
+        // NB: we have to do this twice because some sites may be used to 
+        // form rings with different sizes. So, see above for the first time...
+        List<Vertex> szBiasedUsableBridges = new ArrayList<Vertex>();
+        for (Vertex candidateBridge : usableBridges)
+        {
+            int thisBridgeLength = (int) candidateBridge.getProperty(
+                    DENOPTIMConstants.VRTPROPBRIDGELENGTH);
+            int existingBridgeLength = bhfr.getExistingBridgeLength();
+            int resultingRingSize = existingBridgeLength + thisBridgeLength;
+            int weigth = 1; // weigth of a ring size
+            if (resultingRingSize < rcParams.getMaxRingSize())
+            {
+                weigth = rcParams.getRingSizeBias().get(resultingRingSize);
+            }
+            
+            // We add copies of the same vertex to the list of candidate 
+            // vertexes, so when we randomly choose we are more likely to 
+            // choose those leading to preferred ring sizes.
+            for (int z=0; z<weigth; z++)
+            {
+                szBiasedUsableBridges.add(candidateBridge);
+            }
+        }
+        
+        if (szBiasedUsableBridges.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE);
+            return false;
+        }
+        
+        Vertex incomingVertex = rng.randomlyChooseOne(szBiasedUsableBridges);
         
         // Decide which aps on the bridge are used as head/tail
         List<AttachmentPoint> apsInFusion = new ArrayList<AttachmentPoint>();

@@ -9,7 +9,8 @@
     "allowedBridgeLength": [
       3,
       4
-    ]
+    ],
+    "lengthInAtoms": 2
   },
   {
     "ruleName": "3el3atm_6+6",
@@ -21,7 +22,8 @@
     "allowedBridgeLength": [
       2,
       3
-    ]
+    ],
+    "lengthInAtoms": 3
   },
   {
     "ruleName": "3el3atm_6+5",
@@ -32,7 +34,8 @@
     ],
     "allowedBridgeLength": [
       3
-    ]
+    ],
+    "lengthInAtoms": 3
   },
   {
     "ruleName": "4el4atm_6+6",
@@ -44,7 +47,8 @@
     "allowedBridgeLength": [
       1,
       2
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "4el4atm_6+5",
@@ -55,7 +59,8 @@
     ],
     "allowedBridgeLength": [
       2
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "4el4atm_5+5",
@@ -66,7 +71,8 @@
     ],
     "allowedBridgeLength": [
       2
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "5el5atm_6-6*",
@@ -77,7 +83,8 @@
     ],
     "allowedBridgeLength": [
       1
-    ]
+    ],
+    "lengthInAtoms": 5
   },
   {
     "ruleName": "5el5atm_66-*",
@@ -88,7 +95,8 @@
     ],
     "allowedBridgeLength": [
       1
-    ]
+    ],
+    "lengthInAtoms": 5
   },
   {
     "ruleName": "5el5atm_6+6+6",
@@ -99,7 +107,8 @@
     ],
     "allowedBridgeLength": [
       1
-    ]
+    ],
+    "lengthInAtoms": 5
   },
   {
     "ruleName": "aliph2atm",
@@ -107,7 +116,8 @@
     "bridgeHeadPositions": [
       0,
       1
-    ]
+    ],
+    "lengthInAtoms": 2
   },
   {
     "ruleName": "aliph3atm",
@@ -115,7 +125,8 @@
     "bridgeHeadPositions": [
       0,
       2
-    ]
+    ],
+    "lengthInAtoms": 3
   },
   {
     "ruleName": "aliph4atm_6+6",
@@ -123,7 +134,8 @@
     "bridgeHeadPositions": [
       0,
       7
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "aliph4atm_6+5",
@@ -131,7 +143,8 @@
     "bridgeHeadPositions": [
       0,
       7
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "aliph4atm_6+4",
@@ -139,7 +152,8 @@
     "bridgeHeadPositions": [
       0,
       7
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "aliph4atm_6+3",
@@ -147,7 +161,8 @@
     "bridgeHeadPositions": [
       0,
       7
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "aliph4atm_5+5",
@@ -155,7 +170,8 @@
     "bridgeHeadPositions": [
       0,
       6
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "aliph4atm_5+4",
@@ -163,7 +179,8 @@
     "bridgeHeadPositions": [
       0,
       6
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "aliph4atm_5+3",
@@ -171,7 +188,8 @@
     "bridgeHeadPositions": [
       0,
       6
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "aliph4atm_4+4",
@@ -179,7 +197,8 @@
     "bridgeHeadPositions": [
       0,
       5
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "aliph4atm_4+3",
@@ -187,7 +206,8 @@
     "bridgeHeadPositions": [
       0,
       5
-    ]
+    ],
+    "lengthInAtoms": 4
   },
   {
     "ruleName": "aliph4atm_3+3",
@@ -195,6 +215,7 @@
     "bridgeHeadPositions": [
       0,
       4
-    ]
+    ],
+    "lengthInAtoms": 4
   }
 ]

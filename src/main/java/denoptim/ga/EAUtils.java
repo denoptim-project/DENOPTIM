@@ -2939,7 +2939,9 @@ public class EAUtils
      * number of electrons available to the aromatic system.
      * @param allowedBridgeLength number of atoms.
      * @param fragSpace the fragment space where to look for fragments.
-     * @return the list of usable fragments from the fragment space.
+     * @return the list of usable fragments from the fragment space. The length 
+     * the bridge is recorded in {@link Vertex} property 
+     * {@link DENOPTIMConstants#VRTPROPBRIDGELENGH}.
      */
     public static List<Vertex> getUsableAromaticBridges(
             String elInIncomingFrag, int[] allowedLengths,
@@ -2966,6 +2968,9 @@ public class EAUtils
             if (!IntStream.of(allowedLengths).anyMatch(x -> x == path.size()))
             {
                 toRemove.add(bridge);
+            } else {
+                bridge.setProperty(DENOPTIMConstants.VRTPROPBRIDGELENGTH, 
+                        path.size());
             }
         }
         usableBridges.removeAll(toRemove);

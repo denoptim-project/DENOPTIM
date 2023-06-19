@@ -529,5 +529,11 @@ public final class DENOPTIMConstants
      * Format for intermediate files used during fragmentation.
      */
     public static final FileFormat TMPFRAGFILEFORMAT = FileFormat.VRTXSDF;
+
+    /**
+     * Name of {@link Vertex} property used to record how long a ring-closing 
+     * brigde is.
+     */
+    public static final String VRTPROPBRIDGELENGTH = null;
     
 }

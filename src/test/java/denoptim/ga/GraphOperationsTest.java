@@ -75,6 +75,7 @@ import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.MoleculeUtils;
@@ -1021,6 +1022,21 @@ public class GraphOperationsTest {
         bridge4el.addAP(2, new Point3d(), apcA);
         bridge4el.addAP(3, new Point3d(), apcA);
         libFrags.add(bridge4el);
+
+        Fragment bridge4el3Atm = new Fragment(2);
+        IAtom a3_0 = new Atom("Ge", new Point3d());
+        IAtom a3_1 = new Atom("N", new Point3d());
+        IAtom a3_2 = new Atom("Ge", new Point3d());
+        bridge4el3Atm.addAtom(a3_0);
+        bridge4el3Atm.addAtom(a3_1);
+        bridge4el3Atm.addAtom(a3_2);
+        bridge4el3Atm.addBond(new Bond(a3_0, a3_1, IBond.Order.SINGLE));
+        bridge4el3Atm.addBond(new Bond(a3_1, a3_2, IBond.Order.SINGLE));
+        bridge4el3Atm.addAP(0, new Point3d(), APC4EL);
+        bridge4el3Atm.addAP(2, new Point3d(), APC4EL);
+        bridge4el3Atm.addAP(0, new Point3d(), apcA);
+        bridge4el3Atm.addAP(2, new Point3d(), apcA);
+        libFrags.add(bridge4el3Atm);
         
         APClass APC1EL = APClass.make("1el:0");
         Fragment bridge1el = new Fragment(1);
@@ -1060,6 +1076,10 @@ public class GraphOperationsTest {
         gaParams.setParameters(new RingClosureParameters());
         gaParams.setRandomizer(new Randomizer(1L));
         
+        //
+        // Add multiple rings
+        //
+        
         SmilesParser parser = new SmilesParser(chemBuilder);
         IAtomContainer benzene = parser.parseSmiles("c1ccccc1");
         MoleculeUtils.explicitHydrogens(benzene);
@@ -1086,6 +1106,10 @@ public class GraphOperationsTest {
         }
         assertEquals(12, numSiAtoms);
         
+        // 
+        // Adding one atom to close 6-member aromatic ring
+        //
+        
         IAtomContainer arom = parser.parseSmiles("c1cccc(c12)ccc(c23)ccc(c34)cccc4");
         MoleculeUtils.explicitHydrogens(arom);
         sdg.generateCoordinates(arom);
@@ -1096,16 +1120,50 @@ public class GraphOperationsTest {
         graph = new DGraph();
         graph.addVertex(frag);
         
-
         assertEquals(0, graph.getRingCount());
         GraphOperations.addFusedRing(frag, mnt, true, fs, gaParams);
         assertEquals(1, graph.getRingCount());
         
-        //Just in case you need to look at the mol/fragment/graph
-        //DenoptimIO.writeSDFFile("/tmp/mol.sdf", mol);
-        //DenoptimIO.writeVertexToSDF("/tmp/frag.sdf", frag);
-        //DenoptimIO.writeGraphToSDF(new File("/tmp/graph.sdf"), graph, true,  true,  gaParams.getLogger(), gaParams.getRandomizer());
+        //
+        // Adhering to ring-size biases
+        //
         
+        IAtomContainer arom2 = parser.parseSmiles("c1cccc(c12)ccc(c23)ccc(c34)cccc4");
+        MoleculeUtils.explicitHydrogens(arom2);
+        sdg.generateCoordinates(arom2);
+        Fragment frag2 = new Fragment(arom2, BBType.FRAGMENT);
+        // These two lead to a 5atm5el site, which can generate a 6atom ring
+        EAUtilsTest.replaceHatomWithAP(frag2, 0, apcA);
+        EAUtilsTest.replaceHatomWithAP(frag2, 17, apcA);
+        // these lead to a 2atm2el site that can lead to 6- or 5-membered ring
+        EAUtilsTest.replaceHatomWithAP(frag2, 14, apcA);
+        EAUtilsTest.replaceHatomWithAP(frag2, 15, apcA);
+        frag2.setVertexId(1);
+        graph = new DGraph();
+        graph.addVertex(frag2);
+        RingClosureParameters rcParams = (RingClosureParameters) 
+                gaParams.getParameters(ParametersType.RC_PARAMS);
+        //                                     0,1,2,3,4,5,6,7
+        rcParams.setRingSizeBias(Arrays.asList(0,0,0,0,0,1,0,0));
+        
+        assertEquals(0, graph.getRingCount());
+        GraphOperations.addFusedRing(frag2, mnt, true, fs, gaParams);
+        assertEquals(1, graph.getRingCount());
+        numSiAtoms = 0;
+        int numNAtoms = 0;
+        int numGeAtoms = 0;
+        for (Vertex v : graph.getVertexList())
+        {
+            numSiAtoms = numSiAtoms + MoleculeUtils.countAtomsOfElement(
+                    v.getIAtomContainer(), "Si");
+            numNAtoms = numNAtoms + MoleculeUtils.countAtomsOfElement(
+                    v.getIAtomContainer(), "N");
+            numGeAtoms = numGeAtoms + MoleculeUtils.countAtomsOfElement(
+                    v.getIAtomContainer(), "Ge");
+        }
+        assertEquals(0, numSiAtoms);
+        assertEquals(1, numNAtoms);
+        assertEquals(2, numGeAtoms);
     }
     
 //------------------------------------------------------------------------------

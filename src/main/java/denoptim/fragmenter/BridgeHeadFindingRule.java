@@ -47,6 +47,12 @@ public class BridgeHeadFindingRule
      * The length is given in number of actual atoms (no RCA included).
      */
     private int[] allowedBridgeLength;
+    
+    /**
+     * Number of atoms in the existing bridge connecting the bridge-head atoms, 
+     * including the bridge-head atoms.
+     */
+    private int lengthInAtoms;
 
 
 //------------------------------------------------------------------------------
@@ -58,14 +64,18 @@ public class BridgeHeadFindingRule
      * pertain this rule.
      * @param bridgeHeadPositions the identification of potential bridge-head
      * atoms in the substructure matched by the SMARTS query.
+     * @param lengthInAtoms the number of atoms in the existing bridge 
+     * connecting the bridge-head atoms including the bridge-head atoms.
      */
     public BridgeHeadFindingRule(String name, String smarts, 
-            int[] bridgeHeadPositions, int[] allowedBridgeLength)
+            int[] bridgeHeadPositions, int[] allowedBridgeLength,
+            int lengthInAtoms)
     {
         this.ruleName = name;
         this.smarts = smarts;
         this.bridgeHeadPositions = bridgeHeadPositions;
         this.allowedBridgeLength = allowedBridgeLength;
+        this.lengthInAtoms = lengthInAtoms;
     }
 
 //------------------------------------------------------------------------------
@@ -108,6 +118,18 @@ public class BridgeHeadFindingRule
    public int[] getAllowedBridgeLength()
    {
        return allowedBridgeLength;
+   }
+   
+//------------------------------------------------------------------------------
+   
+   /**
+    * @return the number of atoms in the existing bridge, i.e., the number of 
+    * atoms between the bridge-head atoms plus 2 (we count also the 
+    * bridge-head atoms.
+    */
+   public int getExistingBridgeLength()
+   {
+       return lengthInAtoms;
    }
 
 //------------------------------------------------------------------------------
