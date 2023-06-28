@@ -243,7 +243,7 @@ public class VertexTest
 //------------------------------------------------------------------------------
     
     @Test
-    public void testGetVerticesWithAPClassStartingWith() throws Exception
+    public void testGetAPsWithAPClassStartingWith() throws Exception
     {
         EmptyVertex ev = new EmptyVertex();
         ev.addAP(APClass.make("Abc:1"));
@@ -252,7 +252,7 @@ public class VertexTest
         ev.addAP(APClass.make("AbT:1"));
         ev.addAP(APClass.make("TT:2"));
         
-        List<AttachmentPoint> aps = ev.getVerticesWithAPClassStartingWith("Ab");
+        List<AttachmentPoint> aps = ev.getAPsWithAPClassStartingWith("Ab");
         assertEquals(3, aps.size());
         
         for (AttachmentPoint ap : aps)

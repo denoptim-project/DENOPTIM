@@ -1372,7 +1372,7 @@ public class GraphOperations
         
         // Decide which aps on the bridge are used as head/tail
         List<AttachmentPoint> apsInFusion = new ArrayList<AttachmentPoint>();
-        apsInFusion.addAll(incomingVertex.getVerticesWithAPClassStartingWith(
+        apsInFusion.addAll(incomingVertex.getAPsWithAPClassStartingWith(
                 elInIncomingFrag));
         int[] idApOnBridge = new int[2];
         if (rng.nextBoolean())

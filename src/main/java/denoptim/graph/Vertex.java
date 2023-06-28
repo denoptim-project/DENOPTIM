@@ -258,7 +258,7 @@ public abstract class Vertex implements Cloneable
      * @return a list of APs that belong to this vertex and have {@link APClass}
      * starting with the given string.
      */
-    public List<AttachmentPoint> getVerticesWithAPClassStartingWith(
+    public List<AttachmentPoint> getAPsWithAPClassStartingWith(
             String root)
     {
         List<AttachmentPoint> list = new ArrayList<AttachmentPoint>();
