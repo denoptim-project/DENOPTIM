@@ -2450,5 +2450,89 @@ public class EAUtilsTest
     }
     
 //------------------------------------------------------------------------------
+
+    @Test
+    public void testGetUsableAliphaticBridges() throws Exception
+    {   
+        ArrayList<Vertex> libFrags = new ArrayList<Vertex>();
+
+        APClass apcA = APClass.make("A:1");
+        APClass apcB = APClass.make("B:0");
+        APClass apcC = APClass.make("C:2");
+        APClass apcD = APClass.make("D:2");
+        
+        SmilesParser parser = new SmilesParser(builder);
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        
+        IAtomContainer mol = parser.parseSmiles("CC");
+        MoleculeUtils.explicitHydrogens(mol);
+        sdg.generateCoordinates(mol);
+        Fragment frag = new Fragment(mol, BBType.FRAGMENT);
+        replaceHatomWithAP(frag, 0, apcA);
+        replaceHatomWithAP(frag, 0, apcB);
+        replaceHatomWithAP(frag, 1, apcA);
+        replaceHatomWithAP(frag, 1, apcD);
+        frag.setBuildingBlockId(0);
+        libFrags.add(frag);
+        
+        IAtomContainer mol1 = parser.parseSmiles("CCC");
+        MoleculeUtils.explicitHydrogens(mol1);
+        sdg.generateCoordinates(mol1);
+        Fragment frag1 = new Fragment(mol1, BBType.FRAGMENT);
+        replaceHatomWithAP(frag1, 0, apcA);
+        replaceHatomWithAP(frag1, 2, apcA);
+        frag1.setBuildingBlockId(1);
+        libFrags.add(frag1);
+        
+        IAtomContainer mol2 = parser.parseSmiles("CCCC");
+        MoleculeUtils.explicitHydrogens(mol2);
+        sdg.generateCoordinates(mol2);
+        Fragment frag2 = new Fragment(mol2, BBType.FRAGMENT);
+        replaceHatomWithAP(frag2, 0, apcA);
+        replaceHatomWithAP(frag2, 3, apcA);
+        frag2.setBuildingBlockId(2);
+        libFrags.add(frag2);
+
+        IAtomContainer mol3 = parser.parseSmiles("CCCCC");
+        MoleculeUtils.explicitHydrogens(mol3);
+        sdg.generateCoordinates(mol3);
+        Fragment frag3 = new Fragment(mol3, BBType.FRAGMENT);
+        replaceHatomWithAP(frag3, 0, apcA);
+        replaceHatomWithAP(frag3, 1, apcA);
+        replaceHatomWithAP(frag3, 4, apcA);
+        frag3.setBuildingBlockId(3);
+        libFrags.add(frag3);
+        
+        // Only to trigger class-based approach
+        HashMap<APClass,ArrayList<APClass>> cpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        cpMap.put(apcB, new ArrayList<APClass>(Arrays.asList(apcA)));
+        cpMap.put(apcC, new ArrayList<APClass>(Arrays.asList(apcD)));
+        
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(),
+                libFrags,
+                new ArrayList<Vertex>(), 
+                cpMap, 
+                new HashMap<APClass,APClass>(), 
+                new HashSet<APClass>(),
+                new HashMap<APClass,ArrayList<APClass>>()); 
+        
+        // Same class on both ends
+        List<Vertex> lst = EAUtils.getUsableAliphaticBridges(apcB, apcB, 
+                new int[]{2}, fs);
+        assertEquals(4, lst.size());
+        
+        // Multiple lengths
+        lst = EAUtils.getUsableAliphaticBridges(apcB, apcB, new int[]{2,4}, fs);
+        assertEquals(8, lst.size());
+        
+        // APClass compatibility
+        lst = EAUtils.getUsableAliphaticBridges(apcB, apcC, new int[]{2,4}, fs);
+        assertEquals(1, lst.size());
+    }
+    
+//------------------------------------------------------------------------------
     
 }

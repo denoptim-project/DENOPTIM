@@ -22,6 +22,7 @@ package denoptim.fragspace;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -125,17 +126,22 @@ public class FragmentSpace
     /**
      * Clusters of fragments based on the number of APs
      */
-    private HashMap<Integer, ArrayList<Integer>> fragPoolPerNumAP;
+    private HashMap<Integer, ArrayList<Integer>> fragPoolPerNumAP = 
+            new HashMap<Integer,ArrayList<Integer>>();
 
     /**
      * List of APClasses per each fragment
      */
-    private HashMap<Integer, ArrayList<APClass>> apClassesPerFrag;
+    private HashMap<Integer, ArrayList<APClass>> apClassesPerFrag =
+            new HashMap<Integer,ArrayList<APClass>>();
 
     /**
-     * Clusters of fragments'AP based on AP classes
+     * Clusters of fragments'AP based on AP classes. The inner list of indexes
+     * is a ordered pair defining at position 0 the index of the vertex, and  
+     * the index of the AP at position 1.
      */
-    private HashMap<APClass, ArrayList<ArrayList<Integer>>> fragsApsPerApClass;
+    private HashMap<APClass, ArrayList<ArrayList<Integer>>> fragsApsPerApClass =
+            new HashMap<APClass,ArrayList<ArrayList<Integer>>>();
     
     /**
      * Lock for synchronizing tasks
@@ -991,9 +997,9 @@ public class FragmentSpace
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the list of attachment points with the given class. 
+     * Returns the list of vertexes with attachment points of the given class. 
      * @param apc the attachment point class to search.
-     * @return the list of matching attachment points.
+     * @return the list of matching vertexes from the library.
      */
 
     public ArrayList<Vertex> getVerticesWithAPClass(APClass apc)
@@ -1014,9 +1020,86 @@ public class FragmentSpace
         return lst;
     }
     
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of vertexes with at least one attachment point of each
+     * of the given classes.
+     * @param apcs the wanted attachment point classes.
+     * @return the list of matching vertexes from the library.
+     */
+
+    public List<Vertex> getVerticesWithAPClasses(Set<APClass> apcs)
+    {
+        List<Vertex> lst = new ArrayList<Vertex>();
+        
+        synchronized (LOCK)
+        {
+            for (APClass apc : apcs)
+            {
+                if (!fragsApsPerApClass.containsKey(apc))
+                {
+                    break;
+                }
+                
+                // NB: the list is over APs, so there can be duplicate vertexes
+                for (List<Integer> idxs : fragsApsPerApClass.get(apc))
+                {
+                    Vertex v = fragmentLib.get(idxs.get(0));
+                    if (!lst.contains(v) && v.getAllAPClasses().containsAll(apcs))
+                        lst.add(v);
+                }
+                
+                // NB: we mean to do only one loop
+                break;
+            }
+        }
+        return lst;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of vertexes that have the specified number of 
+     * {@link AttachmentPoint}s with the given {@link APClass}es.
+     * @param apcCounts specifies for each {@link APClass} the desired minimum
+     * number of {@link AttachmentPoint}s.
+     * @return the list of matching vertexes from the library.
+     */
+
+    public List<Vertex> getVerticesWithAPFingerprint(
+            Map<APClass,Integer> apcCounts)
+    {
+        List<Vertex> matches = new ArrayList<Vertex>();
+        for (Vertex candidate : getVerticesWithAPClasses(apcCounts.keySet()))
+        {
+            boolean isMatch = true;
+            for (APClass apc : apcCounts.keySet())
+            {
+                if (apcCounts.get(apc) > 
+                        candidate.getAttachmentPoints().stream().filter(
+                                ap -> ap.getAPClass().equals(apc)).count())
+                {
+                    isMatch = false;
+                    break;
+                }
+            }
+            if (isMatch)
+                matches.add(candidate);
+        }
+        return matches;
+    }
     
 //------------------------------------------------------------------------------
     
+    /**
+     * Extracts vertexes from the collection of vertexes defined by this 
+     * {@link FragmentSpace}.
+     * @param root the initial part of the {@link APClass} full name.
+     * @return the available vertexes that have {@link AttachmentPoint}s that 
+     * start with the given string. The returned vertexes are the original ones, 
+     * not clones!
+     */
     public List<Vertex> getVerticesWithAPClassStartingWith(String root)
     {
         List<Vertex> lst = new ArrayList<Vertex>();
@@ -1044,7 +1127,7 @@ public class FragmentSpace
      * of APs.
      * 
      * @param srcAPs the identifiers of APs meant to hold any of the desired
-     *               fragments.
+     * fragments.
      * @return a list of fragments.
      */
     public ArrayList<Vertex> getFragmentsCompatibleWithTheseAPs(
@@ -1209,7 +1292,7 @@ public class FragmentSpace
      * Searches for all APs that are compatible with the given list of APs.
      * 
      * @param srcAPs the identifiers of APs meant to hold any of the desired
-     *               fragments.
+     * fragments.
      * @return a list of identifiers for APs on fragments in the library.
      */
     public ArrayList<IdFragmentAndAP> getFragAPsCompatibleWithTheseAPs(
@@ -1453,14 +1536,6 @@ public class FragmentSpace
 
 //------------------------------------------------------------------------------
 
-    public void setFragPoolPerNumAP(
-            HashMap<Integer, ArrayList<Integer>> map)
-    {
-        fragPoolPerNumAP = map;
-    }
-
-//------------------------------------------------------------------------------
-
     public void setSymmConstraints(HashMap<APClass, Double> map)
     {
         symmConstraints = map;
@@ -1481,9 +1556,9 @@ public class FragmentSpace
         rcCompatMap = null;
         cappingMap = null;
         forbiddenEndList = null;
-        fragPoolPerNumAP = null;
-        apClassesPerFrag = null;
-        fragsApsPerApClass = null;
+        fragPoolPerNumAP = new HashMap<Integer,ArrayList<Integer>>();
+        apClassesPerFrag = new HashMap<Integer,ArrayList<APClass>>();
+        fragsApsPerApClass = new HashMap<APClass,ArrayList<ArrayList<Integer>>>();
         symmConstraints = null;
         isValid = false;
     }
@@ -1492,7 +1567,7 @@ public class FragmentSpace
 
     /**
      * Takes a list of vertices and add them to a given library. Each vertex
-     * is assigned the building block type and ID. 
+     * is assigned the building block type and ID.
      * 
      * @param list of vertices to import.
      * @param bbt the type of building block the vertices should be set to.
@@ -1504,7 +1579,7 @@ public class FragmentSpace
     {
         for (Vertex v : list)
         {
-            appendVertexToLibrary(v,bbt,library);
+            appendVertexToLibrary(v, bbt, library);
         }
     }
     
@@ -1512,7 +1587,7 @@ public class FragmentSpace
 
     /**
      * Takes a vertex and add it to a given library. Each vertex
-     * is assigned the building block type and ID. 
+     * is assigned the building block type and ID.
      * 
      * @param v vertex to import.
      * @param bbt the type of building block the vertex should be set to.
@@ -1525,6 +1600,10 @@ public class FragmentSpace
         v.setBuildingBlockId(library.size());
         v.setBuildingBlockType(bbt);
         library.add(v);
+        if (bbt == BBType.FRAGMENT)
+        {
+            classifyFragment(v, library.size()-1);
+        }
     }
     
 //------------------------------------------------------------------------------
@@ -1918,19 +1997,6 @@ public class FragmentSpace
     public void groupAndClassifyFragments(boolean apClassBasedApproch)
             throws DENOPTIMException
     {	
-    	setFragPoolPerNumAP(new HashMap<Integer,ArrayList<Integer>>());
-    	if (apClassBasedApproch)
-    	{
-    	    synchronized (LOCK)
-            {
-    	        fragsApsPerApClass = new HashMap<APClass,ArrayList<
-    	            ArrayList<Integer>>>();
-            }
-    	    synchronized (LOCK)
-            {
-    	        apClassesPerFrag = new HashMap<Integer,ArrayList<APClass>>();
-            }
-    	}
     	for (int j=0; j<getFragmentLibrary().size(); j++)
     	{
     		Vertex frag = getFragmentLibrary().get(j);

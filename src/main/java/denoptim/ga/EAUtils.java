@@ -2939,20 +2939,19 @@ public class EAUtils
      * number of electrons available to the aromatic system.
      * @param allowedBridgeLength number of atoms.
      * @param fragSpace the fragment space where to look for fragments.
-     * @return the list of usable fragments from the fragment space. The length 
-     * the bridge is recorded in {@link Vertex} property 
+     * @return the list of clones of usable fragments from the fragment space. 
+     * The length the bridge is recorded in {@link Vertex} property 
      * {@link DENOPTIMConstants#VRTPROPBRIDGELENGH}.
      */
     public static List<Vertex> getUsableAromaticBridges(
             String elInIncomingFrag, int[] allowedLengths,
             FragmentSpace fragSpace)
     {
-        List<Vertex> usableBridges =
+        List<Vertex> usableBridgesOriginals =
                 fragSpace.getVerticesWithAPClassStartingWith(elInIncomingFrag);
-                
-        List<Vertex> toRemove = new ArrayList<>();
+        List<Vertex> usableBridges = new ArrayList<Vertex>();
         final String rootAPC = elInIncomingFrag;
-        for (Vertex bridge : usableBridges)
+        for (Vertex bridge : usableBridgesOriginals)
         {
             IAtomContainer iacFrag = bridge.getIAtomContainer();
             List<Integer> atomIDs = new ArrayList<Integer>();
@@ -2965,15 +2964,97 @@ public class EAUtils
                     (atomIDs.get(0)));
             List<IAtom> path = new ArrayList<IAtom>(Arrays.asList(
                     sp.atomsTo(atomIDs.get(1))));
-            if (!IntStream.of(allowedLengths).anyMatch(x -> x == path.size()))
+            if (IntStream.of(allowedLengths).anyMatch(x -> x == path.size()))
             {
-                toRemove.add(bridge);
-            } else {
-                bridge.setProperty(DENOPTIMConstants.VRTPROPBRIDGELENGTH, 
+                Vertex clone = bridge.clone();
+                clone.setProperty(DENOPTIMConstants.VRTPROPBRIDGELENGTH, 
                         path.size());
+                usableBridges.add(clone);
             }
         }
-        usableBridges.removeAll(toRemove);
+        return usableBridges;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Finds all vertexes that can be used as aliphatic bridge.
+     * @param allowedBridgeLength number of atoms.
+     * @param fragSpace the fragment space where to look for fragments.
+     * @return the list of clones of usable fragments from the fragment space. 
+     * The length the bridge is recorded in {@link Vertex} property 
+     * {@link DENOPTIMConstants#VRTPROPBRIDGELENGH}.
+     */
+    public static List<Vertex> getUsableAliphaticBridges(APClass apcA, 
+            APClass apcB, int[] allowedLengths, FragmentSpace fragSpace)
+    {
+        List<Vertex> usableBridges = new ArrayList<Vertex>();
+        
+        List<APClass> compatApClassesA = fragSpace.getCompatibleAPClasses(apcA);
+        List<APClass> compatApClassesB = fragSpace.getCompatibleAPClasses(apcB);
+        for (APClass compatA : compatApClassesA)
+        {
+            for (APClass compatB : compatApClassesB)
+            {
+                boolean sameAPC = compatA.equals(compatB);
+                Map<APClass,Integer> apFingerprint = 
+                        new HashMap<APClass,Integer>();
+                if (sameAPC)
+                {
+                    apFingerprint.put(compatA,2);
+                } else {
+                    apFingerprint.put(compatA,1);
+                    apFingerprint.put(compatB,1);
+                }
+                for (Vertex bridge : fragSpace.getVerticesWithAPFingerprint(
+                        apFingerprint))
+                {
+                    IAtomContainer iacFrag = bridge.getIAtomContainer();
+                    
+                    // Identify APs that can be used for each side
+                    List<AttachmentPoint> apsForA = new ArrayList<AttachmentPoint>();
+                    List<AttachmentPoint> apsForB = new ArrayList<AttachmentPoint>();
+                    for (AttachmentPoint apOnBridge : bridge.getAttachmentPoints())
+                    {
+                        if (compatA.equals(apOnBridge.getAPClass()))
+                            apsForA.add(apOnBridge);
+                        if (compatB.equals(apOnBridge.getAPClass()))
+                            apsForB.add(apOnBridge);
+                    }
+                    
+                    // Find combinations of usable APs
+                    for (AttachmentPoint apForA : apsForA)
+                    {
+                        ShortestPaths sp = new ShortestPaths(iacFrag, 
+                                iacFrag.getAtom(apForA.getAtomPositionNumber()));
+                        for (AttachmentPoint apForB : apsForB)
+                        {
+                            if (apForA.equals(apForB))
+                                continue;
+                            // Retains only combinations of allowed length
+                            List<IAtom> path = new ArrayList<IAtom>(
+                                    Arrays.asList(sp.atomsTo(
+                                            apForB.getAtomPositionNumber())));
+                            if (IntStream.of(allowedLengths).anyMatch(
+                                    x -> x == path.size()))
+                            {
+                                Vertex clone = bridge.clone();
+                                clone.setProperty(
+                                        DENOPTIMConstants.VRTPROPBRIDGELENGTH, 
+                                        path.size());
+                                clone.setProperty(
+                                        DENOPTIMConstants.VRTPROPBRIDGEEND_A, 
+                                        apForA.getIndexInOwner());
+                                clone.setProperty(
+                                        DENOPTIMConstants.VRTPROPBRIDGEEND_B, 
+                                        apForB.getIndexInOwner());
+                                usableBridges.add(clone);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return usableBridges;
     }
   

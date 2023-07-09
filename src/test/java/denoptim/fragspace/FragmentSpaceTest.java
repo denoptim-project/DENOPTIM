@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -331,6 +332,105 @@ public class FragmentSpaceTest
         for (Vertex v : lst)
         {
             assertTrue( v.getAllAPClasses().contains(APC2));
+        }
+    }
+    
+//-----------------------------------------------------------------------------     
+    
+    @Test
+    public void testGetVerticesWithAPClasses() throws Exception
+    {
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpace fs = fsp.getFragmentSpace();
+        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        
+        Set<APClass> query = new HashSet<APClass>();
+        query.add(APC2);
+        query.add(APC1);
+        List<Vertex> lst = fs.getVerticesWithAPClasses(query);
+        assertEquals(2, lst.size());
+        for (APClass apc : query)
+        {
+            for (Vertex v : lst)
+            {
+                assertTrue(v.getAllAPClasses().contains(apc));
+            }
+        }
+    }
+    
+//-----------------------------------------------------------------------------     
+    
+    @Test
+    public void testGetVerticesWithAPFingerprint() throws Exception
+    {
+        FragmentSpaceParameters fsp = buildFragmentSpace();
+        FragmentSpace fs = fsp.getFragmentSpace();
+        assertTrue(fs.isDefined(),"FragmentSpace is defined");
+        
+        // Add vertex to get more results
+        Fragment frg1b = new Fragment();
+        Atom a1b = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2b = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        frg1b.addAtom(a1b);
+        frg1b.addAtom(a2b);
+        frg1b.addBond(new Bond(a1b, a2b));
+        frg1b.addAPOnAtom(a1b, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg1b.addAPOnAtom(a1b, APC1, new Point3d(new double[]{0.0, 0.0, 3.3}));
+        frg1b.addAPOnAtom(a2b, APC2, new Point3d(new double[]{0.0, 0.0, 1.1}));
+        frg1b.addAPOnAtom(a2b, APC2, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        frg1b.projectAPsToProperties();
+        fs.appendVertexToLibrary(frg1b, BBTFRAG, fs.getFragmentLibrary());
+
+        Fragment frg1c = new Fragment();
+        Atom a1c = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2c = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        frg1c.addAtom(a1c);
+        frg1c.addAtom(a2c);
+        frg1c.addBond(new Bond(a1c, a2c));
+        frg1c.addAPOnAtom(a1c, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg1c.addAPOnAtom(a2c, APC2, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        frg1c.projectAPsToProperties();
+        fs.appendVertexToLibrary(frg1c, BBTFRAG, fs.getFragmentLibrary());
+        
+        Fragment frg1d = new Fragment();
+        Atom a1d = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2d = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        frg1d.addAtom(a1d);
+        frg1d.addAtom(a2d);
+        frg1d.addBond(new Bond(a1d, a2d));
+        frg1d.addAPOnAtom(a1d, APCS, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg1d.addAPOnAtom(a2d, APC2, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        frg1d.addAPOnAtom(a1d, APC2, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        frg1d.addAPOnAtom(a1d, APC1, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        frg1d.projectAPsToProperties();
+        fs.appendVertexToLibrary(frg1d, BBTFRAG, fs.getFragmentLibrary());
+        
+        Fragment frg1 = new Fragment();
+        Atom a1 = new Atom("C", new Point3d(new double[]{0.0, 1.1, 2.2}));
+        Atom a2 = new Atom("C", new Point3d(new double[]{1.0, 1.1, 2.2}));
+        frg1.addAtom(a1);
+        frg1.addAtom(a2);
+        frg1.addBond(new Bond(a1, a2));
+        frg1.addAPOnAtom(a1, APC1, new Point3d(new double[]{0.0, 2.2, 3.3}));
+        frg1.addAPOnAtom(a2, APC2, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        frg1.addAPOnAtom(a1, APC2, new Point3d(new double[]{3.0, 0.0, 3.3}));
+        frg1.projectAPsToProperties();
+        fs.appendVertexToLibrary(frg1, BBTFRAG, fs.getFragmentLibrary());
+        
+        Map<APClass,Integer> query = new HashMap<APClass,Integer>();
+        query.put(APC2,2);
+        query.put(APC1,1);
+        List<Vertex> lst = fs.getVerticesWithAPFingerprint(query);
+        assertEquals(3, lst.size());
+
+        for (Vertex v : lst)
+        {
+            for (APClass apc : query.keySet())
+            {
+                assertTrue(query.get(apc) <= v.getAttachmentPoints().stream()
+                        .filter(ap -> ap.getAPClass().equals(apc))
+                        .count());
+            }
         }
     }
     

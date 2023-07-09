@@ -532,8 +532,20 @@ public final class DENOPTIMConstants
 
     /**
      * Name of {@link Vertex} property used to record how long a ring-closing 
-     * brigde is.
+     * bridge is.
      */
-    public static final String VRTPROPBRIDGELENGTH = null;
+    public static final String VRTPROPBRIDGELENGTH = "VRTPROPBRIDGELENGTH";
+    
+    /**
+     * Name of {@link Vertex} property used to record which AP is selected 
+     * for bridge formation on side 'A'
+     */
+    public static final String VRTPROPBRIDGEEND_A = "VRTPROPBRIDGEEND_A";
+    
+    /**
+     * Name of {@link Vertex} property used to record which AP is selected 
+     * for bridge formation on side 'B'
+     */
+    public static final String VRTPROPBRIDGEEND_B = "VRTPROPBRIDGEEND_B";
     
 }
