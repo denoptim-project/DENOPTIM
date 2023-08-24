@@ -38,6 +38,7 @@ import denoptim.ga.XoverSite;
 import denoptim.graph.DGraph;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
+import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
@@ -162,6 +163,11 @@ public class GeneOpsRunner extends ProgramTask
         {
             gaParams.setParameters(((FragmentSpaceParameters) 
                     settings.getParameters(ParametersType.FS_PARAMS)));
+        }
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            gaParams.setParameters(((RingClosureParameters) 
+                    settings.getParameters(ParametersType.RC_PARAMS)));
         }
         
         boolean done = false;
