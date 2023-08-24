@@ -5,6 +5,11 @@
     "bridgeHeadPositions": [
       0,
       7
-    ]
+    ],
+    "allowedBridgeLength": [
+      1,
+      2
+    ],
+    "lengthInAtoms": 4
   }
 ]
