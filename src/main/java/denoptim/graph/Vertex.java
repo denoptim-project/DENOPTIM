@@ -1280,7 +1280,17 @@ public abstract class Vertex implements Cloneable
                     for (JsonElement elId : elSet.getAsJsonArray())
                     {
                         int id = context.deserialize(elId, Integer.class);
-                        aps.add(v.getAPWithId(id));
+                        AttachmentPoint ap = v.getAPWithId(id);
+                        if (ap==null)
+                        {
+                            String msg = "Failed to parse 'lstSymAPs'. It is "
+                                    + "possible that the JSON input has been "
+                                    + "writted by a previosu version of "
+                                    + "DENOPTIM. If so, its syntax needs to be "
+                                    + "upgraded.";
+                            throw new JsonParseException(msg);
+                        }
+                        aps.add(ap);
                     }
                     v.addSymmetricAPSet(new SymmetricAPs(aps));
                 }                
