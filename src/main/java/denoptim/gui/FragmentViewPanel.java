@@ -564,9 +564,8 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 			throw new DENOPTIMException("Unexpected format in Jmol molecular "
 					+ "data: " + strData);
 		}
-		String[] counters = lines[3].trim().split("\\s+");
-		int nAtms = Integer.parseInt(counters[0]);
-		int nBonds = Integer.parseInt(counters[1]);
+		int nAtms = Integer.parseInt(lines[3].substring(0,3).trim());
+		int nBonds = Integer.parseInt(lines[3].substring(3,6).trim());
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("Structure in JmolViewer").append(NL);
