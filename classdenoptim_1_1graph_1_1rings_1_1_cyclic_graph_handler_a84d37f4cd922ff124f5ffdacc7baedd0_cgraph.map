@@ -1,0 +1,18 @@
+<map id="denoptim.graph.rings.CyclicGraphHandler.combineCompatPathSubGraphs" name="denoptim.graph.rings.CyclicGraphHandler.combineCompatPathSubGraphs">
+<area shape="rect" id="node1" title="Recursive method to identify all the combination of rings." alt="" coords="5,386,255,442"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_ring_closing_utils.html#a8fa59e4704c7f4c466909324332f575a" title="Compares two combinations of DENOPTIMRingss and evaluates whether these correspond to the same combin..." alt="" coords="344,5,519,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_cyclic_graph_handler.html#aba56fbedee8705e0a7e58ef749fdaf03" title="This method checks whether the interdependent paths are simultaneously closable." alt="" coords="325,70,538,126"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a52560f621975a4663bba65af7398ff39" title=" " alt="" coords="303,150,560,206"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#ac7a87199e5084e72f85b854192fcdff5" title="Returns the list of edges involved." alt="" coords="346,229,517,271"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_object_pair.html#a59bf5822c6e17f235fe9732a5db78621" title=" " alt="" coords="338,295,525,336"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a91534bd0e3751ff4d330dfef5e2b99ad" title="Returns the vertex representing the head of the chain." alt="" coords="346,360,517,401"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_object_pair.html#a4286b48d08a3f0d307a225eb1defb5b6" title=" " alt="" coords="338,425,525,467"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#abfd8a2695e34c42566abbc3883f8e92a" title="Returns the vertex representing the tail of the chain." alt="" coords="346,491,517,532"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a181e1471235b48ddef2fa922ef35a964" title="Returns the list of verteces involved." alt="" coords="341,556,521,597"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="346,621,517,663"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1rings_1_1_cyclic_graph_handler.html#a06aebe8eb0fd1b00a55fdd78cb11280b" title="Checks whether the combination of RCA&#39;s pairs leads to interdependent paths, that is,..." alt="" coords="308,687,555,728"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_ring.html#a4d36b4964430194b787e708d47b00af5" title="Set the bond type (i.e., bond order) of the chord connecting the head and the tail vertices." alt="" coords="322,753,541,779"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a0cabc498b6d99e3d7da1078a41012af0" title="Returns the list of bonds in the path between the head and the tail." alt="" coords="626,5,797,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_conformations.html#a6e005c7993eec351eae91ce3b3fdb76b" title=" " alt="" coords="608,70,815,126"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a10d870c941a295ec9e16aa31d502625f" title="Returns the ring closing conformations." alt="" coords="626,149,797,191"/>
+</map>

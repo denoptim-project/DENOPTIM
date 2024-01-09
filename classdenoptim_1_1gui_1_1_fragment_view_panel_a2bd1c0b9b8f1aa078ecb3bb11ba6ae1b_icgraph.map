@@ -1,0 +1,9 @@
+<map id="denoptim.gui.FragmentViewPanel.waitForJmolViewer" name="denoptim.gui.FragmentViewPanel.waitForJmolViewer">
+<area shape="rect" id="node1" title="Waits until Jmol is finished." alt="" coords="1649,5,1832,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a4e986670257e51a91dcf4aa090043427" title="Loads a molecule build from a smiles string." alt="" coords="1152,5,1335,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a208bb82cc9e83c541c42345ba46c084b" title=" " alt="" coords="1383,35,1601,76"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#aa5e4bcd31e5652e33beb4c8b54908cda" title="Loads a molecule build from a smiles string." alt="" coords="880,5,1104,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a530b2f509d3e15fd285526a34461cc9e" title="Imports the given SMILES into the viewer." alt="" coords="580,5,832,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,13,532,39"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,5,221,47"/>
+</map>

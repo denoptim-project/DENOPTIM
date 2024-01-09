@@ -1,0 +1,20 @@
+<map id="denoptim.utils.GraphConversionTool.getGraphFromString" name="denoptim.utils.GraphConversionTool.getGraphFromString">
+<area shape="rect" id="node1" title="Given a formatted string&#45;like representation of a DENOPTIM graph create the corresponding DENOPTIMGra..." alt="" coords="5,284,211,325"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="296,5,471,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="269,71,497,98"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="289,122,478,149"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a514b89b11dff8939e74e5b95e749b703" title=" " alt="" coords="298,173,469,215"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="298,239,469,280"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#aeed71fb5a76a745190ea6f0e3e0b939d" title="Builds a new molecular fragment kind of vertex." alt="" coords="295,328,472,369"/>
+<area shape="rect" id="node11" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_b_b_type.html#a98d45f9fb02ed946e4d2600d731dc0ca" title="Translates the integer into the enum." alt="" coords="259,394,508,421"/>
+<area shape="rect" id="node12" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html#a662c8cd4eb991324b763ac99709d8a6a" title=" " alt="" coords="296,445,471,487"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a13c466d60a1ed85384812ca2ff63fdb2" title="Set the Attachment Point class." alt="" coords="293,511,473,552"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#a421ce3718c62761e49a4dd4d0f20682c" title=" " alt="" coords="294,576,473,617"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="556,64,763,105"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="574,152,745,193"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="565,328,753,369"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="560,518,759,545"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="811,511,988,552"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1036,477,1213,519"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1036,543,1213,584"/>
+</map>

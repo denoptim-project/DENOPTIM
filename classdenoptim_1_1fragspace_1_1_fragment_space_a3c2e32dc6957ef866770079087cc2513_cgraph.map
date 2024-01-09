@@ -1,0 +1,4 @@
+<map id="denoptim.fragspace.FragmentSpace.getRandomizer" name="denoptim.fragspace.FragmentSpace.getRandomizer">
+<area shape="rect" id="node1" title="Returns the program&#45;specific randomizer that is associated with this program&#45;specific fragment space." alt="" coords="5,5,199,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ad9db6420b91ff13e0a8b2d02402c0242" title="Returns the current program&#45;specific randomizer." alt="" coords="247,5,433,47"/>
+</map>

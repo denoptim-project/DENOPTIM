@@ -1,0 +1,5 @@
+<map id="denoptim.graph.rings.RingClosingAttractor.getRingUser" name="denoptim.graph.rings.RingClosingAttractor.getRingUser">
+<area shape="rect" id="node1" title="Get the reference to the graph representation of the ring this attractor is meant to close." alt="" coords="608,13,799,54"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a047d30b932c29146e81ae7b3fef90c07" title=" " alt="" coords="332,5,560,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#aa20e503a18ca493f44df861fa490c021" title="Constructs an item specifying all its features." alt="" coords="5,13,284,54"/>
+</map>

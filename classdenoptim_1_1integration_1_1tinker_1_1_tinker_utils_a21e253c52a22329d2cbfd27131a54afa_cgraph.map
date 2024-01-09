@@ -1,0 +1,7 @@
+<map id="denoptim.integration.tinker.TinkerUtils.getThirdRefAtomId" name="denoptim.integration.tinker.TinkerUtils.getThirdRefAtomId">
+<area shape="rect" id="node1" title=" " alt="" coords="5,81,203,122"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="277,29,471,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a38e8be0339a09dfcb518ad1fecfae4e4" title=" " alt="" coords="251,81,497,122"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="271,146,477,187"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="545,146,743,187"/>
+</map>

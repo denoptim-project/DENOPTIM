@@ -1,0 +1,8 @@
+<map id="denoptim.fitness.FitnessExpressionParser.makeIFingerprinter" name="denoptim.fitness.FitnessExpressionParser.makeIFingerprinter">
+<area shape="rect" id="node1" title=" " alt="" coords="740,93,975,134"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser.html#a761cd46875eff5864f29dbb7f353bde7" title="Parses the given expressions." alt="" coords="529,93,692,134"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fitness_1_1_fitness_parameters.html#a2ab06430e0d6c35625d03557520cf505" title="Processes all parameters and initialize related objects." alt="" coords="276,93,481,134"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#a2272dbcf72c993b4544719ddf64c98b6" title=" " alt="" coords="19,5,214,61"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#ac3684e1e2969ee1c883ab279d4d5c048" title="This test is reproducing most of what done in FitnessParametersTest#testProcessExpressions() so if bo..." alt="" coords="11,85,222,141"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser_test.html#ad8c3056173f2ab17ebb7c12133ea03a8" title=" " alt="" coords="5,165,228,221"/>
+</map>

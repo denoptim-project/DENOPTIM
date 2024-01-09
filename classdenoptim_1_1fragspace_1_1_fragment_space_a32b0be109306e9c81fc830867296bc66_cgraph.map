@@ -1,0 +1,52 @@
+<map id="denoptim.fragspace.FragmentSpace.addFusedRingsToFragmentLibrary" name="denoptim.fragspace.FragmentSpace.addFusedRingsToFragmentLibrary">
+<area shape="rect" id="node1" title="Extracts a system of one or more fused rings and adds them to the fragment space if not already prese..." alt="" coords="5,1363,267,1404"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a29a9f624b749868d8afd6aa5a987543d" title="Takes a vertex and add it to a given library." alt="" coords="357,71,551,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a13df4c55db0679bb62fb833a91ef38b2" title="Classify a fragment in terms of the number of APs and possibly their type (AP&#45;Class)." alt="" coords="357,417,551,459"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ae0fc307ce14bc73de8cb51459e122392" title="Selects only the atoms that originate from a subgraph of a whole graph that originated the whole mole..." alt="" coords="341,944,567,985"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a651bbd4b7b5581af4e4abb520cd7e114" title="Writes the graph to SDF file." alt="" coords="669,1360,859,1401"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6fe5ab71083430bbab0b7d2e2f139c3a" title="Extracts subgraphs that match the provided pattern." alt="" coords="355,1085,553,1127"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_d_graph.html#acece20b4fadc48400615a6efb4c9ea66" title="Returns the reference of the candidate item that is defined by this graph." alt="" coords="365,1151,543,1192"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="365,1216,543,1257"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_template.html#a7869ba705f5898855fe68dd443721f8e" title=" " alt="" coords="670,1425,858,1467"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="361,1333,547,1375"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_candidate.html#ae97ca468f9830ef96fb75199460e3568" title=" " alt="" coords="341,1399,567,1426"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a2969cd2a672bc446a0c813eb821dc782" title=" " alt="" coords="315,1450,593,1506"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#aa0865a75cdb1a2976342a90d7ee6179f" title=" " alt="" coords="315,1530,593,1586"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ad9db6420b91ff13e0a8b2d02402c0242" title="Returns the current program&#45;specific randomizer." alt="" coords="361,1609,547,1651"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#aa1ab6fb973f06fca341fd05dbae6aee3" title="Checks if a graph is isomorphic to another template&#39;s inner graph in its appropriate fragment space l..." alt="" coords="357,1675,551,1716"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_template.html#ad5daf794be97bcd8e43046b702b23b4d" title="Attaches a molecular representation to this template." alt="" coords="360,1740,548,1781"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_template.html#a405d47ac1a08ac9bd658bcdcc693a0a4" title=" " alt="" coords="360,1805,548,1847"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a26675b858b0472e03a29d517db448a30" title="Writes the graphs to JSON file." alt="" coords="359,1871,549,1912"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="359,1960,549,2001"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="679,5,849,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="679,71,849,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a274e9253fa2a75073e7fc14918e54eef" title="Returns the list of all APClasses present on this vertex." alt="" coords="679,136,849,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="935,195,1105,236"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="674,645,854,687"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ae9d431ee87c4285c7d49d78b90ebe3a6" title="Returns the list of fragments with given number of APs." alt="" coords="667,253,861,295"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#ac578a57700de26b2f0ba1fc7470129d0" title=" " alt="" coords="679,319,849,360"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a3aad125a846731307d56e68cd69b8ae5" title=" " alt="" coords="653,384,875,425"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a77887ce020d49c189b89e049f12b70ba" title="Check availability of this attachment point." alt="" coords="674,449,854,491"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a1746f750aa65cefd1ed92ab55e750e63" title="Adds the reference to a ring&#45;closing vertex (RCV) to the quick&#45;access list of RCVs known in this buil..." alt="" coords="667,515,861,556"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a47b278f84db073b1f06809f9c42cfae5" title="Check usage of APClass&#45;based approach, i.e., uses attachment points with annotated data (i...." alt="" coords="652,580,876,621"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_fragment.html#a25e45b22a20adcc72ee6f599a7694b0f" title="Add an attachment point to the specifies atom." alt="" coords="668,711,860,752"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_fragment.html#ae9ece74cb5379ccf2b555a0092048592" title=" " alt="" coords="661,777,867,803"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_fragment.html#a66ef044fb958d43d820bd05c71a2bfb2" title=" " alt="" coords="654,827,874,854"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_fragment.html#a7e8b973a33c7ec906e65d1512d9faecb" title=" " alt="" coords="669,879,859,920"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_attachment_point.html#acd666767475f39f0d7f17550d2b47651" title=" " alt="" coords="674,944,854,985"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="661,1009,867,1051"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="655,1075,873,1116"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_fragment.html#a7deab5658f2c5176b3edd77fb714c0c2" title=" " alt="" coords="641,1141,887,1167"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_fragment.html#a0b5b1b4c1bca9ba9ecfb14c3f4c5c106" title=" " alt="" coords="642,1191,886,1218"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af58c1eca18c36403992fc01d2e08fc03" title=" " alt="" coords="674,1243,854,1284"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_fragment.html#a8a6b413cc1a9c7276c9cfbd7e9284c99" title="Changes the properties of each APs as to reflect the current atom list." alt="" coords="647,1309,881,1335"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="935,1181,1105,1223"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_attachment_point.html#abf5b2cd3742215db41d879865d9d6609" title="Prepares the two strings that can be used to define AttachmentPoints in SDF files." alt="" coords="666,1543,862,1584"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="665,1608,863,1649"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_template.html#a7de3b3ecb0743c881a629727648955be" title="Return the list of attachment points visible from outside the template, i.e., the so&#45;called outer APs..." alt="" coords="670,1673,858,1715"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a9c1db3123b7f73aa20c0d1895f31f8d7" title="Returns the end of the direction vector." alt="" coords="674,1739,854,1780"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_template.html#ae72040ff2cc2c9592a942b7db96b4b04" title=" " alt="" coords="670,1804,858,1845"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a5ec92eb2ffc5a1b3fadce0c816e481b7" title="Sets the end of the 3D vector defining the direction of the AP in 3D." alt="" coords="674,1869,854,1911"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_template.html#a687f8680d7c74dacadeb80c85ced2be5" title="Adds the projection of an AP in the template&#39;s inner graph (i.e., innerAP) to the list of APs visible..." alt="" coords="669,1959,859,2000"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_template.html#a82c53a76c42c31848f394c3f7aab21b9" title="Removes the molecular representation." alt="" coords="665,2024,863,2065"/>
+</map>

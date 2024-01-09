@@ -1,0 +1,27 @@
+<map id="denoptim.graph.AttachmentPoint.sameAs" name="denoptim.graph.AttachmentPoint.sameAs">
+<area shape="rect" id="node1" title="Compares the features of this and another attachment point and decides if the two are same." alt="" coords="1152,428,1332,469"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad38e8849839cb63835e727530ca124d9" title="Checks if the Vertexs that are attached to two given AttachmentPoints apA and apB satisfy these condi..." alt="" coords="895,101,1083,143"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a2c78b09395bee33b8a8f6a1839e8f614" title="Compares this and given attachment point." alt="" coords="899,329,1079,371"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a7a48a6fb07f119d17a6c8eb091ee73ea" title="Compares this and another vertex ignoring vertex IDs." alt="" coords="896,395,1081,436"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a309f26b0bad9acff15e95672089c2432" title=" " alt="" coords="899,460,1079,501"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af2fc2503c300637c2369eb4347c990c1" title=" " alt="" coords="873,525,1104,567"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#accefbd3b7ce4b270e565cb3c1c71d6a4" title=" " alt="" coords="877,591,1100,632"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#aff06be9fc2508e591352e7ae46260721" title="Tries to determine the set of symmetric vertices in this graph based on finding compatible Vertexes t..." alt="" coords="303,37,499,79"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa46fb7d3a38e4c4401723a75f7c8d764" title=" " alt="" coords="606,101,807,143"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a18eb5d0ba6772e9116176ef6ca9f84fc" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="7,5,212,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a05b87ffb43b9710fcea83b0777654e27" title=" " alt="" coords="5,71,213,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ac02ab6b199aee9280e88a14d0026a175" title=" " alt="" coords="287,103,514,144"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#a49db24fa07ea13a15f3219d233796fb4" title="Compares this and another vertex ignoring vertex IDs." alt="" coords="588,274,825,301"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_fragment.html#a1e138d14fa526fe231303f154b936856" title="Compares this and another fragment ignoring vertex IDs." alt="" coords="597,402,816,429"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_template.html#a649893e67ee5c2d9fa0c73b264032da3" title="Compares this and another template ignoring vertex IDs." alt="" coords="597,549,816,575"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_vertex.html#a7c03cfb4a9b0602d7de6952b33818188" title="Compares this and another vertex ignoring vertex IDs." alt="" coords="606,599,807,626"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#ad2d55573cddc254b2b779b6c9c0c1514" title=" " alt="" coords="295,168,506,209"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex_test.html#a5ee8f2ce0446cacb71cd1cac63c4dae7" title=" " alt="" coords="300,233,501,275"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex_test.html#af9b6ae1fc223d53b07bb0856c8c8c6ce" title=" " alt="" coords="300,299,501,340"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ac722cc2d3eff673746ba6c3eba3cace3" title=" " alt="" coords="279,364,522,405"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#afa1376c9ab452a7e75cdf00489be1e07" title=" " alt="" coords="295,429,506,471"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a6f2ce8f6a8319b39440b0dc43ede061f" title="Check that the following graph&#39;s fused ring gets added to the fragment library." alt="" coords="261,494,540,550"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a56ef448997df677c5ce4a73737f127e2" title="Checks that a graph with a fused ring containing a scaffold vertex is added to the scaffold library." alt="" coords="265,574,536,630"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a9ad0d01f5abd9f5c57e64dc7dd92484f" title=" " alt="" coords="295,653,506,695"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_template_test.html#a50688358b5a557ee51683082427bdc14" title=" " alt="" coords="291,719,510,760"/>
+</map>

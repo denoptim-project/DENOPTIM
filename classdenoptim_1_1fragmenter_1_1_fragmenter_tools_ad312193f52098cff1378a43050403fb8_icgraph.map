@@ -1,0 +1,8 @@
+<map id="denoptim.fragmenter.FragmenterTools.manageFragmentCollection" name="denoptim.fragmenter.FragmenterTools.manageFragmentCollection">
+<area shape="rect" id="node1" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="837,41,1052,83"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#ad73de82da7bcd76c0159c2d5080682c4" title="Performs the whatever work has to be done by this task." alt="" coords="296,5,505,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#afe25e249e1296a0a0d911a41e18bb2c2" title="Performs fragmentation according to the given cutting rules." alt="" coords="580,83,789,124"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,83,532,110"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a18eb5d0ba6772e9116176ef6ca9f84fc" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="298,135,503,176"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,76,221,117"/>
+</map>

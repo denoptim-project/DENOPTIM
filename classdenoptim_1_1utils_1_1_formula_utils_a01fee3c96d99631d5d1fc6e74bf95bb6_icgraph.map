@@ -1,0 +1,6 @@
+<map id="denoptim.utils.FormulaUtils.compareFormulaAndElementalAnalysis" name="denoptim.utils.FormulaUtils.compareFormulaAndElementalAnalysis">
+<area shape="rect" id="node1" title="Compares the molecular formula formatted as from the Cambridge Structural Database (CSD) against the ..." alt="" coords="563,53,795,94"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a263cc85b9ab1551b9ede736f9da7f21b" title="Processes all molecules analyzing the composition of the structure in the chemical representation as ..." alt="" coords="267,5,510,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_formula_utils_test.html#a622ce2668736392e608383ee6a1a3085" title=" " alt="" coords="263,85,515,141"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#ad73de82da7bcd76c0159c2d5080682c4" title="Performs the whatever work has to be done by this task." alt="" coords="5,13,215,54"/>
+</map>

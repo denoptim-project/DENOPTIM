@@ -1,0 +1,52 @@
+<map id="denoptim.files.FileUtils.detectKindOfSDFFile" name="denoptim.files.FileUtils.detectKindOfSDFFile">
+<area shape="rect" id="node1" title="Looks into a text file and tries to understand if the file is a collection of parameters for any spec..." alt="" coords="2231,569,2421,610"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#adf038babeb9f64d8c853a0290efe04fb" title="Inspects a file/folder and tries to detect if there is one of the data sources that is recognized by ..." alt="" coords="1992,569,2183,610"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a9c42cf2eaeda70e10b570a290cce5518" title=" " alt="" coords="1073,126,1320,167"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1main_1_1_main.html#a10bfad61d15a696a1e3d24918f9c55c2" title="Checks the file exists and format is recognized." alt="" coords="1749,54,1928,95"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a81df728192225395c24224607bc63eee" title="Imports graphs from file." alt="" coords="1076,205,1317,246"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a0df9ca063352fbc50f9476f3b2820926" title="Initialize the contents of the tool bar." alt="" coords="228,848,448,875"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1gui_1_1_g_u_i.html#a460fa99497f04de06d2adf8671a92441" title="Launch the application." alt="" coords="533,597,675,624"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a746a93c4742c53dfb3cc767eae8aac92" title="Reads any content of a given pathname and tries to read DENOPTIM data from it." alt="" coords="1434,862,1622,903"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a9efd887c11557ffc565a152950ad9e25" title="Reads a list of &lt;DGraphs from file." alt="" coords="1745,569,1933,610"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc4e3a5d4e0db3c1eb06e1ff721af9cf" title="Reads Vertexes from any file that can contain such items." alt="" coords="1745,1181,1933,1222"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#abf77c83e1f027edcd85290bb59dc18f9" title=" " alt="" coords="1733,1735,1944,1777"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="766,133,1017,160"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="501,114,707,155"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1main_1_1_main.html#ad66372a30d3c394e0476de91e5fe6589" title="Does the processing of the application arguments and decides what the program should do." alt="" coords="1441,54,1615,95"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1main_1_1_main.html#a5d0a8599c5e2e81cffd07e35353bfc84" title="Launches the appropriate program according to the arguments given." alt="" coords="1113,5,1281,32"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1main_1_1_main_test.html#a94c1db07c57d2ec754035270fc1a435c" title=" " alt="" coords="1103,57,1291,98"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#aa30815ac9aa8f815fd24c115afaabd62" title="Initialize the panel and add buttons." alt="" coords="760,237,1023,264"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#ad63012fa4fa9bec2e54ce86425039186" title="Initialize the panel and add buttons." alt="" coords="763,187,1019,213"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a1a2e06a2647032587d42155302b8c0a6" title="Process a file that has a recognized file format and loads a suitable GUI card to visualize the file ..." alt="" coords="780,789,1003,816"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#aa4cc9386cd3e91865c486ba914af789d" title="Constructor." alt="" coords="496,245,712,286"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#aefffdc97385f7a524badf71808a3053b" title="Constructor." alt="" coords="499,179,709,221"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a94df24e485081c9b9d7441387f409e26" title="Updated the the list of recent files in the &quot;open Recent&quot; menu." alt="" coords="497,841,711,882"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a36f4409849998e032342f49b19e6c5b5" title="Constructor that build the tool bar." alt="" coords="5,841,180,882"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1integration_1_1python_1_1_py4_j_getaway_server.html#a15873756d67e5fcc5b3219c5d26db990" title="Reads any DENOPTIM&#45;kind of data from the given pathname." alt="" coords="1099,859,1294,901"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a06fc8c701fcb26782ce85d2383bc542b" title="Processes all parameters and initialize related objects." alt="" coords="1409,339,1647,381"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1programs_1_1graphlisthandler_1_1_graph_lists_handler_parameters.html#a98f687cfec97ad11454cbeb41e1e54bd" title="Processes all parameters and initialize related objects." alt="" coords="1371,405,1685,446"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a1688ab120fd681dabe18d8e60185371a" title=" " alt="" coords="1445,470,1611,511"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a288cf0ff784fd2355c5011f9b18001b2" title=" " alt="" coords="1413,222,1643,263"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_ed_parameters.html#a03bf3252e3940afc8e1401fdb7c19161" title=" " alt="" coords="1409,601,1647,642"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_p_runner.html#a7c993ef280d2c2a458c0650284b9352b" title="Create and run the fitness task." alt="" coords="1413,797,1643,838"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#adb60b4cb2cda6a912a831974c5303df4" title=" " alt="" coords="1422,535,1634,577"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1programs_1_1isomorphism_1_1_isomorphism.html#a558ff128682d8685e2c95b8eeea85461" title=" " alt="" coords="1422,666,1634,707"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#ab0f92a94c4fb2334e7d3813e73fc4247" title=" " alt="" coords="1422,731,1634,773"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_frag_space_explorer.html#a1c6a2aae9ab686d5c7c0fc6246f7aa61" title=" " alt="" coords="1089,339,1304,381"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1programs_1_1graphlisthandler_1_1_graph_lists_handler.html#a82e75728262a789cc27189d910b5c74a" title=" " alt="" coords="1082,405,1311,446"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="1107,470,1286,511"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="1095,601,1298,642"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_p_runner.html#a8581fe2c5a66bf2682795cfa8554e2b4" title="Constructor." alt="" coords="1082,794,1311,835"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1fragmenter_1_1_parallel_conformer_extraction_algorithm.html#accbc5c0326e13ccf00126143b0851369" title="Implementations of this method must call the submitTask(Task, String) method to actually send the tas..." alt="" coords="1411,1539,1645,1595"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a43ed8d5c01a09ba050aad844bfc57406" title="Define all components of a fragment space that implements the attachment point class&#45;approach." alt="" coords="1431,1618,1625,1659"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6698fa37bf04503e58c61f0543946834" title="Imports fragments from a file." alt="" coords="1071,925,1323,966"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="1397,979,1659,1005"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a82c4a82da2a3283a870a8c8af94f0a4e" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="1421,1030,1635,1071"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#aeb24d66181afd49b30a224fb495cc558" title="Processes all parameters and initialize related objects." alt="" coords="1393,1278,1663,1319"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter.html#aa27df9705e3aed34cc8cb8bc05e6ce85" title=" " alt="" coords="1097,1183,1297,1225"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a89735856fa91d61a10ed02c3c0ce08f9" title=" " alt="" coords="1434,1147,1622,1189"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a26000bb6c3e2b76a500512de6f2a66a9" title="Reads a list of DGraphs from file." alt="" coords="1434,1213,1622,1254"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#ad2d55573cddc254b2b779b6c9c0c1514" title=" " alt="" coords="1423,1343,1633,1385"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#afa1376c9ab452a7e75cdf00489be1e07" title=" " alt="" coords="1423,1409,1633,1450"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a9ad0d01f5abd9f5c57e64dc7dd92484f" title=" " alt="" coords="1423,1474,1633,1515"/>
+</map>

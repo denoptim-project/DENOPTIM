@@ -1,0 +1,5 @@
+<map id="denoptim.io.DenoptimIO.readDENOPTIMGraphsFromSDFile" name="denoptim.io.DenoptimIO.readDENOPTIMGraphsFromSDFile">
+<area shape="rect" id="node1" title="Reads a list of &lt;DGraphs from a SDF file." alt="" coords="5,63,208,104"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a3d1393195144f47b8071517c24336a66" title="Converts an atom container read in from an SDF file into a graph, if possible." alt="" coords="256,29,444,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a48102bb79e9cc581e8c6ef527e003b08" title="Reads a file containing multiple molecules (multiple SD format))" alt="" coords="256,95,444,136"/>
+</map>

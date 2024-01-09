@@ -1,0 +1,4 @@
+<map id="denoptim.main.Main.terminate" name="denoptim.main.Main.terminate">
+<area shape="rect" id="node1" title="Stops services and halts the Virtual Machine." alt="" coords="221,5,416,32"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1main_1_1_main.html#a5d0a8599c5e2e81cffd07e35353bfc84" title="Launches the appropriate program according to the arguments given." alt="" coords="5,5,173,32"/>
+</map>

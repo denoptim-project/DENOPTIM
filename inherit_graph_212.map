@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,136,68,163"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_socket_provided_descriptor_test_1_1_my_socket_server.html" title=" " alt="" coords="116,5,376,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_socket_provided_descriptor_test_1_1_request_handler.html" title=" " alt="" coords="121,85,371,141"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1task_1_1_static_task_manager_1_1_shut_down_hook.html" title="Shutdown hook that stops all child tasks upon shutdown of JavaVM." alt="" coords="161,165,331,206"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1task_1_1_stream_gobbler.html" title="See http://www.javaworld.com/jw&#45;12&#45;2000/jw&#45;1229&#45;traps.html?page=4." alt="" coords="149,231,343,257"/>
+</map>

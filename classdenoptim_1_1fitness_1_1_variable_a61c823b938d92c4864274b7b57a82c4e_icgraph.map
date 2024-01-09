@@ -1,0 +1,4 @@
+<map id="denoptim.fitness.Variable.setDescriptorParameters" name="denoptim.fitness.Variable.setDescriptorParameters">
+<area shape="rect" id="node1" title="Set the list of strings defining customisable parameter for the descriptor implementation." alt="" coords="296,5,483,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1_variable.html#aacdf4ab2692d77180dae7dd6b173e5a3" title="Returns an parameterized variable, i.e., a variable the value of which needs to be obtained from the ..." alt="" coords="5,13,248,39"/>
+</map>

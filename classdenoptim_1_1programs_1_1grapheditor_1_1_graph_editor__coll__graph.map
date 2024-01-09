@@ -1,0 +1,8 @@
+<map id="denoptim.programs.grapheditor.GraphEditor" name="denoptim.programs.grapheditor.GraphEditor">
+<area shape="rect" id="node1" title="Tool for editing DGraphs." alt="" coords="272,247,475,288"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_program_task.html" title="Task structure for any of the main programs in the denoptim project, such as genetic algorithm and co..." alt="" coords="281,171,465,197"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="229,95,363,121"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,5,133,32"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1task_1_1_process_handler.html" title=" " alt="" coords="158,5,357,32"/>
+<area shape="rect" id="node6" title=" " alt="" coords="405,5,448,32"/>
+</map>

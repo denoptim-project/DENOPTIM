@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GUIPreferences" name="denoptim.gui.GUIPreferences">
+<area shape="rect" id="node1" title="The collection of tunable preferences." alt="" coords="353,85,545,112"/>
+<area shape="rect" id="node2" title=" " alt="" coords="41,5,165,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="31,56,175,83"/>
+<area shape="rect" id="node4" href="$enumdenoptim_1_1gui_1_1_g_u_i_preferences_1_1_s_m_i_to3_d_engine.html" title="Available engines used to do SMILES&#45;to&#45;3D conversion." alt="" coords="5,107,200,149"/>
+<area shape="rect" id="node5" title=" " alt="" coords="81,173,124,200"/>
+</map>

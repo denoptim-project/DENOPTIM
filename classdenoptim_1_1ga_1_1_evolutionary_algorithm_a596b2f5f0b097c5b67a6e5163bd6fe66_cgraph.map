@@ -1,0 +1,52 @@
+<map id="denoptim.ga.EvolutionaryAlgorithm.evolvePopulation" name="denoptim.ga.EvolutionaryAlgorithm.evolvePopulation">
+<area shape="rect" id="node1" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="5,765,184,807"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_size_controlled_set.html#aa6aeb248f6884d9a6f331b35058b5e18" title="Checks if the given entry is already container in the set of known entries and, if not,..." alt="" coords="265,49,453,91"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0b22682f788bae4f1108dfe842940773" title=" " alt="" coords="263,232,454,273"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a2367e2b5713154c6d49905975fb852b0" title="Removes all tasks whether they are completed or not." alt="" coords="563,297,729,339"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a64a628fcbfe766969d180920b9380455" title="Removes only tasks that are marked as completed." alt="" coords="265,415,452,456"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aab14b898988cd607e9d08f09f2ba10cb" title="Creates a folder meant to hold all the data generated during a generation." alt="" coords="269,480,448,521"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad094b30fa7e429418af3f5ba26addfa4" title=" " alt="" coords="553,363,739,404"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="265,831,452,872"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a78b85fade7c215def19e44e2e4d29d24" title=" " alt="" coords="249,896,468,937"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a1fb6717e57bb54265151ba1f6922041a" title=" " alt="" coords="242,961,475,1003"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#ac71f418cf81cb54228b4cfc8f1502d4d" title=" " alt="" coords="262,1027,455,1068"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a348920f4e672fe3b835c971f1fdf2452" title=" " alt="" coords="241,1092,477,1133"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a9a404230a4a32a941ffd2e92d0804f31" title=" " alt="" coords="537,1207,755,1248"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="843,761,1029,803"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a36879837ae46feab7bcfdc7c61ef5c32" title=" " alt="" coords="251,1275,466,1316"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a8b94af5aea3e61cb241457e1b9ae8d7a" title=" " alt="" coords="232,1340,485,1381"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_candidate.html#a5c007ed1edb500326899f34540812fef" title=" " alt="" coords="251,1406,466,1433"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a02c80cc53f2732f207b1d578681f62f8" title=" " alt="" coords="261,1457,456,1499"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1logging_1_1_monitor.html#a70e3e14ab63e7e39ed3ce7d895aa01cf" title=" " alt="" coords="250,181,467,207"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0c2e353b243250b4959a3f86608f1020" title="Generates one offspring according to the method where crossover and mutation are decoupled,..." alt="" coords="272,648,445,689"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ae7a90a911b109ed47b3acf54193acc35" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="272,765,445,807"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1logging_1_1_monitor.html#ac668f96dfdc2b419f1563efc721f6eac" title=" " alt="" coords="262,115,455,156"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a1688ab120fd681dabe18d8e60185371a" title=" " alt="" coords="563,432,729,473"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_candidate.html#a2bd00398a6f5842075f95c707c03de1a" title=" " alt="" coords="263,1523,455,1564"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a5d4c7ed4e7b8d2219c845f906e539408" title=" " alt="" coords="276,297,441,339"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a83dce514937b0922c514bd5d919eca64" title=" " alt="" coords="246,1157,471,1199"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_file_utils.html#a67d99e2b559128d91c93886ba80fa392" title="Search in a file for a line matching the given string query." alt="" coords="563,5,729,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="537,71,755,98"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a2cbfb524deabf9890bd1bd12b87c6bac" title=" " alt="" coords="833,87,1039,128"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a71a6c20ceaf9395ab2a5eee83dbd5eb3" title=" " alt="" coords="807,152,1065,193"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_general_utils.html#ab0c97460520e98fa670681d851754703" title="returns the padded string with zeroes placed to the left of &#39;number&#39; up to reach the desired number o..." alt="" coords="837,359,1035,400"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1logging_1_1_monitor.html#ade26a9010bd7c28e7c2b215b76bc8e43" title=" " alt="" coords="533,177,759,203"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1logging_1_1_monitor.html#abb3dc0b4444cb901fee1a6e7763cfff7" title="Build a string with the value of all counters." alt="" coords="843,21,1029,63"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="561,563,731,604"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad3d2daeb11e68a356e971ca1846596b5" title=" " alt="" coords="561,497,731,539"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a2014fe16fbd88124afa846c8d2227104" title="Generates a pair of new offspring by performing a crossover operation." alt="" coords="561,652,731,693"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a56acf2ee9e798fee88334db3cdaedb6b" title="Choose one of the methods to make new Candidates." alt="" coords="554,972,738,1013"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_d_graph.html#a54af78e8bef32c0ef673243e5f17a98b" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="839,631,1033,672"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_d_graph.html#abcfe2ce7f7bb4d5bea2dbbd816d12d2b" title="Wipes the data in this graph." alt="" coords="833,425,1039,451"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_candidate.html#a50cd0725a1b1c8766897427f2375e79d" title=" " alt="" coords="840,827,1032,868"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1utils_1_1_graph_utils.html#ad951e78a24210e710cba8296b67bf732" title="Unique counter for the number of molecules generated." alt="" coords="842,476,1030,517"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_candidate.html#acff1b65216b9f5403c40906e2378bc2a" title="Just place the argument in the IAtomContainer field of this object." alt="" coords="840,541,1032,583"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_d_graph.html#af5cb07ab0686739e6e1713da9d8959c1" title=" " alt="" coords="847,696,1025,737"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a0281bd3b3cef141abde0026934d6c2a8" title=" " alt="" coords="815,892,1057,933"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#afdae0c2be1ea60331db7288ca9d4f0af" title=" " alt="" coords="822,957,1050,999"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a0494fffda539d98fc9a64976ab193798" title=" " alt="" coords="827,1023,1045,1064"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ad9db6420b91ff13e0a8b2d02402c0242" title="Returns the current program&#45;specific randomizer." alt="" coords="843,1088,1029,1129"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0eaa0754c76b7a20702ae6de34424d13" title="Takes a decision on which CandidateSource method to use for generating a new Candidate." alt="" coords="835,1153,1037,1195"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_candidate.html#ae97ca468f9830ef96fb75199460e3568" title=" " alt="" coords="823,218,1049,245"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a9efd887c11557ffc565a152950ad9e25" title="Reads a list of &lt;DGraphs from file." alt="" coords="842,293,1030,335"/>
+</map>

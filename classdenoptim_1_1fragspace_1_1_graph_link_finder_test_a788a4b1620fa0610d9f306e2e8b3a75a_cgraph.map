@@ -1,0 +1,45 @@
+<map id="denoptim.fragspace.GraphLinkFinderTest.makeTestGraphE" name="denoptim.fragspace.GraphLinkFinderTest.makeTestGraphE">
+<area shape="rect" id="node1" title="Creates a test graph that looks like this: v0(E)&#45;(E)v1." alt="" coords="5,611,219,652"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="269,99,479,126"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="283,151,465,192"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="279,342,469,369"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a492683049dc687fcdc41b43051d30554" title="Returns a clone of the requested building block." alt="" coords="547,715,740,756"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a5703166de7261111b98b40fce0c9fad6" title=" " alt="" coords="287,796,461,837"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_d_graph.html#a78dd305de83fa47a17964f9916519337" title="Reassign vertex IDs to all vertices of this graph." alt="" coords="267,893,481,935"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="539,5,748,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="554,71,733,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="1332,209,1503,251"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="817,598,1001,625"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="823,649,994,691"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="815,715,1002,756"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="815,845,1003,887"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="823,780,994,821"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#a29e20c43a6110fbaac6cc86c216fe143" title=" " alt="" coords="823,911,994,952"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="529,611,757,638"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a29a9f624b749868d8afd6aa5a987543d" title="Takes a vertex and add it to a given library." alt="" coords="546,796,741,837"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="823,1237,994,1279"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#aed02226a5695be948ae2c33e787e22c3" title=" " alt="" coords="812,467,1005,508"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ae30c8a77be3202d7072d5b0b66a6ae59" title=" " alt="" coords="547,1028,740,1069"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a500eaadf61dbb4a0d9c1105f907212c7" title="Performs grouping and classification operations on the library of building blocks of BBType#FRAGMENT." alt="" coords="531,435,756,476"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="544,1118,743,1145"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a4bbfced62cc83d37242245a13ef680f9" title="Set the fragment space to behave according to APClass&#45;based approach." alt="" coords="533,1169,754,1211"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="805,532,1012,573"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a13df4c55db0679bb62fb833a91ef38b2" title="Classify a fragment in terms of the number of APs and possibly their type (AP&#45;Class)." alt="" coords="812,336,1005,377"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#afc50d518876feef08a08e217b1e0b89f" title=" " alt="" coords="809,401,1008,443"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_vertex.html#a274e9253fa2a75073e7fc14918e54eef" title="Returns the list of all APClasses present on this vertex." alt="" coords="1087,239,1257,280"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="1082,369,1262,411"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ae9d431ee87c4285c7d49d78b90ebe3a6" title="Returns the list of fragments with given number of APs." alt="" coords="1075,435,1269,476"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_vertex.html#ac578a57700de26b2f0ba1fc7470129d0" title=" " alt="" coords="1087,304,1257,345"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a3aad125a846731307d56e68cd69b8ae5" title=" " alt="" coords="1061,500,1283,541"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a77887ce020d49c189b89e049f12b70ba" title="Check availability of this attachment point." alt="" coords="1082,565,1262,607"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a1746f750aa65cefd1ed92ab55e750e63" title="Adds the reference to a ring&#45;closing vertex (RCV) to the quick&#45;access list of RCVs known in this buil..." alt="" coords="1075,631,1269,672"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a47b278f84db073b1f06809f9c42cfae5" title="Check usage of APClass&#45;based approach, i.e., uses attachment points with annotated data (i...." alt="" coords="1060,696,1284,737"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="820,1303,997,1344"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1083,1269,1261,1311"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1083,1335,1261,1376"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad36b954088b2e04ea927801775e56d77" title="Reassign vertex IDs to a graph." alt="" coords="536,911,751,952"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b7c2feb2da30079318f06819e0e6761" title=" " alt="" coords="819,976,998,1017"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="823,1041,994,1083"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_d_graph.html#a650a0f54382fb930bf57429dd616258a" title=" " alt="" coords="819,1107,998,1148"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_vertex.html#ad26ecf426a5e415605df94be904e58d3" title=" " alt="" coords="823,1172,994,1213"/>
+</map>

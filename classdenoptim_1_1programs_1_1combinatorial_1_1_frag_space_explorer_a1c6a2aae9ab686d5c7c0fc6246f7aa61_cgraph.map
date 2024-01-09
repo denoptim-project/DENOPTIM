@@ -1,0 +1,52 @@
+<map id="denoptim.programs.combinatorial.FragSpaceExplorer.runProgram" name="denoptim.programs.combinatorial.FragSpaceExplorer.runProgram">
+<area shape="rect" id="node1" title=" " alt="" coords="5,487,220,528"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a4a169c6eb13f0541bcd9672ba76ffe1c" title="Evaluate consistency of input parameters." alt="" coords="273,71,501,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a747dfcef0bb64dfb54817a282b351bfa" title="Print all parameters." alt="" coords="294,201,481,243"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a06fc8c701fcb26782ce85d2383bc542b" title="Processes all parameters and initialize related objects." alt="" coords="268,332,507,373"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5cd97fddb8c8166d2e38410aedd1c3f1" title="Read the parameter TXT file line by line and interpret its content." alt="" coords="288,487,487,528"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#af9327fa81f9e2a617cdff353848ad6e1" title="Run the combinatorial exploration." alt="" coords="269,1039,506,1080"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ae4368af6ab6f5e93920f6e4e22639d3a" title="Gets the pathname to the working directory." alt="" coords="292,1104,483,1145"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a068e87ad643ab93690714153354f9944" title="Starts a logger with the given name." alt="" coords="281,1194,494,1250"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_file_utils.html#a16bc762b79f5033f2323fb8728593334" title=" " alt="" coords="601,5,791,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#aaeaf94275f1b63439850a68a244a74c2" title="Checks any of the parameter collections contained in this instance." alt="" coords="583,71,809,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a48c9658a7543389e399130191924f107" title="Returns the list of parameters in a string with newline characters as delimiters." alt="" coords="603,136,789,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a6571da5ffceeda3e571ebb92d4df8b14" title=" " alt="" coords="566,201,826,243"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1combinatorial_1_1_c_e_b_l_utils.html#a1666b546c68b051f6f2e3a1e8ea924fd" title="Converts a text file into the corresponding checkpoint object." alt="" coords="555,267,837,308"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#abcdf563c6c95b9a293cb0e71738355ff" title="Processes any of the parameter collections contained in this instance." alt="" coords="577,332,815,373"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a9efd887c11557ffc565a152950ad9e25" title="Reads a list of &lt;DGraphs from file." alt="" coords="602,421,790,463"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1files_1_1_file_utils.html#af572123d13600224e1de3cb7b79cb028" title="Appends an entry to the list of recent files." alt="" coords="940,205,1116,247"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1files_1_1_file_utils.html#a5c4375aa4522cc7f8229c131fbc2e0af" title="Creates a directory." alt="" coords="933,116,1123,157"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#abb6475cf2be569dd6c87969f80b27d59" title="Read text from file." alt="" coords="921,274,1135,301"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1files_1_1_file_utils.html#adf038babeb9f64d8c853a0290efe04fb" title="Inspects a file/folder and tries to detect if there is one of the data sources that is recognized by ..." alt="" coords="933,397,1123,439"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a890aaf1919e171a9c3f9206c9a93aa3b" title=" " alt="" coords="595,487,797,528"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a38d652dfc85081f78687a61b32f9a283" title="Builds the implementation of this class suitable to allocate parameters of the given type." alt="" coords="935,552,1121,593"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4cf7f93ac962a8979be6426b5b576384" title="Processes a string looking for keyword and a possibly associated value." alt="" coords="933,487,1123,528"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a8f4213efd2243199301fea86f30f8ddf" title="Check for completion of all subtasks." alt="" coords="577,813,815,855"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a471ee8aed24d5e6499dd4d747d6fea5b" title="clean all reference to submitted tasks" alt="" coords="1219,712,1456,753"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a73e2e419fe51fd6fa66f9ad6d4459d8d" title=" " alt="" coords="577,1264,815,1305"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#adcd462866e3f9d6a2a6ef0385807807e" title="Generate graphs by exploring all combination of fragments at a given level of a growing graph." alt="" coords="571,1031,821,1087"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a906b534927f606245fb23da129c9c6ef" title=" " alt="" coords="921,777,1135,819"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="935,1417,1121,1459"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1combinatorial_1_1_c_e_b_l_utils.html#ab3c17463c9705fb6bf49302dbf804922" title=" " alt="" coords="908,1483,1148,1524"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#ace61a6c1b9d4fc0c4120c1bd3507efed" title="Stops all subtasks and shutdown executor." alt="" coords="909,712,1147,753"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a6e6636646a999bb99b5bacaf47cc19d0" title="Looks for exceptions in the subtasks and, if any, store its reference locally to allow reporting it b..." alt="" coords="906,1548,1150,1589"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a9c179466cc0b7a909a49e1a3c99c978e" title=" " alt="" coords="569,1329,823,1371"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a3b88fb1b00a0495f9eef193a584111fd" title=" " alt="" coords="599,1395,793,1436"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#ad1db7422d160f86b1fd7c8b763ff09ae" title=" " alt="" coords="589,1460,803,1501"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a85007a0717aa59e1ad62d0e7ac011ff8" title=" " alt="" coords="589,1525,803,1567"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#adf596805698d9ae5eaa1c72eff10f16a" title=" " alt="" coords="599,1591,793,1632"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a52c260f1847aa42a37937251e69b527b" title=" " alt="" coords="599,1656,793,1697"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#ae183fe3b1a8bfa167668ac265f1f421c" title=" " alt="" coords="599,1721,793,1763"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#aa0966d4ebdeed6fa74f57786a4367563" title=" " alt="" coords="589,552,803,593"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1utils_1_1_graph_utils.html#a1091a546a79a1a9dce17b752537607f3" title="Reset the unique graph counter to the given value." alt="" coords="597,617,795,659"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1utils_1_1_graph_utils.html#ad381686872b7a5f0a0edea36351ca09f" title="Reset the unique mol counter to the given value." alt="" coords="597,683,795,724"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1utils_1_1_graph_utils.html#adceb5d2a62ee7cb0c67e8ccd1c13e0f0" title="Reset the unique vertex counter to the given value." alt="" coords="597,748,795,789"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a3965de7390821648447a3836e8513364" title=" " alt="" coords="905,1287,1151,1328"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a2f91aecfbbe9f05c354de6b401743fc2" title=" " alt="" coords="909,1352,1147,1393"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a93693af51412000689dc7517151b9a05" title=" " alt="" coords="909,843,1147,884"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a41a3fd2923a0dcfcd6f0f223fbf23945" title=" " alt="" coords="931,908,1125,949"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a532e0154ce9f506ed8e2a9a1306ddff4" title="Returns the list of indeces used to calculate the next iteration." alt="" coords="927,973,1129,1015"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a0128db5fc55504fd1fbd343065b454b8" title=" " alt="" coords="885,1039,1171,1080"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a22b9e935d0a6fc2531cca254c39307af" title=" " alt="" coords="910,1104,1146,1145"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a42fa0c192003a92661cad9dda0a8ee57" title=" " alt="" coords="921,1169,1135,1211"/>
+</map>

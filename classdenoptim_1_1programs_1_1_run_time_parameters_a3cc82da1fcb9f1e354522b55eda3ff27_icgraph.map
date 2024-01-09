@@ -1,0 +1,12 @@
+<map id="denoptim.programs.RunTimeParameters.readYesNoTrueFalse" name="denoptim.programs.RunTimeParameters.readYesNoTrueFalse">
+<area shape="rect" id="node1" title="Reads a string searching for any common way to say either yes/true (including shorthand t/y) or no/fa..." alt="" coords="591,206,805,247"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fitness_parameters_form.html#a7733fc4b4f35b5c59ea9212f328b9c40" title=" " alt="" coords="311,107,519,149"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fitness_1_1_fitness_parameters.html#ad950662f851c42ff6638e104d54fb2d4" title="Processes a keyword/value pair and assign the related parameters." alt="" coords="321,173,510,214"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a151bc101f1480bfd9f0df329e31e3990" title="Processes a keyword/value pair and assign the related parameters." alt="" coords="311,246,519,287"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a39c9da99a018596cb21d0a7101ed32f6" title="Processes a keyword/value pair and assign the related parameters." alt="" coords="288,311,543,353"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#a2272dbcf72c993b4544719ddf64c98b6" title=" " alt="" coords="25,5,220,61"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#ac3684e1e2969ee1c883ab279d4d5c048" title="This test is reproducing most of what done in FitnessParametersTest#testProcessExpressions() so if bo..." alt="" coords="17,85,228,141"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser_test.html#ad8c3056173f2ab17ebb7c12133ea03a8" title=" " alt="" coords="11,165,234,221"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters_test.html#aa838fcfa49302bd09aaf49cf36c3b5a9" title=" " alt="" coords="5,245,240,301"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters_test.html#a5f7524a0ac50011f7bc3e7cb31689504" title=" " alt="" coords="10,325,235,381"/>
+</map>

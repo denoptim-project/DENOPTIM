@@ -1,0 +1,5 @@
+<map id="denoptim.graph.Vertex.getHeavyAtomsCount" name="denoptim.graph.Vertex.getHeavyAtomsCount">
+<area shape="rect" id="node1" title=" " alt="" coords="288,39,459,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="5,5,240,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a18eb5d0ba6772e9116176ef6ca9f84fc" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="20,71,225,112"/>
+</map>

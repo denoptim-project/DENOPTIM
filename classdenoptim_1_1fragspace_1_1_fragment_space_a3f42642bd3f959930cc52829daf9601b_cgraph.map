@@ -1,0 +1,6 @@
+<map id="denoptim.fragspace.FragmentSpace.getAPsCompatibleWithClass" name="denoptim.fragspace.FragmentSpace.getAPsCompatibleWithClass">
+<area shape="rect" id="node1" title="Returns the list of attachment points found in the fragment space and that are compatible with a give..." alt="" coords="5,71,235,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ada04f68d55f8ff85345e2a6c6d1ad840" title="Returns a list of APClasses compatible with the given APClass." alt="" coords="283,5,493,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="295,71,481,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ad17f8c370343a41da602372579e801d5" title="Returns the list of attachment points with the given class." alt="" coords="285,136,491,177"/>
+</map>

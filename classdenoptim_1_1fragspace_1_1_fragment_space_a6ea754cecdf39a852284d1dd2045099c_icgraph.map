@@ -1,0 +1,6 @@
+<map id="denoptim.fragspace.FragmentSpace.getAPClassOfCappingVertex" name="denoptim.fragspace.FragmentSpace.getAPClassOfCappingVertex">
+<area shape="rect" id="node1" title=" " alt="" coords="537,49,767,90"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#afa4835767d37078abce9e3fbe5fa16e1" title="Constructs a new factory for generating all the combination of fragments that can be attached on a gi..." alt="" coords="247,5,489,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3e217d508fc1952084aa04087d6cc00c" title="Checks the graph for unused APs that need to be capped." alt="" coords="272,85,464,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="5,85,199,126"/>
+</map>

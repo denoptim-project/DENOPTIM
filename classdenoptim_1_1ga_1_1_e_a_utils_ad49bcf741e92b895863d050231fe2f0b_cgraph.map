@@ -1,0 +1,7 @@
+<map id="denoptim.ga.EAUtils.getCrowdingProbability" name="denoptim.ga.EAUtils.getCrowdingProbability">
+<area shape="rect" id="node1" title="Calculated the probability of using and attachment point rooted on an atom that is holding other atta..." alt="" coords="5,81,220,122"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aaed3e8b68da8babf5bb77f577b11a278" title="Calculate the current crowdedness of the given attachment point." alt="" coords="268,29,507,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#acf42fcadab45800cf712361cc025ffbb" title="Calculated the crowding probability for a given level of crowdedness." alt="" coords="280,81,495,122"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="297,146,477,187"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a41e3b62363bfa04f372d094483eee83f" title="Calculated a probability given parameters defining the shape of the probability function and a single..." alt="" coords="555,88,775,115"/>
+</map>

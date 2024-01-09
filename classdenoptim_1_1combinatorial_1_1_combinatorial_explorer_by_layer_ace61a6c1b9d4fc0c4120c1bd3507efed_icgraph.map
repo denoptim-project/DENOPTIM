@@ -1,0 +1,8 @@
+<map id="denoptim.combinatorial.CombinatorialExplorerByLayer.stopRun" name="denoptim.combinatorial.CombinatorialExplorerByLayer.stopRun">
+<area shape="rect" id="node1" title="Stops all subtasks and shutdown executor." alt="" coords="880,81,1117,122"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#adcd462866e3f9d6a2a6ef0385807807e" title="Generate graphs by exploring all combination of fragments at a given level of a growing graph." alt="" coords="581,8,832,64"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#af9327fa81f9e2a617cdff353848ad6e1" title="Run the combinatorial exploration." alt="" coords="296,49,533,90"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_frag_space_explorer.html#aa02c7c6c32de390e99688042d4c60918" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="591,139,823,181"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a8f359a45038dc604a5e437d63a35e1a2" title="Constructor." alt="" coords="5,5,248,61"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_frag_space_explorer.html#a1c6a2aae9ab686d5c7c0fc6246f7aa61" title=" " alt="" coords="19,85,234,126"/>
+</map>

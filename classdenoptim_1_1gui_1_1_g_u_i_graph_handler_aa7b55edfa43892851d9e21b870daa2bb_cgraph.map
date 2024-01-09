@@ -1,0 +1,11 @@
+<map id="denoptim.gui.GUIGraphHandler.collectFragAndAPsCompatibleWithSelectedAPs" name="denoptim.gui.GUIGraphHandler.collectFragAndAPsCompatibleWithSelectedAPs">
+<area shape="rect" id="node1" title=" " alt="" coords="5,104,268,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="340,19,524,46"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a4e752fe6501b10df944b5e8757e40b76" title="Searches for all attachment points that are compatible with the given list of attachment points." alt="" coords="316,71,548,112"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="347,136,517,177"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#ad26ecf426a5e415605df94be904e58d3" title=" " alt="" coords="347,201,517,243"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a3f42642bd3f959930cc52829daf9601b" title="Returns the list of attachment points found in the fragment space and that are compatible with a give..." alt="" coords="596,71,825,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ada04f68d55f8ff85345e2a6c6d1ad840" title="Returns a list of APClasses compatible with the given APClass." alt="" coords="873,5,1084,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="885,71,1072,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ad17f8c370343a41da602372579e801d5" title="Returns the list of attachment points with the given class." alt="" coords="876,136,1081,177"/>
+</map>

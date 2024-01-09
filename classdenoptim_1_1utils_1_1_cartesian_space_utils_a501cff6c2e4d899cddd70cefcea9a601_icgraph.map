@@ -1,0 +1,10 @@
+<map id="denoptim.utils.CartesianSpaceUtils.getSumOfVector" name="denoptim.utils.CartesianSpaceUtils.getSumOfVector">
+<area shape="rect" id="node1" title="Get sum of vector A and B." alt="" coords="1120,97,1307,139"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a610946112e9e5c6a35fb025ecbcc1022" title="Generates a dummy atom 0.1 nm from atom A in a place that is safe for a dummy atom." alt="" coords="851,97,1072,139"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a100cd8246e61d933a6420fac5c22160a" title="Append dummy atoms on otherwise linear arrangements of atoms." alt="" coords="580,97,803,139"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,13,532,39"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a18eb5d0ba6772e9116176ef6ca9f84fc" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="298,64,503,105"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a82c4a82da2a3283a870a8c8af94f0a4e" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="293,129,508,171"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_fragment_test.html#aa17f42b21847b022c3d7a87876e17717" title=" " alt="" coords="291,195,510,236"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,5,221,47"/>
+</map>

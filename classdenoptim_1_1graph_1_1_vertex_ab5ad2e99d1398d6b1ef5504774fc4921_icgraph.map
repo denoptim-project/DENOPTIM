@@ -1,0 +1,29 @@
+<map id="denoptim.graph.Vertex.sameAs" name="denoptim.graph.Vertex.sameAs">
+<area shape="rect" id="node1" title="Compares this and another vertex ignoring vertex IDs." alt="" coords="1908,259,2109,286"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad38e8849839cb63835e727530ca124d9" title="Checks if the Vertexs that are attached to two given AttachmentPoints apA and apB satisfy these condi..." alt="" coords="1672,93,1860,135"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a305c9a12afe5bb190894fcd730ef299a" title="Checks if this graph is &quot;DENOPTIM&#45;isomorphic&quot; to the other one given." alt="" coords="1681,409,1851,451"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#aff06be9fc2508e591352e7ae46260721" title="Tries to determine the set of symmetric vertices in this graph based on finding compatible Vertexes t..." alt="" coords="1094,31,1290,72"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa46fb7d3a38e4c4401723a75f7c8d764" title=" " alt="" coords="1392,93,1593,135"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a18eb5d0ba6772e9116176ef6ca9f84fc" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="805,9,1010,51"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a05b87ffb43b9710fcea83b0777654e27" title=" " alt="" coords="803,75,1011,116"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ac02ab6b199aee9280e88a14d0026a175" title=" " alt="" coords="1079,96,1305,137"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a2396c23acf24d07f255b94eb3a2105b7" title="Identify crossover sites, i.e., subgraphs that can be swapped between two graphs (i...." alt="" coords="792,177,1023,219"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a65b1468961ba53b217848640d8fd5232" title="Given a pair of seed vertexes that define where a pair of subgraphs stars in the corresponding origin..." alt="" coords="1371,213,1614,255"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1programs_1_1graphlisthandler_1_1_graph_lists_handler.html#a82e75728262a789cc27189d910b5c74a" title=" " alt="" coords="1378,279,1607,320"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1programs_1_1isomorphism_1_1_isomorphism.html#a558ff128682d8685e2c95b8eeea85461" title=" " alt="" coords="1387,344,1599,385"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#ae0baa3684be9b8a4af611083649a9e6d" title=" " alt="" coords="1361,409,1624,451"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a6b4a7a889a0e36c8b2dc97bcd8055c9e" title=" " alt="" coords="1389,475,1597,516"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a02791a3f61db5dd584dec5c3995ec72c" title=" " alt="" coords="1389,540,1597,581"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aea227d615f6c2f3bac5839a8099a900d" title=" " alt="" coords="1389,605,1597,647"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a83a9624ea5dc6a2c515407b865b62611" title=" " alt="" coords="1389,671,1597,712"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0b946dc2730c68f796c37e5f5cea4e36" title=" " alt="" coords="1389,736,1597,777"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_population.html#a31b74cc5407c42fa3a4214029fb08190" title="Returns a list of population members that can do crossover with the specified member." alt="" coords="529,80,707,121"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#ab0f92a94c4fb2334e7d3813e73fc4247" title=" " alt="" coords="512,177,724,219"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a9fcf8fffef10a59df722c92e94da2815" title=" " alt="" coords="492,243,744,284"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a45d4e9ec6a308aa73891efa1d501dd5e" title="Perform fitness&#45;based, class&#45;compatible selection of parents that can do crossover operations." alt="" coords="223,13,444,39"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1ga_1_1_population_test.html#a5db0672054a9fc1dbc923310732fdb3a" title=" " alt="" coords="230,64,437,105"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_population_test.html#a278212ebff2501b7071d342f9a027599" title=" " alt="" coords="230,129,437,171"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="5,5,175,47"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#a3c2407eb1204a7b25600d3d347d98447" title=" " alt="" coords="227,195,439,236"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a5d90c6e2fa30f287f8f69ed3367ccd0e" title="Given a pair of seed vertexes that define where a pair of subgraphs stars in the corresponding origin..." alt="" coords="1071,213,1313,255"/>
+</map>

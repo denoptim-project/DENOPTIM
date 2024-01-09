@@ -1,0 +1,6 @@
+<map id="denoptim.fragspace.FragmentSpace.appendVerticesToLibrary" name="denoptim.fragspace.FragmentSpace.appendVerticesToLibrary">
+<area shape="rect" id="node1" title="Takes a list of vertices and add them to a given library." alt="" coords="5,39,212,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a29a9f624b749868d8afd6aa5a987543d" title="Takes a vertex and add it to a given library." alt="" coords="260,39,455,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="503,5,673,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="503,71,673,112"/>
+</map>

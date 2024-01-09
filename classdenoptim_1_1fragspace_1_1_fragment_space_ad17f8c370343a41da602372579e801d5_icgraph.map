@@ -1,0 +1,9 @@
+<map id="denoptim.fragspace.FragmentSpace.getVerticesWithAPClass" name="denoptim.fragspace.FragmentSpace.getVerticesWithAPClass">
+<area shape="rect" id="node1" title="Returns the list of attachment points with the given class." alt="" coords="1716,5,1921,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a3f42642bd3f959930cc52829daf9601b" title="Returns the list of attachment points found in the fragment space and that are compatible with a give..." alt="" coords="1439,5,1668,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a4e752fe6501b10df944b5e8757e40b76" title="Searches for all attachment points that are compatible with the given list of attachment points." alt="" coords="1159,5,1391,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#aa7b55edfa43892851d9e21b870daa2bb" title=" " alt="" coords="848,5,1111,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a44e2ff798d22b73f966cb8393ceb4f18" title="Extends the current graph by appending a node to a specific free AP on the growing graph." alt="" coords="557,5,800,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,13,509,39"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,5,211,47"/>
+</map>

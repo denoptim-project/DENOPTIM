@@ -1,0 +1,4 @@
+<map id="denoptim.ga.GraphOperations.performMutation" name="denoptim.ga.GraphOperations.performMutation">
+<area shape="rect" id="node1" title="Tries to do mutate the given graph." alt="" coords="5,29,245,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a125819423e7790a4684dfb09ff87c4ae" title="Takes a decision on how many sites to mutate on a candidate." alt="" coords="293,29,477,71"/>
+</map>

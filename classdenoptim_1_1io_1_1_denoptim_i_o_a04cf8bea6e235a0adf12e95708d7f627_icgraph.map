@@ -1,0 +1,20 @@
+<map id="denoptim.io.DenoptimIO.writeVertexesToFile" name="denoptim.io.DenoptimIO.writeVertexesToFile">
+<area shape="rect" id="node1" title="Writes vertexes to file." alt="" coords="1141,319,1332,360"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#aa21ebdf147f5bdb2685f9e775efd0b10" title=" " alt="" coords="867,5,1069,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#afe25e249e1296a0a0d911a41e18bb2c2" title="Performs fragmentation according to the given cutting rules." alt="" coords="583,147,792,188"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,81,532,107"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="843,267,1093,294"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#ad312193f52098cff1378a43050403fb8" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="861,201,1075,243"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a7710e822a7212af405b83c4693ace410" title=" " alt="" coords="863,319,1073,360"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#aa17925160f3f03080e8680c7016fc1c4" title=" " alt="" coords="869,384,1067,425"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#ad2d55573cddc254b2b779b6c9c0c1514" title=" " alt="" coords="863,449,1073,491"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#afa1376c9ab452a7e75cdf00489be1e07" title=" " alt="" coords="863,515,1073,556"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a9ad0d01f5abd9f5c57e64dc7dd92484f" title=" " alt="" coords="863,580,1073,621"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a79964352fcd3821d7862b771aa7c8cd0" title="Writes vertexes to file." alt="" coords="873,645,1063,687"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter.html#aa27df9705e3aed34cc8cb8bc05e6ce85" title=" " alt="" coords="587,5,787,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#ad73de82da7bcd76c0159c2d5080682c4" title="Performs the whatever work has to be done by this task." alt="" coords="296,205,505,247"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a18eb5d0ba6772e9116176ef6ca9f84fc" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="298,140,503,181"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,73,221,115"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="585,264,790,305"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a82c4a82da2a3283a870a8c8af94f0a4e" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="580,645,795,687"/>
+</map>

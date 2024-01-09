@@ -1,0 +1,5 @@
+<map id="denoptim.io.DenoptimIO.readDENOPTIMGraphEditFromFile" name="denoptim.io.DenoptimIO.readDENOPTIMGraphEditFromFile">
+<area shape="rect" id="node1" title="Reads a list of graph editing tasks from a JSON file." alt="" coords="559,5,757,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_ed_parameters.html#a1f96c8b37f5ae25a220182d617534023" title="Processes all parameters and initialize related objects." alt="" coords="256,5,511,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="5,5,208,47"/>
+</map>

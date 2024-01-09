@@ -1,0 +1,12 @@
+<map id="denoptim.utils.MoleculeUtils.explicitHydrogens" name="denoptim.utils.MoleculeUtils.explicitHydrogens">
+<area shape="rect" id="node1" title="Converts all the implicit hydrogens to explicit." alt="" coords="1283,75,1509,116"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a624fc0eddfb7d67faf19afc6b7caa3fd" title="Do any pre&#45;processing on a IAtomContainer meant to be fragmented." alt="" coords="1016,75,1235,116"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8357317053a9158e81f78ffe6bd65688" title="Generates a candidate by fragmenting a molecule and generating the graph that reconnects all fragment..." alt="" coords="749,39,968,80"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm.html#ab9c7a6f840388b48f51387ff8ea9b64b" title="Splits the input data (from FragmenterParameters) into batches suitable for parallel batch processing..." alt="" coords="751,103,967,159"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="493,39,680,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,39,424,80"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,5,211,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,71,198,112"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm.html#a13ae260c713d9b901a9aa71152c615ad" title=" " alt="" coords="472,103,701,159"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm_test.html#a11b2178cd3d55ba7f1fe1e0e047dd684" title=" " alt="" coords="481,183,692,239"/>
+</map>

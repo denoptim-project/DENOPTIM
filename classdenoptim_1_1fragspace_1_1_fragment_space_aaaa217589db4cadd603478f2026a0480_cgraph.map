@@ -1,0 +1,5 @@
+<map id="denoptim.fragspace.FragmentSpace.getFragAPsCompatibleWithClass" name="denoptim.fragspace.FragmentSpace.getFragAPsCompatibleWithClass">
+<area shape="rect" id="node1" title="Returns the list of attachment points found in the fragment space and that are compatible with a give..." alt="" coords="5,39,260,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ada04f68d55f8ff85345e2a6c6d1ad840" title="Returns a list of APClasses compatible with the given APClass." alt="" coords="308,5,519,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a4cefb29c13191752b0ec529c5774fcb1" title="Returns the list of attachment points with the given class." alt="" coords="317,71,510,112"/>
+</map>

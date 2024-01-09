@@ -1,0 +1,8 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.addBond" name="denoptim.molecularmodeling.ChemicalObjectModel.addBond">
+<area shape="rect" id="node1" title="Modify the molecule adding a cyclic bond between two atoms." alt="" coords="1411,13,1613,54"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#a065481cf3ca3229eee8b417fa3f7c0b5" title="Makes new rings by connecting pairs of atoms that hold properly arranged RingClosingAttractors." alt="" coords="1173,13,1363,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#abd87e8b7391948be1c3156eb9d131be7" title="Attempts to close rings by finding the conformation that allows to join heads and tails of atom speci..." alt="" coords="891,13,1125,54"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#a26896649739e0a5e63dd88079c6efe7a" title="Performs one or more attempts to close rings by conformational adaptation." alt="" coords="587,13,843,54"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,5,539,61"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,13,280,54"/>
+</map>

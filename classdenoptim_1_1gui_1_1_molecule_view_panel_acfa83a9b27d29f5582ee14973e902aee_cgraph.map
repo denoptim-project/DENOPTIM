@@ -1,0 +1,10 @@
+<map id="denoptim.gui.MoleculeViewPanel.fillDataTable" name="denoptim.gui.MoleculeViewPanel.fillDataTable">
+<area shape="rect" id="node1" title=" " alt="" coords="5,201,184,243"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a0917c33381934f156d4196b46819276b" title="Clears the table of attachment points." alt="" coords="256,5,435,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_candidate.html#afdc55605f63d47a4d9c3faeddcb04040" title=" " alt="" coords="249,71,441,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_candidate.html#a182985812f13f2e039da2912e7fc83f2" title=" " alt="" coords="249,136,441,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_candidate.html#a0738609a1a3bec92633440d449a62c67" title=" " alt="" coords="249,201,441,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_candidate.html#ab0fe6ba8e6a45ea539366ac6cef13d79" title="The generation this candidate belong to is that in which it was generated." alt="" coords="249,267,441,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_candidate.html#ae97ca468f9830ef96fb75199460e3568" title=" " alt="" coords="232,333,459,359"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_candidate.html#a5c007ed1edb500326899f34540812fef" title=" " alt="" coords="238,383,453,410"/>
+</map>

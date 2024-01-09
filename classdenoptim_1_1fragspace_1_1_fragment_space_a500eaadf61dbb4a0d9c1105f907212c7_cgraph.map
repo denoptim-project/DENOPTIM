@@ -1,0 +1,15 @@
+<map id="denoptim.fragspace.FragmentSpace.groupAndClassifyFragments" name="denoptim.fragspace.FragmentSpace.groupAndClassifyFragments">
+<area shape="rect" id="node1" title="Performs grouping and classification operations on the library of building blocks of BBType#FRAGMENT." alt="" coords="5,319,231,360"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a13df4c55db0679bb62fb833a91ef38b2" title="Classify a fragment in terms of the number of APs and possibly their type (AP&#45;Class)." alt="" coords="281,253,475,295"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#aed02226a5695be948ae2c33e787e22c3" title=" " alt="" coords="281,319,475,360"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#afc50d518876feef08a08e217b1e0b89f" title=" " alt="" coords="279,384,477,425"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a274e9253fa2a75073e7fc14918e54eef" title="Returns the list of all APClasses present on this vertex." alt="" coords="552,5,723,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="797,64,968,105"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="547,123,727,164"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ae9d431ee87c4285c7d49d78b90ebe3a6" title="Returns the list of fragments with given number of APs." alt="" coords="541,188,734,229"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#ac578a57700de26b2f0ba1fc7470129d0" title=" " alt="" coords="552,253,723,295"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a3aad125a846731307d56e68cd69b8ae5" title=" " alt="" coords="526,319,749,360"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a77887ce020d49c189b89e049f12b70ba" title="Check availability of this attachment point." alt="" coords="547,384,727,425"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a1746f750aa65cefd1ed92ab55e750e63" title="Adds the reference to a ring&#45;closing vertex (RCV) to the quick&#45;access list of RCVs known in this buil..." alt="" coords="541,449,734,491"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a47b278f84db073b1f06809f9c42cfae5" title="Check usage of APClass&#45;based approach, i.e., uses attachment points with annotated data (i...." alt="" coords="525,515,749,556"/>
+</map>

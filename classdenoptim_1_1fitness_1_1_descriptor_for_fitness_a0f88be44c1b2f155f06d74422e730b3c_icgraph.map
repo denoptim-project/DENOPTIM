@@ -1,0 +1,10 @@
+<map id="denoptim.fitness.DescriptorForFitness.getShortName" name="denoptim.fitness.DescriptorForFitness.getShortName">
+<area shape="rect" id="node1" title=" " alt="" coords="811,118,989,159"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fitness_parameters_form_1_1_descriptor_tree_node.html#a220f9ec738ec6f7abe9ed855e33dbce9" title="Constructor meant for nodes representing an actual descriptor value." alt="" coords="529,5,763,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_fitness_parameters_form.html#a989880b9075bcb6124c36a444731b6a9" title=" " alt="" coords="542,85,750,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser.html#a761cd46875eff5864f29dbb7f353bde7" title="Parses the given expressions." alt="" coords="565,150,727,191"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser_test.html#ad8c3056173f2ab17ebb7c12133ea03a8" title=" " alt="" coords="5,212,228,268"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fitness_1_1_fitness_parameters.html#a2ab06430e0d6c35625d03557520cf505" title="Processes all parameters and initialize related objects." alt="" coords="276,145,481,186"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#a2272dbcf72c993b4544719ddf64c98b6" title=" " alt="" coords="19,52,214,108"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#ac3684e1e2969ee1c883ab279d4d5c048" title="This test is reproducing most of what done in FitnessParametersTest#testProcessExpressions() so if bo..." alt="" coords="11,132,222,188"/>
+</map>

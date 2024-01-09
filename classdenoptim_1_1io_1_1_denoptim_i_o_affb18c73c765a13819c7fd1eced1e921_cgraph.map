@@ -1,0 +1,6 @@
+<map id="denoptim.io.DenoptimIO.readCandidates" name="denoptim.io.DenoptimIO.readCandidates">
+<area shape="rect" id="node1" title="Reads SDF files that represent one or more tested or to be tested candidates." alt="" coords="5,71,193,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a48102bb79e9cc581e8c6ef527e003b08" title="Reads a file containing multiple molecules (multiple SD format))" alt="" coords="243,5,431,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_candidate.html#a2bd00398a6f5842075f95c707c03de1a" title=" " alt="" coords="241,71,433,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_candidate.html#a283198cd3d6acf63f66ab1aa5400a957" title=" " alt="" coords="241,136,433,177"/>
+</map>

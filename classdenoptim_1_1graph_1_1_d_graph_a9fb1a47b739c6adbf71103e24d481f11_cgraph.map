@@ -1,0 +1,4 @@
+<map id="denoptim.graph.DGraph.getOutermostGraphOwner" name="denoptim.graph.DGraph.getOutermostGraphOwner">
+<area shape="rect" id="node1" title=" " alt="" coords="5,29,184,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="232,29,403,71"/>
+</map>

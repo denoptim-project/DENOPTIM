@@ -1,0 +1,13 @@
+<map id="denoptim.graph.Fragment.indexOf" name="denoptim.graph.Fragment.indexOf">
+<area shape="rect" id="node1" title=" " alt="" coords="1135,79,1349,106"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6b60be1b437b1d21334d39d003c14249" title="Removes an atom and replaces it with an attachment point." alt="" coords="828,24,1087,65"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#a1e02c5f6054d5764ff597bd12337345a" title=" " alt="" coords="853,104,1061,145"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="517,14,780,41"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="253,5,469,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer.html#a1845241fead0bee7fd92feaf6d71e331" title="Once the clustering is done, this method return the list of cluster centroids." alt="" coords="549,133,748,175"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer.html#aae37739ae959ab8a85bf01286c5a518e" title="Once the clustering is done, this method return the list of fragments that are nearest to the respect..." alt="" coords="523,68,775,109"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment_test.html#a30be40702849bf4781129bf3dabf88e8" title=" " alt="" coords="523,199,774,240"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#aa21ebdf147f5bdb2685f9e775efd0b10" title=" " alt="" coords="260,71,463,112"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#aa17925160f3f03080e8680c7016fc1c4" title=" " alt="" coords="262,136,461,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter.html#aa27df9705e3aed34cc8cb8bc05e6ce85" title=" " alt="" coords="5,71,205,112"/>
+</map>

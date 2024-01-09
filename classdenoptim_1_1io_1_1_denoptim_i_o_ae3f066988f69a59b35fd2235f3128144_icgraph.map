@@ -1,0 +1,16 @@
+<map id="denoptim.io.DenoptimIO.writeCompatibilityMatrix" name="denoptim.io.DenoptimIO.writeCompatibilityMatrix">
+<area shape="rect" id="node1" title="The class compatibility matrix." alt="" coords="903,498,1093,539"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ae401cb5105c9afd41d058685eb051869" title=" " alt="" coords="633,357,839,398"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#a88a23def2b037c1f8e8c383e3fd02265" title="Writes all the compatibility matrix data to the given file." alt="" coords="617,530,855,571"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a6f2ce8f6a8319b39440b0dc43ede061f" title="Check that the following graph&#39;s fused ring gets added to the fragment library." alt="" coords="291,5,569,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a56ef448997df677c5ce4a73737f127e2" title="Checks that a graph with a fused ring containing a scaffold vertex is added to the scaffold library." alt="" coords="295,85,565,141"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a7555fcdf60b6fabae0c95844f351fc6f" title=" " alt="" coords="297,165,563,206"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ae884d9d970bc9d561dad00bf0c20b4b5" title=" " alt="" coords="307,229,553,285"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a2ba7718688486212e987638aef444bad" title=" " alt="" coords="307,309,553,365"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab95d03f36f68718eb1cc11fac188401f" title=" " alt="" coords="301,389,559,445"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a7179e27179c0bbe5a8ae101a9aa8e3d8" title=" " alt="" coords="309,469,551,510"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab364422886eee4ba289a703f83b0ef1b" title=" " alt="" coords="333,534,527,575"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a692723b803a64dd25e775b2f8726fe27" title="Works with this graph:" alt="" coords="307,599,553,655"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#a4bc183818810a26037080b47f082b9af" title="Initialize the panel and add buttons." alt="" coords="332,678,528,719"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#ab550b03594a5843183d6f925e66d444b" title="Constructor." alt="" coords="5,678,243,719"/>
+</map>

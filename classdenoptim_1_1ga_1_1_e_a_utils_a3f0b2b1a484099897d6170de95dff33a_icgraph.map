@@ -1,0 +1,16 @@
+<map id="denoptim.ga.EAUtils.makeGraphFromFragmentationOfMol" name="denoptim.ga.EAUtils.makeGraphFromFragmentationOfMol">
+<area shape="rect" id="node1" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="1105,208,1311,249"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a2546eaac0cf6becaf10b56a1c929953a" title=" " alt="" coords="811,5,1057,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8357317053a9158e81f78ffe6bd65688" title="Generates a candidate by fragmenting a molecule and generating the graph that reconnects all fragment..." alt="" coords="825,71,1043,112"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a24f7c5614809e179869e3ff7f0915067" title=" " alt="" coords="815,136,1053,177"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a7aacd3106f0bd9b473ad774341985f4f" title=" " alt="" coords="815,201,1053,257"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#abcbac685a05d95293f9ed0c994337f96" title=" " alt="" coords="815,281,1053,337"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a85f73c095ad2eb848d44d9cff6de5f5d" title=" " alt="" coords="815,361,1053,417"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a69668d1501ae274745b223d93feae166" title="Test the detection of &quot;some&quot; symmetry." alt="" coords="815,441,1053,497"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="512,13,763,39"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="259,5,464,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="544,71,731,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="279,71,444,112"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,37,211,79"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,103,198,144"/>
+</map>

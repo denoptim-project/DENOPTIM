@@ -1,0 +1,6 @@
+<map id="denoptim.ga.OffspringEvaluationTask" name="denoptim.ga.OffspringEvaluationTask">
+<area shape="rect" id="node1" title="Task that calls the fitness provider for an offspring that can become a member of the current populat..." alt="" coords="5,229,241,256"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_fitness_task.html" title="Task that assesses the fitness of a given graph." alt="" coords="34,155,213,181"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="56,80,191,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="59,5,187,32"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.graph.SymmetricAPs.getAllSameAs" name="denoptim.graph.SymmetricAPs.getAllSameAs">
+<area shape="rect" id="node1" title="Identifies any set of symmetric APs that, although it contains references to different instances of A..." alt="" coords="505,39,680,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aff06be9fc2508e591352e7ae46260721" title="Tries to determine the set of symmetric vertices in this graph based on finding compatible Vertexes t..." alt="" coords="261,39,457,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a18eb5d0ba6772e9116176ef6ca9f84fc" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="7,5,212,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a05b87ffb43b9710fcea83b0777654e27" title=" " alt="" coords="5,71,213,112"/>
+</map>

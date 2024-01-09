@@ -1,0 +1,52 @@
+<map id="denoptim.ga.EvolutionaryAlgorithm.makeOffspringB" name="denoptim.ga.EvolutionaryAlgorithm.makeOffspringB">
+<area shape="rect" id="node1" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="5,2281,179,2323"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="263,1141,433,1183"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#af5cb07ab0686739e6e1713da9d8959c1" title=" " alt="" coords="823,1259,1001,1300"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_candidate.html#a50cd0725a1b1c8766897427f2375e79d" title=" " alt="" coords="535,229,727,271"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad3d2daeb11e68a356e971ca1846596b5" title=" " alt="" coords="263,1696,433,1737"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a2014fe16fbd88124afa846c8d2227104" title="Generates a pair of new offspring by performing a crossover operation." alt="" coords="263,2248,433,2289"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a0281bd3b3cef141abde0026934d6c2a8" title=" " alt="" coords="227,2313,469,2355"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#afdae0c2be1ea60331db7288ca9d4f0af" title=" " alt="" coords="234,2379,462,2420"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a0494fffda539d98fc9a64976ab193798" title=" " alt="" coords="239,2444,457,2485"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ad9db6420b91ff13e0a8b2d02402c0242" title="Returns the current program&#45;specific randomizer." alt="" coords="255,2509,441,2551"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0eaa0754c76b7a20702ae6de34424d13" title="Takes a decision on which CandidateSource method to use for generating a new Candidate." alt="" coords="247,2575,449,2616"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#ab0ede6172563425e523bab9d949f30d4" title="Add a capping groups on free unused attachment points." alt="" coords="821,1025,1003,1067"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a54af78e8bef32c0ef673243e5f17a98b" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="533,1837,728,1879"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#abcfe2ce7f7bb4d5bea2dbbd816d12d2b" title="Wipes the data in this graph." alt="" coords="528,1903,733,1930"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6f0b9a42074fe224ae52cee5f5875a7c" title="Returns almost &quot;deep&#45;copy&quot; of this graph." alt="" coords="535,319,726,346"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph.html#a421ce3718c62761e49a4dd4d0f20682c" title=" " alt="" coords="823,668,1001,709"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ad8710eee33a792e0bc46f5bc4f8cf251" title=" " alt="" coords="534,1955,727,1996"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a5933a7161684c3526a63b176407f059e" title=" " alt="" coords="534,1317,727,1359"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a93693af51412000689dc7517151b9a05" title=" " alt="" coords="793,1179,1031,1220"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph.html#a49ca4849cb306cbbd45e579bb8139cf6" title="Search for unused ring closing vertices: vertices that contain only a RingClosingAttractor and are no..." alt="" coords="541,1383,720,1424"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_candidate.html#ab0fe6ba8e6a45ea539366ac6cef13d79" title="The generation this candidate belong to is that in which it was generated." alt="" coords="535,836,727,877"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="541,901,720,943"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3e70a05980faed946fbf264a1fc6fa75" title=" " alt="" coords="541,967,720,1008"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1utils_1_1_general_utils.html#ab0c97460520e98fa670681d851754703" title="returns the padded string with zeroes placed to the left of &#39;number&#39; up to reach the desired number o..." alt="" coords="531,1448,730,1489"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="819,1099,1005,1140"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_candidate.html#a65cfcaa4ce7b537005082fd90e90d8b6" title=" " alt="" coords="535,523,727,564"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aec200d5d7fdb3bdd7139736499a679ae" title="Unique counter for the number of graphs generated." alt="" coords="818,763,1006,804"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1utils_1_1_graph_utils.html#ad951e78a24210e710cba8296b67bf732" title="Unique counter for the number of molecules generated." alt="" coords="537,1513,725,1555"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1ga_1_1_graph_operations.html#ad6ad588ae59fe0454cae046259b3f49d" title="Tries to do mutate the given graph." alt="" coords="792,912,1032,953"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_d_graph.html#a78dd305de83fa47a17964f9916519337" title="Reassign vertex IDs to all vertices of this graph." alt="" coords="523,640,738,681"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a17505cbf52d9203a1af793f07bcf27f9" title="Selects a number of members from the given population." alt="" coords="542,705,719,747"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_candidate.html#acff1b65216b9f5403c40906e2378bc2a" title="Just place the argument in the IAtomContainer field of this object." alt="" coords="535,1579,727,1620"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_candidate.html#ac0412da09a4ce62479ffee060b453d70" title=" " alt="" coords="517,1645,744,1671"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_candidate.html#a5957f2063e01acea98dd00da6dfdfc5c" title=" " alt="" coords="535,1696,727,1737"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_candidate.html#a92203ad4eb0c99e8e3bc75b0fba6d746" title=" " alt="" coords="523,1762,738,1789"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a1ddb932d4618434d435e4f85ce5e5eb5" title="Evaluates the possibility of closing rings in a given graph and if any ring can be closed,..." alt="" coords="543,1200,718,1241"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a651bbd4b7b5581af4e4abb520cd7e114" title="Writes the graph to SDF file." alt="" coords="535,771,726,812"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="825,253,999,295"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_ring.html#a26caae2f4e91d37ffb2f7f3becd97a8e" title="Append a DENOPTIMVertex to the list." alt="" coords="812,319,1012,346"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="820,370,1004,397"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8c53e13b64166fc85fc9a7787dadd46b" title=" " alt="" coords="810,421,1014,447"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a774671253396558cf35ab75613762174" title="Returns the bond type preferred by this attachment point as defined by the APClass,..." alt="" coords="822,472,1002,513"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="827,537,997,579"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="827,5,997,47"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="823,71,1001,112"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_ring.html#a4d36b4964430194b787e708d47b00af5" title="Set the bond type (i.e., bond order) of the chord connecting the head and the tail vertices." alt="" coords="803,137,1021,163"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_d_graph.html#a30bfc345b743b8859c842b3b4e3ca5fa" title=" " alt="" coords="823,603,1001,644"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5126283bcf1434c3366ea17bfac2c55f" title=" " alt="" coords="823,188,1001,229"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a87ea0ad600ad26e1a89a4947abcfef86" title="Graph construction starts with selecting a random core/scaffold." alt="" coords="546,1032,715,1073"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1utils_1_1_randomizer.html#abedece0dc015bf122af76a2ca10bfccd" title="Returns the next pseudo&#45;random, uniformly distributed double value between 0.0 and 1...." alt="" coords="531,2575,731,2616"/>
+</map>

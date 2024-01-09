@@ -1,0 +1,52 @@
+<map id="denoptim.gui.GUIGraphHandler.initialize" name="denoptim.gui.GUIGraphHandler.initialize">
+<area shape="rect" id="node1" title="Initialize the panel and add buttons." alt="" coords="5,1496,256,1523"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_buttons_bar.html#a18fff5d1fdf9c9632154001fac4381ca" title=" " alt="" coords="360,359,547,385"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a862033257c1fb94842ad5dee46a8910c" title="Edits the currently loaded graph by adding a chord involving the two selected vertices." alt="" coords="340,410,567,451"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#aadb666e7d30a631bf9b97d77a8aa0b1d" title="Adds a symmetric set of vertices to this graph." alt="" coords="363,475,544,517"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1files_1_1_file_utils.html#af572123d13600224e1de3cb7b79cb028" title="Appends an entry to the list of recent files." alt="" coords="365,565,541,606"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a2546eaac0cf6becaf10b56a1c929953a" title=" " alt="" coords="330,630,577,671"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#ac58ac806c3220d9a069f7259c843dbaa" title="Loads the given graph into the graph viewer." alt="" coords="991,1248,1201,1304"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a9c42cf2eaeda70e10b570a290cce5518" title=" " alt="" coords="330,1142,577,1183"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af7024886a4203aa93d8cf7975f7c2e72" title=" " alt="" coords="667,1358,909,1399"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a0bfee228212165cd5bc2f5cee7b131d8" title=" " alt="" coords="973,1467,1219,1509"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#ab50cb5be3164a9e6ea3d87d21c7d5416" title="Triggers the generation of the molecular representation of the loaded graph." alt="" coords="989,939,1203,995"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#aaa04536e178fdfa5bad92cdc1fcc4583" title="Shows the dialog and restrains the modality to it, until the dialog gets closed." alt="" coords="983,1811,1209,1853"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#aecf8050385cc9b905141c7404021ac64" title=" " alt="" coords="659,1627,917,1669"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#ae6eecb27bf631e3cf159af0834ff6ee2" title="Starts a dialog to define the on&#45;the&#45;fly fragmentation settings." alt="" coords="328,959,579,1001"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a08082e27d7533670cd4e73f1d0608d83" title=" " alt="" coords="663,952,913,1008"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a44e2ff798d22b73f966cb8393ceb4f18" title="Extends the current graph by appending a node to a specific free AP on the growing graph." alt="" coords="667,2243,909,2285"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a569ab034eb86d265ef07683af407b81f" title="Identifies which attachment points are selected in the graph viewer." alt="" coords="347,1441,560,1497"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a6d4f1b74752e7b7cddc792e86992866f" title="Identifies which vertices are selected in the graph viewer." alt="" coords="340,1521,567,1577"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a81df728192225395c24224607bc63eee" title="Imports graphs from file." alt="" coords="333,1207,574,1249"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a67ce3e03e9d13d3f312652296d25c0a5" title=" " alt="" coords="339,1666,568,1707"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1gui_1_1_g_u_i_file_opener.html#ad35e400e91aa5777334a672546a124cc" title=" " alt="" coords="337,1732,570,1759"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1gui_1_1_g_u_i_file_saver.html#ad5cdfcff83de2e2b403f3b3fe561113a" title=" " alt="" coords="351,1783,555,1825"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1gui_1_1_g_u_i_file_saver.html#ab2181dc4353ca1d2acc117de618234ed" title=" " alt="" coords="351,1849,555,1890"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1gui_1_1_g_u_i_file_opener.html#abe089d38320e7616877eb88d841d158a" title=" " alt="" coords="347,1914,559,1955"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a11c5c55e0930e8eb7304416707016522" title=" " alt="" coords="329,1077,577,1118"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_d_graph.html#a40786de6efd159a5c54c122d0d3d2c1c" title="Remove a vertex from this graph." alt="" coords="352,2031,555,2073"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ad54901fb2a09953591c971ffc48f3de1" title=" " alt="" coords="337,1601,570,1642"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_template.html#ab6a7859f36c5e25a8ad218b665a3a20c" title="Imposes the given contract to this template." alt="" coords="359,2149,547,2190"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_template.html#a405d47ac1a08ac9bd658bcdcc693a0a4" title=" " alt="" coords="359,2214,547,2255"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a62d04b3acf7b29a3f2babd988b25f263" title="Alters the functionality of mouse in the graph visualization panel." alt="" coords="349,2279,557,2321"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a857bfe6291322daccf2af3fd9a28a356" title="Start the construction of a new graph from scratch." alt="" coords="304,1325,603,1366"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a99f65e1d8dba2217d95e75deac5b0e52" title="Writes the graphs to file." alt="" coords="358,2397,549,2438"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a04cf8bea6e235a0adf12e95708d7f627" title="Writes vertexes to file." alt="" coords="358,2486,549,2527"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad16255987a45bace2ef62f2b49e0d873" title=" " alt="" coords="685,5,891,32"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a385b38d07e2ef13ea37a10de069b4320" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="689,146,887,187"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a9dcce7e1ee36996395b1b8d3aa2116dc" title=" " alt="" coords="663,211,913,253"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#aa636fa2c7871c8b248bd9b87d57a11c4" title=" " alt="" coords="669,276,907,332"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#a385c2741a907c1810014958feb4d94e1" title=" " alt="" coords="684,355,892,397"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a04f2b439550bbb6f001eeaca4d40702d" title=" " alt="" coords="651,421,925,462"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="695,486,881,527"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a6672288e5788e184b299354ee3f31d96" title=" " alt="" coords="668,551,908,607"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#a9ed0aa4606b687bc3fdeb787fd5535b1" title=" " alt="" coords="703,630,873,671"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ad71f3e0107bfa15b942563cfcf6f260a" title="Loads the graph corresponding to the field currGrphIdx." alt="" coords="673,1031,903,1073"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a3f0b2b1a484099897d6170de95dff33a" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="685,719,891,761"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#af5ec56eba56e5fd3898d162206d78c34" title=" " alt="" coords="703,785,873,826"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#afa32564e6f9995213a2e9c9ee37f04c8" title="Sets boolean variable workingIn3D." alt="" coords="663,57,913,98"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ae236e3fe871b414dfcc7a2b219a516a6" title=" " alt="" coords="666,1097,910,1138"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1files_1_1_file_utils.html#adf038babeb9f64d8c853a0290efe04fb" title="Inspects a file/folder and tries to detect if there is one of the data sources that is recognized by ..." alt="" coords="693,1293,883,1334"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a288cf0ff784fd2355c5011f9b18001b2" title=" " alt="" coords="673,1162,903,1203"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a48102bb79e9cc581e8c6ef527e003b08" title="Reads a file containing multiple molecules (multiple SD format))" alt="" coords="694,1227,882,1269"/>
+</map>
