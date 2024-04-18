@@ -373,7 +373,7 @@ public class DGraph implements Cloneable
     {
         int initialSize = symVertices.size();
         
-        // This is do hold vertexes in a staging area (symVrtxsFromAnyBranch)
+        // This is to hold vertexes in a staging area (symVrtxsFromAnyBranch)
         // without adding them to a SymmetricVertexes right away. 
         Set<Vertex> alreadyAssignedVrtxs = new HashSet<Vertex>();
 
@@ -439,14 +439,59 @@ public class DGraph implements Cloneable
             }
         }
         
-        for (List<Vertex> symVertexes : symVrtxsFromAnyBranch.values())
+
+        for (Map.Entry<SymmetricAPs,
+                List<Vertex>> entry : symVrtxsFromAnyBranch.entrySet()) 
         {
-            if (symVertexes.size()<2)
-            {
+            
+            List<Vertex> symVertexes = entry.getValue();
+            SymmetricAPs key = entry.getKey();
+            if (symVertexes.size() < 2) {
                 // We get rid of placeholders for vertexes that use APs that 
                 // are not part of a symmetriAPs, but could have been part 
-                // of symmetric subgraphs
+                // of symmetric subgraphs                
                 continue;
+            } else {
+            
+                Map<Vertex, List<Vertex>> vertexChildrenMap = new HashMap<>();
+                // Get children tree for each vertex in the symmetric set
+                for (Vertex vertex : symVertexes) {
+                    List<Vertex> children = new ArrayList<>();
+                    getChildrenTree(vertex, children);
+                    vertexChildrenMap.put(vertex, children);
+                }
+                
+                boolean allInOneBranch = false;
+                Set<Vertex> toRemove = new HashSet<>();
+                for (Vertex parent : vertexChildrenMap.keySet()) {
+                    List<Vertex> children = vertexChildrenMap.get(parent);
+                    boolean allChildren = true;
+                    for (Vertex other : symVertexes) {
+                        if (other != parent && !children.contains(other)) {
+                            allChildren = false;
+                            break;
+                        }
+                    }
+                    if (allChildren) {
+                        allInOneBranch = true;
+                        break;
+                    }
+                    // Mark children for removal if they are contained in any 
+                    // parent's children tree
+                    for (Vertex child : children) {
+                        if (symVertexes.contains(child) && child != parent) {
+                            toRemove.add(child);
+                        }
+                    }
+                }
+                if (allInOneBranch) {
+                    // All vertices are in the same branch, skip the set
+                    continue;
+                    
+                } else if (!toRemove.isEmpty()) {
+                    // Remove only the child vertices.
+                    symVertexes.removeAll(toRemove);
+                }
             }
             alreadyAssignedVrtxs.addAll(symVertexes);
             addSymmetricSetOfVertices(new SymmetricVertexes(symVertexes));
