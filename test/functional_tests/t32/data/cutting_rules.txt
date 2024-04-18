@@ -1,0 +1,45 @@
+###############################################################################
+###############################################################################
+##
+## extendedRECAP Cutting Rules
+##
+## The following rules are extendedRECAP (Retrosynthetic Combinatorial Analysis
+## Procedure) rules;
+## outlined in  https://doi.org/10.1111/cbdd.13129.
+## The files with the rules in their original syntax can be found at
+## https://github.com/kheikamp/modified_molBLOCKS.
+## These rules are limited to organic molecules and they have been design to
+## produce fragments interesting for drug design.
+##
+## January 30, 2023
+##
+###############################################################################
+CTR UREA 1 [#7;D2,D3] [C;$(C(!@=[#8,#16])(!@[#7;D1,D2,D3])!@[#7;D1,D2,D3])] -!@
+CTR AMIDE 2 [#7;!D1] [C;$(C=!@[#8,#16]);!$(C([#7])[#7])] -!@
+CTR AZO 3 [NX2] [NX2] =!@
+CTR ESTERS 4 [C;!D1;$(C(=!@[O,S]))] [O,S;!D1;!$([O,S][*;D1])] -!@
+CTR AMINES 5 [N;!D1;!R;!$(N=O);!X4] [*;!#16;!D1] -!@
+CTR AROMN_ALIC 6 [n] [C] -!@
+CTR CYCLIC_AMINES 7 [#7;R,D3;!$(N=O);!$(N(C=O))] [*;!#16;!D1;!$(O-S)] -!@
+CTR AROM_AROM 8 [c,n] [c] -!@
+CTR SULPHONAMIDE 9 [#7;D2,D3] [S;$([S](=[O])=[O])] -!@
+CTR ETHERS 10 [#8,#16;$([#8,#16](!@[#6,#16;!D1])(!@[#6,#16;!D1]));!$([#8,#16][#6]=!@[#8,#16]);!$([#16]=O);!$([#8,#16]([#16]=O))] [#6;!D1;!$([#6](=!@[#8,#16]))] -!@
+CTR OLEFIN 11 [C;!D1] [C;!D1] =!@
+CTR DISULPHIDE 12 [S;!D1;!$(S-[OH])] [S;!D1;!$(S-[OH])] -!@
+CTR RCARBON_RCARBON 13 [#6;R] [#6;R] -!@
+CTR PHOSPHATES 14 [OX2;$([OX2][PX4])] [*;!P;!D1] -
+CTR SULFONYL 15 [#16;$([#16X4]([*;!D1])(=[OX1])=[OX1]);!$([#16]-[O]);!$([#16]-[N;H2])] [*;!D1] -!@
+CTR RCARBON_ALIC_RCARBON 16 [#6;R] [#6$([#6;H2](-!@[#6;R])(-!@[#6;R]))] -!@
+CTR NITRO_COMPOUND 17 [#7;$([NX3](=O)=O),$([NX3+](=O)[O-])] [*;!D1;!#8] -!@
+CTR SULFINATO 18 [S;D4;$(S(=O)(=O)(-[OH]))] [*;!D1;!#8] -!@
+CTR SULFATES 19 [OX2;$([OX2][S;$([#16X4](=[OX1])(=[OX1])([OX2])([O]))])] [*;!S;!D1] - 
+CTR SULFONATES 20 [S;$([#16X4](=[OX1])(=[OX1])([O]));!$([#16X4](=[OX1])(=[OX1])([OH]))] [*;!S;!O;!D1] -!@
+CTR SULFAMOYL 21 [SD4;$(S(=O)(=O)([N,H2]))] [*;!N] -!@
+CTR ALDEHYDE 22 [#6;R] [C$([CX3H1](=[O]))] -!@
+CTR quaternary_nitrogen 23 [N;+1;D4] [#6] -!@
+CTR lactam_nitrogen-aliphatic_carbon 24 [$(N(@-C(=O)))] [#6] -!@
+CTR RCARBON_anyAtom 25 [#6;R] [*;!#1] -!@
+CTR PHOSPHATES_2 26 [O;$(O(P)[*;!P])] [PX4;$(P([OX2])(=O)[OX2])] -!@
+CTR CRCARBON_anyAtom 27 [#6;$([#6]-!@[#6;R])] [*;!#1] -!@
+
+

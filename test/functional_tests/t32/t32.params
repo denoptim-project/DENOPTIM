@@ -1,0 +1,13 @@
+# Genetic Algorithm - parameters
+GA-Verbosity=2
+GA-PopulationSize=1
+GA-InitMolsToFragmentFile=init_pop.txt
+#Fragmentation
+FRG-CUTTINGRULESFILE=cutting_rules.txt
+FRG-ADDEXPLICITHYDROGEN
+
+#Building Blocks Space - parameters
+FS-CompMatrixFile=comp_matrix
+
+# Fitness Provider - parameters
+FP-Equation=${Zagreb*2}
