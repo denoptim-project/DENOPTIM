@@ -305,10 +305,10 @@ runTest "t12f"
 #
 runTest "t12g"
 
-#
-# t12h: Initial population given as molecules to fragment from SDF file
-#
-runTest "t12h"
+# #
+# # t12h: Initial population given as molecules to fragment from SDF file
+# #
+# runTest "t12h"
 
 #
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation
@@ -402,6 +402,11 @@ runTest "t30"
 # t31: test Py4J integration
 #
 runTest "t31"
+
+#
+# t32: test managing of sym vertices when initial population is built by fragmentation
+#
+runTest "t32"
 
 echo "All done!"
 exit 0

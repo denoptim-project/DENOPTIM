@@ -51,7 +51,7 @@ if [[ "$count" -ne 5 ]]; then
     echo "Test NOT PASSED: The expected number of symmetric vertices (5) is different from the one found ($count)."
     exit -1
 else
-    echo "Test t32 PASSED: Correct number of symmetric vertices found ($count)."
+    echo "Test t32 PASSED"
 fi
 
 exit 0
