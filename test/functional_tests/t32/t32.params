@@ -1,6 +1,6 @@
 # Genetic Algorithm - parameters
 GA-Verbosity=2
-GA-PopulationSize=3
+GA-PopulationSize=1
 GA-InitMolsToFragmentFile=init_pop.txt
 #Fragmentation
 FRG-CUTTINGRULESFILE=cutting_rules.txt

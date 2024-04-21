@@ -354,7 +354,7 @@ public class DGraph implements Cloneable
      * vertexes that are compatible with each other) 
      * or that are downstream (i.e., according to edge 
      * direction) w.r.t {@link Vertex}es that are using symmetric 
-     * {@link AttachmentPoint}s. The compatibility of the vertexes is determined 
+     * {@link AttachmentPoint}s.The compatibility of the vertexes is determined 
      * by these criteria:<ul>
      * <li>the AP used to link the parent vertex must have the same features
      * as defined by the {@link AttachmentPoint#sameAs(Vertex)} method.</li>
@@ -365,17 +365,12 @@ public class DGraph implements Cloneable
      * space, in which case the last condition applies,</li>
      * <li>vertexes have same features and isomorphic internal structure as 
      * from the {@link Fragment#isIsomorphicTo(Vertex)} method.</li>
-     * <li>the symmetric vertexes must not be connected by a directed path, 
-     * i.e., one cannot be (grand)^N-parent of the other.
      * </ul>
      * @return <code>true</code> if some symmetric set of vertex has been found.
      * @throws DENOPTIMException
      */
     public boolean detectSymVertexSets() throws DENOPTIMException
     {
-        //TODO-gg del
-        DenoptimIO.writeGraphToJSON(new File("/tmp/g.json"), this);
-        
         int initialSize = symVertices.size();
         
         // This is to hold vertexes in a staging area (symVrtxsFromAnyBranch)
@@ -408,76 +403,28 @@ public class DGraph implements Cloneable
                         findSymmetrySetsOfChildVertexes(symToVrtx, 
                                 alreadyAssignedVrtxs);
                 
-                for (SymmetricAPs candSymAP 
-                        : symChildenSetsOnSymToVrtxs.keySet())
+                for (SymmetricAPs key : symChildenSetsOnSymToVrtxs.keySet())
                 {
-                    // Search for any mapping with previously recorded sym sets
-                    // of vertexes...
+                    // Find any mapping with previously recorded SymmetricAPs
                     boolean foundSymmetricBranch = false;
-                    Set<SymmetricAPs> candidatePreviousSAPsIDs = 
-                            candSymAP.getAllSameAs(
-                                    symVrtxsFromAnyBranch.keySet());
-                    // ...but exclude those that identify location in the parent
-                    // tree.
-                    Set<SymmetricAPs> toExclude = new HashSet<SymmetricAPs>();
-                    for (SymmetricAPs candPreviousSymAPID
-                            : candidatePreviousSAPsIDs)
+                    for (SymmetricAPs keyOnMaster : key.getAllSameAs( 
+                            symVrtxsFromAnyBranch.keySet()))
                     {
-                        List<Vertex> potentialParents = 
-                                symVrtxsFromAnyBranch.get(candPreviousSymAPID);
-                        if (potentialParents!=null)
-                        {
-                            for (Vertex candParent : potentialParents)
-                            {
-                                if (symToVrtx==candParent)
-                                {
-                                    // The previous sym set already contains 
-                                    // symToVrtx
-                                    toExclude.add(candPreviousSymAPID);
-                                    break;
-                                }
-                                List<Vertex> children = new ArrayList<>();
-                                getChildrenTree(candParent, children);
-                                if (children.contains(symToVrtx))
-                                {
-                                    // symToVrtx would be grand^N-children on a 
-                                    // vertex already in the sym set.
-                                    toExclude.add(candPreviousSymAPID);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    candidatePreviousSAPsIDs.removeAll(toExclude);
-                    
-                    // Evaluate whether the candidate AP (i.e., possible root
-                    // of a symmetric branch) holds a users that is symmetric
-                    // to the one we have on the candSymAP
-                    for (SymmetricAPs keyOnMaster : candidatePreviousSAPsIDs)
-                    {
+                        foundSymmetricBranch = true;
+                        
                         // Here we must NOT consider the already assigned ones!
-                        if (areApsUsedBySymmetricUsers(candSymAP.get(0),
+                        if (areApsUsedBySymmetricUsers(key.get(0),
                                 keyOnMaster.get(0), new HashSet<Vertex>()))
                         {
                             // the previously recorded branch and 
-                            // this one are consistent, so add this sym children
-                            // to previously known set.
-
-                            //TODO-gg del
-                            System.out.println("appending to "+candSymAP+" -> "+symChildenSetsOnSymToVrtxs.get(candSymAP));
-                            for (Vertex v : 
-                                symChildenSetsOnSymToVrtxs.get(candSymAP))
-                            {
-                                List<Vertex> targetSymLst = 
-                                        symVrtxsFromAnyBranch.get(keyOnMaster);
-                                if (!targetSymLst.contains(v))
-                                    targetSymLst.add(v);
-                            }
-                            foundSymmetricBranch = true;
+                            // this one are consistent
+                            symVrtxsFromAnyBranch.get(keyOnMaster).addAll(
+                                    symChildenSetsOnSymToVrtxs.get(key));
                         } else {
                             // branches correspond to two different sets of
                             // symmetric vertexes. So, we treat the new branch
                             // independently
+                            foundSymmetricBranch = false;
                         }
                     } 
                     if (!foundSymmetricBranch)
@@ -485,117 +432,68 @@ public class DGraph implements Cloneable
                         // Effectively, in the first iteration of the loop
                         // we will always end up here
                         List<Vertex> lst = new ArrayList<Vertex>();
-                        lst.addAll(symChildenSetsOnSymToVrtxs.get(candSymAP));
-                        //TODO-gg del
-                        System.out.println("ADDING "+candSymAP+" -> "+lst);
-                        symVrtxsFromAnyBranch.put(candSymAP, lst);
+                        lst.addAll(symChildenSetsOnSymToVrtxs.get(key));
+                        symVrtxsFromAnyBranch.put(key, lst);
                     }
                 }
             }
         }
         
-        // Remove unused place holders
-        Set<SymmetricAPs> keysToRemove = new HashSet<SymmetricAPs>();
-        for (SymmetricAPs key : symVrtxsFromAnyBranch.keySet())
+
+        for (Map.Entry<SymmetricAPs,
+                List<Vertex>> entry : symVrtxsFromAnyBranch.entrySet()) 
         {
-            if (symVrtxsFromAnyBranch.get(key).size() < 2) {
-                // We get rid of place holders for vertexes that use APs that 
-                // are not part of a symmetriAPs, but could have been part 
-                // of symmetric subgraphs     
-                keysToRemove.add(key);
-            }
-        }
-        for (SymmetricAPs key : keysToRemove)
-            symVrtxsFromAnyBranch.remove(key);
-        
-        // Resolve sets that consider at least one same vertex
-        keysToRemove.clear();
-        List<SymmetricAPs> orderedKeys = new ArrayList<SymmetricAPs>(
-                symVrtxsFromAnyBranch.keySet());
-        for (int i=0; i<orderedKeys.size(); i++)
-        {
-            SymmetricAPs keyI = orderedKeys.get(i);
-            List<Vertex> listSymVrtxsI = symVrtxsFromAnyBranch.get(keyI);
-            for (int j=i+1; j<orderedKeys.size(); j++)
-            {
-                SymmetricAPs keyJ = orderedKeys.get(j);
-                List<Vertex> listSymVrtxsJ = symVrtxsFromAnyBranch.get(keyJ);
-                if (!Collections.disjoint(listSymVrtxsI,listSymVrtxsJ))
-                {
-                    // The two lists share one or more vertexes: cannot coexist!
-                    // Choose the largest...
-                    if (listSymVrtxsI.size()>listSymVrtxsJ.size())
-                    {
-                        keysToRemove.add(keyJ);
-                    } else if (listSymVrtxsI.size()<listSymVrtxsJ.size())
-                    {
-                        keysToRemove.add(keyI);
-                    } else {
-                        // ...or in case of equal size, choose the one that 
-                        // considers the vertexes closest to the scaffold
-                        int sumOfLevelsI = 0;
-                        for (Vertex vI : listSymVrtxsI)
-                            sumOfLevelsI = sumOfLevelsI + getLevel(vI);
-                        int sumOfLevelsJ = 0;
-                        for (Vertex vJ : listSymVrtxsJ)
-                            sumOfLevelsJ = sumOfLevelsJ + getLevel(vJ);
-                        if (sumOfLevelsI>sumOfLevelsJ)
-                        {
-                            keysToRemove.add(keyI);
-                        } else {
-                            // If the sum of levels is the same, it should not 
-                            // matter which one we choose.
-                            keysToRemove.add(keyJ);
-                        }   
-                    }
-                }
-            }
-        }
-        for (SymmetricAPs key : keysToRemove)
-            symVrtxsFromAnyBranch.remove(key);
-        
-        // Final clean
-        for (List<Vertex> symVertexes : symVrtxsFromAnyBranch.values())
-        {
-            Map<Vertex, List<Vertex>> vertexChildrenMap = new HashMap<>();
-            // Get children tree for each vertex in the symmetric set
-            for (Vertex vertex : symVertexes) {
-                List<Vertex> children = new ArrayList<>();
-                getChildrenTree(vertex, children);
-                vertexChildrenMap.put(vertex, children);
-            }
             
-            boolean allInOneBranch = false;
-            Set<Vertex> toRemove = new HashSet<>();
-            for (Vertex parent : vertexChildrenMap.keySet()) {
-                List<Vertex> children = vertexChildrenMap.get(parent);
-                boolean allChildren = true;
-                for (Vertex other : symVertexes) {
-                    if (other != parent && !children.contains(other)) {
-                        allChildren = false;
+            List<Vertex> symVertexes = entry.getValue();
+            SymmetricAPs key = entry.getKey();
+            if (symVertexes.size() < 2) {
+                // We get rid of placeholders for vertexes that use APs that 
+                // are not part of a symmetriAPs, but could have been part 
+                // of symmetric subgraphs                
+                continue;
+            } else {
+            
+                Map<Vertex, List<Vertex>> vertexChildrenMap = new HashMap<>();
+                // Get children tree for each vertex in the symmetric set
+                for (Vertex vertex : symVertexes) {
+                    List<Vertex> children = new ArrayList<>();
+                    getChildrenTree(vertex, children);
+                    vertexChildrenMap.put(vertex, children);
+                }
+                
+                boolean allInOneBranch = false;
+                Set<Vertex> toRemove = new HashSet<>();
+                for (Vertex parent : vertexChildrenMap.keySet()) {
+                    List<Vertex> children = vertexChildrenMap.get(parent);
+                    boolean allChildren = true;
+                    for (Vertex other : symVertexes) {
+                        if (other != parent && !children.contains(other)) {
+                            allChildren = false;
+                            break;
+                        }
+                    }
+                    if (allChildren) {
+                        allInOneBranch = true;
                         break;
                     }
-                }
-                if (allChildren) {
-                    allInOneBranch = true;
-                    break;
-                }
-                // Mark children for removal if they are contained in any 
-                // parent's children tree
-                for (Vertex child : children) {
-                    if (symVertexes.contains(child) && child != parent) {
-                        toRemove.add(child);
+                    // Mark children for removal if they are contained in any 
+                    // parent's children tree
+                    for (Vertex child : children) {
+                        if (symVertexes.contains(child) && child != parent) {
+                            toRemove.add(child);
+                        }
                     }
                 }
+                if (allInOneBranch) {
+                    // All vertices are in the same branch, skip the set
+                    continue;
+                    
+                } else if (!toRemove.isEmpty()) {
+                    // Remove only the child vertices.
+                    symVertexes.removeAll(toRemove);
+                }
             }
-            if (allInOneBranch) {
-                // All vertices are in the same branch, skip the set
-                continue;
-            } else if (!toRemove.isEmpty()) {
-                // Remove only the child vertices.
-                symVertexes.removeAll(toRemove);
-            }
-            
+            alreadyAssignedVrtxs.addAll(symVertexes);
             addSymmetricSetOfVertices(new SymmetricVertexes(symVertexes));
         }
         
@@ -604,44 +502,26 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
     
-    protected Map<SymmetricAPs, List<Vertex>> findSymmetrySetsOfChildVertexes(
+    Map<SymmetricAPs, List<Vertex>> findSymmetrySetsOfChildVertexes(
             Vertex vrtx, Set<Vertex> alreadyAssignedVrtxs)
     {
         Map<SymmetricAPs,List<Vertex>> symSetsOfChildVrtxs = 
                 new HashMap<SymmetricAPs,List<Vertex>>();
         
-        Set<Vertex> addedBySymAP = new HashSet<Vertex>();
-        
         Set<AttachmentPoint> doneAPs = new HashSet<AttachmentPoint>();
         for (SymmetricAPs symAPs : vrtx.getSymmetricAPSets())
         {   
-            // First condition: all symmetric APs must be in use...
-            boolean symAPsAreUsedConsistently = true;
-            boolean first = true;
-            boolean usedAsSrc = false;
+            // First condition: all symmetric APs must be in use
+            boolean addSymAPsAreUsed = true;
             for (AttachmentPoint ap : symAPs)
             {
                 if (ap.isAvailableThroughout())
                 {
-                    symAPsAreUsedConsistently = false;
+                    addSymAPsAreUsed = false;
                     break;
-                } else {
-                    // ...and used in the same way (i.e., as head/tail of edge)
-                    if (first)
-                    {
-                        usedAsSrc = ap.isSrcInUserThroughout();
-                        first = false;
-                    } else {
-                        if ((usedAsSrc && !ap.isSrcInUserThroughout())
-                                || (!usedAsSrc && ap.isSrcInUserThroughout()))
-                        {
-                            symAPsAreUsedConsistently = false;
-                            break;
-                        }
-                    }
                 }
             }
-            if (!symAPsAreUsedConsistently)
+            if (!addSymAPsAreUsed)
                 continue;
             
             // Now consider what vertex is attached to the symmetric APs
@@ -652,6 +532,8 @@ public class DGraph implements Cloneable
             symVertexes.add(firstAp.getLinkedAPThroughout().getOwner());
             for (AttachmentPoint ap : symAPs)
             {
+                doneAPs.add(ap);
+                
                 if (firstAp==ap)
                     continue;
                 
@@ -662,34 +544,28 @@ public class DGraph implements Cloneable
 
                 // OK: this user of AP is symmetric to the user on firstAP
                 symVertexes.add(ap.getLinkedAPThroughout().getOwner());
-                doneAPs.add(ap);
             }
             
             if (setSymmetryRelation)
             {
                 symSetsOfChildVrtxs.put(symAPs,symVertexes);
-                //TODO-ff alreadyAssignedVrtxs.addAll(symVertexes);
-                addedBySymAP.addAll(symVertexes);
+                alreadyAssignedVrtxs.addAll(symVertexes);
             }
         }
         
-        // Here we account for the possibility that vertex without sym APs
-        // is part of a subgraph that is symmetrically reproduced elsewhere.
+        // Here we account for the possibility that  vertex without sym APs
+        // is part of a subgraph the is symmetrically reproduced elsewhere.
         // This is a common pattern in chemistry.
         // To this end we create dummy symmetric sets of APs that contain 
         // only one APs, and use them as placeholder in case the same AP-user
         // is found on symmetric branches.
         for (AttachmentPoint ap : vrtx.getAttachmentPoints())
         {
-            if (doneAPs.contains(ap) || ap.isAvailableThroughout()
-                    || !ap.isSrcInUserThroughout())
+            if (doneAPs.contains(ap) || ap.isAvailableThroughout())
                 continue;            
          
             Vertex user = ap.getLinkedAPThroughout().getOwner();
-            //TODO-ff if (alreadyAssignedVrtxs.contains(user))
-            //    continue;
-
-            if (addedBySymAP.contains(user))
+            if (alreadyAssignedVrtxs.contains(user))
                 continue;
             
             // Create an artifact of SymmetricAPs that contains one entry
@@ -702,11 +578,11 @@ public class DGraph implements Cloneable
             symVertexes.add(user);
             
             symSetsOfChildVrtxs.put(soloSymAps,symVertexes);
-            //TODO-ff alreadyAssignedVrtxs.addAll(symVertexes);
+            alreadyAssignedVrtxs.addAll(symVertexes);
         }
         return symSetsOfChildVrtxs;
     }
-
+    
 //------------------------------------------------------------------------------
 
     /**
@@ -717,7 +593,7 @@ public class DGraph implements Cloneable
      * {@link AttachmentPoint#sameAs(AttachmentPoint)}</li>
      * <li>the {@link Vertex} owner of apB is not contained in the set of
      * already-assigned vertexes (the 3rd argument)</li>
-     * <li>the {@link Vertex}s attached to apA and apB must be return satisfy
+     * <li>the {@link Vertex}a attached to apA andapB must be return satisfy
      * {@link Vertex#sameAs(Vertex)}</li>
      * <li>if such vertexes are instances of {@link Fragment}, then they must  
      * satisfy {@link Fragment#isIsomorphicTo(Vertex)}.</li>
@@ -752,7 +628,7 @@ public class DGraph implements Cloneable
         Vertex userOfApB = apUserOfApB.getOwner();
         if (alreadyAssignedVrtxs.contains(userOfApB))
         {
-            //TODO-consider return false;
+            return false;
         }
         
         // 3rd condition: (not fast, not too slow) the linked
