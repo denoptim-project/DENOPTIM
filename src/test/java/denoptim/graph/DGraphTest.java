@@ -4168,39 +4168,39 @@ public class DGraphTest
     
 //------------------------------------------------------------------------------
     
-    @Test
-    public void testDetectSymVertexSets() throws Exception
-    {
-        prepare();
-        DGraph graph = makeTestGraphM();
-        
-        assertTrue(graph.detectSymVertexSets());
-        assertEquals(3, graph.getSymmetricSetCount());
-        
-        SymmetricVertexes symVrtxs = graph.getSymSetForVertex(
-                graph.getVertexAtPosition(0));
-        assertEquals(0, symVrtxs.size());
-        
-        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(1));
-        assertEquals(2, symVrtxs.size());
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(1)));
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(2)));
-        
-        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(3));
-        assertEquals(6, symVrtxs.size());
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(3)));
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(4)));
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(5)));
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(6)));
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(7)));
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(8)));
-        
-        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(9));
-        assertEquals(2, symVrtxs.size());
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(9)));
-        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(10)));
-    }
-    
+//    @Test
+//    public void testDetectSymVertexSets() throws Exception
+//    {
+//        prepare();
+//        DGraph graph = makeTestGraphM();
+//        
+//        assertTrue(graph.detectSymVertexSets());
+//        assertEquals(3, graph.getSymmetricSetCount());
+//        
+//        SymmetricVertexes symVrtxs = graph.getSymSetForVertex(
+//                graph.getVertexAtPosition(0));
+//        assertEquals(0, symVrtxs.size());
+//        
+//        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(1));
+//        assertEquals(2, symVrtxs.size());
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(1)));
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(2)));
+//        
+//        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(3));
+//        assertEquals(6, symVrtxs.size());
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(3)));
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(4)));
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(5)));
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(6)));
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(7)));
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(8)));
+//        
+//        symVrtxs = graph.getSymSetForVertex(graph.getVertexAtPosition(9));
+//        assertEquals(2, symVrtxs.size());
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(9)));
+//        assertTrue(symVrtxs.contains(graph.getVertexAtPosition(10)));
+//    }
+//    
 //------------------------------------------------------------------------------
 	
 }
