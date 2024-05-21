@@ -432,16 +432,16 @@ public class DGraph implements Cloneable
              }
          }
          
-         return (symVertices.size()-initialSize)>0;
          }
-    
+         return (symVertices.size()-initialSize)>0;
+         
     }
 //------------------------------------------------------------------------------    
 
     private void dfsEncodePaths(Vertex current, 
             String currentPath,
             Set<Vertex> visited,
-            Map<String, List<Vertex>> pathMap) {
+            Map<String, List<Vertex>> pathMap) throws DENOPTIMException {
         
         if (visited.contains(current)) 
         {
