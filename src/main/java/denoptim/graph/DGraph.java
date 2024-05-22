@@ -170,8 +170,13 @@ public class DGraph implements Cloneable
      * Generator of unique AP identifiers within this graph
      */
     private AtomicInteger apCounter = new AtomicInteger(1);
-
-
+    
+    /**
+     * Key used to uniquely identify vertices and attachment points for 
+     * symmetry detection
+     */
+    private static final String SYM_ID = "symmetryKey";
+ 
 //------------------------------------------------------------------------------
 
     public DGraph(List<Vertex> gVertices, List<Edge> gEdges)
@@ -347,16 +352,27 @@ public class DGraph implements Cloneable
     }
     
 //------------------------------------------------------------------------------
-    
+    /**
+      * Detects and groups symmetric sets of {@link Vertex}es in the graph based
+      * on unique identification and path encoding. This function first 
+      * identifies unique {@link Vertex}es and their {@link AttachmentPoint}s, 
+      * assigns them unique identifiers, and uses depth-first search (DFS) to 
+      * encode paths to these {@link Vertex}es starting from the designated 
+      * scaffold. {@link Vertex}es with identical path encodings are considered
+      * symmetric and are grouped together.
+      * @return <code>true</code> if some symmetric set of vertex has been found.
+      * @throws DENOPTIMException
+      */
     public boolean detectSymVertexSets() throws DENOPTIMException
-    {
+    {        
         int initialSize = symVertices.size();
         List<Vertex> uniqueVertices = new ArrayList<>();
-//        Map<Vertex, String> vertexEncodings = new HashMap<>();
-//        Map<AttachmentPoint, String> apEncodings = new HashMap<>();
         Map<String, List<Vertex>> pathMap = new HashMap<>();
         Set<Vertex> visited = new HashSet<>();
         Vertex scaffold = null;
+
+        AtomicInteger vrtxIdCounter = new AtomicInteger();
+        AtomicInteger apIdCounter = new AtomicInteger();
         
         for (Vertex vertex : getVertexList()) 
         {
@@ -366,10 +382,10 @@ public class DGraph implements Cloneable
             boolean isVertexNew = true;
             Vertex matchedVertex = null;
             
-            // Check if the vertex is the same as other in the unique vertices
+         // Check if the vertex is the same as other in the unique vertices
             for (Vertex uniqueVertex : uniqueVertices) 
             {
-                // equality condition
+             // Equality condition
                 if (vertex.sameAs(uniqueVertex)) 
                 {
                     isVertexNew = false;
@@ -379,40 +395,53 @@ public class DGraph implements Cloneable
             }
             if (isVertexNew) 
             {   
-                // Create unique encoding for the vertex
-//                vertexEncodings.put(vertex, 
-//                        vertex.getProperties().toString() + vertex.hashCode());
-                String vertexKey = UUID.randomUUID().toString();
-                vertex.setProperty("uniqueKey", vertexKey);
-            
-                // Create unique encoding for each AP of the vertex
+             // Create unique key for the vertex
+                int vertexKey = vrtxIdCounter.getAndIncrement();
+                vertex.setProperty(SYM_ID, vertexKey);
+             // Create unique key for each AP of the vertex
+                Map<AttachmentPoint, Integer> apKeys = new HashMap<>();
                 for (AttachmentPoint ap : vertex.getAttachmentPoints()) 
                 {
-//                  apEncodings.put(ap, 
-//                          ap.getProperties().toString() + ap.hashCode());  
-                    String apKey = UUID.randomUUID().toString();
-                    ap.setProperty("uniqueKey", apKey);
-                }
-                // Add the unique vertex to the list of unique vertices
-                uniqueVertices.add(vertex);
-             } else {
+                 // symAPs share the same symmetry key
+                    SymmetricAPs symAPs = vertex.getSymmetricAPs(ap);
+                    if (!symAPs.isEmpty()) 
+                    {
+                        Integer sharedKey = apKeys.get(symAPs.get(0));
+                        
+                        if (sharedKey == null) {
+                            sharedKey = apIdCounter.getAndIncrement();
+                            apKeys.put(symAPs.get(0), sharedKey);
+                        }
+                        for (AttachmentPoint symAp : symAPs) {
+                            symAp.setProperty(SYM_ID, sharedKey);
+                        }
+                        
+                    } else {  
+                        
+                        int apKey = apIdCounter.getAndIncrement();
+                        ap.setProperty(SYM_ID, apKey);
+                    }                     
+                    
+                 }     
+              // Add the vertex to the list of unique vertices
+                 uniqueVertices.add(vertex);
+             
+              } else {
                  
-                 // The vertex is not new, so we copy properties from the 
-                 // matched vertex
-                 vertex.setProperty("uniqueKey", 
-                         matchedVertex.getProperty("uniqueKey"));
+              // The vertex is not new, so we copy properties from the 
+              // matched vertex
+                 vertex.setProperty(SYM_ID, matchedVertex.getProperty(SYM_ID));
                  
-                 // Ensure APs are synchronized between the current vertex 
-                 // and the matched vertex
+              // Ensure APs are synchronized between the current vertex 
+              // and the matched vertex
                  for (int i = 0; i < vertex.getAttachmentPoints().size(); i++) {
-                     AttachmentPoint currentAP = 
-                             vertex.getAttachmentPoints().get(i);
-                     AttachmentPoint matchedAP = 
-                             matchedVertex.getAttachmentPoints().get(i);
-                     // Assuming sameAs checks APs order and count; 
-                     // thus, index should align
-                     currentAP.setProperty("uniqueKey", 
-                             matchedAP.getProperty("uniqueKey"));
+                    AttachmentPoint currentAP = 
+                            vertex.getAttachmentPoints().get(i);
+                    AttachmentPoint matchedAP = 
+                            matchedVertex.getAttachmentPoints().get(i);
+                 // Since sameAs checks APs order, AP indices align
+                    currentAP.setProperty(SYM_ID,matchedAP.getProperty(SYM_ID));
+                 }
              }
          }
         
@@ -420,10 +449,10 @@ public class DGraph implements Cloneable
              throw new DENOPTIMException("No scaffold vertex found in the graph.");
          }
          
-         // Get all path with Depth First Search (DFS) algorithm
+      // Get all path with Depth First Search (DFS) algorithm
          dfsEncodePaths(scaffold, "", visited, pathMap);
          
-         // Detect symmetric sets based on path encodings
+      // Detect symmetric sets based on path encodings
          for (Map.Entry<String, List<Vertex>> entry : pathMap.entrySet()) {
              List<Vertex> symVertices = entry.getValue();
              if (symVertices.size() > 1) 
@@ -432,12 +461,27 @@ public class DGraph implements Cloneable
              }
          }
          
-         }
          return (symVertices.size()-initialSize)>0;
          
     }
 //------------------------------------------------------------------------------    
-
+    /**
+     * Performs a depth-first search (DFS) starting from a given {@link Vertex} 
+     * to encode paths in the graph. This method appends the unique identifier 
+     * of each {@link Vertex} and its {@link AttachmentPoint}s to the current 
+     * path string as it traverses the graph. Each unique path is stored in a 
+     * map, with {@link Vertex}es collected under their respective path 
+     * encodings. This encoding helps in identifying symmetric {@link Vertex}es
+     * based on shared path signatures.
+     *
+     * @param current The current vertex from which the DFS is initiated.
+     * @param currentPath The encoded path string accumulated up to the current 
+     * vertex.
+     * @param visited A set of visited vertices to avoid re-visitation.
+     * @param pathMap A map that aggregates vertices under their unique path 
+     * encodings.
+     * @throws DENOPTIMException 
+     */         
     private void dfsEncodePaths(Vertex current, 
             String currentPath,
             Set<Vertex> visited,
@@ -449,30 +493,30 @@ public class DGraph implements Cloneable
         }
         visited.add(current);
         
-        String vertexKey = (String) current.getProperty("uniqueKey");
-        currentPath += vertexKey; 
+        Integer vertexKey = (Integer) current.getProperty(SYM_ID);
+        currentPath += vertexKey.toString(); 
 
-        // Store the current path in pathMap
+     // Store the current path in pathMap
         pathMap.computeIfAbsent(currentPath, k -> new ArrayList<>()).add(current);
 
-        // Recursively encode paths for each child vertex
+     // Recursively encode paths for each child vertex
         for (AttachmentPoint ap : current.getAttachmentPoints()) {
             
-            // Check if the AP is making an edge
+         // Check if the AP is making an edge
             if (ap.getEdgeUser()!=null  &&
                     !visited.contains(ap.getEdgeUser().getTrgAP().getOwner()))  
             {
                 Edge edge = ap.getEdgeUser();
-                // Get target AP
+             // Get target AP
                 AttachmentPoint trAp = edge.getTrgAP();
-                // Get child vertex
+             // Get child vertex
                 Vertex child = trAp.getOwner();
-                String apKey = (String) ap.getProperty("uniqueKey");
+                Integer apKey = (Integer) ap.getProperty(SYM_ID);
                 
-                // Ensure the apKey is valid
+             // Ensure the apKey is valid
                 if (apKey != null) {
                     dfsEncodePaths(child, 
-                        currentPath + apKey,
+                        currentPath + apKey.toString(),
                         visited,
                         pathMap); 
                 } else {
