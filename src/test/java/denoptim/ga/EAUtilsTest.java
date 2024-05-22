@@ -1186,6 +1186,48 @@ public class EAUtilsTest
                 assertTrue(sv0 == svI);
             }
         }
+        
+        IAtomContainer mol2 = p.parseSmiles(
+                "C1C(C(C(F)(F)(F))(C(F)(F)(F)))OCCC1((N(C([H])([H])C3=C"
+                + "(C(=C(C(=C3[H])[H])[F])[F]))(C([H])([H])C3=C(C(=C(C"
+                + "(=C3[H])[H])[F])[F]))))");
+
+        cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("C-C", "[#6]", "[#6]", "-!@", -1, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-X", "[#6]", "[#9]", "-", 0, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-N", "[#6]", "[N]", "-", 1, 
+                new ArrayList<String>()));
+        
+        ScaffoldingPolicy scaffold = ScaffoldingPolicy.LARGEST_FRAGMENT;
+
+        graph = EAUtils.makeGraphFromFragmentationOfMol(mol2,
+                cuttingRules, settings.getLogger(), 
+                scaffold, 170);
+        
+        DenoptimIO.writeGraphToJSON(new File("/tmp/graph.json"), graph); 
+        
+        assertEquals(5, graph.getSymmetricSetCount());
+        expected = new ArrayList<List<Integer>>();
+        expected.add(Arrays.asList(11, 15));      
+        expected.add(Arrays.asList(2, 6));  
+        expected.add(Arrays.asList(3, 4, 5, 7, 8, 9));
+        expected.add(Arrays.asList(13, 14, 17, 18));
+        expected.add(Arrays.asList(12, 16));
+        for (List<Integer> vrtxIDs : expected)
+        {
+            SymmetricVertexes sv0 = graph.getSymSetForVertex(
+                    graph.getVertexWithId(vrtxIDs.get(0)));
+            assertFalse(sv0.isEmpty());
+            for (int i=1; i<vrtxIDs.size(); i++)
+            {
+                SymmetricVertexes svI = graph.getSymSetForVertex(
+                        graph.getVertexWithId(vrtxIDs.get(i)));
+                assertTrue(sv0 == svI);
+            }
+        }
+        
     }
     
 //------------------------------------------------------------------------------
