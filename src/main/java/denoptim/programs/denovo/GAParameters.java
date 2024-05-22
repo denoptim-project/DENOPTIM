@@ -305,6 +305,11 @@ public class GAParameters extends RunTimeParameters
     protected boolean sortOrderDecreasing = true;
 
     /**
+     * Flag controlling whether we allow NaN fitness to kill design experiments.
+     */
+    protected boolean nanFitnessKillsExperiment = false;
+
+    /**
      * Precision for reporting the value of the fitness
      */
     protected int precisionLevel = 3;
@@ -485,8 +490,15 @@ public class GAParameters extends RunTimeParameters
     public boolean isSortOrderDecreasing()
     {
         return sortOrderDecreasing;
-    }
+    }   
 
+//------------------------------------------------------------------------------
+
+    public boolean isNanFitnessKillsExperiment()
+    {
+        return nanFitnessKillsExperiment;
+    }
+    
 //------------------------------------------------------------------------------
 
     public int getMaxTriesFactor()
@@ -966,6 +978,14 @@ public class GAParameters extends RunTimeParameters
                     sortOrderDecreasing = false;
                 }
                 break;
+            }
+            
+            case "NANFITNESSKILLSEXPERIMENT":
+            {
+                if (value.length() > 0)
+                {
+                    nanFitnessKillsExperiment = true;
+                }
             }
         
             case "LEVELGROWTHMULTIPLIER=":

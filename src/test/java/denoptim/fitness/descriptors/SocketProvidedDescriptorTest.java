@@ -50,9 +50,11 @@ import com.google.gson.JsonSyntaxException;
 
 public class SocketProvidedDescriptorTest
 {
-    private SocketProvidedDescriptor descriptor;
+    public SocketProvidedDescriptor descriptor;
     private MySocketServer server;
     private Gson jsonConverted;
+    
+    public String fakeErrorMsg = "#SocketServer: fake error.";
     
     private static final String HOSTNAME = "localhost";
     
@@ -60,7 +62,7 @@ public class SocketProvidedDescriptorTest
 //------------------------------------------------------------------------------
     
     @BeforeEach
-    public void setUpSertver() throws Exception
+    public void setUpServer() throws Exception
     {
         // We create a socket server the SocketProvidedDescriptor can talk to.
         server = new MySocketServer();
@@ -78,7 +80,7 @@ public class SocketProvidedDescriptorTest
 //------------------------------------------------------------------------------
     
     @AfterEach
-    public void ClossServer() throws Exception
+    public void closeServer() throws Exception
     {
         server.stopServer();
     }
@@ -218,7 +220,7 @@ public class SocketProvidedDescriptorTest
                 } else {
                     jsonAnswer.addProperty(
                             SocketProvidedDescriptor.KEYJSONMEMBERERR,
-                            "#SocketServer: fake error.");
+                            fakeErrorMsg);
                 }
                 
                 // Send response
