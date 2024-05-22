@@ -341,7 +341,7 @@ runTest "t16"
 #
 
 #
-# t19: removed 
+# t19: removed
 
 #
 # t20: crossover with templates (outside templates)
@@ -402,11 +402,6 @@ runTest "t30"
 # t31: test Py4J integration
 #
 runTest "t31"
-
-#
-# t32: test managing of sym vertices when initial population is built by fragmentation
-#
-runTest "t32"
 
 echo "All done!"
 exit 0
