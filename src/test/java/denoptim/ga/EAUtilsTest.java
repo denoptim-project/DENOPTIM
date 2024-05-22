@@ -1206,8 +1206,6 @@ public class EAUtilsTest
                 cuttingRules, settings.getLogger(), 
                 scaffold, 170);
         
-        DenoptimIO.writeGraphToJSON(new File("/tmp/graph.json"), graph); 
-        
         assertEquals(5, graph.getSymmetricSetCount());
         expected = new ArrayList<List<Integer>>();
         expected.add(Arrays.asList(11, 15));      
