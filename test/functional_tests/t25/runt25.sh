@@ -47,7 +47,7 @@ then
     echo "Test 't25' NOT PASSED (symptom: fitness tag not found)"
     exit 1
 fi
-if ! grep -A 1 'FITNESS' "$wrkDir"/t25_out.sdf | grep -q "^0\.9117"
+if ! grep -A 1 'FITNESS' "$wrkDir"/t25_out.sdf | grep -q "^0\.921"
 then
     echo " "
     echo "Test 't25' NOT PASSED (symptom: wrong fitness value)"

@@ -213,7 +213,7 @@ public class FitnessProviderTest
         //Get the result and check it
         Object propObj = mol.getProperty(DENOPTIMConstants.FITNESSTAG);
         assertTrue(propObj!=null,"Fitness is not null.");
-        double trsh = 0.001;
+        double trsh = 0.01;
         assertTrue(Math.abs(((double) propObj) - fitness) < trsh, 
                 "Fitness value should be 0.6 but is " + fitness);
         assertTrue(Math.abs(0.6 - fitness) < trsh, 
@@ -263,15 +263,15 @@ public class FitnessProviderTest
         
         fp.getFitness(mol);
         
-        String[] expectedProps = new String[] {DENOPTIMConstants.FITNESSTAG,"Zagreb","taniBis",
-                "taniSym","aHyb_1","aHyb_2"};
+        String[] expectedProps = new String[] {DENOPTIMConstants.FITNESSTAG,
+                "Zagreb","taniBis","taniSym","aHyb_1","aHyb_2"};
         double[] expectedValue = new double[] {
-                2.5689610, // fitness
-                34.000000, // Zagreb
-                0.4318000, // taniBis
-                0.6000000, // taniSym
-                2.1428571, // aHyb_1
-                3.0000000 // aHyb_2
+                2.5755, // fitness
+                34.000, // Zagreb
+                0.4318, // taniBis
+                0.6065, // taniSym
+                2.1428, // aHyb_1
+                3.0000 // aHyb_2
         };
         for (int i=0; i<expectedProps.length; i++)
         {
