@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.bcel.generic.RETURN;
 import org.apache.commons.lang3.time.StopWatch;
 import org.openscience.cdk.io.iterator.IteratingSMILESReader;
 
