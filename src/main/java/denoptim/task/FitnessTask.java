@@ -416,13 +416,22 @@ public abstract class FitnessTask extends Task
 
         if (Double.isNaN(fitVal))
         {
-            msg = "Fitness value is NaN for " + result.getName();
+            
+            if (fitProvMol.getProperty(DENOPTIMConstants.MOLERRORTAG) != null)
+            {
+                // The MOLERRORTAG has been passed by any embedded task, and we 
+                // pass it to the general manipulation of the candidate. 
+                msg = fitProvMol.getProperty(DENOPTIMConstants.MOLERRORTAG);
+                
+            } else {
+                // The calculation of the fitness returns NaN 
+                msg = "Fitness value is NaN for " + result.getName();
+                fitProvMol.setProperty(DENOPTIMConstants.MOLERRORTAG, 
+                        "#InternalFitness: NaN value");
+            }
+            fitProvMol.removeProperty(DENOPTIMConstants.FITNESSTAG);
             errMsg = msg;
             fitnessSettings.getLogger().severe(msg);
-            
-            fitProvMol.removeProperty(DENOPTIMConstants.FITNESSTAG);
-            fitProvMol.setProperty(DENOPTIMConstants.MOLERRORTAG, 
-                    "#InternalFitness: NaN value");
             result.setError(msg);
             
             //TODO-V3 make ignoring of NaN optional
@@ -430,6 +439,7 @@ public abstract class FitnessTask extends Task
             dGraph.cleanup();
             throw new DENOPTIMException(msg);
             */
+            
         } else {
             result.setFitness(fitVal);
         }

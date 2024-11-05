@@ -41,6 +41,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
+import denoptim.constants.DENOPTIMConstants;
 import denoptim.fitness.IDenoptimDescriptor;
 
 
@@ -311,6 +312,7 @@ implements IMolecularDescriptor, IDenoptimDescriptor
         
         JsonObject answer = null;
         DoubleResult result;
+        Exception potentialProblem = null;
         try {
             answer = jsonConverted.fromJson(readerFromSocket.readLine(), 
                     JsonObject.class);
@@ -320,18 +322,23 @@ implements IMolecularDescriptor, IDenoptimDescriptor
                         answer.get(KEYJSONMEMBERSCORE).toString());
                 result = new DoubleResult(value);
             } else if (answer.has(KEYJSONMEMBERERR)) {
-                //System.err.println(KEYJSONMEMBERERR + " from socket server.");
                 result = new DoubleResult(Double.NaN);
+                mol.setProperty(DENOPTIMConstants.MOLERRORTAG, 
+                        answer.get(KEYJSONMEMBERERR).toString());
             } else {
-                System.err.println("WARNING: Socket server replied without "
+                System.err.println("ERROR: Socket server replied without "
                         + "providing either " + KEYJSONMEMBERSCORE + " or "
                         + KEYJSONMEMBERERR + " member. Setting desctriptor "
                         + "'" + NAMES[0] + "'to NaN.");
+                
                 result = new DoubleResult(Double.NaN);
+                potentialProblem = new Exception(
+                        "Wrong syntax in answer from socket server."); 
             }
         } catch (JsonSyntaxException | IOException e) {
             e.printStackTrace();
             result = new DoubleResult(Double.NaN);
+            potentialProblem = e;
         }
         
         try
@@ -346,7 +353,8 @@ implements IMolecularDescriptor, IDenoptimDescriptor
                 getParameterNames(),
                 getParameters(),
                 result,
-                getDescriptorNames());
+                getDescriptorNames(),
+                potentialProblem);
     }
 
 //------------------------------------------------------------------------------

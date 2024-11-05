@@ -1,5 +1,7 @@
 package denoptim.fitness;
 
+import static org.junit.Assert.assertNotNull;
+
 /*
  *   DENOPTIM
  *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
@@ -43,6 +45,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.fitness.descriptors.SocketProvidedDescriptorTest;
 import denoptim.fitness.descriptors.TanimotoMolSimilarity;
 import denoptim.io.DenoptimIO;
 
@@ -303,6 +306,45 @@ public class FitnessProviderTest
         assertTrue(closeEnough(1.23456, Double.parseDouble(prop.toString())),
                 "Numerical result (" + Double.parseDouble(prop.toString()) 
                     + ") is correct");
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testNaNFitness() throws Exception
+    {
+        SocketProvidedDescriptorTest socketServerUtil = 
+                new SocketProvidedDescriptorTest();
+        try {
+            socketServerUtil.setUpServer();
+
+            FitnessParameters fitPar = new FitnessParameters();
+            fitPar.interpretKeyword("FP-Equation=${fromSocket}");
+            fitPar.interpretKeyword("FP-DescriptorSpecs="
+                    + "${Variable.parametrized('fromSocket',"
+                    + "'SocketProvidedDescriptor','localhost, "
+                    + socketServerUtil.descriptor.getParameters()[1] + "')}");
+            fitPar.processParameters();
+
+            FitnessProvider fp = new FitnessProvider(
+                    fitPar.getDescriptors(),
+                    fitPar.getFitnessExpression(),
+                    logger);
+            
+            String smiles = "O";
+            IAtomContainer mol = sp.parseSmiles(smiles);
+            mol.setProperty("SMILES", smiles);
+            
+            double fitness = fp.getFitness(mol);
+            
+            assertTrue(Double.isNaN(fitness));
+            Object prop = mol.getProperty(DENOPTIMConstants.MOLERRORTAG);
+            assertNotNull(prop);
+            assertTrue(prop.toString().contains(socketServerUtil.fakeErrorMsg));
+            
+        } finally {
+            socketServerUtil.closeServer();
+        }
     }
  
 //------------------------------------------------------------------------------
