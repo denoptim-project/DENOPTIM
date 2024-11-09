@@ -1934,7 +1934,7 @@ public class EAUtilsTest
         combinations = EAUtils.searchRingFusionSites(
                 graph, fragSpace, rcParams, false, logger, rng);
        
-        assertEquals(25, combinations.size());
+        assertEquals(27, combinations.size());
         apUsageCounts = new int[20];
         countTypes = new HashMap<String,Integer>();
         for (List<RelatedAPPair> comb : combinations)
@@ -1954,11 +1954,11 @@ public class EAUtilsTest
         
         assertEquals(3, apUsageCounts[0]); // AP on atm 4
         assertEquals(3, apUsageCounts[1]); // AP on atm 4
-        assertEquals(4, apUsageCounts[2]); // AP on atm 7
+        assertEquals(6, apUsageCounts[2]); // AP on atm 7
         assertEquals(3, apUsageCounts[3]); // AP on atm 8
         assertEquals(3, apUsageCounts[4]); // AP on atm 8
-        assertEquals(2, apUsageCounts[5]); // AP on atm 11
-        assertEquals(2, apUsageCounts[6]); // AP on atm 11
+        assertEquals(3, apUsageCounts[5]); // AP on atm 11
+        assertEquals(3, apUsageCounts[6]); // AP on atm 11
         assertEquals(3, apUsageCounts[7]); // AP on atm 16
         assertEquals(3, apUsageCounts[8]); // AP on atm 16
         assertEquals(4, apUsageCounts[9]); // AP on atm 21
@@ -1973,7 +1973,7 @@ public class EAUtilsTest
         assertEquals(1, apUsageCounts[18]); // AP on atm 50
         assertEquals(1, apUsageCounts[19]); // AP on atm 56
         assertEquals(2, countTypes.get("aliph2atm")); //WARNING: hard code type name!
-        assertEquals(2, countTypes.get("aliph3atm")); //WARNING: hard code type name!
+        assertEquals(4, countTypes.get("aliph3atm")); //WARNING: hard code type name!
         assertEquals(6, countTypes.get("aliph4atm_6+6")); //WARNING: hard code type name!
         assertEquals(4, countTypes.get("aliph4atm_6+5")); //WARNING: hard code type name!
         assertEquals(2, countTypes.get("aliph4atm_6+4")); //WARNING: hard code type name!
@@ -2027,9 +2027,9 @@ public class EAUtilsTest
         combinations = EAUtils.searchRingFusionSites(
                 graph, fragSpace, rcParams, true, logger, rng);
         
-        // NB: 66 is given by the hard-coded limit to the number of combinations
-        assertEquals(66, combinations.size());
-        // NB: 6 is given by the hard-coded limit to the max number of ring 
+        // NB: given by the hard-coded limit to the number of combinations
+        assertEquals(136, combinations.size());
+        // NB: given by the hard-coded limit to the max number of ring 
         // fusions on a single vertex.
         assertEquals(6, combinations.get(0).size());
         

@@ -200,7 +200,7 @@ public class APClass implements Cloneable,Comparable<APClass>
         return make(rule, subClass, DEFAULTBT);
     }
     
- //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Constructor for a fully defined APClass. 

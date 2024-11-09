@@ -1245,27 +1245,25 @@ public class GraphOperations
             BridgeHeadFindingRule bhfrOfPair = (BridgeHeadFindingRule) 
                     pairSet.get(0).property;
             int existingBridgeLength = bhfrOfPair.getExistingBridgeLength();
-            int[] allowedBridgeLengths = bhfrOfPair.getAllowedBridgeLength();
-            if (allowedBridgeLengths!=null)
+            int[] allowedBridgeLengths = bhfrOfPair.getAllowedBridgeLength(
+                    rcParams.getMaxRingSize());
+            for (int i=0; i<allowedBridgeLengths.length; i++)
             {
-                for (int i=0; i<allowedBridgeLengths.length; i++)
+                int allowedBridgeLength = allowedBridgeLengths[i];
+                int possibleRingSize = allowedBridgeLength 
+                        + existingBridgeLength;
+                int weight = 1; // weight of a ring size
+                if (possibleRingSize < rcParams.getMaxRingSize())
                 {
-                    int allowedBridgeLength = allowedBridgeLengths[i];
-                    int possibleRingSize = allowedBridgeLength 
-                            + existingBridgeLength;
-                    int weight = 1; // weight of a ring size
-                    if (possibleRingSize < rcParams.getMaxRingSize())
-                    {
-                        weight = rcParams.getRingSizeBias().get(possibleRingSize);
-                    }
-                    
-                    // We add copies of the same set to the list of candidate 
-                    // sets, so when we randomly choose we are more likely to 
-                    // choose a set that leads to preferred ring sizes.
-                    for (int z=0; z<weight; z++)
-                    {
-                        szBiasedCandidatePairsSets.add(pairSet);
-                    }
+                    weight = rcParams.getRingSizeBias().get(possibleRingSize);
+                }
+                
+                // We add copies of the same set to the list of candidate 
+                // sets, so when we randomly choose we are more likely to 
+                // choose a set that leads to preferred ring sizes.
+                for (int z=0; z<weight; z++)
+                {
+                    szBiasedCandidatePairsSets.add(pairSet);
                 }
             }
         }
@@ -1285,6 +1283,7 @@ public class GraphOperations
         String elsInHalfFrag = chosenPairsSet.get(0).propID.substring(0,1);
         if (elsInHalfFrag.matches("[a-zA-Z]"))
             elsInHalfFrag = "0";
+        boolean newRingIsAromatic = true;
         String elInIncomingFrag = "0el";
         switch (elsInHalfFrag)
         {
@@ -1292,6 +1291,7 @@ public class GraphOperations
             case "1":
                 // no aromaticity to be retained: use non-aromatic chords
                 elInIncomingFrag = "0el";
+                newRingIsAromatic = false;
                 break;
                 
             case "2":
@@ -1317,19 +1317,31 @@ public class GraphOperations
                 elInIncomingFrag = "1el";
                 break;
             default:
-                throw new Error("Unknown number if electrons in fragment to be "
-                        + "used for ring fusion operation.");
+                throw new Error("Unknown number of pi-electrons in fragment to "
+                        + "be used for ring fusion operation.");
         }
         
         // Collect fragment that can be used as ring-closing bridge based on the
         // number of aromatic electrons and number of atoms
         BridgeHeadFindingRule bhfr = (BridgeHeadFindingRule) 
                 chosenPairsSet.get(0).property;
-        //TODO-gg aromatic vs. aliphatic
-        List<Vertex> usableBridges = EAUtils.getUsableAromaticBridges(
+
+        List<Vertex> usableBridges = null;
+        if (newRingIsAromatic)
+        {
+            usableBridges = EAUtils.getUsableAromaticBridges(
                 elInIncomingFrag,
-                bhfr.getAllowedBridgeLength(),
+                bhfr.getAllowedBridgeLength(rcParams.getMaxRingSize()),
                 fragSpace);
+        } else {
+            // NB: we keep track of which APs are supposed to be used to form
+            // the bridge by recording their index in a property of the vertex
+            usableBridges = EAUtils.getUsableAliphaticBridges(
+                    chosenPairsSet.get(0).apA.getAPClass(),
+                    chosenPairsSet.get(0).apB.getAPClass(),
+                    bhfr.getAllowedBridgeLength(rcParams.getMaxRingSize()),
+                    fragSpace);
+        }
         
         if (usableBridges.size()==0)
         {
@@ -1347,7 +1359,7 @@ public class GraphOperations
                     DENOPTIMConstants.VRTPROPBRIDGELENGTH);
             int existingBridgeLength = bhfr.getExistingBridgeLength();
             int resultingRingSize = existingBridgeLength + thisBridgeLength;
-            int weigth = 1; // weigth of a ring size
+            int weigth = 1; // weight of a ring size
             if (resultingRingSize < rcParams.getMaxRingSize())
             {
                 weigth = rcParams.getRingSizeBias().get(resultingRingSize);
@@ -1372,16 +1384,24 @@ public class GraphOperations
         
         // Decide which aps on the bridge are used as head/tail
         List<AttachmentPoint> apsInFusion = new ArrayList<AttachmentPoint>();
-        apsInFusion.addAll(incomingVertex.getAPsWithAPClassStartingWith(
-                elInIncomingFrag));
         int[] idApOnBridge = new int[2];
-        if (rng.nextBoolean())
+        if (newRingIsAromatic)
         {
-            idApOnBridge[0] = apsInFusion.get(0).getIndexInOwner();
-            idApOnBridge[1] = apsInFusion.get(1).getIndexInOwner();
+            apsInFusion.addAll(incomingVertex.getAPsWithAPClassStartingWith(
+                    elInIncomingFrag));
+            if (rng.nextBoolean())
+            {
+                idApOnBridge[0] = apsInFusion.get(0).getIndexInOwner();
+                idApOnBridge[1] = apsInFusion.get(1).getIndexInOwner();
+            } else {
+                idApOnBridge[0] = apsInFusion.get(1).getIndexInOwner();
+                idApOnBridge[1] = apsInFusion.get(0).getIndexInOwner();
+            }
         } else {
-            idApOnBridge[0] = apsInFusion.get(1).getIndexInOwner();
-            idApOnBridge[1] = apsInFusion.get(0).getIndexInOwner();
+            idApOnBridge[0] = Integer.parseInt(incomingVertex.getProperty(
+                            DENOPTIMConstants.VRTPROPBRIDGEEND_A).toString());
+            idApOnBridge[1] = Integer.parseInt(incomingVertex.getProperty(
+                    DENOPTIMConstants.VRTPROPBRIDGEEND_B).toString());
         }
         
         boolean done = false;

@@ -254,8 +254,10 @@ public class ThreeDimTreeBuilder
         
             if (iacRootVrtx == null)
             {
-                String msg = "ThreeDimTreeBuilder found a building block daclaring "
-                        + "to containg atoms, but returning null atom container. "
+                String msg = this.getClass().getSimpleName()
+                        + " found a building block daclaring "
+                        + "to containg atoms, "
+                        + "but returning null atom container. "
                         + "Building blocks: " + rootVrtx;
                 throw new IllegalArgumentException(msg);
             }
@@ -272,7 +274,7 @@ public class ThreeDimTreeBuilder
                     atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
                             idRootVrtx);
                 }
-                atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID,idRootVrtx);
+                atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, idRootVrtx);
             }
             mol.add(iacRootVrtx);
         }

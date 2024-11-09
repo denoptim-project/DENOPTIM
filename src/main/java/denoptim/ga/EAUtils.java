@@ -2519,7 +2519,7 @@ public class EAUtils
         // otherwise we have to write SMARTS that match systems with potentially
         // unsaturated valences, and that is a mess.
         // Here we change both graph and molecular representation, but it all 
-        // happens on the tmp copy, so the original graph an mol representation 
+        // happens on the tmp copy, so the original graph and mol representation 
         // remain intact. Also, note that the order of atoms does not have a 
         // role because we only use the position of the atom in the list of atoms
         // within the tmp system, and then we use the reference to the
@@ -2607,9 +2607,6 @@ public class EAUtils
                         bhB.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
                 
                 // Each AP on each side can be used
-                // NB: these are dummy copies stores in the atom properties
-                // for easy recovery independently on chances of atom list.
-                // Therefore, these APs are NOT the actual APs of the vertex!
                 @SuppressWarnings("unchecked")
                 List<AttachmentPoint> apsOnA = (List<AttachmentPoint>) 
                         bhA.getProperty(DENOPTIMConstants.ATMPROPAPS);
@@ -2619,12 +2616,35 @@ public class EAUtils
                 for (int iAPA=0; iAPA<apsOnA.size(); iAPA++)
                 {
                     AttachmentPoint copyOfApA = apsOnA.get(iAPA);
+                    
+                    // for extreme debug only
+                    /*
+                    System.out.println(rule.getName()+" "+idPairIdentifier+" "
+                            +MoleculeUtils.getAtomRef(bhA, mol)+"-"
+                            +MoleculeUtils.getAtomRef(bhB, mol)+" "
+                            +copyOfApA.getIndexInOwner()
+                            +" in "+copyOfApA.getOwner());
+                            */
+                    
                     if (!canBeUsedForRingFusion(copyOfApA, originalVertexIDs, 
                             fragSpace))
                         continue;
                     for (int iAPB=0; iAPB<apsOnB.size(); iAPB++)
                     {
                         AttachmentPoint copyOfApB = apsOnB.get(iAPB);
+                        
+                        // for extreme debug only
+                        /*
+                        System.out.println("       "+idPairIdentifier+" "
+                                +MoleculeUtils.getAtomRef(bhA, mol)+"-"
+                                +MoleculeUtils.getAtomRef(bhB, mol)+" "
+                                +copyOfApA.getIndexInOwner() 
+                                +" in "+copyOfApA.getOwner() 
+                                + "--- "
+                                +copyOfApB.getIndexInOwner()
+                                +" in "+copyOfApB.getOwner());
+                                */
+                        
                         if (!canBeUsedForRingFusion(copyOfApB, originalVertexIDs, 
                                 fragSpace))
                             continue;
@@ -2979,7 +2999,9 @@ public class EAUtils
 
     /**
      * Finds all vertexes that can be used as aliphatic bridge.
-     * @param allowedBridgeLength number of atoms.
+     * @param apcA class of one of the AP to be used to attach the bridge.
+     * @param apcB class of the other AP to be used to attach the bridge.
+     * @param allowedLengths list of allowed lengths in number of atoms.
      * @param fragSpace the fragment space where to look for fragments.
      * @return the list of clones of usable fragments from the fragment space. 
      * The length the bridge is recorded in {@link Vertex} property 

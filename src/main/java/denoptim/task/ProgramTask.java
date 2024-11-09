@@ -108,6 +108,7 @@ public abstract class ProgramTask extends Task
      */
     protected void handleThrowable()
     {
+        thrownExc.printStackTrace();
         printErrorToFile();
         stopLogger();
     }

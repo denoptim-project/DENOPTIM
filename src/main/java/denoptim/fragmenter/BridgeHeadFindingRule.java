@@ -112,13 +112,37 @@ public class BridgeHeadFindingRule
 //------------------------------------------------------------------------------
     
     /**
-     * @return the the allowed length of 
+     * @return the allowed length of 
      * the new bridge this rule allows to define between the bridge-head atoms.
+     * This can be <code>null</code>.
      */
    public int[] getAllowedBridgeLength()
    {
        return allowedBridgeLength;
    }
+   
+ //------------------------------------------------------------------------------
+   
+   /**
+    * @return the allowed length of 
+    * the new bridge this rule allows to define between the bridge-head atoms.
+    * This cannot be <code>null</code> because if this rule does not specify 
+    * any allowed bridge length, then this method generated a return value that 
+    * corresponds to saying "any bridge length is allowed as long as it leads 
+    * to a ring with size smaller than the given maximum size".
+    */
+  public int[] getAllowedBridgeLength(int maxRingSize)
+  {
+      if (allowedBridgeLength!=null)
+          return allowedBridgeLength;
+
+      // Any bridge length is allowed
+      int[] anyLength = new int[maxRingSize - lengthInAtoms];
+      for (int i=1; i<anyLength.length; i++) {
+          anyLength[i-1] = i;
+      }
+      return anyLength;
+  }
    
 //------------------------------------------------------------------------------
    

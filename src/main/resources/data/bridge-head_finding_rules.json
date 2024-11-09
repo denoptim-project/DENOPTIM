@@ -121,7 +121,7 @@
   },
   {
     "ruleName": "aliph3atm",
-    "smarts": "[A;R1]~[*;R2]~[A;R1]",
+    "smarts": "[A;R1]~[*;R]~[A;R1]",
     "bridgeHeadPositions": [
       0,
       2

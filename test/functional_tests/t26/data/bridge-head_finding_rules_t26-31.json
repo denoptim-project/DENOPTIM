@@ -1,0 +1,11 @@
+[
+  {
+    "ruleName": "aliph2atm",
+    "smarts": "[A;R1]~@[A;R1]",
+    "bridgeHeadPositions": [
+      0,
+      1
+    ],
+    "lengthInAtoms": 2
+  }
+]
