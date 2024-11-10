@@ -71,7 +71,7 @@ public class FragmentIsomorphismInspectorTest
         inspector.reportTimeoutIncidents = false;
         assertTrue(inspector.isomorphismExists());
         
-        inspector = new FragmentIsomorphismInspector(a, b, 10, false); // 0.01 secs
+        inspector = new FragmentIsomorphismInspector(a, b, 1, false); // 0.001 s
         inspector.reportTimeoutIncidents = false;
         assertFalse(inspector.isomorphismExists());
     }
