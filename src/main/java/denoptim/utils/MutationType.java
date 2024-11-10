@@ -59,6 +59,11 @@ public enum MutationType {
     ADDRING,
     
     /**
+     * Adds a subgraph that introduced a fused ring.
+     */
+    ADDFUSEDRING,
+    
+    /**
      * Removes a vertex from a tree and merges remaining branches into the
      * remaining trunk.
      */
@@ -70,5 +75,4 @@ public enum MutationType {
      * non-capping vertexes.
      */
     DELETECHAIN
-
 }

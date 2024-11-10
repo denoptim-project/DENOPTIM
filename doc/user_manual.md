@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.2.0, Jan 2024_
+_Version 4.2.2, Nov 2024_
 
 
 [TOC]
@@ -511,7 +511,8 @@ The following tables list all the keywords grouped according to the main functio
 |`RC-EvaluationClosabilityMode`| Defined the closability condition's evaluation mode:<br><br> 0.  only constitution of candidate ring,<br> 1.  only closability of 3D chain,<br> 2.  both 0 and 1.|
 |`RC-RequiredElementInRings`| Specifies the elemental symbol that has to be contained in all acceptable rings of fragments. The shortest path is used to evaluate this ring closing condition.|
 |`RC-ClosableRingSMARTS`| Specifies a single constitutional ring closability condition by a single SMARTS string. This keyword may be used multiple times to provide a list of constitutional ring closability conditions. <br><br> Example:<br><br> `RC-ClosableRingSMARTS=C1CCCCC1`<br> `RC-ClosableRingSMARTS=C1CCCCCC1`|
-|`RC-RingSizeBias`| Specifies the bias associated to a given ring size when selecting the combination of rings (i.e., RCAs) for a given graph.<br><br> The syntax is:<br><br>`RC-RingSizeBias=<size> <bias>`<br><br> Multiple occurrence of this keyword can be used.<br><br> Example: the following lines give to all 6-member rings a probability of being formed that is twice that given to all 5-member rings. Instead 7-membered rings will never be formed.<br><br> `RC-RingSizeBias=5 1`<br> `RC-RingSizeBias=6 2` <br>`RC-RingSizeBias=7 0`<br>
+|`RC-RingSizeBias`| Specifies the bias associated to a given ring size when selecting the combination of rings (i.e., RCAs) for a given graph.<br><br> The syntax is:<br><br>`RC-RingSizeBias=<size> <bias>`<br><br> Multiple occurrence of this keyword can be used.<br><br> Example: the following lines give to all 6-member rings a probability of being formed that is twice that given to all 5-member rings. Instead 7-membered rings will never be formed.<br><br> `RC-RingSizeBias=5 1`<br> `RC-RingSizeBias=6 2` <br>`RC-RingSizeBias=7 0`<br>|
+|`RC-BridgeHeadFindingRulesFile`| Specifies the pathname to a JSON file defining how to identify candidate bridge-head atoms that can be used to extend ring systems by adding fused rings. The bridge-head atoms are a pair of atoms (with attachment points) that already belong to at least one ring and, once they are identified as candidate bridge-head pair, they can be used, according to APclass compatibility rules, to form a new ring of vertexes, hence a ring. Default rules are available in the distribution folder at src/main/resources/data/bridge-head_finding_rules.json|
 |`RC-MaxSizeNewRings`| Specifies the maximum number of ring members for rings created from scratch. |
 |`RC-CheckInterdependentChains`| Requires evaluation of interdependent closability condition. WARNING: this function require exhaustive conformational search, which is very time consuming.|
 |__Search for ring closing conformations in 3D__||

@@ -20,6 +20,7 @@ package denoptim.graph;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -99,6 +100,33 @@ public class APClass implements Cloneable,Comparable<APClass>
             BondType.ANY);
     
     /**
+     * Conventional class of attachment points on aromatic-bridge vertexes
+     * bringing 2 electrons to the aromatic system.
+     */
+    public static final APClass APCAROMBRIDGE2EL = getUnique("2elAromBridge", 0, 
+            BondType.SINGLE); //TODO: one day we should introduce AROMATIC type
+    
+    /**
+     * Conventional class of attachment points on aromatic-bridge vertexes
+     * bringing 3 electrons to the aromatic system.
+     */
+    public static final APClass APCAROMBRIDGE3EL = getUnique("3elAromBridge", 0, 
+            BondType.SINGLE); //TODO: one day we should introduce AROMATIC type
+    
+    /**
+     * Conventional class of attachment points on aromatic-bridge vertexes
+     * bringing 4 electrons to the aromatic system.
+     */
+    public static final APClass APCAROMBRIDGE4EL = getUnique("4elAromBridge", 0, 
+            BondType.SINGLE); //TODO: one day we should introduce AROMATIC type
+    
+    /**
+     * Conventional classes for of attachment points on aromatic-bridge vertexes.
+     */
+    public static final Set<APClass> APCAROMBRIDGES = new HashSet<APClass>(
+            Arrays.asList(APCAROMBRIDGE2EL, APCAROMBRIDGE3EL, APCAROMBRIDGE4EL));
+    
+    /**
      * Bond type to use when converting edge users into formal bonds
      */
     private BondType bndTyp = DEFAULTBT; 
@@ -172,7 +200,7 @@ public class APClass implements Cloneable,Comparable<APClass>
         return make(rule, subClass, DEFAULTBT);
     }
     
- //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
     /**
      * Constructor for a fully defined APClass. 

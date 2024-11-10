@@ -82,7 +82,7 @@ public class ManySMARTSQuery
                         + "get more info)";
             }
             err = "WARNING! For query " + err + " => Exception returned "
-                    + "by " + cause;
+                    + "by " + cause + ". " + t.getMessage();
             problems = true;
             problem = t;
             message = err;

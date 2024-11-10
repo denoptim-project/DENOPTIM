@@ -779,6 +779,20 @@ public class Template extends Vertex
                 }
             }
             
+            // Remove references to inner APs in atom properties
+            for (IAtom atm : iac.atoms())
+            {
+                atm.removeProperty(DENOPTIMConstants.ATMPROPAPS);
+            }
+            
+            // Store references to outer APs in atom properties
+            for (Integer atmId : apsPerAtom.keySet())
+            {
+                IAtom atm = iac.getAtom(atmId);
+                atm.setProperty(DENOPTIMConstants.ATMPROPAPS,
+                        apsPerAtom.get(atmId));
+            }
+            
             // Prepare SDF-like string for atom container. 0-based to 1-based
             // index conversion done in here
             iac.setProperty(DENOPTIMConstants.APSTAG, 

@@ -22,6 +22,7 @@ package denoptim.graph;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -248,6 +249,26 @@ public abstract class Vertex implements Cloneable
 //------------------------------------------------------------------------------
 
     public abstract List<AttachmentPoint> getAttachmentPoints();
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Finds only APs that have {@link APClass} starting with the given string.
+     * @param root the beginning of the {@link APClass} string to search for.
+     * @return a list of APs that belong to this vertex and have {@link APClass}
+     * starting with the given string.
+     */
+    public List<AttachmentPoint> getAPsWithAPClassStartingWith(
+            String root)
+    {
+        List<AttachmentPoint> list = new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            if (ap.getAPClass().toString().startsWith(root))
+                list.add(ap);
+        }
+        return list;
+    }
 
 //------------------------------------------------------------------------------
     
@@ -529,6 +550,58 @@ public abstract class Vertex implements Cloneable
     public boolean isRCV()
     {
         return isRCV;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if this vertex is meant to be a piece of an aromatic system. 
+     * @return <code>true</code> if this vertex has {@link AttachmentPoint}s
+     * with any {@link APClass} reserved for aromatic system fragments. See
+     * {@link APClass#APCAROMBRIDGES}.
+     */
+
+    public boolean isAromaticBridge()
+    {
+        return getAllAPClasses()
+            .stream()
+            .anyMatch(apc -> APClass.APCAROMBRIDGES.contains(apc));
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Checks if this vertex is connected to any vertex meant to be a piece of 
+     * an aromatic system. The connection may be direct or via a pair of 
+     * RCVs.
+     * @return <code>true</code> if this vertex has {@link AttachmentPoint}s
+     * linked to any other {@link AttachmentPoint}s with any {@link APClass} 
+     * reserved for aromatic system fragments. See
+     * {@link APClass#APCAROMBRIDGES}.
+     */
+
+    public boolean isConnectedToAromaticBridge()
+    {
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            if (ap.isAvailableThroughout())
+                continue;
+            
+            AttachmentPoint linkedAp = ap.getLinkedAPThroughout();
+            if (APClass.APCAROMBRIDGES.contains(linkedAp.getAPClass()))
+                return true;
+            Vertex rcv = linkedAp.getOwner();
+            if (rcv.isRCV)
+            {
+                if (getGraphOwner().getRingsInvolvingVertex(rcv).size()==0)
+                    continue;
+                // Since it is an RCV, there can be only one ring involved.
+                Ring r = getGraphOwner().getRingsInvolvingVertex(rcv).get(0);
+                return r.getVertexAtPosition(r.getSize()-2).isAromaticBridge()
+                        || r.getVertexAtPosition(1).isAromaticBridge();
+            }
+        }
+        return false;
     }
 
 //------------------------------------------------------------------------------
@@ -877,6 +950,7 @@ public abstract class Vertex implements Cloneable
             {
                 filteredTypes.remove(MutationType.EXTEND);
                 filteredTypes.remove(MutationType.ADDRING);
+                filteredTypes.remove(MutationType.ADDFUSEDRING);
             }
             
             // Cannot remove the only vertex of a graph
@@ -889,6 +963,20 @@ public abstract class Vertex implements Cloneable
                     - getFreeAPCountThroughout();
             if (nonCap > 2)
                 filteredTypes.remove(MutationType.DELETECHAIN);
+        }
+        
+        if (isAromaticBridge() || isConnectedToAromaticBridge())
+        {
+            // So far we do not do any check to ensure that 
+            // A) the change/additions/removal of a link retains aromaticity,
+            // B) the other APs can be safely interchanged between links as long
+            // as the APClass compatibility is respected.
+            // Therefore, link editing is unsafe for building blocks of aromatic
+            // systems. 
+            filteredTypes.remove(MutationType.ADDLINK);
+            filteredTypes.remove(MutationType.DELETELINK);
+            filteredTypes.remove(MutationType.CHANGELINK);
+            filteredTypes.remove(MutationType.CHANGEBRANCH);
         }
         
         if (getAttachmentPoints().size()-getFreeAPCountThroughout() < 2)

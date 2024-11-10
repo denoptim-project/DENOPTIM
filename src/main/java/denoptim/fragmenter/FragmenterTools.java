@@ -162,40 +162,43 @@ public class FragmenterTools
             MoleculeUtils.ensureNoUnsetBondOrders(mol);
         } catch (CDKException e)
         {
-            if (!settings.acceptUnsetToSingeBO())
+            if (e.getMessage().contains("Cannot assign Kekulé structure"))
             {
-                settings.getLogger().log(Level.WARNING,"Some bond order "
-                        + "are unset and attempt to kekulize the "
-                        + "system has failed "
-                        + "for structure " + index + "."
-                        + "This hampers use of SMARTS queries, which "
-                        + "may very "
-                        + "not work as expected. Structure " + index 
-                        + " will "
-                        + "be rejected. You can avoid rejection by using "
-                        + "keyword " 
-                        + ParametersType.FRG_PARAMS.getKeywordRoot() 
-                        + "UNSETTOSINGLEBO, but you'll "
-                        + "still be using a peculiar connectivity "
-                        + "table were"
-                        + "many bonds are artificially markes as "
-                        + "single to "
-                        + "avoid use of 'UNSET' bond order. "
-                        + "Further details on the problem: " 
-                        + e.getMessage());
-                return false;
-            } else {
-                settings.getLogger().log(Level.WARNING,"Failed "
-                        + "kekulization "
-                        + "for structure " + index 
-                        + " but UNSETTOSINGLEBO "
-                        + "keyword used. Forcing use of single bonds to "
-                        + "replace bonds with unset order.");
-                for (IBond bnd : mol.bonds())
+                if (!settings.acceptUnsetToSingeBO())
                 {
-                    if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+                    settings.getLogger().log(Level.WARNING,"Some bond order "
+                            + "are unset and attempt to kekulize the "
+                            + "system has failed "
+                            + "for structure " + index + ". "
+                            + "This hampers use of SMARTS queries, which "
+                            + "may very well "
+                            + "not work as expected. Structure " + index 
+                            + " will be rejected. "
+                            + "You can avoid rejection by using "
+                            + "keyword " 
+                            + ParametersType.FRG_PARAMS.getKeywordRoot() 
+                            + "UNSETTOSINGLEBO, but you'll "
+                            + "still be using a peculiar connectivity "
+                            + "table were "
+                            + "many bonds are artificially marked as "
+                            + "single to "
+                            + "avoid use of 'UNSET' bond order. "
+                            + "Further details on the problem: " 
+                            + e.getMessage());
+                    return false;
+                } else {
+                    settings.getLogger().log(Level.WARNING,"Failed "
+                            + "kekulization "
+                            + "for structure " + index 
+                            + " but UNSETTOSINGLEBO "
+                            + "keyword used. Forcing use of single bonds to "
+                            + "replace bonds with unset order.");
+                    for (IBond bnd : mol.bonds())
                     {
-                        bnd.setOrder(IBond.Order.SINGLE);
+                        if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+                        {
+                            bnd.setOrder(IBond.Order.SINGLE);
+                        }
                     }
                 }
             }

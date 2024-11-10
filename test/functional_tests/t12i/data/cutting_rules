@@ -1,0 +1,8 @@
+#
+# Cutting rules for t12i
+#
+# NB: these rules are only meant for testing purposes
+# 
+#
+CTR sAr 1 [c] [#1,#6] ~!@
+CTR nArom 2 [#7;D3;$(N1aaaa1)] [#1,#6] ~!@

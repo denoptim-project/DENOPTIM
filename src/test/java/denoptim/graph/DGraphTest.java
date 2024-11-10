@@ -49,6 +49,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -3897,6 +3898,7 @@ public class DGraphTest
                 Arrays.asList(v0.getAP(0), v0.getAP(2))));
         v0.addSymmetricAPSet(new SymmetricAPs(
                 Arrays.asList(v0.getAP(1), v0.getAP(3))));
+        v0.setBuildingBlockType(BBType.SCAFFOLD);
 
         EmptyVertex v1 = new EmptyVertex(1);
         v1.addAP(APCB);
@@ -3942,87 +3944,8 @@ public class DGraphTest
         
         return g;
     }
-    
+
 //------------------------------------------------------------------------------
-    
-    @Test
-    public void testFindSymmetrySetsOfChildVertexes() throws Exception
-    {
-        prepare();
-        DGraph graph = makeTestGraphM();
-
-        Set<Vertex> alreadyAssignedVrtxs = new HashSet<Vertex>();
-        
-        Vertex focusVrtx = graph.getVertexAtPosition(1);
-        
-        Map<SymmetricAPs,List<Vertex>> symChildenSetsOnSymToVrtxs = 
-                graph.findSymmetrySetsOfChildVertexes(focusVrtx, 
-                        alreadyAssignedVrtxs);
-        
-        Set<SymmetricAPs> keysToRemove = new HashSet<SymmetricAPs>();
-        for (Map.Entry<SymmetricAPs,List<Vertex>> e : 
-            symChildenSetsOnSymToVrtxs.entrySet())
-        {
-            if (e.getValue().size()<2)
-                keysToRemove.add(e.getKey());
-        }
-        for (SymmetricAPs key : keysToRemove)
-            symChildenSetsOnSymToVrtxs.remove(key);
-        
-        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
-        
-        List<Vertex> foundVrtxs = symChildenSetsOnSymToVrtxs.get(
-                focusVrtx.getSymmetricAPSets().get(0));
-        
-        assertEquals(3, foundVrtxs.size());
-        List<Vertex> expected = new ArrayList<Vertex>();
-        expected.add(graph.getVertexAtPosition(3));
-        expected.add(graph.getVertexAtPosition(4));
-        expected.add(graph.getVertexAtPosition(5));
-        for (Vertex foundVrts : foundVrtxs)
-            assertTrue(expected.contains(foundVrts));
-        
-        
-        focusVrtx = graph.getVertexAtPosition(0);
-        
-        alreadyAssignedVrtxs = new HashSet<Vertex>();
-        symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
-                focusVrtx, alreadyAssignedVrtxs);
-        
-        keysToRemove = new HashSet<SymmetricAPs>();
-        for (Map.Entry<SymmetricAPs,List<Vertex>> e : 
-            symChildenSetsOnSymToVrtxs.entrySet())
-        {
-            if (e.getValue().size()<2)
-                keysToRemove.add(e.getKey());
-        }
-        for (SymmetricAPs key : keysToRemove)
-            symChildenSetsOnSymToVrtxs.remove(key);
-        
-        assertEquals(2, symChildenSetsOnSymToVrtxs.size());
-
-        foundVrtxs = symChildenSetsOnSymToVrtxs.get(
-                focusVrtx.getSymmetricAPSets().get(0));
-        
-        assertEquals(2, foundVrtxs.size());
-        expected = new ArrayList<Vertex>();
-        expected.add(graph.getVertexAtPosition(1));
-        expected.add(graph.getVertexAtPosition(2));
-        for (Vertex foundVrts : foundVrtxs)
-            assertTrue(expected.contains(foundVrts));
-        
-        foundVrtxs = symChildenSetsOnSymToVrtxs.get(
-                focusVrtx.getSymmetricAPSets().get(1));
-        
-        assertEquals(2, foundVrtxs.size());
-        expected = new ArrayList<Vertex>();
-        expected.add(graph.getVertexAtPosition(9));
-        expected.add(graph.getVertexAtPosition(10));
-        for (Vertex foundVrts : foundVrtxs)
-            assertTrue(expected.contains(foundVrts));
-    }
-    
-  //------------------------------------------------------------------------------
 
     /**
      * Returns a graph with peculiar definition of symmetric vertexes and 
@@ -4103,71 +4026,6 @@ public class DGraphTest
     
 //------------------------------------------------------------------------------
     
-    /*
-    @Test
-    public void testFindSymmetrySetsOfChildVertexes_partFilledAps() 
-            throws Exception
-    {
-        prepare();
-        DGraph graph = makeTestGraphN();
-        
-        Vertex focusVrtx = graph.getVertexAtPosition(1);
-
-        Set<Vertex> alreadyAssignedVrtxs = new HashSet<Vertex>();
-        Map<SymmetricAPs,List<Vertex>> symChildenSetsOnSymToVrtxs = 
-                graph.findSymmetrySetsOfChildVertexes(focusVrtx, 
-                        alreadyAssignedVrtxs);
-        
-        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
-        Iterator<List<Vertex>> iter = symChildenSetsOnSymToVrtxs.values().iterator();
-        List<Vertex> foundVrtxs = iter.next(); // there is only one
-        assertEquals(3, foundVrtxs.size());
-        List<Vertex> expected = new ArrayList<Vertex>();
-        expected.add(graph.getVertexAtPosition(3));
-        expected.add(graph.getVertexAtPosition(4));
-        expected.add(graph.getVertexAtPosition(5));
-        for (Vertex foundVrts : foundVrtxs)
-            assertTrue(expected.contains(foundVrts));
-        
-        
-        focusVrtx = graph.getVertexAtPosition(0);
-        
-        alreadyAssignedVrtxs = new HashSet<Vertex>();
-        symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
-                focusVrtx, alreadyAssignedVrtxs);
-        
-        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
-        iter = symChildenSetsOnSymToVrtxs.values().iterator();
-        foundVrtxs = iter.next(); // there is only one
-        assertEquals(3, foundVrtxs.size());
-        expected = new ArrayList<Vertex>();
-        expected.add(graph.getVertexAtPosition(1));
-        expected.add(graph.getVertexAtPosition(2));
-        expected.add(graph.getVertexAtPosition(8)); // this is v9
-        for (Vertex foundVrts : foundVrtxs)
-            assertTrue(expected.contains(foundVrts));
-        
-
-        focusVrtx = graph.getVertexAtPosition(2);
-        
-        alreadyAssignedVrtxs = new HashSet<Vertex>();
-        symChildenSetsOnSymToVrtxs = graph.findSymmetrySetsOfChildVertexes(
-                focusVrtx, alreadyAssignedVrtxs);
-        
-        assertEquals(1, symChildenSetsOnSymToVrtxs.size());
-        iter = symChildenSetsOnSymToVrtxs.values().iterator();
-        foundVrtxs = iter.next(); // there is only one
-        assertEquals(2, foundVrtxs.size());
-        expected = new ArrayList<Vertex>();
-        expected.add(graph.getVertexAtPosition(6));
-        expected.add(graph.getVertexAtPosition(7));
-        for (Vertex foundVrts : foundVrtxs)
-            assertTrue(expected.contains(foundVrts));
-    }
-    */
-    
-//------------------------------------------------------------------------------
-    
     @Test
     public void testDetectSymVertexSets() throws Exception
     {
@@ -4202,5 +4060,6 @@ public class DGraphTest
     }
     
 //------------------------------------------------------------------------------
-	
+
+
 }

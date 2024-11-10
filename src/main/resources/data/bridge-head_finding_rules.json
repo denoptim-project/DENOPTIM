@@ -1,0 +1,221 @@
+[
+  {
+    "ruleName": "2el2atm",
+    "smarts": "[a;D3]~[a;D3]",
+    "bridgeHeadPositions": [
+      0,
+      1
+    ],
+    "allowedBridgeLength": [
+      3,
+      4
+    ],
+    "lengthInAtoms": 2
+  },
+  {
+    "ruleName": "3el3atm_6+6",
+    "smarts": "[a;D3]1a2a(aaa1)aaaa2",
+    "bridgeHeadPositions": [
+      0,
+      9
+    ],
+    "allowedBridgeLength": [
+      2,
+      3
+    ],
+    "lengthInAtoms": 3
+  },
+  {
+    "ruleName": "3el3atm_6+5",
+    "smarts": "[a;D3]1a2a(aaa1)aaa2",
+    "bridgeHeadPositions": [
+      0,
+      8
+    ],
+    "allowedBridgeLength": [
+      3
+    ],
+    "lengthInAtoms": 3
+  },
+  {
+    "ruleName": "4el4atm_6+6",
+    "smarts": "[a;D3]1aaaa[a;r6]1~[a;r6]1[a;D3]aaaa1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ],
+    "allowedBridgeLength": [
+      1,
+      2
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "4el4atm_6+5",
+    "smarts": "[a;D3]1aaaa[a;r6]1~[a;r5]1[a;D3;R1]aaa1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ],
+    "allowedBridgeLength": [
+      2
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "4el4atm_5+5",
+    "smarts": "[a;D3]1aaaa1~a1[a;D3;R1]aaa1",
+    "bridgeHeadPositions": [
+      0,
+      6
+    ],
+    "allowedBridgeLength": [
+      2
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "5el5atm_6-6*",
+    "smarts": "[a;D3]1a(aaaa1)~!@a1a(aaaa1)~[a;D3]",
+    "bridgeHeadPositions": [
+      0,
+      12
+    ],
+    "allowedBridgeLength": [
+      1
+    ],
+    "lengthInAtoms": 5
+  },
+  {
+    "ruleName": "5el5atm_66-*",
+    "smarts": "[a;D3]1a2a(aaa1)aaaa2~!@a[a;D3]",
+    "bridgeHeadPositions": [
+      0,
+      11
+    ],
+    "allowedBridgeLength": [
+      1
+    ],
+    "lengthInAtoms": 5
+  },
+  {
+    "ruleName": "5el5atm_6+6+6",
+    "smarts": "[a;D3]1a2a(aaa1)aaa3a2a([a;D3])aaa3",
+    "bridgeHeadPositions": [
+      0,
+      11
+    ],
+    "allowedBridgeLength": [
+      1
+    ],
+    "lengthInAtoms": 5
+  },
+  {
+    "ruleName": "aliph2atm",
+    "smarts": "[A;R1]~@[A;R1]",
+    "bridgeHeadPositions": [
+      0,
+      1
+    ],
+    "lengthInAtoms": 2
+  },
+  {
+    "ruleName": "aliph3atm",
+    "smarts": "[A;R1]~[*;R]~[A;R1]",
+    "bridgeHeadPositions": [
+      0,
+      2
+    ],
+    "lengthInAtoms": 3
+  },
+  {
+    "ruleName": "aliph4atm_6+6",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "aliph4atm_6+5",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "aliph4atm_6+4",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "aliph4atm_6+3",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      7
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "aliph4atm_5+5",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      6
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "aliph4atm_5+4",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      6
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "aliph4atm_5+3",
+    "smarts": "[A]~1[*]~[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      6
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "aliph4atm_4+4",
+    "smarts": "[A]~1[*]~[*]~[*]~1~[*]~1[A]~[*]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      5
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "aliph4atm_4+3",
+    "smarts": "[A]~1[*]~[*]~[*]~1~[*]~1[A]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      5
+    ],
+    "lengthInAtoms": 4
+  },
+  {
+    "ruleName": "aliph4atm_3+3",
+    "smarts": "[A]~1[*]~[*]~1~[*]~1[A]~[*]~1",
+    "bridgeHeadPositions": [
+      0,
+      4
+    ],
+    "lengthInAtoms": 4
+  }
+]

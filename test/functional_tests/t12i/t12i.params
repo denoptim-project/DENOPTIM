@@ -1,41 +1,36 @@
-#
-# This is the parameter file for test t12
-#
+# Initial candidates converted from existing molecules
+GA-InitMolsToFragmentFile=initial_pop.sdf
+FRG-CuttingRulesFile=cutting_rules
+#GA-InitPoplnFile=initial_pop.sdf
 
 # Definition of the Fragment Space
-FS-scaffoldLibFile=OTF_WDIR/lib_scaff.sdf
-FS-fragmentLibFile=OTF_WDIR/lib_frags.sdf
-FS-cappingFragmentLibFile=OTF_WDIR/lib_cap.sdf
-FS-compMatrixFile=OTF_WDIR/CPMap.par
-FS-rcCompMatrixFile=OTF_WDIR/RC-CPMap.par
-FS-RotBondsDefFile=OTF_WDIR/rotatableBonds-1.2
-FS-ConstrainSymmetry=ch:0 1.0
-FS-ConstrainSymmetry=co:0 1.0
+FS-scaffoldLibFile=lib_scaff.sdf
+FS-fragmentLibFile=lib_frags.sdf
+FS-cappingFragmentLibFile=lib_cap.sdf
+FS-compMatrixFile=CPMap.par
+FS-rcCompMatrixFile=RC-CPMap.par
+FS-MaxMW=2000
 
 # Control ring formation
 RC-CLOSERINGS
-RC-EVALUATIONCLOSABILITYMODE=CONSTITUTION
-RC-CLOSABLERINGSMARTS=C1[C,O]CC[C,O]1
-RC-CLOSABLERINGSMARTS=C1[C,O]C[C,O]C[C,O]1
-RC-CLOSABLERINGSMARTS=C1[C,O]C[C,O]CC[C,O]1
 
 # Genetic Algorithm parameters
-GA-InitPoplnFile=OTF_WDIR/initialPop.sdf
 GA-randomSeed=8572368003836
 GA-Parallelization=synchronous
 GA-numParallelTasks=4
 GA-populationSize=10
 GA-numChildren=10
-GA-numGenerations=4
+GA-numGenerations=10
 GA-numConvGen=9
 GA-XOverSelectionMode=TS
-GA-crossoverWeight=0.0
+GA-crossoverWeight=1.0
 GA-mutationWeight=1.0
-GA-ConstructionWeight=0.0
+GA-ConstructionWeight=0
 GA-symmetryProbability=0.5
 GA-LevelGrowthProbScheme=sigma
 GA-LevelGrowthSigmaSteepness=1.0
 GA-LevelGrowthSigmaMiddle=1.0
+GA-EXCLUDEMUTATIONTYPE=EXTEND
 
 FP-equation=${MW}
 FP-CheckUidBeforeFitness=yes

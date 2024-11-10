@@ -47,9 +47,12 @@ import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.silent.Bond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpace;
@@ -57,6 +60,7 @@ import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
@@ -71,8 +75,10 @@ import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
+import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
 /**
@@ -981,6 +987,183 @@ public class GraphOperationsTest {
         assertEquals(0, graph.getRingCount());
         GraphOperations.addRing(vC5, mnt, true, fs, gaParams);
         assertEquals(1, graph.getRingCount());
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testAddFusedRings() throws Exception
+    {
+        APClass apcA = APClass.make("apcA:1");
+        APClass hyd = APClass.make("hyd:1");
+        
+        // Prepare environment to run graph operation. First, a monitor of events
+        Monitor mnt = new Monitor();
+        
+        ArrayList<Vertex> libFrags = new ArrayList<Vertex>();
+        
+        APClass APC4EL = APClass.make("4el:0");
+        Fragment bridge4el = new Fragment(4);
+        IAtom a4_0 = new Atom("Si", new Point3d());
+        IAtom a4_1 = new Atom("Si", new Point3d());
+        IAtom a4_2 = new Atom("Si", new Point3d());
+        IAtom a4_3 = new Atom("Si", new Point3d());
+        bridge4el.addAtom(a4_0);
+        bridge4el.addAtom(a4_1);
+        bridge4el.addAtom(a4_2);
+        bridge4el.addAtom(a4_3);
+        bridge4el.addBond(new Bond(a4_0, a4_1, IBond.Order.DOUBLE));
+        bridge4el.addBond(new Bond(a4_1, a4_2, IBond.Order.SINGLE));
+        bridge4el.addBond(new Bond(a4_2, a4_3, IBond.Order.DOUBLE));
+        bridge4el.addAP(0, new Point3d(), APC4EL);
+        bridge4el.addAP(3, new Point3d(), APC4EL);
+        bridge4el.addAP(0, new Point3d(), apcA);
+        bridge4el.addAP(1, new Point3d(), apcA);
+        bridge4el.addAP(2, new Point3d(), apcA);
+        bridge4el.addAP(3, new Point3d(), apcA);
+        libFrags.add(bridge4el);
+
+        Fragment bridge4el3Atm = new Fragment(2);
+        IAtom a3_0 = new Atom("Ge", new Point3d());
+        IAtom a3_1 = new Atom("N", new Point3d());
+        IAtom a3_2 = new Atom("Ge", new Point3d());
+        bridge4el3Atm.addAtom(a3_0);
+        bridge4el3Atm.addAtom(a3_1);
+        bridge4el3Atm.addAtom(a3_2);
+        bridge4el3Atm.addBond(new Bond(a3_0, a3_1, IBond.Order.SINGLE));
+        bridge4el3Atm.addBond(new Bond(a3_1, a3_2, IBond.Order.SINGLE));
+        bridge4el3Atm.addAP(0, new Point3d(), APC4EL);
+        bridge4el3Atm.addAP(2, new Point3d(), APC4EL);
+        bridge4el3Atm.addAP(0, new Point3d(), apcA);
+        bridge4el3Atm.addAP(2, new Point3d(), apcA);
+        libFrags.add(bridge4el3Atm);
+        
+        APClass APC1EL = APClass.make("1el:0");
+        Fragment bridge1el = new Fragment(1);
+        IAtom a1_0 = new Atom("N", new Point3d());
+        bridge1el.addAtom(a1_0);
+        bridge1el.addAP(0, new Point3d(), APC1EL);
+        bridge1el.addAP(0, new Point3d(), APC1EL);
+        libFrags.add(bridge1el);
+        
+        HashMap<APClass,APClass> cappingRules = new HashMap<APClass,APClass>();
+        cappingRules.put(apcA, hyd);
+        
+        ArrayList<Vertex> cappingGroups = new ArrayList<Vertex>();
+        Fragment capH = new Fragment();
+        capH.addAtom(new Atom("H", new Point3d()));
+        capH.addAP(0, new Point3d(1.0, 0, 0), hyd);
+        cappingGroups.add(capH);
+        
+        HashMap<APClass,ArrayList<APClass>> rcCpMap = 
+                new HashMap<APClass,ArrayList<APClass>>();
+        rcCpMap.put(apcA, new ArrayList<APClass>(Arrays.asList(APC4EL)));
+        
+        FragmentSpaceParameters fsp = new FragmentSpaceParameters();
+        FragmentSpace fs = new FragmentSpace(fsp,
+                new ArrayList<Vertex>(),
+                libFrags,
+                cappingGroups, 
+                new HashMap<APClass,ArrayList<APClass>>(), 
+                cappingRules, 
+                new HashSet<APClass>(),
+                rcCpMap); 
+        //NB: a non-empty rcCpMap is enough to trigger the automated recognition
+        // that we are within the class-based approach.
+        
+        // Then, some GA-parameters
+        GAParameters gaParams = new GAParameters();
+        gaParams.setParameters(new RingClosureParameters());
+        gaParams.setRandomizer(new Randomizer(1L));
+        
+        //
+        // Add multiple rings
+        //
+        
+        SmilesParser parser = new SmilesParser(chemBuilder);
+        IAtomContainer benzene = parser.parseSmiles("c1ccccc1");
+        MoleculeUtils.explicitHydrogens(benzene);
+        StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+        sdg.generateCoordinates(benzene);
+        Fragment benzeneScaffold = new Fragment(benzene, BBType.FRAGMENT);
+        for (int i= 0; i<6; i++)
+        {
+            EAUtilsTest.replaceHatomWithAP(benzeneScaffold, i, apcA);
+        }
+        benzeneScaffold.setVertexId(123);
+        DGraph graph = new DGraph();
+        graph.addVertex(benzeneScaffold);
+
+        assertEquals(0, graph.getRingCount());
+        GraphOperations.addFusedRing(benzeneScaffold, mnt, true, fs, gaParams);
+        
+        assertEquals(3, graph.getRingCount());
+        int numSiAtoms = 0;
+        for (Vertex v : graph.getVertexList())
+        {
+            numSiAtoms = numSiAtoms + MoleculeUtils.countAtomsOfElement(
+                    v.getIAtomContainer(), "Si");
+        }
+        assertEquals(12, numSiAtoms);
+        
+        // 
+        // Adding one atom to close 6-member aromatic ring
+        //
+        
+        IAtomContainer arom = parser.parseSmiles("c1cccc(c12)ccc(c23)ccc(c34)cccc4");
+        MoleculeUtils.explicitHydrogens(arom);
+        sdg.generateCoordinates(arom);
+        Fragment frag = new Fragment(arom, BBType.FRAGMENT);
+        EAUtilsTest.replaceHatomWithAP(frag, 0, apcA);
+        EAUtilsTest.replaceHatomWithAP(frag, 17, apcA);
+        frag.setVertexId(123);
+        graph = new DGraph();
+        graph.addVertex(frag);
+        
+        assertEquals(0, graph.getRingCount());
+        GraphOperations.addFusedRing(frag, mnt, true, fs, gaParams);
+        assertEquals(1, graph.getRingCount());
+        
+        //
+        // Adhering to ring-size biases
+        //
+        
+        IAtomContainer arom2 = parser.parseSmiles("c1cccc(c12)ccc(c23)ccc(c34)cccc4");
+        MoleculeUtils.explicitHydrogens(arom2);
+        sdg.generateCoordinates(arom2);
+        Fragment frag2 = new Fragment(arom2, BBType.FRAGMENT);
+        // These two lead to a 5atm5el site, which can generate a 6atom ring
+        EAUtilsTest.replaceHatomWithAP(frag2, 0, apcA);
+        EAUtilsTest.replaceHatomWithAP(frag2, 17, apcA);
+        // these lead to a 2atm2el site that can lead to 6- or 5-membered ring
+        EAUtilsTest.replaceHatomWithAP(frag2, 14, apcA);
+        EAUtilsTest.replaceHatomWithAP(frag2, 15, apcA);
+        frag2.setVertexId(1);
+        graph = new DGraph();
+        graph.addVertex(frag2);
+        RingClosureParameters rcParams = (RingClosureParameters) 
+                gaParams.getParameters(ParametersType.RC_PARAMS);
+        //                                     0,1,2,3,4,5,6,7
+        rcParams.setRingSizeBias(Arrays.asList(0,0,0,0,0,1,0,0));
+        
+        assertEquals(0, graph.getRingCount());
+        GraphOperations.addFusedRing(frag2, mnt, true, fs, gaParams);
+        assertEquals(1, graph.getRingCount());
+        numSiAtoms = 0;
+        int numNAtoms = 0;
+        int numGeAtoms = 0;
+        for (Vertex v : graph.getVertexList())
+        {
+            numSiAtoms = numSiAtoms + MoleculeUtils.countAtomsOfElement(
+                    v.getIAtomContainer(), "Si");
+            numNAtoms = numNAtoms + MoleculeUtils.countAtomsOfElement(
+                    v.getIAtomContainer(), "N");
+            numGeAtoms = numGeAtoms + MoleculeUtils.countAtomsOfElement(
+                    v.getIAtomContainer(), "Ge");
+        }
+        assertEquals(0, numSiAtoms);
+        assertEquals(1, numNAtoms);
+        assertEquals(2, numGeAtoms);
     }
     
 //------------------------------------------------------------------------------

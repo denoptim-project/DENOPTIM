@@ -173,15 +173,20 @@ implements IMolecularDescriptor, IDenoptimDescriptor
                 if (params.length == 0) 
                 {
                     fp = (IFingerprinter) constructor.newInstance();
-                } else if (params[0].equals(IChemObjectBuilder.class))
+                } else if (params.length == 1 && params[0].equals(
+                        IChemObjectBuilder.class))
                 {
                     //NB potential source of ambiguity on the builder class
                     fp = (IFingerprinter) constructor.newInstance(cdkBuilder);
                 }
+                // NB: we know there are constuctors that take more, for example
+                // that of PubchemFingerprinter, but those
+                // exist to enable backwards compatibility
+                if (fp!=null)
+                    break;
             }
         } catch (Throwable t)
         {
-            
             throw new CDKException("Could not make new instance of '" 
                     + classShortName + "'.", t);
         }

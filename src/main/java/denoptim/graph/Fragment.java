@@ -1065,6 +1065,27 @@ public class Fragment extends Vertex
      */
     public boolean isIsomorphicTo(Vertex other)
     {
+        return isIsomorphicTo(other, false);
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Checks for isomorphism of the graph representation of this and another 
+     * fragment. The graph representation results from the combination of the
+     * molecular structure (atoms as nodes, bonds as edges of the graph) 
+     * and the presence of attachment points (attachment points as nodes of the
+     * graph). See {@link #getJGraphFragIsomorphism()} for details.
+     * Does not consider three-dimensional features. Does not consider dummy
+     * atoms on linearities so, de facto, fragments can be isomorphic and have a 
+     * different number of atoms and bonds.
+     * @param other the other building block to consider.
+     * @param ignoreAPClasses use <code>true</code> to compare attachment points
+     * ignoring their APClass.
+     * @return <code>true</code> if at least one isomorphism exists.
+     */
+    public boolean isIsomorphicTo(Vertex other, boolean ignoreAPClasses)
+    {
         if (!(other instanceof Fragment))
         {
             return false;
@@ -1084,7 +1105,7 @@ public class Fragment extends Vertex
         }
   
         FragmentIsomorphismInspector fii = new FragmentIsomorphismInspector(
-                this, otherFrag); 
+                this, otherFrag, ignoreAPClasses); 
         return fii.isomorphismExists();
     }
     

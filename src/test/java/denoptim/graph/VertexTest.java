@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.vecmath.Point3d;
 
@@ -33,6 +34,7 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.silent.Bond;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 import denoptim.utils.MutationType;
@@ -236,6 +238,73 @@ public class VertexTest
         assertEquals(0,v.getMutationSites(new ArrayList<>(Arrays.asList(
                 MutationType.EXTEND))).size(), "Vertex that allows only "
                         + "ignored mutation types is not a mutable site");
+    }
+    
+//------------------------------------------------------------------------------
+    
+    @Test
+    public void testGetAPsWithAPClassStartingWith() throws Exception
+    {
+        EmptyVertex ev = new EmptyVertex();
+        ev.addAP(APClass.make("Abc:1"));
+        ev.addAP(APClass.make("Abc:0"));
+        ev.addAP(APClass.make("TT:0"));
+        ev.addAP(APClass.make("AbT:1"));
+        ev.addAP(APClass.make("TT:2"));
+        
+        List<AttachmentPoint> aps = ev.getAPsWithAPClassStartingWith("Ab");
+        assertEquals(3, aps.size());
+        
+        for (AttachmentPoint ap : aps)
+        {
+            assertTrue(ap.getAPClass().toString().startsWith("Ab"));
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testIsConnectedToAromaticBridge() throws Exception 
+    { 
+        EmptyVertex aromBridge = new EmptyVertex();
+        aromBridge.addAP(APClass.APCAROMBRIDGE2EL);
+        aromBridge.addAP(APClass.APCAROMBRIDGE2EL);
+        aromBridge.addAP(APClass.make("ab:0"));
+        
+        EmptyVertex nonBridge = new EmptyVertex();
+        nonBridge.addAP(APClass.make("Abc:1"));
+        nonBridge.addAP(APClass.make("Abc:0"));
+        nonBridge.addAP(APClass.make("Abc:0"));
+        
+        EmptyVertex nonBridge2 = new EmptyVertex();
+        nonBridge2.addAP(APClass.make("nb2:1"));
+        
+        EmptyVertex nonBridge3 = new EmptyVertex();
+        nonBridge3.addAP(APClass.make("nb2:1"));
+        nonBridge3.addAP(APClass.make("nb2:1"));
+        
+        Vertex rcvA = FragmentSpace.getPolarizedRCV(true);
+        
+        Vertex rcvB = FragmentSpace.getPolarizedRCV(false);
+        
+        DGraph graph = new DGraph();
+        graph.addVertex(nonBridge);
+        graph.appendVertexOnAP(nonBridge.getAP(0), nonBridge2.getAP(0));
+        graph.appendVertexOnAP(nonBridge.getAP(1), aromBridge.getAP(0));
+        graph.appendVertexOnAP(nonBridge.getAP(2), nonBridge3.getAP(0));
+        graph.appendVertexOnAP(nonBridge3.getAP(1), rcvA.getAP(0));
+        graph.appendVertexOnAP(aromBridge.getAP(1), rcvB.getAP(0));
+        graph.addRing(rcvA, rcvB);
+        
+        assertFalse(nonBridge.isAromaticBridge());
+        assertFalse(nonBridge2.isAromaticBridge());
+        assertFalse(nonBridge3.isAromaticBridge());
+        assertTrue(aromBridge.isAromaticBridge());
+        
+        assertTrue(nonBridge.isConnectedToAromaticBridge());
+        assertFalse(nonBridge2.isConnectedToAromaticBridge());
+        assertTrue(nonBridge3.isConnectedToAromaticBridge());
+        assertTrue(aromBridge.isConnectedToAromaticBridge());
     }
     
 //------------------------------------------------------------------------------

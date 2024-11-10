@@ -58,8 +58,9 @@ public class FragmentIsomorphismInspector
      */
     VF2GraphIsomorphismInspector<FragIsomorphNode, FragIsomorphEdge> vf2;
 
-//------------------------------------------------------------------------------
     
+//------------------------------------------------------------------------------
+      
     /**
      * Constructs a default inspector with a timeout runtime of 60 seconds.
      * @param fragA
@@ -67,13 +68,27 @@ public class FragmentIsomorphismInspector
      */
     public FragmentIsomorphismInspector(Fragment fragA, Fragment fragB)
     {
-        this(fragA, fragB, 60000);
+        this(fragA, fragB, 60000, false);
+    }
+      
+//------------------------------------------------------------------------------
+    
+    /**
+     * Constructs a default inspector with a timeout runtime of 60 seconds.
+     * @param fragA
+     * @param fragB
+     * @param ignoreAPClasses
+     */
+    public FragmentIsomorphismInspector(Fragment fragA, Fragment fragB,
+            boolean ignoreAPClasses)
+    {
+        this(fragA, fragB, 60000, ignoreAPClasses);
     }
     
 //------------------------------------------------------------------------------
     
     /**
-     * Constructs  an inspector with a custom timeout limiet.
+     * Constructs  an inspector with a custom timeout limit.
      * @param fragA one fragment to compare
      * @param fragB the other fragment to compare
      * @param timeout maximum amount of time (milliseconds) given to the 
@@ -82,7 +97,7 @@ public class FragmentIsomorphismInspector
      * method in this class.
      */
     public FragmentIsomorphismInspector(Fragment fragA, Fragment fragB,
-            int timeout)
+            int timeout, boolean ignoreAPClasses)
     {
         this.timeout = timeout;
         Comparator<FragIsomorphNode> vComp = new Comparator<FragIsomorphNode>() 
@@ -90,7 +105,18 @@ public class FragmentIsomorphismInspector
             @Override
             public int compare(FragIsomorphNode n1, FragIsomorphNode n2)
             {
-                return n1.label.compareTo(n2.label);
+                if (ignoreAPClasses)
+                {
+                    String tmpLbl1 = "ap";
+                    String tmpLbl2 = "ap";
+                    if (n1.isAtm)
+                        tmpLbl1 = n1.label;
+                    if (n2.isAtm)
+                        tmpLbl2 = n2.label;
+                    return tmpLbl1.compareTo(tmpLbl2);
+                } else {
+                    return n1.label.compareTo(n2.label);
+                }
             }
         };
         

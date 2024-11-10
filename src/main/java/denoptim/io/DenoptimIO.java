@@ -83,6 +83,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.fragmenter.BridgeHeadFindingRule;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
@@ -1541,7 +1542,7 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a list of <{@link DGraph}s from file.
+     * Reads a list of {@link DGraph}s from file.
      *
      * @param fileName the pathname of the file to read
      * @return the list of graphs
@@ -2593,6 +2594,77 @@ public class DenoptimIO
             if (pw!=null)
                 pw.close();
         }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads a list of rules for identifying potential bridge-head sites.
+     *
+     * @param fileName the pathname of the file to read
+     * @return the list of rules found in the file.
+     * @throws DENOPTIMException in case we cannot read, find, or understand
+     * the data.
+     */
+    public static List<BridgeHeadFindingRule> readBridgeHesFindingRules(
+            String fileName) throws DENOPTIMException 
+    {
+        List<BridgeHeadFindingRule> rules = null;
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(fileName));
+            rules = readBridgeHesFindingRules(br);
+        }
+        catch (FileNotFoundException fnfe)
+        {
+            throw new DENOPTIMException("File '" + fileName + "' not found.");
+        } catch (IOException ioe)
+        {
+            throw new DENOPTIMException(ioe);
+        }
+        finally 
+        {
+            try {
+                if (br != null)
+                {
+                    br.close();
+                }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException(ioe);
+            }
+        }
+        return rules;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Reads a list of rules for identifying potential bridge-head sites.
+     *
+     * @param reader the source of data.
+     * @return the list of rules found in the reader.
+     * @throws IOException 
+     * @throws DENOPTIMException in case we cannot read, find, or understand
+     * the data.
+     */
+    public static List<BridgeHeadFindingRule> readBridgeHesFindingRules(
+            BufferedReader br) throws IOException
+    {
+        List<BridgeHeadFindingRule> rules = new ArrayList<>();
+        Gson reader = DENOPTIMgson.getReader();
+        try
+        {
+            rules = reader.fromJson(br, 
+                    new TypeToken<ArrayList<BridgeHeadFindingRule>>(){}.getType());
+        }
+        finally 
+        {
+            if (br != null)
+            {
+                br.close();
+            }
+        }
+        return rules;
     }
 
 //------------------------------------------------------------------------------

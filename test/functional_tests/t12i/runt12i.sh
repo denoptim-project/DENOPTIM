@@ -38,10 +38,16 @@ if ! grep -q "\"gRings\": \[$" "$wrkDir/$runFolder"/*/*sdf ; then
     exit 1
 fi
 
-if ! grep -q "ADDRING.*: done" "$wrkDir"/$runFolder.log
+if ! grep -q "ADDFUSEDRING.*: done" "$wrkDir"/$runFolder.log
 then
     echo " "
-    echo "Test 't12i' NOT PASSED (symptom: no ADDRING mutation)"
+    echo "Test 't12i' NOT PASSED (symptom: no ADDFUSEDRING mutation)"
+    exit 1
+fi
+
+if ! grep -q "1elAromBridge" "$wrkDir/$runFolder"/*/*sdf ; then
+    echo " "
+    echo "Test 't12i' NOT PASSED (symptom: no 1el aromatic bridge)"
     exit 1
 fi
 

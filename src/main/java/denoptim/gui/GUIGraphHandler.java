@@ -65,6 +65,7 @@ import denoptim.files.FileAndFormat;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.fragmenter.FragmenterTools;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.ga.EAUtils;
 import denoptim.graph.AttachmentPoint;
@@ -1568,6 +1569,7 @@ public class GUIGraphHandler extends GUICardPanel
                     IteratingSMILESReader.class))
             {
                 frgParams.setWorkingIn3D(false);
+                frgParams.setAddExplicitH(true);
                 make2D = true;
                 sdg = new StructureDiagramGenerator();
             }
@@ -1583,6 +1585,12 @@ public class GUIGraphHandler extends GUICardPanel
             return;
         }
         
+        // Make empty fragment space or use the loaded one to identify capping
+        if (fragSpace == null)
+        {
+            fragSpace = new FragmentSpace();
+        }
+        
         // Read and convert molecules one by one
         List<DGraph> graphs = new ArrayList<DGraph>();
         int i=0;
@@ -1590,6 +1598,7 @@ public class GUIGraphHandler extends GUICardPanel
         {
             i++;
             IAtomContainer mol = iterMolsToFragment.next();
+            FragmenterTools.prepareMolToFragmentation(mol, frgParams, i);
             if (make2D)
             {
                 try
@@ -1606,7 +1615,8 @@ public class GUIGraphHandler extends GUICardPanel
                 graph = EAUtils.makeGraphFromFragmentationOfMol(mol, 
                         frgParams.getCuttingRules(), frgParams.getLogger(),
                         frgParams.getScaffoldingPolicy(),
-                        frgParams.getLinearAngleLimit());
+                        frgParams.getLinearAngleLimit(),
+                        fragSpace);
             } catch (DENOPTIMException de)
             {
                 String msg = "<html><body width='%1s'>Unable to convert "
@@ -1622,10 +1632,6 @@ public class GUIGraphHandler extends GUICardPanel
             
             if (frgParams.embedRingsInTemplate())
             {
-                if (fragSpace==null)
-                {
-                    fragSpace = new FragmentSpace();
-                }
                 try {
                     DGraph modGraph = graph.embedPatternsInTemplates(
                             GraphPattern.RING, 

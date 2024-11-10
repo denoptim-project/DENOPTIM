@@ -161,7 +161,7 @@ public class EmptyVertex extends Vertex
                 return symmetricSet;
             }
         }
-        return null;
+        return new SymmetricAPs();
     }
 
 //------------------------------------------------------------------------------

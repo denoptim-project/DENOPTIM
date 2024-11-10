@@ -21,20 +21,29 @@ package denoptim.ga;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.http.TruncatedChunkException;
+import org.openscience.cdk.graph.ShortestPaths;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.isomorphism.Mappings;
 import org.paukov.combinatorics3.Generator;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.fragmenter.BridgeHeadFindingRule;
 import denoptim.fragspace.APMapFinder;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
@@ -45,6 +54,7 @@ import denoptim.graph.APMapping;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
+import denoptim.graph.RelatedAPPair;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
 import denoptim.graph.SymmetricVertexes;
@@ -64,9 +74,13 @@ import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
+import denoptim.programs.fragmenter.CuttingRule;
+import denoptim.programs.fragmenter.MatchedBond;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MutationType;
+import denoptim.utils.ObjectPair;
 import denoptim.utils.Randomizer;
 
 /**
@@ -1160,7 +1174,263 @@ public class GraphOperations
         
         return done;
     }
+    
+//------------------------------------------------------------------------------
 
+    /**
+     * Tries to add a fused ring using a pair of free APs, one of which on the 
+     * given vertex.
+     * @param vertex the vertex on which we start to close a the ring.
+     * @param mnt monitoring tool to keep count of events.
+     * @param force use <code>true</code> to by-pass random decisions and force
+     * the creation of rings.
+     * @param fragSpace the fragment space controlling how we put together
+     * building blocks.
+     * @param settings the GA settings controlling how we work.
+     * @return <code>true</code> when at least one ring was added to the graph.
+     * @throws DENOPTIMException
+     * 
+     */
+    
+    protected static boolean addFusedRing(Vertex vertex, Monitor mnt, 
+            boolean force, FragmentSpace fragSpace, GAParameters settings) 
+                    throws DENOPTIMException
+    {
+        // get settings //TODO: this should happen inside RunTimeParameters
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (settings.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)settings.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        
+        Randomizer rng = settings.getRandomizer();
+        
+        // First of all we remove capping groups in the graph
+        vertex.getGraphOwner().removeCappingGroups();
+        
+        List<AttachmentPoint> freeAPs = vertex.getFreeAPThroughout();
+        if (freeAPs.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOFREEAP);
+            return false;
+        }
+        
+        DGraph graph = vertex.getGraphOwner();
+        
+        // Define where to add a bridge. Multiple sites are the result of
+        // symmetry, so they all correspond to the same kind of operation
+        // performed on symmetry-related sites
+        List<List<RelatedAPPair>> candidatePairsSets = 
+                EAUtils.searchRingFusionSites(
+                    graph, 
+                    fragSpace,
+                    rcParams,
+                    rng.nextBoolean(settings.getSymmetryProbability()),
+                    settings.getLogger(), rng);
+        if (candidatePairsSets.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOSITE);
+            return false;
+        }
+        
+        // Bias by potential ring size considering the existing part of the
+        // to-be-created ring.
+        // NB: we have to do this twice because some sites may be used to 
+        // form rings with different sizes. So, see below for the second time...
+        List<List<RelatedAPPair>> szBiasedCandidatePairsSets = 
+                new ArrayList<List<RelatedAPPair>>();
+        for (List<RelatedAPPair> pairSet : candidatePairsSets)
+        {
+            BridgeHeadFindingRule bhfrOfPair = (BridgeHeadFindingRule) 
+                    pairSet.get(0).property;
+            int existingBridgeLength = bhfrOfPair.getExistingBridgeLength();
+            int[] allowedBridgeLengths = bhfrOfPair.getAllowedBridgeLength(
+                    rcParams.getMaxRingSize());
+            for (int i=0; i<allowedBridgeLengths.length; i++)
+            {
+                int allowedBridgeLength = allowedBridgeLengths[i];
+                int possibleRingSize = allowedBridgeLength 
+                        + existingBridgeLength;
+                int weight = 1; // weight of a ring size
+                if (possibleRingSize < rcParams.getMaxRingSize())
+                {
+                    weight = rcParams.getRingSizeBias().get(possibleRingSize);
+                }
+                
+                // We add copies of the same set to the list of candidate 
+                // sets, so when we randomly choose we are more likely to 
+                // choose a set that leads to preferred ring sizes.
+                for (int z=0; z<weight; z++)
+                {
+                    szBiasedCandidatePairsSets.add(pairSet);
+                }
+            }
+        }
+        if (szBiasedCandidatePairsSets.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOSITE);
+            return false;
+        }
+        
+        // Select one combination
+        List<RelatedAPPair> chosenPairsSet = rng.randomlyChooseOne(
+                szBiasedCandidatePairsSets);
+        
+        // Based on the chosen pair, decide on the number of electrons to use
+        // in the incoming fragment that will be used to close the ring
+        // the pairs are all the same kind of ring fusion, so just take the 1st
+        String elsInHalfFrag = chosenPairsSet.get(0).propID.substring(0,1);
+        if (elsInHalfFrag.matches("[a-zA-Z]"))
+            elsInHalfFrag = "0";
+        boolean newRingIsAromatic = true;
+        String elInIncomingFrag = "0el";
+        switch (elsInHalfFrag)
+        {
+            case "0":
+            case "1":
+                // no aromaticity to be retained: use non-aromatic chords
+                elInIncomingFrag = "0el";
+                newRingIsAromatic = false;
+                break;
+                
+            case "2":
+                // Formally we can use any fragment delivering 4n electrons.
+                // Effectively, we have only 4-el fragments
+                elInIncomingFrag = "4el";
+                break;
+                
+            case "3":
+                // We could use a 5-el fragment, but the 8-el aromatic system is
+                // so rare that we avoid it. So, we can only use 3-el fragment 
+                elInIncomingFrag = "3el";
+                break;
+                
+            case "4":
+                // Effectively can only use 2-el fragments
+                elInIncomingFrag = "2el";
+                break;
+                
+            case "5":
+                // We could use a 3-el fragment, but the 8-el aromatic system is
+                // so rare that we avoid it. This could become a tunable config
+                elInIncomingFrag = "1el";
+                break;
+            default:
+                throw new Error("Unknown number of pi-electrons in fragment to "
+                        + "be used for ring fusion operation.");
+        }
+        
+        // Collect fragment that can be used as ring-closing bridge based on the
+        // number of aromatic electrons and number of atoms
+        BridgeHeadFindingRule bhfr = (BridgeHeadFindingRule) 
+                chosenPairsSet.get(0).property;
+
+        List<Vertex> usableBridges = null;
+        if (newRingIsAromatic)
+        {
+            usableBridges = EAUtils.getUsableAromaticBridges(
+                elInIncomingFrag,
+                bhfr.getAllowedBridgeLength(rcParams.getMaxRingSize()),
+                fragSpace);
+        } else {
+            // NB: we keep track of which APs are supposed to be used to form
+            // the bridge by recording their index in a property of the vertex
+            usableBridges = EAUtils.getUsableAliphaticBridges(
+                    chosenPairsSet.get(0).apA.getAPClass(),
+                    chosenPairsSet.get(0).apB.getAPClass(),
+                    bhfr.getAllowedBridgeLength(rcParams.getMaxRingSize()),
+                    fragSpace);
+        }
+        
+        if (usableBridges.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE);
+            return false;
+        }
+        
+        // Select size of the incoming bridge based on ring-size biases
+        // NB: we have to do this twice because some sites may be used to 
+        // form rings with different sizes. So, see above for the first time...
+        List<Vertex> szBiasedUsableBridges = new ArrayList<Vertex>();
+        for (Vertex candidateBridge : usableBridges)
+        {
+            int thisBridgeLength = (int) candidateBridge.getProperty(
+                    DENOPTIMConstants.VRTPROPBRIDGELENGTH);
+            int existingBridgeLength = bhfr.getExistingBridgeLength();
+            int resultingRingSize = existingBridgeLength + thisBridgeLength;
+            int weigth = 1; // weight of a ring size
+            if (resultingRingSize < rcParams.getMaxRingSize())
+            {
+                weigth = rcParams.getRingSizeBias().get(resultingRingSize);
+            }
+            
+            // We add copies of the same vertex to the list of candidate 
+            // vertexes, so when we randomly choose we are more likely to 
+            // choose those leading to preferred ring sizes.
+            for (int z=0; z<weigth; z++)
+            {
+                szBiasedUsableBridges.add(candidateBridge);
+            }
+        }
+        
+        if (szBiasedUsableBridges.size()==0)
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE);
+            return false;
+        }
+        
+        Vertex incomingVertex = rng.randomlyChooseOne(szBiasedUsableBridges);
+        
+        // Decide which aps on the bridge are used as head/tail
+        List<AttachmentPoint> apsInFusion = new ArrayList<AttachmentPoint>();
+        int[] idApOnBridge = new int[2];
+        if (newRingIsAromatic)
+        {
+            apsInFusion.addAll(incomingVertex.getAPsWithAPClassStartingWith(
+                    elInIncomingFrag));
+            if (rng.nextBoolean())
+            {
+                idApOnBridge[0] = apsInFusion.get(0).getIndexInOwner();
+                idApOnBridge[1] = apsInFusion.get(1).getIndexInOwner();
+            } else {
+                idApOnBridge[0] = apsInFusion.get(1).getIndexInOwner();
+                idApOnBridge[1] = apsInFusion.get(0).getIndexInOwner();
+            }
+        } else {
+            idApOnBridge[0] = Integer.parseInt(incomingVertex.getProperty(
+                            DENOPTIMConstants.VRTPROPBRIDGEEND_A).toString());
+            idApOnBridge[1] = Integer.parseInt(incomingVertex.getProperty(
+                    DENOPTIMConstants.VRTPROPBRIDGEEND_B).toString());
+        }
+        
+        boolean done = false;
+        for (RelatedAPPair pairOfAPs : chosenPairsSet)
+        {
+            AttachmentPoint apHead = pairOfAPs.apA;
+            AttachmentPoint apTail = pairOfAPs.apB;
+            
+            Vertex bridgeClone = incomingVertex.clone();
+            bridgeClone.setVertexId(graph.getMaxVertexId()+1);
+            
+            graph.appendVertexOnAP(apHead, bridgeClone.getAP(idApOnBridge[0]));
+            
+            Vertex rcvBridge = fragSpace.getPolarizedRCV(true);
+            graph.appendVertexOnAP(bridgeClone.getAP(idApOnBridge[1]),
+                    rcvBridge.getAP(0));
+            
+            Vertex rcvTail = fragSpace.getPolarizedRCV(false);
+            graph.appendVertexOnAP(apTail, rcvTail.getAP(0));
+            graph.addRing(rcvBridge, rcvTail);
+            done = true;
+        }
+        
+        // Restore capping groups
+        vertex.getGraphOwner().addCappingGroups(fragSpace);
+        
+        return done;
+    }
+    
 //------------------------------------------------------------------------------
     
     /**
@@ -2140,9 +2410,26 @@ public class GraphOperations
             GAParameters settings) throws DENOPTIMException
     {  
         // Get vertices that can be mutated: they can be part of subgraphs
-        // embedded in templates
+        // embedded in templates. Here, we consider only single-vertexes sites.
+        // So sites for ADDRINGFUSION mutation are not added here.
         List<Vertex> mutable = graph.getMutableSites(
                 settings.getExcludedMutationTypes());
+        // Now, add also the sites that involve multiple vertexes, such sites for
+        // ADDFUSEDRING mutation.
+        for (List<RelatedAPPair> siteCombination : EAUtils.searchRingFusionSites(
+                graph, settings))
+        {
+            for (RelatedAPPair site : siteCombination)
+            {
+                Vertex vA = site.apA.getOwner();
+                Vertex vB = site.apB.getOwner();
+                if (!mutable.contains(vA))
+                    mutable.add(vA);
+                if (!mutable.contains(vB))
+                    mutable.add(vB);
+            }
+        }
+        
         if (mutable.size() == 0)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOMUTSITE);
@@ -2296,6 +2583,7 @@ public class GraphOperations
         // when reporting what vertex is being mutated. Also, note that the
         // identity of the candidate is already in the graph's local msg.
         String mutantOrigin = graph.getLocalMsg() + "|"
+                + mType + "|"
                 + vertex.getProperty(DENOPTIMConstants.STOREDVID) 
                 + " (" + positionOfVertex + ")";
         graph.setLocalMsg(mutantOrigin);
@@ -2361,6 +2649,13 @@ public class GraphOperations
                 
             case ADDRING:
                 done = addRing(vertex, mnt, false, fsParams.getFragmentSpace(), 
+                        settings);
+                if (!done)
+                    mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING);
+                break;
+                
+            case ADDFUSEDRING:
+                done = addFusedRing(vertex, mnt, false, fsParams.getFragmentSpace(), 
                         settings);
                 if (!done)
                     mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDRING);

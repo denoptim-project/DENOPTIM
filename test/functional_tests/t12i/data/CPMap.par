@@ -1,14 +1,15 @@
-# 
-# CompatibilityMatrix for Class Based Builders
-# 
-RCN cca:0 cca:0,ccb:0
-RCN ccb:0 cca:0,ccb:0,F:0,coa:0
-RCN co:0 coa:1
-RCN cob:1 cca:0
-RCN ch:0 F:0
-# Capping
-CAP cca:0 hyd:1
-CAP ccb:0 hyd:1
-CAP cob:1 hyd:1
-CAP ch:0  hyd:1
-CAP co:0  hyd:1
+# Compatibility matrix data
+# NB: even if there is no compatibility, ring fusion on aromatic systems can still be done
+RCN sAr:0 none:0
+
+# Capping rules
+CAP nArom:0 hyd:1
+CAP sAr:0 hyd:1
+CAP sArBridge:0 hyd:1
+
+# Forbidden ends
+DEL 1elAromBridge:0
+DEL 2elAromBridge:0 
+DEL 3elAromBridge:0 
+DEL 4elAromBridge:0 
+

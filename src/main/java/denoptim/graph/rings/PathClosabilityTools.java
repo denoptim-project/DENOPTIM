@@ -87,6 +87,20 @@ public class PathClosabilityTools
             IAtomContainer mol, RingClosureParameters settings) 
     {
         boolean closable = false;
+        
+
+        // Cases that we may want to exclude:
+        //
+        // Exclude adding fused cycle of vertexes on already fused system.
+        // This can be achieved by controlling APClass compatibilities, if the
+        // APClasses are also chosen to describe the role of the vertex bearing 
+        // the AP in the system, e.g., its role in an aromatic system.
+        // Otherwise, we can see if the vertexes in the path already belong to 
+        // cycles: This is fast, so it might be better to do it even if acting 
+        // at the level of the molecular representation will deliver the same 
+        // information.
+        
+        
         switch (settings.getClosabilityEvalMode())
         {
             case -1:

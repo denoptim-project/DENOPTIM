@@ -23,7 +23,7 @@ do
 done
 
 #Run sub tests
-nSubTests=29
+nSubTests=32
 elSymbols=('C  ' 'N  ' 'P  ' 'H  ' 'ATM' 'O  ' 'Si ' 'F  ' 'S  ')
 totChecks=0
 for i in $(seq 1 $nSubTests)

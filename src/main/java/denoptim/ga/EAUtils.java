@@ -32,19 +32,28 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.openscience.cdk.graph.ShortestPaths;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.isomorphism.Mappings;
+import org.paukov.combinatorics3.Generator;
+
+import com.google.gson.Gson;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.fitness.FitnessParameters;
+import denoptim.fragmenter.BridgeHeadFindingRule;
 import denoptim.fragmenter.FragmenterTools;
 import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
@@ -57,8 +66,11 @@ import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
+import denoptim.graph.RelatedAPPair;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
+import denoptim.graph.SymmetricSet;
+import denoptim.graph.SymmetricSetWithMode;
 import denoptim.graph.Template;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
@@ -67,6 +79,7 @@ import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.graph.rings.RingClosuresArchive;
 import denoptim.io.DenoptimIO;
+import denoptim.json.DENOPTIMgson;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
@@ -77,6 +90,7 @@ import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
+import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 import denoptim.utils.RotationalSpaceUtils;
@@ -670,7 +684,7 @@ public class EAUtils
                 + " Gen:" + parent.getGeneration() + " Cand:" + parentMolName 
                 + "|" + parentGraphId);
         
-        if (!GraphOperations.performMutation(graph,mnt,settings))
+        if (!GraphOperations.performMutation(graph, mnt, settings))
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM);
             mnt.increase(CounterID.FAILEDMUTATTEMTS);
@@ -964,7 +978,8 @@ public class EAUtils
             graph = makeGraphFromFragmentationOfMol(mol, 
                     frgParams.getCuttingRules(), settings.getLogger(),
                     frgParams.getScaffoldingPolicy(),
-                    frgParams.getLinearAngleLimit());
+                    frgParams.getLinearAngleLimit(),
+                    fragSpace);
         } catch (DENOPTIMException de)
         {
             String msg = "Unable to convert molecule (" + mol.getAtomCount() 
@@ -1011,7 +1026,7 @@ public class EAUtils
         
         return candidate;
     }
-
+    
 //------------------------------------------------------------------------------  
     
     /**
@@ -1031,12 +1046,13 @@ public class EAUtils
                     throws DENOPTIMException
     {
         return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
-                scaffoldingPolicy, 190); 
+                scaffoldingPolicy, 190, new FragmentSpace()); 
         // NB: and angle of 190 means we are not adding Du on linearities
+        // because the max possible bond angle is 180.
     }
-    
+
 //------------------------------------------------------------------------------  
-    
+      
     /**
      * Converts a molecule into a {@link DGraph} by fragmentation and 
      * re-assembling of the fragments.
@@ -1053,6 +1069,59 @@ public class EAUtils
     public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
             List<CuttingRule> cuttingRules, Logger logger, 
             ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit) 
+                    throws DENOPTIMException
+    {
+        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
+                scaffoldingPolicy, linearAngleLimit, new FragmentSpace()); 
+    }
+      
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @param fragSpace the fragment space for defining things like, what
+     * capping groups we have.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy, FragmentSpace fragSpace) 
+                    throws DENOPTIMException
+    {
+        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
+                scaffoldingPolicy, 190, fragSpace); 
+        // NB: and angle of 190 means we are not adding Du on linearities
+        // because the max possible bond angle is 180.
+    }
+    
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @param linearAngleLimit the max bond angle before we start considering 
+     * the angle linear and add a linearity-breaking dummy atom.
+     * @param fragSpace the definition of the fragment space to consider when
+     * generating fragments.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit,
+            FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {
         // We expect only Fragments here.
@@ -1141,6 +1210,34 @@ public class EAUtils
         
         // Set symmetry relations: these depend on which scaffold we have chosen
         graph.detectSymVertexSets();
+        
+        // Identify capping groups, i.e., fragments that reflect the capping 
+        // groups found in the fragment space, if any.
+        if (fragSpace!=null && fragSpace.getCappingMap()!=null)
+        {
+            for (Vertex v : graph.getVertexList())
+            {
+                if (v.getAttachmentPoints().size()!=1 || v.isRCV())
+                    continue;
+                
+                APClass srcAPC = v.getAP(0).getLinkedAPThroughout().getAPClass();
+                APClass capAPC = fragSpace.getAPClassOfCappingVertex(srcAPC);
+                Vertex cap = fragSpace.getCappingVertexWithAPClass(capAPC);
+                if (cap==null)
+                    continue;
+                
+                if (!(v instanceof Fragment && cap instanceof Fragment))
+                    continue;
+                    
+                Fragment f = (Fragment) v;
+                // NB: here we ignore APClasses and Du atoms
+                if (f.isIsomorphicTo(cap, true))
+                {
+                    v.setBuildingBlockType(BBType.CAP);
+                    v.getAP(0).setAPClass(capAPC);
+                }
+            }
+        }
         
         return graph;
     }
@@ -2312,16 +2409,677 @@ public class EAUtils
             lstInchi.add(str);
         lst.clear();
     }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * <p>Searches for combinations of sites suitable for ring fusion, i.e., 
+     * combinations of {@link RelatedAPPair} where
+     * each such pair allows to expand a ring system by adding a fused ring 
+     * resulting by connecting the two {@link AttachmentPoint}s in the 
+     * {@link RelatedAPPair} by a non-empty bridge. 
+     * The tile of bridge can depend on the properties of
+     * the {@link RelatedAPPair}.
+     * </p>
+     * <p>The set of combinations is only a sample resulting by taking random 
+     * decisions that prevent combinatorial explosion.</p>
+     * 
+     * @param graph the definition of the system to work with
+     * @param projectOnSymmetricAPs use <code>true</code> to impose projection
+     * onto symmetric APs (within a vertex) and onto symmetric vertexes. When
+     * this is <code>true</code> the result will be a list of lists, where the 
+     * nested list may contain more than one item. Yet, each such item is
+     * symmetric projection of the other items.
+     * @param logger a tool to deal with log messages.
+     * @param rng a tool to deal with random decisions.
+     * @return the list of combinations of {@link RelatedAPPair}.
+     * @throws DENOPTIMException if the conversion into a molecular 
+     * representation fails.
+     */
+    
+    //NB: we return a List to retain ordering of the items, but the list must
+    // not contain redundancies, i.e., lists of AP pairs that are made of the 
+    // same set of AP pairs.
+    public static List<List<RelatedAPPair>> searchRingFusionSites(
+            DGraph graph, GAParameters gaParams) throws DENOPTIMException
+    { 
+        RingClosureParameters rcParams = new RingClosureParameters();
+        if (gaParams.containsParameters(ParametersType.RC_PARAMS))
+        {
+            rcParams = (RingClosureParameters)gaParams.getParameters(
+                    ParametersType.RC_PARAMS);
+        }
+        FragmentSpaceParameters fsParams = new FragmentSpaceParameters();
+        if (gaParams.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fsParams = (FragmentSpaceParameters)gaParams.getParameters(
+                    ParametersType.FS_PARAMS);
+        }
+        FragmentSpace fragSpace = fsParams.getFragmentSpace();
+        Randomizer rng = gaParams.getRandomizer();
+        boolean projectOnSymmetricAPs = rng.nextBoolean(
+                gaParams.getSymmetryProbability());
+        // NB: imposeSymmetryOnAPsOfClass is evaluated inside the  
+        // method searchRingFusionSites
+        Logger logger = gaParams.getLogger();
+        return searchRingFusionSites(graph, fragSpace, rcParams, 
+                projectOnSymmetricAPs, logger,  rng);
+    }
 
 //------------------------------------------------------------------------------
 
-    public static AttachmentPoint searchForApSuitableToRingClosure(
-            AttachmentPoint apA, SymmetricAPs symAPsA, GAParameters settings)
-    {
+    /**
+     * <p>Searches for combinations of sites suitable for ring fusion, i.e., 
+     * combinations of {@link RelatedAPPair} where
+     * each such pair allows to expand a ring system by adding a fused ring 
+     * resulting by connecting the two {@link AttachmentPoint}s in the 
+     * {@link RelatedAPPair} by a non-empty bridge. 
+     * The tile of bridge can depend on the properties of
+     * the {@link RelatedAPPair}.
+     * </p>
+     * <p>The set of combinations is only a sample resulting by taking random 
+     * decisions that prevent combinatorial explosion.</p>
+     * 
+     * @param graph the definition of the system to work with
+     * @param projectOnSymmetricAPs use <code>true</code> to impose projection
+     * onto symmetric APs (within a vertex) and onto symmetric vertexes. When
+     * this is <code>true</code> the result will be a list of lists, where the 
+     * nested list may contain more than one item. Yet, each such item is
+     * symmetric projection of the other items.
+     * @param logger a tool to deal with log messages.
+     * @param rng a tool to deal with random decisions.
+     * @return the list of combinations of {@link RelatedAPPair}.
+     * @throws DENOPTIMException if the conversion into a molecular 
+     * representation fails.
+     */
+    
+    //NB: we return a List to retain ordering of the items, but the list must
+    // not contain redundancies, i.e., lists of AP pairs that are made of the 
+    // same set of AP pairs.
+    public static List<List<RelatedAPPair>> searchRingFusionSites(
+            DGraph graph, FragmentSpace fragSpace, 
+            RingClosureParameters rcParams, boolean projectOnSymmetricAPs, 
+            Logger logger, Randomizer rng) throws DENOPTIMException
+    {   
+        // Prepare the empty collector of combinations
+        List<List<RelatedAPPair>> result = new ArrayList<List<RelatedAPPair>>();
         
-        // TODO Auto-generated method stub
-        return null;
+        // Most of the work is done on a clone to prevent any modification of the
+        // 3D molecular representation of the graph, which is here rebuilt in
+        // a crude way because we only need the connectivity.
+        DGraph tmpGraph = graph.clone();
+        
+        // Keep track of which vertexes come from the original graph. We need
+        // to distinguish them from the capping groups we add here.
+        Set<Long> originalVertexIDs = new HashSet<Long>();
+        tmpGraph.getVertexList().stream()
+            .forEach(v -> originalVertexIDs.add(v.getVertexId()));
+        
+        // We add capping groups to facilitate the search for substructures
+        // otherwise we have to write SMARTS that match systems with potentially
+        // unsaturated valences, and that is a mess.
+        // Here we change both graph and molecular representation, but it all 
+        // happens on the tmp copy, so the original graph and mol representation 
+        // remain intact. Also, note that the order of atoms does not have a 
+        // role because we only use the position of the atom in the list of atoms
+        // within the tmp system, and then we use the reference to the
+        // AP to project the information back into the original system.
+        tmpGraph.addCappingGroups(fragSpace);
+        
+        // Get a molecular representation
+        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(logger, rng);
+        t3d.setAlignBBsIn3D(false); //3D not needed
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(tmpGraph, true);
+        
+        // Search for potential half-ring environments, i.e., sets of atoms
+        // that belongs to a cyclic system and could hold a chord that would
+        // define the fused ring.
+        Map<String, String> smarts = new HashMap<String, String>();
+        for (BridgeHeadFindingRule rule : rcParams.getBridgeHeadFindingRules())
+        {
+            smarts.put(rule.getName(), rule.getSMARTS());
+        }
+        
+        ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
+        if (msq.hasProblems())
+        {
+            throw new DENOPTIMException(msq.getMessage());
+        }
+        Map<SymmetricSetWithMode,List<RelatedAPPair>> symmRelatedBridgeHeadAPs = 
+                new HashMap<SymmetricSetWithMode,List<RelatedAPPair>>();
+        List<RelatedAPPair> symBridgeHeadAPs = new ArrayList<RelatedAPPair>();
+        List<RelatedAPPair> asymBridgeHeadAPs = new ArrayList<RelatedAPPair>();
+        for (BridgeHeadFindingRule rule : rcParams.getBridgeHeadFindingRules())
+        {
+            if (msq.getNumMatchesOfQuery(rule.getName()) == 0)
+            {
+                continue;
+            }
+           
+            // Get bridge-head atoms
+            Mappings halfRingAtms = msq.getMatchesOfSMARTS(rule.getName());
+            // We use a string to facilitate detection of pairs of ids
+            // irrespectively on the order of ids, i.e., 1-2 vs. 2-1.
+            Set<String> doneIdPairs = new HashSet<String>();
+            for (int[] idSubstructure : halfRingAtms) 
+            {
+                if (idSubstructure.length<2)
+                {
+                    throw new Error("SMARTS for matching half-ring pattern '" 
+                            + rule.getName() 
+                            + "' has identified " + idSubstructure.length 
+                            + " atoms "
+                            + "instead of at least 2. Modify rule to make it "
+                            + "find 2 or more atoms.");
+                }
+                
+                // Potential bridge-head atoms
+                int[] ids = new int[] {
+                        idSubstructure[rule.getBridgeHeadPositions()[0]],
+                        idSubstructure[rule.getBridgeHeadPositions()[1]]};
+                
+                IAtom bhA = mol.getAtom(ids[0]);
+                IAtom bhB = mol.getAtom(ids[1]);
+                
+                // Avoid duplicate pairs with inverted AP identity
+                String idPairIdentifier = "";
+                if (ids[0]<ids[1])
+                    idPairIdentifier = ids[0]+"_"+ids[1];
+                else
+                    idPairIdentifier = ids[1]+"_"+ids[0];
+                if (doneIdPairs.contains(idPairIdentifier))
+                    continue;
+                doneIdPairs.add(idPairIdentifier);
+                
+                // Bridge-head atoms must have attachment points
+                if (bhA.getProperty(DENOPTIMConstants.ATMPROPAPS)==null 
+                        || bhB.getProperty(DENOPTIMConstants.ATMPROPAPS)==null)
+                    continue;
+                if (bhA.getProperty(DENOPTIMConstants.ATMPROPVERTEXID)==null 
+                        || bhB.getProperty(DENOPTIMConstants.ATMPROPVERTEXID)==null)
+                    throw new IllegalStateException("Atoms in 3d molecular "
+                            + "models of graph objects must have the "
+                            + DENOPTIMConstants.ATMPROPVERTEXID + " property.");
+                
+                long vrtxIdA = (Long)
+                        bhA.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+                long vrtxIdB = (Long)
+                        bhB.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
+                
+                // Each AP on each side can be used
+                @SuppressWarnings("unchecked")
+                List<AttachmentPoint> apsOnA = (List<AttachmentPoint>) 
+                        bhA.getProperty(DENOPTIMConstants.ATMPROPAPS);
+                @SuppressWarnings("unchecked")
+                List<AttachmentPoint> apsOnB = (List<AttachmentPoint>) 
+                        bhB.getProperty(DENOPTIMConstants.ATMPROPAPS);
+                for (int iAPA=0; iAPA<apsOnA.size(); iAPA++)
+                {
+                    AttachmentPoint copyOfApA = apsOnA.get(iAPA);
+                    
+                    // for extreme debug only
+                    /*
+                    System.out.println(rule.getName()+" "+idPairIdentifier+" "
+                            +MoleculeUtils.getAtomRef(bhA, mol)+"-"
+                            +MoleculeUtils.getAtomRef(bhB, mol)+" "
+                            +copyOfApA.getIndexInOwner()
+                            +" in "+copyOfApA.getOwner());
+                            */
+                    
+                    if (!canBeUsedForRingFusion(copyOfApA, originalVertexIDs, 
+                            fragSpace))
+                        continue;
+                    for (int iAPB=0; iAPB<apsOnB.size(); iAPB++)
+                    {
+                        AttachmentPoint copyOfApB = apsOnB.get(iAPB);
+                        
+                        // for extreme debug only
+                        /*
+                        System.out.println("       "+idPairIdentifier+" "
+                                +MoleculeUtils.getAtomRef(bhA, mol)+"-"
+                                +MoleculeUtils.getAtomRef(bhB, mol)+" "
+                                +copyOfApA.getIndexInOwner() 
+                                +" in "+copyOfApA.getOwner() 
+                                + "--- "
+                                +copyOfApB.getIndexInOwner()
+                                +" in "+copyOfApB.getOwner());
+                                */
+                        
+                        if (!canBeUsedForRingFusion(copyOfApB, originalVertexIDs, 
+                                fragSpace))
+                            continue;
+                        
+                        // Now take the references to the actual APs
+                        AttachmentPoint apA = tmpGraph.getVertexWithId(vrtxIdA)
+                                .getAPWithId(copyOfApA.getID());
+                        AttachmentPoint apB = tmpGraph.getVertexWithId(vrtxIdB)
+                                .getAPWithId(copyOfApB.getID());
+                        if (apA==null || apB==null)
+                            continue;
+                
+                        // Now we have identified a pair of APs suitable to ring fusion
+                        RelatedAPPair pair = new RelatedAPPair(apA, apB, rule,
+                                rule.getName());
+                        
+                        //Record symmetric relations
+                        SymmetricAPs symInA = apA.getOwner().getSymmetricAPs(apA);
+                        SymmetricAPs symInB = apB.getOwner().getSymmetricAPs(apB);
+                        if (symInA.size()!=0 && symInB.size()!=0)
+                        {
+                            if (symInA==symInB)
+                            {
+                                storePairsSymmetricRelations(pair, symInA,
+                                        symmRelatedBridgeHeadAPs);
+                            } else {
+                                storePairsSymmetricRelations(pair, symInA,
+                                        symmRelatedBridgeHeadAPs);
+                                storePairsSymmetricRelations(pair, symInB,
+                                        symmRelatedBridgeHeadAPs);
+                            }
+                            symBridgeHeadAPs.add(pair);
+                        } else {
+                            asymBridgeHeadAPs.add(pair);
+                        }
+                    }
+                }
+            }
+        }
+        if (asymBridgeHeadAPs.size()==0 && symBridgeHeadAPs.size()==0)
+        {
+            return result;
+        }
+        
+        // Collect potential set of pairs of APs that can be used to create 
+        // fused ring systems accounting for symmetric AP relations.
+        List<List<RelatedAPPair>> candidateBridgeHeadAPPairs = 
+                new ArrayList<List<RelatedAPPair>>();
+        if (symmRelatedBridgeHeadAPs.size()>0)
+        {
+            for (SymmetricSetWithMode key : symmRelatedBridgeHeadAPs.keySet())
+            {
+                List<RelatedAPPair> chosenSymSet = 
+                        symmRelatedBridgeHeadAPs.get(key);
+                
+                @SuppressWarnings("unchecked")
+                SymmetricSet<AttachmentPoint> symmRelatedAPs = 
+                        (SymmetricSet<AttachmentPoint>) key.getItems();
+                boolean apcImposedSymm = fragSpace.imposeSymmetryOnAPsOfClass(
+                        symmRelatedAPs.get(0).getAPClass());
+                
+                if (projectOnSymmetricAPs || apcImposedSymm)
+                {
+                    // We try to get the biggest combination (k is the size)
+                    // but we do limit to avoid combinatorial explosion.
+                    for (int k=Math.min(chosenSymSet.size(), 6); k>0; k--)
+                    {
+                        // Generate combinations that use non-overlapping pairs of APs
+                        List<List<RelatedAPPair>> combs = combineRelatedAPPair(
+                                chosenSymSet, k, 50);
+                        //TODO: make limit of combinations tuneable?
+                        
+                        if (combs.size()>0)
+                        {
+                            // We keep only combinations that are not already 
+                            // among previously known ones
+                            for (List<RelatedAPPair> comb : combs)
+                            {
+                                boolean isNew = true;
+                                for (List<RelatedAPPair> knownComb : 
+                                    candidateBridgeHeadAPPairs)
+                                {
+                                    if (knownComb.containsAll(comb) 
+                                            && comb.containsAll(knownComb))
+                                    {
+                                        isNew = false;
+                                        break;
+                                    }
+                                }
+                                if (isNew)
+                                {
+                                    candidateBridgeHeadAPPairs.add(comb);
+                                    for (RelatedAPPair pair : comb)
+                                        symBridgeHeadAPs.remove(pair);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            // Add left over pairs, if any.
+            for (RelatedAPPair pair : symBridgeHeadAPs)
+            {
+                List<RelatedAPPair> single = new ArrayList<RelatedAPPair>();
+                single.add(pair);
+                candidateBridgeHeadAPPairs.add(single);
+            }
+        }
+        for (RelatedAPPair pair : asymBridgeHeadAPs)
+        {
+            List<RelatedAPPair> single = new ArrayList<RelatedAPPair>();
+            single.add(pair);
+            candidateBridgeHeadAPPairs.add(single);
+        }
+        
+        // Project ring fusions into the actual graph (considering symmetry)
+        for (List<RelatedAPPair> combOnTmpGraph : candidateBridgeHeadAPPairs)
+        {
+            List<RelatedAPPair> combOnOriginalGraph = 
+                    new ArrayList<RelatedAPPair>();
+            for (RelatedAPPair pairOnTmpGraph : combOnTmpGraph)
+            {   
+                Vertex headVertexOnGraph = graph.getVertexAtPosition(
+                        tmpGraph.indexOf(pairOnTmpGraph.apA.getOwner()));
+                int apHeadID = pairOnTmpGraph.apA.getIndexInOwner();
+                List<Vertex> symHeadVrts = graph.getSymVerticesForVertex(
+                        headVertexOnGraph);
+                if (symHeadVrts.size()==0)
+                    symHeadVrts.add(headVertexOnGraph);
+                
+                Vertex tailVertexOnGraph = graph.getVertexAtPosition(
+                        tmpGraph.indexOf(pairOnTmpGraph.apB.getOwner()));
+                int apTailID = pairOnTmpGraph.apB.getIndexInOwner();
+                List<Vertex> symTailVrts = graph.getSymVerticesForVertex(
+                        tailVertexOnGraph);
+                if (symTailVrts.size()==0)
+                    symTailVrts.add(tailVertexOnGraph);
+                
+                int numPairs = Math.min(symHeadVrts.size(), symTailVrts.size());
+                for (int iPair=0; iPair<numPairs; iPair++)
+                {
+                    RelatedAPPair pairOnOriginalGraph = new RelatedAPPair(
+                            symHeadVrts.get(iPair).getAP(apHeadID), 
+                            symTailVrts.get(iPair).getAP(apTailID),
+                            pairOnTmpGraph.property, 
+                            pairOnTmpGraph.propID);
+                    combOnOriginalGraph.add(pairOnOriginalGraph);
+                }
+            }
+            result.add(combOnOriginalGraph);
+        }
+        return result;
+    } 
+    
+//------------------------------------------------------------------------------
+    
+    private static List<List<RelatedAPPair>> combineRelatedAPPair(
+            List<RelatedAPPair> pool, int k, int limit)
+    {
+        List<RelatedAPPair> tmp = new ArrayList<RelatedAPPair>();
+        List<List<RelatedAPPair>> allCombs = new ArrayList<List<RelatedAPPair>>();
+        combineRelatedAPPairUtil(pool, 0, k, tmp, allCombs, limit);
+        return allCombs;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static void combineRelatedAPPairUtil(List<RelatedAPPair> pool, 
+            int left, int k, 
+            List<RelatedAPPair> tmp,
+            List<List<RelatedAPPair>> allCombs, int limit)
+    {
+        // PRevent combinatorial explosion: stop if the number of combinations
+        // grown above the limit
+        if (allCombs.size()>=limit)
+            return;
+        
+        // For last iteration: save answer
+        if (k == 0) 
+        {
+            if (!apPairsAreOverlapping(tmp))
+            {   
+                List<RelatedAPPair> oneComb = new ArrayList<RelatedAPPair>(tmp);
+                allCombs.add(oneComb);
+            }
+            return;
+        }
+        // In normal iteration, do recursion
+        for (int i=left; i<pool.size(); ++i)
+        {
+            RelatedAPPair next = pool.get(i);
+            if (shareAPs(next, tmp))
+            {
+                continue;
+            }
+            tmp.add(next);
+            combineRelatedAPPairUtil(pool, i + 1, k-1, tmp, allCombs, limit);
+            tmp.remove(tmp.size() - 1);
+        }
     }
     
 //------------------------------------------------------------------------------    
+
+    private static void storePairsSymmetricRelations(RelatedAPPair pair, 
+            SymmetricAPs symAPs, 
+            Map<SymmetricSetWithMode,List<RelatedAPPair>> storage)
+    {
+        SymmetricSetWithMode key = new SymmetricSetWithMode(symAPs, pair.propID);
+        if (storage.containsKey(key))
+        {
+            storage.get(key).add(pair);
+        } else {
+            List<RelatedAPPair> lst = new ArrayList<RelatedAPPair>();
+            lst.add(pair);
+            storage.put(key, lst);
+        }
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Evaluates if any pair of {@link AttachmentPoint} pairs involve the 
+     * same {@link AttachmentPoint}, i.e., if there is overlap between any pair 
+     * of pairs.
+     * @param pairs the collection of pairs to evaluate for overlap.
+     * @return <code>true</code> if there is any {@link AttachmentPoint} that
+     * is present in more than one pair visited by the iterations.
+     */
+    public static Boolean apPairsAreOverlapping(Iterable<RelatedAPPair> pairs)
+    {
+        Set<AttachmentPoint> aps = new HashSet<AttachmentPoint>();
+        
+        for (RelatedAPPair pair : pairs)
+        {
+            if (aps.contains(pair.apA) || aps.contains(pair.apB))
+            {
+                return true;
+            }
+            aps.add(pair.apA);
+            aps.add(pair.apB);
+        }
+        return false;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Evaluates if a {@link RelatedAPPair} involves the 
+     * same {@link AttachmentPoint} present in a collection.
+     * @param pairA the pair to test.
+     * @param lstB the collection.
+     * @return <code>true</code> if any {@link AttachmentPoint} of the given 
+     * pair is present in the collection.
+     */
+    public static Boolean shareAPs(RelatedAPPair pairA, 
+            Iterable<RelatedAPPair> lstB)
+    {
+        Set<AttachmentPoint> aps = new HashSet<AttachmentPoint>();
+        for (RelatedAPPair pairB : lstB)
+        {
+            aps.add(pairB.apA);
+            aps.add(pairB.apB);
+        }
+        return aps.contains(pairA.apA) || aps.contains(pairA.apB);
+    }
+    
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Decides if an {@link AttachmentPoint} can be considered for making a
+     * ring fusion operation,
+     * i.e., attach a bridge on one AP and use another AP to close a ring.
+     * The condition to return <code>true</code> is that both these are 
+     * satisfied:
+     * <ul>
+     * <li>the AP is available (at any level of template embedding). This
+     * ignores any vertex that is added to saturate valences.</li>
+     * <li>the {@link APClass} of the AP allows ring closure, i.e., it is
+     * present in the ring-closing compatibility matrix.</li>
+     * </ul>
+     * @param ap the attachment point we want to analyze. Note this is 
+     * NOT the actual AP in the graph, but a copy of it that is stored
+     * in the IAtom properties!
+     * @param originalVertexIDs list of ID defining which vertex is from the 
+     * original graph. This is used to explode any vertex that has been 
+     * added on the graph to saturate valences.
+     * @param fs the fragment space containing the ring-closures compatibility 
+     * matrix.
+     * @return
+     */
+    private static boolean canBeUsedForRingFusion(AttachmentPoint ap,
+            Set<Long> originalVertexIDs, FragmentSpace fs)
+    {
+        if (ap.isAvailableThroughout()
+                || !originalVertexIDs.contains(
+                        ap.getLinkedAPThroughout().getOwner().getVertexId()))
+        {
+            if (fs.getRCCompatibilityMatrix().containsKey(ap.getAPClass()))
+                return true;
+        }               
+        return false;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Finds all vertexes that can be used as aromatic bridge, i.e., can be used 
+     * to create an aromatic ring by fusion with another aromatic ring.
+     * @param elInIncomingFrag beginning of the {@link APClass} required on the
+     * aromatic bridge fragment. This is conventionally used to define the 
+     * number of electrons available to the aromatic system.
+     * @param allowedBridgeLength number of atoms.
+     * @param fragSpace the fragment space where to look for fragments.
+     * @return the list of clones of usable fragments from the fragment space. 
+     * The length the bridge is recorded in {@link Vertex} property 
+     * {@link DENOPTIMConstants#VRTPROPBRIDGELENGH}.
+     */
+    public static List<Vertex> getUsableAromaticBridges(
+            String elInIncomingFrag, int[] allowedLengths,
+            FragmentSpace fragSpace)
+    {
+        List<Vertex> usableBridgesOriginals =
+                fragSpace.getVerticesWithAPClassStartingWith(elInIncomingFrag);
+        List<Vertex> usableBridges = new ArrayList<Vertex>();
+        final String rootAPC = elInIncomingFrag;
+        for (Vertex bridge : usableBridgesOriginals)
+        {
+            IAtomContainer iacFrag = bridge.getIAtomContainer();
+            List<Integer> atomIDs = new ArrayList<Integer>();
+            bridge.getAttachmentPoints()
+                .stream()
+                .filter(ap -> ap.getAPClass().getRule().startsWith(
+                        rootAPC))
+                .forEach(ap -> atomIDs.add(ap.getAtomPositionNumber()));
+            ShortestPaths sp = new ShortestPaths(iacFrag, iacFrag.getAtom
+                    (atomIDs.get(0)));
+            List<IAtom> path = new ArrayList<IAtom>(Arrays.asList(
+                    sp.atomsTo(atomIDs.get(1))));
+            if (IntStream.of(allowedLengths).anyMatch(x -> x == path.size()))
+            {
+                Vertex clone = bridge.clone();
+                clone.setProperty(DENOPTIMConstants.VRTPROPBRIDGELENGTH, 
+                        path.size());
+                usableBridges.add(clone);
+            }
+        }
+        return usableBridges;
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
+     * Finds all vertexes that can be used as aliphatic bridge.
+     * @param apcA class of one of the AP to be used to attach the bridge.
+     * @param apcB class of the other AP to be used to attach the bridge.
+     * @param allowedLengths list of allowed lengths in number of atoms.
+     * @param fragSpace the fragment space where to look for fragments.
+     * @return the list of clones of usable fragments from the fragment space. 
+     * The length the bridge is recorded in {@link Vertex} property 
+     * {@link DENOPTIMConstants#VRTPROPBRIDGELENGH}.
+     */
+    public static List<Vertex> getUsableAliphaticBridges(APClass apcA, 
+            APClass apcB, int[] allowedLengths, FragmentSpace fragSpace)
+    {
+        List<Vertex> usableBridges = new ArrayList<Vertex>();
+        
+        List<APClass> compatApClassesA = fragSpace.getCompatibleAPClasses(apcA);
+        List<APClass> compatApClassesB = fragSpace.getCompatibleAPClasses(apcB);
+        for (APClass compatA : compatApClassesA)
+        {
+            for (APClass compatB : compatApClassesB)
+            {
+                boolean sameAPC = compatA.equals(compatB);
+                Map<APClass,Integer> apFingerprint = 
+                        new HashMap<APClass,Integer>();
+                if (sameAPC)
+                {
+                    apFingerprint.put(compatA,2);
+                } else {
+                    apFingerprint.put(compatA,1);
+                    apFingerprint.put(compatB,1);
+                }
+                for (Vertex bridge : fragSpace.getVerticesWithAPFingerprint(
+                        apFingerprint))
+                {
+                    IAtomContainer iacFrag = bridge.getIAtomContainer();
+                    
+                    // Identify APs that can be used for each side
+                    List<AttachmentPoint> apsForA = new ArrayList<AttachmentPoint>();
+                    List<AttachmentPoint> apsForB = new ArrayList<AttachmentPoint>();
+                    for (AttachmentPoint apOnBridge : bridge.getAttachmentPoints())
+                    {
+                        if (compatA.equals(apOnBridge.getAPClass()))
+                            apsForA.add(apOnBridge);
+                        if (compatB.equals(apOnBridge.getAPClass()))
+                            apsForB.add(apOnBridge);
+                    }
+                    
+                    // Find combinations of usable APs
+                    for (AttachmentPoint apForA : apsForA)
+                    {
+                        ShortestPaths sp = new ShortestPaths(iacFrag, 
+                                iacFrag.getAtom(apForA.getAtomPositionNumber()));
+                        for (AttachmentPoint apForB : apsForB)
+                        {
+                            if (apForA.equals(apForB))
+                                continue;
+                            // Retains only combinations of allowed length
+                            List<IAtom> path = new ArrayList<IAtom>(
+                                    Arrays.asList(sp.atomsTo(
+                                            apForB.getAtomPositionNumber())));
+                            if (IntStream.of(allowedLengths).anyMatch(
+                                    x -> x == path.size()))
+                            {
+                                Vertex clone = bridge.clone();
+                                clone.setProperty(
+                                        DENOPTIMConstants.VRTPROPBRIDGELENGTH, 
+                                        path.size());
+                                clone.setProperty(
+                                        DENOPTIMConstants.VRTPROPBRIDGEEND_A, 
+                                        apForA.getIndexInOwner());
+                                clone.setProperty(
+                                        DENOPTIMConstants.VRTPROPBRIDGEEND_B, 
+                                        apForB.getIndexInOwner());
+                                usableBridges.add(clone);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return usableBridges;
+    }
+  
+//------------------------------------------------------------------------------  
+    
 }

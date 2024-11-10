@@ -305,10 +305,15 @@ runTest "t12f"
 #
 runTest "t12g"
 
+# #
+# # t12h: Initial population given as molecules to fragment from SDF file
+# #
+# runTest "t12h"
+
 #
-# t12h: Initial population given as molecules to fragment from SDF file
+# t12i: Genetic algorithm using ADDFUSEDRING mutation to generat aromatic systems
 #
-runTest "t12h"
+runTest "t12i"
 
 #
 # t13: DenoptimGA recovering symmetry from SDF field with graph representation
@@ -341,7 +346,7 @@ runTest "t16"
 #
 
 #
-# t19: removed 
+# t19: removed
 
 #
 # t20: crossover with templates (outside templates)
