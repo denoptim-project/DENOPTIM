@@ -107,7 +107,7 @@ sleep 0.15
 
 # These are the candidates that will have an artificially high fitness:
 candIdTo50="M00000027"
-candIdTo40="M00000025"
+candIdTo40="M00000024"
 # Note that these values are used also in the run.sh script! Make sure there
 # is consistency.
 
