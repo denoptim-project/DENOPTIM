@@ -1146,11 +1146,16 @@ public class GraphOperations
             AttachmentPoint apToHeadRCV = vToHeadRCV.getAP(
                     rOnTmp.getHeadVertex().getEdgeToParent().getSrcAP()
                     .getIndexInOwner());
-            Vertex headRCV = rOnTmp.getHeadVertex().clone();
-            headRCV.setVertexId(GraphUtils.getUniqueVertexIndex());
-            
-            // And append head RCV on original graph
-            originalGraph.appendVertexOnAP(apToHeadRCV, headRCV.getAP(0));
+            Vertex headRCV = null;
+            if (!apToHeadRCV.isAvailable())
+            {
+                headRCV = apToHeadRCV.getLinkedAP().getOwner();
+            } else {
+                headRCV = rOnTmp.getHeadVertex().clone();
+                headRCV.setVertexId(GraphUtils.getUniqueVertexIndex());
+                // And append head RCV on original graph
+                originalGraph.appendVertexOnAP(apToHeadRCV, headRCV.getAP(0));
+            }
             
             // Project tail RCV and all info to attach it to original graph
             Vertex vToTailRCV = originalGraph.getVertexAtPosition(
@@ -1158,11 +1163,16 @@ public class GraphOperations
             AttachmentPoint apToTailRCV = vToTailRCV.getAP(
                     rOnTmp.getTailVertex().getEdgeToParent().getSrcAP()
                     .getIndexInOwner());
-            Vertex tailRCV = rOnTmp.getHeadVertex().clone();
-            tailRCV.setVertexId(GraphUtils.getUniqueVertexIndex());
-            
-            // And append tail RCV on original graph
-            originalGraph.appendVertexOnAP(apToTailRCV, tailRCV.getAP(0));
+            Vertex tailRCV = null;
+            if (!apToTailRCV.isAvailable())
+            {
+                tailRCV = apToTailRCV.getLinkedAP().getOwner();
+            } else {
+                tailRCV = rOnTmp.getTailVertex().clone();
+                tailRCV.setVertexId(GraphUtils.getUniqueVertexIndex());
+                // And append tail RCV on original graph
+                originalGraph.appendVertexOnAP(apToTailRCV, tailRCV.getAP(0));
+            }
             
             // Add ring
             originalGraph.addRing(headRCV, tailRCV);

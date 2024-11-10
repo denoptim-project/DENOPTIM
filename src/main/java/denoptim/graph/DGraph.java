@@ -6004,15 +6004,18 @@ public class DGraph implements Cloneable
     {
         if (!srcAP.isAvailable())
         {
-            throw new DENOPTIMException("Attempt to use unavailable attachment "
-                    + "point " + srcAP + " on vertex " 
-                    + srcAP.getOwner().getVertexId());
+            //TODO-gg del
+            DenoptimIO.writeGraphToJSON(new File("/tmp/failing.json"), 
+                    srcAP.getOwner().getGraphOwner().getOutermostGraphOwner());
+            throw new DENOPTIMException("Attempt to use unavailable "
+                    + "attachment point " + srcAP + " on vertex " 
+                    + srcAP.getOwner().getVertexId() + " as srcAP.");
         }
         if ( !trgAP.isAvailable())
         {
-            throw new DENOPTIMException("Attempt to use unavailable attachment "
-                    + "point " + trgAP + " on vertex " 
-                    + trgAP.getOwner().getVertexId());
+            throw new DENOPTIMException("Attempt to use unavailable "
+                    + "attachment point " + trgAP + " on vertex " 
+                    + trgAP.getOwner().getVertexId() + " as trgAP.");
         }
         
         BondType btSrc = srcAP.getBondType();
