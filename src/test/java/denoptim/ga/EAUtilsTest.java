@@ -963,7 +963,7 @@ public class EAUtilsTest
         assertEquals(14, graph1.getVertexCount());
         assertEquals(13, graph1.getEdgeCount());
         assertEquals(0, graph1.getRingCount());
-        assertEquals(2, graph1.getSymmetricSetCount());
+        assertEquals(4, graph1.getSymmetricSetCount());
         boolean foundO = false;
         boolean foundF = false;
         Iterator<SymmetricVertexes> iter = graph1.getSymSetsIterator();
@@ -988,7 +988,7 @@ public class EAUtilsTest
         assertEquals(14, graph2.getVertexCount());
         assertEquals(13, graph2.getEdgeCount());
         assertEquals(0, graph2.getRingCount());
-        assertEquals(2, graph2.getSymmetricSetCount());
+        assertEquals(4, graph2.getSymmetricSetCount());
         foundO = false;
         foundF = false;
         iter = graph2.getSymSetsIterator();
@@ -1014,7 +1014,7 @@ public class EAUtilsTest
         assertEquals(14, graph3.getVertexCount());
         assertEquals(13, graph3.getEdgeCount());
         assertEquals(0, graph3.getRingCount());
-        assertEquals(1, graph3.getSymmetricSetCount());
+        assertEquals(3, graph3.getSymmetricSetCount());
         foundO = false;
         foundF = false;
         iter = graph3.getSymSetsIterator();
@@ -1040,7 +1040,7 @@ public class EAUtilsTest
         SmilesParser p = new SmilesParser(builder);
         IAtomContainer mol = p.parseSmiles("C#C-C#C-C#N");
 
-        // 2D is enough to get linearities. No need to wast time getting 3D
+        // 2D is enough to get linearities. No need to waste time getting 3D
         StructureDiagramGenerator sdg = new StructureDiagramGenerator();
         sdg.generateCoordinates(mol);
         
@@ -1160,12 +1160,12 @@ public class EAUtilsTest
         
         assertEquals(6, graph.getSymmetricSetCount());
         List<List<Integer>> expected = new ArrayList<List<Integer>>();
-        expected.add(Arrays.asList(2, 8, 14));
-        expected.add(Arrays.asList(3, 9, 15));
-        expected.add(Arrays.asList(4, 10, 16));
-        expected.add(Arrays.asList(5, 11, 17));
-        expected.add(Arrays.asList(6, 12, 18));
+        expected.add(Arrays.asList(3, 9, 15));      
+        expected.add(Arrays.asList(5, 11, 17));  
         expected.add(Arrays.asList(7, 13, 19));
+        expected.add(Arrays.asList(4, 10, 16));
+        expected.add(Arrays.asList(2, 8, 14));
+        expected.add(Arrays.asList(6, 12, 18));
         for (List<Integer> vrtxIDs : expected)
         {
             SymmetricVertexes sv0 = graph.getSymSetForVertex(
@@ -1178,6 +1178,46 @@ public class EAUtilsTest
                 assertTrue(sv0 == svI);
             }
         }
+        
+        IAtomContainer mol2 = p.parseSmiles(
+                "C1C(C(C(F)(F)(F))(C(F)(F)(F)))OCCC1((N(C([H])([H])C3=C"
+                + "(C(=C(C(=C3[H])[H])[F])[F]))(C([H])([H])C3=C(C(=C(C"
+                + "(=C3[H])[H])[F])[F]))))");
+
+        cuttingRules = new ArrayList<CuttingRule>();
+        cuttingRules.add(new CuttingRule("C-C", "[#6]", "[#6]", "-!@", -1, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-X", "[#6]", "[#9]", "-", 0, 
+                new ArrayList<String>()));
+        cuttingRules.add(new CuttingRule("C-N", "[#6]", "[N]", "-", 1, 
+                new ArrayList<String>()));
+        
+        ScaffoldingPolicy scaffold = ScaffoldingPolicy.LARGEST_FRAGMENT;
+
+        graph = EAUtils.makeGraphFromFragmentationOfMol(mol2,
+                cuttingRules, settings.getLogger(), 
+                scaffold, 170);
+        
+        assertEquals(5, graph.getSymmetricSetCount());
+        expected = new ArrayList<List<Integer>>();
+        expected.add(Arrays.asList(11, 15));      
+        expected.add(Arrays.asList(2, 6));  
+        expected.add(Arrays.asList(3, 4, 5, 7, 8, 9));
+        expected.add(Arrays.asList(13, 14, 17, 18));
+        expected.add(Arrays.asList(12, 16));
+        for (List<Integer> vrtxIDs : expected)
+        {
+            SymmetricVertexes sv0 = graph.getSymSetForVertex(
+                    graph.getVertexWithId(vrtxIDs.get(0)));
+            assertFalse(sv0.isEmpty());
+            for (int i=1; i<vrtxIDs.size(); i++)
+            {
+                SymmetricVertexes svI = graph.getSymSetForVertex(
+                        graph.getVertexWithId(vrtxIDs.get(i)));
+                assertTrue(sv0 == svI);
+            }
+        }
+        
     }
     
     

@@ -55,7 +55,7 @@ fi
 
 # NB: set this to true in case you have to update the expected results. This
 # is needed in case of changes to the GA algorithms that make the sequence of
-# generated candidates differe from version to version. For example, when
+# generated candidates differ from version to version. For example, when
 # introducing new or modifying existing genetic operators.
 prepare_expected=false
 # The lines beginning with M00... should then be processed to remove duplicates 

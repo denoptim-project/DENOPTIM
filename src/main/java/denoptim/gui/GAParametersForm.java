@@ -122,6 +122,10 @@ public class GAParametersForm extends ParametersForm
     JPanel linePar5;
     JRadioButton rdbPar5;
 
+    String keyPar5a = "GA-NaNFitnessKillsExperiment";
+    JPanel linePar5a;
+    JRadioButton rdbPar5a;
+
     String keyPar6 = "GA-PopulationSize";
     JPanel linePar6;
     JLabel lblPar6;
@@ -1321,6 +1325,15 @@ public class GAParametersForm extends ParametersForm
         linePar5.add(rdbPar5);
         advOptsBlock.add(linePar5);
 
+        String toolTipPar5a = "Specifies whether a NaN fitness value should stop the design experiment.";
+        linePar5a = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rdbPar5a = new JRadioButton("Kill experiment on NaN fitness");
+        rdbPar5a.setToolTipText(toolTipPar5a);
+        rdbPar5a.addChangeListener(rdbFieldChange);
+        mapKeyFieldToValueField.put(keyPar5a.toUpperCase(),rdbPar5a);
+        linePar5a.add(rdbPar5a);
+        advOptsBlock.add(linePar5a);
+
         String toolTipPar10 = "<html>Controls the maximum number of attempts to build a new graph.<br> The maximum number of attempts to build a new graph is given by the size of the population, times this factor.</html>";
         linePar10 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPar10 = new JLabel("Max tries to get new graph:", SwingConstants.LEFT);
@@ -2099,6 +2112,7 @@ public class GAParametersForm extends ParametersForm
         sb.append(keyPar2).append("=").append(cmbPar2.getSelectedItem())
         .append(NL);
         sb.append(getStringIfSelected(keyPar5,rdbPar5));
+        sb.append(getStringIfSelected(keyPar5a,rdbPar5a));
         sb.append(getStringIfNotEmpty(keyPar6,txtPar6));
         sb.append(getStringIfNotEmpty(keyPar7,txtPar7));
         sb.append(getStringIfNotEmpty(keyPar8,txtPar8));

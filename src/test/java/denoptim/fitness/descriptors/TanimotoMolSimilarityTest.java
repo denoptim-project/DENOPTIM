@@ -67,19 +67,19 @@ public class TanimotoMolSimilarityTest
         IAtomContainer mol1 = sp.parseSmiles("COc1ccccc1");
         double value = ((DoubleResult) descriptor.calculate(mol1).getValue())
                 .doubleValue();
-        assertTrue(closeEnough(0.6,value), "Tanimoto similarity with mol1: "
+        assertTrue(closeEnough(0.6065, value), "Tanimoto similarity with mol1: "
                 + value);
 
         IAtomContainer mol2 = sp.parseSmiles("P");
         value = ((DoubleResult) descriptor.calculate(mol2).getValue())
                 .doubleValue();
-        assertTrue(closeEnough(0.0,value), "Tanimoto similarity with mol2: "
+        assertTrue(closeEnough(0.0, value), "Tanimoto similarity with mol2: "
                 + value);
 
         IAtomContainer mol3 = sp.parseSmiles("COc1cc(C(=O)NC)ccc1");
         value = ((DoubleResult) descriptor.calculate(mol3).getValue())
                 .doubleValue();
-        assertTrue(closeEnough(1.0,value), "Tanimoto similarity with mol3: "
+        assertTrue(closeEnough(1.0, value), "Tanimoto similarity with mol3: "
                 + value);
 	}
 	

@@ -472,16 +472,22 @@ public class FitnessProvider
             {
                 return vm;
             }};
-        ValueExpression ve = expFactory.createValueExpression(ncc, expression, 
-                Double.class);
-        double fitness = (double) ve.getValue(ncc);
-		iac.setProperty(DENOPTIMConstants.FITNESSTAG,fitness);
+
+        double fitness = Double.NaN;
+        if (iac.getProperty(DENOPTIMConstants.MOLERRORTAG) == null)
+        {
+            ValueExpression ve = expFactory.createValueExpression(ncc, expression, 
+                    Double.class);
+            fitness = (double) ve.getValue(ncc);
+            iac.setProperty(DENOPTIMConstants.FITNESSTAG,fitness);
+        }
+                    
 		return fitness;
 	}
 	
 //------------------------------------------------------------------------------
 
-	/**
+    /**
 	 * Takes the value and checks that it is all good, then processes the value 
 	 * to extract the result defined by the DescriptorForFitness, puts a 
 	 * human-readable version in the molecular representation, and the numerical
@@ -493,16 +499,24 @@ public class FitnessProvider
 			IDescriptor implementation, 
 			IImplementationSpecification descSpec, DescriptorValue value,
 			String varName, IAtomContainer iac) throws Exception 
-	{
-       	if (value == null)
-    	{
-    		throw new Exception("Null value from calcualation of descriptor"
-    				+ " " + descName + " (for variable '" + varName + "'");
-    	}
+	{	   	
+        if (value == null)
+        {
+            throw new Exception("Null value from calculation of descriptor"
+                    + " " + descName + " (for variable '" + varName + "'");
+        }
+        
+        Exception expFromDescriptor = value.getException();
+        if (expFromDescriptor != null) 
+        {
+            // This causes interruption of the experiment
+            throw new Exception(expFromDescriptor);
+        }
+        
     	IDescriptorResult result = value.getValue();
     	if (result == null)
     	{
-    		throw new Exception("Null result from calcualation of "
+    		throw new Exception("Null result from calculation of "
     				+ "descriptor " + descName + "(for variable '" 
     				+ varName + "'");
     	}

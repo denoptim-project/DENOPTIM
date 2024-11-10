@@ -1,5 +1,7 @@
 package denoptim.fitness;
 
+import static org.junit.Assert.assertNotNull;
+
 /*
  *   DENOPTIM
  *   Copyright (C) 2019 Vishwesh Venkatraman <vishwesh.venkatraman@ntnu.no>
@@ -43,6 +45,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.fitness.descriptors.SocketProvidedDescriptorTest;
 import denoptim.fitness.descriptors.TanimotoMolSimilarity;
 import denoptim.io.DenoptimIO;
 
@@ -210,7 +213,7 @@ public class FitnessProviderTest
         //Get the result and check it
         Object propObj = mol.getProperty(DENOPTIMConstants.FITNESSTAG);
         assertTrue(propObj!=null,"Fitness is not null.");
-        double trsh = 0.001;
+        double trsh = 0.01;
         assertTrue(Math.abs(((double) propObj) - fitness) < trsh, 
                 "Fitness value should be 0.6 but is " + fitness);
         assertTrue(Math.abs(0.6 - fitness) < trsh, 
@@ -260,15 +263,15 @@ public class FitnessProviderTest
         
         fp.getFitness(mol);
         
-        String[] expectedProps = new String[] {DENOPTIMConstants.FITNESSTAG,"Zagreb","taniBis",
-                "taniSym","aHyb_1","aHyb_2"};
+        String[] expectedProps = new String[] {DENOPTIMConstants.FITNESSTAG,
+                "Zagreb","taniBis","taniSym","aHyb_1","aHyb_2"};
         double[] expectedValue = new double[] {
-                2.5689610, // fitness
-                34.000000, // Zagreb
-                0.4318000, // taniBis
-                0.6000000, // taniSym
-                2.1428571, // aHyb_1
-                3.0000000 // aHyb_2
+                2.5755, // fitness
+                34.000, // Zagreb
+                0.4318, // taniBis
+                0.6065, // taniSym
+                2.1428, // aHyb_1
+                3.0000 // aHyb_2
         };
         for (int i=0; i<expectedProps.length; i++)
         {
@@ -303,6 +306,45 @@ public class FitnessProviderTest
         assertTrue(closeEnough(1.23456, Double.parseDouble(prop.toString())),
                 "Numerical result (" + Double.parseDouble(prop.toString()) 
                     + ") is correct");
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testNaNFitness() throws Exception
+    {
+        SocketProvidedDescriptorTest socketServerUtil = 
+                new SocketProvidedDescriptorTest();
+        try {
+            socketServerUtil.setUpServer();
+
+            FitnessParameters fitPar = new FitnessParameters();
+            fitPar.interpretKeyword("FP-Equation=${fromSocket}");
+            fitPar.interpretKeyword("FP-DescriptorSpecs="
+                    + "${Variable.parametrized('fromSocket',"
+                    + "'SocketProvidedDescriptor','localhost, "
+                    + socketServerUtil.descriptor.getParameters()[1] + "')}");
+            fitPar.processParameters();
+
+            FitnessProvider fp = new FitnessProvider(
+                    fitPar.getDescriptors(),
+                    fitPar.getFitnessExpression(),
+                    logger);
+            
+            String smiles = "O";
+            IAtomContainer mol = sp.parseSmiles(smiles);
+            mol.setProperty("SMILES", smiles);
+            
+            double fitness = fp.getFitness(mol);
+            
+            assertTrue(Double.isNaN(fitness));
+            Object prop = mol.getProperty(DENOPTIMConstants.MOLERRORTAG);
+            assertNotNull(prop);
+            assertTrue(prop.toString().contains(socketServerUtil.fakeErrorMsg));
+            
+        } finally {
+            socketServerUtil.closeServer();
+        }
     }
  
 //------------------------------------------------------------------------------

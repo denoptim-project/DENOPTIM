@@ -26,7 +26,7 @@ exec 6>&1
 exec > "$logFile"
 exec 2>&1
 "$javaDENOPTIM" -jar "$denoptimJar" -r FSE "$paramFile"
-exec 1>&6 6>&- 
+exec 1>&6 6>&-
 
 #Check outcome
 grep -q 'Attempt to deserialized old graph' "$wrkDir"/FSE*.log
@@ -35,7 +35,7 @@ then
     echo " "
     echo "Test 't6' NOT PASSED (serialized graphs need to be updated)"
     exit -1
-fi 
+fi
 
 nGraphs=$(cat "$wrkDir"/*/FSE-Level_*/F*.txt | wc -l | tr -d '[[:space:]]')
 if [[ $nGraphs != 278 ]]

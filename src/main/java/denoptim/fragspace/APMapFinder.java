@@ -416,44 +416,101 @@ public class APMapFinder
                 boolean compatible = false;
                 if (fragSpace.useAPclassBasedApproach())
                 {
+                    // Addressing the cases where the APs are used/free
+                    // and have src/trg role
+                    
+                    boolean oAPInUse = !oAP.isAvailableThroughout();
+                    boolean oAPIsSrc = oAP.isSrcInUserThroughout();
+                    boolean oAPIsTrg = oAPInUse && !oAP.isSrcInUserThroughout();
+
+                    boolean cAPInUse = !cAP.isAvailableThroughout();
+                    boolean cAPIsSrc = cAP.isSrcInUserThroughout();
+                    boolean cAPIsTrg = cAPInUse && !cAP.isSrcInUserThroughout();
+                    
+                    // These can be null if AP is not in use!
+                    AttachmentPoint loAP = oAP.getLinkedAPThroughout();
+                    AttachmentPoint lcAP = cAP.getLinkedAPThroughout();
+                    
+                    APClass oAPcl = oAP.getAPClass();
+                    APClass cAPcl = cAP.getAPClass();
+                    APClass loAPcl = null;
+                    if (loAP!=null)
+                        loAPcl = loAP.getAPClass();
+                    APClass lcAPcl = null;
+                    if (lcAP!=null)
+                        lcAPcl = lcAP.getAPClass();
+                    
                     // TODO: if the vertex is a template, we should
                     // consider the required APs.
                     
                     if (oAP.getAPClass().equals(cAP.getAPClass()))
-                        compatible = true;
-                    
-                    if (oAP.isAvailableThroughout())
                     {
-                        //TODO: template's required AP will have to be considered.
-                        if (compatibleIfFree)
+                        compatible = true;
+                    } else {
+                        if (!oAPInUse && !cAPInUse && compatibleIfFree)
                         {
                             compatible = true;
-                        }
-                    } else {
-                        AttachmentPoint lAP = oAP.getLinkedAPThroughout();
-                        if (oAP.isSrcInUserThroughout())
+                        } else if (!oAPInUse && cAPInUse && compatibleIfFree)
                         {
-                            if (lAP!=null && cAP.getAPClass()
-                                  .isCPMapCompatibleWith(lAP.getAPClass(), 
-                                          fragSpace))
+                            if (cAPIsSrc && oAPcl.isCPMapCompatibleWith(lcAPcl, 
+                                    fragSpace))
+                            {
+                                compatible = true;
+                            } else if (cAPIsTrg && lcAPcl.isCPMapCompatibleWith(
+                                    oAPcl, fragSpace))
                             {
                                 compatible = true;
                             }
-                            if (lAP!=null && lAP.getOwner().getBuildingBlockType()==BBType.CAP
-                                    && fragSpace.getAPClassOfCappingVertex(
-                                            cAP.getAPClass())==lAP.getAPClass())
+                        } else if (oAPInUse && !cAPInUse && compatibleIfFree)
+                        {
+                            if (oAPIsSrc && cAPcl.isCPMapCompatibleWith(loAPcl, 
+                                    fragSpace))
+                            {
+                                compatible = true;
+                            } else if (oAPIsTrg && loAPcl.isCPMapCompatibleWith(
+                                    cAPcl, fragSpace))
                             {
                                 compatible = true;
                             }
-                        } else {
-                            if (lAP!=null && lAP.getAPClass()
-                                  .isCPMapCompatibleWith(cAP.getAPClass(), 
-                                          fragSpace))
+                        } else if (oAPInUse && cAPInUse) 
+                        {
+                            if (oAPIsSrc && cAPIsSrc)
                             {
-                                compatible = true;
+                                // both are SRC
+                                if (oAPcl.isCPMapCompatibleWith(lcAPcl, 
+                                        fragSpace) 
+                                    && cAPcl.isCPMapCompatibleWith(loAPcl,
+                                        fragSpace))
+                                {
+                                    compatible = true;
+                                }
+                            } else if ((!oAPIsSrc && cAPIsSrc)
+                                || (oAPIsSrc && !cAPIsSrc))
+                            {
+                                // Since directions will have to be inverted, we
+                                // want the APClass compatibility to exists in
+                                // both directions on each connection.
+                                if (oAPcl.isCPMapCompatibleWith(lcAPcl, 
+                                        fragSpace) 
+                                    && lcAPcl.isCPMapCompatibleWith(oAPcl,
+                                            fragSpace)
+                                    && cAPcl.isCPMapCompatibleWith(loAPcl,
+                                        fragSpace)
+                                    && loAPcl.isCPMapCompatibleWith(cAPcl,
+                                            fragSpace))
+                                {
+                                    compatible = true;
+                                }
+                            } else {
+                                // both oAP and cAP are TRG
+                                if (lcAPcl.isCPMapCompatibleWith(oAPcl,
+                                            fragSpace)
+                                    && loAPcl.isCPMapCompatibleWith(cAPcl,
+                                            fragSpace))
+                                {
+                                    compatible = true;
+                                }
                             }
-                            // NB lAP cannot be a capping group because it is
-                            // the source of an edge.
                         }
                     }
                 } else {
