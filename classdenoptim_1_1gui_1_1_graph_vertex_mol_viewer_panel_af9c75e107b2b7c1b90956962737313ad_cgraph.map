@@ -1,0 +1,8 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.dispose" name="denoptim.gui.GraphVertexMolViewerPanel.dispose">
+<area shape="rect" id="node1" title=" " alt="" coords="5,71,176,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a9ca37c0606b3e1f5dee183b405b07d2d" title=" " alt="" coords="224,5,407,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a99d4a461e15c4fb9f9132a41181825bd" title=" " alt="" coords="229,136,402,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#aa3eb9fa70c64b518c4797cb1d1675ff9" title=" " alt="" coords="226,71,405,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_jmol_panel.html#a83ab608f9724a6305640ad8722ad6c3e" title=" " alt="" coords="455,46,661,73"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a581e856de9d7b202a219773b3d9bef2a" title="Removes the currently loaded graph viewer." alt="" coords="471,136,645,177"/>
+</map>

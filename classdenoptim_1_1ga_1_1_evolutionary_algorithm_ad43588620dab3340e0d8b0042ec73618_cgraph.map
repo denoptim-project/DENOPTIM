@@ -1,0 +1,52 @@
+<map id="denoptim.ga.EvolutionaryAlgorithm.initializePopulation" name="denoptim.ga.EvolutionaryAlgorithm.initializePopulation">
+<area shape="rect" id="node1" title="Fills up the population with candidates build from scratch." alt="" coords="5,1960,192,2001"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8357317053a9158e81f78ffe6bd65688" title="Generates a candidate by fragmenting a molecule and generating the graph that reconnects all fragment..." alt="" coords="264,1285,483,1327"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="903,1413,1090,1455"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="903,2319,1090,2360"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad3d2daeb11e68a356e971ca1846596b5" title=" " alt="" coords="289,1813,458,1855"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0b22682f788bae4f1108dfe842940773" title=" " alt="" coords="278,1931,469,1972"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a2367e2b5713154c6d49905975fb852b0" title="Removes all tasks whether they are completed or not." alt="" coords="609,2432,775,2473"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a64a628fcbfe766969d180920b9380455" title="Removes only tasks that are marked as completed." alt="" coords="599,5,785,47"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a132443dda8e8278736100a7ff759f666" title=" " alt="" coords="269,2113,477,2155"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a418ccaa556fe14e5a5c2867b41911ba8" title=" " alt="" coords="240,2179,507,2220"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#a385c2741a907c1810014958feb4d94e1" title=" " alt="" coords="269,2244,477,2285"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a78b85fade7c215def19e44e2e4d29d24" title=" " alt="" coords="583,71,801,112"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a1fb6717e57bb54265151ba1f6922041a" title=" " alt="" coords="257,2309,490,2351"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#ac71f418cf81cb54228b4cfc8f1502d4d" title=" " alt="" coords="277,2375,470,2416"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a36879837ae46feab7bcfdc7c61ef5c32" title=" " alt="" coords="585,436,799,477"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a8b94af5aea3e61cb241457e1b9ae8d7a" title=" " alt="" coords="247,2440,500,2481"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#a9ed0aa4606b687bc3fdeb787fd5535b1" title=" " alt="" coords="289,2505,458,2547"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#af5ec56eba56e5fd3898d162206d78c34" title=" " alt="" coords="289,2571,458,2612"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1logging_1_1_monitor.html#ac668f96dfdc2b419f1563efc721f6eac" title=" " alt="" coords="277,553,470,595"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a5288db1eb3c645ed5b3cb33430c62bdf" title=" " alt="" coords="254,253,493,295"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a83dce514937b0922c514bd5d919eca64" title=" " alt="" coords="579,136,805,177"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#afa32564e6f9995213a2e9c9ee37f04c8" title="Sets boolean variable workingIn3D." alt="" coords="248,2636,499,2677"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a5d4c7ed4e7b8d2219c845f906e539408" title=" " alt="" coords="291,2048,456,2089"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a54af78e8bef32c0ef673243e5f17a98b" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="595,1784,789,1825"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#abcfe2ce7f7bb4d5bea2dbbd816d12d2b" title="Wipes the data in this graph." alt="" coords="589,1410,795,1437"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a385b38d07e2ef13ea37a10de069b4320" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="593,745,791,787"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a9dcce7e1ee36996395b1b8d3aa2116dc" title=" " alt="" coords="567,811,817,852"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#aa636fa2c7871c8b248bd9b87d57a11c4" title=" " alt="" coords="573,875,811,931"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a93693af51412000689dc7517151b9a05" title=" " alt="" coords="877,2232,1116,2273"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a04f2b439550bbb6f001eeaca4d40702d" title=" " alt="" coords="555,1007,829,1048"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_general_utils.html#ab0c97460520e98fa670681d851754703" title="returns the padded string with zeroes placed to the left of &#39;number&#39; up to reach the desired number o..." alt="" coords="897,663,1096,704"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a6672288e5788e184b299354ee3f31d96" title=" " alt="" coords="572,1071,812,1127"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_graph_utils.html#ad951e78a24210e710cba8296b67bf732" title="Unique counter for the number of molecules generated." alt="" coords="598,1512,786,1553"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a3f0b2b1a484099897d6170de95dff33a" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="589,1176,795,1217"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a624fc0eddfb7d67faf19afc6b7caa3fd" title="Do any pre&#45;processing on a IAtomContainer meant to be fragmented." alt="" coords="583,1344,801,1385"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_candidate.html#acff1b65216b9f5403c40906e2378bc2a" title="Just place the argument in the IAtomContainer field of this object." alt="" coords="596,1577,788,1619"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#af5cb07ab0686739e6e1713da9d8959c1" title=" " alt="" coords="907,1944,1086,1985"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_candidate.html#ac0412da09a4ce62479ffee060b453d70" title=" " alt="" coords="579,1643,805,1670"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_candidate.html#a5957f2063e01acea98dd00da6dfdfc5c" title=" " alt="" coords="596,1695,788,1736"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_candidate.html#a92203ad4eb0c99e8e3bc75b0fba6d746" title=" " alt="" coords="585,1461,799,1487"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a87ea0ad600ad26e1a89a4947abcfef86" title="Graph construction starts with selecting a random core/scaffold." alt="" coords="607,2199,777,2240"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ad8710eee33a792e0bc46f5bc4f8cf251" title=" " alt="" coords="595,2003,789,2044"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a5933a7161684c3526a63b176407f059e" title=" " alt="" coords="595,2068,789,2109"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph.html#a49ca4849cb306cbbd45e579bb8139cf6" title="Search for unused ring closing vertices: vertices that contain only a RingClosingAttractor and are no..." alt="" coords="603,2133,781,2175"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a1ddb932d4618434d435e4f85ce5e5eb5" title="Evaluates the possibility of closing rings in a given graph and if any ring can be closed,..." alt="" coords="605,2264,779,2305"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1logging_1_1_monitor.html#abb3dc0b4444cb901fee1a6e7763cfff7" title="Build a string with the value of all counters." alt="" coords="599,553,785,595"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="887,382,1106,409"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1utils_1_1_size_controlled_set.html#aa6aeb248f6884d9a6f331b35058b5e18" title="Checks if the given entry is already container in the set of known entries and, if not,..." alt="" coords="598,253,786,295"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a9a404230a4a32a941ffd2e92d0804f31" title=" " alt="" coords="888,165,1105,207"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad094b30fa7e429418af3f5ba26addfa4" title=" " alt="" coords="599,319,785,360"/>
+</map>

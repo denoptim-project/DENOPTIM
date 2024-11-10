@@ -1,0 +1,13 @@
+<map id="denoptim.graph.Candidate.getUID" name="denoptim.graph.Candidate.getUID">
+<area shape="rect" id="node1" title=" " alt="" coords="985,130,1200,157"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#aab5b9c0b8a88922460f5c28ae161d1fa" title=" " alt="" coords="731,5,937,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="488,84,667,125"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#acfa83a9b27d29f5582ee14973e902aee" title=" " alt="" coords="745,123,923,164"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#ab222efa0ae1a954ba00305d123484264" title=" " alt="" coords="731,188,937,229"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ac03e7d805c9afda30244e831da74ae81" title="Write out summary for the current GA population." alt="" coords="745,253,923,295"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,161,424,203"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,128,211,169"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,193,198,235"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a01ee989f992e0cff04e3498b63d6c0b0" title="Saves the final results to disk." alt="" coords="488,220,667,261"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#af5c2f9114881ebde82a83f922c0c23fe" title=" " alt="" coords="472,285,683,327"/>
+</map>

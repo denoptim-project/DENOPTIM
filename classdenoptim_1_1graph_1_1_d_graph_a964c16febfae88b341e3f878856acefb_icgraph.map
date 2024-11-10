@@ -1,0 +1,11 @@
+<map id="denoptim.graph.DGraph.toString" name="denoptim.graph.DGraph.toString">
+<area shape="rect" id="node1" title=" " alt="" coords="615,183,785,225"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="342,5,553,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#aab5b9c0b8a88922460f5c28ae161d1fa" title=" " alt="" coords="344,85,551,126"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#ac1e5c9703afc6f29fe11cca08ddb1a1c" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="350,150,545,191"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_candidate.html#ace97fc2021ebb11463e062dddbec6aac" title="Returns an atom container representing this item in a way that is compatible for writing this item to..." alt="" coords="328,215,567,257"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#adb60b4cb2cda6a912a831974c5303df4" title=" " alt="" coords="341,281,553,322"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1graphlisthandler_1_1_graph_lists_handler.html#a82e75728262a789cc27189d910b5c74a" title=" " alt="" coords="333,346,562,387"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,13,280,54"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#a3c2407eb1204a7b25600d3d347d98447" title=" " alt="" coords="37,281,249,322"/>
+</map>

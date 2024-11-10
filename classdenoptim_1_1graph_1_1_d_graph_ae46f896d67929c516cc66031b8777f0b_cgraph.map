@@ -1,0 +1,5 @@
+<map id="denoptim.graph.DGraph.removeBranchStartingAt" name="denoptim.graph.DGraph.removeBranchStartingAt">
+<area shape="rect" id="node1" title="Deletes the branch, i.e., the specified vertex and its children." alt="" coords="5,39,208,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aadd56400d6e58931401e88dd814de705" title="Returns the set of vertexes symmetric to the given one." alt="" coords="257,5,436,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad6c07d79d0bf95370569f11ad4d4cadf" title=" " alt="" coords="256,71,437,112"/>
+</map>

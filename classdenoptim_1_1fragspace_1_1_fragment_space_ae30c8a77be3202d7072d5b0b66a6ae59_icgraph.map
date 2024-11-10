@@ -1,0 +1,45 @@
+<map id="denoptim.fragspace.FragmentSpace.getScaffoldLibrary" name="denoptim.fragspace.FragmentSpace.getScaffoldLibrary">
+<area shape="rect" id="node1" title=" " alt="" coords="947,1259,1140,1300"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder.html#a23a02a7ccf016632eb93ac02eae9bc6b" title=" " alt="" coords="656,91,843,132"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a5703166de7261111b98b40fce0c9fad6" title=" " alt="" coords="663,269,836,311"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a2d248a6e73decf7665c6d1b1d6971e84" title=" " alt="" coords="644,547,855,574"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a973ecea761d5353163750c8c82f41ac2" title=" " alt="" coords="635,1266,864,1293"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a857bfe6291322daccf2af3fd9a28a356" title="Start the construction of a new graph from scratch." alt="" coords="600,1317,899,1359"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a56ef448997df677c5ce4a73737f127e2" title="Checks that a graph with a fused ring containing a scaffold vertex is added to the scaffold library." alt="" coords="614,1382,885,1438"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a692723b803a64dd25e775b2f8726fe27" title="Works with this graph:" alt="" coords="626,1462,873,1518"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder.html#acbb92ddbad514c788140dc2fbcbcfef7" title="Constructor that specifies which vertex has to be replaced." alt="" coords="325,5,507,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a586ff58307127b487068fe2aa5e43359" title="Creates a test graph that looks like this: v0(A)&#45;(A)v1(B)&#45;(B)v2." alt="" coords="309,123,523,164"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a10f29a0409c104973230371493a734ed" title=" " alt="" coords="9,77,228,119"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a11b5fce33ae34132f5b16a11b57aaae7" title=" " alt="" coords="5,168,232,209"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a788a4b1620fa0610d9f306e2e8b3a75a" title="Creates a test graph that looks like this: v0(E)&#45;(E)v1." alt="" coords="309,240,523,281"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a0ec3c77508e8ec583b570a6803056e9a" title=" " alt="" coords="9,262,228,318"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a978d58856f04a9a844344ad2cacc812b" title="Creates a test graph that looks like this: v0(F)&#45;(F)v1." alt="" coords="309,357,523,399"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a027bbe60b63ad7c458011fe4c4814ff7" title=" " alt="" coords="9,379,228,435"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a9aa17c44bb5d48c83e350c36cd68af68" title=" " alt="" coords="321,475,511,516"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#ab7a37d3340d35ab586332ce2122e7bb0" title=" " alt="" coords="307,540,525,581"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a88c2fd8a1b401d9aa25bf85869bc28c7" title=" " alt="" coords="280,605,552,647"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a05b87ffb43b9710fcea83b0777654e27" title=" " alt="" coords="312,671,520,712"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aa9ebd151440fb02ddfa82c194ba5cf27" title=" " alt="" coords="312,736,520,777"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a6b4a7a889a0e36c8b2dc97bcd8055c9e" title=" " alt="" coords="312,801,520,843"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a487a63ee35e943451ab84845de3982b1" title=" " alt="" coords="312,867,520,908"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a58da23a0d5e884652fecf95eac4995ad" title=" " alt="" coords="312,932,520,973"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#abfaf918deddf6407a4b1916c06a8c412" title=" " alt="" coords="300,997,532,1039"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a3c2936a80e6e37238b4ce5c5e66f3351" title=" " alt="" coords="312,1063,520,1104"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#abbd9f77ca8e1f7b733ca74bce6ccad28" title=" " alt="" coords="312,1128,520,1169"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a14c5ab7724f5d78b6c721b6e24e3a588" title=" " alt="" coords="312,1193,520,1235"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a67cac5083662b518183810d74bb901d6" title=" " alt="" coords="312,1259,520,1300"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a7a211a2f8477d88f90d85d6ab26c25e3" title=" " alt="" coords="312,1324,520,1365"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a428fb92fa7fcf1312fc2eb81cf7fac4f" title=" " alt="" coords="312,1389,520,1431"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#afa69d04d566adebf5cf8873815074713" title=" " alt="" coords="312,1455,520,1496"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ac09e961280beb2c61cc88ce1b4bccd3f" title=" " alt="" coords="312,1520,520,1561"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a02791a3f61db5dd584dec5c3995ec72c" title=" " alt="" coords="312,1585,520,1627"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aea227d615f6c2f3bac5839a8099a900d" title=" " alt="" coords="312,1651,520,1692"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1ga_1_1_xover_site_test.html#a3936ca2cfc1bb9ace410f7f47ad2c1f2" title=" " alt="" coords="315,1716,517,1757"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a83a9624ea5dc6a2c515407b865b62611" title=" " alt="" coords="312,1781,520,1823"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0c949ec1131a872dea53524614b3b42a" title=" " alt="" coords="312,1847,520,1888"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a3b99d7012da487a88acf937e3c9f5ea4" title=" " alt="" coords="312,1912,520,1953"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0b946dc2730c68f796c37e5f5cea4e36" title=" " alt="" coords="312,1977,520,2019"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0250850e0ef186b2cf9617a5de3ff34d" title=" " alt="" coords="312,2043,520,2084"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="291,2109,541,2135"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="16,2101,221,2143"/>
+</map>

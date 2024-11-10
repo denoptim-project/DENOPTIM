@@ -1,0 +1,6 @@
+<map id="denoptim.gui.GUIGraphHandler.collectFragAndAPsCompatibleWithSelectedAPs" name="denoptim.gui.GUIGraphHandler.collectFragAndAPsCompatibleWithSelectedAPs">
+<area shape="rect" id="node1" title=" " alt="" coords="848,5,1111,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a44e2ff798d22b73f966cb8393ceb4f18" title="Extends the current graph by appending a node to a specific free AP on the growing graph." alt="" coords="557,5,800,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,13,509,39"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,5,211,47"/>
+</map>

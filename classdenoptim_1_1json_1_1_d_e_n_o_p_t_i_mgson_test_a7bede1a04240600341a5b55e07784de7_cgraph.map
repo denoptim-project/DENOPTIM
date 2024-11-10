@@ -1,0 +1,11 @@
+<map id="denoptim.json.DENOPTIMgsonTest.testIAtomContainerToJSONAndBack" name="denoptim.json.DENOPTIMgsonTest.testIAtomContainerToJSONAndBack">
+<area shape="rect" id="node1" title=" " alt="" coords="5,136,272,177"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#a660afdac96a1541bfa34ea2ec4016caa" title=" " alt="" coords="330,5,533,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="329,71,534,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a3e85cb26bb2f36407e309e41880ef191" title=" " alt="" coords="320,136,543,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="329,267,534,308"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa8cbbc7dcd366e9f1053c4b2b676e0d7" title=" " alt="" coords="320,201,543,243"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="591,157,813,199"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a4aafec42bd09225870fdf330db93b84c" title=" " alt="" coords="861,157,1067,199"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="603,267,801,308"/>
+</map>

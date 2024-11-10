@@ -1,0 +1,28 @@
+var classdenoptim_1_1ga_1_1_graph_operations_test =
+[
+    [ "ExtractPatternCase", "classdenoptim_1_1ga_1_1_graph_operations_test_1_1_extract_pattern_case.html", "classdenoptim_1_1ga_1_1_graph_operations_test_1_1_extract_pattern_case" ],
+    [ "addRings", "classdenoptim_1_1ga_1_1_graph_operations_test.html#aa18317903fc58af6da75ea042aaa46f8", null ],
+    [ "buildFragment", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a51714d8c8f32f1fc1be324ffe8f6ec2d", null ],
+    [ "buildGraph", "classdenoptim_1_1ga_1_1_graph_operations_test.html#aded315f8892f22fd849a73778b4a84c8", null ],
+    [ "getExpectedSubgraphs", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a2eeb942b25efcbe3b7d829b41ffc3139", null ],
+    [ "getFusedRings", "classdenoptim_1_1ga_1_1_graph_operations_test.html#af7dad44701e1c81c71d47052733822fd", null ],
+    [ "getPairOfTestGraphs", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a0dd5e8c7f80f7e7c7fa2d46e01355a2d", null ],
+    [ "getRandomVector", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a9d8e1716fe7a202319c8e9fc34dea487", null ],
+    [ "getThreeCycle", "classdenoptim_1_1ga_1_1_graph_operations_test.html#aada424fd443017c7bb183a39efbbeacd", null ],
+    [ "prepare", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a9effbff8fc6e63bb0493e177f765bb9a", null ],
+    [ "setUpClass", "classdenoptim_1_1ga_1_1_graph_operations_test.html#abdb2b97a86b35c811e0d2d4e60de77ae", null ],
+    [ "testAddFusedRings", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a6dbd168077a4fb24f16e1e9ac14d0c4c", null ],
+    [ "testAddRing", "classdenoptim_1_1ga_1_1_graph_operations_test.html#af86b79061d15a4d2e3d7ccdf0d758f44", null ],
+    [ "testExtendGraph", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a2b8d6293663bce9a9da1d35efe31911b", null ],
+    [ "testExtractPattern_fusedRings", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a81e15cea05ce67c5b0c2af89d301d072", null ],
+    [ "testExtractPattern_returnsEmptyListIfNoRings", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a51afdfc40faf5bcc51609ddef161f078", null ],
+    [ "testExtractPattern_singleRingSystem", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a161540d22b2ad17c44fc3e1a911a1367", null ],
+    [ "testLocateCompatibleXOverPoints", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a9fcf8fffef10a59df722c92e94da2815", null ],
+    [ "APCA", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a9540a43be47b41684254f6e8ae3da9ae", null ],
+    [ "APCB", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a2cb01f908892c023a2c2c53ba775d26f", null ],
+    [ "APCC", "classdenoptim_1_1ga_1_1_graph_operations_test.html#ae93a002e3ebef860622a201f92c5e34c", null ],
+    [ "APCD", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a86d7ff1de0ef45a8dba0399a9dfe3796", null ],
+    [ "chemBuilder", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a26ef332243b5b42c5317e3ac67090664", null ],
+    [ "DEFAULT_APCLASS", "classdenoptim_1_1ga_1_1_graph_operations_test.html#ad040e2d28f84260d629e5b156bd238d0", null ],
+    [ "rng", "classdenoptim_1_1ga_1_1_graph_operations_test.html#a585bd17d8b6524f89501e035fbd3f8e0", null ]
+];

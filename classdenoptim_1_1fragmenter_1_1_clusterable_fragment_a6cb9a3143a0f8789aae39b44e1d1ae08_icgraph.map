@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.ClusterableFragment.convertToCoordsVector" name="denoptim.fragmenter.ClusterableFragment.convertToCoordsVector">
+<area shape="rect" id="node1" title="Converts an array of 3&#45;dimensional points in a vector of coordinates in 3*N&#45;dimensional space where c..." alt="" coords="261,5,479,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#ad0689424c8d2e91db6ee47325a09c133" title="Sets the coordinates of each atom and attachment point in this object." alt="" coords="5,5,213,47"/>
+</map>

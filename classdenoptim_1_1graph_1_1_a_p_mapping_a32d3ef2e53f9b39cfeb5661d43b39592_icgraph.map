@@ -1,0 +1,9 @@
+<map id="denoptim.graph.APMapping.APMapping" name="denoptim.graph.APMapping.APMapping">
+<area shape="rect" id="node1" title="Creates a mapping that links no pair of APs." alt="" coords="1013,43,1196,84"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_mapping.html#a9b9fdac59130cd95e89edd7a74e2b7c5" title="Shallow cloning." alt="" coords="751,50,965,77"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#ae5c8afa4b7defd6ce35df0fa1c5facf2" title="Searches for mappings between the AttachmentPoints on the two lists." alt="" coords="255,5,437,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space_utils.html#ace7d0f68e2dd6f9bedc0d019790a9036" title="Search for all possible combinations of compatible APs." alt="" coords="505,84,703,125"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#ada1b2c2155faeefced1d9a64f82a6668" title="Constructor that launches the search for a mapping between the AttachmentPoints on the first vertex t..." alt="" coords="5,5,187,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder.html#a9a9f36816442f741ecae5391e186bc49" title="Constructor that specifies which edge has to be replaced with a vertex and two edges." alt="" coords="255,79,437,120"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a135ebdda8ec9f789934d7ca2b82079ad" title="Given two lists of APs this method maps the APClass&#45;compatibilities from between the two lists consid..." alt="" coords="235,144,457,185"/>
+</map>

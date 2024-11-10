@@ -1,0 +1,8 @@
+<map id="denoptim.graph.DGraph.removeOrphanBranchStartingAt" name="denoptim.graph.DGraph.removeOrphanBranchStartingAt">
+<area shape="rect" id="node1" title="Deletes the branch, i.e., the specified vertex and its children." alt="" coords="1099,51,1301,92"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a65f0577c098508ced9925878e94ead82" title="Deletes the branch, i.e., the specified vertex and its children." alt="" coords="848,5,1051,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a357b4099599e47ae47102123550771f8" title="Remove a given vertex belonging to this graph and re&#45;connects the resulting graph branches as much as..." alt="" coords="848,95,1051,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a00209ca8b4a9623b41e7d9e1e62f69ec" title="Remove a given vertex belonging to this graph and re&#45;connects the resulting graph branches as much as..." alt="" coords="597,95,800,136"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_graph_operations.html#ab3adb5141a8941bf23916bb516faee63" title="Removes a vertex while merging as many of the child branches into the parent vertex." alt="" coords="293,102,549,129"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a0c851972015fbb4b2a317b053b8b81d9" title="Mutates the given vertex according to the given mutation type, if possible." alt="" coords="5,95,245,136"/>
+</map>

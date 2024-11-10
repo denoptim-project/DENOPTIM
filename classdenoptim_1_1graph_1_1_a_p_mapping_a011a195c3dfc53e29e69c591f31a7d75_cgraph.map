@@ -1,0 +1,9 @@
+<map id="denoptim.graph.APMapping.toIntMappig" name="denoptim.graph.APMapping.toIntMappig">
+<area shape="rect" id="node1" title="Produces an index&#45;based version of this mapping where each index represents the attachment point as i..." alt="" coords="5,104,200,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a72dd6bd75a701cabb65832778da6e574" title="Returns a unique integer that is used to sort list of attachment points." alt="" coords="248,5,428,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#acd666767475f39f0d7f17550d2b47651" title=" " alt="" coords="248,71,428,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="248,136,428,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="253,201,423,243"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="476,71,647,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="695,71,865,112"/>
+</map>

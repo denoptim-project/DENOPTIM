@@ -1,0 +1,4 @@
+<map id="denoptim.main.Main.reportError" name="denoptim.main.Main.reportError">
+<area shape="rect" id="node1" title="Prints an error message on standard output, possibly after the help message, and then stops the Virtu..." alt="" coords="5,5,179,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1main_1_1_main.html#ad11d4b1f0dae6d3318ea92f3c94f30c2" title="Prints an error message on standard output and then stops the Virtual Machine with an exit code." alt="" coords="227,5,400,47"/>
+</map>

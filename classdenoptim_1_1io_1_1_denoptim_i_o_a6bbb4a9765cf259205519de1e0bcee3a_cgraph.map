@@ -1,0 +1,6 @@
+<map id="denoptim.io.DenoptimIO.writeGraphsToSDF" name="denoptim.io.DenoptimIO.writeGraphsToSDF">
+<area shape="rect" id="node1" title="Writes the graphs to SDF file." alt="" coords="5,109,196,150"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#aa1352172290adaaf3a478ed7a90cf3fc" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="244,29,469,85"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_graph_utils.html#ad3229a37d4cb8866a236f4b7deeb834e" title=" " alt="" coords="257,109,456,150"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="261,198,452,239"/>
+</map>

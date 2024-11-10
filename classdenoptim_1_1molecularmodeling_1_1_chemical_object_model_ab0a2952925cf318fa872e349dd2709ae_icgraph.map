@@ -1,0 +1,4 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.updateXYZFromINT" name="denoptim.molecularmodeling.ChemicalObjectModel.updateXYZFromINT">
+<area shape="rect" id="node1" title="Converts currently loaded internal coordinates into Cartesian overwriting the current XYZ." alt="" coords="332,5,601,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a078749e82762b41d68b51bbc5af46e0c" title="Constructs a Molecule3DBuilder specifying all its features." alt="" coords="5,5,284,47"/>
+</map>

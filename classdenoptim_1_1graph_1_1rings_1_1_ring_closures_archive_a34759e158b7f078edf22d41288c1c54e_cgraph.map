@@ -1,0 +1,7 @@
+<map id="denoptim.graph.rings.RingClosuresArchive.getRCCsOfChain" name="denoptim.graph.rings.RingClosuresArchive.getRCCsOfChain">
+<area shape="rect" id="node1" title=" " alt="" coords="5,64,224,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="583,5,770,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closures_archive.html#a90d692f78a5016dc5e2e0f4eacb4d739" title="Get serialized RingClosingConformations from archive." alt="" coords="272,64,519,105"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a1233e8cbc64fc9ed1f06852c733b15ef" title="Returns the level of verbosity, i.e., the amount of log that we want to print." alt="" coords="291,129,499,171"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a8f39942e5774cec5686e959fa588e301" title=" " alt="" coords="567,70,787,126"/>
+</map>

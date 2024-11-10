@@ -1,0 +1,13 @@
+<map id="denoptim.ga.SelectionHelper.performTournamentSelection" name="denoptim.ga.SelectionHelper.performTournamentSelection">
+<area shape="rect" id="node1" title="Select p individuals at random." alt="" coords="5,100,240,141"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_candidate.html#a0738609a1a3bec92633440d449a62c67" title=" " alt="" coords="306,5,498,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ad9db6420b91ff13e0a8b2d02402c0242" title="Returns the current program&#45;specific randomizer." alt="" coords="309,71,495,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_randomizer.html#a110f1f5570f2ccd121a19d7df730e5fd" title="Returns the next pseudo&#45;random, uniformly distributed boolean value from this random number generator..." alt="" coords="571,129,771,171"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_randomizer.html#a1ac7cea6bdf732a6dd69f1a83e591ed5" title="Chooses one member among the given collection." alt="" coords="288,188,516,229"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_randomizer.html#a6873dd710cc271ed81bfa45411a62359" title="Returns the random number generator." alt="" coords="827,139,1049,166"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_randomizer.html#acaa5e386da195d9454fae611ed554c48" title="Utility to debug: writes some log in file &#39;/tmp/rng_debug_log&#39;." alt="" coords="837,191,1039,218"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_randomizer.html#aaaeda6dedda5664a47a2a9a68194162a" title="Initializes this random number generator (RNG) using a random seed that is generated on&#45;the&#45;fly rando..." alt="" coords="1097,139,1349,166"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_randomizer.html#ad74f0608d3e2e10caa8873ae059367a7" title=" " alt="" coords="1397,139,1651,166"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="1114,191,1333,218"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_randomizer.html#a6949bec32b63f1207da17e0c136a1d58" title="Returns a pseudo&#45;random, uniformly distributed int value between 0 (inclusive) and the specified valu..." alt="" coords="564,195,779,222"/>
+</map>
