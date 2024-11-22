@@ -1702,6 +1702,12 @@ public class EAUtils
                         candidate, false);
                 
                 population.add(candidate);
+            } else {
+                settings.getLogger().log(Level.WARNING, "Candidate from intial "
+                        + "population file '" + filename 
+                        + "' is rejected because its identifier is "
+                        + "already listed among the previously visited "
+                        + "identifiers.");
             }
         }
 
