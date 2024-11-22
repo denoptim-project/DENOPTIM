@@ -61,7 +61,7 @@ public class SelectionHelper
             Candidate p1 = settings.getRandomizer().randomlyChooseOne(eligibleParents);
             Candidate p2 = settings.getRandomizer().randomlyChooseOne(eligibleParents);
 
-            // Use a random value to decide weather to select the fitter individual
+            // Use a random value to decide whether to select the fitter individual
             // or the weaker one.
             boolean selectFitter = settings.getRandomizer().nextBoolean();
             
