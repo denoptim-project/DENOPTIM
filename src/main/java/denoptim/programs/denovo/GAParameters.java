@@ -275,6 +275,13 @@ public class GAParameters extends RunTimeParameters
     protected String strXoverSelectionMode = xoverSelectionMode+"";
     
     /**
+     * Intensity for selecting high fitness parents. For tournament selection
+     * acts as the size of the tournament pool. Default value is calculated 
+     * from population size.
+     */
+    protected int selectivePressure = -1;
+    
+    /**
      * Number of offspring that a single crossover operation can produce.
      */
     protected int maxOffsprintFromXover = 1;
@@ -680,6 +687,13 @@ public class GAParameters extends RunTimeParameters
     public String getSelectionStrategy()
     {
         return strXoverSelectionMode;
+    }
+    
+ //------------------------------------------------------------------------------
+
+    public int getSelectivePressure()
+    {
+        return selectivePressure;
     }
     
 //------------------------------------------------------------------------------
@@ -1306,6 +1320,16 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "SELECTIVEPRESSURE=":
+            {
+                if (value.length() > 0)
+                {
+                    selectivePressure = Integer.parseInt(value);
+                }
+                break;
+            }
+            
+            
             case "NUMOFFSPRINGFROMXOVER=":
             {
                 if (value.length() > 0)
@@ -1457,6 +1481,9 @@ public class GAParameters extends RunTimeParameters
         {
             numParallelTasks = nproc;
         }
+        
+        if (selectivePressure<0)
+            selectivePressure = (int) Math.round(populationSize * 0.2);
         
         processOtherParameters();
         
