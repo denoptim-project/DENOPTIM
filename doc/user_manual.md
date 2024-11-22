@@ -561,6 +561,7 @@ The following tables list all the keywords grouped according to the main functio
 |`GA-CrowdSigmaMiddle`| Specifies the value of parameter σ2 used in crowding probability scheme `SIGMA`.|
 |`GA-ParentsSurvive`| Use `true` to allow members of the population to remain part of the population for any number of generations. Use `false` to change all members of the population in every generation. Default is `true`.|
 |`GA-XOverSelectionMode`| Specifies the strategy for selecting crossover partners. Acceptable values are: `RANDOM`, `TS`, `RW`, and `SUS`.See Genetic Operations.|
+|`GA-recordMateSelection`| Use `true` to request the recording of which mates are selected for any genetic operation. When `true`, the UIDs of all mates selected for any kind of operation are written to a file irrespectively on the outcome of the operation. Default is `false`.|
 |`GA-CrossoverWeight`| Specifies the relative weight of crossover when generating new candidate population members.|
 |`GA-NumOffspringFromXover`| Specifies how many offspring (1 or 2) should result from a single crossover operation. When 2 offspring are produced, you can choose to keep only the fittest offspring in the population by using `GA-KeepBestSibling=true`.|
 |`GA-KeepBestSibling`| Use `true` to require that only the best of two sibling produced by a single crossover operation enters the population.|

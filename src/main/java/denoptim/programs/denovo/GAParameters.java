@@ -89,6 +89,11 @@ public class GAParameters extends RunTimeParameters
      * Pathname of file where EA monitors dumps are printed
      */
     private String monitorFile = "";
+    
+    /**
+     * Flag defining whether we record which mates are selected or not
+     */
+    private boolean recordMateSelection = false;
 
     /**
      * Default name of the UIDFileOut
@@ -470,6 +475,17 @@ public class GAParameters extends RunTimeParameters
     {
         return monitorDumpStep;
     }
+  
+//------------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if we are asked to print the selected mates to 
+     * file.
+     */
+    public boolean recordMateSelection()
+    {
+        return recordMateSelection;
+    } 
 
 //------------------------------------------------------------------------------
 
@@ -920,6 +936,15 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "RECORDMATESELECTION=":
+            {
+                if (value.length() > 0)
+                {
+                    recordMateSelection = readYesNoTrueFalse(value);
+                }
+                break;
+            }
+            
             case "MONITORDUMPSTEP=":
             {
                 if (value.length() > 0)
@@ -973,19 +998,13 @@ public class GAParameters extends RunTimeParameters
         
             case "SORTBYINCREASINGFITNESS":
             {
-                if (value.length() > 0)
-                {
-                    sortOrderDecreasing = false;
-                }
+                sortOrderDecreasing = false;
                 break;
             }
             
             case "NANFITNESSKILLSEXPERIMENT":
             {
-                if (value.length() > 0)
-                {
-                    nanFitnessKillsExperiment = true;
-                }
+                nanFitnessKillsExperiment = true;
             }
         
             case "LEVELGROWTHMULTIPLIER=":

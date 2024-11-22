@@ -136,6 +136,7 @@ public class DGraph implements Cloneable
      * instance, whether this graph comes from a given initial population or
      * is generated anew from scratch, or from mutation/crossover.
      */
+    //TODO: rename to Provenance
     String localMsg;
 
     /**
@@ -274,6 +275,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
+    //TODO: rename to Provenance
     public void setLocalMsg(String msg)
     {
         localMsg = msg;
@@ -281,6 +283,7 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
+    //TODO: rename to Provenance
     public String getLocalMsg()
     {
         return localMsg;
