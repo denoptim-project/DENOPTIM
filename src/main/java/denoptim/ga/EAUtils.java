@@ -594,6 +594,7 @@ public class EAUtils
             }
             if (res == null)
             {
+                mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
                 gOutermost.cleanup();
                 gOutermost = null;
                 continue;
