@@ -1,0 +1,4 @@
+<map id="denoptim.io.DenoptimIO.readDENOPTIMGraphsFromTxtFile" name="denoptim.io.DenoptimIO.readDENOPTIMGraphsFromTxtFile">
+<area shape="rect" id="node1" title="Reads a list of &lt;DGraphs from a text file." alt="" coords="5,29,208,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_graph_conversion_tool.html#a6ddaefb11013ac411ad8d34a07d7c890" title="Given a formatted string&#45;like representation of a DENOPTIM graph create the corresponding DENOPTIMGra..." alt="" coords="256,29,461,71"/>
+</map>

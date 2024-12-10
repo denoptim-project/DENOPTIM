@@ -1,0 +1,5 @@
+<map id="denoptim.utils.FormulaUtils.parseCSDFormula" name="denoptim.utils.FormulaUtils.parseCSDFormula">
+<area shape="rect" id="node1" title="Reads a molecular formula formatted as from the Cambridge Structural Database and produces a profile ..." alt="" coords="285,39,500,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_formula_utils.html#abba2418bc3482f8003770d851abb5f6b" title="Compares the molecular formula formatted as from the Cambridge Structural Database (CSD) against the ..." alt="" coords="5,5,237,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_formula_utils_test.html#a064ac6dfeefb404b3ab1212254355b7f" title=" " alt="" coords="19,71,224,112"/>
+</map>

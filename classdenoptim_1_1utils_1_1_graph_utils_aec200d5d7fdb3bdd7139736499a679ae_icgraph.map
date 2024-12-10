@@ -1,0 +1,26 @@
+<map id="denoptim.utils.GraphUtils.getUniqueGraphIndex" name="denoptim.utils.GraphUtils.getUniqueGraphIndex">
+<area shape="rect" id="node1" title="Unique counter for the number of graphs generated." alt="" coords="1677,291,1865,332"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="1089,195,1258,236"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="1403,232,1573,273"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a87ea0ad600ad26e1a89a4947abcfef86" title="Graph construction starts with selecting a random core/scaffold." alt="" coords="1403,115,1573,156"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#adcd462866e3f9d6a2a6ef0385807807e" title="Generate graphs by exploring all combination of fragments at a given level of a growing graph." alt="" coords="1048,342,1299,398"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a2f160fc3fb0488bb995d1e008a706ed4" title="Reconstruct the molecular population from the file." alt="" coords="1377,20,1599,61"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a59614b27e9b449fd776e31b7c2fdb492" title="Constructor." alt="" coords="1383,480,1593,521"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_d_graph.html#a7a4743d014e860237f4b20703ef9779b" title="Evaluates the possibility of closing rings in this graph and generates all alternative graphs resulti..." alt="" coords="1385,545,1591,587"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a1be545d680af3dd3f3bdf986662b55f4" title="Identify the task preceding the earliest non&#45;completed task and use it to create a checkpoint file." alt="" coords="1369,349,1607,391"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a2832a6b7facd6c31092e1edb237e4a5f" title=" " alt="" coords="1347,415,1629,456"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0c2e353b243250b4959a3f86608f1020" title="Generates one offspring according to the method where crossover and mutation are decoupled,..." alt="" coords="795,129,968,171"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ae7a90a911b109ed47b3acf54193acc35" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="795,195,968,236"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="504,129,683,171"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,64,424,105"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,31,211,72"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,96,198,137"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad3d2daeb11e68a356e971ca1846596b5" title=" " alt="" coords="1089,64,1258,105"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#ab7a37d3340d35ab586332ce2122e7bb0" title=" " alt="" coords="1065,129,1282,171"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="788,64,975,105"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#af9327fa81f9e2a617cdff353848ad6e1" title="Run the combinatorial exploration." alt="" coords="763,349,1000,391"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a8f359a45038dc604a5e437d63a35e1a2" title="Constructor." alt="" coords="472,378,715,434"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_frag_space_explorer.html#a1c6a2aae9ab686d5c7c0fc6246f7aa61" title=" " alt="" coords="486,313,701,355"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aecbe9af608218e129a006ddae17ac66b" title="Reads unique identifiers and initial population file according to the GAParameters." alt="" coords="504,5,683,47"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="1077,545,1270,587"/>
+</map>

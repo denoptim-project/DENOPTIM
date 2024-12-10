@@ -1,0 +1,8 @@
+<map id="denoptim.gui.GUIAPClassDefinitionDialog.GUIAPClassDefinitionDialog" name="denoptim.gui.GUIAPClassDefinitionDialog.GUIAPClassDefinitionDialog">
+<area shape="rect" id="node1" title=" " alt="" coords="5,64,232,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#a2a2fc5b1a50e2ff8b54728dcf44f42f6" title="Adds a component to the central part of this dialog frame." alt="" coords="285,5,502,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#aef5c48b1c797dddd898f2564c330318c" title="Closes the dialog window." alt="" coords="280,71,507,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="305,123,482,164"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="555,89,732,131"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="555,155,732,196"/>
+</map>

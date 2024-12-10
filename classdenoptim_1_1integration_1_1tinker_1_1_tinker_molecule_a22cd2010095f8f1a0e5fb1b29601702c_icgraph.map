@@ -1,0 +1,11 @@
+<map id="denoptim.integration.tinker.TinkerMolecule.addBond" name="denoptim.integration.tinker.TinkerMolecule.addBond">
+<area shape="rect" id="node1" title="Add one bond by appending a pair of indeces into the z&#45;add section." alt="" coords="1680,39,1856,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a85aaa2ca417ef0cf65457ad46f288344" title="Modify the molecule adding a cyclic bond between two atoms." alt="" coords="1429,5,1632,47"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#aae018598945eacf2b1c984b2efc3c6a0" title="Convert IAtomContainer to TinkerMolecule." alt="" coords="1443,71,1619,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#a065481cf3ca3229eee8b417fa3f7c0b5" title="Makes new rings by connecting pairs of atoms that hold properly arranged RingClosingAttractors." alt="" coords="1192,5,1381,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#abd87e8b7391948be1c3156eb9d131be7" title="Attempts to close rings by finding the conformation that allows to join heads and tails of atom speci..." alt="" coords="900,5,1135,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#a26896649739e0a5e63dd88079c6efe7a" title="Performs one or more attempts to close rings by conformational adaptation." alt="" coords="587,8,843,49"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,31,539,87"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,39,280,80"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a1cd879265bf12e9c2980efae1e8e74aa" title="Generate 3D structure by assembling 3D fragments according to attachment point vector and following t..." alt="" coords="891,71,1144,112"/>
+</map>

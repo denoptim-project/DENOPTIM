@@ -1,0 +1,12 @@
+<map id="denoptim.graph.EdgeTest.testConnectionDeconnectionLoop" name="denoptim.graph.EdgeTest.testConnectionDeconnectionLoop">
+<area shape="rect" id="node1" title=" " alt="" coords="5,151,200,193"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="259,5,469,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="273,57,455,98"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af8040db3f56d75da29132079df2b25cb" title="Gets the edge that is using this AP, or null if no edge is using this AP." alt="" coords="274,122,454,163"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="532,180,733,207"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="533,297,733,324"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#ae1243cc2bc48423cbbea5e0678b8b1be" title="Removes an edge and update the free valences of the attachment points that were originally involved i..." alt="" coords="248,239,480,265"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="528,86,737,127"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="543,21,722,62"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a266aa67ce6e0afd82fa723a12f46235a" title="Sets the reference to the edge that is using this attachment point." alt="" coords="543,231,723,273"/>
+</map>

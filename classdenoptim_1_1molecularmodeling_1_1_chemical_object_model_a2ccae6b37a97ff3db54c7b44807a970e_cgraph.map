@@ -1,0 +1,33 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.deepcopy" name="denoptim.molecularmodeling.ChemicalObjectModel.deepcopy">
+<area shape="rect" id="node1" title="Return a new Molecule3DBuilder having exactly the same features of this Molecule3DBuilder." alt="" coords="5,721,212,763"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a65611287e4448c66470ab2177468f5a6" title="Constructs an empty item." alt="" coords="260,353,539,395"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6f0b9a42074fe224ae52cee5f5875a7c" title="Returns almost &quot;deep&#45;copy&quot; of this graph." alt="" coords="304,443,495,470"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a993ba5eae0eafe4aa4df98206f54f798" title="This method produces a shallow copy of the object." alt="" coords="311,721,487,763"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a20d893ee504b0efbf9c3f274a401cc10" title="This method produces a deep copy of the object." alt="" coords="311,1015,487,1056"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a4abdef6e5d7f2d714f4bbcf37bc168f4" title="Returns the CDK atom number, 0 to (n&#45;1), of the given RingClosingAttractor." alt="" coords="276,1080,523,1121"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="609,5,783,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_ring.html#a26caae2f4e91d37ffb2f7f3becd97a8e" title="Append a DENOPTIMVertex to the list." alt="" coords="596,71,796,98"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="604,122,788,149"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8c53e13b64166fc85fc9a7787dadd46b" title=" " alt="" coords="594,173,798,199"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a774671253396558cf35ab75613762174" title="Returns the bond type preferred by this attachment point as defined by the APClass,..." alt="" coords="606,224,786,265"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="611,289,781,331"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="1092,377,1263,419"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="607,407,785,448"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_ring.html#a4d36b4964430194b787e708d47b00af5" title="Set the bond type (i.e., bond order) of the chord connecting the head and the tail vertices." alt="" coords="587,473,805,499"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_d_graph.html#a30bfc345b743b8859c842b3b4e3ca5fa" title=" " alt="" coords="607,524,785,565"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph.html#a421ce3718c62761e49a4dd4d0f20682c" title=" " alt="" coords="607,589,785,631"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#af5cb07ab0686739e6e1713da9d8959c1" title=" " alt="" coords="607,655,785,696"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5126283bcf1434c3366ea17bfac2c55f" title=" " alt="" coords="607,720,785,761"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5c72d2f8c10e05c4bf58de3ccce6522c" title=" " alt="" coords="607,785,785,827"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a7ecbfcc68b17ef630d0f46ccb6bb763b" title=" " alt="" coords="856,224,1041,265"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="863,289,1034,331"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3560b051e55499bf45522a55f6219d29" title="Returns the position of the first vertex that has the given ID." alt="" coords="853,407,1044,448"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#aea4ab5789d28e5f2b02ab48fd5b93292" title=" " alt="" coords="593,851,799,892"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a1dbc76d6f0f983ec1b6db689c08dbb05" title=" " alt="" coords="608,916,784,957"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a8df950169a75db97d86189d4147c05a9" title=" " alt="" coords="608,981,784,1023"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ae597e352e57e001ca5c4bda8ab599988" title=" " alt="" coords="608,1047,784,1088"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a6d299276ab1f7f00d622e32ae3a72442" title=" " alt="" coords="608,1112,784,1153"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a9e03b076ab654e68b88d9cfc2ac4cbf2" title=" " alt="" coords="608,1177,784,1219"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ac94129cb2177bb9426b2068762c636ea" title=" " alt="" coords="608,1243,784,1284"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a84c5f4bbca147e316b6f8c1e6ba8d02d" title=" " alt="" coords="595,1308,797,1349"/>
+</map>

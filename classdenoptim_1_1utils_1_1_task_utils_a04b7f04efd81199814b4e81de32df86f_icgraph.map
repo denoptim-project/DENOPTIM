@@ -1,0 +1,7 @@
+<map id="denoptim.utils.TaskUtils.getUniqueTaskIndex" name="denoptim.utils.TaskUtils.getUniqueTaskIndex">
+<area shape="rect" id="node1" title="Unique counter for tasks." alt="" coords="299,104,481,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#a8551fcecfdcd74d47493e1e7b62f93f0" title="Constructs a task that will analyze the given isomorphic family." alt="" coords="5,5,251,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_fitness_task.html#a3d3a94b223c2edefbf03b2df765d2bea" title=" " alt="" coords="37,71,219,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#ad96e2170d65cb887bdc35fba3ded1b2b" title="Create a task by giving the input file (i.e., containing structures to work with) and the configurati..." alt="" coords="23,136,233,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1task_1_1_program_task.html#a5f2fa7cbd888136a479d70085a93c8d7" title="Creates and configures the program task." alt="" coords="35,201,221,243"/>
+</map>

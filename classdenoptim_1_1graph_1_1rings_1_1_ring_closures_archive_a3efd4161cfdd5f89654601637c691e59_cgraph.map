@@ -1,0 +1,10 @@
+<map id="denoptim.graph.rings.RingClosuresArchive.storeEntry" name="denoptim.graph.rings.RingClosuresArchive.storeEntry">
+<area shape="rect" id="node1" title="Append a new closable chain entry to the archive." alt="" coords="5,140,184,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closures_archive.html#a16ab04b77232f70ee5fec35b80caa36f" title=" " alt="" coords="251,39,433,80"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="249,104,435,145"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a8f39942e5774cec5686e959fa588e301" title=" " alt="" coords="232,169,452,225"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#ace3ced16478d3b2d25d64038c3be7011" title=" " alt="" coords="232,249,452,305"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#ab17dd74bc55e826f3aa69ac69a674639" title="Get the vertex ID of the turning point.Note that since the chain is a path in a graph the relative di..." alt="" coords="500,39,695,80"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_chain_link.html#a22ada7777c4665cbe71df26caa560d54" title=" " alt="" coords="751,5,929,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#a2c40d6aa717937f6f478f413cbcc1eb5" title="Get a specific ChainLink" alt="" coords="743,71,937,112"/>
+</map>

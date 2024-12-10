@@ -1,0 +1,5 @@
+<map id="denoptim.io.DenoptimIO.readRCCompatibilityMatrix" name="denoptim.io.DenoptimIO.readRCCompatibilityMatrix">
+<area shape="rect" id="node1" title="Reads the APclass compatibility matrix for ring&#45;closing connections (the RC&#45;CPMap)." alt="" coords="279,41,467,83"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a43ed8d5c01a09ba050aad844bfc57406" title="Define all components of a fragment space that implements the attachment point class&#45;approach." alt="" coords="21,5,215,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a3e4ff5737a1f452b388e1eee888346ca" title="Load info for ring closures compatibilities from a compatibility matrix file." alt="" coords="5,70,231,126"/>
+</map>

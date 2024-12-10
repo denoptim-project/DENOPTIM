@@ -1,0 +1,9 @@
+<map id="denoptim.ga.EvolutionaryAlgorithm.cleanupCompleted" name="denoptim.ga.EvolutionaryAlgorithm.cleanupCompleted">
+<area shape="rect" id="node1" title="Removes only tasks that are marked as completed." alt="" coords="993,56,1180,97"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="476,5,655,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="472,71,659,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a5288db1eb3c645ed5b3cb33430c62bdf" title=" " alt="" coords="707,115,945,156"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,39,424,80"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,5,211,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,71,198,112"/>
+</map>

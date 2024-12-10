@@ -1,0 +1,4 @@
+<map id="denoptim.graph.DGraph.getAPWithId" name="denoptim.graph.DGraph.getAPWithId">
+<area shape="rect" id="node1" title="Returns the attachment point with the given identifier, or null if no AP is found with the given iden..." alt="" coords="5,5,184,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a27e25f8f8e1516d81cc281e2795a9428" title="Returns the list of all attachment points contained in this graph." alt="" coords="232,5,411,47"/>
+</map>

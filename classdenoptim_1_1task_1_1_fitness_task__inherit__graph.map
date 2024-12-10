@@ -1,0 +1,8 @@
+<map id="denoptim.task.FitnessTask" name="denoptim.task.FitnessTask">
+<area shape="rect" id="node1" title="Task that assesses the fitness of a given graph." alt="" coords="364,71,543,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html" title="Task that builds a graph by appending a given combination of fragments onto a given list of attachmen..." alt="" coords="612,5,805,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html" title="Task that calls the fitness provider for an offspring that can become a member of the current populat..." alt="" coords="591,71,827,98"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_fitness_evaluation_task.html" title="Task that calls the fitness provider." alt="" coords="594,123,823,164"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="181,71,316,98"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,71,133,98"/>
+</map>

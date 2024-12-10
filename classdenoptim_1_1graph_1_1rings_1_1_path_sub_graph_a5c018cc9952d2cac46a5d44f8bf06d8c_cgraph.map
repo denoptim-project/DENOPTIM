@@ -1,0 +1,19 @@
+<map id="denoptim.graph.rings.PathSubGraph.PathSubGraph" name="denoptim.graph.rings.PathSubGraph.PathSubGraph">
+<area shape="rect" id="node1" title="Constructs a new PathSubGraph specifying the first and last vertex of the path." alt="" coords="5,267,176,309"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="243,5,427,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="726,85,915,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_edge.html#aadec63c8f1ce93b0c82ae1f2a409acf1" title=" " alt="" coords="224,573,445,600"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="731,238,911,279"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#aaf3eb72074f66c853ea40c06ac9bea0e" title="Traverse the graph until it identifies the source of the directed path reachable from the given verte..." alt="" coords="245,350,424,391"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="720,447,921,473"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex.html#a3065859eaefc4c2f4f2374b11c1a8e08" title="Produces a pair of strings that identify the &quot;path&quot; between two given attachment points." alt="" coords="249,415,420,457"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_edge.html#a9696d3ee0d321b73b06d33bcb8fa86fd" title=" " alt="" coords="227,224,442,251"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_edge.html#a5575d6b605dda2f40a16556a163c46da" title=" " alt="" coords="228,165,441,192"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="984,158,1155,199"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a978d4b9f0c7e555fa1db7ed5a6af5a6c" title=" " alt="" coords="493,326,672,367"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a2937a75fd3652481c84235742b94736b" title="Looks into the edges that use any of the APs that belong to this vertex and returns the edge that has..." alt="" coords="735,315,906,357"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="969,323,1169,349"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="497,457,668,498"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="497,391,668,433"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="497,158,668,199"/>
+</map>

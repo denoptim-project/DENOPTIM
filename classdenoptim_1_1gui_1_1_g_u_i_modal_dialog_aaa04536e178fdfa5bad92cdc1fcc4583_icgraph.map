@@ -1,0 +1,19 @@
+<map id="denoptim.gui.GUIModalDialog.showDialog" name="denoptim.gui.GUIModalDialog.showDialog">
+<area shape="rect" id="node1" title="Shows the dialog and restrains the modality to it, until the dialog gets closed." alt="" coords="1208,355,1435,396"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#aa842f4661d59827a275b7231750b4736" title="Runs a dialog aimed at selecting an existing APClass or defining a new one." alt="" coords="907,5,1157,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="575,71,838,98"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#a755795e8d94da4aa261af2bda7a62d14" title=" " alt="" coords="917,123,1147,164"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#ad8e7f966c3eb1ed008233618c829c154" title=" " alt="" coords="923,187,1141,243"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af7024886a4203aa93d8cf7975f7c2e72" title=" " alt="" coords="911,384,1153,425"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,425,509,451"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a857bfe6291322daccf2af3fd9a28a356" title="Start the construction of a new graph from scratch." alt="" coords="557,333,856,375"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a44e2ff798d22b73f966cb8393ceb4f18" title="Extends the current graph by appending a node to a specific free AP on the growing graph." alt="" coords="585,523,828,564"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_fitness_parameters_form.html#a989880b9075bcb6124c36a444731b6a9" title=" " alt="" coords="928,501,1136,543"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#ad63012fa4fa9bec2e54ce86425039186" title="Initialize the panel and add buttons." alt="" coords="904,618,1160,645"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a09363e21a5254efe8f128a99e82acbf0" title=" " alt="" coords="910,267,1154,308"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog_1_1_s_m_a_r_t_s_visualization_button.html#afc18aa7ca6a0b238477d8d99e1877bf2" title=" " alt="" coords="911,669,1153,725"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_empty_vertex_maker.html#a5b98876b4b05ee77516d9889ec438acc" title="Constructs a maker that can make empty vertexes, but controls whether the generated vertexes are allo..." alt="" coords="609,5,804,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="276,64,492,105"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,417,211,459"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#aefffdc97385f7a524badf71808a3053b" title="Constructor." alt="" coords="601,611,812,652"/>
+</map>

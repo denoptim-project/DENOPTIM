@@ -1,0 +1,6 @@
+<map id="denoptim.gui.GUI.closeIfAllSaved" name="denoptim.gui.GUI.closeIfAllSaved">
+<area shape="rect" id="node1" title="Close GUI is there are no unsaved changes to the open components." alt="" coords="5,95,169,136"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_static_task_manager.html#aa082037a2747bc07e6a496157b1d9652" title=" " alt="" coords="236,5,405,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_main_panel.html#a175562c560d3a40dd88b9abefc18fcaa" title="Checks is any card has unsaved changes." alt="" coords="217,95,424,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1task_1_1_static_task_manager.html#a8482fea755a3ebfb8284d64e82b9ae3a" title=" " alt="" coords="236,160,405,201"/>
+</map>

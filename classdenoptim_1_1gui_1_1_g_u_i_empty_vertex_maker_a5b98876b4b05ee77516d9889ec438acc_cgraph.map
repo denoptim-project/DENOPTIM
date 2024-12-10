@@ -1,0 +1,15 @@
+<map id="denoptim.gui.GUIEmptyVertexMaker.GUIEmptyVertexMaker" name="denoptim.gui.GUIEmptyVertexMaker.GUIEmptyVertexMaker">
+<area shape="rect" id="node1" title="Constructs a maker that can make empty vertexes, but controls whether the generated vertexes are allo..." alt="" coords="5,220,200,261"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="260,49,488,75"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#aa842f4661d59827a275b7231750b4736" title="Runs a dialog aimed at selecting an existing APClass or defining a new one." alt="" coords="249,136,499,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="562,226,761,253"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#aef5c48b1c797dddd898f2564c330318c" title="Closes the dialog window." alt="" coords="261,253,487,279"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex.html#a5dbac662f4102558f3cf874c55174c5e" title=" " alt="" coords="289,304,459,345"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_g_u_i_empty_vertex_maker.html#a0ee1bd89553c036bc4a17ef5f15c2666" title=" " alt="" coords="248,369,500,411"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="558,5,765,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a0f37a2cf0618c5753f917dfc335dd68a" title="Returns the list of the names of all APClasses." alt="" coords="569,71,754,112"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#aaa04536e178fdfa5bad92cdc1fcc4583" title="Shows the dialog and restrains the modality to it, until the dialog gets closed." alt="" coords="548,136,775,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="823,219,1000,260"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1048,185,1225,227"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1048,251,1225,292"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.graph.rings.RingClosingAttractor.toString" name="denoptim.graph.rings.RingClosingAttractor.toString">
+<area shape="rect" id="node1" title=" " alt="" coords="5,29,176,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="224,29,429,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="477,29,675,71"/>
+</map>

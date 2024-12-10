@@ -1,0 +1,52 @@
+<map id="denoptim.graph.AttachmentPoint.getAtomPositionNumber" name="denoptim.graph.AttachmentPoint.getAtomPositionNumber">
+<area shape="rect" id="node1" title="The index of the source atom in the atom list of the fragment." alt="" coords="1219,711,1416,752"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a91fba166ba9fe73858ed16209d575cc5" title="Recursive method that appends branches of building blocks following the edges of the graph." alt="" coords="904,193,1171,249"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#acbaf5061621ed283eecc80a51b523422" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="613,113,838,169"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_template.html#ac7d7400f47d4bad33f3755f1b3d19a3e" title="Returns a deep copy of this template." alt="" coords="937,347,1138,374"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template_test.html#a72d37b4c24ad896838401b319b1d667e" title=" " alt="" coords="616,208,835,249"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a2c78b09395bee33b8a8f6a1839e8f614" title="Compares this and given attachment point." alt="" coords="947,743,1127,784"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager.html#a35227b133c623d446566ac26a7ee1424" title="Method to analyze a pair of vertices and evaluate whether they respect the criteria for being the two..." alt="" coords="938,439,1137,480"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_fragment.html#addd288710bfeda27690b15548054b6a9" title="Returns the atom where the given attachment point is rooted, i.e., the atom that is involved in the b..." alt="" coords="943,808,1132,849"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ab70fae45026bfeaf568f42a6b1fc0bf5" title="Calculate the current crowdedness of the given attachment point." alt="" coords="918,874,1157,901"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_fragment.html#ad87484692035efb425e352a5135aa3d9" title=" " alt="" coords="931,677,1143,719"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_fragment.html#a64c9ad687b06f3615aabcb18f2123840" title="Uses a string formatted like the molecular property used for defining attachment points to create the..." alt="" coords="324,643,535,684"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_fragment.html#ad165ef32248dbac7c3c4a7033bf9d92f" title=" " alt="" coords="313,709,545,735"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_fragment.html#a8d33526e74e10db5d8db591544d6836a" title="Takes the list of APs from the field of this class and projects the APs into properties of the IAtoms..." alt="" coords="620,509,831,551"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a68ee6c51c35a97db781f09c87672adc1" title=" " alt="" coords="927,925,1147,981"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aff187a1444128eb4c6ce8761b0def198" title="Compares the features of this and another attachment point and decides if the two are same." alt="" coords="947,1004,1127,1045"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_template.html#ad5daf794be97bcd8e43046b702b23b4d" title="Attaches a molecular representation to this template." alt="" coords="943,1069,1131,1111"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#ad2ec08c6a9ef246e017561984a9e9930" title=" " alt="" coords="947,1135,1127,1176"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_related_a_p_pair.html#a48309ea7444f5ee9882acc66e3dfe804" title=" " alt="" coords="931,1200,1143,1241"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a039c1f297f20187d7a3db26cc9823501" title=" " alt="" coords="937,1265,1138,1307"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af88d30ce68477984fe6179325d1540b2" title=" " alt="" coords="15,5,255,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_template_test.html#a50688358b5a557ee51683082427bdc14" title=" " alt="" coords="616,273,835,315"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager.html#af6100504547bbc59d54692ed355ca5d8" title=" " alt="" coords="612,419,839,475"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager.html#a547c0ffdb4a260f249040aba0a941b6b" title=" " alt="" coords="319,427,539,468"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager.html#a88079843bc382135c60bd1649cc84254" title="Makes this ring size manager work on a specific system that has a molecular representation and a DENO..." alt="" coords="344,361,515,403"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager_test.html#a55d1482a18edbaabf15b090392a282f3" title=" " alt="" coords="11,71,259,112"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_fragment.html#aa1cdff6a2da8a5c234a58317c8ac33e6" title="Constructor from an atom container, which has APs only as molecular properties." alt="" coords="640,677,811,719"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_fragment.html#ab272daa0515a1ee2fb99a2eb6a81a4a0" title="Depends on an healthy list of attachment points with properly set pointers to the source atoms." alt="" coords="620,748,831,789"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_fragment.html#ad9470ff6edecddcecf07dcfab36cc340" title="Adds an attachment point." alt="" coords="324,759,535,786"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_fragment.html#afe608a1ee2180aa73c91b8cc0a5bb744" title="Removes a list of atoms and updates the list of attachment points." alt="" coords="322,811,537,852"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_fragment.html#a8a6b413cc1a9c7276c9cfbd7e9284c99" title="Changes the properties of each APs as to reflect the current atom list." alt="" coords="312,877,547,903"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector_test.html#ac33b26784f254c873593368ccd717125" title=" " alt="" coords="13,896,256,937"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a37c0e44680ec1c54fcff98dae0832a50" title="Chops one chemical structure by applying the given cutting rules." alt="" coords="30,1027,239,1068"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_fragment.html#a3b476687a392e637d2bf2f3b6ccb09a4" title="Returns a deep copy of this fragments." alt="" coords="328,517,531,543"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_fragment.html#ac54b13faabd9aaef2f6fbcf41d5310f7" title="Reads a JSON string and returns an instance of this class." alt="" coords="317,591,542,618"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#a1e02c5f6054d5764ff597bd12337345a" title=" " alt="" coords="31,345,239,387"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager_test.html#ac3efa7ffa90ffbdb876e8489054b02af" title="Build a graph meant to be used in unit tests." alt="" coords="21,411,249,452"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#af86b79061d15a4d2e3d7ccdf0d758f44" title=" " alt="" coords="38,476,231,517"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a0a98792d99861bb6673e66a76ff49d31" title=" " alt="" coords="25,541,244,583"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_vertex_test.html#ab36c441c57e9852e2be6d810d80fbc87" title=" " alt="" coords="34,607,235,648"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1rings_1_1_path_closability_tools_test.html#af991094bf8c17599150d2e43ea582cf9" title=" " alt="" coords="27,671,242,727"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1rings_1_1_random_comb_of_ring_iterator_test.html#a4a178f479d08c120f5fea6ef60feac8b" title=" " alt="" coords="15,751,254,807"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a2b8d6293663bce9a9da1d35efe31911b" title=" " alt="" coords="38,831,231,872"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task_test.html#a2dc64f375774087fc0b4511384f50bc9" title=" " alt="" coords="5,135,264,191"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1fragmenter_1_1_fragment_alignement_test.html#ad46b9a4324bb5b9bbfc08c73de0e1124" title=" " alt="" coords="9,215,260,256"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a4889032266eb87d0f91af8b4e9869360" title=" " alt="" coords="29,280,241,321"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_vertex_1_1_d_e_n_o_p_t_i_m_vertex_deserializer.html#a281fc89776bbb6dbb93813fbb6eb2f70" title=" " alt="" coords="5,961,264,1003"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ae583c90795f338ffbf02776738700c09" title="Returns the chemical representation of the currently loaded chemical object." alt="" coords="634,932,817,973"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a756c2375d70d66c5bbba03e8772bb24a" title="Returns the currently loaded vertex." alt="" coords="320,932,539,973"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a32b0be109306e9c81fc830867296bc66" title="Extracts a system of one or more fused rings and adds them to the fragment space if not already prese..." alt="" coords="595,1069,856,1111"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ace0d1e97a4f3899a40c6bc9430be7aef" title="Loads the given fragments to this viewer." alt="" coords="629,1265,821,1307"/>
+</map>

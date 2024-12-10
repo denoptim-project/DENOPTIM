@@ -1,0 +1,7 @@
+<map id="denoptim.integration.tinker.TinkerUtils.getThirdRefAtomId" name="denoptim.integration.tinker.TinkerUtils.getThirdRefAtomId">
+<area shape="rect" id="node1" title=" " alt="" coords="1112,13,1309,54"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#aae018598945eacf2b1c984b2efc3c6a0" title="Convert IAtomContainer to TinkerMolecule." alt="" coords="888,13,1064,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a1cd879265bf12e9c2980efae1e8e74aa" title="Generate 3D structure by assembling 3D fragments according to attachment point vector and following t..." alt="" coords="587,13,840,54"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,5,539,61"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,13,280,54"/>
+</map>

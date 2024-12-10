@@ -1,0 +1,4 @@
+<map id="denoptim.programs.fitnessevaluator.FPRunner.stopRun" name="denoptim.programs.fitnessevaluator.FPRunner.stopRun">
+<area shape="rect" id="node1" title="Stops all subtasks and shutdown executor." alt="" coords="5,5,235,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_p_runner.html#a0f302f505dfa91115b098f94ea44d9cf" title="clean all reference to submitted tasks" alt="" coords="283,5,512,47"/>
+</map>

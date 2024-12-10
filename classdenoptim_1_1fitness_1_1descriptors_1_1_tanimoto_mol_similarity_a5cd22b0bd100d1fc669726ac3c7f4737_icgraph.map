@@ -1,0 +1,12 @@
+<map id="denoptim.fitness.descriptors.TanimotoMolSimilarity.makeIFingerprinter" name="denoptim.fitness.descriptors.TanimotoMolSimilarity.makeIFingerprinter">
+<area shape="rect" id="node1" title=" " alt="" coords="1119,166,1380,207"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser.html#a900707cd37f6d64d633309ba9dd50384" title=" " alt="" coords="834,131,1069,173"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#a2bebb1a5e8a993d83d6aa983781beba8" title="Set the parameters attribute of TanimotoMolSimilarity object." alt="" coords="832,198,1071,239"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser.html#a761cd46875eff5864f29dbb7f353bde7" title="Parses the given expressions." alt="" coords="575,129,738,170"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fitness_1_1_fitness_parameters.html#a2ab06430e0d6c35625d03557520cf505" title="Processes all parameters and initialize related objects." alt="" coords="276,129,481,170"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#a2272dbcf72c993b4544719ddf64c98b6" title=" " alt="" coords="19,5,214,61"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#ac3684e1e2969ee1c883ab279d4d5c048" title="This test is reproducing most of what done in FitnessParametersTest#testProcessExpressions() so if bo..." alt="" coords="11,85,222,141"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#a81954dc756c3f22356f01bdc0037e9f5" title=" " alt="" coords="21,165,212,206"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser_test.html#ad8c3056173f2ab17ebb7c12133ea03a8" title=" " alt="" coords="5,229,228,285"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity_test.html#ae5ba0357459bd900a54104f75b44ae3d" title=" " alt="" coords="529,193,784,249"/>
+</map>

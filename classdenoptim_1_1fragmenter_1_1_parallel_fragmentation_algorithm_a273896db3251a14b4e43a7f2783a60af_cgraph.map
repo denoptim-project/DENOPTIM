@@ -1,0 +1,8 @@
+<map id="denoptim.fragmenter.ParallelFragmentationAlgorithm.createAndSubmitTasks" name="denoptim.fragmenter.ParallelFragmentationAlgorithm.createAndSubmitTasks">
+<area shape="rect" id="node1" title="Implementations of this method must call the submitTask(Task, String) method to actually send the tas..." alt="" coords="5,63,228,119"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#ad66e838c3af64def4d0aad3a6102b086" title=" " alt="" coords="291,5,501,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a49cb9bef7ce9aec3bc6d7bb948e2c8ae" title=" " alt="" coords="276,71,516,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#a2ac8a65c7e2ed87472c1744527c94b22" title=" " alt="" coords="281,136,511,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#a1df7d9703e94f5d58dc53afdaa7688d4" title="Removes only tasks that are marked as completed." alt="" coords="564,107,795,148"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1task_1_1_task.html#ad75b4d3407d7d677cc71ad94028f8841" title=" " alt="" coords="596,173,763,199"/>
+</map>

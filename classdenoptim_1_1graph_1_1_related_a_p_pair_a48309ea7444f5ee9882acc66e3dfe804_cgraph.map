@@ -1,0 +1,5 @@
+<map id="denoptim.graph.RelatedAPPair.toString" name="denoptim.graph.RelatedAPPair.toString">
+<area shape="rect" id="node1" title=" " alt="" coords="5,39,217,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="265,5,463,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a72dd6bd75a701cabb65832778da6e574" title="Returns a unique integer that is used to sort list of attachment points." alt="" coords="274,71,454,112"/>
+</map>

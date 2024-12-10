@@ -1,0 +1,8 @@
+<map id="denoptim.graph.Vertex.BBType.parseInt" name="denoptim.graph.Vertex.BBType.parseInt">
+<area shape="rect" id="node1" title="Translates the integer into the enum." alt="" coords="831,70,1080,96"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a649892c4a2b1d4ccd2f97cae6dd7ed98" title=" " alt="" coords="288,33,520,74"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#aed775359798aa8181f006436d643872f" title="Constructs a ClosableChain from the string representation." alt="" coords="578,29,773,70"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a7a13e1b1304c0857ae6fa97b744e7289" title="Method to select fragments that increase the likeliness of generating closable chains." alt="" coords="568,94,783,136"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_graph_conversion_tool.html#abf9ddf4333b1151356a00b686f93604d" title="Given a formatted string&#45;like representation of a DENOPTIM graph create the corresponding DENOPTIMGra..." alt="" coords="573,160,778,201"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="5,33,240,74"/>
+</map>

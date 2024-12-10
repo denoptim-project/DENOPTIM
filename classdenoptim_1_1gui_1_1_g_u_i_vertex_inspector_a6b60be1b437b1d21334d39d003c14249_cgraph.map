@@ -1,0 +1,13 @@
+<map id="denoptim.gui.GUIVertexInspector.convertAtomToAP" name="denoptim.gui.GUIVertexInspector.convertAtomToAP">
+<area shape="rect" id="node1" title="Removes an atom and replaces it with an attachment point." alt="" coords="5,186,264,227"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a25e45b22a20adcc72ee6f599a7694b0f" title="Add an attachment point to the specifies atom." alt="" coords="323,22,515,63"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment.html#aeee294fa281e31afd7f87ede342b486e" title=" " alt="" coords="325,87,514,129"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_fragment.html#a1293bf717422dce4ecb43d1f39d734df" title=" " alt="" coords="325,153,514,194"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="317,218,522,259"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_fragment.html#af7331efe9eccdc6ef2df711fbeec1068" title=" " alt="" coords="312,284,527,311"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="320,359,519,385"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a1f1eee26acede7b656a922201399f2b4" title="Adds an attachment point with a dummy APClass." alt="" coords="575,29,785,56"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="591,351,769,393"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="833,318,1011,359"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="833,383,1011,425"/>
+</map>
