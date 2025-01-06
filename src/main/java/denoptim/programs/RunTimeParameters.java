@@ -45,6 +45,7 @@ import denoptim.programs.genetweeker.GeneOpsRunnerParameters;
 import denoptim.programs.grapheditor.GraphEdParameters;
 import denoptim.programs.graphlisthandler.GraphListsHandlerParameters;
 import denoptim.programs.isomorphism.IsomorphismParameters;
+import denoptim.programs.mol2graph.Mol2GraphParameters;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 import denoptim.utils.Randomizer;
 
@@ -181,7 +182,12 @@ public abstract class RunTimeParameters
         /**
          * Parameters controlling the fragmenter.
          */
-        FRG_PARAMS;
+        FRG_PARAMS,
+        
+        /**
+         * Parameters controlling molecule-to-graph conversion
+         */
+        M2G_PARAMS;
         
         /**
          * The root of any keyword that is meant to be used to set any of the
@@ -207,6 +213,7 @@ public abstract class RunTimeParameters
             GE_PARAMS.keywordRoot = "GRAPHEDIT-";
             GLH_PARAMS.keywordRoot = "GRAPHLISTS-";
             ISO_PARAMS.keywordRoot = "ISOMORPHISM-";
+            M2G_PARAMS.keywordRoot = "M2G-";
             
             CEBL_PARAMS.implementation = CEBLParameters.class;
             GA_PARAMS.implementation = GAParameters.class;
@@ -220,6 +227,7 @@ public abstract class RunTimeParameters
             GE_PARAMS.implementation = GraphEdParameters.class;
             GLH_PARAMS.implementation = GraphListsHandlerParameters.class;
             ISO_PARAMS.implementation = IsomorphismParameters.class;
+            M2G_PARAMS.implementation = Mol2GraphParameters.class;
         }
 
         /**

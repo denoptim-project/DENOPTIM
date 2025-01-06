@@ -47,6 +47,7 @@ import denoptim.programs.genetweeker.GeneOpsRunner;
 import denoptim.programs.grapheditor.GraphEditor;
 import denoptim.programs.graphlisthandler.GraphListsHandler;
 import denoptim.programs.isomorphism.Isomorphism;
+import denoptim.programs.mol2graph.Mol2Graph;
 import denoptim.programs.moldecularmodelbuilder.MolecularModelBuilder;
 import denoptim.task.ProgramTask;
 import denoptim.task.StaticTaskManager;
@@ -118,6 +119,11 @@ public class Main
         FRG,
         
         /**
+         * Run a conversion of molecules to graphs
+         */
+        M2G,
+        
+        /**
          * Starts a listener to Python;
          */
         PY4J;
@@ -127,8 +133,9 @@ public class Main
         //     importance (i.e., common use) of a run type.
         //  2) set the value of "description" in the static block below
         //  3) set the value of "isCLIEnabled" in the static block below
-        //  4) set the value of "programTaskImpl" in the static block below
-        //  5) consider whether a new parameter file format should be added
+        //  4) set the value of "needsInputFile" in the static block below
+        //  5) set the value of "programTaskImpl" in the static block below
+        //  6) consider whether a new parameter file format should be added
         //     in FileFormats.
         
         /**
@@ -165,6 +172,7 @@ public class Main
             B3D.description = "Stand-alone build a 3D molecular model from a "
                     + "graph";
             FRG.description = "Fragmentation and managment of fragments";
+            M2G.description = "Convert Molecules to Graphs.";
             PY4J.description = "Starts a server listening to Python";
             
             DRY.isCLIEnabled = false;
@@ -178,6 +186,7 @@ public class Main
             CLG.isCLIEnabled = true;
             B3D.isCLIEnabled = true;
             FRG.isCLIEnabled = true;
+            M2G.isCLIEnabled = true;
             PY4J.isCLIEnabled = true;
             
             DRY.needsInputFile = false;
@@ -191,6 +200,7 @@ public class Main
             CLG.needsInputFile = true;
             B3D.needsInputFile = true;
             FRG.needsInputFile = true;
+            M2G.needsInputFile = true;
             PY4J.needsInputFile = false;
             
             DRY.programTaskImpl = null;
@@ -204,6 +214,7 @@ public class Main
             CLG.programTaskImpl = GraphListsHandler.class;
             B3D.programTaskImpl = MolecularModelBuilder.class;
             FRG.programTaskImpl = Fragmenter.class;
+            M2G.programTaskImpl = Mol2Graph.class;
             PY4J.programTaskImpl = null;
         }
 

@@ -1230,7 +1230,8 @@ public class FragmenterParameters extends RunTimeParameters
             case "SCAFFOLDINGPOLICY=":
                 String[] words = value.split("\\s+");
                 try {
-                    scaffoldingPolicy = ScaffoldingPolicy.valueOf(words[0]);
+                    scaffoldingPolicy = ScaffoldingPolicy.valueOf(
+                            words[0].toUpperCase());
                     if (ScaffoldingPolicy.ELEMENT.equals(scaffoldingPolicy))
                     {
                         if (words.length<2)
@@ -1245,7 +1246,7 @@ public class FragmenterParameters extends RunTimeParameters
                 } catch (Throwable t)
                 {
                     msg = "Unable to parse value of " + key + ": '" + value + "'";
-                    throw new DENOPTIMException(msg);
+                    throw new DENOPTIMException(msg, t);
                 }
                 break;
 

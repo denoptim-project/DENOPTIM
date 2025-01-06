@@ -2135,14 +2135,14 @@ public class DenoptimIO
      * Writes the graphs to JSON file.
      *
      * @param file the file where to print
-     * @param modGraphs the list of graphs to print
+     * @param graphs the list of graphs to print
      * @throws DENOPTIMException
      */
     public static void writeGraphsToJSON(File file,
-            List<DGraph> modGraphs) throws DENOPTIMException
+            List<DGraph> graphs) throws DENOPTIMException
     {
         Gson writer = DENOPTIMgson.getWriter();
-        writeData(file.getAbsolutePath(), writer.toJson(modGraphs), false);
+        writeData(file.getAbsolutePath(), writer.toJson(graphs), false);
     }
     
 //------------------------------------------------------------------------------

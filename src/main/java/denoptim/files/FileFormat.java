@@ -36,7 +36,7 @@ public enum FileFormat {
     FSE_RUN, GA_RUN,
     
     GA_PARAM, FSE_PARAM, FR_PARAM, COMP_MAP, GO_PARAM, CLG_PARAM, GE_PARAM, 
-    GI_PARAM, B3D_PARAM, FRG_RUN, FRG_PARAM, CUTRULE,
+    GI_PARAM, B3D_PARAM, FRG_RUN, FRG_PARAM, CUTRULE, M2G_PARAM,
     
     TXT, GRAPHTXT, GENSUMMARY,
     UNRECOGNIZED;
@@ -163,6 +163,12 @@ public enum FileFormat {
         
         //------------------------------------
         
+        M2G_PARAM.extension = "";
+        M2G_PARAM.definingRegex = new HashSet<String>(Arrays.asList(
+                "^" + ParametersType.M2G_PARAMS.getKeywordRoot() + ".*"));
+        
+        //------------------------------------
+        
         CUTRULE.extension = "";
         CUTRULE.definingRegex = new HashSet<String>(Arrays.asList(
                 "^CTR.*"));
@@ -231,6 +237,7 @@ public enum FileFormat {
      */
     public enum DataKind {GRAPH, VERTEX, GA_RUN, FSE_RUN, GA_PARAM, FSE_PARAM,
         FR_PARAM, GO_PARAM, CLG_PARAM, GE_PARAM, GI_PARAM, COMP_MAP, B3D_PARAM,
+        M2G_PARAM,
         FRG_RUN, FRG_PARAM}
     
 //------------------------------------------------------------------------------
@@ -298,6 +305,8 @@ public enum FileFormat {
                     case GA_PARAM:
                         ff = GA_PARAM;
                         break;
+                    case M2G_PARAM:
+                        ff = M2G_PARAM;
                     case FRG_RUN:
                         ff = FRG_RUN;
                         break;
@@ -371,6 +380,7 @@ public enum FileFormat {
          // the setting of the random seed)
             FileFormat.GA_PARAM,  
             FileFormat.FSE_PARAM,
+            FileFormat.M2G_PARAM,
             FileFormat.FR_PARAM,
             FileFormat.FRG_PARAM,
             FileFormat.COMP_MAP};
