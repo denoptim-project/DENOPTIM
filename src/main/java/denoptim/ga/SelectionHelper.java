@@ -21,11 +21,13 @@ package denoptim.ga;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.lang.Math;
 
 import denoptim.graph.Candidate;
 import denoptim.programs.RunTimeParameters;
+import denoptim.programs.denovo.GAParameters;
 
 
 /**
@@ -39,42 +41,35 @@ public class SelectionHelper
 //------------------------------------------------------------------------------
 
     /**
-     * Select p individuals at random.
-     * The individual with the highest fitness becomes the parent.
+     * Select a number individuals at random (i.e., tournamentSize).
+     * The individual with the highest fitness is chosen the parent.
      * Keeping the tournament size small results in a smaller selection pressure,
      * thus increasing genetic diversity.
-     * Note: this implementation is based on the WATCHMAKER framework
-     * http://watchmaker.uncommons.org/
      * @param eligibleParents the ensemble of individuals to choose from
      * @param sz number of individuals to select
+     * @param tournamentSize the number of candidates participating to each 
+     * tournament. Corresponds to the selection pressure: high values make high
+     * fitness values be more likely to be selected.
      * @param settings the program-specific settings.
      * @return list of selected individuals 
      */
 
     protected static Candidate[] performTournamentSelection(
-            List<Candidate> eligibleParents, int sz, RunTimeParameters settings)
+            List<Candidate> eligibleParents, int sz,
+            GAParameters settings)
     {
         Candidate[] selection = new Candidate[sz];
         for (int i=0; i<sz; i++)
         {
-            // Pick two candidates at random.
-            Candidate p1 = settings.getRandomizer().randomlyChooseOne(eligibleParents);
-            Candidate p2 = settings.getRandomizer().randomlyChooseOne(eligibleParents);
-
-            // Use a random value to decide weather to select the fitter individual
-            // or the weaker one.
-            boolean selectFitter = settings.getRandomizer().nextBoolean();
+            List<Candidate> pool = new ArrayList<Candidate>();
+            for (int j=0; j<settings.getSelectivePressure(); j++)
+            {
+                pool.add(settings.getRandomizer().randomlyChooseOne(
+                        eligibleParents));
+            }
             
-            if (selectFitter)
-            {
-                // Select the fitter candidate.
-                selection[i] = p1.getFitness() > p2.getFitness() ? p1 : p2;
-            }
-            else
-            {
-                // Select the weaker candidate.
-                selection[i] = p2.getFitness() > p1.getFitness() ? p1 : p2;
-            }
+            selection[i] = Collections.max(pool, Comparator.comparing(
+                    c -> c.getFitness()));
         }
         return selection;
     }

@@ -1301,7 +1301,7 @@ public class GUIInspectGARun extends GUICardPanel
 	    
 	    NumberAxis xAxis = new NumberAxis("Generation");
 	    //"-0.5" because includes 0
-	    xAxis.setRange(-0.5, Double.valueOf(iRecordsKept)-0.5);
+	    xAxis.setRange(-0.5, Math.max(Double.valueOf(iRecordsKept),2.0)-0.5);
 	    xAxis.setAutoRangeIncludesZero(false);
 	    // By default we show the first series (should be the number of attempts
 	    // to create candidates)
@@ -1336,8 +1336,11 @@ public class GUIInspectGARun extends GUICardPanel
             dataset.addSeries(headers[iSeries], xyData.get(iSeries));
             monitorDatasets.put(CounterID.valueOf(headers[iSeries]), dataset);
             
+            boolean renderPoints = false;
+            if (iRecordsKept<2)
+                renderPoints = true;
             XYLineAndShapeRenderer serierRenderer =
-                new XYLineAndShapeRenderer(true, false);
+                new XYLineAndShapeRenderer(true, renderPoints);
             monitorPlot.setDataset(iSeries, dataset);
             monitorPlot.setRenderer(iSeries, serierRenderer);
             

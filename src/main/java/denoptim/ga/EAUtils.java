@@ -594,6 +594,7 @@ public class EAUtils
             }
             if (res == null)
             {
+                mnt.increase(CounterID.FAILEDXOVERATTEMPTS);
                 gOutermost.cleanup();
                 gOutermost = null;
                 continue;
@@ -1457,6 +1458,27 @@ public class EAUtils
                     settings);
             break;
         }
+        
+        if (settings.recordMateSelection())
+        {
+            String matesStr="";
+            for (int i=0; i < mates.length; i++)
+            {
+                if (i>0)
+                    matesStr = matesStr + settings.NL;
+                matesStr = matesStr + mates[i].getUID();
+            }
+            try
+            {
+                DenoptimIO.writeData(settings.getMonitorFile()+".mates", 
+                        matesStr, true);
+            } catch (DENOPTIMException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
         return mates;
     }
     
@@ -1702,6 +1724,12 @@ public class EAUtils
                         candidate, false);
                 
                 population.add(candidate);
+            } else {
+                settings.getLogger().log(Level.WARNING, "Candidate from intial "
+                        + "population file '" + filename 
+                        + "' is rejected because its identifier is "
+                        + "already listed among the previously visited "
+                        + "identifiers.");
             }
         }
 

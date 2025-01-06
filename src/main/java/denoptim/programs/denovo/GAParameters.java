@@ -89,6 +89,11 @@ public class GAParameters extends RunTimeParameters
      * Pathname of file where EA monitors dumps are printed
      */
     private String monitorFile = "";
+    
+    /**
+     * Flag defining whether we record which mates are selected or not
+     */
+    private boolean recordMateSelection = false;
 
     /**
      * Default name of the UIDFileOut
@@ -268,6 +273,13 @@ public class GAParameters extends RunTimeParameters
      * Crossover parents selection strategy: string
      */
     protected String strXoverSelectionMode = xoverSelectionMode+"";
+    
+    /**
+     * Intensity for selecting high fitness parents. For tournament selection
+     * acts as the size of the tournament pool. Default value is calculated 
+     * from population size.
+     */
+    protected int selectivePressure = -1;
     
     /**
      * Number of offspring that a single crossover operation can produce.
@@ -470,6 +482,17 @@ public class GAParameters extends RunTimeParameters
     {
         return monitorDumpStep;
     }
+  
+//------------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if we are asked to print the selected mates to 
+     * file.
+     */
+    public boolean recordMateSelection()
+    {
+        return recordMateSelection;
+    } 
 
 //------------------------------------------------------------------------------
 
@@ -664,6 +687,13 @@ public class GAParameters extends RunTimeParameters
     public String getSelectionStrategy()
     {
         return strXoverSelectionMode;
+    }
+    
+ //------------------------------------------------------------------------------
+
+    public int getSelectivePressure()
+    {
+        return selectivePressure;
     }
     
 //------------------------------------------------------------------------------
@@ -920,6 +950,15 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "RECORDMATESELECTION=":
+            {
+                if (value.length() > 0)
+                {
+                    recordMateSelection = readYesNoTrueFalse(value);
+                }
+                break;
+            }
+            
             case "MONITORDUMPSTEP=":
             {
                 if (value.length() > 0)
@@ -973,19 +1012,13 @@ public class GAParameters extends RunTimeParameters
         
             case "SORTBYINCREASINGFITNESS":
             {
-                if (value.length() > 0)
-                {
-                    sortOrderDecreasing = false;
-                }
+                sortOrderDecreasing = false;
                 break;
             }
             
             case "NANFITNESSKILLSEXPERIMENT":
             {
-                if (value.length() > 0)
-                {
-                    nanFitnessKillsExperiment = true;
-                }
+                nanFitnessKillsExperiment = true;
             }
         
             case "LEVELGROWTHMULTIPLIER=":
@@ -1287,6 +1320,16 @@ public class GAParameters extends RunTimeParameters
                 break;
             }
             
+            case "SELECTIVEPRESSURE=":
+            {
+                if (value.length() > 0)
+                {
+                    selectivePressure = Integer.parseInt(value);
+                }
+                break;
+            }
+            
+            
             case "NUMOFFSPRINGFROMXOVER=":
             {
                 if (value.length() > 0)
@@ -1438,6 +1481,9 @@ public class GAParameters extends RunTimeParameters
         {
             numParallelTasks = nproc;
         }
+        
+        if (selectivePressure<0)
+            selectivePressure = (int) Math.round(populationSize * 0.2);
         
         processOtherParameters();
         
