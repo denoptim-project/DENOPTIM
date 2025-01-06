@@ -1,0 +1,28 @@
+<map id="denoptim.fragspace.FragsCombinationIterator.next" name="denoptim.fragspace.FragsCombinationIterator.next">
+<area shape="rect" id="node1" title="Generate the next combination of fragments." alt="" coords="5,645,176,687"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="259,5,439,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_id_fragment_and_a_p.html#adf2b5d0397410451714ec39348336089" title=" " alt="" coords="247,71,451,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="767,313,937,355"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="264,201,435,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="264,267,435,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a93693af51412000689dc7517151b9a05" title=" " alt="" coords="230,332,469,373"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point.html#acd666767475f39f0d7f17550d2b47651" title=" " alt="" coords="259,136,439,177"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="256,449,443,491"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex.html#a9542f18a17ab836ed3ade18348b22f3c" title=" " alt="" coords="535,815,706,856"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph.html#a419f97ea0a361b122274c4eda97e3be6" title="Get an iterator for the sets of symmetrically related vertices." alt="" coords="260,580,439,621"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="255,645,443,687"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="767,876,937,917"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_id_fragment_and_a_p.html#ad63dd7a75f57e164d33d6d84479f261e" title=" " alt="" coords="247,763,451,804"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1fragspace_1_1_id_fragment_and_a_p.html#a39900b3436a1150e228c236bb4aa6864" title=" " alt="" coords="247,828,451,869"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="260,515,439,556"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1fragspace_1_1_id_fragment_and_a_p.html#a86ef8e9f9bf1bf0b1a8c6ce7d8b6b56d" title=" " alt="" coords="247,959,451,1000"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_d_graph.html#a690bb91df0e75ab1d1ff662117a5942d" title=" " alt="" coords="259,1024,440,1065"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_vertex.html#a44507a876a3505edbeaf455a6f71a601" title=" " alt="" coords="262,893,437,935"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a95c29949d65364ea844e8b3e7150311d" title="Checks if the symmetry settings impose use of symmetry on attachment points of the given AP class." alt="" coords="224,1141,475,1183"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a77887ce020d49c189b89e049f12b70ba" title="Check availability of this attachment point." alt="" coords="259,1207,439,1248"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1fragspace_1_1_id_fragment_and_a_p.html#a6c74042257bf1581c026b08cbb358e4f" title=" " alt="" coords="247,1272,451,1313"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="535,235,706,276"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3560b051e55499bf45522a55f6219d29" title="Returns the position of the first vertex that has the given ID." alt="" coords="525,671,716,712"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a1e550048eaf844b84ca694d149458a01" title="Return the constitutional symmetry constrain for the given APclass, or null." alt="" coords="524,1207,717,1248"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a0f617041b436cd3c990f946511026cd7" title="Checks if there is a constraint on the constitutional symmetry probability for the given AP class." alt="" coords="523,1141,719,1183"/>
+</map>

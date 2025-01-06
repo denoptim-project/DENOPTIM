@@ -1,0 +1,17 @@
+<map id="denoptim.graph.SymmetricAPsTest.testGetSameAsThis" name="denoptim.graph.SymmetricAPsTest.testGetSameAsThis">
+<area shape="rect" id="node1" title=" " alt="" coords="5,210,200,251"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a25e45b22a20adcc72ee6f599a7694b0f" title="Add an attachment point to the specifies atom." alt="" coords="541,22,733,63"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment.html#a66ef044fb958d43d820bd05c71a2bfb2" title=" " alt="" coords="253,217,473,244"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_symmetric_a_ps.html#a04ca9cb05339fc67e21ca6892ab5c5ae" title="Identifies a set of symmetric APs that, although it contains references to different instances of Att..." alt="" coords="275,269,450,310"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_fragment.html#ab6e4a71b8f20faab8bec095322604f73" title=" " alt="" coords="268,334,457,375"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a9542f18a17ab836ed3ade18348b22f3c" title=" " alt="" coords="277,399,448,441"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="537,112,736,139"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a8bff8b7d1c409ddc9a55707f4e67f427" title=" " alt="" coords="248,151,477,193"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a1f1eee26acede7b656a922201399f2b4" title="Adds an attachment point with a dummy APClass." alt="" coords="796,29,1007,56"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_symmetric_a_ps.html#ad9c4e2505401b818c31793385f23946f" title="Checks if this collection SymmetricAPs is analogous to the other one, i.e., they contain AttachmentPo..." alt="" coords="549,269,724,310"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="813,105,990,146"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1055,71,1232,113"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1055,137,1232,178"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_fragment.html#a65c4f181651f2cd9606b581988af9247" title=" " alt="" coords="525,213,748,240"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_fragment.html#a2bb3bfa838f2661ee993e1a57e018873" title=" " alt="" coords="525,163,748,189"/>
+</map>

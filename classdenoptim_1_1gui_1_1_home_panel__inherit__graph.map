@@ -1,0 +1,5 @@
+<map id="denoptim.gui.HomePanel" name="denoptim.gui.HomePanel">
+<area shape="rect" id="node1" title="The home panel contains shortcuts buttons to perform the most common tasks." alt="" coords="13,155,180,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel.html" title="Class of GUI panels meant to occupy one card in the deck&#45;of&#45;cards layout of the main panel." alt="" coords="5,80,188,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="65,5,128,32"/>
+</map>

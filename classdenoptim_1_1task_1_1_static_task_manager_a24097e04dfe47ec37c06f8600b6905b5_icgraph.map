@@ -1,0 +1,5 @@
+<map id="denoptim.task.StaticTaskManager.submitAndWait" name="denoptim.task.StaticTaskManager.submitAndWait">
+<area shape="rect" id="node1" title="Submits a task and waits for completion." alt="" coords="505,5,675,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1main_1_1_main.html#ad1194d9a4011f76d1b358f10ce90027e" title="Creates a task for the given class." alt="" coords="221,13,457,39"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1main_1_1_main.html#a5d0a8599c5e2e81cffd07e35353bfc84" title="Launches the appropriate program according to the arguments given." alt="" coords="5,13,173,39"/>
+</map>

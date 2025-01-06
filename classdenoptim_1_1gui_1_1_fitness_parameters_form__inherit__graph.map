@@ -1,0 +1,6 @@
+<map id="denoptim.gui.FitnessParametersForm" name="denoptim.gui.FitnessParametersForm">
+<area shape="rect" id="node1" title="Form collecting input parameters for a setting&#45;up the fitness provider." alt="" coords="5,155,244,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html" title="General structure of a form for collecting input parameters of various nature." alt="" coords="27,80,222,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="16,5,79,32"/>
+<area shape="rect" id="node4" href="$interfacedenoptim_1_1gui_1_1_i_parameters_form.html" title="Interface for parameter forms." alt="" coords="103,5,301,32"/>
+</map>

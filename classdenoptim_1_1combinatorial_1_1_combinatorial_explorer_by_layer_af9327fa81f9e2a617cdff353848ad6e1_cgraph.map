@@ -1,0 +1,52 @@
+<map id="denoptim.combinatorial.CombinatorialExplorerByLayer.run" name="denoptim.combinatorial.CombinatorialExplorerByLayer.run">
+<area shape="rect" id="node1" title="Run the combinatorial exploration." alt="" coords="5,2136,243,2177"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a8f4213efd2243199301fea86f30f8ddf" title="Check for completion of all subtasks." alt="" coords="299,5,537,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a471ee8aed24d5e6499dd4d747d6fea5b" title="clean all reference to submitted tasks" alt="" coords="927,123,1165,164"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a73e2e419fe51fd6fa66f9ad6d4459d8d" title=" " alt="" coords="299,2037,537,2079"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#adcd462866e3f9d6a2a6ef0385807807e" title="Generate graphs by exploring all combination of fragments at a given level of a growing graph." alt="" coords="293,1105,543,1161"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a906b534927f606245fb23da129c9c6ef" title=" " alt="" coords="939,1083,1153,1124"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="953,1827,1139,1868"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1combinatorial_1_1_c_e_b_l_utils.html#ab3c17463c9705fb6bf49302dbf804922" title=" " alt="" coords="616,1936,856,1977"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#ace61a6c1b9d4fc0c4120c1bd3507efed" title="Stops all subtasks and shutdown executor." alt="" coords="617,123,855,164"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a6e6636646a999bb99b5bacaf47cc19d0" title="Looks for exceptions in the subtasks and, if any, store its reference locally to allow reporting it b..." alt="" coords="614,2001,858,2043"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a9c179466cc0b7a909a49e1a3c99c978e" title=" " alt="" coords="291,2103,545,2144"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a3b88fb1b00a0495f9eef193a584111fd" title=" " alt="" coords="321,2168,515,2209"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#ad1db7422d160f86b1fd7c8b763ff09ae" title=" " alt="" coords="311,2233,525,2275"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a85007a0717aa59e1ad62d0e7ac011ff8" title=" " alt="" coords="311,2299,525,2340"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#adf596805698d9ae5eaa1c72eff10f16a" title=" " alt="" coords="321,2364,515,2405"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a52c260f1847aa42a37937251e69b527b" title=" " alt="" coords="321,2429,515,2471"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#ae183fe3b1a8bfa167668ac265f1f421c" title=" " alt="" coords="321,2495,515,2536"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#aa0966d4ebdeed6fa74f57786a4367563" title=" " alt="" coords="311,2560,525,2601"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1utils_1_1_graph_utils.html#a1091a546a79a1a9dce17b752537607f3" title="Reset the unique graph counter to the given value." alt="" coords="319,2625,517,2667"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1utils_1_1_graph_utils.html#ad381686872b7a5f0a0edea36351ca09f" title="Reset the unique mol counter to the given value." alt="" coords="319,2691,517,2732"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1utils_1_1_graph_utils.html#adceb5d2a62ee7cb0c67e8ccd1c13e0f0" title="Reset the unique vertex counter to the given value." alt="" coords="319,2756,517,2797"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a3965de7390821648447a3836e8513364" title=" " alt="" coords="613,1468,859,1509"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a2f91aecfbbe9f05c354de6b401743fc2" title=" " alt="" coords="617,305,855,347"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a93693af51412000689dc7517151b9a05" title=" " alt="" coords="927,1716,1165,1757"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a41a3fd2923a0dcfcd6f0f223fbf23945" title=" " alt="" coords="639,371,833,412"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a532e0154ce9f506ed8e2a9a1306ddff4" title="Returns the list of indeces used to calculate the next iteration." alt="" coords="635,436,837,477"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a0128db5fc55504fd1fbd343065b454b8" title=" " alt="" coords="593,501,879,543"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a22b9e935d0a6fc2531cca254c39307af" title=" " alt="" coords="618,567,854,608"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a42fa0c192003a92661cad9dda0a8ee57" title=" " alt="" coords="629,684,843,725"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#afd361c3f96a9809946d940d1b38e189a" title=" " alt="" coords="642,749,830,805"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#ab74480b0fab77f171b31ae2ec7492e0c" title=" " alt="" coords="611,828,861,869"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aec200d5d7fdb3bdd7139736499a679ae" title="Unique counter for the number of graphs generated." alt="" coords="952,1651,1140,1692"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ab9435a1f708029904ab012387c5e4f13" title="Returns the level of verbosity, i.e., the amount of log that we want to print." alt="" coords="643,893,829,935"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a37f87b26bd9a229cfd84e9c487f6495a" title="Gets the pathname to the working directory." alt="" coords="641,959,831,1000"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a128db3fa9abd62cd145447442d5f8fdc" title=" " alt="" coords="643,1024,829,1065"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a1be545d680af3dd3f3bdf986662b55f4" title="Identify the task preceding the earliest non&#45;completed task and use it to create a checkpoint file." alt="" coords="617,1533,855,1575"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a1669a88512d2bd3b14cdd00235dff50a" title="Generate the next combination of fragments." alt="" coords="651,1768,821,1809"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#ac8881b46ce563ef66268cc2b7822865e" title=" " alt="" coords="611,1141,861,1183"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a8c1a03486f0b05207bce11ae61c843dd" title="Reads a list of DGraphs from a JSON file." alt="" coords="626,1207,846,1248"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a4c2f8a0f643060ecff83ca32c296d0f2" title=" " alt="" coords="639,1272,833,1313"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a946ff44ff0d38cac2969ccca11608be1" title="Set the set of indexes that identify the position of the the (next) combination of fragment in the sp..." alt="" coords="639,1337,833,1379"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a573e775177da2a08042c3f569d2c0dc5" title="Sets the starting point for the iterator." alt="" coords="621,1403,851,1444"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a2832a6b7facd6c31092e1edb237e4a5f" title=" " alt="" coords="595,1651,877,1692"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1combinatorial_1_1_c_e_b_l_utils.html#a78098828adbf6277a04188e6f82f39cf" title="Serialize all DENOPTIMGraphs to file." alt="" coords="611,240,861,281"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a39bafb4f1bdb25ae05ac2aa3e38fb440" title=" " alt="" coords="939,1936,1153,1977"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#ace2ebe3ea2faa9aefda342d15df19630" title="Returns the graphID of the original graph or of the latest cyclic alternative." alt="" coords="949,1455,1143,1496"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a4c0e6106d2a80f371826e2c803a801b9" title=" " alt="" coords="949,1520,1143,1561"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a6b805a736ff39570870f8d5435de76be" title="Returns the set of indeces that identify the position of the the (next) combination of fragment in th..." alt="" coords="949,1585,1143,1627"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a8d7e710ee1c88236eeb924be147fa23a" title="Returns the graphID of the root graph." alt="" coords="949,1324,1143,1365"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1utils_1_1_graph_utils.html#ad951e78a24210e710cba8296b67bf732" title="Unique counter for the number of molecules generated." alt="" coords="952,1389,1140,1431"/>
+</map>

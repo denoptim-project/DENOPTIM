@@ -1,0 +1,13 @@
+<map id="denoptim.graph.DGraph.appendVertexOnAP" name="denoptim.graph.DGraph.appendVertexOnAP">
+<area shape="rect" id="node1" title="Append a vertex to this graph: adds the new vertex to the list of vertices belonging to the graph,..." alt="" coords="5,71,208,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="256,19,467,46"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="271,71,452,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ab38de9f2630baab2d129b844b6968060" title="Writes the graph to JSON file." alt="" coords="266,136,457,177"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="515,5,724,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="530,71,709,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ade2d4fd20748770f8beae294ff3e5aac" title="Writes the graphs to JSON file." alt="" coords="524,136,715,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa8cbbc7dcd366e9f1053c4b2b676e0d7" title=" " alt="" coords="772,107,995,148"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="774,173,993,199"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="1043,107,1265,148"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a4aafec42bd09225870fdf330db93b84c" title=" " alt="" coords="1313,107,1519,148"/>
+</map>

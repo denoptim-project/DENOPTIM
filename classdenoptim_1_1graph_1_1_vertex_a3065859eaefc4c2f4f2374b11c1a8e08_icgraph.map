@@ -1,0 +1,4 @@
+<map id="denoptim.graph.Vertex.getPathIDs" name="denoptim.graph.Vertex.getPathIDs">
+<area shape="rect" id="node1" title="Produces a pair of strings that identify the &quot;path&quot; between two given attachment points." alt="" coords="224,5,395,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a5c018cc9952d2cac46a5d44f8bf06d8c" title="Constructs a new PathSubGraph specifying the first and last vertex of the path." alt="" coords="5,5,176,47"/>
+</map>

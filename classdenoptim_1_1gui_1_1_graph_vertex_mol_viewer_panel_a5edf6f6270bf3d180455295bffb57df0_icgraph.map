@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.visualizeVertexInNestedViewer" name="denoptim.gui.GraphVertexMolViewerPanel.visualizeVertexInNestedViewer">
+<area shape="rect" id="node1" title="Makes a clone of the given vertex and loads that clone into the nested visualization frame." alt="" coords="343,45,549,101"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#abab3007ca39f050b3b9916c4bcc994ca" title="Loads the given graph into the graph viewer." alt="" coords="45,5,255,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel_1_1_node_clicked_listener.html#a4c7c2b6e03029c1850296cda96c5d6bc" title=" " alt="" coords="5,85,295,141"/>
+</map>

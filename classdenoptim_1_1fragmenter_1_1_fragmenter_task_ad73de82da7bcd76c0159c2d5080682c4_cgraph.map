@@ -1,0 +1,25 @@
+<map id="denoptim.fragmenter.FragmenterTask.call" name="denoptim.fragmenter.FragmenterTask.call">
+<area shape="rect" id="node1" title="Performs the whatever work has to be done by this task." alt="" coords="5,569,215,611"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a263cc85b9ab1551b9ede736f9da7f21b" title="Processes all molecules analyzing the composition of the structure in the chemical representation as ..." alt="" coords="269,111,512,167"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a5dceaf88ed2df1829f77d6ec22f43a41" title=" " alt="" coords="263,220,519,261"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#aa44a043c1f8734a4fa35ca41eba674e8" title=" " alt="" coords="280,285,501,327"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#ab89ea9451a597bb25940dc080087798e" title="Removes from the structures anyone that matches any of the given SMARTS queries." alt="" coords="285,351,496,392"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#afe25e249e1296a0a0d911a41e18bb2c2" title="Performs fragmentation according to the given cutting rules." alt="" coords="286,511,495,552"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#ad312193f52098cff1378a43050403fb8" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="584,717,799,759"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#adb9ea9924ac2bb2b9d6c261839f26c4f" title="Builds the pathname of the structure file meant to hold structures that survive the comparison of str..." alt="" coords="274,628,507,669"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#a618c7dcb57386629d4996476f37e1afe" title="Builds the pathname of the structure file meant to hold fragments resulting from this task." alt="" coords="286,693,495,735"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a49cb9bef7ce9aec3bc6d7bb948e2c8ae" title=" " alt="" coords="271,759,511,800"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#a780b865a7695184525f01e1a2bc124d3" title="Builds the pathname of the structure file meant to hold structures that survive the pre&#45;filtering ste..." alt="" coords="286,824,495,865"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a6d6995ca29daca4ececec1fbf0c43663" title=" " alt="" coords="267,889,514,945"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_formula_utils.html#a01fee3c96d99631d5d1fc6e74bf95bb6" title="Compares the molecular formula formatted as from the Cambridge Structural Database (CSD) against the ..." alt="" coords="575,29,807,71"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="596,119,787,160"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a07031c5387efae1aa8c10465067293b7" title=" " alt="" coords="568,184,815,225"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3506079a3de962c32b2c715f8cea96e6" title=" " alt="" coords="568,249,815,291"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a9c0bc47eeaca313657de40ca4b1fb24b" title=" " alt="" coords="568,315,815,356"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aaffb007354a24c9fb679742e431c9980" title=" " alt="" coords="567,380,816,421"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#a79eaaa08cc9353e5ebc47066b7cc99eb" title="Close the memory&#45;efficient iterator if any is open." alt="" coords="607,445,776,487"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#a9ed0aa4606b687bc3fdeb787fd5535b1" title=" " alt="" coords="607,511,776,552"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a04cf8bea6e235a0adf12e95708d7f627" title="Writes vertexes to file." alt="" coords="864,644,1055,685"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#af5ec56eba56e5fd3898d162206d78c34" title=" " alt="" coords="607,628,776,669"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a37f87b26bd9a229cfd84e9c487f6495a" title="Gets the pathname to the working directory." alt="" coords="596,783,787,824"/>
+</map>

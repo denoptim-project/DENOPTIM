@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GUIMainPanel" name="denoptim.gui.GUIMainPanel">
+<area shape="rect" id="node1" title="The main panel is a deck of cards that occupies all the GUI frame." alt="" coords="5,80,188,107"/>
+<area shape="rect" id="node2" title=" " alt="" coords="65,5,128,32"/>
+</map>

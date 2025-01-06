@@ -1,0 +1,17 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.ChemicalObjectModel" name="denoptim.molecularmodeling.ChemicalObjectModel.ChemicalObjectModel">
+<area shape="rect" id="node1" title="Constructs a Molecule3DBuilder specifying all its features." alt="" coords="5,130,284,171"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a047d30b932c29146e81ae7b3fef90c07" title=" " alt="" coords="353,5,581,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a4a6af1c7cf4d276fbebacb62d5ab812b" title=" " alt="" coords="352,85,581,126"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#afcb7e84c46c1a2eeb445a90cb282dc83" title="Check for rings in this graph and in any graph that is embedded at any level in any vertex of this gr..." alt="" coords="376,174,557,215"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#ab0a2952925cf318fa872e349dd2709ae" title="Converts currently loaded internal coordinates into Cartesian overwriting the current XYZ." alt="" coords="332,345,601,386"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#a082a9cf3e1a0b4d17f08080d00b0d6df" title="Get the reference to the graph representation of the ring this attractor is meant to close." alt="" coords="662,13,853,54"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#a1181ea61bfd92dd5bfc3068772cce586" title="Checks whether the constructed RingClosingAttractor does corresponds to a RingClosingAttractor in the..." alt="" coords="668,85,847,126"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_template.html#a7869ba705f5898855fe68dd443721f8e" title=" " alt="" coords="663,162,851,203"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_math_utils.html#ad3885756312f8e602cc604f1b0ce62d9" title="Calculates distance between point a and point b." alt="" coords="651,228,864,255"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a2d838680c1d8eed4fe495ed1f3e03912" title="Returns the atom which has the XYZ index set to pos." alt="" coords="669,279,845,321"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#aea4ab5789d28e5f2b02ab48fd5b93292" title=" " alt="" coords="654,345,861,386"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ae597e352e57e001ca5c4bda8ab599988" title=" " alt="" coords="669,410,845,451"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#aa50eb67d7f5ca77922ec7b7b645b9f01" title="Add a vector to the Atom&#39;s current position vector." alt="" coords="669,475,845,517"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1utils_1_1_math_utils.html#a13781fc52b86d8f40dbdedba314ef9a4" title="Get normalized distance between two point." alt="" coords="649,541,865,568"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a0df417191b38fb579c03650a808efe55" title="Gets the XYZ Index." alt="" coords="913,279,1089,321"/>
+</map>

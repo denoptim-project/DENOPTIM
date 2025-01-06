@@ -1,0 +1,8 @@
+<map id="denoptim.graph.DGraph.removeSymmetryRedundantIds" name="denoptim.graph.DGraph.removeSymmetryRedundantIds">
+<area shape="rect" id="node1" title="Remove all but one of the symmetry&#45;related partners in a given list of vertex IDs." alt="" coords="5,39,208,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="268,5,447,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4395e171b2005045364f19cf8cc59763" title="Remove all but one of the symmetry&#45;related partners in a list of vertices." alt="" coords="256,71,459,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3560b051e55499bf45522a55f6219d29" title="Returns the position of the first vertex that has the given ID." alt="" coords="507,5,697,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="745,5,916,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a419f97ea0a361b122274c4eda97e3be6" title="Get an iterator for the sets of symmetrically related vertices." alt="" coords="513,71,691,112"/>
+</map>

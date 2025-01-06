@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$interfacedenoptim_1_1gui_1_1_i_vertex_a_p_selection.html" title="Interface for all vertex viewers that intend to allow selection of attachment points." alt="" coords="5,78,216,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html" title="A panel with a molecular viewer and attachment point table." alt="" coords="266,5,449,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html" title="A panel to visualize a vertex as a graph component with attachment point table." alt="" coords="264,71,451,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html" title="A panel to visualize a vertex as two&#45;dimensional chemical structure with attachment point table." alt="" coords="269,136,445,177"/>
+<area shape="rect" id="node5" title=" " alt="" coords="68,143,153,170"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html" title="A panel that collects three viewers:" alt="" coords="272,267,443,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html" title="A panel with a molecular viewer and data table." alt="" coords="268,201,447,243"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.programs.fitnessevaluator.FPRunner.cleanup" name="denoptim.programs.fitnessevaluator.FPRunner.cleanup">
+<area shape="rect" id="node1" title="clean all reference to submitted tasks" alt="" coords="560,39,789,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_p_runner.html#a8581fe2c5a66bf2682795cfa8554e2b4" title="Constructor." alt="" coords="283,5,512,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_p_runner.html#ac75c866228ee066fdfb7ecf6d35b5c30" title="Stops all subtasks and shutdown executor." alt="" coords="283,71,512,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_fitness_runner.html#a2e2e9fbbaa4e5d3ece7bd4f010435bcd" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="5,71,235,112"/>
+</map>

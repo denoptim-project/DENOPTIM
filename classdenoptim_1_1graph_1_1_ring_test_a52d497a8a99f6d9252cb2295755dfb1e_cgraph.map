@@ -1,0 +1,7 @@
+<map id="denoptim.graph.RingTest.testUndirectedComparison" name="denoptim.graph.RingTest.testUndirectedComparison">
+<area shape="rect" id="node1" title=" " alt="" coords="5,57,196,98"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_ring.html#abcf9fd414bbe992f13f0ba51b0e079b8" title="Returns the index of the first occurrence of the specified element in this ring, or &#45;1 if this list d..." alt="" coords="244,5,431,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_ring.html#aca08b208ca54c53ff946f94acbc263fb" title="Adds a vertex to the ring, in the given position." alt="" coords="250,57,425,98"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="252,122,423,163"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_ring.html#a52d320207aa3fc73898eb662e8f208cb" title="Checks whether a given vertex is part of this ring." alt="" coords="479,64,669,91"/>
+</map>

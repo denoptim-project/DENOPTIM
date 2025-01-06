@@ -1,0 +1,17 @@
+<map id="denoptim.gui.ParametersForm" name="denoptim.gui.ParametersForm">
+<area shape="rect" id="node1" title="General structure of a form for collecting input parameters of various nature." alt="" coords="695,267,889,294"/>
+<area shape="rect" id="node2" title=" " alt="" coords="259,14,321,40"/>
+<area shape="rect" id="node3" href="$interfacedenoptim_1_1gui_1_1_i_parameters_form.html" title="Interface for parameter forms." alt="" coords="191,64,389,91"/>
+<area shape="rect" id="node4" title=" " alt="" coords="249,115,331,142"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_parameters_form_1_1_field_listener.html" title=" " alt="" coords="191,166,389,208"/>
+<area shape="rect" id="node6" title=" " alt="" coords="9,174,137,200"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_parameters_form_1_1_rdb_field_change.html" title=" " alt="" coords="191,232,389,273"/>
+<area shape="rect" id="node8" title=" " alt="" coords="17,239,130,266"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_parameters_form_1_1_tab_field_change.html" title=" " alt="" coords="191,297,389,338"/>
+<area shape="rect" id="node10" title=" " alt="" coords="5,304,141,331"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_parameters_form_1_1_cmb_field_change.html" title=" " alt="" coords="191,362,389,404"/>
+<area shape="rect" id="node12" title=" " alt="" coords="20,370,127,396"/>
+<area shape="rect" id="node13" title=" " alt="" coords="211,428,369,455"/>
+<area shape="rect" id="node14" title=" " alt="" coords="249,479,331,506"/>
+<area shape="rect" id="node15" title=" " alt="" coords="264,536,316,563"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="denoptim.graph.AttachmentPoint.isAvailableThroughout" name="denoptim.graph.AttachmentPoint.isAvailableThroughout">
+<area shape="rect" id="node1" title="Check availability of this attachment point throughout the graph level, i.e., check also across the i..." alt="" coords="829,39,1012,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a25c838437e3b367bb80f8daf74a50ffe" title="Decides if an AttachmentPoint can be considered for making a ring fusion operation,..." alt="" coords="581,5,759,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a5868844d747acb9bd5331c760a24ff09" title="Compares the AttachmentPoint of two lists searching for all the APs of the second list that are &quot;comp..." alt="" coords="559,71,781,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#adf927b8dfc6e153e639fac3509e259c1" title=" " alt="" coords="282,5,463,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#ae5c8afa4b7defd6ce35df0fa1c5facf2" title="Searches for mappings between the AttachmentPoints on the two lists." alt="" coords="282,71,463,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder_test.html#a4908ea837bed3714cd5d17ba4e3954fa" title=" " alt="" coords="235,136,511,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#ada1b2c2155faeefced1d9a64f82a6668" title="Constructor that launches the search for a mapping between the AttachmentPoints on the first vertex t..." alt="" coords="5,71,187,112"/>
+</map>

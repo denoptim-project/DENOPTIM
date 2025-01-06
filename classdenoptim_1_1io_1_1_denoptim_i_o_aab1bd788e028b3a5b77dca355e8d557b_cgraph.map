@@ -1,0 +1,9 @@
+<map id="denoptim.io.DenoptimIO.readLightWeightCandidate" name="denoptim.io.DenoptimIO.readLightWeightCandidate">
+<area shape="rect" id="node1" title="Read only selected data from a GA produced items." alt="" coords="5,136,193,177"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ab0e2d1314d9babeda94e65c471832df1" title="Extract selected properties from SDF files." alt="" coords="241,5,429,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a5b0854960a04b31ce12b5d0bdbcfbad6" title=" " alt="" coords="250,71,421,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a382d6d04e131453c7c4736de583ea996" title=" " alt="" coords="250,136,421,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#aa375e204e094848126768561901a32e4" title=" " alt="" coords="250,201,421,243"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a7458628d4e902ca60749a5986a14ecc0" title="Sets level that generated this graph in a fragment space exploration experiment." alt="" coords="250,267,421,308"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a48102bb79e9cc581e8c6ef527e003b08" title="Reads a file containing multiple molecules (multiple SD format))" alt="" coords="477,5,665,47"/>
+</map>

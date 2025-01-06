@@ -1,0 +1,12 @@
+<map id="denoptim.utils.MoleculeUtils.moleculeToPNG" name="denoptim.utils.MoleculeUtils.moleculeToPNG">
+<area shape="rect" id="node1" title="Generate a PNG image from molecule mol" alt="" coords="5,237,244,279"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a58fcbd2f74b34850ddbf4d9f8b9fa06c" title="Generates 2D coordinates for the molecule." alt="" coords="292,237,536,279"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#afeb315a7590ab0ded7285e333319a195" title=" " alt="" coords="611,205,814,247"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a5b9d0a88dd69734a1c54659e07d1294a" title="Replace any PseudoAtoms representing ring closing attractors with H." alt="" coords="584,274,841,301"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a51781b0ca6eb50ceb2160e1020af04ab" title="Explore connected systems in a list of atoms and returns all the atoms that can be reached starting f..." alt="" coords="889,29,1108,71"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a27e71c4eff13a223903ab212a4f316eb" title="Generates a vector of boolean flags." alt="" coords="909,95,1089,136"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a4cd147e9f65c7826d4bf8bc295f9d5b3" title=" " alt="" coords="903,160,1094,201"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="896,315,1101,356"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="903,249,1094,291"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="1156,315,1353,356"/>
+</map>
