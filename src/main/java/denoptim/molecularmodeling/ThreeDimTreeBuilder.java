@@ -255,7 +255,7 @@ public class ThreeDimTreeBuilder
             if (iacRootVrtx == null)
             {
                 String msg = this.getClass().getSimpleName()
-                        + " found a building block daclaring "
+                        + " found a building block declaring "
                         + "to containg atoms, "
                         + "but returning null atom container. "
                         + "Building blocks: " + rootVrtx;
@@ -429,7 +429,7 @@ public class ThreeDimTreeBuilder
                              +"-"+mol.indexOf(b.getAtom(1))+" AP = "+ap+NL);
                 }
             }
-            System.out.println(sb.toString());
+            logger.log(Level.FINEST, sb.toString());
         }
         
         // Prepare the string-representation of unused APs on this graph

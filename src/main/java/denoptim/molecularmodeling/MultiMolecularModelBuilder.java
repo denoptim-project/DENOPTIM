@@ -95,6 +95,7 @@ public class MultiMolecularModelBuilder
         ChemicalObjectModel mol = build3DTree();
         long endTime = System.nanoTime();
         long time = (endTime - startTime);
+        
         logger.log(Level.FINE, "TIME (build 3D model): " + time/1000000 + " ms"
                   + " #frags: " + mol.getGraph().getVertexList().size() 
                   + " #atoms: " + mol.getIAtomContainer().getAtomCount());
@@ -229,7 +230,7 @@ public class MultiMolecularModelBuilder
      */
 
     public ChemicalObjectModel build3DTree() throws DENOPTIMException
-    {
+    {   
         // Create 3D tree-like structure
         ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, 
                 settings.getRandomizer());
