@@ -1,0 +1,4 @@
+<map id="denoptim.graph.Edge.compareAsUndirected" name="denoptim.graph.Edge.compareAsUndirected">
+<area shape="rect" id="node1" title="Compares this and another edge ignoring the directionality of both, i.e., as if both edges were undir..." alt="" coords="247,5,441,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_edge_test.html#aeb47a9169ac3c3583ac5c1c061431599" title=" " alt="" coords="5,5,199,47"/>
+</map>

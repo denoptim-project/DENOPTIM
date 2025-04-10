@@ -1,0 +1,7 @@
+<map id="denoptim.graph.Vertex.getChilddren" name="denoptim.graph.Vertex.getChilddren">
+<area shape="rect" id="node1" title="Looks into the edges that use any of the APs that belong to this vertex and returns the list of verti..." alt="" coords="5,100,176,141"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="239,5,410,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="235,71,415,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="224,137,425,163"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="225,187,425,214"/>
+</map>

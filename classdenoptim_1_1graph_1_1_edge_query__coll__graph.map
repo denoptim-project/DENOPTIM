@@ -1,0 +1,9 @@
+<map id="denoptim.graph.EdgeQuery" name="denoptim.graph.EdgeQuery">
+<area shape="rect" id="node1" title="A query for edges: a list of properties that target edges should possess in order to match this query..." alt="" coords="415,364,591,391"/>
+<area shape="rect" id="node2" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html" title="Possible chemical bond types an edge can represent." alt="" coords="542,95,745,121"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html" title=" " alt="" coords="273,229,437,256"/>
+<area shape="rect" id="node3" title=" " alt="" coords="615,5,671,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="5,95,84,121"/>
+<area shape="rect" id="node6" title=" " alt="" coords="108,95,272,121"/>
+<area shape="rect" id="node7" title=" " alt="" coords="296,95,503,121"/>
+</map>

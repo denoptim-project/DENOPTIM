@@ -1,0 +1,6 @@
+<map id="denoptim.molecularmodeling.RingClosureTool.RingClosedMolComparator.compare" name="denoptim.molecularmodeling.RingClosureTool.RingClosedMolComparator.compare">
+<area shape="rect" id="node1" title=" " alt="" coords="5,71,332,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a099d5033b4d2ee01213dc19a7569e168" title="Return the atoms overlap score which is calculated for all atoms pairs not in 1&#45;4 or lower relationsh..." alt="" coords="380,5,660,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#af8fed87c6544203b7695ff1707ede3e1" title="Return the list of RingClosures that have been identified as closable head/tail of atom chains during..." alt="" coords="383,71,657,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a1db8fce27edec2ee20af84c7d75c2def" title="Return the overal evaluation of the whole list of RingClosures." alt="" coords="383,135,657,191"/>
+</map>

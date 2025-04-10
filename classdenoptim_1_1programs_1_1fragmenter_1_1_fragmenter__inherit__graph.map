@@ -1,0 +1,6 @@
+<map id="denoptim.programs.fragmenter.Fragmenter" name="denoptim.programs.fragmenter.Fragmenter">
+<area shape="rect" id="node1" title="Tool to create fragments by chopping 2D/3D chemical structures." alt="" coords="5,229,205,271"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_program_task.html" title="Task structure for any of the main programs in the denoptim project, such as genetic algorithm and co..." alt="" coords="13,155,197,181"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="38,80,173,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="41,5,169,32"/>
+</map>

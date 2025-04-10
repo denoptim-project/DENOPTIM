@@ -1,0 +1,7 @@
+<map id="denoptim.graph.Template.isValidInnerGraph" name="denoptim.graph.Template.isValidInnerGraph">
+<area shape="rect" id="node1" title=" " alt="" coords="5,71,185,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="237,5,417,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a309d3784aeae9aedce785314e753bdc5" title="Returns the list of available attachment points contained in this graph." alt="" coords="238,71,417,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template.html#af47237c84381d97803d99a7ee16ddc63" title=" " alt="" coords="233,136,421,177"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a27e25f8f8e1516d81cc281e2795a9428" title="Returns the list of all attachment points contained in this graph." alt="" coords="469,71,648,112"/>
+</map>

@@ -1,0 +1,39 @@
+<map id="denoptim.graph.DGraph.checkConsistency" name="denoptim.graph.DGraph.checkConsistency">
+<area shape="rect" id="node1" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="5,735,200,776"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#ac31060459a0e96c5382f0e609422f178" title=" " alt="" coords="255,12,497,53"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#aa1352172290adaaf3a478ed7a90cf3fc" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="263,102,489,158"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a93693af51412000689dc7517151b9a05" title=" " alt="" coords="561,5,800,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#afcb5ae979766b07bc1347834442793aa" title="The heavy atom count." alt="" coords="578,332,783,373"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="868,405,1073,447"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a1720cc65862dcf630440ac4391a19e4a" title="Generates the InChI key for the given atom container." alt="" coords="273,539,479,580"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#afa65cd5ca21323bcc1a4c26d38f0ed55" title=" " alt="" coords="257,604,495,645"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#aad21189ae5add3f4f5794b185bc5b2b6" title=" " alt="" coords="279,669,473,711"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a69db306dd4ec24c01e82d2f5c6fe0cb6" title=" " alt="" coords="251,735,501,776"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#ab78cd9ebc918ddc3d77bb1a2d0bbba4a" title=" " alt="" coords="248,800,504,841"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a8f20219150b9fbcb4638a246e921dc1d" title=" " alt="" coords="253,865,499,907"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#aadc92a2682df451c5bdb5a184b541407" title=" " alt="" coords="250,931,502,972"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a5f26a5f6c49536d2cc8c54aae5713224" title=" " alt="" coords="273,996,479,1037"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a4c8d5b9488679451464ecc234532eb07" title="Count number of rotatable bonds." alt="" coords="273,1061,479,1103"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="283,1127,469,1168"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#a46e5563a41c18adbcee9aa60b39094fa" title="Search for ring closing vertices: vertices that contain only a RingClosingAttractor" alt="" coords="287,1192,465,1233"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a572e6936929d9decea95808edbbfd16c" title="Returns the SMILES representation of the molecule." alt="" coords="273,449,479,491"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6f8ce50f702ca94de401335a3a18d0da" title="Check if there are forbidden ends: free attachment points that are not suitable for capping and not a..." alt="" coords="285,233,467,275"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a3d187f47c0c8df855ea6a0601e95fcc0" title="Sets the flag that controls whether building blocks have to be aligned according to the AP vectors or..." alt="" coords="253,1257,499,1299"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_d_graph.html#a964c16febfae88b341e3f878856acefb" title=" " alt="" coords="291,1323,461,1364"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a47b278f84db073b1f06809f9c42cfae5" title="Check usage of APClass&#45;based approach, i.e., uses attachment points with annotated data (i...." alt="" coords="264,1388,488,1429"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="1132,372,1329,413"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8cc5143fa76686dda4a0e1e348fef03c" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="567,767,794,808"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#aebb34175897f152ed3927c27c896a4c3" title="Removes all dummy atoms and the bonds connecting them to other atoms." alt="" coords="591,565,771,607"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#afeb315a7590ab0ded7285e333319a195" title=" " alt="" coords="579,631,782,672"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="875,720,1066,761"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a5b9d0a88dd69734a1c54659e07d1294a" title="Replace any PseudoAtoms representing ring closing attractors with H." alt="" coords="552,449,809,475"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a364533d507e42ebb43dc537c0e3ad3a4" title="Sets zero implicit hydrogen count to all atoms." alt="" coords="571,500,791,541"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ab217b40e0b54cad6f9857b2103d4fd69" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="857,785,1084,827"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a4cd147e9f65c7826d4bf8bc295f9d5b3" title=" " alt="" coords="875,476,1066,517"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a51781b0ca6eb50ceb2160e1020af04ab" title="Explore connected systems in a list of atoms and returns all the atoms that can be reached starting f..." alt="" coords="861,631,1080,672"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a27e71c4eff13a223903ab212a4f316eb" title="Generates a vector of boolean flags." alt="" coords="881,541,1061,583"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a5933a7161684c3526a63b176407f059e" title=" " alt="" coords="584,136,777,177"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="587,201,774,243"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_d_graph.html#a650a0f54382fb930bf57429dd616258a" title=" " alt="" coords="591,267,770,308"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac33a29894453a78896488fa441fcbd85" title="Do not use this to make SDF representations." alt="" coords="591,71,770,112"/>
+</map>

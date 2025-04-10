@@ -1,0 +1,6 @@
+<map id="denoptim.graph.rings.ClosableChain.clone" name="denoptim.graph.rings.ClosableChain.clone">
+<area shape="rect" id="node1" title="Returns a deep&#45;copy." alt="" coords="5,71,200,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#acb85de93a153f83b791b7053c1e983ed" title="Append a link to this chain." alt="" coords="248,5,443,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#af137b5f9017e2546b9e6d7d0f31eece6" title="Constructs an empty ClosableChain." alt="" coords="248,71,443,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#ad14a482d6ac30ed79a876611c67c9fd4" title="Defined the turning point in the list of links." alt="" coords="248,136,443,177"/>
+</map>

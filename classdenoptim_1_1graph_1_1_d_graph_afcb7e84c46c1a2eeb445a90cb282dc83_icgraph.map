@@ -1,0 +1,6 @@
+<map id="denoptim.graph.DGraph.hasOrEmbedsRings" name="denoptim.graph.DGraph.hasOrEmbedsRings">
+<area shape="rect" id="node1" title="Check for rings in this graph and in any graph that is embedded at any level in any vertex of this gr..." alt="" coords="655,49,836,90"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="362,5,573,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#aa20e503a18ca493f44df861fa490c021" title="Constructs an item specifying all its features." alt="" coords="328,85,607,126"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,13,280,54"/>
+</map>

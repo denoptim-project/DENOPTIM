@@ -1,0 +1,6 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.addBond" name="denoptim.molecularmodeling.ChemicalObjectModel.addBond">
+<area shape="rect" id="node1" title="Modify the molecule adding a cyclic bond between two atoms." alt="" coords="5,71,208,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a22cd2010095f8f1a0e5fb1b29601702c" title="Add one bond by appending a pair of indeces into the z&#45;add section." alt="" coords="256,5,432,47"/>
+<area shape="rect" id="node3" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html#a3b106d49993cb7dcc1544211e8a17dfd" title=" " alt="" coords="257,71,431,112"/>
+<area shape="rect" id="node4" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html#a8be61f74c1beaa52e4a53ff70d32a614" title="Checks if it is possible to convert this edge type into a CDK bond." alt="" coords="257,136,431,177"/>
+</map>

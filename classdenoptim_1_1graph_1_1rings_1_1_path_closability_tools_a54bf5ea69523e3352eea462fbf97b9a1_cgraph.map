@@ -1,0 +1,19 @@
+<map id="denoptim.graph.rings.PathClosabilityTools.evaluateConstitutionalClosability" name="denoptim.graph.rings.PathClosabilityTools.evaluateConstitutionalClosability">
+<area shape="rect" id="node1" title="Method to evaluate the closability of a single path considering only its constitution." alt="" coords="5,475,249,531"/>
+<area shape="rect" id="node2" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html#a3b106d49993cb7dcc1544211e8a17dfd" title=" " alt="" coords="339,5,513,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#afa4e3573a7b37595993ca817af9f2da3" title=" " alt="" coords="309,70,543,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#ac7a87199e5084e72f85b854192fcdff5" title="Returns the list of edges involved." alt="" coords="341,149,511,191"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a91534bd0e3751ff4d330dfef5e2b99ad" title="Returns the vertex representing the head of the chain." alt="" coords="341,215,511,256"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="333,280,519,321"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3506079a3de962c32b2c715f8cea96e6" title=" " alt="" coords="303,345,549,387"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aea287dfe72ffc150250c8180706289bd" title=" " alt="" coords="303,411,549,452"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a6940bab85827c126d84f53b8eea6cc2f" title=" " alt="" coords="311,475,541,531"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="603,737,808,779"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#abfd8a2695e34c42566abbc3883f8e92a" title="Returns the vertex representing the tail of the chain." alt="" coords="341,607,511,648"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a181e1471235b48ddef2fa922ef35a964" title="Returns the list of verteces involved." alt="" coords="336,672,516,713"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#abf225c363ca09f229c7b0939cba3b1da" title="Method to generate the map making in relation DENOPTIMVertex ID and atom index in the IAtomContainer ..." alt="" coords="323,737,529,779"/>
+<area shape="rect" id="node15" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html#a8be61f74c1beaa52e4a53ff70d32a614" title="Checks if it is possible to convert this edge type into a CDK bond." alt="" coords="339,803,513,844"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aaffb007354a24c9fb679742e431c9980" title=" " alt="" coords="301,868,551,909"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a5b9d0a88dd69734a1c54659e07d1294a" title="Replace any PseudoAtoms representing ring closing attractors with H." alt="" coords="297,934,555,961"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="856,737,1053,779"/>
+</map>

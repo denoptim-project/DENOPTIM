@@ -1,0 +1,7 @@
+<map id="denoptim.programs.fragmenter.FragmenterParameters.setCuttingRules" name="denoptim.programs.fragmenter.FragmenterParameters.setCuttingRules">
+<area shape="rect" id="node1" title="Assigns the cutting rules loaded from the input." alt="" coords="612,43,863,84"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#a978e5b8072fc346a9c580e841a5bb201" title="Processes all parameters and initialize related objects." alt="" coords="296,8,564,49"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog.html#a0c04a0dd8ab32399789f630741562a50" title=" " alt="" coords="337,75,523,116"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph.html#a55924e2fcd5c0081af56b98766d74ee1" title=" " alt="" coords="27,5,226,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog.html#a64ab4ac8312bff57a077266658555757" title="Constructor." alt="" coords="5,70,248,126"/>
+</map>

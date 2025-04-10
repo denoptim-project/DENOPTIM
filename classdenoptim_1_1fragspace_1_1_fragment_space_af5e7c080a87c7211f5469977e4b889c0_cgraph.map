@@ -1,0 +1,6 @@
+<map id="denoptim.fragspace.FragmentSpace.getVerticesWithAPFingerprint" name="denoptim.fragspace.FragmentSpace.getVerticesWithAPFingerprint">
+<area shape="rect" id="node1" title="Returns the list of vertexes that have the specified number of AttachmentPoints with the given APClas..." alt="" coords="5,5,239,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ad1b6e3b137f82605270e95d5a23207b9" title="Returns the list of vertexes with at least one attachment point of each of the given classes." alt="" coords="287,5,505,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a274e9253fa2a75073e7fc14918e54eef" title="Returns the list of all APClasses present on this vertex." alt="" coords="553,5,724,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="772,5,943,47"/>
+</map>

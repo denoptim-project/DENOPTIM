@@ -1,0 +1,7 @@
+<map id="denoptim.programs.moldecularmodelbuilder.MMBuilderParameters.checkParameters" name="denoptim.programs.moldecularmodelbuilder.MMBuilderParameters.checkParameters">
+<area shape="rect" id="node1" title="Check all parameters." alt="" coords="5,71,280,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#aaeaf94275f1b63439850a68a244a74c2" title="Checks any of the parameter collections contained in this instance." alt="" coords="328,5,555,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4bbba7d904df2457647bfd35f1d884a1" title="Ensures a pathname does lead to an existing file or triggers an error." alt="" coords="348,71,535,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a92281036025447f0305771cc9fc798b8" title="Ensures that a parameter is not null or triggers an error." alt="" coords="348,136,535,177"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1files_1_1_file_utils.html#a16bc762b79f5033f2323fb8728593334" title=" " alt="" coords="603,71,793,112"/>
+</map>

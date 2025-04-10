@@ -1,0 +1,8 @@
+<map id="denoptim.ga.EAUtils.getPopulationSD" name="denoptim.ga.EAUtils.getPopulationSD">
+<area shape="rect" id="node1" title="Check if fitness values have significant standard deviation." alt="" coords="5,43,244,69"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aa9960d143f0848577aec0e8ee65deb12" title="Get the fitness values for the list of molecules." alt="" coords="292,5,509,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a31cf5dc53af191a60dbcdba3b1f9da6b" title="Returns the standard deviation of the numbers." alt="" coords="301,80,500,107"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_stat_utils.html#aac6cf70b1516266ef3e845d5ad4633f5" title="Computes the variance of the available values." alt="" coords="557,80,735,107"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a12ae258bebe1f3568dabdd606edd3d56" title="Returns the mean number in the numbers list." alt="" coords="783,55,973,81"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a181673167433cb8ad256d0295d76c29f" title="Returns the sum number in the numbers list." alt="" coords="1021,80,1205,107"/>
+</map>

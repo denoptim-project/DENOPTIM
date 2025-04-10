@@ -1,0 +1,11 @@
+<map id="denoptim.ga.EAUtilsTest.testMakeGraphFromFragmentationOfMol_linearities" name="denoptim.ga.EAUtilsTest.testMakeGraphFromFragmentationOfMol_linearities">
+<area shape="rect" id="node1" title=" " alt="" coords="5,194,243,250"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a559b3bd2aa8849d8d58430afcb20b016" title=" " alt="" coords="304,5,483,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="300,71,487,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b85d3e24edffe6e9cb5722718054f5b" title=" " alt="" coords="304,136,483,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="291,201,496,243"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b7c2feb2da30079318f06819e0e6761" title=" " alt="" coords="304,267,483,308"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a650a0f54382fb930bf57429dd616258a" title=" " alt="" coords="304,332,483,373"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a3f0b2b1a484099897d6170de95dff33a" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="291,421,496,463"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="544,201,741,243"/>
+</map>

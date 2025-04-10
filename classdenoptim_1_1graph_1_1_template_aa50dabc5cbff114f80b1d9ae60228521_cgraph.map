@@ -1,0 +1,13 @@
+<map id="denoptim.graph.Template.getTestTemplate" name="denoptim.graph.Template.getTestTemplate">
+<area shape="rect" id="node1" title="Method meant for devel phase only." alt="" coords="5,136,193,177"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="241,23,469,50"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="250,85,461,111"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="265,136,446,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="261,206,450,233"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_template.html#aad385a42d6afcdac25d87f9519644a00" title=" " alt="" coords="270,260,441,301"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="519,5,725,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="517,71,727,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="533,136,711,177"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="537,201,707,243"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="537,267,707,308"/>
+</map>
