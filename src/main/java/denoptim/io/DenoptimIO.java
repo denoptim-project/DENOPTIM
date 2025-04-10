@@ -2666,6 +2666,26 @@ public class DenoptimIO
         }
         return rules;
     }
+    
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Utility to trigger logging at all known levels. Useful to check what is 
+     * the effective verbosity level.
+     * @param logger
+     */
+    public static void scanLoggingLevels(Logger logger)
+    {
+        logger.log(Level.ALL, "ALL");
+        logger.log(Level.SEVERE, "SEVERE");
+        logger.log(Level.WARNING, "WARN");
+        logger.log(Level.INFO, "INFO");
+        logger.log(Level.CONFIG, "CONGIF");
+        logger.log(Level.FINE, "Fine");
+        logger.log(Level.FINER, "FINER");
+        logger.log(Level.FINEST, "FIENEST");
+    }
 
 //------------------------------------------------------------------------------
 

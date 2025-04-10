@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -36,6 +37,7 @@ import denoptim.files.FileUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.io.DenoptimIO;
 import denoptim.main.Main.RunType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.programs.denovo.GAParameters;
@@ -434,10 +436,15 @@ public abstract class RunTimeParameters
         
         if (verbosity!=0)
         {
-            logger.setLevel(verbosityTologLevel());
-            for (int iH=0; iH<logger.getHandlers().length; iH++)
+            Logger parlogger = logger;
+            while (parlogger != null) 
             {
-                logger.getHandlers()[iH].setLevel(verbosityTologLevel());
+                parlogger.setLevel(verbosityTologLevel());
+                for (Handler handler : parlogger.getHandlers()) 
+                {
+                    handler.setLevel(verbosityTologLevel());
+                }
+                parlogger = parlogger.getParent();
             }
         }
         

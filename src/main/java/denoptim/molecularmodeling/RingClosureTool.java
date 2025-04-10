@@ -150,6 +150,14 @@ public class RingClosureTool
         for (int i=0; i<mol.getRCACombinations().size(); i++)
         {
             Set<ObjectPair> rcaComb = mol.getRCACombinations().get(i);
+            if (rcaComb.isEmpty())
+            {
+                logger.log(Level.WARNING,"Attempt to close rings with "
+                        + "no compatible RCA combination. "
+                        + "This is most likely a mistake. Please, "
+                        + "make sure that ring-closing vertexes are"
+                        + "properly detected.");
+            }
             if (logger.isLoggable(Level.FINE))
             {
                 String s = "";
