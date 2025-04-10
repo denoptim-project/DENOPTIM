@@ -139,7 +139,7 @@ public class MMBuilderParameters extends RunTimeParameters
     protected String inpSDFFile;
 
     /**
-     * Pathname of ouput SDF file
+     * Pathname of output SDF file
      */
     protected String outSDFFile;
     

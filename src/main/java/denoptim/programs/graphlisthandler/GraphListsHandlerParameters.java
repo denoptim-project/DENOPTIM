@@ -207,7 +207,7 @@ public class GraphListsHandlerParameters extends RunTimeParameters
 
         if (outGraphsFile != null && FileUtils.checkExists(outGraphsFile))
         {
-            msg = "Ouput file '" + outGraphsFile + "' exists aleary!";
+            msg = "Output file '" + outGraphsFile + "' exists aleary!";
             throw new DENOPTIMException(msg);
         }
 
@@ -229,7 +229,7 @@ public class GraphListsHandlerParameters extends RunTimeParameters
             outGraphsFile = "graphListHandler.output" ;
             if (FileUtils.checkExists(outGraphsFile))
             {
-                String msg = "Ouput file '" + outGraphsFile +
+                String msg = "Output file '" + outGraphsFile +
                                                              "' exists aleary!";
                 throw new DENOPTIMException(msg);
             }

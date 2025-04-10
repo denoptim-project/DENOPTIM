@@ -408,5 +408,10 @@ runTest "t30"
 #
 runTest "t31"
 
+#
+# t32: test conversion of molecules to graphs
+#
+runTest "t32"
+
 echo "All done!"
 exit 0

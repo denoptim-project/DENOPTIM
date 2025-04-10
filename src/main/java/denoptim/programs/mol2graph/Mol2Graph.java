@@ -32,6 +32,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.EAUtils;
 import denoptim.graph.DGraph;
+import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.fragmenter.FragmenterParameters;
@@ -69,7 +70,7 @@ public class Mol2Graph extends ProgramTask
         m2gParams.checkParameters();
         m2gParams.processParameters();
         m2gParams.startProgramSpecificLogger(loggerIdentifier, false); //to STDOUT
-
+        
         List<DGraph> graphs = new ArrayList<DGraph>();
         for (int i=0; i<m2gParams.getInputMolsCount(); i++)
         {
@@ -81,7 +82,10 @@ public class Mol2Graph extends ProgramTask
                         m2gParams.getLogger(),
                         m2gParams.getScaffoldingPolicy(),
                         m2gParams.getLinearAngleLimit(),
-                        m2gParams.getFragmentSpace());
+                        m2gParams.embedRingsInTemplate(),
+                        m2gParams.getEmbeddedRingsContract(),
+                        m2gParams.getFragmentSpace(),
+                        null); // monitor is not used here
             } catch (DENOPTIMException de)
             {
                 m2gParams.getLogger().log(Level.SEVERE, "Unable to convert "

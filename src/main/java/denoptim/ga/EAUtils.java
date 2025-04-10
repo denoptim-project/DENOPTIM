@@ -980,30 +980,19 @@ public class EAUtils
                     frgParams.getCuttingRules(), settings.getLogger(),
                     frgParams.getScaffoldingPolicy(),
                     frgParams.getLinearAngleLimit(),
-                    fragSpace);
+                    frgParams.embedRingsInTemplate(),
+                    frgParams.getEmbeddedRingsContract(),
+                    fragSpace, mnt);
         } catch (DENOPTIMException de)
         {
             String msg = "Unable to convert molecule (" + mol.getAtomCount() 
-                + " atoms) to DENPTIM graph. " + de.getMessage();
+                + " atoms) to DENOPTIM graph. " + de.getMessage();
             settings.getLogger().log(Level.WARNING, msg);
         }
         if (graph == null)
         {
-            mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
             mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
             return null;
-        }
-
-        if (frgParams.embedRingsInTemplate())
-        {
-            try {
-                graph = graph.embedPatternsInTemplates(GraphPattern.RING, 
-                        fragSpace, frgParams.getEmbeddedRingsContract());
-            } catch (DENOPTIMException e) {
-                graph.cleanup();
-                mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING);
-                return null;
-            }
         }
         
         graph.setLocalMsg("INITIAL_MOL_FRAGMENTED");
@@ -1125,6 +1114,41 @@ public class EAUtils
             FragmentSpace fragSpace) 
                     throws DENOPTIMException
     {
+        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
+                scaffoldingPolicy, linearAngleLimit, false, null, 
+                fragSpace, null); 
+    }
+    
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @param linearAngleLimit the max bond angle before we start considering 
+     * the angle linear and add a linearity-breaking dummy atom.
+     * @param embedRingsInTemplates use <code>true</code> to require embedding
+     * of rings in {@link Template}s.
+     * @param ringTmplContract specifies the type of contract to give to 
+     * templates embedding rings. Can be <code>null</code>.
+     * @param fragSpace the definition of the fragment space to consider when
+     * generating fragments.
+     * @param monitor tool to keep track of events and count failures. Can be 
+     * <code>null</code>, in which case it is ignored.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+            List<CuttingRule> cuttingRules, Logger logger, 
+            ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit,
+            boolean embedRingsInTemplates, ContractLevel ringTmplContract,
+            FragmentSpace fragSpace, Monitor monitor) 
+                    throws DENOPTIMException
+    {
         // We expect only Fragments here.
         List<Vertex> fragments = FragmenterTools.fragmentation(mol, 
                 cuttingRules, logger);
@@ -1140,6 +1164,10 @@ public class EAUtils
         }
         if (fragments.size()==0)
         {
+            if (monitor!=null)
+            {
+                monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
+            }
             throw new DENOPTIMException("Fragmentation of molecule with "
                     + mol.getAtomCount() + " atoms produced 0 fragments.");
         }
@@ -1185,6 +1213,10 @@ public class EAUtils
                             .get();
                 } catch (Exception e)
                 {
+                    if (monitor!=null)
+                    {
+                        monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
+                    }
                     throw new DENOPTIMException("Cannot get largest fragment "
                             + "among " + fragments.size() + " fragments.", e);
                 }
@@ -1193,6 +1225,10 @@ public class EAUtils
         }
         if (scaffold==null)
         {
+            if (monitor!=null)
+            {
+                monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
+            }
             throw new DENOPTIMException("No fragment matches criteria to be "
                     + "identified as the " 
                     + BBType.SCAFFOLD.toString().toLowerCase() + ".");
@@ -1239,6 +1275,21 @@ public class EAUtils
                 }
             }
         }
+
+        if (embedRingsInTemplates)
+        {
+            try {
+                graph = graph.embedPatternsInTemplates(GraphPattern.RING, 
+                        fragSpace, ringTmplContract);
+            } catch (DENOPTIMException e) {
+                graph.cleanup();
+                if (monitor!=null)
+                {
+                    monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING);
+                }
+                return null;
+            }
+        }
         
         return graph;
     }
@@ -1280,14 +1331,14 @@ public class EAUtils
                     {
                         if (ringClosure)
                         {
-                            Vertex rcvI = FragmenterTools.getRCPForAP(apI,
+                            Vertex rcvI = FragmenterTools.getRCVForAP(apI,
                                     APClass.make(APClass.ATPLUS, 0, 
                                             BondType.ANY));
                             rcvI.setBuildingBlockType(BBType.FRAGMENT);
                             rcvI.setVertexId(vId.getAndIncrement());
                             graph.appendVertexOnAP(apI, rcvI.getAP(0));
                             
-                            Vertex rcvJ = FragmenterTools.getRCPForAP(apJ,
+                            Vertex rcvJ = FragmenterTools.getRCVForAP(apJ,
                                     APClass.RCACLASSMINUS);
                             rcvJ.setBuildingBlockType(BBType.FRAGMENT);
                             rcvJ.setVertexId(vId.getAndIncrement());

@@ -719,8 +719,8 @@ The following tables list all the keywords grouped according to the main functio
 | :------- | :----------- |
 |__General__  ||
 |`M2G-InputFile`| Pathname of a SDF file containing the molecules to convert into graphs. __[REQUIRED]__|
-|`GRAPHEDIT-OutputGraphs`| Pathname of a file where to put the edited graphs. __[REQUIRED]__|
-|`GRAPHEDIT-OutpotGraphsFormat`| Format of the output. Can be SDF (default) or JSON.|
+|`M2G-OutputGraphs`| Pathname of a file where to put the edited graphs. __[REQUIRED]__|
+|`M2G-OutpotGraphsFormat`| Format of the output. Can be SDF (default) or JSON.|
 Default settings apply to the fragmentation process and the management of fragments unless the corresponding `FRG-` and `FS-` keywords are found to specify custom settings (e.g., FRG-ScaffoldingPolicy, FRG-CuttingRulesFile).
 
 

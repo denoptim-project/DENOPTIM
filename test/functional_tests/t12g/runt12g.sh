@@ -31,51 +31,51 @@ exec 1>&6 6>&-
 
 #Check outcome
 nFromFragmentation=$(grep -l "INITIAL_MOL_FRAGMENTED" "$wrkDir/"RUN*/Gen0/*.sdf | wc -l)
-if [[ 34 -ne "$nFromFragmentation" ]]; then
+if [[ 36 -ne "$nFromFragmentation" ]]; then
    echo " "
-   echo "Test 't12g' NOT PASSED (Found $nFromFragmentation instead of 34 candidates build from fragmentation)"
+   echo "Test 't12g' NOT PASSED (Found $nFromFragmentation instead of 36 candidates build from fragmentation)"
    exit 1
 fi
 
 maxFitness=$(grep "^MAX:" "$wrkDir/"RUN*/Gen0/Gen0.txt | awk '{print $2}')
-if [[ "$maxFitness" != "59"* ]]; then
+if [[ "$maxFitness" != "57"* ]]; then
    echo " "
-   echo "Test 't12g' NOT PASSED (Max fitness in Gen0 is $maxFitness instead of 58*)"
+   echo "Test 't12g' NOT PASSED (Max fitness in Gen0 is $maxFitness instead of 57*)"
    exit 1
 fi
 
 minFitness=$(grep "^MIN:" "$wrkDir/"RUN*/Gen0/Gen0.txt | awk '{print $2}')
-if [[ "$minFitness" != "43"* ]]; then
+if [[ "$minFitness" != "348"* ]]; then
    echo " "
-   echo "Test 't12g' NOT PASSED (Min fitness in Gen0 is $minFitness instead of 43*)"
+   echo "Test 't12g' NOT PASSED (Min fitness in Gen0 is $minFitness instead of 348*)"
    exit 1
 fi
 
 maxFitnessMember=$(head -n 2 "$wrkDir/"RUN*/Gen0/Gen0.txt | tail -n 1 | awk '{print $1}')
-if [[ "M00000028_out.sdf" -ne "$maxFitnessMember" ]]; then
+if [[ "M00000029_out.sdf" -ne "$maxFitnessMember" ]]; then
    echo " "
-   echo "Test 't12g' NOT PASSED (Max fitness member in Gen0 is $maxFitnessMember instead of M00000028_out.sdf)"
+   echo "Test 't12g' NOT PASSED (Max fitness member in Gen0 is $maxFitnessMember instead of M00000029_out.sdf)"
    exit 1
 fi
 
 minFitnessMember=$(head -n 11 "$wrkDir/"RUN*/Gen0/Gen0.txt | tail -n 1 | awk '{print $1}')
-if [[ "M00000014_out.sdf" -ne "$maxFitnessMember" ]]; then
+if [[ "M00000033_out.sdf" -ne "$maxFitnessMember" ]]; then
    echo " "
-   echo "Test 't12g' NOT PASSED (Min fitness member in Gen0 is $minFitnessMember instead of M00000014_out.sdf)"
+   echo "Test 't12g' NOT PASSED (Min fitness member in Gen0 is $minFitnessMember instead of M00000033_out.sdf)"
    exit 1
 fi
 
 nTemplated=$(grep -l "Template" "$wrkDir/"RUN*/Gen0/*.sdf | wc -l)
-if "$nTemplated" -gt 1 ; then
+if "$nTemplated" -gt 26 ; then
    echo " "
    echo "Test 't12g' NOT PASSED (Found $nTemplated candidates with Templates)"
    exit 1
 fi
 
 nFixedStruct=$(grep -l "FIXED_STRUCT" "$wrkDir/"RUN*/Gen0/*.sdf | wc -l)
-if "$nFixedStruct" -gt 1 ; then
+if "$nFixedStruct" -gt 26 ; then
    echo " "
-   echo "Test 't12g' NOT PASSED (Found $nFixedStruct candidated with fixed-structure Templates)"
+   echo "Test 't12g' NOT PASSED (Found $nFixedStruct candidates with fixed-structure Templates)"
    exit 1
 fi
 

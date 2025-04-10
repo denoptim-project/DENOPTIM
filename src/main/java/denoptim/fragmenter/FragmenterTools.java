@@ -1297,19 +1297,21 @@ public class FragmenterTools
     
 //------------------------------------------------------------------------------
     
-    public static Vertex getRCPForAP(AttachmentPoint ap, APClass rcvApClass) 
+    public static Vertex getRCVForAP(AttachmentPoint ap, APClass rcvApClass) 
             throws DENOPTIMException
     {
         IAtomContainer mol = SilentChemObjectBuilder.getInstance()
                 .newAtomContainer();
         Point3d apv = ap.getDirectionVector();
-        mol.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(rcvApClass), 
+        mol.addAtom(new PseudoAtom(RingClosingAttractor.RCALABELPERAPCLASS.get(
+                    rcvApClass), 
                 new Point3d(
                     Double.valueOf(apv.x),
                     Double.valueOf(apv.y),
                     Double.valueOf(apv.z))));
         
         Fragment rcv = new Fragment(mol, BBType.FRAGMENT);
+        rcv.setAsRCV(true);
 
         Point3d aps = MoleculeUtils.getPoint3d(
                 ap.getOwner().getIAtomContainer().getAtom(

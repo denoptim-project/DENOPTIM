@@ -269,7 +269,7 @@ public class GraphEdParameters extends RunTimeParameters
 
         if (outGraphsFile != null && FileUtils.checkExists(outGraphsFile))
         {
-            msg = "Ouput file '" + outGraphsFile + "' exists already!";
+            msg = "Output file '" + outGraphsFile + "' exists already!";
             throw new DENOPTIMException(msg);
         }
 
@@ -292,7 +292,7 @@ public class GraphEdParameters extends RunTimeParameters
             outGraphsFile = inGraphsFile + ".mod" ;
             if (FileUtils.checkExists(outGraphsFile))
             {
-                String msg = "Ouput file '" + outGraphsFile + "' exists already!";
+                String msg = "Output file '" + outGraphsFile + "' exists already!";
                 throw new DENOPTIMException(msg);
             }
         }
