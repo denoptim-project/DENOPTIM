@@ -98,7 +98,7 @@ public class MolToGraphParametersDialog extends CuttingRulesSelectionDialog
         appendToCentralPanel(lineScaffoldingPolicy);
         
         String toolTipEmbTmpl = String.format("<html><body width='%1s'>"
-                + "Require converting ggubstrags that define ring systems into "
+                + "Require converting subgraphs that define ring systems into "
                 + "Templates that embed the subgraph of an entire ring syste. "
                 + "Ring systems that are separated by at least one acyclic "
                 + "edge are mbedded into separate Templates.</html>", 400);

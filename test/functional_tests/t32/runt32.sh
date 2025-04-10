@@ -93,7 +93,11 @@ if ! scaffoldContainsElement W graphs-2.sdf_2 ; then
   exit -1
 fi
 
+"$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-3.params" > "t32-3.log" 2>&1
+if ! checkLog t32-3.log ; then exit -1 ; fi
 
+if ! checkMatchCount '"vertexType": "Template"' graphs-3.json 1 ; then exit -1 ; fi
+if ! checkMatchCount '"isRCV": true,' graphs-3.json 2 ; then exit -1 ; fi
 
 echo "Test 't32' PASSED"
 exit 0

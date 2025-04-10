@@ -33,6 +33,7 @@ import denoptim.files.FileUtils;
 import denoptim.fragmenter.ScaffoldingPolicy;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.RunTimeParameters;
 import denoptim.programs.fragmenter.CuttingRule;
@@ -123,6 +124,26 @@ public class Mol2GraphParameters extends RunTimeParameters
     
 //-----------------------------------------------------------------------------
     
+    public boolean embedRingsInTemplate()
+    {
+        ensureFragmenterParams();
+        FragmenterParameters frgParams = (FragmenterParameters) 
+                getParameters(ParametersType.FRG_PARAMS);
+        return frgParams.embedRingsInTemplate();
+    }
+    
+//-----------------------------------------------------------------------------
+    
+    public ContractLevel getEmbeddedRingsContract()
+    {
+        ensureFragmenterParams();
+        FragmenterParameters frgParams = (FragmenterParameters) 
+                getParameters(ParametersType.FRG_PARAMS);
+        return frgParams.getEmbeddedRingsContract();
+    }
+    
+//-----------------------------------------------------------------------------
+    
     public double getLinearAngleLimit()
     {
         ensureFragmenterParams();
@@ -157,7 +178,7 @@ public class Mol2GraphParameters extends RunTimeParameters
     {
         if (!containsParameters(ParametersType.FS_PARAMS))
         {
-            setParameters(new FragmentSpaceParameters());
+            setParameters(new FragmentSpaceParameters(new FragmentSpace()));
         }
     }
     
@@ -282,7 +303,7 @@ public class Mol2GraphParameters extends RunTimeParameters
 
         if (outGraphsFile != null && FileUtils.checkExists(outGraphsFile))
         {
-            msg = "Ouput file '" + outGraphsFile + "' exists already!";
+            msg = "Output file '" + outGraphsFile + "' exists already!";
             throw new DENOPTIMException(msg);
         }
 
