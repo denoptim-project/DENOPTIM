@@ -16,7 +16,7 @@ if not exist "%JAVA_HOME%\bin\java.exe" (
 )
 
 echo Using JAVA_HOME: %JAVA_HOME%
-"%JAVA_HOME%\bin\java" -version
+cmd.exe /c "%JAVA_HOME%\bin\java" -version
 
 cmd.exe /c mvn -version
 cmd.exe /c mvn --batch-mode clean || echo ""
