@@ -1,6 +1,5 @@
 name: dnp_package_builder
 channels:
-  - defaults
   - conda-forge
 dependencies:
   - python=3.8
