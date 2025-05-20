@@ -61,7 +61,9 @@ import org.openscience.cdk.interfaces.IAtomContainerSet;
 import org.openscience.cdk.interfaces.IChemFile;
 import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.io.DefaultChemObjectReader;
 import org.openscience.cdk.io.FormatFactory;
+import org.openscience.cdk.io.IChemObjectReaderErrorHandler;
 import org.openscience.cdk.io.ISimpleChemObjectReader;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
@@ -72,6 +74,8 @@ import org.openscience.cdk.io.XYZWriter;
 import org.openscience.cdk.io.formats.CIFFormat;
 import org.openscience.cdk.io.formats.IChemFormat;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.tools.ILoggingTool;
+import org.openscience.cdk.tools.LoggingToolFactory;
 import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 import com.google.gson.Gson;
@@ -327,6 +331,8 @@ public class DenoptimIO
             FileReader fileReader = new FileReader(file);
             ReaderFactory readerFact = new ReaderFactory();
             ISimpleChemObjectReader reader = readerFact.createReader(fileReader);
+            reader.setErrorHandler(new PartlySilencedChemObjReaderErrorHandler(
+                    DefaultChemObjectReader.class));
             IChemFile chemFile = (IChemFile) reader.read(
                     (IChemObject) new ChemFile());
             results = ChemFileManipulator.getAllAtomContainers(chemFile);
@@ -352,6 +358,8 @@ public class DenoptimIO
 
         try {
             mdlreader = new MDLV2000Reader(new FileReader(new File(fileName)));
+            mdlreader.setErrorHandler(new PartlySilencedChemObjReaderErrorHandler(
+                    DefaultChemObjectReader.class));
             ChemFile chemFile = (ChemFile) mdlreader.read((ChemObject) new ChemFile());
             lstContainers.addAll(
                     ChemFileManipulator.getAllAtomContainers(chemFile));
@@ -372,6 +380,83 @@ public class DenoptimIO
         }
 
         return lstContainers;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * This differs from DefaultChemObjectReaderErrorHandler just by ignoring
+     * messages about invalid symbol. However, to achieve this result we need 
+     * to overcome the closed permission mask of 
+     * DefaultChemObjectReaderErrorHandler where the logger is private. As a 
+     * result, we have to duplicate nearly the entire class.
+     */
+    private static class PartlySilencedChemObjReaderErrorHandler implements IChemObjectReaderErrorHandler
+    {
+        private final ILoggingTool logger;
+
+        /**
+         * Constructs a new instance using a given class as the source for logging purposes.
+         *
+         * @param clazz the class for which the {@link ILoggingTool} should be constructed
+         */
+        public PartlySilencedChemObjReaderErrorHandler(final Class<?> clazz) {
+            this(LoggingToolFactory.createLoggingTool(clazz));
+        }
+
+        /**
+         * Constructs a new instance using the provided logging tool.
+         *
+         * @param logger the logger to be used for emitting log entries
+         */
+        public PartlySilencedChemObjReaderErrorHandler(final ILoggingTool logger) {
+            this.logger = logger;
+        }
+
+        @Override
+        public void handleError(String message) {
+            if (!isInvalidSymbolMessage(message)) logger.error(message);
+        }
+
+        @Override
+        public void handleError(String message, Exception exception) {
+            if (!isInvalidSymbolMessage(message)) logger.error(message, ", ", exception);
+        }
+
+        @Override
+        public void handleError(String message, int row, int colStart, int colEnd) {
+            if (!isInvalidSymbolMessage(message)) logger.error(message, ", row ", row, " column ", colStart, "-", colEnd);
+        }
+
+        @Override
+        public void handleError(String message, int row, int colStart, int colEnd, Exception exception) {
+            if (!isInvalidSymbolMessage(message)) logger.error(message + ", row ", row, " column ", colStart, "-", colEnd, ", ", exception);
+        }
+
+        @Override
+        public void handleFatalError(String message) {
+            logger.fatal(message);
+        }
+
+        @Override
+        public void handleFatalError(String message, Exception exception) {
+            logger.fatal(message + ", " + exception);
+        }
+
+        @Override
+        public void handleFatalError(String message, int row, int colStart, int colEnd) {
+            logger.fatal(message + ", row " + row + " column " + colStart + "-" + colEnd);
+        }
+
+        @Override
+        public void handleFatalError(String message, int row, int colStart, int colEnd, Exception exception) {
+            logger.fatal(message + ", row " + row + " column " + colStart + "-" + colEnd + ", " + exception);
+        }
+        
+        private boolean isInvalidSymbolMessage(String message)
+        {
+            return message.contains("invalid symbol:");
+        }
     }
     
 //------------------------------------------------------------------------------
