@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.3.0, Jan 2025_
+_Version 4.4.0, May 2025_
 
 
 [TOC]

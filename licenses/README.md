@@ -12,4 +12,3 @@ This folder collects the tools to obtain and manipulate the licenses for the lib
 	mvn license:download-licenses
 	```
 
-**WARNING:** the `licenses/dependencies` folder is cleaned by maven. Do not put any file in there, as it will be removed.

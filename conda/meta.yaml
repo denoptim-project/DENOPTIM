@@ -1,4 +1,4 @@
-{% set openjdk_version = "11.0.*" %}
+{% set openjdk_version = "17.0.*" %}
 
 package:
   name: denoptim
