@@ -1,0 +1,29 @@
+<map id="denoptim.graph.DGraph.findVertices" name="denoptim.graph.DGraph.findVertices">
+<area shape="rect" id="node1" title="Filters a list of vertices according to a query." alt="" coords="5,585,185,627"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph_1_1_edge_finder.html#ab680e7b151a5a8592f8555a589d9f6d4" title=" " alt="" coords="713,41,903,83"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_edge_query.html#aa56069e35cc44415b1efea8332199879" title=" " alt="" coords="237,95,435,136"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex_query.html#a5ff48ed0a0c4551658a06777616b1fe7" title=" " alt="" coords="233,160,439,201"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a9677d31ec5986be0e1694dfd1a184f5f" title="Calculates the level of a vertex in this graph." alt="" coords="247,225,425,267"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex_query.html#a8c647cfdd1ddac15d8c5e98e8851c17e" title=" " alt="" coords="233,291,439,332"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_edge_query.html#a4f7c8caa2f5caddabef8bc3523b9884e" title=" " alt="" coords="237,356,435,397"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_edge_query.html#aa64da4ae1c252fb8d5f6811c0a8f390e" title=" " alt="" coords="237,421,435,463"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_edge_query.html#a78e4041c8ab45209ca6a98fd3dec9ff8" title=" " alt="" coords="237,487,435,528"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_edge_query.html#a9287c527bdea64e2c4a7e144e2ff4c1c" title=" " alt="" coords="237,552,435,593"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_edge_query.html#a23d4aaf735e2654a17b699e32ce538c8" title=" " alt="" coords="237,617,435,659"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_edge_query.html#a0c850015106c4e07044c516fd0cbc99f" title=" " alt="" coords="237,683,435,724"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_vertex_query.html#a43d20b1041975cb48d6300ec1278dc5a" title=" " alt="" coords="233,748,439,789"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_vertex_query.html#aafa1d392dec14c1d08363a815ab26dfd" title=" " alt="" coords="233,813,439,855"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_vertex_query.html#addad30be404abe3f0b308a0d70d32626" title=" " alt="" coords="233,879,439,920"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_vertex_query.html#a4afcb06bb1c404ebb4e647480172b6f3" title=" " alt="" coords="233,944,439,985"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_d_graph.html#a650a0f54382fb930bf57429dd616258a" title=" " alt="" coords="247,1009,425,1051"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_vertex_query.html#a5995181e0184e1455f820df1b4f6f6b8" title=" " alt="" coords="233,1075,439,1116"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4395e171b2005045364f19cf8cc59763" title="Remove all but one of the symmetry&#45;related partners in a list of vertices." alt="" coords="235,1140,437,1181"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="1215,41,1385,83"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a2937a75fd3652481c84235742b94736b" title="Looks into the edges that use any of the APs that belong to this vertex and returns the edge that has..." alt="" coords="966,100,1137,141"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="1200,107,1400,134"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#aaf3eb72074f66c853ea40c06ac9bea0e" title="Traverse the graph until it identifies the source of the directed path reachable from the given verte..." alt="" coords="487,221,665,263"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph.html#a978d4b9f0c7e555fa1db7ed5a6af5a6c" title=" " alt="" coords="719,189,897,231"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="961,173,1141,215"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="951,239,1152,266"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph.html#a419f97ea0a361b122274c4eda97e3be6" title="Get an iterator for the sets of symmetrically related vertices." alt="" coords="487,1140,665,1181"/>
+</map>

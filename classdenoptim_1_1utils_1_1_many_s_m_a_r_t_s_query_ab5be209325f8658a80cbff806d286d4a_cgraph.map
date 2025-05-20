@@ -1,0 +1,6 @@
+<map id="denoptim.utils.ManySMARTSQuery.ManySMARTSQuery" name="denoptim.utils.ManySMARTSQuery.ManySMARTSQuery">
+<area shape="rect" id="node1" title=" " alt="" coords="5,39,233,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8cc5143fa76686dda4a0e1e348fef03c" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="281,5,508,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a364533d507e42ebb43dc537c0e3ad3a4" title="Sets zero implicit hydrogen count to all atoms." alt="" coords="285,71,505,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ab217b40e0b54cad6f9857b2103d4fd69" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="556,5,783,47"/>
+</map>

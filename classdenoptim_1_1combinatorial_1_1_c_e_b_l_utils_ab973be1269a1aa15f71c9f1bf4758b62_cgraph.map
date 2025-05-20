@@ -1,0 +1,4 @@
+<map id="denoptim.combinatorial.CEBLUtils.serializeCheckPoint" name="denoptim.combinatorial.CEBLUtils.serializeCheckPoint">
+<area shape="rect" id="node1" title="Store the checkpoint in a text file with json format." alt="" coords="5,5,275,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="323,13,541,39"/>
+</map>

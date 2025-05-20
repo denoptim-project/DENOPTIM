@@ -1,0 +1,52 @@
+<map id="denoptim.ga.GraphOperations.locateCompatibleXOverPoints" name="denoptim.ga.GraphOperations.locateCompatibleXOverPoints">
+<area shape="rect" id="node1" title="Identify crossover sites, i.e., subgraphs that can be swapped between two graphs (i...." alt="" coords="5,1767,236,1808"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a27ba99409e7aaa6b6f6f3d40737863ca" title="Here we check that the given subgraphs have a mapping that allows to swap them, and full fill any oth..." alt="" coords="290,376,521,417"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1e17e9819b88c46fdaa97587f661d907" title="Creates a new graph that corresponds to the subgraph of this graph when exploring the spanning tree f..." alt="" coords="585,29,783,71"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_template.html#a021d75b3c1a57a4fd106530cde5c083b" title="Returns the contract level of this template, i.e., to what extent the content of this template can be..." alt="" coords="590,95,778,136"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#af2525aa3773ba7f1c60697d6587f91c5" title=" " alt="" coords="595,735,773,776"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="857,1651,1027,1692"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6f0b9a42074fe224ae52cee5f5875a7c" title="Returns almost &quot;deep&#45;copy&quot; of this graph." alt="" coords="310,1258,501,1285"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5fa7a00a2017c040659c1a4a65553c87" title="Returns the branch identifier as a literal string." alt="" coords="316,1767,495,1808"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="320,1832,491,1873"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3a184063c09f54ff6798aea4dd504302" title="Gets all the children of the current vertex recursively." alt="" coords="316,1921,495,1963"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_template.html#a7869ba705f5898855fe68dd443721f8e" title=" " alt="" coords="311,1987,499,2028"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_vertex.html#a44e705b8949b0fd73763e2e92a118b78" title="Looks into the edges that use any of the APs that belong to this vertex and returns the vertex which ..." alt="" coords="599,604,769,645"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a14e367d6e7224c3c5ef6279e10ca267d" title="Returns the length of the list of edges involved in this path." alt="" coords="320,2052,491,2093"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b7c2feb2da30079318f06819e0e6761" title=" " alt="" coords="316,2117,495,2159"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4ce08e69a1405ecd454bafbe2e86e363" title="Returns the index of a vertex in the list of vertices of this graph." alt="" coords="303,2183,507,2210"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a4f66827484cc4de0ac568545fb2033c2" title="Evaluate AP class&#45;compatibility of a pair of edges with respect to crossover." alt="" coords="302,2235,509,2276"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_d_graph.html#a305c9a12afe5bb190894fcd730ef299a" title="Checks if this graph is &quot;DENOPTIM&#45;isomorphic&quot; to the other one given." alt="" coords="320,1701,491,1743"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a5d90c6e2fa30f287f8f69ed3367ccd0e" title="Given a pair of seed vertexes that define where a pair of subgraphs stars in the corresponding origin..." alt="" coords="284,2300,527,2341"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a6db61d6017ac32cdd5b12c0665270406" title="Returns true if any mapping has been found." alt="" coords="593,473,775,515"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5e4be036a7fd8299fd15e1ffb0d3e42f" title="Identify the oldest ancestor (i.e., most great grandparent) in the given collection." alt="" coords="595,539,773,580"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a2937a75fd3652481c84235742b94736b" title="Looks into the edges that use any of the APs that belong to this vertex and returns the edge that has..." alt="" coords="599,343,769,384"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="842,350,1042,377"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6e658646bb7be49c4deea6fc892150ee" title="Searches for all AttachmentPoints that represent the interface between a subgraph,..." alt="" coords="595,160,773,201"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3334159ed57d53d1e29bd34f31bfc9a4" title="Returns the list of rings that include the given vertex in their fundamental cycle." alt="" coords="595,277,773,319"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph.html#acb7416edd218ba143cb316e4b363ccc6" title="Searches for all AttachmentPoints that are owned by vertices in a subgraph but either available or us..." alt="" coords="595,408,773,449"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_d_graph.html#afb3a5b3a5e8d74babc82474f8458b91f" title="Checks if this graph is &quot;DENOPTIM&#45;isostructural&quot; to the other one given." alt="" coords="599,669,769,711"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a58811a9ea75a26abffc1a9c7c2b22741" title="Returns the vertex that is in the given position of the list of vertices belonging to this graph." alt="" coords="853,29,1031,71"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="857,604,1027,645"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="597,1192,771,1233"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_ring.html#a26caae2f4e91d37ffb2f7f3becd97a8e" title="Append a DENOPTIMVertex to the list." alt="" coords="584,1258,784,1285"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="592,1309,776,1335"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8c53e13b64166fc85fc9a7787dadd46b" title=" " alt="" coords="582,1359,786,1386"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a774671253396558cf35ab75613762174" title="Returns the bond type preferred by this attachment point as defined by the APClass,..." alt="" coords="594,1411,774,1452"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="599,800,769,841"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="599,1476,769,1517"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="595,1541,773,1583"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_ring.html#a4d36b4964430194b787e708d47b00af5" title="Set the bond type (i.e., bond order) of the chord connecting the head and the tail vertices." alt="" coords="575,1607,793,1634"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph.html#a30bfc345b743b8859c842b3b4e3ca5fa" title=" " alt="" coords="595,865,773,907"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_d_graph.html#a421ce3718c62761e49a4dd4d0f20682c" title=" " alt="" coords="595,931,773,972"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_d_graph.html#af5cb07ab0686739e6e1713da9d8959c1" title=" " alt="" coords="595,996,773,1037"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5126283bcf1434c3366ea17bfac2c55f" title=" " alt="" coords="595,1061,773,1103"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5c72d2f8c10e05c4bf58de3ccce6522c" title=" " alt="" coords="595,1127,773,1168"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1b6ffe09345affdaf53651dfbdbb691b" title="Returns the branch identifier." alt="" coords="595,1825,773,1867"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_d_graph.html#a70aeea1a1fe35ea9fe5a49a147e76f1a" title=" " alt="" coords="595,1921,773,1963"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="852,669,1032,711"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="841,553,1043,579"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_edge.html#a79f950d1cffe6e323eadc8cd36079841" title=" " alt="" coords="593,2169,775,2211"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_edge.html#a662733a6744a63aec552a1cc2685d468" title=" " alt="" coords="593,2235,775,2276"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a12ddb416c705a90f1e9bccb1b0de2749" title="Check compatibility as defined in the compatibility matrix considering this AP as source and the othe..." alt="" coords="595,2300,773,2341"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1simplified_1_1_undirected_edge.html#ac7a25cc7fa015aee01be6566b4ba19f5" title=" " alt="" coords="599,1760,769,1801"/>
+</map>

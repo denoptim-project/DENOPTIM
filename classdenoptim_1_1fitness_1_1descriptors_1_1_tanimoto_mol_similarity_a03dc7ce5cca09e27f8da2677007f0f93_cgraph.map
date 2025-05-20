@@ -1,0 +1,7 @@
+<map id="denoptim.fitness.descriptors.TanimotoMolSimilarity.calculate" name="denoptim.fitness.descriptors.TanimotoMolSimilarity.calculate">
+<area shape="rect" id="node1" title=" " alt="" coords="5,104,211,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#ada8ae2ee4869ed795708ce8c1231e030" title=" " alt="" coords="259,5,531,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#ab8ec5792a8cdce2c5609fa853af8e4a4" title="Gets the parameterNames attribute of the TanimotoMolSimilarity object." alt="" coords="259,71,532,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#acb3139ac9681cdc01b49d176c61c85c2" title=" " alt="" coords="276,136,515,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#a8d412be332465a382ebad8d6b00287c2" title="Get the specification attribute of Tanimoto molecular similarity." alt="" coords="273,201,518,243"/>
+</map>

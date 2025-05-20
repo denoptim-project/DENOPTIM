@@ -1,0 +1,4 @@
+<map id="denoptim.fitness.Variable.setSMARTS" name="denoptim.fitness.Variable.setSMARTS">
+<area shape="rect" id="node1" title="Set the list of smarts used to identify atom/bond&#45;specific values." alt="" coords="252,5,439,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1_variable.html#a1b027b792398027934078f778091a7dc" title="Returns an atom specific variable, i.e., a variable the value of which needs to be obtained from the ..." alt="" coords="5,5,204,47"/>
+</map>

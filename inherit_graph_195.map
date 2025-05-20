@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,64,84,91"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1exception_1_1_d_e_n_o_p_t_i_m_exception.html" title=" " alt="" coords="132,5,393,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_undetected_file_format_exception.html" title="Exception thrown when the format of a file is not recognized." alt="" coords="177,57,348,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_exception.html" title="Exceptions resulting from a failure of Tinker." alt="" coords="175,122,351,163"/>
+</map>

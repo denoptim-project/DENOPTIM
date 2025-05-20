@@ -1,0 +1,8 @@
+<map id="denoptim.programs.fragmenter.FragmenterParameters.checkParameters" name="denoptim.programs.fragmenter.FragmenterParameters.checkParameters">
+<area shape="rect" id="node1" title="Evaluate consistency of input parameters." alt="" coords="5,104,265,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#aaeaf94275f1b63439850a68a244a74c2" title="Checks any of the parameter collections contained in this instance." alt="" coords="313,5,540,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4bbba7d904df2457647bfd35f1d884a1" title="Ensures a pathname does lead to an existing file or triggers an error." alt="" coords="333,71,520,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#af8e9bb9f4aa35ba2f1c8284cc5051c29" title="Ensures a pathname is not empty nor null and that it does lead to an existing file or triggers an err..." alt="" coords="319,136,534,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#aa017c76256ef57e48199cd32df47441d" title="Ensures that a parameter is a positive number (x&gt;=0) or triggers an error." alt="" coords="332,201,521,243"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1files_1_1_file_utils.html#a16bc762b79f5033f2323fb8728593334" title=" " alt="" coords="588,104,779,145"/>
+</map>

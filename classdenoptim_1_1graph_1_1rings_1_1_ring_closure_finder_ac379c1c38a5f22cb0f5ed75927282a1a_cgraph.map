@@ -1,0 +1,6 @@
+<map id="denoptim.graph.rings.RingClosureFinder.hasClosableRotamer" name="denoptim.graph.rings.RingClosureFinder.hasClosableRotamer">
+<area shape="rect" id="node1" title="Scan rotatable space looking for conformations that satisfy closability condition." alt="" coords="5,63,231,104"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure.html#a195a0d2736b579d139500a36eeee7480" title="Evaluate closability by comparing the distances and the dot product with the given critera." alt="" coords="291,29,461,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_finder.html#a07eef6f45a5828caaa382d5036bfd110" title="Method for reporting a path of atoms (list of points) as SDF file." alt="" coords="279,95,473,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="521,95,712,136"/>
+</map>

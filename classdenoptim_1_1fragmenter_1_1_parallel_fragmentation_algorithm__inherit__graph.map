@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.ParallelFragmentationAlgorithm" name="denoptim.fragmenter.ParallelFragmentationAlgorithm">
+<area shape="rect" id="node1" title="Fragments a list of chemical systems by running parallel fragmentation tasks." alt="" coords="27,95,214,136"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html" title="Runs tasks parallel in asynchronous fashion." alt="" coords="5,5,236,47"/>
+</map>

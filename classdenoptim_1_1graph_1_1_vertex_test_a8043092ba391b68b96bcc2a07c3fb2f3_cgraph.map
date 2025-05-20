@@ -1,0 +1,11 @@
+<map id="denoptim.graph.VertexTest.testGetAPsWithAPClassStartingWith" name="denoptim.graph.VertexTest.testGetAPsWithAPClassStartingWith">
+<area shape="rect" id="node1" title=" " alt="" coords="5,68,221,109"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="269,14,497,41"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a1216cb8f6b46cacde0ed8edf0b6e8b16" title="Finds only APs that have APClass starting with the given string." alt="" coords="286,68,481,109"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="284,158,483,185"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="545,5,752,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="563,71,734,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="560,151,737,192"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="800,117,977,159"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="800,183,977,224"/>
+</map>

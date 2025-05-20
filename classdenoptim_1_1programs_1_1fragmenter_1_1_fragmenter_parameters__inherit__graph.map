@@ -1,0 +1,4 @@
+<map id="denoptim.programs.fragmenter.FragmenterParameters" name="denoptim.programs.fragmenter.FragmenterParameters">
+<area shape="rect" id="node1" title="Parameters controlling execution of the fragmenter." alt="" coords="5,95,205,136"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html" title="Collection of parameters controlling the behavior of the software." alt="" coords="12,5,199,47"/>
+</map>

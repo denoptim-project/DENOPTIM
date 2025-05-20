@@ -1,0 +1,4 @@
+<map id="denoptim.graph.APClass.isCPMapCompatibleWith" name="denoptim.graph.APClass.isCPMapCompatibleWith">
+<area shape="rect" id="node1" title="Check compatibility as defined in the compatibility matrix considering this AP as source and the othe..." alt="" coords="5,5,183,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ada04f68d55f8ff85345e2a6c6d1ad840" title="Returns a list of APClasses compatible with the given APClass." alt="" coords="231,5,441,47"/>
+</map>

@@ -1,0 +1,18 @@
+<map id="denoptim.graph.DGraph.sameAs" name="denoptim.graph.DGraph.sameAs">
+<area shape="rect" id="node1" title="Compare this and another graph ignoring the vertex IDs." alt="" coords="5,363,213,390"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6691d1a16abf0588873c4b7085696b4c" title="Compares graphs by spanning vertices starting from the given vertex and following the direction of ed..." alt="" coords="261,29,472,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a559b3bd2aa8849d8d58430afcb20b016" title=" " alt="" coords="277,95,456,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b85d3e24edffe6e9cb5722718054f5b" title=" " alt="" coords="277,160,456,201"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa97f94be30bcd2895a615904c741f4f8" title=" " alt="" coords="277,225,456,267"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3334159ed57d53d1e29bd34f31bfc9a4" title="Returns the list of rings that include the given vertex in their fundamental cycle." alt="" coords="277,291,456,332"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16fdf30d1117873f1c441f15b354a9e2" title="Returns the number of symmetric sets of vertices." alt="" coords="277,356,456,397"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#aadd56400d6e58931401e88dd814de705" title="Returns the set of vertexes symmetric to the given one." alt="" coords="277,421,456,463"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#a419f97ea0a361b122274c4eda97e3be6" title="Get an iterator for the sets of symmetrically related vertices." alt="" coords="277,487,456,528"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph.html#a58811a9ea75a26abffc1a9c7c2b22741" title="Returns the vertex that is in the given position of the list of vertices belonging to this graph." alt="" coords="277,552,456,593"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b7c2feb2da30079318f06819e0e6761" title=" " alt="" coords="277,617,456,659"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph.html#a71bdb31d9dd3cc65d3f3e58a0ba87cc2" title=" " alt="" coords="271,683,463,724"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_ring.html#a97b3268c5abcf3b28c8bb00251408de8" title=" " alt="" coords="523,595,714,636"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_ring.html#a846516d883b41bd5877172be18265a1d" title=" " alt="" coords="526,661,711,687"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_ring.html#a1a0f7fdd78989d61817dbb85b621ce71" title=" " alt="" coords="528,712,709,753"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_ring.html#a306c459210e60f0133d0b3549a531a6c" title=" " alt="" coords="520,777,717,819"/>
+</map>

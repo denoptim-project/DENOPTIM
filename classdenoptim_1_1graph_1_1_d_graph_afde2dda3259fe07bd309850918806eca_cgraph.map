@@ -1,0 +1,8 @@
+<map id="denoptim.graph.DGraph.dfsEncodePaths" name="denoptim.graph.DGraph.dfsEncodePaths">
+<area shape="rect" id="node1" title="Performs a depth&#45;first search (DFS) starting from a given Vertex to encode paths in the graph." alt="" coords="5,100,184,141"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="242,5,422,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="247,71,417,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="232,137,432,163"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a40c6f81a4ae2e75b4190b4f2d8786107" title="Produces a human readable, short string to represent the vertex by its vertex ID, building block ID (..." alt="" coords="250,188,414,229"/>
+<area shape="rect" id="node6" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_b_b_type.html#a56c398edbab7c08675d68448afeb42ac" title=" " alt="" coords="480,188,693,229"/>
+</map>

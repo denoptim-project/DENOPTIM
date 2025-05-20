@@ -1,0 +1,17 @@
+<map id="denoptim.gui.ButtonsBar.add" name="denoptim.gui.ButtonsBar.add">
+<area shape="rect" id="node1" title=" " alt="" coords="601,209,788,235"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#a4bc183818810a26037080b47f082b9af" title="Initialize the panel and add buttons." alt="" coords="324,15,520,56"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="297,90,547,117"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#aa30815ac9aa8f815fd24c115afaabd62" title="Initialize the panel and add buttons." alt="" coords="291,151,553,178"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#ad63012fa4fa9bec2e54ce86425039186" title="Initialize the panel and add buttons." alt="" coords="294,209,550,235"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare.html#a8a63383bbabdfbda99d36e6dbd9c390e" title="Initialize the panel with tabbedPane and buttons." alt="" coords="314,267,530,294"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_g_u_i_text_reader.html#ac894756b8366d8eab2cf772846f03002" title="Initialize the panel and add buttons." alt="" coords="303,333,541,359"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="291,390,553,417"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#ab550b03594a5843183d6f925e66d444b" title="Constructor." alt="" coords="5,5,243,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="21,71,227,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#aa4cc9386cd3e91865c486ba914af789d" title="Constructor." alt="" coords="16,136,232,177"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#aefffdc97385f7a524badf71808a3053b" title="Constructor." alt="" coords="19,201,229,243"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare.html#a429aa206246e784daacd7308e908f6af" title="Constructor." alt="" coords="39,267,209,308"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_g_u_i_text_reader.html#a41aa0eb6909339c281fbc30b1c13ec98" title="Constructor." alt="" coords="29,332,219,373"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="16,397,232,439"/>
+</map>

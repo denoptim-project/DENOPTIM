@@ -1,0 +1,20 @@
+<map id="denoptim.ga.GraphOperations.getFragmentForClosableChain" name="denoptim.ga.GraphOperations.getFragmentForClosableChain">
+<area shape="rect" id="node1" title="Method to select fragments that increase the likeliness of generating closable chains." alt="" coords="5,365,220,407"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations_1_1_frag_for_closab_chains.html#ae2f414dbc4a886ba7ab7cdd8e521fbb1" title=" " alt="" coords="268,5,523,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_chain_link.html#a4abe55a728c3ebd6366081c060d0a2ea" title=" " alt="" coords="307,71,484,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_chain_link.html#a9ef03c9120888fbd5859646d06786f1c" title=" " alt="" coords="307,136,484,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="310,201,481,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="310,267,481,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1rings_1_1_chain_link.html#ada8ed0b13730ab295eb1d0cff2b660c4" title=" " alt="" coords="307,332,484,373"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1rings_1_1_chain_link.html#a22ada7777c4665cbe71df26caa560d54" title=" " alt="" coords="307,397,484,439"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a44e705b8949b0fd73763e2e92a118b78" title="Looks into the edges that use any of the APs that belong to this vertex and returns the vertex which ..." alt="" coords="310,565,481,607"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_edge.html#a9696d3ee0d321b73b06d33bcb8fa86fd" title=" " alt="" coords="288,514,503,541"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_edge.html#a5575d6b605dda2f40a16556a163c46da" title=" " alt="" coords="289,463,502,490"/>
+<area shape="rect" id="node17" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_b_b_type.html#a98d45f9fb02ed946e4d2600d731dc0ca" title="Translates the integer into the enum." alt="" coords="271,631,520,658"/>
+<area shape="rect" id="node18" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_b_b_type.html#a56c398edbab7c08675d68448afeb42ac" title=" " alt="" coords="289,683,502,724"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="820,555,991,596"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="581,507,761,548"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="571,623,772,650"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="571,573,771,599"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="586,441,757,483"/>
+</map>

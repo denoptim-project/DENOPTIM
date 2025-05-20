@@ -1,0 +1,18 @@
+<map id="denoptim.fragspace.FragmentSpace.getFragAPsCompatibleWithTheseAPs" name="denoptim.fragspace.FragmentSpace.getFragAPsCompatibleWithTheseAPs">
+<area shape="rect" id="node1" title="Searches for all APs that are compatible with the given list of APs." alt="" coords="5,285,288,326"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a464680d8b4e470182a7d2f0acb8c4ef0" title="Search for a specific AP on a specific fragment and finds out its class." alt="" coords="361,187,566,229"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#aaaa217589db4cadd603478f2026a0480" title="Returns the list of attachment points found in the fragment space and that are compatible with a give..." alt="" coords="336,350,591,391"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_id_fragment_and_a_p.html#adf2b5d0397410451714ec39348336089" title=" " alt="" coords="642,23,846,65"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="659,89,829,130"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a492683049dc687fcdc41b43051d30554" title="Returns a clone of the requested building block." alt="" coords="647,154,841,195"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1fragspace_1_1_id_fragment_and_a_p.html#ad63dd7a75f57e164d33d6d84479f261e" title=" " alt="" coords="642,219,846,261"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1fragspace_1_1_id_fragment_and_a_p.html#a39900b3436a1150e228c236bb4aa6864" title=" " alt="" coords="642,285,846,326"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="899,5,1083,32"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="906,57,1077,98"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="898,122,1085,163"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="897,187,1085,229"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="906,253,1077,294"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex.html#a29e20c43a6110fbaac6cc86c216fe143" title=" " alt="" coords="906,318,1077,359"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ada04f68d55f8ff85345e2a6c6d1ad840" title="Returns a list of APClasses compatible with the given APClass." alt="" coords="639,350,849,391"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a4cefb29c13191752b0ec529c5774fcb1" title="Returns the list of attachment points with the given class." alt="" coords="647,415,841,457"/>
+</map>

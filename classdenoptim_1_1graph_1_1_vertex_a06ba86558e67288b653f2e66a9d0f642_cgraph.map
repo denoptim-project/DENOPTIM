@@ -1,0 +1,13 @@
+<map id="denoptim.graph.Vertex.parseVertexFromSDFFormat" name="denoptim.graph.Vertex.parseVertexFromSDFFormat">
+<area shape="rect" id="node1" title="Created a Vertex from the SDF representation, i.e., from an IAtomContainer." alt="" coords="5,159,191,200"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a9e929305eb2d84df0e8dbf73fc2eb325" title="Processes an IAtomContainer and builds a Vertex that is an instance of Fragment." alt="" coords="244,68,440,109"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#aaac79f0c3bbeeb57790d23dd57332a6f" title=" " alt="" coords="239,137,445,163"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="257,188,427,229"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="257,253,427,295"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="790,5,961,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a514b89b11dff8939e74e5b95e749b703" title=" " alt="" coords="519,35,690,76"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a5dbac662f4102558f3cf874c55174c5e" title=" " alt="" coords="519,100,690,141"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a3e85cb26bb2f36407e309e41880ef191" title=" " alt="" coords="493,165,716,207"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="764,165,987,207"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a4aafec42bd09225870fdf330db93b84c" title=" " alt="" coords="1035,165,1240,207"/>
+</map>
