@@ -10,6 +10,8 @@ fi
 cd "$SRC_DIR"
 mkdir -p "$PREFIX/lib" "$PREFIX/bin"
 
+mvn -version
+
 mvn clean package 
 
 # Install

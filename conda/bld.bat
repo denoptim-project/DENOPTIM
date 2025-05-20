@@ -1,5 +1,6 @@
 cd "%SRC_DIR%"
 
+cmd.exe /c mvn -version
 cmd.exe /c mvn --batch-mode clean || echo ""
 cmd.exe /c mvn --batch-mode package || echo ""
 
