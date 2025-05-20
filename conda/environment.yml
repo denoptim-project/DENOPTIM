@@ -3,5 +3,6 @@ channels:
   - defaults
 dependencies:
   - python=3.8
+  - openjdk=17.*
   - anaconda-client
   - conda-build
