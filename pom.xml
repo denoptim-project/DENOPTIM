@@ -4,7 +4,7 @@
   <artifactId>denoptim</artifactId>
 
 
-  <version>4.4.0</version>
+  <version>4.4.1</version>
   <!-- WARNING: the vesion must be changes also in doc/user_manual.md-->
 
   <name>denoptim</name>
@@ -43,7 +43,7 @@
     <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.17.0</version>
+        <version>3.18.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
     <dependency>
@@ -162,7 +162,7 @@
     <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
-        <version>6.2.7</version>
+        <version>6.2.11</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.github.dpaukov/combinatoricslib3 -->
     <dependency>
