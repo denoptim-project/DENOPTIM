@@ -1,0 +1,6 @@
+<map id="denoptim.graph.Fragment.is3D" name="denoptim.graph.Fragment.is3D">
+<area shape="rect" id="node1" title="Checks if atoms and APs contained in this fragment have non&#45;zero 3D coordinates." alt="" coords="5,56,203,83"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a4babe43e60f32e990179be8dfe96e38e" title=" " alt="" coords="254,5,461,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_math_utils.html#ad3885756312f8e602cc604f1b0ce62d9" title="Calculates distance between point a and point b." alt="" coords="251,56,464,83"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment.html#a366dfaf65191c724b8e393b9d9dc899f" title=" " alt="" coords="263,107,452,149"/>
+</map>

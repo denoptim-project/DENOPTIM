@@ -1,0 +1,7 @@
+<map id="denoptim.molecularmodeling.ThreeDimTreeBuilder" name="denoptim.molecularmodeling.ThreeDimTreeBuilder">
+<area shape="rect" id="node1" title="Tool to build build three&#45;dimensional (3D) tree&#45;like molecular structures from DGraph." alt="" coords="105,184,295,225"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,95,144,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="169,95,231,121"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="256,95,429,121"/>
+<area shape="rect" id="node5" title=" " alt="" coords="281,5,404,32"/>
+</map>

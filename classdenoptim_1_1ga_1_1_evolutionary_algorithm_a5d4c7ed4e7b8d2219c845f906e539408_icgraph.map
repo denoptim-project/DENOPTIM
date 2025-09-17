@@ -1,0 +1,11 @@
+<map id="denoptim.ga.EvolutionaryAlgorithm.stopRun" name="denoptim.ga.EvolutionaryAlgorithm.stopRun">
+<area shape="rect" id="node1" title=" " alt="" coords="741,104,907,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="498,5,677,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a9fb2a04ced0e58e85f666da8ab68aaa5" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="496,71,679,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="494,136,681,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_external_cmds_listener.html#a252e1a6342524c0dc6fc467c43966655" title=" " alt="" coords="481,201,693,243"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="263,71,429,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,39,211,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,104,198,145"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_external_cmds_listener.html#ac0a246d13b23cb71a502e42ed5d5bda7" title="Starts listening for events and keeps listening in its own thread." alt="" coords="259,201,433,243"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.gui.Utils.getTempFile" name="denoptim.gui.Utils.getTempFile">
+<area shape="rect" id="node1" title="Returns the pathname to a tmp file." alt="" coords="5,55,205,81"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#abb578573334c0bc633d537d987223e63" title="Check whether we can write and read to a given pathname." alt="" coords="475,47,651,89"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1files_1_1_file_utils.html#ae2209fbdfdcf1fdf0499e32989b057b5" title="Looks for a writable location where to put temporary files and returns an absolute pathname to the fo..." alt="" coords="253,77,427,118"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="703,29,913,56"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="699,80,917,107"/>
+</map>

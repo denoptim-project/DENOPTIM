@@ -1,0 +1,10 @@
+<map id="denoptim.gui.GAParametersForm.importParametersFromDenoptimParamsFile" name="denoptim.gui.GAParametersForm.importParametersFromDenoptimParamsFile">
+<area shape="rect" id="node1" title="Imports parameters from a properly formatted parameters file." alt="" coords="5,63,248,119"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a32d73057266a7b76fdf463cbf4400547" title=" " alt="" coords="297,5,524,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_parameters_form.html#aa73e9df9398e76e8f146f8b70e4a468c" title="Shown a warning dialog that informs the user about having found text that is not present in the Param..." alt="" coords="296,71,525,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#a2e63957f5d08fb45f9a5fb3fbf5882a0" title=" " alt="" coords="309,136,512,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#a44e653526253cfea892611376a7fa3bb" title=" " alt="" coords="573,136,773,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a4488a01992b7a7f2cda6f3aa7baa25ab" title=" " alt="" coords="821,93,1036,149"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#acf42fcadab45800cf712361cc025ffbb" title="Calculated the crowding probability for a given level of crowdedness." alt="" coords="821,172,1036,213"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a41e3b62363bfa04f372d094483eee83f" title="Calculated a probability given parameters defining the shape of the probability function and a single..." alt="" coords="1084,179,1304,206"/>
+</map>

@@ -1,0 +1,52 @@
+<map id="denoptim.fragspace.FragmentSpaceParameters.getFragmentSpace" name="denoptim.fragspace.FragmentSpaceParameters.getFragmentSpace">
+<area shape="rect" id="node1" title=" " alt="" coords="927,1270,1165,1311"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a649892c4a2b1d4ccd2f97cae6dd7ed98" title=" " alt="" coords="618,79,850,121"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="299,43,533,85"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8357317053a9158e81f78ffe6bd65688" title="Generates a candidate by fragmenting a molecule and generating the graph that reconnects all fragment..." alt="" coords="307,131,525,173"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="331,327,501,369"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad3d2daeb11e68a356e971ca1846596b5" title=" " alt="" coords="331,262,501,303"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="331,423,501,465"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a87ea0ad600ad26e1a89a4947abcfef86" title="Graph construction starts with selecting a random core/scaffold." alt="" coords="649,197,819,238"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph.html#ac1e5c9703afc6f29fe11cca08ddb1a1c" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="319,554,513,595"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#adcd462866e3f9d6a2a6ef0385807807e" title="Generate graphs by exploring all combination of fragments at a given level of a growing graph." alt="" coords="291,693,541,749"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_fitness_evaluation_task.html#a916d0f71da568a6824263a70b3d3ad4a" title=" " alt="" coords="589,831,879,873"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a638180fb98641b836237e670cf214441" title="Check if there are forbidden ends: free attachment points that are not suitable for capping and not a..." alt="" coords="647,897,821,938"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#afa4835767d37078abce9e3fbe5fa16e1" title="Constructs a new factory for generating all the combination of fragments that can be attached on a gi..." alt="" coords="613,961,855,1017"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#a28d48b83380c4dd412104dd8d7a972fa" title=" " alt="" coords="601,1041,867,1082"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a59614b27e9b449fd776e31b7c2fdb492" title="Constructor." alt="" coords="629,1106,839,1147"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6f8ce50f702ca94de401335a3a18d0da" title="Check if there are forbidden ends: free attachment points that are not suitable for capping and not a..." alt="" coords="643,583,825,625"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph.html#a7a4743d014e860237f4b20703ef9779b" title="Evaluates the possibility of closing rings in this graph and generates all alternative graphs resulti..." alt="" coords="631,1171,837,1213"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1gui_1_1_f_s_params_dialog.html#ae39602275c1287e6916f7693a0824b08" title="Reads all the parameters, calls the interpreters, and eventually creates the static FragmentSpace obj..." alt="" coords="619,1237,849,1278"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a1669a88512d2bd3b14cdd00235dff50a" title="Generate the next combination of fragments." alt="" coords="649,701,819,742"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#ab222efa0ae1a954ba00305d123484264" title=" " alt="" coords="631,1302,837,1343"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a45d4e9ec6a308aa73891efa1d501dd5e" title="Perform fitness&#45;based, class&#45;compatible selection of parents that can do crossover operations." alt="" coords="623,481,845,508"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a0c851972015fbb4b2a317b053b8b81d9" title="Mutates the given vertex according to the given mutation type, if possible." alt="" coords="614,1367,854,1409"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1ga_1_1_population.html#a61b4df049189c95349aec0e4fb292c66" title=" " alt="" coords="624,1433,844,1460"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#a3c2407eb1204a7b25600d3d347d98447" title=" " alt="" coords="628,1485,840,1526"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="633,1550,835,1591"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a6931f6dd235b0cf3c2fe974797e24857" title=" " alt="" coords="643,1639,825,1681"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a1ddb932d4618434d435e4f85ce5e5eb5" title="Evaluates the possibility of closing rings in a given graph and if any ring can be closed,..." alt="" coords="647,314,821,355"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a2832a6b7facd6c31092e1edb237e4a5f" title=" " alt="" coords="593,766,875,807"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1ga_1_1_population_test.html#a5db0672054a9fc1dbc923310732fdb3a" title=" " alt="" coords="631,1705,837,1746"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a6f2ce8f6a8319b39440b0dc43ede061f" title="Check that the following graph&#39;s fused ring gets added to the fragment library." alt="" coords="595,1769,873,1825"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a56ef448997df677c5ce4a73737f127e2" title="Checks that a graph with a fused ring containing a scaffold vertex is added to the scaffold library." alt="" coords="599,1849,869,1905"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a7555fcdf60b6fabae0c95844f351fc6f" title=" " alt="" coords="601,1929,867,1970"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ae884d9d970bc9d561dad00bf0c20b4b5" title=" " alt="" coords="611,1993,857,2049"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a2ba7718688486212e987638aef444bad" title=" " alt="" coords="611,2073,857,2129"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab95d03f36f68718eb1cc11fac188401f" title=" " alt="" coords="605,2153,863,2209"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a7179e27179c0bbe5a8ae101a9aa8e3d8" title=" " alt="" coords="613,2233,855,2274"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab9575d2419ec5b1e4ec532a1214ed718" title=" " alt="" coords="613,2297,855,2353"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a2bc47267db60222f3843961ce8c54933" title=" " alt="" coords="606,2377,862,2418"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a0a8e70b34898de659ead818d0202f242" title=" " alt="" coords="599,2442,869,2483"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ac8fad7d4a576d2af0fe5c2fbd4164e99" title=" " alt="" coords="592,2507,876,2549"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab364422886eee4ba289a703f83b0ef1b" title=" " alt="" coords="637,2573,831,2614"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a692723b803a64dd25e775b2f8726fe27" title="Works with this graph:" alt="" coords="611,2637,857,2693"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1ga_1_1_population_test.html#a278212ebff2501b7071d342f9a027599" title=" " alt="" coords="631,2717,837,2758"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="31,165,217,206"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0c2e353b243250b4959a3f86608f1020" title="Generates one offspring according to the method where crossover and mutation are decoupled,..." alt="" coords="37,262,211,303"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ae7a90a911b109ed47b3acf54193acc35" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="37,327,211,369"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#ab7a37d3340d35ab586332ce2122e7bb0" title=" " alt="" coords="307,197,525,238"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#af9327fa81f9e2a617cdff353848ad6e1" title="Run the combinatorial exploration." alt="" coords="5,701,243,742"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph.html#a55924e2fcd5c0081af56b98766d74ee1" title=" " alt="" coords="317,1041,515,1082"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="319,1171,513,1213"/>
+</map>

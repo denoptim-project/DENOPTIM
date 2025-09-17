@@ -1,0 +1,4 @@
+<map id="denoptim.graph.Template.fromJson" name="denoptim.graph.Template.fromJson">
+<area shape="rect" id="node1" title="Reads a JSON string and returns an instance of this class." alt="" coords="312,29,536,56"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex_1_1_d_e_n_o_p_t_i_m_vertex_deserializer.html#a281fc89776bbb6dbb93813fbb6eb2f70" title=" " alt="" coords="5,22,264,63"/>
+</map>

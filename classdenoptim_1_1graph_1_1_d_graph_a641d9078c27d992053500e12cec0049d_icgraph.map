@@ -1,0 +1,52 @@
+<map id="denoptim.graph.DGraph.appendVertexOnAP" name="denoptim.graph.DGraph.appendVertexOnAP">
+<area shape="rect" id="node1" title="Append a vertex to this graph: adds the new vertex to the list of vertices belonging to the graph,..." alt="" coords="620,1365,823,1407"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#af154cd13fffcbeb21632dec9653fa4e8" title="Add a capping group on the given vertices, if needed." alt="" coords="343,5,525,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#ab157137220b19383b24af17f77cf8948" title="Tries to add a fused ring using a pair of free APs, one of which on the given vertex." alt="" coords="325,71,543,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_graph_operations.html#add74b865c897144437bf30e3734edf01" title="Tries to use any free AP of the given vertex to close ring in the graph by adding a chord." alt="" coords="313,137,555,163"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#af86b79061d15a4d2e3d7ccdf0d758f44" title=" " alt="" coords="30,173,223,215"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#aded315f8892f22fd849a73778b4a84c8" title=" " alt="" coords="337,239,531,280"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="30,1580,223,1621"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ad6447c67b6246a5c22e842b17cefc3fd" title=" " alt="" coords="313,304,555,345"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="317,435,551,476"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#ac6577b7b2c9ed849e54cd48c3f99ba8b" title="Returns a path as a DENOPTIMGraph from the first argument to the second one." alt="" coords="349,524,519,565"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_template_test.html#ad45d6edc7ff123cee0939301b6d1fc2b" title="Creating a template that contains another template with the following structure: |&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;..." alt="" coords="327,589,541,631"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a0dd5e8c7f80f7e7c7fa2d46e01355a2d" title="Generates a pair of graphs that include templates with free content." alt="" coords="337,655,531,696"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_population_test.html#ad6c0ff8cf3b73b88407f1a8ce2d699dd" title="Builds a pair of graphs that contain templates with ContractLevel#FREE contract." alt="" coords="333,369,535,411"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1ga_1_1_population_test.html#a41f0c8d31458a49c72e7b22daf45073a" title="Builds a pair of graphs that contain templates with ContractLevel#FREE contract." alt="" coords="25,575,228,616"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1ga_1_1_population_test.html#aec2f105b3ec1dad337b2a1708b803439" title="Builds a pair of graphs that contain templates with ContractLevel#FREE contract." alt="" coords="333,823,535,864"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_template_test.html#a6bb3cdf3bc0c265c1afdd6fcdb8250a8" title=" " alt="" coords="19,827,234,868"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_template_test.html#a24cb0acd547ff1ce40433455a0c593a3" title="Builds a template object meant for tests." alt="" coords="327,888,541,929"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a86c3b01084322d2c465809840d7a3122" title=" " alt="" coords="337,1005,531,1047"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#aada424fd443017c7bb183a39efbbeacd" title="Returns a 3&#45;cycle." alt="" coords="337,1071,531,1112"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a196d26a2c4112547a8bc43e40b6abd55" title="Returns a graph that contains a 10&#45;layered recursive structure." alt="" coords="325,1136,543,1177"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ae0bfec852d2322ca7ba2b7793ae15622" title=" " alt="" coords="325,1201,543,1243"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager_test.html#ac3efa7ffa90ffbdb876e8489054b02af" title="Build a graph meant to be used in unit tests." alt="" coords="320,1267,548,1308"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#afb5d16108851dc3359365d1a9b50f1af" title="Creates a test graph that looks like this:" alt="" coords="325,1332,543,1373"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aa694aa3e4ec8b30a326a892d189ad023" title="Creates a test graph that looks like this:" alt="" coords="325,1397,543,1439"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0fd4c84840d3eb11b1838a627d9e6956" title="Returns a graph with definition of symmetric vertexes and symmetric APs meant for testing purposes." alt="" coords="325,1463,543,1504"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ade544f5bf2f66ccb7a4f179e84b33c1c" title="Returns a graph with peculiar definition of symmetric vertexes and symmetric APs meant for testing pu..." alt="" coords="325,1528,543,1569"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a2d248a6e73decf7665c6d1b1d6971e84" title=" " alt="" coords="329,1659,539,1686"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a9aa17c44bb5d48c83e350c36cd68af68" title=" " alt="" coords="31,1667,222,1708"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8fb951a35b028bcf098b8a83d94d7e75" title="Removes unused ring&#45;closing vertices." alt="" coords="333,1593,535,1635"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#abf9b48ed3f9504324020cc9ff44ca4e4" title=" " alt="" coords="327,1761,541,1803"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_template_test.html#a72d37b4c24ad896838401b319b1d667e" title=" " alt="" coords="325,1827,543,1868"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1rings_1_1_path_closability_tools_test.html#af991094bf8c17599150d2e43ea582cf9" title=" " alt="" coords="327,1891,541,1947"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1rings_1_1_random_comb_of_ring_iterator_test.html#a4a178f479d08c120f5fea6ef60feac8b" title=" " alt="" coords="315,1971,553,2027"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager_test.html#a55d1482a18edbaabf15b090392a282f3" title=" " alt="" coords="310,2051,558,2092"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a2b8d6293663bce9a9da1d35efe31911b" title=" " alt="" coords="337,2116,531,2157"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder_test.html#a4908ea837bed3714cd5d17ba4e3954fa" title=" " alt="" coords="296,2181,572,2223"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_template_test.html#ac49684d98a8e9eb615b9b85469f25971" title=" " alt="" coords="316,2246,552,2302"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#abaee0d6a612fa9cd7430a8e50ca2b934" title=" " alt="" coords="315,2325,553,2367"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a356dbf786633f3c7be94439c0e151913" title=" " alt="" coords="333,2391,535,2432"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a0b0bdaef47bda93b08dbb3dc0e7b23e5" title=" " alt="" coords="343,2456,525,2497"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a02791a3f61db5dd584dec5c3995ec72c" title=" " alt="" coords="330,2521,538,2563"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_vertex_test.html#a33f3323568140d1668837b954db5bb94" title=" " alt="" coords="333,2587,535,2628"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a8c8367f9d5cf4662dab2d83c4f38a882" title=" " alt="" coords="344,2652,524,2693"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a3f7e3dd977875217a40f51b5d3bffff5" title=" " alt="" coords="307,2717,561,2759"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a60b1ca7ac8b9d3775e72bd7cea418f1a" title=" " alt="" coords="327,2783,541,2824"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a0c851972015fbb4b2a317b053b8b81d9" title="Mutates the given vertex according to the given mutation type, if possible." alt="" coords="7,108,247,149"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a6dbd168077a4fb24f16e1e9ac14d0c4c" title=" " alt="" coords="30,43,223,84"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#af7dad44701e1c81c71d47052733822fd" title="Returns a molecule consisting of two pairs of fused rings connected by an oxygen atom." alt="" coords="30,239,223,280"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af7024886a4203aa93d8cf7975f7c2e72" title=" " alt="" coords="6,304,247,345"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a44e2ff798d22b73f966cb8393ceb4f18" title="Extends the current graph by appending a node to a specific free AP on the growing graph." alt="" coords="5,369,248,411"/>
+</map>

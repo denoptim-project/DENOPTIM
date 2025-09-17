@@ -1,0 +1,10 @@
+<map id="denoptim.ga.GraphOperations.extendLink" name="denoptim.ga.GraphOperations.extendLink">
+<area shape="rect" id="node1" title="Inserts a vertex in between two connected vertexes that are identified by the one vertex holding the ..." alt="" coords="5,145,264,172"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a15ec04508f3a436a288dbdbc95fe9228" title="Inserts a vertex in between two connected vertexes that are identified by the one vertex holding the ..." alt="" coords="312,29,571,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aa1ae3c328e8ea24ead206b822daca7f7" title="Gets the edge that is using this AP, or null if no edge is using this AP." alt="" coords="344,105,539,146"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="351,170,531,211"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="341,236,542,263"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="627,73,798,114"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template.html#aca9a03a1d6e2fd5de8f859f18996ec62" title=" " alt="" coords="619,138,807,179"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#abb77efcfaa507592758e7fd4845bdd80" title=" " alt="" coords="855,145,1057,172"/>
+</map>

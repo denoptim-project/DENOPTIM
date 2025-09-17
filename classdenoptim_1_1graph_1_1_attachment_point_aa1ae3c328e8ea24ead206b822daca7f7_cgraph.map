@@ -1,0 +1,6 @@
+<map id="denoptim.graph.AttachmentPoint.getEdgeUserThroughout" name="denoptim.graph.AttachmentPoint.getEdgeUserThroughout">
+<area shape="rect" id="node1" title="Gets the edge that is using this AP, or null if no edge is using this AP." alt="" coords="5,39,200,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="257,5,427,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_template.html#aca9a03a1d6e2fd5de8f859f18996ec62" title=" " alt="" coords="248,71,436,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#abb77efcfaa507592758e7fd4845bdd80" title=" " alt="" coords="484,78,687,105"/>
+</map>

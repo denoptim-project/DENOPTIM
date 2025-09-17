@@ -1,0 +1,18 @@
+<map id="denoptim.gui.MoleculeViewPanel.loadChemicalStructureFromFile" name="denoptim.gui.MoleculeViewPanel.loadChemicalStructureFromFile">
+<area shape="rect" id="node1" title="Loads a structure in the Jmol viewer." alt="" coords="5,241,245,283"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a700b2ae92d1de1c0be3e1bbde5cae71d" title="Removes the currently visualized molecule and AP table." alt="" coords="304,64,483,105"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a7823d9f27dc96ba2c777339e181dcfdc" title=" " alt="" coords="304,153,483,195"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#aded8f83abc7d4310a5d95312a29363af" title="Returns a single collection with all atom containers found in a file of any format." alt="" coords="557,173,745,215"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_candidate.html#aa1033981d50358ae3d89dc5def72e1e7" title="Wraps an atom container as a candidate even if a graph is not available." alt="" coords="293,271,493,312"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a042c8c616521cdd15aee8b7a0cf02fdf" title="Reads SDF files that represent one or more tested candidates." alt="" coords="299,360,487,401"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a1f54e0f3b92a5d46bf1c6f52ace64262" title=" " alt="" coords="304,425,483,467"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a0917c33381934f156d4196b46819276b" title="Clears the table of attachment points." alt="" coords="561,5,740,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a20eef80a872503d11d3253d5557e0876" title="Clears the molecular viewer." alt="" coords="559,71,742,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1files_1_1_file_utils.html#ae2209fbdfdcf1fdf0499e32989b057b5" title="Looks for a writable location where to put temporary files and returns an absolute pathname to the fo..." alt="" coords="831,173,1004,215"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1files_1_1_file_utils.html#abb578573334c0bc633d537d987223e63" title="Check whether we can write and read to a given pathname." alt="" coords="1075,173,1251,215"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="1303,155,1513,182"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="1299,206,1517,233"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_candidate.html#a22ec2234eaccbb43f211b09ce64b28ef" title=" " alt="" coords="563,264,738,305"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="541,329,760,371"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="808,329,1027,371"/>
+</map>

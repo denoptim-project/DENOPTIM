@@ -1,0 +1,19 @@
+<map id="denoptim.fragspace.GraphLinkFinder.GraphLinkFinder" name="denoptim.fragspace.GraphLinkFinder.GraphLinkFinder">
+<area shape="rect" id="node1" title="Constructor that specifies which vertex has to be replaced." alt="" coords="5,221,188,263"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a6db61d6017ac32cdd5b12c0665270406" title="Returns true if any mapping has been found." alt="" coords="241,5,422,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a7bf9e961f1aed252d9d3e255d5f4e223" title="Returns all AttachmentPoint&#45;AttachmentPoint mapping found." alt="" coords="241,71,422,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="725,132,895,173"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="246,188,417,229"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder.html#a23a02a7ccf016632eb93ac02eae9bc6b" title=" " alt="" coords="238,253,425,295"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a492683049dc687fcdc41b43051d30554" title="Returns a clone of the requested building block." alt="" coords="475,319,668,360"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a1259fc018fc5131cdf102d4030933f3e" title="Returns the AttachmentPoint&#45;AttachmentPoint mapping chosen among the possible mappings." alt="" coords="236,371,427,412"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_vertex.html#a514b89b11dff8939e74e5b95e749b703" title=" " alt="" coords="246,436,417,477"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#aed02226a5695be948ae2c33e787e22c3" title=" " alt="" coords="475,188,668,229"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ae30c8a77be3202d7072d5b0b66a6ae59" title=" " alt="" coords="475,253,668,295"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="718,202,902,229"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="717,253,903,295"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="716,319,904,360"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="725,384,895,425"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#a29e20c43a6110fbaac6cc86c216fe143" title=" " alt="" coords="725,449,895,491"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="486,436,657,477"/>
+</map>

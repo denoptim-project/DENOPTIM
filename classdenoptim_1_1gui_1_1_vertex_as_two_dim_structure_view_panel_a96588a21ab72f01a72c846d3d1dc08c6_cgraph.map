@@ -1,0 +1,5 @@
+<map id="denoptim.gui.VertexAsTwoDimStructureViewPanel.clearAPTable" name="denoptim.gui.VertexAsTwoDimStructureViewPanel.clearAPTable">
+<area shape="rect" id="node1" title="Clears the table of attachment points." alt="" coords="5,13,247,54"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a69ceb353f2391f1e5b25dc6e6bc88492" title="Allows to activate and deactivate the listener." alt="" coords="295,5,504,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_pausable_table_model_listener.html#a326ffbf277447d4c06bcb4fbf85f20cb" title=" " alt="" coords="552,5,769,61"/>
+</map>

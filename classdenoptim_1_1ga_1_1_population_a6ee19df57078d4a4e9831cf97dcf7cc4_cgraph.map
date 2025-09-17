@@ -1,0 +1,10 @@
+<map id="denoptim.ga.Population.clone" name="denoptim.ga.Population.clone">
+<area shape="rect" id="node1" title="Does not clone the cross&#45;over compatibility relations between each pairs of population members." alt="" coords="5,64,196,91"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_population.html#a4c6d546befc92708dbf8fff1aa840438" title=" " alt="" coords="264,5,444,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_population_1_1_xover_sites_among_candidates.html#ac06d99289f7db3b1153427446c9a9054" title="Return a somewhat&#45;shallow clone of this object: the map and list are new objects, but the references ..." alt="" coords="257,57,451,98"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_population.html#a61b4df049189c95349aec0e4fb292c66" title=" " alt="" coords="244,145,464,172"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_population_1_1_xover_sites_among_candidates.html#a2fc4ca3a6b2a90ec357b8dcce9f5aca1" title="Initializes an empty data structure." alt="" coords="519,25,744,81"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a93693af51412000689dc7517151b9a05" title=" " alt="" coords="512,105,751,146"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="538,170,725,211"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a47b278f84db073b1f06809f9c42cfae5" title="Check usage of APClass&#45;based approach, i.e., uses attachment points with annotated data (i...." alt="" coords="519,235,743,277"/>
+</map>

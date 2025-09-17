@@ -1,0 +1,5 @@
+<map id="denoptim.utils.Randomizer.getRNG" name="denoptim.utils.Randomizer.getRNG">
+<area shape="rect" id="node1" title="Returns the random number generator." alt="" coords="5,5,228,32"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_randomizer.html#aaaeda6dedda5664a47a2a9a68194162a" title="Initializes this random number generator (RNG) using a random seed that is generated on&#45;the&#45;fly rando..." alt="" coords="276,5,528,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_randomizer.html#ad74f0608d3e2e10caa8873ae059367a7" title=" " alt="" coords="576,5,829,32"/>
+</map>

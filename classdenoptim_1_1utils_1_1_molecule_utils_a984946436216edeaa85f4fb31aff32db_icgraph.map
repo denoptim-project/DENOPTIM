@@ -1,0 +1,4 @@
+<map id="denoptim.utils.MoleculeUtils.getAtomRef" name="denoptim.utils.MoleculeUtils.getAtomRef">
+<area shape="rect" id="node1" title=" " alt="" coords="321,5,527,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a64dcaabacba2ea9c1cd1586cf81b74e9" title="Looks for carbon atoms that are flagged as aromatic, but do not have any double bond and are,..." alt="" coords="5,5,273,47"/>
+</map>

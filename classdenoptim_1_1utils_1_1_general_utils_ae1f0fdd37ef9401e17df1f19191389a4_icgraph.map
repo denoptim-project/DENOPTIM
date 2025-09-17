@@ -1,0 +1,5 @@
+<map id="denoptim.utils.GeneralUtils.unionOfIntersectingSets" name="denoptim.utils.GeneralUtils.unionOfIntersectingSets">
+<area shape="rect" id="node1" title="Takes the union of any two sets in this list that intersect." alt="" coords="260,39,471,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5f9a8cd2ab45c226c2e1ec714c19724b" title="Extracts subgraphs that match the provided pattern." alt="" coords="9,5,208,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_gen_utils_test.html#a0a0d440317ec08c08daee5651d16a810" title=" " alt="" coords="5,71,212,112"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="denoptim.graph.Template.updateInnerApID" name="denoptim.graph.Template.updateInnerApID">
+<area shape="rect" id="node1" title="Replaces a given link between APs on the surface of this template (i.e., outerAP) and the correspondi..." alt="" coords="5,115,215,157"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#abb77efcfaa507592758e7fd4845bdd80" title=" " alt="" coords="275,5,478,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="287,57,467,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#a9e1e1c1dd87ebfb469b6c705c00038b6" title=" " alt="" coords="275,123,478,149"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#aa54ed59052b374e590620626bcd2a90c" title=" " alt="" coords="263,173,491,200"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a13c466d60a1ed85384812ca2ff63fdb2" title="Set the Attachment Point class." alt="" coords="287,225,467,266"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="539,232,737,259"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="785,225,963,266"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1011,191,1188,233"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1011,257,1188,298"/>
+</map>

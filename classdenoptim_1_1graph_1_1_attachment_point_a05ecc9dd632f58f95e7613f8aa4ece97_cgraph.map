@@ -1,0 +1,5 @@
+<map id="denoptim.graph.AttachmentPoint.getLinkedAP" name="denoptim.graph.AttachmentPoint.getLinkedAP">
+<area shape="rect" id="node1" title="Gets the attachment point (AP) that is connected to this AP via the edge user." alt="" coords="5,23,185,65"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="233,5,435,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="234,56,434,83"/>
+</map>

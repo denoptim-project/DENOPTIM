@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GraphViewerPanel.setMouseMode" name="denoptim.gui.GraphViewerPanel.setMouseMode">
+<area shape="rect" id="node1" title=" " alt="" coords="813,39,987,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a62d04b3acf7b29a3f2babd988b25f263" title="Alters the functionality of mouse in the graph visualization panel." alt="" coords="557,39,765,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,13,509,39"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel_1_1_mouse_mode_choice_listener.html#abeed2d222f5e86ea9cac3035996a8c99" title=" " alt="" coords="269,63,499,119"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,5,211,47"/>
+</map>

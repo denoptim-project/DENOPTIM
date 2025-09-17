@@ -1,0 +1,15 @@
+<map id="denoptim.graph.AttachmentPointTest.testConstructorsAndSDFStringNoDirVec" name="denoptim.graph.AttachmentPointTest.testConstructorsAndSDFStringNoDirVec">
+<area shape="rect" id="node1" title=" " alt="" coords="5,145,265,201"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a1f1eee26acede7b656a922201399f2b4" title="Adds an attachment point with a dummy APClass." alt="" coords="319,29,530,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a65c4f181651f2cd9606b581988af9247" title=" " alt="" coords="313,80,536,107"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="330,131,519,157"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ae529678561712f679be4b8d737f2ab83" title="Prepare a string for writing this AP in a fragment SDF file." alt="" coords="331,182,518,223"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="325,272,524,299"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af8c99eab417d49b9c5439c69fe6abac8" title="Produces a string with the information included in this object." alt="" coords="335,323,515,365"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="598,93,769,134"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_general_utils.html#a05bc718161978283c7db11369386a934" title="Formats a decimal number using the given pattern but with English format as for separators." alt="" coords="584,158,783,199"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ad771aba34950060ecbba81eb4b924445" title=" " alt="" coords="594,223,773,265"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="595,289,772,330"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="831,255,1008,297"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="831,321,1008,362"/>
+</map>

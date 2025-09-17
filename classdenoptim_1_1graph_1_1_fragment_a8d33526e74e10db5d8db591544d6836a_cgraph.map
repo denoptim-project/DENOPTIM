@@ -1,0 +1,5 @@
+<map id="denoptim.graph.Fragment.projectListAPToAtomProperties" name="denoptim.graph.Fragment.projectListAPToAtomProperties">
+<area shape="rect" id="node1" title="Takes the list of APs from the field of this class and projects the APs into properties of the IAtoms..." alt="" coords="5,39,216,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a551361a1155600e6e2fe4e37590c924f" title=" " alt="" coords="268,5,457,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="264,71,461,112"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.fitness.DescriptorForFitness.cloneAllButImpl" name="denoptim.fitness.DescriptorForFitness.cloneAllButImpl">
+<area shape="rect" id="node1" title="This is a sort of cloning that returns a new DescriptorForFitness with the same field content of this..." alt="" coords="5,39,184,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#ab8f951d76ea7e265ed07fce7662d2996" title=" " alt="" coords="232,5,440,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a6c5ade3a33290d44ff2afc82adac985a" title="Overwrites the list of variables using this descriptor." alt="" coords="247,71,425,112"/>
+</map>

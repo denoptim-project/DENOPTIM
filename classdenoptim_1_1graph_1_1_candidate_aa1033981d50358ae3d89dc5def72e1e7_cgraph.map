@@ -1,0 +1,6 @@
+<map id="denoptim.graph.Candidate.fromAtomContainerNoGraph" name="denoptim.graph.Candidate.fromAtomContainerNoGraph">
+<area shape="rect" id="node1" title="Wraps an atom container as a candidate even if a graph is not available." alt="" coords="5,39,205,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_candidate.html#a22ec2234eaccbb43f211b09ce64b28ef" title=" " alt="" coords="275,5,450,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="253,71,472,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="520,71,739,112"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="denoptim.fragmenter.ConformerExtractorTask.ConformerExtractorTask" name="denoptim.fragmenter.ConformerExtractorTask.ConformerExtractorTask">
+<area shape="rect" id="node1" title="Constructs a task that will analyze the given isomorphic family." alt="" coords="5,71,251,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="337,5,524,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_task_utils.html#a04b7f04efd81199814b4e81de32df86f" title="Unique counter for tasks." alt="" coords="339,71,522,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#a97f49c2de9c019c32f4e828b1fb2dc69" title="Tries to add a fragment into a sample of isomorphic fragments." alt="" coords="299,135,563,191"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#add663e71e20399ddad63276ebda60034" title=" " alt="" coords="611,77,852,119"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragmenter_1_1_fragment_alignement.html#a8767911dd2054fa0a8e8c7f3f0cc002e" title="Returns the mapping leading to the lowest RMSD that could be found among all isomorphic mappings." alt="" coords="612,143,851,184"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#ac969b7cb43cdd23507e67c5141766997" title="Sets the order of nodes (i.e., atoms/APs) to use for geometric comparison with other fragments,..." alt="" coords="627,208,835,249"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_fragment.html#a860d31c5334438764f9d7ace863c7ed0" title="Creates a graph representation of this fragment where both atoms and AttachmentPoints are represented..." alt="" coords="900,77,1089,119"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_fragment.html#a366dfaf65191c724b8e393b9d9dc899f" title=" " alt="" coords="1145,44,1335,85"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="1137,109,1343,151"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="1391,109,1588,151"/>
+</map>

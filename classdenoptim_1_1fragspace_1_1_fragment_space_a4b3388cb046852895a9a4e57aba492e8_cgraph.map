@@ -1,0 +1,11 @@
+<map id="denoptim.fragspace.FragmentSpace.importCompatibilityMatrixFromFile" name="denoptim.fragspace.FragmentSpace.importCompatibilityMatrixFromFile">
+<area shape="rect" id="node1" title="Load info from a compatibility matrix file." alt="" coords="5,130,212,186"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a7ae01ef3a462f014e7928b908883ecae" title="Read the APclass compatibility matrix data from file." alt="" coords="263,39,451,80"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a8d1502cdc46db8fe67ddc594ae1cb180" title=" " alt="" coords="260,104,453,145"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a2f5afb31f605b8d3b6908ac2c7683545" title=" " alt="" coords="260,169,453,211"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a5d0471e0761aebff87d894c0bf39ecd7" title=" " alt="" coords="260,235,453,276"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="501,46,700,73"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="748,39,925,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="973,5,1151,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="973,71,1151,112"/>
+</map>

@@ -1,0 +1,24 @@
+<map id="denoptim.files.FileUtils.addToRecentFiles" name="denoptim.files.FileUtils.addToRecentFiles">
+<area shape="rect" id="node1" title="Appends an entry to the list of recent files." alt="" coords="897,288,1073,329"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a6571da5ffceeda3e571ebb92d4df8b14" title=" " alt="" coords="588,5,848,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#aed327bbb0a16e7eb391b2d41a1844855" title=" " alt="" coords="597,70,839,126"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog.html#a64ab4ac8312bff57a077266658555757" title="Constructor." alt="" coords="597,150,839,206"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#a4bc183818810a26037080b47f082b9af" title="Initialize the panel and add buttons." alt="" coords="620,229,816,271"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="593,295,843,322"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare.html#a8a63383bbabdfbda99d36e6dbd9c390e" title="Initialize the panel with tabbedPane and buttons." alt="" coords="610,346,826,373"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="587,403,849,430"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1task_1_1_program_task.html#a13d57c647330c442afe4cb0f013fca76" title="Method that can be called to create a text file with the error triggered by any Throwable that can be..." alt="" coords="612,463,824,504"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_r_parameters.html#a7e2c4b2eab2399f39e2b0bef8e2c3931" title="Processes all parameters and initialize related objects." alt="" coords="603,528,833,569"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a06fc8c701fcb26782ce85d2383bc542b" title="Processes all parameters and initialize related objects." alt="" coords="284,5,523,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_frag_space_explorer.html#a1c6a2aae9ab686d5c7c0fc6246f7aa61" title=" " alt="" coords="5,5,220,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#aeb24d66181afd49b30a224fb495cc558" title="Processes all parameters and initialize related objects." alt="" coords="268,77,539,119"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter.html#aa27df9705e3aed34cc8cb8bc05e6ce85" title=" " alt="" coords="13,75,213,116"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm_test.html#a11b2178cd3d55ba7f1fe1e0e047dd684" title=" " alt="" coords="7,139,218,195"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#ab550b03594a5843183d6f925e66d444b" title="Constructor." alt="" coords="285,204,522,245"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="301,269,506,311"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare.html#a429aa206246e784daacd7308e908f6af" title="Constructor." alt="" coords="318,335,489,376"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="295,400,511,441"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1task_1_1_program_task.html#a767ef4b581e23afb93815dc866764ce4" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="291,465,516,507"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1task_1_1_program_task.html#a2745e7f75fcf2ef6d128bd826156e2ce" title="This method redirects the callable functionality to an abstract method (namely ProgramTask#runProgram..." alt="" coords="9,473,216,499"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_fitness_runner.html#a557845da14612ff98352debd815ef557" title=" " alt="" coords="289,531,518,572"/>
+</map>

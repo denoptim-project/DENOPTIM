@@ -1,0 +1,8 @@
+<map id="denoptim.utils.AtomOrganizer.layerOrientedReordering" name="denoptim.utils.AtomOrganizer.layerOrientedReordering">
+<area shape="rect" id="node1" title="Reorders atoms according to the layer&#45;oriented scheme." alt="" coords="5,136,227,177"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a71803b33cd2507b3053503bbc10a3d7c" title="Set the layer membership of an antom." alt="" coords="303,5,517,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a057aaf4bd577d0566b6fc73c1f792e10" title="Destroy a vector of flags." alt="" coords="295,71,525,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#aa08a493e0e4325f3f76262dc9cb40de0" title="Generates a vector of boolean flags." alt="" coords="304,136,516,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a32438216f863d45940768576a05178f5" title="Change the order of atoms in a list according to the priority rules defined in the comparator Connect..." alt="" coords="289,201,531,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a291686eac0b022879608b2dd85ffab6e" title="Perform all the operation to report an atom in the new order." alt="" coords="275,267,545,294"/>
+</map>

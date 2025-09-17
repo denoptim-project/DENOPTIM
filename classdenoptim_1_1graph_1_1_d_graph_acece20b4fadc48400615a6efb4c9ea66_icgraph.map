@@ -1,0 +1,5 @@
+<map id="denoptim.graph.DGraph.getCandidateOwner" name="denoptim.graph.DGraph.getCandidateOwner">
+<area shape="rect" id="node1" title="Returns the reference of the candidate item that is defined by this graph." alt="" coords="315,39,493,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a32b0be109306e9c81fc830867296bc66" title="Extracts a system of one or more fused rings and adds them to the fragment space if not already prese..." alt="" coords="5,5,267,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="51,71,221,112"/>
+</map>

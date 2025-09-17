@@ -1,0 +1,52 @@
+<map id="denoptim.ga.EAUtils.buildCandidatesByXOver" name="denoptim.ga.EAUtils.buildCandidatesByXOver">
+<area shape="rect" id="node1" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="5,1140,175,1181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#ab0ede6172563425e523bab9d949f30d4" title="Add a capping groups on free unused attachment points." alt="" coords="252,29,433,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a54af78e8bef32c0ef673243e5f17a98b" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="245,119,440,160"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#abcfe2ce7f7bb4d5bea2dbbd816d12d2b" title="Wipes the data in this graph." alt="" coords="240,185,445,211"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_xover_site.html#ab02673a493a61cbe208dc8f63164e7d6" title="Returns the collection of vertexes belonging to the first subgraph." alt="" coords="251,235,434,262"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_xover_site.html#afd7388a5db2be07928d6db910815b72b" title="Returns the collection of vertexes belonging to the second subgraph." alt="" coords="251,286,434,313"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#acece20b4fadc48400615a6efb4c9ea66" title="Returns the reference of the candidate item that is defined by this graph." alt="" coords="253,337,432,379"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ad8710eee33a792e0bc46f5bc4f8cf251" title=" " alt="" coords="246,403,439,444"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3a184063c09f54ff6798aea4dd504302" title="Gets all the children of the current vertex recursively." alt="" coords="253,492,432,533"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a5933a7161684c3526a63b176407f059e" title=" " alt="" coords="246,557,439,599"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a93693af51412000689dc7517151b9a05" title=" " alt="" coords="511,672,749,713"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph.html#a49ca4849cb306cbbd45e579bb8139cf6" title="Search for unused ring closing vertices: vertices that contain only a RingClosingAttractor and are no..." alt="" coords="253,944,432,985"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_candidate.html#ab0fe6ba8e6a45ea539366ac6cef13d79" title="The generation this candidate belong to is that in which it was generated." alt="" coords="247,1009,439,1051"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_candidate.html#a50cd0725a1b1c8766897427f2375e79d" title=" " alt="" coords="247,1075,439,1116"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="253,1140,432,1181"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="545,1259,715,1300"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_candidate.html#ae97ca468f9830ef96fb75199460e3568" title=" " alt="" coords="229,1346,456,1373"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_d_graph.html#a9fb1a47b739c6adbf71103e24d481f11" title=" " alt="" coords="253,1229,432,1271"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1utils_1_1_general_utils.html#ab0c97460520e98fa670681d851754703" title="returns the padded string with zeroes placed to the left of &#39;number&#39; up to reach the desired number o..." alt="" coords="243,1397,442,1439"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="537,737,723,779"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aec200d5d7fdb3bdd7139736499a679ae" title="Unique counter for the number of graphs generated." alt="" coords="249,1463,437,1504"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1utils_1_1_graph_utils.html#ad951e78a24210e710cba8296b67bf732" title="Unique counter for the number of molecules generated." alt="" coords="249,1528,437,1569"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1ga_1_1_graph_operations.html#affb1be89a32e4a429bd7dbdfe0708419" title="Performs the crossover that swaps the two subgraphs defining the given XoverSite." alt="" coords="223,1711,463,1752"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a45d4e9ec6a308aa73891efa1d501dd5e" title="Perform fitness&#45;based, class&#45;compatible selection of parents that can do crossover operations." alt="" coords="232,741,453,767"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a17505cbf52d9203a1af793f07bcf27f9" title="Selects a number of members from the given population." alt="" coords="541,873,719,915"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1ga_1_1_xover_site.html#a1d75cc7f886374a295deec540178cb61" title="Creates a new instance of this class that contains the list of vertexes that correspond to those cont..." alt="" coords="245,1645,440,1687"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_d_graph.html#a78dd305de83fa47a17964f9916519337" title="Reassign vertex IDs to all vertices of this graph." alt="" coords="523,1496,737,1537"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ac8c9339d352074aafb4a8e3cc206b0d6" title="Chose randomly a vertex that is neither scaffold or capping group." alt="" coords="254,1776,431,1817"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_candidate.html#acff1b65216b9f5403c40906e2378bc2a" title="Just place the argument in the IAtomContainer field of this object." alt="" coords="247,1841,439,1883"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_d_graph.html#a421ce3718c62761e49a4dd4d0f20682c" title=" " alt="" coords="253,1907,432,1948"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_d_graph.html#af5cb07ab0686739e6e1713da9d8959c1" title=" " alt="" coords="253,1972,432,2013"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_candidate.html#ac0412da09a4ce62479ffee060b453d70" title=" " alt="" coords="229,2038,456,2065"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_candidate.html#a5957f2063e01acea98dd00da6dfdfc5c" title=" " alt="" coords="247,2089,439,2131"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_candidate.html#a92203ad4eb0c99e8e3bc75b0fba6d746" title=" " alt="" coords="235,2155,450,2182"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a1ddb932d4618434d435e4f85ce5e5eb5" title="Evaluates the possibility of closing rings in a given graph and if any ring can be closed,..." alt="" coords="255,675,430,716"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a47b278f84db073b1f06809f9c42cfae5" title="Check usage of APClass&#45;based approach, i.e., uses attachment points with annotated data (i...." alt="" coords="518,804,742,845"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1ga_1_1_xover_site.html#a81112b0353de238bec0a6f15bc04ab4c" title="Produced a string for showing what this object is." alt="" coords="259,2207,426,2248"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a54435f521439c89304a0cef32c7c256b" title="Writes the graphs to SDF file." alt="" coords="247,2296,438,2337"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph.html#a70aeea1a1fe35ea9fe5a49a147e76f1a" title=" " alt="" coords="541,492,719,533"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#a46e5563a41c18adbcee9aa60b39094fa" title="Search for ring closing vertices: vertices that contain only a RingClosingAttractor" alt="" coords="541,941,719,983"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_d_graph.html#aca10b3acbf66e3652cb9664179ed368f" title=" " alt="" coords="545,1007,715,1048"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1e17e9819b88c46fdaa97587f661d907" title="Creates a new graph that corresponds to the subgraph of this graph when exploring the spanning tree f..." alt="" coords="531,2029,729,2071"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a6db61d6017ac32cdd5b12c0665270406" title="Returns true if any mapping has been found." alt="" coords="539,2095,721,2136"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="535,1562,725,1589"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a1259fc018fc5131cdf102d4030933f3e" title="Returns the AttachmentPoint&#45;AttachmentPoint mapping chosen among the possible mappings." alt="" coords="535,1613,725,1655"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_attachment_point.html#acd666767475f39f0d7f17550d2b47651" title=" " alt="" coords="540,1679,720,1720"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="540,1744,720,1785"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_d_graph.html#acb7416edd218ba143cb316e4b363ccc6" title="Searches for all AttachmentPoints that are owned by vertices in a subgraph but either available or us..." alt="" coords="541,1809,719,1851"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="545,1875,715,1916"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="541,1940,719,1981"/>
+</map>

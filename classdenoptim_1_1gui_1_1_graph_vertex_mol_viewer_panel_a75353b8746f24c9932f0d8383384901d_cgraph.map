@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.initialize" name="denoptim.gui.GraphVertexMolViewerPanel.initialize">
+<area shape="rect" id="node1" title="Initialize the panel and add buttons." alt="" coords="5,5,176,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a488715b94b87e30884b75269d4dddb23" title="Sets the behavior in case of request to visualize partial data." alt="" coords="224,5,403,47"/>
+</map>

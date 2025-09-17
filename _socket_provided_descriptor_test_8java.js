@@ -1,0 +1,6 @@
+var _socket_provided_descriptor_test_8java =
+[
+    [ "denoptim.fitness.descriptors.SocketProvidedDescriptorTest", "classdenoptim_1_1fitness_1_1descriptors_1_1_socket_provided_descriptor_test.html", "classdenoptim_1_1fitness_1_1descriptors_1_1_socket_provided_descriptor_test" ],
+    [ "denoptim.fitness.descriptors.SocketProvidedDescriptorTest.MySocketServer", "classdenoptim_1_1fitness_1_1descriptors_1_1_socket_provided_descriptor_test_1_1_my_socket_server.html", "classdenoptim_1_1fitness_1_1descriptors_1_1_socket_provided_descriptor_test_1_1_my_socket_server" ],
+    [ "denoptim.fitness.descriptors.SocketProvidedDescriptorTest.RequestHandler", "classdenoptim_1_1fitness_1_1descriptors_1_1_socket_provided_descriptor_test_1_1_request_handler.html", "classdenoptim_1_1fitness_1_1descriptors_1_1_socket_provided_descriptor_test_1_1_request_handler" ]
+];

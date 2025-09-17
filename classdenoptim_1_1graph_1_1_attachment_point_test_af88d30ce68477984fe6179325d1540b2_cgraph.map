@@ -1,0 +1,52 @@
+<map id="denoptim.graph.AttachmentPointTest.testHasConnectedSrcAtom" name="denoptim.graph.AttachmentPointTest.testHasConnectedSrcAtom">
+<area shape="rect" id="node1" title=" " alt="" coords="5,871,245,913"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a25e45b22a20adcc72ee6f599a7694b0f" title="Add an attachment point to the specifies atom." alt="" coords="309,255,501,297"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment.html#a65c4f181651f2cd9606b581988af9247" title=" " alt="" coords="293,585,516,612"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_fragment.html#a2bb3bfa838f2661ee993e1a57e018873" title=" " alt="" coords="293,636,516,663"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="299,687,510,713"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="314,738,495,779"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_fragment.html#a3b476687a392e637d2bf2f3b6ccb09a4" title="Returns a deep copy of this fragments." alt="" coords="303,879,506,905"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="579,212,768,239"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="588,1230,759,1271"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_vertex.html#a29e20c43a6110fbaac6cc86c216fe143" title=" " alt="" coords="588,1726,759,1767"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_template.html#ac7d7400f47d4bad33f3755f1b3d19a3e" title="Returns a deep copy of this template." alt="" coords="304,1400,505,1427"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_template.html#a405d47ac1a08ac9bd658bcdcc693a0a4" title=" " alt="" coords="579,1987,767,2029"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aa3f954b074d8d8deef518821f13dcd24" title="Checks if this and another APs are rooted on atoms that are bonded in any way other than a possible c..." alt="" coords="310,2073,499,2114"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="305,2216,504,2243"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a1f1eee26acede7b656a922201399f2b4" title="Adds an attachment point with a dummy APClass." alt="" coords="568,29,779,56"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="569,81,778,122"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="584,146,763,187"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="586,577,761,618"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex.html#a6e237f0bbd68ebc3c6cd4278713ea7b2" title="Copies all the string&#45;based properties and properties defined in the Vertex#uniquefyingPropertyKeys s..." alt="" coords="583,969,763,1010"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_fragment.html#ad9843701125210a688964d85a77bfac4" title="Constructor of an empty fragment." alt="" coords="588,642,759,683"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="588,1034,759,1075"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="588,1099,759,1141"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_fragment.html#ab6e4a71b8f20faab8bec095322604f73" title=" " alt="" coords="579,707,768,749"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_vertex.html#a5671e1d926fba782f48c494d61980d29" title="Returns the mutation types that are constitutionally configures for this vertex irrespectively on the..." alt="" coords="588,1165,759,1206"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="564,1295,783,1337"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_fragment.html#a8d33526e74e10db5d8db591544d6836a" title="Takes the list of APs from the field of this class and projects the APs into properties of the IAtoms..." alt="" coords="568,773,779,814"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_vertex.html#a5dbac662f4102558f3cf874c55174c5e" title=" " alt="" coords="588,263,759,305"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="588,1361,759,1402"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="845,874,1015,915"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aef38e3d525bb269bd6e77a25ebfbd144" title=" " alt="" coords="583,381,763,422"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a929c8f781b4c999a5228f322a3bd901e" title="Sets the unique integer that is used to sort list of attachment points." alt="" coords="583,446,763,487"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_vertex.html#a0e1114b16856fd16a2de9cface2ea806" title=" " alt="" coords="588,838,759,879"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_vertex.html#a1b3682ddb7fc71fdd981526b43d773dc" title=" " alt="" coords="588,903,759,945"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_fragment.html#a13fe376fd06c5aca7e4dfeba36e37b0e" title=" " alt="" coords="579,511,768,553"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="845,205,1015,246"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="831,1521,1029,1562"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_template.html#a97f3fd8552c85b78dcad22d4ce1f4b0a" title="Adds attachment point (AP) to the list of required APs on this template." alt="" coords="578,1791,769,1833"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_template.html#a7869ba705f5898855fe68dd443721f8e" title=" " alt="" coords="836,1779,1024,1821"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_template.html#a7de3b3ecb0743c881a629727648955be" title="Return the list of attachment points visible from outside the template, i.e., the so&#45;called outer APs..." alt="" coords="579,1609,767,1650"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a9c1db3123b7f73aa20c0d1895f31f8d7" title="Returns the end of the direction vector." alt="" coords="583,1857,763,1898"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a54d64a8abc57153a64783ddb262f518c" title="Set the index of the source atom in the list of atoms of the fragment." alt="" coords="575,1922,772,1963"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a5ec92eb2ffc5a1b3fadce0c816e481b7" title="Sets the end of the 3D vector defining the direction of the AP in 3D." alt="" coords="583,1491,763,1533"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_template.html#aad385a42d6afcdac25d87f9519644a00" title=" " alt="" coords="588,1426,759,1467"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_template.html#a82c53a76c42c31848f394c3f7aab21b9" title="Removes the molecular representation." alt="" coords="831,1845,1029,1886"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_template.html#a687f8680d7c74dacadeb80c85ced2be5" title="Adds the projection of an AP in the template&#39;s inner graph (i.e., innerAP) to the list of APs visible..." alt="" coords="835,1935,1025,1977"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_d_graph.html#a309d3784aeae9aedce785314e753bdc5" title="Returns the list of available attachment points contained in this graph." alt="" coords="841,2001,1019,2042"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a0e96f6c954de060a628eb3de1b2f4554" title="For vertices that are templates this method returns the attachment point that is embedded in the temp..." alt="" coords="840,2091,1020,2133"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_attachment_point.html#adfc2840f3e5126d847c8d800082f8958" title="Gets the attachment point (AP) that is connected to this AP via the edge user or in any edge user tha..." alt="" coords="576,2105,771,2146"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="583,2170,763,2211"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="585,2235,762,2277"/>
+</map>

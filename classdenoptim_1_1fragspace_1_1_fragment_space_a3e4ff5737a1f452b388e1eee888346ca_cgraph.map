@@ -1,0 +1,9 @@
+<map id="denoptim.fragspace.FragmentSpace.importRCCompatibilityMatrixFromFile" name="denoptim.fragspace.FragmentSpace.importRCCompatibilityMatrixFromFile">
+<area shape="rect" id="node1" title="Load info for ring closures compatibilities from a compatibility matrix file." alt="" coords="5,65,231,121"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a1e24217d1290762758dd51243e269c34" title="Reads the APclass compatibility matrix for ring&#45;closing connections (the RC&#45;CPMap)." alt="" coords="288,39,476,80"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ae9f3a26c3e08408196f58254b6cd6a2e" title=" " alt="" coords="279,104,485,145"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="533,46,732,73"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="780,39,957,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1005,5,1183,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1005,71,1183,112"/>
+</map>

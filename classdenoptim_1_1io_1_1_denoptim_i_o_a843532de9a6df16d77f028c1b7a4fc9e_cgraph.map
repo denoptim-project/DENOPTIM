@@ -1,0 +1,10 @@
+<map id="denoptim.io.DenoptimIO.writeVertexesToJSON" name="denoptim.io.DenoptimIO.writeVertexesToJSON">
+<area shape="rect" id="node1" title="Writes vertexes to JSON file." alt="" coords="5,64,196,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa8cbbc7dcd366e9f1053c4b2b676e0d7" title=" " alt="" coords="521,5,744,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a3c0fb8cce99f346b2f4fb353363a6979" title="Reads a list of Vertexes from a JSON file." alt="" coords="244,64,473,105"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="249,130,468,157"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="1063,35,1285,76"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a4aafec42bd09225870fdf330db93b84c" title=" " alt="" coords="1333,35,1539,76"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#aaac79f0c3bbeeb57790d23dd57332a6f" title=" " alt="" coords="529,71,736,98"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a3e85cb26bb2f36407e309e41880ef191" title=" " alt="" coords="792,64,1015,105"/>
+</map>

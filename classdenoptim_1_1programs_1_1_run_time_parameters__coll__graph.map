@@ -1,0 +1,8 @@
+<map id="denoptim.programs.RunTimeParameters" name="denoptim.programs.RunTimeParameters">
+<area shape="rect" id="node1" title="Collection of parameters controlling the behavior of the software." alt="" coords="611,82,797,123"/>
+<area shape="rect" id="node2" title=" " alt="" coords="297,5,360,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="242,56,415,83"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,56,128,83"/>
+<area shape="rect" id="node5" title=" " alt="" coords="195,107,463,163"/>
+<area shape="rect" id="node6" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html" title="Identifier of the type of parameters." alt="" coords="235,186,422,227"/>
+</map>

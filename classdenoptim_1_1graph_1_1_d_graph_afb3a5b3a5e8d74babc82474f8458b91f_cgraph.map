@@ -1,0 +1,21 @@
+<map id="denoptim.graph.DGraph.isIsostructuralTo" name="denoptim.graph.DGraph.isIsostructuralTo">
+<area shape="rect" id="node1" title="Checks if this graph is &quot;DENOPTIM&#45;isostructural&quot; to the other one given." alt="" coords="5,169,176,211"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1simplified_1_1_node.html#a50e54a8bf7a4927c23f43c1cdbabdf38" title=" " alt="" coords="245,5,415,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1simplified_1_1_node_connection.html#a23745c4d04b0c44f58d23317fe85d98d" title=" " alt="" coords="245,71,415,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1simplified_1_1_node.html#a481c397369dce8e1764756963c709119" title=" " alt="" coords="245,136,415,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="245,201,415,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_graph_conversion_tool.html#adeaae6388172f39d971e781f4b8f0efb" title="Converts a DGraph into a simplified JGraphT DefaultUndirectedGraph." alt="" coords="224,267,436,308"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_d_graph.html#aadd56400d6e58931401e88dd814de705" title="Returns the set of vertexes symmetric to the given one." alt="" coords="241,332,419,373"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a309d3784aeae9aedce785314e753bdc5" title="Returns the list of available attachment points contained in this graph." alt="" coords="484,71,663,112"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#ab5d3641bcfd0c8dd76d5de6159d6b8c8" title=" " alt="" coords="484,136,663,177"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a44e705b8949b0fd73763e2e92a118b78" title="Looks into the edges that use any of the APs that belong to this vertex and returns the vertex which ..." alt="" coords="488,201,659,243"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="488,267,659,308"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa97f94be30bcd2895a615904c741f4f8" title=" " alt="" coords="484,332,663,373"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph.html#a650a0f54382fb930bf57429dd616258a" title=" " alt="" coords="484,397,663,439"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#aca10b3acbf66e3652cb9664179ed368f" title=" " alt="" coords="488,463,659,504"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a27e25f8f8e1516d81cc281e2795a9428" title="Returns the list of all attachment points contained in this graph." alt="" coords="722,71,901,112"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="726,136,897,177"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="721,201,901,243"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="711,267,912,294"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="711,318,911,345"/>
+</map>

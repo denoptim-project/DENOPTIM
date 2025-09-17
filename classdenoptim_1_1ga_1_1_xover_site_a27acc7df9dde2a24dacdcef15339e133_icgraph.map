@@ -1,0 +1,14 @@
+<map id="denoptim.ga.XoverSite.XoverSite" name="denoptim.ga.XoverSite.XoverSite">
+<area shape="rect" id="node1" title="Initiate an empty data structure." alt="" coords="1211,117,1423,144"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_xover_site.html#a1365d29678f952dd1d85a4b3282a5455" title="Creates a new XoverSite that contains the same information of this one, i.e., a shallow copy." alt="" coords="972,29,1159,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_xover_site.html#a91d470661642274184e6ef634e899720" title="Creates a new XoverSite that considers the opposite order of candidates of this one." alt="" coords="970,81,1161,122"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_xover_site.html#ab41422d3c5afa9c865d6a6d5feb5260a" title="Compares this and another instance." alt="" coords="969,147,1162,173"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_xover_site.html#a1d75cc7f886374a295deec540178cb61" title="Creates a new instance of this class that contains the list of vertexes that correspond to those cont..." alt="" coords="968,199,1163,241"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_population_1_1_xover_sites_among_candidates.html#ab53b763a029645b968fc3f2b0fd2bd74" title="Creates the entry corresponding to the pair of given candidates." alt="" coords="722,78,915,119"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_population.html#a31b74cc5407c42fa3a4214029fb08190" title="Returns a list of population members that can do crossover with the specified member." alt="" coords="492,77,669,118"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a45d4e9ec6a308aa73891efa1d501dd5e" title="Perform fitness&#45;based, class&#45;compatible selection of parents that can do crossover operations." alt="" coords="223,24,444,51"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_population_test.html#a5db0672054a9fc1dbc923310732fdb3a" title=" " alt="" coords="230,75,437,117"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_population_test.html#a278212ebff2501b7071d342f9a027599" title=" " alt="" coords="230,141,437,182"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="5,109,175,150"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_xover_site_test.html#a3936ca2cfc1bb9ace410f7f47ad2c1f2" title=" " alt="" coords="717,258,920,299"/>
+</map>

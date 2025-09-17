@@ -1,0 +1,4 @@
+<map id="denoptim.graph.DGraph.insertVertex" name="denoptim.graph.DGraph.insertVertex">
+<area shape="rect" id="node1" title="Inserts a given vertex in between two vertices connected by the given edge." alt="" coords="312,5,504,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#af53d9f29a7d8f8e7bc5540ab3cb0c9c7" title="Replace an edge with two edges with a new vertex in between, thus inserting a vertex in between two d..." alt="" coords="5,13,264,39"/>
+</map>

@@ -1,0 +1,52 @@
+<map id="denoptim.graph.DGraph.renumberVerticesGetMap" name="denoptim.graph.DGraph.renumberVerticesGetMap">
+<area shape="rect" id="node1" title="Reassign vertex IDs to a graph." alt="" coords="1173,1025,1388,1067"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a7a4743d014e860237f4b20703ef9779b" title="Evaluates the possibility of closing rings in this graph and generates all alternative graphs resulti..." alt="" coords="915,499,1121,540"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a78dd305de83fa47a17964f9916519337" title="Reassign vertex IDs to all vertices of this graph." alt="" coords="911,1057,1125,1099"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="634,5,827,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5e5447d406f6d4b9cbeb29c2222a721d" title="Appends a graph onto this graph." alt="" coords="629,267,832,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="646,332,815,373"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="357,421,526,463"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4df69c91a742d22f8d14d44489aeac15" title="Edit this graph according to a given list of edit tasks." alt="" coords="640,515,821,556"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#af3d68c634b78e89ff2937bdf8ac1387f" title=" " alt="" coords="624,632,837,673"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a86c3b01084322d2c465809840d7a3122" title=" " alt="" coords="345,552,538,593"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#af7dad44701e1c81c71d47052733822fd" title="Returns a molecule consisting of two pairs of fused rings connected by an oxygen atom." alt="" coords="634,697,827,739"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#aada424fd443017c7bb183a39efbbeacd" title="Returns a 3&#45;cycle." alt="" coords="634,763,827,804"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1ga_1_1_population_test.html#af6207d739243d036fa78f062053e0758" title="Produced a graph like this:" alt="" coords="622,828,839,869"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1ga_1_1_population_test.html#a3e817b8e694a0e283c62e6f60093c099" title="Produced a graph like this:" alt="" coords="622,893,839,935"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1ga_1_1_population_test.html#a2415235ca9e676921cd9f4c0a8348f72" title="Produced a graph like this:" alt="" coords="622,959,839,1000"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1ga_1_1_population_test.html#a0183558e815cbb69e80797fe57d27da0" title="Produced a graph like this:" alt="" coords="622,1024,839,1065"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1ga_1_1_population_test.html#ab094d82420ee26c35339351b2adba8d2" title="Produced a graph like this:" alt="" coords="622,1089,839,1131"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a586ff58307127b487068fe2aa5e43359" title="Creates a test graph that looks like this: v0(A)&#45;(A)v1(B)&#45;(B)v2." alt="" coords="623,1155,838,1196"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a78e0a424c267fe667e094704751430cb" title="Creates a test graph that looks like this:" alt="" coords="621,1220,840,1261"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#afb5d16108851dc3359365d1a9b50f1af" title="Creates a test graph that looks like this:" alt="" coords="621,1285,840,1327"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a32c600aa56729b962114649ff182394a" title="Creates a test graph that looks like this:" alt="" coords="621,1351,840,1392"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aa82ecc7b3a88a0cf915a4fca52ce51eb" title="Creates a test graph that looks like this:" alt="" coords="621,1416,840,1457"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a2065189e10c38879dcf9034692ac0228" title="Creates a test graph that looks like this:" alt="" coords="621,1481,840,1523"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a788a4b1620fa0610d9f306e2e8b3a75a" title="Creates a test graph that looks like this: v0(E)&#45;(E)v1." alt="" coords="624,1547,837,1588"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a32d1be6cbba5f29ec8abf94aa3508d3a" title="Creates a test graph that looks like this:" alt="" coords="621,1612,840,1653"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a978d58856f04a9a844344ad2cacc812b" title="Creates a test graph that looks like this: v0(F)&#45;(F)v1." alt="" coords="624,1677,837,1719"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ad0b3d5e8fab4b301eccf4a6e2296ba9e" title="Creates a test graph that looks like this:" alt="" coords="621,1743,840,1784"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a67822e904d4f08743edc67de4fd1c637" title="Creates a test graph that looks like this:" alt="" coords="621,1860,840,1901"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a5c27386c8f0a9a6df8c3ed87b7bbff2a" title="Creates a test graph that looks like this:" alt="" coords="332,1831,551,1872"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a955548efb39f246b73380af6dd7ebf5d" title="Creates a test graph that looks like this:" alt="" coords="621,1925,840,1967"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aa694aa3e4ec8b30a326a892d189ad023" title="Creates a test graph that looks like this:" alt="" coords="621,1991,840,2032"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a422cfdbd52e1df3f711220bdd552bd8f" title="Creates a test graph that looks like this:" alt="" coords="621,2056,840,2097"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1ga_1_1_xover_site.html#a1d75cc7f886374a295deec540178cb61" title="Creates a new instance of this class that contains the list of vertexes that correspond to those cont..." alt="" coords="633,449,828,491"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_d_graph.html#a86e888ef245d2bd40b49d145c7ef3af0" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="629,2121,832,2163"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_d_graph.html#adc362402e41af41656e820def73de5ad" title="Replaced a given vertex belonging to this graph with a new vertex generated specifically for this pur..." alt="" coords="629,71,832,112"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#ab0f92a94c4fb2334e7d3813e73fc4247" title=" " alt="" coords="625,136,837,177"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1_d_graph_1_1_d_e_n_o_p_t_i_m_graph_serializer.html#a642832757b905c952fc7c194dcb7e0dd" title=" " alt="" coords="599,201,863,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#af7aab2a161415ce3fc837e79157df54a" title="Append a graph (incoming=I) onto this graph (receiving=R)." alt="" coords="340,225,543,267"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0c2e353b243250b4959a3f86608f1020" title="Generates one offspring according to the method where crossover and mutation are decoupled,..." alt="" coords="355,356,528,397"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ae7a90a911b109ed47b3acf54193acc35" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="355,291,528,332"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="340,487,543,528"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a6f2ce8f6a8319b39440b0dc43ede061f" title="Check that the following graph&#39;s fused ring gets added to the fragment library." alt="" coords="5,465,284,521"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a56ef448997df677c5ce4a73737f127e2" title="Checks that a graph with a fused ring containing a scaffold vertex is added to the scaffold library." alt="" coords="9,545,280,601"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a7555fcdf60b6fabae0c95844f351fc6f" title=" " alt="" coords="11,624,278,665"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a81e15cea05ce67c5b0c2af89d301d072" title=" " alt="" coords="345,617,538,673"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a51afdfc40faf5bcc51609ddef161f078" title=" " alt="" coords="345,777,538,833"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a161540d22b2ad17c44fc3e1a911a1367" title=" " alt="" coords="345,697,538,753"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a52682a0cc73283eafd36d345b6929ea8" title=" " alt="" coords="346,856,537,897"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1ga_1_1_population_test.html#a5db0672054a9fc1dbc923310732fdb3a" title=" " alt="" coords="338,921,545,963"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1ga_1_1_population_test.html#aa40d0bedbf2ca22b34267aa8491d7ec3" title=" " alt="" coords="338,987,545,1028"/>
+</map>

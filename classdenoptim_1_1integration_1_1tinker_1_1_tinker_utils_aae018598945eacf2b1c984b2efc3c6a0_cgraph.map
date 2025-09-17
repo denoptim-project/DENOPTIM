@@ -1,0 +1,26 @@
+<map id="denoptim.integration.tinker.TinkerUtils.getICFromIAC" name="denoptim.integration.tinker.TinkerUtils.getICFromIAC">
+<area shape="rect" id="node1" title="Convert IAtomContainer to TinkerMolecule." alt="" coords="5,417,181,459"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a48d24f893c36e4f13732a4c3589e026e" title="Add one atom to this molecule." alt="" coords="247,5,423,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a22cd2010095f8f1a0e5fb1b29601702c" title="Add one bond by appending a pair of indeces into the z&#45;add section." alt="" coords="247,71,423,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="515,195,710,222"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_object_pair.html#a59bf5822c6e17f235fe9732a5db78621" title=" " alt="" coords="242,188,429,229"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a9c64e860b98da51f3450361b718a87ec" title=" " alt="" coords="238,253,433,295"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_object_pair.html#a4286b48d08a3f0d307a225eb1defb5b6" title=" " alt="" coords="242,319,429,360"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a1580d654c9b761d4e6b83db342d8ad25" title=" " alt="" coords="229,384,441,425"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="510,371,715,412"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a21e253c52a22329d2cbfd27131a54afa" title=" " alt="" coords="237,449,434,491"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#ae54df7dc95b4567bb0f609c0ea0aa535" title=" " alt="" coords="247,567,423,608"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#ac29919f241e14b0c835e80dc88dabc69" title="Conversion to tinker IC may not always have the necessary atom types." alt="" coords="247,632,424,673"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ac94129cb2177bb9426b2068762c636ea" title=" " alt="" coords="247,697,423,739"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1utils_1_1_math_utils.html#ad18764665d2f24f72e8b18ce015d84ce" title="Calculate the torsion angle between the 4 points." alt="" coords="234,763,437,790"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a53a21c4869f848ca728fb5750dcee034" title=" " alt="" coords="247,815,423,856"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="784,371,981,412"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a38e8be0339a09dfcb518ad1fecfae4e4" title=" " alt="" coords="489,305,736,347"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#aea4ab5789d28e5f2b02ab48fd5b93292" title=" " alt="" coords="509,567,716,608"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a1dbc76d6f0f983ec1b6db689c08dbb05" title=" " alt="" coords="525,697,701,739"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a8df950169a75db97d86189d4147c05a9" title=" " alt="" coords="525,632,701,673"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ae597e352e57e001ca5c4bda8ab599988" title=" " alt="" coords="525,436,701,477"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a0df417191b38fb579c03650a808efe55" title="Gets the XYZ Index." alt="" coords="525,501,701,543"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#afe903c0e393cbf06540b620c8045b1d9" title=" " alt="" coords="525,763,701,804"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1utils_1_1_math_utils.html#ac6f7f135ee0acd6ee3f9a288a17510c6" title="Compute the dihedral angle." alt="" coords="505,852,720,893"/>
+</map>

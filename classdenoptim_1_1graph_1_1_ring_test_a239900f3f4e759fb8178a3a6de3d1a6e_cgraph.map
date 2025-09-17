@@ -1,0 +1,10 @@
+<map id="denoptim.graph.RingTest.testGetCloserVertex" name="denoptim.graph.RingTest.testGetCloserVertex">
+<area shape="rect" id="node1" title=" " alt="" coords="5,99,196,140"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_ring.html#ae8d15b94c699e5555c032e268807df0a" title="Chooses among the two given vertices the one that is closer to the target vertex." alt="" coords="489,41,701,68"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_ring.html#a2662f3078f277d97eebf88adc2d53742" title="Chooses among the two given vertices the one that is closer to the head vertex." alt="" coords="244,34,441,75"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_ring.html#af177de24d64e641f9895af5dcfe647d4" title="Chooses among the two given vertices the one that is closer to the tail vertex." alt="" coords="244,99,441,140"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_ring.html#a306c459210e60f0133d0b3549a531a6c" title=" " alt="" coords="244,164,441,206"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="257,230,428,271"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_ring.html#a52d320207aa3fc73898eb662e8f208cb" title="Checks whether a given vertex is part of this ring." alt="" coords="1008,41,1199,68"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_ring.html#a5f09bd9ccfc437f70de652e0746d2fe1" title="Measures how many edges there are between two edges along the sequence of vertices that defined this ..." alt="" coords="749,66,960,93"/>
+</map>

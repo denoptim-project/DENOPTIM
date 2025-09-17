@@ -1,0 +1,16 @@
+<map id="denoptim.fragmenter.ClusterableFragmentTest.testSetNaturalNodeOrder" name="denoptim.fragmenter.ClusterableFragmentTest.testSetNaturalNodeOrder">
+<area shape="rect" id="node1" title=" " alt="" coords="5,122,259,163"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a1f1eee26acede7b656a922201399f2b4" title="Adds an attachment point with a dummy APClass." alt="" coords="307,29,517,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#a440243910feec0eca5653a43e4fb6721" title="Get the ordered list of nodes representing each either an atom or an attachment point is the alignmen..." alt="" coords="308,81,516,122"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="313,171,511,197"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#a5dadf1ba45cb5471e1f907e84d3e9749" title="Define the node order from the list of atoms and attachment points." alt="" coords="308,247,516,289"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="581,138,758,179"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="835,95,1013,137"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="835,161,1013,202"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_fragment.html#a4babe43e60f32e990179be8dfe96e38e" title=" " alt="" coords="566,204,773,231"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_fragment.html#a366dfaf65191c724b8e393b9d9dc899f" title=" " alt="" coords="829,247,1019,289"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_fragment.html#a860d31c5334438764f9d7ace863c7ed0" title="Creates a graph representation of this fragment where both atoms and AttachmentPoints are represented..." alt="" coords="575,306,764,347"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#ac969b7cb43cdd23507e67c5141766997" title="Sets the order of nodes (i.e., atoms/APs) to use for geometric comparison with other fragments,..." alt="" coords="565,371,773,413"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="821,313,1027,354"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="1075,313,1272,354"/>
+</map>

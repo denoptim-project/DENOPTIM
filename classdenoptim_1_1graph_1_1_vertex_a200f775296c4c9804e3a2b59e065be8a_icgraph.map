@@ -1,0 +1,52 @@
+<map id="denoptim.graph.Vertex.getBuildingBlockId" name="denoptim.graph.Vertex.getBuildingBlockId">
+<area shape="rect" id="node1" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="905,1549,1076,1590"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a91fba166ba9fe73858ed16209d575cc5" title="Recursive method that appends branches of building blocks following the edges of the graph." alt="" coords="585,31,851,87"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel_1_1_vertex_label_transformer.html#a9b14b3398a0ece5aa42faf9e2b74af91" title=" " alt="" coords="603,161,833,202"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a87ea0ad600ad26e1a89a4947abcfef86" title="Graph construction starts with selecting a random core/scaffold." alt="" coords="633,226,803,267"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#a537720023ac6debd9f4663d61026a423" title="Returns a deep&#45;copy of this vertex." alt="" coords="608,393,828,420"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_fragment.html#a3b476687a392e637d2bf2f3b6ccb09a4" title="Returns a deep copy of this fragments." alt="" coords="617,999,819,1025"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_template.html#ac7d7400f47d4bad33f3755f1b3d19a3e" title="Returns a deep copy of this template." alt="" coords="617,1151,819,1177"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_edge.html#a32e31de78eb07c2ac9eb0424e1530efd" title="Compares this and another edge ignoring the directionality of both, i.e., as if both edges were undir..." alt="" coords="621,1202,815,1243"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1ga_1_1_graph_operations.html#af53d9f29a7d8f8e7bc5540ab3cb0c9c7" title="Replace an edge with two edges with a new vertex in between, thus inserting a vertex in between two d..." alt="" coords="589,1268,847,1295"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a7a13e1b1304c0857ae6fa97b744e7289" title="Method to select fragments that increase the likeliness of generating closable chains." alt="" coords="611,1319,825,1361"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_template.html#a49bb195397a18972a5e6be8c25472e26" title="Produces a pair of strings that identify the &quot;path&quot; between two given attachment points." alt="" coords="624,1385,812,1426"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_vertex.html#a3065859eaefc4c2f4f2374b11c1a8e08" title="Produces a pair of strings that identify the &quot;path&quot; between two given attachment points." alt="" coords="633,1450,803,1491"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a8c3e7dd2981cbda13c9e5847f4a4e826" title="Select a compatible ring&#45;closing vertex for the given attachment point." alt="" coords="611,1515,825,1557"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a492683049dc687fcdc41b43051d30554" title="Returns a clone of the requested building block." alt="" coords="621,1581,815,1622"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder.html#acbb92ddbad514c788140dc2fbcbcfef7" title="Constructor that specifies which vertex has to be replaced." alt="" coords="310,1681,493,1722"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_d_graph.html#a305c9a12afe5bb190894fcd730ef299a" title="Checks if this graph is &quot;DENOPTIM&#45;isomorphic&quot; to the other one given." alt="" coords="633,1698,803,1739"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1simplified_1_1_undirected_edge.html#ace4a4459d14c2a0e2ee869b8e0be054e" title=" " alt="" coords="619,1763,817,1805"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a1669a88512d2bd3b14cdd00235dff50a" title="Generate the next combination of fragments." alt="" coords="633,1829,803,1870"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_template.html#a649893e67ee5c2d9fa0c73b264032da3" title="Compares this and another template ignoring vertex IDs." alt="" coords="292,1895,511,1921"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_vertex.html#a7a48a6fb07f119d17a6c8eb091ee73ea" title="Compares this and another vertex ignoring vertex IDs." alt="" coords="625,1946,811,1987"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a35da4565f6579a36546fbfa7233b9df9" title="Substitutes a vertex while keeping its surrounding." alt="" coords="579,2012,857,2039"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#ac2186d67581bef7c19379247af6672d6" title=" " alt="" coords="591,2063,845,2105"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a3b99d7012da487a88acf937e3c9f5ea4" title=" " alt="" coords="614,2129,822,2170"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#a78e6eb5e60124f63897dd28e1c21082d" title=" " alt="" coords="617,2194,819,2235"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1_fragment.html#a9329e824fda4ccb57fd59ad3b7df7c6e" title="Produces a human readable, short string to represent the vertex by its vertex ID, building block ID (..." alt="" coords="627,2259,809,2301"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#acbaf5061621ed283eecc80a51b523422" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="289,5,514,61"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad3d2daeb11e68a356e971ca1846596b5" title=" " alt="" coords="317,85,486,126"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#ab7a37d3340d35ab586332ce2122e7bb0" title=" " alt="" coords="293,150,510,191"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0fd4c84840d3eb11b1838a627d9e6956" title="Returns a graph with definition of symmetric vertexes and symmetric APs meant for testing purposes." alt="" coords="292,215,511,257"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ade544f5bf2f66ccb7a4f179e84b33c1c" title="Returns a graph with peculiar definition of symmetric vertexes and symmetric APs meant for testing pu..." alt="" coords="292,281,511,322"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex_test.html#ab36c441c57e9852e2be6d810d80fbc87" title=" " alt="" coords="301,477,502,518"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a309f26b0bad9acff15e95672089c2432" title=" " alt="" coords="311,346,491,387"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af2fc2503c300637c2369eb4347c990c1" title=" " alt="" coords="286,411,517,453"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a37c0e44680ec1c54fcff98dae0832a50" title="Chops one chemical structure by applying the given cutting rules." alt="" coords="297,542,506,583"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#a1e02c5f6054d5764ff597bd12337345a" title=" " alt="" coords="297,607,505,649"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager_test.html#ac3efa7ffa90ffbdb876e8489054b02af" title="Build a graph meant to be used in unit tests." alt="" coords="287,673,515,714"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#af86b79061d15a4d2e3d7ccdf0d758f44" title=" " alt="" coords="305,738,498,779"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a0a98792d99861bb6673e66a76ff49d31" title=" " alt="" coords="292,803,511,845"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1rings_1_1_path_closability_tools_test.html#af991094bf8c17599150d2e43ea582cf9" title=" " alt="" coords="294,868,509,924"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1rings_1_1_random_comb_of_ring_iterator_test.html#a4a178f479d08c120f5fea6ef60feac8b" title=" " alt="" coords="282,948,521,1004"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager_test.html#a55d1482a18edbaabf15b090392a282f3" title=" " alt="" coords="277,1027,525,1069"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a2b8d6293663bce9a9da1d35efe31911b" title=" " alt="" coords="305,1093,498,1134"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task_test.html#a2dc64f375774087fc0b4511384f50bc9" title=" " alt="" coords="272,1157,531,1213"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1fragmenter_1_1_fragment_alignement_test.html#ad46b9a4324bb5b9bbfc08c73de0e1124" title=" " alt="" coords="276,1237,527,1278"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af88d30ce68477984fe6179325d1540b2" title=" " alt="" coords="281,1433,521,1474"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a4889032266eb87d0f91af8b4e9869360" title=" " alt="" coords="295,1302,507,1343"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector_test.html#ac33b26784f254c873593368ccd717125" title=" " alt="" coords="280,1367,523,1409"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_template_test.html#a72d37b4c24ad896838401b319b1d667e" title=" " alt="" coords="292,1498,511,1539"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_template_test.html#a50688358b5a557ee51683082427bdc14" title=" " alt="" coords="5,1779,224,1821"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_edge_test.html#aeb47a9169ac3c3583ac5c1c061431599" title=" " alt="" coords="305,1615,498,1657"/>
+</map>

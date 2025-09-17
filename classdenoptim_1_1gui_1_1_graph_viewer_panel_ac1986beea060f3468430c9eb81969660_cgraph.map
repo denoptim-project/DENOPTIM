@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GraphViewerPanel.alterLabels" name="denoptim.gui.GraphViewerPanel.alterLabels">
+<area shape="rect" id="node1" title="Adds or removes labels from the elements selected in the graph view." alt="" coords="5,5,179,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a63652cbc8cbef5690625202ab7f6ac3e" title="Finds selected nodes from the viewer." alt="" coords="227,5,400,47"/>
+</map>

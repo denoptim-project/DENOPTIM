@@ -1,0 +1,52 @@
+<map id="denoptim.graph.DGraph.addSymmetricSetOfVertices" name="denoptim.graph.DGraph.addSymmetricSetOfVertices">
+<area shape="rect" id="node1" title="Adds a symmetric set of vertices to this graph." alt="" coords="1143,1051,1324,1092"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a9d462aa2f0112bdc68f0e28fa4353e54" title="Append a subgraph (I) to this graph (R) specifying which vertex and attachment point to use for the c..." alt="" coords="861,152,1064,193"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="866,217,1059,259"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a691da5435e53ae7835b8c58bc0bf3495" title="Looks for any symmetric labels, creates symmetric sets that collect the same information,..." alt="" coords="849,283,1076,324"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph_1_1_d_e_n_o_p_t_i_m_graph_deserializer.html#ac7e1fd6d8a34f40e43c818404546d404" title=" " alt="" coords="831,952,1095,993"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph.html#aff06be9fc2508e591352e7ae46260721" title="Detects and groups symmetric sets of Vertexes in the graph based on unique identification and path en..." alt="" coords="865,1017,1061,1059"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="845,1083,1080,1124"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="837,1149,1088,1175"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_d_graph.html#ade5b573cc8eac0a26ec18969238fd84a" title="Inserts a given vertex in between two vertices connected by the given edge." alt="" coords="867,1200,1059,1241"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a78e0a424c267fe667e094704751430cb" title="Creates a test graph that looks like this:" alt="" coords="853,413,1072,455"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#afb5d16108851dc3359365d1a9b50f1af" title="Creates a test graph that looks like this:" alt="" coords="853,1265,1072,1307"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a32c600aa56729b962114649ff182394a" title="Creates a test graph that looks like this:" alt="" coords="853,625,1072,667"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a2065189e10c38879dcf9034692ac0228" title="Creates a test graph that looks like this:" alt="" coords="853,756,1072,797"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a32d1be6cbba5f29ec8abf94aa3508d3a" title="Creates a test graph that looks like this:" alt="" coords="853,348,1072,389"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ad0b3d5e8fab4b301eccf4a6e2296ba9e" title="Creates a test graph that looks like this:" alt="" coords="853,821,1072,863"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a13095fe0cc8ad6bb9a2720ef10316fae" title="Creates a test graph that looks like this:" alt="" coords="853,511,1072,552"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aa694aa3e4ec8b30a326a892d189ad023" title="Creates a test graph that looks like this:" alt="" coords="853,887,1072,928"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a422cfdbd52e1df3f711220bdd552bd8f" title="Creates a test graph that looks like this:" alt="" coords="853,1331,1072,1372"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ad372c95de212882f1c7b64adb4b760ea" title=" " alt="" coords="859,1396,1067,1437"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a2b8d6293663bce9a9da1d35efe31911b" title=" " alt="" coords="866,1461,1059,1503"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0091493800250a2794af19f597241126" title=" " alt="" coords="859,1527,1067,1568"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a337ce2733050aa5d37cec418eb7d9081" title=" " alt="" coords="859,1592,1067,1633"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a64805f4f059b37a9be325ce5ac8374ce" title=" " alt="" coords="859,1657,1067,1699"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a2cb527dcac2a1f307d70dfda13965786" title=" " alt="" coords="859,1723,1067,1764"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a716f5e1ae52b617c411ab57cb83ee78a" title=" " alt="" coords="840,1788,1085,1829"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a86e888ef245d2bd40b49d145c7ef3af0" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="545,37,748,79"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#adc362402e41af41656e820def73de5ad" title="Replaced a given vertex belonging to this graph with a new vertex generated specifically for this pur..." alt="" coords="545,103,748,144"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a88c2fd8a1b401d9aa25bf85869bc28c7" title=" " alt="" coords="511,168,783,209"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a83a9624ea5dc6a2c515407b865b62611" title=" " alt="" coords="543,495,751,536"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="243,5,442,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_graph_operations.html#affb1be89a32e4a429bd7dbdfe0708419" title="Performs the crossover that swaps the two subgraphs defining the given XoverSite." alt="" coords="223,71,463,112"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="5,71,175,112"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a5e9b439608a02da3f5074f24a17d4b0a" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="544,1017,749,1059"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a05b87ffb43b9710fcea83b0777654e27" title=" " alt="" coords="543,1083,751,1124"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="544,1148,749,1189"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1ga_1_1_graph_operations.html#af53d9f29a7d8f8e7bc5540ab3cb0c9c7" title="Replace an edge with two edges with a new vertex in between, thus inserting a vertex in between two d..." alt="" coords="517,1214,776,1241"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a02791a3f61db5dd584dec5c3995ec72c" title=" " alt="" coords="543,364,751,405"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aea227d615f6c2f3bac5839a8099a900d" title=" " alt="" coords="543,429,751,471"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a3b99d7012da487a88acf937e3c9f5ea4" title=" " alt="" coords="543,299,751,340"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0250850e0ef186b2cf9617a5de3ff34d" title=" " alt="" coords="543,233,751,275"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a7a211a2f8477d88f90d85d6ab26c25e3" title=" " alt="" coords="543,1265,751,1307"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a428fb92fa7fcf1312fc2eb81cf7fac4f" title=" " alt="" coords="543,1331,751,1372"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a6b4a7a889a0e36c8b2dc97bcd8055c9e" title=" " alt="" coords="543,821,751,863"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a487a63ee35e943451ab84845de3982b1" title=" " alt="" coords="543,691,751,732"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a58da23a0d5e884652fecf95eac4995ad" title=" " alt="" coords="543,756,751,797"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#abfaf918deddf6407a4b1916c06a8c412" title=" " alt="" coords="531,560,763,601"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0b946dc2730c68f796c37e5f5cea4e36" title=" " alt="" coords="543,625,751,667"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a3c2936a80e6e37238b4ce5c5e66f3351" title=" " alt="" coords="543,887,751,928"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ac09e961280beb2c61cc88ce1b4bccd3f" title=" " alt="" coords="543,952,751,993"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aa9ebd151440fb02ddfa82c194ba5cf27" title=" " alt="" coords="543,1396,751,1437"/>
+</map>

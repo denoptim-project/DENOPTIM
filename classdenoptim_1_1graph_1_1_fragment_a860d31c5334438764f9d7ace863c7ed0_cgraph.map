@@ -1,0 +1,6 @@
+<map id="denoptim.graph.Fragment.getJGraphFragIsomorphism" name="denoptim.graph.Fragment.getJGraphFragIsomorphism">
+<area shape="rect" id="node1" title="Creates a graph representation of this fragment where both atoms and AttachmentPoints are represented..." alt="" coords="5,39,195,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a366dfaf65191c724b8e393b9d9dc899f" title=" " alt="" coords="251,5,440,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="243,71,448,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="496,71,693,112"/>
+</map>

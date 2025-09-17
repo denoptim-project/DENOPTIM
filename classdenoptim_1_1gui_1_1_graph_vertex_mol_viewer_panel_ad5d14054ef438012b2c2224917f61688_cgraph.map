@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.alterLabels" name="denoptim.gui.GraphVertexMolViewerPanel.alterLabels">
+<area shape="rect" id="node1" title="Adds/Removes labels to the graph components that are presently selected." alt="" coords="5,5,188,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#ac1986beea060f3468430c9eb81969660" title="Adds or removes labels from the elements selected in the graph view." alt="" coords="236,5,409,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a63652cbc8cbef5690625202ab7f6ac3e" title="Finds selected nodes from the viewer." alt="" coords="457,5,631,47"/>
+</map>

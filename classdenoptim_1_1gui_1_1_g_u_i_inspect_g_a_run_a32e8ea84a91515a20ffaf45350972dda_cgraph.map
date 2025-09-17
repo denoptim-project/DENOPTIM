@@ -1,0 +1,17 @@
+<map id="denoptim.gui.GUIInspectGARun.readOneGeneration" name="denoptim.gui.GUIInspectGARun.readOneGeneration">
+<area shape="rect" id="node1" title=" " alt="" coords="5,267,240,308"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#ae0d754f27cb1396b28fadfa6e1cfcd92" title=" " alt="" coords="301,71,471,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a015435de7c18b38757709c97bd46f10d" title=" " alt="" coords="301,136,471,177"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#aab1bd788e028b3a5b77dca355e8d557b" title="Read only selected data from a GA produced items." alt="" coords="292,201,480,243"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a2cda5028becae07d4a0ac873a9352768" title="Read the pathnames to the population members from a FileFormat#GENSUMMARY file." alt="" coords="288,332,484,373"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ae0786894c12a0c3c94f10aca107c8edf" title="Read the minimal info that can be found in a FileFormat#GENSUMMARY file about the members of a popula..." alt="" coords="292,267,480,308"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a888315451366a81a41786fe6aea46d46" title="Read the min, max, mean, and median of a population from FileFormat#GENSUMMARY file." alt="" coords="292,397,480,439"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#abeb30140b862fc08d90bdd6d2290b9b6" title=" " alt="" coords="301,463,471,504"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ab0e2d1314d9babeda94e65c471832df1" title="Extract selected properties from SDF files." alt="" coords="543,5,731,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a5b0854960a04b31ce12b5d0bdbcfbad6" title=" " alt="" coords="552,71,723,112"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a382d6d04e131453c7c4736de583ea996" title=" " alt="" coords="552,267,723,308"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#aa375e204e094848126768561901a32e4" title=" " alt="" coords="552,136,723,177"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a7458628d4e902ca60749a5986a14ecc0" title="Sets level that generated this graph in a fragment space exploration experiment." alt="" coords="552,201,723,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a48102bb79e9cc581e8c6ef527e003b08" title="Reads a file containing multiple molecules (multiple SD format))" alt="" coords="791,5,979,47"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="532,357,743,383"/>
+</map>

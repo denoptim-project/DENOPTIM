@@ -1,0 +1,4 @@
+<map id="denoptim.graph.SymmetricAPs.getAllSameAs" name="denoptim.graph.SymmetricAPs.getAllSameAs">
+<area shape="rect" id="node1" title="Identifies any set of symmetric APs that, although it contains references to different instances of A..." alt="" coords="5,5,180,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_symmetric_a_ps.html#ad9c4e2505401b818c31793385f23946f" title="Checks if this collection SymmetricAPs is analogous to the other one, i.e., they contain AttachmentPo..." alt="" coords="228,5,403,47"/>
+</map>

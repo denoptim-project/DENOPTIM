@@ -1,0 +1,9 @@
+<map id="denoptim.fitness.FitnessParameters.getExternalFitnessProviderInterpreter" name="denoptim.fitness.FitnessParameters.getExternalFitnessProviderInterpreter">
+<area shape="rect" id="node1" title="Gets the interpreter used to run the external fitness provider." alt="" coords="1023,63,1221,119"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_fitness_task.html#a3ce62241b837ed3807a424211d9270c8" title=" " alt="" coords="776,71,975,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_fitness_task.html#a39bac06427179a7d067d3eadee30ba79" title="This method runs the actual evaluation of the fitness, whether that is run internally (i...." alt="" coords="529,71,728,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#aab5b9c0b8a88922460f5c28ae161d1fa" title=" " alt="" coords="261,5,467,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_fitness_evaluation_task.html#a498b4214d06fc161d92cf1a38635ece3" title=" " alt="" coords="249,71,479,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a6b74fb1e5678145e094259bfa2401bd4" title=" " alt="" coords="247,136,481,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="5,136,199,177"/>
+</map>

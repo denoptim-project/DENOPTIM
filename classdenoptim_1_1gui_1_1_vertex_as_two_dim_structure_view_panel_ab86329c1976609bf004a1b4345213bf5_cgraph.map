@@ -1,0 +1,13 @@
+<map id="denoptim.gui.VertexAsTwoDimStructureViewPanel.loadVertexToViewer" name="denoptim.gui.VertexAsTwoDimStructureViewPanel.loadVertexToViewer">
+<area shape="rect" id="node1" title=" " alt="" coords="5,136,229,192"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a96588a21ab72f01a72c846d3d1dc08c6" title="Clears the table of attachment points." alt="" coords="568,198,809,239"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#aea1a1a4a407b6886148f398f09fe78b3" title=" " alt="" coords="287,5,511,61"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a0ce8a719faec963fb57855c12a8ddb4d" title=" " alt="" coords="277,85,520,126"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a27bd1b9426bdc53468cbfd8afea54f7d" title=" " alt="" coords="289,201,508,257"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#af05043aa9732bea8f31603a41e3c1dea" title="Uses the AP of the Fragment to create a new map and table of APs." alt="" coords="297,281,500,337"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a69ceb353f2391f1e5b25dc6e6bc88492" title="Allows to activate and deactivate the listener." alt="" coords="857,191,1067,247"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_pausable_table_model_listener.html#a326ffbf277447d4c06bcb4fbf85f20cb" title=" " alt="" coords="1115,191,1332,247"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a2caf56ade915a499efa13013f71e0cba" title="trashed the current panel displaying any 2D structure and replaces it with a new empty panel." alt="" coords="577,13,801,54"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="603,81,774,122"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="603,315,774,357"/>
+</map>

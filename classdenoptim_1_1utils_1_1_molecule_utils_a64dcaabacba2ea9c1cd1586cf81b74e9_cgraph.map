@@ -1,0 +1,5 @@
+<map id="denoptim.utils.MoleculeUtils.missmatchingAromaticity" name="denoptim.utils.MoleculeUtils.missmatchingAromaticity">
+<area shape="rect" id="node1" title="Looks for carbon atoms that are flagged as aromatic, but do not have any double bond and are,..." alt="" coords="5,39,273,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a984946436216edeaa85f4fb31aff32db" title=" " alt="" coords="325,5,530,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a06c17dfdfda7ee42594bd4a1f9024a3a" title="Returns the number of bonds, with a certain bond order, surrounding the given atom." alt="" coords="321,71,533,112"/>
+</map>

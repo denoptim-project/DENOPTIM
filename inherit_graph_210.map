@@ -1,0 +1,10 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,209,108,235"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_tree_map_1_1_a_p_map_serializer.html" title="Method that serializes this class without creating loops of references." alt="" coords="195,5,381,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph_1_1_d_e_n_o_p_t_i_m_graph_serializer.html" title="We expect unique IDs for vertices." alt="" coords="156,71,420,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_edge_1_1_d_e_n_o_p_t_i_m_edge_serializer.html" title=" " alt="" coords="167,136,409,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_ring_1_1_d_e_n_o_p_t_i_m_ring_serializer.html" title=" " alt="" coords="169,201,407,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_symmetric_a_ps_1_1_symmetric_a_ps_serializer.html" title=" " alt="" coords="193,267,383,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_symmetric_vertexes_1_1_symmetric_vertexes_serializer.html" title=" " alt="" coords="167,332,409,373"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1json_1_1_i_atom_container_serializer.html" title="Class to serialise CDK&#39;s IAtomContainer in a simplified manner." alt="" coords="191,397,385,439"/>
+</map>

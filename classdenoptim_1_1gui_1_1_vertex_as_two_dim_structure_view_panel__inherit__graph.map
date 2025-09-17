@@ -1,0 +1,5 @@
+<map id="denoptim.gui.VertexAsTwoDimStructureViewPanel" name="denoptim.gui.VertexAsTwoDimStructureViewPanel">
+<area shape="rect" id="node1" title="A panel to visualize a vertex as two&#45;dimensional chemical structure with attachment point table." alt="" coords="45,80,221,121"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,5,91,32"/>
+<area shape="rect" id="node3" href="$interfacedenoptim_1_1gui_1_1_i_vertex_a_p_selection.html" title="Interface for all vertex viewers that intend to allow selection of attachment points." alt="" coords="115,5,325,32"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.graph.DGraph.findVertices" name="denoptim.graph.DGraph.findVertices">
+<area shape="rect" id="node1" title="Filters a list of vertices according to a query." alt="" coords="512,71,692,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4df69c91a742d22f8d14d44489aeac15" title="Edit this graph according to a given list of edit tasks." alt="" coords="269,5,451,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa33092b4424428a7f574efe6397c2c71" title="Search a graph for vertices that match the criteria defined in a query vertex." alt="" coords="270,71,450,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ab660196af28b1c83162c6028ea203519" title=" " alt="" coords="256,136,464,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="5,5,208,47"/>
+</map>

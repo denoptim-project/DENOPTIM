@@ -1,0 +1,52 @@
+<map id="denoptim.gui.GUIVertexInspector.importVerticesFromFile" name="denoptim.gui.GUIVertexInspector.importVerticesFromFile">
+<area shape="rect" id="node1" title="Imports fragments from a file." alt="" coords="5,560,257,601"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a69d3deb57097286f9a01cdf256ec8d65" title="Imports vertices." alt="" coords="305,344,557,385"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc4e3a5d4e0db3c1eb06e1ff721af9cf" title="Reads Vertexes from any file that can contain such items." alt="" coords="337,851,525,892"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#ad9676f2418e5c4221fd7927d68cedad5" title="Loads the fragments corresponding to the field index." alt="" coords="613,155,853,196"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a013aff2b78fa8e41950e763cdb1e2bab" title=" " alt="" coords="605,344,860,385"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a0218e1fb0eb91fdd035a39d8856d4ddf" title=" " alt="" coords="908,39,1152,80"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a697ecc5ef3352a5860a6a6a355d87d1b" title="Loads the given vertex to this viewer." alt="" coords="918,155,1142,196"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a04374b744146d399fb0403bf9d95b132" title="Removes the currently visualized molecule and AP table." alt="" coords="1200,12,1428,53"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a65e5473c03b2075c97fbfa9b587b8949" title="Clears the table of attachment points." alt="" coords="1504,5,1687,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a9bcc749971b5bff83b5c94c419509567" title=" " alt="" coords="1476,71,1715,112"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#af961ff72b42d1852cd21fc95a238a294" title="Loads the given empty vertex to this viewer." alt="" coords="1202,180,1426,221"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a5de255e134fc5c4eea74c6b653ddb913" title="Loads the given fragments to this viewer." alt="" coords="1483,191,1707,232"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a23695fc49f5ff660a828bddbf74a5006" title="Loads the given template to this viewer." alt="" coords="1202,245,1426,287"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1files_1_1_file_utils.html#adf038babeb9f64d8c853a0290efe04fb" title="Inspects a file/folder and tries to detect if there is one of the data sources that is recognized by ..." alt="" coords="637,1328,828,1369"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a8c1a03486f0b05207bce11ae61c843dd" title="Reads a list of DGraphs from a JSON file." alt="" coords="920,785,1140,827"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ac6c5a3a9286a795c120861c768ce4bd3" title="Reads a list of &lt;DGraphs from a SDF file." alt="" coords="631,940,834,981"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a3c0fb8cce99f346b2f4fb353363a6979" title="Reads a list of Vertexes from a JSON file." alt="" coords="915,851,1145,892"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#afafcbd0eb3ef895e462f309889f05328" title="Reads a list of Vertexes from a SDF file." alt="" coords="627,1039,838,1080"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_template.html#a405d47ac1a08ac9bd658bcdcc693a0a4" title=" " alt="" coords="639,515,827,556"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1files_1_1_file_utils.html#a81ee3939d31a3703a85b19b02b7c2906" title="Detect the content of a json file." alt="" coords="935,1231,1125,1272"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1files_1_1_file_utils.html#af0429c88ee95afd0cc9d3da72fe5b60b" title="Looks into a text file and tries to understand if the file is a collection of parameters for any spec..." alt="" coords="935,1492,1125,1533"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1files_1_1_file_utils.html#aa44c824a41849bcaaae541151db21cd6" title="Looks into a text file and tries to understand if the file is a collection of parameters for any spec..." alt="" coords="935,1427,1125,1468"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1files_1_1_file_utils.html#a33e38e26f52c870617eec9e1c4810f7a" title="Looks into a text file and tries to understand if the file is a known text file." alt="" coords="935,1361,1125,1403"/>
+<area shape="rect" id="node25" href="$enumdenoptim_1_1files_1_1_file_format.html#a3add0e6a04faada7ca012a68d9658bf2" title=" " alt="" coords="937,1296,1123,1337"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a3e85cb26bb2f36407e309e41880ef191" title=" " alt="" coords="1484,899,1707,940"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="1763,899,1985,940"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1files_1_1_file_utils.html#ac4f9dab79d47fe1f2c398fa7ab99da83" title="Looks into a text file and tries to understand what format it is among the given formats." alt="" coords="1219,1393,1409,1435"/>
+<area shape="rect" id="node20" href="$enumdenoptim_1_1files_1_1_file_format.html#a1195c718a5815ad69711686b478e5ec6" title="Returns the collection of file formats with input parameters." alt="" coords="1221,1524,1407,1565"/>
+<area shape="rect" id="node22" href="$enumdenoptim_1_1files_1_1_file_format.html#a45ce558c824bcceb76dcb1cd0ccc6013" title="Returns the collection of file formats using SDF syntax." alt="" coords="1221,1459,1407,1500"/>
+<area shape="rect" id="node24" href="$enumdenoptim_1_1files_1_1_file_format.html#aacb6d37afa380f4f44c3f6699882a432" title="Returns the collection of file formats restricted to TXT files (excluded parameter files)" alt="" coords="1221,1328,1407,1369"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa5f803143b57df02989af878b098798f" title="Reads a JSON string and returns an instance of this class." alt="" coords="1207,830,1421,857"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a3d1393195144f47b8071517c24336a66" title="Converts an atom container read in from an SDF file into a graph, if possible." alt="" coords="936,940,1124,981"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a48102bb79e9cc581e8c6ef527e003b08" title="Reads a file containing multiple molecules (multiple SD format))" alt="" coords="936,1005,1124,1047"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_vertex.html#aaac79f0c3bbeeb57790d23dd57332a6f" title=" " alt="" coords="1211,931,1417,958"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_vertex.html#a06ba86558e67288b653f2e66a9d0f642" title="Created a Vertex from the SDF representation, i.e., from an IAtomContainer." alt="" coords="937,1071,1123,1112"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_vertex.html#a9e929305eb2d84df0e8dbf73fc2eb325" title="Processes an IAtomContainer and builds a Vertex that is an instance of Fragment." alt="" coords="1216,983,1412,1024"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="1229,1048,1399,1089"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="1229,1113,1399,1155"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_template.html#a687f8680d7c74dacadeb80c85ced2be5" title="Adds the projection of an AP in the template&#39;s inner graph (i.e., innerAP) to the list of APs visible..." alt="" coords="935,559,1125,600"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_template.html#a82c53a76c42c31848f394c3f7aab21b9" title="Removes the molecular representation." alt="" coords="931,624,1129,665"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_d_graph.html#a309d3784aeae9aedce785314e753bdc5" title="Returns the list of available attachment points contained in this graph." alt="" coords="1225,311,1403,352"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_template.html#a1b1c82228b19609959356d3aa1f2a53b" title=" " alt="" coords="940,396,1120,437"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1_d_graph.html#a04463f5a015f34500e6c516d4ef0eabb" title="Sets the reference to a template that embeds this graph, i.e., this graph&#39;s &quot;jacket&quot; template." alt="" coords="941,469,1119,511"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a8dc9e31a8d2fb5ef6a9705cbf2ec22c9" title="Returns a deep clone of this attachment point." alt="" coords="1224,624,1404,665"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="1229,689,1399,731"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#a9e1e1c1dd87ebfb469b6c705c00038b6" title=" " alt="" coords="1213,507,1415,534"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a76bfbe6cc3918c114c73974b2fe4e59d" title="Sets the reference to the vertex that owns this attachment point." alt="" coords="1224,559,1404,600"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_d_graph.html#a27e25f8f8e1516d81cc281e2795a9428" title="Returns the list of all attachment points contained in this graph." alt="" coords="1506,311,1685,352"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="1224,441,1404,483"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1_template.html#af47237c84381d97803d99a7ee16ddc63" title=" " alt="" coords="1220,376,1408,417"/>
+</map>

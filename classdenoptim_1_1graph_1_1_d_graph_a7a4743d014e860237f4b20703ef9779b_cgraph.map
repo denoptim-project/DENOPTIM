@@ -1,0 +1,52 @@
+<map id="denoptim.graph.DGraph.makeAllGraphsWithDifferentRingSets" name="denoptim.graph.DGraph.makeAllGraphsWithDifferentRingSets">
+<area shape="rect" id="node1" title="Evaluates the possibility of closing rings in this graph and generates all alternative graphs resulti..." alt="" coords="5,1869,212,1911"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad16255987a45bace2ef62f2b49e0d873" title=" " alt="" coords="280,267,487,294"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_ring.html#a26caae2f4e91d37ffb2f7f3becd97a8e" title="Append a DENOPTIMVertex to the list." alt="" coords="583,1186,783,1213"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#ac31060459a0e96c5382f0e609422f178" title=" " alt="" coords="262,1928,505,1969"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_cyclic_graph_handler.html#a3608d608f5dc3f2e3cebb95929681410" title="Evaluates the combination of a DENOPTIMGraph and a set of DENOPTIMRings and decides whether it&#39;s a pr..." alt="" coords="270,319,497,360"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="899,624,1078,665"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6f0b9a42074fe224ae52cee5f5875a7c" title="Returns almost &quot;deep&#45;copy&quot; of this graph." alt="" coords="288,1477,479,1503"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_ring.html#a4d36b4964430194b787e708d47b00af5" title="Set the bond type (i.e., bond order) of the chord connecting the head and the tail vertices." alt="" coords="879,1731,1098,1758"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_d_graph.html#a421ce3718c62761e49a4dd4d0f20682c" title=" " alt="" coords="594,1783,773,1824"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5126283bcf1434c3366ea17bfac2c55f" title=" " alt="" coords="594,1848,773,1889"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#aa1352172290adaaf3a478ed7a90cf3fc" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="271,2018,496,2074"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#af386024b4389e50ad3ff118168e5382d" title="Define the rotational space (also torsional space) for a given molecule." alt="" coords="276,2097,491,2139"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#a93693af51412000689dc7517151b9a05" title=" " alt="" coords="264,2163,503,2204"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="290,2228,477,2269"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1rings_1_1_cyclic_graph_handler.html#a3ce96322723f45d9285a248ebcef94d3" title="Identifies all possible ring closing paths and returns them as list of DENOPTIMRings ready to be appe..." alt="" coords="261,865,506,921"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html#ad59362b4945815190cb66c807d766c57" title=" " alt="" coords="261,2293,506,2335"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aec200d5d7fdb3bdd7139736499a679ae" title="Unique counter for the number of graphs generated." alt="" coords="289,2359,477,2400"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad36b954088b2e04ea927801775e56d77" title="Reassign vertex IDs to a graph." alt="" coords="276,565,491,607"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a3d187f47c0c8df855ea6a0601e95fcc0" title="Sets the flag that controls whether building blocks have to be aligned according to the AP vectors or..." alt="" coords="260,2424,507,2465"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a47b278f84db073b1f06809f9c42cfae5" title="Check usage of APClass&#45;based approach, i.e., uses attachment points with annotated data (i...." alt="" coords="271,2489,495,2531"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="899,289,1079,331"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="598,449,769,491"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a846e0f49dfefd933c429450545338d25" title="Looks into the edges that use any of the APs that belong to this vertex and returns the list of verti..." alt="" coords="598,5,769,47"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#adec35096a825bca2b923e6c9c720a707" title="Looks for an edge that points to a vertex with the given vertex id." alt="" coords="594,384,773,425"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph.html#a9677d31ec5986be0e1694dfd1a184f5f" title="Calculates the level of a vertex in this graph." alt="" coords="594,71,773,112"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_edge.html#a662733a6744a63aec552a1cc2685d468" title=" " alt="" coords="592,319,775,360"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph.html#a650a0f54382fb930bf57429dd616258a" title=" " alt="" coords="594,515,773,556"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#aca10b3acbf66e3652cb9664179ed368f" title=" " alt="" coords="598,136,769,177"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac33a29894453a78896488fa441fcbd85" title="Do not use this to make SDF representations." alt="" coords="594,201,773,243"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="596,1665,771,1707"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="591,1237,775,1263"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8c53e13b64166fc85fc9a7787dadd46b" title=" " alt="" coords="581,1287,785,1314"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a774671253396558cf35ab75613762174" title="Returns the bond type preferred by this attachment point as defined by the APClass,..." alt="" coords="593,1339,773,1380"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="598,1404,769,1445"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="903,948,1074,989"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_d_graph.html#a30bfc345b743b8859c842b3b4e3ca5fa" title=" " alt="" coords="594,1469,773,1511"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph.html#af5cb07ab0686739e6e1713da9d8959c1" title=" " alt="" coords="594,1535,773,1576"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5c72d2f8c10e05c4bf58de3ccce6522c" title=" " alt="" coords="594,1600,773,1641"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#a632725819d97adeb31a5eb613b307ea2" title="Search for all bonds connecting atoms corresponding to two different vertices in the DENOPTIMGraph." alt="" coords="580,2083,787,2124"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3cd7e9334f87d11a46f3a424beaa6751" title=" " alt="" coords="560,2148,807,2189"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3506079a3de962c32b2c715f8cea96e6" title=" " alt="" coords="560,2213,807,2255"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aea287dfe72ffc150250c8180706289bd" title=" " alt="" coords="560,2279,807,2320"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#ab9bae44c65063e18fecfe4525154f877" title="Read a formatted file and return a map with all the SMARTS queries identifying rotatable bonds." alt="" coords="556,2344,811,2385"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aaffb007354a24c9fb679742e431c9980" title=" " alt="" coords="559,1965,808,2007"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a5b9d0a88dd69734a1c54659e07d1294a" title="Replace any PseudoAtoms representing ring closing attractors with H." alt="" coords="555,2031,812,2058"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a52560f621975a4663bba65af7398ff39" title=" " alt="" coords="860,1059,1117,1115"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1rings_1_1_cyclic_graph_handler.html#a84d37f4cd922ff124f5ffdacc7baedd0" title="Recursive method to identify all the combination of rings." alt="" coords="559,1106,808,1162"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager.html#a1dae0d654f9f01019b6f797435322c43" title=" " alt="" coords="569,683,798,724"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="598,748,769,789"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager.html#a88079843bc382135c60bd1649cc84254" title="Makes this ring size manager work on a specific system that has a molecular representation and a DENO..." alt="" coords="598,813,769,855"/>
+</map>

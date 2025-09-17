@@ -1,0 +1,6 @@
+<map id="denoptim.utils.MathUtils.length" name="denoptim.utils.MathUtils.length">
+<area shape="rect" id="node1" title="Return the norm of a vector." alt="" coords="500,42,699,69"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_math_utils.html#ac697c4b44f2cc17f369c23672ed6f68e" title="compute the angle between two vectors a &amp; b of same length" alt="" coords="236,5,452,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_math_utils.html#acec0512d4bf542b6642fff81811a791a" title="Normalizes a vector." alt="" coords="247,71,441,98"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_math_utils.html#aab91f5150ef82c7e3c04c350fa2bfe0f" title="Calculates angle (in degrees) between vectors BA and BC." alt="" coords="5,5,188,47"/>
+</map>

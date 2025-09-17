@@ -1,0 +1,10 @@
+<map id="denoptim.graph.Fragment.toJson" name="denoptim.graph.Fragment.toJson">
+<area shape="rect" id="node1" title="Produces a string that represents this vertex and that adheres to the JSON format." alt="" coords="587,78,797,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector.html#adda9ae414e7bcde531d4c7914539791b" title=" " alt="" coords="296,5,539,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector.html#a7170efe46e1730c48fe2dbf1d5a0aefc" title="Checks if an isomorphism exists between the two fragments." alt="" coords="296,71,539,112"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex_test.html#a903343147e9c65e098a01e6210426817" title=" " alt="" coords="317,136,518,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragment_alignement.html#a544426b853510be7f33a7b794b225b04" title="Constructor for an alignment of two fragments." alt="" coords="21,5,232,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_fragment.html#a58818a8ad99db167934420283484a5f7" title="Checks for isomorphism of the graph representation of this and another fragment." alt="" coords="36,71,217,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector_test.html#ac33b26784f254c873593368ccd717125" title=" " alt="" coords="5,136,248,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector_test.html#a06e7f03c86471b6a5b06ffcb5358d0cf" title=" " alt="" coords="5,201,248,243"/>
+</map>

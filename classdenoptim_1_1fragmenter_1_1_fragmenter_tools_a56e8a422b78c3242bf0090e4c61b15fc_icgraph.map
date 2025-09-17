@@ -1,0 +1,5 @@
+<map id="denoptim.fragmenter.FragmenterTools.exploreConnectivity" name="denoptim.fragmenter.FragmenterTools.exploreConnectivity">
+<area shape="rect" id="node1" title="Explores the connectivity annotating which atoms have been visited." alt="" coords="272,39,481,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a37c0e44680ec1c54fcff98dae0832a50" title="Chops one chemical structure by applying the given cutting rules." alt="" coords="10,5,219,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools_test.html#af0f56dd3dbbfd4ac7c14060a2ba33a89" title=" " alt="" coords="5,71,224,112"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="denoptim.utils.Randomizer.getNormallyNoisyPoint" name="denoptim.utils.Randomizer.getNormallyNoisyPoint">
+<area shape="rect" id="node1" title="Returns a point in three&#45;dimensional space with a random set of coordinates, the absolute value of wh..." alt="" coords="5,23,200,65"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_randomizer.html#aa3802a9e92c4733a7510775090d04557" title="Returns the next pseudo&#45;random, normally distributed double value between 0.0 and 1...." alt="" coords="248,23,448,65"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_randomizer.html#a6873dd710cc271ed81bfa45411a62359" title="Returns the random number generator." alt="" coords="496,5,719,32"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_randomizer.html#acaa5e386da195d9454fae611ed554c48" title="Utility to debug: writes some log in file &#39;/tmp/rng_debug_log&#39;." alt="" coords="507,56,708,83"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_randomizer.html#aaaeda6dedda5664a47a2a9a68194162a" title="Initializes this random number generator (RNG) using a random seed that is generated on&#45;the&#45;fly rando..." alt="" coords="767,5,1019,32"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_randomizer.html#ad74f0608d3e2e10caa8873ae059367a7" title=" " alt="" coords="1067,5,1320,32"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="783,56,1002,83"/>
+</map>

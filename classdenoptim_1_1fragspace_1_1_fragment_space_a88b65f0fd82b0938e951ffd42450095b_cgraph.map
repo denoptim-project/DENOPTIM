@@ -1,0 +1,6 @@
+<map id="denoptim.fragspace.FragmentSpace.getCompatibleCappingFragments" name="denoptim.fragspace.FragmentSpace.getCompatibleCappingFragments">
+<area shape="rect" id="node1" title="Retrieve a list of compatible capping groups." alt="" coords="5,39,260,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a274e9253fa2a75073e7fc14918e54eef" title="Returns the list of all APClasses present on this vertex." alt="" coords="319,5,490,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ac3651ea11f0b3f14f5aeab474bd43191" title=" " alt="" coords="308,71,501,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="549,5,720,47"/>
+</map>

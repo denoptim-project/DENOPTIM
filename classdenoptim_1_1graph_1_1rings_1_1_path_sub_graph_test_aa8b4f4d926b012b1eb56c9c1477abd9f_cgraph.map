@@ -1,0 +1,25 @@
+<map id="denoptim.graph.rings.PathSubGraphTest.testMakePathSubGraph" name="denoptim.graph.rings.PathSubGraphTest.testMakePathSubGraph">
+<area shape="rect" id="node1" title=" " alt="" coords="5,358,253,399"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#aa1352172290adaaf3a478ed7a90cf3fc" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="608,29,833,85"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a29c6e1bbc1ca727f10c162951d254ee7" title="Returns the molecular representation." alt="" coords="309,293,553,334"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a58811a9ea75a26abffc1a9c7c2b22741" title="Returns the vertex that is in the given position of the list of vertices belonging to this graph." alt="" coords="341,358,520,399"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a178fe4dd52877659d0d0ae635635e880" title="Creates the molecular representation, list of atoms and bonds involved in the path between the head a..." alt="" coords="301,174,560,215"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph_test.html#ace88ac9b173816aff6d93f41a1323266" title="Build a graph meant to be used in unit tests." alt="" coords="325,489,536,530"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph_test.html#a8fc97bebc417b6e412be5e083c264211" title="Build a graph meant to be used in unit tests." alt="" coords="325,423,536,465"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a3d187f47c0c8df855ea6a0601e95fcc0" title="Sets the flag that controls whether building blocks have to be aligned according to the AP vectors or..." alt="" coords="307,554,554,595"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a9fb520cb11466c3613745b31df09ee0c" title="Finds the shortest path of atoms between the first and last atom in the given atom container." alt="" coords="635,109,806,150"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#aef11c232cbc65e343d11fcce3a6a1ebd" title=" " alt="" coords="627,174,814,215"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="625,263,816,305"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_fragment.html#a1f1eee26acede7b656a922201399f2b4" title="Adds an attachment point with a dummy APClass." alt="" coords="615,353,826,380"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="615,404,826,431"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="630,455,811,497"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="626,521,815,548"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="621,596,820,623"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_vertex.html#a5dbac662f4102558f3cf874c55174c5e" title=" " alt="" coords="635,647,806,689"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="881,390,1091,431"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="897,455,1075,497"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="901,521,1071,562"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="897,589,1075,630"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1139,555,1316,597"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1139,621,1316,662"/>
+</map>

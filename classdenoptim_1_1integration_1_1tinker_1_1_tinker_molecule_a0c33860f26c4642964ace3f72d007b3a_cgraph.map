@@ -1,0 +1,4 @@
+<map id="denoptim.integration.tinker.TinkerMolecule.set3DCoordinates" name="denoptim.integration.tinker.TinkerMolecule.set3DCoordinates">
+<area shape="rect" id="node1" title="store 3d coordinates of the fragments" alt="" coords="5,5,221,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#aa50eb67d7f5ca77922ec7b7b645b9f01" title="Add a vector to the Atom&#39;s current position vector." alt="" coords="269,5,445,47"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.graph.rings.ChainLink.getApIdToLeft" name="denoptim.graph.rings.ChainLink.getApIdToLeft">
+<area shape="rect" id="node1" title=" " alt="" coords="831,39,1008,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a7a13e1b1304c0857ae6fa97b744e7289" title="Method to select fragments that increase the likeliness of generating closable chains." alt="" coords="568,5,783,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#a9e4574e03e6a0c6763497833f15f0c04" title="Check whether a combination of vertex and attachment points ID is involved in this chain." alt="" coords="578,71,773,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a649892c4a2b1d4ccd2f97cae6dd7ed98" title=" " alt="" coords="288,5,520,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="5,5,240,47"/>
+</map>

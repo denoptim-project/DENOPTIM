@@ -1,0 +1,24 @@
+<map id="denoptim.fragspace.FragmentSpace.getVertexFromLibrary" name="denoptim.fragspace.FragmentSpace.getVertexFromLibrary">
+<area shape="rect" id="node1" title="Returns a clone of the requested building block." alt="" coords="1232,353,1425,394"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#afa4835767d37078abce9e3fbe5fa16e1" title="Constructs a new factory for generating all the combination of fragments that can be attached on a gi..." alt="" coords="939,5,1182,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a464680d8b4e470182a7d2f0acb8c4ef0" title="Search for a specific AP on a specific fragment and finds out its class." alt="" coords="958,85,1163,126"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a0311d9fe4a945fc7e06ba466bb8ca121" title="Searches for all building blocks that are compatible with the given list of APs." alt="" coords="319,136,552,192"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder.html#a23a02a7ccf016632eb93ac02eae9bc6b" title=" " alt="" coords="967,202,1154,243"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder.html#acbb92ddbad514c788140dc2fbcbcfef7" title="Constructor that specifies which vertex has to be replaced." alt="" coords="657,227,839,269"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#aaebd9e32b3be01d8eb6ddb12fdd84dfb" title=" " alt="" coords="940,319,1181,361"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#af15a7e1bfc7235e3242e3d99f4277397" title="Searches for all building blocks that are ring&#45;closing vertexes and are compatible with the given AP." alt="" coords="964,385,1157,426"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a96de4850b97ff260187dc7450c883167" title="Searches for all building blocks that are ring&#45;closing vertexes and hold an AP with the given class." alt="" coords="964,450,1157,491"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a586ff58307127b487068fe2aa5e43359" title="Creates a test graph that looks like this: v0(A)&#45;(A)v1(B)&#45;(B)v2." alt="" coords="953,515,1168,557"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a788a4b1620fa0610d9f306e2e8b3a75a" title="Creates a test graph that looks like this: v0(E)&#45;(E)v1." alt="" coords="954,581,1167,622"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a978d58856f04a9a844344ad2cacc812b" title="Creates a test graph that looks like this: v0(F)&#45;(F)v1." alt="" coords="954,646,1167,687"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a692723b803a64dd25e775b2f8726fe27" title="Works with this graph:" alt="" coords="937,711,1184,767"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a2dca1b8ac952e62a5b5aa1f961334a01" title="Searches for all APs that are compatible with the given list of APs." alt="" coords="607,85,889,126"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a2ba7718688486212e987638aef444bad" title=" " alt="" coords="312,56,559,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab95d03f36f68718eb1cc11fac188401f" title=" " alt="" coords="5,136,264,192"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a342092d5d542a9e50e81c73aa931b223" title=" " alt="" coords="631,351,865,393"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ac722cc2d3eff673746ba6c3eba3cace3" title=" " alt="" coords="627,417,869,458"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a10f29a0409c104973230371493a734ed" title=" " alt="" coords="639,482,857,523"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a11b5fce33ae34132f5b16a11b57aaae7" title=" " alt="" coords="635,547,861,589"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a0ec3c77508e8ec583b570a6803056e9a" title=" " alt="" coords="639,612,857,668"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder_test.html#a027bbe60b63ad7c458011fe4c4814ff7" title=" " alt="" coords="639,692,857,748"/>
+</map>

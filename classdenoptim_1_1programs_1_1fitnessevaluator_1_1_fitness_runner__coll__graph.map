@@ -1,0 +1,19 @@
+<map id="denoptim.programs.fitnessevaluator.FitnessRunner" name="denoptim.programs.fitnessevaluator.FitnessRunner">
+<area shape="rect" id="node1" title="Stand&#45;alone fitness provider." alt="" coords="1608,206,1837,247"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_program_task.html" title="Task structure for any of the main programs in the denoptim project, such as genetic algorithm and co..." alt="" coords="1313,145,1497,172"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="999,69,1134,96"/>
+<area shape="rect" id="node4" title=" " alt="" coords="646,5,774,32"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1task_1_1_process_handler.html" title=" " alt="" coords="611,56,809,83"/>
+<area shape="rect" id="node6" title=" " alt="" coords="689,145,731,172"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_r_parameters.html" title="Parameters controlling execution of FitnessRunner." alt="" coords="952,207,1181,249"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_p_runner.html" title="Runs a fitness provider task as defined in the static parameters." alt="" coords="1291,273,1520,314"/>
+<area shape="rect" id="node8" title=" " alt="" coords="974,273,1159,314"/>
+<area shape="rect" id="node9" title=" " alt="" coords="975,338,1158,379"/>
+<area shape="rect" id="node10" title=" " alt="" coords="997,404,1136,431"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html" title="Collection of parameters controlling the behavior of the software." alt="" coords="617,231,803,273"/>
+<area shape="rect" id="node13" title=" " alt="" coords="297,155,360,181"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="242,205,415,232"/>
+<area shape="rect" id="node15" title=" " alt="" coords="5,205,128,232"/>
+<area shape="rect" id="node16" title=" " alt="" coords="195,256,463,312"/>
+<area shape="rect" id="node17" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html" title="Identifier of the type of parameters." alt="" coords="235,335,422,377"/>
+</map>

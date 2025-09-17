@@ -1,0 +1,10 @@
+<map id="denoptim.fitness.descriptors.TanimotoMolSimilarityTest" name="denoptim.fitness.descriptors.TanimotoMolSimilarityTest">
+<area shape="rect" id="node1" title="Unit test for descriptor TanimotoMolSimilarity." alt="" coords="655,137,841,178"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html" title="Calculates the molecular similarity against a target compound the fingerprint of which is given as pa..." alt="" coords="359,137,545,178"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,5,192,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="28,56,169,83"/>
+<area shape="rect" id="node5" href="$interfacedenoptim_1_1fitness_1_1_i_denoptim_descriptor.html" title="This interface forces descriptors that are not defined in the CDK ontology to provide information tha..." alt="" coords="9,107,188,149"/>
+<area shape="rect" id="node6" title=" " alt="" coords="47,173,150,200"/>
+<area shape="rect" id="node7" title=" " alt="" coords="49,224,148,251"/>
+<area shape="rect" id="node8" title=" " alt="" coords="29,275,168,301"/>
+</map>

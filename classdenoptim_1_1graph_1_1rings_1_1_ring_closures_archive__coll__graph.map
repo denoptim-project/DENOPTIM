@@ -1,0 +1,19 @@
+<map id="denoptim.graph.rings.RingClosuresArchive" name="denoptim.graph.rings.RingClosuresArchive">
+<area shape="rect" id="node1" title="Data structure to store and handle information about sub&#45;structures (i.e., chains of fragments) and r..." alt="" coords="1307,81,1477,123"/>
+<area shape="rect" id="node2" title=" " alt="" coords="237,5,420,47"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closures_archive.html" title="Data structure to store and handle information about sub&#45;structures (i.e., chains of fragments) and r..." alt="" coords="629,393,799,435"/>
+<area shape="rect" id="node3" title=" " alt="" coords="226,161,431,217"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html" title="Parameters and setting related to handling ring closures." alt="" coords="1039,305,1209,347"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html" title="Collection of parameters controlling the behavior of the software." alt="" coords="621,529,807,571"/>
+<area shape="rect" id="node6" title=" " alt="" coords="297,453,360,479"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="242,503,415,530"/>
+<area shape="rect" id="node8" title=" " alt="" coords="5,503,128,530"/>
+<area shape="rect" id="node9" title=" " alt="" coords="195,554,463,610"/>
+<area shape="rect" id="node10" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html" title="Identifier of the type of parameters." alt="" coords="235,633,422,675"/>
+<area shape="rect" id="node11" title=" " alt="" coords="611,139,817,166"/>
+<area shape="rect" id="node12" title=" " alt="" coords="639,190,789,217"/>
+<area shape="rect" id="node13" title=" " alt="" coords="661,241,767,267"/>
+<area shape="rect" id="node14" title=" " alt="" coords="642,291,786,318"/>
+<area shape="rect" id="node15" title=" " alt="" coords="665,342,763,369"/>
+<area shape="rect" id="node17" title=" " alt="" coords="626,464,802,505"/>
+</map>

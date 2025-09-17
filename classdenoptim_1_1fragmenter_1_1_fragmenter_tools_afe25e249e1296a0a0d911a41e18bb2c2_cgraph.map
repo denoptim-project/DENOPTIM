@@ -1,0 +1,8 @@
+<map id="denoptim.fragmenter.FragmenterTools.fragmentation" name="denoptim.fragmenter.FragmenterTools.fragmentation">
+<area shape="rect" id="node1" title="Performs fragmentation according to the given cutting rules." alt="" coords="5,160,215,201"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#a79eaaa08cc9353e5ebc47066b7cc99eb" title="Close the memory&#45;efficient iterator if any is open." alt="" coords="285,5,455,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#a9ed0aa4606b687bc3fdeb787fd5535b1" title=" " alt="" coords="285,71,455,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#ad312193f52098cff1378a43050403fb8" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="263,160,477,201"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a04cf8bea6e235a0adf12e95708d7f627" title="Writes vertexes to file." alt="" coords="525,189,716,231"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_iterating_atom_container_reader.html#af5ec56eba56e5fd3898d162206d78c34" title=" " alt="" coords="285,277,455,319"/>
+</map>

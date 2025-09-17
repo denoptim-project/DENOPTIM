@@ -1,0 +1,8 @@
+<map id="denoptim.ga.ExternalCmdsListener.processExternalCmdFile" name="denoptim.ga.ExternalCmdsListener.processExternalCmdFile">
+<area shape="rect" id="node1" title=" " alt="" coords="5,117,217,159"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a64d75b20ef9ab8af80544e9981881631" title="Adds candidate IDs to the list of &quot;to&#45;be&#45;included&quot; candidates." alt="" coords="287,5,454,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="265,95,476,122"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad3c60eba8bde5a804c840482acc829a6" title="Adds candidate IDs to the list of &quot;to&#45;be&#45;removed&quot; candidates." alt="" coords="277,147,465,188"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a5d4c7ed4e7b8d2219c845f906e539408" title=" " alt="" coords="288,212,453,253"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a2367e2b5713154c6d49905975fb852b0" title="Removes all tasks whether they are completed or not." alt="" coords="524,212,689,253"/>
+</map>

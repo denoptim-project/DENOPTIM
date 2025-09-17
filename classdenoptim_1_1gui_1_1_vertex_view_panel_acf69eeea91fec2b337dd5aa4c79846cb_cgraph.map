@@ -1,0 +1,6 @@
+<map id="denoptim.gui.VertexViewPanel.getAtomsSelectedFromJMol" name="denoptim.gui.VertexViewPanel.getAtomsSelectedFromJMol">
+<area shape="rect" id="node1" title="Identifies the atoms that are selected in the Jmol viewer." alt="" coords="5,27,224,69"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a62cf21fd05f14a84956958f948f6d7d7" title="Identifies the atoms that are selected in the Jmol viewer." alt="" coords="272,27,495,69"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a66ef044fb958d43d820bd05c71a2bfb2" title=" " alt="" coords="543,5,763,32"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment.html#abc17b26de8be2c51acd434f914c76b83" title=" " alt="" coords="558,57,747,98"/>
+</map>

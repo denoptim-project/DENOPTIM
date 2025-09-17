@@ -1,0 +1,11 @@
+<map id="denoptim.graph.Edge.compareAsUndirected" name="denoptim.graph.Edge.compareAsUndirected">
+<area shape="rect" id="node1" title="Compares this and another edge ignoring the directionality of both, i.e., as if both edges were undir..." alt="" coords="5,155,200,197"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_edge.html#aadec63c8f1ce93b0c82ae1f2a409acf1" title=" " alt="" coords="248,5,469,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="273,57,444,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="273,122,444,163"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#acd666767475f39f0d7f17550d2b47651" title=" " alt="" coords="269,187,449,229"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="269,253,449,294"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_general_utils.html#ab0c97460520e98fa670681d851754703" title="returns the padded string with zeroes placed to the left of &#39;number&#39; up to reach the desired number o..." alt="" coords="259,318,458,359"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="517,187,688,229"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="736,187,907,229"/>
+</map>

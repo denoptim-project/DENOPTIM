@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.FragmenterTask.getFragmentsFileName" name="denoptim.fragmenter.FragmenterTask.getFragmentsFileName">
+<area shape="rect" id="node1" title="Builds the pathname of the structure file meant to hold fragments resulting from all tasks." alt="" coords="5,5,215,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a37f87b26bd9a229cfd84e9c487f6495a" title="Gets the pathname to the working directory." alt="" coords="263,5,453,47"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.gui.VertexAsTwoDimStructureViewPanel.VertexAsTwoDimStructureViewPanel" name="denoptim.gui.VertexAsTwoDimStructureViewPanel.VertexAsTwoDimStructureViewPanel">
+<area shape="rect" id="node1" title="Constructor that allows to specify whether the AP table is editable or not." alt="" coords="5,5,207,61"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a3df44ee82f1ff2f1f8bfc4b594e94ca8" title=" " alt="" coords="255,13,464,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a2caf56ade915a499efa13013f71e0cba" title="trashed the current panel displaying any 2D structure and replaces it with a new empty panel." alt="" coords="512,13,736,54"/>
+</map>

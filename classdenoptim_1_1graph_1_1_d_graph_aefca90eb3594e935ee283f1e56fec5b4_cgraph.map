@@ -1,0 +1,49 @@
+<map id="denoptim.graph.DGraph.replaceSingleSubGraph" name="denoptim.graph.DGraph.replaceSingleSubGraph">
+<area shape="rect" id="node1" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="5,508,208,549"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="261,17,472,43"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_template.html#a687f8680d7c74dacadeb80c85ced2be5" title="Adds the projection of an AP in the template&#39;s inner graph (i.e., innerAP) to the list of APs visible..." alt="" coords="271,157,462,199"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="816,937,996,979"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad16255987a45bace2ef62f2b49e0d873" title=" " alt="" coords="263,223,470,250"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="276,68,457,109"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_template.html#a82c53a76c42c31848f394c3f7aab21b9" title="Removes the molecular representation." alt="" coords="267,325,466,367"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph.html#a2cc0afd77bd965cd49c8a631867f114e" title="Check if this graph contains the specified vertex." alt="" coords="262,391,471,432"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_edge.html#aadec63c8f1ce93b0c82ae1f2a409acf1" title=" " alt="" coords="256,457,477,483"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af8040db3f56d75da29132079df2b25cb" title="Gets the edge that is using this AP, or null if no edge is using this AP." alt="" coords="277,508,457,549"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a05ecc9dd632f58f95e7613f8aa4ece97" title="Gets the attachment point (AP) that is connected to this AP via the edge user." alt="" coords="551,427,731,468"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3334159ed57d53d1e29bd34f31bfc9a4" title="Returns the list of rings that include the given vertex in their fundamental cycle." alt="" coords="552,996,731,1037"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a181e1471235b48ddef2fa922ef35a964" title="Returns the list of verteces involved." alt="" coords="277,715,457,756"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a77887ce020d49c189b89e049f12b70ba" title="Check availability of this attachment point." alt="" coords="551,595,731,636"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph.html#ae1243cc2bc48423cbbea5e0678b8b1be" title="Removes an edge and update the free valences of the attachment points that were originally involved i..." alt="" coords="525,762,757,789"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_template.html#a049d3fd512e29df9e0dd7b94f484ce97" title="Removes the mapping of the given inner AP from this template&#39;s surface, if such mapping exists." alt="" coords="260,597,473,639"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_d_graph.html#a40786de6efd159a5c54c122d0d3d2c1c" title="Remove a vertex from this graph." alt="" coords="265,1113,468,1155"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_template.html#a61cc569f5d46c943ca1981653eaa5869" title="Replaces a given link between APs on the surface of this template (i.e., outerAP) and the correspondi..." alt="" coords="262,832,471,873"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a8dc9e31a8d2fb5ef6a9705cbf2ec22c9" title="Returns a deep clone of this attachment point." alt="" coords="551,141,731,183"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="556,272,727,313"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#a9e1e1c1dd87ebfb469b6c705c00038b6" title=" " alt="" coords="540,543,743,570"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a76bfbe6cc3918c114c73974b2fe4e59d" title="Sets the reference to the vertex that owns this attachment point." alt="" coords="551,207,731,248"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a087f6102f1c542587ec2ec3c2240041f" title="Constructor for undefined DENOPTIMAttachmentPoint." alt="" coords="816,207,996,248"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a1781af804ce3ff7b7ed2d681fd1eeae3" title="WARNING: this method does NOT clone! It just returns the reference to this." alt="" coords="807,90,1005,117"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af58c1eca18c36403992fc01d2e08fc03" title=" " alt="" coords="816,141,996,183"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="537,5,746,47"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="552,71,731,112"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="805,501,1007,527"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="806,631,1006,658"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a266aa67ce6e0afd82fa723a12f46235a" title="Sets the reference to the edge that is using this attachment point." alt="" coords="816,743,996,784"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#abb77efcfaa507592758e7fd4845bdd80" title=" " alt="" coords="540,711,743,738"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#aa54ed59052b374e590620626bcd2a90c" title=" " alt="" coords="527,661,755,687"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_d_graph.html#ae46f896d67929c516cc66031b8777f0b" title="Deletes the branch, i.e., the specified vertex and its children." alt="" coords="540,361,743,403"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_d_graph.html#aadd56400d6e58931401e88dd814de705" title="Returns the set of vertexes symmetric to the given one." alt="" coords="817,395,995,436"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad6c07d79d0bf95370569f11ad4d4cadf" title=" " alt="" coords="815,329,997,371"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_edge.html#a6331fb41fb8390b908ca7d737cc13602" title=" " alt="" coords="550,1244,733,1285"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="821,1244,991,1285"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_edge.html#a9a569de09e30a53338e1983f2a07e105" title=" " alt="" coords="550,1179,733,1220"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_d_graph.html#aca10b3acbf66e3652cb9664179ed368f" title=" " alt="" coords="556,1361,727,1403"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_d_graph.html#a21d59a33af92f5b876dae72b809762e0" title=" " alt="" coords="527,1062,756,1089"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_vertex.html#a7474f10f1819eec042011dddfa767472" title=" " alt="" coords="550,1113,733,1155"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="551,879,731,920"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a13c466d60a1ed85384812ca2ff63fdb2" title="Set the Attachment Point class." alt="" coords="551,813,731,855"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="807,833,1005,859"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="1055,825,1232,867"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1280,792,1457,833"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1280,857,1457,899"/>
+</map>

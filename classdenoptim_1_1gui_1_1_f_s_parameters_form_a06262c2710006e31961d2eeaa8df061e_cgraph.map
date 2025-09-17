@@ -1,0 +1,11 @@
+<map id="denoptim.gui.FSParametersForm.putParametersToString" name="denoptim.gui.FSParametersForm.putParametersToString">
+<area shape="rect" id="node1" title=" " alt="" coords="5,160,195,201"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a625c868bd274a682e1c81eaaefce8f5d" title="Produced an overall string including one or more KEY:VALUE strings taken from a table." alt="" coords="267,29,483,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_parameters_form.html#adba801c985eb2aa293c9dc1ce455fb63" title="Produced the KEY:VALUE string for a general text field." alt="" coords="267,95,483,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a8fe7e5b6db435de65b2629b0e175cc82" title="Produced the KEY:VALUE string for a on/off button." alt="" coords="267,160,483,201"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a1879098dd089c42923a2ced5c837bbdf" title=" " alt="" coords="267,225,483,267"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_f_s_parameters_form.html#acf9f63e43965c7723e5b577212de9ecf" title=" " alt="" coords="243,291,508,332"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_f_s_parameters_form.html#a3efd797a6bfa6106f3134ead85fcab5e" title="Imports parameters from a properly formatted parameters file." alt="" coords="556,283,799,339"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a32d73057266a7b76fdf463cbf4400547" title=" " alt="" coords="848,257,1075,299"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_parameters_form.html#aa73e9df9398e76e8f146f8b70e4a468c" title="Shown a warning dialog that informs the user about having found text that is not present in the Param..." alt="" coords="847,323,1076,364"/>
+</map>

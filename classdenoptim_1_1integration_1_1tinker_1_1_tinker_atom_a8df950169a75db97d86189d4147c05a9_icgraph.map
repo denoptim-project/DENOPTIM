@@ -1,0 +1,13 @@
+<map id="denoptim.integration.tinker.TinkerAtom.getAtomType" name="denoptim.integration.tinker.TinkerAtom.getAtomType">
+<area shape="rect" id="node1" title=" " alt="" coords="1413,123,1589,164"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a20d893ee504b0efbf9c3f274a401cc10" title="This method produces a deep copy of the object." alt="" coords="1189,57,1365,99"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#ae54df7dc95b4567bb0f609c0ea0aa535" title=" " alt="" coords="1189,123,1365,164"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a50d24613772adb45916a87146fa727a5" title="Write Tinker INT file." alt="" coords="1189,191,1365,232"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a2ccae6b37a97ff3db54c7b44807a970e" title="Return a new Molecule3DBuilder having exactly the same features of this Molecule3DBuilder." alt="" coords="913,57,1119,99"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#a26896649739e0a5e63dd88079c6efe7a" title="Performs one or more attempts to close rings by conformational adaptation." alt="" coords="587,5,843,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,57,539,113"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,64,280,105"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#aae018598945eacf2b1c984b2efc3c6a0" title="Convert IAtomContainer to TinkerMolecule." alt="" coords="928,123,1104,164"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a1cd879265bf12e9c2980efae1e8e74aa" title="Generate 3D structure by assembling 3D fragments according to attachment point vector and following t..." alt="" coords="588,123,841,164"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1integration_1_1tinker_1_1_conformational_search_p_s_s_r_o_t.html#aedff481352b5fd5ac099a3129e11f16c" title="Performs PSSROT conformational search on the given chemical object." alt="" coords="891,187,1141,243"/>
+</map>

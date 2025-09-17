@@ -1,0 +1,12 @@
+<map id="denoptim.molecularmodeling.RingClosureTool.saturateRingClosingAttractor" name="denoptim.molecularmodeling.RingClosureTool.saturateRingClosingAttractor">
+<area shape="rect" id="node1" title="Looks for unused RingClosingAttractors and attach proper capping group saturating the free valency/bo..." alt="" coords="5,129,241,185"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a2d838680c1d8eed4fe495ed1f3e03912" title="Returns the atom which has the XYZ index set to pos." alt="" coords="306,5,482,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ae597e352e57e001ca5c4bda8ab599988" title=" " alt="" coords="306,71,482,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ae5099bfd877437d705a94f013f2c229c" title=" " alt="" coords="306,136,482,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ab6a956b9a184ee9df3780b1e0717ccde" title=" " alt="" coords="306,201,482,243"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#adf6d5bac598421f5a91289e5f5e43a1f" title="Conversion to tinker IC may not always have the necessary atom types." alt="" coords="289,267,499,308"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a0df417191b38fb579c03650a808efe55" title="Gets the XYZ Index." alt="" coords="596,5,772,47"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a1dbc76d6f0f983ec1b6db689c08dbb05" title=" " alt="" coords="596,201,772,243"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_m_m_builder_parameters.html#ab38c908c33a65a88dbb2d04798b96037" title=" " alt="" coords="547,267,821,308"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#afe903c0e393cbf06540b620c8045b1d9" title=" " alt="" coords="596,332,772,373"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.fragmenter.DynamicCentroidCluster.DynamicCentroidCluster" name="denoptim.fragmenter.DynamicCentroidCluster.DynamicCentroidCluster">
+<area shape="rect" id="node1" title="Constructor that defines the current centroid to be a clone of the given fragment and adds the given ..." alt="" coords="5,31,217,87"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#a7cabc6cae04b4f82c2892d0735350e89" title="Returns a shallow copy where the vector of coordinates has a new reference." alt="" coords="265,39,473,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#ac860d026acae0a9381c5ddf3e5d5bba3" title="Constructor." alt="" coords="521,5,729,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#ac969b7cb43cdd23507e67c5141766997" title="Sets the order of nodes (i.e., atoms/APs) to use for geometric comparison with other fragments,..." alt="" coords="521,71,729,112"/>
+</map>

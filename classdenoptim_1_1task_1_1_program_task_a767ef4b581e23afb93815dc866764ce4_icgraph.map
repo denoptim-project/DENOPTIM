@@ -1,0 +1,4 @@
+<map id="denoptim.task.ProgramTask.handleThrowable" name="denoptim.task.ProgramTask.handleThrowable">
+<area shape="rect" id="node1" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="260,5,485,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_program_task.html#a2745e7f75fcf2ef6d128bd826156e2ce" title="This method redirects the callable functionality to an abstract method (namely ProgramTask#runProgram..." alt="" coords="5,13,212,39"/>
+</map>

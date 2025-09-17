@@ -1,0 +1,11 @@
+<map id="denoptim.task.ProgramTask.call" name="denoptim.task.ProgramTask.call">
+<area shape="rect" id="node1" title="This method redirects the callable functionality to an abstract method (namely ProgramTask#runProgram..." alt="" coords="5,163,212,190"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_program_task.html#a767ef4b581e23afb93815dc866764ce4" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="260,91,485,132"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1task_1_1_program_task.html#ac66c4b1bbee2331607c8c0404cc91357" title=" " alt="" coords="270,156,475,197"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1task_1_1_static_task_manager.html#a00dfeb1aebe14acd14a6a72f938b1f40" title=" " alt="" coords="282,221,463,263"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_program_task.html#a13d57c647330c442afe4cb0f013fca76" title="Method that can be called to create a text file with the error triggered by any Throwable that can be..." alt="" coords="533,59,745,100"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1task_1_1_program_task.html#ac96f584d6f5a562460929b5358fc9d54" title="Stops the program&#45;specific logger and releases the lock file on the logfile." alt="" coords="533,124,745,165"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1files_1_1_file_utils.html#af572123d13600224e1de3cb7b79cb028" title="Appends an entry to the list of recent files." alt="" coords="815,29,991,71"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="793,95,1012,122"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1task_1_1_static_task_manager.html#a35710993ed6901f26af2ee934897b658" title=" " alt="" coords="545,221,733,263"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.utils.MathUtils.normDist" name="denoptim.utils.MathUtils.normDist">
+<area shape="rect" id="node1" title="Get normalized distance between two point." alt="" coords="649,13,865,39"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#ab0a2952925cf318fa872e349dd2709ae" title="Converts currently loaded internal coordinates into Cartesian overwriting the current XYZ." alt="" coords="332,5,601,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a078749e82762b41d68b51bbc5af46e0c" title="Constructs a Molecule3DBuilder specifying all its features." alt="" coords="5,5,284,47"/>
+</map>

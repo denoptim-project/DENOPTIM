@@ -1,0 +1,9 @@
+<map id="denoptim.graph.Fragment.projectAPsToProperties" name="denoptim.graph.Fragment.projectAPsToProperties">
+<area shape="rect" id="node1" title="Finds the DENOPTIMAttachmentPoint objects defined as properties of the atoms in this container,..." alt="" coords="5,104,216,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#abf5b2cd3742215db41d879865d9d6609" title="Prepares the two strings that can be used to define AttachmentPoints in SDF files." alt="" coords="264,39,460,80"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_fragment.html#a551361a1155600e6e2fe4e37590c924f" title=" " alt="" coords="267,104,457,145"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#ad26ecf426a5e415605df94be904e58d3" title=" " alt="" coords="277,169,447,211"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ae529678561712f679be4b8d737f2ab83" title="Prepare a string for writing this AP in a fragment SDF file." alt="" coords="508,39,695,80"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_general_utils.html#a05bc718161978283c7db11369386a934" title="Formats a decimal number using the given pattern but with English format as for separators." alt="" coords="743,5,941,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ad771aba34950060ecbba81eb4b924445" title=" " alt="" coords="753,71,931,112"/>
+</map>

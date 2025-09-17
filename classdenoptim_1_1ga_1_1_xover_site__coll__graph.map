@@ -1,0 +1,7 @@
+<map id="denoptim.ga.XoverSite" name="denoptim.ga.XoverSite">
+<area shape="rect" id="node1" title="This class collects the data identifying the subgraphs that would be swapped by a crossover event." alt="" coords="356,87,508,113"/>
+<area shape="rect" id="node2" title=" " alt="" coords="73,5,151,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="15,56,209,83"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,109,219,150"/>
+<area shape="rect" id="node5" href="$enumdenoptim_1_1utils_1_1_crossover_type.html" title="Types of crossover defined." alt="" coords="16,175,208,201"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="denoptim.gui.FSEParametersForm.putParametersToString" name="denoptim.gui.FSEParametersForm.putParametersToString">
+<area shape="rect" id="node1" title=" " alt="" coords="5,71,196,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html#adba801c985eb2aa293c9dc1ce455fb63" title="Produced the KEY:VALUE string for a general text field." alt="" coords="257,5,473,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a1879098dd089c42923a2ced5c837bbdf" title=" " alt="" coords="257,71,473,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_f_s_e_parameters_form.html#a1234cecc07c0e1f8f33a1adbd42b26be" title="Imports parameters from a properly formatted parameters file." alt="" coords="244,161,487,217"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a32d73057266a7b76fdf463cbf4400547" title=" " alt="" coords="536,135,763,176"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_parameters_form.html#aa73e9df9398e76e8f146f8b70e4a468c" title="Shown a warning dialog that informs the user about having found text that is not present in the Param..." alt="" coords="535,200,764,241"/>
+</map>

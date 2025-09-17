@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.MouseModeChoiceListener" name="denoptim.gui.GraphVertexMolViewerPanel.MouseModeChoiceListener">
+<area shape="rect" id="node1" title="Listener for identifying the node on which the user has clicked and load the corresponding fragment i..." alt="" coords="5,80,236,136"/>
+<area shape="rect" id="node2" title=" " alt="" coords="40,5,201,32"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="denoptim.graph.DGraph.replaceSingleSubGraph" name="denoptim.graph.DGraph.replaceSingleSubGraph">
+<area shape="rect" id="node1" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="1069,169,1272,211"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4df69c91a742d22f8d14d44489aeac15" title="Edit this graph according to a given list of edit tasks." alt="" coords="827,5,1008,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a86e888ef245d2bd40b49d145c7ef3af0" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="816,71,1019,112"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph.html#adc362402e41af41656e820def73de5ad" title="Replaced a given vertex belonging to this graph with a new vertex generated specifically for this pur..." alt="" coords="816,136,1019,177"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aea227d615f6c2f3bac5839a8099a900d" title=" " alt="" coords="813,201,1021,243"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a83a9624ea5dc6a2c515407b865b62611" title=" " alt="" coords="813,267,1021,308"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0c949ec1131a872dea53524614b3b42a" title=" " alt="" coords="813,332,1021,373"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="544,5,747,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="546,71,745,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_graph_operations.html#affb1be89a32e4a429bd7dbdfe0708419" title="Performs the crossover that swaps the two subgraphs defining the given XoverSite." alt="" coords="525,136,765,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="287,103,456,144"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#ab0f92a94c4fb2334e7d3813e73fc4247" title=" " alt="" coords="265,168,477,209"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#a3c2407eb1204a7b25600d3d347d98447" title=" " alt="" coords="5,168,217,209"/>
+</map>

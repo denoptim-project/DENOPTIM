@@ -1,0 +1,25 @@
+var classdenoptim_1_1utils_1_1_graph_edit =
+[
+    [ "EditTask", "enumdenoptim_1_1utils_1_1_graph_edit_1_1_edit_task.html", "enumdenoptim_1_1utils_1_1_graph_edit_1_1_edit_task" ],
+    [ "GraphEdit", "classdenoptim_1_1utils_1_1_graph_edit.html#a6ceddeacf73cce0dd29a0f6d19256ca1", null ],
+    [ "getAPMappig", "classdenoptim_1_1utils_1_1_graph_edit.html#aa6386ba3a15e9ba09b366f00aa1b3969", null ],
+    [ "getEdgeQuery", "classdenoptim_1_1utils_1_1_graph_edit.html#aad9e24fdab74eb7fc76d291bc653319d", null ],
+    [ "getIncomingAPId", "classdenoptim_1_1utils_1_1_graph_edit.html#a471aa6b271be5d8077cd265cee79dede", null ],
+    [ "getIncomingBBId", "classdenoptim_1_1utils_1_1_graph_edit.html#a1ebb1c7258dbe72520bb49d2878df50f", null ],
+    [ "getIncomingBBType", "classdenoptim_1_1utils_1_1_graph_edit.html#ad1834a7b881e1185f8fbc70957107bda", null ],
+    [ "getIncomingGraph", "classdenoptim_1_1utils_1_1_graph_edit.html#a0bdab6f29fa24c55fdba980695f3d609", null ],
+    [ "getType", "classdenoptim_1_1utils_1_1_graph_edit.html#a7cc10b4ec9a229d4d3168be0605f84ad", null ],
+    [ "getVertexQuery", "classdenoptim_1_1utils_1_1_graph_edit.html#ac290d36154b92b1c2c8dd1db8ea7bdbf", null ],
+    [ "setAP", "classdenoptim_1_1utils_1_1_graph_edit.html#aa1f47a537e4e1023f25f84cc2ff61f27", null ],
+    [ "setEdgeQuery", "classdenoptim_1_1utils_1_1_graph_edit.html#a979ffe590681795bb433a0b006a9546f", null ],
+    [ "setIncomingGraph", "classdenoptim_1_1utils_1_1_graph_edit.html#ad8e029e759675a5afd0ccf7162496474", null ],
+    [ "setVertexQuery", "classdenoptim_1_1utils_1_1_graph_edit.html#aab28b3ac710d26d11658fb18f5dd761f", null ],
+    [ "edgeQuery", "classdenoptim_1_1utils_1_1_graph_edit.html#a77275110ac08b6f40472c36c2f601d49", null ],
+    [ "idAPOnIncomingGraph", "classdenoptim_1_1utils_1_1_graph_edit.html#a3c9eaad0682f5fb22d6e9aec3631beb5", null ],
+    [ "incomingAPMap", "classdenoptim_1_1utils_1_1_graph_edit.html#a0d14bc8b6d2a684e2ebc6c72f7dc6504", null ],
+    [ "incomingBBId", "classdenoptim_1_1utils_1_1_graph_edit.html#ac624689bf7d2fb0610a4b9d6fb2da989", null ],
+    [ "incomingBBTyp", "classdenoptim_1_1utils_1_1_graph_edit.html#a1fea5a8dfac8279cf98517bc8d675661", null ],
+    [ "incomingGraph", "classdenoptim_1_1utils_1_1_graph_edit.html#a2b82c76d31bbc6112a13781fcb25b621", null ],
+    [ "task", "classdenoptim_1_1utils_1_1_graph_edit.html#a6619826333b081f2b16a7f1b8f94a753", null ],
+    [ "vertexQuery", "classdenoptim_1_1utils_1_1_graph_edit.html#a36fbd0f34ea81c1a6946772ad33c898d", null ]
+];

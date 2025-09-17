@@ -1,0 +1,5 @@
+<map id="denoptim.molecularmodeling.ThreeDimTreeBuilder.getRandomPoint" name="denoptim.molecularmodeling.ThreeDimTreeBuilder.getRandomPoint">
+<area shape="rect" id="node1" title=" " alt="" coords="593,70,836,111"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a91fba166ba9fe73858ed16209d575cc5" title="Recursive method that appends branches of building blocks following the edges of the graph." alt="" coords="279,29,545,85"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#acbaf5061621ed283eecc80a51b523422" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="5,63,231,119"/>
+</map>

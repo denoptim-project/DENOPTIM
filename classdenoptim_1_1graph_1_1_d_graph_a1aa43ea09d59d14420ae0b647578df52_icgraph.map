@@ -1,0 +1,13 @@
+<map id="denoptim.graph.DGraph.getSourceVertex" name="denoptim.graph.DGraph.getSourceVertex">
+<area shape="rect" id="node1" title="Identifies and return the vertex from which the spanning tree originates." alt="" coords="1104,207,1283,248"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a9f63f3990784eee06842737c42bfc08d" title="Flips edges in the graph so that the scaffold is the only source vertex." alt="" coords="866,29,1038,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a45b3ec4b3b4d6384e49093e9b9449537" title="Sets the vertex at the lowest level as the scaffold, changes the &#160;&#160;directions of edges so that the sc..." alt="" coords="599,59,799,100"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a357b4099599e47ae47102123550771f8" title="Remove a given vertex belonging to this graph and re&#45;connects the resulting graph branches as much as..." alt="" coords="851,171,1053,212"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a161540d22b2ad17c44fc3e1a911a1367" title=" " alt="" coords="855,235,1049,291"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a428fb92fa7fcf1312fc2eb81cf7fac4f" title=" " alt="" coords="848,315,1056,356"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a83a9624ea5dc6a2c515407b865b62611" title=" " alt="" coords="848,380,1056,421"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5f9a8cd2ab45c226c2e1ec714c19724b" title="Extracts subgraphs that match the provided pattern." alt="" coords="322,59,521,100"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a00209ca8b4a9623b41e7d9e1e62f69ec" title="Remove a given vertex belonging to this graph and re&#45;connects the resulting graph branches as much as..." alt="" coords="597,171,800,212"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_graph_operations.html#ab3adb5141a8941bf23916bb516faee63" title="Removes a vertex while merging as many of the child branches into the parent vertex." alt="" coords="293,178,549,205"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a0c851972015fbb4b2a317b053b8b81d9" title="Mutates the given vertex according to the given mutation type, if possible." alt="" coords="5,171,245,212"/>
+</map>

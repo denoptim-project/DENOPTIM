@@ -1,0 +1,5 @@
+<map id="denoptim.utils.FormulaUtils.getElementalanalysis" name="denoptim.utils.FormulaUtils.getElementalanalysis">
+<area shape="rect" id="node1" title="Threads Deuterium as a different element than Hydrogen." alt="" coords="285,39,485,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_formula_utils.html#abba2418bc3482f8003770d851abb5f6b" title="Compares the molecular formula formatted as from the Cambridge Structural Database (CSD) against the ..." alt="" coords="5,5,237,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#aacad4752a8f6324a9c8e5a96ff14efe5" title="Filter fragments according to the criteria defined in the settings." alt="" coords="17,71,226,112"/>
+</map>

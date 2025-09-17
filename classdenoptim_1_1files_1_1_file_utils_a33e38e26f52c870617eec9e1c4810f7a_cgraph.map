@@ -1,0 +1,5 @@
+<map id="denoptim.files.FileUtils.detectKindOfTXTFile" name="denoptim.files.FileUtils.detectKindOfTXTFile">
+<area shape="rect" id="node1" title="Looks into a text file and tries to understand if the file is a known text file." alt="" coords="5,39,196,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#ac4f9dab79d47fe1f2c398fa7ab99da83" title="Looks into a text file and tries to understand what format it is among the given formats." alt="" coords="244,5,435,47"/>
+<area shape="rect" id="node3" href="$enumdenoptim_1_1files_1_1_file_format.html#aacb6d37afa380f4f44c3f6699882a432" title="Returns the collection of file formats restricted to TXT files (excluded parameter files)" alt="" coords="246,71,433,112"/>
+</map>

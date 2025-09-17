@@ -1,0 +1,7 @@
+<map id="denoptim.ga.Population.isWithinPercentile" name="denoptim.ga.Population.isWithinPercentile">
+<area shape="rect" id="node1" title="Checks if a given fitness value if within the given percentile of best candidates." alt="" coords="5,35,175,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_population.html#afa798c05fd795d3860b2d6e44c9791e5" title="Gets the maximum value of the fitness in this population." alt="" coords="448,5,625,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_population.html#a0324ca75861e476b7f6480e740864ffb" title="Gets the minimum value of the fitness in this population." alt="" coords="223,64,400,105"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_candidate.html#a0738609a1a3bec92633440d449a62c67" title=" " alt="" coords="673,64,865,105"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_population.html#a914f7bdf119e8a7b749d6e37eed3f0e4" title="Gets the Candidate with minimum value of the fitness in this population." alt="" coords="448,123,625,164"/>
+</map>

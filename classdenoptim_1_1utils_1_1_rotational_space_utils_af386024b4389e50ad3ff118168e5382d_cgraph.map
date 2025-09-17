@@ -1,0 +1,12 @@
+<map id="denoptim.utils.RotationalSpaceUtils.defineRotatableBonds" name="denoptim.utils.RotationalSpaceUtils.defineRotatableBonds">
+<area shape="rect" id="node1" title="Define the rotational space (also torsional space) for a given molecule." alt="" coords="5,201,220,243"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#a632725819d97adeb31a5eb613b307ea2" title="Search for all bonds connecting atoms corresponding to two different vertices in the DENOPTIMGraph." alt="" coords="293,5,500,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3cd7e9334f87d11a46f3a424beaa6751" title=" " alt="" coords="273,71,520,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3506079a3de962c32b2c715f8cea96e6" title=" " alt="" coords="273,136,520,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aea287dfe72ffc150250c8180706289bd" title=" " alt="" coords="273,201,520,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#ab9bae44c65063e18fecfe4525154f877" title="Read a formatted file and return a map with all the SMARTS queries identifying rotatable bonds." alt="" coords="269,267,524,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aaffb007354a24c9fb679742e431c9980" title=" " alt="" coords="272,332,521,373"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a5b9d0a88dd69734a1c54659e07d1294a" title="Replace any PseudoAtoms representing ring closing attractors with H." alt="" coords="268,398,525,425"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="573,391,779,432"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="827,391,1024,432"/>
+</map>

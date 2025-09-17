@@ -1,0 +1,52 @@
+<map id="denoptim.molecularmodeling.MultiMolecularModelBuilder.build3DTree" name="denoptim.molecularmodeling.MultiMolecularModelBuilder.build3DTree">
+<area shape="rect" id="node1" title="Generate 3D structure by assembling 3D fragments according to attachment point vector and following t..." alt="" coords="5,1125,259,1166"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#aa1352172290adaaf3a478ed7a90cf3fc" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="344,173,569,229"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#af386024b4389e50ad3ff118168e5382d" title="Define the rotational space (also torsional space) for a given molecule." alt="" coords="349,253,564,294"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_m_m_builder_parameters.html#afb3f2f047c21d3dad8979ef298a3390b" title=" " alt="" coords="307,961,607,1002"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#aae018598945eacf2b1c984b2efc3c6a0" title="Convert IAtomContainer to TinkerMolecule." alt="" coords="369,843,545,885"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#ac29919f241e14b0c835e80dc88dabc69" title="Conversion to tinker IC may not always have the necessary atom types." alt="" coords="695,1258,872,1299"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="363,1026,550,1067"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a7763adca4ef3db32304e7e9a3b64046f" title="Returns the list of indexes that allow to map the new atom position with the old one." alt="" coords="351,1091,563,1133"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#ac9040472c92d377c69056a8128eee6e6" title="Returns the list of indexes that allow to map the old atom position with the new one." alt="" coords="351,1157,563,1198"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="363,1222,550,1263"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ad9db6420b91ff13e0a8b2d02402c0242" title="Returns the current program&#45;specific randomizer." alt="" coords="363,1287,550,1329"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_m_m_builder_parameters.html#ab38c908c33a65a88dbb2d04798b96037" title=" " alt="" coords="319,1353,594,1394"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#ac679b2a45c111736e81e8dd2604b5a77" title="Reorder the atoms in mol starting with atom seed" alt="" coords="339,1418,574,1459"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a675930891448161c649a5f647c004080" title=" " alt="" coords="351,1483,563,1525"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="361,1573,552,1614"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#a632725819d97adeb31a5eb613b307ea2" title="Search for all bonds connecting atoms corresponding to two different vertices in the DENOPTIMGraph." alt="" coords="680,57,887,98"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3cd7e9334f87d11a46f3a424beaa6751" title=" " alt="" coords="660,122,907,163"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3506079a3de962c32b2c715f8cea96e6" title=" " alt="" coords="660,187,907,229"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aea287dfe72ffc150250c8180706289bd" title=" " alt="" coords="660,253,907,294"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#ab9bae44c65063e18fecfe4525154f877" title="Read a formatted file and return a map with all the SMARTS queries identifying rotatable bonds." alt="" coords="656,318,911,359"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aaffb007354a24c9fb679742e431c9980" title=" " alt="" coords="659,383,908,425"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a5b9d0a88dd69734a1c54659e07d1294a" title="Replace any PseudoAtoms representing ring closing attractors with H." alt="" coords="655,5,912,32"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="981,439,1186,481"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="1255,439,1452,481"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a48d24f893c36e4f13732a4c3589e026e" title="Add one atom to this molecule." alt="" coords="695,566,871,607"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#a22cd2010095f8f1a0e5fb1b29601702c" title="Add one bond by appending a pair of indeces into the z&#45;add section." alt="" coords="695,631,871,673"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="986,647,1181,673"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1utils_1_1_object_pair.html#a59bf5822c6e17f235fe9732a5db78621" title=" " alt="" coords="690,749,877,790"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a9c64e860b98da51f3450361b718a87ec" title=" " alt="" coords="686,814,881,855"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1utils_1_1_object_pair.html#a4286b48d08a3f0d307a225eb1defb5b6" title=" " alt="" coords="690,879,877,921"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a1580d654c9b761d4e6b83db342d8ad25" title=" " alt="" coords="677,945,889,986"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a21e253c52a22329d2cbfd27131a54afa" title=" " alt="" coords="685,501,882,542"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_molecule.html#ae54df7dc95b4567bb0f609c0ea0aa535" title=" " alt="" coords="695,1010,871,1051"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ac94129cb2177bb9426b2068762c636ea" title=" " alt="" coords="695,1075,871,1117"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1utils_1_1_math_utils.html#ad18764665d2f24f72e8b18ce015d84ce" title="Calculate the torsion angle between the 4 points." alt="" coords="682,1141,885,1168"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a53a21c4869f848ca728fb5750dcee034" title=" " alt="" coords="695,1193,871,1234"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a38e8be0339a09dfcb518ad1fecfae4e4" title=" " alt="" coords="960,505,1207,546"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#aea4ab5789d28e5f2b02ab48fd5b93292" title=" " alt="" coords="980,1045,1187,1086"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a1dbc76d6f0f983ec1b6db689c08dbb05" title=" " alt="" coords="995,1199,1171,1241"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a8df950169a75db97d86189d4147c05a9" title=" " alt="" coords="995,849,1171,890"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#ae597e352e57e001ca5c4bda8ab599988" title=" " alt="" coords="995,914,1171,955"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a0df417191b38fb579c03650a808efe55" title="Gets the XYZ Index." alt="" coords="995,979,1171,1021"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#afe903c0e393cbf06540b620c8045b1d9" title=" " alt="" coords="995,1265,1171,1306"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1utils_1_1_math_utils.html#ac6f7f135ee0acd6ee3f9a288a17510c6" title="Compute the dihedral angle." alt="" coords="976,1134,1191,1175"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a2970c029fa822f5597969bda9adabdaf" title="Reorders atoms according to the branch&#45;oriented scheme." alt="" coords="667,1330,900,1371"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a057aaf4bd577d0566b6fc73c1f792e10" title="Destroy a vector of flags." alt="" coords="969,1542,1198,1583"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#aa08a493e0e4325f3f76262dc9cb40de0" title="Generates a vector of boolean flags." alt="" coords="977,1433,1189,1474"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#ac9be639b72c847d5875a12250a94bebe" title="Reorders atoms according to the layer&#45;oriented scheme." alt="" coords="673,1513,894,1554"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#aaa2b8f9bfaed825389a6453e88403108" title="Produces a new container that looks very similar to the original one, but has a different atom order." alt="" coords="670,1447,897,1489"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#af107340bb330f98b9b7f899ff08c80ad" title="Method meant for recursion on all atoms connected to a starting point." alt="" coords="966,1354,1201,1395"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="denoptim.gui.CompatibilityMatrixForm.CompatibilityMatrixForm" name="denoptim.gui.CompatibilityMatrixForm.CompatibilityMatrixForm">
+<area shape="rect" id="node1" title=" " alt="" coords="5,298,235,340"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#aa8d2af53bad6cd60e61a6d541e01e3f7" title=" " alt="" coords="640,70,849,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a1ea31fa5b2bb97bec91eeb351c652474" title=" " alt="" coords="321,202,531,228"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="327,276,525,303"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#a20314e7e16476836d69f231db3e534c3" title=" " alt="" coords="336,136,516,177"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#aaa04536e178fdfa5bad92cdc1fcc4583" title="Shows the dialog and restrains the modality to it, until the dialog gets closed." alt="" coords="313,328,539,369"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#aa2164c46be451878033d11e206e92c05" title=" " alt="" coords="283,393,569,434"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#a51b1ebdab321894bbea4ec5cff24efcd" title=" " alt="" coords="305,458,547,500"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#a8e30b784ac73038dfda109e5c597e821" title=" " alt="" coords="303,524,549,565"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="656,294,833,336"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="965,294,1142,336"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="965,360,1142,401"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#afd80538579bb580c1cd94c53598d914a" title="Checks if there is any component matching the regex query and returns the number of matches." alt="" coords="617,135,872,191"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_target_a_p_class_token.html#abefc7dbd695b17f6952e14edff49b358" title=" " alt="" coords="920,55,1187,111"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac33a29894453a78896488fa441fcbd85" title="Do not use this to make SDF representations." alt="" coords="1235,30,1413,72"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_target_a_p_class_token.html#a9828a0edadb7eca402276acf445bc2c9" title=" " alt="" coords="927,135,1180,191"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a362c0a6c7b89d2375c41f4e6248e2fb7" title=" " alt="" coords="923,215,1184,271"/>
+</map>

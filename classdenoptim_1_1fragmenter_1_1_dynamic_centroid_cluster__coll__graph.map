@@ -1,0 +1,34 @@
+<map id="denoptim.fragmenter.DynamicCentroidCluster" name="denoptim.fragmenter.DynamicCentroidCluster">
+<area shape="rect" id="node1" title="A cluster with a centroid that can be updated after definition of the cluster." alt="" coords="1575,103,1768,144"/>
+<area shape="rect" id="node2" title=" " alt="" coords="1275,129,1451,171"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html" title="Represents a fragment that can be clustered based on the 3*N coordinate of atoms and attachment point..." alt="" coords="1259,64,1467,105"/>
+<area shape="rect" id="node4" title=" " alt="" coords="955,122,1041,149"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_fragment.html" title="Class representing a continuously connected portion of chemical object holding attachment points." alt="" coords="914,71,1082,98"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html" title="A vertex is a data structure that has an identity and holds a list of AttachmentPoints." alt="" coords="477,419,628,446"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_template.html" title=" " alt="" coords="915,811,1081,838"/>
+<area shape="rect" id="node7" title=" " alt="" coords="75,542,154,569"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html" title="Container for the list of vertices and the edges that connect them." alt="" coords="1284,613,1441,639"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_candidate.html" title="A candidate is the combination of a denoptim graph with molecular representation and may include also..." alt="" coords="1586,862,1757,889"/>
+<area shape="rect" id="node9" title=" " alt="" coords="901,593,1095,619"/>
+<area shape="rect" id="node10" title=" " alt="" coords="905,643,1091,670"/>
+<area shape="rect" id="node11" title=" " alt="" coords="907,694,1089,721"/>
+<area shape="rect" id="node12" title=" " alt="" coords="909,745,1087,787"/>
+<area shape="rect" id="node13" title=" " alt="" coords="894,173,1102,215"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1277,963,1448,990"/>
+<area shape="rect" id="node16" title=" " alt="" coords="497,790,609,817"/>
+<area shape="rect" id="node18" href="$enumdenoptim_1_1graph_1_1_template_1_1_contract_level.html" title="Enum specifying to what extent the template&#39;s inner graph can be changed." alt="" coords="467,847,638,888"/>
+<area shape="rect" id="node19" title=" " alt="" coords="446,204,659,245"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html" title="Attachment point mapping where keys are sorted by natural ordering, i.e., by AttachmentPoint#compareT..." alt="" coords="461,963,644,990"/>
+<area shape="rect" id="node21" title=" " alt="" coords="17,956,212,997"/>
+<area shape="rect" id="node22" title=" " alt="" coords="880,239,1116,309"/>
+<area shape="rect" id="node23" title=" " alt="" coords="879,333,1117,404"/>
+<area shape="rect" id="node24" title=" " alt="" coords="947,491,1049,518"/>
+<area shape="rect" id="node25" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_b_b_type.html" title="The type of building block." alt="" coords="15,369,214,395"/>
+<area shape="rect" id="node26" title=" " alt="" coords="39,419,191,446"/>
+<area shape="rect" id="node27" title=" " alt="" coords="65,470,164,497"/>
+<area shape="rect" id="node28" title=" " alt="" coords="21,252,209,293"/>
+<area shape="rect" id="node29" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_vertex_type.html" title="Flag declaring the type of Vertex implementation." alt="" coords="5,318,224,345"/>
+<area shape="rect" id="node30" title=" " alt="" coords="449,28,657,69"/>
+<area shape="rect" id="node31" title=" " alt="" coords="417,93,688,149"/>
+<area shape="rect" id="node32" title=" " alt="" coords="912,5,1084,47"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="denoptim.molecularmodeling.RingClosureTool" name="denoptim.molecularmodeling.RingClosureTool">
+<area shape="rect" id="node1" title="Toolkit to perform ring closing conformational search." alt="" coords="1347,23,1536,65"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_m_m_builder_parameters.html" title="Parameters for the conformer generator (3D builder)." alt="" coords="975,99,1249,141"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html" title="Collection of parameters controlling the behavior of the software." alt="" coords="611,74,797,115"/>
+<area shape="rect" id="node4" title=" " alt="" coords="297,5,360,32"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="242,61,415,88"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,61,128,88"/>
+<area shape="rect" id="node7" title=" " alt="" coords="195,112,463,168"/>
+<area shape="rect" id="node8" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html" title="Identifier of the type of parameters." alt="" coords="235,191,422,233"/>
+<area shape="rect" id="node9" title=" " alt="" coords="639,171,769,197"/>
+<area shape="rect" id="node10" title=" " alt="" coords="613,221,795,248"/>
+</map>

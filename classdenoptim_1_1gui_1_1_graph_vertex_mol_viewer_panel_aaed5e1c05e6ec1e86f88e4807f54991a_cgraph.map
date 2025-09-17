@@ -1,0 +1,9 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.clearVertexViewer" name="denoptim.gui.GraphVertexMolViewerPanel.clearVertexViewer">
+<area shape="rect" id="node1" title="Clears the molecular viewer and hides it behind the empty card." alt="" coords="5,49,229,90"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a161579a33a00d54d8cc3610cacd3d98e" title="Allows to show the given card in the vertex viewer panel." alt="" coords="277,5,488,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a5b02a7e511de2c6dd4aa18420d5f76f8" title="Removes the currently visualized molecule and AP table." alt="" coords="291,85,474,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a65e5473c03b2075c97fbfa9b587b8949" title="Clears the table of attachment points." alt="" coords="536,51,719,93"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad2fc717c7c33817e4178031130d46f6d" title="Clears the molecular viewer." alt="" coords="536,117,719,158"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad1564e5c67234495668c68f02ab04ed4" title="Allows to activate and deactivate the listener." alt="" coords="767,51,969,93"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_fragment_view_panel_1_1_pausable_table_model_listener.html#ab8f315a71d317424e2647c160fc3fdfb" title=" " alt="" coords="1017,44,1264,100"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GUIMainPanel.removeCard" name="denoptim.gui.GUIMainPanel.removeCard">
+<area shape="rect" id="node1" title="Remove a panel (i.e., a card) from the pile of cards (i.e., card deck)" alt="" coords="284,13,540,39"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel_1_1remove_card_action_listener.html#a6f16b51e1935bd468b305e251bc2d228" title=" " alt="" coords="5,5,236,47"/>
+</map>

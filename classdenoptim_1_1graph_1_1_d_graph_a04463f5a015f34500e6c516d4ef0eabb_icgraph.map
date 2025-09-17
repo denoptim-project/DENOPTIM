@@ -1,0 +1,52 @@
+<map id="denoptim.graph.DGraph.setTemplateJacket" name="denoptim.graph.DGraph.setTemplateJacket">
+<area shape="rect" id="node1" title="Sets the reference to a template that embeds this graph, i.e., this graph&#39;s &quot;jacket&quot; template." alt="" coords="1179,733,1357,775"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_template.html#a405d47ac1a08ac9bd658bcdcc693a0a4" title=" " alt="" coords="943,733,1131,775"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a32b0be109306e9c81fc830867296bc66" title="Extracts a system of one or more fused rings and adds them to the fragment space if not already prese..." alt="" coords="633,5,895,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_template.html#ac7d7400f47d4bad33f3755f1b3d19a3e" title="Returns a deep copy of this template." alt="" coords="663,197,865,223"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template_test.html#a72d37b4c24ad896838401b319b1d667e" title=" " alt="" coords="345,60,563,101"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af88d30ce68477984fe6179325d1540b2" title=" " alt="" coords="334,125,574,167"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="665,313,863,355"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_template.html#a1918656a5c1deed84daddfcf84757a3b" title="Reads a JSON string and returns an instance of this class." alt="" coords="652,403,876,430"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#af3d68c634b78e89ff2937bdf8ac1387f" title=" " alt="" coords="657,455,871,496"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_template_test.html#ad45d6edc7ff123cee0939301b6d1fc2b" title="Creating a template that contains another template with the following structure: |&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;..." alt="" coords="657,248,871,289"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a0dd5e8c7f80f7e7c7fa2d46e01355a2d" title="Generates a pair of graphs that include templates with free content." alt="" coords="667,520,861,561"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1ga_1_1_population_test.html#ad6c0ff8cf3b73b88407f1a8ce2d699dd" title="Builds a pair of graphs that contain templates with ContractLevel#FREE contract." alt="" coords="663,703,865,744"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1ga_1_1_population_test.html#a41f0c8d31458a49c72e7b22daf45073a" title="Builds a pair of graphs that contain templates with ContractLevel#FREE contract." alt="" coords="353,569,555,611"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1ga_1_1_population_test.html#aec2f105b3ec1dad337b2a1708b803439" title="Builds a pair of graphs that contain templates with ContractLevel#FREE contract." alt="" coords="663,585,865,627"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_template_test.html#a6bb3cdf3bc0c265c1afdd6fcdb8250a8" title=" " alt="" coords="347,765,561,807"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_template_test.html#a24cb0acd547ff1ce40433455a0c593a3" title="Builds a template object meant for tests." alt="" coords="657,831,871,872"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="639,1093,889,1119"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a196d26a2c4112547a8bc43e40b6abd55" title="Returns a graph that contains a 10&#45;layered recursive structure." alt="" coords="655,1144,873,1185"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a5c27386c8f0a9a6df8c3ed87b7bbff2a" title="Creates a test graph that looks like this:" alt="" coords="655,1209,873,1251"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc4e3a5d4e0db3c1eb06e1ff721af9cf" title="Reads Vertexes from any file that can contain such items." alt="" coords="670,1027,858,1068"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_template_test.html#a255d7ef2a87d37ff0fd1e5063872d838" title=" " alt="" coords="655,1274,873,1330"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#abf9b48ed3f9504324020cc9ff44ca4e4" title=" " alt="" coords="657,1353,871,1395"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#abaee0d6a612fa9cd7430a8e50ca2b934" title=" " alt="" coords="645,1419,883,1460"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a356dbf786633f3c7be94439c0e151913" title=" " alt="" coords="663,1484,865,1525"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a4889032266eb87d0f91af8b4e9869360" title=" " alt="" coords="658,1549,870,1591"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1_template_test.html#abec2a04150d4f8948c18a796b5144ddc" title=" " alt="" coords="655,1615,873,1656"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_template_test.html#a50688358b5a557ee51683082427bdc14" title=" " alt="" coords="345,191,563,232"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex_1_1_d_e_n_o_p_t_i_m_vertex_deserializer.html#a281fc89776bbb6dbb93813fbb6eb2f70" title=" " alt="" coords="325,256,583,297"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a86c3b01084322d2c465809840d7a3122" title=" " alt="" coords="357,321,551,363"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a9fcf8fffef10a59df722c92e94da2815" title=" " alt="" coords="328,387,580,428"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#ae0baa3684be9b8a4af611083649a9e6d" title=" " alt="" coords="323,700,585,741"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#ad4662f1a3a989020f953f7034d7c1beb" title="NB: the graphs from methods getPairOfTestGraphsB() and getPairOfTestGraphsBxo() and &#160;&#160;getPairOfTestGr..." alt="" coords="352,504,556,545"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1utils_1_1_graph_conversion_tool_test.html#a9cf6fcaba3bac28b528db1eb73c21c62" title=" " alt="" coords="323,635,585,676"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#af8cfc323dd7d12090ddf4b836a3349cf" title="NB: the graphs from methods getPairOfTestGraphsB() and getPairOfTestGraphsBxo() and &#160;&#160;getPairOfTestGr..." alt="" coords="5,508,275,549"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_template_test.html#a5a0585829290194f7e8dfc718346d212" title=" " alt="" coords="31,765,249,807"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_template_test.html#ae81b16e3af5927e6d5672d0639ac54f7" title=" " alt="" coords="345,896,563,937"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a9ad0d01f5abd9f5c57e64dc7dd92484f" title=" " alt="" coords="349,961,559,1003"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#a78e6eb5e60124f63897dd28e1c21082d" title=" " alt="" coords="353,831,555,872"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="351,1353,557,1395"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#abbd9f77ca8e1f7b733ca74bce6ccad28" title=" " alt="" coords="350,1419,558,1460"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a14c5ab7724f5d78b6c721b6e24e3a588" title=" " alt="" coords="350,1484,558,1525"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1ga_1_1_xover_site_test.html#a3936ca2cfc1bb9ace410f7f47ad2c1f2" title=" " alt="" coords="353,1549,555,1591"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a67cac5083662b518183810d74bb901d6" title=" " alt="" coords="350,1615,558,1656"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#afa69d04d566adebf5cf8873815074713" title=" " alt="" coords="350,1680,558,1721"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0c949ec1131a872dea53524614b3b42a" title=" " alt="" coords="350,1745,558,1787"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1fragmenter_1_1_parallel_conformer_extraction_algorithm.html#accbc5c0326e13ccf00126143b0851369" title="Implementations of this method must call the submitTask(Task, String) method to actually send the tas..." alt="" coords="337,1091,571,1147"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a43ed8d5c01a09ba050aad844bfc57406" title="Define all components of a fragment space that implements the attachment point class&#45;approach." alt="" coords="357,1171,551,1212"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6698fa37bf04503e58c61f0543946834" title="Imports fragments from a file." alt="" coords="328,1236,580,1277"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="323,1302,585,1329"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a82c4a82da2a3283a870a8c8af94f0a4e" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="347,1027,561,1068"/>
+</map>

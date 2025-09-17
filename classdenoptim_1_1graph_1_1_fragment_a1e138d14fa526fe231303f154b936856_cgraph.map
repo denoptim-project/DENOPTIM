@@ -1,0 +1,11 @@
+<map id="denoptim.graph.Fragment.sameAs" name="denoptim.graph.Fragment.sameAs">
+<area shape="rect" id="node1" title="Compares this and another fragment ignoring vertex IDs." alt="" coords="5,97,224,124"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#ab6651f8664de0fb3ca604a0e91b0703b" title=" " alt="" coords="272,57,492,98"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a7a48a6fb07f119d17a6c8eb091ee73ea" title="Compares this and another vertex ignoring vertex IDs." alt="" coords="289,122,475,163"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="540,5,729,32"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="549,57,720,98"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="549,122,720,163"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a514b89b11dff8939e74e5b95e749b703" title=" " alt="" coords="549,187,720,229"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ab1226264e663d411606bc5af27dd921e" title="Compares the features of this and another attachment point and decides if the two are same." alt="" coords="545,277,725,318"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="777,93,948,134"/>
+</map>

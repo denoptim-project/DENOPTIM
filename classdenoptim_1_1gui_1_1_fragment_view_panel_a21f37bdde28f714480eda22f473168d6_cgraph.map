@@ -1,0 +1,9 @@
+<map id="denoptim.gui.FragmentViewPanel.FragmentViewPanel" name="denoptim.gui.FragmentViewPanel.FragmentViewPanel">
+<area shape="rect" id="node1" title="Constructor that allows to specify whether the AP table is editable or not." alt="" coords="5,47,188,89"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a425f62217ecdff6ec36138e6e8099f15" title=" " alt="" coords="236,47,419,89"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_utils.html#a392b3f9d6c47ab4ee7dc8e9f2a09f0c5" title="Returns the pathname to a tmp file." alt="" coords="467,55,667,81"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1files_1_1_file_utils.html#abb578573334c0bc633d537d987223e63" title="Check whether we can write and read to a given pathname." alt="" coords="936,47,1112,89"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1files_1_1_file_utils.html#ae2209fbdfdcf1fdf0499e32989b057b5" title="Looks for a writable location where to put temporary files and returns an absolute pathname to the fo..." alt="" coords="715,77,888,118"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="1164,29,1375,56"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="1160,80,1379,107"/>
+</map>

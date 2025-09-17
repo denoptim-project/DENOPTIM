@@ -1,0 +1,9 @@
+<map id="denoptim.graph.APClass.make" name="denoptim.graph.APClass.make">
+<area shape="rect" id="node1" title="Constructor for a fully defined APClass." alt="" coords="5,127,204,153"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_class.html#aff98621bcbffd63488b7659957378704" title="Checks if there is already a instance with the given members, if not it created one." alt="" coords="252,86,437,127"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="256,151,433,193"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a9cd7b50704b244f23be16cceb27995bc" title="Constructor for an empty APClass." alt="" coords="485,5,704,32"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a91912545845208beeaafd39b2e980fb7" title=" " alt="" coords="502,57,687,98"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ae27f3da18e92f2bd723a25ad1e97cc21" title=" " alt="" coords="489,123,700,149"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#aa4f79073ea5b31bf0f847a655e50f0df" title=" " alt="" coords="502,174,687,215"/>
+</map>

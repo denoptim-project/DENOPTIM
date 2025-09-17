@@ -1,0 +1,27 @@
+<map id="denoptim.fragmenter.FragmenterTask" name="denoptim.fragmenter.FragmenterTask">
+<area shape="rect" id="node1" title="Task that performs the various steps in the process that prepares chemical structured to be chopped,..." alt="" coords="1369,176,1608,203"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="1105,68,1239,95"/>
+<area shape="rect" id="node3" title=" " alt="" coords="663,5,791,32"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1task_1_1_process_handler.html" title=" " alt="" coords="628,56,827,83"/>
+<area shape="rect" id="node5" title=" " alt="" coords="706,125,749,152"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html" title="Parameters controlling execution of the fragmenter." alt="" coords="1072,611,1272,653"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html" title="Collection of parameters controlling the behavior of the software." alt="" coords="634,279,821,321"/>
+<area shape="rect" id="node8" title=" " alt="" coords="297,211,360,237"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="242,267,415,293"/>
+<area shape="rect" id="node10" title=" " alt="" coords="5,267,128,293"/>
+<area shape="rect" id="node11" title=" " alt="" coords="195,317,463,373"/>
+<area shape="rect" id="node12" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html" title="Identifier of the type of parameters." alt="" coords="235,397,422,438"/>
+<area shape="rect" id="node13" title=" " alt="" coords="644,345,811,386"/>
+<area shape="rect" id="node14" title=" " alt="" coords="611,410,844,451"/>
+<area shape="rect" id="node15" title=" " alt="" coords="678,476,777,503"/>
+<area shape="rect" id="node16" title=" " alt="" coords="652,527,803,553"/>
+<area shape="rect" id="node17" title=" " alt="" coords="631,577,823,604"/>
+<area shape="rect" id="node18" title=" " alt="" coords="676,628,779,655"/>
+<area shape="rect" id="node19" title=" " alt="" coords="655,679,799,705"/>
+<area shape="rect" id="node20" title=" " alt="" coords="639,730,815,771"/>
+<area shape="rect" id="node21" title=" " alt="" coords="662,796,793,823"/>
+<area shape="rect" id="node22" title=" " alt="" coords="652,847,803,873"/>
+<area shape="rect" id="node23" title=" " alt="" coords="676,897,779,924"/>
+<area shape="rect" id="node24" href="$enumdenoptim_1_1fragmenter_1_1_scaffolding_policy.html" title="Defines how to define the scaffold vertex of a graph." alt="" coords="624,949,831,990"/>
+<area shape="rect" id="node25" href="$enumdenoptim_1_1graph_1_1_template_1_1_contract_level.html" title="Enum specifying to what extent the template&#39;s inner graph can be changed." alt="" coords="642,1014,813,1055"/>
+</map>

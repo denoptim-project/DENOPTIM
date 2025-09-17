@@ -1,0 +1,13 @@
+<map id="denoptim.gui.CompatibilityMatrixForm.importCPMapFromFile" name="denoptim.gui.CompatibilityMatrixForm.importCPMapFromFile">
+<area shape="rect" id="node1" title=" " alt="" coords="5,198,225,239"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#aa3b2b3c5c4cbe08ab9f10a741493dc25" title="Reads all the APClasses found in the currently loaded compatibility matrix." alt="" coords="299,5,535,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#a0a22931b5a84b91973ea019500bb24e5" title="Reads all the APClasses of capping groups as found in the currently loaded capping rules." alt="" coords="301,85,532,141"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a7ae01ef3a462f014e7928b908883ecae" title="Read the APclass compatibility matrix data from file." alt="" coords="323,165,511,206"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#aa2164c46be451878033d11e206e92c05" title=" " alt="" coords="273,230,560,271"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#a51b1ebdab321894bbea4ec5cff24efcd" title=" " alt="" coords="296,295,537,337"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#a8e30b784ac73038dfda109e5c597e821" title=" " alt="" coords="293,361,540,402"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="608,172,807,199"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="855,165,1032,206"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1080,131,1257,173"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1080,197,1257,238"/>
+</map>

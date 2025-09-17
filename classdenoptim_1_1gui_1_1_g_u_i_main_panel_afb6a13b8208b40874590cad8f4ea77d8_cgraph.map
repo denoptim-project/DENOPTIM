@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GUIMainPanel.removeCard" name="denoptim.gui.GUIMainPanel.removeCard">
+<area shape="rect" id="node1" title="Remove a panel (i.e., a card) from the pile of cards (i.e., card deck)" alt="" coords="5,13,261,39"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a919ef551482113b114895b79c0209ce8" title="Remove the reference to an panel/tab in the menu listing active tabs." alt="" coords="309,5,527,47"/>
+</map>

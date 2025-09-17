@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GUIVertexInspector.dialogToDefineCuttingRules" name="denoptim.gui.GUIVertexInspector.dialogToDefineCuttingRules">
+<area shape="rect" id="node1" title="Starts a dialog to define the on&#45;the&#45;fly fragmentation settings." alt="" coords="5,110,256,151"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a08082e27d7533670cd4e73f1d0608d83" title=" " alt="" coords="304,5,555,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a582437708ec38a71972a4da0ef0a4526" title="Read cutting rules from a stream." alt="" coords="335,110,523,151"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ab2ef881db354b6eada312a132af8e4c5" title="Starts a program&#45;specific logger that prints to System.err stream." alt="" coords="327,175,532,217"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ab50cf53bb905ea6cd32f361243d899da" title=" " alt="" coords="603,175,811,217"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.fragspace.FragmentSpace.getVerticesWithAPClasses" name="denoptim.fragspace.FragmentSpace.getVerticesWithAPClasses">
+<area shape="rect" id="node1" title="Returns the list of vertexes with at least one attachment point of each of the given classes." alt="" coords="5,5,224,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a274e9253fa2a75073e7fc14918e54eef" title="Returns the list of all APClasses present on this vertex." alt="" coords="272,5,443,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="491,5,661,47"/>
+</map>

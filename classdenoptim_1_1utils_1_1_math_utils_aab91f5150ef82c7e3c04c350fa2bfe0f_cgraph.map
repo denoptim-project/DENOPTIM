@@ -1,0 +1,7 @@
+<map id="denoptim.utils.MathUtils.getAngle" name="denoptim.utils.MathUtils.getAngle">
+<area shape="rect" id="node1" title="Calculates angle (in degrees) between vectors BA and BC." alt="" coords="5,81,188,122"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_math_utils.html#ac697c4b44f2cc17f369c23672ed6f68e" title="compute the angle between two vectors a &amp; b of same length" alt="" coords="236,81,452,122"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="510,29,705,56"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_math_utils.html#a2d786a84f8631fb1080ee7bfbc15d697" title="Compute the dot product (a scalar) between two vectors." alt="" coords="500,81,715,122"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_math_utils.html#a56ec1293dcc43a7c5cf5f41a551ecd72" title="Return the norm of a vector." alt="" coords="508,147,707,173"/>
+</map>

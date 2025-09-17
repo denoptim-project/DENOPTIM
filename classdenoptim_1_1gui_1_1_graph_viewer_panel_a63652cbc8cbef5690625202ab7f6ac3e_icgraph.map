@@ -1,0 +1,11 @@
+<map id="denoptim.gui.GraphViewerPanel.getSelectedNodes" name="denoptim.gui.GraphViewerPanel.getSelectedNodes">
+<area shape="rect" id="node1" title="Finds selected nodes from the viewer." alt="" coords="873,109,1047,151"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#ac1986beea060f3468430c9eb81969660" title="Adds or removes labels from the elements selected in the graph view." alt="" coords="625,37,799,79"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a569ab034eb86d265ef07683af407b81f" title="Identifies which attachment points are selected in the graph viewer." alt="" coords="605,102,819,158"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a6d4f1b74752e7b7cddc792e86992866f" title="Identifies which vertices are selected in the graph viewer." alt="" coords="599,182,825,238"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#ad5d14054ef438012b2c2224917f61688" title="Adds/Removes labels to the graph components that are presently selected." alt="" coords="329,5,511,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel_1_1_graph_opts_popup.html#ad5380bf971a6c413523b5b4d4093645b" title=" " alt="" coords="289,71,551,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler_1_1show_hide_labels_listener.html#af7b0f674a506d867f40e6e780ef45fbc" title=" " alt="" coords="5,5,241,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="295,150,545,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="21,143,226,184"/>
+</map>

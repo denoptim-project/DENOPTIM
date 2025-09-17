@@ -1,0 +1,29 @@
+<map id="denoptim.graph.Fragment.getSymmetricAPSets" name="denoptim.graph.Fragment.getSymmetricAPSets">
+<area shape="rect" id="node1" title=" " alt="" coords="1413,469,1603,511"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a3b476687a392e637d2bf2f3b6ccb09a4" title="Returns a deep copy of this fragments." alt="" coords="1137,418,1339,445"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a0a98792d99861bb6673e66a76ff49d31" title=" " alt="" coords="824,5,1043,47"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex_test.html#ab36c441c57e9852e2be6d810d80fbc87" title=" " alt="" coords="833,71,1034,112"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a12552fabbb6c8af399da78f10279fce2" title=" " alt="" coords="1129,469,1347,511"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_symmetric_a_ps_test.html#a9425bd6d6e87f4d8ff966498564a3633" title=" " alt="" coords="1141,535,1335,576"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#ac2186d67581bef7c19379247af6672d6" title=" " alt="" coords="1111,600,1365,641"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_symmetric_a_ps_test.html#a90b0920db91160f9d8f797d5167e39de" title=" " alt="" coords="1151,665,1325,707"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a37c0e44680ec1c54fcff98dae0832a50" title="Chops one chemical structure by applying the given cutting rules." alt="" coords="829,541,1038,583"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#a1e02c5f6054d5764ff597bd12337345a" title=" " alt="" coords="829,607,1037,648"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager_test.html#ac3efa7ffa90ffbdb876e8489054b02af" title="Build a graph meant to be used in unit tests." alt="" coords="819,672,1047,713"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#af86b79061d15a4d2e3d7ccdf0d758f44" title=" " alt="" coords="837,737,1030,779"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1rings_1_1_path_closability_tools_test.html#af991094bf8c17599150d2e43ea582cf9" title=" " alt="" coords="826,802,1041,858"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1rings_1_1_random_comb_of_ring_iterator_test.html#a4a178f479d08c120f5fea6ef60feac8b" title=" " alt="" coords="814,882,1053,938"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_size_manager_test.html#a55d1482a18edbaabf15b090392a282f3" title=" " alt="" coords="809,961,1057,1003"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a2b8d6293663bce9a9da1d35efe31911b" title=" " alt="" coords="837,136,1030,177"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task_test.html#a2dc64f375774087fc0b4511384f50bc9" title=" " alt="" coords="804,201,1063,257"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1fragmenter_1_1_fragment_alignement_test.html#ad46b9a4324bb5b9bbfc08c73de0e1124" title=" " alt="" coords="808,280,1059,321"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af88d30ce68477984fe6179325d1540b2" title=" " alt="" coords="813,345,1053,387"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a4889032266eb87d0f91af8b4e9869360" title=" " alt="" coords="827,411,1039,452"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector_test.html#ac33b26784f254c873593368ccd717125" title=" " alt="" coords="812,476,1055,517"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer.html#a1845241fead0bee7fd92feaf6d71e331" title="Once the clustering is done, this method return the list of cluster centroids." alt="" coords="531,607,729,648"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer.html#aae37739ae959ab8a85bf01286c5a518e" title="Once the clustering is done, this method return the list of fragments that are nearest to the respect..." alt="" coords="504,541,756,583"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment_test.html#a30be40702849bf4781129bf3dabf88e8" title=" " alt="" coords="505,672,755,713"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#aa21ebdf147f5bdb2685f9e775efd0b10" title=" " alt="" coords="253,541,456,583"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#aa17925160f3f03080e8680c7016fc1c4" title=" " alt="" coords="255,607,454,648"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter.html#aa27df9705e3aed34cc8cb8bc05e6ce85" title=" " alt="" coords="5,541,205,583"/>
+</map>

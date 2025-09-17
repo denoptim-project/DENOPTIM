@@ -1,0 +1,24 @@
+<map id="denoptim.gui.GUIGraphHandler.GraphSpinnerChangeEvent.stateChanged" name="denoptim.gui.GUIGraphHandler.GraphSpinnerChangeEvent.stateChanged">
+<area shape="rect" id="node1" title=" " alt="" coords="5,222,267,263"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ad71f3e0107bfa15b942563cfcf6f260a" title="Loads the graph corresponding to the field currGrphIdx." alt="" coords="315,222,544,263"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab5c539d49c8d6af83e4cf4596465a97b" title="Clears the current graph viewer but keeps track of the latest graph loaded." alt="" coords="597,105,830,146"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ae14524d4fe252a9ce27a06cc5193f953" title=" " alt="" coords="592,294,835,335"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#ac58ac806c3220d9a069f7259c843dbaa" title="Loads the given graph into the graph viewer." alt="" coords="609,215,818,271"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#aa6856d61cbbaa2fa6919e1c87d088bd3" title="Clears the current graph viewer but keeps track of the latest graph loaded." alt="" coords="883,95,1116,137"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a581e856de9d7b202a219773b3d9bef2a" title="Removes the currently loaded graph viewer." alt="" coords="1197,19,1371,61"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a5a72b0b91e2f169d5b9a473d0bc04a3f" title="Clears the molecular viewer and hides it behind the empty card." alt="" coords="1183,149,1385,205"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#aaed5e1c05e6ec1e86f88e4807f54991a" title="Clears the molecular viewer and hides it behind the empty card." alt="" coords="1172,85,1396,126"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a71ebb2645638b3512d2f4bb137c7d77d" title="Allows to show the given card in the molecular structure viewer." alt="" coords="1452,215,1663,271"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a700b2ae92d1de1c0be3e1bbde5cae71d" title="Removes the currently visualized molecule and AP table." alt="" coords="1468,150,1647,191"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a0917c33381934f156d4196b46819276b" title="Clears the table of attachment points." alt="" coords="1713,150,1891,191"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a20eef80a872503d11d3253d5557e0876" title="Clears the molecular viewer." alt="" coords="1711,215,1893,257"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a161579a33a00d54d8cc3610cacd3d98e" title="Allows to show the given card in the vertex viewer panel." alt="" coords="1452,5,1663,61"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a5b02a7e511de2c6dd4aa18420d5f76f8" title="Removes the currently visualized molecule and AP table." alt="" coords="1466,85,1649,126"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a65e5473c03b2075c97fbfa9b587b8949" title="Clears the table of attachment points." alt="" coords="1711,19,1893,61"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad2fc717c7c33817e4178031130d46f6d" title="Clears the molecular viewer." alt="" coords="1711,85,1893,126"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad1564e5c67234495668c68f02ab04ed4" title="Allows to activate and deactivate the listener." alt="" coords="1941,19,2144,61"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_fragment_view_panel_1_1_pausable_table_model_listener.html#ab8f315a71d317424e2647c160fc3fdfb" title=" " alt="" coords="2192,12,2439,68"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a77e7e3eacddd0198571354f931c2c470" title="Loads a structure in the Jmol viewer." alt="" coords="905,305,1094,346"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#aa64c40b887997341511f076c73f51480" title="Loads a structure in the Jmol viewer." alt="" coords="1164,394,1404,435"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="1189,305,1379,346"/>
+</map>

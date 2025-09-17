@@ -1,0 +1,7 @@
+<map id="denoptim.programs.moldecularmodelbuilder.MMBuilderParameters.processParameters" name="denoptim.programs.moldecularmodelbuilder.MMBuilderParameters.processParameters">
+<area shape="rect" id="node1" title="Processes all parameters and initialize related objects." alt="" coords="5,104,280,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#abcdf563c6c95b9a293cb0e71738355ff" title="Processes any of the parameter collections contained in this instance." alt="" coords="328,5,565,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_m_m_builder_utils.html#ace39b2317079164a34645f994ec201ed" title="Read the parameter settings to be used by PSSROT." alt="" coords="333,71,560,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#aa78874eb75a8c5ef18569ae691ec014b" title="Read the parameter settings to be used by PSSROT." alt="" coords="341,136,553,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a03ba5b59434dbcb0cab960417b650617" title="Read the Tinker atom mapping from Tinker Force Field." alt="" coords="339,201,554,243"/>
+</map>

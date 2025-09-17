@@ -1,0 +1,6 @@
+<map id="denoptim.task.Task.stopTask" name="denoptim.task.Task.stopTask">
+<area shape="rect" id="node1" title="Stop the task if not already completed." alt="" coords="5,46,197,73"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_process_handler.html#abf2a0e6d6119b98dc028d69b1a0e7522" title=" " alt="" coords="245,5,472,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_static_task_manager.html#a00dfeb1aebe14acd14a6a72f938b1f40" title=" " alt="" coords="268,71,449,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1task_1_1_static_task_manager.html#a35710993ed6901f26af2ee934897b658" title=" " alt="" coords="520,71,708,112"/>
+</map>

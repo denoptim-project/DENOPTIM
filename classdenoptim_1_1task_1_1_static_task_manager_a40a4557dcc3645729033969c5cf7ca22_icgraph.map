@@ -1,0 +1,5 @@
+<map id="denoptim.task.StaticTaskManager.setLinkToProgressBar" name="denoptim.task.StaticTaskManager.setLinkToProgressBar">
+<area shape="rect" id="node1" title="Adds a reference to the given progress bar." alt="" coords="496,5,701,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a0df9ca063352fbc50f9476f3b2820926" title="Initialize the contents of the tool bar." alt="" coords="228,13,448,39"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a36f4409849998e032342f49b19e6c5b5" title="Constructor that build the tool bar." alt="" coords="5,5,180,47"/>
+</map>

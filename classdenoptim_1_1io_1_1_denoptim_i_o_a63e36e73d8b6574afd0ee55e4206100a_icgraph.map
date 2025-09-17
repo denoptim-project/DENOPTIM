@@ -1,0 +1,15 @@
+<map id="denoptim.io.DenoptimIO.writeCandidateToFile" name="denoptim.io.DenoptimIO.writeCandidateToFile">
+<area shape="rect" id="node1" title="Writes one candidate item to file." alt="" coords="1052,108,1243,149"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a2f160fc3fb0488bb995d1e008a706ed4" title="Reconstruct the molecular population from the file." alt="" coords="783,9,1004,51"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a01ee989f992e0cff04e3498b63d6c0b0" title="Saves the final results to disk." alt="" coords="804,75,983,116"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1task_1_1_fitness_task.html#a39bac06427179a7d067d3eadee30ba79" title="This method runs the actual evaluation of the fitness, whether that is run internally (i...." alt="" coords="794,140,993,181"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#af5c2f9114881ebde82a83f922c0c23fe" title=" " alt="" coords="788,205,999,247"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aecbe9af608218e129a006ddae17ac66b" title="Reads unique identifiers and initial population file according to the GAParameters." alt="" coords="528,9,707,51"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="273,39,438,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,5,211,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,71,198,112"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#aab5b9c0b8a88922460f5c28ae161d1fa" title=" " alt="" coords="514,127,721,168"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_fitness_evaluation_task.html#a498b4214d06fc161d92cf1a38635ece3" title=" " alt="" coords="503,192,732,233"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a6b74fb1e5678145e094259bfa2401bd4" title=" " alt="" coords="500,257,735,299"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="259,257,452,299"/>
+</map>

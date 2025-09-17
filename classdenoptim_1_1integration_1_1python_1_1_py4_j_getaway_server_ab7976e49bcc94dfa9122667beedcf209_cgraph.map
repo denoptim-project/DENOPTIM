@@ -1,0 +1,4 @@
+<map id="denoptim.integration.python.Py4JGetawayServer.launch" name="denoptim.integration.python.Py4JGetawayServer.launch">
+<area shape="rect" id="node1" title="Starts a gateway server using this class as entry point, which then becomes the interpreter of any da..." alt="" coords="5,5,188,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1python_1_1_py4_j_getaway_server.html#a0c2e04693751b0a753db1c069afcc902" title="Sets the reference to the launched server." alt="" coords="236,5,435,47"/>
+</map>

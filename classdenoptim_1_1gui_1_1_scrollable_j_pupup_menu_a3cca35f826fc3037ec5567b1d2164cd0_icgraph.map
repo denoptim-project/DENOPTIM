@@ -1,0 +1,5 @@
+<map id="denoptim.gui.ScrollableJPupupMenu.showMenu" name="denoptim.gui.ScrollableJPupupMenu.showMenu">
+<area shape="rect" id="node1" title="Displays the menu with the components that have been added so far." alt="" coords="568,5,767,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#ad63012fa4fa9bec2e54ce86425039186" title="Initialize the panel and add buttons." alt="" coords="264,13,520,39"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#aefffdc97385f7a524badf71808a3053b" title="Constructor." alt="" coords="5,5,216,47"/>
+</map>

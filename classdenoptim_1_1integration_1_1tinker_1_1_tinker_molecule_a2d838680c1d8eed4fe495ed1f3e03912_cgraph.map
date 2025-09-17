@@ -1,0 +1,4 @@
+<map id="denoptim.integration.tinker.TinkerMolecule.getAtom" name="denoptim.integration.tinker.TinkerMolecule.getAtom">
+<area shape="rect" id="node1" title="Returns the atom which has the XYZ index set to pos." alt="" coords="5,5,181,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_atom.html#a0df417191b38fb579c03650a808efe55" title="Gets the XYZ Index." alt="" coords="229,5,405,47"/>
+</map>

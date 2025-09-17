@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GUICompatibilityMatrixTab" name="denoptim.gui.GUICompatibilityMatrixTab">
+<area shape="rect" id="node1" title="A panel for handling of compatibility matrix." alt="" coords="5,155,201,196"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel.html" title="Class of GUI panels meant to occupy one card in the deck&#45;of&#45;cards layout of the main panel." alt="" coords="12,80,195,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="72,5,135,32"/>
+</map>

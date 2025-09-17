@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.renderMolVieverToNeedUpdate" name="denoptim.gui.GraphVertexMolViewerPanel.renderMolVieverToNeedUpdate">
+<area shape="rect" id="node1" title="Triggers the generation of the molecular representation of the loaded graph." alt="" coords="1193,48,1407,104"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af7024886a4203aa93d8cf7975f7c2e72" title=" " alt="" coords="904,26,1145,67"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,33,509,60"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a857bfe6291322daccf2af3fd9a28a356" title="Start the construction of a new graph from scratch." alt="" coords="557,26,856,67"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,26,211,67"/>
+</map>

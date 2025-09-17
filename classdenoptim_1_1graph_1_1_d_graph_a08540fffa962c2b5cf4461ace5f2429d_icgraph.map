@@ -1,0 +1,7 @@
+<map id="denoptim.graph.DGraph.toJson" name="denoptim.graph.DGraph.toJson">
+<area shape="rect" id="node1" title="Produces a string that represents this graph and that adheres to the JSON format." alt="" coords="299,111,497,138"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#aab5b9c0b8a88922460f5c28ae161d1fa" title=" " alt="" coords="25,5,231,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_candidate.html#ace97fc2021ebb11463e062dddbec6aac" title="Returns an atom container representing this item in a way that is compatible for writing this item to..." alt="" coords="9,71,247,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0091493800250a2794af19f597241126" title=" " alt="" coords="24,136,232,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a716f5e1ae52b617c411ab57cb83ee78a" title=" " alt="" coords="5,201,251,243"/>
+</map>

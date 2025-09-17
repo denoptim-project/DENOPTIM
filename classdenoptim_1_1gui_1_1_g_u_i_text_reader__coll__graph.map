@@ -1,0 +1,20 @@
+<map id="denoptim.gui.GUITextReader" name="denoptim.gui.GUITextReader">
+<area shape="rect" id="node1" title="A panel that allows to print the content of a text file into a GUI tab." alt="" coords="841,81,1029,108"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel.html" title="Class of GUI panels meant to occupy one card in the deck&#45;of&#45;cards layout of the main panel." alt="" coords="492,5,675,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="35,241,98,268"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_main_panel.html" title="The main panel is a deck of cards that occupies all the GUI frame." alt="" coords="195,241,377,268"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i.html" title="Graphical User Interface of the DENOPTIM package." alt="" coords="522,552,645,579"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html" title="Main tool bar of the DENOPTIM graphical user interface." alt="" coords="850,389,1021,416"/>
+<area shape="rect" id="node6" title=" " alt="" coords="543,333,624,360"/>
+<area shape="rect" id="node7" title=" " alt="" coords="553,384,614,411"/>
+<area shape="rect" id="node8" title=" " alt="" coords="533,435,634,461"/>
+<area shape="rect" id="node9" title=" " alt="" coords="491,486,676,527"/>
+<area shape="rect" id="node11" title=" " alt="" coords="248,476,324,503"/>
+<area shape="rect" id="node12" title=" " alt="" coords="253,527,319,553"/>
+<area shape="rect" id="node13" title=" " alt="" coords="233,577,339,604"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="199,628,373,655"/>
+<area shape="rect" id="node15" title=" " alt="" coords="5,628,128,655"/>
+<area shape="rect" id="node16" title=" " alt="" coords="532,56,635,83"/>
+<area shape="rect" id="node17" title=" " alt="" coords="541,107,625,133"/>
+<area shape="rect" id="node18" title=" " alt="" coords="537,157,629,184"/>
+</map>

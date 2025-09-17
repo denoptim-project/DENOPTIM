@@ -1,0 +1,13 @@
+<map id="denoptim.gui.ParametersForm.getTextForUnformattedSettings" name="denoptim.gui.ParametersForm.getTextForUnformattedSettings">
+<area shape="rect" id="node1" title=" " alt="" coords="1389,136,1605,177"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fitness_parameters_form.html#a1977224ff3bcdcb05a811f8c228e9589" title=" " alt="" coords="1123,5,1331,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_f_s_e_parameters_form.html#a998029e4bda3be74f2d53e32ba3f7894" title=" " alt="" coords="1132,71,1323,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_f_s_parameters_form.html#a06262c2710006e31961d2eeaa8df061e" title=" " alt="" coords="1133,136,1322,177"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#aa88930fb4bdf44a723bfe96599a7275f" title=" " alt="" coords="1133,201,1322,243"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare_fitness_runner_1_1_input_form.html#a8fdfac40427c549bb2e9c5cea540c5b4" title=" " alt="" coords="1113,266,1341,322"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_f_s_params_dialog.html#ae39602275c1287e6916f7693a0824b08" title="Reads all the parameters, calls the interpreters, and eventually creates the static FragmentSpace obj..." alt="" coords="835,136,1065,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_f_s_params_dialog.html#a5a9b51978e6cfce0b434a8d72c7c6107" title="Constructor." alt="" coords="573,103,771,144"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a67ce3e03e9d13d3f312652296d25c0a5" title=" " alt="" coords="557,168,787,209"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,175,509,202"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,168,211,209"/>
+</map>

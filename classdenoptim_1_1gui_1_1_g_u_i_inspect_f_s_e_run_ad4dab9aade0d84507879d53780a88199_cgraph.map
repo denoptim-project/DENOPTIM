@@ -1,0 +1,23 @@
+<map id="denoptim.gui.GUIInspectFSERun.importFSERunData" name="denoptim.gui.GUIInspectFSERun.importFSERunData">
+<area shape="rect" id="node1" title=" " alt="" coords="5,261,257,303"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#adc9aaa1dcca5325d211a6a197a72af53" title=" " alt="" coords="306,5,557,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a95069843e337d5e85a5434aceb8e9c42" title=" " alt="" coords="640,31,811,72"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a32bfab2ec1e037a1a28e9d0c9bb2075d" title="Returns the level that generated this graph in a fragment space exploration experiment." alt="" coords="640,96,811,137"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a015435de7c18b38757709c97bd46f10d" title=" " alt="" coords="346,261,517,303"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#aab1bd788e028b3a5b77dca355e8d557b" title="Read only selected data from a GA produced items." alt="" coords="337,371,525,412"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#a93064e3487745a0588ef1eb77d3d5e15" title=" " alt="" coords="305,436,557,477"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#a3eaeb4ba499d9f3c9a8a905127bf8ce7" title=" " alt="" coords="305,173,557,215"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#ae64c850463d7d16d61d9612ea1613eb3" title=" " alt="" coords="309,501,554,543"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#afaf02b7c3af6f525e2536b23bd0bbdd1" title=" " alt="" coords="309,567,554,608"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ab0e2d1314d9babeda94e65c471832df1" title="Extract selected properties from SDF files." alt="" coords="631,316,819,357"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a5b0854960a04b31ce12b5d0bdbcfbad6" title=" " alt="" coords="640,381,811,423"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a382d6d04e131453c7c4736de583ea996" title=" " alt="" coords="640,447,811,488"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#aa375e204e094848126768561901a32e4" title=" " alt="" coords="640,512,811,553"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a7458628d4e902ca60749a5986a14ecc0" title="Sets level that generated this graph in a fragment space exploration experiment." alt="" coords="640,577,811,619"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a48102bb79e9cc581e8c6ef527e003b08" title="Reads a file containing multiple molecules (multiple SD format))" alt="" coords="893,316,1081,357"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a700b2ae92d1de1c0be3e1bbde5cae71d" title="Removes the currently visualized molecule and AP table." alt="" coords="636,643,815,684"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a0917c33381934f156d4196b46819276b" title="Clears the table of attachment points." alt="" coords="898,675,1077,716"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a20eef80a872503d11d3253d5557e0876" title="Clears the molecular viewer." alt="" coords="896,609,1079,651"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a73f9188a92ff8dde58db2d344accde90" title=" " alt="" coords="640,161,811,203"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#aa64c40b887997341511f076c73f51480" title="Loads a structure in the Jmol viewer." alt="" coords="605,251,845,292"/>
+</map>

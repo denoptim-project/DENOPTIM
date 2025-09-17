@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GUITextReader.displayContent" name="denoptim.gui.GUITextReader.displayContent">
+<area shape="rect" id="node1" title="Print the content of the given file in this tab&#39;s pane." alt="" coords="5,27,236,69"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#abb6475cf2be569dd6c87969f80b27d59" title="Read text from file." alt="" coords="284,5,497,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_text_reader.html#a630acef76d0ef789df6536d4a4853c9c" title=" " alt="" coords="286,57,495,98"/>
+</map>

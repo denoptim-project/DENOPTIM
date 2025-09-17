@@ -1,0 +1,4 @@
+<map id="denoptim.gui.MainToolBar.initialize" name="denoptim.gui.MainToolBar.initialize">
+<area shape="rect" id="node1" title="Initialize the contents of the tool bar." alt="" coords="228,13,448,39"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a36f4409849998e032342f49b19e6c5b5" title="Constructor that build the tool bar." alt="" coords="5,5,180,47"/>
+</map>

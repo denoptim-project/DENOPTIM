@@ -1,0 +1,30 @@
+<map id="denoptim.utils.MathUtils.distance" name="denoptim.utils.MathUtils.distance">
+<area shape="rect" id="node1" title="Calculates distance between point a and point b." alt="" coords="3235,330,3448,357"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#aad537b06e3c2091bd768b10358a72bb4" title="Checks if atoms and APs contained in this fragment have non&#45;zero 3D coordinates." alt="" coords="2953,299,3151,326"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#ab0a2952925cf318fa872e349dd2709ae" title="Converts currently loaded internal coordinates into Cartesian overwriting the current XYZ." alt="" coords="2917,352,3187,393"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a5de255e134fc5c4eea74c6b653ddb913" title="Loads the given fragments to this viewer." alt="" coords="2618,289,2842,331"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a23695fc49f5ff660a828bddbf74a5006" title="Loads the given template to this viewer." alt="" coords="2319,319,2543,360"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a697ecc5ef3352a5860a6a6a355d87d1b" title="Loads the given vertex to this viewer." alt="" coords="2047,289,2271,331"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="1141,238,1404,265"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#ad9676f2418e5c4221fd7927d68cedad5" title="Loads the fragments corresponding to the field index." alt="" coords="1759,165,1999,207"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a9a6057c6f67098a32bd84f4f7bffe4a8" title="Loads the vertices corresponding to the field index." alt="" coords="1761,348,1996,389"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="836,231,1052,272"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a69d3deb57097286f9a01cdf256ec8d65" title="Imports vertices." alt="" coords="1455,35,1707,76"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6e5cc3cb1cd2f98bf03934b3b2defa22" title=" " alt="" coords="1452,231,1711,272"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a09363e21a5254efe8f128a99e82acbf0" title=" " alt="" coords="1459,165,1703,207"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector_1_1_vrtx_spinner_change_event.html#aca98b170c98a615d12f199d1ccdd26dd" title=" " alt="" coords="1457,100,1706,141"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6698fa37bf04503e58c61f0543946834" title="Imports fragments from a file." alt="" coords="1147,35,1399,76"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a1a2e06a2647032587d42155302b8c0a6" title="Process a file that has a recognized file format and loads a suitable GUI card to visualize the file ..." alt="" coords="833,42,1055,69"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a0df9ca063352fbc50f9476f3b2820926" title="Initialize the contents of the tool bar." alt="" coords="228,13,448,39"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_g_u_i.html#a460fa99497f04de06d2adf8671a92441" title="Launch the application." alt="" coords="550,101,693,127"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a94df24e485081c9b9d7441387f409e26" title="Updated the the list of recent files in the &quot;open Recent&quot; menu." alt="" coords="515,35,728,76"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a36f4409849998e032342f49b19e6c5b5" title="Constructor that build the tool bar." alt="" coords="5,5,180,47"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a15c6a5de34e54f74d33c7c82f2a3125d" title="Load the list of vertexes to choose from." alt="" coords="1464,414,1699,441"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector_1_1_vrtx_spinner_change_event.html#aa4094444bbbf29fde85df9440ab5c0e7" title=" " alt="" coords="1457,348,1706,389"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af7024886a4203aa93d8cf7975f7c2e72" title=" " alt="" coords="1152,407,1393,448"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a857bfe6291322daccf2af3fd9a28a356" title="Start the construction of a new graph from scratch." alt="" coords="795,348,1093,389"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a44e2ff798d22b73f966cb8393ceb4f18" title="Extends the current graph by appending a node to a specific free AP on the growing graph." alt="" coords="823,465,1065,507"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="496,414,747,441"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="235,407,441,448"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a078749e82762b41d68b51bbc5af46e0c" title="Constructs a Molecule3DBuilder specifying all its features." alt="" coords="2591,355,2869,396"/>
+</map>

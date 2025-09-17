@@ -1,0 +1,5 @@
+<map id="denoptim.fragmenter.FragmenterTools.getMatchingBondsAllInOne" name="denoptim.fragmenter.FragmenterTools.getMatchingBondsAllInOne">
+<area shape="rect" id="node1" title="Identification of the bonds matching a list of SMARTS queries." alt="" coords="269,39,484,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a37c0e44680ec1c54fcff98dae0832a50" title="Chops one chemical structure by applying the given cutting rules." alt="" coords="9,5,218,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools_test.html#a5891eb6753a8237f0fea294ef62a7f96" title=" " alt="" coords="5,71,221,112"/>
+</map>

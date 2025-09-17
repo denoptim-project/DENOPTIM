@@ -1,0 +1,33 @@
+<map id="denoptim.programs.RunTimeParameters.containsParameters" name="denoptim.programs.RunTimeParameters.containsParameters">
+<area shape="rect" id="node1" title=" " alt="" coords="1559,650,1767,691"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,76,539,132"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#a065481cf3ca3229eee8b417fa3f7c0b5" title="Makes new rings by connecting pairs of atoms that hold properly arranged RingClosingAttractors." alt="" coords="1265,179,1455,220"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a8f359a45038dc604a5e437d63a35e1a2" title="Constructor." alt="" coords="1239,312,1481,368"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#a36bba7d683495a288f718e58b6494ff1" title=" " alt="" coords="1230,392,1490,448"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#a2cbb59c28aafec9b7ca7922e173d0a4f" title=" " alt="" coords="1233,472,1487,528"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_fitness_evaluation_task.html#a916d0f71da568a6824263a70b3d3ad4a" title=" " alt="" coords="1215,551,1505,592"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="1267,616,1453,658"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#ab222efa0ae1a954ba00305d123484264" title=" " alt="" coords="1257,682,1463,723"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a45d4e9ec6a308aa73891efa1d501dd5e" title="Perform fitness&#45;based, class&#45;compatible selection of parents that can do crossover operations." alt="" coords="1249,748,1471,774"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#ad8adff3858c7dea67631d2c0de1b0a8c" title="Processes currently loaded fields." alt="" coords="1248,799,1472,840"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner_parameters.html#a98b6c6b389e456945a968edc31086451" title="Processes all parameters and initialize related objects." alt="" coords="1209,864,1511,906"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#a3c2407eb1204a7b25600d3d347d98447" title=" " alt="" coords="920,923,1132,964"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#adb60b4cb2cda6a912a831974c5303df4" title=" " alt="" coords="1254,982,1466,1023"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="1259,1047,1461,1088"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,83,280,124"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#abd87e8b7391948be1c3156eb9d131be7" title="Attempts to close rings by finding the conformation that allows to join heads and tails of atom speci..." alt="" coords="909,112,1143,154"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#a26896649739e0a5e63dd88079c6efe7a" title="Performs one or more attempts to close rings by conformational adaptation." alt="" coords="587,112,843,154"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#ab6f3e42211a0e64952cac4563c8adab5" title=" " alt="" coords="907,177,1145,233"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#a5e334ae3cc2712bf8e893b82b2f655e9" title=" " alt="" coords="903,256,1149,298"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#a5e1e5c4d0ee951cce946a8637f11347d" title=" " alt="" coords="909,321,1143,377"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#a219eff4d45e790b5e6223e2f217a6988" title=" " alt="" coords="891,400,1161,442"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#af5bb3fefec5ad4f6a564031cfe1165a4" title=" " alt="" coords="907,465,1145,521"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#a978e5b8072fc346a9c580e841a5bb201" title="Processes all parameters and initialize related objects." alt="" coords="892,544,1160,586"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph.html#a55924e2fcd5c0081af56b98766d74ee1" title=" " alt="" coords="615,400,814,442"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1programs_1_1mol2graph_1_1_mol2_graph_parameters.html#a28d48b83380c4dd412104dd8d7a972fa" title=" " alt="" coords="893,610,1159,651"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="943,675,1109,716"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="612,675,817,716"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="625,770,805,811"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="941,740,1111,782"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters_test.html#a5f81adfed5156347b58d54172f7618d8" title=" " alt="" coords="923,858,1129,899"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.graph.Vertex.isAromaticBridge" name="denoptim.graph.Vertex.isAromaticBridge">
+<area shape="rect" id="node1" title="Checks if this vertex is meant to be a piece of an aromatic system." alt="" coords="491,51,653,92"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a5c6af6108f5caedf3641ef2ed383f954" title="Returns the list of mutation types." alt="" coords="21,5,191,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a4e80e5af73f6e594984e80c3c8d6c845" title="Checks if this vertex is connected to any vertex meant to be a piece of an aromatic system." alt="" coords="255,51,443,92"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex_test.html#a33f3323568140d1668837b954db5bb94" title=" " alt="" coords="5,84,207,125"/>
+</map>

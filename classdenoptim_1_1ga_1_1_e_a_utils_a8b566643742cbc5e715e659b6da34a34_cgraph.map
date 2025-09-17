@@ -1,0 +1,4 @@
+<map id="denoptim.ga.EAUtils.buildCandidateByXOver" name="denoptim.ga.EAUtils.buildCandidateByXOver">
+<area shape="rect" id="node1" title="Generates a new offspring by performing a crossover operation." alt="" coords="5,29,175,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a2014fe16fbd88124afa846c8d2227104" title="Generates a pair of new offspring by performing a crossover operation." alt="" coords="223,29,392,71"/>
+</map>

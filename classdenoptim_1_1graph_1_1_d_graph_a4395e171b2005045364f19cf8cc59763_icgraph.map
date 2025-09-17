@@ -1,0 +1,5 @@
+<map id="denoptim.graph.DGraph.removeSymmetryRedundance" name="denoptim.graph.DGraph.removeSymmetryRedundance">
+<area shape="rect" id="node1" title="Remove all but one of the symmetry&#45;related partners in a list of vertices." alt="" coords="256,39,459,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#ac950db68259da0226f3d7eb549ba792c" title="Filters a list of vertices according to a query." alt="" coords="17,5,197,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a97d5836e2a8d0d9e16a598a13b14a84a" title="Remove all but one of the symmetry&#45;related partners in a given list of vertex IDs." alt="" coords="5,71,208,112"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.utils.GraphUtils.ensureVertexIDConsistency" name="denoptim.utils.GraphUtils.ensureVertexIDConsistency">
+<area shape="rect" id="node1" title="Method used to ensure consistency between internal atomic integer and vertex id from imported graphs." alt="" coords="5,39,215,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="268,5,456,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_graph_utils.html#adceb5d2a62ee7cb0c67e8ccd1c13e0f0" title="Reset the unique vertex counter to the given value." alt="" coords="263,71,461,112"/>
+</map>

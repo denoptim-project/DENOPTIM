@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GraphViewerPanel.getGraphStatusSnapshot" name="denoptim.gui.GraphViewerPanel.getGraphStatusSnapshot">
+<area shape="rect" id="node1" title="Returns a copy of the graph loaded into the viewer." alt="" coords="315,41,519,83"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel_1_1_graph_opts_popup.html#ad5380bf971a6c413523b5b4d4093645b" title=" " alt="" coords="5,5,267,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#abab3007ca39f050b3b9916c4bcc994ca" title="Loads the given graph into the graph viewer." alt="" coords="31,70,241,126"/>
+</map>

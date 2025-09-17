@@ -1,0 +1,8 @@
+<map id="denoptim.graph.AttachmentPoint.comparePropertiesTo" name="denoptim.graph.AttachmentPoint.comparePropertiesTo">
+<area shape="rect" id="node1" title="Compares this and given attachment point." alt="" coords="5,122,185,163"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a5cac5d20b70a0eace014ce062a271fbf" title=" " alt="" coords="233,5,465,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="259,57,439,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="251,122,448,163"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a9c1db3123b7f73aa20c0d1895f31f8d7" title="Returns the end of the direction vector." alt="" coords="259,187,439,229"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ab1226264e663d411606bc5af27dd921e" title="Compares the features of this and another attachment point and decides if the two are same." alt="" coords="259,277,439,318"/>
+</map>

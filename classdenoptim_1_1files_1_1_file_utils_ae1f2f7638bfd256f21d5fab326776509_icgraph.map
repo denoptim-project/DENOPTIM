@@ -1,0 +1,16 @@
+<map id="denoptim.files.FileUtils.deleteFile" name="denoptim.files.FileUtils.deleteFile">
+<area shape="rect" id="node1" title="Delete the file." alt="" coords="1516,272,1727,299"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#a0ab2bda53da73be71983ff00ff734b66" title="Delete all files with pathname containing a given string." alt="" coords="1233,85,1424,126"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_preferences_dialog.html#a7ac3b0e8cd1aa31e2c48c2aed77bf620" title=" " alt="" coords="1213,153,1445,194"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a6f2ce8f6a8319b39440b0dc43ede061f" title="Check that the following graph&#39;s fused ring gets added to the fragment library." alt="" coords="1189,217,1468,273"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a56ef448997df677c5ce4a73737f127e2" title="Checks that a graph with a fused ring containing a scaffold vertex is added to the scaffold library." alt="" coords="1193,297,1464,353"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a7555fcdf60b6fabae0c95844f351fc6f" title=" " alt="" coords="1195,377,1462,418"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a692723b803a64dd25e775b2f8726fe27" title="Works with this graph:" alt="" coords="1205,441,1452,497"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#abd87e8b7391948be1c3156eb9d131be7" title="Attempts to close rings by finding the conformation that allows to join heads and tails of atom speci..." alt="" coords="899,13,1133,54"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1integration_1_1tinker_1_1_conformational_search_p_s_s_r_o_t.html#aedff481352b5fd5ac099a3129e11f16c" title="Performs PSSROT conformational search on the given chemical object." alt="" coords="891,77,1141,133"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#a26896649739e0a5e63dd88079c6efe7a" title="Performs one or more attempts to close rings by conformational adaptation." alt="" coords="587,13,843,54"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,5,539,61"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,13,280,54"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_preferences_dialog.html#ab9703d44532c40f4f03c47fcc5e07c23" title=" " alt="" coords="920,157,1112,198"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_preferences_dialog.html#a1218810b281701e6806afcf90fb4725a" title="Constructs a dialog for setting the preferences of the GUI." alt="" coords="619,157,811,198"/>
+</map>

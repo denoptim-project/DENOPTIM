@@ -1,0 +1,52 @@
+<map id="denoptim.graph.Vertex.getVertexId" name="denoptim.graph.Vertex.getVertexId">
+<area shape="rect" id="node1" title=" " alt="" coords="929,1430,1100,1471"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a91fba166ba9fe73858ed16209d575cc5" title="Recursive method that appends branches of building blocks following the edges of the graph." alt="" coords="607,92,873,148"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#acbaf5061621ed283eecc80a51b523422" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="311,81,536,137"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a25c838437e3b367bb80f8daf74a50ffe" title="Decides if an AttachmentPoint can be considered for making a ring fusion operation,..." alt="" coords="651,171,829,212"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6f0b9a42074fe224ae52cee5f5875a7c" title="Returns almost &quot;deep&#45;copy&quot; of this graph." alt="" coords="645,261,835,288"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#a537720023ac6debd9f4663d61026a423" title="Returns a deep&#45;copy of this vertex." alt="" coords="630,362,850,389"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex_test.html#ab36c441c57e9852e2be6d810d80fbc87" title=" " alt="" coords="323,355,524,396"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_fragment.html#a3b476687a392e637d2bf2f3b6ccb09a4" title="Returns a deep copy of this fragments." alt="" coords="639,437,841,464"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a0a98792d99861bb6673e66a76ff49d31" title=" " alt="" coords="314,455,533,496"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af88d30ce68477984fe6179325d1540b2" title=" " alt="" coords="303,555,543,596"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_template.html#ac7d7400f47d4bad33f3755f1b3d19a3e" title="Returns a deep copy of this template." alt="" coords="639,562,841,589"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1rings_1_1_cyclic_graph_handler.html#a84d37f4cd922ff124f5ffdacc7baedd0" title="Recursive method to identify all the combination of rings." alt="" coords="615,738,865,794"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1rings_1_1_cyclic_graph_handler.html#a3ce96322723f45d9285a248ebcef94d3" title="Identifies all possible ring closing paths and returns them as list of DENOPTIMRings ready to be appe..." alt="" coords="301,726,546,782"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a0c2a682b968acaab3aaa4966a7296a14" title="Returns a sequence of APs that is the path from vertex from to vertex to." alt="" coords="338,824,509,866"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph.html#ada30f3ea44a73ae851fc1f154ce4fed3" title="Recursive utility method for fixEdgeDirections(graph)." alt="" coords="337,920,509,962"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5bac29c23eccedca8d2371ad372d87b6" title=" " alt="" coords="334,1051,513,1092"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1utils_1_1_graph_conversion_tool.html#abf9ddf4333b1151356a00b686f93604d" title="Given a formatted string&#45;like representation of a DENOPTIM graph create the corresponding DENOPTIMGra..." alt="" coords="637,986,843,1027"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_fragment.html#a7e8b973a33c7ec906e65d1512d9faecb" title=" " alt="" coords="645,1270,835,1311"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#ac2186d67581bef7c19379247af6672d6" title=" " alt="" coords="296,1295,551,1336"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_edge.html#a6331fb41fb8390b908ca7d737cc13602" title=" " alt="" coords="649,920,831,962"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph.html#a40786de6efd159a5c54c122d0d3d2c1c" title="Remove a vertex from this graph." alt="" coords="322,1152,525,1194"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_d_graph.html#a70a5450315c7af3d64c44179ec2cede8" title="Remove capping groups that belong to this graph and are in the given list." alt="" coords="25,1182,228,1223"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_d_graph.html#af404e25092eabcdfbe69b5d7204e9483" title="Mutates the graph by removing the chain where a given vertex is located up to the first branching (i...." alt="" coords="25,1268,228,1310"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8fb951a35b028bcf098b8a83d94d7e75" title="Removes unused ring&#45;closing vertices." alt="" coords="25,1378,228,1419"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_edge.html#a9a569de09e30a53338e1983f2a07e105" title=" " alt="" coords="649,1051,831,1092"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3560b051e55499bf45522a55f6219d29" title="Returns the position of the first vertex that has the given ID." alt="" coords="645,1488,835,1530"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel_1_1_j_edge.html#a6c144135a962e48c69967632c31a1232" title="Constructor for a JUNG edge representing a AttachmentPoint." alt="" coords="653,1554,827,1595"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel_1_1_j_vertex.html#a5668df0b7885e6408de29b5bbd60f935" title="Constructor for vertex that represents a given AttachmentPoint." alt="" coords="653,1619,827,1660"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a23695fc49f5ff660a828bddbf74a5006" title="Loads the given template to this viewer." alt="" coords="628,1684,852,1726"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a1669a88512d2bd3b14cdd00235dff50a" title="Generate the next combination of fragments." alt="" coords="655,1750,825,1791"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1ga_1_1_graph_operations.html#affb1be89a32e4a429bd7dbdfe0708419" title="Performs the crossover that swaps the two subgraphs defining the given XoverSite." alt="" coords="620,1867,860,1908"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#ab0f92a94c4fb2334e7d3813e73fc4247" title=" " alt="" coords="317,1838,529,1879"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad36b954088b2e04ea927801775e56d77" title="Reassign vertex IDs to a graph." alt="" coords="633,1932,847,1974"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#adb60b4cb2cda6a912a831974c5303df4" title=" " alt="" coords="634,1998,846,2039"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_ring_1_1_d_e_n_o_p_t_i_m_ring_serializer.html#ab3e3accae9a69d01d2668ea09a4bbad2" title=" " alt="" coords="621,2063,859,2104"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_template.html#ad5daf794be97bcd8e43046b702b23b4d" title="Attaches a molecular representation to this template." alt="" coords="646,2128,834,2170"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5f83a5964a20b7fd7ca36f28e32fd425" title="Update the graph so that the vertex argument is at the scaffold level i.e." alt="" coords="651,2194,829,2235"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ab660196af28b1c83162c6028ea203519" title=" " alt="" coords="636,2259,844,2300"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a2e2f6b35718dbf77d68809022170ab22" title=" " alt="" coords="599,2324,881,2366"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ac09e961280beb2c61cc88ce1b4bccd3f" title=" " alt="" coords="636,2390,844,2431"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a3b99d7012da487a88acf937e3c9f5ea4" title=" " alt="" coords="636,2455,844,2496"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a3f7e3dd977875217a40f51b5d3bffff5" title=" " alt="" coords="613,2520,867,2562"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#a78e6eb5e60124f63897dd28e1c21082d" title=" " alt="" coords="639,2586,841,2627"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_a_p_mapping.html#a011a195c3dfc53e29e69c591f31a7d75" title="Produces an index&#45;based version of this mapping where each index represents the attachment point as i..." alt="" coords="643,2651,837,2692"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_edge.html#a9a7430e5a0df146b404ca4d30e0beee4" title=" " alt="" coords="645,2717,835,2744"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ac4f0f7ede6d42620f85be3b7cca0ef54" title="Produces a human readable, short string to represent the vertex by its vertex ID, building block ID (..." alt="" coords="640,2768,840,2810"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1_fragment.html#a9329e824fda4ccb57fd59ad3b7df7c6e" title="Produces a human readable, short string to represent the vertex by its vertex ID, building block ID (..." alt="" coords="649,2834,831,2875"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1simplified_1_1_undirected_edge.html#a3f4b637fe69b034b4160b445aa966b6c" title=" " alt="" coords="655,2899,825,2940"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#adf927b8dfc6e153e639fac3509e259c1" title=" " alt="" coords="333,183,514,224"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_graph_operations.html#add74b865c897144437bf30e3734edf01" title="Tries to use any free AP of the given vertex to close ring in the graph by adding a chord." alt="" coords="5,692,248,718"/>
+</map>

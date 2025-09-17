@@ -1,0 +1,11 @@
+<map id="denoptim.fitness.DescriptorForFitness.addDependentVariable" name="denoptim.fitness.DescriptorForFitness.addDependentVariable">
+<area shape="rect" id="node1" title="Append the reference to a variable that used data produced by the calculation of this descriptor." alt="" coords="788,194,1005,235"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser.html#a761cd46875eff5864f29dbb7f353bde7" title="Parses the given expressions." alt="" coords="553,129,716,170"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#a797d2bef11fed4d885baa11089538b23" title=" " alt="" coords="542,194,727,235"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#a49819c248ea4d3acf19689f8d6fcec2c" title=" " alt="" coords="529,259,740,315"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fitness_1_1_fitness_parameters.html#a2ab06430e0d6c35625d03557520cf505" title="Processes all parameters and initialize related objects." alt="" coords="276,129,481,170"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#a2272dbcf72c993b4544719ddf64c98b6" title=" " alt="" coords="19,5,214,61"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#ac3684e1e2969ee1c883ab279d4d5c048" title="This test is reproducing most of what done in FitnessParametersTest#testProcessExpressions() so if bo..." alt="" coords="11,85,222,141"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fitness_1_1_fitness_provider_test.html#a81954dc756c3f22356f01bdc0037e9f5" title=" " alt="" coords="21,165,212,206"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fitness_1_1_fitness_expression_parser_test.html#ad8c3056173f2ab17ebb7c12133ea03a8" title=" " alt="" coords="5,229,228,285"/>
+</map>

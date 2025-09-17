@@ -1,0 +1,5 @@
+<map id="denoptim.programs.fragmenter.FragmenterParameters.setLinearAngleLimit" name="denoptim.programs.fragmenter.FragmenterParameters.setLinearAngleLimit">
+<area shape="rect" id="node1" title="Sets the upper limit for an angle before it is treated as &quot;flat&quot; angle, i.e., close enough to 180 DEG..." alt="" coords="531,13,805,54"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog.html#a0c04a0dd8ab32399789f630741562a50" title=" " alt="" coords="296,13,483,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog.html#a64ab4ac8312bff57a077266658555757" title="Constructor." alt="" coords="5,5,248,61"/>
+</map>

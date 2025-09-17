@@ -1,0 +1,10 @@
+<map id="denoptim.graph.EmptyVertex.EmptyVertex" name="denoptim.graph.EmptyVertex.EmptyVertex">
+<area shape="rect" id="node1" title="Constructor for an empty vertex." alt="" coords="808,136,997,177"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#a537720023ac6debd9f4663d61026a423" title="Returns a deep&#45;copy of this vertex." alt="" coords="540,143,760,170"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a0fd4c84840d3eb11b1838a627d9e6956" title="Returns a graph with definition of symmetric vertexes and symmetric APs meant for testing purposes." alt="" coords="267,5,486,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ade544f5bf2f66ccb7a4f179e84b33c1c" title="Returns a graph with peculiar definition of symmetric vertexes and symmetric APs meant for testing pu..." alt="" coords="267,71,486,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex_test.html#ab36c441c57e9852e2be6d810d80fbc87" title=" " alt="" coords="276,136,477,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a309f26b0bad9acff15e95672089c2432" title=" " alt="" coords="287,201,467,243"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af2fc2503c300637c2369eb4347c990c1" title=" " alt="" coords="261,267,492,308"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a05b87ffb43b9710fcea83b0777654e27" title=" " alt="" coords="5,5,213,47"/>
+</map>

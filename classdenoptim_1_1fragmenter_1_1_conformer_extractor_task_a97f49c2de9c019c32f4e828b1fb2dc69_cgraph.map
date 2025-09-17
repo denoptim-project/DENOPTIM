@@ -1,0 +1,10 @@
+<map id="denoptim.fragmenter.ConformerExtractorTask.populateListOfClusterizableFragments" name="denoptim.fragmenter.ConformerExtractorTask.populateListOfClusterizableFragments">
+<area shape="rect" id="node1" title="Tries to add a fragment into a sample of isomorphic fragments." alt="" coords="5,97,269,153"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#add663e71e20399ddad63276ebda60034" title=" " alt="" coords="317,39,559,80"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragmenter_1_1_fragment_alignement.html#a8767911dd2054fa0a8e8c7f3f0cc002e" title="Returns the mapping leading to the lowest RMSD that could be found among all isomorphic mappings." alt="" coords="319,104,557,145"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#ac969b7cb43cdd23507e67c5141766997" title="Sets the order of nodes (i.e., atoms/APs) to use for geometric comparison with other fragments,..." alt="" coords="334,169,542,211"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a860d31c5334438764f9d7ace863c7ed0" title="Creates a graph representation of this fragment where both atoms and AttachmentPoints are represented..." alt="" coords="607,39,796,80"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment.html#a366dfaf65191c724b8e393b9d9dc899f" title=" " alt="" coords="852,5,1041,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="844,71,1049,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="1097,71,1295,112"/>
+</map>

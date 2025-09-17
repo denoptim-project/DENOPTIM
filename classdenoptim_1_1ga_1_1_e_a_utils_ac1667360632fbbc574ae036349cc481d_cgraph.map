@@ -1,0 +1,6 @@
+<map id="denoptim.ga.EAUtils.getUsableAromaticBridges" name="denoptim.ga.EAUtils.getUsableAromaticBridges">
+<area shape="rect" id="node1" title="Finds all vertexes that can be used as aromatic bridge, i.e., can be used to create an aromatic ring ..." alt="" coords="5,57,207,98"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="301,5,485,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a745fca25471c9384d4ee7fa79e76b4b6" title="Extracts vertexes from the collection of vertexes defined by this FragmentSpace." alt="" coords="255,57,531,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#ad26ecf426a5e415605df94be904e58d3" title=" " alt="" coords="307,122,478,163"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.fragspace.APMapFinder.findMappingCompatibileAPs" name="denoptim.fragspace.APMapFinder.findMappingCompatibileAPs">
+<area shape="rect" id="node1" title="Compares the AttachmentPoint of two lists searching for all the APs of the second list that are &quot;comp..." alt="" coords="559,39,781,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#ae5c8afa4b7defd6ce35df0fa1c5facf2" title="Searches for mappings between the AttachmentPoints on the two lists." alt="" coords="282,5,463,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder_test.html#a4908ea837bed3714cd5d17ba4e3954fa" title=" " alt="" coords="235,71,511,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#ada1b2c2155faeefced1d9a64f82a6668" title="Constructor that launches the search for a mapping between the AttachmentPoints on the first vertex t..." alt="" coords="5,5,187,47"/>
+</map>

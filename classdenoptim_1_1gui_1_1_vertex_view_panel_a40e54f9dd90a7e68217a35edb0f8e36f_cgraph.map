@@ -1,0 +1,5 @@
+<map id="denoptim.gui.VertexViewPanel.deprotectEdits" name="denoptim.gui.VertexViewPanel.deprotectEdits">
+<area shape="rect" id="node1" title="Overrides the flag signaling unsaved edits to saying that there are no altered data." alt="" coords="5,39,260,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a924ff49c544f18a4726d8bc871a641d5" title="Overrides the flag signaling unsaved edits to saying that there are no altered data." alt="" coords="310,5,493,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#a59ae85a6ec6537cafb8391e70331c734" title="Overrides the flag signaling unsaved edits to saying that there are no altered data." alt="" coords="308,71,495,112"/>
+</map>

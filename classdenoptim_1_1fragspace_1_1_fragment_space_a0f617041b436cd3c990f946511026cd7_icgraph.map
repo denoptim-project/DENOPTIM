@@ -1,0 +1,12 @@
+<map id="denoptim.fragspace.FragmentSpace.hasSymmetryConstrain" name="denoptim.fragspace.FragmentSpace.hasSymmetryConstrain">
+<area shape="rect" id="node1" title="Checks if there is a constraint on the constitutional symmetry probability for the given AP class." alt="" coords="1469,97,1665,139"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a95c29949d65364ea844e8b3e7150311d" title="Checks if the symmetry settings impose use of symmetry on attachment points of the given AP class." alt="" coords="1171,97,1421,139"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a649892c4a2b1d4ccd2f97cae6dd7ed98" title=" " alt="" coords="885,5,1117,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="589,35,824,76"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#afa4835767d37078abce9e3fbe5fa16e1" title="Constructs a new factory for generating all the combination of fragments that can be attached on a gi..." alt="" coords="880,122,1123,178"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a1669a88512d2bd3b14cdd00235dff50a" title="Generate the next combination of fragments." alt="" coords="916,201,1087,243"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#adcd462866e3f9d6a2a6ef0385807807e" title="Generate graphs by exploring all combination of fragments at a given level of a growing graph." alt="" coords="581,194,832,250"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#af9327fa81f9e2a617cdff353848ad6e1" title="Run the combinatorial exploration." alt="" coords="296,201,533,243"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a8f359a45038dc604a5e437d63a35e1a2" title="Constructor." alt="" coords="5,158,248,214"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_frag_space_explorer.html#a1c6a2aae9ab686d5c7c0fc6246f7aa61" title=" " alt="" coords="19,237,234,279"/>
+</map>

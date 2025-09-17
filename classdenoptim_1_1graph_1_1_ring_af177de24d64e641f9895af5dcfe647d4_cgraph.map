@@ -1,0 +1,6 @@
+<map id="denoptim.graph.Ring.getCloserToTail" name="denoptim.graph.Ring.getCloserToTail">
+<area shape="rect" id="node1" title="Chooses among the two given vertices the one that is closer to the tail vertex." alt="" coords="5,5,203,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_ring.html#ae8d15b94c699e5555c032e268807df0a" title="Chooses among the two given vertices the one that is closer to the target vertex." alt="" coords="251,13,463,39"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_ring.html#a52d320207aa3fc73898eb662e8f208cb" title="Checks whether a given vertex is part of this ring." alt="" coords="769,13,960,39"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_ring.html#a5f09bd9ccfc437f70de652e0746d2fe1" title="Measures how many edges there are between two edges along the sequence of vertices that defined this ..." alt="" coords="511,38,721,65"/>
+</map>

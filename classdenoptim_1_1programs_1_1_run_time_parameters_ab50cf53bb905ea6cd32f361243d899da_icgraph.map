@@ -1,0 +1,12 @@
+<map id="denoptim.programs.RunTimeParameters.verbosityTologLevel" name="denoptim.programs.RunTimeParameters.verbosityTologLevel">
+<area shape="rect" id="node1" title=" " alt="" coords="1140,71,1348,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ad8d756c13aedcd9056a78bcb50cd1c32" title="Set the level of verbosity." alt="" coords="892,5,1079,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ab2ef881db354b6eada312a132af8e4c5" title="Starts a program&#45;specific logger that prints to System.err stream." alt="" coords="883,71,1088,112"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5f65b0918d8b492cbc46e1de2a3776ca" title="Starts a logger with the given name." alt="" coords="879,135,1092,191"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#aa17925160f3f03080e8680c7016fc1c4" title=" " alt="" coords="606,5,805,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#ae6eecb27bf631e3cf159af0834ff6ee2" title="Starts a dialog to define the on&#45;the&#45;fly fragmentation settings." alt="" coords="580,71,831,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="275,49,526,75"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,103,532,130"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="11,37,216,79"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,103,221,144"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.gui.VertexViewPanel.dispose" name="denoptim.gui.VertexViewPanel.dispose">
+<area shape="rect" id="node1" title=" " alt="" coords="315,35,560,61"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a08b5cd406c7f5c7c68b8a50cc12a009e" title=" " alt="" coords="5,5,267,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a9ddb1f2b12985b37138d9a43f1edb233" title="Constructor for an empty modal panel meant for selection of vertexes." alt="" coords="31,57,241,98"/>
+</map>

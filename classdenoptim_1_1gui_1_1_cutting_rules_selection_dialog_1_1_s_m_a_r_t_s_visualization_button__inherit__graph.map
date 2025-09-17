@@ -1,0 +1,4 @@
+<map id="denoptim.gui.CuttingRulesSelectionDialog.SMARTSVisualizationButton" name="denoptim.gui.CuttingRulesSelectionDialog.SMARTSVisualizationButton">
+<area shape="rect" id="node1" title="A button that opens a modal dialog displaying the PNGs with a visual representation of SMARTS queries..." alt="" coords="5,80,248,136"/>
+<area shape="rect" id="node2" title=" " alt="" coords="93,5,160,32"/>
+</map>
