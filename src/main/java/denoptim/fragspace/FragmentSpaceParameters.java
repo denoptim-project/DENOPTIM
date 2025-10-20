@@ -75,6 +75,11 @@ public class FragmentSpaceParameters extends RunTimeParameters
     protected String rotBndsFile = "";
 
     /**
+     * Rotatable bonds constraints definition file
+     */
+    protected String rotConstraintsFile = "";
+
+    /**
      * Maximum number of heavy (non-hydrogen) atoms accepted
      */
     protected int maxHeavyAtom = 100;
@@ -181,6 +186,13 @@ public class FragmentSpaceParameters extends RunTimeParameters
     {
         return rotBndsFile;
     }
+
+//------------------------------------------------------------------------------
+
+    public String getRotConstraintDefFile()
+    {
+        return rotConstraintsFile;
+    }
     
 //------------------------------------------------------------------------------
     
@@ -230,6 +242,9 @@ public class FragmentSpaceParameters extends RunTimeParameters
             break;
         case "ROTBONDSDEFFILE=":
             rotBndsFile = value;
+            break;
+        case "ROTCONSTRDEFFILE=":
+            rotConstraintsFile = value;
             break;
         case "MAXHEAVYATOM=":
             try
@@ -392,6 +407,13 @@ public class FragmentSpaceParameters extends RunTimeParameters
         {
             msg = "Cannot find file with definitions of rotatable bonds: " 
                   + rotBndsFile;
+            throw new DENOPTIMException(msg);
+        }
+
+        if (rotConstraintsFile.length()>0 && !FileUtils.checkExists(rotConstraintsFile))
+        {
+            msg = "Cannot find file with definitions of constrained rotatable bonds: " 
+                  + rotConstraintsFile;
             throw new DENOPTIMException(msg);
         }
         

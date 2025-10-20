@@ -43,6 +43,7 @@ import denoptim.utils.GeneralUtils;
 import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.ObjectPair;
+import denoptim.utils.RotationalSpaceUtils;
 
 
 /**
@@ -802,10 +803,69 @@ public class TinkerUtils
                 }
                 else
                 {
-                    t = MathUtils.torsion(atmI.getPoint3d(),
-                                                mol.getAtom(i2).getPoint3d(),
-                                                mol.getAtom(i3).getPoint3d(),
-                                                mol.getAtom(i4).getPoint3d());
+                    IAtom atmJ = mol.getAtom(i2);
+                    IAtom atmK = mol.getAtom(i3);
+                    IAtom atmL = mol.getAtom(i4);
+                    double valueIJKL = MathUtils.torsion(
+                            atmI.getPoint3d(), atmJ.getPoint3d(),
+                            atmK.getPoint3d(), atmL.getPoint3d());
+                    
+                    t = valueIJKL;
+                    
+                    IBond bnd = mol.getBond(atmJ, atmK);
+                    if (bnd!=null)
+                    {
+                        Object cnstrDefObj = bnd.getProperty(
+                                RotationalSpaceUtils.PROPERTY_ROTDBDCSTR_DEF);
+                        if (cnstrDefObj!=null)
+                        {
+                            // For clarity, IJKL are the atoms identifying the
+                            // dihedral used in the internal coordinates,
+                            // while ABCD are the atoms used to define the 
+                            // constrained dihedral angle.
+                            IAtom[] atomsABCD = (IAtom[]) cnstrDefObj;
+                            double cnstrABCD = (double) bnd.getProperty(
+                                    RotationalSpaceUtils.PROPERTY_ROTDBDCSTR_VALUE);
+                            if (atmJ==atomsABCD[2] && atmK==atomsABCD[1])
+                            {
+                                // We ensure consistent orfer in the definitions
+                                // of the two dihedral angles
+                                atomsABCD = new IAtom[]{
+                                        atomsABCD[3], atomsABCD[2],
+                                        atomsABCD[1], atomsABCD[0]};
+                                if (cnstrABCD>0)
+                                {
+                                    cnstrABCD = 360.0 - cnstrABCD;
+                                } else {
+                                    cnstrABCD = cnstrABCD - 360.0;
+                                }
+                            }
+
+                            double valueABCD = MathUtils.torsion(
+                                    atomsABCD[0].getPoint3d(), 
+                                    atomsABCD[1].getPoint3d(),
+                                    atomsABCD[2].getPoint3d(), 
+                                    atomsABCD[3].getPoint3d());
+                            double correctionABCD = cnstrABCD - valueABCD;
+                            
+                            t = valueIJKL + correctionABCD;
+                            
+                            if (t > 360)
+                            {
+                                t = t - 360;
+                            } else if (t < -360) {
+                                t = t + 360;
+                            }
+
+                            if (debug)
+                            {
+                                System.err.println(" dihedral constrain along "
+                                        + i2 + "-" + i3 + ": " 
+                                        + valueIJKL + " -> " + t 
+                                        + " (changed by " + correctionABCD + ")");
+                            }
+                        }
+                    }
                 }
                 if (debug)
                 {

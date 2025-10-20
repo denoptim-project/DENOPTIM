@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.4.1, September 2025_
+_Version 4.4.2, October 2025_
 
 
 [TOC]
@@ -315,7 +315,7 @@ All graphs are complete (i.e., no capping groups needed, no forbidden free AP fo
 
 ### FragSpaceExplorer Input
 
-A FragSpaceExplorer run (or FSE run) can be performed either by defining the input in the GUI and running the experiment from the gui, or by issuing this command:
+A FragSpaceExplorer run (or FSE run) can be performed either by defining the input in the GUI and running the experiment from the GUI, or by issuing this command:
 ```
 denoptim -r FSE input_parameters_file
 ```
@@ -358,7 +358,7 @@ where `input_parameters_file` is a text parameters file with the [keywords](#Key
 
 ## Molecule-to-graph converter {#Mol2Graph}
 
-While fragmentation is typically meant to generate building blocks, the same mechanism can be used to convert a molecular representation into a graph representation by replacing specific bonds with fragment-fragment connections. 
+While fragmentation is typically meant to generate building blocks, the same mechanism can be used to convert a molecular representation into a graph representation by replacing specific bonds with fragment-fragment connections.
 
 The Mol2Graph converted can be run with this command:
 ```
@@ -493,6 +493,7 @@ The following tables list all the keywords grouped according to the main functio
 |`FS-CompMatrixFile`| Specifies the pathname of the file containing the compatibility matrix and related information such as the AP-Class to bond order map, the capping map, and the list of forbidden ends.|
 |`FS-RCCompMatrixFile`|Specifies the pathname of the file containing the compatibility matrix for ring closures.|
 |`FS-RotBondsDefFile`| Specifies the pathname of the file containing the definition of the rotatable bonds by SMARTS.|
+|`FS-RotConstrDefFile`| Specifies the pathname of the file defining the constraints to apply on the rotatable bonds. The files should contain one rule per line, where each rule has the syntax "name  SMARTS value" where "name" is a simple identifier used for logging purposes, "SMARTS" must be a SMARTS matching an ordered list of 4 atoms, which are the atoms identifying the dihedral to be constrained, and "value" is a double with numerical value to be assigned to the dihedral.|
 |__Graph filtering criteria__||
 |`FS-MaxHeavyAtom`| Specifies the maximum number of heavy (non-hydrogen) atoms for a candidate.|
 |`FS-MaxMW`| Specifies the maximum molecular weight accepted for a candidate.|

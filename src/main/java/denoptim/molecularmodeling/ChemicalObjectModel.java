@@ -50,6 +50,8 @@ import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosure;
 import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerMolecule;
+import denoptim.integration.tinker.TinkerUtils;
+import denoptim.io.DenoptimIO;
 import denoptim.utils.MathUtils;
 import denoptim.utils.ObjectPair;
 
@@ -212,10 +214,10 @@ public class ChemicalObjectModel
      * @param molName the reference name of this molecule
      * @param rotatableBnds the list of rotatable bonds (as pairs of atom 
      * @param oldToNewOrder indexes that allow to map the atom position 
-     * before and after the reordering neede to make use of internal coordinates
+     * before and after the reordering needed to make use of internal coordinates
      * possible.
      * @param newToOldOrder indexes that allow to map the atom position 
-     * before and after the reordering neede to make use of internal coordinates
+     * before and after the reordering needed to make use of internal coordinates
      * possible.
      * @param logger the tool dealing with log messages.
      * indexes)

@@ -97,10 +97,7 @@ do
     #Prepare parameters
     echo "3DB-inpSDF=$inpSDF" > "$dnpParams"
     echo "3DB-outSDF=$outSDF" >> "$dnpParams"
-    echo "FS-ScaffoldLibFile=$wrkDir/scaff.sdf" >> "$dnpParams"
-    echo "FS-FragmentLibFile=$wrkDir/frags.sdf" >> "$dnpParams"
-    echo "FS-CappingFragmentLibFile=$wrkDir/cap.sdf" >> "$dnpParams"
-    echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> "$dnpParams"
+    #echo "FS-CompMatrixFile=$wrkDir/CPMap.par" >> "$dnpParams"
     echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/main/resources/data/rotatableBonds-1.0" >> "$dnpParams"
 
     echo "3DB-workDir=$wrkDir" >> "$dnpParams"
@@ -116,6 +113,16 @@ do
     # parameters used by PSSROT
     # this file is copied and edited for every molecule
     echo "3DB-PSSROTPARAMS=$DENOPTIM_HOME/src/main/resources/data/submit_pssrot" >> "$dnpParams"
+    if [ "$fname" = "MOL000009" ]; then
+       # Ring closing settings
+        echo "RC-CloseRings"  >> "$dnpParams"
+        echo "3DB-RCKEYFILE=$DENOPTIM_HOME/src/main/resources/data/build_rc-uff.key" >> "$dnpParams"
+        echo "3DB-RCPSSROTPARAMS=$DENOPTIM_HOME/src/main/resources/data/submit_rc-pssrot" >> "$dnpParams"
+        echo "RC-EvaluationClosabilityMode=CONSTITUTION" >> "$dnpParams"
+        echo "RC-DISTANCETOLERANCEFACTOR=0.70" >> "$dnpParams"
+        echo "RC-ClosableRingSMARTS=[Ru]1[Cl,Br,I,C,O,N,S,P][Ru][Cl,Br,I,C,O,N,S,P]1" >> "$dnpParams"
+        echo "FS-rotConstrDefFile=input/MOL000009_tor_cnstr" >> "$dnpParams"
+    fi
 
     #run builder
     "$javaDENOPTIM" -jar "$denoptimJar" -r B3D "$dnpParams" &> "$logFile"
@@ -172,6 +179,13 @@ do
         exit 1
     fi 
     compareElementalAnalysis "$outSDF" "$expRes"
+
+    if [ "$fname" = "MOL000009" ]; then
+        if ! grep -q 'Constraining dihedral along bond Ru3-C7' "$logFile"; then
+            echo "Cannot find traces of constrained dihedral"
+            exit 1
+        fi
+    fi    
 done
 echo " "
 echo "Test 't1' PASSED"

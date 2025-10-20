@@ -254,6 +254,11 @@ public class MultiMolecularModelBuilder
                         ((FragmentSpaceParameters) settings.getParameters(
                                 ParametersType.FS_PARAMS)).getRotSpaceDefFile(),
                         true, true, settings.getLogger());
+
+        //Apply constraints, if any
+        RotationalSpaceUtils.processConstrainedRotatableBonds(reorderedMol, 
+            rotBonds, ((FragmentSpaceParameters) settings.getParameters(
+                ParametersType.FS_PARAMS)).getRotConstraintDefFile(), logger);
         
         logger.log(Level.FINE, "Rotatable bonds: "+rotBonds);
         if (logger.isLoggable(Level.FINEST))
@@ -265,7 +270,6 @@ public class MultiMolecularModelBuilder
         // Generate Internal Coordinates
         TinkerMolecule tmol = TinkerUtils.getICFromIAC(reorderedMol, 
                 settings.getTinkerMap());
-        TinkerUtils.setTinkerTypes(tmol, settings.getTinkerMap());
 
         // Generate combined molecular representations (both XYZ and INT)
         return new ChemicalObjectModel(
