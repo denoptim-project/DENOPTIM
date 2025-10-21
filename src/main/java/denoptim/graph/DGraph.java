@@ -6007,9 +6007,6 @@ public class DGraph implements Cloneable
     {
         if (!srcAP.isAvailable())
         {
-            //TODO-gg del
-            DenoptimIO.writeGraphToJSON(new File("/tmp/failing.json"), 
-                    srcAP.getOwner().getGraphOwner().getOutermostGraphOwner());
             throw new DENOPTIMException("Attempt to use unavailable "
                     + "attachment point " + srcAP + " on vertex " 
                     + srcAP.getOwner().getVertexId() + " as srcAP.");

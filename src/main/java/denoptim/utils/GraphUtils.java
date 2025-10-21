@@ -100,7 +100,7 @@ public class GraphUtils
             throw new Error("Reached maximum value for "
                     + "Vertex identifier. It is highly likely that you should "
                     + "not be in this situation as it means you have generated "
-                    + "too many vertices. Contact the authors is you really "
+                    + "too many vertices. Contact the authors if you really "
                     + "think you need vertex identifiers bigger than 2^64.");
         return vertexCounter.getAndIncrement();
     }

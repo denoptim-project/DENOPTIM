@@ -1291,21 +1291,22 @@ public class DGraphTest
         Vertex refToPRevVrtx = vOut;
         for (int embeddingLevel=0; embeddingLevel<10; embeddingLevel++)
         {
-            EmptyVertex v0 = new EmptyVertex(0+100*embeddingLevel);
+            EmptyVertex v0 = new EmptyVertex(1+100*embeddingLevel);
             v0.addAP(APCA);
             v0.addAP(APCB);
             v0.addAP(APCC);
-            EmptyVertex v1 = new EmptyVertex(1+100*embeddingLevel);
+            EmptyVertex v1 = new EmptyVertex(2+100*embeddingLevel);
             v1.addAP(APCB);
             v1.addAP(APCA);
             v1.addAP(APCD);
-            EmptyVertex v2 = new EmptyVertex(2+100*embeddingLevel);
+            EmptyVertex v2 = new EmptyVertex(3+100*embeddingLevel);
             v2.addAP(APCB);
             DGraph g = new DGraph();
             g.addVertex(v0);
             g.appendVertexOnAP(v0.getAP(1), v1.getAP(0));
             g.appendVertexOnAP(v1.getAP(1), v2.getAP(0));
             Template t = new Template(BBType.UNDEFINED);
+            t.setVertexId(5+100*embeddingLevel);
             t.setInnerGraph(g);
             
             refToPrevGraph.appendVertexOnAP(refToPRevVrtx.getAP(0), t.getAP(1));
