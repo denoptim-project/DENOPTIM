@@ -20,19 +20,24 @@ package denoptim.integration.tinker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ChemicalObjectModel;
+import denoptim.molecularmodeling.zmatrix.ZMatrix;
+import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;
 import denoptim.task.ProcessHandler;
 import denoptim.utils.ObjectPair;
 
 /**
- * Toolkit to perform conformational search via Tinker PSSROT program
+ * Tool to perform conformational search via Tinker PSSROT program.
  *
  * @author Marco Foscato 
  */
@@ -54,6 +59,7 @@ public class ConformationalSearchPSSROT
      * Performs PSSROT conformational search for all chemical objects in the 
      * list. The objects will be modifier: no cloning.
      * @param mols the list of object to modify.
+     * @param atmTypeMap map of elemental symbol to atom types.
      * @param runLabel a string to identify the type of run in log messages (
      * e.g., "cs" for conformational search, "rc" for ring closing 
      * conformational search).
@@ -78,6 +84,7 @@ public class ConformationalSearchPSSROT
      */
 
     public static void performPSSROT(ArrayList<ChemicalObjectModel> mols, 
+            Map<String, Integer> atmTypeMap,
             String runLabel, String ffFilePathName, List<String> keyFileLines, 
             List<String> subParamsInit, List<String> subParamsRest,
             String pssExePathName, String xyzintPathName, String workDir, 
@@ -91,7 +98,7 @@ public class ConformationalSearchPSSROT
     	    {
     	        logger.log(Level.INFO, "Field MOL_ERROR is null: proceeding "
     	                + "with conformational search.");
-        		performPSSROT(mols.get(i), i, 
+        		performPSSROT(mols.get(i),atmTypeMap, i, 
         		        runLabel, ffFilePathName, keyFileLines,
         		        subParamsInit, subParamsRest,
         		        pssExePathName, xyzintPathName,
@@ -109,6 +116,7 @@ public class ConformationalSearchPSSROT
      * Performs PSSROT conformational search on the given chemical object.
      * The object is modified directly, no cloning.
      * @param chemObj the object to perform conformational search on.
+     * @param atmTypeMap map of elemental symbol to atom types.
      * @param idm index to distinguish molecules with same name (e.g., multiple
      * models starting from the same {@link ChemicalObjectModel}.
      * @param runLabel a string to identify the type of run in log messages (
@@ -135,6 +143,7 @@ public class ConformationalSearchPSSROT
      */
 
     public static void performPSSROT(ChemicalObjectModel chemObj, 
+            Map<String, Integer> atmTypeMap,
             int idm, String runLabel, 
             String ffFilePathName, List<String> keyFileLines, 
             List<String> subParamsInit, List<String> subParamsRest,
@@ -148,18 +157,20 @@ public class ConformationalSearchPSSROT
         int sz = chemObj.getNumberRotatableBonds();
     	if (sz == 0)
     	{
-    	    logger.log(Level.FINE, "No rotatable bond: skiping "
+    	    logger.log(Level.FINE, "No rotatable bond: skipping "
     	            + " PSSROT conformational search.");
     	    return;
     	}
+    	
+    	setTinkerTypes(chemObj, atmTypeMap);
 
-        TinkerMolecule tmol = chemObj.getTinkerMolecule();
+        ZMatrix zmat = chemObj.getZMatrix();
         String molName = chemObj.getName();
 
         // Prepare Tinker INT file (Internal coordinates)
         String csIntFile = workDir + FSEP + molName + "_"+runLabel + idm 
                 + ".int";
-        TinkerUtils.writeIC(csIntFile, tmol);
+        TinkerUtils.writeTinkerINT(csIntFile, zmat);
 
         //Prepare Tinker KEY file (keywords, definition of potential)
         String csKeyFile = workDir + FSEP + molName + "_"+runLabel + idm 
@@ -297,12 +308,15 @@ public class ConformationalSearchPSSROT
                 "convert xyz to int for " + runLabel + "job");
         
         // Update local molecular representation with output from PSSROT
-        TinkerMolecule tmpTmol = TinkerUtils.readTinkerIC(newTnkIC);
-        ArrayList<TinkerAtom> lstAtoms = tmpTmol.getAtoms();
-        for (int i=0; i<lstAtoms.size(); i++)
+        ZMatrix tmpZmat = TinkerUtils.readTinkerINT(newTnkIC);
+        List<ZMatrixAtom> lstZAtoms = tmpZmat.getAtoms();
+        for (int i=0; i<lstZAtoms.size(); i++)
         {
-            TinkerAtom ta = lstAtoms.get(i);
-            tmol.getAtom(i+1).setDistAngle(ta.getDistAngle());
+            ZMatrixAtom za = lstZAtoms.get(i);
+            zmat.getAtom(i).setBondLength(za.getBondLength());
+            zmat.getAtom(i).setAngleValue(za.getAngleValue());
+            zmat.getAtom(i).setAngle2Value(za.getAngle2Value());
+            zmat.getAtom(i).setChiralFlag(za.getChiralFlag());
         }
         chemObj.updateXYZFromINT();
 
@@ -312,6 +326,43 @@ public class ConformationalSearchPSSROT
 
 //------------------------------------------------------------------------------    
     
+    /**
+     * Used elemental symbols (ot pseudo-element symbols) to assign atom types.
+     * @param chemObj
+     * @param atmTypMap the relation between elemntal symbol and type.
+     * @throws DENOPTIMException 
+     */
+    private static void setTinkerTypes(ChemicalObjectModel chemObj, 
+            Map<String, Integer> atmTypMap) throws DENOPTIMException
+    {
+        if (atmTypMap == null)
+        {
+            return;
+        }
+        ZMatrix zmat = chemObj.getZMatrix();
+        IAtomContainer iac = chemObj.getIAtomContainer();
+      
+        for (int i = 0; i < iac.getAtomCount(); i++)
+        {
+            ZMatrixAtom zatm = zmat.getAtom(i);
+            String st = zatm.getSymbol().trim();
+            if (!atmTypMap.containsKey(st))
+            {
+                String msg = "Unable to assign atom type to atom '" + st +"'.";
+                throw new DENOPTIMException(msg);
+            }
+            Integer val = atmTypMap.get(st);
+            if (val == null)
+            {
+                String msg = "No valid Tinker atom type for atom " + st;
+                throw new DENOPTIMException(msg);
+            }
+            zatm.setType(val.toString());
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
     /**
      * The XYZ file generated by Tinker for molecules having atoms with many 
      * Neighbors is corrupted: the line of the atom with long list of connected

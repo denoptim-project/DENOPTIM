@@ -106,16 +106,7 @@ public class MolecularModelBuilder extends ProgramTask
             }
             DenoptimIO.writeSDFFile(mmbParams.getOutputSDFFile(), nmols);
             normalTerm = true;
-        } catch (TinkerException te)
-        {
-            String msg = "ERROR! Tinker failed on task '" + te.taskName 
-                    + "'!";
-            if (te.solution != "")
-            {
-                msg = msg + NL + te.solution;
-            }
-            mmbParams.getLogger().log(Level.SEVERE, msg);
-        } 
+        }
         catch (Exception de)
         {
             de.printStackTrace(System.err);

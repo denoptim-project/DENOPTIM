@@ -33,9 +33,9 @@ import denoptim.graph.DGraph;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.integration.tinker.ConformationalSearchPSSROT;
 import denoptim.integration.tinker.TinkerException;
-import denoptim.integration.tinker.TinkerMolecule;
 import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
+import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 import denoptim.utils.AtomOrganizer;
@@ -85,7 +85,7 @@ public class MultiMolecularModelBuilder
      */
 
     public ArrayList<IAtomContainer> buildMulti3DStructure() 
-            throws DENOPTIMException, TinkerException
+            throws DENOPTIMException
     {
         logger.log(Level.INFO, "Building Multiple 3D representations for "
                  + "graph = " + molGraph.toString());
@@ -155,17 +155,43 @@ public class MultiMolecularModelBuilder
         // 2: Conformational search (if possible)
         if (!skipConfSearch)
         {
-            startTime = System.nanoTime();
-            ConformationalSearchPSSROT.performPSSROT(structures, "cs",
-                    settings.getParamFile(), 
-                    settings.getKeyFileParams(),
-                    settings.getInitPSSROTParams(),
-                    settings.getRestPSSROTParams(),
-                    settings.getPSSROTTool(),
-                    settings.getXYZINTTool(),
-                    settings.getWorkingDirectory(),
-                    settings.getTaskID(), logger);
-            time = (endTime - startTime);
+            if (settings.getPSSROTTool() != null)
+            {
+                try
+                {
+                    startTime = System.nanoTime();
+                    ConformationalSearchPSSROT.performPSSROT(structures, 
+                            settings.getTinkerMap(),
+                            "cs",
+                            settings.getParamFile(), 
+                            settings.getKeyFileParams(),
+                            settings.getInitPSSROTParams(),
+                            settings.getRestPSSROTParams(),
+                            settings.getPSSROTTool(),
+                            settings.getXYZINTTool(),
+                            settings.getWorkingDirectory(),
+                            settings.getTaskID(), logger);
+                    time = (endTime - startTime);
+                }  catch (TinkerException te)
+                {
+                    String msg = "ERROR! Tinker failed on task '" 
+                            + te.taskName + "'!";
+                    if (te.solution != "")
+                    {
+                        msg = msg + settings.NL + te.solution;
+                    }
+                    logger.log(Level.SEVERE, msg);
+                    throw new DENOPTIMException(msg, te);
+                } 
+            } else {
+                for (ChemicalObjectModel com : structures)
+                {
+                    //TODO-gg
+                    //attemptRingClosureWithRCOServer(molTo3d, 
+                    //        molTo3d.getRCACombinations().get(i));
+                    System.out.print("TODO-HERE-HERER");
+                }
+            }
             logger.log(Level.FINE, "TIME (conf. search): "+time/1000000+" ms"
                       + " #frags: " + mol.getGraph().getVertexList().size()
                       + " #atoms: " + mol.getIAtomContainer().getAtomCount()
@@ -266,16 +292,15 @@ public class MultiMolecularModelBuilder
             logger.log(Level.FINEST, "Reordered IAtomContainer: 'iacToIC.sdf'");
             DenoptimIO.writeSDFFile("iacToIC.sdf",reorderedMol,false);
         }
-
+        
         // Generate Internal Coordinates
-        TinkerMolecule tmol = TinkerUtils.getICFromIAC(reorderedMol, 
-                settings.getTinkerMap());
-
+        ZMatrix zmat= ZMatrix.getZMatrixFromIAC(reorderedMol);
+        
         // Generate combined molecular representations (both XYZ and INT)
         return new ChemicalObjectModel(
                 molGraph,
                 reorderedMol,
-                tmol,
+                zmat,
                 molName,
                 rotBonds,
                 oldToNewMap,
