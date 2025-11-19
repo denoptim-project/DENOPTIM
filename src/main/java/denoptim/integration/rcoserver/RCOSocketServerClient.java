@@ -25,7 +25,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,9 +39,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 import denoptim.exception.DENOPTIMException;
+import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.molecularmodeling.ChemicalObjectModel;
 import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;
+import denoptim.utils.ObjectPair;
 
 
 /**
@@ -163,9 +167,41 @@ public class RCOSocketServerClient
 
 //------------------------------------------------------------------------------
 
-    public void optimizeRingClosingConformation(ChemicalObjectModel chemObj, 
-        List<int[]> rcpTerms, List<int[]> rotatableBonds, Logger logger) 
-        throws IOException, JsonSyntaxException, DENOPTIMException
+    /**
+     * Runs a conformational optimization using the services provided by the 
+     * socket server configured for this instance. This wrapper does not 
+     * consider the possibility to close rings defined by 
+     * {@link RingClosingAttractor} combinations.
+     * @param chemObj the definition of the chemical system to work with.
+     * @param logger logging tool
+     * @throws IOException
+     * @throws JsonSyntaxException
+     * @throws DENOPTIMException
+     */
+    public void runConformationalOptimization(ChemicalObjectModel chemObj,
+            Logger logger)
+                    throws IOException, JsonSyntaxException, DENOPTIMException
+    {
+        runConformationalOptimization(chemObj, null, logger);
+    }
+        
+//------------------------------------------------------------------------------
+
+    /**
+     * Runs a conformational optimization using the services provided by the 
+     * socket server configured for this instance.
+     * @param chemObj the definition of the chemical system to work with.
+     * @param rcaCombination if not <code>null</code> and not empty, biases
+     * the conformational search towards conformations closing the rings defined
+     * by each given pair of {@link RingClosingAttractor}s.
+     * @param logger logging tool
+     * @throws IOException
+     * @throws JsonSyntaxException
+     * @throws DENOPTIMException
+     */
+    public void runConformationalOptimization(ChemicalObjectModel chemObj, 
+            Set<ObjectPair> rcaCombination, Logger logger)
+                    throws IOException, JsonSyntaxException, DENOPTIMException
     {
     	if (chemObj.getNumberRotatableBonds() == 0)
     	{
@@ -173,9 +209,42 @@ public class RCOSocketServerClient
     	            + " conformational search.");
     	    return;
     	}
+    	
+        List<int[]> rcpTerms = new ArrayList<int[]>();
+        if (rcaCombination!=null && rcaCombination.size()>0)
+        {
+            for (ObjectPair op : rcaCombination)
+            {
+                int iZMatRcaA = chemObj.getZMatIdxOfRCA(
+                        (RingClosingAttractor) op.getFirst());
+                int iZMatRcaB = chemObj.getZMatIdxOfRCA(
+                        (RingClosingAttractor) op.getSecond());
+                rcpTerms.add(new int[] {iZMatRcaA, iZMatRcaB});
+            }
+        }
 
-        String requestAsJSONString = formulateRequest(chemObj.getZMatrix(), rcpTerms, rotatableBonds);
+        List<int[]> rotatableBonds = new ArrayList<int[]>();
+        for(ObjectPair bondedAtms : chemObj.getRotatableBonds())
+        {
+            int t1 = ((Integer)bondedAtms.getFirst()).intValue();
+            int t2 = ((Integer)bondedAtms.getSecond()).intValue();
+            rotatableBonds.add(new int[] {t1, t2});
+        }
+
+        List<int[]> allBonds = new ArrayList<int[]>();
+        for(int[] bondedAtmIds : chemObj.getZMatrix().getBondData())
+        {
+            int t1 = bondedAtmIds[0];
+            int t2 = bondedAtmIds[1];
+            allBonds.add(new int[] {t1, t2});
+        }
+        
+        String requestAsJSONString = formulateRequest(chemObj.getZMatrix(), 
+                rcpTerms, rotatableBonds, allBonds);
+        
+        //TODO-gg del
         System.out.println(requestAsJSONString);
+        
         JsonObject answer = sendRequest(requestAsJSONString);
         for (String requiredMember : new String[] {"Cartesian_coordinates", "zmatrix"})
         {
@@ -187,27 +256,36 @@ public class RCOSocketServerClient
             }
         }
 
-        // Update local molecular representation with output from PSSROT
+        // Update local molecular representation with output from the conf. search
         JsonArray cartesianCoordinates = answer.get(
                 "Cartesian_coordinates").getAsJsonArray();
         //TODO put the min the chemObj
         
-        JsonArray zmatrixArray = answer.get("zmatrix").getAsJsonArray();
-        for (int i = 0; i < zmatrixArray.size(); i++)
+        JsonArray zmatrixArrayAsJson = answer.get("zmatrix").getAsJsonArray();
+        for (int i = 0; i < zmatrixArrayAsJson.size(); i++)
         {
-            JsonElement element = zmatrixArray.get(i);
+            JsonElement element = zmatrixArrayAsJson.get(i);
             JsonObject zmatrixObject = element.getAsJsonObject();
             ZMatrixAtom zatm = chemObj.getZMatrix().getAtom(i);
-            zatm.setBondLength(
-                zmatrixObject.get("bond_length").getAsDouble());
-            zatm.setAngleValue(
-                    zmatrixObject.get("angle").getAsDouble());
-            zatm.setAngle2Value(
-                zmatrixObject.get("dihedral").getAsDouble());
-            zatm.setChiralFlag(
-                zmatrixObject.get("chirality").getAsInt());
             // NB: no change is expected on the reference atoms used to define
             // the internal coordinates.
+            if (i>0)
+            {
+                zatm.setBondLength(
+                    zmatrixObject.get("bond_length").getAsDouble());
+                if (i>1)
+                {
+                    zatm.setAngleValue(
+                            zmatrixObject.get("angle").getAsDouble());
+                    if (i>3)
+                    {
+                        zatm.setAngle2Value(
+                            zmatrixObject.get("dihedral").getAsDouble());
+                        zatm.setChiralFlag(
+                            zmatrixObject.get("chirality").getAsInt());
+                    }
+                }
+            }
         }
         chemObj.updateXYZFromINT();
     }
@@ -215,34 +293,28 @@ public class RCOSocketServerClient
 //------------------------------------------------------------------------------
 
     /**
-     * Formulates the request to be sent to the socket server.
+     * Formulates the request to be sent to the socket server. Since the socket 
+     * works with chemical conventions, not with Java or Python conventions,
+     * the request has to be formulated with 1-based indexing. This method takes
+     * care of
      * @param zmat the zMatrix representation
      * @param rcpTerms The list of ring-closing potential energy terms (RCP terms)
-     * @param rotatableBonds The list of bonds that can be twisted
+     * (0-based)
+     * @param rotatableBonds The list of bonds that can be twisted. Each bond 
+     * is defined by the two 0-based indexes of the bonded atoms.
+     * @param allBonds The list of all bonds. Each bond 
+     * is defined by the two 0-based indexes of the bonded atoms.
      * @return The request as a JSON string.
      */
-    public String formulateRequest(ZMatrix zmat, List<int[]> rcpTerms, List<int[]> rotatableBonds) throws IOException
-    {
-        String rcpTermsLine = "";
-        for(int[] rcpTerm : rcpTerms)
-        {
-            rcpTermsLine = rcpTermsLine + " " + rcpTerm[0] + " " + rcpTerm[1];
-        }
-        String rotatableBondsLine = "";
-        for(int[] rotatableBond : rotatableBonds)
-        {
-            rotatableBondsLine = rotatableBondsLine + " " + rotatableBond[0] + " " + rotatableBond[1];
-        }
-         
+    public String formulateRequest(ZMatrix zmat, List<int[]> rcpTerms, 
+            List<int[]> rotatableBonds, List<int[]> allBonds) throws IOException
+    {    
         JsonObject jsonObj = new JsonObject();
         jsonObj.add("zmatrix", getZMatrixAsJsonArray(zmat));
-        jsonObj.addProperty("rcp_terms", rcpTermsLine);
-        jsonObj.addProperty("bonds_data", rotatableBondsLine);
+        jsonObj.add("rcp_terms", convertIntArrayListToJsonArray(rcpTerms));
+        jsonObj.add("rotatable_bonds", convertIntArrayListToJsonArray(rotatableBonds));
+        jsonObj.add("bonds_data", convertIntArrayListToJsonArray(allBonds));
         jsonObj.addProperty("version", version);
-
-
-        System.out.println("rcpTermsLine: " + rcpTermsLine);
-        System.out.println("rotatableBondsLine: " + rotatableBondsLine);
         
         return jsonConverter.toJson(jsonObj);
     }
@@ -255,27 +327,69 @@ public class RCOSocketServerClient
      * @param zmat The TinkerMolecule object to be processed.
      * @return the Z-matrix as a JsonArray.
      */
-    private JsonArray getZMatrixAsJsonArray(ZMatrix zmat)
+    public static JsonArray getZMatrixAsJsonArray(ZMatrix zmat)
     {
         JsonArray zmatrixArray = new JsonArray();
-        int i = 0;
-        for(ZMatrixAtom atom : zmat.getAtoms())
-        {   
-            i++;
+        for(int i = 0; i<zmat.getAtomCount(); i++)
+        {
+            ZMatrixAtom atom = zmat.getAtom(i);
             JsonObject atomObj = new JsonObject();
-            atomObj.addProperty("id", atom.getId());
+            atomObj.addProperty("id", atom.getId()+1);
             atomObj.addProperty("element", atom.getSymbol());
-            atomObj.addProperty("atomi_type", atom.getType());
-            atomObj.addProperty("bond_ref", zmat.getBondRefAtomIndex(i));
-            atomObj.addProperty("bond_length", zmat.getBondLength(i));
-            atomObj.addProperty("angle_ref", zmat.getAngleRefAtomIndex(i));
-            atomObj.addProperty("angle", zmat.getAngleValue(i));
-            atomObj.addProperty("dihedral_ref", zmat.getAngle2RefAtomIndex(i));
-            atomObj.addProperty("dihedral", zmat.getAngle2Value(i));
-            atomObj.addProperty("chirality", zmat.getChiralFlag(i));
+            if (zmat.getBondRefAtomIndex(i) > -1)
+            {
+                atomObj.addProperty("bond_ref", zmat.getBondRefAtomIndex(i)+1);
+            }
+            if (zmat.getBondLength(i) != null)
+            {
+                atomObj.addProperty("bond_length", zmat.getBondLength(i));
+            }
+            if (zmat.getAngleRefAtomIndex(i) > -1)
+            {
+                atomObj.addProperty("angle_ref", zmat.getAngleRefAtomIndex(i)+1);
+            }
+            if (zmat.getAngleValue(i) != null)
+            {
+                atomObj.addProperty("angle", zmat.getAngleValue(i));
+            }
+            if (zmat.getAngle2RefAtomIndex(i) > -1)
+            {
+                atomObj.addProperty("dihedral_ref", zmat.getAngle2RefAtomIndex(i)+1);
+            }
+            if (zmat.getAngle2Value(i) != null)
+            {
+                atomObj.addProperty("dihedral", zmat.getAngle2Value(i));
+            }
+            if (zmat.getChiralFlag(i) != null)
+            {
+                atomObj.addProperty("chirality", zmat.getChiralFlag(i));
+            }
             zmatrixArray.add(atomObj);
         }
         return zmatrixArray;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Converts a List of 0-based int arrays to a JsonArray containing 1-based
+     * ints.
+     * @param intArrayList The list of int arrays to convert
+     * @return A JsonArray where each element is a JsonArray of integers
+     */
+    private static JsonArray convertIntArrayListToJsonArray(List<int[]> intArrayList)
+    {
+        JsonArray jsonArray = new JsonArray();
+        for (int[] intArray : intArrayList)
+        {
+            JsonArray innerArray = new JsonArray();
+            for (int value : intArray)
+            {
+                innerArray.add(value+1);
+            }
+            jsonArray.add(innerArray);
+        }
+        return jsonArray;
     }
 
 //------------------------------------------------------------------------------
@@ -363,10 +477,17 @@ public class RCOSocketServerClient
         try {
             answer = jsonConverter.fromJson(readerFromSocket.readLine(), 
                     JsonObject.class);
-            if (!(answer.has("STATUS") && answer.get("STATUS").getAsString().equals("SUCCESS")))
+            if (!(answer.has("STATUS")))
             {
+
                 throw new Error("Socket server replied without "
                         + "including " + "STATUS" + " member. " 
+                        + "Something is badly wrong: aborting! " + answer.toString());
+            }
+            if (!answer.get("STATUS").getAsString().equals("SUCCESS"))
+            {
+                throw new Error("Socket server replied but with STATUS=" 
+                        + answer.get("STATUS") + ". " 
                         + "Something is badly wrong: aborting! " + answer.toString());
             }
         } catch (JsonSyntaxException e) {
