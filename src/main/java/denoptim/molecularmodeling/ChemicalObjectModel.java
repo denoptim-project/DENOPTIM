@@ -294,6 +294,21 @@ public class ChemicalObjectModel
 //------------------------------------------------------------------------------
 
     /**
+     * currently loaded internal coordinates into Cartesian 
+     * overwriting the current XYZ.
+     */
+
+    public void updateXYZ(List<Point3d> newCoords) throws DENOPTIMException
+    {
+        for (int i=0; i<fmol.getAtomCount(); i++)
+        {
+            fmol.getAtom(i).setPoint3d(newCoords.get(i));
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Converts currently loaded internal coordinates into Cartesian 
      * overwriting the current XYZ.
      */
@@ -469,11 +484,7 @@ public class ChemicalObjectModel
             newCoords.add(p3d);
         }
 
-        // Update Cartesian coordinates
-        for (int i=0; i<fmol.getAtomCount(); i++)
-        {
-            fmol.getAtom(i).setPoint3d(newCoords.get(i));
-        }
+        updateXYZ(newCoords);
     }
 
 //------------------------------------------------------------------------------
@@ -535,13 +546,27 @@ public class ChemicalObjectModel
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the index of the given 
+     * @return the index of the given 
      * {@link RingClosingAttractor} in the ZMatrix representation
      */
 
     public int getZMatIdxOfRCA(RingClosingAttractor rca)
     {
-        return attToAtmID.get(rca) + 1;
+        return attToAtmID.get(rca);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the index of the source atom of the given 
+     * {@link RingClosingAttractor} (i.e., the only atom bonded to the  
+     * {@link RingClosingAttractor}) in the ZMatrix representation.
+     */
+
+    public int getZMatIdxOfRCASrc(RingClosingAttractor rca)
+    {
+        int rcaIdx = getZMatIdxOfRCA(rca);
+        return  zmat.getBondRefAtomIndex(rcaIdx);
     }
 
 //------------------------------------------------------------------------------

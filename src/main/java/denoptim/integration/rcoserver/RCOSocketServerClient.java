@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.vecmath.Point3d;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -40,6 +42,7 @@ import com.google.gson.JsonSyntaxException;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.rings.RingClosingAttractor;
+import denoptim.integration.tinker.TinkerUtils;
 import denoptim.molecularmodeling.ChemicalObjectModel;
 import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;
@@ -100,7 +103,8 @@ public class RCOSocketServerClient
      * @param port The port number of the socket server
      * @return The singleton instance
      */
-    public static synchronized RCOSocketServerClient getInstance(String hostname, Integer port) 
+    public static synchronized RCOSocketServerClient getInstance(String hostname, 
+            Integer port) 
     {
         if (instance == null) {
             instance = new RCOSocketServerClient(hostname, port);
@@ -111,14 +115,17 @@ public class RCOSocketServerClient
 //------------------------------------------------------------------------------
 
     /**
-     * Gets the singleton instance of RCOSocketServerClient if it has been initialized.
+     * Gets the singleton instance of RCOSocketServerClient if it has been 
+     * initialized.
      * @return The singleton instance
-     * @throws IllegalStateException if the instance has not been initialized yet
+     * @throws IllegalStateException if the instance has not been initialized 
+     * yet.
      */
     public static RCOSocketServerClient getInstance() 
     {
         if (instance == null) {
-            throw new IllegalStateException("RCOSocketServerClient has not been initialized. "
+            throw new IllegalStateException(
+                    "RCOSocketServerClient has not been initialized. "
                     + "Call getInstance(hostname, port) first.");
         }
         return instance;
@@ -215,11 +222,14 @@ public class RCOSocketServerClient
         {
             for (ObjectPair op : rcaCombination)
             {
-                int iZMatRcaA = chemObj.getZMatIdxOfRCA(
-                        (RingClosingAttractor) op.getFirst());
-                int iZMatRcaB = chemObj.getZMatIdxOfRCA(
-                        (RingClosingAttractor) op.getSecond());
-                rcpTerms.add(new int[] {iZMatRcaA, iZMatRcaB});
+                RingClosingAttractor rcaA = (RingClosingAttractor) op.getFirst();
+                RingClosingAttractor rcaB = (RingClosingAttractor) op.getSecond();
+                int iZMatRcaA = chemObj.getZMatIdxOfRCA(rcaA);
+                int iZMatRcaB = chemObj.getZMatIdxOfRCA(rcaB);
+                int iZMatSrcA = chemObj.getZMatIdxOfRCASrc(rcaA);
+                int iZMatSrcB = chemObj.getZMatIdxOfRCASrc(rcaB);
+                rcpTerms.add(new int[] {iZMatRcaA, iZMatSrcB});
+                rcpTerms.add(new int[] {iZMatRcaB, iZMatSrcA});
             }
         }
 
@@ -242,8 +252,10 @@ public class RCOSocketServerClient
         String requestAsJSONString = formulateRequest(chemObj.getZMatrix(), 
                 rcpTerms, rotatableBonds, allBonds);
         
-        //TODO-gg del
+        //This might be useful for debugging to get the actual request placed to the server
+        //TODO-gg comment out
         System.out.println(requestAsJSONString);
+        //TinkerUtils.writeTinkerINT("/tmp/zmat.int", chemObj.getZMatrix());
         
         JsonObject answer = sendRequest(requestAsJSONString);
         for (String requiredMember : new String[] {"Cartesian_coordinates", "zmatrix"})
@@ -259,7 +271,16 @@ public class RCOSocketServerClient
         // Update local molecular representation with output from the conf. search
         JsonArray cartesianCoordinates = answer.get(
                 "Cartesian_coordinates").getAsJsonArray();
-        //TODO put the min the chemObj
+        List<Point3d> newCoordinates = new ArrayList<>();
+        for (int i = 0; i < cartesianCoordinates.size(); i++)
+        {
+            JsonArray element = cartesianCoordinates.get(i).getAsJsonArray();
+            newCoordinates.add(new Point3d(
+                    element.get(0).getAsDouble(), 
+                    element.get(1).getAsDouble(), 
+                    element.get(2).getAsDouble()));
+        }
+        chemObj.updateXYZ(newCoordinates);
         
         JsonArray zmatrixArrayAsJson = answer.get("zmatrix").getAsJsonArray();
         for (int i = 0; i < zmatrixArrayAsJson.size(); i++)
@@ -287,7 +308,6 @@ public class RCOSocketServerClient
                 }
             }
         }
-        chemObj.updateXYZFromINT();
     }
 
 //------------------------------------------------------------------------------
