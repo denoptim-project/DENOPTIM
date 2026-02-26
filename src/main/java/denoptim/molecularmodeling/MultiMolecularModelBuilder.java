@@ -19,15 +19,12 @@
 
 package denoptim.molecularmodeling;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-
-import com.google.gson.JsonSyntaxException;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -37,7 +34,6 @@ import denoptim.graph.rings.RingClosureParameters;
 import denoptim.integration.rcoserver.RCOSocketServerClient;
 import denoptim.integration.tinker.ConformationalSearchPSSROT;
 import denoptim.integration.tinker.TinkerException;
-import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.programs.RunTimeParameters.ParametersType;
@@ -142,7 +138,7 @@ public class MultiMolecularModelBuilder
                         + "Nothing to send to conformational search.");
                 skipConfSearch = true;
             }
-            // Ring-closinf conf search on the RCO server includes general
+            // Ring-closing conf search on the RCO server includes general
             // purpose conformational search, so no need to run a second 
             // conformational search.
             // RCO server is the default, so the condition checks for non-default

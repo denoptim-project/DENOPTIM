@@ -20,7 +20,6 @@ package denoptim.graph.rings;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,7 +44,6 @@ import denoptim.graph.Fragment;
 import denoptim.graph.Ring;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
-import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.utils.Randomizer;
 

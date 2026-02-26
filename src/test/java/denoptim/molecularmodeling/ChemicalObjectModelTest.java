@@ -20,7 +20,6 @@ package denoptim.molecularmodeling;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.interfaces.IAtom;
@@ -36,7 +34,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
 import denoptim.graph.DGraph;
 import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;

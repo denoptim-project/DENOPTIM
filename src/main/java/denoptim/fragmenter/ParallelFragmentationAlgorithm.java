@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.io.iterator.IteratingSMILESReader;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -41,10 +40,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.io.DenoptimIO;
 import denoptim.io.IteratingAtomContainerReader;
-import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.ParallelAsynchronousTaskExecutor;
-import denoptim.utils.MoleculeUtils;
 
 
 /**

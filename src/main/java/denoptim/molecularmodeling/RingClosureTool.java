@@ -19,7 +19,6 @@
 package denoptim.molecularmodeling;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -44,7 +43,6 @@ import denoptim.graph.rings.RingClosureParameters;
 import denoptim.integration.rcoserver.RCOSocketServerClient;
 import denoptim.integration.tinker.ConformationalSearchPSSROT;
 import denoptim.integration.tinker.TinkerException;
-import denoptim.integration.tinker.TinkerUtils;
 import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;
 import denoptim.programs.RunTimeParameters.ParametersType;

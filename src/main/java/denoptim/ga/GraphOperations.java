@@ -21,24 +21,15 @@ package denoptim.ga;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import org.apache.http.TruncatedChunkException;
-import org.openscience.cdk.graph.ShortestPaths;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.isomorphism.Mappings;
 import org.paukov.combinatorics3.Generator;
 
 import denoptim.constants.DENOPTIMConstants;
@@ -74,13 +65,9 @@ import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
-import denoptim.programs.fragmenter.CuttingRule;
-import denoptim.programs.fragmenter.MatchedBond;
 import denoptim.utils.CrossoverType;
 import denoptim.utils.GraphUtils;
-import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MutationType;
-import denoptim.utils.ObjectPair;
 import denoptim.utils.Randomizer;
 
 /**

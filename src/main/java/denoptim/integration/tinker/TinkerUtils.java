@@ -25,27 +25,16 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.io.input.ReversedLinesFileReader;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecularmodeling.MMBuilderUtils;
 import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;
-import denoptim.utils.ConnectedLigand;
-import denoptim.utils.ConnectedLigandComparator;
 import denoptim.utils.GeneralUtils;
-import denoptim.utils.MathUtils;
-import denoptim.utils.MoleculeUtils;
-import denoptim.utils.ObjectPair;
-import denoptim.utils.RotationalSpaceUtils;
 
 
 /**

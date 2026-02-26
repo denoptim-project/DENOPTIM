@@ -1,7 +1,5 @@
 package denoptim.molecularmodeling.zmatrix;
 
-import org.openscience.cdk.interfaces.IBond;
-
 /**
  * Representation of a bond in the ZMatrix.
  */

@@ -2,7 +2,6 @@ package denoptim.molecularmodeling.zmatrix;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,7 +12,6 @@ import org.openscience.cdk.interfaces.IBond;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.integration.tinker.TinkerUtils;
 import denoptim.utils.ConnectedLigand;
 import denoptim.utils.ConnectedLigandComparator;
 import denoptim.utils.MathUtils;

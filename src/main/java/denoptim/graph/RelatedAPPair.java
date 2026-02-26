@@ -1,9 +1,5 @@
 package denoptim.graph;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Class representing a pair of {@link AttachmentPoint}s related by some 
  * property that is defined by string.

@@ -1,21 +1,5 @@
 package denoptim.fragmenter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.isomorphism.Mappings;
-
-import denoptim.constants.DENOPTIMConstants;
-import denoptim.exception.DENOPTIMException;
-import denoptim.graph.APClass;
-import denoptim.utils.ManySMARTSQuery;
-import denoptim.utils.MoleculeUtils;
-
 /**
  * SMARTS-based rules to identify potential bridge head atoms for ring fusion 
  * operations.

@@ -21,7 +21,6 @@ package denoptim.ga;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -37,8 +36,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -46,9 +43,8 @@ import org.openscience.cdk.graph.ShortestPaths;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.isomorphism.Mappings;
-import org.paukov.combinatorics3.Generator;
 
-import com.google.gson.Gson;
+import java.util.stream.IntStream;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -79,7 +75,6 @@ import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.RingClosureParameters;
 import denoptim.graph.rings.RingClosuresArchive;
 import denoptim.io.DenoptimIO;
-import denoptim.json.DENOPTIMgson;
 import denoptim.logging.CounterID;
 import denoptim.logging.Monitor;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;

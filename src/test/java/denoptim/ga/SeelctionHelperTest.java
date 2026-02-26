@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import denoptim.graph.Candidate;
-import denoptim.programs.RunTimeParameters;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.utils.Randomizer;;
 

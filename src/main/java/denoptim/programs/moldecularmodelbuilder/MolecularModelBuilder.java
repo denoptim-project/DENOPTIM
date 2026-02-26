@@ -29,7 +29,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
-import denoptim.integration.tinker.TinkerException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.MultiMolecularModelBuilder;
 import denoptim.task.ProgramTask;
