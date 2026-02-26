@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Help message",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-h"
+            ],
+            "cwd": "/tmp/denoptim_test/t1",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test t1_Mol-2",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "B3D", "MOL000002_DnpCG.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t1",
+            "console": "integratedTerminal"
+        }
+    ]
+}

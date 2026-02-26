@@ -1,0 +1,19 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.jdt.ls.java.home": "/Users/marcof/miniforge3/envs/dnp_devel/lib/jvm",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-17",
+            "path": "/Users/marcof/miniforge3/envs/dnp_devel/lib/jvm",
+            "default": true
+        }
+    ],
+    "java.autobuild.enabled": true,
+    "java.project.outputPath": "target/classes",
+    "java.test.config": {
+        "workingDirectory": "${workspaceFolder}",
+        "vmArgs": []
+    },
+    "java.test.defaultConfig": "default",
+    "java.debug.settings.onBuildFailureProceed": true
+}
