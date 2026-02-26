@@ -265,9 +265,7 @@ public class RingClosureTool
                                 + " adaptation for " + molName
                                 + " (Iteration: " + itn + ")");
 
-        //TODO: get hostname and port from settings
-        // RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance(settings.getRCOServerHostname(), settings.getRCOServerPort());
-        RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance("localhost", 5972);
+        RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance(settings.getRCOServerHostname(), settings.getRCOServerPort());
         
         long startTime = System.nanoTime();
         try {

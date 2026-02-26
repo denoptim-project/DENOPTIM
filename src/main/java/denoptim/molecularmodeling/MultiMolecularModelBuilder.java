@@ -190,9 +190,8 @@ public class MultiMolecularModelBuilder
                     throw new DENOPTIMException(msg, te);
                 } 
             } else {
-                //TODO: get hostname and port from settings
-                // RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance(settings.getRCOServerHostname(), settings.getRCOServerPort());
-                RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance("localhost", 5972);
+                RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance(
+                    settings.getRCOServerHostname(), settings.getRCOServerPort());
                 for (ChemicalObjectModel com : structures)
                 {
                     try

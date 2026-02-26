@@ -42,7 +42,6 @@ import com.google.gson.JsonSyntaxException;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.rings.RingClosingAttractor;
-import denoptim.integration.tinker.TinkerUtils;
 import denoptim.molecularmodeling.ChemicalObjectModel;
 import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;
@@ -253,8 +252,7 @@ public class RCOSocketServerClient
                 rcpTerms, rotatableBonds, allBonds);
         
         //This might be useful for debugging to get the actual request placed to the server
-        //TODO-gg comment out
-        System.out.println(requestAsJSONString);
+        logger.log(Level.FINE, "Request to the socket server: " + requestAsJSONString);
         //TinkerUtils.writeTinkerINT("/tmp/zmat.int", chemObj.getZMatrix());
         
         JsonObject answer = sendRequest(requestAsJSONString);

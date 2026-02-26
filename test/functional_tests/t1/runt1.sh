@@ -82,7 +82,8 @@ do
     echo "3DB-inpSDF=$inpSDF" > "$dnpParams"
     echo "3DB-outSDF=$outSDF" >> "$dnpParams"
     echo "FS-RotBondsDefFile=$DENOPTIM_HOME/src/main/resources/data/rotatableBonds-1.0" >> "$dnpParams"
-
+    echo "3DB-RCOServerHostname=$HOST" >> "$dnpParams"
+    echo "3DB-RCOServerPort=$PORT" >> "$dnpParams"
     echo "3DB-workDir=$wrkDir" >> "$dnpParams"
 
     if [ "$fname" = "MOL000009" ]; then

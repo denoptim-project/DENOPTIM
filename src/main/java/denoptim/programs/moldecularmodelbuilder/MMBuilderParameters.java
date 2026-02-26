@@ -142,7 +142,16 @@ public class MMBuilderParameters extends RunTimeParameters
      * Pathname of output SDF file
      */
     protected String outSDFFile;
-    
+
+    /**
+     * Hostname of the RCOServer
+     */
+    protected String rcoServerHostname = "localhost";
+
+    /**
+     * Port of the RCOServer
+     */
+    protected Integer rcoServerPort = 5972;
 
 //------------------------------------------------------------------------------
     
@@ -280,6 +289,18 @@ public class MMBuilderParameters extends RunTimeParameters
         return workDir;
     }
 
+//------------------------------------------------------------------------------
+
+    public String getRCOServerHostname() {
+        return rcoServerHostname;
+    }
+
+//------------------------------------------------------------------------------
+
+    public Integer getRCOServerPort() {
+        return rcoServerPort;
+    }
+
 //-----------------------------------------------------------------------------
 
     /**
@@ -290,7 +311,7 @@ public class MMBuilderParameters extends RunTimeParameters
      */
 
     public void interpretKeyword(String key, String value)
-                                                      throws DENOPTIMException
+        throws DENOPTIMException
     {
         String msg = "";
         switch (key.toUpperCase())
@@ -356,6 +377,13 @@ public class MMBuilderParameters extends RunTimeParameters
         case "WORKDIR=":
             workDir = value;
             break;
+        case "RCOSERVERHOSTNAME=":
+            rcoServerHostname = value;
+            break;
+        case "RCOSERVERPORT=":
+            rcoServerPort = Integer.parseInt(value);
+            break;
+
 /*
         case "=":
             = value;
