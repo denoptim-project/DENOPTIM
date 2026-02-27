@@ -55,6 +55,8 @@ import org.openscience.cdk.interfaces.IAtomType.Hybridization;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IElement;
+import org.openscience.cdk.isomorphism.Mappings;
+import org.openscience.cdk.isomorphism.Pattern;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.qsar.DescriptorValue;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
@@ -1264,6 +1266,249 @@ public class MoleculeUtils
             return is3D;
         else
             return not2or3D;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    /**
+     * Calculates the bond angle agreement score between a template molecule and
+     * a matched molecule. Lower scores indicate better agreement.
+     * The score includes both bond angle differences and chirality-sensitive terms
+     * (scalar triple product) to distinguish between enantiomeric mappings.
+     * @param templateMol the template molecule
+     * @param mol the matched molecule
+     * @param templateToMolMap mapping from template atoms to matched molecule atoms
+     * @return the combined score (angle differences + chirality penalty)
+     */
+    public static double calculateBondAngleAgreement(IAtomContainer templateMol,
+        IAtomContainer mol, Map<IAtom, IAtom> templateToMolMap)
+    {
+        double totalAngleDifference = 0.0;
+        int angleCount = 0;
+        double totalChiralityPenalty = 0.0;
+        int chiralityCount = 0;
+        
+        // For each atom in the template, calculate bond angles and chirality
+        for (IAtom templateAtom : templateMol.atoms())
+        {
+            IAtom molAtom = templateToMolMap.get(templateAtom);
+            if (molAtom == null)
+                continue;
+            
+            Point3d templatePos = MoleculeUtils.getPoint3d(templateAtom);
+            Point3d molPos = MoleculeUtils.getPoint3d(molAtom);
+            
+            if (templatePos == null || molPos == null)
+                continue;
+            
+            // Get neighbors of this atom in the template
+            List<IAtom> templateNeighbors = templateMol.getConnectedAtomsList(templateAtom);
+            if (templateNeighbors.size() < 2)
+                continue; // Need at least 2 neighbors to form an angle
+            
+            // Get corresponding neighbors in the matched molecule
+            List<IAtom> molNeighbors = new ArrayList<>();
+            for (IAtom templateNeighbor : templateNeighbors)
+            {
+                IAtom molNeighbor = templateToMolMap.get(templateNeighbor);
+                if (molNeighbor != null)
+                {
+                    molNeighbors.add(molNeighbor);
+                }
+            }
+            
+            if (molNeighbors.size() < 2)
+                continue;
+            
+            // Calculate all bond angles in the template
+            for (int i = 0; i < templateNeighbors.size(); i++)
+            {
+                for (int j = i + 1; j < templateNeighbors.size(); j++)
+                {
+                    IAtom neighbor1 = templateNeighbors.get(i);
+                    IAtom neighbor2 = templateNeighbors.get(j);
+                    
+                    IAtom molNeighbor1 = templateToMolMap.get(neighbor1);
+                    IAtom molNeighbor2 = templateToMolMap.get(neighbor2);
+                    
+                    if (molNeighbor1 == null || molNeighbor2 == null)
+                        continue;
+                    
+                    Point3d pos1 = MoleculeUtils.getPoint3d(neighbor1);
+                    Point3d pos2 = MoleculeUtils.getPoint3d(neighbor2);
+                    Point3d molPos1 = MoleculeUtils.getPoint3d(molNeighbor1);
+                    Point3d molPos2 = MoleculeUtils.getPoint3d(molNeighbor2);
+                    
+                    if (pos1 == null || pos2 == null || molPos1 == null || molPos2 == null)
+                        continue;
+                    
+                    // Calculate angle in template: angle at templateAtom between neighbor1 and neighbor2
+                    double[] templateA = {pos1.x, pos1.y, pos1.z};
+                    double[] templateB = {templatePos.x, templatePos.y, templatePos.z};
+                    double[] templateC = {pos2.x, pos2.y, pos2.z};
+                    double templateAngle = MathUtils.getAngle(templateA, templateB, templateC);
+                    
+                    // Calculate corresponding angle in matched molecule
+                    double[] molA = {molPos1.x, molPos1.y, molPos1.z};
+                    double[] molB = {molPos.x, molPos.y, molPos.z};
+                    double[] molC = {molPos2.x, molPos2.y, molPos2.z};
+                    double molAngle = MathUtils.getAngle(molA, molB, molC);
+                    
+                    // Add absolute difference to total
+                    totalAngleDifference += Math.abs(templateAngle - molAngle);
+                    angleCount++;
+                }
+            }
+            
+            // Calculate chirality-sensitive term using scalar triple product
+            // Need at least 3 neighbors to define chirality
+            if (templateNeighbors.size() >= 3 && molNeighbors.size() >= 3)
+            {
+                // Use first three neighbors to compute scalar triple product
+                IAtom n1 = templateNeighbors.get(0);
+                IAtom n2 = templateNeighbors.get(1);
+                IAtom n3 = templateNeighbors.get(2);
+                
+                IAtom molN1 = templateToMolMap.get(n1);
+                IAtom molN2 = templateToMolMap.get(n2);
+                IAtom molN3 = templateToMolMap.get(n3);
+                
+                if (molN1 != null && molN2 != null && molN3 != null)
+                {
+                    Point3d p1 = MoleculeUtils.getPoint3d(n1);
+                    Point3d p2 = MoleculeUtils.getPoint3d(n2);
+                    Point3d p3 = MoleculeUtils.getPoint3d(n3);
+                    Point3d molP1 = MoleculeUtils.getPoint3d(molN1);
+                    Point3d molP2 = MoleculeUtils.getPoint3d(molN2);
+                    Point3d molP3 = MoleculeUtils.getPoint3d(molN3);
+                    
+                    if (p1 != null && p2 != null && p3 != null && 
+                        molP1 != null && molP2 != null && molP3 != null)
+                    {
+                        // Compute vectors from central atom to neighbors
+                        double[] v1Template = {p1.x - templatePos.x, p1.y - templatePos.y, p1.z - templatePos.z};
+                        double[] v2Template = {p2.x - templatePos.x, p2.y - templatePos.y, p2.z - templatePos.z};
+                        double[] v3Template = {p3.x - templatePos.x, p3.y - templatePos.y, p3.z - templatePos.z};
+                        
+                        double[] v1Mol = {molP1.x - molPos.x, molP1.y - molPos.y, molP1.z - molPos.z};
+                        double[] v2Mol = {molP2.x - molPos.x, molP2.y - molPos.y, molP2.z - molPos.z};
+                        double[] v3Mol = {molP3.x - molPos.x, molP3.y - molPos.y, molP3.z - molPos.z};
+                        
+                        // Compute scalar triple product: v1 · (v2 × v3)
+                        double[] crossTemplate = MathUtils.computeCrossProduct(v2Template, v3Template);
+                        double[] crossMol = MathUtils.computeCrossProduct(v2Mol, v3Mol);
+                        
+                        double stpTemplate = v1Template[0] * crossTemplate[0] + 
+                                           v1Template[1] * crossTemplate[1] + 
+                                           v1Template[2] * crossTemplate[2];
+                        double stpMol = v1Mol[0] * crossMol[0] + 
+                                       v1Mol[1] * crossMol[1] + 
+                                       v1Mol[2] * crossMol[2];
+                        
+                        // Penalty based on sign difference and magnitude difference
+                        // If signs differ, add large penalty; if same sign, add magnitude difference
+                        double chiralityPenalty = 0.0;
+                        if (Math.signum(stpTemplate) != Math.signum(stpMol))
+                        {
+                            // Opposite chirality - large penalty
+                            chiralityPenalty = 1000.0 + Math.abs(stpTemplate - stpMol);
+                        }
+                        else
+                        {
+                            // Same chirality - small penalty based on magnitude difference
+                            chiralityPenalty = Math.abs(stpTemplate - stpMol);
+                        }
+                        
+                        totalChiralityPenalty += chiralityPenalty;
+                        chiralityCount++;
+                    }
+                }
+            }
+        }
+        
+        // If no valid comparisons could be made (incomplete mapping), return MAX_VALUE
+        if (angleCount == 0 && chiralityCount == 0)
+        {
+            return Double.MAX_VALUE;
+        }
+        
+        // Combine angle difference and chirality penalty
+        double angleScore = angleCount > 0 ? totalAngleDifference / angleCount : 0.0;
+        double chiralityScore = chiralityCount > 0 ? totalChiralityPenalty / chiralityCount : 0.0;
+        
+        // Return combined score (angle differences + chirality penalty)
+        // Chirality penalty is weighted more heavily to ensure correct enantiomeric mapping
+        return angleScore + chiralityScore;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Finds the maximum common substructure (MCS) between two molecules.
+     * @param substructure the template molecule
+     * @param mol the target molecule to search in
+     * @param logger logger for reporting
+     * @return the maximum common substructure as an IAtomContainer, or null if none found
+     */
+    public static Map<IAtom,IAtom> findAtomMapping(
+            IAtomContainer substructure, IAtomContainer mol, Logger logger)
+    {
+        try
+        {
+            // Ensure molecules are properly configured for isomorphism matching
+            MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(substructure);
+            MoleculeUtils.setZeroImplicitHydrogensToAllAtoms(mol);
+            MoleculeUtils.ensureNoUnsetBondOrdersSilent(substructure);
+            MoleculeUtils.ensureNoUnsetBondOrdersSilent(mol);
+            
+            // Create a pattern from the template molecule
+            Pattern pattern = Pattern.findSubstructure(substructure);
+            
+            // Check if template is a substructure of mol
+            if (!pattern.matches(mol))
+            {
+                // Template is not a substructure, try to find MCS using SMSD if available
+                // For now, return null - could be enhanced with SMSD library
+                return new HashMap<>();
+            }
+            
+            // Get all matching substructures
+            Mappings mappings = pattern.matchAll(mol);
+            if (!mappings.iterator().hasNext())
+            {
+                return new HashMap<>();
+            }
+            
+            // Find the best mapping based on bond angle agreement
+            Map<IAtom, IAtom> bestTemplateToMolMap = new HashMap<>();
+            double bestScore = Double.MAX_VALUE;
+            
+            for (int[] mapping : mappings)
+            {
+                // Build atom mapping for this mapping
+                Map<IAtom, IAtom> templateToMolMap = new HashMap<>();
+                for (int i = 0; i < mapping.length; i++)
+                {
+                    templateToMolMap.put(substructure.getAtom(i), mol.getAtom(mapping[i]));
+                }
+                
+                // Calculate bond angle agreement score
+                double score = calculateBondAngleAgreement(substructure, mol, templateToMolMap);
+                
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    bestTemplateToMolMap = templateToMolMap;
+                }
+            }
+
+            return bestTemplateToMolMap;
+        }
+        catch (Exception e)
+        {
+            logger.log(Level.WARNING, "Error finding MCS: " + e.getMessage());
+            return new HashMap<>();
+        }
     }
 
 //------------------------------------------------------------------------------
