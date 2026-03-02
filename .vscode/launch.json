@@ -24,6 +24,40 @@
             ],
             "cwd": "/tmp/denoptim_test/t1",
             "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run GUI",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test t33",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "FRG", "t33.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t33",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test t33 TIMED",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "FRG", "t33.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t33",
+            "console": "integratedTerminal",
+            "preLaunchTask": "Start timing for t33",
+            "postDebugTask": "Show timing for t33"
         }
     ]
 }

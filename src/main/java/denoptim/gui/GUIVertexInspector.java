@@ -147,6 +147,9 @@ public class GUIVertexInspector extends GUICardPanel
 	private JPanel pnlAtmToAP;
 	private JButton btnAtmToAP;
 
+	private JPanel pnlTmplBasedChop;
+	private JButton btnTmplBldChop;
+
     private JPanel pnlChop;
     private JButton btnChop;
     
@@ -633,7 +636,154 @@ public class GUIVertexInspector extends GUICardPanel
         });
         pnlChop.add(btnChop);
         ctrlPane.add(pnlChop);
-		
+
+		pnlTmplBasedChop = new JPanel();
+	    btnTmplBldChop = new JButton("Chop by Template");
+        btnTmplBldChop.setToolTipText(String.format("<html><body width='%1s'>"
+                + "Chops the current structure according to a given graph template expected to be a substructure of the current structure.</html>", 400));
+	    btnTmplBldChop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				// NB: we call it vertex because we are in the vertex viewer, but it is a structure that may not be a vertex.
+				vertex = vertexViewer.getLoadedStructure();
+				if (vertex==null)
+				{
+					return;
+				}
+
+				File inFile = GUIFileOpener.pickFile(btnTmplBldChop);
+				if (inFile == null || inFile.getAbsolutePath().equals(""))
+				{
+					return;
+				}
+				
+				List<DGraph> fragmentationTmpls = new ArrayList<>();
+				try
+				{
+					fragmentationTmpls = DenoptimIO.readDENOPTIMGraphsFromFile(inFile);
+				} catch (Throwable e)
+				{
+                    JOptionPane.showMessageDialog(btnTmplBldChop,String.format(
+                            "<html><body width='%1s'"
+                            + "Could not read template file. Hint: "
+                            + e.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+				}
+
+				if (fragmentationTmpls.size() == 0)
+				{
+					JOptionPane.showMessageDialog(btnTmplBldChop,
+                            "<html>No graphs found in file '"
+                            + inFile + "'.</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+					return;
+				}
+
+				FragmenterParameters settings = new FragmenterParameters();
+				settings.setFragmentationTmpls(fragmentationTmpls);
+                
+                // Now chop the structure to produce fragments
+                List<Vertex> fragments;
+                try
+                {
+					fragments = FragmenterTools.fragmentation(vertex.getIAtomContainer(),
+						settings.getFragmentationTmpls(), 
+                        settings.getRandomizer(), 
+						settings.getLogger());
+                } catch (DENOPTIMException e)
+                {
+                    JOptionPane.showMessageDialog(btnChop,String.format(
+                            "<html><body width='%1s'"
+                            + "Could not complete fragmentation. Hint: "
+                            + e.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                
+                // Add linearity-breaking dummy atoms
+                for (Vertex frag : fragments)
+                {
+                    DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
+                            settings.getLinearAngleLimit());
+                }
+                
+                // Signal no result obtained
+                if (fragments.size() < 1 || (fragments.size() == 1 &&
+                        ((Fragment)fragments.get(0)).isIsomorphicTo(vertex)))
+                {
+                    JOptionPane.showMessageDialog(btnAddVrtx,
+                            "<html>Fragmentation produced no fragments!</html>",
+                            "Error",
+                            JOptionPane.WARNING_MESSAGE,
+                            UIManager.getIcon("OptionPane.warningIcon"));
+                    return;
+                }
+                
+                // The resulting fragments are loaded into the viewer, without
+                // removing the original structure.
+                
+                String[] options = new String[]{"All", 
+                        "Select",
+                        "Cancel"};
+                String txt = "<html><body width='%1s'>Fragmentation produced "
+                        + fragments.size() + " fragments. Do you want to "
+                        + "append all or select some?"
+                        + "</html>";
+                int answer = JOptionPane.showOptionDialog(btnAddVrtx,
+                        String.format(txt,200),
+                        "Append Building Blocks",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        UIManager.getIcon("OptionPane.warningIcon"),
+                        options,
+                        options[0]);
+                
+                if (answer == 2)
+                {
+                    return;
+                }
+                
+                switch (answer)
+                {
+                    case 0:
+                        importVertices(fragments);
+                        break;
+                        
+                    case 1:
+                        List<Vertex> selectedVrtxs = 
+                                new ArrayList<Vertex>();
+                        GUIVertexSelector vrtxSelector = new GUIVertexSelector(
+                                btnAddVrtx,true);
+                        vrtxSelector.setRequireApSelection(false);
+                        vrtxSelector.load(fragments, 0);
+                        Object selected = vrtxSelector.showDialog();
+
+                        if (selected != null)
+                        {
+                            @SuppressWarnings("unchecked")
+                            List<ArrayList<Integer>> selList = 
+                                    (ArrayList<ArrayList<Integer>>) selected;
+                            for (ArrayList<Integer> pair : selList)
+                            {
+                                selectedVrtxs.add(fragments.get(pair.get(0)));
+                            }
+                        }
+                        importVertices(selectedVrtxs);
+                        break;
+                    
+                    default:
+                        return;
+                }
+			}
+		});
+		pnlTmplBasedChop.add(btnTmplBldChop);
+		ctrlPane.add(pnlTmplBasedChop);
 		
 		pnlDelSel = new JPanel();
 		btnDelSel = new JButton("Remove Atoms");

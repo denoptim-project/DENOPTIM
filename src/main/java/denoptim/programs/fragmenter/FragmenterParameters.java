@@ -381,7 +381,18 @@ public class FragmenterParameters extends RunTimeParameters
      * molecules into {@link DGraph}.
      */
     protected ContractLevel embeddedRingsContract = ContractLevel.FREE;
-    
+
+    /**
+     * Pathname to file containing a graph to be used as template for fragmentation.
+     * If not set, no template will be used.
+     */
+    private String fragmentationTmplFile = "";
+
+    /**
+     * List of graphs to be used as templates for fragmentation. If not set,
+     * no template will be used.
+     */
+    private List<DGraph> fragmentationTmpls = new ArrayList<DGraph>();
     
 //------------------------------------------------------------------------------
     
@@ -1023,7 +1034,18 @@ public class FragmenterParameters extends RunTimeParameters
     {
         return scaffoldingPolicy;
     }
-      
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the graph to be used as template for fragmentation. If not set,
+     * no template will be used.
+     */
+    public List<DGraph> getFragmentationTmpls()
+    {
+        return fragmentationTmpls;
+    }
+
 //------------------------------------------------------------------------------
     
     /**
@@ -1264,6 +1286,13 @@ public class FragmenterParameters extends RunTimeParameters
                 }
                 break;
             }
+
+            case "FRAGMENTATIONTEMPLATE=":
+            {
+                doFragmentation = true;
+                fragmentationTmplFile = value;
+                break;
+            }
                 
 /*
             case "=":
@@ -1320,6 +1349,7 @@ public class FragmenterParameters extends RunTimeParameters
     	ensureIsPositive("isomorphicSampleSize", isomorphicSampleSize, 
     	        "ISOMORPHICSAMPLESIZE");
     	ensureIsPositive("mwSlotSize", mwSlotSize, "MWSLOTSIZE");
+    	ensureFileExistsIfSet(fragmentationTmplFile);
     	ensureFileExistsIfSet(structuresFile);
     	ensureFileExistsIfSet(cutRulesFile);
     	ensureFileExistsIfSet(formulaeFile);
@@ -1377,7 +1407,20 @@ public class FragmenterParameters extends RunTimeParameters
                         + targetFragmentsFile + "'", e);
             }
         }
-        
+
+        if (fragmentationTmplFile!=null && !fragmentationTmplFile.isBlank())
+        {
+            try
+            {
+                fragmentationTmpls = DenoptimIO.readDENOPTIMGraphsFromFile(
+                        new File(fragmentationTmplFile));
+            } catch (Throwable e)
+            {
+                throw new DENOPTIMException("Problems reading file '"
+                        + fragmentationTmplFile + "'", e);
+            }
+        }
+
         if (!doFragmentation && doExtactRepresentativeConformer)
         {
             isStandaloneFragmentClustering = true;
@@ -1641,6 +1684,16 @@ public class FragmenterParameters extends RunTimeParameters
     public void setWorkingIn3D(boolean workingIn3D)
     {
         this.workingIn3D = workingIn3D;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the list of graph templates for fragmentation.
+     * @param fragmentationTmpls the list of graph templates for fragmentation.
+     */
+    public void setFragmentationTmpls(List<DGraph> fragmentationTmpls) {
+        this.fragmentationTmpls = fragmentationTmpls;
     }
     
 //------------------------------------------------------------------------------    

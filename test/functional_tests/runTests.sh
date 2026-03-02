@@ -419,5 +419,10 @@ runTest "t31"
 #
 runTest "t32"
 
+#
+# t33: test fragmentation based ona template graph
+#
+runTest "t33"
+
 echo "All done!"
 exit 0

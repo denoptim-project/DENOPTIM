@@ -25,7 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.vecmath.Point2d;
@@ -131,7 +134,8 @@ public class MoleculeUtilsTest
         mapping.put(h2, h4);
         
         // Calculate bond angle agreement
-        double score = MoleculeUtils.calculateBondAngleAgreement(template, mol, mapping);
+        double[] rawData = MoleculeUtils.calculateBondAngleAgreement(template, mol, mapping);
+        double score = MoleculeUtils.normalizeBondAngleScore(rawData);
         
         // Score should be small (good agreement) but not zero
         assertTrue(score < 10.0, "Bond angle agreement score should be small for similar structures");
@@ -153,7 +157,8 @@ public class MoleculeUtilsTest
         mapping2.put(h1, h5);
         mapping2.put(h2, h6);
         
-        double score2 = MoleculeUtils.calculateBondAngleAgreement(template, mol2, mapping2);
+        double[] rawData2 = MoleculeUtils.calculateBondAngleAgreement(template, mol2, mapping2);
+        double score2 = MoleculeUtils.normalizeBondAngleScore(rawData2);
         assertTrue(score2 < 0.1, "Identical structures should have very low score");
         
         // Test with incomplete mapping (should return MAX_VALUE)
@@ -161,7 +166,8 @@ public class MoleculeUtilsTest
         incompleteMapping.put(o1, o2);
         // Missing h1 and h2 mappings
         
-        double score3 = MoleculeUtils.calculateBondAngleAgreement(template, mol, incompleteMapping);
+        double[] rawData3 = MoleculeUtils.calculateBondAngleAgreement(template, mol, incompleteMapping);
+        double score3 = MoleculeUtils.normalizeBondAngleScore(rawData3);
         assertEquals(Double.MAX_VALUE, score3, "Incomplete mapping should return MAX_VALUE, but got " + score3);
 
         // Test CH4 with different mappings
@@ -210,7 +216,8 @@ public class MoleculeUtilsTest
         correctMapping.put(h3Template, h3Target);
         correctMapping.put(h4Template, h4Target);
         
-        double identicalMappingScore = MoleculeUtils.calculateBondAngleAgreement(ch4Template, ch4Target, correctMapping);
+        double[] rawDataIdentical = MoleculeUtils.calculateBondAngleAgreement(ch4Template, ch4Target, correctMapping);
+        double identicalMappingScore = MoleculeUtils.normalizeBondAngleScore(rawDataIdentical);
         assertTrue(identicalMappingScore < 0.1, "Correct mapping should have very low score: " + identicalMappingScore);
         
         // Test swapped mapping (h1 <-> h2)
@@ -221,7 +228,8 @@ public class MoleculeUtilsTest
         swappedMapping.put(h3Template, h3Target);
         swappedMapping.put(h4Template, h4Target);
         
-        double swappedScore = MoleculeUtils.calculateBondAngleAgreement(ch4Template, ch4Target, swappedMapping);
+        double[] rawDataSwapped = MoleculeUtils.calculateBondAngleAgreement(ch4Template, ch4Target, swappedMapping);
+        double swappedScore = MoleculeUtils.normalizeBondAngleScore(rawDataSwapped);
         // Since all H are equivalent in perfect tetrahedron, score should be similar
         assertTrue(swappedScore > identicalMappingScore, 
             "Swapped mapping should give higher score than identical mapping (> "
@@ -261,7 +269,7 @@ public class MoleculeUtilsTest
         mol.addBond(new Bond(c5, h2));
         
         // Find mapping
-        Map<IAtom, IAtom> mapping = MoleculeUtils.findAtomMapping(substructure, mol, logger);
+        Map<IAtom, IAtom> mapping = MoleculeUtils.findBestAtomMapping(substructure, mol, logger);
         
         // Should find a mapping
         assertNotNull(mapping, "Mapping should not be null");
@@ -327,7 +335,7 @@ public class MoleculeUtilsTest
         chiralTarget.addBond(new Bond(cTarget, cl2Target));
         
         // Find mapping - should prefer the correct enantiomeric mapping
-        Map<IAtom, IAtom> mapping = MoleculeUtils.findAtomMapping(chiralTemplate, chiralTarget, logger);
+        Map<IAtom, IAtom> mapping = MoleculeUtils.findBestAtomMapping(chiralTemplate, chiralTarget, logger);
         
         // Should find a mapping
         assertNotNull(mapping, "Mapping should not be null");
@@ -359,7 +367,7 @@ public class MoleculeUtilsTest
         enantiomerTarget.addBond(new Bond(cEnantiomer, cl2Enantiomer));
         
         // Find mapping for enantiomer
-        Map<IAtom, IAtom> enantiomerMapping = MoleculeUtils.findAtomMapping(
+        Map<IAtom, IAtom> enantiomerMapping = MoleculeUtils.findBestAtomMapping(
                 chiralTemplate, enantiomerTarget, logger);
         
         // Should still find a mapping (isomorphism exists)
@@ -399,12 +407,15 @@ public class MoleculeUtilsTest
         enantiomerMappingForScore.put(cl1Template, cl1Enantiomer);
         enantiomerMappingForScore.put(cl2Template, cl2Enantiomer);
         
-        double correctScore = MoleculeUtils.calculateBondAngleAgreement(
+        double[] rawDataCorrect = MoleculeUtils.calculateBondAngleAgreement(
                 chiralTemplate, chiralTarget, correctMapping);
-        double swappedClScore = MoleculeUtils.calculateBondAngleAgreement(
+        double correctScore = MoleculeUtils.normalizeBondAngleScore(rawDataCorrect);
+        double[] rawDataSwappedCl = MoleculeUtils.calculateBondAngleAgreement(
                 chiralTemplate, chiralTarget, swappedClMapping);
-        double enantiomerScore = MoleculeUtils.calculateBondAngleAgreement(
+        double swappedClScore = MoleculeUtils.normalizeBondAngleScore(rawDataSwappedCl);
+        double[] rawDataEnantiomer = MoleculeUtils.calculateBondAngleAgreement(
                 chiralTemplate, enantiomerTarget, enantiomerMappingForScore);
+        double enantiomerScore = MoleculeUtils.normalizeBondAngleScore(rawDataEnantiomer);
         
         // The swapped Cl mapping should have a higher score due to opposite chirality
         assertTrue(swappedClScore > correctScore,
@@ -441,7 +452,7 @@ public class MoleculeUtilsTest
         mol.addBond(new Bond(c1, c2));
         
         // Find mapping - should return empty map
-        Map<IAtom, IAtom> mapping = MoleculeUtils.findAtomMapping(substructure, mol, logger);
+        Map<IAtom, IAtom> mapping = MoleculeUtils.findBestAtomMapping(substructure, mol, logger);
         
         assertNotNull(mapping, "Mapping should not be null");
         assertTrue(mapping.isEmpty(), "Mapping should be empty when no match found");
@@ -478,7 +489,7 @@ public class MoleculeUtilsTest
         mol.addBond(new Bond(c5, c6));
         
         // Find mapping - should select one of the possible matches
-        Map<IAtom, IAtom> mapping = MoleculeUtils.findAtomMapping(substructure, mol, logger);
+        Map<IAtom, IAtom> mapping = MoleculeUtils.findBestAtomMapping(substructure, mol, logger);
         
         assertNotNull(mapping, "Mapping should not be null");
         assertEquals(2, mapping.size(), "Mapping should contain 2 atoms");
@@ -490,6 +501,159 @@ public class MoleculeUtilsTest
         IAtom mappedC2 = mapping.get(c2);
         IBond bond = mol.getBond(mappedC1, mappedC2);
         assertNotNull(bond, "Mapped atoms should be bonded");
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFindUniqueAtomMappingsMultipleOccurrences() throws Exception
+    {
+        Logger logger = Logger.getLogger("TestLogger");
+        
+        // Create a simple substructure: C-C (carbon-carbon bond)
+        IAtomContainer substructure = builder.newAtomContainer();
+        IAtom c1 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
+        IAtom c2 = new Atom("C", new Point3d(1.5, 0.0, 0.0));
+        substructure.addAtom(c1);
+        substructure.addAtom(c2);
+        substructure.addBond(new Bond(c1, c2));
+        
+        // Create a larger molecule with multiple C-C bonds: C-C-C-C
+        // This molecule has 3 distinct C-C bonds that match the substructure:
+        // 1. c3-c4 (atoms 0-1)
+        // 2. c4-c5 (atoms 1-2)
+        // 3. c5-c6 (atoms 2-3)
+        IAtomContainer mol = builder.newAtomContainer();
+        IAtom c3 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
+        IAtom c4 = new Atom("C", new Point3d(1.5, 0.0, 0.0));
+        IAtom c5 = new Atom("C", new Point3d(3.0, 0.0, 0.0));
+        IAtom c6 = new Atom("C", new Point3d(4.5, 0.0, 0.0));
+        mol.addAtom(c3);
+        mol.addAtom(c4);
+        mol.addAtom(c5);
+        mol.addAtom(c6);
+        mol.addBond(new Bond(c3, c4));
+        mol.addBond(new Bond(c4, c5));
+        mol.addBond(new Bond(c5, c6));
+        
+        // Find all unique atom mappings
+        List<Map<IAtom, IAtom>> mappings = MoleculeUtils.findUniqueAtomMappings(
+                substructure, mol, logger);
+        
+        // Should find multiple mappings (at least 3, one for each C-C bond)
+        assertNotNull(mappings, "Mappings list should not be null");
+        assertTrue(mappings.size() > 1, 
+                "Should find more than one mapping when substructure appears multiple times. " +
+                "Found: " + mappings.size());
+        
+        // Verify each mapping contains 2 atoms (the C-C pair)
+        for (Map<IAtom, IAtom> mapping : mappings)
+        {
+            assertEquals(2, mapping.size(), 
+                    "Each mapping should contain exactly 2 atoms");
+            assertTrue(mapping.containsKey(c1), 
+                    "Each mapping should contain the first carbon from substructure");
+            assertTrue(mapping.containsKey(c2), 
+                    "Each mapping should contain the second carbon from substructure");
+            
+            // Verify the mapped atoms are carbons and are bonded
+            IAtom mappedC1 = mapping.get(c1);
+            IAtom mappedC2 = mapping.get(c2);
+            assertNotNull(mappedC1, "Mapped atom should not be null");
+            assertNotNull(mappedC2, "Mapped atom should not be null");
+            assertEquals("C", mappedC1.getSymbol(), "Mapped atom should be carbon");
+            assertEquals("C", mappedC2.getSymbol(), "Mapped atom should be carbon");
+            
+            IBond bond = mol.getBond(mappedC1, mappedC2);
+            assertNotNull(bond, "Mapped atoms should be bonded in the target molecule");
+        }
+        
+        // Verify that we have distinct mappings (different atom pairs)
+        // Count unique pairs of mapped atoms
+        Set<String> uniquePairs = new HashSet<>();
+        for (Map<IAtom, IAtom> mapping : mappings)
+        {
+            IAtom mappedC1 = mapping.get(c1);
+            IAtom mappedC2 = mapping.get(c2);
+            // Create a unique identifier for the pair (sorted to handle both directions)
+            String pairId = mappedC1.getIndex() < mappedC2.getIndex() 
+                    ? mappedC1.getIndex() + "-" + mappedC2.getIndex()
+                    : mappedC2.getIndex() + "-" + mappedC1.getIndex();
+            uniquePairs.add(pairId);
+        }
+        
+        assertTrue(uniquePairs.size() > 1, 
+                "Should have multiple distinct atom pair mappings. " +
+                "Found " + uniquePairs.size() + " unique pairs");
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFindShortestPath() throws Exception
+    {
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        
+        // Create a simple chain molecule: C-C-C-C-C
+        IAtomContainer mol = builder.newAtomContainer();
+        IAtom c1 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
+        IAtom c2 = new Atom("C", new Point3d(1.0, 0.0, 0.0));
+        IAtom c3 = new Atom("C", new Point3d(2.0, 0.0, 0.0));
+        IAtom c4 = new Atom("C", new Point3d(3.0, 0.0, 0.0));
+        IAtom c5 = new Atom("C", new Point3d(4.0, 0.0, 0.0));
+        mol.addAtom(c1);
+        mol.addAtom(c2);
+        mol.addAtom(c3);
+        mol.addAtom(c4);
+        mol.addAtom(c5);
+        mol.addBond(new Bond(c1, c2));
+        mol.addBond(new Bond(c2, c3));
+        mol.addBond(new Bond(c3, c4));
+        mol.addBond(new Bond(c4, c5));
+        
+        // Create vertex ID map (all same vertex ID for simple path)
+        Map<IAtom, Long> atomToVertexId = new HashMap<>();
+        atomToVertexId.put(c1, 1L);
+        atomToVertexId.put(c2, 1L);
+        atomToVertexId.put(c3, 1L);
+        atomToVertexId.put(c4, 1L);
+        atomToVertexId.put(c5, 1L);
+        
+        // Test path from c1 to c5 (should be c1-c2-c3-c4-c5)
+        List<IAtom> path = MoleculeUtils.findShortestPath(mol, c1, c5, atomToVertexId);
+        assertNotNull(path, "Path should not be null");
+        assertEquals(5, path.size(), "Path should contain 5 atoms");
+        assertEquals(c1, path.get(0), "First atom should be c1");
+        assertEquals(c2, path.get(1), "Second atom should be c2");
+        assertEquals(c3, path.get(2), "Third atom should be c3");
+        assertEquals(c4, path.get(3), "Fourth atom should be c4");
+        assertEquals(c5, path.get(4), "Fifth atom should be c5");
+        
+        // Test path from c2 to c4 (should be c2-c3-c4)
+        List<IAtom> path2 = MoleculeUtils.findShortestPath(mol, c2, c4, atomToVertexId);
+        assertNotNull(path2, "Path should not be null");
+        assertEquals(3, path2.size(), "Path should contain 3 atoms");
+        assertEquals(c2, path2.get(0), "First atom should be c2");
+        assertEquals(c3, path2.get(1), "Second atom should be c3");
+        assertEquals(c4, path2.get(2), "Third atom should be c4");
+        
+        // Test path from atom to itself (should return empty list)
+        List<IAtom> path3 = MoleculeUtils.findShortestPath(mol, c3, c3, atomToVertexId);
+        assertNotNull(path3, "Path should not be null");
+        assertTrue(path3.isEmpty(), "Path from atom to itself should be empty");
+        
+        // Test with different vertex IDs (should still find path)
+        Map<IAtom, Long> atomToVertexId2 = new HashMap<>();
+        atomToVertexId2.put(c1, 1L);
+        atomToVertexId2.put(c2, 1L);
+        atomToVertexId2.put(c3, 2L); // Different vertex ID
+        atomToVertexId2.put(c4, 2L);
+        atomToVertexId2.put(c5, 2L);
+        
+        // Path from c1 to c5 should still work (boundary transition allowed)
+        List<IAtom> path4 = MoleculeUtils.findShortestPath(mol, c1, c5, atomToVertexId2);
+        assertNotNull(path4, "Path should not be null");
+        assertEquals(5, path4.size(), "Path should contain 5 atoms even with different vertex IDs");
     }
     
 //------------------------------------------------------------------------------

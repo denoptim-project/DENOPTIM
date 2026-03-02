@@ -21,6 +21,7 @@ package denoptim.utils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +38,7 @@ import org.openscience.cdk.Atom;
 import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.AtomRef;
 import org.openscience.cdk.CDKConstants;
+import org.openscience.cdk.Mapping;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.aromaticity.Kekulization;
 import org.openscience.cdk.config.IsotopeFactory;
@@ -1271,22 +1273,29 @@ public class MoleculeUtils
 //------------------------------------------------------------------------------
     
     /**
-     * Calculates the bond angle agreement score between a template molecule and
-     * a matched molecule. Lower scores indicate better agreement.
-     * The score includes both bond angle differences and chirality-sensitive terms
-     * (scalar triple product) to distinguish between enantiomeric mappings.
+     * Calculates bond angle agreement and returns raw data.
      * @param templateMol the template molecule
-     * @param mol the matched molecule
-     * @param templateToMolMap mapping from template atoms to matched molecule atoms
-     * @return the combined score (angle differences + chirality penalty)
+     * @param mol the target molecule
+     * @param templateToMolMap the atom mapping
+     * @return double array with [totalAngleDifference, angleCount, totalChiralityPenalty, chiralityCount]
+     *         Returns null if calculation fails (incomplete mapping with angles expected)
      */
-    public static double calculateBondAngleAgreement(IAtomContainer templateMol,
+    public static double[] calculateBondAngleAgreement(IAtomContainer templateMol,
         IAtomContainer mol, Map<IAtom, IAtom> templateToMolMap)
     {
         double totalAngleDifference = 0.0;
         int angleCount = 0;
         double totalChiralityPenalty = 0.0;
         int chiralityCount = 0;
+        boolean hasAngles = false;
+
+        for (IAtom templateAtom : templateMol.atoms())
+        {
+            if (templateAtom.getBondCount() > 1)
+            {
+                hasAngles = true;
+            }
+        }
         
         // For each atom in the template, calculate bond angles and chirality
         for (IAtom templateAtom : templateMol.atoms())
@@ -1319,7 +1328,7 @@ public class MoleculeUtils
             
             if (molNeighbors.size() < 2)
                 continue;
-            
+
             // Calculate all bond angles in the template
             for (int i = 0; i < templateNeighbors.size(); i++)
             {
@@ -1426,13 +1435,50 @@ public class MoleculeUtils
             }
         }
         
-        // If no valid comparisons could be made (incomplete mapping), return MAX_VALUE
+        // If no valid comparisons could be made (incomplete mapping), return null if angles expected
         if (angleCount == 0 && chiralityCount == 0)
+        {
+            if (hasAngles)
+            {
+                return null; // Indicates failure
+            }
+            else
+            {
+                // No angles expected, return zero values
+                return new double[]{0.0, 0.0, 0.0, 0.0};
+            }
+        }
+        
+        // Return array: [totalAngleDifference, angleCount, totalChiralityPenalty, chiralityCount]
+        return new double[]{totalAngleDifference, angleCount, totalChiralityPenalty, chiralityCount};
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Normalizes the raw bond angle agreement data to a single score.
+     * @param rawData array with [totalAngleDifference, angleCount, totalChiralityPenalty, chiralityCount]
+     * @return normalized score, or Double.MAX_VALUE if rawData is null
+     */
+    public static double normalizeBondAngleScore(double[] rawData)
+    {
+        if (rawData == null)
         {
             return Double.MAX_VALUE;
         }
         
-        // Combine angle difference and chirality penalty
+        double totalAngleDifference = rawData[0];
+        double angleCount = rawData[1];
+        double totalChiralityPenalty = rawData[2];
+        double chiralityCount = rawData[3];
+        
+        // If no valid comparisons could be made
+        if (angleCount == 0 && chiralityCount == 0)
+        {
+            return 0.0;
+        }
+        
+        // Combine angle difference and chirality penalty (normalized)
         double angleScore = angleCount > 0 ? totalAngleDifference / angleCount : 0.0;
         double chiralityScore = chiralityCount > 0 ? totalChiralityPenalty / chiralityCount : 0.0;
         
@@ -1445,12 +1491,42 @@ public class MoleculeUtils
 
     /**
      * Finds the maximum common substructure (MCS) between two molecules.
-     * @param substructure the template molecule
+     * @param substructure the substructure to search for in the target molecule
      * @param mol the target molecule to search in
      * @param logger logger for reporting
-     * @return the maximum common substructure as an IAtomContainer, or null if none found
+     * @return the atom mapping as a Map<IAtom,IAtom> (key: substructure atom, 
+     * value: mol atom), or an empty map if none found
      */
-    public static Map<IAtom,IAtom> findAtomMapping(
+    public static Map<IAtom,IAtom> findBestAtomMapping(
+            IAtomContainer substructure, IAtomContainer mol, Logger logger)
+    {
+        List<Map<IAtom,IAtom>> uniqueAtomMappings = findUniqueAtomMappings(substructure, mol, logger);
+        double bestScore = Double.MAX_VALUE;
+        Map<IAtom,IAtom> bestTemplateToMolMap = new HashMap<>();
+        for (Map<IAtom,IAtom> templateToMolMap : uniqueAtomMappings)
+        {
+            double[] rawData = calculateBondAngleAgreement(substructure, mol, templateToMolMap);
+            double score = normalizeBondAngleScore(rawData);
+            if (score < bestScore)
+            {
+                bestScore = score;
+                bestTemplateToMolMap = templateToMolMap;
+            }
+        }
+        return bestTemplateToMolMap;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Finds the maximum common substructure (MCS) between two molecules.
+     * @param substructure the substructure to search for in the target molecule
+     * @param mol the target molecule to search in
+     * @param logger logger for reporting
+     * @return the atom mapping as a Map<IAtom,IAtom> (key: substructure atom, 
+     * value: mol atom), or an empty map if none found
+     */
+    public static List<Map<IAtom,IAtom>> findUniqueAtomMappings(
             IAtomContainer substructure, IAtomContainer mol, Logger logger)
     {
         try
@@ -1469,48 +1545,194 @@ public class MoleculeUtils
             {
                 // Template is not a substructure, try to find MCS using SMSD if available
                 // For now, return null - could be enhanced with SMSD library
-                return new HashMap<>();
+                return new ArrayList<>();
             }
             
             // Get all matching substructures
             Mappings mappings = pattern.matchAll(mol);
             if (!mappings.iterator().hasNext())
             {
-                return new HashMap<>();
+                return new ArrayList<>();
             }
             
-            // Find the best mapping based on bond angle agreement
-            Map<IAtom, IAtom> bestTemplateToMolMap = new HashMap<>();
-            double bestScore = Double.MAX_VALUE;
-            
+            // Find unique mappings based on which target atoms are mapped to
+            // Use a sorted list of target atom indices as the key to identify unique mappings
+            // This is more reliable than using Set<IAtom> as a HashMap key
+            Map<String,Map<IAtom,IAtom>> uniqueAtomMappingsByKey = new HashMap<>();
+            Map<String,Double> bestScores = new HashMap<>();
+            // Track "bad" atom assignments: when we find a better mapping, we identify
+            // which specific template->target atom assignments were in the worse mapping
+            // and skip future mappings that have those same problematic assignments
+            Map<String,Set<String>> badAssignmentsByKey = new HashMap<>();
             for (int[] mapping : mappings)
             {
-                // Build atom mapping for this mapping
-                Map<IAtom, IAtom> templateToMolMap = new HashMap<>();
-                for (int i = 0; i < mapping.length; i++)
+                try
                 {
-                    templateToMolMap.put(substructure.getAtom(i), mol.getAtom(mapping[i]));
+                    // Build atom mapping for this mapping
+                    Map<IAtom, IAtom> templateToMolMap = new HashMap<>();
+                    List<Integer> targetIndices = new ArrayList<>();
+                    for (int i = 0; i < mapping.length; i++)
+                    {
+                        IAtom templateAtom = substructure.getAtom(i);
+                        IAtom targetAtom = mol.getAtom(mapping[i]);
+                        templateToMolMap.put(templateAtom, targetAtom);
+                        targetIndices.add(mapping[i]);
+                    }
+                    // Create a unique key from sorted target atom indices
+                    Collections.sort(targetIndices);
+                    String key = targetIndices.toString();
+                    
+                    // Check if this mapping has any "bad" assignments we've identified
+                    // for this target atom set
+                    if (badAssignmentsByKey.containsKey(key))
+                    {
+                        Set<String> badAssignments = badAssignmentsByKey.get(key);
+                        boolean hasBadAssignment = false;
+                        for (Map.Entry<IAtom, IAtom> entry : templateToMolMap.entrySet())
+                        {
+                            // Create a signature for this template->target assignment
+                            String assignment = entry.getKey().getIndex() + "->" + entry.getValue().getIndex();
+                            if (badAssignments.contains(assignment))
+                            {
+                                hasBadAssignment = true;
+                                break;
+                            }
+                        }
+                        if (hasBadAssignment)
+                        {
+                            // Skip this mapping - it has a known bad assignment
+                            continue;
+                        }
+                    }
+                    
+                    // Calculate bond angle agreement score
+                    double[] rawData = calculateBondAngleAgreement(substructure, mol, templateToMolMap);
+                    double score = normalizeBondAngleScore(rawData);
+                    
+                    // Keep the mapping with the best score for each unique set of target atoms
+                    if (!bestScores.containsKey(key) || score < bestScores.get(key))
+                    {
+                        // If we're replacing a previous mapping, identify the bad assignments
+                        if (bestScores.containsKey(key) && uniqueAtomMappingsByKey.containsKey(key))
+                        {
+                            Map<IAtom, IAtom> previousMapping = uniqueAtomMappingsByKey.get(key);
+                            Set<String> badAssignments = badAssignmentsByKey.computeIfAbsent(key, k -> new HashSet<>());
+                            
+                            // Find assignments that were in the previous (worse) mapping but not in the new (better) one
+                            for (Map.Entry<IAtom, IAtom> entry : previousMapping.entrySet())
+                            {
+                                IAtom templateAtom = entry.getKey();
+                                IAtom oldTargetAtom = entry.getValue();
+                                IAtom newTargetAtom = templateToMolMap.get(templateAtom);
+                                
+                                // If this template atom maps to a different target atom in the better mapping,
+                                // the old assignment was a "mistake"
+                                if (!oldTargetAtom.equals(newTargetAtom))
+                                {
+                                    String badAssignment = templateAtom.getIndex() + "->" + oldTargetAtom.getIndex();
+                                    badAssignments.add(badAssignment);
+                                }
+                            }
+                        }
+                        
+                        bestScores.put(key, score);
+                        uniqueAtomMappingsByKey.put(key, templateToMolMap);
+                    }
                 }
-                
-                // Calculate bond angle agreement score
-                double score = calculateBondAngleAgreement(substructure, mol, templateToMolMap);
-                
-                if (score < bestScore)
+                catch (Exception e)
                 {
-                    bestScore = score;
-                    bestTemplateToMolMap = templateToMolMap;
+                    // Log but continue processing other mappings
+                    logger.log(Level.FINE, "Error processing mapping: " + e.getMessage());
                 }
             }
 
-            return bestTemplateToMolMap;
+            return new ArrayList<>(uniqueAtomMappingsByKey.values());
         }
         catch (Exception e)
         {
             logger.log(Level.WARNING, "Error finding MCS: " + e.getMessage());
-            return new HashMap<>();
+            return new ArrayList<>();
         }
     }
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Finds the shortest path between two atoms in a molecule using BFS.
+     * Only considers paths where all atoms have the same vertex ID or are boundary atoms.
+     * @param mol the molecule
+     * @param start the starting atom
+     * @param end the ending atom
+     * @param atomToVertexId map from atoms to their vertex IDs
+     * @return the shortest path as a list of atoms, or null if no path exists
+     */
+    public static List<IAtom> findShortestPath(IAtomContainer mol, IAtom start, 
+            IAtom end, Map<IAtom, Long> atomToVertexId)
+    {
+        if (start.equals(end))
+        {
+            return new ArrayList<>();
+        }
+        
+        // BFS to find shortest path
+        Map<IAtom, IAtom> parent = new HashMap<>();
+        Set<IAtom> visited = new HashSet<>();
+        List<IAtom> queue = new ArrayList<>();
+        
+        queue.add(start);
+        visited.add(start);
+        parent.put(start, null);
+        
+        while (!queue.isEmpty())
+        {
+            IAtom current = queue.remove(0);
+            
+            if (current.equals(end))
+            {
+                // Reconstruct path
+                List<IAtom> path = new ArrayList<>();
+                IAtom node = end;
+                while (node != null)
+                {
+                    path.add(0, node);
+                    node = parent.get(node);
+                }
+                return path;
+            }
+            
+            List<IAtom> neighbors = mol.getConnectedAtomsList(current);
+            for (IAtom neighbor : neighbors)
+            {
+                if (!visited.contains(neighbor))
+                {
+                    // Only traverse if same vertex ID or if we're at a boundary
+                    Long currentVid = atomToVertexId.get(current);
+                    Long neighborVid = atomToVertexId.get(neighbor);
+                    
+                    if (currentVid != null && neighborVid != null)
+                    {
+                        // Allow traversal if same vertex ID, or if moving to/from boundary
+                        boolean canTraverse = currentVid.equals(neighborVid);
+                        if (!canTraverse)
+                        {
+                            // Check if this is a boundary transition (both are boundary atoms)
+                            // This is already handled by the boundary detection, so allow it
+                            canTraverse = true;
+                        }
+                        
+                        if (canTraverse)
+                        {
+                            visited.add(neighbor);
+                            parent.put(neighbor, current);
+                            queue.add(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return null; // No path found
+    }
 }
+
+//------------------------------------------------------------------------------

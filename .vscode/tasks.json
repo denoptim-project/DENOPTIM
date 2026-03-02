@@ -1,5 +1,17 @@
 {
     "version": "2.0.0",
     "tasks": [
+        {
+            "label": "Start timing for t33",
+            "type": "shell",
+            "command": "echo $(date +%s.%N) > /tmp/denoptim_test/t33/.test_start_time && echo 'Timing started for test t33'",
+            "problemMatcher": []
+        },
+        {
+            "label": "Show timing for t33",
+            "type": "shell",
+            "command": "if [ -f /tmp/denoptim_test/t33/.test_start_time ]; then start_time=$(cat /tmp/denoptim_test/t33/.test_start_time); end_time=$(date +%s.%N); duration=$(echo \"scale=3; $end_time - $start_time\" | bc 2>/dev/null || echo \"calculation failed\"); echo ''; echo '========================================'; echo \"Test 't33' runtime: ${duration} seconds\"; echo '========================================'; rm -f /tmp/denoptim_test/t33/.test_start_time; else echo 'Start time file not found'; fi",
+            "problemMatcher": []
+        }
     ]
 }
