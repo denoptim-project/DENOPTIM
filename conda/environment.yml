@@ -6,3 +6,4 @@ dependencies:
   - openjdk=17.*
   - anaconda-client
   - conda-build
+  - conda-libmamba-solver
