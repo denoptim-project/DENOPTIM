@@ -86,10 +86,10 @@ do
     echo "3DB-RCOServerPort=$PORT" >> "$dnpParams"
     echo "3DB-workDir=$wrkDir" >> "$dnpParams"
 
-    if [ "$fname" = "MOL000009" ]; then
+    if [ "$fname" = "Mol9" ]; then
        # Ring closing settings
         echo "RC-CloseRings"  >> "$dnpParams"
-        echo "FS-rotConstrDefFile=input/MOL000009_tor_cnstr" >> "$dnpParams"
+        echo "FS-rotConstrDefFile=input/Mol9_tor_cnstr" >> "$dnpParams"
     fi
 
     #run builder
@@ -133,7 +133,7 @@ do
     fi 
     compareElementalAnalysis "$outSDF" "$expRes"
 
-    if [ "$fname" = "MOL000009" ]; then
+    if [ "$fname" = "Mol9" ]; then
         if ! grep -q 'Constraining dihedral along bond Ru3-C7' "$logFile"; then
             echo "Cannot find traces of constrained dihedral"
             exit 1
