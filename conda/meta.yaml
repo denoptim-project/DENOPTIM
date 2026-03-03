@@ -19,6 +19,7 @@ requirements:
     - openjdk =={{ openjdk_version }}
     - python
     - py4j
+    - ringclosingmm
 
 test:
   commands:
