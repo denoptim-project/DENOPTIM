@@ -37,7 +37,6 @@ import denoptim.files.FileUtils;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.rings.RingClosureParameters;
-import denoptim.io.DenoptimIO;
 import denoptim.main.Main.RunType;
 import denoptim.programs.combinatorial.CEBLParameters;
 import denoptim.programs.denovo.GAParameters;

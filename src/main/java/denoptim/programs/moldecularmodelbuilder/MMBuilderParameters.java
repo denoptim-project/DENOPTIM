@@ -124,7 +124,7 @@ public class MMBuilderParameters extends RunTimeParameters
     protected int atomOrderingScheme = 1;
 
     /**
-     * Atom type map
+     * Atom type map for Tinker
      */    
     protected HashMap<String, Integer> TINKER_MAP;
 
@@ -142,7 +142,16 @@ public class MMBuilderParameters extends RunTimeParameters
      * Pathname of output SDF file
      */
     protected String outSDFFile;
-    
+
+    /**
+     * Hostname of the RCOServer
+     */
+    protected String rcoServerHostname = "localhost";
+
+    /**
+     * Port of the RCOServer
+     */
+    protected Integer rcoServerPort = 5972;
 
 //------------------------------------------------------------------------------
     
@@ -280,6 +289,18 @@ public class MMBuilderParameters extends RunTimeParameters
         return workDir;
     }
 
+//------------------------------------------------------------------------------
+
+    public String getRCOServerHostname() {
+        return rcoServerHostname;
+    }
+
+//------------------------------------------------------------------------------
+
+    public Integer getRCOServerPort() {
+        return rcoServerPort;
+    }
+
 //-----------------------------------------------------------------------------
 
     /**
@@ -290,7 +311,7 @@ public class MMBuilderParameters extends RunTimeParameters
      */
 
     public void interpretKeyword(String key, String value)
-                                                      throws DENOPTIMException
+        throws DENOPTIMException
     {
         String msg = "";
         switch (key.toUpperCase())
@@ -356,6 +377,13 @@ public class MMBuilderParameters extends RunTimeParameters
         case "WORKDIR=":
             workDir = value;
             break;
+        case "RCOSERVERHOSTNAME=":
+            rcoServerHostname = value;
+            break;
+        case "RCOSERVERPORT=":
+            rcoServerPort = Integer.parseInt(value);
+            break;
+
 /*
         case "=":
             = value;
@@ -384,25 +412,6 @@ public class MMBuilderParameters extends RunTimeParameters
         ensureFileExists(inpSDFFile);
 
         ensureNotNull("outSDFFile",outSDFFile,"OUTSDF");
-
-        ensureNotNull("toolPSSROT",toolPSSROT,"TOOLPSSROT");
-        ensureFileExists(toolPSSROT);
-
-        ensureNotNull("toolXYZINT",toolXYZINT,"TOOLXYZINT");
-        ensureFileExists(toolXYZINT);
-
-        ensureNotNull("toolINTXYZ",toolINTXYZ,"TOOLINTXYZ");
-        ensureFileExists(toolINTXYZ);
-
-        ensureNotNull("forceFieldFile",forceFieldFile,"FORCEFIELDFILE");
-        ensureFileExists(forceFieldFile);
-
-        ensureNotNull("keyFile",keyFile,"KEYFILE");
-        ensureFileExists(keyFile);
-
-        ensureNotNull("pssrotFile",pssrotFile,"PSSROTPARAMS");
-        ensureFileExists(pssrotFile);
-
 
         if (atomOrderingScheme < 1 || atomOrderingScheme > 2)
         {
@@ -456,22 +465,31 @@ public class MMBuilderParameters extends RunTimeParameters
         rsPssrotParams_Rest = new ArrayList<>();
         rsKeyFileParams = new ArrayList<>();
         
-        MMBuilderUtils.readKeyFileParams(keyFile, keyFileParams);
-        TinkerUtils.readPSSROTParams(pssrotFile, pssrotParams_Init, 
-                                                             pssrotParams_Rest);
-        TINKER_MAP = TinkerUtils.readTinkerAtomTypes(forceFieldFile);
+        if (keyFile!=null)
+        {
+            MMBuilderUtils.readKeyFileParams(keyFile, keyFileParams);
+        }
+        if (pssrotFile!=null)
+        {
+            TinkerUtils.readPSSROTParams(pssrotFile, pssrotParams_Init, 
+                    pssrotParams_Rest);
+        }
+        if (forceFieldFile!=null)
+        {
+            TINKER_MAP = TinkerUtils.readTinkerAtomTypes(forceFieldFile);
+        }
 
         if (otherParameters.containsKey(ParametersType.RC_PARAMS))
         {
-            if (rsPssrotFile==null)
-                throw new DENOPTIMException("Missing template for settings of "
-                        + "ring-closing PSSROT jobs.");
-            TinkerUtils.readPSSROTParams(rsPssrotFile, rsPssrotParams_Init, 
+            if (rsPssrotFile!=null)
+            {
+                TinkerUtils.readPSSROTParams(rsPssrotFile, rsPssrotParams_Init, 
                                                            rsPssrotParams_Rest);
-            if (rsKeyFile==null)
-                throw new DENOPTIMException("Missing template of "
-                        + "ring-closing PSSROT key file.");
-            MMBuilderUtils.readKeyFileParams(rsKeyFile, rsKeyFileParams);
+            }
+            if (rsKeyFile!=null)
+            {
+                MMBuilderUtils.readKeyFileParams(rsKeyFile, rsKeyFileParams);
+            }
         }
         processOtherParameters();
     }

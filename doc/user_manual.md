@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.4.2, October 2025_
+_Version 4.5.0, March 2026_
 
 
 [TOC]
@@ -406,8 +406,6 @@ denoptim -r B3D input_parameters_file
 ```
 where `input_parameters_file` is a text parameters file with the [Keywords](#Keywords) providing all input parameters.
 
-**WARNING:** This program requires [Tinker Molecular Modeling software](https://dasher.wustl.edu/tinker/) to be installed on the system. The user is responsible for installing Tinker in accordance with its license terms. Furthermore, the ring-closing conformational search requires a customized version of Tinker. Contact [denoptim.project@gmail.com](mailto:denoptim.project@gmail.com) for instructions on how to modify Tinker and use the customized version in accordance with Tinker license's terms.
-
 ## Graph Isomorphism Analyzer {#GraphIsomorphism}
 
 This is a program that analyzes graph aiming to detect "DENOPTIM-isomorphism". "DENOPTIM-isomorphic" is a DENOPTIM-specific definition of [graph isomorphism](https://mathworld.wolfram.com/IsomorphicGraphs.html) that differs from the most common meaning of isomorphism in graph theory. In general, graphs are considered undirected when evaluating DENOPTIM-isomorphism. Next, since a graph is effectively a spanning tree (ST<sub>i</sub>={{vertices}, {acyclic edges}}) with a set of fundamental cycles (FC<sub>i</sub>={C<sub>1</sub>, C<sub>2</sub>,...C<sub>n</sub>}), any graph G={ST<sub>i</sub>,FC<sub>i</sub>} that contains one or more cycles can be represented in multiple ways, G={ST<sub>j</sub>,FC<sub>j</sub>} or G={ST<sub>k</sub>,FC<sub>k</sub>}, that differ by the position of the chord/s and by the corresponding pair of ring-closing vertices between each chord defined. The DENOPTIM-isomorphism for two graphs G1 and G2 is given by the common graph theory isomorphism between two undirected graphs U1 and U2 built respectively from G1 and G2.
@@ -612,14 +610,17 @@ The following tables list all the keywords grouped according to the main functio
 |`3DB-OutSDF`| Specifies the pathname of the output SDF file that will contain the generated conformation. __[REQUIRED]__|
 |`3DB-KeepDummyAtoms`| Dummy atoms are used to handle linearities and multi-hapto bonds. By default all dummy atoms are removed before returning the final structure. This keyword prevents removal of the dummy atoms. No value needed.|
 |`3DB-Verbosity`| Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
-|__Interface__||
-|`3DB-ToolPSSROT`| Specifies the pathname of Tinker’s `pssrot` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
-|`3DB-ToolXYZINT`| Specifies the pathname of Tinker’s `xyzint` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
-|`3DB-ToolINTXYZ`| Specifies the pathname of Tinker’s `intxyz` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). __[REQUIRED]__|
-|`3DB-ForceFieldFile`| Specifies the pathname of the file that defines Tinker’s force field parameters (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/uff_vdw.prm __[REQUIRED]__|
-|`3DB-KeyFile`| Specifies the pathname of the file with Tinker’s keywords (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/build_uff.key __[REQUIRED]__|
+|__RCO Service__||
+|`3DB-RCOServerHostName`| Specifies a custom hostname for the ring-closing molecular modeling service (see [RingClosingMM](https://github.com/denoptim-project/RingClosingMM)). By default we use `localhost`.|
+|`3DB-RCOServerPort`| Specifies a custom port for the ring-closing molecular modeling service  (see [RingClosingMM](https://github.com/denoptim-project/RingClosingMM)). By default we use port 5972.|
+|__Tinker Interface__||
+|`3DB-ToolPSSROT`| Specifies the pathname of Tinker’s `pssrot` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)).|
+|`3DB-ToolXYZINT`| Specifies the pathname of Tinker’s `xyzint` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)).|
+|`3DB-ToolINTXYZ`| Specifies the pathname of Tinker’s `intxyz` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)).|
+|`3DB-ForceFieldFile`| Specifies the pathname of the file that defines Tinker’s force field parameters (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/uff_vdw.prm|
+|`3DB-KeyFile`| Specifies the pathname of the file with Tinker’s keywords (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)). An example is available at src/main/resources/data/build_uff.key|
 |`3DB-RCKeyFile`| Specifies the pathname of the Tinker’s keywords used in ring-closing conformational searches (see [_J. Chem. Inf. Model._ **2015**, 55, 9 1844-1856](https://doi.org/10.1021/acs.jcim.5b00424))|
-|`3DB-PSSROTParams`| Specifies the pathname of a text file with the command line arguments for standard conformational search with Tinker’s `pssrot`. An example is available at `src/main/resources/data/submit_pssrot` __[REQUIRED]__|
+|`3DB-PSSROTParams`| Specifies the pathname of a text file with the command line arguments for standard conformational search with Tinker’s `pssrot`. An example is available at `src/main/resources/data/submit_pssrot`|
 |`3DB-RCPSSROTParams`| Specifies the pathname of a text file with the command line arguments for ring-closing conformational search with Tinker’s `pssrot` (see [_J. Chem. Inf. Model._ **2015**, 55, 9 1844-1856](https://doi.org/10.1021/acs.jcim.5b00424)).|
 
 

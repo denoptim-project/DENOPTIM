@@ -29,7 +29,6 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
-import denoptim.integration.tinker.TinkerException;
 import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.MultiMolecularModelBuilder;
 import denoptim.task.ProgramTask;
@@ -106,16 +105,7 @@ public class MolecularModelBuilder extends ProgramTask
             }
             DenoptimIO.writeSDFFile(mmbParams.getOutputSDFFile(), nmols);
             normalTerm = true;
-        } catch (TinkerException te)
-        {
-            String msg = "ERROR! Tinker failed on task '" + te.taskName 
-                    + "'!";
-            if (te.solution != "")
-            {
-                msg = msg + NL + te.solution;
-            }
-            mmbParams.getLogger().log(Level.SEVERE, msg);
-        } 
+        }
         catch (Exception de)
         {
             de.printStackTrace(System.err);

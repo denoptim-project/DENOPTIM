@@ -547,5 +547,10 @@ public final class DENOPTIMConstants
      * for bridge formation on side 'B'
      */
     public static final String VRTPROPBRIDGEEND_B = "VRTPROPBRIDGEEND_B";
+
+    /**
+     * NAme of the property used to hold atom types, if any.
+     */
+    public static final Object ATMPROPATOMTYPE = null;
     
 }

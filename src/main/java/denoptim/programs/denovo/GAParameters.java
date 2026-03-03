@@ -33,7 +33,6 @@ import denoptim.graph.rings.RingClosureParameters;
 import denoptim.logging.Monitor;
 import denoptim.logging.StaticLogger;
 import denoptim.programs.RunTimeParameters;
-import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.utils.MutationType;
 
 

@@ -1,6 +1,7 @@
 name: dnp_devel
 channels:
   - conda-forge
+  - denoptim-project
 dependencies:
   - openjdk=17.*
   - maven
@@ -8,3 +9,4 @@ dependencies:
   - py4j
   - doxygen
   - graphviz
+  - ringclosingmm

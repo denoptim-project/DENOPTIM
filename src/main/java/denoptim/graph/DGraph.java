@@ -6956,7 +6956,7 @@ public class DGraph implements Cloneable
 
     /**
      * Reads a JSON string and returns an instance of this class.
-     * @param json the string to parse.
+     * @param re the string to parse.
      * @return a new instance of this class.
      */
 

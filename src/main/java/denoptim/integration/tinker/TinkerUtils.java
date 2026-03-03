@@ -25,25 +25,16 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.io.input.ReversedLinesFileReader;
-import org.openscience.cdk.interfaces.IAtom;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 
-import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.molecularmodeling.MMBuilderUtils;
-import denoptim.utils.ConnectedLigand;
-import denoptim.utils.ConnectedLigandComparator;
+import denoptim.molecularmodeling.zmatrix.ZMatrix;
+import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;
 import denoptim.utils.GeneralUtils;
-import denoptim.utils.MathUtils;
-import denoptim.utils.MoleculeUtils;
-import denoptim.utils.ObjectPair;
-import denoptim.utils.RotationalSpaceUtils;
 
 
 /**
@@ -108,14 +99,13 @@ public class TinkerUtils
      * @param filename
      */
 
-    public static TinkerMolecule readTinkerIC(String filename)
-                                                      throws DENOPTIMException
+    public static ZMatrix readTinkerINT(String filename) throws DENOPTIMException
     {
         BufferedReader br = null;
         String line = null;
         int natom = 0;
 
-        TinkerMolecule tinkermol = new TinkerMolecule();
+        ZMatrix zmat = new ZMatrix();
 
         try
         {
@@ -134,16 +124,8 @@ public class TinkerUtils
             if (arr.length >= 2)
             {
                 arr = line.split(" +", 2);
-                // set the name
-                //System.err.println("Name: " + arr[1]);
-                tinkermol.setName(arr[1]);
+                zmat.setId(arr[1]);
             }
-
-
-            ArrayList<int[]> zadd = new ArrayList<>();
-            ArrayList<int[]> zdel = new ArrayList<>();
-
-            ArrayList<TinkerAtom> lstAtom = new ArrayList<>();
 
             for (int i = 0; i < natom; i++)
             {
@@ -160,54 +142,46 @@ public class TinkerUtils
                     throw new DENOPTIMException(msg);
                 }
 
-                // Atom number, name, type
-                String name = arr[1];
-                int type = Integer.parseInt(arr[2]);
-                double zv[] = new double[3];
-                int zi[] = new int[4];
-                double d[] =
-                {
-                    0.0d, 0.0d, 0.0d
-                };
+                int id = Integer.parseInt(arr[0])-1;
+                String symbol = arr[1];
+                String type = arr[2];
+                ZMatrixAtom bndRef = null;
+                ZMatrixAtom angRef = null;
+                ZMatrixAtom ang2Ref = null;
+                Double bondLength = null;
+                Double angleValue = null;
+                Double angle2Value = null;
+                Integer chiralFlag = null;
 
                 // Bond partner and bond value
                 if (arr.length >= 5)
                 {
-                    zi[0] = Integer.parseInt(arr[3]);
-                    zv[0] = Double.parseDouble(arr[4]);
-                }
-                else
-                {
-                    zi[0] = 0;
-                    zv[0] = 0.0d;
+                    bndRef = zmat.getAtom(Integer.parseInt(arr[3])-1);
+                    bondLength = Double.parseDouble(arr[4]);
                 }
                 // Angle partner and angle value
                 if (arr.length >= 7)
                 {
-                    zi[1] = Integer.parseInt(arr[5]);
-                    zv[1] = Double.parseDouble(arr[6]);
-                }
-                else
-                {
-                    zi[1] = 0;
-                    zv[1] = 0.0d;
+                    angRef = zmat.getAtom(Integer.parseInt(arr[5])-1);
+                    angleValue = Double.parseDouble(arr[6]);
                 }
                 // Torsion partner and dihedral value
                 if (arr.length >= 10)
                 {
-                    zi[2] = Integer.parseInt(arr[7]);
-                    zv[2] = Double.parseDouble(arr[8]);
-                    zi[3] = Integer.parseInt(arr[9]);
+                    ang2Ref = zmat.getAtom(Integer.parseInt(arr[7])-1);
+                    angle2Value = Double.parseDouble(arr[8]);
+                    chiralFlag = Integer.parseInt(arr[9]);
                 }
-                else
+                ZMatrixAtom zatm = new ZMatrixAtom(id, symbol, type,
+                        bndRef, angRef, ang2Ref, 
+                        bondLength, angleValue, angle2Value, 
+                        chiralFlag);
+                zmat.addAtom(zatm);
+                if (bndRef!=null)
                 {
-                    zi[2] = 0;
-                    zv[2] = 0.0d;
-                    zi[3] = 0;
+                    zmat.addBond(zatm, bndRef);
                 }
-                TinkerAtom tkatm = new TinkerAtom(i + 1,name,type,d,zi,zv);
-                lstAtom.add(tkatm);
-            } // end for
+            }
 
             if (br.ready())
             {
@@ -230,14 +204,12 @@ public class TinkerUtils
                             arr = line.trim().split(" +");
                             if (arr.length != 2)
                             {
-                                String msg = "Check Bond Pair to Remove: " 
-                                    + (zadd.size() + 1) + " in " + filename;
+                                String msg = "Check Bond Pair to Remove: '" 
+                                    + line + "' in " + filename;
                                 throw new DENOPTIMException(msg);
                             }
-                            int pair[] = new int[2];
-                            pair[0] = Integer.parseInt(arr[0]);
-                            pair[1] = Integer.parseInt(arr[1]);
-                            zadd.add(pair);
+                            zmat.addBond(Integer.parseInt(arr[0])-1, 
+                                    Integer.parseInt(arr[1])-1);
                         }
                     }
                     // Parse bond pairs to be removed until EOF
@@ -247,20 +219,15 @@ public class TinkerUtils
                         arr = line.trim().split(" +");
                         if (arr.length != 2)
                         {
-                            String msg = "Check Bond Pair to Remove: " 
-                                    + (zadd.size() + 1) + " in " + filename;
+                            String msg = "Check Bond Pair to Remove: '" 
+                                    + line + "' in " + filename;
                             throw new DENOPTIMException(msg);
                         }
-                        int pair[] = new int[2];
-                        pair[0] = Integer.parseInt(arr[0]);
-                        pair[1] = Integer.parseInt(arr[1]);
-                        zdel.add(pair);
+                        zmat.delBond(Integer.parseInt(arr[0])-1, 
+                                Integer.parseInt(arr[1])-1);
                     }
                 }
             }
-
-            tinkermol.setAtoms(lstAtom);
-            tinkermol.setBondPairs(zdel, zadd);
         }
         catch (NumberFormatException | IOException nfe)
         {
@@ -281,7 +248,7 @@ public class TinkerUtils
             }
         }
 
-        return tinkermol;
+        return zmat;
     }
 
 //------------------------------------------------------------------------------
@@ -294,10 +261,10 @@ public class TinkerUtils
      * @throws DENOPTIMException
      */
     
-    public static ArrayList<double[]> readTinkerXYZ(String filename)
+    public static List<double[]> readTinkerXYZ(String filename)
                                                         throws DENOPTIMException
     {
-        ArrayList<double[]> coords = new ArrayList<>();
+        List<double[]> coords = new ArrayList<>();
 
         BufferedReader br = null;
         String line = null;
@@ -374,20 +341,20 @@ public class TinkerUtils
      * Write Tinker INT file.
      *
      * @param filename
-     * @param tmol
+     * @param zmat
      * @throws DENOPTIMException
      */
 
-    public static void writeIC(String filename, TinkerMolecule tmol)
+    public static void writeTinkerINT(String filename, ZMatrix zmat)
             throws DENOPTIMException
     {
         FileWriter fw = null;
         try
         {
             fw = new FileWriter(new File(filename));
-            int numatoms = tmol.getAtoms().size();
+            int numatoms = zmat.getAtoms().size();
             // write out the number of atoms and the title
-            String header = String.format("%6d  %s%n", numatoms, tmol.getName());
+            String header = String.format("%6d  %s%n", numatoms, zmat.getId());
             fw.write(header);
             fw.flush();
 
@@ -395,15 +362,13 @@ public class TinkerUtils
 
             for (int i = 0; i < numatoms; i++)
             {
-                TinkerAtom atom = tmol.getAtoms().get(i);
-                int[] d1 = atom.getAtomNeighbours();
-                double[] d2 = atom.getDistAngle();
-                // output of first three atoms is handled separately
+                ZMatrixAtom atom = zmat.getAtoms().get(i);
                 if (i == 0)
                 {
-                    line = String.format("%6d  %-3s%6d%n",
-                            atom.getXYZIndex(), atom.getAtomString(),
-                            atom.getAtomType());
+                    line = String.format("%6d  %-3s%6s%n",
+                            atom.getId()+1,  // 1-based indexing
+                            atom.getSymbol(),
+                            atom.getType());
                     fw.write(line);
                     fw.flush();
                 }
@@ -411,9 +376,11 @@ public class TinkerUtils
                 {
                     if (i == 1)
                     {
-                        line = String.format("%6d  %-3s%6d%6d%10.5f%n",
-                                atom.getXYZIndex(), atom.getAtomString(),
-                                atom.getAtomType(), d1[0], d2[0]);
+                        line = String.format("%6d  %-3s%6s%6d%10.5f%n",
+                                atom.getId()+1, atom.getSymbol(),
+                                atom.getType(), 
+                                zmat.getBondRefAtomIndex(i)+1, // 1-based indexing
+                                zmat.getBondLength(i));
                         fw.write(line);
                         fw.flush();
                     }
@@ -421,19 +388,28 @@ public class TinkerUtils
                     {
                         if (i == 2)
                         {
-                            line = String.format("%6d  %-3s%6d%6d%10.5f%6d%10.4f%n",
-                                    atom.getXYZIndex(), atom.getAtomString(),
-                                    atom.getAtomType(), d1[0], d2[0],
-                                    d1[1], d2[1]);
+                            line = String.format("%6d  %-3s%6s%6d%10.5f%6d%10.4f%n",
+                                    atom.getId()+1, atom.getSymbol(),
+                                    atom.getType(), 
+                                    zmat.getBondRefAtomIndex(i)+1,
+                                    zmat.getBondLength(i),
+                                    zmat.getAngleRefAtomIndex(i)+1,
+                                    zmat.getAngleValue(i));
                             fw.write(line);
                             fw.flush();
                         } // output the fourth through final atoms
                         else
                         {
-                            line = String.format("%6d  %-3s%6d%6d%10.5f%6d%10.4f%6d%10.4f%6d%n",
-                                    atom.getXYZIndex(), atom.getAtomString(),
-                                    atom.getAtomType(), d1[0], d2[0],
-                                    d1[1], d2[1], d1[2], d2[2], d1[3]);
+                            line = String.format("%6d  %-3s%6s%6d%10.5f%6d%10.4f%6d%10.4f%6d%n",
+                                    atom.getId()+1, atom.getSymbol(),
+                                    atom.getType(), 
+                                    zmat.getBondRefAtomIndex(i)+1,
+                                    zmat.getBondLength(i),
+                                    zmat.getAngleRefAtomIndex(i)+1,
+                                    zmat.getAngleValue(i),
+                                    zmat.getAngle2RefAtomIndex(i)+1,
+                                    zmat.getAngle2Value(i),
+                                    zmat.getChiralFlag(i));
                             fw.write(line);
                             fw.flush();
                         }
@@ -442,8 +418,8 @@ public class TinkerUtils
             }
 
             // addition and deletion of bonds as required
-            ArrayList<int[]> zadd = tmol.getBondAdd();
-            ArrayList<int[]> zdel = tmol.getBondDel();
+            List<int[]> zadd = zmat.getBondsToAdd();
+            List<int[]> zdel = zmat.getBondsToDel();
 
             if (zadd.size() > 0 || zdel.size() > 0)
             {
@@ -453,7 +429,7 @@ public class TinkerUtils
                 for (int i = 0; i < zadd.size(); i++)
                 {
                     int[] z = zadd.get(i);
-                    line = String.format("%6d%6d%n", z[0], z[1]);
+                    line = String.format("%6d%6d%n", z[0]+1, z[1]+1);
                     fw.write(line);
                     fw.flush();
                 }
@@ -466,7 +442,7 @@ public class TinkerUtils
                     for (int i = 0; i < zdel.size(); i++)
                     {
                         int[] z = zdel.get(i);
-                        line = String.format("%6d%6d%n", z[0], z[1]);
+                        line = String.format("%6d%6d%n", z[0]+1, z[1]+1);
                         fw.write(line);
                         fw.flush();
                     }
@@ -503,10 +479,10 @@ public class TinkerUtils
      * @return the list of energies
      * @throws DENOPTIMException
      */
-    public static ArrayList<Double> readPSSROTOutput(String filename)
+    public static List<Double> readPSSROTOutput(String filename)
             throws DENOPTIMException
     {
-        ArrayList<Double> energies = new ArrayList<>();
+        List<Double> energies = new ArrayList<>();
 
         BufferedReader br = null;
         String line;
@@ -563,7 +539,7 @@ public class TinkerUtils
      * @throws DENOPTIMException
      */
     public static void readPSSROTParams(String filename, 
-            ArrayList<String> initPars, ArrayList<String> restPars)
+            List<String> initPars, List<String> restPars)
                     throws DENOPTIMException
     {
         BufferedReader br = null;
@@ -715,393 +691,6 @@ public class TinkerUtils
         }
 
         return atomTypesMap;
-    }
-
-//------------------------------------------------------------------------------
- 
-    /**
-     * Convert {@link IAtomContainer} to {@link TinkerMolecule}.
-     * Supports only containers where all atoms are reachable following
-     * the connectivity and starting from any other atom in the container.
-     * @param mol the CDK molecule to convert
-     * @param tMap the atom type map
-     * @return the molecule represented by internal coordinates
-     */
-
-    public static TinkerMolecule getICFromIAC(IAtomContainer mol, 
-                       HashMap<String,Integer> tMap )  throws DENOPTIMException
-    {
-        TinkerMolecule tm = new TinkerMolecule();
-        String doneBnd = "visitedBond";
-        for (int i=0; i<mol.getAtomCount(); i++)
-        {
-            int i2 = 0;
-            int i3 = 0;
-            int i4 = 0;
-            int i5 = 0;
-            double d = 0.0;
-            double a = 0.0;
-            double t = 0.0;
-
-            int[] nbrs = new int[] {0, 0, 0, 0};
-
-            IAtom atmI = mol.getAtom(i);
-            if (debug)
-            {
-                System.err.println("Atom to IC: "
-                        +MoleculeUtils.getSymbolOrLabel(atmI)+" "+i);
-            }
-
-            // define the bond length
-            if (i>0)
-            {
-                i2 = getFirstRefAtomId(i,mol);
-                d = atmI.getPoint3d().distance(mol.getAtom(i2).getPoint3d());
-                mol.getBond(atmI,mol.getAtom(i2)).setProperty(doneBnd,"T");
-                if (debug)
-                {
-                    System.err.println(" i2 = " + i2 + " d: " + d);
-                }
-                nbrs[0] = i2+1;
-            }
-
-            // define the bond angle
-            if (i>1)
-            {
-                i3 = getSecondRefAtomId(i,i2,mol);
-                a = MathUtils.angle(atmI.getPoint3d(),
-                                            mol.getAtom(i2).getPoint3d(),
-                                            mol.getAtom(i3).getPoint3d());
-                if (debug)
-                {
-                    System.err.println(" i3 = "+ i3 + " a: " + a);
-                }
-                nbrs[0] = i2+1;
-                nbrs[1] = i3+1;
-            }
-
-            // decide on dihedral or second angle
-            if (i>2)
-            {
-                ObjectPair op = getThirdRefAtomId(i,i2,i3,mol,tm);
-                i4 = (int) op.getFirst();
-                i5 = (int) op.getSecond();
-                if (i5==1)
-                {
-                    t = MathUtils.angle(atmI.getPoint3d(),
-                                                mol.getAtom(i2).getPoint3d(),
-                                                mol.getAtom(i4).getPoint3d());
-                    double sign = MathUtils.torsion(
-                                                atmI.getPoint3d(),
-                                                mol.getAtom(i2).getPoint3d(),
-                                                mol.getAtom(i3).getPoint3d(),
-                                                mol.getAtom(i4).getPoint3d());
-                    if (sign > 0.0)
-                    {
-                        i5 = -1;
-                    } 
-                }
-                else
-                {
-                    IAtom atmJ = mol.getAtom(i2);
-                    IAtom atmK = mol.getAtom(i3);
-                    IAtom atmL = mol.getAtom(i4);
-                    double valueIJKL = MathUtils.torsion(
-                            atmI.getPoint3d(), atmJ.getPoint3d(),
-                            atmK.getPoint3d(), atmL.getPoint3d());
-                    
-                    t = valueIJKL;
-                    
-                    IBond bnd = mol.getBond(atmJ, atmK);
-                    if (bnd!=null)
-                    {
-                        Object cnstrDefObj = bnd.getProperty(
-                                RotationalSpaceUtils.PROPERTY_ROTDBDCSTR_DEF);
-                        if (cnstrDefObj!=null)
-                        {
-                            // For clarity, IJKL are the atoms identifying the
-                            // dihedral used in the internal coordinates,
-                            // while ABCD are the atoms used to define the 
-                            // constrained dihedral angle.
-                            IAtom[] atomsABCD = (IAtom[]) cnstrDefObj;
-                            double cnstrABCD = (double) bnd.getProperty(
-                                    RotationalSpaceUtils.PROPERTY_ROTDBDCSTR_VALUE);
-                            if (atmJ==atomsABCD[2] && atmK==atomsABCD[1])
-                            {
-                                // We ensure consistent orfer in the definitions
-                                // of the two dihedral angles
-                                atomsABCD = new IAtom[]{
-                                        atomsABCD[3], atomsABCD[2],
-                                        atomsABCD[1], atomsABCD[0]};
-                                if (cnstrABCD>0)
-                                {
-                                    cnstrABCD = 360.0 - cnstrABCD;
-                                } else {
-                                    cnstrABCD = cnstrABCD - 360.0;
-                                }
-                            }
-
-                            double valueABCD = MathUtils.torsion(
-                                    atomsABCD[0].getPoint3d(), 
-                                    atomsABCD[1].getPoint3d(),
-                                    atomsABCD[2].getPoint3d(), 
-                                    atomsABCD[3].getPoint3d());
-                            double correctionABCD = cnstrABCD - valueABCD;
-                            
-                            t = valueIJKL + correctionABCD;
-                            
-                            if (t > 360)
-                            {
-                                t = t - 360;
-                            } else if (t < -360) {
-                                t = t + 360;
-                            }
-
-                            if (debug)
-                            {
-                                System.err.println(" dihedral constrain along "
-                                        + i2 + "-" + i3 + ": " 
-                                        + valueIJKL + " -> " + t 
-                                        + " (changed by " + correctionABCD + ")");
-                            }
-                        }
-                    }
-                }
-                if (debug)
-                {
-                    System.err.println(" i4 = "+ i4 + " t: " + t + " " + i5);
-                }
-                nbrs[0] = i2+1;
-                nbrs[1] = i3+1;
-                nbrs[2] = i4+1;
-                nbrs[3] = i5;
-            }
-
-            String symb = MoleculeUtils.getSymbolOrLabel(atmI);
-            int atyp = 0; // Tinker types are assigned later
-
-            TinkerAtom ta = new TinkerAtom(i+1, symb, atyp,
-                                           new double[] {atmI.getPoint3d().x,
-                                                         atmI.getPoint3d().y, 
-                                                         atmI.getPoint3d().z},
-                                                                         nbrs,
-                                                        new double[] {d,a,t});
-
-            long vidx = atmI.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
-            ta.setVertexId(vidx);
-
-            if (debug)
-            {
-                System.err.println(" TinkerAtom: "+ta.toString());
-            }
-
-            tm.addAtom(ta);
-
-            if (debug)
-            {
-                System.err.println("TinkerMolecule: ");
-                tm.printIC();
-            }
-        }
-
-        // Add bonds not visited
-        for (IBond b : mol.bonds())
-        {
-            if (b.getProperty(doneBnd) == null)
-            {
-                tm.addBond(mol.indexOf(b.getAtom(0))+1,
-                           mol.indexOf(b.getAtom(1))+1);
-            }
-        }
-
-        // Due to the assumption that all atoms are part of the same 
-        // connected network, no bond has to be deleted
-
-        // Fix TinkerAtom types
-        setTinkerTypes(tm,tMap);
-
-        return tm;
-    }
-
-//----------------------------------------------------------------------------
-   
-    private static int getFirstRefAtomId(int i1, IAtomContainer mol)
-    {
-        List<ConnectedLigand> candidates = new ArrayList<ConnectedLigand>();
-        for (IAtom nbr : mol.getConnectedAtomsList(mol.getAtom(i1)))
-        {
-            if (mol.indexOf(nbr) < i1)
-            {
-                ConnectedLigand cl = new ConnectedLigand(nbr,1);
-                candidates.add(cl);
-            }
-        }
-        Collections.sort(candidates, new ConnectedLigandComparator());
-        int i2 = mol.indexOf(candidates.get(0).getAtom());
-        return i2;
-    }
-
-//----------------------------------------------------------------------------
-
-    private static int getSecondRefAtomId(int i1, int i2, IAtomContainer mol)
-    {
-        List<ConnectedLigand> candidates = new ArrayList<ConnectedLigand>();
-        for (IAtom nbr : mol.getConnectedAtomsList(mol.getAtom(i2)))
-        {
-            if ((mol.indexOf(nbr) < i1) && (nbr != mol.getAtom(i1)))
-            {
-                ConnectedLigand cl = new ConnectedLigand(nbr,1);
-                candidates.add(cl);
-            }
-        }
-        Collections.sort(candidates, new ConnectedLigandComparator());
-        int i3 = mol.indexOf(candidates.get(0).getAtom());
-        return i3;
-    }
-
-//----------------------------------------------------------------------------
-
-    private static ObjectPair getThirdRefAtomId(int i1, int i2, int i3, 
-               IAtomContainer mol, TinkerMolecule tm) throws DENOPTIMException
-    {
-        int i5 = 0;
-        IAtom atmI1 = mol.getAtom(i1);
-        IAtom atmI2 = mol.getAtom(i2);
-        IAtom atmI3 = mol.getAtom(i3);
-        List<ConnectedLigand> candidates = new ArrayList<ConnectedLigand>();
-        if (tm.isTorsionUsed(i2+1, i3+1) || 
-            countPredefinedNeighbours(i1,atmI3,mol)==1)
-        {
-            i5 = 1;
-            for (IAtom nbr : mol.getConnectedAtomsList(atmI2))
-            {
-                if (debug)
-                {
-                   System.err.println("  Eval. 3rd (ANG): " + 
-                           MoleculeUtils.getSymbolOrLabel(nbr)
-                   + mol.indexOf(nbr) + " " 
-                   + (mol.indexOf(nbr) < i1) + " "
-                   + (nbr != atmI1) + " " 
-                   + (nbr != atmI3));
-                }
-                if ((mol.indexOf(nbr) < i1) && (nbr != atmI1) && 
-                                                        (nbr != atmI3))
-                {
-                    double dbcAng = MathUtils.angle(nbr.getPoint3d(),
-                                                          atmI2.getPoint3d(),
-                                                          atmI3.getPoint3d());
-                    if(dbcAng > 1.0)
-                    {
-                        ConnectedLigand cl = new ConnectedLigand(nbr,1);
-                        candidates.add(cl);
-                    }
-                    else
-                    {
-                        if (debug)
-                        {
-                            System.err.println("  ...but collinear with "
-                                    + MoleculeUtils.getSymbolOrLabel(atmI3) + i3
-                                               + " (i4-i2-i3: " + dbcAng 
-                                               + ")");
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            i5 = 0;
-            for (IAtom nbr : mol.getConnectedAtomsList(atmI3))
-            {
-                if (debug)
-                {
-                   System.err.println("  Eval. 3rd (TOR): " 
-                            + MoleculeUtils.getSymbolOrLabel(nbr)
-                   + mol.indexOf(nbr) + " "
-                   + (mol.indexOf(nbr) < i1) + " "
-                   + (nbr != atmI1) + " "
-                   + (nbr != atmI2));
-                }
-                if ((mol.indexOf(nbr) < i1) && (nbr != atmI1) &&
-                                                        (nbr != atmI2))
-                {
-                    ConnectedLigand cl = new ConnectedLigand(nbr,1);
-                    candidates.add(cl);
-                }
-            }
-        }
-        Collections.sort(candidates, new ConnectedLigandComparator());
-        if (candidates.size() == 0)
-        {
-            String msg = "Unable to make internal coordinates. Please, "
-                         + "consider the use of dummy atoms in proximity "
-                         + "of atom " + tm.getAtom(i1+1);
-            throw new DENOPTIMException(msg);
-        }
-        int i4 = mol.indexOf(candidates.get(0).getAtom());
-
-        ObjectPair op = new ObjectPair(i4,i5);
-        
-        return op;
-    }
-
-//------------------------------------------------------------------------------
-
-    private static int countPredefinedNeighbours(int i, IAtom a, IAtomContainer mol)
-    {
-        int tot = 0;
-        for (IAtom nbr : mol.getConnectedAtomsList(a))
-        {
-            if (mol.indexOf(nbr) < i)
-                tot++;
-        }
-        return tot;
-    }
-
-//------------------------------------------------------------------------------
-
-   /**
-     * Conversion to tinker IC may not always have the necessary atom types.
-     * In order to fix this, we add user defined atom types.
-     *
-     * @param tmol The tinker IC representation
-     * @throws DENOPTIMException
-     */
-
-    public static void setTinkerTypes(TinkerMolecule tmol, 
-                        HashMap<String,Integer> tMap) throws DENOPTIMException
-    {
-        ArrayList<TinkerAtom> lstAtoms = tmol.getAtoms();
-        int numberOfAtoms = lstAtoms.size();
-        for (int i = 0; i < numberOfAtoms; i++)
-        {
-            TinkerAtom tatom = lstAtoms.get(i);
-
-            String st = tatom.getAtomString().trim();
-            if (!tMap.containsKey(st))
-            {
-                String msg = "Unable to assign atom type to atom '" + st +"'. ";
-        		if (st.equals("R"))
-        		{
-        		    msg = msg + "Unusual dummy atom symbols get atom symbol "
-        		      + "'R'. Please, add atom type 'R' in your atom type map.";
-        		}
-                throw new DENOPTIMException(msg);
-            }
-            Integer val = tMap.get(st);
-            if (val != null)
-            {
-                tatom.setAtomType(val.intValue());
-                if (debug)
-                    System.err.println("Set parameter for " + st + " " + val);
-            }
-            else
-            {
-                String msg = "No valid Tinker atom type assigned for atom "
-                            + st + ".\n";
-                throw new DENOPTIMException(msg);
-            }
-        }
     }
     
 //------------------------------------------------------------------------------

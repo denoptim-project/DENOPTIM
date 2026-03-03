@@ -8,7 +8,7 @@ function checkLog() {
     if ! grep -q 'Completed Mol2Graph' "$1"
     then
         echo " "
-        echo "Test 't30' NOT PASSED (symptom: completion msg not found in $1)"
+        echo "Test 't32' NOT PASSED (symptom: completion msg not found in $1)"
         return 1
     fi
     return 0
@@ -21,7 +21,7 @@ function checkMatchCount() {
     n=0;n=$(grep -c "$query" "$file")
     if [ "$expected" -ne "$n" ]; then
         echo " "
-        echo "Test 't30' NOT PASSED (symptom: found $n instead of $expected matches of $query in $file)"
+        echo "Test 't32' NOT PASSED (symptom: found $n instead of $expected matches of $query in $file)"
         return 1
     fi
     return 0
@@ -34,7 +34,7 @@ function chopJSONFile() {
   endLines=($(grep -n "^$indent}" "$file"  | awk -F':' '{print $1}'))
   if [ 3 -ne "${#startLines[@]}" ] && [ 3 -ne "${#endLines[@]}" ]; then
     echo " "
-    echo "Test 't30' NOT PASSED (symptom: wrong match in json format of $file)"
+    echo "Test 't32' NOT PASSED (symptom: wrong match in json format of $file)"
     return -1
   fi
   for i in $(seq 0 $((${#startLines[@]} -1)) )

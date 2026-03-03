@@ -22,7 +22,8 @@
 #
 
 # Path to TINKER executables
-# Currently required only by t1 that will be skipped if the following is empty.
+# Required only by test t1tnk. Such test will be skipped if the following is empty.
+# Use of the Tinker engine is now obsolete, but this is kept for backwards compatibility.
 export tinkerPathDENOPTIM=""
 
 # Directory created for running tests (must be shorter than 40 characters).
@@ -181,9 +182,14 @@ fi
 # Run all tests
 
 #
-# t1: use DenoptimCG to build funny molecules.
+# t1: use DenoptimCG to build funny molecules using the RingClosingMM server.
 #
 runTest "t1"
+
+#
+# t1tnk: use DenoptimCG to build funny molecules using the Tinker and MM engine.
+#
+runTest "t1tnk"
 
 #
 # t2: parallel combinatorial builder from given root (default format: STRING)
@@ -412,6 +418,11 @@ runTest "t31"
 # t32: test conversion of molecules to graphs
 #
 runTest "t32"
+
+#
+# t33: test fragmentation based ona template graph
+#
+runTest "t33"
 
 echo "All done!"
 exit 0

@@ -36,10 +36,8 @@ import org.openscience.cdk.graph.SpanningTree;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.interfaces.IRingSet;
 import org.openscience.cdk.silent.RingSet;
-import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -48,10 +46,7 @@ import denoptim.graph.Edge.BondType;
 import denoptim.graph.Ring;
 import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosure;
-import denoptim.integration.tinker.TinkerAtom;
-import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.integration.tinker.TinkerUtils;
-import denoptim.io.DenoptimIO;
+import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.utils.MathUtils;
 import denoptim.utils.ObjectPair;
 
@@ -75,9 +70,9 @@ public class ChemicalObjectModel
     private IAtomContainer fmol;
 
     /**
-     * Tinker internal coordinates representation
+     * ZMatrix representation
      */
-    private TinkerMolecule tmol;
+    private ZMatrix zmat;
 
     /**
      * Reference name
@@ -85,33 +80,33 @@ public class ChemicalObjectModel
     private String molName;
 
     /**
-     * List of Ring Closing Attractors.
+     * List of {@link RingClosingAttractor}s.
      */
-    private ArrayList<RingClosingAttractor> attractors;
+    private List<RingClosingAttractor> attractors;
 
     /**
-     * Relation between RingClosingAttractor and atom ID
+     * Relation between {@link RingClosingAttractor} and index in the ZMatrix
      */
     private Map<RingClosingAttractor,Integer> attToAtmID;
 
     /**
-     * List of combinations of RingClosingAttractors (i.e., possible
+     * List of combinations of {@link RingClosingAttractor} (i.e., possible
      * set of rings to create)
      */
-    private ArrayList<Set<ObjectPair>> allRCACombs;
+    private List<Set<ObjectPair>> allRCACombs;
 
     /**
      * List of rotatable bonds
      */
-    private ArrayList<ObjectPair> rotatableBnds;
+    private List<ObjectPair> rotatableBnds;
 
     /**
      * List of new ring closing environments
      */
-    private ArrayList<RingClosure> newRingClosures;
+    private List<RingClosure> newRingClosures;
 
     /**
-     * Quality score of the list of RingClosures
+     * Quality score of the list of ring closures
      */
     private double overalRCScore = Double.NaN;
 
@@ -125,30 +120,8 @@ public class ChemicalObjectModel
      */
     private Logger logger;
     
-    private ArrayList<Integer> oldToNewOrder;
-    private ArrayList<Integer> newToOldOrder;
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Constructs an empty item.
-     */
-
-    public ChemicalObjectModel()
-    {
-        this.molGraph = new DGraph();
-        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
-        this.fmol = builder.newAtomContainer();
-        this.tmol = new TinkerMolecule();
-        this.attractors = new ArrayList<RingClosingAttractor>();
-        this.attToAtmID = new HashMap<RingClosingAttractor,Integer>();
-        this.allRCACombs = new ArrayList<Set<ObjectPair>>();
-        this.rotatableBnds = new ArrayList<ObjectPair>();
-        this.newRingClosures = new ArrayList<RingClosure>();
-        this.molName = "none";
-        this.oldToNewOrder = new ArrayList<Integer>();
-        this.newToOldOrder =  new ArrayList<Integer>();
-    }
+    private List<Integer> oldToNewOrder;
+    private List<Integer> newToOldOrder;
 
 //------------------------------------------------------------------------------
 
@@ -156,12 +129,13 @@ public class ChemicalObjectModel
      * Constructs an item specifying all its features
      * @param molGraph the graph representation
      * @param fmol the CDK molecular representation
-     * @param tmol the internal coordinates representation
+     * @param zmat the internal coordinates representation
      * @param molName the reference name of this molecule
      * @param rotatableBnds the list of rotatable bonds (as pairs of atom 
      * indexes)
      * @param attractors all the ring closing attractors (RCA)
-     * @param attToAtmID the correspondence between RCA and atom index
+     * @param attToAtmID the correspondence between RCA and atom index in the 
+     * ZMatrix
      * @param allRCACombs all combinations of compatible pairs of RCAs
      * @param ringClosures the list of closed multi-fragment rings
      * @param logger the tool to use for logging.
@@ -169,20 +143,21 @@ public class ChemicalObjectModel
 
     public ChemicalObjectModel(DGraph molGraph, 
             IAtomContainer fmol, 
-            TinkerMolecule tmol, 
+            ZMatrix zmat, 
             String molName, 
-            ArrayList<ObjectPair> rotatableBnds,
-            ArrayList<RingClosingAttractor> attractors,
+            List<ObjectPair> rotatableBnds,
+            List<RingClosingAttractor> attractors,
             Map<RingClosingAttractor,Integer> attToAtmID,
-            ArrayList<Set<ObjectPair>> allRCACombs,
-            ArrayList<RingClosure> ringClosures,
-            ArrayList<Integer> oldToNewOrder,
-            ArrayList<Integer> newToOldOrder,
+            List<Set<ObjectPair>> allRCACombs,
+            List<RingClosure> ringClosures,
+            List<Integer> oldToNewOrder,
+            List<Integer> newToOldOrder,
             Logger logger)
     {
+        this.logger = logger;
         this.molGraph = molGraph;
         this.fmol = fmol;
-        this.tmol = tmol;
+        this.zmat = zmat;
         this.attractors = attractors;
         this.attToAtmID = attToAtmID;
         this.allRCACombs = allRCACombs;
@@ -201,7 +176,6 @@ public class ChemicalObjectModel
         }
         this.oldToNewOrder = oldToNewOrder;
         this.newToOldOrder = newToOldOrder;
-        this.logger = logger;
     }
 
 //------------------------------------------------------------------------------
@@ -210,7 +184,7 @@ public class ChemicalObjectModel
      * Constructs a <code>Molecule3DBuilder</code> specifying all its features
      * @param molGraph the graph representation
      * @param fmol the CDK molecular representation
-     * @param tmol the internal coordinates representation
+     * @param zmat the internal coordinates representation
      * @param molName the reference name of this molecule
      * @param rotatableBnds the list of rotatable bonds (as pairs of atom 
      * @param oldToNewOrder indexes that allow to map the atom position 
@@ -224,15 +198,16 @@ public class ChemicalObjectModel
      */
 
     public ChemicalObjectModel(DGraph molGraph, IAtomContainer fmol, 
-            TinkerMolecule tmol, String molName,
-            ArrayList<ObjectPair> rotatableBnds,
-            ArrayList<Integer> oldToNewOrder,
-            ArrayList<Integer> newToOldOrder,
+            ZMatrix zmat, String molName,
+            List<ObjectPair> rotatableBnds,
+            List<Integer> oldToNewOrder,
+            List<Integer> newToOldOrder,
             Logger logger) throws DENOPTIMException
     {
+        this.logger = logger;
         this.molGraph = molGraph;
         this.fmol = fmol;
-        this.tmol = tmol;
+        this.zmat = zmat;
         updateXYZFromINT();
         this.molName = molName;
         this.rotatableBnds = rotatableBnds;
@@ -254,7 +229,6 @@ public class ChemicalObjectModel
         this.atmOveralScore = Double.NaN;
         this.oldToNewOrder = oldToNewOrder;
         this.newToOldOrder = newToOldOrder;
-        this.logger = logger;
     }
     
 //------------------------------------------------------------------------------
@@ -320,141 +294,197 @@ public class ChemicalObjectModel
 //------------------------------------------------------------------------------
 
     /**
+     * currently loaded internal coordinates into Cartesian 
+     * overwriting the current XYZ.
+     */
+
+    public void updateXYZ(List<Point3d> newCoords) throws DENOPTIMException
+    {
+        for (int i=0; i<fmol.getAtomCount(); i++)
+        {
+            fmol.getAtom(i).setPoint3d(newCoords.get(i));
+        }
+    }
+    
+//------------------------------------------------------------------------------
+
+    /**
      * Converts currently loaded internal coordinates into Cartesian 
      * overwriting the current XYZ.
      */
 
     public void updateXYZFromINT() throws DENOPTIMException
     {
-        ArrayList<Point3d> newCoords = new ArrayList<Point3d>();
+        List<Point3d> newCoords = new ArrayList<Point3d>();
         for (int i=0; i<fmol.getAtomCount(); i++)
         {
-            int iTnk = i + 1;
-            TinkerAtom tAtm = tmol.getAtom(iTnk);
-            int ia = tAtm.getAtomNeighbours()[0];
-            int ib = tAtm.getAtomNeighbours()[1];
-            int ic = tAtm.getAtomNeighbours()[2];
-            if (ia >  i || ib > i || ic > i)
+            int ia = zmat.getBondRefAtomIndex(i);
+            int ib = zmat.getAngleRefAtomIndex(i);
+            int ic = zmat.getAngle2RefAtomIndex(i);
+            if ((ia != -1 && ia >  i) || (ib != -1 && ib > i) || (ic != -1 && ic > i))
             {
                 String msg = "ERROR! Cannot convert internal coordinates of "
-                                   + "atom " + i + " " + tAtm + ". Reference "
+                                   + "atom " + i + ". Reference "
                                    + "atoms have higher ID. The atoms list in "
                                    + "Molecule3DBuilder needs to be reordered.";
                 throw new DENOPTIMException(msg);
             }
-            int angleFlag = tAtm.getAtomNeighbours()[3];
-            double bond = tAtm.getDistAngle()[0];
-            double angle1 = tAtm.getDistAngle()[1] * 2 * Math.PI / 360.0;
-            double angle2 = tAtm.getDistAngle()[2] * 2 * Math.PI / 360.0;
+            Integer chirality = zmat.getChiralFlag(i);
+            Double bond = zmat.getBondLength(i);
+            Double angle1 = zmat.getAngleValue(i);
+            Double angle2 = zmat.getAngle2Value(i);
+
             double[] newXYZ = {0.0, 0.0, 0.0};
+
             double smallDble = DENOPTIMConstants.FLOATCOMPARISONTOLERANCE;
-            double s1 = Math.sin(angle1); 
-            double s2 = Math.sin(angle2);
-            double c1 = Math.cos(angle1);
-            double c2 = Math.cos(angle2);
-            if (ia == 0)
+            if (ia == -1 && ib == -1 && ic == -1)
             {
                 //first atom remains on the origin
             }
-            else if (ib == 0)
+            else if (ib == -1 && ic == -1)
             {
-                newXYZ[2] = bond;
-            }
-            else if (ic == 0)
-            {
-                Vector3d nab = MathUtils.normDist(
-                                       newCoords.get(ia-1),newCoords.get(ib-1));
-                double rab = MathUtils.distance(
-                                       newCoords.get(ia-1),newCoords.get(ib-1));
-                newXYZ[0] = bond * s1;
-                newXYZ[2] = newCoords.get(ib-1).z + (rab - bond*c1)*nab.z;
-            }
-            else if (angleFlag == 0)
-            {
-                Vector3d nab = MathUtils.normDist(
-                                       newCoords.get(ia-1),newCoords.get(ib-1));
-                Vector3d nbc = MathUtils.normDist(
-                                       newCoords.get(ib-1),newCoords.get(ic-1));
-                Vector3d t = new Vector3d();
-                t.cross(nbc,nab);
-                double c = nab.x*nbc.x + nab.y*nbc.y + nab.z*nbc.z;
-                if (Math.abs(c) > (1.0 - smallDble))
+                if (bond == null)
                 {
-                    String msg = "ERROR! Linearity does not allow definition "
-                        + "of the dihedral angle for atom " + i + " " + tAtm 
-                        + " (Value of c="+c+" too close to unity; threshold is "
-                        + (1.0 - smallDble) + "). "
-                        + "You better use dummy atoms to avoid linearities.";
+                    String msg = "ERROR! Cannot convert internal coordinates of "
+                                   + "atom " + i + ". Bond length is null.";
                     throw new DENOPTIMException(msg);
                 }
-                t.scale(1/Math.sqrt(Math.max(1.00 - c*c, smallDble)));
-                Vector3d u = new Vector3d();
-                u.cross(t,nab);
-                newXYZ[0] = newCoords.get(ia-1).x
-                                      + bond*(u.x*s1*c2 + t.x*s1*s2 - nab.x*c1);
-                newXYZ[1] = newCoords.get(ia-1).y
-                                      + bond*(u.y*s1*c2 + t.y*s1*s2 - nab.y*c1);
-                newXYZ[2] = newCoords.get(ia-1).z
-                                      + bond*(u.z*s1*c2 + t.z*s1*s2 - nab.z*c1);
+                newXYZ[2] = bond;
             }
-            else if (Math.abs(angleFlag) == 1)
+            else if (ic == -1)
             {
-                Vector3d nba = MathUtils.normDist(
-                                       newCoords.get(ib-1),newCoords.get(ia-1));
-                Vector3d nac = MathUtils.normDist(
-                                       newCoords.get(ia-1),newCoords.get(ic-1));
-                Vector3d t = new Vector3d();
-                t.cross(nac,nba);
-                double c = nba.x*nac.x + nba.y*nac.y + nba.z*nac.z;
-                if (Math.abs(c) > (1.0 - smallDble))
+                if (bond == null)
                 {
-                    logger.log(Level.WARNING, "WARNING! close-to-linear system "
-                        + "in the definition of atom " + i + " " + tAtm + ". "
-                        + "You better use dummy atoms to avoid linearities.");
+                    String msg = "ERROR! Cannot convert internal coordinates of "
+                                   + "atom " + i + ". Bond length is null.";
+                    throw new DENOPTIMException(msg);
                 }
-                double s = Math.max(1.00 - c*c, smallDble);
-                double a = (-c2 - c*c1) / s;
-                double b = (c1 + c*c2) / s;
-                double ci = (1.00 + a*c2 - b*c1) / s;
-                if (ci > smallDble)
+                if (angle1 == null)
                 {
-                    ci = angleFlag * Math.sqrt(ci);
-                } 
-                else if (ci < -smallDble)
-                {
-                    ci = Math.sqrt((a*nac.x+b*nba.x)*(a*nac.x+b*nba.x) 
-                                + (a*nac.y+b*nba.y)*(a*nac.y+b*nba.y)
-                                + (a*nac.z+b*nba.z)*(a*nac.z+b*nba.z));
-                    a = a / ci;
-                    b = b / ci;
-                    ci = 0.0;
-                    logger.log(Level.WARNING, "WARNING! close-to-linear system "
-                        + "in the definition of atom " + i + " " + tAtm + ". "
-                        + "You better use dummy atoms to avoid linearities.");
+                    String msg = "ERROR! Cannot convert internal coordinates of "
+                                   + "atom " + i + ". Angle 1 is null.";
+                    throw new DENOPTIMException(msg);
                 }
-                else 
+                double s1 = Math.sin(angle1 * 2 * Math.PI / 360.0);
+                double c1 = Math.cos(angle1 * 2 * Math.PI / 360.0);
+                Vector3d nab = MathUtils.normDist(
+                                       newCoords.get(ia),newCoords.get(ib));
+                double rab = MathUtils.distance(
+                                       newCoords.get(ia),newCoords.get(ib));
+                newXYZ[0] = bond * s1;
+                newXYZ[2] = newCoords.get(ib).z + (rab - bond*c1)*nab.z;
+            }
+            else
+            {
+                if (bond == null)
                 {
-                   ci = 0.0;
+                    String msg = "ERROR! Cannot convert internal coordinates of "
+                                   + "atom " + i + ". Bond length is null.";
+                    throw new DENOPTIMException(msg);
                 }
-                newXYZ[0] = newCoords.get(ia-1).x 
+                if (angle1 == null)
+                {
+                    String msg = "ERROR! Cannot convert internal coordinates of "
+                                   + "atom " + i + ". Angle 1 is null.";
+                    throw new DENOPTIMException(msg);
+                }
+                if (angle2 == null)
+                {
+                    String msg = "ERROR! Cannot convert internal coordinates of "
+                                   + "atom " + i + ". Angle 2 is null.";
+                    throw new DENOPTIMException(msg);
+                }
+                if (chirality == null)
+                {
+                    String msg = "ERROR! Cannot convert internal coordinates of "
+                                   + "atom " + i + ". Chirality is null.";
+                    throw new DENOPTIMException(msg);
+                }
+                double s1 = Math.sin(angle1 * 2 * Math.PI / 360.0); 
+                double s2 = Math.sin(angle2 * 2 * Math.PI / 360.0);
+                double c1 = Math.cos(angle1 * 2 * Math.PI / 360.0);
+                double c2 = Math.cos(angle2 * 2 * Math.PI / 360.0);
+
+                if (chirality.equals(0))
+                {
+                    Vector3d nab = MathUtils.normDist(
+                                        newCoords.get(ia),newCoords.get(ib));
+                    Vector3d nbc = MathUtils.normDist(
+                                        newCoords.get(ib),newCoords.get(ic));
+                    Vector3d t = new Vector3d();
+                    t.cross(nbc,nab);
+                    double c = nab.x*nbc.x + nab.y*nbc.y + nab.z*nbc.z;
+                    if (Math.abs(c) > (1.0 - smallDble))
+                    {
+                        String msg = "ERROR! Linearity does not allow definition "
+                            + "of the dihedral angle for atom " + i  
+                            + " (Value of c="+c+" too close to unity; threshold is "
+                            + (1.0 - smallDble) + "). "
+                            + "You better use dummy atoms to avoid linearities.";
+                        throw new DENOPTIMException(msg);
+                    }
+                    t.scale(1/Math.sqrt(Math.max(1.00 - c*c, smallDble)));
+                    Vector3d u = new Vector3d();
+                    u.cross(t,nab);
+                    newXYZ[0] = newCoords.get(ia).x
+                                    + bond*(u.x*s1*c2 + t.x*s1*s2 - nab.x*c1);
+                    newXYZ[1] = newCoords.get(ia).y
+                                    + bond*(u.y*s1*c2 + t.y*s1*s2 - nab.y*c1);
+                    newXYZ[2] = newCoords.get(ia).z
+                                    + bond*(u.z*s1*c2 + t.z*s1*s2 - nab.z*c1);
+                }
+                else if (chirality.equals(1) || chirality.equals(-1))
+                {
+                    Vector3d nba = MathUtils.normDist(
+                                        newCoords.get(ib),newCoords.get(ia));
+                    Vector3d nac = MathUtils.normDist(
+                                        newCoords.get(ia),newCoords.get(ic));
+                    Vector3d t = new Vector3d();
+                    t.cross(nac,nba);
+                    double c = nba.x*nac.x + nba.y*nac.y + nba.z*nac.z;
+                    if (Math.abs(c) > (1.0 - smallDble))
+                    {
+                        logger.log(Level.WARNING, "WARNING! close-to-linear system "
+                            + "in the definition of atom " + i + ". "
+                            + "You better use dummy atoms to avoid linearities.");
+                    }
+                    double s = Math.max(1.00 - c*c, smallDble);
+                    double a = (-c2 - c*c1) / s;
+                    double b = (c1 + c*c2) / s;
+                    double ci = (1.00 + a*c2 - b*c1) / s;
+                    if (ci > smallDble)
+                    {
+                        ci = chirality * Math.sqrt(ci);
+                    } 
+                    else if (ci < -smallDble)
+                    {
+                        ci = Math.sqrt((a*nac.x+b*nba.x)*(a*nac.x+b*nba.x) 
+                                    + (a*nac.y+b*nba.y)*(a*nac.y+b*nba.y)
+                                    + (a*nac.z+b*nba.z)*(a*nac.z+b*nba.z));
+                        a = a / ci;
+                        b = b / ci;
+                        ci = 0.0;
+                        logger.log(Level.WARNING, "WARNING! close-to-linear system "
+                            + "in the definition of atom " + i + ". "
+                            + "You better use dummy atoms to avoid linearities.");
+                    }
+                    else 
+                    {
+                        ci = 0.0;
+                    }
+                    newXYZ[0] = newCoords.get(ia).x 
                                             + bond*(a*nac.x + b*nba.x + ci*t.x);
-                newXYZ[1] = newCoords.get(ia-1).y 
+                    newXYZ[1] = newCoords.get(ia).y 
                                             + bond*(a*nac.y + b*nba.y + ci*t.y);
-                newXYZ[2] = newCoords.get(ia-1).z 
+                    newXYZ[2] = newCoords.get(ia).z 
                                             + bond*(a*nac.z + b*nba.z + ci*t.z);
+                }
             }
             Point3d p3d = new Point3d(newXYZ[0],newXYZ[1],newXYZ[2]);
             newCoords.add(p3d);
         }
 
-        // Update Cartesian coordinates
-        for (int i=0; i<fmol.getAtomCount(); i++)
-        {
-            fmol.getAtom(i).setPoint3d(newCoords.get(i));
-            tmol.getAtom(i+1).moveTo(newCoords.get(i).x, 
-                                     newCoords.get(i).y,
-                                     newCoords.get(i).z);
-        }
+        updateXYZ(newCoords);
     }
 
 //------------------------------------------------------------------------------
@@ -483,12 +513,12 @@ public class ChemicalObjectModel
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the Tinker Internal Coordination representation of the molecule
+     * Returns the ZMatrix representation of the molecule
      */
 
-    public TinkerMolecule getTinkerMolecule()
+    public ZMatrix getZMatrix()
     {
-        return tmol;
+        return zmat;
     }
 
 //------------------------------------------------------------------------------
@@ -497,7 +527,7 @@ public class ChemicalObjectModel
      * Returns the list of RuingClosingAttractors.
      */
 
-    public ArrayList<RingClosingAttractor> getAttractorsList()
+    public List<RingClosingAttractor> getAttractorsList()
     {
         return attractors;
     }
@@ -516,11 +546,11 @@ public class ChemicalObjectModel
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the CDK atom number, 0 to (n-1), of the given 
-     * RingClosingAttractor
+     * @return the index of the given 
+     * {@link RingClosingAttractor} in the ZMatrix representation
      */
 
-    public int getAtmIdOfRCA(RingClosingAttractor rca)
+    public int getZMatIdxOfRCA(RingClosingAttractor rca)
     {
         return attToAtmID.get(rca);
     }
@@ -528,13 +558,15 @@ public class ChemicalObjectModel
 //------------------------------------------------------------------------------
 
     /**
-     * Returns the Tinker atom number, 1 to n,of the given 
-     * RingClosingAttractor
+     * @return the index of the source atom of the given 
+     * {@link RingClosingAttractor} (i.e., the only atom bonded to the  
+     * {@link RingClosingAttractor}) in the ZMatrix representation.
      */
 
-    public int getTnkAtmIdOfRCA(RingClosingAttractor rca)
+    public int getZMatIdxOfRCASrc(RingClosingAttractor rca)
     {
-        return attToAtmID.get(rca) + 1;
+        int rcaIdx = getZMatIdxOfRCA(rca);
+        return  zmat.getBondRefAtomIndex(rcaIdx);
     }
 
 //------------------------------------------------------------------------------
@@ -546,7 +578,7 @@ public class ChemicalObjectModel
      * of this object.
      */
 
-    public ArrayList<Set<ObjectPair>> getRCACombinations()
+    public List<Set<ObjectPair>> getRCACombinations()
     {
         return allRCACombs;
     }
@@ -557,7 +589,7 @@ public class ChemicalObjectModel
      * Returns the list of rotatable bonds
      */
 
-    public ArrayList<ObjectPair> getRotatableBonds()
+    public List<ObjectPair> getRotatableBonds()
     {
         return rotatableBnds;
     }
@@ -580,7 +612,7 @@ public class ChemicalObjectModel
      * head/tail of atom chains during RC-PSSROT conformational adaptation.
      */
 
-    public ArrayList<RingClosure> getNewRingClosures()
+    public List<RingClosure> getNewRingClosures()
     {
         return newRingClosures;
     }
@@ -662,10 +694,10 @@ public class ChemicalObjectModel
     /**
      * Modify the molecule adding a cyclic bond between two atoms. This
      * method is ONLY meant to add new cyclic bonds and requires that
-     * the pair of involved atoms comes with the object RingClosure.
+     * the pair of involved atoms comes with the object {@link RingClosure}.
      * @param atmA the first atom
      * @param atmA the second atom
-     * @param nRc the RingClosure object describing the ring-closing arrangement
+     * @param nRc the {@link RingClosure} object describing the ring-closing arrangement
      * of atoms.
      */
 
@@ -690,11 +722,9 @@ public class ChemicalObjectModel
 
         if (iA < iB)
         {
-            this.tmol.addBond(iA+1, iB+1);
-        }
-        else
-        {
-            this.tmol.addBond(iB+1, iA+1);
+            this.zmat.addBond(iA, iB);
+        } else {
+            this.zmat.addBond(iB, iA);
         }
     }
 
@@ -717,7 +747,7 @@ public class ChemicalObjectModel
         }
 
         //Identify bonds to remove (cyclic bonds)
-        ArrayList<ObjectPair> toRemove = new ArrayList<ObjectPair>();
+        List<ObjectPair> toRemove = new ArrayList<ObjectPair>();
         for (ObjectPair op : rotatableBnds)
         {
             int i1 = ((Integer)op.getFirst()).intValue();
@@ -749,27 +779,27 @@ public class ChemicalObjectModel
      * @throws DENOPTIMException
      */ 
 
-    @SuppressWarnings("unchecked")
     public ChemicalObjectModel deepcopy() throws DENOPTIMException
     {
         String nMolName = this.molName;
         DGraph nMolGraph = this.molGraph.clone();
         IAtomContainer nFMol;
-        TinkerMolecule nTMol;
-        ArrayList<ObjectPair> nRotBnds;
+        ZMatrix nzmat;
+        List<ObjectPair> nRotBnds;
 
         try 
         {
             nFMol = this.fmol.clone();
-            nTMol = (TinkerMolecule) this.tmol.deepCopy();
-            nRotBnds = (ArrayList<ObjectPair>) this.rotatableBnds.clone();
+            nzmat = (ZMatrix) this.zmat.clone();
         }
         catch (CloneNotSupportedException cns) 
         {
             throw new DENOPTIMException(cns);
         }
 
-        ArrayList<RingClosingAttractor> nAttractors = 
+        nRotBnds = new ArrayList<>(this.rotatableBnds);
+
+        List<RingClosingAttractor> nAttractors = 
                 new ArrayList<RingClosingAttractor>();
         Map<RingClosingAttractor,Integer> nAttToAtmID = 
                 new HashMap<RingClosingAttractor,Integer>();
@@ -778,7 +808,7 @@ public class ChemicalObjectModel
         for (int iorca=0; iorca<attractors.size(); iorca++)
         {
             RingClosingAttractor oRca = attractors.get(iorca);
-            int ioatm = this.getAtmIdOfRCA(oRca);
+            int ioatm = this.attToAtmID.get(oRca);
             IAtom atm = nFMol.getAtom(ioatm);
             RingClosingAttractor nRca = new RingClosingAttractor(atm,nFMol);
             nAttractors.add(nRca);
@@ -786,7 +816,7 @@ public class ChemicalObjectModel
             oldToNewRCA.put(oRca, nRca);
         }
 
-        ArrayList<Set<ObjectPair>> nAllRCACombs = 
+        List<Set<ObjectPair>> nAllRCACombs = 
                 new ArrayList<Set<ObjectPair>>();
         for (Set<ObjectPair> sop : this.allRCACombs)
         {
@@ -801,23 +831,23 @@ public class ChemicalObjectModel
             nAllRCACombs.add(nSop);
         }
 
-        ArrayList<RingClosure> nNewRingClosures = new ArrayList<RingClosure>();
+        List<RingClosure> nNewRingClosures = new ArrayList<RingClosure>();
         for (RingClosure rc : this.newRingClosures)
         {
             nNewRingClosures.add(rc.deepCopy());
         }
         
-        ArrayList<Integer> newOldToNewOrder = new ArrayList<Integer>();
+        List<Integer> newOldToNewOrder = new ArrayList<Integer>();
         for (Integer i : oldToNewOrder)
             newOldToNewOrder.add(i.intValue());
         
-        ArrayList<Integer> newNewToOldOrder = new ArrayList<Integer>();
+        List<Integer> newNewToOldOrder = new ArrayList<Integer>();
         for (Integer i : newToOldOrder)
             newNewToOldOrder.add(i.intValue());
         
         ChemicalObjectModel molClone = new ChemicalObjectModel(nMolGraph,
                 nFMol,
-                nTMol,
+                nzmat,
                 nMolName,
                 nRotBnds,
                 nAttractors,

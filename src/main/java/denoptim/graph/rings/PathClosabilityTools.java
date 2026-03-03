@@ -20,20 +20,14 @@ package denoptim.graph.rings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
-import org.openscience.cdk.Bond;
 import org.openscience.cdk.graph.ShortestPaths;
-import org.openscience.cdk.graph.matrix.TopologicalMatrix;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -42,21 +36,10 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpace;
-import denoptim.graph.APClass;
-import denoptim.graph.AttachmentPoint;
-import denoptim.graph.DGraph;
-import denoptim.graph.Edge;
 import denoptim.graph.Edge.BondType;
-import denoptim.graph.EmptyVertex;
-import denoptim.graph.Fragment;
-import denoptim.graph.Ring;
 import denoptim.graph.Vertex;
-import denoptim.graph.Vertex.BBType;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MoleculeUtils;
-import denoptim.utils.ObjectPair;
-import denoptim.utils.RingClosingUtils;
 
 
 /**

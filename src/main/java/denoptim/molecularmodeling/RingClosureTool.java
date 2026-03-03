@@ -40,17 +40,21 @@ import denoptim.graph.Edge.BondType;
 import denoptim.graph.rings.RingClosingAttractor;
 import denoptim.graph.rings.RingClosure;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.integration.rcoserver.RCOSocketServerClient;
 import denoptim.integration.tinker.ConformationalSearchPSSROT;
-import denoptim.integration.tinker.TinkerAtom;
 import denoptim.integration.tinker.TinkerException;
-import denoptim.integration.tinker.TinkerMolecule;
+import denoptim.molecularmodeling.zmatrix.ZMatrix;
+import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 import denoptim.utils.ObjectPair;
 
 /**
  * Toolkit to perform ring closing conformational search. 
- * This tool makes use of Tinker's PSSROT engine.
+ * Can use both Tinker's PSSROT engine (backwards compatibility), but by 
+ * default it uses a 
+ * <a href="https://github.com/denoptim-project/RingClosingMM">RingClosingMM</a> 
+ * socket server, which runs a more versatile conformational search and refinement.
  *
  * @author Marco Foscato 
  */
@@ -89,48 +93,6 @@ public class RingClosureTool
     }
 
 //------------------------------------------------------------------------------
-
-    /**
-     * Conversion to tinker IC may not always have the necessary atom types.
-     * In order to fix this, we add user defined atom types.
-     *
-     * TODO: this method (from DENOPTIM3DMoleculeBuilder.java) should be made 
-     * public and moved to a more sensible location (i.e., a class of utilities
-     * for tinker methods)
-     *
-     * @param tmol The tinker IC representation
-     * @throws DENOPTIMException
-     */
-    private void setTinkerTypes(TinkerMolecule tmol) throws DENOPTIMException
-    {
-
-        ArrayList<TinkerAtom> lstAtoms = tmol.getAtoms();
-        int numberOfAtoms = lstAtoms.size();
-        for (int i = 0; i < numberOfAtoms; i++)
-        {
-            TinkerAtom tatom = lstAtoms.get(i);
-
-            String st = tatom.getAtomString().trim();
-            if (!settings.getTinkerMap().containsKey(st))
-            {
-                String msg = "Unable to assign atom type to atom '" + st +"'.";
-                throw new DENOPTIMException(msg);
-            }
-            Integer val = settings.getTinkerMap().get(st);
-            if (val != null)
-            {
-                tatom.setAtomType(val.intValue());
-                logger.log(Level.FINEST, "Set parameter for " + st);
-            } 
-            else
-            {
-                String msg = "No valid Tinker atom type for atom " + st;
-                throw new DENOPTIMException(msg);
-            }
-        }
-    }
-
-//------------------------------------------------------------------------------
     
     /**
      * Performs one or more attempts to close rings by conformational adaptation.
@@ -144,7 +106,7 @@ public class RingClosureTool
      */
 
     public ArrayList<ChemicalObjectModel> attemptAllRingClosures(
-            ChemicalObjectModel mol) throws DENOPTIMException, TinkerException
+            ChemicalObjectModel mol) throws DENOPTIMException
     {
         ArrayList<ChemicalObjectModel> rcMols = new ArrayList<ChemicalObjectModel>();
         for (int i=0; i<mol.getRCACombinations().size(); i++)
@@ -171,19 +133,38 @@ public class RingClosureTool
 
             // Try to create new molecule
             ChemicalObjectModel molTo3d = mol.deepcopy();
-            ChemicalObjectModel rcMol = attemptRingClosure(molTo3d, 
-                    molTo3d.getRCACombinations().get(i));
-
+            if (settings.getPSSROTTool() != null)
+            {
+                try
+                {
+                    attemptRingClosureWithTinker(molTo3d, 
+                            molTo3d.getRCACombinations().get(i));
+                }  catch (TinkerException te)
+                {
+                    String msg = "ERROR! Tinker failed on task '" 
+                            + te.taskName + "'!";
+                    if (te.solution != "")
+                    {
+                        msg = msg + settings.NL + te.solution;
+                    }
+                    logger.log(Level.SEVERE, msg);
+                    throw new DENOPTIMException(msg, te);
+                } 
+            } else {
+                attemptRingClosureWithRCOServer(molTo3d, 
+                        molTo3d.getRCACombinations().get(i));
+            }
+            
     	    // If some ring remains open, report in the MOL_ERROR field
-    	    int newRingClosed = rcMol.getNewRingClosures().size();
+    	    int newRingClosed = molTo3d.getNewRingClosures().size();
     	    if (newRingClosed < rcaComb.size())
             {
         	    String err = "#RingClosureTool: uncomplete closure (closed "
     				+ newRingClosed + "/" + rcaComb.size() + ")";
-        	    rcMol.getIAtomContainer().setProperty(
+                    molTo3d.getIAtomContainer().setProperty(
         	            DENOPTIMConstants.MOLERRORTAG,err);
             }
-            rcMols.add(rcMol);
+            rcMols.add(molTo3d);
         }
 
         // Sort
@@ -256,7 +237,68 @@ public class RingClosureTool
 
     /**
      * Attempts to close rings by finding the conformation that allows to
-     * join heads and tails of atom specific chains. To this end a Potential
+     * join heads and tails of specific atom chains. The conformational search
+     * is performed using a
+     * <a href="https://github.com/denoptim-project/RingClosingMM">RingClosingMM</a> 
+     * socket server, which we assume to be running on the local machine.
+     * @param chemObj the definition of the system to work with. This system
+     * will be modified.
+     * @param rcaCombination the combination of RingClosingAttractors. This
+     * object defines which pairs of RingClosingAttractors will we try to join
+     * in this attempt.
+     * @return the updated chemical object given as input.
+     * @throws DENOPTIMException
+     */
+
+    public ChemicalObjectModel attemptRingClosureWithRCOServer(
+            ChemicalObjectModel chemObj,
+            Set<ObjectPair> rcaCombination) throws DENOPTIMException
+    {
+        String molName = chemObj.getName();
+
+        // Increment iteration number (to make unique file names)
+        itn++;
+
+        logger.log(Level.INFO, "Attempting Ring Closure via conformational"
+                                + " adaptation for " + molName
+                                + " (Iteration: " + itn + ")");
+
+        RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance(settings.getRCOServerHostname(), settings.getRCOServerPort());
+        
+        long startTime = System.nanoTime();
+        try {
+            rcoServer.runConformationalOptimization(chemObj, rcaCombination, logger);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error optimizing ring closing conformation: " + e.getMessage());
+            throw new DENOPTIMException("Error optimizing ring closing conformation: " + e.getMessage(), e);
+        }
+        long endTime = System.nanoTime();
+        long time = (endTime - startTime);
+        logger.log(Level.FINE, "TIME (RC conf. search): "+time/1000000+" ms"
+                + " #frags: " + chemObj.getGraph().getVertexList().size()
+                + " #atoms: " + chemObj.getIAtomContainer().getAtomCount()
+                + " #rotBnds: " + chemObj.getRotatableBonds().size());
+
+        logger.log(Level.INFO, "Ring-closing conformational optimization done. "
+                + "Now, post-processing.");
+
+        // Evaluate proximity of RingClosingAttractor and close rings
+        closeRings(chemObj, rcaCombination);
+        
+        // Update list rotatable bonds
+        chemObj.purgeListRotatableBonds();
+
+        // Finalize the molecule: saturate free RCA
+        saturateRingClosingAttractor(chemObj);
+        
+        return chemObj;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Attempts to close rings by finding the conformation that allows to
+     * join heads and tails of specific atom chains. To this end a Potential
      * Smoothing and Search conformational search in ROTational space (PSSROT)
      * is performed under the effect of the Ring Closing potential,
      * that defines which atoms (chain head/tails) attract each other. 
@@ -267,14 +309,14 @@ public class RingClosureTool
      * @param rcaCombination the combination of RingClosingAttractors. This
      * object defines which pairs of RingClosingAttractors will we try to join
      * in this attempt.
-     * @return a new molecular system with the freshly closed rings, if any,
-     * otherwise an empty molecule.
+     * @return the updated chemical object given as input.
      * @throws DENOPTIMException
      * @throws TinkerException 
      */
 
-    public ChemicalObjectModel attemptRingClosure(ChemicalObjectModel chemObj,
-            Set<ObjectPair> rcaCombination) throws DENOPTIMException, TinkerException
+    public ChemicalObjectModel attemptRingClosureWithTinker(
+            ChemicalObjectModel chemObj, Set<ObjectPair> rcaCombination) 
+                    throws DENOPTIMException, TinkerException
     {
         IAtomContainer fmol = chemObj.getIAtomContainer();
         String workDir = settings.getWorkingDirectory();
@@ -291,12 +333,12 @@ public class RingClosureTool
         molSpecificKeyFileLines.addAll(settings.getRSKeyFileParams());
         for (ObjectPair op : rcaCombination)
         {
-            int iTnkAtmRcaA = chemObj.getTnkAtmIdOfRCA(
+            int iZMatRcaA = chemObj.getZMatIdxOfRCA(
                     (RingClosingAttractor) op.getFirst());
-            int iTnkAtmRcaB = chemObj.getTnkAtmIdOfRCA(
+            int iZMatRcaB = chemObj.getZMatIdxOfRCA(
                     (RingClosingAttractor) op.getSecond());
-            molSpecificKeyFileLines.add("RC-PAIR " + iTnkAtmRcaA + " " 
-                    + iTnkAtmRcaB);
+            molSpecificKeyFileLines.add("RC-PAIR " + iZMatRcaA + " " 
+                    + iZMatRcaB);
         }
         
         // Definition of RingClosingPotential
@@ -308,8 +350,8 @@ public class RingClosureTool
             RingClosingAttractor rca1 = (RingClosingAttractor) op.getSecond();
             int s0t = fmol.indexOf(rca0.getSrcAtom()) + 1;
             int s1t = fmol.indexOf(rca1.getSrcAtom()) + 1;
-            int i0t = chemObj.getTnkAtmIdOfRCA(rca0);
-            int i1t = chemObj.getTnkAtmIdOfRCA(rca1);
+            int i0t = chemObj.getZMatIdxOfRCA(rca0);
+            int i1t = chemObj.getZMatIdxOfRCA(rca1);
 
             double parA = 0.0;
             double parB = 0.0;
@@ -323,7 +365,9 @@ public class RingClosureTool
         }
         
         long startTime = System.nanoTime();
-        ConformationalSearchPSSROT.performPSSROT(chemObj, itn, "rs",
+        ConformationalSearchPSSROT.performPSSROT(chemObj, 
+                settings.getTinkerMap(),
+                itn, "rs",
                 settings.getParamFile(), 
                 molSpecificKeyFileLines,
                 settings.getInitPSSROTParams(),
@@ -453,7 +497,7 @@ public class RingClosureTool
                                                        throws DENOPTIMException
     {
     	IAtomContainer fmol = mol.getIAtomContainer();
-    	TinkerMolecule tmol = mol.getTinkerMolecule();
+    	ZMatrix zmat = mol.getZMatrix();
     	String duSymbol = DENOPTIMConstants.DUMMYATMSYMBOL;
         for (RingClosingAttractor rca : mol.getAttractorsList())
         {
@@ -461,8 +505,8 @@ public class RingClosureTool
             {
 		        // Used RCA are changed to inert dummy atoms (to keep ZMatrix)
                 IAtom fatm = rca.getIAtom();
-                TinkerAtom tatm = tmol.getAtom(fmol.indexOf(fatm) + 1);
-                tatm.setAtomString(duSymbol);
+                ZMatrixAtom zatm = zmat.getAtom(fmol.indexOf(fatm));
+                zatm.setSymbol(duSymbol);
                 
                 IAtom newAtm = new PseudoAtom(duSymbol,new Point3d(fatm.getPoint3d()));
                 newAtm.setProperties(fatm.getProperties());
@@ -488,12 +532,9 @@ public class RingClosureTool
         		// This code is temporary as will be removed by the introduction
         		// proper capping group selection and use (TODO)
         		IAtom fatm = rca.getIAtom();
-        		TinkerAtom tatm = tmol.getAtom(fmol.indexOf(fatm) + 1);
-        		tatm.setAtomString("H");
-        		double[] ic = tatm.getDistAngle();
-        		ic[0] = 1.10; //hard coded bond  
-        		tatm.setDistAngle(ic);
-        		
+        		ZMatrixAtom zatm = zmat.getAtom(fmol.indexOf(fatm));
+        		zatm.setSymbol("H");
+        		zatm.setBondLength(1.10);
         		//UPGRADE: this cannot be done since CDK 2.*. So, we must
         		// create a new IAtom object to replace the old one.
         		/*
@@ -510,9 +551,6 @@ public class RingClosureTool
     
     	// Update XYZ
     	mol.updateXYZFromINT();
-
-        // Update Tinker atom types
-        setTinkerTypes(tmol);
     }
 
 //------------------------------------------------------------------------------

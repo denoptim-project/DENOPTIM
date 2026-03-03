@@ -23,19 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.exception.DENOPTIMException;
-import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.ga.EAUtils;
 import denoptim.graph.DGraph;
-import denoptim.graph.rings.RingClosureParameters;
 import denoptim.io.DenoptimIO;
-import denoptim.programs.RunTimeParameters.ParametersType;
-import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.ProgramTask;
 
 

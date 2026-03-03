@@ -31,11 +31,11 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.DGraph;
 import denoptim.graph.rings.RingClosureParameters;
+import denoptim.integration.rcoserver.RCOSocketServerClient;
 import denoptim.integration.tinker.ConformationalSearchPSSROT;
 import denoptim.integration.tinker.TinkerException;
-import denoptim.integration.tinker.TinkerMolecule;
-import denoptim.integration.tinker.TinkerUtils;
 import denoptim.io.DenoptimIO;
+import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.moldecularmodelbuilder.MMBuilderParameters;
 import denoptim.utils.AtomOrganizer;
@@ -85,7 +85,7 @@ public class MultiMolecularModelBuilder
      */
 
     public ArrayList<IAtomContainer> buildMulti3DStructure() 
-            throws DENOPTIMException, TinkerException
+            throws DENOPTIMException
     {
         logger.log(Level.INFO, "Building Multiple 3D representations for "
                  + "graph = " + molGraph.toString());
@@ -138,46 +138,75 @@ public class MultiMolecularModelBuilder
                         + "Nothing to send to conformational search.");
                 skipConfSearch = true;
             }
+            // Ring-closing conf search on the RCO server includes general
+            // purpose conformational search, so no need to run a second 
+            // conformational search.
+            // RCO server is the default, so the condition checks for non-default
+            // configuration.
+            if (settings.getPSSROTTool() == null)
+            {
+                skipConfSearch = true;
+            }
         } else {
             ChemicalObjectModel nMol = mol.deepcopy();
             rct.saturateRingClosingAttractor(nMol);
             structures = new ArrayList<ChemicalObjectModel>();
             structures.add(nMol);
         }
-        
-        /*
-        ArrayList<IAtomContainer> iacs = new ArrayList<IAtomContainer>();
-        for (ChemicalObjectModel com : structures)
-            iacs.add(com.getIAtomContainer());
-        DenoptimIO.writeSDFFile("/tmp/afterRC.sdf", iacs);
-        */
 
         // 2: Conformational search (if possible)
         if (!skipConfSearch)
         {
-            startTime = System.nanoTime();
-            ConformationalSearchPSSROT.performPSSROT(structures, "cs",
-                    settings.getParamFile(), 
-                    settings.getKeyFileParams(),
-                    settings.getInitPSSROTParams(),
-                    settings.getRestPSSROTParams(),
-                    settings.getPSSROTTool(),
-                    settings.getXYZINTTool(),
-                    settings.getWorkingDirectory(),
-                    settings.getTaskID(), logger);
-            time = (endTime - startTime);
+            if (settings.getPSSROTTool() != null)
+            {
+                try
+                {
+                    startTime = System.nanoTime();
+                    ConformationalSearchPSSROT.performPSSROT(structures, 
+                            settings.getTinkerMap(),
+                            "cs",
+                            settings.getParamFile(), 
+                            settings.getKeyFileParams(),
+                            settings.getInitPSSROTParams(),
+                            settings.getRestPSSROTParams(),
+                            settings.getPSSROTTool(),
+                            settings.getXYZINTTool(),
+                            settings.getWorkingDirectory(),
+                            settings.getTaskID(), logger);
+                    time = (endTime - startTime);
+                }  catch (TinkerException te)
+                {
+                    String msg = "ERROR! Tinker failed on task '" 
+                            + te.taskName + "'!";
+                    if (te.solution != "")
+                    {
+                        msg = msg + settings.NL + te.solution;
+                    }
+                    logger.log(Level.SEVERE, msg);
+                    throw new DENOPTIMException(msg, te);
+                } 
+            } else {
+                RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance(
+                    settings.getRCOServerHostname(), settings.getRCOServerPort());
+                for (ChemicalObjectModel com : structures)
+                {
+                    try
+                    {
+                        rcoServer.runConformationalOptimization(com, logger);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        String msg = "ERROR! RCOSocketServer failed!";
+                        logger.log(Level.SEVERE, msg);
+                        throw new DENOPTIMException(msg, e);
+                    }
+                    
+                }
+            }
             logger.log(Level.FINE, "TIME (conf. search): "+time/1000000+" ms"
                       + " #frags: " + mol.getGraph().getVertexList().size()
                       + " #atoms: " + mol.getIAtomContainer().getAtomCount()
                       + " #rotBnds: " + mol.getRotatableBonds().size());
         }
-        
-        /*
-        ArrayList<IAtomContainer> iacs2 = new ArrayList<IAtomContainer>();
-        for (ChemicalObjectModel com : structures)
-            iacs.add(com.getIAtomContainer());
-        DenoptimIO.writeSDFFile("/tmp/afterCS.sdf", iacs2);
-        */
         
         // Convert and return results
         ArrayList<IAtomContainer> results = new ArrayList<IAtomContainer>();
@@ -266,16 +295,15 @@ public class MultiMolecularModelBuilder
             logger.log(Level.FINEST, "Reordered IAtomContainer: 'iacToIC.sdf'");
             DenoptimIO.writeSDFFile("iacToIC.sdf",reorderedMol,false);
         }
-
+        
         // Generate Internal Coordinates
-        TinkerMolecule tmol = TinkerUtils.getICFromIAC(reorderedMol, 
-                settings.getTinkerMap());
-
+        ZMatrix zmat= ZMatrix.getZMatrixFromIAC(reorderedMol);
+        
         // Generate combined molecular representations (both XYZ and INT)
         return new ChemicalObjectModel(
                 molGraph,
                 reorderedMol,
-                tmol,
+                zmat,
                 molName,
                 rotBonds,
                 oldToNewMap,
