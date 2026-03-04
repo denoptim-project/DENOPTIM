@@ -47,21 +47,36 @@ function compareElementalAnalysis()
 HOST="${1:-localhost}"
 PORT="${2:-59557}"
 
+wrkDir=`pwd`
+
+echo "Checking RCO server status on ${HOST}:${PORT}..."
+serverStatus=$(rc-optimizer --server-status --host "${HOST}" --port "${PORT}" 2>&1)
+echo "Server status check output: $serverStatus"
+
 weOwnRCOServer=false
-if ! rc-optimizer --server-status --host "${HOST}" --port "${PORT}" | grep -q "RUNNING" ; then
-    rc-optimizer --server-start --host "${HOST}" --port "${PORT}" > server.log 2>&1 &
+if echo "$serverStatus" | grep -q "NOT RUNNING" ; then
+    echo "RCO server not running. Attempting to start on ${HOST}:${PORT}..."
+    rc-optimizer --server-start --host "${HOST}" --port "${PORT}" > "$wrkDir/server.log" 2>&1 &
     sleep 3
-    if ! rc-optimizer --server-status --host "${HOST}" --port "${PORT}" | grep -q "RUNNING" ; then
+    serverStatusAfter=$(rc-optimizer --server-status --host "${HOST}" --port "${PORT}" 2>&1)
+    echo "Server status after start attempt: $serverStatusAfter"
+    if echo "$serverStatusAfter" | grep -q "NOT RUNNING" ; then
         echo "ERROR: failed to start RCO server"
         echo "See $wrkDir/server.log for details"
         exit -1
-    else
+    elif echo "$serverStatusAfter" | grep -q "RUNNING" ; then
         echo "RCO server started!"
+    else
+        echo "ERROR: unexpected server status: $serverStatusAfter"
+        exit -1
     fi
     weOwnRCOServer=true
+elif echo "$serverStatus" | grep -q "RUNNING" ; then
+    echo "RCO server is already running on ${HOST}:${PORT}"
+else
+    echo "ERROR: unexpected server status output: $serverStatus"
+    exit -1
 fi
-
-wrkDir=`pwd`
 
 files=$(ls input/*.sdf )
 nFiles=$(ls input/*.sdf | wc -l | awk '{print $1}')

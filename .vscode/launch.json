@@ -15,12 +15,12 @@
         },
         {
             "type": "java",
-            "name": "Run test t1_Mol-9",
+            "name": "Run test t1_Mol-2",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "-r", "B3D", "MOL000009_DnpCG.params"
+                "-r", "B3D", "Mol2_DnpCG.params"
             ],
             "cwd": "/tmp/denoptim_test/t1",
             "console": "integratedTerminal"
