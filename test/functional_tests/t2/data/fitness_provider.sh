@@ -93,8 +93,14 @@ exec 2>&1
 #
 molNoRCA="$wrkDir/${molName}_noRCA.sdf"
 cp "$inpSDF" "$molNoRCA"
-sed "$sedInPlace" "s/ATP/H  /g" "$molNoRCA"
-sed "$sedInPlace" "s/ATM/H  /g" "$molNoRCA"
+# Handle sedInPlace which may contain spaces (BSD sed: -i '')
+if [[ "$sedInPlace" == *"''"* ]]; then
+    sed -i '' "s/ATP/H  /g" "$molNoRCA"
+    sed -i '' "s/ATM/H  /g" "$molNoRCA"
+else
+    sed $sedInPlace "s/ATP/H  /g" "$molNoRCA"
+    sed $sedInPlace "s/ATM/H  /g" "$molNoRCA"
+fi
 
 #
 # Prepare final SDF file

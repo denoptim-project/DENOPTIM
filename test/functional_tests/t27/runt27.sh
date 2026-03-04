@@ -27,8 +27,14 @@ rm -rf data
 filesToModify=$(find . -type f | xargs grep -l "OTF")
 for f in $filesToModify
 do
-    sed "$sedInPlace" "s|OTF_WDIR|$wrkDir|g" "$f"
-    sed "$sedInPlace" "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
+    # Handle sedInPlace which may contain spaces (BSD sed: -i '')
+    if [[ "$sedInPlace" == *"''"* ]]; then
+        sed -i '' "s|OTF_WDIR|$wrkDir|g" "$f"
+        sed -i '' "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
+    else
+        sed $sedInPlace "s|OTF_WDIR|$wrkDir|g" "$f"
+        sed $sedInPlace "s|OTF_PROCS|$DENOPTIMslaveCores|g" "$f"
+    fi
 done
 
 #Run it

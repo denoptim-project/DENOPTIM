@@ -35,14 +35,14 @@
         },
         {
             "type": "java",
-            "name": "Run test t33",
+            "name": "Run test t12a",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "-r", "FRG", "t33.params"
+                "-r", "GA", "t12a.params"
             ],
-            "cwd": "/tmp/denoptim_test/t33",
+            "cwd": "/tmp/denoptim_test/t12a",
             "console": "integratedTerminal"
         },
         {
