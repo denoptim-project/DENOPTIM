@@ -527,12 +527,14 @@ public class Main
         StringWriter out = new StringWriter();
         PrintWriter pw = new PrintWriter(out);
         
-        formatter.printHelp(pw, 80, "denoptim", DENOPTIMConstants.EOL, 
+        formatter.printHelp(pw, 80, "denoptim [input_file]", DENOPTIMConstants.EOL, 
                 CLIOptions.getInstance(), 
                 formatter.getLeftPadding(), formatter.getDescPadding(), 
                 DENOPTIMConstants.EOL +
                 "Run without arguments to launch the graphical user "
-                + "interface (GUI) without opening any file. ", true);
+                + "interface (GUI) without opening any file." + DENOPTIMConstants.EOL +
+                "When using -r option, specify an input parameter file "
+                + "(e.g., input.params) as an additional argument.", true);
         pw.flush();
         return out.toString();
     }

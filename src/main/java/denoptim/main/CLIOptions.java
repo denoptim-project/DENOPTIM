@@ -61,7 +61,9 @@ public class CLIOptions extends Options
         
         run = new Option("r","run",true, "Request a specific type of "
                 + "run. Choose among:" + DENOPTIMConstants.EOL
-                + RunType.getRunTypesForUser());
+                + RunType.getRunTypesForUser() + DENOPTIMConstants.EOL
+                + "When using -r, an input parameter file (e.g., input.params) "
+                + "must be specified as an additional argument.");
         run.setRequired(false);
         this.addOption(run);
         
