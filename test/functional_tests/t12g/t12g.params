@@ -25,7 +25,7 @@ FRG-UNSETTOSINGLEBO
 #
 GA-randomSeed=8572368003836
 GA-Parallelization=synchronous
-GA-numParallelTasks=4
+GA-numParallelTasks=1
 GA-populationSize=10
 GA-numChildren=4
 GA-numGenerations=1

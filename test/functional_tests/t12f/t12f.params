@@ -14,7 +14,7 @@ FP-EQUATION=${3*Zagreb - 0.2*nAtom}
 # Genetic Algorithm parameters
 GA-randomSeed=8572368003836
 GA-Parallelization=synchronous
-GA-numParallelTasks=OTF_PROCS
+GA-numParallelTasks=1
 GA-populationSize=6
 GA-numGenerations=6
 GA-XOverSelectionMode=TS

@@ -98,16 +98,27 @@ function runTest() {
 # Process arguments
 chosenTest=""
 overwrite=1
-args=($@)
-for ((i=0; i<$#; i++))
+while [ $# -gt 0 ]
 do
-    arg=${args[$i]}
-    case "$arg" in
-        "-r") overwrite=0 ;;
-        "-t") if [ $((i+1)) -lt $# ];
-              then
-                  chosenTest=${args[$((i+1))]}
-              fi;;
+    case "$1" in
+        "-r") 
+            overwrite=0
+            shift
+            ;;
+        "-t") 
+            if [ $# -gt 1 ]
+            then
+                chosenTest="$2"
+                shift 2
+            else
+                echo "ERROR: -t option requires a test name"
+                exit 1
+            fi
+            ;;
+        *)
+            # Unknown argument - ignore it (for backwards compatibility)
+            shift
+            ;;
     esac
 done
 
@@ -170,12 +181,18 @@ if [ ! -z "$chosenTest" ]
 then
     if [[ "$chosenTest" =~ ^[t,p].*$ ]]
     then
+        # Test name already starts with 't' or 'p'
         runTest "$chosenTest"
         exit 0
-    elif [[ "$chosenTest" =~ ^[1-9]*$ ]]
+    elif [[ "$chosenTest" =~ ^[0-9]+[a-z]*$ ]]
     then
+        # Test name starts with digits (e.g., "12a", "1", "12")
         runTest "t$chosenTest"
         exit 0
+    else
+        echo "ERROR: Invalid test name format: $chosenTest"
+        echo "Test name should start with 't' or 'p', or be a number (e.g., 't1', '12a', '1')"
+        exit 1
     fi
 fi
 
