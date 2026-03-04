@@ -395,10 +395,9 @@ public class ZMatrix
             if ((idxJ==idx1 && idxK==idx2) || (idxJ==idx2 && idxK==idx1))
             {
                 Integer c = getChiralFlag(ia);
-                if (c != null)
+                if (c != null && c == 0)
                 {
-                    return c == 0;
-                    
+                    return true;
                 }
             }
         }
