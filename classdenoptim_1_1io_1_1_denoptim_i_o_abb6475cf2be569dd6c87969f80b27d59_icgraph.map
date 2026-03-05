@@ -1,0 +1,15 @@
+<map id="denoptim.io.DenoptimIO.readText" name="denoptim.io.DenoptimIO.readText">
+<area shape="rect" id="node1" title="Read text from file." alt="" coords="1376,115,1589,142"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1combinatorial_1_1_c_e_b_l_utils.html#a1666b546c68b051f6f2e3a1e8ea924fd" title="Converts a text file into the corresponding checkpoint object." alt="" coords="1045,32,1328,73"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_text_reader.html#af93992c7d6f33c7cf9832462c3059120" title="Print the content of the given file in this tab&#39;s pane." alt="" coords="1071,108,1302,149"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_p_runner.html#a7c993ef280d2c2a458c0650284b9352b" title="Create and run the fitness task." alt="" coords="1072,173,1301,215"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_c_e_b_l_parameters.html#a06fc8c701fcb26782ce85d2383bc542b" title="Processes all parameters and initialize related objects." alt="" coords="759,11,997,52"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_frag_space_explorer.html#a1c6a2aae9ab686d5c7c0fc6246f7aa61" title=" " alt="" coords="496,5,711,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a1a2e06a2647032587d42155302b8c0a6" title="Process a file that has a recognized file format and loads a suitable GUI card to visualize the file ..." alt="" coords="767,117,989,143"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a0df9ca063352fbc50f9476f3b2820926" title="Initialize the contents of the tool bar." alt="" coords="228,126,448,153"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i.html#a460fa99497f04de06d2adf8671a92441" title="Launch the application." alt="" coords="532,122,675,149"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a94df24e485081c9b9d7441387f409e26" title="Updated the the list of recent files in the &quot;open Recent&quot; menu." alt="" coords="497,173,710,215"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a36f4409849998e032342f49b19e6c5b5" title="Constructor that build the tool bar." alt="" coords="5,119,180,160"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_f_p_runner.html#a8581fe2c5a66bf2682795cfa8554e2b4" title="Constructor." alt="" coords="763,171,993,212"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_fitness_runner.html#a557845da14612ff98352debd815ef557" title=" " alt="" coords="763,236,993,277"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixAtom.getSymbol" name="denoptim.molecularmodeling.zmatrix.ZMatrixAtom.getSymbol">
+<area shape="rect" id="node1" title="Get the symbol of the atom." alt="" coords="993,165,1227,206"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client.html#ad1c10c7e111ab08c00ff76db47bfab38" title="Gets a JsonArray representation of the Z&#45;matrix." alt="" coords="676,52,919,108"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1integration_1_1tinker_1_1_conformational_search_p_s_s_r_o_t.html#a4e23cd79b91caeac12ba1e801e919b5c" title="Used elemental symbols (ot pseudo&#45;element symbols) to assign atom types." alt="" coords="649,131,945,173"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#a2ab257580282e910c499668f171df0c6" title=" " alt="" coords="681,197,914,238"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a7ce8ad5c951a5f0c57655ad4b34f4cf2" title="Write Tinker INT file." alt="" coords="709,262,885,303"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client.html#af260b4786b039bdd434edb966ecb91d8" title="Formulates the request to be sent to the socket server." alt="" coords="329,13,596,54"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client_test.html#a1e0e80a90cc79511551c8705cb757e42" title=" " alt="" coords="324,77,601,133"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client.html#af040644747c1ffdfd22c8095f6dfe992" title="Runs a conformational optimization using the services provided by the socket server configured for th..." alt="" coords="5,5,276,61"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1integration_1_1tinker_1_1_conformational_search_p_s_s_r_o_t.html#a40d8eeb17fa0eb16f0a92d3a35408c26" title="Performs PSSROT conformational search on the given chemical object." alt="" coords="337,164,588,220"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils_test.html#a106bc19f7f8be0561f16100c61840627" title=" " alt="" coords="354,255,571,297"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils_test.html#a93f449785655a326943e149ea053ad74" title=" " alt="" coords="351,321,575,362"/>
+</map>

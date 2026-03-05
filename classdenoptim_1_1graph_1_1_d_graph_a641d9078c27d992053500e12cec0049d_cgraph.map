@@ -1,0 +1,7 @@
+<map id="denoptim.graph.DGraph.appendVertexOnAP" name="denoptim.graph.DGraph.appendVertexOnAP">
+<area shape="rect" id="node1" title="Append a vertex to this graph: adds the new vertex to the list of vertices belonging to the graph,..." alt="" coords="5,27,208,69"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="256,5,467,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="271,57,452,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="515,23,724,65"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="530,89,709,130"/>
+</map>

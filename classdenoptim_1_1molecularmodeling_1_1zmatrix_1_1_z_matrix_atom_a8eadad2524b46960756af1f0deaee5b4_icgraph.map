@@ -1,0 +1,6 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixAtom.setAngleValue" name="denoptim.molecularmodeling.zmatrix.ZMatrixAtom.setAngleValue">
+<area shape="rect" id="node1" title="Set the angle value." alt="" coords="324,93,557,134"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_conformational_search_p_s_s_r_o_t.html#a40d8eeb17fa0eb16f0a92d3a35408c26" title="Performs PSSROT conformational search on the given chemical object." alt="" coords="15,5,266,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client.html#af040644747c1ffdfd22c8095f6dfe992" title="Runs a conformational optimization using the services provided by the socket server configured for th..." alt="" coords="5,85,276,141"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom_test.html#ad4d7db05267c3fae2e322ca48ef357f1" title=" " alt="" coords="24,165,257,206"/>
+</map>

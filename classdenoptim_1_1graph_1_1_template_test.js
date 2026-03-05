@@ -1,0 +1,25 @@
+var classdenoptim_1_1graph_1_1_template_test =
+[
+    [ "getAmideFragment", "classdenoptim_1_1graph_1_1_template_test.html#a2bb7471fdd81079cdf32ed268822f10a", null ],
+    [ "getCH2Fragment", "classdenoptim_1_1graph_1_1_template_test.html#afa85545bfdc92e68f953d6a97c4d83cf", null ],
+    [ "getNestedTemplate", "classdenoptim_1_1graph_1_1_template_test.html#ad45d6edc7ff123cee0939301b6d1fc2b", null ],
+    [ "getOHFragment", "classdenoptim_1_1graph_1_1_template_test.html#a5d96f03d4352d04d0a71b88d35b93de5", null ],
+    [ "getTemplateDeepTest", "classdenoptim_1_1graph_1_1_template_test.html#a6bb3cdf3bc0c265c1afdd6fcdb8250a8", null ],
+    [ "getTestAmideTemplate", "classdenoptim_1_1graph_1_1_template_test.html#a24cb0acd547ff1ce40433455a0c593a3", null ],
+    [ "testAddAP_after_setInnerGraph_throwsException", "classdenoptim_1_1graph_1_1_template_test.html#a255d7ef2a87d37ff0fd1e5063872d838", null ],
+    [ "testAtLeastSameNumberOfAPs", "classdenoptim_1_1graph_1_1_template_test.html#ad0e2453976f945a1f018baec051b8224", null ],
+    [ "testClone", "classdenoptim_1_1graph_1_1_template_test.html#a72d37b4c24ad896838401b319b1d667e", null ],
+    [ "testGetAttachmentPoints_returnsAPsWithTemplateAsOwner", "classdenoptim_1_1graph_1_1_template_test.html#a10000b8324c3d9061fb0ab877f142e12", null ],
+    [ "testGetAttachmentPoints_returnsCorrectNumberOfAPs", "classdenoptim_1_1graph_1_1_template_test.html#ac49684d98a8e9eb615b9b85469f25971", null ],
+    [ "testGetIAtomContainer", "classdenoptim_1_1graph_1_1_template_test.html#ae81b16e3af5927e6d5672d0639ac54f7", null ],
+    [ "testGetIAtomContainer_DeepVertex", "classdenoptim_1_1graph_1_1_template_test.html#a5a0585829290194f7e8dfc718346d212", null ],
+    [ "testNestedTemplateCloning", "classdenoptim_1_1graph_1_1_template_test.html#a50688358b5a557ee51683082427bdc14", null ],
+    [ "testSameAPClass", "classdenoptim_1_1graph_1_1_template_test.html#abec2a04150d4f8948c18a796b5144ddc", null ],
+    [ "testSetInnerGraph_throws_on_graph_incompatible_w_requiredAPs", "classdenoptim_1_1graph_1_1_template_test.html#a97788ba0cf69ace70ee9f81139baa36a", null ],
+    [ "chemBuilder", "classdenoptim_1_1graph_1_1_template_test.html#ac00a18c9577d0d6314c86c9f1d625d1f", null ],
+    [ "NL", "classdenoptim_1_1graph_1_1_template_test.html#ad45815966cb568bcedaf27ca63268f8e", null ],
+    [ "rng", "classdenoptim_1_1graph_1_1_template_test.html#a98f427e067533f7af663c583ba4763b2", null ],
+    [ "SEED", "classdenoptim_1_1graph_1_1_template_test.html#a9dc55d9fb6760a3598cac2b1608d1635", null ],
+    [ "SEP", "classdenoptim_1_1graph_1_1_template_test.html#ad1abe7878c61ded9faf97349b68c7eed", null ],
+    [ "tempDir", "classdenoptim_1_1graph_1_1_template_test.html#a33891525bc1a2e06581135efbb51439b", null ]
+];

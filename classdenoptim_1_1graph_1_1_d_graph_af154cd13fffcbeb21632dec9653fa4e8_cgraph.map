@@ -1,0 +1,12 @@
+<map id="denoptim.graph.DGraph.addCappingGroups" name="denoptim.graph.DGraph.addCappingGroups">
+<area shape="rect" id="node1" title="Add a capping group on the given vertices, if needed." alt="" coords="5,143,187,185"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a641d9078c27d992053500e12cec0049d" title="Append a vertex to this graph: adds the new vertex to the list of vertices belonging to the graph,..." alt="" coords="235,57,437,98"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="241,125,431,152"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="497,219,685,261"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#aeed71fb5a76a745190ea6f0e3e0b939d" title="Builds a new molecular fragment kind of vertex." alt="" coords="247,251,425,293"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="485,5,696,32"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="500,57,681,98"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="744,25,953,66"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="759,90,938,131"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="505,122,676,163"/>
+</map>

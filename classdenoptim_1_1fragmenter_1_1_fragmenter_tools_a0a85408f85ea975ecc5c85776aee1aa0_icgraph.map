@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.FragmenterTools.exploreDGraphForMappings" name="denoptim.fragmenter.FragmenterTools.exploreDGraphForMappings">
+<area shape="rect" id="node1" title="Recursive function to process edges at any level of embedding to remove the corresponding bonds and c..." alt="" coords="263,29,480,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a106372ea68c25ed99afb71e15bc0671c" title="Chops one chemical structure by applying the given fragmentation templates." alt="" coords="5,29,215,71"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.graph.Fragment.isIsomorphicTo" name="denoptim.graph.Fragment.isIsomorphicTo">
+<area shape="rect" id="node1" title="Checks for isomorphism of the graph representation of this and another fragment." alt="" coords="272,71,453,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a5e9b439608a02da3f5074f24a17d4b0a" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="12,5,217,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment_test.html#aa17f42b21847b022c3d7a87876e17717" title=" " alt="" coords="5,71,224,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment_test.html#af49cc0e35c38f683bfc3d332210d1124" title=" " alt="" coords="5,136,224,177"/>
+</map>

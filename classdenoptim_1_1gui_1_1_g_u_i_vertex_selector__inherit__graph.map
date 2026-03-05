@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GUIVertexSelector" name="denoptim.gui.GUIVertexSelector">
+<area shape="rect" id="node1" title="A modal dialog with a viewer that understands the different types of DENOPTIM vertex and allows to se..." alt="" coords="5,155,212,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html" title=" " alt="" coords="12,80,205,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="76,5,141,32"/>
+</map>

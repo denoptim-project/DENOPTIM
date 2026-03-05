@@ -1,0 +1,5 @@
+<map id="denoptim.task.ParallelAsynchronousTaskExecutor.stopRun" name="denoptim.task.ParallelAsynchronousTaskExecutor.stopRun">
+<area shape="rect" id="node1" title="Stops all subtasks and shutdown executor." alt="" coords="5,39,236,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#a917eef2acb8d25188a23710dd3564330" title="clean all reference to submitted tasks" alt="" coords="284,5,515,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#a1df7d9703e94f5d58dc53afdaa7688d4" title="Removes only tasks that are marked as completed." alt="" coords="284,71,515,112"/>
+</map>

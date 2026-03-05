@@ -1,0 +1,10 @@
+<map id="denoptim.gui.VertexViewPanel.activateTabEditsListener" name="denoptim.gui.VertexViewPanel.activateTabEditsListener">
+<area shape="rect" id="node1" title="Allows to activate and deactivate the listener." alt="" coords="1188,104,1435,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#afd707af449c1488ca8cbb16cea1b8c6e" title=" " alt="" coords="877,71,1140,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a377dba288cdac33b90ec928f579d9be0" title=" " alt="" coords="881,136,1137,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a09363e21a5254efe8f128a99e82acbf0" title=" " alt="" coords="583,5,827,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector_1_1_vrtx_spinner_change_event.html#aca98b170c98a615d12f199d1ccdd26dd" title=" " alt="" coords="580,71,829,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,13,532,39"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,5,221,47"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector_1_1_vrtx_spinner_change_event.html#aa4094444bbbf29fde85df9440ab5c0e7" title=" " alt="" coords="580,136,829,177"/>
+</map>

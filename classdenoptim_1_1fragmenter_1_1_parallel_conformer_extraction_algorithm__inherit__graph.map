@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.ParallelConformerExtractionAlgorithm" name="denoptim.fragmenter.ParallelConformerExtractionAlgorithm">
+<area shape="rect" id="node1" title="Runs threads that extract the most representative conformer of fragments given as input." alt="" coords="23,95,218,136"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html" title="Runs tasks parallel in asynchronous fashion." alt="" coords="5,5,236,47"/>
+</map>

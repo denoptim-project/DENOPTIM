@@ -1,0 +1,10 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrix.setId" name="denoptim.molecularmodeling.zmatrix.ZMatrix.setId">
+<area shape="rect" id="node1" title="Set the id of the ZMatrix." alt="" coords="585,177,819,218"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a04b53939fb59cd25ba95bf30ba4b33eb" title="Reads a Tinker INT file." alt="" coords="333,26,509,67"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils_test.html#a106bc19f7f8be0561f16100c61840627" title=" " alt="" coords="22,85,239,126"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#a1b9bd2fd9f1fac46fde6c25131bb47f6" title=" " alt="" coords="304,143,537,185"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils_test.html#a93f449785655a326943e149ea053ad74" title=" " alt="" coords="309,209,533,250"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#aafe0d884d732aa14d0e66ba51903a247" title=" " alt="" coords="304,274,537,315"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#aed8071bf45b6758aa6000a5f0196d1f4" title=" " alt="" coords="304,339,537,381"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1tinker_1_1_conformational_search_p_s_s_r_o_t.html#a40d8eeb17fa0eb16f0a92d3a35408c26" title="Performs PSSROT conformational search on the given chemical object." alt="" coords="5,5,256,61"/>
+</map>

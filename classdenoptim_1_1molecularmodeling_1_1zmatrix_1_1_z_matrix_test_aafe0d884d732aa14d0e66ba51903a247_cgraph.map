@@ -1,0 +1,9 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testZMatrixEquals" name="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testZMatrixEquals">
+<area shape="rect" id="node1" title=" " alt="" coords="5,169,239,211"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ae9486d28880e0c8225c0092acab98165" title="Add an atom to the ZMatrix." alt="" coords="568,17,801,59"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="568,168,801,209"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a1db113a8dbb6ff33d597115771893fed" title="Delete the bond between the two atoms at the given indices." alt="" coords="287,136,520,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="287,201,520,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#af057822127c5cdb8dd95809365f69f32" title=" " alt="" coords="287,47,520,88"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a6a5dddb77381cffcd8f187d3cf009c48" title="Set the id of the ZMatrix." alt="" coords="287,319,520,360"/>
+</map>

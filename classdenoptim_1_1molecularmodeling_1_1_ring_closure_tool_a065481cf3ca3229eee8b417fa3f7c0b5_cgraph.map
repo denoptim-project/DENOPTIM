@@ -1,0 +1,16 @@
+<map id="denoptim.molecularmodeling.RingClosureTool.closeRings" name="denoptim.molecularmodeling.RingClosureTool.closeRings">
+<area shape="rect" id="node1" title="Makes new rings by connecting pairs of atoms that hold properly arranged RingClosingAttractors." alt="" coords="5,412,195,453"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a85aaa2ca417ef0cf65457ad46f288344" title="Modify the molecule adding a cyclic bond between two atoms." alt="" coords="273,96,475,137"/>
+<area shape="rect" id="node5" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html#a8be61f74c1beaa52e4a53ff70d32a614" title="Checks if it is possible to convert this edge type into a CDK bond." alt="" coords="583,160,757,201"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a132443dda8e8278736100a7ff759f666" title=" " alt="" coords="270,216,478,257"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#a73b956a6d46e61cec71683dff846945d" title="Get the atom corresponding to this RingClosingAttractor in the molecular representation." alt="" coords="289,281,459,323"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="281,347,467,388"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#ad7adf870dace8113fbdc9978a807aa4c" title="Get the type of bond this attractor is meant to close." alt="" coords="268,412,480,453"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a2b37c2553ba1f6e445f3ad5f0e606e0e" title=" " alt="" coords="248,477,500,519"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a3d9bbb2c0fb41a4e940af508adff49ac" title=" " alt="" coords="243,543,505,584"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#a2d505bfe97a7a22f2957cbbe80909823" title="Get the atom in the parent fragment that holds the attachment point occupied by this RingClosingAttra..." alt="" coords="281,608,467,649"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure.html#a195a0d2736b579d139500a36eeee7480" title="Evaluate closability by comparing the distances and the dot product with the given critera." alt="" coords="289,697,459,739"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#a6acddae9b5fb483557efd5eefb38a975" title="Set this RingClosingAttractor to &#39;used&#39;." alt="" coords="289,763,459,804"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="553,29,787,71"/>
+<area shape="rect" id="node4" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html#a3b106d49993cb7dcc1544211e8a17dfd" title=" " alt="" coords="583,95,757,136"/>
+</map>

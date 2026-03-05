@@ -1,0 +1,9 @@
+<map id="denoptim.graph.DGraph.renumberVerticesGetMap" name="denoptim.graph.DGraph.renumberVerticesGetMap">
+<area shape="rect" id="node1" title="Reassign vertex IDs to a graph." alt="" coords="5,169,220,211"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="268,5,456,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b7c2feb2da30079318f06819e0e6761" title=" " alt="" coords="273,71,451,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="277,136,447,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a650a0f54382fb930bf57429dd616258a" title=" " alt="" coords="273,201,451,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#ad26ecf426a5e415605df94be904e58d3" title=" " alt="" coords="277,267,447,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a29e20c43a6110fbaac6cc86c216fe143" title=" " alt="" coords="277,332,447,373"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testZMatrixHashCode" name="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testZMatrixHashCode">
+<area shape="rect" id="node1" title=" " alt="" coords="5,115,239,156"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#af057822127c5cdb8dd95809365f69f32" title=" " alt="" coords="287,49,520,91"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a63ba63dfe8cc3bb84f558653dc479c82" title=" " alt="" coords="287,115,520,156"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a6a5dddb77381cffcd8f187d3cf009c48" title="Set the id of the ZMatrix." alt="" coords="287,180,520,221"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ae9486d28880e0c8225c0092acab98165" title="Add an atom to the ZMatrix." alt="" coords="568,5,801,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="568,95,801,136"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="denoptim.ga.EAUtilsTest.testMakeGraphFromFragmentationOfMol_symmetry" name="denoptim.ga.EAUtilsTest.testMakeGraphFromFragmentationOfMol_symmetry">
+<area shape="rect" id="node1" title="Test the detection of &quot;some&quot; symmetry." alt="" coords="5,129,243,185"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="300,5,487,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16fdf30d1117873f1c441f15b354a9e2" title="Returns the number of symmetric sets of vertices." alt="" coords="304,71,483,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#aadd56400d6e58931401e88dd814de705" title="Returns the set of vertexes symmetric to the given one." alt="" coords="304,136,483,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="304,201,483,243"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a3f0b2b1a484099897d6170de95dff33a" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="291,291,496,332"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3560b051e55499bf45522a55f6219d29" title="Returns the position of the first vertex that has the given ID." alt="" coords="544,201,735,243"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="783,201,953,243"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrix.getAtomCount" name="denoptim.molecularmodeling.zmatrix.ZMatrix.getAtomCount">
+<area shape="rect" id="node1" title="Get the number of atoms in the ZMatrix." alt="" coords="940,186,1173,227"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client.html#ad1c10c7e111ab08c00ff76db47bfab38" title="Gets a JsonArray representation of the Z&#45;matrix." alt="" coords="649,41,892,97"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#a9a87b7a4bdd995fb60056505238b4ebd" title=" " alt="" coords="654,121,887,162"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#a2ab257580282e910c499668f171df0c6" title=" " alt="" coords="654,186,887,227"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#a7ed06df52caf02874e307632684e5dbd" title=" " alt="" coords="654,251,887,293"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#aa8b5c8178d85003c80e18e03e74dfb4e" title=" " alt="" coords="654,317,887,358"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client.html#af260b4786b039bdd434edb966ecb91d8" title="Formulates the request to be sent to the socket server." alt="" coords="329,13,596,54"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client_test.html#a1e0e80a90cc79511551c8705cb757e42" title=" " alt="" coords="324,77,601,133"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client.html#af040644747c1ffdfd22c8095f6dfe992" title="Runs a conformational optimization using the services provided by the socket server configured for th..." alt="" coords="5,5,276,61"/>
+</map>

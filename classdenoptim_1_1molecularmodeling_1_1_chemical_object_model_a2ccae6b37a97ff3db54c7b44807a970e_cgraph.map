@@ -1,0 +1,37 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.deepcopy" name="denoptim.molecularmodeling.ChemicalObjectModel.deepcopy">
+<area shape="rect" id="node1" title="Return a new Molecule3DBuilder having exactly the same features of this Molecule3DBuilder." alt="" coords="5,547,212,589"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#ac0634d6b3357ce42af71c844241e7c5c" title="Constructs an item specifying all its features." alt="" coords="260,110,539,151"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6f0b9a42074fe224ae52cee5f5875a7c" title="Returns almost &quot;deep&#45;copy&quot; of this graph." alt="" coords="304,555,495,581"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a4cc6da41ef9754b4551de0155c905678" title="Clone the ZMatrix." alt="" coords="283,1306,516,1347"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a047d30b932c29146e81ae7b3fef90c07" title=" " alt="" coords="589,5,817,61"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#afcb7e84c46c1a2eeb445a90cb282dc83" title="Check for rings in this graph and in any graph that is embedded at any level in any vertex of this gr..." alt="" coords="613,110,794,151"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#a082a9cf3e1a0b4d17f08080d00b0d6df" title="Get the reference to the graph representation of the ring this attractor is meant to close." alt="" coords="868,13,1059,54"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_template.html#a7869ba705f5898855fe68dd443721f8e" title=" " alt="" coords="869,110,1057,151"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="616,175,791,217"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_ring.html#a26caae2f4e91d37ffb2f7f3becd97a8e" title="Append a DENOPTIMVertex to the list." alt="" coords="603,241,803,268"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="611,292,795,319"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8c53e13b64166fc85fc9a7787dadd46b" title=" " alt="" coords="601,343,805,369"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a774671253396558cf35ab75613762174" title="Returns the bond type preferred by this attachment point as defined by the APClass,..." alt="" coords="613,394,793,435"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="618,459,789,501"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="1107,547,1277,589"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="614,577,793,618"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_ring.html#a4d36b4964430194b787e708d47b00af5" title="Set the bond type (i.e., bond order) of the chord connecting the head and the tail vertices." alt="" coords="594,643,813,669"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_d_graph.html#a30bfc345b743b8859c842b3b4e3ca5fa" title=" " alt="" coords="614,694,793,735"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_d_graph.html#a421ce3718c62761e49a4dd4d0f20682c" title=" " alt="" coords="614,759,793,801"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_d_graph.html#af5cb07ab0686739e6e1713da9d8959c1" title=" " alt="" coords="614,825,793,866"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5126283bcf1434c3366ea17bfac2c55f" title=" " alt="" coords="614,890,793,931"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5c72d2f8c10e05c4bf58de3ccce6522c" title=" " alt="" coords="614,955,793,997"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a7ecbfcc68b17ef630d0f46ccb6bb763b" title=" " alt="" coords="871,394,1056,435"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="878,459,1049,501"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3560b051e55499bf45522a55f6219d29" title="Returns the position of the first vertex that has the given ID." alt="" coords="868,577,1059,618"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ae9486d28880e0c8225c0092acab98165" title="Add an atom to the ZMatrix." alt="" coords="587,1021,820,1062"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="587,1110,820,1151"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a76a9f2f7c1ef80f1c891ce0568158815" title="Get the angle2 reference atom." alt="" coords="587,1175,820,1217"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#af58205f6fbb21f9df38755ee8cd17e89" title="Get the angle reference atom." alt="" coords="587,1241,820,1282"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a70fef3e9cafe930bc1fa43a5e8729fcd" title="Get the bond reference atom." alt="" coords="587,1306,820,1347"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a030ef020dd1838742b479b7daf1226ea" title="Get the index of the atom." alt="" coords="587,1371,820,1413"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#abd3a8405638cf11ea7632fc7d878339b" title="Package&#45;private setter for angle2 reference atom (used for cloning)." alt="" coords="587,1437,820,1478"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#aea6794bf8d80d6492c942cb4c294baf7" title="Package&#45;private setter for angle reference atom (used for cloning)." alt="" coords="587,1502,820,1543"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a6915c426d9674bd224456a5b2a90b2e3" title="Package&#45;private setter for bond reference atom (used for cloning)." alt="" coords="587,1567,820,1609"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ab3814ca6929883135e97eca28175407e" title="Constructor for ZMatrix." alt="" coords="587,1633,820,1674"/>
+</map>

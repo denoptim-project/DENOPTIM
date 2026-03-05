@@ -1,0 +1,4 @@
+<map id="denoptim.integration.rcoserver.RCOSocketServerClient.getInstance" name="denoptim.integration.rcoserver.RCOSocketServerClient.getInstance">
+<area shape="rect" id="node1" title="Gets the singleton instance of RCOSocketServerClient." alt="" coords="5,5,239,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1rcoserver_1_1_r_c_o_socket_server_client.html#af5f24b4b23601c3a015353c09df48468" title="Private constructor for singleton pattern." alt="" coords="287,5,592,47"/>
+</map>

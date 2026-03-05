@@ -1,0 +1,6 @@
+<map id="denoptim.molecularmodeling.RingClosureTool.saturateRingClosingAttractor" name="denoptim.molecularmodeling.RingClosureTool.saturateRingClosingAttractor">
+<area shape="rect" id="node1" title="Looks for unused RingClosingAttractors and attach proper capping group saturating the free valency/bo..." alt="" coords="5,63,241,119"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="289,5,523,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a19f28cdd099636e8988e180126dbca99" title="Set the bond length." alt="" coords="289,71,523,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#ab4690ae8eb830591493f0b671a303e61" title="Set the symbol of the atom." alt="" coords="289,136,523,177"/>
+</map>

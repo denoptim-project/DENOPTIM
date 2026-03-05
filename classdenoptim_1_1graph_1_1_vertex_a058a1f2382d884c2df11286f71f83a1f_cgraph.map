@@ -1,0 +1,8 @@
+<map id="denoptim.graph.Vertex.connectedTo" name="denoptim.graph.Vertex.connectedTo">
+<area shape="rect" id="node1" title="Checks if this and another vertex are directly connected by an edge within the same graph recursion l..." alt="" coords="5,107,233,134"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a44e705b8949b0fd73763e2e92a118b78" title="Looks into the edges that use any of the APs that belong to this vertex and returns the vertex which ..." alt="" coords="281,100,452,141"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="515,5,686,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="511,71,691,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="500,137,701,163"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="501,187,701,214"/>
+</map>

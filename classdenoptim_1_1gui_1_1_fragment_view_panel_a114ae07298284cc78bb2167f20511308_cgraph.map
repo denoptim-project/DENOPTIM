@@ -1,0 +1,13 @@
+<map id="denoptim.gui.FragmentViewPanel.getStructureFromJmolViewer" name="denoptim.gui.FragmentViewPanel.getStructureFromJmolViewer">
+<area shape="rect" id="node1" title=" " alt="" coords="5,143,232,185"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a65e5473c03b2075c97fbfa9b587b8949" title="Clears the table of attachment points." alt="" coords="283,13,465,54"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad2fc717c7c33817e4178031130d46f6d" title="Clears the molecular viewer." alt="" coords="283,78,465,119"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ae215d0cd0d6f3890132bcd422fd09d86" title=" " alt="" coords="283,143,465,185"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#aded8f83abc7d4310a5d95312a29363af" title="Returns a single collection with all atom containers found in a file of any format." alt="" coords="280,233,468,274"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="1061,295,1280,321"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad1564e5c67234495668c68f02ab04ed4" title="Allows to activate and deactivate the listener." alt="" coords="516,13,719,54"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_fragment_view_panel_1_1_pausable_table_model_listener.html#ab8f315a71d317424e2647c160fc3fdfb" title=" " alt="" coords="767,5,1013,61"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1files_1_1_file_utils.html#ae2209fbdfdcf1fdf0499e32989b057b5" title="Looks for a writable location where to put temporary files and returns an absolute pathname to the fo..." alt="" coords="531,233,704,274"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1files_1_1_file_utils.html#abb578573334c0bc633d537d987223e63" title="Check whether we can write and read to a given pathname." alt="" coords="802,233,978,274"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="1065,240,1276,267"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrix.getAngleValue" name="denoptim.molecularmodeling.zmatrix.ZMatrix.getAngleValue">
+<area shape="rect" id="node1" title="Get the bond angle for the atom at the given index." alt="" coords="5,39,239,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#aeeeeea7db26d4cba98c38cf795f3a27d" title="Get the angle value." alt="" coords="287,5,520,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="287,71,520,112"/>
+</map>

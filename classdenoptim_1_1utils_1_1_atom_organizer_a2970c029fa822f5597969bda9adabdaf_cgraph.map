@@ -1,0 +1,6 @@
+<map id="denoptim.utils.AtomOrganizer.branchOrienterReordering" name="denoptim.utils.AtomOrganizer.branchOrienterReordering">
+<area shape="rect" id="node1" title="Reorders atoms according to the branch&#45;oriented scheme." alt="" coords="5,59,239,100"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#af107340bb330f98b9b7f899ff08c80ad" title="Method meant for recursion on all atoms connected to a starting point." alt="" coords="287,29,521,71"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a291686eac0b022879608b2dd85ffab6e" title="Perform all the operation to report an atom in the new order." alt="" coords="569,95,840,122"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a32438216f863d45940768576a05178f5" title="Change the order of atoms in a list according to the priority rules defined in the comparator Connect..." alt="" coords="583,29,826,71"/>
+</map>

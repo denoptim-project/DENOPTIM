@@ -1,0 +1,11 @@
+<map id="denoptim.gui.GUIModalDialog.close" name="denoptim.gui.GUIModalDialog.close">
+<area shape="rect" id="node1" title="Closes the dialog window." alt="" coords="540,223,767,249"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog.html#a64ab4ac8312bff57a077266658555757" title="Constructor." alt="" coords="249,5,492,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_f_s_params_dialog.html#a5a9b51978e6cfce0b434a8d72c7c6107" title="Constructor." alt="" coords="271,85,470,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_a_p_class_definition_dialog.html#a74d95e8865ec399c7160d24fdd226cd4" title=" " alt="" coords="257,150,484,191"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_empty_vertex_maker.html#a5b98876b4b05ee77516d9889ec438acc" title="Constructs a maker that can make empty vertexes, but controls whether the generated vertexes are allo..." alt="" coords="273,215,468,257"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_preferences_dialog.html#a1218810b281701e6806afcf90fb4725a" title="Constructs a dialog for setting the preferences of the GUI." alt="" coords="275,281,467,322"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a9ddb1f2b12985b37138d9a43f1edb233" title="Constructor for an empty modal panel meant for selection of vertexes." alt="" coords="265,346,476,387"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#a8cf9d55d17239583a8a83252ef46897f" title=" " alt="" coords="249,412,492,439"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#a07ea326dbe6e769e56dea7d0f8f4b66c" title="Constructor." alt="" coords="5,405,201,446"/>
+</map>

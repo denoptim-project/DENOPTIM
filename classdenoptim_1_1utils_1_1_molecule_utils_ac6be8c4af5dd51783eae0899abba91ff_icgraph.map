@@ -1,0 +1,6 @@
+<map id="denoptim.utils.MoleculeUtils.findShortestPath" name="denoptim.utils.MoleculeUtils.findShortestPath">
+<area shape="rect" id="node1" title="Finds the shortest path between two atoms in a molecule using BFS." alt="" coords="577,39,784,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a5d7d9caba867c8a2e028fd2dd91515e3" title="Reduces a template molecule to keep only atoms at vertex boundaries (atoms connected to atoms with di..." alt="" coords="263,5,529,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils_test.html#a1ef1cc1fa9064fc5b7168e782ebe6f76" title=" " alt="" coords="304,71,488,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a106372ea68c25ed99afb71e15bc0671c" title="Chops one chemical structure by applying the given fragmentation templates." alt="" coords="5,5,215,47"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="denoptim.gui.GraphViewerPanel.convertDnGraphToGSGraph" name="denoptim.gui.GraphViewerPanel.convertDnGraphToGSGraph">
+<area shape="rect" id="node1" title="Created a JUNG graph object that represents a DGraph, and allows to load a graphical representation i..." alt="" coords="5,104,227,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#ab5d3641bcfd0c8dd76d5de6159d6b8c8" title=" " alt="" coords="275,5,453,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa97f94be30bcd2895a615904c741f4f8" title=" " alt="" coords="275,71,453,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a650a0f54382fb930bf57429dd616258a" title=" " alt="" coords="275,136,453,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#ab74f2e80278282e2dfe16c51825a759b" title=" " alt="" coords="277,201,451,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_template.html#a7de3b3ecb0743c881a629727648955be" title="Return the list of attachment points visible from outside the template, i.e., the so&#45;called outer APs..." alt="" coords="501,136,689,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_template.html#ae72040ff2cc2c9592a942b7db96b4b04" title=" " alt="" coords="501,201,689,243"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a454c525d42ead564003d6061be734d3f" title="Produces a string with the information included in this object." alt="" coords="505,267,685,308"/>
+</map>

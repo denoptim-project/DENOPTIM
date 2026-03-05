@@ -1,0 +1,52 @@
+<map id="denoptim.gui.GUIVertexInspector.GUIVertexInspector" name="denoptim.gui.GUIVertexInspector.GUIVertexInspector">
+<area shape="rect" id="node1" title="Constructor." alt="" coords="5,1635,221,1676"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,1642,532,1669"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_buttons_bar.html#a18fff5d1fdf9c9632154001fac4381ca" title=" " alt="" coords="634,307,821,334"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a100cd8246e61d933a6420fac5c22160a" title="Append dummy atoms on otherwise linear arrangements of atoms." alt="" coords="616,424,839,465"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1files_1_1_file_utils.html#af572123d13600224e1de3cb7b79cb028" title="Appends an entry to the list of recent files." alt="" coords="639,1343,815,1384"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#aa842f4661d59827a275b7231750b4736" title="Runs a dialog aimed at selecting an existing APClass or defining a new one." alt="" coords="602,837,853,879"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#aaa04536e178fdfa5bad92cdc1fcc4583" title="Shows the dialog and restrains the modality to it, until the dialog gets closed." alt="" coords="945,959,1171,1000"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6b60be1b437b1d21334d39d003c14249" title="Removes an atom and replaces it with an attachment point." alt="" coords="598,760,857,801"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a5bdbf46e18361151e987085195fcd9fd" title=" " alt="" coords="923,1024,1193,1065"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#ae6eecb27bf631e3cf159af0834ff6ee2" title="Starts a dialog to define the on&#45;the&#45;fly fragmentation settings." alt="" coords="602,1460,853,1501"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a08082e27d7533670cd4e73f1d0608d83" title=" " alt="" coords="933,1423,1183,1479"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#afe25e249e1296a0a0d911a41e18bb2c2" title="Performs fragmentation according to the given cutting rules." alt="" coords="623,1601,832,1643"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a04cf8bea6e235a0adf12e95708d7f627" title="Writes vertexes to file." alt="" coords="963,1549,1153,1591"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#acf69eeea91fec2b337dd5aa4c79846cb" title="Identifies the atoms that are selected in the Jmol viewer." alt="" coords="618,1667,837,1708"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a9dcce7e1ee36996395b1b8d3aa2116dc" title=" " alt="" coords="602,1732,853,1773"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a3e788a5458e3235a8511c6e29eaeec10" title=" " alt="" coords="580,1797,875,1839"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_vertex.html#acc83e15edc2c04f8b3ae66a8628a6134" title=" " alt="" coords="642,1863,813,1904"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a04f2b439550bbb6f001eeaca4d40702d" title=" " alt="" coords="590,1928,865,1969"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a756c2375d70d66c5bbba03e8772bb24a" title="Returns the currently loaded vertex." alt="" coords="949,1159,1167,1200"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="634,1993,821,2035"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ad9db6420b91ff13e0a8b2d02402c0242" title="Returns the current program&#45;specific randomizer." alt="" coords="634,2059,821,2100"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a7e833ba52549966556cc1bd1852dcfa4" title=" " alt="" coords="601,1188,853,1229"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a530b2f509d3e15fd285526a34461cc9e" title="Imports the given SMILES into the viewer." alt="" coords="601,1253,853,1295"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a69d3deb57097286f9a01cdf256ec8d65" title="Imports vertices." alt="" coords="601,2124,853,2165"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a15c6a5de34e54f74d33c7c82f2a3125d" title="Load the list of vertexes to choose from." alt="" coords="610,2190,845,2217"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a697ecc5ef3352a5860a6a6a355d87d1b" title="Loads the given vertex to this viewer." alt="" coords="615,2241,839,2283"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1gui_1_1_g_u_i_file_opener.html#ad35e400e91aa5777334a672546a124cc" title=" " alt="" coords="611,2307,844,2334"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1gui_1_1_g_u_i_file_saver.html#ab2181dc4353ca1d2acc117de618234ed" title=" " alt="" coords="625,2359,829,2400"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#ad2bfee82a2cc7c8e236bcbb18a3aeb84" title=" " alt="" coords="599,2424,855,2465"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a9efd887c11557ffc565a152950ad9e25" title="Reads a list of DGraphs from file." alt="" coords="633,2513,821,2555"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc4e3a5d4e0db3c1eb06e1ff721af9cf" title="Reads Vertexes from any file that can contain such items." alt="" coords="633,2579,821,2620"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#adc65cc0ba7fa1014ecb1ccc447953638" title=" " alt="" coords="598,359,857,400"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6e5cc3cb1cd2f98bf03934b3b2defa22" title=" " alt="" coords="598,1020,857,1061"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a09363e21a5254efe8f128a99e82acbf0" title=" " alt="" coords="605,955,849,996"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a1f6f0babd900f6814e89d02a6210c0c5" title="Sets the list of graph templates for fragmentation." alt="" coords="580,2644,875,2685"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a4789d2ef7ddc44561c4d662d0fb10148" title="Allows to control whether confirming the selection of a vertex without having selected an attachment ..." alt="" coords="613,2709,841,2751"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_fragment.html#a65c4f181651f2cd9606b581988af9247" title=" " alt="" coords="947,343,1169,370"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_fragment.html#a2bb3bfa838f2661ee993e1a57e018873" title=" " alt="" coords="947,394,1169,421"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="961,469,1155,495"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_fragment.html#a4babe43e60f32e990179be8dfe96e38e" title=" " alt="" coords="955,519,1161,546"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_fragment.html#a18eeaacf99e3c1cbaeef4f7ad651cc48" title="Returns the number of APs currently defined on a specific atom source." alt="" coords="963,95,1153,136"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_fragment.html#a551361a1155600e6e2fe4e37590c924f" title=" " alt="" coords="963,5,1153,47"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_fragment.html#aeee294fa281e31afd7f87ede342b486e" title=" " alt="" coords="963,636,1153,677"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_fragment.html#a1293bf717422dce4ecb43d1f39d734df" title=" " alt="" coords="963,701,1153,743"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a610946112e9e5c6a35fb025ecbcc1022" title="Generates a dummy atom 0.1 nm from atom A in a place that is safe for a dummy atom." alt="" coords="947,571,1169,612"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="1241,571,1447,612"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_fragment.html#a7e8b973a33c7ec906e65d1512d9faecb" title=" " alt="" coords="963,212,1153,253"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8dda7a0b732f74ded4ccfdd1c1eab57a" title="Checks if the given atom is a dummy atom based on the elemental symbol and the string used for dummy ..." alt="" coords="959,277,1157,319"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a0f37a2cf0618c5753f917dfc335dd68a" title="Returns the list of the names of all APClasses." alt="" coords="965,893,1151,935"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="959,842,1157,869"/>
+</map>

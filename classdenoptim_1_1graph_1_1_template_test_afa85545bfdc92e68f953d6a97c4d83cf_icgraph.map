@@ -1,0 +1,11 @@
+<map id="denoptim.graph.TemplateTest.getCH2Fragment" name="denoptim.graph.TemplateTest.getCH2Fragment">
+<area shape="rect" id="node1" title="The coordinates hard coded in this method must not be changed because they are needed to reproduce re..." alt="" coords="801,71,1016,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_template_test.html#ad45d6edc7ff123cee0939301b6d1fc2b" title="Creating a template that contains another template with the following structure: |&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;..." alt="" coords="539,9,753,51"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_template_test.html#a6bb3cdf3bc0c265c1afdd6fcdb8250a8" title=" " alt="" coords="274,71,489,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_template_test.html#a24cb0acd547ff1ce40433455a0c593a3" title="Builds a template object meant for tests." alt="" coords="539,136,753,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_template_test.html#a50688358b5a557ee51683082427bdc14" title=" " alt="" coords="272,5,491,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template_test.html#a5a0585829290194f7e8dfc718346d212" title=" " alt="" coords="5,71,224,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_template_test.html#ae81b16e3af5927e6d5672d0639ac54f7" title=" " alt="" coords="272,136,491,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a9ad0d01f5abd9f5c57e64dc7dd92484f" title=" " alt="" coords="276,201,487,243"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#a78e6eb5e60124f63897dd28e1c21082d" title=" " alt="" coords="280,267,483,308"/>
+</map>

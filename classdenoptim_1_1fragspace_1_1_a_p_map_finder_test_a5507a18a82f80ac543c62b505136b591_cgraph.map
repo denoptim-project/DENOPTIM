@@ -1,0 +1,17 @@
+<map id="denoptim.fragspace.APMapFinderTest.testAPMapFinder_ConstrainAll" name="denoptim.fragspace.APMapFinderTest.testAPMapFinder_ConstrainAll">
+<area shape="rect" id="node1" title=" " alt="" coords="5,181,193,237"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="241,13,469,39"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a6db61d6017ac32cdd5b12c0665270406" title="Returns true if any mapping has been found." alt="" coords="265,64,446,105"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a7bf9e961f1aed252d9d3e255d5f4e223" title="Returns all AttachmentPoint&#45;AttachmentPoint mapping found." alt="" coords="265,129,446,171"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="261,195,450,222"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#a1259fc018fc5131cdf102d4030933f3e" title="Returns the AttachmentPoint&#45;AttachmentPoint mapping chosen among the possible mappings." alt="" coords="260,247,451,288"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder_test.html#a94ccd9f6acf490a36d131122c553da95" title=" " alt="" coords="265,312,446,353"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="270,377,441,419"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="525,5,731,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="543,188,713,229"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="529,299,727,326"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a4bbfced62cc83d37242245a13ef680f9" title="Set the fragment space to behave according to APClass&#45;based approach." alt="" coords="517,351,739,392"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="787,292,964,333"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="1012,259,1189,300"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="1012,324,1189,365"/>
+</map>

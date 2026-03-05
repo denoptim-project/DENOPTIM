@@ -1,0 +1,23 @@
+<map id="denoptim.graph.DGraphTest.testSameAs_DiffVertex" name="denoptim.graph.DGraphTest.testSameAs_DiffVertex">
+<area shape="rect" id="node1" title=" " alt="" coords="5,143,213,184"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="263,62,473,89"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a27544d722f14ebdb28572b466a8ec876" title=" " alt="" coords="261,113,475,155"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="273,179,463,206"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a956d0e807af7dbbad5267138e35cdb3d" title="Compare this and another graph ignoring the vertex IDs." alt="" coords="264,397,472,423"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="543,5,713,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a6691d1a16abf0588873c4b7085696b4c" title="Compares graphs by spanning vertices starting from the given vertex and following the direction of ed..." alt="" coords="523,95,733,136"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a559b3bd2aa8849d8d58430afcb20b016" title=" " alt="" coords="539,160,717,201"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b85d3e24edffe6e9cb5722718054f5b" title=" " alt="" coords="539,225,717,267"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa97f94be30bcd2895a615904c741f4f8" title=" " alt="" coords="539,291,717,332"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3334159ed57d53d1e29bd34f31bfc9a4" title="Returns the list of rings that include the given vertex in their fundamental cycle." alt="" coords="539,356,717,397"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16fdf30d1117873f1c441f15b354a9e2" title="Returns the number of symmetric sets of vertices." alt="" coords="539,421,717,463"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph.html#aadd56400d6e58931401e88dd814de705" title="Returns the set of vertexes symmetric to the given one." alt="" coords="539,487,717,528"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#a419f97ea0a361b122274c4eda97e3be6" title="Get an iterator for the sets of symmetrically related vertices." alt="" coords="539,552,717,593"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_d_graph.html#a58811a9ea75a26abffc1a9c7c2b22741" title="Returns the vertex that is in the given position of the list of vertices belonging to this graph." alt="" coords="539,617,717,659"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b7c2feb2da30079318f06819e0e6761" title=" " alt="" coords="539,683,717,724"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph.html#a71bdb31d9dd3cc65d3f3e58a0ba87cc2" title=" " alt="" coords="532,748,724,789"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_ring.html#a97b3268c5abcf3b28c8bb00251408de8" title=" " alt="" coords="785,660,975,701"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_ring.html#a846516d883b41bd5877172be18265a1d" title=" " alt="" coords="787,726,973,753"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_ring.html#a1a0f7fdd78989d61817dbb85b621ce71" title=" " alt="" coords="789,777,971,819"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_ring.html#a306c459210e60f0133d0b3549a531a6c" title=" " alt="" coords="781,843,979,884"/>
+</map>

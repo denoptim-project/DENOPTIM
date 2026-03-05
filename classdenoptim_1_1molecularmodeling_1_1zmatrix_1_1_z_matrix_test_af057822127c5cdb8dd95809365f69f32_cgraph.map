@@ -1,0 +1,5 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixTest.getTestZMatrix" name="denoptim.molecularmodeling.zmatrix.ZMatrixTest.getTestZMatrix">
+<area shape="rect" id="node1" title=" " alt="" coords="5,51,239,92"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ae9486d28880e0c8225c0092acab98165" title="Add an atom to the ZMatrix." alt="" coords="287,5,520,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="287,95,520,136"/>
+</map>

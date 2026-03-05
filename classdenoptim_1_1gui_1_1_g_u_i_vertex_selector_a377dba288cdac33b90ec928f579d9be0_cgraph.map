@@ -1,0 +1,6 @@
+<map id="denoptim.gui.GUIVertexSelector.activateTabEditsListener" name="denoptim.gui.GUIVertexSelector.activateTabEditsListener">
+<area shape="rect" id="node1" title=" " alt="" coords="5,13,261,54"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a3c54fa30efba69df8e46731ec154e0d9" title="Allows to activate and deactivate the listener." alt="" coords="309,13,556,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad1564e5c67234495668c68f02ab04ed4" title="Allows to activate and deactivate the listener." alt="" coords="604,13,807,54"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_fragment_view_panel_1_1_pausable_table_model_listener.html#ab8f315a71d317424e2647c160fc3fdfb" title=" " alt="" coords="855,5,1101,61"/>
+</map>

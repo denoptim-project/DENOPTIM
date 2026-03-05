@@ -1,0 +1,9 @@
+<map id="denoptim.ga.GraphOperationsTest.buildGraph" name="denoptim.ga.GraphOperationsTest.buildGraph">
+<area shape="rect" id="node1" title=" " alt="" coords="5,97,199,139"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="512,39,693,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a641d9078c27d992053500e12cec0049d" title="Append a vertex to this graph: adds the new vertex to the list of vertices belonging to the graph,..." alt="" coords="247,97,449,139"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="263,163,433,204"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="756,5,965,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="771,71,950,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="497,105,708,131"/>
+</map>

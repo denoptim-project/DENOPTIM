@@ -1,0 +1,5 @@
+<map id="denoptim.integration.tinker.TinkerUtils.readTinkerINT" name="denoptim.integration.tinker.TinkerUtils.readTinkerINT">
+<area shape="rect" id="node1" title="Reads a Tinker INT file." alt="" coords="304,49,480,90"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_conformational_search_p_s_s_r_o_t.html#a40d8eeb17fa0eb16f0a92d3a35408c26" title="Performs PSSROT conformational search on the given chemical object." alt="" coords="5,5,256,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils_test.html#a106bc19f7f8be0561f16100c61840627" title=" " alt="" coords="22,85,239,126"/>
+</map>

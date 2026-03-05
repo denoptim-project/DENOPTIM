@@ -1,0 +1,8 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixAtomTest.testZMatrixBondEquals" name="denoptim.molecularmodeling.zmatrix.ZMatrixAtomTest.testZMatrixBondEquals">
+<area shape="rect" id="node1" title=" " alt="" coords="5,71,264,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_bond.html#a7dc0a2dca128485b7b834c0ab3579775" title=" " alt="" coords="312,71,545,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#ac9f6a2b66f926c4e2cec5f96c1d92899" title="Get the string representation of the atom." alt="" coords="593,37,827,79"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_bond.html#a7062b74cff8b611d2f741fa0aeaac30c" title="Constructor for ZMatrixBond." alt="" coords="593,103,827,144"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a501ef1f2a8fddf72585f7776f0b90f73" title="Get the id of the atom." alt="" coords="875,5,1108,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a08714e28482c65103ec560ae8155a607" title="Constructor for ZMatrixAtom." alt="" coords="875,71,1108,112"/>
+</map>

@@ -1,0 +1,52 @@
+<map id="denoptim.graph.TemplateTest.testClone" name="denoptim.graph.TemplateTest.testClone">
+<area shape="rect" id="node1" title=" " alt="" coords="5,940,224,981"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="272,13,500,39"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad16255987a45bace2ef62f2b49e0d873" title=" " alt="" coords="283,63,489,90"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="567,107,748,148"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a641d9078c27d992053500e12cec0049d" title="Append a vertex to this graph: adds the new vertex to the list of vertices belonging to the graph,..." alt="" coords="285,165,487,207"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_template.html#ac7d7400f47d4bad33f3755f1b3d19a3e" title="Returns a deep copy of this template." alt="" coords="285,838,487,865"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_template.html#a7869ba705f5898855fe68dd443721f8e" title=" " alt="" coords="830,1448,1018,1489"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="559,340,756,381"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_template.html#a405d47ac1a08ac9bd658bcdcc693a0a4" title=" " alt="" coords="563,275,751,316"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="1081,229,1261,271"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_template.html#a6b594361056006bb9e5a64f514d30e76" title="Promotes the contract level of this template to the most constrained one (i.e., ContractLevel#FIXED),..." alt="" coords="283,940,489,981"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="291,1071,481,1098"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_vertex.html#ac578a57700de26b2f0ba1fc7470129d0" title=" " alt="" coords="301,1005,471,1047"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="301,1123,471,1164"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b85d3e24edffe6e9cb5722718054f5b" title=" " alt="" coords="297,1188,475,1229"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa97f94be30bcd2895a615904c741f4f8" title=" " alt="" coords="297,1253,475,1295"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_d_graph.html#a58811a9ea75a26abffc1a9c7c2b22741" title="Returns the vertex that is in the given position of the list of vertices belonging to this graph." alt="" coords="297,1319,475,1360"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b7c2feb2da30079318f06819e0e6761" title=" " alt="" coords="297,1384,475,1425"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1_vertex.html#a5dbac662f4102558f3cf874c55174c5e" title=" " alt="" coords="301,1449,471,1491"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1_vertex.html#ad26ecf426a5e415605df94be904e58d3" title=" " alt="" coords="301,1515,471,1556"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="554,5,761,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="819,132,1029,173"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="835,67,1013,108"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="552,173,763,199"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_template.html#a97f3fd8552c85b78dcad22d4ce1f4b0a" title="Adds attachment point (AP) to the list of required APs on this template." alt="" coords="562,863,753,904"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#a6e237f0bbd68ebc3c6cd4278713ea7b2" title="Copies all the string&#45;based properties and properties defined in the Vertex#uniquefyingPropertyKeys s..." alt="" coords="567,928,747,969"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_template.html#a7de3b3ecb0743c881a629727648955be" title="Return the list of attachment points visible from outside the template, i.e., the so&#45;called outer APs..." alt="" coords="563,993,751,1035"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="572,1059,743,1100"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="572,1124,743,1165"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a9c1db3123b7f73aa20c0d1895f31f8d7" title="Returns the end of the direction vector." alt="" coords="567,1189,747,1231"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_vertex.html#a5671e1d926fba782f48c494d61980d29" title="Returns the mutation types that are constitutionally configures for this vertex irrespectively on the..." alt="" coords="572,1255,743,1296"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="572,1320,743,1361"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="548,405,767,447"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a54d64a8abc57153a64783ddb262f518c" title="Set the index of the source atom in the list of atoms of the fragment." alt="" coords="559,471,756,512"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="572,536,743,577"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a5ec92eb2ffc5a1b3fadce0c816e481b7" title="Sets the end of the 3D vector defining the direction of the AP in 3D." alt="" coords="567,601,747,643"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_vertex.html#a0e1114b16856fd16a2de9cface2ea806" title=" " alt="" coords="572,667,743,708"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_vertex.html#a1b3682ddb7fc71fdd981526b43d773dc" title=" " alt="" coords="572,732,743,773"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_vertex.html#a29e20c43a6110fbaac6cc86c216fe143" title=" " alt="" coords="572,797,743,839"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_template.html#aad385a42d6afcdac25d87f9519644a00" title=" " alt="" coords="572,1385,743,1427"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_template.html#a82c53a76c42c31848f394c3f7aab21b9" title="Removes the molecular representation." alt="" coords="825,749,1023,791"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="815,571,1033,612"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_template.html#a687f8680d7c74dacadeb80c85ced2be5" title="Adds the projection of an AP in the template&#39;s inner graph (i.e., innerAP) to the list of APs visible..." alt="" coords="829,416,1019,457"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_d_graph.html#a309d3784aeae9aedce785314e753bdc5" title="Returns the list of available attachment points contained in this graph." alt="" coords="1082,320,1261,361"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_template.html#a1b1c82228b19609959356d3aa1f2a53b" title=" " alt="" coords="834,275,1014,316"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_d_graph.html#a04463f5a015f34500e6c516d4ef0eabb" title="Sets the reference to a template that embeds this graph, i.e., this graph&#39;s &quot;jacket&quot; template." alt="" coords="835,481,1013,523"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a8dc9e31a8d2fb5ef6a9705cbf2ec22c9" title="Returns a deep clone of this attachment point." alt="" coords="1081,473,1261,515"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="1086,408,1257,449"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="839,1383,1009,1424"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="572,1553,743,1595"/>
+</map>

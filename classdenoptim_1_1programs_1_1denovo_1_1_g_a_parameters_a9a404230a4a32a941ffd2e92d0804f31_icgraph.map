@@ -1,0 +1,10 @@
+<map id="denoptim.programs.denovo.GAParameters.getNumberOfCPU" name="denoptim.programs.denovo.GAParameters.getNumberOfCPU">
+<area shape="rect" id="node1" title=" " alt="" coords="1267,73,1484,114"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,10,211,51"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="737,161,915,202"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a5288db1eb3c645ed5b3cb33430c62bdf" title=" " alt="" coords="707,43,945,85"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a83dce514937b0922c514bd5d919eca64" title=" " alt="" coords="993,102,1219,143"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,89,424,130"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,89,198,130"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="472,89,659,130"/>
+</map>

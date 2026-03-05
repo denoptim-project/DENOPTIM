@@ -1,0 +1,28 @@
+var classdenoptim_1_1fitness_1_1_descriptor_for_fitness =
+[
+    [ "DescriptorForFitness", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#ab8f951d76ea7e265ed07fce7662d2996", null ],
+    [ "DescriptorForFitness", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a757cc28f369e7f9e56ce840478e1c1a4", null ],
+    [ "addDependentVariable", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#ae2e434070538ba8fc8a3fc05460db34a", null ],
+    [ "cloneAllButImpl", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#ad37b0818fa973c1826f8ca23e33c925f", null ],
+    [ "getClassName", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a67354732129b314d5c66b397b885b7fd", null ],
+    [ "getDictClasses", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a732e13bcfcb397dd059461b568268204", null ],
+    [ "getDictDefinition", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a946f92d93b2d9de0f3925d44281e93d5", null ],
+    [ "getDictString", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#aa23831b310045e96eb844006780365e0", null ],
+    [ "getDictTitle", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a052909922844c7d99b9918fb37002c9f", null ],
+    [ "getImplementation", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#ae93b296b1ac13cc2eed0f7a012dfff64", null ],
+    [ "getShortName", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a0f88be44c1b2f155f06d74422e730b3c", null ],
+    [ "getVariables", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#acbf83e1eb006482cd43d9943b1ace406", null ],
+    [ "makeCopy", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a5210566cd8101ddc8a541563b1e456f0", null ],
+    [ "newDescriptorImplementation", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a79600446e519ae749fa7da9868a0d1c5", null ],
+    [ "setVariables", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a6c5ade3a33290d44ff2afc82adac985a", null ],
+    [ "toString", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#aec0e4b869e785069b22e96e37aa690e5", null ],
+    [ "cdkBuilder", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a8a3ea3c1f0735beed6f8949a12bfe6bc", null ],
+    [ "className", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a7695a3f0a36247f2b188df32b1e69f1b", null ],
+    [ "dictClasses", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#ae0f7ab2c2b75596b4d5f676a5001ceac", null ],
+    [ "dictDefinition", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#af3b9a4f802652ae18fb57b835c6b6783", null ],
+    [ "dictTitle", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a54782c03bbe996e7af1f474075c2e260", null ],
+    [ "implementation", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a4ceedd620c13fb80f79b4508fd20ed99", null ],
+    [ "resultId", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a68d2ac514fe95e97b211f51afb6d6c1d", null ],
+    [ "shortName", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#afcf3a1a0dd96479af115f24353c707fa", null ],
+    [ "variables", "classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#a59ab324bc0555f5f6ea91a7d297108a0", null ]
+];

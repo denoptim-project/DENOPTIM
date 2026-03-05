@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html" title="Runs tasks parallel in asynchronous fashion." alt="" coords="5,39,236,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_parallel_conformer_extraction_algorithm.html" title="Runs threads that extract the most representative conformer of fragments given as input." alt="" coords="284,5,479,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm.html" title="Fragments a list of chemical systems by running parallel fragmentation tasks." alt="" coords="288,71,475,112"/>
+</map>

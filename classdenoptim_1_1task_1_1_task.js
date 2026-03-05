@@ -1,0 +1,26 @@
+var classdenoptim_1_1task_1_1_task =
+[
+    [ "Task", "classdenoptim_1_1task_1_1_task.html#aac675a4e514b2ba0055cc624378f7ee0", null ],
+    [ "foundException", "classdenoptim_1_1task_1_1_task.html#a9a14acc4170e97cf88c4e8c51525d251", null ],
+    [ "getErrorMessage", "classdenoptim_1_1task_1_1_task.html#adce93bffce19cf1dfb0dd0bf580b32df", null ],
+    [ "getException", "classdenoptim_1_1task_1_1_task.html#a4d91c3f77a773ee6738a8a47d27a1075", null ],
+    [ "getId", "classdenoptim_1_1task_1_1_task.html#ad75b4d3407d7d677cc71ad94028f8841", null ],
+    [ "isCompleted", "classdenoptim_1_1task_1_1_task.html#a40feb97b8f6743d64bb3e3e066ec6e9b", null ],
+    [ "setNotify", "classdenoptim_1_1task_1_1_task.html#a33ac9127f87a17414b8cde2ccced9a0c", null ],
+    [ "setVerbosity", "classdenoptim_1_1task_1_1_task.html#aa057385bd419633b97e9ab02c45e593f", null ],
+    [ "setWorkSpace", "classdenoptim_1_1task_1_1_task.html#aa6f155c1ea06b69944a93e0aaf8a45a2", null ],
+    [ "stopTask", "classdenoptim_1_1task_1_1_task.html#abe8e96c65d147220af01e7cec04d3670", null ],
+    [ "toString", "classdenoptim_1_1task_1_1_task.html#a319608875862e0ffda9cb8c3c650a800", null ],
+    [ "completed", "classdenoptim_1_1task_1_1_task.html#a481e80cd3fe4af84aac1d2e6111655d5", null ],
+    [ "errMsg", "classdenoptim_1_1task_1_1_task.html#a85e03e7a5594e6bf63427ab87190b09b", null ],
+    [ "hasException", "classdenoptim_1_1task_1_1_task.html#a9e9a649d96a201ccbf44c5e26198e5f7", null ],
+    [ "id", "classdenoptim_1_1task_1_1_task.html#a466e4846d0f99e2ca0c2cb736639ea52", null ],
+    [ "lock", "classdenoptim_1_1task_1_1_task.html#a5152481e6a32fe6458feb5e9f223bbf1", null ],
+    [ "NL", "classdenoptim_1_1task_1_1_task.html#aa42de374d9151b2a27e0300983ef5357", null ],
+    [ "notifyGlobalTaskManager", "classdenoptim_1_1task_1_1_task.html#a2cad4cfafb21547cf103f12163e7ebfc", null ],
+    [ "processHandler", "classdenoptim_1_1task_1_1_task.html#a7a54a7f869a870907c50b7a1d4e57165", null ],
+    [ "SEP", "classdenoptim_1_1task_1_1_task.html#aea5e059361d49ee7958ec6178321ab86", null ],
+    [ "thrownExc", "classdenoptim_1_1task_1_1_task.html#aed26b28cc9b1b184701ae7f3706c3db9", null ],
+    [ "verbosity", "classdenoptim_1_1task_1_1_task.html#a4fa4562dfd0847439f10572dafeb9717", null ],
+    [ "workDir", "classdenoptim_1_1task_1_1_task.html#a3604075e9a13a99fa3c53703ec91f0f1", null ]
+];

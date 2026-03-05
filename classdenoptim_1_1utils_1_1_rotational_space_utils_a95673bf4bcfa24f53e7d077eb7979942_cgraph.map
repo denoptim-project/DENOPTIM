@@ -1,0 +1,11 @@
+<map id="denoptim.utils.RotationalSpaceUtils.processConstrainedRotatableBonds" name="denoptim.utils.RotationalSpaceUtils.processConstrainedRotatableBonds">
+<area shape="rect" id="node1" title="Process the constrained rotatable bonds." alt="" coords="5,172,301,213"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a984946436216edeaa85f4fb31aff32db" title=" " alt="" coords="375,5,581,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3cd7e9334f87d11a46f3a424beaa6751" title=" " alt="" coords="355,71,601,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aea287dfe72ffc150250c8180706289bd" title=" " alt="" coords="355,136,601,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#a26b5c6920936b30919baf2c5a1920b23" title="Reads the definition of constraints on the rotatable bonds." alt="" coords="363,201,593,257"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aaffb007354a24c9fb679742e431c9980" title=" " alt="" coords="353,280,603,321"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a5b9d0a88dd69734a1c54659e07d1294a" title="Replace any PseudoAtoms representing ring closing attractors with H." alt="" coords="349,346,607,373"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="655,339,860,380"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="908,339,1105,380"/>
+</map>

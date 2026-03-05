@@ -1,0 +1,25 @@
+var classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line =
+[
+    [ "CompatibilityRuleLine", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#ad8e7f966c3eb1ed008233618c829c154", null ],
+    [ "clearMatches", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a5c97cc0088237d83378a28817c203474", null ],
+    [ "mouseClicked", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a2383327b63bc77b844846bc002c6acf0", null ],
+    [ "mouseEntered", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a298e40b021d19b1d4facd6e5739e3048", null ],
+    [ "mouseExited", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a9af891ff4d202d4b3b32d18afc36ff4e", null ],
+    [ "mousePressed", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#af035487dda9c6159e9923394e167549f", null ],
+    [ "mouseReleased", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#ac61a0ffa33dd42ca9f5b1d1bf31652c8", null ],
+    [ "renderdAsSelected", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a362c0a6c7b89d2375c41f4e6248e2fb7", null ],
+    [ "renderIfMatches", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#afd80538579bb580c1cd94c53598d914a", null ],
+    [ "btnAdd", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#abfd3891f873c48c236afc8c25bb8dd9c", null ],
+    [ "DEFAULTBACKGROUND", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#ae97026864a96197526890c8ac87913c6", null ],
+    [ "isSelected", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#aee83ecdef98d00d9ffd6f2c93d791998", null ],
+    [ "minSrcAPClassName", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a546c983e6ac7d134d82c4d77be5f4325", null ],
+    [ "scrollerSize", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#ad3ff5901d8cbb2809f25ff9eccd4219c", null ],
+    [ "SELECTEDBACKGROUND", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a0728e7ec243070fe6b6cd025591f119a", null ],
+    [ "serialVersionUID", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#ae90479b07309f6761e67a46092a5a4a0", null ],
+    [ "srcAPClass", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a18675a147b059fd138c74cd5ffe0040d", null ],
+    [ "srcClassName", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#ac859e7c53812f4c30e9972ec6535b809", null ],
+    [ "srcClassNameScroller", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#afef514f0a28555846dd0be7f2652b1fc", null ],
+    [ "trgClassesPanel", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#ab5d0c48cbb65f9a652465e5cf6295951", null ],
+    [ "trgClassesScroller", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#acb18323afb0b9baa316ac775778d543a", null ],
+    [ "trgDelListener", "classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a0ad37776faffa0e618749c9e1581ac09", null ]
+];

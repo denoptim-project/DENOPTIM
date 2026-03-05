@@ -1,0 +1,8 @@
+<map id="denoptim.ga.GraphOperations.isCrossoverPossible" name="denoptim.ga.GraphOperations.isCrossoverPossible">
+<area shape="rect" id="node1" title="Evaluate AP class&#45;compatibility of a pair of edges with respect to crossover." alt="" coords="5,71,212,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_edge.html#a79f950d1cffe6e323eadc8cd36079841" title=" " alt="" coords="260,5,443,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_edge.html#a662733a6744a63aec552a1cc2685d468" title=" " alt="" coords="260,71,443,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a12ddb416c705a90f1e9bccb1b0de2749" title="Check compatibility as defined in the compatibility matrix considering this AP as source and the othe..." alt="" coords="263,136,440,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="506,39,686,80"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ada04f68d55f8ff85345e2a6c6d1ad840" title="Returns a list of APClasses compatible with the given APClass." alt="" coords="491,136,701,177"/>
+</map>

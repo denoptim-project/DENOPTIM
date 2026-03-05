@@ -1,0 +1,43 @@
+<map id="denoptim.utils.MoleculeUtils.setZeroImplicitHydrogensToAllAtoms" name="denoptim.utils.MoleculeUtils.setZeroImplicitHydrogensToAllAtoms">
+<area shape="rect" id="node1" title="Sets zero implicit hydrogen count to all atoms." alt="" coords="2003,379,2223,420"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#acbaf5061621ed283eecc80a51b523422" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="1728,161,1953,217"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8f4bc0f5aed8b6b13d69bd58b6a2c441" title="Finds the maximum common substructure (MCS) between two molecules." alt="" coords="1737,240,1944,281"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_fragment.html#aa1cdff6a2da8a5c234a58317c8ac33e6" title="Constructor from an atom container, which has APs only as molecular properties." alt="" coords="1755,345,1926,387"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a572e6936929d9decea95808edbbfd16c" title="Returns the SMILES representation of the molecule." alt="" coords="1738,411,1943,452"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#ab5be209325f8658a80cbff806d286d4a" title=" " alt="" coords="1727,675,1955,716"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a624fc0eddfb7d67faf19afc6b7caa3fd" title="Do any pre&#45;processing on a IAtomContainer meant to be fragmented." alt="" coords="1731,609,1950,651"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a696950b738bc2c4d0374ffb7323f8263" title="Finds the maximum common substructure (MCS) between two molecules." alt="" coords="1452,103,1659,144"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a106372ea68c25ed99afb71e15bc0671c" title="Chops one chemical structure by applying the given fragmentation templates." alt="" coords="1451,168,1660,209"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_molecule_utils_test.html#a6da9adc51a6398c68934fb16deeb9a97" title=" " alt="" coords="1442,233,1669,289"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils_test.html#af1090ba854a9e9d45025caef88fc8123" title=" " alt="" coords="1167,5,1351,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_molecule_utils_test.html#accf229046c6a2cbbe4c666df334d9d48" title=" " alt="" coords="1153,71,1364,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_molecule_utils_test.html#af0d3ad21b92dea372bed6dc8f3499332" title=" " alt="" coords="1143,136,1374,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_molecule_utils_test.html#a7855947abc6f7080233f36fa13aba864" title=" " alt="" coords="1134,201,1383,257"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="1459,377,1652,419"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#ac1e5c9703afc6f29fe11cca08ddb1a1c" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="1458,443,1653,484"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ae583c90795f338ffbf02776738700c09" title="Returns the chemical representation of the currently loaded chemical object." alt="" coords="1464,312,1647,353"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a1ddb932d4618434d435e4f85ce5e5eb5" title="Evaluates the possibility of closing rings in a given graph and if any ring can be closed,..." alt="" coords="1468,508,1643,549"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a756c2375d70d66c5bbba03e8772bb24a" title="Returns the currently loaded vertex." alt="" coords="1149,312,1368,353"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a7e833ba52549966556cc1bd1852dcfa4" title=" " alt="" coords="833,247,1085,288"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="523,287,785,314"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a530b2f509d3e15fd285526a34461cc9e" title="Imports the given SMILES into the viewer." alt="" coords="833,312,1085,353"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a09363e21a5254efe8f128a99e82acbf0" title=" " alt="" coords="837,377,1081,419"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="259,280,475,321"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="1174,443,1343,484"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad3d2daeb11e68a356e971ca1846596b5" title=" " alt="" coords="1174,508,1343,549"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="1174,377,1343,419"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0c2e353b243250b4959a3f86608f1020" title="Generates one offspring according to the method where crossover and mutation are decoupled,..." alt="" coords="873,508,1046,549"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ae7a90a911b109ed47b3acf54193acc35" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="873,443,1046,484"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="565,508,743,549"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="284,537,449,579"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,504,211,545"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,569,198,611"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="866,573,1053,615"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a2546eaac0cf6becaf10b56a1c929953a" title=" " alt="" coords="1432,768,1679,809"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8357317053a9158e81f78ffe6bd65688" title="Generates a candidate by fragmenting a molecule and generating the graph that reconnects all fragment..." alt="" coords="1446,688,1665,729"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm.html#ab9c7a6f840388b48f51387ff8ea9b64b" title="Splits the input data (from FragmenterParameters) into batches suitable for parallel batch processing..." alt="" coords="1447,602,1663,658"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="1133,783,1384,810"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="857,776,1062,817"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm.html#a13ae260c713d9b901a9aa71152c615ad" title=" " alt="" coords="1144,653,1373,709"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm_test.html#a11b2178cd3d55ba7f1fe1e0e047dd684" title=" " alt="" coords="1153,573,1364,629"/>
+</map>

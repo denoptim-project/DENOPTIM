@@ -1,0 +1,11 @@
+<map id="denoptim.gui.GUIVertexSelector.updateVrtxListSpinner" name="denoptim.gui.GUIVertexSelector.updateVrtxListSpinner">
+<area shape="rect" id="node1" title=" " alt="" coords="1497,89,1747,131"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a15c6a5de34e54f74d33c7c82f2a3125d" title="Load the list of vertexes to choose from." alt="" coords="1215,97,1449,123"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af7024886a4203aa93d8cf7975f7c2e72" title=" " alt="" coords="915,5,1156,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a857bfe6291322daccf2af3fd9a28a356" title="Start the construction of a new graph from scratch." alt="" coords="557,49,856,91"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a44e2ff798d22b73f966cb8393ceb4f18" title="Extends the current graph by appending a node to a specific free AP on the growing graph." alt="" coords="585,115,828,156"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="904,179,1167,206"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,57,509,83"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,49,211,91"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="599,180,815,221"/>
+</map>

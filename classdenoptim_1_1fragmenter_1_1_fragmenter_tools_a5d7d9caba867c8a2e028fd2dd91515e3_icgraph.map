@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.FragmenterTools.reduceTemplateToVertexBoundaries" name="denoptim.fragmenter.FragmenterTools.reduceTemplateToVertexBoundaries">
+<area shape="rect" id="node1" title="Reduces a template molecule to keep only atoms at vertex boundaries (atoms connected to atoms with di..." alt="" coords="263,5,529,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a106372ea68c25ed99afb71e15bc0671c" title="Chops one chemical structure by applying the given fragmentation templates." alt="" coords="5,5,215,47"/>
+</map>

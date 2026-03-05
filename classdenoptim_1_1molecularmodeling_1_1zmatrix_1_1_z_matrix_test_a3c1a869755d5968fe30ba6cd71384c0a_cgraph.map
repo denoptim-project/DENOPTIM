@@ -1,0 +1,9 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testGetChiralFlag" name="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testGetChiralFlag">
+<area shape="rect" id="node1" title=" " alt="" coords="5,104,239,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a2b48b01815de175fe998f9f28ff22ea7" title="Get the chiral flag for the atom at the given index." alt="" coords="287,71,520,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#af057822127c5cdb8dd95809365f69f32" title=" " alt="" coords="287,136,520,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="568,5,801,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a348f17c35781a2d5a15bd53022b5af24" title="Get the chiral flag." alt="" coords="568,71,801,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ae9486d28880e0c8225c0092acab98165" title="Add an atom to the ZMatrix." alt="" coords="568,136,801,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="568,225,801,267"/>
+</map>

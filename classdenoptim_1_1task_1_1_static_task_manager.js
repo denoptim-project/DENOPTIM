@@ -1,0 +1,27 @@
+var classdenoptim_1_1task_1_1_static_task_manager =
+[
+    [ "ShutDownHook", "classdenoptim_1_1task_1_1_static_task_manager_1_1_shut_down_hook.html", "classdenoptim_1_1task_1_1_static_task_manager_1_1_shut_down_hook" ],
+    [ "StaticTaskManager", "classdenoptim_1_1task_1_1_static_task_manager.html#ab84fcba2e43d7feb59b9b4c638cf14d1", null ],
+    [ "addTodoTask", "classdenoptim_1_1task_1_1_static_task_manager.html#a6d063079649e998534a625365affc412", null ],
+    [ "addTodoTasks", "classdenoptim_1_1task_1_1_static_task_manager.html#a452601b54846db9aac6ffbbe6fdeeaf8", null ],
+    [ "getInstance", "classdenoptim_1_1task_1_1_static_task_manager.html#aa563160371b763ed964fc981e6bd978c", null ],
+    [ "getQueueSnapshot", "classdenoptim_1_1task_1_1_static_task_manager.html#a6c4eda3a36fdf5641d073f28e9a491da", null ],
+    [ "hasActive", "classdenoptim_1_1task_1_1_static_task_manager.html#aa082037a2747bc07e6a496157b1d9652", null ],
+    [ "setLinkToProgressBar", "classdenoptim_1_1task_1_1_static_task_manager.html#a40a4557dcc3645729033969c5cf7ca22", null ],
+    [ "stop", "classdenoptim_1_1task_1_1_static_task_manager.html#ae63bb7f573cf95c77d7441ae648ee7f3", null ],
+    [ "stopAll", "classdenoptim_1_1task_1_1_static_task_manager.html#a8482fea755a3ebfb8284d64e82b9ae3a", null ],
+    [ "submit", "classdenoptim_1_1task_1_1_static_task_manager.html#a3b5b5f30075174630a548584c34ad233", null ],
+    [ "submitAndWait", "classdenoptim_1_1task_1_1_static_task_manager.html#a24097e04dfe47ec37c06f8600b6905b5", null ],
+    [ "subtractDoneTask", "classdenoptim_1_1task_1_1_static_task_manager.html#a00dfeb1aebe14acd14a6a72f938b1f40", null ],
+    [ "subtractDoneTasks", "classdenoptim_1_1task_1_1_static_task_manager.html#a35710993ed6901f26af2ee934897b658", null ],
+    [ "instance", "classdenoptim_1_1task_1_1_static_task_manager.html#a15d56dfca8bceded267833ffc79e893e", null ],
+    [ "LOCK", "classdenoptim_1_1task_1_1_static_task_manager.html#a1c42402660477f735ef1c3f6ca59b8ec", null ],
+    [ "maxParallelPrograms", "classdenoptim_1_1task_1_1_static_task_manager.html#a4f81fc572b67f80ff0ae1882b5168818", null ],
+    [ "maxProgressBar", "classdenoptim_1_1task_1_1_static_task_manager.html#ae4ce54f3cf3697f92fd9f1bbcf8753b5", null ],
+    [ "PROGRESSBARUPDATE", "classdenoptim_1_1task_1_1_static_task_manager.html#a9b7ea444c51ce7d5f13f6f470c847d82", null ],
+    [ "queueSize", "classdenoptim_1_1task_1_1_static_task_manager.html#a46f571280673388e6aca59e5d4274f94", null ],
+    [ "queueStatusBar", "classdenoptim_1_1task_1_1_static_task_manager.html#a1854abae5632a059326a1ade7d0b92c5", null ],
+    [ "subToFutureMap", "classdenoptim_1_1task_1_1_static_task_manager.html#aa4ec1a24554909750e4bc80b08877450", null ],
+    [ "tpe", "classdenoptim_1_1task_1_1_static_task_manager.html#accad72f24ffb24dcc77a3af837c8a03f", null ],
+    [ "valProgressBar", "classdenoptim_1_1task_1_1_static_task_manager.html#ae127846df1e2036f87ecb417da5143a2", null ]
+];

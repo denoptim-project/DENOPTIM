@@ -1,0 +1,6 @@
+<map id="denoptim.io.DenoptimIO.readGenerationFromSummary" name="denoptim.io.DenoptimIO.readGenerationFromSummary">
+<area shape="rect" id="node1" title="Reads a FileFormat#GENSUMMARY file and searches all the files defining each member of the population." alt="" coords="5,63,193,104"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a042c8c616521cdd15aee8b7a0cf02fdf" title="Reads SDF files that represent one or more tested candidates." alt="" coords="245,29,433,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a2cda5028becae07d4a0ac873a9352768" title="Read the pathnames to the population members from a FileFormat#GENSUMMARY file." alt="" coords="241,95,437,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="485,102,696,129"/>
+</map>

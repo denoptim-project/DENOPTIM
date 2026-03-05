@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.FragmenterTools.reduceTemplateToVertexBoundaries" name="denoptim.fragmenter.FragmenterTools.reduceTemplateToVertexBoundaries">
+<area shape="rect" id="node1" title="Reduces a template molecule to keep only atoms at vertex boundaries (atoms connected to atoms with di..." alt="" coords="5,5,272,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac6be8c4af5dd51783eae0899abba91ff" title="Finds the shortest path between two atoms in a molecule using BFS." alt="" coords="320,5,527,47"/>
+</map>
