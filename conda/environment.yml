@@ -1,3 +1,8 @@
+# Build/publish tools for conda recipes (see conda/meta.yaml).
+# With conda >=26.3, install these in base so the `conda build` plugin is registered:
+#   conda install -n base -c conda-forge conda-build anaconda-client conda-libmamba-solver
+#
+# Optional env for local workflows that also want a pinned Python/OpenJDK alongside:
 name: dnp_package_builder
 channels:
   - conda-forge

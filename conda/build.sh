@@ -12,7 +12,9 @@ mkdir -p "$PREFIX/lib" "$PREFIX/bin"
 
 mvn -version
 
-mvn clean package 
+# Skip unit tests here: conda-build uses a long PREFIX that breaks Surefire on some OSes.
+# Run the full suite with mvn test (e.g. GitHub maven workflow). Recipe test: denoptim -v.
+mvn clean package -DskipTests
 
 # Install
 cp "$SRC_DIR/target/denoptim-$PKG_VERSION-jar-with-dependencies.jar" "$PREFIX/lib"

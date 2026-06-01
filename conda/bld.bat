@@ -20,7 +20,7 @@ cmd.exe /c "%JAVA_HOME%\bin\java" -version
 
 cmd.exe /c mvn -version
 cmd.exe /c mvn --batch-mode clean || echo ""
-cmd.exe /c mvn --batch-mode package || echo ""
+cmd.exe /c mvn --batch-mode package -DskipTests || echo ""
 
 copy "%SRC_DIR%\target\denoptim-%PKG_VERSION%-jar-with-dependencies.jar" "%LIBRARY_LIB%\"
 

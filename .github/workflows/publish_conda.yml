@@ -33,14 +33,21 @@ jobs:
       with:
         miniconda-version: "latest"
         auto-update-conda: true
-        auto-activate-base: false
-        activate-environment: anaconda-client-env
-        environment-file: conda/environment.yml
+        channels: conda-forge
+        channel-priority: strict
+        auto-activate-base: true
+        # conda-build registers the `build` subcommand only in base (conda >=26.3 plugin model)
+        install-packages: >-
+          conda-build
+          anaconda-client
+          conda-libmamba-solver
 
     - name: Build package and publish
       run: |
         conda config --set anaconda_upload yes
-        conda build -c conda-forge  .
+        mkdir -p "${RUNNER_TEMP}/conda-bld-denoptim"
+        cd conda
+        conda build -c conda-forge . --croot "${RUNNER_TEMP}/conda-bld-denoptim"
       env:
         DENOPTIM_VERSION: ${{ steps.get_version.outputs.VERSION }}
 
@@ -63,15 +70,21 @@ jobs:
     - name: Setup Miniconda
       uses: conda-incubator/setup-miniconda@v3.1.0
       with:
+        miniconda-version: "latest"
         auto-update-conda: true
-        auto-activate-base: false
-        activate-environment: anaconda-client-env
-        environment-file: conda/environment.yml
+        channels: conda-forge
+        channel-priority: strict
+        auto-activate-base: true
+        install-packages: >-
+          conda-build
+          anaconda-client
+          conda-libmamba-solver
 
     - name: Build package and publish
       run: |
         conda config --set anaconda_upload yes
-        conda build -c conda-forge  .  --variants "{'arch': 'noarch'}"
+        mkdir -p "${RUNNER_TEMP}/conda-bld-denoptim"
+        cd conda
+        conda build -c conda-forge . --croot "${RUNNER_TEMP}/conda-bld-denoptim" --variants "{'arch': 'noarch'}"
       env:
         DENOPTIM_VERSION: ${{ steps.get_version.outputs.VERSION }}
-

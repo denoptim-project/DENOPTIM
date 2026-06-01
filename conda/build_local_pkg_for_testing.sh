@@ -11,12 +11,14 @@
 # WARNING: now works only on osx-64. Se TODO label below.
 # 
 
-# Identify the proper environment for building the package
-envName=$(grep name environment.yml | awk '{print $2}')
-conda activate "$envName"
-if [ $? -ne 0 ]; then
-  echo "ERROR: Non-zero exit status from activating conda environment '$envName'"
-  exit -1
+# conda-build must be in base for `conda build` (conda >=26.3 plugin model)
+if ! conda build --help &>/dev/null; then
+  echo "Installing build tools into base environment..."
+  conda install -n base -c conda-forge conda-build anaconda-client conda-libmamba-solver -y
+  if [ $? -ne 0 ]; then
+    echo "ERROR: Could not install conda-build in base"
+    exit -1
+  fi
 fi
 
 # Get version from pom.xml
@@ -27,8 +29,12 @@ if [ $nDots -ne 2 ]; then
   exit -1
 fi
 
+# Short croot avoids extra-long paths on macOS (FileVault/encryption can worsen placeholders)
+croot="${CONDA_BUILD_CROOT:-/tmp/conda-bld-denoptim}"
+mkdir -p "$croot"
+
 # Build the package
-DENOPTIM_VERSION="$pkgVersion" conda build . --no-anaconda-upload
+DENOPTIM_VERSION="$pkgVersion" conda build . --croot "$croot" --no-anaconda-upload
 if [ $? -ne 0 ]; then 
   echo "ERROR: Non-zero exit status from conda"
   exit -1
@@ -40,7 +46,7 @@ fi
 # further details:
 # https://github.com/conda/conda/issues/1884#issuecomment-868488922
 #
-pkgArchive=$(DENOPTIM_VERSION="$pkgVersion" conda build . --output | tail -n 1)
+pkgArchive=$(DENOPTIM_VERSION="$pkgVersion" conda build . --croot "$croot" --output | tail -n 1)
 if [ ! -f "$pkgArchive" ]; then
   echo "ERROR: Package tarball not found: $pkgArchive"
   exit 1

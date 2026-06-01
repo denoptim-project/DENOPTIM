@@ -13,8 +13,8 @@ build:
 
 requirements:
   build:
-    - openjdk =={{ openjdk_version }}
-    - maven
+    - conda-forge::openjdk =={{ openjdk_version }}
+    - conda-forge::maven
   run:
     - openjdk =={{ openjdk_version }}
     - python
