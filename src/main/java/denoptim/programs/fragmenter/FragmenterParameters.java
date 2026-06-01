@@ -58,7 +58,7 @@ public class FragmenterParameters extends RunTimeParameters
 {
     /**
      * Pathname to the file containing the structures of the molecules 
-     * to fragment.
+     * to fragment or the fragments to process.
      */
     private String structuresFile;
     
@@ -134,6 +134,11 @@ public class FragmenterParameters extends RunTimeParameters
      * given fragments
      */
     private boolean doFiltering = false;
+
+    /**
+     * Flag requesting to extract fragments from graphs.
+     */
+    private boolean doFragExtractionFromGraphs = false;
     
     /**
      * Flag requesting to reject fragments with minor isotopes.
@@ -574,6 +579,16 @@ public class FragmenterParameters extends RunTimeParameters
     public boolean doFragmentation()
     {
         return doFragmentation;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return <code>true</code> if we are asked to extract fragments from graphs.
+     */
+    public boolean doFragExtractionFromGraphs()
+    {
+        return doFragExtractionFromGraphs;
     }
     
 //------------------------------------------------------------------------------
@@ -1082,6 +1097,11 @@ public class FragmenterParameters extends RunTimeParameters
                 doFragmentation = true;
                 cutRulesFile = value;
                 break;
+
+            case "EXTRACTFROMGRAPHS=":
+                structuresFile = value;
+                doFragExtractionFromGraphs = true;
+                break;
                 
             case "ADDEXPLICITHYDROGEN":
                 addExplicitH = true;
@@ -1421,7 +1441,7 @@ public class FragmenterParameters extends RunTimeParameters
             }
         }
 
-        if (!doFragmentation && doExtactRepresentativeConformer)
+        if (!doFragmentation && !doFragExtractionFromGraphs && doExtactRepresentativeConformer)
         {
             isStandaloneFragmentClustering = true;
         }

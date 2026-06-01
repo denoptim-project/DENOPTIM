@@ -41,6 +41,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.io.DenoptimIO;
 
 
 /**
@@ -416,6 +417,9 @@ public class RotationalSpaceUtils
         {
             listQueries.put(e.getKey(),e.getValue().getSmarts());
         }
+
+        //TODO-gg del
+        DenoptimIO.writeSDFFile("/tmp/locMol.sdf", locMol, false);
 
         // Get bonds matching one of the definitions of rotatable bonds
         ManySMARTSQuery msq = new ManySMARTSQuery(locMol,listQueries);

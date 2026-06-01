@@ -283,9 +283,20 @@ public class FragmenterTask extends Task
                 return null;
             }
             preliminaryResults = newResultsFile;
+        } else if (settings.doFragExtractionFromGraphs()) {
+            logger.log(Level.INFO,"Extraction of fragments from graphs");
+            File newResultsFile = new File(getFragmentsFileName(settings, id));
+            boolean producedSomething = FragmenterTools.fragmentationFromGraphs(inputFile, 
+                    settings, newResultsFile, logger);
+            if (!producedSomething)
+            {
+                completed = true;
+                return null;
+            }
+            preliminaryResults = newResultsFile;
         }
         
-        if (!settings.doFragmentation() && settings.doFiltering())
+        if (!settings.doFragmentation() && !settings.doFragExtractionFromGraphs() && settings.doFiltering())
         {
             logger.log(Level.INFO,"Filtering fragments");
             File newResultsFile = new File(getFragmentsFileName(settings, id));

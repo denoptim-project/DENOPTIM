@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.5.1, March 2026_
+_Version 4.5.2, June 2026_
 
 
 [TOC]
@@ -677,6 +677,8 @@ The following tables list all the keywords grouped according to the main functio
 |`FRG-StructuresFile`| The pathname to the SDF file containing the input to be processed. Depending on the task, this keyword is used to specify where to take molecular structured to be fragmented or fragments to be filtered or clustered.|
 |`FRG-ParallelTasks`| Specifies the number (integer) of parallel threads when performing parallelizable tasks such as fragmentation or analysis of isomorphic fragment families.|
 |`FRG-Verbosity`| Specifies the verbosity level and an integer [-3, ..., 0, ..., 3] where 0 is normal, -3 is none, and 3 is maximum verbosity.|
+|__Fragment_Mining__||
+|`FRG-ExtractFromGraphs`| The pathname to the file containing graphs to be used as source of fragments. No further fragmentation can be applied to the fragments taken from the graphs, but any post-processing  (e.g., filtering) is applied as if fragments were produced by fragmentation. |
 |__Pre-Fragmentation Operation__||
 |`FRG-FormulaTxtFile`| The pathname to a TXT file (see [Formula file](#FormulaFile)) containing the molecular formulae for the structures to be fragmented. Use this keyword to enable detection of missing atoms by checking the consistency between declared molecular formula (reported in the pathname given here) and actual molecular formula found in the structure file. Molecules with missing atoms are not fragmented.|
 |`FRG-PreFilterSmarts`| Specifies the SMARTS query to filter structure before fragmentation. Any input molecule matching the SMARTS query will not be fragmented. This keyword can be used multiple times to define more than one pre-filtering SMARTS criterion.|

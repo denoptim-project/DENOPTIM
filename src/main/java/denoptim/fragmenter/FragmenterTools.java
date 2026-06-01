@@ -296,6 +296,58 @@ public class FragmenterTools
             buffer.clear();
         }
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Performs fragmentation from graphs, i.e., extracts existing fragments 
+     * from graphs (stored in a file). No cutting rule is applied.
+     * @param input the source of graphs.
+     * @param settings configurations including filtration criteria.
+     * @param output the file where to write extracted structures. 
+     * @param logger where to direct log messages. This is typically different 
+     * from the logger registered in the {@link FragmenterParameters}, which is
+     * the master logger, as we want thread-specific logging.
+     * @return <code>true</code> if the extraction produced at least one 
+     * fragment that survived post filtering, i.e., the <code>output</code> file
+     * does contain something.
+     * @throws Exception 
+     * @throws DENOPTIMException 
+     */
+    public static boolean fragmentationFromGraphs(File input, 
+        FragmenterParameters settings, File output, Logger logger) 
+        throws DENOPTIMException, Exception
+    {
+        int totalProd = 0;
+        for (DGraph graph : DenoptimIO.readDENOPTIMGraphsFromFile(input))
+        {
+            List<Vertex> fragments = graph.getVertexList();
+
+            // Post-fragmentation processing of fragments
+            List<Vertex> keptFragments = new ArrayList<Vertex>();
+            int fragCounter = 0;
+            for (Vertex frag : fragments)
+            {
+                // Add metadata
+                fragCounter++;
+                manageFragmentCollection(frag, fragCounter, settings,
+                        keptFragments, logger);
+            }
+            if (logger!=null)
+            {
+                logger.log(Level.FINE,"Fragments surviving post-"
+                        + "processing: " + keptFragments.size());
+            }
+
+            if (keptFragments.size()>0)
+            {
+                totalProd += keptFragments.size();
+                DenoptimIO.writeVertexesToFile(output, FileFormat.VRTXSDF, 
+                    keptFragments, true);
+            }
+        }
+        return totalProd>0;
+    }
     
 //-----------------------------------------------------------------------------
     

@@ -1,0 +1,8 @@
+#
+# Extraction of fragments from graphs and filtering
+#
+FRG-VERBOSITY=4
+FRG-ExtractFromGraphs=graphs_as_source_of_fragments.sdf
+FRG-RetainSmarts=[#6]
+FRG-REMOVEDUPLICATES
+FRG-PARALLELTASKS=2
