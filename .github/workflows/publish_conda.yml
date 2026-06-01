@@ -35,12 +35,13 @@ jobs:
         auto-update-conda: true
         channels: conda-forge
         channel-priority: strict
+        conda-remove-defaults: true
         auto-activate-base: true
-        # conda-build registers the `build` subcommand only in base (conda >=26.3 plugin model)
-        install-packages: >-
-          conda-build
-          anaconda-client
-          conda-libmamba-solver
+        conda-build-version: "*"
+        conda-solver: libmamba
+
+    - name: Install anaconda-client
+      run: conda install -n base -c conda-forge anaconda-client -y
 
     - name: Build package and publish
       run: |
@@ -74,11 +75,13 @@ jobs:
         auto-update-conda: true
         channels: conda-forge
         channel-priority: strict
+        conda-remove-defaults: true
         auto-activate-base: true
-        install-packages: >-
-          conda-build
-          anaconda-client
-          conda-libmamba-solver
+        conda-build-version: "*"
+        conda-solver: libmamba
+
+    - name: Install anaconda-client
+      run: conda install -n base -c conda-forge anaconda-client -y
 
     - name: Build package and publish
       run: |
