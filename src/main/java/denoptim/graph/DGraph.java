@@ -956,7 +956,9 @@ public class DGraph implements Cloneable
      * This is typically the first vertex in the list, but it is possible to
      * programmatically build graphs that do not follow this convention. 
      * Therefore, here we test if the first vertex is a seed (i.e., it only has
-     * departing edges) and, if not, we search for the closest seed.
+     * departing edges) and, if not, we search for the deepest descendant seed.
+     * Note that the type of verted (i.e., scaffold/fragment/capping) is not 
+     * relevant for this method.
      * <b>WARNING</b>: the graph is assumed to be an healthy spanning tree, in 
      * that it has only one seed that is reachable from any vertex by a 
      * inverse directed path.
@@ -6825,7 +6827,7 @@ public class DGraph implements Cloneable
                     
                     break;
                 }
-                case DELETEVERTEX:
+                case DELETEBRANCH:
                 {
                     ArrayList<Vertex> matches = modGraph.findVertices(
                             edit.getVertexQuery(), false, logger);
@@ -6837,8 +6839,26 @@ public class DGraph implements Cloneable
                     }
                     break;
                 }
+                case DELETEVERTEX:
+                {
+                    ArrayList<Vertex> matches = modGraph.findVertices(
+                            edit.getVertexQuery(), false, logger);
+                    for (Vertex vertexToRemove : matches)
+                    {
+                        if (modGraph.containsVertex(vertexToRemove))
+                            modGraph.removeVertex(vertexToRemove);
+                    }
+                    break;
+                }
             }
         }
+
+        if (modGraph.getVertexList().size() == 0)
+        {
+            logger.log(Level.WARNING, "The graph after editing is empty. "
+                    + "This will likely trigger an error in subsequent steps.");
+        }
+        
         return modGraph;
     }
 

@@ -53,7 +53,7 @@
     }
   },
   {
-    "task": "DELETEVERTEX",
+    "task": "DELETEBRANCH",
     "vertexQuery": {
        "buildingBlockId": 0,
        "buildingBlockType": "FRAGMENT"
