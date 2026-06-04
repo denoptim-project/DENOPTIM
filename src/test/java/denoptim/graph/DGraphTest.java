@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Edge.BondType;
@@ -59,6 +61,7 @@ import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.PathSubGraph;
+import denoptim.io.DenoptimIO;
 import denoptim.utils.MutationType;
 
 
@@ -73,7 +76,6 @@ public class DGraphTest
     
     private static APClass APCA, APCB, APCC, APCD, CAPP;
     private static String a="A", b="B", c="C", d="D", cap="cap";
-    
     
 //------------------------------------------------------------------------------
     
@@ -138,6 +140,14 @@ public class DGraphTest
         s1.addAP(APCA);
         s1.addAP(APCD);
         fs.appendVertexToLibrary(s1, BBType.SCAFFOLD, fs.getScaffoldLibrary());
+        
+        EmptyVertex s2 = new EmptyVertex();
+        s2.setBuildingBlockType(BBType.SCAFFOLD);
+        s2.addAP(APCA);
+        s2.addAP(APCB);
+        s2.addAP(APCA);
+        s2.addAP(APCC);
+        fs.appendVertexToLibrary(s2, BBType.SCAFFOLD, fs.getScaffoldLibrary());
         
         EmptyVertex v0 = new EmptyVertex();
         v0.setBuildingBlockType(BBType.FRAGMENT);
@@ -1770,7 +1780,7 @@ public class DGraphTest
         assertEquals(4,pathC.getEdgesPath().size(),"path within a ring (C)");
         
         DGraph expected = makeTestGraphG(fs);
-        assertTrue(g.isIsomorphicTo(expected),"isomforphic to expected");
+        assertTrue(g.isIsomorphicTo(expected),"isomorphic to expected");
     }
     
 //------------------------------------------------------------------------------
@@ -1827,697 +1837,697 @@ public class DGraphTest
     }
     
 //------------------------------------------------------------------------------
-	
+    
     @Test
-	public void testRemoveVertex() throws Exception {
-		DGraph graph = new DGraph();
-		EmptyVertex v0 = new EmptyVertex(0);
-		buildVertexAndConnectToGraph(v0, 3, graph);
+    public void testRemoveVertex() throws Exception {
+        DGraph graph = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        buildVertexAndConnectToGraph(v0, 3, graph);
 
-		EmptyVertex v1 = new EmptyVertex(1);
-		buildVertexAndConnectToGraph(v1, 2, graph);
-		graph.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        EmptyVertex v1 = new EmptyVertex(1);
+        buildVertexAndConnectToGraph(v1, 2, graph);
+        graph.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
 
-		EmptyVertex v2 = new EmptyVertex(2);
-		buildVertexAndConnectToGraph(v2, 2, graph);
-		graph.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+        EmptyVertex v2 = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(v2, 2, graph);
+        graph.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
 
-		EmptyVertex v3 = new EmptyVertex(3);
-		buildVertexAndConnectToGraph(v3, 1, graph);
-		graph.addEdge(new Edge(v2.getAP(1), v3.getAP(0)));
+        EmptyVertex v3 = new EmptyVertex(3);
+        buildVertexAndConnectToGraph(v3, 1, graph);
+        graph.addEdge(new Edge(v2.getAP(1), v3.getAP(0)));
 
-		EmptyVertex v4 = new EmptyVertex(4);
-		buildVertexAndConnectToGraph(v4, 3, graph);
-		graph.addEdge(new Edge(v0.getAP(1), v4.getAP(0)));
+        EmptyVertex v4 = new EmptyVertex(4);
+        buildVertexAndConnectToGraph(v4, 3, graph);
+        graph.addEdge(new Edge(v0.getAP(1), v4.getAP(0)));
 
-		EmptyVertex v5 = new EmptyVertex(5);
-		buildVertexAndConnectToGraph(v5, 1, graph);
-		graph.addEdge(new Edge(v4.getAP(1), v5.getAP(0)));
+        EmptyVertex v5 = new EmptyVertex(5);
+        buildVertexAndConnectToGraph(v5, 1, graph);
+        graph.addEdge(new Edge(v4.getAP(1), v5.getAP(0)));
 
-		EmptyVertex v6 = new EmptyVertex(6);
-		buildVertexAndConnectToGraph(v6, 1, graph);
-		graph.addEdge(new Edge(v0.getAP(2), v6.getAP(0)));
+        EmptyVertex v6 = new EmptyVertex(6);
+        buildVertexAndConnectToGraph(v6, 1, graph);
+        graph.addEdge(new Edge(v0.getAP(2), v6.getAP(0)));
 
-		EmptyVertex v7 = new EmptyVertex(7);
-		buildVertexAndConnectToGraph(v7, 1, graph);
-		graph.addEdge(new Edge(v4.getAP(2), v7.getAP(0)));
+        EmptyVertex v7 = new EmptyVertex(7);
+        buildVertexAndConnectToGraph(v7, 1, graph);
+        graph.addEdge(new Edge(v4.getAP(2), v7.getAP(0)));
 
-		graph.addRing(new Ring(new ArrayList<>(
-				Arrays.asList(v5, v4, v0, v1, v2, v3))));
+        graph.addRing(new Ring(new ArrayList<>(
+                Arrays.asList(v5, v4, v0, v1, v2, v3))));
 
-		graph.addRing(new Ring(new ArrayList<>(
-				Arrays.asList(v6, v0, v4, v7))));
+        graph.addRing(new Ring(new ArrayList<>(
+                Arrays.asList(v6, v0, v4, v7))));
 
-		SymmetricVertexes ss = new SymmetricVertexes();
-		ss.add(v3);
-		ss.add(v5);
-		graph.addSymmetricSetOfVertices(ss);
+        SymmetricVertexes ss = new SymmetricVertexes();
+        ss.add(v3);
+        ss.add(v5);
+        graph.addSymmetricSetOfVertices(ss);
 
         SymmetricVertexes ss2 = new SymmetricVertexes();
         ss2.add(v6);
         ss2.add(v7);
-		graph.addSymmetricSetOfVertices(ss2);
+        graph.addSymmetricSetOfVertices(ss2);
 
-		// Current string encoding this graph is
-//    	  "0 0_1_0_0,1_1_1_0,2_1_1_0,3_1_1_0,4_1_1_0,5_1_1_0,"
-//    			+ "6_1_1_0,7_1_1_0, 0_0_1_0_1,1_1_2_0_1,2_1_3_0_1,0_1_4_0_1,"
-//    			+ "4_1_5_0_1,0_2_6_0_1,4_2_7_0_1, "
-//    			+ "DENOPTIMRing [verteces=[5_1_1_0, 4_1_1_0, 0_1_0_0, 1_1_1_0,"
-//    			+ " 2_1_1_0, 3_1_1_0]] DENOPTIMRing [verteces=[6_1_1_0,"
-//    			+ " 0_1_0_0, 4_1_1_0, 7_1_1_0]] "
-//    			+ "SymmetricSet [symVrtxIds=[3, 5]] "
-//    			+ "SymmetricSet [symVrtxIds=[6, 7]]";
+        // Current string encoding this graph is
+//          "0 0_1_0_0,1_1_1_0,2_1_1_0,3_1_1_0,4_1_1_0,5_1_1_0,"
+//                + "6_1_1_0,7_1_1_0, 0_0_1_0_1,1_1_2_0_1,2_1_3_0_1,0_1_4_0_1,"
+//                + "4_1_5_0_1,0_2_6_0_1,4_2_7_0_1, "
+//                + "DENOPTIMRing [verteces=[5_1_1_0, 4_1_1_0, 0_1_0_0, 1_1_1_0,"
+//                + " 2_1_1_0, 3_1_1_0]] DENOPTIMRing [verteces=[6_1_1_0,"
+//                + " 0_1_0_0, 4_1_1_0, 7_1_1_0]] "
+//                + "SymmetricSet [symVrtxIds=[3, 5]] "
+//                + "SymmetricSet [symVrtxIds=[6, 7]]";
 
-		int numV = graph.getVertexCount();
-		int numE = graph.getEdgeCount();
-		int numS = graph.getSymmetricSetCount();
-		int numR = graph.getRingCount();
+        int numV = graph.getVertexCount();
+        int numE = graph.getEdgeCount();
+        int numS = graph.getSymmetricSetCount();
+        int numR = graph.getRingCount();
 
-		graph.removeVertex(v5);
+        graph.removeVertex(v5);
 
-		int numVa = graph.getVertexCount();
-		int numEa = graph.getEdgeCount();
-		int numSa = graph.getSymmetricSetCount();
-		int numRa = graph.getRingCount();
+        int numVa = graph.getVertexCount();
+        int numEa = graph.getEdgeCount();
+        int numSa = graph.getSymmetricSetCount();
+        int numRa = graph.getRingCount();
 
-		assertEquals(numVa, numV - 1);
-		assertEquals(numEa, numE - 1);
-		assertEquals(numSa, numS - 1);
-		assertEquals(numRa, numR - 1);
+        assertEquals(numVa, numV - 1);
+        assertEquals(numEa, numE - 1);
+        assertEquals(numSa, numS - 1);
+        assertEquals(numRa, numR - 1);
 
-		graph.removeVertex(v3);
+        graph.removeVertex(v3);
 
-		int numVb = graph.getVertexCount();
-		int numEb = graph.getEdgeCount();
-		int numSb = graph.getSymmetricSetCount();
-		int numRb = graph.getRingCount();
+        int numVb = graph.getVertexCount();
+        int numEb = graph.getEdgeCount();
+        int numSb = graph.getSymmetricSetCount();
+        int numRb = graph.getRingCount();
 
-		assertEquals(numVb, numVa - 1);
-		assertEquals(numEb, numEa - 1);
-		assertEquals(numSb, numSa);
-		assertEquals(numRb, numRa);
+        assertEquals(numVb, numVa - 1);
+        assertEquals(numEb, numEa - 1);
+        assertEquals(numSb, numSa);
+        assertEquals(numRb, numRa);
 
-		graph.removeVertex(v4); // non terminal vertex
+        graph.removeVertex(v4); // non terminal vertex
 
-		int numVc = graph.getVertexCount();
-		int numEc = graph.getEdgeCount();
-		int numSc = graph.getSymmetricSetCount();
-		int numRc = graph.getRingCount();
+        int numVc = graph.getVertexCount();
+        int numEc = graph.getEdgeCount();
+        int numSc = graph.getSymmetricSetCount();
+        int numRc = graph.getRingCount();
 
-		assertEquals(numVc, numVb - 1);
-		assertEquals(numEc, numEb - 2);
-		assertEquals(numSc, numSb);
-		assertEquals(numRc, numRb - 1);
+        assertEquals(numVc, numVb - 1);
+        assertEquals(numEc, numEb - 2);
+        assertEquals(numSc, numSb);
+        assertEquals(numRc, numRb - 1);
 
-	}
-
-//------------------------------------------------------------------------------
-
-	@Test
-	public void testSameAs_Equal() throws DENOPTIMException
-	{
-		DGraph graphA = new DGraph();
-		EmptyVertex v0 = new EmptyVertex(0);
-		buildVertexAndConnectToGraph(v0, 3, graphA);
-
-		EmptyVertex v1 = new EmptyVertex(1);
-		buildVertexAndConnectToGraph(v1, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
-
-		EmptyVertex v2 = new EmptyVertex(2);
-		buildVertexAndConnectToGraph(v2, 2, graphA);
-		graphA.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
-
-		// Other graph, but is the same graph
-
-		DGraph graphB = new DGraph();
-		EmptyVertex v90 = new EmptyVertex(90);
-		buildVertexAndConnectToGraph(v90, 3, graphB);
-
-		EmptyVertex v91 = new EmptyVertex(91);
-		buildVertexAndConnectToGraph(v91, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
-
-		EmptyVertex v92 = new EmptyVertex(92);
-		buildVertexAndConnectToGraph(v92, 2, graphB);
-		graphB.addEdge(new Edge(v91.getAP(1), v92.getAP(0)));
-
-		StringBuilder reason = new StringBuilder();
-		assertTrue(graphA.sameAs(graphB, reason), reason.toString());
-	}
+    }
 
 //------------------------------------------------------------------------------
 
-	@Test
-	public void testSameAs_DiffVertex() throws DENOPTIMException
-	{
-		DGraph graphA = new DGraph();
-		EmptyVertex v0 = new EmptyVertex(0);
-		buildVertexAndConnectToGraph(v0, 3, graphA);
+    @Test
+    public void testSameAs_Equal() throws DENOPTIMException
+    {
+        DGraph graphA = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        buildVertexAndConnectToGraph(v0, 3, graphA);
 
-		EmptyVertex v1 = new EmptyVertex(1);
-		buildVertexAndConnectToGraph(v1, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        EmptyVertex v1 = new EmptyVertex(1);
+        buildVertexAndConnectToGraph(v1, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
 
-		EmptyVertex v2 = new EmptyVertex(2);
-		buildVertexAndConnectToGraph(v2, 2, graphA);
-		graphA.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+        EmptyVertex v2 = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(v2, 2, graphA);
+        graphA.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
 
-		// Other graph
+        // Other graph, but is the same graph
 
-		DGraph graphB = new DGraph();
-		EmptyVertex v90 = new EmptyVertex(90);
-		buildVertexAndConnectToGraph(v90, 3, graphB);
+        DGraph graphB = new DGraph();
+        EmptyVertex v90 = new EmptyVertex(90);
+        buildVertexAndConnectToGraph(v90, 3, graphB);
 
-		EmptyVertex v91 = new EmptyVertex(91);
-		buildVertexAndConnectToGraph(v91, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
+        EmptyVertex v91 = new EmptyVertex(91);
+        buildVertexAndConnectToGraph(v91, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
 
-		EmptyVertex v92 = new EmptyVertex(92);
-		buildVertexAndConnectToGraph(v92, 3, graphB);
-		graphB.addEdge(new Edge(v91.getAP(1), v92.getAP(0)));
+        EmptyVertex v92 = new EmptyVertex(92);
+        buildVertexAndConnectToGraph(v92, 2, graphB);
+        graphB.addEdge(new Edge(v91.getAP(1), v92.getAP(0)));
 
-		StringBuilder reason = new StringBuilder();
-		assertFalse(graphA.sameAs(graphB, reason));
-	}
-
-//------------------------------------------------------------------------------
-
-	@Test
-	public void testSameAs_SameSymmSet() throws Exception {
-		DGraph graphA = new DGraph();
-		EmptyVertex v0 = new EmptyVertex(0);
-		buildVertexAndConnectToGraph(v0, 4, graphA);
-
-		EmptyVertex v1 = new EmptyVertex(1);
-		buildVertexAndConnectToGraph(v1, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
-
-		EmptyVertex v2 = new EmptyVertex(2);
-		buildVertexAndConnectToGraph(v2, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
-
-		EmptyVertex v3 = new EmptyVertex(3);
-		buildVertexAndConnectToGraph(v3, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
-
-		EmptyVertex v4 = new EmptyVertex(4);
-		buildVertexAndConnectToGraph(v4, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
-
-		SymmetricVertexes ssA = new SymmetricVertexes();
-		ssA.add(v1);
-		ssA.add(v2);
-		graphA.addSymmetricSetOfVertices(ssA);
-		SymmetricVertexes ssA2 = new SymmetricVertexes();
-		ssA2.add(v3);
-		ssA2.add(v4);
-		graphA.addSymmetricSetOfVertices(ssA2);
-
-		// Other
-
-		DGraph graphB = new DGraph();
-		EmptyVertex v90 = new EmptyVertex(90);
-		buildVertexAndConnectToGraph(v90, 4, graphB);
-
-		EmptyVertex v91 = new EmptyVertex(91);
-		buildVertexAndConnectToGraph(v91, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
-
-		EmptyVertex v92 = new EmptyVertex(92);
-		buildVertexAndConnectToGraph(v92, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(1), v92.getAP(0)));
-
-		EmptyVertex v93 = new EmptyVertex(93);
-		buildVertexAndConnectToGraph(v93, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(2), v93.getAP(0)));
-
-		EmptyVertex v94 = new EmptyVertex(94);
-		buildVertexAndConnectToGraph(v94, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
-
-		SymmetricVertexes ssB2 = new SymmetricVertexes();
-		ssB2.add(v93);
-		ssB2.add(v94);
-		graphB.addSymmetricSetOfVertices(ssB2);
-		SymmetricVertexes ssB = new SymmetricVertexes();
-		ssB.add(v91);
-		ssB.add(v92);
-		graphB.addSymmetricSetOfVertices(ssB);
-
-    	/*
-    	System.out.println("Graphs Same SS");
-    	System.out.println(graphA);
-    	System.out.println(graphB);
-    	*/
-
-		StringBuilder reason = new StringBuilder();
-		assertTrue(graphA.sameAs(graphB, reason));
-	}
+        StringBuilder reason = new StringBuilder();
+        assertTrue(graphA.sameAs(graphB, reason), reason.toString());
+    }
 
 //------------------------------------------------------------------------------
 
-	@Test
-	public void testSameAs_DiffSymmSet() throws Exception {
-		DGraph graphA = new DGraph();
-		EmptyVertex v0 = new EmptyVertex(0);
-		buildVertexAndConnectToGraph(v0, 4, graphA);
+    @Test
+    public void testSameAs_DiffVertex() throws DENOPTIMException
+    {
+        DGraph graphA = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        buildVertexAndConnectToGraph(v0, 3, graphA);
 
-		EmptyVertex v1 = new EmptyVertex(1);
-		buildVertexAndConnectToGraph(v1, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        EmptyVertex v1 = new EmptyVertex(1);
+        buildVertexAndConnectToGraph(v1, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
 
-		EmptyVertex v2 = new EmptyVertex(2);
-		buildVertexAndConnectToGraph(v2, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
+        EmptyVertex v2 = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(v2, 2, graphA);
+        graphA.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
 
-		EmptyVertex v3 = new EmptyVertex(3);
-		buildVertexAndConnectToGraph(v3, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
+        // Other graph
 
-		EmptyVertex v4 = new EmptyVertex(4);
-		buildVertexAndConnectToGraph(v4, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
+        DGraph graphB = new DGraph();
+        EmptyVertex v90 = new EmptyVertex(90);
+        buildVertexAndConnectToGraph(v90, 3, graphB);
 
-		SymmetricVertexes ssA = new SymmetricVertexes();
-		ssA.add(v1);                            //difference
-		ssA.add(v2);                            //difference
-		graphA.addSymmetricSetOfVertices(ssA);
-		SymmetricVertexes ssA2 = new SymmetricVertexes();
-		ssA2.add(v3);                           //difference
-		ssA2.add(v4);                           //difference
-		graphA.addSymmetricSetOfVertices(ssA2);
+        EmptyVertex v91 = new EmptyVertex(91);
+        buildVertexAndConnectToGraph(v91, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
 
-		// Other
+        EmptyVertex v92 = new EmptyVertex(92);
+        buildVertexAndConnectToGraph(v92, 3, graphB);
+        graphB.addEdge(new Edge(v91.getAP(1), v92.getAP(0)));
 
-		DGraph graphB = new DGraph();
-		EmptyVertex v90 = new EmptyVertex(90);
-		buildVertexAndConnectToGraph(v90, 4, graphB);
-
-		EmptyVertex v91 = new EmptyVertex(91);
-		buildVertexAndConnectToGraph(v91, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(0), v1.getAP(0)));
-
-		EmptyVertex v92 = new EmptyVertex(92);
-		buildVertexAndConnectToGraph(v92, 2, graphB);
-		graphB.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
-
-		EmptyVertex v93 = new EmptyVertex(93);
-		buildVertexAndConnectToGraph(v93, 2, graphB);
-		graphB.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
-
-		EmptyVertex v94 = new EmptyVertex(94);
-		buildVertexAndConnectToGraph(v94, 2, graphB);
-		graphB.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
-
-		SymmetricVertexes ssB = new SymmetricVertexes();
-		ssB.add(v1);                           //difference
-		ssB.add(v3);                           //difference
-		graphB.addSymmetricSetOfVertices(ssB);
-		SymmetricVertexes ssB2 = new SymmetricVertexes();
-		ssB2.add(v2);                           //difference
-		ssB2.add(v4);                           //difference
-		graphB.addSymmetricSetOfVertices(ssB2);
-
-		StringBuilder reason = new StringBuilder();
-		assertFalse(graphA.sameAs(graphB, reason));
-	}
+        StringBuilder reason = new StringBuilder();
+        assertFalse(graphA.sameAs(graphB, reason));
+    }
 
 //------------------------------------------------------------------------------
 
-	@Test
-	public void testSameAs_SameRings() throws DENOPTIMException
-	{
-		DGraph graphA = new DGraph();
-		EmptyVertex v0 = new EmptyVertex(0);
-		buildVertexAndConnectToGraph(v0, 4, graphA);
+    @Test
+    public void testSameAs_SameSymmSet() throws Exception {
+        DGraph graphA = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        buildVertexAndConnectToGraph(v0, 4, graphA);
 
-		EmptyVertex v1 = new EmptyVertex(1);
-		buildVertexAndConnectToGraph(v1, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        EmptyVertex v1 = new EmptyVertex(1);
+        buildVertexAndConnectToGraph(v1, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
 
-		EmptyVertex v2 = new EmptyVertex(2);
-		buildVertexAndConnectToGraph(v2, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
+        EmptyVertex v2 = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(v2, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
 
-		EmptyVertex v3 = new EmptyVertex(3);
-		buildVertexAndConnectToGraph(v3, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
+        EmptyVertex v3 = new EmptyVertex(3);
+        buildVertexAndConnectToGraph(v3, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
 
-		EmptyVertex v4 = new EmptyVertex(4);
-		buildVertexAndConnectToGraph(v4, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
+        EmptyVertex v4 = new EmptyVertex(4);
+        buildVertexAndConnectToGraph(v4, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-		ArrayList<Vertex> vrA = new ArrayList<Vertex>();
-		vrA.add(v1);
-		vrA.add(v0);
-		vrA.add(v2);
-		Ring rA = new Ring(vrA);
-		graphA.addRing(rA);
-		ArrayList<Vertex> vrA2 = new ArrayList<Vertex>();
-		vrA2.add(v3);
-		vrA2.add(v0);
-		vrA2.add(v4);
-		Ring rA2 = new Ring(vrA2);
-		graphA.addRing(rA2);
+        SymmetricVertexes ssA = new SymmetricVertexes();
+        ssA.add(v1);
+        ssA.add(v2);
+        graphA.addSymmetricSetOfVertices(ssA);
+        SymmetricVertexes ssA2 = new SymmetricVertexes();
+        ssA2.add(v3);
+        ssA2.add(v4);
+        graphA.addSymmetricSetOfVertices(ssA2);
 
+        // Other
 
-		// Other
+        DGraph graphB = new DGraph();
+        EmptyVertex v90 = new EmptyVertex(90);
+        buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		DGraph graphB = new DGraph();
-		EmptyVertex v90 = new EmptyVertex(90);
-		buildVertexAndConnectToGraph(v90, 4, graphB);
+        EmptyVertex v91 = new EmptyVertex(91);
+        buildVertexAndConnectToGraph(v91, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
 
-		EmptyVertex v91 = new EmptyVertex(91);
-		buildVertexAndConnectToGraph(v91, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
+        EmptyVertex v92 = new EmptyVertex(92);
+        buildVertexAndConnectToGraph(v92, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(1), v92.getAP(0)));
 
-		EmptyVertex v92 = new EmptyVertex(92);
-		buildVertexAndConnectToGraph(v92, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(1), v92.getAP(0)));
+        EmptyVertex v93 = new EmptyVertex(93);
+        buildVertexAndConnectToGraph(v93, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(2), v93.getAP(0)));
 
-		EmptyVertex v93 = new EmptyVertex(93);
-		buildVertexAndConnectToGraph(v93, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(2), v93.getAP(0)));
+        EmptyVertex v94 = new EmptyVertex(94);
+        buildVertexAndConnectToGraph(v94, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
 
-		EmptyVertex v94 = new EmptyVertex(94);
-		buildVertexAndConnectToGraph(v94, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
+        SymmetricVertexes ssB2 = new SymmetricVertexes();
+        ssB2.add(v93);
+        ssB2.add(v94);
+        graphB.addSymmetricSetOfVertices(ssB2);
+        SymmetricVertexes ssB = new SymmetricVertexes();
+        ssB.add(v91);
+        ssB.add(v92);
+        graphB.addSymmetricSetOfVertices(ssB);
 
-		ArrayList<Vertex> vrB = new ArrayList<Vertex>();
-		vrB.add(v91);
-		vrB.add(v90);
-		vrB.add(v92);
-		Ring rB = new Ring(vrB);
-		graphB.addRing(rB);
-		ArrayList<Vertex> vrB2 = new ArrayList<Vertex>();
-		vrB2.add(v93);
-		vrB2.add(v90);
-		vrB2.add(v94);
-		Ring rB2 = new Ring(vrB2);
-		graphB.addRing(rB2);
+        /*
+        System.out.println("Graphs Same SS");
+        System.out.println(graphA);
+        System.out.println(graphB);
+        */
 
-		StringBuilder reason = new StringBuilder();
-		assertTrue(graphA.sameAs(graphB, reason));
-	}
+        StringBuilder reason = new StringBuilder();
+        assertTrue(graphA.sameAs(graphB, reason));
+    }
 
 //------------------------------------------------------------------------------
 
-	@Test
-	public void testSameAs_DisorderRings() throws Exception 
-	{
-		DGraph graphA = new DGraph();
-		EmptyVertex v0 = new EmptyVertex(0);
-		buildVertexAndConnectToGraph(v0, 4, graphA);
+    @Test
+    public void testSameAs_DiffSymmSet() throws Exception {
+        DGraph graphA = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        buildVertexAndConnectToGraph(v0, 4, graphA);
 
-		EmptyVertex v1 = new EmptyVertex(1);
-		buildVertexAndConnectToGraph(v1, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        EmptyVertex v1 = new EmptyVertex(1);
+        buildVertexAndConnectToGraph(v1, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
 
-		EmptyVertex v2 = new EmptyVertex(2);
-		buildVertexAndConnectToGraph(v2, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
+        EmptyVertex v2 = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(v2, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
 
-		EmptyVertex v3 = new EmptyVertex(3);
-		buildVertexAndConnectToGraph(v3, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
+        EmptyVertex v3 = new EmptyVertex(3);
+        buildVertexAndConnectToGraph(v3, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
 
-		EmptyVertex v4 = new EmptyVertex(4);
-		buildVertexAndConnectToGraph(v4, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
+        EmptyVertex v4 = new EmptyVertex(4);
+        buildVertexAndConnectToGraph(v4, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-		ArrayList<Vertex> vrA = new ArrayList<>();
-		vrA.add(v1);
-		vrA.add(v0);
-		vrA.add(v2);
-		Ring rA = new Ring(vrA);
-		graphA.addRing(rA);
-		ArrayList<Vertex> vrA2 = new ArrayList<>();
-		vrA2.add(v3);
-		vrA2.add(v0);
-		vrA2.add(v4);
-		Ring rA2 = new Ring(vrA2);
-		graphA.addRing(rA2);
+        SymmetricVertexes ssA = new SymmetricVertexes();
+        ssA.add(v1);                            //difference
+        ssA.add(v2);                            //difference
+        graphA.addSymmetricSetOfVertices(ssA);
+        SymmetricVertexes ssA2 = new SymmetricVertexes();
+        ssA2.add(v3);                           //difference
+        ssA2.add(v4);                           //difference
+        graphA.addSymmetricSetOfVertices(ssA2);
 
+        // Other
 
-		// Other
+        DGraph graphB = new DGraph();
+        EmptyVertex v90 = new EmptyVertex(90);
+        buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		DGraph graphB = new DGraph();
-		EmptyVertex v90 = new EmptyVertex(90);
-		buildVertexAndConnectToGraph(v90, 4, graphB);
+        EmptyVertex v91 = new EmptyVertex(91);
+        buildVertexAndConnectToGraph(v91, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(0), v1.getAP(0)));
 
-		EmptyVertex v91 = new EmptyVertex(91);
-		buildVertexAndConnectToGraph(v91, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
+        EmptyVertex v92 = new EmptyVertex(92);
+        buildVertexAndConnectToGraph(v92, 2, graphB);
+        graphB.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
 
-		EmptyVertex v92 = new EmptyVertex(92);
-		buildVertexAndConnectToGraph(v92, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(1), v92.getAP(0)));
+        EmptyVertex v93 = new EmptyVertex(93);
+        buildVertexAndConnectToGraph(v93, 2, graphB);
+        graphB.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
 
-		EmptyVertex v93 = new EmptyVertex(93);
-		buildVertexAndConnectToGraph(v93, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(2), v93.getAP(0)));
+        EmptyVertex v94 = new EmptyVertex(94);
+        buildVertexAndConnectToGraph(v94, 2, graphB);
+        graphB.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-		EmptyVertex v94 = new EmptyVertex(94);
-		buildVertexAndConnectToGraph(v94, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
+        SymmetricVertexes ssB = new SymmetricVertexes();
+        ssB.add(v1);                           //difference
+        ssB.add(v3);                           //difference
+        graphB.addSymmetricSetOfVertices(ssB);
+        SymmetricVertexes ssB2 = new SymmetricVertexes();
+        ssB2.add(v2);                           //difference
+        ssB2.add(v4);                           //difference
+        graphB.addSymmetricSetOfVertices(ssB2);
 
-		ArrayList<Vertex> vrB = new ArrayList<>();
-		vrB.add(v91);
-		vrB.add(v90);
-		vrB.add(v92);
-		Ring rB = new Ring(vrB);
-		graphB.addRing(rB);
-		ArrayList<Vertex> vrB2 = new ArrayList<>();
-		vrB2.add(v94);
-		vrB2.add(v90);
-		vrB2.add(v93);
-		Ring rB2 = new Ring(vrB2);
-		graphB.addRing(rB2);
-
-		StringBuilder reason = new StringBuilder();
-		assertTrue(graphA.sameAs(graphB, reason));
-	}
+        StringBuilder reason = new StringBuilder();
+        assertFalse(graphA.sameAs(graphB, reason));
+    }
 
 //------------------------------------------------------------------------------
 
-	@Test
-	public void testSameAs_DiffRings() throws DENOPTIMException
-	{
-		DGraph graphA = new DGraph();
-		EmptyVertex v0 = new EmptyVertex(0);
-		buildVertexAndConnectToGraph(v0, 4, graphA);
+    @Test
+    public void testSameAs_SameRings() throws DENOPTIMException
+    {
+        DGraph graphA = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        buildVertexAndConnectToGraph(v0, 4, graphA);
 
-		EmptyVertex v1 = new EmptyVertex(1);
-		buildVertexAndConnectToGraph(v1, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        EmptyVertex v1 = new EmptyVertex(1);
+        buildVertexAndConnectToGraph(v1, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
 
-		EmptyVertex v2 = new EmptyVertex(2);
-		buildVertexAndConnectToGraph(v2, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
+        EmptyVertex v2 = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(v2, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
 
-		EmptyVertex v3 = new EmptyVertex(3);
-		buildVertexAndConnectToGraph(v3, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
+        EmptyVertex v3 = new EmptyVertex(3);
+        buildVertexAndConnectToGraph(v3, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
 
-		EmptyVertex v4 = new EmptyVertex(4);
-		buildVertexAndConnectToGraph(v4, 2, graphA);
-		graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
+        EmptyVertex v4 = new EmptyVertex(4);
+        buildVertexAndConnectToGraph(v4, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-		ArrayList<Vertex> vrA = new ArrayList<>();
-		vrA.add(v1);
-		vrA.add(v0);
-		vrA.add(v2);
-		Ring rA = new Ring(vrA);
-		graphA.addRing(rA);
-		ArrayList<Vertex> vrA2 = new ArrayList<>();
-		vrA2.add(v3);
-		vrA2.add(v0);
-		vrA2.add(v4);
-		Ring rA2 = new Ring(vrA2);
-		graphA.addRing(rA2);
+        ArrayList<Vertex> vrA = new ArrayList<Vertex>();
+        vrA.add(v1);
+        vrA.add(v0);
+        vrA.add(v2);
+        Ring rA = new Ring(vrA);
+        graphA.addRing(rA);
+        ArrayList<Vertex> vrA2 = new ArrayList<Vertex>();
+        vrA2.add(v3);
+        vrA2.add(v0);
+        vrA2.add(v4);
+        Ring rA2 = new Ring(vrA2);
+        graphA.addRing(rA2);
 
-		// Other
-		DGraph graphB = new DGraph();
-		EmptyVertex v90 = new EmptyVertex(90);
-		buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		EmptyVertex v91 = new EmptyVertex(91);
-		buildVertexAndConnectToGraph(v91, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
+        // Other
 
-		EmptyVertex v92 = new EmptyVertex(92);
-		buildVertexAndConnectToGraph(v92, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(1), v92.getAP(0)));
+        DGraph graphB = new DGraph();
+        EmptyVertex v90 = new EmptyVertex(90);
+        buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		EmptyVertex v93 = new EmptyVertex(93);
-		buildVertexAndConnectToGraph(v93, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(2), v93.getAP(0)));
+        EmptyVertex v91 = new EmptyVertex(91);
+        buildVertexAndConnectToGraph(v91, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
 
-		EmptyVertex v94 = new EmptyVertex(94);
-		buildVertexAndConnectToGraph(v94, 2, graphB);
-		graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
+        EmptyVertex v92 = new EmptyVertex(92);
+        buildVertexAndConnectToGraph(v92, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(1), v92.getAP(0)));
 
-		ArrayList<Vertex> vrB = new ArrayList<>();
-		vrB.add(v91);
-		vrB.add(v90);
-		vrB.add(v94);
-		Ring rB = new Ring(vrB);
-		graphB.addRing(rB);
-		ArrayList<Vertex> vrB2 = new ArrayList<>();
-		vrB2.add(v92);
-		vrB2.add(v90);
-		vrB2.add(v93);
-		Ring rB2 = new Ring(vrB2);
-		graphB.addRing(rB2);
+        EmptyVertex v93 = new EmptyVertex(93);
+        buildVertexAndConnectToGraph(v93, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(2), v93.getAP(0)));
 
-		StringBuilder reason = new StringBuilder();
-		assertFalse(graphA.sameAs(graphB, reason));
-	}
+        EmptyVertex v94 = new EmptyVertex(94);
+        buildVertexAndConnectToGraph(v94, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
 
-//------------------------------------------------------------------------------
+        ArrayList<Vertex> vrB = new ArrayList<Vertex>();
+        vrB.add(v91);
+        vrB.add(v90);
+        vrB.add(v92);
+        Ring rB = new Ring(vrB);
+        graphB.addRing(rB);
+        ArrayList<Vertex> vrB2 = new ArrayList<Vertex>();
+        vrB2.add(v93);
+        vrB2.add(v90);
+        vrB2.add(v94);
+        Ring rB2 = new Ring(vrB2);
+        graphB.addRing(rB2);
 
-	@Test
-	public void testGetAvailableAPs_returnsListOfAvailableAPs() 
-	        throws DENOPTIMException 
-	{
-	    EmptyVertex vertex0 = new EmptyVertex(0);
-	    EmptyVertex vertex1 = new EmptyVertex(1);
-
-		vertex0.addAP();
-		vertex0.addAP();
-		vertex1.addAP();
-
-		Edge edge0 = new Edge(vertex0.getAP(0),
-		        vertex1.getAP(0));
-
-		DGraph graph = new DGraph();
-		graph.addVertex(vertex0);
-		graph.addVertex(vertex1);
-		graph.addEdge(edge0);
-
-		List<AttachmentPoint> lst = graph.getAvailableAPs();
-		assertEquals(1,lst.size(), "Size of list");
-		assertEquals(vertex0.getVertexId(),lst.get(0).getOwner().getVertexId(),
-		        "ID of the vertex holding the available AP.");
-	}
+        StringBuilder reason = new StringBuilder();
+        assertTrue(graphA.sameAs(graphB, reason));
+    }
 
 //------------------------------------------------------------------------------
 
-	@Test
-	public void testClone() throws DENOPTIMException {
-		DGraph graph = new DGraph();
-		EmptyVertex v0 = new EmptyVertex(0);
-		buildVertexAndConnectToGraph(v0, 3, graph);
+    @Test
+    public void testSameAs_DisorderRings() throws Exception 
+    {
+        DGraph graphA = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        buildVertexAndConnectToGraph(v0, 4, graphA);
 
-		EmptyVertex v1 = new EmptyVertex(1);
-		buildVertexAndConnectToGraph(v1, 2, graph);
-		graph.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+        EmptyVertex v1 = new EmptyVertex(1);
+        buildVertexAndConnectToGraph(v1, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
 
-		EmptyVertex v2 = new EmptyVertex(2);
-		buildVertexAndConnectToGraph(v2, 2, graph);
-		graph.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+        EmptyVertex v2 = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(v2, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
 
-		EmptyVertex v3 = new EmptyVertex(3);
-		buildVertexAndConnectToGraph(v3, 1, graph);
-		graph.addEdge(new Edge(v2.getAP(1), v3.getAP(0)));
+        EmptyVertex v3 = new EmptyVertex(3);
+        buildVertexAndConnectToGraph(v3, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
 
-		EmptyVertex v4 = new EmptyVertex(4);
-		buildVertexAndConnectToGraph(v4, 3, graph);
-		graph.addEdge(new Edge(v0.getAP(1), v4.getAP(0)));
+        EmptyVertex v4 = new EmptyVertex(4);
+        buildVertexAndConnectToGraph(v4, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
 
-		EmptyVertex v5 = new EmptyVertex(5);
-		buildVertexAndConnectToGraph(v5, 1, graph);
-		graph.addEdge(new Edge(v4.getAP(1), v5.getAP(0)));
+        ArrayList<Vertex> vrA = new ArrayList<>();
+        vrA.add(v1);
+        vrA.add(v0);
+        vrA.add(v2);
+        Ring rA = new Ring(vrA);
+        graphA.addRing(rA);
+        ArrayList<Vertex> vrA2 = new ArrayList<>();
+        vrA2.add(v3);
+        vrA2.add(v0);
+        vrA2.add(v4);
+        Ring rA2 = new Ring(vrA2);
+        graphA.addRing(rA2);
 
-		EmptyVertex v6 = new EmptyVertex(6);
-		buildVertexAndConnectToGraph(v6, 1, graph);
-		graph.addEdge(new Edge(v0.getAP(2), v6.getAP(0)));
 
-		EmptyVertex v7 = new EmptyVertex(7);
-		buildVertexAndConnectToGraph(v7, 1, graph);
-		graph.addEdge(new Edge(v4.getAP(2), v7.getAP(0)));
+        // Other
 
-		graph.addRing(new Ring(new ArrayList<>(
-				Arrays.asList(v5, v4, v0, v1, v2, v3))));
+        DGraph graphB = new DGraph();
+        EmptyVertex v90 = new EmptyVertex(90);
+        buildVertexAndConnectToGraph(v90, 4, graphB);
 
-		graph.addRing(new Ring(new ArrayList<>(
-				Arrays.asList(v6, v0, v4, v7))));
+        EmptyVertex v91 = new EmptyVertex(91);
+        buildVertexAndConnectToGraph(v91, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
 
-		SymmetricVertexes ss1 = new SymmetricVertexes();
-		ss1.add(v3);
+        EmptyVertex v92 = new EmptyVertex(92);
+        buildVertexAndConnectToGraph(v92, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(1), v92.getAP(0)));
+
+        EmptyVertex v93 = new EmptyVertex(93);
+        buildVertexAndConnectToGraph(v93, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(2), v93.getAP(0)));
+
+        EmptyVertex v94 = new EmptyVertex(94);
+        buildVertexAndConnectToGraph(v94, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
+
+        ArrayList<Vertex> vrB = new ArrayList<>();
+        vrB.add(v91);
+        vrB.add(v90);
+        vrB.add(v92);
+        Ring rB = new Ring(vrB);
+        graphB.addRing(rB);
+        ArrayList<Vertex> vrB2 = new ArrayList<>();
+        vrB2.add(v94);
+        vrB2.add(v90);
+        vrB2.add(v93);
+        Ring rB2 = new Ring(vrB2);
+        graphB.addRing(rB2);
+
+        StringBuilder reason = new StringBuilder();
+        assertTrue(graphA.sameAs(graphB, reason));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testSameAs_DiffRings() throws DENOPTIMException
+    {
+        DGraph graphA = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        buildVertexAndConnectToGraph(v0, 4, graphA);
+
+        EmptyVertex v1 = new EmptyVertex(1);
+        buildVertexAndConnectToGraph(v1, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+
+        EmptyVertex v2 = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(v2, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(1), v2.getAP(0)));
+
+        EmptyVertex v3 = new EmptyVertex(3);
+        buildVertexAndConnectToGraph(v3, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(2), v3.getAP(0)));
+
+        EmptyVertex v4 = new EmptyVertex(4);
+        buildVertexAndConnectToGraph(v4, 2, graphA);
+        graphA.addEdge(new Edge(v0.getAP(3), v4.getAP(0)));
+
+        ArrayList<Vertex> vrA = new ArrayList<>();
+        vrA.add(v1);
+        vrA.add(v0);
+        vrA.add(v2);
+        Ring rA = new Ring(vrA);
+        graphA.addRing(rA);
+        ArrayList<Vertex> vrA2 = new ArrayList<>();
+        vrA2.add(v3);
+        vrA2.add(v0);
+        vrA2.add(v4);
+        Ring rA2 = new Ring(vrA2);
+        graphA.addRing(rA2);
+
+        // Other
+        DGraph graphB = new DGraph();
+        EmptyVertex v90 = new EmptyVertex(90);
+        buildVertexAndConnectToGraph(v90, 4, graphB);
+
+        EmptyVertex v91 = new EmptyVertex(91);
+        buildVertexAndConnectToGraph(v91, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(0), v91.getAP(0)));
+
+        EmptyVertex v92 = new EmptyVertex(92);
+        buildVertexAndConnectToGraph(v92, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(1), v92.getAP(0)));
+
+        EmptyVertex v93 = new EmptyVertex(93);
+        buildVertexAndConnectToGraph(v93, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(2), v93.getAP(0)));
+
+        EmptyVertex v94 = new EmptyVertex(94);
+        buildVertexAndConnectToGraph(v94, 2, graphB);
+        graphB.addEdge(new Edge(v90.getAP(3), v94.getAP(0)));
+
+        ArrayList<Vertex> vrB = new ArrayList<>();
+        vrB.add(v91);
+        vrB.add(v90);
+        vrB.add(v94);
+        Ring rB = new Ring(vrB);
+        graphB.addRing(rB);
+        ArrayList<Vertex> vrB2 = new ArrayList<>();
+        vrB2.add(v92);
+        vrB2.add(v90);
+        vrB2.add(v93);
+        Ring rB2 = new Ring(vrB2);
+        graphB.addRing(rB2);
+
+        StringBuilder reason = new StringBuilder();
+        assertFalse(graphA.sameAs(graphB, reason));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testGetAvailableAPs_returnsListOfAvailableAPs() 
+            throws DENOPTIMException 
+    {
+        EmptyVertex vertex0 = new EmptyVertex(0);
+        EmptyVertex vertex1 = new EmptyVertex(1);
+
+        vertex0.addAP();
+        vertex0.addAP();
+        vertex1.addAP();
+
+        Edge edge0 = new Edge(vertex0.getAP(0),
+                vertex1.getAP(0));
+
+        DGraph graph = new DGraph();
+        graph.addVertex(vertex0);
+        graph.addVertex(vertex1);
+        graph.addEdge(edge0);
+
+        List<AttachmentPoint> lst = graph.getAvailableAPs();
+        assertEquals(1,lst.size(), "Size of list");
+        assertEquals(vertex0.getVertexId(),lst.get(0).getOwner().getVertexId(),
+                "ID of the vertex holding the available AP.");
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testClone() throws DENOPTIMException {
+        DGraph graph = new DGraph();
+        EmptyVertex v0 = new EmptyVertex(0);
+        buildVertexAndConnectToGraph(v0, 3, graph);
+
+        EmptyVertex v1 = new EmptyVertex(1);
+        buildVertexAndConnectToGraph(v1, 2, graph);
+        graph.addEdge(new Edge(v0.getAP(0), v1.getAP(0)));
+
+        EmptyVertex v2 = new EmptyVertex(2);
+        buildVertexAndConnectToGraph(v2, 2, graph);
+        graph.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+
+        EmptyVertex v3 = new EmptyVertex(3);
+        buildVertexAndConnectToGraph(v3, 1, graph);
+        graph.addEdge(new Edge(v2.getAP(1), v3.getAP(0)));
+
+        EmptyVertex v4 = new EmptyVertex(4);
+        buildVertexAndConnectToGraph(v4, 3, graph);
+        graph.addEdge(new Edge(v0.getAP(1), v4.getAP(0)));
+
+        EmptyVertex v5 = new EmptyVertex(5);
+        buildVertexAndConnectToGraph(v5, 1, graph);
+        graph.addEdge(new Edge(v4.getAP(1), v5.getAP(0)));
+
+        EmptyVertex v6 = new EmptyVertex(6);
+        buildVertexAndConnectToGraph(v6, 1, graph);
+        graph.addEdge(new Edge(v0.getAP(2), v6.getAP(0)));
+
+        EmptyVertex v7 = new EmptyVertex(7);
+        buildVertexAndConnectToGraph(v7, 1, graph);
+        graph.addEdge(new Edge(v4.getAP(2), v7.getAP(0)));
+
+        graph.addRing(new Ring(new ArrayList<>(
+                Arrays.asList(v5, v4, v0, v1, v2, v3))));
+
+        graph.addRing(new Ring(new ArrayList<>(
+                Arrays.asList(v6, v0, v4, v7))));
+
+        SymmetricVertexes ss1 = new SymmetricVertexes();
+        ss1.add(v3);
         ss1.add(v5);
-		graph.addSymmetricSetOfVertices(ss1);
+        graph.addSymmetricSetOfVertices(ss1);
 
         SymmetricVertexes ss2 = new SymmetricVertexes();
         ss2.add(v6);
         ss2.add(v7);
-		graph.addSymmetricSetOfVertices(ss2);
-		
-		DGraph clone = graph.clone();
+        graph.addSymmetricSetOfVertices(ss2);
         
-		assertEquals(graph.gVertices.size(), clone.gVertices.size(),
-				"Number of vertices");
-		assertEquals(graph.gEdges.size(), clone.gEdges.size(),
-				"Number of Edges");
-		assertEquals(graph.gRings.size(), clone.gRings.size(),
-				"Number of Rings");
-		assertEquals(graph.getSymmetricSetCount(), clone.getSymmetricSetCount(),
-				"Number of symmetric sets");
-		assertEquals(graph.closableChains.size(), clone.closableChains.size(),
-				"Number of closable chains");
-		assertEquals(graph.localMsg, clone.localMsg,
-				"Local msg");
-		assertEquals(graph.graphId, clone.graphId,
-				"Graph ID");
-		
-		for (int iv=0; iv<graph.getVertexCount(); iv++)
-		{
-		    Vertex vg = graph.getVertexAtPosition(iv);
-		    Vertex vc = clone.getVertexAtPosition(iv);
-		    int hashVG = vg.hashCode();
-		    int hashVC = vc.hashCode();
+        DGraph clone = graph.clone();
+        
+        assertEquals(graph.gVertices.size(), clone.gVertices.size(),
+                "Number of vertices");
+        assertEquals(graph.gEdges.size(), clone.gEdges.size(),
+                "Number of Edges");
+        assertEquals(graph.gRings.size(), clone.gRings.size(),
+                "Number of Rings");
+        assertEquals(graph.getSymmetricSetCount(), clone.getSymmetricSetCount(),
+                "Number of symmetric sets");
+        assertEquals(graph.closableChains.size(), clone.closableChains.size(),
+                "Number of closable chains");
+        assertEquals(graph.localMsg, clone.localMsg,
+                "Local msg");
+        assertEquals(graph.graphId, clone.graphId,
+                "Graph ID");
+        
+        for (int iv=0; iv<graph.getVertexCount(); iv++)
+        {
+            Vertex vg = graph.getVertexAtPosition(iv);
+            Vertex vc = clone.getVertexAtPosition(iv);
+            int hashVG = vg.hashCode();
+            int hashVC = vc.hashCode();
             
-		    for (int iap = 0; iap<vg.getNumberOfAPs(); iap++)
-		    {
-		        assertEquals(vg.getAP(iap).getOwner().hashCode(), hashVG, 
-		                "Reference to vertex owner in ap " + iap + " vertex " 
-		                        + iv + "(G)");
+            for (int iap = 0; iap<vg.getNumberOfAPs(); iap++)
+            {
+                assertEquals(vg.getAP(iap).getOwner().hashCode(), hashVG, 
+                        "Reference to vertex owner in ap " + iap + " vertex " 
+                                + iv + "(G)");
                 assertEquals(vc.getAP(iap).getOwner().hashCode(), hashVC, 
                         "Reference to vertex owner in ap " + iap + " vertex " 
                                 + iv + " (C)");
-		        assertNotEquals(vc.getAP(iap).getOwner().hashCode(),
-		        vg.getAP(iap).getOwner().hashCode(),
-		        "Owner of AP "+iap+" in vertex "+iv);
-		    }
-		}          
-	}
+                assertNotEquals(vc.getAP(iap).getOwner().hashCode(),
+                vg.getAP(iap).getOwner().hashCode(),
+                "Owner of AP "+iap+" in vertex "+iv);
+            }
+        }          
+    }
 
 //------------------------------------------------------------------------------
 
-	@Test
-	public void testGetMutationSites() throws DENOPTIMException 
-	{
-		DGraph graph = new DGraph();
-		Template tmpl = Template.getTestTemplate(
-		        ContractLevel.FIXED);
-		graph.addVertex(tmpl);
+    @Test
+    public void testGetMutationSites() throws DENOPTIMException 
+    {
+        DGraph graph = new DGraph();
+        Template tmpl = Template.getTestTemplate(
+                ContractLevel.FIXED);
+        graph.addVertex(tmpl);
 
-		assertEquals(1, graph.getMutableSites().size(),
-				"Size of mutation list in case of frozen template");
+        assertEquals(1, graph.getMutableSites().size(),
+                "Size of mutation list in case of frozen template");
 
-		graph = new DGraph();
-		tmpl = Template.getTestTemplate(ContractLevel.FREE);
-		graph.addVertex(tmpl);
+        graph = new DGraph();
+        tmpl = Template.getTestTemplate(ContractLevel.FREE);
+        graph.addVertex(tmpl);
 
-		assertEquals(2, graph.getMutableSites().size(),
-				"Size of mutation list in case of free template");
-		
+        assertEquals(2, graph.getMutableSites().size(),
+                "Size of mutation list in case of free template");
+        
         assertEquals(0, graph.getMutableSites(new ArrayList<>(
                 Arrays.asList(MutationType.values()))).size(),
                 "No sites if all is ignored");
-	}
-	
+    }
+    
 //------------------------------------------------------------------------------
     
     /**
@@ -2557,26 +2567,26 @@ public class DGraphTest
         
         return graph;
     }
-	
+    
 //------------------------------------------------------------------------------
-	
-	/**
-	 * Build a graph meant to be used in unit tests. The returned graph has
-	 * the following structure:
-	 * <pre>
-	 *        (free)
-	 *        ap2
-	 *       /
-	 * [C1-C0-ap0]-[ap0-O-ap1]-[ap0-H]
-	 *  |    \
-	 *  ap3   ap1
-	 *  |       \
-	 * (free)    [ap0-H]</pre>
-	 * 
-	 * @return a new instance of the test graph.
-	 */
-	public static DGraph makeTestGraphA() 
-	{
+    
+    /**
+     * Build a graph meant to be used in unit tests. The returned graph has
+     * the following structure:
+     * <pre>
+     *        (free)
+     *        ap2
+     *       /
+     * [C1-C0-ap0]-[ap0-O-ap1]-[ap0-H]
+     *  |    \
+     *  ap3   ap1
+     *  |       \
+     * (free)    [ap0-H]</pre>
+     * 
+     * @return a new instance of the test graph.
+     */
+    public static DGraph makeTestGraphA() 
+    {
         DGraph graph = new DGraph();
     
         // If we cannot make the test graph, something is deeeeeply wrong and
@@ -2638,7 +2648,7 @@ public class DGraphTest
         }
         
         return graph;
-	}
+    }
 
 //------------------------------------------------------------------------------
     
@@ -2755,125 +2765,125 @@ public class DGraphTest
 
 //------------------------------------------------------------------------------
 
-	@Test
-	public void testRemoveCapping() throws Exception 
-	{
-		DGraph graph = new DGraph();
+    @Test
+    public void testRemoveCapping() throws Exception 
+    {
+        DGraph graph = new DGraph();
 
-		IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
-		IAtomContainer iac1 = builder.newAtomContainer();
-		iac1.addAtom(new Atom("C"));
-		Fragment v1 = new Fragment(1, iac1, BBType.SCAFFOLD);
-		v1.addAP(0);
-		v1.addAP(0);
+        IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
+        IAtomContainer iac1 = builder.newAtomContainer();
+        iac1.addAtom(new Atom("C"));
+        Fragment v1 = new Fragment(1, iac1, BBType.SCAFFOLD);
+        v1.addAP(0);
+        v1.addAP(0);
 
-		IAtomContainer iac2 = builder.newAtomContainer();
-		iac2.addAtom(new Atom("O"));
-		Fragment v2 = new Fragment(2, iac2, BBType.FRAGMENT);
-		v2.addAP(0);
-		v2.addAP(0);
+        IAtomContainer iac2 = builder.newAtomContainer();
+        iac2.addAtom(new Atom("O"));
+        Fragment v2 = new Fragment(2, iac2, BBType.FRAGMENT);
+        v2.addAP(0);
+        v2.addAP(0);
 
-		IAtomContainer iac3 = builder.newAtomContainer();
-		iac3.addAtom(new Atom("H"));
-		Fragment v3 = new Fragment(3, iac3, BBType.CAP);
-		v3.addAP(0);
+        IAtomContainer iac3 = builder.newAtomContainer();
+        iac3.addAtom(new Atom("H"));
+        Fragment v3 = new Fragment(3, iac3, BBType.CAP);
+        v3.addAP(0);
 
-		IAtomContainer iac4 = builder.newAtomContainer();
-		iac4.addAtom(new Atom("H"));
-		Fragment v4 = new Fragment(4, iac4, BBType.CAP);
-		v4.addAP(0);
+        IAtomContainer iac4 = builder.newAtomContainer();
+        iac4.addAtom(new Atom("H"));
+        Fragment v4 = new Fragment(4, iac4, BBType.CAP);
+        v4.addAP(0);
 
-		graph.addVertex(v1);
-		graph.addVertex(v2);
-		graph.addVertex(v3);
-		graph.addVertex(v4);
-		graph.addEdge(new Edge(v1.getAP(0), v2.getAP(0)));
-		graph.addEdge(new Edge(v1.getAP(1), v3.getAP(0)));
-		graph.addEdge(new Edge(v2.getAP(1), v4.getAP(0)));
+        graph.addVertex(v1);
+        graph.addVertex(v2);
+        graph.addVertex(v3);
+        graph.addVertex(v4);
+        graph.addEdge(new Edge(v1.getAP(0), v2.getAP(0)));
+        graph.addEdge(new Edge(v1.getAP(1), v3.getAP(0)));
+        graph.addEdge(new Edge(v2.getAP(1), v4.getAP(0)));
 
-		assertEquals(4, graph.getVertexCount(),
-				"#vertices in graph before removal");
-		assertTrue(graph == v4.getGraphOwner());
+        assertEquals(4, graph.getVertexCount(),
+                "#vertices in graph before removal");
+        assertTrue(graph == v4.getGraphOwner());
 
-		graph.removeCappingGroupsOn(v2);
+        graph.removeCappingGroupsOn(v2);
 
-		assertEquals(3, graph.getVertexCount(),
-				"#vertices in graph before removal");
-		assertFalse(graph.containsVertex(v4),
-				"Capping is still contained");
-		assertTrue(null == v4.getGraphOwner(),
-				"Owner of removed capping group is null");
+        assertEquals(3, graph.getVertexCount(),
+                "#vertices in graph before removal");
+        assertFalse(graph.containsVertex(v4),
+                "Capping is still contained");
+        assertTrue(null == v4.getGraphOwner(),
+                "Owner of removed capping group is null");
 
-		DGraph graph2 = new DGraph();
+        DGraph graph2 = new DGraph();
 
-		IAtomContainer iac12 = builder.newAtomContainer();
-		iac12.addAtom(new Atom("C"));
-		Fragment v21 = new Fragment(21, iac12, BBType.SCAFFOLD);
-		v21.addAP(0);
-		v21.addAP(0);
+        IAtomContainer iac12 = builder.newAtomContainer();
+        iac12.addAtom(new Atom("C"));
+        Fragment v21 = new Fragment(21, iac12, BBType.SCAFFOLD);
+        v21.addAP(0);
+        v21.addAP(0);
 
-		IAtomContainer iac22 = builder.newAtomContainer();
-		iac22.addAtom(new Atom("O"));
-		Fragment v22 = new Fragment(22, iac22, BBType.FRAGMENT);
-		v22.addAP(0);
-		v22.addAP(0);
+        IAtomContainer iac22 = builder.newAtomContainer();
+        iac22.addAtom(new Atom("O"));
+        Fragment v22 = new Fragment(22, iac22, BBType.FRAGMENT);
+        v22.addAP(0);
+        v22.addAP(0);
 
-		IAtomContainer iac23 = builder.newAtomContainer();
-		iac23.addAtom(new Atom("H"));
-		Fragment v23 = new Fragment(23, iac23, BBType.CAP);
-		v23.addAP(0);
+        IAtomContainer iac23 = builder.newAtomContainer();
+        iac23.addAtom(new Atom("H"));
+        Fragment v23 = new Fragment(23, iac23, BBType.CAP);
+        v23.addAP(0);
 
-		IAtomContainer iac24 = builder.newAtomContainer();
-		iac24.addAtom(new Atom("H"));
-		Fragment v24 = new Fragment(24, iac24, BBType.CAP);
-		v24.addAP(0);
+        IAtomContainer iac24 = builder.newAtomContainer();
+        iac24.addAtom(new Atom("H"));
+        Fragment v24 = new Fragment(24, iac24, BBType.CAP);
+        v24.addAP(0);
 
-		graph2.addVertex(v21);
-		graph2.addVertex(v22);
-		graph2.addVertex(v23);
-		graph2.addVertex(v24);
-		graph2.addEdge(new Edge(v21.getAP(0), v22.getAP(0)));
-		graph2.addEdge(new Edge(v21.getAP(1), v23.getAP(0)));
-		graph2.addEdge(new Edge(v22.getAP(1), v24.getAP(0)));
+        graph2.addVertex(v21);
+        graph2.addVertex(v22);
+        graph2.addVertex(v23);
+        graph2.addVertex(v24);
+        graph2.addEdge(new Edge(v21.getAP(0), v22.getAP(0)));
+        graph2.addEdge(new Edge(v21.getAP(1), v23.getAP(0)));
+        graph2.addEdge(new Edge(v22.getAP(1), v24.getAP(0)));
 
-		assertEquals(4, graph2.getVertexCount(),
-				"#vertices in graph before removal (B)");
-		assertTrue(graph2 == v23.getGraphOwner());
-		assertTrue(graph2 == v24.getGraphOwner());
+        assertEquals(4, graph2.getVertexCount(),
+                "#vertices in graph before removal (B)");
+        assertTrue(graph2 == v23.getGraphOwner());
+        assertTrue(graph2 == v24.getGraphOwner());
 
-		graph2.removeCappingGroups();
+        graph2.removeCappingGroups();
 
-		assertEquals(2, graph2.getVertexCount(),
-				"#vertices in graph before removal (B)");
-		assertFalse(graph.containsVertex(v24),
-				"Capping is still contained (B)");
-		assertFalse(graph.containsVertex(v23),
-				"Capping is still contained (C)");
-		assertTrue(null == v24.getGraphOwner(),
-				"Owner of removed capping group is null (B)");
-		assertTrue(null == v23.getGraphOwner(),
-				"Owner of removed capping group is null (C)");
-	}
-	    
-//------------------------------------------------------------------------------
-
-	private void buildVertexAndConnectToGraph(EmptyVertex v, int apCount,
-	        DGraph graph) throws DENOPTIMException 
-	{
-		for (int atomPos = 0; atomPos < apCount; atomPos++) {
-			v.addAP();
-		}
-		graph.addVertex(v);
-	}
-	
-//------------------------------------------------------------------------------
-
-	@Test
-	public void testFromToJSON() throws Exception 
-	{
-	    DGraph graph = new DGraph();
+        assertEquals(2, graph2.getVertexCount(),
+                "#vertices in graph before removal (B)");
+        assertFalse(graph.containsVertex(v24),
+                "Capping is still contained (B)");
+        assertFalse(graph.containsVertex(v23),
+                "Capping is still contained (C)");
+        assertTrue(null == v24.getGraphOwner(),
+                "Owner of removed capping group is null (B)");
+        assertTrue(null == v23.getGraphOwner(),
+                "Owner of removed capping group is null (C)");
+    }
         
-	    EmptyVertex v0 = new EmptyVertex(0);
+//------------------------------------------------------------------------------
+
+    private void buildVertexAndConnectToGraph(EmptyVertex v, int apCount,
+            DGraph graph) throws DENOPTIMException 
+    {
+        for (int atomPos = 0; atomPos < apCount; atomPos++) {
+            v.addAP();
+        }
+        graph.addVertex(v);
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFromToJSON() throws Exception 
+    {
+        DGraph graph = new DGraph();
+        
+        EmptyVertex v0 = new EmptyVertex(0);
         buildVertexAndConnectToGraph(v0, 3, graph);
 
         EmptyVertex v1 = new EmptyVertex(1);
@@ -2926,8 +2936,8 @@ public class DGraphTest
         String json2 = g2.toJson();
         
         assertTrue(json1.equals(json2), "Round-trip via JSON is successful");
-	}
-	
+    }
+    
 //-----------------------------------------------------------------------------
     
     @Test
@@ -2992,11 +3002,11 @@ public class DGraphTest
     }
     
 //-----------------------------------------------------------------------------
-	
-	@Test
+    
+    @Test
     public void testExtractSubgraph() throws Exception 
-	{
-	    FragmentSpace fs = prepare();
+    {
+        FragmentSpace fs = prepare();
         DGraph graph = makeTestGraphD(fs);
         DGraph graphOriginal = makeTestGraphD(fs);
         
@@ -3030,8 +3040,8 @@ public class DGraphTest
         assertEquals(0,subGraph2.getRingCount(),"Rings in subGraph2");
         assertTrue(graph.isIsomorphicTo(graphOriginal), 
                 "Original stays the same");
-	}
-	
+    }
+    
 //-----------------------------------------------------------------------------
     
     @Test
@@ -3091,22 +3101,22 @@ public class DGraphTest
     }
 
 //-----------------------------------------------------------------------------
-	
-	@Test
-	public void testFindVertex() throws Exception
-	{
-	    DGraph g = makeTestGraphA2();
-	    
-	    List<VertexQuery> allQueries = new ArrayList<VertexQuery>();
-	    List<List<Vertex>> allExpected = 
-	            new ArrayList<List<Vertex>>();
-	    
-	    VertexQuery q0 = new VertexQuery(null, null, null, null, null, null, null);
-	    List<Vertex> e0 = new ArrayList<Vertex>();
-	    e0.addAll(g.getVertexList());
-	    allQueries.add(q0);
-	    allExpected.add(e0);
-	    
+    
+    @Test
+    public void testFindVertex() throws Exception
+    {
+        DGraph g = makeTestGraphA2();
+        
+        List<VertexQuery> allQueries = new ArrayList<VertexQuery>();
+        List<List<Vertex>> allExpected = 
+                new ArrayList<List<Vertex>>();
+        
+        VertexQuery q0 = new VertexQuery(null, null, null, null, null, null, null);
+        List<Vertex> e0 = new ArrayList<Vertex>();
+        e0.addAll(g.getVertexList());
+        allQueries.add(q0);
+        allExpected.add(e0);
+        
         VertexQuery q1 = new VertexQuery(
                 g.getVertexAtPosition(5).getVertexId(), 
                 null, null, null, null, null, null);
@@ -3337,20 +3347,20 @@ public class DGraphTest
         e23.add(g.getVertexAtPosition(1));
         allQueries.add(q23);
         allExpected.add(e23);
-	    
-	    for (int i=0; i<allQueries.size(); i++)
-	    {
-	        List<Vertex> matches = g.findVertices(allQueries.get(i),
-	                Logger.getLogger("DummyLogger"));
-	        assertEquals(allExpected.get(i).size(),matches.size(),
-	                "Different number of matched vertexes ("+i+")");
-    	    assertTrue(allExpected.get(i).containsAll(matches),
-    	            "Inconsistent matches ("+i+")");
-	    }
-	}
+        
+        for (int i=0; i<allQueries.size(); i++)
+        {
+            List<Vertex> matches = g.findVertices(allQueries.get(i),
+                    Logger.getLogger("DummyLogger"));
+            assertEquals(allExpected.get(i).size(),matches.size(),
+                    "Different number of matched vertexes ("+i+")");
+            assertTrue(allExpected.get(i).containsAll(matches),
+                    "Inconsistent matches ("+i+")");
+        }
+    }
 
 //------------------------------------------------------------------------------
-	
+    
     
     @Test
     public void testSymmetricSetLabels() throws Exception
@@ -3775,7 +3785,7 @@ public class DGraphTest
         apMap.put(g2.getVertexAtPosition(1).getAP(1), v1.getAP(0));
         
         List<Vertex> toReplace = new ArrayList<Vertex>();
-		toReplace.add(g2.getVertexAtPosition(1));
+        toReplace.add(g2.getVertexAtPosition(1));
         g2.replaceSingleSubGraph(toReplace, incomingSubGraph, apMap);
         
         assertFalse(g1.isIsomorphicTo(g2));
@@ -4058,8 +4068,173 @@ public class DGraphTest
         assertTrue(symVrtxs.contains(graph.getVertexAtPosition(9)));
         assertTrue(symVrtxs.contains(graph.getVertexAtPosition(10)));
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Creates a test graph that intentionally violates APClass compatibility
+     * and looks like this:
+     * 
+     * <pre>
+     * 
+     *  (A)-(A)-v4
+     *   |
+     *  s2-(B)-(D)-v3a-(D)-v7a
+     *   |\                 / 
+     *   | \              chord
+     *   |  \              |
+     *   |   (C)-v3b-(D)-v7b
+     *   |       
+     *  (A)-(B)-v5
+     *  
+     * </pre>
+     */
+    public static DGraph makeTestGraphO_A(FragmentSpace fs) throws DENOPTIMException
+    {
+        DGraph graph = new DGraph();
+        Vertex s2 = Vertex.newVertexFromLibrary(2,
+                BBType.SCAFFOLD, fs);
+        graph.addVertex(s2);
+        Vertex v4 = Vertex.newVertexFromLibrary(4,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v4);
+        Vertex v3a = Vertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v3a);
+        Vertex v3b = Vertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v3b);
+        Vertex v7a = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a);
+        Vertex v7b = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7b);
+        Vertex v5 = Vertex.newVertexFromLibrary(5,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v5);
+
+        graph.addEdge(new Edge(s2.getAP(0), v4.getAP(0)));
+        graph.addEdge(new Edge(s2.getAP(1), v3a.getAP(0)));
+        graph.addEdge(new Edge(s2.getAP(2), v5.getAP(0)));
+        graph.addEdge(new Edge(s2.getAP(3), v3b.getAP(0)));
+        graph.addEdge(new Edge(v3a.getAP(1), v7a.getAP(0)));
+        graph.addEdge(new Edge(v3b.getAP(1), v7b.getAP(0)));
+
+        graph.addRing(v7a, v7b);
+
+        // Not truly symmetric but flagged as symmetryc to verify symmetry is considered
+        List<Vertex> symA = new ArrayList<Vertex>();
+        symA.add(v3a);
+        symA.add(v3b);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symA));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
     
 //------------------------------------------------------------------------------
 
+    /**
+     * Creates a test graph that intentionally violates APClass compatibility
+     * and looks like this:
+     * 
+     * <pre>
+     * 
+     *  (A)-(D)-v3b-(D)-v7b
+     *   |              |
+     *   |     v6       |
+     *   |   (D)       chord
+     *   |   |          |
+     *  s1-(D)    (C)--v7a
+     *   |       /
+     *  (A)-(A)-v1-(B)-(B)-v2a
+     *          | \
+     *          |  (B)-(B)-v2b
+     *          (A)-(D)-v3a 
+     * </pre>
+     */
+    public static DGraph makeTestGraphO_B(FragmentSpace fs) throws DENOPTIMException
+    {
+        DGraph graph = new DGraph();
+        Vertex s1 = Vertex.newVertexFromLibrary(1,
+                BBType.SCAFFOLD, fs);
+        graph.addVertex(s1);
+        Vertex v1 = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1);
+        Vertex v2a = Vertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v2a);
+        Vertex v2b = Vertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v2b);
+        Vertex v3a = Vertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v3a);
+        Vertex v3b = Vertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v3b);
+        Vertex v6 = Vertex.newVertexFromLibrary(6,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v6);
+        Vertex v7a = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7a);
+        Vertex v7b = Vertex.newVertexFromLibrary(7,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v7b);
 
+        graph.addEdge(new Edge(s1.getAP(0), v1.getAP(0)));
+        graph.addEdge(new Edge(v1.getAP(1), v2a.getAP(0)));
+        graph.addEdge(new Edge(v1.getAP(2), v3a.getAP(0)));
+        graph.addEdge(new Edge(v1.getAP(3), v2b.getAP(0)));
+        graph.addEdge(new Edge(v1.getAP(4), v7a.getAP(0)));
+        graph.addEdge(new Edge(s1.getAP(1), v3b.getAP(1)));
+        graph.addEdge(new Edge(v3b.getAP(0), v7b.getAP(0)));
+        graph.addEdge(new Edge(s1.getAP(2), v6.getAP(1)));
+        
+        graph.addRing(v7a, v7b);
+        
+        // Not truly symmetric but flagged as symmetryc to verify symmetry is considered
+        List<Vertex> symA = new ArrayList<Vertex>();
+        symA.add(v3a);
+        symA.add(v3b);
+        graph.addSymmetricSetOfVertices(new SymmetricVertexes(symA));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+ 
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testCopyPasteVertexEnvironment_ScafScaaf_withAPClassViolation() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphO_A(fs); 
+        DGraph incomingGraph = makeTestGraphO_B(fs);
+
+        Vertex vOnGraph = graph.getVertexAtPosition(0); // is s2
+        Vertex vOnInGraph = incomingGraph.getVertexAtPosition(0); // is s1
+
+        APMapping apMapping = new APMapping();
+        apMapping.put(vOnGraph.getAP(0), vOnInGraph.getAP(0).getLinkedAP());
+        apMapping.put(vOnGraph.getAP(2), vOnInGraph.getAP(1).getLinkedAP());
+
+        incomingGraph.reassignSymmetricLabels();
+
+        graph.importAPsEnvironment(apMapping);
+
+        graph.convertSymmetricLabelsToSymmetricSets();
+
+        DenoptimIO.writeGraphToFile(new File("/tmp/mod.json"),FileFormat.GRAPHJSON,graph);
+
+        assertEquals(graph.getVertexCount(), 12);
+        assertEquals(graph.getEdgeCount(), 11);
+        assertEquals(graph.getRingCount(), 2);
+        assertEquals(graph.getSymmetricSetCount(), 2);
+    }
+
+//------------------------------------------------------------------------------
 }

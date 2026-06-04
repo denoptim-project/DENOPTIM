@@ -39,7 +39,7 @@ import denoptim.graph.Edge.BondType;
 public class Ring
 {
     /**
-     * List of <code>DENOPTIMVertex</code> involved in the ring. 
+     * List of {@link Vertex}es involved in the ring. 
      */
     private List<Vertex> vertices;
 
@@ -65,7 +65,7 @@ public class Ring
 //------------------------------------------------------------------------------
 
     /**
-     * Append a <code>DENOPTIMVertex</code> to the list
+     * Append a {@link Vertex} to the list
      */
 
     public void addVertex(Vertex v)
@@ -77,7 +77,7 @@ public class Ring
 
     /**
      * @return the first vertex in the list
-     * of <code>DENOPTIMVertex</code>s involved in this ring
+     * of {@link Vertex}es involved in this ring
      */
 
     public Vertex getHeadVertex()
@@ -89,7 +89,7 @@ public class Ring
 
     /**
      * @return the last vertex in the list
-     * of <code>DENOPTIMVertex</code>s involved in this ring
+     * of {@link Vertex}es involved in this ring
      */
 
     public Vertex getTailVertex()
@@ -101,7 +101,7 @@ public class Ring
 
     /**
      * @return the vertex at the given position in the list
-     * of <code>DENOPTIMVertex</code>s involved in this ring
+     * of {@link Vertex}es involved in this ring
      */
 
     public Vertex getVertexAtPosition(int i)
@@ -128,7 +128,7 @@ public class Ring
 
     /**
      * @return the size of the list
-     * of <code>DENOPTIMVertex</code>s involved in this ring
+     * of {@link Vertex}es involved in this ring
      */
 
     public int getSize()
@@ -164,9 +164,9 @@ public class Ring
 
     /**
      * Checks whether a given vertex is part of this ring.
-     * @param v the candidate <code>DENOPTIMVertex</code>
+     * @param v the candidate {@link Vertex}
      * @return <code>true</code> if the given vertex is contained in the list
-     * of <code>DENOPTIMVertex</code>s involved in this ring
+     * of {@link Vertex}es involved in this ring
      */
 
     public boolean contains(Vertex v)
@@ -178,9 +178,9 @@ public class Ring
 
     /**
      * Checks whether a given vertex is part of this ring.
-     * @param vid the ID of the candidate <code>DENOPTIMVertex</code>
+     * @param vid the ID of the candidate {@link Vertex}
      * @return <code>true</code> if the list
-     * of <code>DENOPTIMVertex</code>s involved in this ring contains the given
+     * of {@link Vertex}es involved in this ring contains the given
      * vertex ID
      */
 

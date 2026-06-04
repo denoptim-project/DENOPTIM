@@ -121,7 +121,14 @@ public class GraphEdit
          * Changes any vertex matching the vertex query with the vertex given 
          * as input and using the given AP mapping mask.
          */
-        CHANGEVERTEX
+        CHANGEVERTEX,
+
+        /**
+         * Repeatedly adds the subgraph environment of the matched 
+         * vertex (i.e., the part of the graph that is connected to the vertex)
+         * onto one or more vertexes matching the vertex query.
+         */
+        COPYPASTEVERTEXENVIRONMENT
     }
 
 //------------------------------------------------------------------------------

@@ -2015,6 +2015,23 @@ public class DenoptimIO
 
         return list_of_graphs;
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes the a graph to file. Always overwrites.
+     *
+     * @param file the file where to print.
+     * @param format how to print graphs on file.
+     * @param graph the graph to print.
+     * @throws DENOPTIMException
+     */
+    public static File writeGraphToFile(File file, FileFormat format,
+        DGraph graph) throws DENOPTIMException 
+    {
+        return writeGraphToFile(file, format, graph, StaticLogger.appLogger, 
+            new Randomizer());
+    }
     
 //------------------------------------------------------------------------------
 

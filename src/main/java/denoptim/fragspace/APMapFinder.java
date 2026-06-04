@@ -388,7 +388,7 @@ public class APMapFinder
      * Compares the {@link AttachmentPoint} of two lists searching for
      * all the APs of the second list that are "compatible" with each of the APs
      * of the first list. Note that "compatible" does not mean {@link APClass}-
-     * compatible to form connection, but that can be interchanges, i.e., one
+     * compatible to form connection, but that can be interchanged, i.e., one
      * AP from the second list is compatible with one from the first list, if it
      * can replace the latter in whatever role that AP has.
      * @param lstA the first list of APs.
