@@ -597,7 +597,7 @@ public class MoleculeUtils
      */
 
     public static Map<Vertex,ArrayList<Integer>> getVertexToAtomIdMap(
-            ArrayList<Vertex> vertLst,
+            List<Vertex> vertLst,
             IAtomContainer mol
     ) {
 

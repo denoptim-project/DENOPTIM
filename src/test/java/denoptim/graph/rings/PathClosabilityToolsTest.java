@@ -190,7 +190,7 @@ public class PathClosabilityToolsTest
             for (int j=i+1; j<rcvs.size(); j++)
             {
                 Vertex vJ = rcvs.get(j);
-                PathSubGraph path = new PathSubGraph(vI, vJ, graph);
+                PathSubGraph path = new PathSubGraph(vI, vJ);
                 if (PathClosabilityTools.isCloseable(path, mol, rcParams))
                 {
                     numCompatibilities++;
@@ -213,7 +213,7 @@ public class PathClosabilityToolsTest
             for (int j=i+1; j<rcvs.size(); j++)
             {
                 Vertex vJ = rcvs.get(j);
-                PathSubGraph path = new PathSubGraph(vI, vJ, graph);
+                PathSubGraph path = new PathSubGraph(vI, vJ);
                 assertFalse(PathClosabilityTools.isCloseable(path, mol, rcParams));
             }
         }
@@ -249,7 +249,7 @@ public class PathClosabilityToolsTest
             for (int j=i+1; j<rcvs.size(); j++)
             {
                 Vertex vJ = rcvs.get(j);
-                PathSubGraph path = new PathSubGraph(vI, vJ, graph);
+                PathSubGraph path = new PathSubGraph(vI, vJ);
                 if (PathClosabilityTools.isCloseable(path, mol, rcParams))
                 {
                     numCompatibilities++;
@@ -299,7 +299,7 @@ public class PathClosabilityToolsTest
             for (int j=i+1; j<rcvs.size(); j++)
             {
                 Vertex vJ = rcvs.get(j);
-                PathSubGraph path = new PathSubGraph(vI, vJ, graph);
+                PathSubGraph path = new PathSubGraph(vI, vJ);
                 if (PathClosabilityTools.isCloseable(path, mol, rcParams))
                 {
                     numCompatibilities++;

@@ -146,7 +146,7 @@ public class PathClosabilityTools
         // this path of vertices
         Map<Vertex,ArrayList<Integer>> vIdToAtmId =
                 MoleculeUtils.getVertexToAtomIdMap(
-                        (ArrayList<Vertex>) subGraph.getVertecesPath(),
+                        (List<Vertex>) subGraph.getVertecesPath(),
                         mol);
         List<Integer> atmIdsInVrtxPath = new ArrayList<Integer>();
         for (Vertex v : subGraph.getVertecesPath())

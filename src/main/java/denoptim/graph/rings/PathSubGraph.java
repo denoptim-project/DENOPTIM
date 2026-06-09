@@ -21,8 +21,10 @@ package denoptim.graph.rings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +50,7 @@ import denoptim.utils.Randomizer;
 
 /**
  * This object represents a path in a {@link DGraph}. The path 
- * involving more than one {@link Vertex} and {@link Edge}.
+ * involving more than one {@link Vertex} and {@link Edge}. 
  *
  * @author Marco Foscato 
  */
@@ -77,12 +79,6 @@ public class PathSubGraph
      * The vertex representing the second RCA: the tail of the path
      */
     private Vertex vB;
-
-    /**
-     * The turning point in the graph: after this point the direction of 
-     * edges becomes opposite than before.
-     */
-    private Vertex turningPointVert;
 
     /**
      * The list of vertices of the original graph and involved in the path.
@@ -135,125 +131,309 @@ public class PathSubGraph
     // Set to true to write useful debug data to file and log
     private boolean debug = false;
 
+
+//-----------------------------------------------------------------------------
+   
+    /**
+     * Constructs a new path sub graph specifying the first and last vertex of 
+     * the path. 
+     * @param vA the first vertex of the path
+     * @param vB the last vertex of the path
+     * @throws DENOPTIMException if the path cannot be found.
+     */
+
+    public PathSubGraph(Vertex vA, Vertex vB) throws DENOPTIMException
+    {
+        this(vA, vB, new HashMap<Vertex, List<Vertex>>());
+    }
+
 //-----------------------------------------------------------------------------
 
     /**
-     * Constructs a new PathSubGraph specifying the first and last vertex of 
-     * the path
+     * Constructs a new path sub graph specifying the first and last vertex of 
+     * the path. The shortest path is found by breadth-first search over the
+     * neighbourhood relations defined by the combination of the graph's
+     * structure and the {@code additionalConnections}.
+     * @param vA the first vertex of the path
+     * @param vB the last vertex of the path
+     * @param adjacency map defining adjacency between vertices. This may or
+     * may not reflect the underlying {@link DGraph} structure.
+     * @throws DENOPTIMException if the path cannot be found
      */
 
-    public PathSubGraph(Vertex vA, Vertex vB, DGraph molGraph)
+    public PathSubGraph(Vertex vA, Vertex vB, Map<Vertex, List<Vertex>> adjacency)
+        throws DENOPTIMException
     {
+        this(vA, vB, adjacency, true);
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Constructs a new path sub graph specifying the first and last vertex of 
+     * the path. The shortest path is found by breadth-first search over the
+     * neighbourhood relations defined by the graph's
+     * structure optionally in combination with the {@code additionalConnections}.
+     * @param vA the first vertex of the path
+     * @param vB the last vertex of the path
+     * @param adjacency map defining adjacency between vertices. This may or
+     * may not reflect the underlying {@link DGraph} structure.
+     * @param combineAdjacencyAndActualEdges if true, the adjacency and actual
+     * edges are combined to form the path. If false, only the adjacency is used.
+     * @throws DENOPTIMException if the path cannot be found
+     */
+
+    public PathSubGraph(Vertex vA, Vertex vB, Map<Vertex, List<Vertex>> adjacency,
+        boolean combineAdjacencyAndActualEdges) throws DENOPTIMException
+    {
+        // Check assumption that vA and vB are in the same graph.
+        if (vA == null || vB == null)
+        {
+            throw new IllegalArgumentException("Null vertex cannot be used to build a "
+                + this.getClass().getSimpleName() + " object.");
+        }
+        DGraph graphA = vA.getGraphOwner();
+        DGraph graphB = vB.getGraphOwner();
+        if (graphA == null || graphB == null)
+        {  
+            Vertex noGraphVertex = null;
+            if (graphA == null)
+            {
+                noGraphVertex = vA;
+            } else {
+                noGraphVertex = vB;
+            }
+            throw new IllegalArgumentException("Vertex " + noGraphVertex.getVertexId() 
+                + " is not in a graph. "
+                + "Cannot build a " + this.getClass().getSimpleName() + " object.");
+        }
+        if (graphA != graphB)
+        {
+            throw new IllegalArgumentException("Vertices " + vA.getVertexId() + " and " 
+                + vB.getVertexId() + " are not in the same graph. "
+                + "Cannot build a " + this.getClass().getSimpleName() + " object.");
+        }
+
+        // Build the adjacency map, optionally combining given and edge-based adjacency.
+        Map<Vertex, List<Vertex>> adjacencyFromEdges = buildAdjacencyFromGraph(
+            vA.getGraphOwner());
+        if (combineAdjacencyAndActualEdges) 
+        {
+            // Add the actual edges to the adjacency map
+            for (Map.Entry<Vertex, List<Vertex>> entry : adjacencyFromEdges.entrySet()) 
+            {
+                Vertex vertex = entry.getKey();
+                List<Vertex> neighbors = entry.getValue();
+                for (Vertex neighbor : neighbors) {
+                    adjacency.computeIfAbsent(vertex, k -> new ArrayList<Vertex>()).add(neighbor);
+                    adjacency.computeIfAbsent(neighbor, k -> new ArrayList<Vertex>()).add(vertex);
+                }
+            }
+        }
+
+        // Initialize the object.
         this.vA = vA;
         this.vB = vB;
-        
-        // Identify the path between vA/vB and the seed of the spanning tree
-        List<Vertex> vAToSeed = new ArrayList<Vertex>();
-        molGraph.getParentTree(vA, vAToSeed);
-        vAToSeed.add(0, vA);
-        List<Vertex> vBToSeed = new ArrayList<Vertex>();
-        molGraph.getParentTree(vB, vBToSeed);
-        vBToSeed.add(0, vB);
-        
-        if (Collections.disjoint(vAToSeed, vBToSeed))
+
+        // Find the shortest path between vA and vB.
+        vertPathVAVB = findShortestPath(vA, vB, adjacency);
+        if (vertPathVAVB.isEmpty())
         {
-            vertPathVAVB = new ArrayList<Vertex>();
-            edgesPathVAVB = new ArrayList<Edge>();
-            return;
+            throw new DENOPTIMException("No path found between vertices "
+                    + vA.getVertexId() + " and " + vB.getVertexId());
         }
-        
-        // find XOR plus junction vertex (turning point)
-        vertPathVAVB = new ArrayList<Vertex>();
+
+        // Build the corresponding edge path, but may add null.
+        // Here we also set the turning point vertex, if any.
         edgesPathVAVB = new ArrayList<Edge>();
-        turningPointVert = null;
-        for (int i=0; i<vAToSeed.size(); i++)
+        for (int i=1; i<vertPathVAVB.size(); i++)
         {
-            // We dig from vA towards the seed of the graph
-            if (vBToSeed.contains(vAToSeed.get(i)))
+            Vertex vPrev = vertPathVAVB.get(i-1);
+            Vertex vCurr = vertPathVAVB.get(i);
+            Edge edge = vPrev.getEdgeWith(vCurr);
+            if (edge != null)
             {
-                // We are at the turning point vertex: were the vA->seed path
-                // meets the vB->seed path
-                turningPointVert = vAToSeed.get(i);
-                vertPathVAVB.add(vAToSeed.get(i));
-                
-                int idStart = vBToSeed.indexOf(vAToSeed.get(i))-1;
-                
-                for (int j=idStart; j>-1; j--)
-                {
-                    // we climb towards vB
-                    vertPathVAVB.add(vBToSeed.get(j));
-                    edgesPathVAVB.add(vBToSeed.get(j).getEdgeToParent());
-                }
-                break;
-            }
-            else
-            {   
-                vertPathVAVB.add(vAToSeed.get(i));
-                edgesPathVAVB.add(vAToSeed.get(i).getEdgeToParent());
+                edgesPathVAVB.add(edge);
+            } else {
+                edgesPathVAVB.add(null);
             }
         }
-        
-        // Build the DENOPTIMGraph and ID of this sub graph
+        setGraphAndChainIDs();
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Builds an adjacency map from a graph.
+     * @param graph the graph to build the adjacency map from
+     * @return the adjacency map
+     */
+    private static Map<Vertex, List<Vertex>> buildAdjacencyFromGraph(DGraph graph)
+    {
+        Map<Vertex, List<Vertex>> adjacency = new HashMap<Vertex, List<Vertex>>();
+        for (Edge e : graph.getEdgeList())
+        {
+            Vertex srcVertex = e.getSrcAP().getOwner();
+            Vertex trgVertex = e.getTrgAP().getOwner();
+            adjacency.computeIfAbsent(srcVertex, k -> new ArrayList<Vertex>())
+                    .add(trgVertex);
+            adjacency.computeIfAbsent(trgVertex, k -> new ArrayList<Vertex>())
+                    .add(srcVertex);
+        }
+        return adjacency;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Finds the shortest vertex path from {@code vA} to {@code vB} using BFS.
+     * Adjacency is defined solely by {@code additionalConnections}, which maps
+     * each vertex to the list of its neighbours. The {@link Edge}s of 
+     * underlying {@link DGraph} are not considered.
+     * @return the shortest path from {@code vA} to {@code vB} as a list of 
+     * {@link Vertex}es.
+     * @throws DENOPTIMException if the path cannot be found.
+     */
+    private static List<Vertex> findShortestPath(Vertex vA, Vertex vB,
+            Map<Vertex, List<Vertex>> neighbours)
+    {
+        if (vA == vB)
+        {
+            return new ArrayList<Vertex>(Arrays.asList(vA));
+        }
+
+        Map<Vertex, Vertex> parent = new HashMap<Vertex, Vertex>();
+        Set<Long> visited = new HashSet<Long>();
+        List<Vertex> queue = new ArrayList<Vertex>();
+
+        queue.add(vA);
+        visited.add(vA.getVertexId());
+        parent.put(vA, null);
+
+        while (!queue.isEmpty())
+        {
+            Vertex current = queue.remove(0);
+
+            if (current == vB)
+            {
+                return reconstructVertexPath(vA, vB, parent);
+            }
+
+            List<Vertex> neighbors = neighbours.get(current);
+            if (neighbors == null)
+            {
+                continue;
+            }
+
+            for (Vertex neighbor : neighbors)
+            {
+                if (visited.add(neighbor.getVertexId()))
+                {
+                    parent.put(neighbor, current);
+                    queue.add(neighbor);
+                    if (neighbor == vB)
+                    {
+                        return reconstructVertexPath(vA, vB, parent);
+                    }
+                }
+            }
+        }
+
+        return new ArrayList<Vertex>();
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Reconstructs the vertex path from the parent map.
+     * @param vA the first vertex of the path
+     * @param vB the last vertex of the path
+     * @param parent the parent map
+     * @return the vertex path from {@code vA} to {@code vB} as a list of 
+     * {@link Vertex}es.
+     */
+    private static List<Vertex> reconstructVertexPath(Vertex vA, Vertex vB,
+            Map<Vertex, Vertex> parent)
+    {
+        // NB: we start from vB and climb towards vA.
+        LinkedList<Vertex> path = new LinkedList<Vertex>();
+        for (Vertex node = vB; node != null; node = parent.get(node))
+        {
+            path.addFirst(node);
+        }
+        return path;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Sets the graph and chain IDs for the path sub graph.
+     */
+    private void setGraphAndChainIDs()
+    {
+        // Build the graph and chain IDs for this sub graph
         chainID = "";
         revChainID = "";
-        int tpId = -1;
-        int tpIdRev = -1;
-        Vertex vertBack;
-        Vertex vertHere;
-        Vertex vertFrnt;
-        boolean insideOut = false;
         ArrayList<Vertex> gVertices = new ArrayList<Vertex>();
         ArrayList<Edge> gEdges = new ArrayList<Edge>();
         for (int i=1; i < vertPathVAVB.size()-1; i++)
         {
-            vertBack = vertPathVAVB.get(i-1);
-            vertHere = vertPathVAVB.get(i);
-            vertFrnt = vertPathVAVB.get(i+1);
-            Edge edgeToBack = edgesPathVAVB.get(i-1);
-            Edge edgeToFrnt = edgesPathVAVB.get(i);
-            
-            // Avoid assumption that all paths need to go via scaffold
-            if (edgeToBack.getSrcAP().getOwner()==vertBack)
-                insideOut = true;
-            
-            int apIdBack2Here = -1;
-            int apIdHere2Back = -1;
-            int apIdHere2Frnt = -1;
-            int apIdFrnt2Here = -1;
-            if (vertHere == turningPointVert)
-            {
-                insideOut = true;
-                apIdBack2Here = edgeToBack.getTrgAPID();
-                apIdHere2Back = edgeToBack.getSrcAPID();
-                apIdHere2Frnt = edgeToFrnt.getSrcAPID();
-                apIdFrnt2Here = edgeToFrnt.getTrgAPID();
-                tpId = i-1;
-                tpIdRev = vertPathVAVB.size()-i;
-            }
-            else
-            {
-                if (insideOut)
+            Vertex vertBack = vertPathVAVB.get(i-1);
+            Vertex vertHere = vertPathVAVB.get(i);
+            Vertex vertFrnt = vertPathVAVB.get(i+1);
+            Edge edgeToBack = edgesPathVAVB.get(i-1); //NB: may be null!
+            Edge edgeToFrnt = edgesPathVAVB.get(i); //NB: may be null!
+
+            AttachmentPoint apBackToHere = null;
+            AttachmentPoint apHereToBack = null;
+            AttachmentPoint apHereToFrnt = null;
+            AttachmentPoint apFrntToHere = null;
+            if (edgeToBack!=null)
                 {
-                    apIdBack2Here = edgeToBack.getSrcAPID();
-                    apIdHere2Back = edgeToBack.getTrgAPID();
-                    apIdHere2Frnt = edgeToFrnt.getSrcAPID();
-                    apIdFrnt2Here = edgeToFrnt.getTrgAPID();
+                    if (edgeToBack.getSrcAP().getOwner() == vertHere)
+                    {
+                        apHereToBack = edgeToBack.getSrcAP();
+                        apBackToHere = edgeToBack.getTrgAP();
+                    } else {
+                        apHereToBack = edgeToBack.getTrgAP();
+                        apBackToHere = edgeToBack.getSrcAP();
+                    }
                 }
-                else
+            if (edgeToFrnt!=null)
+            {
+                if (edgeToFrnt.getSrcAP().getOwner() == vertHere)
                 {
-                    apIdBack2Here = edgeToBack.getTrgAPID();
-                    apIdHere2Back = edgeToBack.getSrcAPID();
-                    apIdHere2Frnt = edgeToFrnt.getTrgAPID();
-                    apIdFrnt2Here = edgeToFrnt.getSrcAPID();
+                    apHereToFrnt = edgeToFrnt.getSrcAP();
+                    apFrntToHere = edgeToFrnt.getTrgAP();
+                } else {
+                    apHereToFrnt = edgeToFrnt.getTrgAP();
+                    apFrntToHere = edgeToFrnt.getSrcAP();
                 }
             }
-            
-            String[] ids = vertHere.getPathIDs(vertHere.getAP(apIdHere2Back),
-                    vertHere.getAP(apIdHere2Frnt));
+
+            // Build string representation of the path
+            if (i==1)
+            {
+                // Syntax from vertex.getPathIDs() is used:
+                String str = vertBack.getBuildingBlockId() + "/" 
+                    + vertBack.getBuildingBlockType() + "/" + 
+                    + vertBack.getIndexOfAP(apBackToHere);
+                chainID = str + "_";
+                revChainID = "_" + str;
+            }
+            String[] ids = vertHere.getPathIDs(apHereToBack, apHereToFrnt);
             chainID = chainID + ids[0];
             revChainID = ids[1] + revChainID;
+            if (i==vertPathVAVB.size()-2)
+            {
+                String str = vertFrnt.getBuildingBlockId() + "/" 
+                    + vertFrnt.getBuildingBlockType() + "/" + 
+                    + vertFrnt.getIndexOfAP(apFrntToHere);
+                chainID = chainID + "_" + str;
+                revChainID = str + "_" + revChainID;
+            }
             
-            // We must work with clones of the actual vertices/edges
+            // To build the graph make clones of the actual vertices/edges
             Vertex cloneVertBack = vertBack.clone();
             Vertex cloneVertHere = vertHere.clone();
             Vertex cloneVertFrnt = vertFrnt.clone();
@@ -268,15 +448,19 @@ public class PathSubGraph
                 cloneVertBack = gVertices.get(gVertices.size()-1);
             }
             gVertices.add(cloneVertHere);
-            gEdges.add(new Edge(cloneVertBack.getAP(apIdBack2Here),
-                    cloneVertHere.getAP(apIdHere2Back),
+            if (edgeToBack!=null) {
+                gEdges.add(new Edge(cloneVertBack.getAP(vertBack.getIndexOfAP(apBackToHere)),
+                    cloneVertHere.getAP(vertHere.getIndexOfAP(apHereToBack)),
                     edgeToBack.getBondType()));
+            }
             if (i == vertPathVAVB.size()-2)
             {
                 gVertices.add(cloneVertFrnt);
-                gEdges.add(new Edge(cloneVertHere.getAP(apIdHere2Frnt),
-                        cloneVertFrnt.getAP(apIdFrnt2Here),
+                if (edgeToFrnt!=null) {
+                    gEdges.add(new Edge(cloneVertHere.getAP(vertHere.getIndexOfAP(apHereToFrnt)),
+                        cloneVertFrnt.getAP(vertFrnt.getIndexOfAP(apFrntToHere)),
                         edgeToFrnt.getBondType()));
+                }
             }
         }
 
@@ -286,8 +470,6 @@ public class PathSubGraph
     	// prepare alternative chain IDs
     	String[] pA = chainID.split("_");
     	String[] pB = revChainID.split("_");
-    	allPossibleChainIDs.add(chainID + "%" + tpId);
-    	allPossibleChainIDs.add(revChainID + "%" + tpIdRev);
     	for (int i=1; i<pA.length; i++)
     	{
     	    String altrnA = "";
@@ -303,17 +485,13 @@ public class PathSubGraph
                     altrnB = altrnB + pB[i+j-pA.length] + "_";
         		}
     	    }
-    	    allPossibleChainIDs.add(altrnA + "%" + tpId);
-    	    allPossibleChainIDs.add(altrnB + "%" + tpIdRev);
     	}
-        chainID = chainID + "%" + tpId;
-        revChainID = revChainID + "%" + tpIdRev;
     }
 
 //------------------------------------------------------------------------------
 
     /**
-     * Returns a path as a DENOPTIMGraph from the first argument to the
+     * Returns a path subgraph from the first given vertex to the
      * second one. The vertices in the path have vacant APs where they would
      * connect to another vertex in the graph that from and to belongs to.
      * The direction of the edges are the same as the graph that from and to
@@ -819,7 +997,11 @@ public class PathSubGraph
 //-----------------------------------------------------------------------------
 
     /**
-     * Returns the list of edges involved
+     * Returns the list of edges involved, if any.
+     * 
+     * @return the list of edges involved, if any. When edges do not exist
+     * because the path is built upon defining a custom adjacency list,
+     * some edges may be null.
      */
 
     public List<Edge> getEdgesPath()

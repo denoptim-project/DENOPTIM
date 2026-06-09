@@ -1402,12 +1402,19 @@ public abstract class Vertex implements Cloneable
     public String[] getPathIDs(AttachmentPoint apA,
             AttachmentPoint apB)
     {
+        String apAId = "noap";
+        String apBId = "noap";
+        if (apA != null) {
+            apAId = "ap"+getIndexOfAP(apA);
+        }
+        if (apB != null) {
+            apBId = "ap"+getIndexOfAP(apB);
+        }
+
         String a2b = this.getBuildingBlockId() + "/" 
-                + this.getBuildingBlockType() + "/ap"
-                + getIndexOfAP(apA) + "ap" + getIndexOfAP(apB) + "_";
+                + this.getBuildingBlockType() + "/" + apAId + "/" + apBId + "_";
         String b2a = this.getBuildingBlockId() + "/" 
-                + this.getBuildingBlockType() + "/ap"
-                + getIndexOfAP(apB) + "ap" + getIndexOfAP(apA) + "_";
+                + this.getBuildingBlockType() + "/" + apBId + "/" + apAId + "_";
         String[] pair = {a2b,b2a};
         return pair;
     }
@@ -1489,9 +1496,10 @@ public abstract class Vertex implements Cloneable
      * within the same graph recursion level, i.e., both vertices must belong
      * to the same graph.
      * @param other 
-     * @return <code>true</code>
+     * @return <code>true</code> if the two vertices are directly connected by 
+     * an edge.
      */
-    public boolean connectedTo(Vertex other)
+    public boolean isConnectedTo(Vertex other)
     {
         return this.getParent() == other || this == other.getParent();
     }

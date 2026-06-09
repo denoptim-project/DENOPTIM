@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,6 +42,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
 import org.jgrapht.graph.DefaultUndirectedGraph;
@@ -1073,7 +1075,7 @@ public class DGraph implements Cloneable
     /**
      * Returns the list of rings that include the given list of vertices in their 
      * fundamental cycle.
-     * @param vs the collection of vertices to search for.
+     * @param vs the collection of vertices to search for. The order is irrelevant.
      * @return the list of rings of an empty list.
      */
     public ArrayList<Ring> getRingsInvolvingVertex(Vertex[] vs)
@@ -1279,8 +1281,23 @@ public class DGraph implements Cloneable
     public void addRing(Vertex vI, Vertex vJ) 
             throws DENOPTIMException
     {
+        // Presently we assume that RCVs are single-bonded to their parents, so
+        // we assume the direction of any edge to a RCV:
         BondType bndTypI = vI.getEdgeToParent().getBondType();
         BondType bndTypJ = vJ.getEdgeToParent().getBondType();
+        // This assumption can be replaced by more general assumption that RCVs
+        // are single-bonded:
+        /*
+        if (vI.getAP(0) != null)
+        {
+            bndTypI = vI.getAP(0).getBondType();
+        }
+        if (vJ.getAP(0) != null)
+        {
+            bndTypJ = vJ.getAP(0).getBondType();
+        }
+        */
+
         if (bndTypI != bndTypJ)
         {
             String s = "Attempt to close rings is not compatible "
@@ -1299,14 +1316,19 @@ public class DGraph implements Cloneable
     
     /**
      * Adds a chord between the given vertices, thus adding a ring in this
-     * graph.
+     * graph. If no path is possible, the method does nothing.
      * @param vI one of the ring-closing vertices.
      * @param vJ the other of the ring-closing vertices.
      * @param bndTyp the bond type the chord corresponds to.
      */
     public void addRing(Vertex vI, Vertex vJ, BondType bndTyp)
     {
-        PathSubGraph path = new PathSubGraph(vI,vJ,this);
+        PathSubGraph path = null;
+        try {
+            path = new PathSubGraph(vI,vJ);
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+        }
         ArrayList<Vertex> arrLst = new ArrayList<Vertex>();
         arrLst.addAll(path.getVertecesPath());                    
         Ring ring = new Ring(arrLst);
@@ -1888,7 +1910,6 @@ public class DGraph implements Cloneable
         }
     }
     
-        
 //------------------------------------------------------------------------------
     
     /**
@@ -2004,8 +2025,7 @@ public class DGraph implements Cloneable
             removeCappingGroupsFromChilds(verticesToRemove);
             
             // Prepare AP mapping projecting the one for subGrpVrtxs
-            LinkedHashMap<AttachmentPoint,AttachmentPoint> localApMap = 
-                    new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+            APMapping localApMap = new APMapping();
             for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMap.entrySet())
             {
                 // WARNING! Assumption that subGrpVrtxs and verticesToRemove
@@ -2022,7 +2042,7 @@ public class DGraph implements Cloneable
                 localApMap.put(apOnOld,apOnNew);
             }
             
-            if (!replaceSingleSubGraph(verticesToRemove, graphToAdd, localApMap))
+            if (!DGraph.replaceSingleSubGraph(localApMap))
             {
                 return false;
             }
@@ -2153,321 +2173,607 @@ public class DGraph implements Cloneable
 
         return symSites;
     }
-    
+
+//------------------------------------------------------------------------------
+
+//TODO-gg del
+    public boolean replaceSingleSubGraph(List<Vertex> subGrpVrtxs, 
+        DGraph newSubGraph, 
+        LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap, boolean fakeArg) 
+                throws DENOPTIMException
+    {
+        APMapping apMapping = new APMapping();
+        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMap.entrySet())
+        {
+            apMapping.put(e.getKey().getLinkedAPThroughout(), e.getValue());
+        }
+        return replaceSingleSubGraph(apMapping);
+    }
+
 //------------------------------------------------------------------------------
     
     /**
-     * Replaced the subgraph represented by a given collection of vertices that
-     * belong to this graph. 
-     * This method does not project the 
-     * change of vertex on symmetric sites, and does not alter the symmetric 
-     * sets. To properly manage symmetry, you should run 
-     * {@link DGraph#reassignSymmetricLabels()} on <code>newSubGraph</code>
-     * prior to calling this method, and, after running this method, call
-     * {@link DGraph#convertSymmetricLabelsToSymmetricSets()} on this
-     * graph.
-     * This strategy reflects the fact that multiple sub-graph replacements can
-     * introduce vertices that are symmetric throughout these newly inserted
-     * subgraphs, thus a single subgraph replacement cannot know the complete
-     * list of symmetric vertices. 
-     * Therefore, the handling of the symmetry is left outside of the
-     * subgraph replacement operation.
-     * @param subGrpVrtxs the vertices currently belonging to this graph and to be 
-     * replaced. We assume these collection of vertices is a connected subgraph,
-     * i.e., all vertices are reachable by one single vertex via a directed path
-     * that does not involve any other vertex not included in this collections.
-     * @param newSubGraph the graph that will be attached on this graph. 
-     * No copying or cloning: such graph contains the actual vertices that will 
-     * become part of <i>this</i> graph.
-     * @param apMap mapping of attachment points belonging to any vertex in
-     * <code>subGrpVrtxs</code> to attachment points in <code>newSubGraph</code>.
+     * Replaced the subgraph defined by a set of Attachment Points that
+     * belong to a graph (ie.e., the receiving graph)
+     * with a subgraph defined by a set of Attachment Points 
+     * that belong to another graph (i.e., the incoming graph). 
+     * <p>The subgraphs are defined by the given sets of APs. If the given sets
+     * of APs do not defined confined subgraphs, i.e., subgraphs that terminate
+     * with AP included in the mapping or that are unused in the whole graph, 
+     * an exception is thrown. 
+     * For example, consider the following graph:
+     * <code>
+     * Vertes_a
+     *   \
+     *   AP0-AP1 
+     *        \
+     *        Vertex_b
+     *         \
+     *         AP2-AP3
+     *              \
+     *              Vertex_c
+     *               \
+     *               AP4-AP5
+     *                    \
+     *                    Vertex_d
+     * </pre> 
+     * Any set containing a single AP splits this chain into two confined subgraphs.
+     * However, consider these pairs of APs:
+     * <ul>
+     * <li> {AP1, AP4} defines the two confined subgraphs {a,d} and {b,c}. Note that
+     * the subgraph can be disconnected.</li>
+     * <li> {AP3, AP4} defines the two confined subgraphs {a,b,d} and {c}</li>
+     * <li> {AP2, AP4} does NOT define confined subgraphs! The presence of AP2 in
+     * the set implies that vertex b and c should belong to different subgraphs. 
+     * However, a confined subgraph containing c should include also the vertex 
+     * connected to it via AP3, which is verted b. This inconsistency makes the
+     * set {AP2, AP4} not define confined subgraphs.</li>
+     * </ul>
+     * <p>
+     * While the first graph, the one containing a subgraph that will be replaced, 
+     * can be embedded in a jacket template, the incoming graph
+     * cannot be embedded in a template. This because the latter will become 
+     * part of the fist graph and, thus, become embedded in the first graph's 
+     * template, if any.
+     * <p>
+     * @param apMapping mapping of attachment points on the first graph (key)
+     * to be replaces by attachment point on the incoming graph (value). The 
+     * graph ownership is checked for consistency: 
+     * all key APs must belong to the first graph,
+     * and all value APs must belong to the same incoming graph.
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException
      */
-    public boolean replaceSingleSubGraph(List<Vertex> subGrpVrtxs, 
-            DGraph newSubGraph, 
-            LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap) 
-                    throws DENOPTIMException
+    public static boolean replaceSingleSubGraph(APMapping apMapping)
+        throws DENOPTIMException
     {
-        if (!gVertices.containsAll(subGrpVrtxs) 
-                || gVertices.contains(newSubGraph.getVertexAtPosition(0)))
+        // Checks for consistency while identifying vertexes at the interface between 
+        // the two subgraphs.
+        DGraph receivingGraph = null;
+        DGraph incomingGraph = null;
+        Set<Vertex> vertexesOfReceivingGraphToConnectToIncomingGraph = new HashSet<>();
+        Set<Vertex> vertexesOfIncomingGraphToConnectToReceivingGraph = new HashSet<>();
+        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMapping.entrySet())
         {
-            return false;
+            AttachmentPoint apOnFirtsGraph = e.getKey();
+            AttachmentPoint apOnIncomingGraph = e.getValue();
+
+            // Checks for consistency: APs are mapped to the correct graph
+            if (receivingGraph == null)
+            {
+                receivingGraph = apOnFirtsGraph.getOwner().getGraphOwner();
+            } else if (receivingGraph != apOnFirtsGraph.getOwner().getGraphOwner())
+            {
+                throw new DENOPTIMException("The graph ownership of attachment point " 
+                    + apOnFirtsGraph.getID() + " is not the same of the other key APs.");
+            }
+            if (incomingGraph == null)
+            {
+                incomingGraph = apOnIncomingGraph.getOwner().getGraphOwner();
+            } else if (incomingGraph != apOnIncomingGraph.getOwner().getGraphOwner())
+            {
+                throw new DENOPTIMException("The incoming graph is not the same "
+                    + "for all incoming attachment points.");
+            }
+
+            // collect all vertexes of receiving graph to connect to incoming graph
+            if (!apOnFirtsGraph.isAvailable()) //stay within template boundaries
+            {
+                vertexesOfReceivingGraphToConnectToIncomingGraph.add(
+                    apOnFirtsGraph.getLinkedAP().getOwner());
+            }
+
+            // collect all vertexes of incoming graph to connect to receiving graph
+            vertexesOfIncomingGraphToConnectToReceivingGraph.add(
+                apOnIncomingGraph.getOwner());
         }
-        
-        // Identify vertex that will be added
-        ArrayList<Vertex> newvertices = new ArrayList<Vertex>();
-        newvertices.addAll(newSubGraph.getVertexList());
-        
-        // Collect APs from the vertices that will be removed, and that might
-        // be reflected onto the jacket template or used to make links to the 
-        // rest of the graph.
-        List<AttachmentPoint> interfaceApsOnOldBranch = 
-                new ArrayList<AttachmentPoint>();
-        for (Vertex vToDel : subGrpVrtxs)
+
+        if (receivingGraph == null)
         {
-            for (AttachmentPoint ap : vToDel.getAttachmentPoints())
+            throw new DENOPTIMException("The receiving graph is null.");
+        }
+        if (incomingGraph == null)
+        {
+            throw new DENOPTIMException("The incoming graph is null.");
+        }
+        if (incomingGraph.getTemplateJacket() != null)
+        {
+            throw new DENOPTIMException("The incoming graph is embedded in a template. "
+                + "This is not supported.");
+        }
+
+        // Explore receiving graphs to identify vertexes to remove
+        Set<Vertex> verticesToRemoveFromReceivingGraph = new HashSet<>();
+        Set<Vertex> verticesToRemoveFromIncomingGraph = new HashSet<>();
+        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMapping.entrySet())
+        {
+            AttachmentPoint apOnReceivingGraph = e.getKey();
+            AttachmentPoint apOnIncomingGraph = e.getValue();
+
+            // On receiving graph the AP is on a vertex to delete
+            Vertex vToDelOnRecGraph = apOnReceivingGraph.getOwner();
+            verticesToRemoveFromReceivingGraph.add(vToDelOnRecGraph);
+            DGraph.exploreGraph(vToDelOnRecGraph, 
+                vertexesOfReceivingGraphToConnectToIncomingGraph,  // these stop the exploration
+                verticesToRemoveFromReceivingGraph); // these are those visited by the exploration
+
+            // On incoming graph the AP is on a vertex to keep
+            if (!apOnIncomingGraph.isAvailable()) //stay within template boundaries
+            {
+                Vertex vToRemoveOnIncoming = apOnIncomingGraph.getLinkedAP().getOwner();
+                verticesToRemoveFromIncomingGraph.add(vToRemoveOnIncoming);
+                DGraph.exploreGraph(vToRemoveOnIncoming, 
+                    vertexesOfIncomingGraphToConnectToReceivingGraph,  // these stop the exploration
+                    verticesToRemoveFromIncomingGraph); // these are those visited by the exploration
+            }
+        }
+
+        // Check that the AP mapping defines two confined subgraphs: no vertex is
+        // both connected to the branch to delete AND to the branch to keep.
+        for (Vertex vToDelOnRecGraph : verticesToRemoveFromReceivingGraph)
+        {
+            for (AttachmentPoint ap : vToDelOnRecGraph.getAttachmentPoints())
+            {
+                // NB: I write it like this so it is more readable: the order
+                // in which we check these conditions matters!
+                if (!ap.isAvailable())
+                {
+                    if (vertexesOfReceivingGraphToConnectToIncomingGraph.contains(
+                        ap.getLinkedAP().getOwner()))
+                    {
+                        if (!apMapping.keySet().contains(ap))
+                        {
+                            throw new DENOPTIMException(
+                                "The AP mapping does not define confined subgraphs "
+                                + "for receiving graph " + receivingGraph.getGraphId()+".");
+                        }
+                    }
+                }
+            }
+        }
+        for (Vertex vToDelOnIncGraph : verticesToRemoveFromIncomingGraph)
+        {
+            for (AttachmentPoint ap : vToDelOnIncGraph.getAttachmentPoints())
+            {
+                // NB: I write it like this so it is more readable: the order
+                // in which we check these conditions matters!
+                if (!ap.isAvailable())
+                {
+                    if (vertexesOfIncomingGraphToConnectToReceivingGraph.contains(
+                        ap.getLinkedAP().getOwner()))
+                    {
+                        if (!apMapping.values().contains(ap.getLinkedAP()))
+                        {
+                            throw new DENOPTIMException(
+                                "The AP mapping does not define confined subgraphs "
+                                + "for incoming graph " + incomingGraph.getGraphId()+".");
+                        }
+                    }
+                }
+            }
+        }
+
+        // Keep track of the edge type currently used by either APs on the interface
+        // between the two subgraphs.
+        LinkedHashMap<AttachmentPoint,AttachmentPoint> linksToCreate = new LinkedHashMap<>();
+        LinkedHashMap<AttachmentPoint,BondType> linkTypesToCreate = new LinkedHashMap<>();
+        LinkedHashMap<AttachmentPoint,Boolean> linkDirectionToCreate = new LinkedHashMap<>();
+        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMapping.entrySet())
+        {
+            AttachmentPoint apOnReceivingGraph = e.getKey();
+            AttachmentPoint apOnIncomingGraph = e.getValue();
+            
+            if (apOnReceivingGraph.isAvailable() && apOnIncomingGraph.isAvailable())
+            {
+                continue;
+            }
+
+            BondType bondTypeOnRecGraph = null;
+            Boolean directionIsThisToIncoming = true;
+            if (!apOnReceivingGraph.isAvailable())
+            {
+                bondTypeOnRecGraph = apOnReceivingGraph.getEdgeUser().getBondType();
+                directionIsThisToIncoming = !apOnReceivingGraph.isSrcInUser();
+            }
+            BondType bondTypeOnIncoming = null;
+            if (!apOnIncomingGraph.isAvailable())
+            {
+                bondTypeOnIncoming = apOnIncomingGraph.getEdgeUser().getBondType();
+            }
+            if (bondTypeOnRecGraph != null && bondTypeOnIncoming != null 
+                && bondTypeOnRecGraph != bondTypeOnIncoming)
+            {
+                throw new DENOPTIMException("The edge type on the interface "
+                    + "between the two subgraphs is not the : "
+                    + bondTypeOnRecGraph + " != " + bondTypeOnIncoming + ".");
+            }
+            linkTypesToCreate.put(apOnIncomingGraph, bondTypeOnRecGraph);
+            linksToCreate.put(apOnIncomingGraph,apOnReceivingGraph.getLinkedAP());
+            linkDirectionToCreate.put(apOnIncomingGraph,directionIsThisToIncoming);
+        }
+
+        // Keep track of the rings on each of the two graphs
+        List<Ring> ringFromReceivingGraph = new ArrayList<Ring>();
+        for (Ring ring : receivingGraph.getRings())
+        {
+            if (verticesToRemoveFromReceivingGraph.contains(ring.getHeadVertex()) 
+                || verticesToRemoveFromIncomingGraph.contains(ring.getTailVertex()))
+            {
+                continue;
+            }
+            ringFromReceivingGraph.add(ring);
+        }
+        List<Ring> ringFromIncomingGraph = new ArrayList<Ring>();
+        for (Ring ring : incomingGraph.getRings())
+        {
+            if (verticesToRemoveFromIncomingGraph.contains(ring.getHeadVertex()) 
+                || verticesToRemoveFromIncomingGraph.contains(ring.getTailVertex()))
+            {
+                continue;
+            }
+            ringFromIncomingGraph.add(ring);
+        }
+
+        // Collect APs from the vertices that will be removed from receiving graph, 
+        // and that might be reflected onto the jacket template or used to make links 
+        // to the rest of the graph.
+        List<AttachmentPoint> interfaceApsOnReceivingGraph = new ArrayList<AttachmentPoint>();
+        for (Vertex vToDelOnReceivingGraph : verticesToRemoveFromReceivingGraph)
+        {
+            for (AttachmentPoint ap : vToDelOnReceivingGraph.getAttachmentPoints())
             {
                 if (ap.isAvailable())
                 {
-                    // being available, this AP might be reflected onto 
-                    // jacket template
-                    interfaceApsOnOldBranch.add(ap);
+                    // being available, this AP might be reflected onto
+                    // jacket template, so we'll have to remove it from the template.
+                    interfaceApsOnReceivingGraph.add(ap);
                 } else {
                     Vertex user = ap.getLinkedAP().getOwner();
-                    if (!subGrpVrtxs.contains(user))
+                    if (!verticesToRemoveFromReceivingGraph.contains(user))
                     {
-                        interfaceApsOnOldBranch.add(ap);
+                        // this AP is used to make a link to the rest of the graph,
+                        // so we'll have to verify it is replaced by a new AP.
+                        interfaceApsOnReceivingGraph.add(ap);
+                    }
+                }
+            }
+        }
+        List<AttachmentPoint> interfaceApsOnIncomingGraph = new ArrayList<AttachmentPoint>();
+        for (Vertex vFromIncomingGraph : incomingGraph.gVertices)
+        {
+            if (verticesToRemoveFromIncomingGraph.contains(vFromIncomingGraph))
+            {
+                continue;
+            }
+            for (AttachmentPoint ap : vFromIncomingGraph.getAttachmentPoints())
+            {
+                if (ap.isAvailable())
+                {
+                    // being available, this AP might be reflected onto
+                    // jacket template
+                    interfaceApsOnIncomingGraph.add(ap);
+                } else {
+                    Vertex user = ap.getLinkedAP().getOwner();
+                    if (verticesToRemoveFromIncomingGraph.contains(user))
+                    {
+                        interfaceApsOnIncomingGraph.add(ap);
                     }
                 }
             }
         }
         
-        List<AttachmentPoint> interfaceApsOnNewBranch = 
-                new ArrayList<AttachmentPoint>();
-        for (Vertex v : newSubGraph.getVertexList())
-        {
-            for (AttachmentPoint ap : v.getAttachmentPoints())
-            {
-                if (ap.isAvailable())
-                {
-                    // being available, this AP will have to be reflected onto 
-                    // jacket template
-                    interfaceApsOnNewBranch.add(ap);
-                }
-            }
-        }
-        
-        // Keep track of the links that will be broken and re-created,
-        // and also of the relation free APs may have with a possible template
-        // that embeds this graph.
+        // Keep track of the relation any free APs may have with a possible template
+        // that embeds the graph.
         LinkedHashMap<AttachmentPoint,AttachmentPoint> 
-            linksToRecreate = new LinkedHashMap<>();
-        LinkedHashMap<AttachmentPoint,BondType> 
-            linkTypesToRecreate = new LinkedHashMap<>();
-        LinkedHashMap<AttachmentPoint,AttachmentPoint> 
-            inToOutAPForTemplate = new LinkedHashMap<>();
-        List<AttachmentPoint> oldAPToRemoveFromTmpl = new ArrayList<>();
-        AttachmentPoint trgAPOnNewLink = null;
-        for (AttachmentPoint oldAP : interfaceApsOnOldBranch)
+            inToOutAPForTemplateOnReceivingGraph = new LinkedHashMap<>();
+        List<AttachmentPoint> oldAPToRemoveFromTmplOfReceivingGraph = new ArrayList<>();
+        for (AttachmentPoint intphAPOnReceivingGraph : interfaceApsOnReceivingGraph)
         {
-            if (oldAP.isAvailable())
+            if (intphAPOnReceivingGraph.isAvailable())
             {
-                // NB: if this graph is embedded in a template, free/available 
-                // APs at this level (and from the old link) 
-                // are mapped on the templates' surface
-                if (templateJacket!=null)
+                // NB: if receiving graph is embedded in a template, free/available 
+                // APs at this level are mapped on the templates' surface
+                if (receivingGraph.templateJacket!=null)
                 {
-                    if (oldAP.isAvailableThroughout())
+                    if (intphAPOnReceivingGraph.isAvailableThroughout())
                     {
-                        if (!apMap.containsKey(oldAP))
+                        if (!apMapping.containsKey(intphAPOnReceivingGraph))
                         {
                             // An AP of the old link is going to be removed from the
                             // template-jacket's list of APs
-                            oldAPToRemoveFromTmpl.add(oldAP);
+                            oldAPToRemoveFromTmplOfReceivingGraph.add(intphAPOnReceivingGraph);
                         } else {
                             // This AP is not used, not even outside of the template
                             // but for some reason the apMapping wants to keep it
-                            inToOutAPForTemplate.put(apMap.get(oldAP),oldAP);
+                            inToOutAPForTemplateOnReceivingGraph.put(
+                                apMapping.get(intphAPOnReceivingGraph),intphAPOnReceivingGraph);
                         }
                     } else {
-                        if (!apMap.containsKey(oldAP))
+                        if (!apMapping.containsKey(intphAPOnReceivingGraph))
                         {
                             throw new DENOPTIMException("Cannot replace subgraph "
                                     + "if a used AP has no mapping.");
                         } else {
                             // This AP is not used, not even outside of the template
                             // but for some reason the apMapping wants to keep it
-                            inToOutAPForTemplate.put(apMap.get(oldAP),oldAP);
+                            inToOutAPForTemplateOnReceivingGraph.put(
+                                apMapping.get(intphAPOnReceivingGraph),intphAPOnReceivingGraph);
                         }
                     }
                 }
-                continue;
-            }
-            
-            if (!apMap.containsKey(oldAP))
-            {
-                throw new DENOPTIMException("Cannot replace subgraph if a used "
-                        + "AP has no mapping. Missing mapping for AP "
-                        + oldAP.getIndexInOwner() + " in " 
-                        + oldAP.getOwner().getVertexId());
-            }
-            AttachmentPoint newAP = apMap.get(oldAP);
-            linksToRecreate.put(newAP, oldAP.getLinkedAP());
-            linkTypesToRecreate.put(newAP, oldAP.getEdgeUser().getBondType());
-            
-            // This is were we identify the edge/ap to the parent of the oldLink
-            if (!oldAP.isSrcInUser())
-            {
-                trgAPOnNewLink = newAP;
             }
         }
         
-        // Identify rings that are affected by the change of vertices
-        Map<Ring,List<Vertex>> ringsOverSubGraph = 
-                new HashMap<Ring,List<Vertex>>();
-        for (int iA=0; iA<interfaceApsOnOldBranch.size(); iA++)
+        // Remove the vertexes to remove from the graphs
+        for (Vertex v : verticesToRemoveFromReceivingGraph)
         {
-            AttachmentPoint apA = interfaceApsOnOldBranch.get(iA);
-        
-            if (apA.isAvailable())
-                continue;
-            
-            for (int iB=(iA+1); iB<interfaceApsOnOldBranch.size(); iB++)
-            {
-                AttachmentPoint apB = interfaceApsOnOldBranch.get(iB);
-            
-                if (apB.isAvailable())
-                    continue;
-                
-                Vertex vLinkedOnA = apA.getLinkedAP().getOwner();
-                Vertex vLinkedOnB = apB.getLinkedAP().getOwner();
-                for (Ring r : getRingsInvolvingVertex(
-                        new Vertex[] {
-                                apA.getOwner(), vLinkedOnA,
-                                apB.getOwner(), vLinkedOnB}))
-                {
-                    List<Vertex> vPair = new ArrayList<Vertex>();
-                    vPair.add(r.getCloserToHead(vLinkedOnA, vLinkedOnB));
-                    vPair.add(r.getCloserToTail(vLinkedOnA, vLinkedOnB));
-                    ringsOverSubGraph.put(r, vPair);
-                }
-            }
+            receivingGraph.removeVertex(v);
+        }
+        for (Vertex v : verticesToRemoveFromIncomingGraph)
+        {
+            incomingGraph.removeVertex(v);
         }
         
-        // remove the vertex-to-delete from the rings where they participate
-        for (Ring r : ringsOverSubGraph.keySet())
+        // finally introduce the new vertices from incoming graph into receiving graph
+        for (Vertex incomingVrtx : incomingGraph.getVertexList())
         {
-            List<Vertex> vPair = ringsOverSubGraph.get(r);
-            PathSubGraph path = new PathSubGraph(vPair.get(0),vPair.get(1),this);
-            List<Vertex> verticesInPath = path.getVertecesPath();
-            for (int i=1; i<(verticesInPath.size()-1); i++)
-            {
-                r.removeVertex(verticesInPath.get(i));
-            }
-        }
-        
-        // remove edges with old vertex
-        for (AttachmentPoint oldAP : interfaceApsOnOldBranch)
-        {
-            if (!oldAP.isAvailable())
-                removeEdge(oldAP.getEdgeUser());
-        }
-
-        // remove the vertex from the graph
-        for (Vertex vToDel : subGrpVrtxs)
-        {
-            // WARNING! This removes rings involving these vertices. 
-            removeVertex(vToDel);
-        }
-        
-        // finally introduce the new vertices from incoming graph into this graph
-        for (Vertex incomingVrtx : newSubGraph.getVertexList())
-        {
-            addVertex(incomingVrtx);
+            receivingGraph.addVertex(incomingVrtx);
         }
         
         // import edges from incoming graph 
-        for (Edge incomingEdge : newSubGraph.getEdgeList())
+        for (Edge incomingEdge : incomingGraph.getEdgeList())
         {
-            addEdge(incomingEdge);
+            receivingGraph.addEdge(incomingEdge);
         }
         
-        // import rings from incoming graph
-        for (Ring incomingRing : newSubGraph.getRings())
-        {
-            addRing(incomingRing);
-        }
+        // Do we import symmetric sets from incoming graph? 
+        // No, this method doesn't do it because we want to use it in situations 
+        // where we have to perform multiple replaceSubGraph operations and, 
+        // afterwards, use the symmetric labels to create symmetric sets that 
+        // might span across more than one of the subgraphs that were added.
         
-        // import symmetric sets from incoming graph? No, this method doesn't do
-        // it because we want to use it in situations where we have to perform 
-        // multiple replaceSubGraph operations and, afterwards, use the 
-        // symmetric labels to create symmetric sets that might span across
-        // more than one of the subgraphs that were added.
-        
-        // We keep track of the APs on the new link that have been dealt with
-        List<AttachmentPoint> doneApsOnNew = 
-                new ArrayList<AttachmentPoint>();
-        
-        // Connect the incoming subgraph to the rest of the graph
-        if (trgAPOnNewLink != null)
+        // Create the new connections. Keep track of those that have been dealt with
+        List<AttachmentPoint> doneApsOnNew = new ArrayList<AttachmentPoint>();
+        for (AttachmentPoint apOnIncomingGraph : linksToCreate.keySet())
         {
-            // the incoming graph has a parent vertex, and the edge should be  
-            // directed accordingly
-            Edge edge = new Edge(
-                    linksToRecreate.get(trgAPOnNewLink),
-                    trgAPOnNewLink, 
-                    linkTypesToRecreate.get(trgAPOnNewLink));
-            addEdge(edge);
-            doneApsOnNew.add(trgAPOnNewLink);
-        } else {
-            // newLink does NOT have a parent vertex, so all the
-            // edges see newLink as target vertex. Such links are dealt with
-            // in the loop below. So, there is nothing special to do, here.
-        }
-        for (AttachmentPoint apOnNew : linksToRecreate.keySet())
-        {
-            if (apOnNew == trgAPOnNewLink)
+            AttachmentPoint apOnReceivingGraph = linksToCreate.get(apOnIncomingGraph);
+            boolean directionIsThisToIncoming = linkDirectionToCreate.get(
+                apOnIncomingGraph);
+            AttachmentPoint srcAP = apOnReceivingGraph;
+            AttachmentPoint trgAP = apOnIncomingGraph; 
+            if (!directionIsThisToIncoming)
             {
-                continue; //done just before this loop
+                srcAP = apOnIncomingGraph;
+                trgAP = apOnReceivingGraph;
             }
-            AttachmentPoint trgOnChild = linksToRecreate.get(apOnNew);
-            Edge edge = new Edge(apOnNew,trgOnChild, 
-                    linkTypesToRecreate.get(apOnNew));
-            addEdge(edge);
-            doneApsOnNew.add(apOnNew);
-        }
-        
-        // redefine rings that spanned over the removed subgraph
-        for (Ring r : ringsOverSubGraph.keySet())
-        {
-            List<Vertex> vPair = ringsOverSubGraph.get(r);
-            PathSubGraph path = new PathSubGraph(vPair.get(0),vPair.get(1),this);
-            int initialInsertPoint = r.getPositionOf(vPair.get(0));
-            List<Vertex> verticesInPath = path.getVertecesPath();
-            for (int i=1; i<(verticesInPath.size()-1); i++)
+            // We must respect the assumption that RCVs are always the target vertex:
+            if (srcAP.getOwner().isRCV())
             {
-                r.insertVertex(initialInsertPoint+i, verticesInPath.get(i));
+                if (trgAP.getOwner().isRCV())
+                {
+                    throw new IllegalArgumentException("Two RCV vertices cannot "
+                        + "be both the source and the target of an edge. See RCVs "
+                        + srcAP.getOwner().getVertexId() + " and " 
+                        + trgAP.getOwner().getVertexId() + ".");
+                }
+                AttachmentPoint tmp = srcAP;
+                srcAP = trgAP;
+                trgAP = tmp;
             }
+            Edge edge = new Edge(srcAP,trgAP, 
+                linkTypesToCreate.get(apOnIncomingGraph));
+            receivingGraph.addEdge(edge);
+            doneApsOnNew.add(apOnIncomingGraph);
+        }
+
+        // TODO-gg: Convert cycles of edges to ringsout to regenerate them
+
+        // Remove all rings in the graph that will become the result: we are about to regenerate 
+        // rings according to the changes to the graph
+        for (Ring ring : ringFromReceivingGraph)
+        {
+            receivingGraph.removeRing(ring);
+        }
+    
+        // Regenerate rings for either of the two graphs, and those simple
+        // rings that involve only a single RCV-RCV pair but may span across
+        // more than one subgraph. This works because we search for paths resulting 
+        // only from edges, not from rings.
+        List<Ring> doneRings = new ArrayList<Ring>();
+        List<Ring> allRings = new ArrayList<>();
+        allRings.addAll(ringFromReceivingGraph);
+        allRings.addAll(ringFromIncomingGraph);
+        for (Ring ring : allRings)
+        {
+            Vertex head = ring.getHeadVertex();
+            Vertex tail = ring.getTailVertex();
+            PathSubGraph path = null;
+            try {
+                path = new PathSubGraph(head, tail);
+            } catch (DENOPTIMException e) {
+                // No path connects the head and tail, do the ring is broken
+                // but the connection needs to be restored as an edge
+                replaceChordWithEdge(ring);
+            }
+            if (path != null) 
+            {
+                // If the path is found then this ring belong entirely to one of the two subgraphs
+                // and can be regenerated in the receiving graph
+                receivingGraph.addRing(head,tail);
+            }
+            // Remove it from the todo list
+            doneRings.add(ring);
+        }
+        for (Ring ring : doneRings) {
+            allRings.remove(ring);
+            ringFromReceivingGraph.remove(ring);
+            ringFromIncomingGraph.remove(ring);
+        }
+
+        // Identify redundant RCV-RCV pairs: those that pertain to the same ring,
+        // so that one should be replaced by an edge
+        for (Ring ring : allRings)
+        {
+            if (doneRings.contains(ring))
+            {
+                continue;
+            }
+
+            // Make the adjacency reflecting the still-missingpossible ring chords
+            // NB: we have removed RCV pairs that are already transformed into rings or edges
+            Map<Vertex, List<Vertex>> adjacencyFromRingChords = new HashMap<>();
+            for (Ring stillMissingRing : Stream.concat(
+                ringFromReceivingGraph.stream(),
+                ringFromIncomingGraph.stream()).toList())
+            {
+                Vertex head = stillMissingRing.getHeadVertex();
+                Vertex tail = stillMissingRing.getTailVertex();
+                adjacencyFromRingChords.computeIfAbsent(head, k -> new ArrayList<Vertex>()).add(tail);
+                adjacencyFromRingChords.computeIfAbsent(tail, k -> new ArrayList<Vertex>()).add(head);
+            }
+
+            Vertex head = ring.getHeadVertex();
+            Vertex tail = ring.getTailVertex();
+            PathSubGraph path = null;
+            try {
+                path = new PathSubGraph(head, tail, adjacencyFromRingChords);
+            } catch (DENOPTIMException e) {
+                // No path connects the head and tail, do the ring is broken
+                // but the connection needs to be restored as an edge
+                replaceChordWithEdge(ring);
+                // Adjacency will reflect the edge, so we remove it from the list of ring-based adjacency
+                ringFromReceivingGraph.remove(ring);
+                ringFromIncomingGraph.remove(ring);
+            }
+            if (path != null) 
+            {
+                // Here we have path that involves more than one RCV pair.
+                for (int iV=1; iV<(path.getVertecesPath().size()-1); iV++)
+                {
+                    Vertex v = path.getVertecesPath().get(iV);
+                    if (v.isRCV())
+                    {
+                        // This is a redundant RCV-RCV pair
+                        // Identify the corresponding ring
+                        for (Ring redundantRing : allRings)
+                        {
+                            Vertex redHead = redundantRing.getHeadVertex();
+                            Vertex redTail = redundantRing.getTailVertex();
+                            if (redHead == v || redTail == v)
+                            {
+                                // Replace redundant ring with actual edge
+                                receivingGraph.removeRing(redundantRing);
+                                AttachmentPoint apOnRedHead = redHead.getAP(0).getLinkedAP();
+                                AttachmentPoint apOnRedTail = redTail.getAP(0).getLinkedAP();
+                                receivingGraph.removeVertex(redHead);
+                                receivingGraph.removeVertex(redTail);
+                                receivingGraph.addEdge(new Edge(apOnRedHead, apOnRedTail, 
+                                    redundantRing.getBondType()));
+                                doneRings.add(redundantRing);
+                                // Remove it from the todo-lists here to reflect this into the next adjacency
+                                ringFromReceivingGraph.remove(ring);
+                                ringFromIncomingGraph.remove(ring);
+                                iV++; //skio next because it is the associated RCV
+                                break;
+                            }
+                        }
+                    }
+                }
+                receivingGraph.addRing(head,tail);
+            }
+            // Remove it from the todo list
+            doneRings.add(ring);
+        }
+        for (Ring ring : doneRings) {
+            allRings.remove(ring);
         }
         
-        // update the mapping of this vertices' APs in the jacket template
-        if (templateJacket != null)
+        // update the mapping of receiving graph's APs onto the jacket template
+        if (receivingGraph.templateJacket != null)
         {
-            templateJacket.clearIAtomContainer();
-            for (AttachmentPoint apOnNew : inToOutAPForTemplate.keySet())
+            receivingGraph.templateJacket.clearIAtomContainer();
+            for (AttachmentPoint apOnReceivingGraph : inToOutAPForTemplateOnReceivingGraph.keySet())
             {
-                templateJacket.updateInnerApID(
-                        inToOutAPForTemplate.get(apOnNew),apOnNew);
-                doneApsOnNew.add(apOnNew);
+                receivingGraph.templateJacket.updateInnerApID(
+                        inToOutAPForTemplateOnReceivingGraph.get(apOnReceivingGraph),apOnReceivingGraph);
+                doneApsOnNew.add(apOnReceivingGraph);
             }
             
             // Project all remaining APs of new branch on the surface of template
-            for (AttachmentPoint apOnNew : interfaceApsOnNewBranch)
+            for (AttachmentPoint apOnIncGraph : interfaceApsOnIncomingGraph)
             {
-                if (!doneApsOnNew.contains(apOnNew))
+                if (!doneApsOnNew.contains(apOnIncGraph))
                 {
-                    templateJacket.addInnerToOuterAPMapping(apOnNew);
+                    receivingGraph.templateJacket.addInnerToOuterAPMapping(apOnIncGraph);
                 }
             }
             
             // Remove all APs that existed only in the old branch
-            for (AttachmentPoint apOnOld : oldAPToRemoveFromTmpl)
+            for (AttachmentPoint apOnOld : oldAPToRemoveFromTmplOfReceivingGraph)
             {
-                templateJacket.removeProjectionOfInnerAP(apOnOld);
+                receivingGraph.templateJacket.removeProjectionOfInnerAP(apOnOld);
             }
         }
         
-        jGraph = null;
-        jGraphKernel = null;
+        receivingGraph.jGraph = null;
+        receivingGraph.jGraphKernel = null;
         
-        for (Vertex vOld : subGrpVrtxs)
-            if (this.containsVertex(vOld))
+        for (AttachmentPoint apOnIncGraph : apMapping.values())
+        {
+            Vertex vrtxTakenFromIncGraph = apOnIncGraph.getOwner();
+            if (!receivingGraph.containsVertex(vrtxTakenFromIncGraph))
+            {
                 return false;
-        for (Vertex vNew : newvertices)
-            if (!this.containsVertex(vNew))
-                return false;
+            }
+        }
         return true;
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * We assume that the two vertexes belong to the same graph
+     */
+    private static void replaceChordWithEdge(Ring chord)
+    {
+        Vertex head = chord.getHeadVertex();
+        Vertex tail = chord.getTailVertex();
+
+        DGraph graph = head.getGraphOwner();
+        if (graph==null || graph!=tail.getGraphOwner())
+        {
+            throw new IllegalArgumentException("The two RCV to be converted "
+                + "into an Edge must belong to the same graph.");
+        }
+        graph.removeRing(chord);
+
+        AttachmentPoint apOnRedHead = head.getAP(0).getLinkedAP();
+        AttachmentPoint apOnRedTail = tail.getAP(0).getLinkedAP();
+
+        graph.removeVertex(head);
+        graph.removeVertex(tail);
+
+        graph.addEdge(new Edge(apOnRedHead, apOnRedTail, chord.getBondType()));
     }
     
 //------------------------------------------------------------------------------
@@ -2548,15 +2854,14 @@ public class DGraph implements Cloneable
             
             ArrayList<Vertex> oldVertex = new ArrayList<Vertex>();
             oldVertex.add(oldLink);
-            LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap =
-                    new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+            APMapping apMap = new APMapping();
             for (Map.Entry<Integer,Integer> e : apIdMap.entrySet())
             {
                 apMap.put(oldLink.getAP(e.getKey()), 
                         graphAdded.getVertexAtPosition(0).getAP(e.getValue()));
             }
             
-            if (!replaceSingleSubGraph(oldVertex, graphAdded, apMap))
+            if (!DGraph.replaceSingleSubGraph(apMap))
             {
                 return false;
             }
@@ -4627,6 +4932,56 @@ public class DGraph implements Cloneable
         }
         
         return subGraph;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Depth-first exploration of graphs.
+     * @param seed the previously-visited vertex where to start the exploration.
+     * @param limits the vertices playing the role of subgraph end-points that 
+     * stop the exploration of the graph.
+     * @param visited the list of visited vertices.
+     */
+    public static void exploreGraph(Vertex seed, 
+        Set<Vertex> limits, Set<Vertex> visited)
+    {
+        for (AttachmentPoint ap : seed.getAttachmentPoints())
+        {
+            AttachmentPoint userAP = ap.getLinkedAP();
+            if (userAP != null)
+            {
+                Vertex userVertex = userAP.getOwner();
+                if (limits.contains(userVertex))
+                {
+                    continue;
+                }
+                if (!visited.contains(userVertex))
+                {
+                    visited.add(userVertex);
+                    exploreGraph(userVertex, limits, visited);
+                }
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Navigates vertexes starting from a given seed vertex,
+     * and stopping the exploration at any of the given end vertices (i.e., limits).
+     * 
+     * @param seed the vertex from which the exploration has to start.
+     * @param limits the vertices playing the role of subgraph end-points that 
+     * stop the exploration of the graph.
+     * @return the list of visited vertexes. Does include the seed vertex.
+     */
+    public static Set<Vertex> exploreGraph(Vertex seed, Set<Vertex> limits)
+    {   
+        Set<Vertex> visitedVertexes = new HashSet<Vertex>();
+        visitedVertexes.add(seed);
+        exploreGraph(seed, limits, visitedVertexes);
+        return visitedVertexes;
     }
     
 //------------------------------------------------------------------------------
@@ -6808,12 +7163,10 @@ public class DGraph implements Cloneable
                         
                         for (Vertex vertexToChange : matches)
                         {
-                            DGraph graph = vertexToChange.getGraphOwner();
                             DGraph newSubG = edit.getIncomingGraph().clone();
                             newSubG.renumberGraphVertices();
                             
-                            LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap =
-                                    new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+                            APMapping apMap = new APMapping();
                             for (Map.Entry<Integer,Integer> e : 
                                 edit.getAPMappig().entrySet())
                             {
@@ -6824,7 +7177,7 @@ public class DGraph implements Cloneable
                             
                             List<Vertex> oldSubG = new ArrayList<Vertex>();
                             oldSubG.add(vertexToChange);
-                            graph.replaceSingleSubGraph(oldSubG, newSubG, apMap);
+                            DGraph.replaceSingleSubGraph(apMap);
                         }
                     }
                     
@@ -7530,6 +7883,92 @@ public class DGraph implements Cloneable
 //------------------------------------------------------------------------------
 
     /**
+     * testing replace subgrap
+     * 
+     */
+    //TODO-gg del
+    public void importAPsEnvironment(APMapping apMapping) throws DENOPTIMException
+    {
+        List<Vertex> subGrpVrtxs = new ArrayList<>();
+        DGraph incomingGraph = null;
+        List<Vertex> verticesToRemoveFromThisGraph = new ArrayList<>();
+        APMapping apMap = new APMapping();
+        List<Vertex> verticesToKeepFromIncomingGraph = new ArrayList<>();
+        LinkedHashMap<AttachmentPoint,BondType> 
+            linkTypesToCreate = new LinkedHashMap<>();
+        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMapping.entrySet())
+        {
+            AttachmentPoint apOnThisGraph = e.getKey();
+            AttachmentPoint apOnIncomingGraph = e.getValue();
+
+            apMap.put(apOnThisGraph.getLinkedAPThroughout(), apOnIncomingGraph);
+
+            if (incomingGraph == null)
+            {
+                incomingGraph = apOnIncomingGraph.getOwner().getGraphOwner();
+            } else if (incomingGraph != apOnIncomingGraph.getOwner().getGraphOwner())
+            {
+                throw new DENOPTIMException("The incoming graph is not the same "
+                    + "for all attachment points.");
+            }
+
+            // collect all vertexes to remove from this graph
+            if (!apOnThisGraph.isAvailableThroughout())
+            {
+                if (!apOnThisGraph.isSrcInUserThroughout())
+                {
+                    throw new DENOPTIMException("The attachment point " 
+                        + apOnThisGraph.getID() + " is used as target of an edge. "
+                        + "This violates the condition for importing the APs "
+                        + "environment. Check your input.");
+                }
+                List<Vertex> childrenTree = new ArrayList<Vertex>();
+                getChildrenTree(apOnThisGraph.getLinkedAPThroughout().getOwner(), 
+                    childrenTree);
+                verticesToRemoveFromThisGraph.add(
+                    apOnThisGraph.getLinkedAPThroughout().getOwner());
+                verticesToRemoveFromThisGraph.addAll(childrenTree);
+
+                // Keep track of the link type to recreate
+                linkTypesToCreate.put(apOnThisGraph, 
+                    apOnThisGraph.getEdgeUser().getBondType());
+            }
+
+            for (Vertex vToDelOnThis : verticesToRemoveFromThisGraph)
+            {
+                if (!subGrpVrtxs.contains(vToDelOnThis))
+                {
+                    subGrpVrtxs.add(vToDelOnThis);
+                }
+            }
+
+            // collect all vertexes to keep from incoming graph
+            List<Vertex> childrenTreeOnInGraph = new ArrayList<Vertex>();
+            getChildrenTree(apOnIncomingGraph.getOwner(), childrenTreeOnInGraph);
+            verticesToKeepFromIncomingGraph.add(apOnIncomingGraph.getOwner());
+            verticesToKeepFromIncomingGraph.addAll(childrenTreeOnInGraph);
+        }
+
+        List<Vertex> verticesToRemoveFromIncomingGraph = new ArrayList<Vertex>();
+        for (Vertex v : incomingGraph.gVertices)
+        {
+            if (!verticesToKeepFromIncomingGraph.contains(v))
+            {
+                verticesToRemoveFromIncomingGraph.add(v);
+            }
+        }
+        for (Vertex v : verticesToRemoveFromIncomingGraph)
+        {
+            // This removes also the rings, but we have kept track of them
+            incomingGraph.removeVertex(v);
+        }
+
+        DGraph.replaceSingleSubGraph(apMap);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Links the graph environment defined by a set of attachment points of an 
      * incoming graph to the mapped set of attachment points of this graph.
      * attachment points of this graph.
@@ -7552,14 +7991,16 @@ public class DGraph implements Cloneable
      * @param apMapping the mapping of attachment points between the two graphs. 
      * @throws DENOPTIMException if the mapping is not consistent.
      */
-    public void importAPsEnvironment(APMapping apMapping) throws DENOPTIMException
+
+    //TODO-gg del
+    public void importAPsEnvironment(APMapping apMapping, boolean FAKEARG) throws DENOPTIMException
     {
         // checks for consistency while identifying vertexes to remove
         DGraph incomingGraph = null;
         List<Vertex> verticesToRemoveFromThisGraph = new ArrayList<>();
         List<Vertex> verticesToKeepFromIncomingGraph = new ArrayList<>();
         LinkedHashMap<AttachmentPoint,BondType> 
-            linkTypesToRecreate = new LinkedHashMap<>();
+            linkTypesToCreate = new LinkedHashMap<>();
         for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMapping.entrySet())
         {
             AttachmentPoint apOnThisGraph = e.getKey();
@@ -7577,12 +8018,6 @@ public class DGraph implements Cloneable
                 throw new DENOPTIMException("The incoming graph is not the same "
                     + "for all attachment points.");
             }
-
-
-        //TODO-del
-DenoptimIO.writeGraphToFile(new File("/tmp/this.json"),FileFormat.GRAPHJSON,this);
-DenoptimIO.writeGraphToFile(new File("/tmp/incoming.json"),FileFormat.GRAPHJSON,incomingGraph);
-
 
             // collect all vertexes to remove from this graph
             if (!apOnThisGraph.isAvailableThroughout())
@@ -7602,7 +8037,7 @@ DenoptimIO.writeGraphToFile(new File("/tmp/incoming.json"),FileFormat.GRAPHJSON,
                 verticesToRemoveFromThisGraph.addAll(childrenTree);
 
                 // Keep track of the link type to recreate
-                linkTypesToRecreate.put(apOnThisGraph, 
+                linkTypesToCreate.put(apOnThisGraph, 
                     apOnThisGraph.getEdgeUser().getBondType());
             }
 
@@ -7679,7 +8114,7 @@ DenoptimIO.writeGraphToFile(new File("/tmp/incoming.json"),FileFormat.GRAPHJSON,
             AttachmentPoint apOnThisGraph = e.getKey();
             AttachmentPoint apOnIncomingGraph = e.getValue();
             Edge edge = new Edge(apOnThisGraph,apOnIncomingGraph,
-                linkTypesToRecreate.get(apOnThisGraph));
+                linkTypesToCreate.get(apOnThisGraph));
             addEdge(edge);
         }
 

@@ -165,7 +165,7 @@ public class CyclicGraphHandler
                 }
                 
                 // make the new candidate RCA pair
-                PathSubGraph subGraph = new PathSubGraph(vI, vJ, molGraph);
+                PathSubGraph subGraph = new PathSubGraph(vI, vJ);
                 logger.log(Level.FINE, "Evaluating closability of path " 
                 + subGraph);
                 boolean keepRcaPair = PathClosabilityTools.isCloseable(subGraph, 

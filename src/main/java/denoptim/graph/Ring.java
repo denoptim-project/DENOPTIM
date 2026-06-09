@@ -418,5 +418,24 @@ public class Ring
     }
 
 //------------------------------------------------------------------------------
+    
+    /**
+     * Checks if the ring is broken, i.e., the list of vertexes is not connected.
+     * @return the index of the last vertex that is connected to the 
+     * previous one, or -1 if the ring is connected.
+     */
+    public int getBrokenIndex()
+    {
+        for (int iRV=0; iRV<vertices.size()-1; iRV++)
+        {
+            if (! vertices.get(iRV).isConnectedTo(vertices.get(iRV+1)))
+            {
+                return iRV;
+            }
+        }
+        return -1;
+    }
+
+//------------------------------------------------------------------------------
 
 }

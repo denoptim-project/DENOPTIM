@@ -112,7 +112,12 @@ public class RandomCombOfRingsIterator implements Iterator<List<Ring>>
                 Vertex vJ = wLstVrtJ.get(vIdJ);
                 wLstVrtJ.removeAll(Collections.singleton(vJ));
 
-                PathSubGraph path = new PathSubGraph(vI, vJ, molGraph);
+                PathSubGraph path = null;
+                try {
+                    path = new PathSubGraph(vI, vJ);
+                } catch (DENOPTIMException e) {
+                    continue;
+                }
                 // NB: closability is evaluated on the original
                 if (PathClosabilityTools.isCloseable(path, originalMol, settings))
                 {

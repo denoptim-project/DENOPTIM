@@ -126,6 +126,7 @@ public class Edge
     
 //------------------------------------------------------------------------------
 
+//TODO. this returns an Index not the ID
     public int getSrcAPID()
     {
         return srcAP.getOwner().getIndexOfAP(srcAP);
@@ -133,6 +134,7 @@ public class Edge
     
 //------------------------------------------------------------------------------
 
+//TODO. this returns an Index not the ID
     public int getTrgAPID()
     {
         return trgAP.getOwner().getIndexOfAP(trgAP);

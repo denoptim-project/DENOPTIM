@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,7 +52,6 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.files.FileFormat;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
 import denoptim.graph.Edge.BondType;
@@ -61,7 +59,6 @@ import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.PathSubGraph;
-import denoptim.io.DenoptimIO;
 import denoptim.utils.MutationType;
 
 
@@ -312,6 +309,8 @@ public class DGraphTest
      *      0(A)
      *       |
      *       v1-1(B)-(B)-v1-(B)-(B)-v1-(B)-(B)-v1
+     *                    \
+     *                     (A)-(A)-v0
      *   </pre>
      *   
      */
@@ -1007,12 +1006,12 @@ public class DGraphTest
      *  <pre>              
      *                     0(A)
      *                    /
-     *        0(A)--2(A)-v1-1(B)
+     *        0(A)--2(A)-v1b-1(B)
      *       /           | \
      * 2(A)-v1-1(B)       \  3(B)
-     *      |\             4(C)
-     *      | 3(B)
-     *      \
+     *      |\     \        4(C)-(B)-v2b
+     *      | 3(B)  \
+     *      \       (B)-v2
      *       4(C)
      *   </pre>
      *   
@@ -1027,7 +1026,17 @@ public class DGraphTest
         Vertex v1b = Vertex.newVertexFromLibrary(1,
                 BBType.FRAGMENT, fs);
         graph.addVertex(v1b);
+
+        Vertex v2 = Vertex.newVertexFromLibrary(2,
+            BBType.FRAGMENT, fs);
+        graph.addVertex(v2);
+        Vertex v2b = Vertex.newVertexFromLibrary(2,
+            BBType.FRAGMENT, fs);
+        graph.addVertex(v2b);
+
         graph.addEdge(new Edge(v1.getAP(0), v1b.getAP(2)));
+        graph.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+        graph.addEdge(new Edge(v1b.getAP(4), v2b.getAP(0)));
         graph.renumberGraphVertices();
         return graph;
     }
@@ -1734,32 +1743,27 @@ public class DGraphTest
 //------------------------------------------------------------------------------
     
     @Test
-    public void testReplaceSubGraph() throws Exception
+    public void testReplaceSingleSubGraph() throws Exception, DENOPTIMException
     {
         FragmentSpace fs = prepare();
         DGraph g = makeTestGraphD(fs);
-        
-        List<Vertex> vrtxsToReplace = new ArrayList<Vertex>();
-        vrtxsToReplace.add(g.getVertexAtPosition(0));
-        vrtxsToReplace.add(g.getVertexAtPosition(1));
-        
         DGraph incomingSubGraph = makeTestGraphF(fs);
         
-        LinkedHashMap<AttachmentPoint, AttachmentPoint> apMap = 
-                new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+        APMapping apMap = new APMapping();
         apMap.put(g.getVertexAtPosition(0).getAP(1), //A:0
-                incomingSubGraph.getVertexAtPosition(0).getAP(2)); //A:0
+                incomingSubGraph.getVertexAtPosition(0).getAP(2)); //A:0 free 3rd AP
         apMap.put(g.getVertexAtPosition(0).getAP(2), //D:0
-                incomingSubGraph.getVertexAtPosition(7).getAP(1)); //D:0
+                incomingSubGraph.getVertexAtPosition(7).getAP(1)); //D:99
         apMap.put(g.getVertexAtPosition(1).getAP(1), //B:0
-                incomingSubGraph.getVertexAtPosition(6).getAP(2)); //B:0
+                incomingSubGraph.getVertexAtPosition(6).getAP(2)); //A:0
         apMap.put(g.getVertexAtPosition(1).getAP(4), //C:0
                 incomingSubGraph.getVertexAtPosition(6).getAP(4)); //C:0
         apMap.put(g.getVertexAtPosition(1).getAP(3), //B:0
                 incomingSubGraph.getVertexAtPosition(5).getAP(3)); //B:0
+
         incomingSubGraph.reassignSymmetricLabels();
         
-        boolean res = g.replaceSingleSubGraph(vrtxsToReplace, incomingSubGraph, apMap);
+        boolean res = DGraph.replaceSingleSubGraph(apMap);
         assertTrue(res);
         
         g.convertSymmetricLabelsToSymmetricSets();
@@ -1770,13 +1774,13 @@ public class DGraphTest
                 "graph's surce vertex");
         //NB: the position of the vertexes has changes by -2. so vertex 3 is now at 1
         PathSubGraph pathA = new PathSubGraph(g.getVertexAtPosition(1),
-                g.getVertexAtPosition(2), g); // length was 2
+                g.getVertexAtPosition(2)); // length was 2
         assertEquals(3,pathA.getEdgesPath().size(),"path within a ring (A)");
         PathSubGraph pathB = new PathSubGraph(g.getVertexAtPosition(3),
-                g.getVertexAtPosition(6), g); // length was 4
+                g.getVertexAtPosition(6)); // length was 4
         assertEquals(5,pathB.getEdgesPath().size(),"path within a ring (B)");
         PathSubGraph pathC = new PathSubGraph(g.getVertexAtPosition(7),
-                g.getVertexAtPosition(6), g); // length was 2
+                g.getVertexAtPosition(6)); // length was 2
         assertEquals(4,pathC.getEdgesPath().size(),"path within a ring (C)");
         
         DGraph expected = makeTestGraphG(fs);
@@ -1786,7 +1790,7 @@ public class DGraphTest
 //------------------------------------------------------------------------------
     
     @Test
-    public void testReplaceSubGraph_inTemplate() throws Exception
+    public void testReplaceSingleSubGraph_inTemplate() throws Exception
     {
         FragmentSpace fs = prepare();
         DGraph g = makeTestGraphI(fs);
@@ -1794,26 +1798,22 @@ public class DGraphTest
         DGraph innerGraph = ((Template) g.getVertexAtPosition(0))
                 .getInnerGraph();
         
-        List<Vertex> vrtxsToReplace = new ArrayList<Vertex>();
-        vrtxsToReplace.add(innerGraph.getVertexAtPosition(0));
-        
         DGraph incomingSubGraph = makeTestGraphJ(fs);
         
-        LinkedHashMap<AttachmentPoint, AttachmentPoint> apMap = 
-                new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+        APMapping apMap = new APMapping();
         // first two are those needed within the template
-        apMap.put(vrtxsToReplace.get(0).getAP(3), //B:0
+        apMap.put(innerGraph.getVertexAtPosition(0).getAP(3), //B:0
                 incomingSubGraph.getVertexAtPosition(0).getAP(1)); //B:0
-        apMap.put(vrtxsToReplace.get(0).getAP(4), //C:0
+        apMap.put(innerGraph.getVertexAtPosition(0).getAP(4), //C:0
                 incomingSubGraph.getVertexAtPosition(1).getAP(4)); //C:0
         // second two are those projected and used outside template
-        apMap.put(vrtxsToReplace.get(0).getAP(0), //A:0
+        apMap.put(innerGraph.getVertexAtPosition(0).getAP(0), //A:0
                 incomingSubGraph.getVertexAtPosition(0).getAP(2)); //A:0
-        apMap.put(vrtxsToReplace.get(0).getAP(1), //B:0
+        apMap.put(innerGraph.getVertexAtPosition(0).getAP(1), //B:0
                 incomingSubGraph.getVertexAtPosition(0).getAP(3)); //B:0
         
-        boolean res = innerGraph.replaceSingleSubGraph(vrtxsToReplace, 
-                incomingSubGraph, apMap);
+        boolean res = DGraph.replaceSingleSubGraph(apMap);
+
         assertTrue(res);
         
         assertEquals(5,g.getVertexCount(),"Vertex in outer graph");
@@ -1836,6 +1836,101 @@ public class DGraphTest
                 "Distance Head-Tail in ring of inner graph");
     }
     
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testReplaceSingleSubGraph_ScafToScaf_withAPClassViolation() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphO_A(fs); 
+        DGraph incomingGraph = makeTestGraphO_B(fs);
+
+        Vertex vOnGraph = graph.getVertexAtPosition(0); // is s2
+        Vertex vOnInGraph = incomingGraph.getVertexAtPosition(0); // is s1
+
+        APMapping apMapping = new APMapping();
+        apMapping.put(vOnGraph.getAP(0).getLinkedAP(), vOnInGraph.getAP(0).getLinkedAP());
+        apMapping.put(vOnGraph.getAP(2).getLinkedAP(), vOnInGraph.getAP(1).getLinkedAP());
+
+        incomingGraph.reassignSymmetricLabels();
+        DGraph.replaceSingleSubGraph(apMapping);
+        graph.convertSymmetricLabelsToSymmetricSets();
+
+        assertEquals(graph.getVertexCount(), 12);
+        assertEquals(graph.getEdgeCount(), 11);
+        assertEquals(graph.getRingCount(), 2);
+        assertEquals(graph.getSymmetricSetCount(), 2);
+
+        // inverting roles of graphs and ussing the complementary APMapping should lead to
+        // the same results as the original graph because of consistent edge directions
+        DGraph graphB = makeTestGraphO_B(fs); 
+        DGraph incomingGraphB = makeTestGraphO_A(fs);
+
+        Vertex vOnGraphB = graphB.getVertexAtPosition(0); // is s1
+        Vertex vOnInGraphB = incomingGraphB.getVertexAtPosition(0); // is s2
+
+        APMapping apMappingB = new APMapping();
+        apMappingB.put(vOnGraphB.getAP(0), vOnInGraphB.getAP(0));
+        apMappingB.put(vOnGraphB.getAP(1), vOnInGraphB.getAP(2));
+
+        incomingGraphB.reassignSymmetricLabels();
+        DGraph.replaceSingleSubGraph(apMappingB);
+        graphB.convertSymmetricLabelsToSymmetricSets();
+
+        assertEquals(graphB.getVertexCount(), 12);
+        assertEquals(graphB.getEdgeCount(), 11);
+        assertEquals(graphB.getRingCount(), 2);
+        assertEquals(graphB.getSymmetricSetCount(), 2);
+
+        assertTrue(graph.isIsomorphicTo(graphB));
+        assertTrue(graphB.isIsomorphicTo(graph));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testReplaceSingleSubGraph_NonScafToNonScaf_withAPClassViolation() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphO_A(fs); 
+        DGraph incomingGraph = makeTestGraphO_B(fs);
+
+        APMapping apMapping = new APMapping();
+        apMapping.put(graph.getVertexAtPosition(3).getAP(0), 
+            incomingGraph.getVertexAtPosition(1).getAP(0));
+        apMapping.put(graph.getVertexAtPosition(3).getAP(1), 
+            incomingGraph.getVertexAtPosition(5).getAP(1));
+
+        incomingGraph.reassignSymmetricLabels();
+        DGraph.replaceSingleSubGraph(apMapping);
+        graph.convertSymmetricLabelsToSymmetricSets();
+
+        assertEquals(graph.getVertexCount(), 11); // 4+7 becaue of remuval of redudnat RCV pair
+        assertEquals(graph.getEdgeCount(), 10);
+        assertEquals(graph.getRingCount(), 1); // 2-1 because of removal of redundant RCV pair
+        assertEquals(graph.getSymmetricSetCount(), 1);
+
+        // inverting roles of graphs and using the complementary APMapping does not lead to
+        // the same results because of the different RCV pair that survives the filtering
+        DGraph graphB = makeTestGraphO_B(fs); 
+        DGraph incomingGraphB = makeTestGraphO_A(fs);
+
+        APMapping apMappingB = new APMapping();
+        apMappingB.put(graphB.getVertexAtPosition(1).getAP(0).getLinkedAP(), 
+            incomingGraphB.getVertexAtPosition(3).getAP(0).getLinkedAP());
+        apMappingB.put(graphB.getVertexAtPosition(5).getAP(1).getLinkedAP(), 
+            incomingGraphB.getVertexAtPosition(3).getAP(1).getLinkedAP());
+
+        incomingGraphB.reassignSymmetricLabels();
+        DGraph.replaceSingleSubGraph(apMappingB);
+        graphB.convertSymmetricLabelsToSymmetricSets();
+
+        assertEquals(graphB.getVertexCount(), 11);
+        assertEquals(graphB.getEdgeCount(), 10);
+        assertEquals(graphB.getRingCount(), 1);
+        assertEquals(graphB.getSymmetricSetCount(), 1);
+    }
+
 //------------------------------------------------------------------------------
     
     @Test
@@ -1938,7 +2033,6 @@ public class DGraphTest
         assertEquals(numEc, numEb - 2);
         assertEquals(numSc, numSb);
         assertEquals(numRc, numRb - 1);
-
     }
 
 //------------------------------------------------------------------------------
@@ -2075,12 +2169,6 @@ public class DGraphTest
         ssB.add(v92);
         graphB.addSymmetricSetOfVertices(ssB);
 
-        /*
-        System.out.println("Graphs Same SS");
-        System.out.println(graphA);
-        System.out.println(graphB);
-        */
-
         StringBuilder reason = new StringBuilder();
         assertTrue(graphA.sameAs(graphB, reason));
     }
@@ -2191,7 +2279,6 @@ public class DGraphTest
         Ring rA2 = new Ring(vrA2);
         graphA.addRing(rA2);
 
-
         // Other
 
         DGraph graphB = new DGraph();
@@ -2268,7 +2355,6 @@ public class DGraphTest
         vrA2.add(v4);
         Ring rA2 = new Ring(vrA2);
         graphA.addRing(rA2);
-
 
         // Other
 
@@ -3770,7 +3856,7 @@ public class DGraphTest
         DGraph g1 = makeTestGraphDSub1(fs);
         DGraph g2 = makeTestGraphDSub1(fs);
         
-        EmptyVertex v1 = new EmptyVertex(10001);
+        EmptyVertex v1 = new EmptyVertex(100001);
         v1.addAP(APCD);
         v1.addAP(APCC);
         v1.setUniquefyingProperty("blabla123");
@@ -3779,20 +3865,17 @@ public class DGraphTest
         DGraph incomingSubGraph = new DGraph();
         incomingSubGraph.addVertex(v1);
         
-        LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap =
-                new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
+        APMapping apMap = new APMapping();
         apMap.put(g2.getVertexAtPosition(1).getAP(0), v1.getAP(1));
         apMap.put(g2.getVertexAtPosition(1).getAP(1), v1.getAP(0));
         
-        List<Vertex> toReplace = new ArrayList<Vertex>();
-        toReplace.add(g2.getVertexAtPosition(1));
-        g2.replaceSingleSubGraph(toReplace, incomingSubGraph, apMap);
+        DGraph.replaceSingleSubGraph(apMap);
         
         assertFalse(g1.isIsomorphicTo(g2));
         assertTrue(g1.isIsostructuralTo(g2));
         
         // Change structure by adding a bifurcation
-        EmptyVertex v2 = new EmptyVertex(100002);
+        EmptyVertex v2 = new EmptyVertex(1000002);
         v2.addAP(APCD);
         v2.addAP(APCC);
         v2.addAP(APCC);
@@ -3800,12 +3883,12 @@ public class DGraphTest
         v2.setProperty("blabla456", 456);
         incomingSubGraph = new DGraph();
         incomingSubGraph.addVertex(v2);
-        apMap = new LinkedHashMap<AttachmentPoint,AttachmentPoint>();
-        apMap.put(g2.getVertexAtPosition(2).getAP(0), v1.getAP(1));
-        apMap.put(g2.getVertexAtPosition(2).getAP(1), v1.getAP(0));
-        toReplace = new ArrayList<Vertex>();
-        toReplace.add(g2.getVertexAtPosition(2));
-        g2.replaceSingleSubGraph(toReplace, incomingSubGraph, apMap);
+
+        apMap = new APMapping();
+        apMap.put(g2.getVertexAtPosition(2).getAP(0), v2.getAP(1));
+        apMap.put(g2.getVertexAtPosition(2).getAP(1), v2.getAP(0));
+        
+        DGraph.replaceSingleSubGraph(apMap);
         
         assertFalse(g1.isIsomorphicTo(g2));
         assertFalse(g1.isIsostructuralTo(g2));
@@ -4205,36 +4288,65 @@ public class DGraphTest
         graph.renumberGraphVertices();
         return graph;
     }
- 
+            
 //------------------------------------------------------------------------------
 
     @Test
-    public void testCopyPasteVertexEnvironment_ScafScaaf_withAPClassViolation() throws Exception
+    public void testExploreGraph_nothingToExplore() throws Exception
+    {
+        EmptyVertex v = new EmptyVertex();
+        v.setBuildingBlockType(BBType.SCAFFOLD);
+
+        Set<Vertex> limits = new HashSet<Vertex>();
+        Set<Vertex> visited = DGraph.exploreGraph(v, limits);
+        assertEquals(visited.size(), 1);
+        assertTrue(visited.contains(v));
+    }
+            
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testExploreGraph_simpleGraph() throws Exception
     {
         FragmentSpace fs = prepare();
-        DGraph graph = makeTestGraphO_A(fs); 
-        DGraph incomingGraph = makeTestGraphO_B(fs);
+        DGraph graph = makeTestGraphC(fs);
+        Set<Vertex> limits = new HashSet<Vertex>();
+        limits.add(graph.getVertexAtPosition(7));
+        Set<Vertex> visited = DGraph.exploreGraph(
+            graph.getVertexAtPosition(2), limits);
 
-        Vertex vOnGraph = graph.getVertexAtPosition(0); // is s2
-        Vertex vOnInGraph = incomingGraph.getVertexAtPosition(0); // is s1
-
-        APMapping apMapping = new APMapping();
-        apMapping.put(vOnGraph.getAP(0), vOnInGraph.getAP(0).getLinkedAP());
-        apMapping.put(vOnGraph.getAP(2), vOnInGraph.getAP(1).getLinkedAP());
-
-        incomingGraph.reassignSymmetricLabels();
-
-        graph.importAPsEnvironment(apMapping);
-
-        graph.convertSymmetricLabelsToSymmetricSets();
-
-        DenoptimIO.writeGraphToFile(new File("/tmp/mod.json"),FileFormat.GRAPHJSON,graph);
-
-        assertEquals(graph.getVertexCount(), 12);
-        assertEquals(graph.getEdgeCount(), 11);
-        assertEquals(graph.getRingCount(), 2);
-        assertEquals(graph.getSymmetricSetCount(), 2);
+        Set<Vertex> expected = new HashSet<Vertex>();
+        expected.add(graph.getVertexAtPosition(0));
+        expected.add(graph.getVertexAtPosition(1));
+        expected.add(graph.getVertexAtPosition(2));
+        expected.add(graph.getVertexAtPosition(3));
+        expected.add(graph.getVertexAtPosition(4));
+        expected.add(graph.getVertexAtPosition(5));
+        expected.add(graph.getVertexAtPosition(6));
+        assertEquals(visited.size(), expected.size());
+        for (Vertex v : visited) {
+            assertTrue(expected.contains(v),"Vertex "+v.getVertexId()+" not found in visited");
+        }
     }
+            
+//------------------------------------------------------------------------------
 
+    @Test
+    public void testExploreGraph_noCrossingTemplateBoundary() throws Exception
+    {
+        DGraph graph = makeDeeplyEmbeddedGraph();
+        
+        // Limitless
+        Set<Vertex> visited = DGraph.exploreGraph(
+            graph.getVertexAtPosition(0), new HashSet<Vertex>());
+        assertEquals(visited.size(), 2);
+
+        Vertex v = ((Template) ((Template) graph.getVertexAtPosition(1)).getInnerGraph()
+            .getVertexAtPosition(3)).getInnerGraph().getVertexAtPosition(0);
+
+        visited =  DGraph.exploreGraph(v, new HashSet<Vertex>());
+        assertEquals(visited.size(), 4);
+    }
+    
 //------------------------------------------------------------------------------
 }

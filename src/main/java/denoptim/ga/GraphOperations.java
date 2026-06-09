@@ -215,8 +215,8 @@ public class GraphOperations
                     // checked anyway later when checking for isostructural
                     // subgraphs, but here it helps reducing the size of the 
                     // combinatorial problem.
-                    PathSubGraph pathA = new PathSubGraph(vA, endOnA, gA);
-                    PathSubGraph pathB = new PathSubGraph(vB, endOnB, gB);
+                    PathSubGraph pathA = new PathSubGraph(vA, endOnA);
+                    PathSubGraph pathB = new PathSubGraph(vB, endOnB);
                     if (pathA.getPathLength()!=pathB.getPathLength())
                         continue;
                 }
@@ -447,8 +447,18 @@ public class GraphOperations
                     || alreadyIncludedFromB.contains(endOnB))
                 continue;
             
-            PathSubGraph pathA = new PathSubGraph(vA, endOnA, gA);
-            PathSubGraph pathB = new PathSubGraph(vB, endOnB, gB);
+            PathSubGraph pathA = null;
+            try {
+                pathA = new PathSubGraph(vA, endOnA);
+            } catch (DENOPTIMException e) {
+                e.printStackTrace();
+            }
+            PathSubGraph pathB = null;
+            try {
+                pathB = new PathSubGraph(vB, endOnB);
+            } catch (DENOPTIMException e) {
+                e.printStackTrace();
+            }
             subGraphEndInA.add(endOnA);
             subGraphEndInB.add(endOnB);
             alreadyIncludedFromA.addAll(pathA.getVertecesPath());
