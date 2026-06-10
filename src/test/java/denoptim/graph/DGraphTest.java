@@ -1763,7 +1763,7 @@ public class DGraphTest
 
         incomingSubGraph.reassignSymmetricLabels();
         
-        boolean res = DGraph.replaceSingleSubGraph(apMap);
+        boolean res = DGraph.replaceSingleSubGraph(apMap, fs);
         assertTrue(res);
         
         g.convertSymmetricLabelsToSymmetricSets();
@@ -1812,7 +1812,7 @@ public class DGraphTest
         apMap.put(innerGraph.getVertexAtPosition(0).getAP(1), //B:0
                 incomingSubGraph.getVertexAtPosition(0).getAP(3)); //B:0
         
-        boolean res = DGraph.replaceSingleSubGraph(apMap);
+        boolean res = DGraph.replaceSingleSubGraph(apMap, fs);
 
         assertTrue(res);
         
@@ -1853,7 +1853,7 @@ public class DGraphTest
         apMapping.put(vOnGraph.getAP(2).getLinkedAP(), vOnInGraph.getAP(1).getLinkedAP());
 
         incomingGraph.reassignSymmetricLabels();
-        DGraph.replaceSingleSubGraph(apMapping);
+        DGraph.replaceSingleSubGraph(apMapping, fs);
         graph.convertSymmetricLabelsToSymmetricSets();
 
         assertEquals(graph.getVertexCount(), 12);
@@ -1874,7 +1874,7 @@ public class DGraphTest
         apMappingB.put(vOnGraphB.getAP(1), vOnInGraphB.getAP(2));
 
         incomingGraphB.reassignSymmetricLabels();
-        DGraph.replaceSingleSubGraph(apMappingB);
+        DGraph.replaceSingleSubGraph(apMappingB, fs);
         graphB.convertSymmetricLabelsToSymmetricSets();
 
         assertEquals(graphB.getVertexCount(), 12);
@@ -1902,7 +1902,7 @@ public class DGraphTest
             incomingGraph.getVertexAtPosition(5).getAP(1));
 
         incomingGraph.reassignSymmetricLabels();
-        DGraph.replaceSingleSubGraph(apMapping);
+        DGraph.replaceSingleSubGraph(apMapping, fs);
         graph.convertSymmetricLabelsToSymmetricSets();
 
         assertEquals(graph.getVertexCount(), 11); // 4+7 becaue of remuval of redudnat RCV pair
@@ -1922,7 +1922,7 @@ public class DGraphTest
             incomingGraphB.getVertexAtPosition(3).getAP(1).getLinkedAP());
 
         incomingGraphB.reassignSymmetricLabels();
-        DGraph.replaceSingleSubGraph(apMappingB);
+        DGraph.replaceSingleSubGraph(apMappingB, fs);
         graphB.convertSymmetricLabelsToSymmetricSets();
 
         assertEquals(graphB.getVertexCount(), 11);
@@ -1931,10 +1931,78 @@ public class DGraphTest
         assertEquals(graphB.getSymmetricSetCount(), 1);
     }
 
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Creates a test graph that intentionally violates APClass compatibility
+     * and looks like this:
+     * 
+     * <pre>
+     * 
+     *    v1--v2
+     *   /
+     * v0  (not a scaffold, but the seed of the tree!)
+     *  \
+     *   v3--v4
+     * 
+     * </pre>
+     */
+    public static DGraph makeTestGraph_treeWithOutScaffold(FragmentSpace fs) throws DENOPTIMException
+    {
+        DGraph graph = new DGraph();
+        Vertex v0 = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v0);
+        Vertex v1 = Vertex.newVertexFromLibrary(1,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v1);
+        Vertex v2 = Vertex.newVertexFromLibrary(2,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v2);
+        Vertex v3 = Vertex.newVertexFromLibrary(3,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v3);
+        Vertex v4 = Vertex.newVertexFromLibrary(4,
+                BBType.FRAGMENT, fs);
+        graph.addVertex(v4);
+
+        graph.addEdge(new Edge(v0.getAP(0), v1.getAP(2)));
+        graph.addEdge(new Edge(v1.getAP(1), v2.getAP(0)));
+        graph.addEdge(new Edge(v0.getAP(4), v3.getAP(1)));
+        graph.addEdge(new Edge(v3.getAP(0), v4.getAP(1)));
+        
+        graph.renumberGraphVertices();
+        return graph;
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testReplaceSingleSubGraph_ringFormation() throws Exception
+    {
+        FragmentSpace fs = prepare();
+        DGraph graph = makeTestGraphO_A(fs); 
+        DGraph incomingGraph = makeTestGraph_treeWithOutScaffold(fs);
+
+        APMapping apMapping = new APMapping();
+        apMapping.put(graph.getVertexAtPosition(1).getAP(0), 
+            incomingGraph.getVertexAtPosition(1).getAP(4));
+        apMapping.put(graph.getVertexAtPosition(6).getAP(0), 
+            incomingGraph.getVertexAtPosition(4).getAP(3));
+
+        DGraph.replaceSingleSubGraph(apMapping, fs);
+
+        assertEquals(graph.getVertexCount(), 12);
+        assertEquals(graph.getEdgeCount(), 11);
+        assertEquals(graph.getRingCount(), 2);
+    }
+
 //------------------------------------------------------------------------------
     
     @Test
-    public void testRemoveVertex() throws Exception {
+    public void testRemoveVertex() throws Exception 
+    {
         DGraph graph = new DGraph();
         EmptyVertex v0 = new EmptyVertex(0);
         buildVertexAndConnectToGraph(v0, 3, graph);
@@ -3869,7 +3937,7 @@ public class DGraphTest
         apMap.put(g2.getVertexAtPosition(1).getAP(0), v1.getAP(1));
         apMap.put(g2.getVertexAtPosition(1).getAP(1), v1.getAP(0));
         
-        DGraph.replaceSingleSubGraph(apMap);
+        DGraph.replaceSingleSubGraph(apMap, fs);
         
         assertFalse(g1.isIsomorphicTo(g2));
         assertTrue(g1.isIsostructuralTo(g2));
@@ -3888,7 +3956,7 @@ public class DGraphTest
         apMap.put(g2.getVertexAtPosition(2).getAP(0), v2.getAP(1));
         apMap.put(g2.getVertexAtPosition(2).getAP(1), v2.getAP(0));
         
-        DGraph.replaceSingleSubGraph(apMap);
+        DGraph.replaceSingleSubGraph(apMap, fs);
         
         assertFalse(g1.isIsomorphicTo(g2));
         assertFalse(g1.isIsostructuralTo(g2));

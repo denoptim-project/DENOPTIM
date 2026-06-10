@@ -66,6 +66,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
+import denoptim.ga.GraphOperations;
 import denoptim.graph.APClass.APClassDeserializer;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Template.ContractLevel;
@@ -1927,6 +1928,8 @@ public class DGraph implements Cloneable
      * the new vertices to be added to this graph.
      * @param apMap mapping of attachment points belonging to any vertex in
      * <code>subGrpVrtxs</code> to attachment points in <code>newSubGraph</code>.
+     * @param fragSpace the fragment space used to create the new RCVs or 
+     * capping groups.
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException is capping groups are the only vertices in the
      * subgraph.
@@ -2042,7 +2045,7 @@ public class DGraph implements Cloneable
                 localApMap.put(apOnOld,apOnNew);
             }
             
-            if (!DGraph.replaceSingleSubGraph(localApMap))
+            if (!DGraph.replaceSingleSubGraph(localApMap, fragSpace))
             {
                 return false;
             }
@@ -2175,22 +2178,6 @@ public class DGraph implements Cloneable
     }
 
 //------------------------------------------------------------------------------
-
-//TODO-gg del
-    public boolean replaceSingleSubGraph(List<Vertex> subGrpVrtxs, 
-        DGraph newSubGraph, 
-        LinkedHashMap<AttachmentPoint,AttachmentPoint> apMap, boolean fakeArg) 
-                throws DENOPTIMException
-    {
-        APMapping apMapping = new APMapping();
-        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMap.entrySet())
-        {
-            apMapping.put(e.getKey().getLinkedAPThroughout(), e.getValue());
-        }
-        return replaceSingleSubGraph(apMapping);
-    }
-
-//------------------------------------------------------------------------------
     
     /**
      * Replaced the subgraph defined by a set of Attachment Points that
@@ -2244,8 +2231,8 @@ public class DGraph implements Cloneable
      * @return <code>true</code> if the substitution is successful.
      * @throws DENOPTIMException
      */
-    public static boolean replaceSingleSubGraph(APMapping apMapping)
-        throws DENOPTIMException
+    public static boolean replaceSingleSubGraph(APMapping apMapping, 
+        FragmentSpace fragSpace) throws DENOPTIMException
     {
         // Checks for consistency while identifying vertexes at the interface between 
         // the two subgraphs.
@@ -2417,7 +2404,7 @@ public class DGraph implements Cloneable
         for (Ring ring : receivingGraph.getRings())
         {
             if (verticesToRemoveFromReceivingGraph.contains(ring.getHeadVertex()) 
-                || verticesToRemoveFromIncomingGraph.contains(ring.getTailVertex()))
+                || verticesToRemoveFromReceivingGraph.contains(ring.getTailVertex()))
             {
                 continue;
             }
@@ -2551,6 +2538,14 @@ public class DGraph implements Cloneable
         // where we have to perform multiple replaceSubGraph operations and, 
         // afterwards, use the symmetric labels to create symmetric sets that 
         // might span across more than one of the subgraphs that were added.
+
+        // Remove all rings in the graph that will become the result: we are about to regenerate 
+        // rings according to the changes to the graph. We do this here to have the possibility 
+        // to create rings while creating the new links as from the AP mapping.
+        for (Ring ring : ringFromReceivingGraph)
+        {
+            receivingGraph.removeRing(ring);
+        }
         
         // Create the new connections. Keep track of those that have been dealt with
         List<AttachmentPoint> doneApsOnNew = new ArrayList<AttachmentPoint>();
@@ -2580,19 +2575,67 @@ public class DGraph implements Cloneable
                 srcAP = trgAP;
                 trgAP = tmp;
             }
-            Edge edge = new Edge(srcAP,trgAP, 
-                linkTypesToCreate.get(apOnIncomingGraph));
-            receivingGraph.addEdge(edge);
+            boolean makeLinkAsRing = false;
+            Vertex srcVertex = srcAP.getOwner();
+            Vertex trgVertex = trgAP.getOwner();
+            if (srcVertex.isRCV() || trgVertex.isRCV())
+            {
+                // It remains possible to request operations that place RCVs in chains
+                // that have no sense of existing (because RCVs are not expected to be
+                // connected to other RCVs), but we avoid adding RCVs connected to other 
+                // RCVs. Therefore, is either of the APs belong to an RCV, we do make
+                // an Edge instead of considering wherther th edge should be replaced
+                // by a pair of newly added RCVs.
+                makeLinkAsRing = false;
+            } else {
+                // To consider whether to use an edge or a ring, we need to know if
+                // the two APs are already reachable from each other by a path of edges.
+                PathSubGraph path = null;
+                try {
+                    path = new PathSubGraph(srcVertex, trgVertex);
+                } catch (DENOPTIMException e) {
+                    // No path connects the two APs, so we make an Edge
+                    makeLinkAsRing = false;
+                }
+                // NB: since the two APs are guaranteed to be on different vertices,
+                // the path, if any, will always contain at least one edge.
+                if (path != null)
+                {
+                    // There is a path, so we make a ring instead of an Edge
+                    makeLinkAsRing = true;
+                }
+            }
+            if (makeLinkAsRing)
+            {
+                Randomizer rng = fragSpace.getRandomizer();
+                Vertex rcvToSrcAP = null;
+                List<Vertex> candidateRCVsSrc = fragSpace.getRCVsForAPClass(srcAP.getAPClass());
+                if (candidateRCVsSrc.size()>0)
+                {
+                    rcvToSrcAP = rng.randomlyChooseOne(candidateRCVsSrc);
+                } else {
+                    rcvToSrcAP = FragmentSpace.getPolarizedRCV(true);
+                }
+                receivingGraph.appendVertexOnAP(srcAP, rcvToSrcAP.getAP(0));
+
+                Vertex rcvToTrgAP = null;
+                List<Vertex> candidateRCVsTrg = fragSpace.getRCVsForAPClass(trgAP.getAPClass());
+                if (candidateRCVsTrg.size()>0)
+                {
+                    rcvToTrgAP = rng.randomlyChooseOne(candidateRCVsTrg);
+                } else {
+                    rcvToTrgAP = FragmentSpace.getPolarizedRCV(false);
+                }
+                receivingGraph.appendVertexOnAP(trgAP, rcvToTrgAP.getAP(0));
+            
+                receivingGraph.addRing(rcvToSrcAP, rcvToTrgAP, 
+                    linkTypesToCreate.get(apOnIncomingGraph));
+            } else {
+                Edge edge = new Edge(srcAP,trgAP, 
+                    linkTypesToCreate.get(apOnIncomingGraph));
+                receivingGraph.addEdge(edge);
+            } 
             doneApsOnNew.add(apOnIncomingGraph);
-        }
-
-        // TODO-gg: Convert cycles of edges to ringsout to regenerate them
-
-        // Remove all rings in the graph that will become the result: we are about to regenerate 
-        // rings according to the changes to the graph
-        for (Ring ring : ringFromReceivingGraph)
-        {
-            receivingGraph.removeRing(ring);
         }
     
         // Regenerate rings for either of the two graphs, and those simple
@@ -2611,7 +2654,7 @@ public class DGraph implements Cloneable
             try {
                 path = new PathSubGraph(head, tail);
             } catch (DENOPTIMException e) {
-                // No path connects the head and tail, do the ring is broken
+                // No path connects the head and tail, so the ring is broken
                 // but the connection needs to be restored as an edge
                 replaceChordWithEdge(ring);
             }
@@ -2861,7 +2904,7 @@ public class DGraph implements Cloneable
                         graphAdded.getVertexAtPosition(0).getAP(e.getValue()));
             }
             
-            if (!DGraph.replaceSingleSubGraph(apMap))
+            if (!DGraph.replaceSingleSubGraph(apMap, fragSpace))
             {
                 return false;
             }
@@ -7177,7 +7220,7 @@ public class DGraph implements Cloneable
                             
                             List<Vertex> oldSubG = new ArrayList<Vertex>();
                             oldSubG.add(vertexToChange);
-                            DGraph.replaceSingleSubGraph(apMap);
+                            DGraph.replaceSingleSubGraph(apMap, fragSpace);
                         }
                     }
                     
@@ -7889,6 +7932,10 @@ public class DGraph implements Cloneable
     //TODO-gg del
     public void importAPsEnvironment(APMapping apMapping) throws DENOPTIMException
     {
+        //TODO-gg fix if not deleted: this is just a placeholder
+        FragmentSpace fragSpace = null;
+
+
         List<Vertex> subGrpVrtxs = new ArrayList<>();
         DGraph incomingGraph = null;
         List<Vertex> verticesToRemoveFromThisGraph = new ArrayList<>();
@@ -7963,7 +8010,7 @@ public class DGraph implements Cloneable
             incomingGraph.removeVertex(v);
         }
 
-        DGraph.replaceSingleSubGraph(apMap);
+        DGraph.replaceSingleSubGraph(apMap, fragSpace);
     }
 
 //------------------------------------------------------------------------------
