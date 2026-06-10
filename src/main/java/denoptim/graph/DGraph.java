@@ -1768,6 +1768,32 @@ public class DGraph implements Cloneable
         
         return !this.containsVertex(vertex);
     }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Deletes a vertex and, optionally, its symmetric couinterparts.
+     * @param v the vertex to delete.
+     * @param symmetry use <code>true</code> to enforce deletion of all
+     * symmetric vertices.
+     */
+
+    public void removeVertexAndSymmetricOnes(Vertex v, boolean symmetry)
+    {
+        if (hasSymmetryInvolvingVertex(v) && symmetry)
+        {
+            SymmetricVertexes ss = getSymSetForVertex(v);
+            for (Vertex sv : ss)
+            {
+                removeVertex(sv);
+            }
+            symVertices.remove(ss);
+        }
+        else
+        {
+            removeVertex(v);
+        }
+    }
     
 //------------------------------------------------------------------------------
     
@@ -7245,7 +7271,8 @@ public class DGraph implements Cloneable
                     for (Vertex vertexToRemove : matches)
                     {
                         if (modGraph.containsVertex(vertexToRemove))
-                            modGraph.removeVertex(vertexToRemove);
+                            modGraph.removeVertexAndSymmetricOnes(vertexToRemove,
+                                    symmetry);
                     }
                     break;
                 }
