@@ -1,0 +1,46 @@
+[
+  {
+    "task": "CHANGESUBGRAPH",
+    "apQueriesOnTargetGraph": [
+      {
+        "apClass": {
+          "rule": "RuX",
+          "subClass": 0
+        }
+      },
+      {
+        "apClass": {
+          "rule": "RuX",
+          "subClass": 0
+        }
+      },
+      {
+        "apClass": {
+          "rule": "RuL",
+          "subClass": 0
+        }
+      }
+    ],
+    "apQueriesOnIncomingGraph": [
+      {
+        "apClass": {
+          "rule": "RuX",
+          "subClass": 0
+        }
+      },
+      {
+        "apClass": {
+          "rule": "RuX",
+          "subClass": 0
+        }
+      },
+      {
+        "apClass": {
+          "rule": "RuL",
+          "subClass": 0
+        }
+      }
+    ],
+    "incomingGraphPathname": "incomingGraphs-12.sdf"
+  }
+]

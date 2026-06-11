@@ -19,6 +19,7 @@
 package denoptim.utils;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.AttachmentPoint;
@@ -42,6 +43,25 @@ public class GraphEdit
     private EditTask task = null;
 
     /**
+     * Defined the max number of output graphs resulting from application
+     * of the graph editing task. Serves as limit to prevent hanging on 
+     * combinatorial explorion.
+     */
+    private int maxOutputGraphs = 10;
+
+    /**
+     * List of queries identifying an ordered list of {@link AttachmentPoint}s
+     * that may be used to identify a subgraph in the target graph.
+     */
+    private List<AttachmentPointQuery> apQueriesOnTargetGraph = null;
+
+    /**
+     * List of queries identifying an ordered list of {@link AttachmentPoint}s
+     * that may be used to identify a subgraph in the incoming graph.
+     */
+    private List<AttachmentPointQuery> apQueriesOnIncomingGraph = null;
+
+    /**
      * Query identifying the vertex that is the center of our attention when
      * performing the graph editing task. 
      * Depending on the type of task the vertex it
@@ -56,6 +76,11 @@ public class GraphEdit
      * performing the graph editing task.
      */
     private EdgeQuery edgeQuery = null;
+
+    /**
+     * The pathname to a file where to read the incoming graph from.
+     */
+    private String incomingGraphPathname = null;
     
     /**
      * The incoming graph for tasks that involve appending a subgraph onto
@@ -90,8 +115,8 @@ public class GraphEdit
     /**
      * Mapping of {@link AttachmentPoint}s between the current (first entry) and
      * the incoming vertices (second entry) to be enforced when performing
-     * {@link EditTask#CHANGEVERTEX}. Values are indexes of APs in the
-     * respective AP lists.
+     * {@link EditTask#CHANGEVERTEX} or {@link EditTask#CHANGESUBGRAPH} tasks. 
+     * Values are indexes of APs in the respective AP lists.
      */
     private LinkedHashMap<Integer, Integer> incomingAPMap;
     
@@ -124,11 +149,10 @@ public class GraphEdit
         CHANGEVERTEX,
 
         /**
-         * Repeatedly adds the subgraph environment of the matched 
-         * vertex (i.e., the part of the graph that is connected to the vertex)
-         * onto one or more vertexes matching the vertex query.
+         * Changes any subgraph matching the subgraph query with the subgraph 
+         * (or part of it) given as input and using the given AP mapping mask.
          */
-        COPYPASTEVERTEXENVIRONMENT
+        CHANGESUBGRAPH
     }
 
 //------------------------------------------------------------------------------
@@ -158,7 +182,21 @@ public class GraphEdit
     {
         return incomingGraph;
     }
-    
+
+//------------------------------------------------------------------------------
+
+    public void setIncomingGraphPathname(String incomingGraphPathname)
+    {
+        this.incomingGraphPathname = incomingGraphPathname;
+    }
+
+//------------------------------------------------------------------------------
+
+    public String getIncomingGraphPathname()
+    {
+        return incomingGraphPathname;
+    }
+
 //------------------------------------------------------------------------------
 
     public GraphEdit(EditTask task)
@@ -171,6 +209,20 @@ public class GraphEdit
     public EditTask getType() 
     {
         return task;
+    }
+
+//------------------------------------------------------------------------------
+
+    public List<AttachmentPointQuery> getTargetGraphAPQueries() 
+    {
+        return apQueriesOnTargetGraph;
+    }
+
+//------------------------------------------------------------------------------
+
+    public List<AttachmentPointQuery> getIncomingGraphAPQueries() 
+    {
+        return apQueriesOnIncomingGraph;
     }
 
 //------------------------------------------------------------------------------
@@ -224,4 +276,17 @@ public class GraphEdit
 
 //------------------------------------------------------------------------------
 
+    public int getMaxOutputGraphs()
+    {
+        return maxOutputGraphs;
+    }
+
+//------------------------------------------------------------------------------
+
+    public void setMaxOutputGraphs(int maxOutputGraphs)
+    {
+        this.maxOutputGraphs = maxOutputGraphs;
+    }
+
+//------------------------------------------------------------------------------
 }

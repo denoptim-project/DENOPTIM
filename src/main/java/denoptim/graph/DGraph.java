@@ -87,6 +87,7 @@ import denoptim.json.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters;
 import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.utils.AttachmentPointQuery;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphEdit;
@@ -6691,6 +6692,43 @@ public class DGraph implements Cloneable
 //-----------------------------------------------------------------------------
 
     /**
+     * Search the graph for {@link AttachmentPoint}s that match the criteria 
+     * defined in a list of queries.
+     * @param apQueries the list of queries defining what is that we want to find.
+     * @param logger manager of log
+     * @return the list of lists of attachment points that match the queries.
+     */
+    public List<List<AttachmentPoint>> findAPs(
+        List<AttachmentPointQuery> apQueries, Logger logger)
+    {
+        List<List<AttachmentPoint>> result = new ArrayList<>();
+        for (AttachmentPointQuery apQuery : apQueries)
+        {
+            result.add(findAPs(apQuery, logger));
+        }
+        return result;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Search the graph for {@link AttachmentPoint}s that match the criteria 
+     * defined in a query.
+     * @param apQuery the query defining what is that we want to find.
+     * @param logger manager of log
+     * @return the list of attachment points that match the query.
+     */
+    public List<AttachmentPoint> findAPs(AttachmentPointQuery apQuery, Logger logger)
+    {
+        List<AttachmentPoint> result = new ArrayList<>();
+
+        //TODO-gg implement
+        return result;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
      * Search a graph for vertices that match the criteria defined in a query
      * vertex.
      * @param query the query
@@ -6717,7 +6755,7 @@ public class DGraph implements Cloneable
      * @return the list of vertices that match the query.
      */
 
-    public ArrayList<Vertex> findVertices(VertexQuery vrtxQuery, Logger logger)
+    public List<Vertex> findVertices(VertexQuery vrtxQuery, Logger logger)
     {
         return findVertices(vrtxQuery, true,logger);
     }
@@ -6734,7 +6772,7 @@ public class DGraph implements Cloneable
      * @return the list of vertices that match the query.
      */
 
-    public ArrayList<Vertex> findVertices(VertexQuery vrtxQuery, 
+    public List<Vertex> findVertices(VertexQuery vrtxQuery, 
             boolean purgeSym, Logger logger)
     {
         ArrayList<Vertex> matches = new ArrayList<>(getVertexList());
@@ -7171,7 +7209,7 @@ public class DGraph implements Cloneable
                         }
                     }
                     
-                    ArrayList<Vertex> matches = modGraph.findVertices(query, 
+                    List<Vertex> matches = modGraph.findVertices(query, 
                             false, logger);
                     for (Vertex vertexToReplace : matches)
                     {
@@ -7204,7 +7242,7 @@ public class DGraph implements Cloneable
                             && edit.getIncomingBBType() != null
                             && edit.getIncomingGraph() == null)
                     {
-                        ArrayList<Vertex> matches = modGraph.findVertices(
+                        List<Vertex> matches = modGraph.findVertices(
                                 edit.getVertexQuery(), false, logger);
                         for (Vertex vertexToChange : matches)
                         {
@@ -7227,7 +7265,7 @@ public class DGraph implements Cloneable
                         // Since the replaceSingleSubGraph method below does not
                         // deal with symmetry, we keep symmetrically-redundant
                         // matches
-                        ArrayList<Vertex> matches = modGraph.findVertices(
+                        List<Vertex> matches = modGraph.findVertices(
                                 edit.getVertexQuery(), false, logger);
                         
                         for (Vertex vertexToChange : matches)
@@ -7252,9 +7290,69 @@ public class DGraph implements Cloneable
                     
                     break;
                 }
+                case CHANGESUBGRAPH:
+                {
+                    // Identify the APs that are involved within this graph (well, it's clone)
+                    List<List<AttachmentPoint>> apMatchesOnGraph = modGraph.findAPs(
+                        edit.getTargetGraphAPQueries(), logger);
+                    for (List<AttachmentPoint> aps : apMatchesOnGraph)
+                    {
+                        if (aps.size() ==0)
+                        {
+                            throw new IllegalStateException(
+                                "No APs found for the target graph. "
+                                + "Cannot perform " + edit.getType() + ".");
+                        } else if (aps.size() > 1)
+                        {
+                            throw new IllegalStateException(
+                                "Expected 1 AP matching the query on the target "
+                                + "graph, but found " + aps.size() 
+                                + ". Cannot perform " + edit.getType() + ".");
+                        }
+                    }
+
+                    // Identify the APs that are involved within the incoming graph
+                    DGraph incomingGraph = edit.getIncomingGraph();
+                    List<List<AttachmentPoint>> apMatchesOnIncomingGraph = incomingGraph.findAPs(
+                        edit.getIncomingGraphAPQueries(), logger);
+                    for (List<AttachmentPoint> aps : apMatchesOnIncomingGraph)
+                    {
+                        if (aps.size() ==0)
+                        {
+                            throw new IllegalStateException(
+                                "No APs found for the incoming graph. "
+                                + "Cannot perform " + edit.getType() + ".");
+                        } else if (aps.size() > 1)
+                        {
+                            throw new IllegalStateException(
+                                "Expected 1 AP matching the query on the incoming "
+                                + "graph, but found " + aps.size() 
+                                + ". Cannot perform " + edit.getType() + ".");
+                        }
+                    }
+
+                    if (apMatchesOnGraph.get(0).size() 
+                        != apMatchesOnIncomingGraph.get(0).size())
+                    {
+                        throw new IllegalStateException(
+                            "The number of APs on the target graph and the incoming "
+                            + "graph do not match. Cannot perform " + edit.getType() + ".");
+                    }
+
+                    APMapping apMapping = new APMapping();
+                    for (int i = 0; i < apMatchesOnGraph.get(0).size(); i++)
+                    {
+                        apMapping.put(apMatchesOnGraph.get(0).get(i), 
+                        apMatchesOnIncomingGraph.get(0).get(i));
+                    }
+
+                    // Perform the actual subgraph replacement
+                    DGraph.replaceSingleSubGraph(apMapping, fragSpace);
+                    break;
+                }
                 case DELETEBRANCH:
                 {
-                    ArrayList<Vertex> matches = modGraph.findVertices(
+                    List<Vertex> matches = modGraph.findVertices(
                             edit.getVertexQuery(), false, logger);
                     for (Vertex vertexToRemove : matches)
                     {
@@ -7266,7 +7364,7 @@ public class DGraph implements Cloneable
                 }
                 case DELETEVERTEX:
                 {
-                    ArrayList<Vertex> matches = modGraph.findVertices(
+                    List<Vertex> matches = modGraph.findVertices(
                             edit.getVertexQuery(), false, logger);
                     for (Vertex vertexToRemove : matches)
                     {
@@ -7274,78 +7372,6 @@ public class DGraph implements Cloneable
                             modGraph.removeVertexAndSymmetricOnes(vertexToRemove,
                                     symmetry);
                     }
-                    break;
-                }
-                case COPYPASTEVERTEXENVIRONMENT:
-                {
-                    // Query to find vertexes to work with on both this and 
-                    // the incoming graph
-                    VertexQuery query = edit.getVertexQuery();
-
-                    // Define the environment that will be used to wrap vertexes
-                    // in this graph
-                    DGraph incomingGraph = edit.getIncomingGraph();
-                    ArrayList<Vertex> matchesOnIncomingGraph = 
-                        incomingGraph.findVertices(query, false, logger);
-                    if (matchesOnIncomingGraph.size() == 0)
-                    {
-                        logger.log(Level.WARNING, "No vertex matching the query "
-                            + "on the incoming graph. Skipping " + edit.getType() + ".");
-                        continue;
-                    } else if (matchesOnIncomingGraph.size() > 1)
-                    {
-                        logger.log(Level.WARNING, "Expected 1 vertex matching the "
-                            + "query on the incoming graph, but found " 
-                            + matchesOnIncomingGraph.size() 
-                            + ". Using only the first one for " + edit.getType() + ".");
-                        continue;
-                    }
-                    Vertex envSeed = matchesOnIncomingGraph.get(0);
-
-                    // Identify the vertexes of this graph that will be wrapped
-                    ArrayList<Vertex> matchesOnThisGraph = modGraph.findVertices(
-                        query, false, logger);
-                    if (matchesOnThisGraph.size() == 0)
-                    {
-                        logger.log(Level.WARNING, "No vertex matching the query "
-                            + "on this graph. Skipping " + edit.getType() + ".");
-                        continue;
-                    } 
-                    
-                    // Symmetry labels will be used to trace symmetry relationships
-                    // across multiple subgraph additions.
-                    incomingGraph.reassignSymmetricLabels();
-
-                    // Do the actual changes to each vertex that matches the query
-                    for (Vertex vertexToWrap : matchesOnThisGraph)
-                    {
-                        DGraph localEnvGraph = incomingGraph.clone();
-                        Vertex localEnvSeed = localEnvGraph.getVertexWithId(
-                            envSeed.getVertexId());
-
-                        // Define the APMapping.
-                        // For now, we only take it from the definition of the 
-                        // editing task. In the future we could use APMapFinder 
-                        // to find all suitable AP mappings.
-                        //TODO: consider using APMapFinder.
-                        LinkedHashMap<Integer,Integer> apIdMap = edit.getAPMappig();
-                        APMapping apMapping = new APMapping();
-                        for (Map.Entry<Integer,Integer> e : apIdMap.entrySet())
-                        {
-                            int apIndexOnThisGraph = e.getKey();
-                            int apIndexOnLocalEnvGraph = e.getValue();
-                            AttachmentPoint apOnThisGraph = vertexToWrap.getAP(
-                                apIndexOnThisGraph);
-                            AttachmentPoint apOnLocalEnvGraph = localEnvSeed.getAP(
-                                apIndexOnLocalEnvGraph);
-                            apMapping.put(apOnThisGraph, apOnLocalEnvGraph);
-                        }
-
-                        // Do the actual graph editing
-                        modGraph.importAPsEnvironment(apMapping);
-                    }
-                    // Define symmetry across multiple subgraph additions.
-                    modGraph.convertSymmetricLabelsToSymmetricSets();
                     break;
                 }
             }
@@ -8038,167 +8064,6 @@ public class DGraph implements Cloneable
         }
 
         DGraph.replaceSingleSubGraph(apMap, fragSpace);
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Links the graph environment defined by a set of attachment points of an 
-     * incoming graph to the mapped set of attachment points of this graph.
-     * attachment points of this graph.
-     * We assume the following (and check for them):
-     * <ul>
-     * <li>the keys are the attachment points of this graph and the values
-     * are the attachment points of the incoming graph. </li>
-     * <li>the incoming graph is the same for all values.</li>
-     * <li>the keys are either not used or used as source of edges, not as targets.</li>
-     * <li>the values are either not used or used as target of edges, not as sources.</li>
-     * </ul>
-     * No copying or cloning of either graph. So the instances present in either 
-     * graph are those that will be found in the graph after the operation.
-     * Note that symmetry is not projected from the incoming graph to this graph 
-     * because this method could be replacing multiple subgraphs and cannot know
-     * how many symmetric vertexes will be found in the end. To handle symmetry,
-     * the user must call the method {@link DGraph#reassignSymmetricLabels()} before
-     * any call to this method, and then 
-     * {@link DGraph#convertSymmetricLabelsToSymmetricSets()} on the final graph.
-     * @param apMapping the mapping of attachment points between the two graphs. 
-     * @throws DENOPTIMException if the mapping is not consistent.
-     */
-
-    //TODO-gg del
-    public void importAPsEnvironment(APMapping apMapping, boolean FAKEARG) throws DENOPTIMException
-    {
-        // checks for consistency while identifying vertexes to remove
-        DGraph incomingGraph = null;
-        List<Vertex> verticesToRemoveFromThisGraph = new ArrayList<>();
-        List<Vertex> verticesToKeepFromIncomingGraph = new ArrayList<>();
-        LinkedHashMap<AttachmentPoint,BondType> 
-            linkTypesToCreate = new LinkedHashMap<>();
-        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMapping.entrySet())
-        {
-            AttachmentPoint apOnThisGraph = e.getKey();
-            AttachmentPoint apOnIncomingGraph = e.getValue();
-            if (apOnThisGraph.getOwner().getGraphOwner() != this)
-            {
-                throw new DENOPTIMException("The attachment point " 
-                    + apOnThisGraph.getID() + " is not part of this graph.");
-            }
-            if (incomingGraph == null)
-            {
-                incomingGraph = apOnIncomingGraph.getOwner().getGraphOwner();
-            } else if (incomingGraph != apOnIncomingGraph.getOwner().getGraphOwner())
-            {
-                throw new DENOPTIMException("The incoming graph is not the same "
-                    + "for all attachment points.");
-            }
-
-            // collect all vertexes to remove from this graph
-            if (!apOnThisGraph.isAvailableThroughout())
-            {
-                if (!apOnThisGraph.isSrcInUserThroughout())
-                {
-                    throw new DENOPTIMException("The attachment point " 
-                        + apOnThisGraph.getID() + " is used as target of an edge. "
-                        + "This violates the condition for importing the APs "
-                        + "environment. Check your input.");
-                }
-                List<Vertex> childrenTree = new ArrayList<Vertex>();
-                getChildrenTree(apOnThisGraph.getLinkedAPThroughout().getOwner(), 
-                    childrenTree);
-                verticesToRemoveFromThisGraph.add(
-                    apOnThisGraph.getLinkedAPThroughout().getOwner());
-                verticesToRemoveFromThisGraph.addAll(childrenTree);
-
-                // Keep track of the link type to recreate
-                linkTypesToCreate.put(apOnThisGraph, 
-                    apOnThisGraph.getEdgeUser().getBondType());
-            }
-
-            // collect all vertexes to keep from incoming graph
-            List<Vertex> childrenTreeOnInGraph = new ArrayList<Vertex>();
-            getChildrenTree(apOnIncomingGraph.getOwner(), childrenTreeOnInGraph);
-            verticesToKeepFromIncomingGraph.add(apOnIncomingGraph.getOwner());
-            verticesToKeepFromIncomingGraph.addAll(childrenTreeOnInGraph);
-            if (!apOnIncomingGraph.isAvailableThroughout())
-            {
-                if (apOnIncomingGraph.isSrcInUserThroughout())
-                {
-                    throw new DENOPTIMException("The attachment point " 
-                        + apOnIncomingGraph.getID() + " is used as source of an edge. "
-                        + "This violates the condition for importing the APs "
-                        + "environment. Check your input.");
-                }
-            }
-        }
-        if (incomingGraph == null)
-        {
-            throw new DENOPTIMException("The incoming graph is null.");
-        }
-
-        // Remove vertexes from this graph
-        for (Vertex v : verticesToRemoveFromThisGraph)
-        {
-            removeVertex(v);
-        }
-
-        // Keep track of the rings to rebuild in the incoming graph
-        Map<Vertex, Vertex> ringVerticesMap = new HashMap<Vertex, Vertex>();
-        for (Ring ring : incomingGraph.getRings())
-        {
-            ringVerticesMap.put(ring.getHeadVertex(), ring.getTailVertex());
-        }
-
-        // Remove vertexes from incoming graph
-        List<Vertex> verticesToRemoveFromIncomingGraph = new ArrayList<Vertex>();
-        for (Vertex v : incomingGraph.gVertices)
-        {
-            if (!verticesToKeepFromIncomingGraph.contains(v))
-            {
-                verticesToRemoveFromIncomingGraph.add(v);
-            }
-        }
-        for (Vertex v : verticesToRemoveFromIncomingGraph)
-        {
-            // This removes also the rings, but we have kept track of them
-            incomingGraph.removeVertex(v);
-        }
-
-        // Import vertexes from incoming graph to this graph
-        for (Vertex v : incomingGraph.getVertexList())
-        {
-            addVertex(v);
-        }
-
-        // Import edges from incoming graph to this graph
-        for (Edge incomingEdge : incomingGraph.getEdgeList())
-        {
-            addEdge(incomingEdge);
-        }
-
-        // import rings from incoming graph
-        for (Ring incomingRing : incomingGraph.getRings())
-        {
-            addRing(incomingRing);
-        }
-
-        // Connect the vertexes from incoming graph to this graph
-        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMapping.entrySet())
-        {
-            AttachmentPoint apOnThisGraph = e.getKey();
-            AttachmentPoint apOnIncomingGraph = e.getValue();
-            Edge edge = new Edge(apOnThisGraph,apOnIncomingGraph,
-                linkTypesToCreate.get(apOnThisGraph));
-            addEdge(edge);
-        }
-
-        // Rebuild the rings
-        for (Map.Entry<Vertex,Vertex> e : ringVerticesMap.entrySet())
-        {
-            Vertex headVertex = e.getKey();
-            Vertex tailVertex = e.getValue();
-            addRing(headVertex, tailVertex);
-        }
     }
     
 //------------------------------------------------------------------------------    

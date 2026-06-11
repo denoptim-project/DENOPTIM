@@ -1,0 +1,4 @@
+# Parameters for running the test
+GRAPHEDIT-INPUTGRAPHS=inGraphs-12.sdf
+GRAPHEDIT-GRAPHSEDITSFILE=editingTasks-12
+GRAPHEDIT-OUTPUTGRAPHS=outGraphs-12.sdf
