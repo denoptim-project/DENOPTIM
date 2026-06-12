@@ -20,12 +20,13 @@ package denoptim.utils;
 
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.Edge;
 import denoptim.graph.EdgeQuery;
+import denoptim.graph.Vertex;
 import denoptim.graph.VertexQuery;
 
 /**
  * Query for searching {@link AttachmentPoint}s.
- * @author Marco Foscato
  */
 
 public class AttachmentPointQuery 
@@ -53,7 +54,7 @@ public class AttachmentPointQuery
     /**
      * Query on the {@link Edge} using the target attachment point, or null.
      */
-    private EdgeQuery edgeQuery;
+    private EdgeQuery edgeQuery = null;
     
 
 //------------------------------------------------------------------------------
@@ -71,37 +72,54 @@ public class AttachmentPointQuery
 
 //------------------------------------------------------------------------------
 
-    public Long getAttachmentPointId()
+    /**
+     * Tests whether the given attachment point satisfies all non-null criteria
+     * in this query.
+     * @param ap the attachment point to test
+     * @return {@code true} if the attachment point matches, {@code false}
+     * otherwise
+     */
+    public boolean matches(AttachmentPoint ap)
     {
-        return attachmentPointId;
-    }
+        if (attachmentPointId != null && ap.getID() != attachmentPointId)
+        {
+            return false;
+        }
 
-//------------------------------------------------------------------------------
+        if (attachmentPointIndex != null
+                && ap.getIndexInOwner() != attachmentPointIndex)
+        {
+            return false;
+        }
 
-    public Integer getAttachmentPointIndex()
-    {
-        return attachmentPointIndex;
-    }
+        if (apClass != null)
+        {
+            if (ap.getAPClass() == null || !ap.getAPClass().equals(apClass))
+            {
+                return false;
+            }
+        }
 
-//------------------------------------------------------------------------------
+        if (vertexQuery != null)
+        {
+            Vertex owner = ap.getOwner();
+            if (owner == null
+                    || !vertexQuery.matches(owner))
+            {
+                return false;
+            }
+        }
 
-    public APClass getAPClass()
-    {
-        return apClass;
-    }
+        if (edgeQuery != null)
+        {
+            Edge user = ap.getEdgeUser();
+            if (user == null || !edgeQuery.matches(user))
+            {
+                return false;
+            }
+        }
 
-//------------------------------------------------------------------------------
-
-    public VertexQuery getVertexQuery()
-    {
-        return vertexQuery;
-    }
-
-//------------------------------------------------------------------------------
-
-    public EdgeQuery getEdgeQuery()
-    {
-        return edgeQuery;
+        return true;
     }
 
 //------------------------------------------------------------------------------

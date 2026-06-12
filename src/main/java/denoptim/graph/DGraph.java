@@ -6720,10 +6720,19 @@ public class DGraph implements Cloneable
      */
     public List<AttachmentPoint> findAPs(AttachmentPointQuery apQuery, Logger logger)
     {
-        List<AttachmentPoint> result = new ArrayList<>();
+        logger.log(Level.FINE, "AP candidates: " + getAttachmentPoints());
+        
+        List<AttachmentPoint> matches = new ArrayList<>();
+        for (AttachmentPoint ap : getAttachmentPoints())
+        {
+            if (apQuery.matches(ap))
+            {
+                matches.add(ap);
+            }
+        }
 
-        //TODO-gg implement
-        return result;
+        logger.log(Level.FINE, "AP matches: " + matches);
+        return matches;
     }
 
 //-----------------------------------------------------------------------------
@@ -6775,265 +6784,59 @@ public class DGraph implements Cloneable
     public List<Vertex> findVertices(VertexQuery vrtxQuery, 
             boolean purgeSym, Logger logger)
     {
-        ArrayList<Vertex> matches = new ArrayList<>(getVertexList());
+        logger.log(Level.FINE, "Candidates: " + getVertexList());
 
-        logger.log(Level.FINE, "Candidates: " + matches);
+        List<Vertex> matches = new ArrayList<>();
+        for (Vertex v : getVertexList())
+        {
+            if (vrtxQuery.matches(v))
+            {
+                matches.add(v);
+            }
+        }
 
-        //Check condition vertex ID
-        Long vidQuery = vrtxQuery.getVertexIDQuery();
-        if (vidQuery != null)
-        {
-            ArrayList<Vertex> newLst = new ArrayList<>();
-            for (Vertex v : matches)
-            {
-                if (v.getVertexId() == vidQuery.intValue())
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-        }
-        logger.log(Level.FINE,"  After filtering by vertex ID: " + matches);
-        
-        //Check condition vertex type (NB: essentially the vertex implementation
-        VertexType vtQuery = vrtxQuery.getVertexTypeQuery();
-        if (vtQuery != null)
-        {
-            ArrayList<Vertex> newLst = new ArrayList<>();
-            for (Vertex v : matches)
-            {
-                if (v.getVertexType() == vtQuery)
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-            logger.log(Level.FINER, "  After filtering by vertex type: "
-                    + matches);
-        }
-        
-        //Check condition building block Type
-        BBType bbtQuery = vrtxQuery.getVertexBBTypeQuery();
-        if (bbtQuery != null)
-        {
-            ArrayList<Vertex> newLst = new ArrayList<>();
-            for (Vertex v : matches)
-            {
-                if (v.getBuildingBlockType() == bbtQuery)
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-            logger.log(Level.FINER, "  After filtering by building block "
-                        + "type: " + matches);
-        }
-        
-        //Check condition building block ID
-        Integer bbID = vrtxQuery.getVertexBBIDQuery();
-        if (bbID != null)
-        {
-            ArrayList<Vertex> newLst = new ArrayList<>();
-            for (Vertex v : matches)
-            {   
-                if (v.getBuildingBlockId() == bbID.intValue())
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-            logger.log(Level.FINER, "  After filtering by building block ID: " 
-                        + matches);
-        } 
+        logger.log(Level.FINE, "Matches: " + matches);
 
-        //Check condition: level of vertex
-        Integer levelQuery = vrtxQuery.getVertexLevelQuery();
-        if (levelQuery != null)
-        {
-            ArrayList<Vertex> newLst = new ArrayList<Vertex>();
-            for (Vertex v : matches)
-            {
-                if (getLevel(v) == levelQuery)
-                {
-                    newLst.add(v);
-                }
-            }
-            matches = newLst;
-            logger.log(Level.FINER, "  After filtering by level: " + matches);
-        }
-        
-        logger.log(Level.FINE, "After all vertex-based filters: " + matches);
-        
-        List<EdgeQuery> inAndOutEdgeQueries = new ArrayList<>();
-        inAndOutEdgeQueries.add(vrtxQuery.getInEdgeQuery());
-        inAndOutEdgeQueries.add(vrtxQuery.getOutEdgeQuery());
-        for (int i=0; i<2; i++) 
-        {
-            String inOrOut = "";
-            if (i==0)
-                inOrOut = "incoming";
-            else 
-                inOrOut = "ourgoing";
-            
-            EdgeQuery edgeQuery = inAndOutEdgeQueries.get(i);
-            if (edgeQuery == null)
-            {
-                continue;
-            }
-            
-            EdgeFinder edgeFinder = new EdgeFinder(i-1);
-            
-            Integer eTrgApIDx = edgeQuery.getTargetAPIdx();
-            if (eTrgApIDx != null)
-            {
-                ArrayList<Vertex> newLst = new ArrayList<>();
-                for (Vertex v : matches)
-                {
-                    for (Edge e : edgeFinder.apply(v))
-                    {
-                        if (e.getTrgAPID() == eTrgApIDx)
-                        {
-                            newLst.add(v);
-                            break;
-                        }
-                    }
-                }
-                matches = newLst;
-                logger.log(Level.FINER, "  After " + inOrOut 
-                            + " edge trgAPID filter: " + matches);
-            }
-            
-            Integer eInSrcApIDx = edgeQuery.getSourceAPIdx();
-            if (eInSrcApIDx != null)
-            {
-                ArrayList<Vertex> newLst = new ArrayList<>();
-                for (Vertex v : matches)
-                {
-                    for (Edge e : edgeFinder.apply(v))
-                    {
-                        if (e != null && e.getSrcAPID() == eInSrcApIDx)
-                        {
-                            newLst.add(v);
-                            break;
-                        }
-                    }
-                }
-                matches = newLst;
-                logger.log(Level.FINER, "  After " + inOrOut 
-                            + " edge srcAPID filter: " + matches);
-            }
-            
-            if (i==0)
-            {
-                Long eSrcVrtID = edgeQuery.getSourceVertexId();
-                if (eSrcVrtID != null)
-                {
-                    ArrayList<Vertex> newLst = new ArrayList<>();
-                    for (Vertex v : matches)
-                    {
-                        for (Edge e : edgeFinder.apply(v))
-                        {
-                            if(e.getSrcAP().getOwner().getVertexId()==eSrcVrtID)
-                            {
-                                newLst.add(v);
-                                break;
-                            }
-                        }
-                    }
-                    matches = newLst;
-                    logger.log(Level.FINER, "  After " + inOrOut 
-                                + " edge src VertexID filter: " + matches);
-                }
-            } else if (i==1) {
-                Long eTrgVrtID = edgeQuery.getTargetVertexId();
-                if (eTrgVrtID != null)
-                {
-                    ArrayList<Vertex> newLst = new ArrayList<>();
-                    for (Vertex v : matches)
-                    {
-                        for (Edge e : edgeFinder.apply(v))
-                        {
-                            if(e.getTrgAP().getOwner().getVertexId()==eTrgVrtID)
-                            {
-                                newLst.add(v);
-                                break;
-                            }
-                        }
-                    }
-                    matches = newLst;
-                    logger.log(Level.FINER, "  After " + inOrOut 
-                                + " edge trg VertexID filter: " + matches);
-                }
-            }
-
-            BondType btQuery = edgeQuery.getBondType();
-            if (btQuery != null)
-            {
-                ArrayList<Vertex> newLst = new ArrayList<>();
-                for (Vertex v : matches)
-                {
-                    for (Edge e : edgeFinder.apply(v))
-                    {
-                        if (e.getBondType() == btQuery)
-                        {
-                            newLst.add(v);
-                            break;
-                        }
-                    }
-                }
-                matches = newLst;
-                logger.log(Level.FINER, "  After " + inOrOut 
-                            + " edge bond type filter: " + matches);
-            }
-
-            APClass srcAPC = edgeQuery.getSourceAPClass();
-            if (srcAPC != null)
-            {
-                ArrayList<Vertex> newLst = new ArrayList<>();
-                for (Vertex v : matches)
-                {
-                    for (Edge e : edgeFinder.apply(v))
-                    {
-                        if (e.getSrcAPClass().equals(srcAPC))
-                        {
-                            newLst.add(v);
-                            break;
-                        }
-                    }
-                }
-                matches = newLst;
-            }
-            
-            APClass trgAPC = edgeQuery.getTargetAPClass();
-            if (trgAPC != null)
-            {
-                ArrayList<Vertex> newLst = new ArrayList<>();
-                for (Vertex v : matches)
-                {
-                    for (Edge e : edgeFinder.apply(v))
-                    {
-                        if (e.getTrgAPClass().equals(trgAPC))
-                        {
-                            newLst.add(v);
-                            break;
-                        }
-                    }
-                }
-                matches = newLst;
-            }
-            logger.log(Level.FINER, "After all " + inOrOut 
-                        + " edge-based filters: " + matches);
-        }
-    
-        // Identify symmetric sets and keep only one member
         if (purgeSym)
+        {
             removeSymmetryRedundance(matches);
+        }
 
         logger.log(Level.FINE, "Final Matches (after symmetry): " + matches);
 
         return matches;
     }
-    
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Search this graph for edges that match the criteria defined in a query.
+     * @param edgeQuery the query; a {@code null} query matches all edges.
+     * @param logger manager of log
+     * @return the list of edges that match the query.
+     */
+    public List<Edge> findEdges(EdgeQuery edgeQuery, Logger logger)
+    {
+        ArrayList<Edge> matches = new ArrayList<>(getEdgeList());
+        logger.log(Level.FINE, "Edge candidates: " + matches);
+
+        if (edgeQuery == null)
+        {
+            return matches;
+        }
+
+        ArrayList<Edge> newLst = new ArrayList<>();
+        for (Edge e : matches)
+        {
+            if (edgeQuery.matches(e))
+            {
+                newLst.add(e);
+            }
+        }
+        logger.log(Level.FINE, "Edge matches: " + newLst);
+        return newLst;
+    }
+
 //-----------------------------------------------------------------------------
     
     /**

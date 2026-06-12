@@ -19,6 +19,7 @@
 package denoptim.graph;
 
 import denoptim.graph.Edge.BondType;
+import denoptim.utils.AttachmentPointQuery;
 
 /**
  * A query for edges: a list of properties that target edges should possess in 
@@ -26,120 +27,116 @@ import denoptim.graph.Edge.BondType;
  */
 public class EdgeQuery
 {
+    /** 
+     * Query for src vertex.
+     */
+    private VertexQuery srcVertexQuery = null;
 
     /**
-     * The vertex id of the source fragment
+     * Query for trg vertex.
      */
-    private Long srcVertexId = null; 
-    
+    private VertexQuery trgVertexQuery = null;
+
     /**
-     * the vertex id of the destination fragment
+     * Query for src AP.
      */
-    private Long trgVertexId = null; 
-    
+    private AttachmentPointQuery srcAPQuery = null;
+
     /**
-     * The index of the attachment point in the list of DAPs associated
-     * with the source fragment
+     * Query for trg AP.
      */
-    private Integer srcAPID = null;
-    
-    /**
-     * The index of the attachment point in the list of DAPs associated
-     * with the target fragment
-     */
-    private Integer trgAPID = null;
+    private AttachmentPointQuery trgAPQuery = null;
 
     /**
      * The bond type associated with the connection between the fragments
      */
     private BondType bondType = null;
     
+//------------------------------------------------------------------------------
+
     /**
-     * The class associated with the source AP
+     * Constructor from nested vertex and attachment point queries.
+     * @param srcVertexQuery query for the source vertex, or null
+     * @param trgVertexQuery query for the target vertex, or null
+     * @param srcAPQuery query for the source attachment point, or null
+     * @param trgAPQuery query for the target attachment point, or null
+     * @param bondType query for the bond type, or null
      */
-    private APClass srcAPC = null;
-    
+    public EdgeQuery(VertexQuery srcVertexQuery, VertexQuery trgVertexQuery,
+            AttachmentPointQuery srcAPQuery, AttachmentPointQuery trgAPQuery,
+            BondType bondType)
+    {
+        this.srcVertexQuery = srcVertexQuery;
+        this.trgVertexQuery = trgVertexQuery;
+        this.srcAPQuery = srcAPQuery;
+        this.trgAPQuery = trgAPQuery;
+        this.bondType = bondType;
+    }
+
+//------------------------------------------------------------------------------
+
     /**
-     * The class associated with the target AP
+     * Builds an edge query from the legacy flat parameters.
      */
-    private APClass trgAPC = null;
+    public static EdgeQuery make(Long srcVertexId, Long trgVertexId,
+            Integer srcAPIdx, Integer trgAPIdx,
+            BondType bondType, APClass srcAPC, APClass trgAPC)
+    {
+        VertexQuery srcVq = srcVertexId == null ? null
+                : new VertexQuery(srcVertexId, null, null, null, null, null);
+        VertexQuery trgVq = trgVertexId == null ? null
+                : new VertexQuery(trgVertexId, null, null, null, null, null);
+        AttachmentPointQuery srcApQ = (srcAPIdx == null && srcAPC == null)
+                ? null
+                : new AttachmentPointQuery(null, srcAPIdx, srcAPC, null, null);
+        AttachmentPointQuery trgApQ = (trgAPIdx == null && trgAPC == null)
+                ? null
+                : new AttachmentPointQuery(null, trgAPIdx, trgAPC, null, null);
+        return new EdgeQuery(srcVq, trgVq, srcApQ, trgApQ, bondType);
+    }
     
 //------------------------------------------------------------------------------
-    
+
     /**
-     * Constructor for an edge from all parameters
-     * @param srcVertexId vertex ID of the source vertex
-     * @param trgVertexId vertex ID of the target vertex
-     * @param srcAPID index of the {@link AttachmentPoint} on the source
-     *  vertex
-     * @param trgAPID index of the {@link AttachmentPoint} on the target
-     *  vertex
-     * @param btype the bond type
-     * @param srcAPC the {@link APClass} on the source 
-     * {@link AttachmentPoint} .
-     * @param trgAPC the {@link APClass} on the target 
-     * {@link AttachmentPoint} .
+     * Tests whether the given edge satisfies this query.
+     * @param e the edge to test
+     * @return {@code true} if the edge matches, {@code false} otherwise
      */
-    public EdgeQuery(Long srcVertexId, Long trgVertexId, 
-            Integer srcAPID, Integer trgAPID, 
-            BondType bt, APClass srcAPC, APClass trgAPC)
+    public boolean matches(Edge e)
     {
-        this.srcVertexId = srcVertexId;
-        this.trgVertexId = trgVertexId;
-        this.srcAPID = srcAPID;
-        this.trgAPID = trgAPID;
-        this.bondType = bt;
-        this.srcAPC = srcAPC;
-        this.trgAPC = trgAPC;
-    }
-    
-//------------------------------------------------------------------------------
+        if (e == null)
+        {
+            return false;
+        }
 
-    public Long getSourceVertexId()
-    {
-        return srcVertexId;
-    }
-    
-//------------------------------------------------------------------------------
+        if (bondType != null && e.getBondType() != bondType)
+        {
+            return false;
+        }
 
-    public Integer getSourceAPIdx()
-    {
-        return srcAPID;
-    }
-    
-//------------------------------------------------------------------------------
+        if (srcVertexQuery != null
+                && !srcVertexQuery.matches(e.getSrcAP().getOwner()))
+        {
+            return false;
+        }
 
-    public Integer getTargetAPIdx()
-    {
-        return trgAPID;
-    }        
+        if (trgVertexQuery != null
+                && !trgVertexQuery.matches(e.getTrgAP().getOwner()))
+        {
+            return false;
+        }
 
-//------------------------------------------------------------------------------
+        if (srcAPQuery != null && !srcAPQuery.matches(e.getSrcAP()))
+        {
+            return false;
+        }
 
-    public Long getTargetVertexId()
-    {
-        return trgVertexId;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    public APClass getSourceAPClass()
-    {
-        return srcAPC;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    public APClass getTargetAPClass()
-    {
-        return trgAPC;
-    }       
-    
-//------------------------------------------------------------------------------
+        if (trgAPQuery != null && !trgAPQuery.matches(e.getTrgAP()))
+        {
+            return false;
+        }
 
-    public BondType getBondType()
-    {
-        return bondType;
+        return true;
     }
 
 //------------------------------------------------------------------------------    

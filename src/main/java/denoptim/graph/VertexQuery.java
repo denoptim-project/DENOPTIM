@@ -23,7 +23,6 @@ import denoptim.graph.Vertex.VertexType;
 
 /**
  * Query for searching vertices.
- * @author Marco Foscato
  */
 
 public class VertexQuery
@@ -116,54 +115,94 @@ public class VertexQuery
         this(vID, vType, bbType, bbID, level, eIn);
         this.outgoingEdgeQuery = eOut;
     }
-	
+
 //------------------------------------------------------------------------------
 
-    public VertexType getVertexTypeQuery()
+    /**
+     * Tests whether the given vertex satisfies all non-null criteria in this
+     * query.
+     * @param v the vertex to test
+     * @return {@code true} if the vertex matches, {@code false} otherwise
+     */
+    public boolean matches(Vertex v)
     {
-    	return vertexType;
+        if (vertexId != null && v.getVertexId() != vertexId)
+        {
+            return false;
+        }
+
+        if (vertexType != null && v.getVertexType() != vertexType)
+        {
+            return false;
+        }
+
+        if (buildingBlockType != null && v.getBuildingBlockType() != buildingBlockType)
+        {
+            return false;
+        }
+
+        if (buildingBlockId != null && v.getBuildingBlockId() != buildingBlockId)
+        {
+            return false;
+        }
+
+        if (level != null)
+        {
+            if (v.getGraphOwner() == null)
+            {
+                return false;
+            }
+            int vertexLevel = v.getGraphOwner().getLevel(v);
+            if (vertexLevel != level)
+            {
+                return false;
+            }
+        }
+
+        if (incomingEdgeQuery != null
+                && !matchesAnyEdge(v, incomingEdgeQuery, true))
+        {
+            return false;
+        }
+
+        if (outgoingEdgeQuery != null
+                && !matchesAnyEdge(v, outgoingEdgeQuery, false))
+        {
+            return false;
+        }
+
+        return true;
     }
-    
-//------------------------------------------------------------------------------
-
-    public Long getVertexIDQuery()
-    {
-        return vertexId;
-    }
 
 //------------------------------------------------------------------------------
 
-    public BBType getVertexBBTypeQuery()
+    private static boolean matchesAnyEdge(Vertex v, EdgeQuery edgeQuery,
+            boolean incoming)
     {
-        return buildingBlockType;
-    }
-
-//------------------------------------------------------------------------------
-
-    public Integer getVertexBBIDQuery()
-    {
-        return buildingBlockId;
-    }
-
-//------------------------------------------------------------------------------
-    
-    public Integer getVertexLevelQuery()
-    {
-        return level;
-    }
-    
-//------------------------------------------------------------------------------
-
-    public EdgeQuery getInEdgeQuery()
-    {
-        return incomingEdgeQuery;
-    }
-
-//------------------------------------------------------------------------------
-
-    public EdgeQuery getOutEdgeQuery()
-    {
-        return outgoingEdgeQuery;
+        DGraph graph = v.getGraphOwner();
+        if (graph == null)
+        {
+            return false;
+        }
+        if (incoming)
+        {
+            for (Edge e : graph.getEdgesWithTrg(v))
+            {
+                if (edgeQuery.matches(e))
+                {
+                    return true;
+                }
+            }
+        } else {
+            for (Edge e : graph.getEdgesWithSrc(v))
+            {
+                if (edgeQuery.matches(e))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 //------------------------------------------------------------------------------
