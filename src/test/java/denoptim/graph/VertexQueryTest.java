@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -44,7 +45,7 @@ public class VertexQueryTest
     public void testMatchesAllNullCriteria()
     {
         VertexQuery query = new VertexQuery(null, null, null, null, null,
-                null, null);
+                null, null, null);
         for (Vertex v : graph.getVertexList())
         {
             assertTrue(query.matches(v));
@@ -59,7 +60,7 @@ public class VertexQueryTest
         Vertex v2 = graph.getVertexAtPosition(1);
         Vertex v7 = graph.getVertexAtPosition(5); //NB: vertexes are intentionally disordered!
         VertexQuery query = new VertexQuery(v7.getVertexId(), null, null, null,
-                null, null, null);
+                null, null, null, null);
         assertTrue(query.matches(v7));
         assertFalse(query.matches(v2));
     }
@@ -73,7 +74,7 @@ public class VertexQueryTest
         Vertex v2 = graph.getVertexAtPosition(1);
         Vertex v7 = graph.getVertexAtPosition(5); //NB: vertexes are intentionally disordered!
         VertexQuery query = new VertexQuery(null, VertexType.EmptyVertex, null,
-                null, null, null, null);
+                null, null, null, null, null);
         assertTrue(query.matches(v7));
         assertFalse(query.matches(v1));
         assertFalse(query.matches(v2));
@@ -88,12 +89,12 @@ public class VertexQueryTest
         Vertex v2 = graph.getVertexAtPosition(1);
         Vertex v7 = graph.getVertexAtPosition(5); //NB: vertexes are intentionally disordered!
         VertexQuery byType = new VertexQuery(null, null, BBType.SCAFFOLD, null, null,
-                null, null);
+                null, null, null);
         assertTrue(byType.matches(v1));
         assertFalse(byType.matches(v2));
 
         VertexQuery byId = new VertexQuery(null, null, null, 1, null, null,
-                null);
+                null, null);
         assertTrue(byId.matches(v2));
         assertFalse(byId.matches(v1));
     }
@@ -107,12 +108,12 @@ public class VertexQueryTest
         Vertex v2 = graph.getVertexAtPosition(1);
         Vertex v7 = graph.getVertexAtPosition(5); //NB: vertexes are intentionally disordered!
         VertexQuery query = new VertexQuery(null, null, null, null, -1,
-                null, null);
+                null, null, null);
         assertTrue(query.matches(v1));
         assertFalse(query.matches(v2));
         assertFalse(query.matches(v7));
         query = new VertexQuery(null, null, null, null, 1,
-            null, null);
+            null, null, null);
         assertTrue(query.matches(v7));
         assertFalse(query.matches(v1));
         assertFalse(query.matches(v2));
@@ -126,10 +127,11 @@ public class VertexQueryTest
         Vertex v1 = graph.getVertexAtPosition(0);
         Vertex v2 = graph.getVertexAtPosition(1);
         Vertex v4 = graph.getVertexAtPosition(3);
-        EdgeQuery incoming = EdgeQuery.make(null, null, null, null,
-                null, APClass.make("B",1), null);
+        EdgeQuery incoming = new EdgeQuery(null, null,
+                new AttachmentPointQuery(null, null, APClass.make("B",1), null, null, null), 
+                null, null);
         VertexQuery query = new VertexQuery(null, null, null, null, null,
-                incoming, null);
+                null, incoming, null);
 
         assertTrue(query.matches(v4));
         assertFalse(query.matches(v1));
@@ -144,10 +146,11 @@ public class VertexQueryTest
         Vertex v1 = graph.getVertexAtPosition(0);
         Vertex v2 = graph.getVertexAtPosition(1);
         Vertex v4 = graph.getVertexAtPosition(3);
-        EdgeQuery outgoing = EdgeQuery.make(null, null, null, null,
-                null, APClass.make("B",1), null);
+        EdgeQuery outgoing = new EdgeQuery(null, null,
+                new AttachmentPointQuery(null, null, APClass.make("B",1), null, null, null),
+                null, null);
         VertexQuery query = new VertexQuery(null, null, null, null, null, null,
-                outgoing);
+                null, outgoing);
 
         assertTrue(query.matches(v1));
         assertTrue(query.matches(v2));
@@ -162,12 +165,14 @@ public class VertexQueryTest
         Vertex v1 = graph.getVertexAtPosition(0);
         Vertex v2 = graph.getVertexAtPosition(1);
         Vertex v4 = graph.getVertexAtPosition(3);
-        EdgeQuery incoming = EdgeQuery.make(null, null, null, null, null,
-             null, APClass.make("B",1));
-        EdgeQuery outgoing = EdgeQuery.make(null, null, 1, null, null,
-             APClass.make("B",1), null);
+        EdgeQuery incoming = new EdgeQuery(null, null, null,
+            new AttachmentPointQuery(null, null, APClass.make("B",1), null, null, null),
+            null);
+        EdgeQuery outgoing = new EdgeQuery(null, null, 
+            new AttachmentPointQuery(null, 1, APClass.make("B",1), null, null, null), 
+            null, null);
         VertexQuery query = new VertexQuery(null, null, null, null, null,
-                incoming, outgoing);
+                null, incoming, outgoing);
 
         assertTrue(query.matches(v2));
         assertFalse(query.matches(v1));
@@ -177,12 +182,35 @@ public class VertexQueryTest
 //------------------------------------------------------------------------------
 
     @Test
+    public void testMatchesAttachmentPointQueries() throws DENOPTIMException
+    {
+        Vertex v1 = graph.getVertexAtPosition(0);
+        Vertex v2 = graph.getVertexAtPosition(1);
+        Vertex v4 = graph.getVertexAtPosition(3);
+
+        // At leas one ap with this class
+        AttachmentPointQuery apClB1 = new AttachmentPointQuery(null, null, 
+            APClass.make("B",1), null, null, null);
+
+        // More than two attachment points
+        AttachmentPointQuery apIdx = new AttachmentPointQuery(null, 2, null, null, null, null);
+
+        VertexQuery query = new VertexQuery(null, null, null, null, null,
+                Arrays.asList(apClB1, apIdx), null, null);
+
+        assertTrue(query.matches(v1));
+        assertFalse(query.matches(v2));
+        assertFalse(query.matches(v4));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
     public void testEmptyEdgeQueryFiltersVertices()
     {
-        EdgeQuery emptyEdgeQuery = EdgeQuery.make(null, null, null, null, null,
-                null, null);
-        VertexQuery query = new VertexQuery(null, null, null, null, null,
-                emptyEdgeQuery, emptyEdgeQuery);
+        EdgeQuery emptyEdgeQuery = new EdgeQuery();
+        VertexQuery query = new VertexQuery(null, null, null, null,
+                null, null, emptyEdgeQuery, emptyEdgeQuery);
 
         List<Vertex> matched = new ArrayList<>();
         for (Vertex v : graph.getVertexList())
@@ -202,7 +230,7 @@ public class VertexQueryTest
     public void testFindVerticesUsesMatches()
     {
         VertexQuery query = new VertexQuery(null, null, BBType.UNDEFINED,
-             null, 0, null, null);
+             null, 0, null, null, null);
         Logger logger = Logger.getLogger("test");
 
         List<Vertex> fromFind = graph.findVertices(query, false, logger);

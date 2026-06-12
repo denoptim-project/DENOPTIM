@@ -19,8 +19,6 @@ import org.junit.jupiter.api.Test;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
-import denoptim.utils.AttachmentPointQuery;
-
 /**
  * Unit tests for {@link EdgeQuery#matches(Edge)}.
  */
@@ -39,7 +37,7 @@ public class EdgeQueryTest
     @Test
     public void testMatchesNullEdge()
     {
-        EdgeQuery query = EdgeQuery.make(null, null, null, null, null, null, null);
+        EdgeQuery query = new EdgeQuery(null, null, null, null, null);
         assertFalse(query.matches(null));
     }
 
@@ -48,7 +46,7 @@ public class EdgeQueryTest
     @Test
     public void testMatchesAllNullCriteria()
     {
-        EdgeQuery query = EdgeQuery.make(null, null, null, null, null, null, null);
+        EdgeQuery query = new EdgeQuery(null, null, null, null, null);
         Edge edgeV0V1 = graph.getVertexAtPosition(1).getEdgeToParent();
         Edge edgeEV4EV5 = graph.getVertexAtPosition(5).getEdgeToParent();
         assertTrue(query.matches(edgeV0V1));
@@ -67,20 +65,23 @@ public class EdgeQueryTest
         Edge edgeV0V1 = v2.getEdgeToParent();
         Edge edgeEV5EV7 = v7.getEdgeToParent();
 
-        EdgeQuery match = EdgeQuery.make(v1.getVertexId(), v2.getVertexId(),
-                null, null, null, null, null);
+        EdgeQuery match = new EdgeQuery(
+            new VertexQuery(v1.getVertexId(), null, null, null, null, null, null, null),
+            new VertexQuery(v2.getVertexId(), null, null, null, null, null, null, null),
+                null, null, null);
         assertTrue(match.matches(edgeV0V1));
 
-        EdgeQuery matchSrcOnly = EdgeQuery.make(v5.getVertexId(), null,
-                null, null, null, null, null);
+        EdgeQuery matchSrcOnly = new EdgeQuery(new VertexQuery(v5.getVertexId(), null, null, null, null, null, null, null),
+                null, null, null, null);
         assertTrue(matchSrcOnly.matches(edgeEV5EV7));
 
-        EdgeQuery matchTrgOnly = EdgeQuery.make(null, v7.getVertexId(),
-                null, null, null, null, null);
+        EdgeQuery matchTrgOnly = new EdgeQuery(null, new VertexQuery(v7.getVertexId(), null, null, null, null, null, null, null),
+                null, null, null);
         assertTrue(matchTrgOnly.matches(edgeEV5EV7));
 
-        EdgeQuery wrongTarget = EdgeQuery.make(v1.getVertexId(), v7.getVertexId(),
-                null, null, null, null, null);
+        EdgeQuery wrongTarget = new EdgeQuery(new VertexQuery(v1.getVertexId(), null, null, null, null, null, null, null),
+                new VertexQuery(v7.getVertexId(), null, null, null, null, null, null, null),
+                null, null, null);
         assertFalse(wrongTarget.matches(edgeEV5EV7));
     }
 
@@ -95,19 +96,23 @@ public class EdgeQueryTest
         Edge edgeV1V2 = v2.getEdgeToParent(); // ap#0 to ap#0
         Edge edgeV1V3 = v3.getEdgeToParent(); // ap#1 to ap#0
         Edge edgeV1V5 = v5.getEdgeToParent(); // ap#2 to ap#1
-        EdgeQuery match = EdgeQuery.make(null, null, 0, null, null, null, null);
+
+        AttachmentPointQuery ap0 = new AttachmentPointQuery(null, 0, null, null, null, null);
+        AttachmentPointQuery ap1 = new AttachmentPointQuery(null, 1, null, null, null, null);
+        AttachmentPointQuery ap2 = new AttachmentPointQuery(null, 2, null, null, null, null);
+        EdgeQuery match = new EdgeQuery(null, null, ap0, null, null);
         assertTrue(match.matches(edgeV1V2));
         assertFalse(match.matches(edgeV1V5));
-        match = EdgeQuery.make(null, null, null, 0, null, null, null);
+        match = new EdgeQuery(null, null, ap0, null, null);
         assertTrue(match.matches(edgeV1V2));
         assertFalse(match.matches(edgeV1V5));
-        match = EdgeQuery.make(null, null, 1, null, null, null, null);
+        match = new EdgeQuery(null, null, ap1, null, null);
         assertTrue(match.matches(edgeV1V3));
         assertFalse(match.matches(edgeV1V5));
-        match = EdgeQuery.make(null, null, null, 1, null, null, null);
+        match = new EdgeQuery(null, null, null, ap1, null);
         assertTrue(match.matches(edgeV1V5));
         assertFalse(match.matches(edgeV1V3));
-        match = EdgeQuery.make(null, null, 2, 1, null, null, null);
+        match = new EdgeQuery(null, null, ap2, ap1, null);
         assertTrue(match.matches(edgeV1V5));
         assertFalse(match.matches(edgeV1V3));
     }
@@ -121,10 +126,10 @@ public class EdgeQueryTest
         Vertex v3 = graph.getVertexAtPosition(2);
         Edge edgeV1V2 = v2.getEdgeToParent(); //  triple
         Edge edgeV1V3 = v3.getEdgeToParent(); // single
-        EdgeQuery triple = EdgeQuery.make(null, null, null, null,
-                BondType.TRIPLE, null, null);
-        EdgeQuery single = EdgeQuery.make(null, null, null, null,
-                BondType.SINGLE, null, null);
+        EdgeQuery triple = new EdgeQuery(null, null, null, null,
+                BondType.TRIPLE);
+        EdgeQuery single = new EdgeQuery(null, null, null, null,
+                BondType.SINGLE);
 
         assertTrue(triple.matches(edgeV1V2));
         assertFalse(triple.matches(edgeV1V3));
@@ -141,10 +146,11 @@ public class EdgeQueryTest
         Vertex v3 = graph.getVertexAtPosition(2);
         Edge edgeV1V2 = v2.getEdgeToParent(); // A:0  -> B:1
         Edge edgeV1V3 = v3.getEdgeToParent(); // B:1 -> C:0
-        EdgeQuery srcClass = EdgeQuery.make(null, null, null, null, null,
-                APClass.make("A",0), null);
-        EdgeQuery trgClass = EdgeQuery.make(null, null, null, null, null, null,
-                APClass.make("B",1));
+        EdgeQuery srcClass = new EdgeQuery(null, null, 
+            new AttachmentPointQuery(null, null, APClass.make("A",0), null, null, null),
+            null, null);
+        EdgeQuery trgClass = new EdgeQuery(null, null, null, 
+            new AttachmentPointQuery(null, null, APClass.make("B",1), null, null, null), null);
 
         assertTrue(srcClass.matches(edgeV1V2));
         assertTrue(trgClass.matches(edgeV1V2));
@@ -161,18 +167,20 @@ public class EdgeQueryTest
         Vertex v3 = graph.getVertexAtPosition(2);
         Edge edgeV1V2 = v2.getEdgeToParent(); // ap#0 to ap#0, A:0  -> B:1, triple
         Edge edgeV1V3 = v3.getEdgeToParent(); // ap#1 to ap#0, B:1 -> C:0, single
-        EdgeQuery query = EdgeQuery.make(v1.getVertexId(), v2.getVertexId(),
-                0, 0, 
-                BondType.TRIPLE, 
-                APClass.make("A",0), 
-                APClass.make("B",1));
+        EdgeQuery query = new EdgeQuery(
+            new VertexQuery(v1.getVertexId(), null, null, null, null, null, null, null),
+            new VertexQuery(v2.getVertexId(), null, null, null, null, null, null, null),
+            new AttachmentPointQuery(null, 0, APClass.make("A",0), null, null, null),
+            new AttachmentPointQuery(null, 0, APClass.make("B",1), null, null, null),
+            BondType.TRIPLE);
         assertTrue(query.matches(edgeV1V2));
         assertFalse(query.matches(edgeV1V3));
-        EdgeQuery almost = EdgeQuery.make(v1.getVertexId(), v2.getVertexId(),
-                0, 0, 
-                BondType.SINGLE, //This is the difference!
-                APClass.make("A",0), 
-                APClass.make("B",1));
+        EdgeQuery almost = new EdgeQuery(
+            new VertexQuery(v1.getVertexId(), null, null, null, null, null, null, null),
+            new VertexQuery(v2.getVertexId(), null, null, null, null, null, null, null),
+            new AttachmentPointQuery(null, 0, APClass.make("A",0), null, null, null),
+            new AttachmentPointQuery(null, 0, APClass.make("B",1), null, null, null),
+            BondType.SINGLE);
         assertFalse(almost.matches(edgeV1V2));
         assertFalse(query.matches(edgeV1V3));
     }
@@ -182,8 +190,9 @@ public class EdgeQueryTest
     @Test
     public void testFindEdgesUsesMatches()
     {
-        EdgeQuery query = EdgeQuery.make(null, null,
-                null, 0, null, null, null);
+        EdgeQuery query = new EdgeQuery(null, null, null, 
+            new AttachmentPointQuery(null, 0, null, null, null, null),
+            null);
 
         int directMatches = 0;
         for (Edge e : graph.getEdgeList())
@@ -210,13 +219,13 @@ public class EdgeQueryTest
         Edge edgeV1V2 = v2.getEdgeToParent();
 
         VertexQuery srcVertex = new VertexQuery(v1.getVertexId(), null, null,
-                null, null, null);
+                null, null, null, null, null);
         VertexQuery trgVertex = new VertexQuery(v2.getVertexId(), null, null,
-                null, null, null);
+                null, null, null, null, null);
         AttachmentPointQuery srcAp = new AttachmentPointQuery(null, 0,
-                APClass.make("A", 0), null, null);
+                APClass.make("A", 0), null, null, null);
         AttachmentPointQuery trgAp = new AttachmentPointQuery(null, 0,
-                APClass.make("B", 1), null, null);
+                APClass.make("B", 1), null, null, null);
 
         EdgeQuery query = new EdgeQuery(srcVertex, trgVertex, srcAp, trgAp,
                 BondType.TRIPLE);

@@ -19,7 +19,6 @@
 package denoptim.graph;
 
 import denoptim.graph.Edge.BondType;
-import denoptim.utils.AttachmentPointQuery;
 
 /**
  * A query for edges: a list of properties that target edges should possess in 
@@ -52,6 +51,21 @@ public class EdgeQuery
      */
     private BondType bondType = null;
     
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor from empty queries.
+     */
+    public EdgeQuery()
+    {
+        this.srcVertexQuery = null;
+        this.trgVertexQuery = null;
+        this.srcAPQuery = null;
+        this.trgAPQuery = null;
+        this.bondType = null;
+    }
+
 //------------------------------------------------------------------------------
 
     /**
@@ -71,28 +85,6 @@ public class EdgeQuery
         this.srcAPQuery = srcAPQuery;
         this.trgAPQuery = trgAPQuery;
         this.bondType = bondType;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Builds an edge query from the legacy flat parameters.
-     */
-    public static EdgeQuery make(Long srcVertexId, Long trgVertexId,
-            Integer srcAPIdx, Integer trgAPIdx,
-            BondType bondType, APClass srcAPC, APClass trgAPC)
-    {
-        VertexQuery srcVq = srcVertexId == null ? null
-                : new VertexQuery(srcVertexId, null, null, null, null, null);
-        VertexQuery trgVq = trgVertexId == null ? null
-                : new VertexQuery(trgVertexId, null, null, null, null, null);
-        AttachmentPointQuery srcApQ = (srcAPIdx == null && srcAPC == null)
-                ? null
-                : new AttachmentPointQuery(null, srcAPIdx, srcAPC, null, null);
-        AttachmentPointQuery trgApQ = (trgAPIdx == null && trgAPC == null)
-                ? null
-                : new AttachmentPointQuery(null, trgAPIdx, trgAPC, null, null);
-        return new EdgeQuery(srcVq, trgVq, srcApQ, trgApQ, bondType);
     }
     
 //------------------------------------------------------------------------------

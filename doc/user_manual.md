@@ -1014,37 +1014,74 @@ $$$$
 
 ## Graph Editing Task Files {#GraphEditingTaskFiles}
 
-Example of JSON syntax for defining the most detailed vertex query and the editing task to perform.
+Graph editing tasks are defined in JSON format. Multiple tasks can be defined using the JSON array syntax (e.g., "[{task},{another task}]"), and they will be executed sequentially according to the given order. Each task must define a `task` field that defined the type of task among the known tasks defined in the list below (e.g., `DELETEVERTEX`, `CHANGESUBGRAPH`, etc.). Additional fields are required only by some tasks (see list below) but usually involve ways to identify vertexes, edges, or attachment points involved in the graph operation. 
 
-In the vertex query (see example below), any of the fields can be removed. For example, removing the line with `"vertexId"` will make the vertex query match any vertex irrespectively of its vertexID. Similarly, the block of lines pertaining `"incomingEdgeQuery"` (i.e., all the lines included in the curly brackets immediately following `"incomingEdgeQuery"`) will make the vertex query match any vertex irrespectively of the properties of the edge that connects such vertex to its parent vertex (if any).
+### Graph Element Queries
+To following JSON syntax allows to define queries that identify graph elements that may be involved in various graph editing tasks. Any field in any query can be omitted to make the query less restrictive, and some fields are intentionally redundant to provide extreme versatility.
 
-```
-"vertexQuery": {
-    "vertexId": 1,
-    "buildingBlockId": 4,
-    "buildingBlockType": "FRAGMENT",
-    "vertexType": "MolecularFragment",
-    "level": 2,
-    "incomingEdgeQuery": {
-    "srcVertexId": 1,
-    "trgVertexId": 2,
-    "srcAPID": 3,
-    "trgAPID": 4,
-    "bondType": "DOUBLE",
-    "srcAPC": {
-        "rule": "s",
-        "subClass": 0
-    },
-    "trgAPC": {
-        "rule": "t",
-        "subClass": 0
+* Vertex query may include these fields (example values are shown here):
+    ```
+    {
+        "vertexId": 1,
+        "buildingBlockId": 4,
+        "buildingBlockType": "FRAGMENT",
+        "vertexType": "Template",
+        "level": 2,
+        "apQueries": [
+            {
+                (see syntax of attachment point query)...
+            },
+            ...
+        ]
+        "incomingEdgeQuery": {
+            (see syntax of Edge query)...
+        },
+        "outgoingEdgeQuery": {
+            (see syntax of edge query)...
+        }
     }
-    },
-    "outgoingEdgeQuery": {SAME SYNTAX of "incomingEdgeQuery"}
-}
-```
+    ```
+* Attachment point query may include these fields (example values are shown here):
+    ```
+    {
+        "apID": 123,
+        "apIndex": 0,
+        "apClass": 
+        {
+            "rule": "RuL",
+            "subClass": 0
+        },
+        "vertexQuery": {
+            (see syntax of vertex query)...
+        },
+        "edgeQuery": {
+            (see syntax of edge query)...
+        },
+        "linkedAPQuery": {
+            (see syntax of attachment point query)...
+        }
+    }
+    ```
+* Edge query may include these fields (example values are shown here):
+    ```
+    {
+        "bondType": "SINGLE",
+        "srcVertexQuery": {
+            (see syntax of vertex query)...
+        },
+        "trgVertexQuery": {
+            (see syntax of vertex query)...
+        },
+        "srcAPQuery": {
+            (see syntax of attachment point query)...
+        },
+        "trgAPQuery": {
+            (see syntax of attachment point query)...
+        }
+    }
+    ```
 
-The above is a complete list of fields that can be used to define a vertex query, but a valid query can include any of those fields from none (i.e., a query that matches everything) to all of them (i.e., the most detailed query possible). For example, the following is a vertex query meant to match only vertices in level 2:
+In the example above, all possible fields are shown, but a valid query can include any of those fields from none (i.e., a query that matches everything) to all of them (i.e., the most detailed query possible). For example, the following is a vertex query meant to match only vertices in level 2:
 
 ```
 "vertexQuery": {
@@ -1052,8 +1089,14 @@ The above is a complete list of fields that can be used to define a vertex query
 }
 ```
 
+### Graph Editing Tasks
 The currently available graph editing tasks are:
 
+*   "CHANGESUBGRAPH": replaces a subgraph (i.e., a set of vertexes that can be isolated from the rest of the graph) from within a graph (the target graph) with a new subgraph that may be extracted from another graph (the incoming graph). Both subgraphs are defioned by specifying a list of attachment points. The order of the attachment points in two lists also define the mapping between the attachment points replaced in the target graph and the replacing ones from the incoming graph. Each list must define a 'confined subgraph' of the corresponding graph, that is, the attachment points must allow to identify each vertex as either belonging to the subbgraph or not. For example, consider graph *vertec_A*-*AP_A1*--*AP_B1*-*vertex_B*-*AP_B2*--*AP_C1*-*vertex_C*. Forst, note that since this is a linear connected graph, any list containing only one attachment point defines a confined subgraph and its complement. Then, note that a list containing the pair {*AP_B1*, *AP_B2*} defined the confined subgraph containing only *vertex_B*. Instead, the pair {*AP_A1*, *AP_B2*} does not define a confined subgraph because the presence of *AP_A1* in the list bakes *vertex_B* be part outsite of the vertexes selected as members of the subgraph, but the presence of *AP_B2* requires *vertex_B* to be part of the subgraph. This inconsistency makes it impossible to select a subgraph from the pair {*AP_A1*, *AP_B2*}. Attachment point lists are checked for consistency with the requested graph editing task. To this end these are the fields associated with this type of graph edit:
+    * "apQueriesOnTargetGraph": defined a list of attachment point queries needed to identify the attachment points in the target graph.
+    * "apQueriesOnIncomingGraph": defined a list of attachment point queries needed to identify the attachment points in the incoming graph.
+    * "incomingGraph": provides the incoming graph in JSON format.
+    * "incomingGraphPathname": allows to read the incoming graph from the given pathname.
 *   "CHANGEVERTEX": Changes any vertex matching the vertex query with the vertex given as input and using the given AP mapping mask. Requires the definition of these alternative set of additional fields:
     *   `incomingBBId`, `incomingBBTyp`, and `incomingAPMap`, which are respectively the index (0-based) of the building block to use to replace any matched vertex, its type, and the mapping of attachment points (by 0-based index) to use when connecting the incoming vertex to the existing graph. Use of this functionality requires the definition of a space of building blocks. The space needed to perform the graph editing tasks may be different from that used to create the graph to edit, but is defined using the usual keywords defining the [Space of Graphs Building Blocks](#BBSpace) in the primary input file (NB: not in the graph editing task file).
     *   `incomingGraph` and `incomingAPMap`, which are respectively the JSON formatted definition of a subgraph (NB: it may contain a single vertex) and the mapping of attachment points (by 0-based index) to use when connecting the incoming subgraph to the existing graph.
@@ -1070,7 +1113,7 @@ The graph edit tasks can be more than one. A sequence of graph editing tasks is 
     {
         "task": "REPLACECHILD",
         "vertexQuery": {...}
-    }
+    },
     {
         "task": ...,
         "vertexQuery": {...}

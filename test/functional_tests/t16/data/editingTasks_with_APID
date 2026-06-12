@@ -4,9 +4,11 @@
     "vertexQuery": {
        "level": 0,
        "incomingEdgeQuery": {
-         "srcAPC": {
-           "rule": "cc",
-           "subClass": 0
+         "srcAPQuery": {
+           "apClass": {
+             "rule": "cc",
+             "subClass": 0
+           }
          }
        }
     },

@@ -1,0 +1,140 @@
+[
+  {
+    "task": "CHANGESUBGRAPH",
+    "incomingGraphPathname": "incomingGraphs-11.sdf",
+    "apQueriesOnIncomingGraph": [
+      {
+        "linkedAPQuery": {
+          "apClass": {
+            "rule": "RuL",
+            "subClass": 0
+          }
+        }
+      },
+      {
+        "linkedAPQuery": {
+          "apClass": {
+            "rule": "RuX",
+            "subClass": 0
+          },
+          "apIndex": 2
+        }
+      },
+      {
+        "linkedAPQuery": {
+          "apClass": {
+            "rule": "RuX",
+            "subClass": 0
+          },
+          "apIndex": 3
+        }
+      }
+    ],
+    "apQueriesOnTargetGraph": [
+      {
+        "linkedAPQuery": {
+          "apClass": {
+            "rule": "RuL",
+            "subClass": 0
+          },
+          "vertexQuery": {
+            "vertexId": 2
+          }
+        }
+      },
+      {
+        "linkedAPQuery": {
+          "apClass": {
+            "rule": "RuX",
+            "subClass": 0
+          },
+          "apIndex": 0,
+          "vertexQuery": {
+            "vertexId": 2
+          }
+        }
+      },
+      {
+        "linkedAPQuery": {
+          "apClass": {
+            "rule": "RuX",
+            "subClass": 0
+          },
+          "apIndex": 1,
+          "vertexQuery": {
+            "vertexId": 2
+          }
+        }
+      }
+    ]
+  },
+    {
+      "task": "CHANGESUBGRAPH",
+      "incomingGraphPathname": "incomingGraphs-11.sdf",
+      "apQueriesOnIncomingGraph": [
+        {
+          "linkedAPQuery": {
+            "apClass": {
+              "rule": "RuL",
+              "subClass": 0
+            }
+          }
+        },
+        {
+          "linkedAPQuery": {
+            "apClass": {
+              "rule": "RuX",
+              "subClass": 0
+            },
+            "apIndex": 2
+          }
+        },
+        {
+          "linkedAPQuery": {
+            "apClass": {
+              "rule": "RuX",
+              "subClass": 0
+            },
+            "apIndex": 3
+          }
+        }
+      ],
+      "apQueriesOnTargetGraph": [
+        {
+          "linkedAPQuery": {
+            "apClass": {
+              "rule": "RuL",
+              "subClass": 0
+            },
+            "vertexQuery": {
+              "vertexId": 1
+            }
+          }
+        },
+        {
+          "linkedAPQuery": {
+            "apClass": {
+              "rule": "RuX",
+              "subClass": 0
+            },
+            "apIndex": 0,
+            "vertexQuery": {
+              "vertexId": 1
+            }
+          }
+        },
+        {
+          "linkedAPQuery": {
+            "apClass": {
+              "rule": "RuX",
+              "subClass": 0
+            },
+            "apIndex": 1,
+            "vertexQuery": {
+              "vertexId": 1
+            }
+          }
+        }
+      ]
+    }
+]

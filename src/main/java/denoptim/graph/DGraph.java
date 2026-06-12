@@ -87,7 +87,6 @@ import denoptim.json.DENOPTIMgson.DENOPTIMExclusionStrategyNoAPMap;
 import denoptim.molecularmodeling.ThreeDimTreeBuilder;
 import denoptim.programs.RunTimeParameters;
 import denoptim.programs.RunTimeParameters.ParametersType;
-import denoptim.utils.AttachmentPointQuery;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphConversionTool;
 import denoptim.utils.GraphEdit;
@@ -2548,6 +2547,9 @@ public class DGraph implements Cloneable
             incomingGraph.removeVertex(v);
         }
         
+        // we need to guarantee that new vertixe IDs are unique within a graph
+        incomingGraph.renumberGraphVertices();
+
         // finally introduce the new vertices from incoming graph into receiving graph
         for (Vertex incomingVrtx : incomingGraph.getVertexList())
         {
@@ -6721,7 +6723,7 @@ public class DGraph implements Cloneable
     public List<AttachmentPoint> findAPs(AttachmentPointQuery apQuery, Logger logger)
     {
         logger.log(Level.FINE, "AP candidates: " + getAttachmentPoints());
-        
+
         List<AttachmentPoint> matches = new ArrayList<>();
         for (AttachmentPoint ap : getAttachmentPoints())
         {
@@ -7116,11 +7118,29 @@ public class DGraph implements Cloneable
 
                     // Identify the APs that are involved within the incoming graph
                     DGraph incomingGraph = edit.getIncomingGraph();
+                    if (incomingGraph == null)
+                    {
+                        String pathName = edit.getIncomingGraphPathname();
+                        if (pathName == null)
+                        {
+                            throw new IllegalStateException(
+                                "The incoming graph pathname is null. "
+                                + "Cannot perform " + edit.getType() + ".");
+                        }
+                        try {
+                            incomingGraph = DenoptimIO.readDENOPTIMGraphsFromFile(
+                                new File(pathName)).get(0);
+                        } catch (Exception e) {
+                            throw new IllegalStateException(
+                                "Error reading the incoming graph from file " + pathName + ". "
+                                + "Cannot perform " + edit.getType() + ".", e);
+                        }
+                    }
                     List<List<AttachmentPoint>> apMatchesOnIncomingGraph = incomingGraph.findAPs(
                         edit.getIncomingGraphAPQueries(), logger);
                     for (List<AttachmentPoint> aps : apMatchesOnIncomingGraph)
                     {
-                        if (aps.size() ==0)
+                        if (aps.size() == 0)
                         {
                             throw new IllegalStateException(
                                 "No APs found for the incoming graph. "
@@ -7143,10 +7163,11 @@ public class DGraph implements Cloneable
                     }
 
                     APMapping apMapping = new APMapping();
-                    for (int i = 0; i < apMatchesOnGraph.get(0).size(); i++)
+                    for (int i = 0; i < apMatchesOnGraph.size(); i++)
                     {
-                        apMapping.put(apMatchesOnGraph.get(0).get(i), 
-                        apMatchesOnIncomingGraph.get(0).get(i));
+                        // We have ensured the lists contain only one entry
+                        apMapping.put(apMatchesOnGraph.get(i).get(0), 
+                        apMatchesOnIncomingGraph.get(i).get(0));
                     }
 
                     // Perform the actual subgraph replacement
@@ -7778,97 +7799,6 @@ public class DGraph implements Cloneable
         }
         return aps;
     }
-
+    
 //------------------------------------------------------------------------------
-
-    /**
-     * testing replace subgrap
-     * 
-     */
-    //TODO-gg del
-    public void importAPsEnvironment(APMapping apMapping) throws DENOPTIMException
-    {
-        //TODO-gg fix if not deleted: this is just a placeholder
-        FragmentSpace fragSpace = null;
-
-
-        List<Vertex> subGrpVrtxs = new ArrayList<>();
-        DGraph incomingGraph = null;
-        List<Vertex> verticesToRemoveFromThisGraph = new ArrayList<>();
-        APMapping apMap = new APMapping();
-        List<Vertex> verticesToKeepFromIncomingGraph = new ArrayList<>();
-        LinkedHashMap<AttachmentPoint,BondType> 
-            linkTypesToCreate = new LinkedHashMap<>();
-        for (Map.Entry<AttachmentPoint,AttachmentPoint> e : apMapping.entrySet())
-        {
-            AttachmentPoint apOnThisGraph = e.getKey();
-            AttachmentPoint apOnIncomingGraph = e.getValue();
-
-            apMap.put(apOnThisGraph.getLinkedAPThroughout(), apOnIncomingGraph);
-
-            if (incomingGraph == null)
-            {
-                incomingGraph = apOnIncomingGraph.getOwner().getGraphOwner();
-            } else if (incomingGraph != apOnIncomingGraph.getOwner().getGraphOwner())
-            {
-                throw new DENOPTIMException("The incoming graph is not the same "
-                    + "for all attachment points.");
-            }
-
-            // collect all vertexes to remove from this graph
-            if (!apOnThisGraph.isAvailableThroughout())
-            {
-                if (!apOnThisGraph.isSrcInUserThroughout())
-                {
-                    throw new DENOPTIMException("The attachment point " 
-                        + apOnThisGraph.getID() + " is used as target of an edge. "
-                        + "This violates the condition for importing the APs "
-                        + "environment. Check your input.");
-                }
-                List<Vertex> childrenTree = new ArrayList<Vertex>();
-                getChildrenTree(apOnThisGraph.getLinkedAPThroughout().getOwner(), 
-                    childrenTree);
-                verticesToRemoveFromThisGraph.add(
-                    apOnThisGraph.getLinkedAPThroughout().getOwner());
-                verticesToRemoveFromThisGraph.addAll(childrenTree);
-
-                // Keep track of the link type to recreate
-                linkTypesToCreate.put(apOnThisGraph, 
-                    apOnThisGraph.getEdgeUser().getBondType());
-            }
-
-            for (Vertex vToDelOnThis : verticesToRemoveFromThisGraph)
-            {
-                if (!subGrpVrtxs.contains(vToDelOnThis))
-                {
-                    subGrpVrtxs.add(vToDelOnThis);
-                }
-            }
-
-            // collect all vertexes to keep from incoming graph
-            List<Vertex> childrenTreeOnInGraph = new ArrayList<Vertex>();
-            getChildrenTree(apOnIncomingGraph.getOwner(), childrenTreeOnInGraph);
-            verticesToKeepFromIncomingGraph.add(apOnIncomingGraph.getOwner());
-            verticesToKeepFromIncomingGraph.addAll(childrenTreeOnInGraph);
-        }
-
-        List<Vertex> verticesToRemoveFromIncomingGraph = new ArrayList<Vertex>();
-        for (Vertex v : incomingGraph.gVertices)
-        {
-            if (!verticesToKeepFromIncomingGraph.contains(v))
-            {
-                verticesToRemoveFromIncomingGraph.add(v);
-            }
-        }
-        for (Vertex v : verticesToRemoveFromIncomingGraph)
-        {
-            // This removes also the rings, but we have kept track of them
-            incomingGraph.removeVertex(v);
-        }
-
-        DGraph.replaceSingleSubGraph(apMap, fragSpace);
-    }
-    
-//------------------------------------------------------------------------------    
-    
 }

@@ -35,14 +35,14 @@
         },
         {
             "type": "java",
-            "name": "Run test t12a",
+            "name": "Run test t15",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "-r", "GA", "t12a.params"
+                "-r", "GO", "t15.params"
             ],
-            "cwd": "/tmp/denoptim_test/t12a",
+            "cwd": "/tmp/denoptim_test/t15",
             "console": "integratedTerminal"
         },
         {
@@ -58,6 +58,18 @@
             "console": "integratedTerminal",
             "preLaunchTask": "Start timing for t33",
             "postDebugTask": "Show timing for t33"
-        }
+        },
+        {
+            "type": "java",
+            "name": "Run test t29-12",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "GE", "t29-12.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t29",
+            "console": "integratedTerminal"
+        },
     ]
 }

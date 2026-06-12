@@ -16,30 +16,22 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package denoptim.utils;
-
-import denoptim.graph.APClass;
-import denoptim.graph.AttachmentPoint;
-import denoptim.graph.Edge;
-import denoptim.graph.EdgeQuery;
-import denoptim.graph.Vertex;
-import denoptim.graph.VertexQuery;
+package denoptim.graph;
 
 /**
  * Query for searching {@link AttachmentPoint}s.
  */
-
 public class AttachmentPointQuery 
 {
     /**
      * Query on the unique identifier of the target attachment point, or null.
      */
-    private Long attachmentPointId = null;
+    private Long apID = null;
 
     /**
      * Query on the index of the target attachment point, or null.
      */
-    private Integer attachmentPointIndex = null;
+    private Integer apIndex = null;
 
     /**
      * Query on the {@link APClass} of the target attachment point, or null.
@@ -55,19 +47,43 @@ public class AttachmentPointQuery
      * Query on the {@link Edge} using the target attachment point, or null.
      */
     private EdgeQuery edgeQuery = null;
-    
+
+    /**
+     * Query defining the attachment point linked by an edge to the target
+     * attachment point, or null.
+     */
+    private AttachmentPointQuery linkedAPQuery = null;
 
 //------------------------------------------------------------------------------
 
-    public AttachmentPointQuery(Long attachmentPointId, 
-        Integer attachmentPointIndex, APClass apClass, VertexQuery vertexQuery, 
-        EdgeQuery edgeQuery)
+    /**
+     * Constructor for an empty query.
+     */
+    public AttachmentPointQuery()
     {
-        this.attachmentPointId = attachmentPointId;
-        this.attachmentPointIndex = attachmentPointIndex;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor from individual criteria.
+     * @param apID the query on the unique identifier of the target attachment point, or null.
+     * @param apIndex the query on the index of the target attachment point, or null.
+     * @param apClass the query on the {@link APClass} of the target attachment point, or null.
+     * @param vertexQuery the query on the vertex owning the target attachment point, or null.
+     * @param edgeQuery the query on the {@link Edge} using the target attachment point, or null.
+     * @param linkedAPQuery the query on the attachment point linked by an edge to the target attachment point, or null.
+     */
+    public AttachmentPointQuery(Long apID, 
+        Integer apIndex, APClass apClass, VertexQuery vertexQuery, 
+        EdgeQuery edgeQuery, AttachmentPointQuery linkedAPQuery)
+    {
+        this.apID = apID;
+        this.apIndex = apIndex;
         this.apClass = apClass;
         this.vertexQuery = vertexQuery;
         this.edgeQuery = edgeQuery;
+        this.linkedAPQuery = linkedAPQuery;
     }
 
 //------------------------------------------------------------------------------
@@ -81,13 +97,13 @@ public class AttachmentPointQuery
      */
     public boolean matches(AttachmentPoint ap)
     {
-        if (attachmentPointId != null && ap.getID() != attachmentPointId)
+        if (apID != null && ap.getID() != apID)
         {
             return false;
         }
 
-        if (attachmentPointIndex != null
-                && ap.getIndexInOwner() != attachmentPointIndex)
+        if (apIndex != null
+                && ap.getIndexInOwner() != apIndex)
         {
             return false;
         }
@@ -119,6 +135,14 @@ public class AttachmentPointQuery
             }
         }
 
+        if (linkedAPQuery != null)
+        {
+            AttachmentPoint linkedAP = ap.getLinkedAP();
+            if (linkedAP == null || !linkedAPQuery.matches(linkedAP))
+            {
+                return false;
+            }
+        }
         return true;
     }
 

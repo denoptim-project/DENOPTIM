@@ -3,9 +3,11 @@
     "task": "CHANGEVERTEX",
     "vertexQuery": {
       "incomingEdgeQuery": {
-        "srcAPC": {
-          "rule": "RuX",
-          "subClass": 0
+        "srcAPQuery": {
+          "apClass": {
+            "rule": "RuX",
+            "subClass": 0
+          }
         }
       }
     },

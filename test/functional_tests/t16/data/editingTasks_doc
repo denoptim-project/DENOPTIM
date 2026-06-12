@@ -21,19 +21,27 @@
     "vertexType": "MolecularFragment",
     "level": 2,
     "incomingEdgeQuery": {
-      "srcVertexId": 1,
-      "trgVertexId": 2,
-      "srcAPID": 3,
-      "trgAPID": 4,
-      "bondType": "DOUBLE",
-      "srcAPC": {
-        "rule": "s",
-        "subClass": 0
+      "srcVertexQuery": {
+        "vertexId": 1
       },
-      "trgAPC": {
-        "rule": "t",
-        "subClass": 0
-      }
+      "trgVertexQuery": {
+        "vertexId": 2
+      },
+      "srcAPQuery": {
+        "apIndex": 3,
+        "apClass": {
+          "rule": "s",
+          "subClass": 0
+        }
+      },
+      "trgAPQuery": {
+        "apIndex": 4,
+        "apClass": {
+          "rule": "t",
+          "subClass": 0
+        }
+      },
+      "bondType": "DOUBLE"
     },
     "outgoingEdgeQuery": {SAME SYNTAX of "incomingEdgeQuery"}
   }

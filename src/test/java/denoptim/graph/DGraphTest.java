@@ -3265,7 +3265,7 @@ public class DGraphTest
         List<List<Vertex>> allExpected = 
                 new ArrayList<List<Vertex>>();
         
-        VertexQuery q0 = new VertexQuery(null, null, null, null, null, null, null);
+        VertexQuery q0 = new VertexQuery();
         List<Vertex> e0 = new ArrayList<Vertex>();
         e0.addAll(g.getVertexList());
         allQueries.add(q0);
@@ -3273,7 +3273,7 @@ public class DGraphTest
         
         VertexQuery q1 = new VertexQuery(
                 g.getVertexAtPosition(5).getVertexId(), 
-                null, null, null, null, null, null);
+                null, null, null, null, null, null, null);
         List<Vertex> e1 = new ArrayList<Vertex>();
         e1.add(g.getVertexAtPosition(5));
         allQueries.add(q1);
@@ -3281,14 +3281,14 @@ public class DGraphTest
         
         VertexQuery q2 = new VertexQuery(
                 g.getVertexAtPosition(2).getVertexId(), 
-                null, null, null, null, null, null);
+                null, null, null, null, null, null, null);
         List<Vertex> e2 = new ArrayList<Vertex>();
         e2.add(g.getVertexAtPosition(2));
         allQueries.add(q2);
         allExpected.add(e2);
         
         VertexQuery q3 = new VertexQuery(null, VertexType.EmptyVertex, 
-                null, null, null, null, null);
+                null, null, null, null, null, null);
         List<Vertex> e3 = new ArrayList<Vertex>();
         e3.add(g.getVertexAtPosition(4));
         e3.add(g.getVertexAtPosition(5));
@@ -3297,7 +3297,7 @@ public class DGraphTest
         allExpected.add(e3);
         
         VertexQuery q4 = new VertexQuery(null, null, BBType.CAP,
-                null, null, null, null);
+                null, null, null, null, null);
         List<Vertex> e4 = new ArrayList<Vertex>();
         e4.add(g.getVertexAtPosition(2));
         e4.add(g.getVertexAtPosition(3));
@@ -3305,14 +3305,14 @@ public class DGraphTest
         allExpected.add(e4);
         
         VertexQuery q5 = new VertexQuery(null, null, null, 2,
-                null, null, null);
+                null, null, null, null);
         List<Vertex> e5 = new ArrayList<Vertex>();
         e5.add(g.getVertexAtPosition(2));
         allQueries.add(q5);
         allExpected.add(e5);
         
         VertexQuery q6 = new VertexQuery(null, null, null, null, 1,
-                null, null);
+                null, null, null);
         List<Vertex> e6 = new ArrayList<Vertex>();
         e6.add(g.getVertexAtPosition(3));
         e6.add(g.getVertexAtPosition(5));
@@ -3323,46 +3323,51 @@ public class DGraphTest
         // From here: test filters acting on incoming edge
         //
         
-        EdgeQuery eq7 = EdgeQuery.make(null, null, null, null, null, null, null);
+        EdgeQuery eq7 = new EdgeQuery();
         VertexQuery q7 = new VertexQuery(null, null, null, null, null, 
-                eq7, eq7);
+                null, eq7, eq7);
         List<Vertex> e7 = new ArrayList<Vertex>();
         e7.add(g.getVertexAtPosition(1));
         e7.add(g.getVertexAtPosition(6));
         allQueries.add(q7);
         allExpected.add(e7);
         
-        EdgeQuery eq8 = EdgeQuery.make(g.getVertexAtPosition(1).getVertexId(), 
-                null, null, null, null, null, null);
-        VertexQuery q8 = new VertexQuery(null, null, null, null, null, 
+        EdgeQuery eq8 = new EdgeQuery(
+            new VertexQuery(g.getVertexAtPosition(1).getVertexId(), null, null, null, null, null, null, null), 
+            null, null, null, null);
+        VertexQuery q8 = new VertexQuery(null, null, null, null, null, null,
                 eq8, null);
         List<Vertex> e8 = new ArrayList<Vertex>();
         e8.add(g.getVertexAtPosition(3));
         allQueries.add(q8);
         allExpected.add(e8);
 
-        EdgeQuery eq9 = EdgeQuery.make(null, 
-                g.getVertexAtPosition(5).getVertexId(), 
-                null, null, null, null, null);
-        VertexQuery q9 = new VertexQuery(null, null, null, null, null, 
+        EdgeQuery eq9 = new EdgeQuery(null,
+            new VertexQuery(g.getVertexAtPosition(5).getVertexId(), null, null, null, null, null, null, null), 
+            null, null, null);
+        VertexQuery q9 = new VertexQuery(null, null, null, null, null, null,
                 eq9, null);
         List<Vertex> e9 = new ArrayList<Vertex>();
         e9.add(g.getVertexAtPosition(5));
         allQueries.add(q9);
         allExpected.add(e9); // trg vertex id is ignored on incoming edges
         
-        EdgeQuery eq10 = EdgeQuery.make(null, null, 1, null, null, null, null);
+        EdgeQuery eq10 = new EdgeQuery(null, null,
+            new AttachmentPointQuery(null, 1, null, null, null, null),
+            null, null);
         VertexQuery q10 = new VertexQuery(null, null, null, null, null, 
-                eq10, null);
+                null, eq10, null);
         List<Vertex> e10 = new ArrayList<Vertex>();
         e10.add(g.getVertexAtPosition(2));
         e10.add(g.getVertexAtPosition(3));
         allQueries.add(q10);
         allExpected.add(e10);
         
-        EdgeQuery eq11 = EdgeQuery.make(null, null, null, 0, null, null, null);
+        EdgeQuery eq11 = new EdgeQuery(null, null, null,
+            new AttachmentPointQuery(null, 0, null, null, null, null),
+            null);
         VertexQuery q11 = new VertexQuery(null, null, null, null, null, 
-                eq11, null);
+                null, eq11, null);
         List<Vertex> e11 = new ArrayList<Vertex>();
         e11.add(g.getVertexAtPosition(1));
         e11.add(g.getVertexAtPosition(2));
@@ -3372,9 +3377,8 @@ public class DGraphTest
         allQueries.add(q11);
         allExpected.add(e11);
         
-        EdgeQuery eq12 = EdgeQuery.make(null, null, null, null,
-                BondType.TRIPLE, null, null);
-        VertexQuery q12 = new VertexQuery(null, null, null, null, null, 
+        EdgeQuery eq12 = new EdgeQuery(null, null, null, null, BondType.TRIPLE);
+        VertexQuery q12 = new VertexQuery(null, null, null, null, null,null, 
                 eq12, null);
         List<Vertex> e12 = new ArrayList<Vertex>();
         e12.add(g.getVertexAtPosition(1));
@@ -3382,9 +3386,10 @@ public class DGraphTest
         allQueries.add(q12);
         allExpected.add(e12);
         
-        EdgeQuery eq13 = EdgeQuery.make(null, null, null, null, null, 
-                APClass.make(b,1), null);
-        VertexQuery q13 = new VertexQuery(null, null, null, null, null, 
+        EdgeQuery eq13 = new EdgeQuery(null, null, 
+            new AttachmentPointQuery(null, null, APClass.make(b,1), null, null, null),
+            null, null);
+        VertexQuery q13 = new VertexQuery(null, null, null, null, null, null, 
                 eq13, null);
         List<Vertex> e13 = new ArrayList<Vertex>();
         e13.add(g.getVertexAtPosition(2));
@@ -3393,9 +3398,10 @@ public class DGraphTest
         allQueries.add(q13);
         allExpected.add(e13);
         
-        EdgeQuery eq14 = EdgeQuery.make(null, null, null, null, null, null,
-                APClass.make(c,1));
-        VertexQuery q14 = new VertexQuery(null, null, null, null, null, 
+        EdgeQuery eq14 = new EdgeQuery(null, null, null,
+            new AttachmentPointQuery(null, null, APClass.make(c,1), null, null, null), 
+            null);
+        VertexQuery q14 = new VertexQuery(null, null, null, null, null, null,
                 eq14, null);
         List<Vertex> e14 = new ArrayList<Vertex>();
         e14.add(g.getVertexAtPosition(2));
@@ -3407,27 +3413,30 @@ public class DGraphTest
         // From here: test filters acting on outgoing edge
         //
         
-        EdgeQuery eq15 = EdgeQuery.make(g.getVertexAtPosition(1).getVertexId(), 
-                null, null, null, null, null, null);
-        VertexQuery q15 = new VertexQuery(null, null, null, null, null, null,
+        EdgeQuery eq15 = new EdgeQuery(
+            new VertexQuery(g.getVertexAtPosition(1).getVertexId(), null, null, null, null, null, null, null), 
+            null, null, null, null);
+        VertexQuery q15 = new VertexQuery(null, null, null, null, null, null, null,
                 eq15);
         List<Vertex> e15 = new ArrayList<Vertex>();
         e15.add(g.getVertexAtPosition(1));
         allQueries.add(q15);
         allExpected.add(e15);
         
-        EdgeQuery eq16 = EdgeQuery.make(null,
-                g.getVertexAtPosition(3).getVertexId(),
-                null, null, null, null, null);
-        VertexQuery q16 = new VertexQuery(null, null, null, null, null, null,
+        EdgeQuery eq16 = new EdgeQuery(null,
+            new VertexQuery(g.getVertexAtPosition(3).getVertexId(), null, null, null, null, null, null, null), 
+            null, null, null);
+        VertexQuery q16 = new VertexQuery(null, null, null, null, null, null, null,
                 eq16);
         List<Vertex> e16 = new ArrayList<Vertex>();
         e16.add(g.getVertexAtPosition(1));
         allQueries.add(q16);
         allExpected.add(e16);
 
-        EdgeQuery eq17 = EdgeQuery.make(null, null, 1, null, null, null, null);
-        VertexQuery q17 = new VertexQuery(null, null, null, null, null, null,
+        EdgeQuery eq17 = new EdgeQuery(null, null,
+            new AttachmentPointQuery(null, 1, null, null, null, null),
+            null, null);
+        VertexQuery q17 = new VertexQuery(null, null, null, null, null, null, null,
                 eq17);
         List<Vertex> e17 = new ArrayList<Vertex>();
         e17.add(g.getVertexAtPosition(0));
@@ -3435,8 +3444,10 @@ public class DGraphTest
         allQueries.add(q17);
         allExpected.add(e17);
   
-        EdgeQuery eq18 = EdgeQuery.make(null, null, null, 0, null, null, null);
-        VertexQuery q18 = new VertexQuery(null, null, null, null, null, null,
+        EdgeQuery eq18 = new EdgeQuery(null, null, null, 
+            new AttachmentPointQuery(null, 0, null, null, null, null),
+            null);
+        VertexQuery q18 = new VertexQuery(null, null, null, null, null, null, null,
                 eq18);
         List<Vertex> e18 = new ArrayList<Vertex>();
         e18.add(g.getVertexAtPosition(0));
@@ -3445,9 +3456,9 @@ public class DGraphTest
         allQueries.add(q18);
         allExpected.add(e18);
 
-        EdgeQuery eq19 = EdgeQuery.make(null, null, null, null,
-                BondType.TRIPLE, null, null);
-        VertexQuery q19 = new VertexQuery(null, null, null, null, null, null,
+        EdgeQuery eq19 = new EdgeQuery(null, null, null, null,
+                BondType.TRIPLE);
+        VertexQuery q19 = new VertexQuery(null, null, null, null, null, null, null,
                 eq19);
         List<Vertex> e19 = new ArrayList<Vertex>();
         e19.add(g.getVertexAtPosition(0));
@@ -3455,9 +3466,10 @@ public class DGraphTest
         allQueries.add(q19);
         allExpected.add(e19);
         
-        EdgeQuery eq20 = EdgeQuery.make(null, null, null, null, null,
-                APClass.make(b,1), null);
-        VertexQuery q20 = new VertexQuery(null, null, null, null, null, null,
+        EdgeQuery eq20 = new EdgeQuery(null, null,
+            new AttachmentPointQuery(null, null, APClass.make(b,1), null, null, null),
+            null, null);
+        VertexQuery q20 = new VertexQuery(null, null, null, null, null, null, null,
                 eq20);
         List<Vertex> e20 = new ArrayList<Vertex>();
         e20.add(g.getVertexAtPosition(0));
@@ -3465,9 +3477,10 @@ public class DGraphTest
         allQueries.add(q20);
         allExpected.add(e20);
 
-        EdgeQuery eq21 = EdgeQuery.make(null, null, null, null, null, null,
-                APClass.make(d,0));
-        VertexQuery q21 = new VertexQuery(null, null, null, null, null, null,
+        EdgeQuery eq21 = new EdgeQuery(null, null, null,
+            new AttachmentPointQuery(null, null, APClass.make(d,0), null, null, null),
+            null);
+        VertexQuery q21 = new VertexQuery(null, null, null, null, null, null, null,
                 eq21);
         List<Vertex> e21 = new ArrayList<Vertex>();
         e21.add(g.getVertexAtPosition(0));
@@ -3479,19 +3492,22 @@ public class DGraphTest
         // From here: test combinations
         //
        
-        EdgeQuery eq22in = EdgeQuery.make(null, null, null, 0, null, null, null);
-        EdgeQuery eq22out = EdgeQuery.make(null, null, 1,null, null, null, null);
-        VertexQuery q22 = new VertexQuery(null, null, null, null, null, 
+        EdgeQuery eq22in = new EdgeQuery(null, null, null,
+            new AttachmentPointQuery(null, 0, null, null, null, null),
+            null);
+        EdgeQuery eq22out = new EdgeQuery(null, null,
+            new AttachmentPointQuery(null, 1, null, null, null, null),
+            null, null);
+        VertexQuery q22 = new VertexQuery(null, null, null, null, null, null,
                 eq22in, eq22out);
         List<Vertex> e22 = new ArrayList<Vertex>();
         e22.add(g.getVertexAtPosition(1));      
         allQueries.add(q22);
         allExpected.add(e22);
         
-        EdgeQuery eq23 = EdgeQuery.make(null, null, null, null, BondType.TRIPLE, 
-                null, null);
+        EdgeQuery eq23 = new EdgeQuery(null, null, null, null, BondType.TRIPLE);
         VertexQuery q23 = new VertexQuery(null, VertexType.MolecularFragment, 
-                null, null, null, eq23, null);
+                null, null, null, null, eq23, null);
         List<Vertex> e23 = new ArrayList<Vertex>();
         e23.add(g.getVertexAtPosition(1));
         allQueries.add(q23);
@@ -3614,7 +3630,6 @@ public class DGraphTest
         assertEquals(g.getVertexAtPosition(4).getVertexId(),
                 symSubGraphs.get(1).get(1).getVertexId());
         
-
         DGraph g2 = makeTestGraphK(fs);
         List<Vertex> sg2 = new ArrayList<Vertex>();
         sg2.add(g2.getVertexAtPosition(1));

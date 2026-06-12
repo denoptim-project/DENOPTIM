@@ -18,6 +18,8 @@
 
 package denoptim.graph;
 
+import java.util.List;
+
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.VertexType;
 
@@ -53,6 +55,11 @@ public class VertexQuery
     private Integer level = null;
 
     /**
+     * List of attachment point queries on the vertex
+     */
+    private List<AttachmentPointQuery> apQueries = null;
+
+    /**
      * Query on the vertex' incoming connections (i.e., vertex id the target)
      */
     private EdgeQuery incomingEdgeQuery;
@@ -61,6 +68,15 @@ public class VertexQuery
      * Query on the vertex' out coming connections (i.e., vertex id the source)
      */
     private EdgeQuery outgoingEdgeQuery;
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor from empty queries.
+     */
+    public VertexQuery()
+    {
+    }
 
 //------------------------------------------------------------------------------
 
@@ -74,45 +90,27 @@ public class VertexQuery
      * hit type, or null.
      * @param level the level of the vertices to match, or null. Remember level
      * is an integer that starts from -1.
+     * @param apQueries the list of attachment point queries on the vertex, or null.
      * @param eIn the edge query (filters candidates based on the connection of
      * a candidate with the rest of the graph) for incoming connections where
      * the candidate vertex if the target.
+     * @param eOut the edge query (filters candidates based on the connection of
+     * a candidate with the rest of the graph) for outgoing connections where
+     * the candidate vertex if the source.
      */
 
     public VertexQuery(Long vID, VertexType vType, BBType bbType, 
-            Integer bbID, Integer level, EdgeQuery eIn)
+            Integer bbID, Integer level, 
+            List<AttachmentPointQuery> apQueries,
+            EdgeQuery eIn, EdgeQuery eOut)
     {
         this.vertexId = vID;
         this.vertexType = vType;
         this.buildingBlockType = bbType;
         this.buildingBlockId = bbID;
         this.level = level;
+        this.apQueries = apQueries;
         this.incomingEdgeQuery = eIn;
-        this.outgoingEdgeQuery = null;
-    }
-    
-//------------------------------------------------------------------------------
-
-    /**
-     * Constructor from vertex and edge queries
-     * @param eIn the edge query (filters candidates based on the connection of
-     * a candidate with the rest of the graph) for incoming connections where
-     * the candidate vertex if the target.
-     * @param vID the query on vertex's unique identifier, or null.
-     * @param vType the query on vertex's type (i.e., {@link EmptyVertex}, 
-     * {@link Fragment}, or {@link Template}), or null.
-     * @param bbType the query on vertex's building block type, or null,
-     * @param bbID  the query on vertex's building block ID in the library of 
-     * hit type, or null.
-     * @param eOut the edge query (filters candidates based on the connection of
-     * a candidate with the rest of the graph) for incoming connections where
-     * the candidate vertex if the source.
-     */
-
-    public VertexQuery(Long vID, VertexType vType, BBType bbType, 
-            Integer bbID, Integer level, EdgeQuery eIn, EdgeQuery eOut)
-    {
-        this(vID, vType, bbType, bbID, level, eIn);
         this.outgoingEdgeQuery = eOut;
     }
 
@@ -156,6 +154,25 @@ public class VertexQuery
             if (vertexLevel != level)
             {
                 return false;
+            }
+        }
+        if (apQueries != null)
+        {
+            for (AttachmentPointQuery apQuery : apQueries)
+            {
+                boolean matches = false;
+                for (AttachmentPoint ap : v.getAttachmentPoints())
+                {
+                    if (apQuery.matches(ap))
+                    {
+                        matches = true;
+                        break;
+                    }
+                }
+                if (!matches)
+                {
+                    return false;
+                }
             }
         }
 

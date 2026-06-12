@@ -23,6 +23,7 @@ import java.util.List;
 
 import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.AttachmentPoint;
+import denoptim.graph.AttachmentPointQuery;
 import denoptim.graph.DGraph;
 import denoptim.graph.EdgeQuery;
 import denoptim.graph.Vertex.BBType;
