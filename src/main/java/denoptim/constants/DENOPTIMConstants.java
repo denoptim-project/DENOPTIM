@@ -552,5 +552,10 @@ public final class DENOPTIMConstants
      * NAme of the property used to hold atom types, if any.
      */
     public static final Object ATMPROPATOMTYPE = null;
+
+    /**
+     * Property used to mark vertices visited by the 3D tree builder.
+     */
+    public static final Object VISITEDBY3DBUILDER = null;
     
 }

@@ -21,6 +21,7 @@ package denoptim.molecularmodeling;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,6 +47,8 @@ import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
+import denoptim.io.DenoptimIO;
+import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
 /**
@@ -303,6 +306,144 @@ public class ThreeDimTreeBuilderTest
                 + "mol with empty scaffold and other nodes");
         assertEquals(5, molWithEmptyNodes.getAtomCount(), "Number of atoms in "
                 + "mol with empty scaffold and other nodes");
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testConversionTo3dTreeWithDisconnectedGraphs() throws Exception
+    {
+        APClass a0 = APClass.make("a",0,BondType.SINGLE);
+        APClass b0 = APClass.make("b",0,BondType.SINGLE);
+        APClass h0 = APClass.make("h",0,BondType.SINGLE);
+        
+        Fragment frg1 = new Fragment();
+    	IAtom a1 = new Atom("C", new Point3d(new double[]{0.0, 0.0, 0.0}));
+    	IAtom a2 = new Atom("C", new Point3d(new double[]{1.0, 0.0, 0.0}));
+    	frg1.addAtom(a1);
+    	frg1.addAtom(a2);
+    	frg1.addBond(new Bond(a1, a2));
+    	frg1.addAP(0, a0, new Point3d(new double[]{0.0, 0.0, 1.0}));
+    	frg1.addAP(1, a0, new Point3d(new double[]{1.0, 1.0, 1.0}));
+    	frg1.projectAPsToProperties(); 
+    	
+        Fragment frg3 = new Fragment();
+        IAtom a7 = new Atom("C", new Point3d(new double[]{2.0, 0.0, 0.0}));
+        IAtom a8 = new Atom("O", new Point3d(new double[]{3.0, 0.0, 0.0}));
+        frg3.addAtom(a7);
+        frg3.addAtom(a8);
+        frg3.addBond(new Bond(a7, a8));
+        frg3.addAP(0, a0, new Point3d(new double[]{2.0, 1.0, 1.0}));
+        frg3.addAP(0, a0, new Point3d(new double[]{2.0, 1.0, -1.0}));  
+        frg3.addAP(0, b0, new Point3d(new double[]{3.0, 1.0, -1.0})); 
+        frg3.projectAPsToProperties(); 
+
+    	Fragment frg4 = new Fragment();
+    	IAtom a41 = new Atom("Si", new Point3d(new double[]{0.0, 5.0, 5.0}));
+    	IAtom a42 = new Atom("P", new Point3d(new double[]{1.0, 5.0, 5.0}));
+    	frg4.addAtom(a41);
+    	frg4.addAtom(a42);
+    	frg4.addBond(new Bond(a41, a42));
+    	frg4.addAP(0, a0, new Point3d(new double[]{0.0, 5.0, 6.0}));
+    	frg4.addAP(1, a0, new Point3d(new double[]{1.0, 6.0, 6.0}));
+    	frg4.projectAPsToProperties(); 
+    	
+    	Fragment frg5 = new Fragment();
+    	IAtom a53 = new Atom("N", new Point3d(new double[]{0.0, 5.0, 5.0}));
+    	frg5.addAtom(a53);
+    	frg5.addAP(0, a0, new Point3d(new double[]{0.0, 6.0, 6.0}));
+    	frg5.addAP(0, b0, new Point3d(new double[]{0.0, 6.0, 4.0}));   
+    	frg5.projectAPsToProperties();  
+    	
+    	Fragment cap = new Fragment();
+    	IAtom a6 = new Atom("H", new Point3d(new double[]{0.0, 0.0, 0.0}));
+    	cap.addAtom(a6);
+    	cap.addAP(0, h0, new Point3d(new double[]{0.0, 1.0, 1.0}));
+    	cap.projectAPsToProperties(); 
+    	
+
+        Vertex v1d = frg4.clone();
+        v1d.setVertexId(0);
+        v1d.setBuildingBlockType(BBType.SCAFFOLD);
+        Vertex v2d = frg5.clone();
+        v2d.setVertexId(1);
+        v2d.setBuildingBlockType(BBType.FRAGMENT);
+    
+        Vertex v3d = frg1.clone();
+        v3d.setVertexId(3);
+        v3d.setBuildingBlockType(BBType.FRAGMENT);
+        Vertex v4d = frg3.clone();
+        v4d.setVertexId(4);
+        v4d.setBuildingBlockType(BBType.FRAGMENT);
+        Vertex v6d = frg1.clone();
+        v6d.setVertexId(6);
+        v6d.setBuildingBlockType(BBType.FRAGMENT);
+        Vertex v7d = cap.clone();
+        v7d.setVertexId(7);
+        v7d.setBuildingBlockType(BBType.CAP);
+        Vertex v8d = cap.clone();
+        v8d.setVertexId(8);
+        v8d.setBuildingBlockType(BBType.CAP);
+
+        DGraph g4 = new DGraph();
+        g4.addVertex(v1d);
+        g4.addVertex(v2d);
+        g4.addVertex(v3d);
+        g4.addVertex(v4d);
+        g4.addVertex(v6d);
+        g4.addVertex(v7d);
+        g4.addVertex(v8d);
+
+
+        Edge e0d = new Edge(v2d.getAP(0), v1d.getAP(0), 
+                BondType.SINGLE);
+
+        Edge e1d = new Edge(v3d.getAP(0), v4d.getAP(1), 
+                BondType.SINGLE);
+        Edge e2d = new Edge(v4d.getAP(0), v6d.getAP(1), 
+            BondType.DOUBLE);
+        Edge e3d = new Edge(v6d.getAP(0), v7d.getAP(0), 
+                BondType.SINGLE);
+        Edge e4d = new Edge(v3d.getAP(1), v8d.getAP(0), 
+                BondType.SINGLE);
+
+        g4.addEdge(e0d);
+        g4.addEdge(e1d);
+        g4.addEdge(e2d);
+        g4.addEdge(e3d);
+        g4.addEdge(e4d);
+
+        Logger logger = Logger.getLogger("DummyLogger");
+        Randomizer rng = new Randomizer();
+    	ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(logger, rng);
+
+        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(g4,true);
+
+        assertEquals(3, MoleculeUtils.getDimensions(mol));
+        assertEquals(9, mol.getBondCount());
+        assertEquals(11, mol.getAtomCount());
+
+        //Ensure disconnection ith other subgraph
+        for (IAtom atom : mol.atoms()) 
+        {
+            if (atom.getSymbol().equals("N"))
+            {
+                assertEquals(1, mol.getConnectedAtomsList(atom).size());
+                assertEquals("Si", mol.getConnectedAtomsList(atom).get(0).getSymbol());
+            }
+            if (atom.getSymbol().equals("P"))
+            {
+                assertEquals(1, mol.getConnectedAtomsList(atom).size());
+                assertEquals("Si", mol.getConnectedAtomsList(atom).get(0).getSymbol());
+            }
+            if (atom.getSymbol().equals("Si"))
+            {
+                assertEquals(2, mol.getConnectedAtomsList(atom).size());
+                assertEquals("P", mol.getConnectedAtomsList(atom).get(0).getSymbol());
+                assertEquals("N", mol.getConnectedAtomsList(atom).get(1).getSymbol());
+            }
+        }
+        //DenoptimIO.writeGraphToSDF(new File("/tmp/g4.sdf"), g4, false, true, logger, rng);
     }
     
 //------------------------------------------------------------------------------

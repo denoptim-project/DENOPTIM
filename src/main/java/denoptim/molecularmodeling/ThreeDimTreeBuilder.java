@@ -239,107 +239,44 @@ public class ThreeDimTreeBuilder
             boolean removeUsedRCAs, boolean setCDKRequirements, boolean rebuild) 
                     throws DENOPTIMException
     {
-        IAtomContainer mol = builder.newAtomContainer();
-        
-        // WARNING: assumption that the graph is an healthy spanning tree, as
-        // it should always be in DENOPTIM.
-        Vertex rootVrtx = graph.getSourceVertex();
-        long idRootVrtx = rootVrtx.getVertexId();
-        
-        IAtomContainer iacRootVrtx = null;
-        if (rootVrtx.containsAtoms())
-        {
-            iacRootVrtx = rootVrtx.getIAtomContainer(logger, randomizer, 
-                    removeUsedRCAs, rebuild);
-        
-            if (iacRootVrtx == null)
-            {
-                String msg = this.getClass().getSimpleName()
-                        + " found a building block declaring "
-                        + "to containg atoms, "
-                        + "but returning null atom container. "
-                        + "Building blocks: " + rootVrtx;
-                throw new IllegalArgumentException(msg);
-            }
-
-            for (IAtom atm : iacRootVrtx.atoms())
-            {
-                Object prevPath = atm.getProperty(
-                        DENOPTIMConstants.ATMPROPVERTEXPATH);
-                if (prevPath!=null)
-                {
-                    atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
-                            idRootVrtx + ", " + prevPath.toString());
-                } else {
-                    atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
-                            idRootVrtx);
-                }
-                atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, idRootVrtx);
-            }
-            mol.add(iacRootVrtx);
-        }
-        
-        // Store APs in maps
+        // initialize data structures for storing logging info
         Map<Long,ArrayList<AttachmentPoint>> apsPerVertexId = new HashMap<>();
         Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge = new HashMap<>();
         Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom = new HashMap<>();
         Map<IBond,ArrayList<AttachmentPoint>> apsPerBond = new HashMap<>();
-        ArrayList<AttachmentPoint> apsOnThisFrag = new ArrayList<>();
-        for (AttachmentPoint ap : rootVrtx.getAttachmentPoints())
-        {
-            // For first vertex the atomPositionNumber remains the same
-            ap.setAtomPositionNumberInMol(ap.getAtomPositionNumber());
-            apsOnThisFrag.add(ap);
-            if (rootVrtx.containsAtoms())
-            {
-                IAtom srcAtm = iacRootVrtx.getAtom(ap.getAtomPositionNumber());
-                if (apsPerAtom.containsKey(srcAtm))
-                {
-                    apsPerAtom.get(srcAtm).add(ap);
-                }
-                else
-                {
-                    ArrayList<AttachmentPoint> apsOnThisAtm =
-                            new ArrayList<>();
-                    apsOnThisAtm.add(ap);
-                    apsPerAtom.put(srcAtm,apsOnThisAtm);
-                }
-            }
-        }
-        apsPerVertexId.put(idRootVrtx,apsOnThisFrag);
-        
-        // Recursion on all branches of the tree (i.e., all incident edges)
-        for (Edge edge : graph.getEdgesWithSrc(rootVrtx))
-        {
-            // Get the AP from the current vertex to the next
-            AttachmentPoint apSrc = edge.getSrcAP();
 
-            // Add APs to the map of APs per Edges
-            ArrayList<AttachmentPoint> apOnThisEdge =
-                                      new ArrayList<AttachmentPoint>();
-            apOnThisEdge.add(apSrc);
-            apOnThisEdge.add(edge.getTrgAP());
-            apsPerEdge.put(edge,apOnThisEdge);
-            
-            if (rootVrtx.containsAtoms())
+        // initialize the atom container to be returned
+        IAtomContainer mol = builder.newAtomContainer();
+        
+        // We start from the scallof, if any, otherwise we start from the first vertex
+        Vertex rootVrtx = graph.getSourceVertex();
+        append3DFragmentsDisconnected(rootVrtx, mol, graph, removeUsedRCAs, rebuild, 
+            apsPerVertexId, apsPerEdge, apsPerAtom, apsPerBond);
+
+        // Deal with disconnected graphs: not all vertexes are reachable from the root
+        for (Vertex v : graph.getVertexList())
+        {
+            Boolean visited = (Boolean) v.getProperty(DENOPTIMConstants.VISITEDBY3DBUILDER);
+            if (visited != null && visited == true)
             {
-                Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
-                Point3d srcPtApSrc = new Point3d(
-                        MoleculeUtils.getPoint3d(iacRootVrtx.getAtom(
-                        apSrc.getAtomPositionNumber())));
-                
-                // Append next building block on AP-vector - start recursion
-                append3DFragmentsViaEdges(mol, graph,
-                        apSrc.getAtomPositionNumber(),
-                        srcPtApSrc,trgPtApSrc,edge,removeUsedRCAs, rebuild,
-                        apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
-            } else {
-                // Append next building block - start recursion
-                Point3d pt = getRandomPoint(mol);
-                append3DFragmentsViaEdges(mol, graph, -1, pt, pt, edge, 
-                        removeUsedRCAs, rebuild,
-                        apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
+                continue;
             }
+
+            Vertex nextBranchRoot = v;
+            List<Vertex> parentTree = new ArrayList<Vertex>();
+            graph.getParentTree(v, parentTree);
+            if (parentTree.size() > 0)
+            {
+                nextBranchRoot = parentTree.get(parentTree.size()-1);
+            }
+
+            append3DFragmentsDisconnected(nextBranchRoot,
+                mol, graph, removeUsedRCAs, rebuild, 
+                apsPerVertexId, apsPerEdge, apsPerAtom, apsPerBond);
+        }
+        for (Vertex v : graph.getVertexList())
+        {
+            v.removeProperty(DENOPTIMConstants.VISITEDBY3DBUILDER);
         }
 
         if (removeUsedRCAs)
@@ -479,6 +416,138 @@ public class ThreeDimTreeBuilder
 //------------------------------------------------------------------------------
 
     /**
+     * A a veretex 3D structure (if any) that is not connected to anything 
+     * previously added.
+     * @param vrtx the vertex to be added
+     * @param mol the container of atoms that is being built.
+     * @param graph the graph of the disconnected graph
+     * @param removeUsedRCAs when <code>true</code> this method will remove 
+     * used RCAs (the content of ring-closing vertexes, RCVs) 
+     * and add bonds to close the rings
+     * defined by the DENOPTIMRings in the graph (does not alter the graph).
+     * @param rebuild when <code>true</code> the chemical representation of 
+     * every building block is rebuilt ignoring previously available structures.
+     * @param apsPerVertexId the map of APs per vertex ID
+     * @param apsPerEdge the map of APs per edge
+     * @param apsPerAtom the map of APs per atom
+     * @param apsPerBond the map of APs per bond
+     * @throws DENOPTIMException
+     */
+    private void append3DFragmentsDisconnected(Vertex rootVrtx, 
+            IAtomContainer mol, DGraph graph,
+            boolean removeUsedRCAs, boolean rebuild,
+            Map<Long, ArrayList<AttachmentPoint>> apsPerVertexId,
+            Map<Edge,ArrayList<AttachmentPoint>> apsPerEdge,
+            Map<IAtom,ArrayList<AttachmentPoint>> apsPerAtom,
+            Map<IBond,ArrayList<AttachmentPoint>> apsPerBond) 
+                    throws DENOPTIMException
+    {
+        rootVrtx.setProperty(DENOPTIMConstants.VISITEDBY3DBUILDER, true);
+        long idRootVrtx = rootVrtx.getVertexId();
+        
+        int preNumAtms = mol.getAtomCount();
+        IAtomContainer iacRootVrtx = null;
+        if (rootVrtx.containsAtoms())
+        {
+            iacRootVrtx = rootVrtx.getIAtomContainer(logger, randomizer, 
+                    removeUsedRCAs, rebuild);
+        
+            if (iacRootVrtx == null)
+            {
+                String msg = this.getClass().getSimpleName()
+                        + " found a building block declaring "
+                        + "to containg atoms, "
+                        + "but returning null atom container. "
+                        + "Building blocks: " + rootVrtx;
+                throw new IllegalArgumentException(msg);
+            }
+
+            for (IAtom atm : iacRootVrtx.atoms())
+            {
+                Object prevPath = atm.getProperty(
+                        DENOPTIMConstants.ATMPROPVERTEXPATH);
+                if (prevPath!=null)
+                {
+                    atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
+                            idRootVrtx + ", " + prevPath.toString());
+                } else {
+                    atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXPATH, 
+                            idRootVrtx);
+                }
+                atm.setProperty(DENOPTIMConstants.ATMPROPVERTEXID, idRootVrtx);
+            }
+            mol.add(iacRootVrtx);
+        }
+
+        // Store APs per building block and per atom (if atom exists)
+        ArrayList<AttachmentPoint> apsOnThisFrag = new ArrayList<>();
+        for (AttachmentPoint ap : rootVrtx.getAttachmentPoints())
+        {
+            // For vertices other than the first, we adjust the pointer to the
+            // AP source atom according to the atom list of the entire molecule
+            ap.setAtomPositionNumberInMol(ap.getAtomPositionNumber() + preNumAtms);
+            apsOnThisFrag.add(ap);
+            
+            if (rootVrtx.containsAtoms())
+            {
+                IAtom srcAtm = mol.getAtom(ap.getAtomPositionNumberInMol());
+                if (apsPerAtom.containsKey(srcAtm))
+                {
+                    apsPerAtom.get(srcAtm).add(ap);
+                }
+                else
+                {
+                    ArrayList<AttachmentPoint> apsOnThisAtm = 
+                            new ArrayList<AttachmentPoint>();
+                    apsOnThisAtm.add(ap);
+                    apsPerAtom.put(srcAtm,apsOnThisAtm);
+                }
+            }
+        }
+        apsPerVertexId.put(idRootVrtx,apsOnThisFrag);
+        
+        // Recursion on all branches of the tree (i.e., all incident edges)
+        for (Edge edge : graph.getEdgesWithSrc(rootVrtx))
+        {
+            // Get the AP from the current vertex to the next
+            AttachmentPoint apSrc = edge.getSrcAP();
+
+            // Add APs to the map of APs per Edges
+            ArrayList<AttachmentPoint> apOnThisEdge =
+                                      new ArrayList<AttachmentPoint>();
+            apOnThisEdge.add(apSrc);
+            apOnThisEdge.add(edge.getTrgAP());
+            apsPerEdge.put(edge,apOnThisEdge);
+
+            //TODO-gg del
+            DenoptimIO.writeSDFFile("/tmp/molBB.sdf", mol, false);
+
+            
+            if (rootVrtx.containsAtoms())
+            {
+                Point3d trgPtApSrc = new Point3d(apSrc.getDirectionVector());
+                Point3d srcPtApSrc = new Point3d(
+                        MoleculeUtils.getPoint3d(iacRootVrtx.getAtom(
+                        apSrc.getAtomPositionNumber())));
+                
+                // Append next building block on AP-vector - start recursion
+                append3DFragmentsViaEdges(mol, graph,
+                        apSrc.getAtomPositionNumberInMol(),
+                        srcPtApSrc,trgPtApSrc,edge,removeUsedRCAs, rebuild,
+                        apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
+            } else {
+                // Append next building block - start recursion
+                Point3d pt = getRandomPoint(mol);
+                append3DFragmentsViaEdges(mol, graph, -1, pt, pt, edge, 
+                        removeUsedRCAs, rebuild,
+                        apsPerVertexId,apsPerEdge,apsPerAtom,apsPerBond);
+            }
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Recursive method that appends branches of building blocks following the 
      * edges of the graph. The connection is controlled by the geometries of the
      * attachment point on a growing molecule and that of the
@@ -508,6 +577,10 @@ public class ThreeDimTreeBuilder
      * with the 
      * {@link GraphConversionTool#replaceUnusedRCVsWithCapps(DGraph)}
      * method.
+     * @param apsPerVertexId the map of APs per vertex ID
+     * @param apsPerEdge the map of APs per edge
+     * @param apsPerAtom the map of APs per atom
+     * @param apsPerBond the map of APs per bond
      * @throws DENOPTIMException
      */
 
@@ -525,6 +598,7 @@ public class ThreeDimTreeBuilder
         
         // Get the incoming fragment and its AP
         Vertex inVtx = edge.getTrgAP().getOwner();
+        inVtx.setProperty(DENOPTIMConstants.VISITEDBY3DBUILDER, true);
         AttachmentPoint apB = edge.getTrgAP();
         
         //Used to keep track of which atom comes from which vertex
@@ -798,8 +872,7 @@ public class ThreeDimTreeBuilder
         {
             // For vertices other than the first, we adjust the pointer to the
             // AP source atom according to the atom list of the entire molecule
-            ap.setAtomPositionNumberInMol(ap.getAtomPositionNumber() 
-                    + preNumAtms);
+            ap.setAtomPositionNumberInMol(ap.getAtomPositionNumber() + preNumAtms);
             apsOnThisFrag.add(ap);
             
             if (inVtx.containsAtoms())
