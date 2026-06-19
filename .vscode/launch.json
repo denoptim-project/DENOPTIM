@@ -35,14 +35,14 @@
         },
         {
             "type": "java",
-            "name": "Run test t15",
+            "name": "Run test M2G 32-4",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "-r", "GO", "t15.params"
+                "-r", "M2G", "t32-4.params"
             ],
-            "cwd": "/tmp/denoptim_test/t15",
+            "cwd": "/tmp/t32",
             "console": "integratedTerminal"
         },
         {
@@ -61,14 +61,14 @@
         },
         {
             "type": "java",
-            "name": "Run test t29-12",
+            "name": "Run test M2G_L",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "-r", "GE", "t29-12.params"
+                "-r", "M2G", "Mol1_L_1_1_1_m2g.par"
             ],
-            "cwd": "/tmp/denoptim_test/t29",
+            "cwd": "/tmp/m2g_L",
             "console": "integratedTerminal"
         },
     ]

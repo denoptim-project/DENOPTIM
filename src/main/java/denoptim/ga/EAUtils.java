@@ -1165,7 +1165,15 @@ public class EAUtils
     public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
         FragmenterParameters frgParams) throws DENOPTIMException
     {
-        return makeGraphFromFragmentationOfMol(mol, frgParams, null, null);
+        FragmentSpace fragSpace = null;
+        if (frgParams.containsParameters(ParametersType.FS_PARAMS))
+        {
+            fragSpace = ((FragmentSpaceParameters) frgParams.getParameters(
+                    ParametersType.FS_PARAMS)).getFragmentSpace();
+        } else {
+            fragSpace = new FragmentSpace();
+        }
+        return makeGraphFromFragmentationOfMol(mol, frgParams, fragSpace, null);
     }
 
 //------------------------------------------------------------------------------  

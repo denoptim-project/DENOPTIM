@@ -49,6 +49,7 @@ function scaffoldContainsElement() {
     return $(sed '/SCAFFOLD/q' "$file" | grep elSymbol | grep -q "$element")
 }
 
+# First test
 "$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-1.params" > "t32-1.log" 2>&1
 if ! checkLog t32-1.log ; then exit -1 ; fi
 
@@ -71,6 +72,7 @@ if scaffoldContainsElement W graphs-1.json_2 ; then
   exit -1
 fi
 
+# Second
 "$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-2.params" > "t32-2.log" 2>&1
 if ! checkLog t32-2.log ; then exit -1 ; fi
 
@@ -93,11 +95,42 @@ if ! scaffoldContainsElement W graphs-2.sdf_2 ; then
   exit -1
 fi
 
+# Third
 "$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-3.params" > "t32-3.log" 2>&1
 if ! checkLog t32-3.log ; then exit -1 ; fi
 
 if ! checkMatchCount '"vertexType": "Template"' graphs-3.json 1 ; then exit -1 ; fi
 if ! checkMatchCount '"isRCV": true,' graphs-3.json 2 ; then exit -1 ; fi
+
+
+if ! chopJSONFile graphs-2.sdf "" ; then exit -1 ; fi
+if ! scaffoldContainsElement W graphs-2.sdf_0 ; then
+  echo "Test 't32' NOT PASSED (sympton: wrong scaffold in graphs-2.sdf_0)"
+  exit -1
+fi
+if ! scaffoldContainsElement W graphs-2.sdf_1 ; then
+  echo "Test 't32' NOT PASSED (sympton: wrong scaffold in graphs-2.sdf_1)"
+  exit -1
+fi
+if ! scaffoldContainsElement W graphs-2.sdf_2 ; then
+  echo "Test 't32' NOT PASSED (sympton: wrong scaffold in graphs-2.sdf_2)"
+  exit -1
+fi
+
+# 4th: Single-graph vertex with expanded molecule
+"$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-4.params" > "t32-4.log" 2>&1
+if ! checkLog t32-4.log ; then exit -1 ; fi
+if ! checkMatchCount '^ 20 20  0  0  0  0  0  0  0' graphs-4.sdf 1 ; then exit -1 ; fi
+if ! checkMatchCount '"vertexType": "MolecularFragment"' graphs-4.sdf 1 ; then exit -1 ; fi
+if ! checkMatchCount 'apClass' graphs-4.sdf 1 ; then exit -1 ; fi
+
+# 5th: Single-graph vertex, single-atom
+"$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-5.params" > "t32-5.log" 2>&1
+if ! checkLog t32-5.log ; then exit -1 ; fi
+if ! checkMatchCount '^  1  0  0  0  0  0  0  0  0' graphs-5.sdf 1 ; then exit -1 ; fi
+if ! checkMatchCount '"vertexType": "MolecularFragment"' graphs-5.sdf 1 ; then exit -1 ; fi
+if ! checkMatchCount 'apClass' graphs-5.sdf 1 ; then exit -1 ; fi
+
 
 echo "Test 't32' PASSED"
 exit 0

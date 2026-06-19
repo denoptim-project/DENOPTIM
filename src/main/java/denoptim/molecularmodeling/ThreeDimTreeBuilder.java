@@ -518,10 +518,6 @@ public class ThreeDimTreeBuilder
             apOnThisEdge.add(apSrc);
             apOnThisEdge.add(edge.getTrgAP());
             apsPerEdge.put(edge,apOnThisEdge);
-
-            //TODO-gg del
-            DenoptimIO.writeSDFFile("/tmp/molBB.sdf", mol, false);
-
             
             if (rootVrtx.containsAtoms())
             {
