@@ -1144,9 +1144,64 @@ public class EAUtils
             FragmentSpace fragSpace, Monitor monitor) 
                     throws DENOPTIMException
     {
+        FragmenterParameters frgParams = new FragmenterParameters();
+        frgParams.setCuttingRules(cuttingRules);
+        frgParams.setScaffoldingPolicy(scaffoldingPolicy);
+        frgParams.setLinearAngleLimit(linearAngleLimit);
+        frgParams.setEmbedRingsInTemplate(embedRingsInTemplates);
+        frgParams.setEmbeddedRingsContract(ringTmplContract);
+        return makeGraphFromFragmentationOfMol(mol, frgParams, fragSpace, monitor);
+    }
+
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+        FragmenterParameters frgParams) throws DENOPTIMException
+    {
+        return makeGraphFromFragmentationOfMol(mol, frgParams, null, null);
+    }
+
+//------------------------------------------------------------------------------  
+    
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param cuttingRules the cutting rules defining how to do fragmentation.
+     * @param logger tool managing log.
+     * @param scaffoldingPolicy the policy for deciding which vertex should be 
+     * given the role of scaffold.
+     * @param linearAngleLimit the max bond angle before we start considering 
+     * the angle linear and add a linearity-breaking dummy atom.
+     * @param embedRingsInTemplates use <code>true</code> to require embedding
+     * of rings in {@link Template}s.
+     * @param ringTmplContract specifies the type of contract to give to 
+     * templates embedding rings. Can be <code>null</code>.
+     * @param fragSpace the definition of the fragment space to consider when
+     * generating fragments.
+     * @param monitor tool to keep track of events and count failures. Can be 
+     * <code>null</code>, in which case it is ignored.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+        FragmenterParameters frgParams, FragmentSpace fragSpace, Monitor monitor) 
+                throws DENOPTIMException
+    {
+        double linearAngleLimit = frgParams.getLinearAngleLimit();
+        boolean embedRingsInTemplates = frgParams.embedRingsInTemplate();
+        ContractLevel ringTmplContract = frgParams.getEmbeddedRingsContract();
+        ScaffoldingPolicy scaffoldingPolicy = frgParams.getScaffoldingPolicy();
+        
         // We expect only Fragments here.
-        List<Vertex> fragments = FragmenterTools.fragmentation(mol, 
-                cuttingRules, logger);
+        List<Vertex> fragments = FragmenterTools.fragmentation(mol, frgParams);
         for (Vertex v : fragments)
         {
             Fragment frag = (Fragment) v;
@@ -1294,7 +1349,7 @@ public class EAUtils
     private static void appendVertexesToGraphFollowingEdges(DGraph graph,
             AtomicInteger vId, List<Vertex> vertexes) throws DENOPTIMException
     {
-        // We seek for  the last and non-RCV vertex added to the graph
+        // We seek for the last and non-RCV vertex added to the graph
         Vertex lastlyAdded = null;
         for (int i=-1; i>-4; i--)
         {
@@ -1320,6 +1375,9 @@ public class EAUtils
                 for (AttachmentPoint apJ : fragJ.getAttachmentPoints())
                 {
                     if (apI==apJ)
+                        continue;
+
+                    if (!apI.isAvailable() || !apJ.isAvailable())
                         continue;
                     
                     if (apI.getCutId()==apJ.getCutId())

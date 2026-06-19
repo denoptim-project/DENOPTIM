@@ -63,16 +63,13 @@ import com.google.gson.JsonSerializer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
-import denoptim.files.FileFormat;
 import denoptim.fragspace.FragmentSpace;
 import denoptim.fragspace.FragmentSpaceParameters;
-import denoptim.ga.GraphOperations;
 import denoptim.graph.APClass.APClassDeserializer;
 import denoptim.graph.Edge.BondType;
 import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.Vertex.DENOPTIMVertexDeserializer;
-import denoptim.graph.Vertex.VertexType;
 import denoptim.graph.rings.ClosableChain;
 import denoptim.graph.rings.CyclicGraphHandler;
 import denoptim.graph.rings.PathSubGraph;
@@ -1127,6 +1124,24 @@ public class DGraph implements Cloneable
     public boolean hasRings()
     {
         return gRings.size() > 0;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Check if this graph is connected, i.e., there is at least one path between
+     * any two vertices.
+     * @return <code>true</code> if the graph is connected.
+     */
+    public boolean isConnected()
+    {
+        // edge case: empty graph is connected
+        if (gVertices.isEmpty())
+        {
+            return true;
+        }
+        Set<Vertex> visited = exploreGraph(gVertices.get(0), new HashSet<Vertex>());
+        return visited.size() == gVertices.size();
     }
     
 //------------------------------------------------------------------------------

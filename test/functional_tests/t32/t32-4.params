@@ -1,0 +1,6 @@
+# mol-4.sdf contains an intentionally distorted geometry:
+# we want to see how the AP head is placed
+M2G-INPUTFILE=mol-4.sdf
+M2G-OUTPUTGRAPHS=graphs-4.sdf
+FRG-VERBOSITY=1
+FRG-FragmentationTemplate=tmpl-4.json

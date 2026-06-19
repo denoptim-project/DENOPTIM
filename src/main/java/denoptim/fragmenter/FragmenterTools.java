@@ -14,11 +14,13 @@ import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
+import org.openscience.cdk.Atom;
 import org.openscience.cdk.Bond;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.config.Isotopes;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.geometry.alignment.KabschAlignment;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -348,7 +350,32 @@ public class FragmenterTools
         }
         return totalProd>0;
     }
-    
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Performs fragmentation according to the given settings
+     * @param mol the molecule to fragment
+     * @param settings the parameters controlling the fragmentation
+     * @return the list of fragments
+     * @throws DENOPTIMException 
+     */
+    public static List<Vertex> fragmentation(IAtomContainer mol, 
+            FragmenterParameters settings) 
+            throws DENOPTIMException
+    {
+        List<Vertex> fragments = new ArrayList<Vertex>();
+        if (settings.getFragmentationTmpls().size()>0)
+        {
+            fragments = fragmentation(mol, settings.getFragmentationTmpls(), 
+                settings.getRandomizer(), settings.getLogger());
+        } else {
+            fragments = fragmentation(mol, settings.getCuttingRules(), 
+                settings.getLogger());
+        }
+        return fragments;
+    }
+
 //-----------------------------------------------------------------------------
     
     /**
@@ -394,15 +421,7 @@ public class FragmenterTools
                     molName = mol.getTitle();
                 
                 // Generate the fragments
-                List<Vertex> fragments = new ArrayList<Vertex>();
-                if (settings.getFragmentationTmpls().size()>0)
-                {
-                    fragments = fragmentation(mol, settings.getFragmentationTmpls(), 
-                        settings.getRandomizer(), logger);
-                } else {
-                    fragments = fragmentation(mol, settings.getCuttingRules(), 
-                        logger);
-                }
+                List<Vertex> fragments = fragmentation(mol, settings);
                 if (logger!=null)
                 {
                     logger.log(Level.FINE,"Fragmentation produced " 
@@ -468,16 +487,27 @@ public class FragmenterTools
      * chains connecting them. This can speed up isomorphism calculations.
      * Each atom in the reduced molecule has a property "DENOPTIM_ORIGINAL_ATOM_INDEX"
      * storing the index of the original atom in the template molecule.
+     * This assumes the molecular representation pertains to a connected graph 
+     * (i.e., no disconnected atoms). 
+     * If an atom container reflecting a disconnected graph is given, 
+     * then the original atom container is returned.
      * @param templateMol the template molecule to reduce
      * @return the reduced molecule with original atom indices stored as properties,
-     *         or the original molecule if reduction is not possible
+     *         or the original molecule if reduction is not possible or the input
+     *         is a disconnected graph.
      */
-    private static IAtomContainer reduceTemplateToVertexBoundaries(IAtomContainer templateMol)
+    private static IAtomContainer reduceIACToGraphTopologyRelevantAtoms(
+        IAtomContainer templateMol)
     {
         // Find all boundary atoms: atoms connected to atoms with different vertex IDs
         Set<IAtom> boundaryAtoms = new HashSet<>();
         Map<IAtom, Long> atomToVertexId = new HashMap<>();
-        
+        Set<Long> visitedVertexIds = new HashSet<>();
+        Set<Long> visitedVertexIdsBoundaries = new HashSet<>();
+        Set<IAtom> atomsWithAPs = new HashSet<>();
+
+        boolean produceHDepleted = false;
+
         // First pass: collect vertex IDs and identify boundary atoms
         for (IAtom atom : templateMol.atoms())
         {
@@ -485,11 +515,19 @@ public class FragmenterTools
             if (vidProp == null)
             {
                 // If no vertex ID, keep all atoms (can't optimize)
-                return templateMol;
+                produceHDepleted = true;
+                vidProp = -1L;
             }
             Long vid = Long.parseLong(vidProp.toString());
+            visitedVertexIds.add(vid);
             atomToVertexId.put(atom, vid);
-            
+
+            Object apsProp = atom.getProperty(DENOPTIMConstants.ATMPROPAPS);
+            if (apsProp != null)
+            {
+                atomsWithAPs.add(atom);
+            }
+
             // Check neighbors for different vertex IDs
             List<IAtom> neighbors = templateMol.getConnectedAtomsList(atom);
             for (IAtom neighbor : neighbors)
@@ -502,35 +540,68 @@ public class FragmenterTools
                     {
                         boundaryAtoms.add(atom);
                         boundaryAtoms.add(neighbor);
+                        visitedVertexIdsBoundaries.add(vid);
+                        visitedVertexIdsBoundaries.add(nbrVid);
                         break;
                     }
                 }
             }
         }
+
+        // Ensure we have vidited all vertexes, or H-depleted version is needed
+        visitedVertexIds.removeAll(visitedVertexIdsBoundaries);
+        if (!visitedVertexIds.isEmpty())
+        {
+            produceHDepleted = true;
+        }
         
-        // If no boundary atoms found, return original (all atoms have same vertex ID)
+        // If no boundary atoms found, H-depleted version is needed (all atoms have same vertex ID)
         if (boundaryAtoms.isEmpty())
         {
-            return templateMol;
+            produceHDepleted = true;
         }
         
         // Find minimal chains connecting boundary atoms using BFS
         Set<IAtom> atomsToKeep = new HashSet<>(boundaryAtoms);
-        
-        // For each pair of boundary atoms, find shortest path
-        List<IAtom> boundaryList = new ArrayList<>(boundaryAtoms);
-        for (int i = 0; i < boundaryList.size(); i++)
+
+        if (produceHDepleted)
         {
-            for (int j = i + 1; j < boundaryList.size(); j++)
+            // We did not manage to find a sensible subset possibly because the input
+            // is a disconnected graph.
+            // So, we make a simplified version removing all H that do not hold APs
+            for (IAtom atom : templateMol.atoms())
             {
-                IAtom start = boundaryList.get(i);
-                IAtom end = boundaryList.get(j);
-                
-                // Find shortest path between these boundary atoms
-                List<IAtom> path = MoleculeUtils.findShortestPath(templateMol, start, end, atomToVertexId);
-                if (path != null)
+                if (atom.getSymbol().equals("H"))
                 {
-                    atomsToKeep.addAll(path);
+                    if (atomsWithAPs.contains(atom))
+                    {
+                        atomsToKeep.add(atom);
+                    }
+                } else {
+                    atomsToKeep.add(atom);
+                }
+            }
+        } else {
+            // Use the boundaries to identify the smallest set of atoms needed
+            // to identify mathcing topology. 
+            // For each pair of boundary atoms, find shortest path
+            List<IAtom> boundaryList = new ArrayList<>(boundaryAtoms);
+            for (int i = 0; i < boundaryList.size(); i++)
+            {
+                for (int j = i + 1; j < boundaryList.size(); j++)
+                {
+                    IAtom start = boundaryList.get(i);
+                    IAtom end = boundaryList.get(j);
+                    
+                    // Find shortest path between these boundary atoms
+                    //
+                    // WARNING: this method can be very costly for large molecules.
+                    //
+                    List<IAtom> path = MoleculeUtils.findShortestPath(templateMol, start, end, atomToVertexId);
+                    if (path != null)
+                    {
+                        atomsToKeep.addAll(path);
+                    }
                 }
             }
         }
@@ -576,7 +647,6 @@ public class FragmenterTools
         
         return reduced;
     }
-
     
 //------------------------------------------------------------------------------
     
@@ -596,13 +666,29 @@ public class FragmenterTools
         int bestMatch = -1;
         for (DGraph template : templates)
         {
+            // Check if the template is connected
+            if (!template.isConnected())
+            {
+                // This limitation derives from the fact that to speed up substructure
+                // search we reduce the template graph to the smallest set of atoms that
+                // identify the topology of APs. The 
+                // can identify the matching topology. This is not possible for disconnected
+                // graphs.
+                throw new DENOPTIMException("Template graph is not connected. "
+                        + "Cannot use it for fragmentation. Please check the "
+                        + "template graph and make sure it is connected.");
+            }
+
             ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
             IAtomContainer templateMol = tb.convertGraphTo3DAtomContainer(template, 
-                false, true, true);
+                true, true, true);
+
+            //TODO: consider splitting the template into connected components and
+            // reduce each component independently.
             
             // Optimize: create reduced templateMol for faster isomorphism search
             // Keep full templateMol for exploreDGraphForMappings
-            IAtomContainer reducedTemplateMol = reduceTemplateToVertexBoundaries(templateMol);
+            IAtomContainer reducedTemplateMol = reduceIACToGraphTopologyRelevantAtoms(templateMol);
             
             List<Map<IAtom,IAtom>> atomMappings;
             
@@ -611,9 +697,7 @@ public class FragmenterTools
             {
                 // No reduction possible, use full template directly
                 atomMappings = MoleculeUtils.findUniqueAtomMappings(templateMol, mol, logger);
-            }
-            else
-            {
+            } else {
                 // Use reduced template for isomorphism search (faster)
                 List<Map<IAtom,IAtom>> reducedAtomMappings = MoleculeUtils.findUniqueAtomMappings(
                         reducedTemplateMol, mol, logger);
@@ -651,7 +735,7 @@ public class FragmenterTools
             IAtomContainer masterFragIAC = masterFrag.getIAtomContainer();
 
             // For each atom mapping, replace bonds corresponding to edges 
-            // (at any embedding level) with attachment pointsand annotate embedding level
+            // (at any embedding level) with attachment points and annotate embedding level
             for (Map<IAtom,IAtom> atomMapping : atomMappings)
             {
                 try {
@@ -709,8 +793,10 @@ public class FragmenterTools
         Fragment masterFrag, IAtomContainer masterFragIAC, IAtomContainer mol,
         Map<IAtom,IAtom> graphToMolMapping)
     {
+        int cutId = -1;
         for (Edge edge : graph.getEdgeList())
         {
+            cutId++;
             //TODO: what about RCVs?
             IAtom graphAtmSrc = graphIAC.getAtom(edge.getSrcAP().getAtomPositionNumberInMol());
             IAtom graphAtmTrg = graphIAC.getAtom(edge.getTrgAP().getAtomPositionNumberInMol());
@@ -724,12 +810,14 @@ public class FragmenterTools
                 masterFragIAC.removeBond(bnd);
             }
 
-            masterFrag.addAPOnAtom(masterFragAtmSrc, 
+            AttachmentPoint srcAP = masterFrag.addAPOnAtom(masterFragAtmSrc, 
                 edge.getSrcAP().getAPClass(), 
                 MoleculeUtils.getPoint3d(masterFragAtmTrg));
-            masterFrag.addAPOnAtom(masterFragAtmTrg, 
+            srcAP.setCutId(cutId);
+            AttachmentPoint trgAP = masterFrag.addAPOnAtom(masterFragAtmTrg, 
                 edge.getTrgAP().getAPClass(), 
                 MoleculeUtils.getPoint3d(masterFragAtmSrc));
+            trgAP.setCutId(cutId);
         }
 
         for (Vertex v : graph.getVertexList())
@@ -738,10 +826,144 @@ public class FragmenterTools
             {
                 DGraph innerGraph = ((Template) v).getInnerGraph();
                 exploreDGraphForMappings(innerGraph, graphIAC, masterFrag, masterFragIAC, mol, graphToMolMapping);
+                continue;
+            }
+
+            // Deal with vertexes without edges, i.e., free APs
+            for (AttachmentPoint ap : v.getAttachmentPoints())
+            {
+                if (!ap.isAvailable())
+                {
+                    continue;
+                }
+                IAtom graphAtmSrc = graphIAC.getAtom(ap.getAtomPositionNumberInMol());
+                IAtom masterFragAtmSrc = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
+
+                // findthe position of the AP head in 3D space by aligning geoetry to template geometry
+                Point3d apHead = null;
+                try {
+                    apHead = findPointalignedWithTmpl(ap, graphAtmSrc, 
+                        graphIAC, masterFragIAC, mol, graphToMolMapping);
+                } catch (DENOPTIMException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                // Make the free AP on the master
+                masterFrag.addAPOnAtom(masterFragAtmSrc, ap.getAPClass(), apHead);
             }
         }
     }
-    
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Finds the point on the master fragment that is aligned with the template 
+     * geometry.
+     * @param ap the AP for which we do the alignement
+     * @param graphAtmSrc the atom in the template graph that is the source of 
+     * the AP
+     * @param graphIAC the atom container corresonding to the template graph
+     * @param masterFragIAC the fragment being created by fragmentation 
+     * (may be discontinuous)
+     * @param mol the molecule being fragmented
+     * @param graphToMolMapping the mapping between the atoms in the template 
+     * graph and the atoms in the molecule being fragmented
+     * @return the point on the master fragment that is aligned with the template 
+     * geometry
+     * @throws DENOPTIMException
+     */
+    private static Point3d findPointalignedWithTmpl(AttachmentPoint ap, 
+        IAtom graphAtmSrc, IAtomContainer graphIAC, IAtomContainer masterFragIAC, 
+        IAtomContainer mol,
+        Map<IAtom,IAtom> graphToMolMapping) throws DENOPTIMException
+    {
+        // Work with cloned molecules
+        IAtomContainer molA = MoleculeUtils.makeSameAs(masterFragIAC);
+        IAtomContainer molB = MoleculeUtils.makeSameAs(graphIAC);
+
+        // Add the AP as a dummy atom to the molecuel that will be rototranslated
+        IAtom dummyAtm = new Atom("He"); //element is irrelevant
+        dummyAtm.setPoint3d(ap.getDirectionVector());
+        molB.addAtom(dummyAtm);
+
+        List<IAtom> closestNeighbors = graphIAC.getConnectedAtomsList(graphAtmSrc);
+        if (closestNeighbors.size() < 1)
+        {
+            // We do not have enough atoms to do an alignement: use only distance
+//TODO-gg
+        } else {
+            // Try to alogn atoms around AP sourc to get the position of the AP head
+            Map<IAtom,IAtom> molToGraphMappingAroundAPSrc = new HashMap<>();
+            Set<IAtom> atomsAlreadyUsed = new HashSet<>();
+            for (Map.Entry<IAtom,IAtom> pair : graphToMolMapping.entrySet())
+            {
+                IAtom atmGraphIAC = pair.getKey();
+                if (graphIAC.getConnectedAtomsList(graphAtmSrc).contains(atmGraphIAC)
+                || atmGraphIAC == graphAtmSrc)
+                {
+                    atomsAlreadyUsed.add(atmGraphIAC);
+                    molToGraphMappingAroundAPSrc.put(
+                        molA.getAtom(mol.indexOf(pair.getValue())),
+                        molB.getAtom(graphIAC.indexOf(atmGraphIAC)));
+                }
+            }
+            // When we have few atoms we take also the second shell of neighbors
+            if (closestNeighbors.size()<3)
+            {
+                for (Map.Entry<IAtom,IAtom> pair : graphToMolMapping.entrySet())
+                {
+                    IAtom atmGraphIAC = pair.getKey();
+                    if (closestNeighbors.contains(atmGraphIAC) 
+                        && !atomsAlreadyUsed.contains(atmGraphIAC))
+                    {
+                        atomsAlreadyUsed.add(atmGraphIAC);
+                        molToGraphMappingAroundAPSrc.put(
+                            molA.getAtom(mol.indexOf(pair.getValue())),
+                            molB.getAtom(graphIAC.indexOf(atmGraphIAC)));
+                    }
+                }
+            }
+
+            // Make mapping in a format suitable for KabschAlignment
+            IAtom[] lstA = new IAtom[molToGraphMappingAroundAPSrc.size()];
+            IAtom[] lstB = new IAtom[molToGraphMappingAroundAPSrc.size()];
+            int k = 0;
+            for (Map.Entry<IAtom,IAtom> pair : molToGraphMappingAroundAPSrc.entrySet())
+            {
+                lstA[k] = pair.getKey();
+                lstB[k] = pair.getValue();
+                k++;
+            }
+
+            //Calculate rotational matrix and align
+            KabschAlignment sa;
+            try
+            {
+                sa = new KabschAlignment(lstA, lstB);
+                sa.align();
+            } catch (Throwable t) {
+                throw new DENOPTIMException("KabschAlignment failed.", t);
+            }
+
+            //Rototranslation of molecule B (origin is in A's center of mass!!!)
+            sa.rotateAtomContainer(molB);
+
+            // Translate B to to actual coordinates of A (instead of c.o.m.)
+            Point3d cm = sa.getCenterOfMass();
+            for (int ib = 0; ib < molB.getAtomCount(); ib++)
+            {
+                IAtom a = molB.getAtom(ib);
+                Point3d oldPlace = MoleculeUtils.getPoint3d(a);
+                Point3d newPlace = new Point3d(oldPlace.x + cm.x,
+                                                    oldPlace.y + cm.y,
+                                                    oldPlace.z + cm.z);
+                a.setPoint3d(newPlace);
+            }
+        }
+        return MoleculeUtils.getPoint3d(dummyAtm);
+    }
+
 //------------------------------------------------------------------------------
     
     /**

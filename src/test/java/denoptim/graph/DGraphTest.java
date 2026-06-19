@@ -4427,4 +4427,45 @@ public class DGraphTest
     }
     
 //------------------------------------------------------------------------------
+
+    @Test
+    public void testIsConnected() throws Exception
+    {
+        DGraph empty = new DGraph();
+        assertTrue(empty.isConnected());
+
+        DGraph single = new DGraph();
+        EmptyVertex lone = new EmptyVertex();
+        lone.setBuildingBlockType(BBType.SCAFFOLD);
+        single.addVertex(lone);
+        assertTrue(single.isConnected());
+
+        DGraph disconnected = new DGraph();
+        EmptyVertex v1 = new EmptyVertex();
+        v1.addAP();
+        v1.addAP();
+        EmptyVertex v2 = new EmptyVertex();
+        v2.addAP();
+        v2.addAP();
+        disconnected.addVertex(v1);
+        disconnected.addVertex(v2);
+        assertFalse(disconnected.isConnected());
+
+        DGraph connected = new DGraph();
+        EmptyVertex c1 = new EmptyVertex();
+        c1.addAP();
+        c1.addAP();
+        EmptyVertex c2 = new EmptyVertex();
+        c2.addAP();
+        c2.addAP();
+        connected.addVertex(c1);
+        connected.addVertex(c2);
+        connected.addEdge(new Edge(c1.getAP(0), c2.getAP(0)));
+        assertTrue(connected.isConnected());
+
+        FragmentSpace fs = prepare();
+        assertTrue(makeTestGraphC(fs).isConnected());
+    }
+    
+//------------------------------------------------------------------------------
 }

@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.Edge.BondType;
+
 /**
  * Unit tests for {@link EdgeQuery#matches(Edge)}.
  */

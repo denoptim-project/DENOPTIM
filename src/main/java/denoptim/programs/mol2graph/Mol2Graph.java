@@ -29,6 +29,8 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.ga.EAUtils;
 import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
+import denoptim.programs.RunTimeParameters.ParametersType;
+import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.task.ProgramTask;
 
 
@@ -64,21 +66,20 @@ public class Mol2Graph extends ProgramTask
         m2gParams.processParameters();
         m2gParams.startProgramSpecificLogger(loggerIdentifier, false); //to STDOUT
         
+        FragmenterParameters frgParams = new FragmenterParameters();
+        if (m2gParams.containsParameters(ParametersType.FRG_PARAMS))
+        {
+            frgParams = (FragmenterParameters) m2gParams.getParameters(
+                    ParametersType.FRG_PARAMS);
+        }
+        
         List<DGraph> graphs = new ArrayList<DGraph>();
         for (int i=0; i<m2gParams.getInputMolsCount(); i++)
         {
             IAtomContainer mol = m2gParams.getInputMol(i);
             DGraph graph = null;
             try {
-                graph = EAUtils.makeGraphFromFragmentationOfMol(mol, 
-                        m2gParams.getCuttingRules(), 
-                        m2gParams.getLogger(),
-                        m2gParams.getScaffoldingPolicy(),
-                        m2gParams.getLinearAngleLimit(),
-                        m2gParams.embedRingsInTemplate(),
-                        m2gParams.getEmbeddedRingsContract(),
-                        m2gParams.getFragmentSpace(),
-                        null); // monitor is not used here
+                graph = EAUtils.makeGraphFromFragmentationOfMol(mol, frgParams);
             } catch (DENOPTIMException de)
             {
                 m2gParams.getLogger().log(Level.SEVERE, "Unable to convert "
