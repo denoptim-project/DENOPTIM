@@ -72,6 +72,11 @@ public class Mol2Graph extends ProgramTask
             frgParams = (FragmenterParameters) m2gParams.getParameters(
                     ParametersType.FRG_PARAMS);
         }
+        if (m2gParams.containsParameters(ParametersType.FS_PARAMS))
+        {
+            frgParams.setParameters(m2gParams.getParameters(
+                    ParametersType.FS_PARAMS));
+        }
         
         List<DGraph> graphs = new ArrayList<DGraph>();
         for (int i=0; i<m2gParams.getInputMolsCount(); i++)

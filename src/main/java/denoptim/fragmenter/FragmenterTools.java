@@ -882,7 +882,7 @@ public class FragmenterTools
         IAtomContainer molA = MoleculeUtils.makeSameAs(masterFragIAC);
         IAtomContainer molB = MoleculeUtils.makeSameAs(graphIAC);
 
-        // Add the AP as a dummy atom to the molecuel that will be rototranslated
+        // Add the AP as a dummy atom to the molecule that will be rototranslated
         IAtom dummyAtm = new Atom("He"); //element is irrelevant
         dummyAtm.setPoint3d(ap.getDirectionVector());
         molB.addAtom(dummyAtm);
@@ -891,7 +891,13 @@ public class FragmenterTools
         if (closestNeighbors.size() < 1)
         {
             // We do not have enough atoms to do an alignement: use only distance
-//TODO-gg
+            double dist = graphAtmSrc.getPoint3d().distance(ap.getDirectionVector());
+            IAtom srcAtmOnMolA = molA.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
+            Point3d apHead = new Point3d(
+                srcAtmOnMolA.getPoint3d().x + dist,
+                srcAtmOnMolA.getPoint3d().y,
+                srcAtmOnMolA.getPoint3d().z);
+            return apHead;
         } else {
             // Try to alogn atoms around AP sourc to get the position of the AP head
             Map<IAtom,IAtom> molToGraphMappingAroundAPSrc = new HashMap<>();

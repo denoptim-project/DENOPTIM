@@ -1,0 +1,78 @@
+
+  CDK     06192610143D
+
+  1  0  0  0  0  0  0  0  0  0999 V2000
+    0.7476    0.9815   -2.3444 I   0  0  0  0  0 15  0  0  0  0  0  0
+M  END
+> <ATTACHMENT_POINTS>
+1#RuX:1:SINGLE:0.5740%0.8533%-0.0044 
+
+> <GCODE>
+0
+
+> <GraphENC>
+0 2_-98_1,  
+
+> <GraphJson>
+{
+  "graphId": 0,
+  "gVertices": [
+    {
+      "lstAPs": [
+        {
+          "id": 3,
+          "atomPositionNumber": 0,
+          "atomPositionNumberInMol": 0,
+          "apClass": {
+            "rule": "RuX",
+            "subClass": 1,
+            "bndTyp": "SINGLE"
+          },
+          "dirVec": {
+            "x": 0.574,
+            "y": 0.8533,
+            "z": -0.0044
+          }
+        }
+      ],
+      "lstSymAPs": [],
+      "mol": {
+        "atoms": [
+          {
+            "elSymbol": "I",
+            "p3d": {
+              "x": 0.7476,
+              "y": 0.9815,
+              "z": -2.3444
+            }
+          }
+        ],
+        "bonds": []
+      },
+      "vertexId": 2,
+      "buildingBlockId": -99,
+      "buildingBlockType": "FRAGMENT",
+      "isRCV": false,
+      "properties": {
+        "ATTACHMENT_POINTS": "1#RuX:1:SINGLE:0.5740%0.8533%-0.0044 "
+      },
+      "uniquefyingPropertyKeys": [],
+      "allowedMutationTypes": [
+        "DELETE",
+        "EXTEND",
+        "CHANGEBRANCH",
+        "CHANGELINK",
+        "ADDLINK",
+        "ADDRING",
+        "DELETELINK",
+        "DELETECHAIN"
+      ],
+      "vertexType": "MolecularFragment"
+    }
+  ],
+  "gEdges": [],
+  "gRings": [],
+  "symVertices": []
+}
+
+$$$$
