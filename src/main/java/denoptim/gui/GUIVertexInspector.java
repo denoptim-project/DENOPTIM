@@ -692,6 +692,7 @@ public class GUIVertexInspector extends GUICardPanel
                 {
 					fragments = FragmenterTools.fragmentation(vertex.getIAtomContainer(),
 						settings.getFragmentationTmpls(), 
+                        settings.getMaxBufferShellSize(),
                         settings.getRandomizer(), 
 						settings.getLogger());
                 } catch (DENOPTIMException e)

@@ -131,6 +131,12 @@ if ! checkMatchCount '^  1  0  0  0  0  0  0  0  0' graphs-5.sdf 1 ; then exit -
 if ! checkMatchCount '"vertexType": "MolecularFragment"' graphs-5.sdf 1 ; then exit -1 ; fi
 if ! checkMatchCount 'apClass' graphs-5.sdf 1 ; then exit -1 ; fi
 
+# 6th: reduced template matches multiple atoms
+"$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-6.params" > "t32-6.log" 2>&1
+if ! checkLog t32-6.log ; then exit -1 ; fi
+if ! checkMatchCount '^ 53 56  0  0  0  0  0  0  0' graphs-6.sdf 1 ; then exit -1 ; fi
+if ! checkMatchCount '"vertexType": "MolecularFragment"' graphs-6.sdf 5 ; then exit -1 ; fi
+if ! checkMatchCount 'apClass' graphs-6.sdf 8 ; then exit -1 ; fi
 
 echo "Test 't32' PASSED"
 exit 0

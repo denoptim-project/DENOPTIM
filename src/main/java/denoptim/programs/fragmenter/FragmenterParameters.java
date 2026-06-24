@@ -398,6 +398,11 @@ public class FragmenterParameters extends RunTimeParameters
      * no template will be used.
      */
     private List<DGraph> fragmentationTmpls = new ArrayList<DGraph>();
+
+    /**
+     * Maximum number of buffer shells to consider for fragmentation.
+     */
+    private int maxBufferShellSize = 2;
     
 //------------------------------------------------------------------------------
     
@@ -1062,6 +1067,18 @@ public class FragmenterParameters extends RunTimeParameters
     }
 
 //------------------------------------------------------------------------------
+
+    /**
+     * @return the maximum number of bonds to consider for including atoms around 
+     * topology-critical atoms when trying to find a unique mapping between the 
+     * template graph and the molecular structure.
+     */
+    public int getMaxBufferShellSize()
+    {
+        return maxBufferShellSize;
+    }
+
+//------------------------------------------------------------------------------
     
     /**
      * Processes a keyword/value pair and assign the related parameters.
@@ -1313,7 +1330,12 @@ public class FragmenterParameters extends RunTimeParameters
                 fragmentationTmplFile = value;
                 break;
             }
-                
+
+            case "BONDSAROUNDTOPOCRITICATOM=":
+            {
+                maxBufferShellSize = Integer.parseInt(value);
+            }
+
 /*
             case "=":
                 = value;

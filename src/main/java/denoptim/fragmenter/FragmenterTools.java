@@ -368,6 +368,7 @@ public class FragmenterTools
         if (settings.getFragmentationTmpls().size()>0)
         {
             fragments = fragmentation(mol, settings.getFragmentationTmpls(), 
+                settings.getMaxBufferShellSize(),
                 settings.getRandomizer(), settings.getLogger());
         } else {
             fragments = fragmentation(mol, settings.getCuttingRules(), 
@@ -482,192 +483,31 @@ public class FragmenterTools
 //------------------------------------------------------------------------------
     
     /**
-     * Reduces a template molecule to keep only atoms at vertex boundaries
-     * (atoms connected to atoms with different vertex IDs) and the minimal
-     * chains connecting them. This can speed up isomorphism calculations.
-     * Each atom in the reduced molecule has a property "DENOPTIM_ORIGINAL_ATOM_INDEX"
-     * storing the index of the original atom in the template molecule.
-     * This assumes the molecular representation pertains to a connected graph 
-     * (i.e., no disconnected atoms). 
-     * If an atom container reflecting a disconnected graph is given, 
-     * then the original atom container is returned.
-     * @param templateMol the template molecule to reduce
-     * @return the reduced molecule with original atom indices stored as properties,
-     *         or the original molecule if reduction is not possible or the input
-     *         is a disconnected graph.
-     */
-    private static IAtomContainer reduceIACToGraphTopologyRelevantAtoms(
-        IAtomContainer templateMol)
-    {
-        // Find all boundary atoms: atoms connected to atoms with different vertex IDs
-        Set<IAtom> boundaryAtoms = new HashSet<>();
-        Map<IAtom, Long> atomToVertexId = new HashMap<>();
-        Set<Long> visitedVertexIds = new HashSet<>();
-        Set<Long> visitedVertexIdsBoundaries = new HashSet<>();
-        Set<IAtom> atomsWithAPs = new HashSet<>();
-
-        boolean produceHDepleted = false;
-
-        // First pass: collect vertex IDs and identify boundary atoms
-        for (IAtom atom : templateMol.atoms())
-        {
-            Object vidProp = atom.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
-            if (vidProp == null)
-            {
-                // If no vertex ID, keep all atoms (can't optimize)
-                produceHDepleted = true;
-                vidProp = -1L;
-            }
-            Long vid = Long.parseLong(vidProp.toString());
-            visitedVertexIds.add(vid);
-            atomToVertexId.put(atom, vid);
-
-            Object apsProp = atom.getProperty(DENOPTIMConstants.ATMPROPAPS);
-            if (apsProp != null)
-            {
-                atomsWithAPs.add(atom);
-            }
-
-            // Check neighbors for different vertex IDs
-            List<IAtom> neighbors = templateMol.getConnectedAtomsList(atom);
-            for (IAtom neighbor : neighbors)
-            {
-                Object nbrVidProp = neighbor.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
-                if (nbrVidProp != null)
-                {
-                    Long nbrVid = Long.parseLong(nbrVidProp.toString());
-                    if (!vid.equals(nbrVid))
-                    {
-                        boundaryAtoms.add(atom);
-                        boundaryAtoms.add(neighbor);
-                        visitedVertexIdsBoundaries.add(vid);
-                        visitedVertexIdsBoundaries.add(nbrVid);
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Ensure we have vidited all vertexes, or H-depleted version is needed
-        visitedVertexIds.removeAll(visitedVertexIdsBoundaries);
-        if (!visitedVertexIds.isEmpty())
-        {
-            produceHDepleted = true;
-        }
-        
-        // If no boundary atoms found, H-depleted version is needed (all atoms have same vertex ID)
-        if (boundaryAtoms.isEmpty())
-        {
-            produceHDepleted = true;
-        }
-        
-        // Find minimal chains connecting boundary atoms using BFS
-        Set<IAtom> atomsToKeep = new HashSet<>(boundaryAtoms);
-
-        if (produceHDepleted)
-        {
-            // We did not manage to find a sensible subset possibly because the input
-            // is a disconnected graph.
-            // So, we make a simplified version removing all H that do not hold APs
-            for (IAtom atom : templateMol.atoms())
-            {
-                if (atom.getSymbol().equals("H"))
-                {
-                    if (atomsWithAPs.contains(atom))
-                    {
-                        atomsToKeep.add(atom);
-                    }
-                } else {
-                    atomsToKeep.add(atom);
-                }
-            }
-        } else {
-            // Use the boundaries to identify the smallest set of atoms needed
-            // to identify mathcing topology. 
-            // For each pair of boundary atoms, find shortest path
-            List<IAtom> boundaryList = new ArrayList<>(boundaryAtoms);
-            for (int i = 0; i < boundaryList.size(); i++)
-            {
-                for (int j = i + 1; j < boundaryList.size(); j++)
-                {
-                    IAtom start = boundaryList.get(i);
-                    IAtom end = boundaryList.get(j);
-                    
-                    // Find shortest path between these boundary atoms
-                    //
-                    // WARNING: this method can be very costly for large molecules.
-                    //
-                    List<IAtom> path = MoleculeUtils.findShortestPath(templateMol, start, end, atomToVertexId);
-                    if (path != null)
-                    {
-                        atomsToKeep.addAll(path);
-                    }
-                }
-            }
-        }
-        
-        // Create reduced molecule with only atoms to keep
-        IAtomContainer reduced = SilentChemObjectBuilder.getInstance().newAtomContainer();
-        Map<IAtom, IAtom> originalToReduced = new HashMap<>(); // original atom -> reduced atom
-        
-        // Add atoms with original index stored as property
-        for (IAtom originalAtom : atomsToKeep)
-        {
-            IAtom reducedAtom = originalAtom.getBuilder().newInstance(IAtom.class, originalAtom);
-            reduced.addAtom(reducedAtom);
-            originalToReduced.put(originalAtom, reducedAtom);
-            
-            // Store the original atom index as a property
-            int originalIndex = templateMol.indexOf(originalAtom);
-            reducedAtom.setProperty("DENOPTIM_ORIGINAL_ATOM_INDEX", originalIndex);
-            
-            // Copy all other properties
-            for (Object key : originalAtom.getProperties().keySet())
-            {
-                if (!key.equals("DENOPTIM_ORIGINAL_ATOM_INDEX"))
-                {
-                    reducedAtom.setProperty(key, originalAtom.getProperty(key));
-                }
-            }
-        }
-        
-        // Add bonds between kept atoms
-        for (IBond bond : templateMol.bonds())
-        {
-            IAtom atom1 = bond.getAtom(0);
-            IAtom atom2 = bond.getAtom(1);
-            
-            if (atomsToKeep.contains(atom1) && atomsToKeep.contains(atom2))
-            {
-                IBond newBond = bond.getBuilder().newInstance(IBond.class, 
-                        originalToReduced.get(atom1), originalToReduced.get(atom2), bond.getOrder());
-                reduced.addBond(newBond);
-            }
-        }
-        
-        return reduced;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    /**
      * Chops one chemical structure by applying the given fragmentation templates.
-     * @param mol
-     * @param templates
-     * @param logger
+     * @param mol the molecule to fragment
+     * @param templates the template graphs to use for fragmentation
+     * @param maxBufferShellSize the maximum number of buffer shells to consider, 
+     * i.e., the number of bonds to consider for including atoms around 
+     * topology-critical atoms when trying to find a unique mapping between the 
+     * template graph and the molecular structure.
+     * @param randomizer the randomizer to use for the fragmentation.
+     * @param logger the logger to use for logging messages.
      * @return the list of fragments
      * @throws DENOPTIMException 
      */
     public static List<Vertex> fragmentation(IAtomContainer mol, 
-            List<DGraph> templates, Randomizer randomizer, Logger logger) 
+            List<DGraph> templates, int maxBufferShellSize, 
+            Randomizer randomizer, Logger logger) 
             throws DENOPTIMException
     { 
+        // The best set of fragments is the one with as many fragments that are isomorfic 
+        // // with the template
         List<Vertex> fragments = new ArrayList<Vertex>();
-        int bestMatch = -1;
-        for (DGraph template : templates)
+        int maxNumIsomorfFrgs = -1;
+        for (DGraph templateGraph : templates)
         {
             // Check if the template is connected
-            if (!template.isConnected())
+            if (!templateGraph.isConnected())
             {
                 // This limitation derives from the fact that to speed up substructure
                 // search we reduce the template graph to the smallest set of atoms that
@@ -680,30 +520,33 @@ public class FragmenterTools
             }
 
             ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
-            IAtomContainer templateMol = tb.convertGraphTo3DAtomContainer(template, 
+            IAtomContainer templateMol = tb.convertGraphTo3DAtomContainer(templateGraph, 
                 true, true, true);
 
             //TODO: consider splitting the template into connected components and
             // reduce each component independently.
             
-            // Optimize: create reduced templateMol for faster isomorphism search
+            // Optimized creation of a reduced templateMol for faster isomorphism search
             // Keep full templateMol for exploreDGraphForMappings
-            IAtomContainer reducedTemplateMol = reduceIACToGraphTopologyRelevantAtoms(templateMol);
+            TopoTemplateProducer ttp = new TopoTemplateProducer(templateMol);
             
-            List<Map<IAtom,IAtom>> atomMappings;
-            
-            // Check if reduction actually happened
-            if (reducedTemplateMol == templateMol)
+            // The best set of fragments from this template may not be perfect, so we
+            // consider a score that consists of how many vertexes are isomorphic
+            // to the template graph vertexes.
+            List<Vertex> fragsFromThisTemplate = new ArrayList<>();
+            int maxNumIsomorfFrgsFromThisTmpl = -1;
+
+            // Use the smallest possible template needed to identify the graph topology
+            // in the molecular structure.
+            for (int bufferShellSize = 0; bufferShellSize < maxBufferShellSize; bufferShellSize++)
             {
-                // No reduction possible, use full template directly
-                atomMappings = MoleculeUtils.findUniqueAtomMappings(templateMol, mol, logger);
-            } else {
-                // Use reduced template for isomorphism search (faster)
+                // Use a reduced templateMol for isomorphism search (faster)
+                IAtomContainer reducedTemplateMol = ttp.getTemplateWithBufferShell(bufferShellSize);
                 List<Map<IAtom,IAtom>> reducedAtomMappings = MoleculeUtils.findUniqueAtomMappings(
                         reducedTemplateMol, mol, logger);
                 
                 // Convert mappings from reducedTemplateMol:mol to templateMol:mol using stored indices
-                atomMappings = new ArrayList<>();
+                List<Map<IAtom,IAtom>> atomMappings = new ArrayList<>();
                 for (Map<IAtom,IAtom> reducedMapping : reducedAtomMappings)
                 {
                     Map<IAtom,IAtom> fullMapping = new HashMap<>();
@@ -729,55 +572,86 @@ public class FragmenterTools
                         atomMappings.add(fullMapping);
                     }
                 }
-            }
-            
-            Fragment masterFrag = new Fragment(mol, BBType.UNDEFINED);
-            IAtomContainer masterFragIAC = masterFrag.getIAtomContainer();
-
-            // For each atom mapping, replace bonds corresponding to edges 
-            // (at any embedding level) with attachment points and annotate embedding level
-            for (Map<IAtom,IAtom> atomMapping : atomMappings)
-            {
-                try {
-                    exploreDGraphForMappings(template, templateMol,
-                        masterFrag, masterFragIAC, mol, atomMapping);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    logger.log(Level.WARNING, "Error while exploring the template graph: " + e.getMessage());
-                    continue;
-                }
-            }
-
-            // Extract isolated fragments
-            List<Vertex> locfragments = new ArrayList<Vertex>();
-            Set<Integer> doneAlready = new HashSet<Integer>();
-            for (int idx=0 ; idx<masterFrag.getAtomCount(); idx++)
-            {
-                if (doneAlready.contains(idx))
-                    continue;
                 
-                Fragment cloneOfMaster = masterFrag.clone();
-                IAtomContainer iac = cloneOfMaster.getIAtomContainer();
-                Set<IAtom> atmsToKeep = exploreConnectivity(iac.getAtom(idx), iac);
-                atmsToKeep.stream().forEach(atm -> doneAlready.add(iac.indexOf(atm)));
-                
-                Set<IAtom> atmsToRemove = new HashSet<IAtom>();
-                for (IAtom atm : cloneOfMaster.atoms())
+                Fragment masterFrag = new Fragment(mol, BBType.UNDEFINED);
+                IAtomContainer masterFragIAC = masterFrag.getIAtomContainer();
+
+                // For each atom mapping, replace bonds corresponding to edges 
+                // (at any embedding level) with attachment points and annotate embedding level.
+                // In case of symmetry, multiple mappings will effectivly cut the same bonds,
+                // and produce the same fragments of the template graph only for
+                // symmetry-redundant mappings.
+                for (Map<IAtom,IAtom> atomMapping : atomMappings)
                 {
-                    if (!atmsToKeep.contains(atm))
-                    {
-                        atmsToRemove.add(atm);
+                    try {
+                        exploreDGraphForMappings(templateGraph, templateMol,
+                            masterFrag, masterFragIAC, mol, atomMapping);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        logger.log(Level.WARNING, "Error while exploring the template graph: " + e.getMessage());
+                        continue;
                     }
                 }
-                cloneOfMaster.removeAtoms(atmsToRemove);
-                if (cloneOfMaster.getAttachmentPoints().size()>0)
-                    locfragments.add(cloneOfMaster);
+
+                // Extract isolated fragments
+                List<Vertex> locfragments = new ArrayList<Vertex>();
+                Set<Integer> doneAlready = new HashSet<Integer>();
+                for (int idx=0 ; idx<masterFrag.getAtomCount(); idx++)
+                {
+                    if (doneAlready.contains(idx))
+                        continue;
+                    
+                    Fragment cloneOfMaster = masterFrag.clone();
+                    IAtomContainer iac = cloneOfMaster.getIAtomContainer();
+                    Set<IAtom> atmsToKeep = exploreConnectivity(iac.getAtom(idx), iac);
+                    atmsToKeep.stream().forEach(atm -> doneAlready.add(iac.indexOf(atm)));
+                    
+                    Set<IAtom> atmsToRemove = new HashSet<IAtom>();
+                    for (IAtom atm : cloneOfMaster.atoms())
+                    {
+                        if (!atmsToKeep.contains(atm))
+                        {
+                            atmsToRemove.add(atm);
+                        }
+                    }
+                    cloneOfMaster.removeAtoms(atmsToRemove);
+                    if (cloneOfMaster.getAttachmentPoints().size()>0)
+                        locfragments.add(cloneOfMaster);
+                }
+            
+                if (locfragments.size() == templateGraph.getVertexCount())
+                {
+                    int localScore = 0;
+                    for (Vertex frag : locfragments)
+                    {
+                        if (!(frag instanceof Fragment))
+                        {
+                            continue;
+                        }
+                        for (Vertex templateVertex : templateGraph.getVertexList())
+                        {
+                            if (((Fragment) frag).isIsomorphicTo(templateVertex))
+                            {
+                                localScore++;
+                            }
+                        }
+                    }
+                    if (localScore > maxNumIsomorfFrgsFromThisTmpl)
+                    {
+                        maxNumIsomorfFrgsFromThisTmpl = localScore;
+                        fragsFromThisTemplate = locfragments;
+                        if (maxNumIsomorfFrgsFromThisTmpl == templateGraph.getVertexCount())
+                        {
+                            break;
+                        }
+                    }
+                }
             }
-        
-            if (locfragments.size() > bestMatch)
+
+            if (maxNumIsomorfFrgsFromThisTmpl > maxNumIsomorfFrgs)
             {
-                bestMatch = locfragments.size();
-                fragments = locfragments;
+                maxNumIsomorfFrgs = maxNumIsomorfFrgsFromThisTmpl;
+                fragments = fragsFromThisTemplate;
             }
         }
         return fragments;

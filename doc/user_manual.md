@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.6.1, June 2026_
+_Version 4.6.2, June 2026_
 
 
 [TOC]
@@ -687,6 +687,7 @@ The following tables list all the keywords grouped according to the main functio
 |__Fragmentation__||
 |`FRG-CuttingRulesFile`| The pathname to the file defining cutting rules (see [Cutting rules file](#CuttingRules)). Ignored when fragmentation is based on a template graph (see below).|
 |`FRG-FragmentationTemplate`| The pathname to a file with one or more graphs to be used as templates to produce fragments from the input structures. The graphs are expected to have a non-empty molecular representation (i.e., there must be actual molecular fragments, not just empty vertexes) that will be matched to the structures to chop to identify which bonds to cut and what APClasses to assign to the resulting attachment points. Fragmentation by template ignores cutting rules.|
+|`BONDSAROUNDTOPOCRITICATOM`| The maximum number of bonds to consider when distinguishing atoms that are critical for detecting the topology of a template graph into a molecular structure to be fragmented. Large values allow to correctly distinguish fragments that have structural differences only far (that is, at a large number of bonds distance) from attachment points, but require the mapping of many atoms, thus causing longer processing time.|
 |__Post-Fragmentation Filtering__||
 |`FRG-IgnorableFragments`| The pathname to a file containing fragments that can be ignored. Any fragment isomorphic to any of the ignorable fragments will be rejected.|
 |`FRG-TargetFragments`| The pathname to fragments to be collected. Only fragment isomorphic to any of the target fragments will be kept.|

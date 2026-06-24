@@ -1210,6 +1210,7 @@ public class EAUtils
         
         // We expect only Fragments here.
         List<Vertex> fragments = FragmenterTools.fragmentation(mol, frgParams);
+
         for (Vertex v : fragments)
         {
             Fragment frag = (Fragment) v;
