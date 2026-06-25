@@ -536,6 +536,35 @@ public class FragmenterTools
             List<Vertex> fragsFromThisTemplate = new ArrayList<>();
             int maxNumIsomorfFrgsFromThisTmpl = -1;
 
+            // Define the maximum theoretical score considering that the template may
+            // be matched multiple times in the molecule
+            List<Vertex> templateVertexes = templateGraph.getVertexAnyLevel();
+            int maxTheoreticalScorePerMapping = 0;
+            for (int iva=0; iva<templateVertexes.size(); iva++)
+            {
+                Vertex va = templateVertexes.get(iva);
+                if (!(va instanceof Fragment))
+                {
+                    continue;
+                }
+                for (int ivb=0; ivb<templateVertexes.size(); ivb++)
+                {
+                    Vertex vb = templateVertexes.get(ivb);
+                    if (!(vb instanceof Fragment))
+                    {
+                        continue;
+                    }
+                    if (iva == ivb)
+                    {
+                        // we know that the same
+                        maxTheoreticalScorePerMapping++;
+                    } else if (((Fragment) va).isIsomorphicTo(vb))
+                    {
+                        maxTheoreticalScorePerMapping++;
+                    }
+                }
+            }
+
             // Use the smallest possible template needed to identify the graph topology
             // in the molecular structure.
             for (int bufferShellSize = 0; bufferShellSize < maxBufferShellSize; bufferShellSize++)
@@ -619,31 +648,30 @@ public class FragmenterTools
                         locfragments.add(cloneOfMaster);
                 }
             
-                if (locfragments.size() == templateGraph.getVertexCount())
+                int localScore = 0;
+                for (Vertex frag : locfragments)
                 {
-                    int localScore = 0;
-                    for (Vertex frag : locfragments)
+                    if (!(frag instanceof Fragment))
                     {
-                        if (!(frag instanceof Fragment))
+                        continue;
+                    }
+                    for (Vertex templateVertex : templateGraph.getVertexList())
+                    {
+                        if (((Fragment) frag).isIsomorphicTo(templateVertex))
                         {
-                            continue;
-                        }
-                        for (Vertex templateVertex : templateGraph.getVertexList())
-                        {
-                            if (((Fragment) frag).isIsomorphicTo(templateVertex))
-                            {
-                                localScore++;
-                            }
+                            localScore++;
                         }
                     }
-                    if (localScore > maxNumIsomorfFrgsFromThisTmpl)
+                }
+
+                if (localScore > maxNumIsomorfFrgsFromThisTmpl)
+                {
+                    maxNumIsomorfFrgsFromThisTmpl = localScore;
+                    fragsFromThisTemplate = locfragments;
+                    if (maxNumIsomorfFrgsFromThisTmpl == 
+                        maxTheoreticalScorePerMapping*atomMappings.size())
                     {
-                        maxNumIsomorfFrgsFromThisTmpl = localScore;
-                        fragsFromThisTemplate = locfragments;
-                        if (maxNumIsomorfFrgsFromThisTmpl == templateGraph.getVertexCount())
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }

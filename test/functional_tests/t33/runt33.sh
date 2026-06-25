@@ -48,10 +48,10 @@ if [ ! -f "$fragmentsFile" ]; then
     exit -1
 fi
 
-if ! checkMatchCount '$$$$' $fragmentsFile 11 ; then exit -1 ; fi
-if ! checkMatchCount '"RuXa"' $fragmentsFile 3 ; then exit -1 ; fi
-if ! checkMatchCount '"RuXb"' $fragmentsFile 3 ; then exit -1 ; fi
-if ! checkMatchCount '"RuL"' $fragmentsFile 6 ; then exit -1 ; fi
+if ! checkMatchCount '$$$$' $fragmentsFile 23 ; then exit -1 ; fi
+if ! checkMatchCount '"RuXa"' $fragmentsFile 6 ; then exit -1 ; fi
+if ! checkMatchCount '"RuXb"' $fragmentsFile 6 ; then exit -1 ; fi
+if ! checkMatchCount '"RuL"' $fragmentsFile 12 ; then exit -1 ; fi
 
 echo "Test 't33' PASSED"
 exit 0
