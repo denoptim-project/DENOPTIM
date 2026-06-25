@@ -946,6 +946,30 @@ public class DGraph implements Cloneable
 
 //------------------------------------------------------------------------------
 
+    /**
+     * Returns the list of vertexes at any level in the graph.
+     * @return the list of vertexes at any level in the graph.
+     */
+    public List<Vertex> getVertexAnyLevel()
+    {
+        List<Vertex> list = new ArrayList<Vertex>();
+        list.addAll(gVertices);
+        for (Vertex v : gVertices)
+        {
+            if (v instanceof Template)
+            {
+                list.addAll(((Template) v).getInnerGraph().getVertexAnyLevel());
+            }
+        }
+        return list;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the list of vertexes without entering {@link Template}s.
+     * @return the list of vertexes.
+     */
     public List<Vertex> getVertexList()
     {
         return gVertices;

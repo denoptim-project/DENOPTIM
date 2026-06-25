@@ -4468,4 +4468,50 @@ public class DGraphTest
     }
     
 //------------------------------------------------------------------------------
+
+    @Test
+    public void testGetVertexAnyLevel() throws Exception
+    {
+        DGraph empty = new DGraph();
+        assertTrue(empty.getVertexAnyLevel().isEmpty());
+
+        FragmentSpace fs = prepare();
+        DGraph flat = makeTestGraphC(fs);
+        assertEquals(flat.getVertexList().size(), flat.getVertexAnyLevel().size());
+        assertTrue(flat.getVertexAnyLevel().containsAll(flat.getVertexList()));
+
+        DGraph withTemplate = makeTestGraphI(fs);
+        assertEquals(5, withTemplate.getVertexList().size());
+        assertEquals(10, withTemplate.getVertexAnyLevel().size());
+        Template tmpl = (Template) withTemplate.getVertexList().stream()
+                .filter(v -> v instanceof Template)
+                .findAny()
+                .orElseThrow();
+        for (Vertex inner : tmpl.getInnerGraph().getVertexList())
+        {
+            assertTrue(withTemplate.getVertexAnyLevel().contains(inner));
+        }
+
+        prepare();
+        DGraph nested = makeDeeplyEmbeddedGraph();
+        assertEquals(2, nested.getVertexList().size());
+        assertEquals(41, nested.getVertexAnyLevel().size());
+        assertTrue(nested.getVertexAnyLevel().contains(nested.getVertexAtPosition(0)));
+
+        DGraph deepestInner = nested;
+        for (int i = 0; i < 10; i++)
+        {
+            Template t = (Template) deepestInner.getVertexList().stream()
+                    .filter(v -> v instanceof Template)
+                    .findAny()
+                    .orElseThrow();
+            deepestInner = t.getInnerGraph();
+        }
+        for (Vertex inner : deepestInner.getVertexList())
+        {
+            assertTrue(nested.getVertexAnyLevel().contains(inner));
+        }
+    }
+    
+//------------------------------------------------------------------------------
 }
