@@ -1,0 +1,4 @@
+M2G-INPUTFILE=mol-7.sdf
+M2G-OUTPUTGRAPHS=graphs-7.sdf
+FRG-VERBOSITY=1
+FRG-FragmentationTemplate=tmpl-7.sdf

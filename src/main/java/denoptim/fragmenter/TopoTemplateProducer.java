@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -13,6 +14,7 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
+import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.MoleculeUtils;
 
 public class TopoTemplateProducer 
@@ -42,7 +44,9 @@ public class TopoTemplateProducer
      */
     public TopoTemplateProducer(IAtomContainer originalIAC) 
     {
-        this.originalIAC = originalIAC;
+        DummyAtomHandler dah = new DummyAtomHandler(DENOPTIMConstants.DUMMYATMSYMBOL, 
+            Logger.getLogger(TopoTemplateProducer.class.getName()));
+        this.originalIAC = dah.removeDummy(originalIAC);
         initialize();
     }
 
@@ -57,7 +61,7 @@ public class TopoTemplateProducer
         Set<Long> visitedVertexIdsBoundaries = new HashSet<>();
         Set<IAtom> atomsWithAPs = new HashSet<>();
 
-        // First pass: collect vertex IDs and identify boundary atoms
+        // collect vertex IDs and identify boundary atoms
         for (IAtom atom : originalIAC.atoms())
         {
             Object vidProp = atom.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
@@ -97,7 +101,10 @@ public class TopoTemplateProducer
             }
         }
 
-        // Ensure we have vidited all vertexes, or H-depleted version is needed
+        // NB: is we have a single vertex in the template, then there are no boundary atom!
+        // We'll go forward with the H-depleted version.
+
+        // Ensure we have visited all vertexes, or H-depleted version is needed
         visitedVertexIds.removeAll(visitedVertexIdsBoundaries);
         if (!visitedVertexIds.isEmpty())
         {
@@ -114,8 +121,8 @@ public class TopoTemplateProducer
         if (produceHDepleted)
         {
             // We did not manage to find a sensible subset possibly because the input
-            // is a disconnected graph.
-            // So, we make a simplified version removing all H that do not hold APs
+            // is a disconnected graph, or s single-vertex graph.
+            // So, we make a simplified version removing all H and dummy atoms
             for (IAtom atom : originalIAC.atoms())
             {
                 if (atom.getSymbol().equals("H"))

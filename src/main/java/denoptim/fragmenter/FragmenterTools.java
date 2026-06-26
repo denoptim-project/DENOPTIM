@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 
 import org.openscience.cdk.Atom;
 import org.openscience.cdk.Bond;
@@ -51,9 +52,11 @@ import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
 import denoptim.programs.fragmenter.MatchedBond;
+import denoptim.utils.CartesianSpaceUtils;
 import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.FormulaUtils;
 import denoptim.utils.ManySMARTSQuery;
+import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
 import denoptim.utils.Randomizer;
 
@@ -741,7 +744,7 @@ public class FragmenterTools
                 IAtom graphAtmSrc = graphIAC.getAtom(ap.getAtomPositionNumberInMol());
                 IAtom masterFragAtmSrc = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
 
-                // findthe position of the AP head in 3D space by aligning geoetry to template geometry
+                // find the position of the AP head in 3D space by aligning geoetry to template geometry
                 Point3d apHead = null;
                 try {
                     apHead = findPointalignedWithTmpl(ap, graphAtmSrc, 
@@ -793,12 +796,68 @@ public class FragmenterTools
         if (closestNeighbors.size() < 1)
         {
             // We do not have enough atoms to do an alignement: use only distance
+            // NB: the case of a biatomic fragment is handles below.
             double dist = graphAtmSrc.getPoint3d().distance(ap.getDirectionVector());
             IAtom srcAtmOnMolA = molA.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
             Point3d apHead = new Point3d(
                 srcAtmOnMolA.getPoint3d().x + dist,
                 srcAtmOnMolA.getPoint3d().y,
                 srcAtmOnMolA.getPoint3d().z);
+            return apHead;
+        } else if (closestNeighbors.size() == 1) {
+            // For biatomic fragments
+            double dist = graphAtmSrc.getPoint3d().distance(ap.getDirectionVector());
+            double angle = MathUtils.angle(
+                closestNeighbors.get(0).getPoint3d(), 
+                graphAtmSrc.getPoint3d(), 
+                ap.getDirectionVector());
+            IAtom srcAtmOnMolA = molA.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
+            IAtom nbrAtmOnMolA = molA.getAtom(mol.indexOf(graphToMolMapping.get(closestNeighbors.get(0))));
+            Point3d pSrc = srcAtmOnMolA.getPoint3d();
+            Point3d pNbr = nbrAtmOnMolA.getPoint3d();
+            Point3d pSrcTmpl = graphAtmSrc.getPoint3d();
+            Point3d pNbrTmpl = closestNeighbors.get(0).getPoint3d();
+            Point3d pApTmpl = ap.getDirectionVector();
+
+            Vector3d uMol = CartesianSpaceUtils.getVectorFromTo(pSrc, pNbr);
+            uMol.normalize();
+            Vector3d uTmpl = CartesianSpaceUtils.getVectorFromTo(pSrcTmpl, pNbrTmpl);
+            uTmpl.normalize();
+            Vector3d wTmpl = CartesianSpaceUtils.getVectorFromTo(pSrcTmpl, pApTmpl);
+            wTmpl.normalize();
+
+            double angleRad = Math.toRadians(angle);
+            Vector3d apDir = new Vector3d();
+            apDir.scale(Math.cos(angleRad), uMol);
+            double sinAngle = Math.sin(angleRad);
+            if (sinAngle > DENOPTIMConstants.FLOATCOMPARISONTOLERANCE)
+            {
+                Vector3d vRefTmpl = new Vector3d(wTmpl);
+                vRefTmpl.scaleAdd(-uTmpl.dot(wTmpl), uTmpl, vRefTmpl);
+                vRefTmpl.normalize();
+                Vector3d rotAxis = new Vector3d();
+                rotAxis.cross(uTmpl, uMol);
+                double sinRot = rotAxis.length();
+                double cosRot = uTmpl.dot(uMol);
+                if (sinRot > DENOPTIMConstants.FLOATCOMPARISONTOLERANCE)
+                {
+                    rotAxis.normalize();
+                    double rotAng = Math.toDegrees(Math.atan2(sinRot, cosRot));
+                    CartesianSpaceUtils.rotatedVectorWAxisAngle(vRefTmpl, rotAxis, rotAng);
+                }
+                else if (cosRot < 0.0)
+                {
+                    Vector3d flipAxis = CartesianSpaceUtils.getNormalDirection(uMol);
+                    CartesianSpaceUtils.rotatedVectorWAxisAngle(vRefTmpl, flipAxis, 180.0);
+                }
+                vRefTmpl.scale(sinAngle);
+                apDir.add(vRefTmpl);
+            }
+
+            Point3d apHead = new Point3d(
+                pSrc.x + dist * apDir.x,
+                pSrc.y + dist * apDir.y,
+                pSrc.z + dist * apDir.z);
             return apHead;
         } else {
             // Try to alogn atoms around AP sourc to get the position of the AP head
@@ -808,7 +867,7 @@ public class FragmenterTools
             {
                 IAtom atmGraphIAC = pair.getKey();
                 if (graphIAC.getConnectedAtomsList(graphAtmSrc).contains(atmGraphIAC)
-                || atmGraphIAC == graphAtmSrc)
+                    || atmGraphIAC == graphAtmSrc)
                 {
                     atomsAlreadyUsed.add(atmGraphIAC);
                     molToGraphMappingAroundAPSrc.put(
