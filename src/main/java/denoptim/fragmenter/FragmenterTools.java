@@ -693,18 +693,24 @@ public class FragmenterTools
     /**
      * Recursive function to process edges at any level of embedding to 
      * remove the corresponding bonds and create the corresponding attachment points.
+     * 
+     * TODO: 
+     * 1) deal with RCVs in the graph.
+     * 2) deal with multihapticity.
      */
     private static void exploreDGraphForMappings(DGraph graph, IAtomContainer graphIAC, 
         Fragment masterFrag, IAtomContainer masterFragIAC, IAtomContainer mol,
-        Map<IAtom,IAtom> graphToMolMapping)
+        Map<IAtom,IAtom> graphToMolMapping) 
+        throws DENOPTIMException
     {
         int cutId = -1;
         for (Edge edge : graph.getEdgeList())
         {
             cutId++;
-            //TODO: what about RCVs?
-            IAtom graphAtmSrc = graphIAC.getAtom(edge.getSrcAP().getAtomPositionNumberInMol());
-            IAtom graphAtmTrg = graphIAC.getAtom(edge.getTrgAP().getAtomPositionNumberInMol());
+            int srcAPIdx = edge.getSrcAP().getAtomPositionNumberInMol();
+            int trgAPIdx = edge.getTrgAP().getAtomPositionNumberInMol();
+            IAtom graphAtmSrc = graphIAC.getAtom(srcAPIdx);
+            IAtom graphAtmTrg = graphIAC.getAtom(trgAPIdx);
 
             IAtom masterFragAtmSrc = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
             IAtom masterFragAtmTrg = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmTrg)));
@@ -745,14 +751,8 @@ public class FragmenterTools
                 IAtom masterFragAtmSrc = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
 
                 // find the position of the AP head in 3D space by aligning geoetry to template geometry
-                Point3d apHead = null;
-                try {
-                    apHead = findPointalignedWithTmpl(ap, graphAtmSrc, 
-                        graphIAC, masterFragIAC, mol, graphToMolMapping);
-                } catch (DENOPTIMException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                Point3d apHead = findPointAlignedWithTmpl(ap, graphAtmSrc, 
+                    graphIAC, masterFragIAC, mol, graphToMolMapping);
 
                 // Make the free AP on the master
                 masterFrag.addAPOnAtom(masterFragAtmSrc, ap.getAPClass(), apHead);
@@ -767,56 +767,70 @@ public class FragmenterTools
      * geometry.
      * @param ap the AP for which we do the alignement
      * @param graphAtmSrc the atom in the template graph that is the source of 
-     * the AP
+     * the AP. It belongs to graphIAC.
      * @param graphIAC the atom container corresonding to the template graph
      * @param masterFragIAC the fragment being created by fragmentation 
-     * (may be discontinuous)
+     * (may be discontinuous). Must be consistent with mol.
      * @param mol the molecule being fragmented
      * @param graphToMolMapping the mapping between the atoms in the template 
-     * graph and the atoms in the molecule being fragmented
+     * graph (graphIAC) and the atoms in the molecule being fragmented (mol).
      * @return the point on the master fragment that is aligned with the template 
      * geometry
      * @throws DENOPTIMException
      */
-    private static Point3d findPointalignedWithTmpl(AttachmentPoint ap, 
+    private static Point3d findPointAlignedWithTmpl(AttachmentPoint ap, 
         IAtom graphAtmSrc, IAtomContainer graphIAC, IAtomContainer masterFragIAC, 
         IAtomContainer mol,
         Map<IAtom,IAtom> graphToMolMapping) throws DENOPTIMException
     {
+        // Ensure assumptions
+        if (!graphIAC.contains(graphAtmSrc))
+        {
+            throw new DENOPTIMException("The atom " + graphAtmSrc.getSymbol() + " is not in the graphIAC.");
+        }
+        if (mol.getAtomCount() != masterFragIAC.getAtomCount())
+        {
+            throw new DENOPTIMException("The number of atoms in the molecule and the master fragment are not the same.");
+        }
+
         // Work with cloned molecules
         IAtomContainer molA = MoleculeUtils.makeSameAs(masterFragIAC);
         IAtomContainer molB = MoleculeUtils.makeSameAs(graphIAC);
+
+        // Analogue of graphAtmSrc (belongs to graphIAC) on molA, which is a clone of masterFragIAC
+        // which is consistent with mol.
+        IAtom graphAtmSrcOnMolA = molA.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
 
         // Add the AP as a dummy atom to the molecule that will be rototranslated
         IAtom dummyAtm = new Atom("He"); //element is irrelevant
         dummyAtm.setPoint3d(ap.getDirectionVector());
         molB.addAtom(dummyAtm);
 
-        List<IAtom> closestNeighbors = graphIAC.getConnectedAtomsList(graphAtmSrc);
-        if (closestNeighbors.size() < 1)
+        List<IAtom> closestNeighborsOnGrphIAC = graphIAC.getConnectedAtomsList(graphAtmSrc);
+        List<IAtom> closestNeighborsOnMolA = molA.getConnectedAtomsList(graphAtmSrcOnMolA);
+        int minNumClosestNeighbors = Math.min(closestNeighborsOnGrphIAC.size(), closestNeighborsOnMolA.size());
+        if (minNumClosestNeighbors < 1)
         {
             // We do not have enough atoms to do an alignement: use only distance
             // NB: the case of a biatomic fragment is handles below.
             double dist = graphAtmSrc.getPoint3d().distance(ap.getDirectionVector());
-            IAtom srcAtmOnMolA = molA.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
             Point3d apHead = new Point3d(
-                srcAtmOnMolA.getPoint3d().x + dist,
-                srcAtmOnMolA.getPoint3d().y,
-                srcAtmOnMolA.getPoint3d().z);
+                graphAtmSrcOnMolA.getPoint3d().x + dist,
+                graphAtmSrcOnMolA.getPoint3d().y,
+                graphAtmSrcOnMolA.getPoint3d().z);
             return apHead;
-        } else if (closestNeighbors.size() == 1) {
+        } else if (minNumClosestNeighbors == 1) {
             // For biatomic fragments
             double dist = graphAtmSrc.getPoint3d().distance(ap.getDirectionVector());
             double angle = MathUtils.angle(
-                closestNeighbors.get(0).getPoint3d(), 
+                closestNeighborsOnGrphIAC.get(0).getPoint3d(), 
                 graphAtmSrc.getPoint3d(), 
                 ap.getDirectionVector());
-            IAtom srcAtmOnMolA = molA.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
-            IAtom nbrAtmOnMolA = molA.getAtom(mol.indexOf(graphToMolMapping.get(closestNeighbors.get(0))));
-            Point3d pSrc = srcAtmOnMolA.getPoint3d();
+            IAtom nbrAtmOnMolA = molA.getAtom(mol.indexOf(graphToMolMapping.get(closestNeighborsOnGrphIAC.get(0))));
+            Point3d pSrc = graphAtmSrcOnMolA.getPoint3d();
             Point3d pNbr = nbrAtmOnMolA.getPoint3d();
             Point3d pSrcTmpl = graphAtmSrc.getPoint3d();
-            Point3d pNbrTmpl = closestNeighbors.get(0).getPoint3d();
+            Point3d pNbrTmpl = closestNeighborsOnGrphIAC.get(0).getPoint3d();
             Point3d pApTmpl = ap.getDirectionVector();
 
             Vector3d uMol = CartesianSpaceUtils.getVectorFromTo(pSrc, pNbr);
@@ -876,12 +890,12 @@ public class FragmenterTools
                 }
             }
             // When we have few atoms we take also the second shell of neighbors
-            if (closestNeighbors.size()<3)
+            if (minNumClosestNeighbors<3)
             {
                 for (Map.Entry<IAtom,IAtom> pair : graphToMolMapping.entrySet())
                 {
                     IAtom atmGraphIAC = pair.getKey();
-                    if (closestNeighbors.contains(atmGraphIAC) 
+                    if (closestNeighborsOnGrphIAC.contains(atmGraphIAC) 
                         && !atomsAlreadyUsed.contains(atmGraphIAC))
                     {
                         atomsAlreadyUsed.add(atmGraphIAC);

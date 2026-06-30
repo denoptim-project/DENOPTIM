@@ -44,9 +44,7 @@ public class TopoTemplateProducer
      */
     public TopoTemplateProducer(IAtomContainer originalIAC) 
     {
-        DummyAtomHandler dah = new DummyAtomHandler(DENOPTIMConstants.DUMMYATMSYMBOL, 
-            Logger.getLogger(TopoTemplateProducer.class.getName()));
-        this.originalIAC = dah.removeDummy(originalIAC);
+        this.originalIAC = originalIAC;
         initialize();
     }
 
@@ -125,6 +123,16 @@ public class TopoTemplateProducer
             // So, we make a simplified version removing all H and dummy atoms
             for (IAtom atom : originalIAC.atoms())
             {
+                // DUmmy atoms that are not AP sources are not considered
+                if (MoleculeUtils.getSymbolOrLabel(atom).equals(DENOPTIMConstants.DUMMYATMSYMBOL))
+                {
+                    if (atomsWithAPs.contains(atom))
+                    {
+                        topoCriticalAtoms.add(atom);
+                    } else {
+                        continue;
+                    }
+                }
                 if (atom.getSymbol().equals("H"))
                 {
                     if (atomsWithAPs.contains(atom))
@@ -196,6 +204,11 @@ public class TopoTemplateProducer
                 {
                     if (!atomsToKeep.contains(neighbor))
                     {
+                        // Exclude any pseudo atom
+                        if (!MoleculeUtils.isElement(atm))
+                        {
+                            continue;
+                        }
                         atomsToKeep.add(neighbor);
                         nextLevelAtoms.add(neighbor);
                     }
