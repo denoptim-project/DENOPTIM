@@ -205,7 +205,7 @@ public class TopoTemplateProducer
                     if (!atomsToKeep.contains(neighbor))
                     {
                         // Exclude any pseudo atom
-                        if (!MoleculeUtils.isElement(atm))
+                        if (!MoleculeUtils.isElement(neighbor))
                         {
                             continue;
                         }

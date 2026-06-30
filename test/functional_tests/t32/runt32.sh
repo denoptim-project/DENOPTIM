@@ -152,5 +152,12 @@ if ! checkMatchCount '^ 30 31  0  0  0  0  0  0  0' graphs-8.sdf 1 ; then exit -
 if ! checkMatchCount '"vertexType": "MolecularFragment"' graphs-8.sdf 4 ; then exit -1 ; fi
 if ! checkMatchCount 'apClass' graphs-8.sdf 6 ; then exit -1 ; fi
 
+# 9th: graph with linearity-Du atoms and need for bond buffer > 0
+"$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-9.params" > "t32-9.log" 2>&1
+if ! checkLog t32-9.log ; then exit -1 ; fi
+if ! checkMatchCount '^ 38 40  0  0  0  0  0  0  0' graphs-9.sdf 1 ; then exit -1 ; fi
+if ! checkMatchCount '"vertexType": "MolecularFragment"' graphs-9.sdf 5 ; then exit -1 ; fi
+if ! checkMatchCount 'apClass' graphs-9.sdf 8 ; then exit -1 ; fi
+
 echo "Test 't32' PASSED"
 exit 0
