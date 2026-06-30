@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,111,123,138"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_class_1_1_a_p_class_deserializer.html" title=" " alt="" coords="193,5,412,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph_1_1_d_e_n_o_p_t_i_m_graph_deserializer.html" title=" " alt="" coords="171,71,435,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex_1_1_d_e_n_o_p_t_i_m_vertex_deserializer.html" title=" " alt="" coords="173,136,432,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1json_1_1_i_atom_container_deserializer.html" title="Deserialisation of collections of both light&#45;weight atoms and bonds into a CDK IAtomContainer." alt="" coords="205,201,400,243"/>
+</map>

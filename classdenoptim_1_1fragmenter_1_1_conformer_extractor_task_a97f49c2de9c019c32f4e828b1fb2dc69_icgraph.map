@@ -1,0 +1,9 @@
+<map id="denoptim.fragmenter.ConformerExtractorTask.populateListOfClusterizableFragments" name="denoptim.fragmenter.ConformerExtractorTask.populateListOfClusterizableFragments">
+<area shape="rect" id="node1" title="Tries to add a fragment into a sample of isomorphic fragments." alt="" coords="1104,34,1368,90"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#a8551fcecfdcd74d47493e1e7b62f93f0" title="Constructs a task that will analyze the given isomorphic family." alt="" coords="811,5,1056,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#af88002e0d86630f29d1db35225ac3d1f" title="Analyzes all the entries provided by the iterator and extracts those that pertain the specified isomo..." alt="" coords="829,70,1038,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#aa59d52186e432a0cd6d4d1821924db62" title="Collects the clusterable fragments from the disk." alt="" coords="529,30,737,86"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task_test.html#a2dc64f375774087fc0b4511384f50bc9" title=" " alt="" coords="504,110,763,166"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#aa21ebdf147f5bdb2685f9e775efd0b10" title=" " alt="" coords="253,37,456,79"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter.html#aa27df9705e3aed34cc8cb8bc05e6ce85" title=" " alt="" coords="5,37,205,79"/>
+</map>

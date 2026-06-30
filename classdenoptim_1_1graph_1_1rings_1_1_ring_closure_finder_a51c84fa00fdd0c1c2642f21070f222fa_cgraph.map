@@ -1,0 +1,18 @@
+<map id="denoptim.graph.rings.RingClosureFinder.evaluateClosability" name="denoptim.graph.rings.RingClosureFinder.evaluateClosability">
+<area shape="rect" id="node1" title="Giving a list of points in 3D space (the path) this method evaluates whether it exists at least one c..." alt="" coords="5,357,219,398"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="307,29,502,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_math_utils.html#ac6f7f135ee0acd6ee3f9a288a17510c6" title="Compute the dihedral angle." alt="" coords="297,105,512,146"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a0993b2fb4b6b797ac869966df5b3f4eb" title=" " alt="" coords="298,169,511,225"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure.html#a3f5608b6f2844cb59cd1c709c5912072" title="Returns the list of min/max values defining the closability conditions." alt="" coords="301,249,508,290"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a66e4622d6a39b0dffbc63b82312e9846" title=" " alt="" coords="286,313,523,369"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a6dc80f26f3be515e7ea51b1314228a7f" title=" " alt="" coords="289,393,521,434"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="311,458,498,499"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a67ea0a5dedcce3fe20ad197524f8138c" title=" " alt="" coords="293,523,517,579"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#ae9e77465faa29a48ad51fe3608a6fd2c" title=" " alt="" coords="267,602,543,643"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_finder.html#ac379c1c38a5f22cb0f5ed75927282a1a" title="Scan rotatable space looking for conformations that satisfy closability condition." alt="" coords="292,691,517,733"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a2b37c2553ba1f6e445f3ad5f0e606e0e" title=" " alt="" coords="596,217,848,258"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#a3d9bbb2c0fb41a4e940af508adff49ac" title=" " alt="" coords="591,282,853,323"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure.html#a195a0d2736b579d139500a36eeee7480" title="Evaluate closability by comparing the distances and the dot product with the given critera." alt="" coords="637,658,807,699"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_finder.html#a07eef6f45a5828caaa382d5036bfd110" title="Method for reporting a path of atoms (list of points) as SDF file." alt="" coords="625,723,819,765"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="901,723,1092,765"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.graph.Template.addRequiredAP" name="denoptim.graph.Template.addRequiredAP">
+<area shape="rect" id="node1" title="Adds attachment point (AP) to the list of required APs on this template." alt="" coords="5,39,196,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_template.html#a82c53a76c42c31848f394c3f7aab21b9" title="Removes the molecular representation." alt="" coords="244,5,443,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_template.html#a7869ba705f5898855fe68dd443721f8e" title=" " alt="" coords="249,71,437,112"/>
+</map>

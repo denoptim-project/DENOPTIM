@@ -1,0 +1,10 @@
+<map id="denoptim.graph.Template.getMutationTypes" name="denoptim.graph.Template.getMutationTypes">
+<area shape="rect" id="node1" title="Returns the list of mutation types." alt="" coords="5,71,193,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="241,5,412,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a846e0f49dfefd933c429450545338d25" title="Looks into the edges that use any of the APs that belong to this vertex and returns the list of verti..." alt="" coords="241,136,412,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a514b89b11dff8939e74e5b95e749b703" title=" " alt="" coords="241,71,412,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="475,71,646,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="471,136,651,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="460,202,661,229"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="461,253,661,279"/>
+</map>

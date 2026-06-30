@@ -1,0 +1,18 @@
+<map id="denoptim.graph.DGraph.removeCappingGroups" name="denoptim.graph.DGraph.removeCappingGroups">
+<area shape="rect" id="node1" title="Remove capping groups that belong to this graph and are in the given list." alt="" coords="5,99,208,140"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="802,191,973,232"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="268,70,447,111"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#aca10b3acbf66e3652cb9664179ed368f" title=" " alt="" coords="537,132,708,174"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a40786de6efd159a5c54c122d0d3d2c1c" title="Remove a vertex from this graph." alt="" coords="256,315,459,356"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3560b051e55499bf45522a55f6219d29" title="Returns the position of the first vertex that has the given ID." alt="" coords="527,67,718,108"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3334159ed57d53d1e29bd34f31bfc9a4" title="Returns the list of rings that include the given vertex in their fundamental cycle." alt="" coords="533,380,712,422"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_edge.html#a6331fb41fb8390b908ca7d737cc13602" title=" " alt="" coords="531,250,714,291"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_edge.html#a9a569de09e30a53338e1983f2a07e105" title=" " alt="" coords="531,315,714,356"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph.html#ae1243cc2bc48423cbbea5e0678b8b1be" title="Removes an edge and update the free valences of the attachment points that were originally involved i..." alt="" coords="507,446,739,473"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_d_graph.html#a21d59a33af92f5b876dae72b809762e0" title=" " alt="" coords="508,497,737,524"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_vertex.html#a7474f10f1819eec042011dddfa767472" title=" " alt="" coords="531,548,714,590"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="797,286,977,327"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="787,396,988,422"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="787,446,987,473"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a266aa67ce6e0afd82fa723a12f46235a" title="Sets the reference to the edge that is using this attachment point." alt="" coords="797,498,977,539"/>
+</map>

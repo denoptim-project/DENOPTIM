@@ -1,0 +1,6 @@
+<map id="denoptim.fitness.Variable.atomSpecific" name="denoptim.fitness.Variable.atomSpecific">
+<area shape="rect" id="node1" title="Returns an atom specific variable, i.e., a variable the value of which needs to be obtained from the ..." alt="" coords="5,71,204,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1_variable.html#aeb8481558c218f7f95a747616ed60df6" title="Set the short name of the descriptor implementation." alt="" coords="252,5,439,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fitness_1_1_variable.html#a6c0df37ceb44c10c6da1c908370973c4" title="Set the list of smarts used to identify atom/bond&#45;specific values." alt="" coords="252,71,439,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fitness_1_1_variable.html#a67ef06e6181314fc38490cf55e698299" title="Constructs a named variable." alt="" coords="261,136,430,177"/>
+</map>

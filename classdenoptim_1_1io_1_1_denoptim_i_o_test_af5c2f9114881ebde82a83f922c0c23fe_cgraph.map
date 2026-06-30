@@ -1,0 +1,43 @@
+<map id="denoptim.io.DenoptimIOTest.testReadGenerationFromSummary" name="denoptim.io.DenoptimIOTest.testReadGenerationFromSummary">
+<area shape="rect" id="node1" title=" " alt="" coords="5,798,216,839"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_population.html#a4c6d546befc92708dbf8fff1aa840438" title=" " alt="" coords="287,232,467,259"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_file_utils.html#a5c4375aa4522cc7f8229c131fbc2e0af" title="Creates a directory." alt="" coords="282,283,473,325"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_candidate.html#a50cd0725a1b1c8766897427f2375e79d" title=" " alt="" coords="572,69,764,110"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aeb642f3a46a239c05e36bf385e7f5243" title=" " alt="" coords="279,733,475,774"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad094b30fa7e429418af3f5ba26addfa4" title=" " alt="" coords="284,667,471,709"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ac03e7d805c9afda30244e831da74ae81" title="Write out summary for the current GA population." alt="" coords="288,401,467,442"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a0e2c428b137f3e18aba6a26861d1062f" title="Reads a FileFormat#GENSUMMARY file and searches all the files defining each member of the population." alt="" coords="283,798,471,839"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_candidate.html#a7eab4bb153c498bbc62a5f7c84dfb127" title=" " alt="" coords="281,863,473,905"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_d_graph.html#a421ce3718c62761e49a4dd4d0f20682c" title=" " alt="" coords="288,929,467,970"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a267f19b2ad078af972f18eba0e83556e" title=" " alt="" coords="284,994,471,1035"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a8f778576bdce97d39e833143ac406dca" title=" " alt="" coords="270,1059,485,1101"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_candidate.html#a283198cd3d6acf63f66ab1aa5400a957" title=" " alt="" coords="281,1125,473,1166"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_candidate.html#a92203ad4eb0c99e8e3bc75b0fba6d746" title=" " alt="" coords="270,1191,485,1217"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#af044aeccd6e679f1835024718507855e" title=" " alt="" coords="264,1242,491,1283"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a63e36e73d8b6574afd0ee55e4206100a" title="Writes one candidate item to file." alt="" coords="282,602,473,643"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a2cbfb524deabf9890bd1bd12b87c6bac" title=" " alt="" coords="565,667,771,709"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a71a6c20ceaf9395ab2a5eee83dbd5eb3" title=" " alt="" coords="539,733,797,774"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_general_utils.html#ab0c97460520e98fa670681d851754703" title="returns the padded string with zeroes placed to the left of &#39;number&#39; up to reach the desired number o..." alt="" coords="569,798,767,839"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_candidate.html#a0738609a1a3bec92633440d449a62c67" title=" " alt="" coords="572,367,764,409"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="579,433,757,474"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_candidate.html#ae97ca468f9830ef96fb75199460e3568" title=" " alt="" coords="555,499,781,525"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_candidate.html#a65cfcaa4ce7b537005082fd90e90d8b6" title=" " alt="" coords="572,134,764,175"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aa9dec22b5b0a35d6b333f8ce3bf83643" title=" " alt="" coords="561,199,775,241"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_candidate.html#a5c007ed1edb500326899f34540812fef" title=" " alt="" coords="561,265,775,292"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ae21f3c5cdf8ae03a3b64ba7f4c60745e" title="Writes candidate items to file." alt="" coords="573,550,763,591"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="559,316,777,343"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aa9960d143f0848577aec0e8ee65deb12" title="Get the fitness values for the list of molecules." alt="" coords="846,357,1063,384"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a2e544172988f30a190ef37cceb09fbfc" title=" " alt="" coords="847,409,1062,450"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1utils_1_1_stat_utils.html#abd3508ae7b87a92f819db91a0dd70dcb" title="Returns the maximum value among the numbers ." alt="" coords="863,29,1046,56"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a12ae258bebe1f3568dabdd606edd3d56" title="Returns the mean number in the numbers list." alt="" coords="1584,131,1775,157"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a68460a326762f6b16aca2c3380525c35" title="Calculates median value of a sorted list." alt="" coords="854,232,1055,259"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1utils_1_1_stat_utils.html#aad3c103a99a3c3110108f6dd7d1922ff" title="Returns the minimum value among the numbers ." alt="" coords="865,307,1045,333"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a42a83457989ab54a4cbb808fbca8ee1f" title="Computes the skewness of the available values." alt="" coords="845,131,1064,157"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a31cf5dc53af191a60dbcdba3b1f9da6b" title="Returns the standard deviation of the numbers." alt="" coords="1112,80,1311,107"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a181673167433cb8ad256d0295d76c29f" title="Returns the sum number in the numbers list." alt="" coords="1823,105,2007,132"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1utils_1_1_stat_utils.html#aac6cf70b1516266ef3e845d5ad4633f5" title="Computes the variance of the available values." alt="" coords="1359,80,1536,107"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="859,579,1050,621"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a042c8c616521cdd15aee8b7a0cf02fdf" title="Reads SDF files that represent one or more tested candidates." alt="" coords="574,953,762,994"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a2cda5028becae07d4a0ac873a9352768" title="Read the pathnames to the population members from a FileFormat#GENSUMMARY file." alt="" coords="570,863,766,905"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="849,871,1060,897"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.graph.APClass.setSubClass" name="denoptim.graph.APClass.setSubClass">
+<area shape="rect" id="node1" title=" " alt="" coords="505,35,691,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_class.html#aff98621bcbffd63488b7659957378704" title="Checks if there is already a instance with the given members, if not it created one." alt="" coords="272,35,457,76"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class_1_1_a_p_class_deserializer.html#a06482f2c807fe8b1ae49ed2bdeda1b11" title=" " alt="" coords="5,5,224,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a42365424242845e35a0596ed3e54087f" title="Constructor for a fully defined APClass." alt="" coords="15,71,214,98"/>
+</map>

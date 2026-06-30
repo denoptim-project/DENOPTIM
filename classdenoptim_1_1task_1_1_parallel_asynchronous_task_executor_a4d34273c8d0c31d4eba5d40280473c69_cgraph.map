@@ -1,0 +1,7 @@
+<map id="denoptim.task.ParallelAsynchronousTaskExecutor.run" name="denoptim.task.ParallelAsynchronousTaskExecutor.run">
+<area shape="rect" id="node1" title="Run the parallelized task." alt="" coords="5,104,236,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#a1df7d9703e94f5d58dc53afdaa7688d4" title="Removes only tasks that are marked as completed." alt="" coords="289,5,519,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#abb79453d3ddc23c3f39297070d1904fd" title="Implementations of this method must call the submitTask(Task, String) method to actually send the tas..." alt="" coords="284,71,524,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#a3cd2e9cf92e87d1daf4dbda7be9e4b58" title=" " alt="" coords="284,136,524,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#a26657a7869d63e260067523aca319037" title=" " alt="" coords="287,201,521,243"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="denoptim.graph.AttachmentPoint.sameAs" name="denoptim.graph.AttachmentPoint.sameAs">
+<area shape="rect" id="node1" title="Compares the features of this and another attachment point and decides if the two are same." alt="" coords="5,71,185,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="242,5,422,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="233,71,431,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#acd666767475f39f0d7f17550d2b47651" title=" " alt="" coords="242,136,422,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="479,136,649,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="697,136,868,177"/>
+</map>

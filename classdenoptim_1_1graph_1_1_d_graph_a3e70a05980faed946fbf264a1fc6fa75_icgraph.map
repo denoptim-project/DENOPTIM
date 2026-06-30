@@ -1,0 +1,13 @@
+<map id="denoptim.graph.DGraph.getLocalMsg" name="denoptim.graph.DGraph.getLocalMsg">
+<area shape="rect" id="node1" title=" " alt="" coords="1208,136,1387,177"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="955,37,1125,79"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#aab5b9c0b8a88922460f5c28ae161d1fa" title=" " alt="" coords="937,103,1143,144"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_candidate.html#ace97fc2021ebb11463e062dddbec6aac" title="Returns an atom container representing this item in a way that is compatible for writing this item to..." alt="" coords="921,168,1159,209"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a0c851972015fbb4b2a317b053b8b81d9" title="Mutates the given vertex according to the given mutation type, if possible." alt="" coords="920,233,1160,275"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0c2e353b243250b4959a3f86608f1020" title="Generates one offspring according to the method where crossover and mutation are decoupled,..." alt="" coords="699,5,872,47"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ae7a90a911b109ed47b3acf54193acc35" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="699,71,872,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="472,39,651,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,39,424,80"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,5,211,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,71,198,112"/>
+</map>

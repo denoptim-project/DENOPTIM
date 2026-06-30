@@ -1,0 +1,18 @@
+<map id="denoptim.graph.Vertex.getIAtomContainer" name="denoptim.graph.Vertex.getIAtomContainer">
+<area shape="rect" id="node1" title=" " alt="" coords="908,339,1079,381"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a91fba166ba9fe73858ed16209d575cc5" title="Recursive method that appends branches of building blocks following the edges of the graph." alt="" coords="593,39,860,95"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#ac485c253cfb295e84e2d77b2c253b5b8" title="Determines the name of the MW slot to use when comparing the given fragment with previously stored fr..." alt="" coords="622,150,831,191"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="595,216,858,243"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a95283787736fea0328ce98a3be6ff042" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="624,267,829,309"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#abcbac685a05d95293f9ed0c994337f96" title=" " alt="" coords="608,332,845,388"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#ac2186d67581bef7c19379247af6672d6" title=" " alt="" coords="599,411,854,453"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#a78e6eb5e60124f63897dd28e1c21082d" title=" " alt="" coords="625,477,828,518"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a692723b803a64dd25e775b2f8726fe27" title="Works with this graph:" alt="" coords="603,541,850,597"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_two_dim_structure_panel.html#a92418511f562021844aad4a286d1720d" title=" " alt="" coords="604,621,849,677"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a38d5f86f923595401e3315e0460c46d7" title="A a veretex 3D structure (if any) that is not connected to anything previously added." alt="" coords="279,5,545,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#acbaf5061621ed283eecc80a51b523422" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="5,5,231,61"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragmenter_1_1_conformer_extractor_task.html#a597e54ad1e629a89449ef6e9a150cb2b" title="Constructs a task that will analyze the isomorphic family of the given fragment." alt="" coords="289,85,535,126"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a82c4a82da2a3283a870a8c8af94f0a4e" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="305,150,519,191"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools_test.html#a5a2c187a2929b398bf814b504a7db3a0" title=" " alt="" coords="301,215,523,257"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="304,281,520,322"/>
+</map>

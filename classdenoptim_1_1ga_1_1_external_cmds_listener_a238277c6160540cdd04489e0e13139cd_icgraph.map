@@ -1,0 +1,6 @@
+<map id="denoptim.ga.ExternalCmdsListener.closeWatcher" name="denoptim.ga.ExternalCmdsListener.closeWatcher">
+<area shape="rect" id="node1" title=" " alt="" coords="515,39,689,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#ac286f9ce5bfd00ea611a16b72504f66b" title="Stop the service that waits for instructions from the outside world." alt="" coords="236,39,467,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a9fb2a04ced0e58e85f666da8ab68aaa5" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="5,5,188,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="7,71,187,112"/>
+</map>

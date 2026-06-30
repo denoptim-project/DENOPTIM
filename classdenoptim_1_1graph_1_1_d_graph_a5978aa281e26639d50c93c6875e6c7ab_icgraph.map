@@ -1,0 +1,7 @@
+<map id="denoptim.graph.DGraph.getEmbeddedGraphInClone" name="denoptim.graph.DGraph.getEmbeddedGraphInClone">
+<area shape="rect" id="node1" title="Searches for a graphs (X) embedded at any level in a graph (Y) by knowing." alt="" coords="512,71,691,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_xover_site.html#a1d75cc7f886374a295deec540178cb61" title="Creates a new instance of this class that contains the list of vertexes that correspond to those cont..." alt="" coords="263,37,457,79"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#abbd9f77ca8e1f7b733ca74bce6ccad28" title=" " alt="" coords="256,103,464,144"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="22,5,191,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_xover_site_test.html#a3936ca2cfc1bb9ace410f7f47ad2c1f2" title=" " alt="" coords="5,71,208,112"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.graph.APClass.isValidAPClassString" name="denoptim.graph.APClass.isValidAPClassString">
+<area shape="rect" id="node1" title="Evaluate is a candidate string can be used as APClass." alt="" coords="5,39,183,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="231,5,408,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="231,71,408,112"/>
+</map>

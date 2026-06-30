@@ -1,0 +1,10 @@
+<map id="denoptim.utils.AtomOrganizer.prioritizeAtomList" name="denoptim.utils.AtomOrganizer.prioritizeAtomList">
+<area shape="rect" id="node1" title="Change the order of atoms in a list according to the priority rules defined in the comparator Connect..." alt="" coords="1735,60,1977,101"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#af107340bb330f98b9b7f899ff08c80ad" title="Method meant for recursion on all atoms connected to a starting point." alt="" coords="1452,29,1687,71"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#ac9be639b72c847d5875a12250a94bebe" title="Reorders atoms according to the layer&#45;oriented scheme." alt="" coords="1177,92,1398,133"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a2970c029fa822f5597969bda9adabdaf" title="Reorders atoms according to the branch&#45;oriented scheme." alt="" coords="1171,27,1404,68"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#ac679b2a45c111736e81e8dd2604b5a77" title="Reorder the atoms in mol starting with atom seed" alt="" coords="888,60,1123,101"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a1cd879265bf12e9c2980efae1e8e74aa" title="Generate 3D structure by assembling 3D fragments according to attachment point vector and following t..." alt="" coords="587,60,840,101"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,53,539,109"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,60,280,101"/>
+</map>

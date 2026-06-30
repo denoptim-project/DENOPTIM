@@ -1,0 +1,14 @@
+<map id="denoptim.programs.fragmenter.CuttingRule.equals" name="denoptim.programs.fragmenter.CuttingRule.equals">
+<area shape="rect" id="node1" title=" " alt="" coords="5,235,205,276"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_cutting_rule.html#a9991bd79391096eb303b58e2e423ee05" title="Constructor for a cutting rule." alt="" coords="255,39,455,80"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_cutting_rule.html#a11abf50af256c8ae6cf033790032a11a" title="Returns the name of the cutting rule." alt="" coords="255,104,455,145"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_cutting_rule.html#a745c58c6e283eb9f9dafbe8b5568453a" title="Returns the list of options." alt="" coords="255,169,455,211"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_cutting_rule.html#ae81f85ef7294cd839e274c38ed0948ed" title=" " alt="" coords="255,235,455,276"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_cutting_rule.html#a9f007fc57ef012372a7fb2ae44fd6f66" title="Get the SMARTS query of the first atom (SubClass 0)" alt="" coords="253,300,456,341"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_cutting_rule.html#a672bec1cfce657b93283db403b89e922" title="Get the SMARTS query of the second atom (SubClass 1)" alt="" coords="253,365,456,407"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_cutting_rule.html#ada45f336f895c367bc636c802b9f3142" title="Get the SMARTS query of the bond." alt="" coords="255,431,455,472"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="504,46,703,73"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="751,39,928,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="976,5,1153,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="976,71,1153,112"/>
+</map>

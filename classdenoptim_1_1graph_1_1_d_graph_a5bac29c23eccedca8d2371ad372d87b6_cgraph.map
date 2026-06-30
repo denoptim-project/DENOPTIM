@@ -1,0 +1,13 @@
+<map id="denoptim.graph.DGraph.getBondingAPIndex" name="denoptim.graph.DGraph.getBondingAPIndex">
+<area shape="rect" id="node1" title=" " alt="" coords="5,180,184,221"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a559b3bd2aa8849d8d58430afcb20b016" title=" " alt="" coords="250,5,429,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#ab5d3641bcfd0c8dd76d5de6159d6b8c8" title=" " alt="" coords="250,71,429,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_edge.html#a9696d3ee0d321b73b06d33bcb8fa86fd" title=" " alt="" coords="232,187,447,214"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_edge.html#a6331fb41fb8390b908ca7d737cc13602" title=" " alt="" coords="248,304,431,345"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="499,304,670,345"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_edge.html#a5575d6b605dda2f40a16556a163c46da" title=" " alt="" coords="233,137,446,163"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_edge.html#a9a569de09e30a53338e1983f2a07e105" title=" " alt="" coords="248,239,431,280"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="499,141,670,183"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="495,228,675,269"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="723,141,893,183"/>
+</map>

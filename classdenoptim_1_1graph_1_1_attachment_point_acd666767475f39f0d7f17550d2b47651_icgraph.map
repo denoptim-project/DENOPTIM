@@ -1,0 +1,52 @@
+<map id="denoptim.graph.AttachmentPoint.getIndexInOwner" name="denoptim.graph.AttachmentPoint.getIndexInOwner">
+<area shape="rect" id="node1" title=" " alt="" coords="1268,637,1448,679"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_edge.html#a32e31de78eb07c2ac9eb0424e1530efd" title="Compares this and another edge ignoring the directionality of both, i.e., as if both edges were undir..." alt="" coords="1001,20,1196,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4df69c91a742d22f8d14d44489aeac15" title="Edit this graph according to a given list of edit tasks." alt="" coords="1008,100,1189,141"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ad6447c67b6246a5c22e842b17cefc3fd" title=" " alt="" coords="977,195,1220,236"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="981,376,1216,417"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ae0fc307ce14bc73de8cb51459e122392" title="Selects only the atoms that originate from a subgraph of a whole graph that originated the whole mole..." alt="" coords="985,441,1212,483"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel_1_1_j_edge.html#a6c144135a962e48c69967632c31a1232" title="Constructor for a JUNG edge representing a AttachmentPoint." alt="" coords="1012,507,1185,548"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel_1_1_j_vertex.html#a5668df0b7885e6408de29b5bbd60f935" title="Constructor for vertex that represents a given AttachmentPoint." alt="" coords="1012,572,1185,613"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1simplified_1_1_undirected_edge.html#ace4a4459d14c2a0e2ee869b8e0be054e" title=" " alt="" coords="999,637,1198,679"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_attachment_point_query.html#ae479b571d3b26271e8caa535fb26fd97" title="Tests whether the given attachment point satisfies all non&#45;null criteria in this query." alt="" coords="1009,727,1189,768"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#a1669a88512d2bd3b14cdd00235dff50a" title="Generate the next combination of fragments." alt="" coords="1013,792,1184,833"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1ga_1_1_graph_operations.html#affb1be89a32e4a429bd7dbdfe0708419" title="Performs the crossover that swaps the two subgraphs defining the given XoverSite." alt="" coords="670,1291,910,1332"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_d_graph.html#a86e888ef245d2bd40b49d145c7ef3af0" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="997,909,1200,951"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aff187a1444128eb4c6ce8761b0def198" title="Compares the features of this and another attachment point and decides if the two are same." alt="" coords="1009,975,1189,1016"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_a_p_mapping.html#a011a195c3dfc53e29e69c591f31a7d75" title="Produces an index&#45;based version of this mapping where each index represents the attachment point as i..." alt="" coords="1001,1040,1196,1081"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1simplified_1_1_undirected_edge.html#a3f4b637fe69b034b4160b445aa966b6c" title=" " alt="" coords="1013,1105,1184,1147"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_edge_test.html#aeb47a9169ac3c3583ac5c1c061431599" title=" " alt="" coords="693,5,887,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="689,71,891,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af7024886a4203aa93d8cf7975f7c2e72" title=" " alt="" coords="669,136,911,177"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a44e2ff798d22b73f966cb8393ceb4f18" title="Extends the current graph by appending a node to a specific free AP on the growing graph." alt="" coords="332,168,575,209"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="5,110,256,137"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a857bfe6291322daccf2af3fd9a28a356" title="Start the construction of a new graph from scratch." alt="" coords="304,103,603,144"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a32b0be109306e9c81fc830867296bc66" title="Extracts a system of one or more fused rings and adds them to the fragment space if not already prese..." alt="" coords="659,280,921,321"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1simplified_1_1_undirected_edge.html#ac7a25cc7fa015aee01be6566b4ba19f5" title=" " alt="" coords="705,345,875,387"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#a305c9a12afe5bb190894fcd730ef299a" title="Checks if this graph is &quot;DENOPTIM&#45;isomorphic&quot; to the other one given." alt="" coords="368,233,539,275"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_undirected_edge_relation_test.html#a5e8d7b8fd7f52918d3750434fc895bc5" title=" " alt="" coords="347,298,559,354"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_d_graph.html#abd78d550ed20f6423ad5b02d4b64e88e" title="Search the graph for AttachmentPoints that match the criteria defined in a query." alt="" coords="687,451,893,478"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_edge_query.html#a348b003646180ab98f25eb1d2dcd1a01" title="Tests whether the given edge satisfies this query." alt="" coords="675,502,905,529"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ac1f03b3b5f2827eddb99ff3dcffee46f" title=" " alt="" coords="339,899,568,955"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ab87c87b4f3d9d00c9e636c09a64b10c0" title=" " alt="" coords="672,603,908,659"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a4155118d5840043feffc693e1e4201d7" title=" " alt="" coords="681,683,899,739"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a53d8b566aaa0a77eeaa840021d48ace4" title=" " alt="" coords="676,763,904,804"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ac51fc0114c7ab50fe54f761193d05652" title=" " alt="" coords="677,827,903,883"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a3c62de3555953fdec032b260711206f5" title=" " alt="" coords="671,907,909,948"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a30e0dc0ce67cebcd9a938e368cb0f087" title=" " alt="" coords="663,971,917,1027"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ad10db1021c53834285d1f2a42a3bf028" title=" " alt="" coords="663,1051,917,1107"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a8307c3a13a2700eba3fceb2b986dfb19" title=" " alt="" coords="675,1131,905,1187"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8e50ddb746bca4b0d9c341327482f88b" title="Search this graph for edges that match the criteria defined in a query." alt="" coords="363,377,543,419"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a7e95907b905875bb7bcc9521a3b90a94" title=" " alt="" coords="23,407,238,448"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_vertex_query.html#af23dd64a35938660e9be863c60b5b47d" title=" " alt="" coords="335,495,572,536"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#af64066b322b2594efbea933ced2bc2b5" title=" " alt="" coords="352,560,555,601"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a74cb8674a8fd016993c045b0a9041dda" title=" " alt="" coords="359,625,547,667"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a95f6b08356683724ca6005311d56a9c5" title=" " alt="" coords="343,690,563,746"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a565f15c53df8b3dc07e595dc2f0d09b2" title=" " alt="" coords="363,769,544,811"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#ae6ddfb3fbb3165eb20c1737fb796f58e" title=" " alt="" coords="342,835,565,876"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#adcd462866e3f9d6a2a6ef0385807807e" title="Generate graphs by exploring all combination of fragments at a given level of a growing graph." alt="" coords="665,1211,915,1267"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="369,1257,538,1299"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#ab0f92a94c4fb2334e7d3813e73fc4247" title=" " alt="" coords="347,1323,559,1364"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="691,1356,889,1397"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a35da4565f6579a36546fbfa7233b9df9" title="Substitutes a vertex while keeping its surrounding." alt="" coords="651,1422,929,1449"/>
+</map>

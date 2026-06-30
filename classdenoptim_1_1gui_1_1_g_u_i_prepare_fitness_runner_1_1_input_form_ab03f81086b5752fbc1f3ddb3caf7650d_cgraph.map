@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GUIPrepareFitnessRunner.InputForm.importParametersFromDenoptimParamsFile" name="denoptim.gui.GUIPrepareFitnessRunner.InputForm.importParametersFromDenoptimParamsFile">
+<area shape="rect" id="node1" title="Imports parameters from a properly formatted parameters file." alt="" coords="5,31,236,87"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a32d73057266a7b76fdf463cbf4400547" title=" " alt="" coords="285,5,512,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_parameters_form.html#aa73e9df9398e76e8f146f8b70e4a468c" title="Shown a warning dialog that informs the user about having found text that is not present in the Param..." alt="" coords="284,71,513,112"/>
+</map>

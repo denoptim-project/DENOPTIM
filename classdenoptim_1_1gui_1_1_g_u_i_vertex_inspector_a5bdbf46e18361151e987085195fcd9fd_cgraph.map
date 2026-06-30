@@ -1,0 +1,8 @@
+<map id="denoptim.gui.GUIVertexInspector.deprotectEditedSystem" name="denoptim.gui.GUIVertexInspector.deprotectEditedSystem">
+<area shape="rect" id="node1" title=" " alt="" coords="5,103,276,144"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a40e54f9dd90a7e68217a35edb0f8e36f" title="Overrides the flag signaling unsaved edits to saying that there are no altered data." alt="" coords="324,37,579,79"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector_1_1_vrtx_spinner_change_event.html#aadd9bd7cbca65495eb27e4f9e4a3411f" title="Enables/disable the listener." alt="" coords="335,103,568,144"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#ab5a415c6dbe55114c957b6241eab83eb" title="Enable/disable switch&#45;able view." alt="" coords="342,168,561,209"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a924ff49c544f18a4726d8bc871a641d5" title="Overrides the flag signaling unsaved edits to saying that there are no altered data." alt="" coords="629,5,811,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#a59ae85a6ec6537cafb8391e70331c734" title="Overrides the flag signaling unsaved edits to saying that there are no altered data." alt="" coords="627,71,813,112"/>
+</map>

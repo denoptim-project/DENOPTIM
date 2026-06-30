@@ -1,0 +1,4 @@
+<map id="denoptim.ga.XoverSite.clone" name="denoptim.ga.XoverSite.clone">
+<area shape="rect" id="node1" title="Creates a new XoverSite that contains the same information of this one, i.e., a shallow copy." alt="" coords="5,29,192,56"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_xover_site.html#a27acc7df9dde2a24dacdcef15339e133" title="Initiate an empty data structure." alt="" coords="240,29,452,56"/>
+</map>

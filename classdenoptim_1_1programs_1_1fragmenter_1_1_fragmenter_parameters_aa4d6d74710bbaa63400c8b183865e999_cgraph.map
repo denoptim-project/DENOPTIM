@@ -1,0 +1,5 @@
+<map id="denoptim.programs.fragmenter.FragmenterParameters.getMWSlotFileNameUnqFrags" name="denoptim.programs.fragmenter.FragmenterParameters.getMWSlotFileNameUnqFrags">
+<area shape="rect" id="node1" title="Builds the pathname of the file meant to hold unique fragments from within a given MW slot,..." alt="" coords="5,31,248,87"/>
+<area shape="rect" id="node2" href="$enumdenoptim_1_1files_1_1_file_format.html#a3add0e6a04faada7ca012a68d9658bf2" title=" " alt="" coords="298,5,485,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a37f87b26bd9a229cfd84e9c487f6495a" title="Gets the pathname to the working directory." alt="" coords="296,71,487,112"/>
+</map>

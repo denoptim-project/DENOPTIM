@@ -1,0 +1,4 @@
+<map id="denoptim.graph.DGraph.directedPathExists" name="denoptim.graph.DGraph.directedPathExists">
+<area shape="rect" id="node1" title="Uses branch identifiers to define is two vertices are in such a relation that allows the drawing of a..." alt="" coords="5,5,212,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1b6ffe09345affdaf53651dfbdbb691b" title="Returns the branch identifier." alt="" coords="260,5,439,47"/>
+</map>

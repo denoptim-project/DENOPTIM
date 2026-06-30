@@ -1,0 +1,7 @@
+<map id="denoptim.graph.Vertex" name="denoptim.graph.Vertex">
+<area shape="rect" id="node1" title="A vertex is a data structure that has an identity and holds a list of AttachmentPoints." alt="" coords="225,80,375,107"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html" title="An empty vertex has the behaviors of a vertex, but has no molecular structure." alt="" coords="5,155,192,181"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment.html" title="Class representing a continuously connected portion of chemical object holding attachment points." alt="" coords="216,155,384,181"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template.html" title=" " alt="" coords="409,155,575,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="261,5,339,32"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="denoptim.ga.EAUtils.getPathNameToGenerationFolder" name="denoptim.ga.EAUtils.getPathNameToGenerationFolder">
+<area shape="rect" id="node1" title=" " alt="" coords="993,123,1180,164"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aab14b898988cd607e9d08f09f2ba10cb" title="Creates a folder meant to hold all the data generated during a generation." alt="" coords="737,64,915,105"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="476,5,655,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aecbe9af608218e129a006ddae17ac66b" title="Reads unique identifiers and initial population file according to the GAParameters." alt="" coords="476,123,655,164"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a5288db1eb3c645ed5b3cb33430c62bdf" title=" " alt="" coords="707,181,945,223"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#af5c2f9114881ebde82a83f922c0c23fe" title=" " alt="" coords="721,247,931,288"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,93,424,135"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,60,211,101"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,125,198,167"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="472,188,659,229"/>
+</map>

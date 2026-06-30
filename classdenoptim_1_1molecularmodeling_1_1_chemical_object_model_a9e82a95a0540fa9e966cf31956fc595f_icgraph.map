@@ -1,0 +1,12 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.updateXYZ" name="denoptim.molecularmodeling.ChemicalObjectModel.updateXYZ">
+<area shape="rect" id="node1" title="currently loaded internal coordinates into Cartesian overwriting the current XYZ." alt="" coords="649,277,867,319"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#ab0a2952925cf318fa872e349dd2709ae" title="Converts currently loaded internal coordinates into Cartesian overwriting the current XYZ." alt="" coords="332,277,601,319"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a5b6a2d27491b6dcf3d6a7d5910bd9c8b" title="Constructs a Molecule3DBuilder specifying all its features." alt="" coords="5,5,284,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model_test.html#abc0a13511805e3a3762c00f95f7427de" title=" " alt="" coords="23,70,266,126"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model_test.html#a991182ec86fd53cd373d3359a9c92373" title=" " alt="" coords="23,150,266,206"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model_test.html#a419ebc591b27f69c2eef988bbfa30034" title=" " alt="" coords="23,230,266,286"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model_test.html#a3b3e26d79f2d7cccd68c6bb2fa7143cb" title=" " alt="" coords="23,310,266,366"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model_test.html#a0bde13c1170d9e7983b0a40db875cecb" title=" " alt="" coords="21,390,269,446"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model_test.html#a4b1c2991fa23f24226f266e7914a62b4" title=" " alt="" coords="21,470,269,526"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model_test.html#a671cec65638eb9e1b2c514b9ce821e8d" title=" " alt="" coords="23,550,266,606"/>
+</map>

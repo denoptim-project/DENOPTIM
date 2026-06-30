@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GUIVertexInspector.ensureGoodAPRuleString" name="denoptim.gui.GUIVertexInspector.ensureGoodAPRuleString">
+<area shape="rect" id="node1" title="Forces the user to specify a properly formatted APRule, i.e., the first component of an APClass." alt="" coords="5,5,260,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="308,5,485,47"/>
+</map>

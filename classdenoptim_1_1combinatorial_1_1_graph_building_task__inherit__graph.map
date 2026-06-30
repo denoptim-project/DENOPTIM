@@ -1,0 +1,6 @@
+<map id="denoptim.combinatorial.GraphBuildingTask" name="denoptim.combinatorial.GraphBuildingTask">
+<area shape="rect" id="node1" title="Task that builds a graph by appending a given combination of fragments onto a given list of attachmen..." alt="" coords="5,229,199,271"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_fitness_task.html" title="Task that assesses the fitness of a given graph." alt="" coords="13,155,191,181"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="35,80,169,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="38,5,166,32"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="denoptim.gui.Utils.getTempFile" name="denoptim.gui.Utils.getTempFile">
+<area shape="rect" id="node1" title="Returns the pathname to a tmp file." alt="" coords="568,78,768,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#ad63012fa4fa9bec2e54ce86425039186" title="Initialize the panel and add buttons." alt="" coords="264,17,520,43"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a425f62217ecdff6ec36138e6e8099f15" title=" " alt="" coords="301,71,483,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a4e3a3010d8d8ac998af38872fd03f092" title=" " alt="" coords="303,136,481,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#aefffdc97385f7a524badf71808a3053b" title="Constructor." alt="" coords="5,5,216,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a21f37bdde28f714480eda22f473168d6" title="Constructor that allows to specify whether the AP table is editable or not." alt="" coords="19,71,202,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a58a6483ddef60d65b376afd4098e9465" title="Constructor." alt="" coords="21,136,200,177"/>
+</map>

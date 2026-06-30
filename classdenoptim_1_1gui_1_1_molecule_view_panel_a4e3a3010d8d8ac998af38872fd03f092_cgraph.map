@@ -1,0 +1,12 @@
+<map id="denoptim.gui.MoleculeViewPanel.initialize" name="denoptim.gui.MoleculeViewPanel.initialize">
+<area shape="rect" id="node1" title=" " alt="" coords="5,89,184,130"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_utils.html#a392b3f9d6c47ab4ee7dc8e9f2a09f0c5" title="Returns the pathname to a tmp file." alt="" coords="699,25,899,52"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#af99749d5f2b6b6d83ce1b0f9b5c94095" title=" " alt="" coords="232,130,411,171"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_file_utils.html#abb578573334c0bc633d537d987223e63" title="Check whether we can write and read to a given pathname." alt="" coords="1168,47,1344,89"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1files_1_1_file_utils.html#ae2209fbdfdcf1fdf0499e32989b057b5" title="Looks for a writable location where to put temporary files and returns an absolute pathname to the fo..." alt="" coords="947,77,1120,118"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="1396,29,1607,56"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="1392,80,1611,107"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a7823d9f27dc96ba2c777339e181dcfdc" title=" " alt="" coords="465,101,644,142"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#aded8f83abc7d4310a5d95312a29363af" title="Returns a single collection with all atom containers found in a file of any format." alt="" coords="705,101,893,142"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_candidate.html#a65cfcaa4ce7b537005082fd90e90d8b6" title=" " alt="" coords="459,218,651,259"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="denoptim.graph.DGraph.removeCappingGroupsFromChilds" name="denoptim.graph.DGraph.removeCappingGroupsFromChilds">
+<area shape="rect" id="node1" title=" " alt="" coords="5,145,208,187"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a70aeea1a1fe35ea9fe5a49a147e76f1a" title=" " alt="" coords="268,100,447,141"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#abb3232f7f303b60cb2f24b70a6fbb00d" title="Remove all capping groups on this graph." alt="" coords="256,189,459,231"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a846e0f49dfefd933c429450545338d25" title="Looks into the edges that use any of the APs that belong to this vertex and returns the list of verti..." alt="" coords="507,100,677,141"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="741,5,911,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="736,71,916,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="725,137,927,163"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="726,187,926,214"/>
+</map>

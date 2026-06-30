@@ -1,0 +1,5 @@
+<map id="denoptim.utils.AtomOrganizer.exploreMolecule" name="denoptim.utils.AtomOrganizer.exploreMolecule">
+<area shape="rect" id="node1" title="Method meant for recursion on all atoms connected to a starting point." alt="" coords="5,35,240,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a32438216f863d45940768576a05178f5" title="Change the order of atoms in a list according to the priority rules defined in the comparator Connect..." alt="" coords="302,5,545,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a291686eac0b022879608b2dd85ffab6e" title="Perform all the operation to report an atom in the new order." alt="" coords="288,71,559,98"/>
+</map>

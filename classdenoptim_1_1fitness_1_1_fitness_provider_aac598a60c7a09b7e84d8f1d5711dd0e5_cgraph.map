@@ -1,0 +1,19 @@
+<map id="denoptim.fitness.FitnessProvider.getFitness" name="denoptim.fitness.FitnessProvider.getFitness">
+<area shape="rect" id="node1" title="Calculated the fitness according to the current configuration." alt="" coords="5,267,168,308"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a07031c5387efae1aa8c10465067293b7" title=" " alt="" coords="217,5,464,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3506079a3de962c32b2c715f8cea96e6" title=" " alt="" coords="217,71,464,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a9c0bc47eeaca313657de40ca4b1fb24b" title=" " alt="" coords="217,136,464,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fitness_1_1_descriptor_for_fitness.html#acbf83e1eb006482cd43d9943b1ace406" title="Get the variables that make use of values produced by this descriptor." alt="" coords="251,201,430,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aaffb007354a24c9fb679742e431c9980" title=" " alt="" coords="216,267,465,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_math_utils.html#afb2d69d1322542d8a1b2f0a35ae8657a" title="Calculate mean value." alt="" coords="243,333,439,359"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fitness_1_1_fitness_provider.html#a4cb79aa02aae2c8bf2041939bb0a5267" title="Takes the value and checks that it is all good, then processes the value to extract the result define..." alt="" coords="259,384,422,425"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#aebb34175897f152ed3927c27c896a4c3" title="Removes all dummy atoms and the bonds connecting them to other atoms." alt="" coords="251,449,431,491"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#afeb315a7590ab0ded7285e333319a195" title=" " alt="" coords="239,527,442,568"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_math_utils.html#a186a9887c032a9af88b74f6e326ba594" title="Return sum of all values in array." alt="" coords="528,333,717,359"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a4cd147e9f65c7826d4bf8bc295f9d5b3" title=" " alt="" coords="527,384,718,425"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="520,449,725,491"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="780,449,977,491"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a51781b0ca6eb50ceb2160e1020af04ab" title="Explore connected systems in a list of atoms and returns all the atoms that can be reached starting f..." alt="" coords="513,539,732,580"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a27e71c4eff13a223903ab212a4f316eb" title="Generates a vector of boolean flags." alt="" coords="533,604,713,645"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="527,693,718,735"/>
+</map>

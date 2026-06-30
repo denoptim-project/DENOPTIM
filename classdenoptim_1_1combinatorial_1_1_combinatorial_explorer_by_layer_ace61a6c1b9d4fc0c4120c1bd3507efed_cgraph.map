@@ -1,0 +1,4 @@
+<map id="denoptim.combinatorial.CombinatorialExplorerByLayer.stopRun" name="denoptim.combinatorial.CombinatorialExplorerByLayer.stopRun">
+<area shape="rect" id="node1" title="Stops all subtasks and shutdown executor." alt="" coords="5,5,243,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a471ee8aed24d5e6499dd4d747d6fea5b" title="clean all reference to submitted tasks" alt="" coords="291,5,528,47"/>
+</map>

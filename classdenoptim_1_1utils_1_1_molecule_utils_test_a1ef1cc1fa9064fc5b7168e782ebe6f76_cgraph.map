@@ -1,0 +1,4 @@
+<map id="denoptim.utils.MoleculeUtilsTest.testFindShortestPath" name="denoptim.utils.MoleculeUtilsTest.testFindShortestPath">
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,189,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac6be8c4af5dd51783eae0899abba91ff" title="Finds the shortest path between two atoms in a molecule using BFS." alt="" coords="237,5,444,47"/>
+</map>

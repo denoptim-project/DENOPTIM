@@ -1,0 +1,3 @@
+<map id="denoptim.gui.VertexAsTwoDimStructureViewPanel.AtomOrAPGenerator.getAtomColor" name="denoptim.gui.VertexAsTwoDimStructureViewPanel.AtomOrAPGenerator.getAtomColor">
+<area shape="rect" id="node1" title="Chooses default colors from CDK2DAtomColor for all but PseudoAtoms which we expect to be placeholder ..." alt="" coords="5,29,213,85"/>
+</map>

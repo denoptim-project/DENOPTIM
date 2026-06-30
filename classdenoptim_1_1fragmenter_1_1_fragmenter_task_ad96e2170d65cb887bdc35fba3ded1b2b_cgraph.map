@@ -1,0 +1,7 @@
+<map id="denoptim.fragmenter.FragmenterTask.FragmenterTask" name="denoptim.fragmenter.FragmenterTask.FragmenterTask">
+<area shape="rect" id="node1" title="Create a task by giving the input file (i.e., containing structures to work with) and the configurati..." alt="" coords="5,71,215,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#a53b4f3e4569b2a3ce4a871e006692680" title="Builds the pathname of the log file for this task." alt="" coords="263,5,472,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="274,71,461,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_task_utils.html#a04b7f04efd81199814b4e81de32df86f" title="Unique counter for tasks." alt="" coords="276,136,459,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a37f87b26bd9a229cfd84e9c487f6495a" title="Gets the pathname to the working directory." alt="" coords="520,5,711,47"/>
+</map>

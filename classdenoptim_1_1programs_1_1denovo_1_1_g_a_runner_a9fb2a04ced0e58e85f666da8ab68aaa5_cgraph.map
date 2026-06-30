@@ -1,0 +1,7 @@
+<map id="denoptim.programs.denovo.GARunner.handleThrowable" name="denoptim.programs.denovo.GARunner.handleThrowable">
+<area shape="rect" id="node1" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="5,39,188,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#ac286f9ce5bfd00ea611a16b72504f66b" title="Stop the service that waits for instructions from the outside world." alt="" coords="236,5,467,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a5d4c7ed4e7b8d2219c845f906e539408" title=" " alt="" coords="269,71,434,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_external_cmds_listener.html#a238277c6160540cdd04489e0e13139cd" title=" " alt="" coords="515,5,689,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a2367e2b5713154c6d49905975fb852b0" title="Removes all tasks whether they are completed or not." alt="" coords="519,71,685,112"/>
+</map>

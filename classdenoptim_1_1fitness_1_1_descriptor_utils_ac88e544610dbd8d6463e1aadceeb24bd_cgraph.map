@@ -1,0 +1,6 @@
+<map id="denoptim.fitness.DescriptorUtils.findDescriptorImplementations" name="denoptim.fitness.DescriptorUtils.findDescriptorImplementations">
+<area shape="rect" id="node1" title="Searches for descriptor implementations." alt="" coords="5,71,232,112"/>
+<area shape="rect" id="node2" href="$interfacedenoptim_1_1fitness_1_1_i_denoptim_descriptor.html#a349d60db2af497012dd0c903f91125e4" title="Get the classification of this descriptor." alt="" coords="290,5,482,47"/>
+<area shape="rect" id="node3" href="$interfacedenoptim_1_1fitness_1_1_i_denoptim_descriptor.html#ae9dfd06511a97b92fb7df7636edc6c57" title="Get a string that describes the descriptor in detail." alt="" coords="280,71,492,112"/>
+<area shape="rect" id="node4" href="$interfacedenoptim_1_1fitness_1_1_i_denoptim_descriptor.html#ad2108e8cc890e1869717e956fbcdbffa" title="Gets the title of this descriptor as it should be in the dictionary." alt="" coords="294,136,478,177"/>
+</map>

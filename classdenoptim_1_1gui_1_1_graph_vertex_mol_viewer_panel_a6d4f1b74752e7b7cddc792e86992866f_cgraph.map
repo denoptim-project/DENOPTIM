@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.getSelectedNodesInViewer" name="denoptim.gui.GraphVertexMolViewerPanel.getSelectedNodesInViewer">
+<area shape="rect" id="node1" title="Identifies which vertices are selected in the graph viewer." alt="" coords="5,5,232,61"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a63652cbc8cbef5690625202ab7f6ac3e" title="Finds selected nodes from the viewer." alt="" coords="280,13,453,54"/>
+</map>

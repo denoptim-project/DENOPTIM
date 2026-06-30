@@ -1,0 +1,6 @@
+<map id="denoptim.gui.VertexAsGraphViewPanel.clearAll" name="denoptim.gui.VertexAsGraphViewPanel.clearAll">
+<area shape="rect" id="node1" title="Removes the currently visualized molecule and AP table." alt="" coords="5,13,192,54"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#af9187da422f4f24b56b63c8e225b9c13" title="Clears the table of attachment points." alt="" coords="240,13,427,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#a87f08fd10d2e9ce079c42619f52317e3" title="Allows to activate and deactivate the listener." alt="" coords="475,13,705,54"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel_1_1_pausable_table_model_listener.html#a37b99134be224897be59444fca4734bf" title=" " alt="" coords="753,5,1029,61"/>
+</map>

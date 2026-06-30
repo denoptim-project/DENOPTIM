@@ -1,0 +1,8 @@
+<map id="denoptim.graph.simplified.UndirectedEdge.toString" name="denoptim.graph.simplified.UndirectedEdge.toString">
+<area shape="rect" id="node1" title=" " alt="" coords="5,71,176,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#acd666767475f39f0d7f17550d2b47651" title=" " alt="" coords="224,5,404,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="224,71,404,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="229,136,399,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="452,5,623,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="671,5,841,47"/>
+</map>

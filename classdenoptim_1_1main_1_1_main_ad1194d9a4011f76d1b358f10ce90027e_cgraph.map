@@ -1,0 +1,6 @@
+<map id="denoptim.main.Main.runProgramTask" name="denoptim.main.Main.runProgramTask">
+<area shape="rect" id="node1" title="Creates a task for the given class." alt="" coords="5,78,241,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1exception_1_1_exception_utils.html#ad9c36f7546914017a9ce5d6e22508fa2" title="Prints the stack trace of an exception into a string." alt="" coords="289,5,481,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1main_1_1_main.html#ad11d4b1f0dae6d3318ea92f3c94f30c2" title="Prints an error message on standard output and then stops the Virtual Machine with an exit code." alt="" coords="299,71,472,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1task_1_1_static_task_manager.html#a24097e04dfe47ec37c06f8600b6905b5" title="Submits a task and waits for completion." alt="" coords="301,136,470,177"/>
+</map>

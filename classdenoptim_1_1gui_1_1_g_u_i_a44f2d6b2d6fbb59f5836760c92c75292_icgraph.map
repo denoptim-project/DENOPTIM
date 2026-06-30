@@ -1,0 +1,6 @@
+<map id="denoptim.gui.GUI.closeIfAllSaved" name="denoptim.gui.GUI.closeIfAllSaved">
+<area shape="rect" id="node1" title="Close GUI is there are no unsaved changes to the open components." alt="" coords="496,31,660,72"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a0df9ca063352fbc50f9476f3b2820926" title="Initialize the contents of the tool bar." alt="" coords="228,13,448,39"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i.html#a460fa99497f04de06d2adf8671a92441" title="Launch the application." alt="" coords="267,63,409,90"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a36f4409849998e032342f49b19e6c5b5" title="Constructor that build the tool bar." alt="" coords="5,5,180,47"/>
+</map>

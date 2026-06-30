@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GraphViewerPanel.loadGraphToViewer" name="denoptim.gui.GraphViewerPanel.loadGraphToViewer">
+<area shape="rect" id="node1" title="Load the given DGraph to the graph viewer." alt="" coords="5,29,179,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#abed87e5b88f44a20955b9e1bb2491156" title="Created a JUNG graph object that represents a DGraph, and allows to load a graphical representation i..." alt="" coords="448,29,669,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a0311f258391ff189afefcc333ade4cee" title="Load the given DGraph to this graph viewer." alt="" coords="227,71,400,112"/>
+</map>

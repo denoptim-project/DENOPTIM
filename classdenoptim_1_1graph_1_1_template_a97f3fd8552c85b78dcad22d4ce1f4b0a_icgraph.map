@@ -1,0 +1,8 @@
+<map id="denoptim.graph.Template.addRequiredAP" name="denoptim.graph.Template.addRequiredAP">
+<area shape="rect" id="node1" title="Adds attachment point (AP) to the list of required APs on this template." alt="" coords="560,104,751,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_template.html#ac7d7400f47d4bad33f3755f1b3d19a3e" title="Returns a deep copy of this template." alt="" coords="302,78,503,105"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_template_test.html#a255d7ef2a87d37ff0fd1e5063872d838" title=" " alt="" coords="293,129,512,185"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_template_test.html#a72d37b4c24ad896838401b319b1d667e" title=" " alt="" coords="16,5,235,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af88d30ce68477984fe6179325d1540b2" title=" " alt="" coords="5,71,245,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template_test.html#a50688358b5a557ee51683082427bdc14" title=" " alt="" coords="16,136,235,177"/>
+</map>

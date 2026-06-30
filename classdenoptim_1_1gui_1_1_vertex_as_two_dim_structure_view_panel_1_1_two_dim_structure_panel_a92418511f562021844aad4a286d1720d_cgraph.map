@@ -1,0 +1,7 @@
+<map id="denoptim.gui.VertexAsTwoDimStructureViewPanel.TwoDimStructurePanel.TwoDimStructurePanel" name="denoptim.gui.VertexAsTwoDimStructureViewPanel.TwoDimStructurePanel.TwoDimStructurePanel">
+<area shape="rect" id="node1" title=" " alt="" coords="5,63,251,119"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="323,5,493,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#acc83e15edc2c04f8b3ae66a8628a6134" title=" " alt="" coords="323,71,493,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="299,136,517,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="565,136,784,177"/>
+</map>

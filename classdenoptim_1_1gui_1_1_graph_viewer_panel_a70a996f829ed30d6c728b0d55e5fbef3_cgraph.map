@@ -1,0 +1,8 @@
+<map id="denoptim.gui.GraphViewerPanel.loadGraphToViewer" name="denoptim.gui.GraphViewerPanel.loadGraphToViewer">
+<area shape="rect" id="node1" title="Load the given graph to the graph viewer." alt="" coords="5,39,179,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a5d141993a4e2544320e3905fd2ef5df9" title=" " alt="" coords="227,5,400,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a183c7b0ef1cd998011e73519a8de10d8" title=" " alt="" coords="227,71,400,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#ad5c23dcbf1dcf069a53ab6da2e1d1049" title=" " alt="" coords="485,5,658,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_j_u_n_g_graph_snapshot.html#a645af5804ba66bd2254611bc45e9d4fc" title=" " alt="" coords="448,71,695,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_j_u_n_g_graph_snapshot.html#acb38b8ce035bc084bae800b68e0a529b" title=" " alt="" coords="448,136,695,177"/>
+</map>

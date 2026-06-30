@@ -1,0 +1,11 @@
+<map id="denoptim.gui.FragmentViewPanel.updateAPsInJmolViewer" name="denoptim.gui.FragmentViewPanel.updateAPsInJmolViewer">
+<area shape="rect" id="node1" title=" " alt="" coords="5,206,207,247"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_math_utils.html#a73353da67db83f1e704a4150ca34da9f" title="Perform vector addition." alt="" coords="272,5,457,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a66ef044fb958d43d820bd05c71a2bfb2" title=" " alt="" coords="255,56,475,83"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="266,107,463,149"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a9c1db3123b7f73aa20c0d1895f31f8d7" title="Returns the end of the direction vector." alt="" coords="275,173,455,214"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a7fdbccebaad39ee47c887f0a6b7e6506" title=" " alt="" coords="273,238,456,279"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="262,303,467,345"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_math_utils.html#acaebe2b74dbf0b6772546a9b7b121f1e" title="Scales a vector." alt="" coords="267,369,462,396"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_math_utils.html#abd305c2110e62105a52004b18053d3ec" title="Perform vector subtraction." alt="" coords="259,420,470,447"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="denoptim.programs.combinatorial.CEBLParameters" name="denoptim.programs.combinatorial.CEBLParameters">
+<area shape="rect" id="node1" title="Parameters controlling execution of the combinatorial algorithm for exploration of a fragment space b..." alt="" coords="921,179,1136,221"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html" title="Collection of parameters controlling the behavior of the software." alt="" coords="615,114,801,155"/>
+<area shape="rect" id="node3" title=" " alt="" coords="297,5,360,32"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="242,56,415,83"/>
+<area shape="rect" id="node5" title=" " alt="" coords="5,56,128,83"/>
+<area shape="rect" id="node6" title=" " alt="" coords="195,107,463,163"/>
+<area shape="rect" id="node7" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html" title="Identifier of the type of parameters." alt="" coords="235,186,422,227"/>
+<area shape="rect" id="node8" title=" " alt="" coords="620,179,796,221"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1combinatorial_1_1_check_point.html" title="Object collecting information needed to restart a FragSpaceExplorer job." alt="" coords="611,245,805,286"/>
+<area shape="rect" id="node10" title=" " alt="" coords="261,252,397,279"/>
+</map>

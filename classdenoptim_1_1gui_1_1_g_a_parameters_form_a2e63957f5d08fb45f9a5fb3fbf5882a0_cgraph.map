@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GAParametersForm.updateCrowdProbDataset" name="denoptim.gui.GAParametersForm.updateCrowdProbDataset">
+<area shape="rect" id="node1" title=" " alt="" coords="5,49,208,90"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#a44e653526253cfea892611376a7fa3bb" title=" " alt="" coords="256,49,456,90"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a4488a01992b7a7f2cda6f3aa7baa25ab" title=" " alt="" coords="504,5,719,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#acf42fcadab45800cf712361cc025ffbb" title="Calculated the crowding probability for a given level of crowdedness." alt="" coords="504,85,719,126"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a41e3b62363bfa04f372d094483eee83f" title="Calculated a probability given parameters defining the shape of the probability function and a single..." alt="" coords="767,92,987,119"/>
+</map>

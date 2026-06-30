@@ -1,0 +1,5 @@
+<map id="denoptim.graph.DGraph.isConnected" name="denoptim.graph.DGraph.isConnected">
+<area shape="rect" id="node1" title="Check if this graph is connected, i.e., there is at least one path between any two vertices." alt="" coords="261,39,432,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#ac1e5c9703afc6f29fe11cca08ddb1a1c" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="12,5,207,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a2a0dc529e97e433ef5df472916def13e" title=" " alt="" coords="5,71,213,112"/>
+</map>

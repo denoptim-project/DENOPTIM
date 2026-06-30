@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.FragmenterTools.filterFragment" name="denoptim.fragmenter.FragmenterTools.filterFragment">
+<area shape="rect" id="node1" title="Filter fragments according to the criteria defined in the settings." alt="" coords="5,29,215,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="263,29,449,71"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="denoptim.graph.Template.getMutationSites" name="denoptim.graph.Template.getMutationSites">
+<area shape="rect" id="node1" title="A list of mutation sites from within this vertex." alt="" coords="5,140,193,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="261,5,431,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a57e3b82a73a9c600722a5fb192e6b04b" title="A list of mutation sites from within this vertex." alt="" coords="261,95,431,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a0ff4d9561ea341eb2d968d37a1db8818" title="Returns the list of mutation types." alt="" coords="261,184,431,225"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template.html#a1c1bd08e467f7738d2868996e9f22c3a" title=" " alt="" coords="241,249,451,291"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#aac7848d9fe16b008e5b2989ac294fbf2" title="Removes the specified mutation type." alt="" coords="499,216,695,257"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_template.html#aad385a42d6afcdac25d87f9519644a00" title=" " alt="" coords="511,281,682,323"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="743,281,913,323"/>
+</map>

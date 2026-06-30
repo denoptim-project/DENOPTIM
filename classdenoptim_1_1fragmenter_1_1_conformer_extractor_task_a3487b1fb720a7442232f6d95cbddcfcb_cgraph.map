@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.ConformerExtractorTask.getClusterPathname" name="denoptim.fragmenter.ConformerExtractorTask.getClusterPathname">
+<area shape="rect" id="node1" title="Builds the pathname for the file where we save the members of a given cluster." alt="" coords="5,5,228,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a37f87b26bd9a229cfd84e9c487f6495a" title="Gets the pathname to the working directory." alt="" coords="276,5,467,47"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="denoptim.fragspace.FragmentSpace.getCappingVertexWithAPClass" name="denoptim.fragspace.FragmentSpace.getCappingVertexWithAPClass">
+<area shape="rect" id="node1" title=" " alt="" coords="5,126,247,167"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a45fa1cc43d2915d4674fd544890b7019" title=" " alt="" coords="295,104,500,131"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a492683049dc687fcdc41b43051d30554" title="Returns a clone of the requested building block." alt="" coords="301,155,494,197"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="550,5,734,32"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="557,57,727,98"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="549,122,735,163"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="548,187,736,229"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="557,253,727,294"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a29e20c43a6110fbaac6cc86c216fe143" title=" " alt="" coords="557,318,727,359"/>
+</map>

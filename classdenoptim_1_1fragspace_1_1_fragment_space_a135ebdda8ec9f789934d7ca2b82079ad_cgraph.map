@@ -1,0 +1,7 @@
+<map id="denoptim.fragspace.FragmentSpace.mapAPClassCompatibilities" name="denoptim.fragspace.FragmentSpace.mapAPClassCompatibilities">
+<area shape="rect" id="node1" title="Given two lists of APs this method maps the APClass&#45;compatibilities from between the two lists consid..." alt="" coords="5,63,228,104"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space_utils.html#ace7d0f68e2dd6f9bedc0d019790a9036" title="Search for all possible combinations of compatible APs." alt="" coords="289,29,487,71"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a47b278f84db073b1f06809f9c42cfae5" title="Check usage of APClass&#45;based approach, i.e., uses attachment points with annotated data (i...." alt="" coords="276,95,500,136"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_mapping.html#a9b9fdac59130cd95e89edd7a74e2b7c5" title="Shallow cloning." alt="" coords="548,37,763,63"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_mapping.html#a32d3ef2e53f9b39cfeb5661d43b39592" title="Creates a mapping that links no pair of APs." alt="" coords="811,29,993,71"/>
+</map>

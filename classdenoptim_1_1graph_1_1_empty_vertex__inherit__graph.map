@@ -1,0 +1,5 @@
+<map id="denoptim.graph.EmptyVertex" name="denoptim.graph.EmptyVertex">
+<area shape="rect" id="node1" title="An empty vertex has the behaviors of a vertex, but has no molecular structure." alt="" coords="5,155,192,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html" title="A vertex is a data structure that has an identity and holds a list of AttachmentPoints." alt="" coords="23,80,174,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="59,5,138,32"/>
+</map>

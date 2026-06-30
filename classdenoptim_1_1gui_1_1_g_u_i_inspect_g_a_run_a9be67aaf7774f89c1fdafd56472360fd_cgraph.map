@@ -1,0 +1,33 @@
+<map id="denoptim.gui.GUIInspectGARun.importGARunData" name="denoptim.gui.GUIInspectGARun.importGARunData">
+<area shape="rect" id="node1" title=" " alt="" coords="5,669,252,711"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a3f8fe730afa2012143c6365e7a9d79cc" title="Modal dialog to display visual examples of line colors and strokes." alt="" coords="305,115,542,156"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#afe7e7a12c08dba4f2ecb97274064d35b" title=" " alt="" coords="301,823,546,864"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a95069843e337d5e85a5434aceb8e9c42" title=" " alt="" coords="629,703,800,744"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#ae0d754f27cb1396b28fadfa6e1cfcd92" title=" " alt="" coords="629,637,800,679"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a9a5cf8d6ae31378ae37fcfb3031c567e" title=" " alt="" coords="309,640,537,681"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a015435de7c18b38757709c97bd46f10d" title=" " alt="" coords="629,572,800,613"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_general_utils.html#ab0c97460520e98fa670681d851754703" title="returns the padded string with zeroes placed to the left of &#39;number&#39; up to reach the desired number o..." alt="" coords="324,888,523,929"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a32e8ea84a91515a20ffaf45350972dda" title=" " alt="" coords="306,455,541,496"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a2b7d3fce2af7d87f440dc68c574da8b1" title=" " alt="" coords="300,953,547,995"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a4eab97fdfc9d8117177459e50180ee67" title=" " alt="" coords="300,757,547,799"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_scrollable_j_pupup_menu.html#abed0c4ce1f87a5be689f05d377ff9848" title="Add a check box to the list of check boxes to display in the menu." alt="" coords="615,49,814,91"/>
+<area shape="rect" id="node4" href="$enumdenoptim_1_1logging_1_1_counter_i_d.html#a9e7a6825141da490fbb146db05242ca4" title=" " alt="" coords="631,115,798,156"/>
+<area shape="rect" id="node5" href="$enumdenoptim_1_1logging_1_1_counter_i_d.html#a63a44b7afb772b979182aa0eb83ea1ac" title="Returns a string representing the mane of this counter in a way that is pretty enough to be shown in ..." alt="" coords="631,180,798,221"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="883,286,1093,313"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#aab1bd788e028b3a5b77dca355e8d557b" title="Read only selected data from a GA produced items." alt="" coords="621,441,809,483"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a2cda5028becae07d4a0ac873a9352768" title="Read the pathnames to the population members from a FileFormat#GENSUMMARY file." alt="" coords="617,245,813,287"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ae0786894c12a0c3c94f10aca107c8edf" title="Read the minimal info that can be found in a FileFormat#GENSUMMARY file about the members of a popula..." alt="" coords="621,376,809,417"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a888315451366a81a41786fe6aea46d46" title="Read the min, max, mean, and median of a population from FileFormat#GENSUMMARY file." alt="" coords="621,311,809,352"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#abeb30140b862fc08d90bdd6d2290b9b6" title=" " alt="" coords="629,507,800,548"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ab0e2d1314d9babeda94e65c471832df1" title="Extract selected properties from SDF files." alt="" coords="894,439,1082,480"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a5b0854960a04b31ce12b5d0bdbcfbad6" title=" " alt="" coords="903,504,1073,545"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a382d6d04e131453c7c4736de583ea996" title=" " alt="" coords="903,373,1073,415"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#aa375e204e094848126768561901a32e4" title=" " alt="" coords="903,569,1073,611"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a7458628d4e902ca60749a5986a14ecc0" title="Sets level that generated this graph in a fragment space exploration experiment." alt="" coords="903,635,1073,676"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a48102bb79e9cc581e8c6ef527e003b08" title="Reads a file containing multiple molecules (multiple SD format))" alt="" coords="1141,439,1329,480"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a700b2ae92d1de1c0be3e1bbde5cae71d" title="Removes the currently visualized molecule and AP table." alt="" coords="625,953,804,995"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a0917c33381934f156d4196b46819276b" title="Clears the table of attachment points." alt="" coords="899,920,1077,961"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a20eef80a872503d11d3253d5557e0876" title="Clears the molecular viewer." alt="" coords="897,985,1079,1027"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a73f9188a92ff8dde58db2d344accde90" title=" " alt="" coords="629,857,800,899"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#aa64c40b887997341511f076c73f51480" title="Loads a structure in the Jmol viewer." alt="" coords="595,792,835,833"/>
+</map>

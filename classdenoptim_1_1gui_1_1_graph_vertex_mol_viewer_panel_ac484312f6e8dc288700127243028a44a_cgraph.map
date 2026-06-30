@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.GraphVertexMolViewerPanel" name="denoptim.gui.GraphVertexMolViewerPanel.GraphVertexMolViewerPanel">
+<area shape="rect" id="node1" title="Constructor." alt="" coords="5,5,217,61"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a75353b8746f24c9932f0d8383384901d" title="Initialize the panel and add buttons." alt="" coords="265,13,436,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a488715b94b87e30884b75269d4dddb23" title="Sets the behavior in case of request to visualize partial data." alt="" coords="484,13,663,54"/>
+</map>

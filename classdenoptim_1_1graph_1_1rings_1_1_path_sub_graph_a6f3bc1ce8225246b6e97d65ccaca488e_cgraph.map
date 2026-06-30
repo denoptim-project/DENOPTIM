@@ -1,0 +1,5 @@
+<map id="denoptim.graph.rings.PathSubGraph.findShortestPath" name="denoptim.graph.rings.PathSubGraph.findShortestPath">
+<area shape="rect" id="node1" title="Finds the shortest vertex path from vA to vB using BFS." alt="" coords="5,39,184,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="253,5,423,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a4240e60dba8dd738ef315c1891dc6b59" title="Reconstructs the vertex path from the parent map." alt="" coords="232,71,444,112"/>
+</map>

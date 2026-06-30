@@ -1,0 +1,8 @@
+<map id="denoptim.gui.GUIModalDialog.addToCentralPane" name="denoptim.gui.GUIModalDialog.addToCentralPane">
+<area shape="rect" id="node1" title="Adds a component to the central part of this dialog frame." alt="" coords="296,150,513,191"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog.html#a64ab4ac8312bff57a077266658555757" title="Constructor." alt="" coords="5,5,248,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_f_s_params_dialog.html#a5a9b51978e6cfce0b434a8d72c7c6107" title="Constructor." alt="" coords="27,85,226,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_a_p_class_definition_dialog.html#a74d95e8865ec399c7160d24fdd226cd4" title=" " alt="" coords="13,150,240,191"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a9ddb1f2b12985b37138d9a43f1edb233" title="Constructor for an empty modal panel meant for selection of vertexes." alt="" coords="21,215,232,257"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog_1_1_s_m_a_r_t_s_visualization_button.html#afc18aa7ca6a0b238477d8d99e1877bf2" title=" " alt="" coords="5,280,248,336"/>
+</map>

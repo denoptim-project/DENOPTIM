@@ -1,0 +1,11 @@
+<map id="denoptim.fitness.descriptors.TanimotoMolSimilarityTest.testTanimotoMolSimilarity" name="denoptim.fitness.descriptors.TanimotoMolSimilarityTest.testTanimotoMolSimilarity">
+<area shape="rect" id="node1" title=" " alt="" coords="5,194,260,250"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#a03dc7ce5cca09e27f8da2677007f0f93" title=" " alt="" coords="332,136,537,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity_test.html#a87cd08d782d028a1d2e0a4c637c282bb" title=" " alt="" coords="308,201,561,243"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#a2bebb1a5e8a993d83d6aa983781beba8" title="Set the parameters attribute of TanimotoMolSimilarity object." alt="" coords="315,267,554,308"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#ada8ae2ee4869ed795708ce8c1231e030" title=" " alt="" coords="610,5,882,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#ab8ec5792a8cdce2c5609fa853af8e4a4" title="Gets the parameterNames attribute of the TanimotoMolSimilarity object." alt="" coords="609,71,883,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#acb3139ac9681cdc01b49d176c61c85c2" title=" " alt="" coords="627,136,865,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#a8d412be332465a382ebad8d6b00287c2" title="Get the specification attribute of Tanimoto molecular similarity." alt="" coords="623,201,869,243"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fitness_1_1descriptors_1_1_tanimoto_mol_similarity.html#a5cd22b0bd100d1fc669726ac3c7f4737" title=" " alt="" coords="615,267,877,308"/>
+</map>

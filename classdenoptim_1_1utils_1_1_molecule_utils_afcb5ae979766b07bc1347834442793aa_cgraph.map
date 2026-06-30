@@ -1,0 +1,5 @@
+<map id="denoptim.utils.MoleculeUtils.getHeavyAtomCount" name="denoptim.utils.MoleculeUtils.getHeavyAtomCount">
+<area shape="rect" id="node1" title="The heavy atom count." alt="" coords="5,35,211,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="259,5,464,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="512,35,709,76"/>
+</map>

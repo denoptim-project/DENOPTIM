@@ -1,0 +1,27 @@
+<map id="denoptim.graph.Template.fromJson" name="denoptim.graph.Template.fromJson">
+<area shape="rect" id="node1" title="Reads a JSON string and returns an instance of this class." alt="" coords="5,286,229,313"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa5f803143b57df02989af878b098798f" title="Reads a JSON string and returns an instance of this class." alt="" coords="277,227,492,254"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a3e85cb26bb2f36407e309e41880ef191" title=" " alt="" coords="540,145,763,187"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_template.html#a7de3b3ecb0743c881a629727648955be" title="Return the list of attachment points visible from outside the template, i.e., the so&#45;called outer APs..." alt="" coords="291,279,479,320"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_template.html#a405d47ac1a08ac9bd658bcdcc693a0a4" title=" " alt="" coords="291,468,479,509"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_template.html#a8ec4d171f4457634263a61211fb3508b" title=" " alt="" coords="547,337,756,379"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="811,35,1033,76"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a4aafec42bd09225870fdf330db93b84c" title=" " alt="" coords="1081,5,1287,47"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_template.html#a687f8680d7c74dacadeb80c85ced2be5" title="Adds the projection of an AP in the template&#39;s inner graph (i.e., innerAP) to the list of APs visible..." alt="" coords="556,253,747,295"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_template.html#a82c53a76c42c31848f394c3f7aab21b9" title="Removes the molecular representation." alt="" coords="823,443,1021,484"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph.html#a309d3784aeae9aedce785314e753bdc5" title="Returns the list of available attachment points contained in this graph." alt="" coords="833,508,1011,549"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_template.html#a1b1c82228b19609959356d3aa1f2a53b" title=" " alt="" coords="561,552,741,593"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_d_graph.html#a04463f5a015f34500e6c516d4ef0eabb" title="Sets the reference to a template that embeds this graph, i.e., this graph&#39;s &quot;jacket&quot; template." alt="" coords="562,617,741,659"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a8dc9e31a8d2fb5ef6a9705cbf2ec22c9" title="Returns a deep clone of this attachment point." alt="" coords="832,129,1012,171"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="837,195,1007,236"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#a9e1e1c1dd87ebfb469b6c705c00038b6" title=" " alt="" coords="821,261,1023,287"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a76bfbe6cc3918c114c73974b2fe4e59d" title="Sets the reference to the vertex that owns this attachment point." alt="" coords="832,312,1012,353"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a087f6102f1c542587ec2ec3c2240041f" title="Constructor for undefined DENOPTIMAttachmentPoint." alt="" coords="1094,71,1274,112"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a1781af804ce3ff7b7ed2d681fd1eeae3" title="WARNING: this method does NOT clone! It just returns the reference to this." alt="" coords="1085,137,1283,163"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="1094,188,1274,229"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af58c1eca18c36403992fc01d2e08fc03" title=" " alt="" coords="1094,253,1274,295"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_d_graph.html#a27e25f8f8e1516d81cc281e2795a9428" title="Returns the list of all attachment points contained in this graph." alt="" coords="1095,443,1273,484"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="832,573,1012,615"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_template.html#af47237c84381d97803d99a7ee16ddc63" title=" " alt="" coords="828,639,1016,680"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3fc88e09bf84838d98d7583b457f637f" title="Returns the attachment point with the given identifier, or null if no AP is found with the given iden..." alt="" coords="833,377,1011,419"/>
+</map>

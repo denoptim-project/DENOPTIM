@@ -1,0 +1,6 @@
+<map id="denoptim.fitness.descriptors.SocketProvidedDescriptor" name="denoptim.fitness.descriptors.SocketProvidedDescriptor">
+<area shape="rect" id="node1" title="Sends the request to produce a numerical descriptor to a defined socket and receives back the respons..." alt="" coords="240,49,427,90"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,5,192,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="28,56,169,83"/>
+<area shape="rect" id="node4" href="$interfacedenoptim_1_1fitness_1_1_i_denoptim_descriptor.html" title="This interface forces descriptors that are not defined in the CDK ontology to provide information tha..." alt="" coords="9,107,188,149"/>
+</map>

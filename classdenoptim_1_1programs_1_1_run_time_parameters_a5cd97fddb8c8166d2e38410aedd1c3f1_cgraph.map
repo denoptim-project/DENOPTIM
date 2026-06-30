@@ -1,0 +1,8 @@
+<map id="denoptim.programs.RunTimeParameters.readParameterFile" name="denoptim.programs.RunTimeParameters.readParameterFile">
+<area shape="rect" id="node1" title="Read the parameter TXT file line by line and interpret its content." alt="" coords="5,83,204,124"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a890aaf1919e171a9c3f9206c9a93aa3b" title=" " alt="" coords="252,83,455,124"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a38d652dfc85081f78687a61b32f9a283" title="Builds the implementation of this class suitable to allocate parameters of the given type." alt="" coords="504,37,691,79"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4cf7f93ac962a8979be6426b5b576384" title="Processes a string looking for keyword and a possibly associated value." alt="" coords="503,127,692,168"/>
+<area shape="rect" id="node4" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html#af225a4d21c1a04771222f81fe5622b2d" title=" " alt="" coords="740,5,1037,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a0ff947a81c127a3460907c7cffb9843b" title="Constructor." alt="" coords="783,71,994,112"/>
+</map>

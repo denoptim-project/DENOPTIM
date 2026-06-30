@@ -1,0 +1,10 @@
+<map id="denoptim.fragspace.APMapFinder.getChosenAPMapping" name="denoptim.fragspace.APMapFinder.getChosenAPMapping">
+<area shape="rect" id="node1" title="Returns the AttachmentPoint&#45;AttachmentPoint mapping chosen among the possible mappings." alt="" coords="813,104,1004,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_graph_link_finder.html#acbb92ddbad514c788140dc2fbcbcfef7" title="Constructor that specifies which vertex has to be replaced." alt="" coords="554,5,737,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#affb1be89a32e4a429bd7dbdfe0708419" title="Performs the crossover that swaps the two subgraphs defining the given XoverSite." alt="" coords="525,71,765,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder_test.html#a12a0f64465045efc142984cf7f919c98" title=" " alt="" coords="551,136,739,177"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder_test.html#a5507a18a82f80ac543c62b505136b591" title=" " alt="" coords="551,201,739,257"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="287,39,456,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#ab0f92a94c4fb2334e7d3813e73fc4247" title=" " alt="" coords="265,104,477,145"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#a3c2407eb1204a7b25600d3d347d98447" title=" " alt="" coords="5,104,217,145"/>
+</map>

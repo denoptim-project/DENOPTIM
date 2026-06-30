@@ -1,0 +1,5 @@
+<map id="denoptim.ga.Population.XoverSitesAmongCandidates.put" name="denoptim.ga.Population.XoverSitesAmongCandidates.put">
+<area shape="rect" id="node1" title="Creates the entry corresponding to the pair of given candidates." alt="" coords="5,5,199,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_xover_site.html#a91d470661642274184e6ef634e899720" title="Creates a new XoverSite that considers the opposite order of candidates of this one." alt="" coords="247,5,437,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_xover_site.html#a27acc7df9dde2a24dacdcef15339e133" title="Initiate an empty data structure." alt="" coords="485,13,697,39"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="denoptim.gui.VertexViewPanel.getSelectedAPIDs" name="denoptim.gui.VertexViewPanel.getSelectedAPIDs">
+<area shape="rect" id="node1" title="Identifies which attachment points are selected in the currently active viewer." alt="" coords="264,5,483,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a9ddb1f2b12985b37138d9a43f1edb233" title="Constructor for an empty modal panel meant for selection of vertexes." alt="" coords="5,5,216,47"/>
+</map>

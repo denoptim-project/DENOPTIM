@@ -1,0 +1,6 @@
+<map id="denoptim.utils.StatUtils.kurtosis" name="denoptim.utils.StatUtils.kurtosis">
+<area shape="rect" id="node1" title="Computes the Kurtosis of the available values." alt="" coords="5,31,211,57"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a12ae258bebe1f3568dabdd606edd3d56" title="Returns the mean number in the numbers list." alt="" coords="484,5,675,32"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_stat_utils.html#aac6cf70b1516266ef3e845d5ad4633f5" title="Computes the variance of the available values." alt="" coords="259,56,436,83"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a181673167433cb8ad256d0295d76c29f" title="Returns the sum number in the numbers list." alt="" coords="723,31,907,57"/>
+</map>

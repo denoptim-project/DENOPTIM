@@ -1,0 +1,7 @@
+<map id="denoptim.graph.EmptyVertex.fromJson" name="denoptim.graph.EmptyVertex.fromJson">
+<area shape="rect" id="node1" title="Reads a JSON string and returns an instance of this class." alt="" coords="5,46,248,73"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="304,5,511,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a3e85cb26bb2f36407e309e41880ef191" title=" " alt="" coords="296,71,519,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="567,71,789,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a4aafec42bd09225870fdf330db93b84c" title=" " alt="" coords="837,71,1043,112"/>
+</map>

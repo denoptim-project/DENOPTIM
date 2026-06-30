@@ -1,0 +1,7 @@
+<map id="denoptim.ga.Population.getMinFitness" name="denoptim.ga.Population.getMinFitness">
+<area shape="rect" id="node1" title="Gets the minimum value of the fitness in this population." alt="" coords="515,64,692,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#aab5b9c0b8a88922460f5c28ae161d1fa" title=" " alt="" coords="5,5,212,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_population.html#a43092319305b5aaef2c335cabadc7d06" title="Checks if a given fitness value if within the given percentile of best candidates." alt="" coords="279,64,448,105"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_population_test.html#aa40d0bedbf2ca22b34267aa8491d7ec3" title=" " alt="" coords="260,129,467,171"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_population_test.html#a6725ae8dc980dd79466800b489fc9620" title=" " alt="" coords="5,71,212,112"/>
+</map>

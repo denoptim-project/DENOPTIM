@@ -1,0 +1,11 @@
+<map id="denoptim.gui.GUIVertexInspector.importVertices" name="denoptim.gui.GUIVertexInspector.importVertices">
+<area shape="rect" id="node1" title="Imports vertices." alt="" coords="1339,46,1591,87"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6698fa37bf04503e58c61f0543946834" title="Imports fragments from a file." alt="" coords="1033,16,1285,58"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="1028,82,1291,109"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a1a2e06a2647032587d42155302b8c0a6" title="Process a file that has a recognized file format and loads a suitable GUI card to visualize the file ..." alt="" coords="757,24,980,50"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a0df9ca063352fbc50f9476f3b2820926" title="Initialize the contents of the tool bar." alt="" coords="228,28,448,54"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i.html#a460fa99497f04de06d2adf8671a92441" title="Launch the application." alt="" coords="531,24,674,50"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a94df24e485081c9b9d7441387f409e26" title="Updated the the list of recent files in the &quot;open Recent&quot; menu." alt="" coords="496,75,709,116"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a36f4409849998e032342f49b19e6c5b5" title="Constructor that build the tool bar." alt="" coords="5,20,180,62"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="761,75,977,116"/>
+</map>

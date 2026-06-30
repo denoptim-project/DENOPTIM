@@ -1,0 +1,11 @@
+<map id="denoptim.ga.EAUtils.getFitnesses" name="denoptim.ga.EAUtils.getFitnesses">
+<area shape="rect" id="node1" title="Get the fitness values for the list of molecules." alt="" coords="1280,50,1497,77"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad34f42098ef4a513cd3f551024e8498e" title="Check if fitness values have significant standard deviation." alt="" coords="731,9,969,35"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aa9dec22b5b0a35d6b333f8ce3bf83643" title=" " alt="" coords="1017,72,1232,113"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,39,424,80"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,5,211,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,71,198,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ac03e7d805c9afda30244e831da74ae81" title="Write out summary for the current GA population." alt="" coords="761,72,939,113"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a01ee989f992e0cff04e3498b63d6c0b0" title="Saves the final results to disk." alt="" coords="488,97,667,139"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#af5c2f9114881ebde82a83f922c0c23fe" title=" " alt="" coords="472,163,683,204"/>
+</map>

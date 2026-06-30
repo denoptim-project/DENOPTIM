@@ -1,0 +1,44 @@
+<map id="denoptim.utils.Randomizer.randomlyChooseOne" name="denoptim.utils.Randomizer.randomlyChooseOne">
+<area shape="rect" id="node1" title="Chooses one member among the given collection." alt="" coords="1879,445,2107,487"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#ab157137220b19383b24af17f77cf8948" title="Tries to add a fused ring using a pair of free APs, one of which on the given vertex." alt="" coords="1601,132,1818,173"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_graph_operations.html#add74b865c897144437bf30e3734edf01" title="Tries to use any free AP of the given vertex to close ring in the graph by adding a chord." alt="" coords="1588,78,1831,105"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#ae5c8afa4b7defd6ce35df0fa1c5facf2" title="Searches for mappings between the AttachmentPoints on the two lists." alt="" coords="1619,197,1800,239"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#af556efa5109b1a7edfe10bdfcfdfdd00" title="Select a compatible capping group for the given APClass." alt="" coords="1613,263,1806,304"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a8c3e7dd2981cbda13c9e5847f4a4e826" title="Select a compatible ring&#45;closing vertex for the given attachment point." alt="" coords="1602,328,1817,369"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a45d4e9ec6a308aa73891efa1d501dd5e" title="Perform fitness&#45;based, class&#45;compatible selection of parents that can do crossover operations." alt="" coords="1001,482,1223,509"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_selection_helper.html#a276133ac3cc94b28a8dc93ef1cf41f1c" title="Randomly select k individuals from the population." alt="" coords="1592,511,1827,552"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1ga_1_1_selection_helper.html#ad80401a2f0464f4856ceb8e1a0967e90" title="Select a number individuals at random (i.e., tournamentSize)." alt="" coords="1592,445,1827,487"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5eada465c0a497b7c7b057ab28e518c1" title="Replaced the subgraph defined by a set of Attachment Points that belong to a graph (ie...." alt="" coords="1608,763,1811,804"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#ab0f92a94c4fb2334e7d3813e73fc4247" title=" " alt="" coords="732,1221,944,1263"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#adb60b4cb2cda6a912a831974c5303df4" title=" " alt="" coords="732,1287,944,1328"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ac8c9339d352074aafb4a8e3cc206b0d6" title="Chose randomly a vertex that is neither scaffold or capping group." alt="" coords="1621,1119,1798,1160"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1utils_1_1_randomizer_test.html#ad0b9d795bd04c26929654e03f07671b1" title=" " alt="" coords="1610,1345,1809,1387"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a0c851972015fbb4b2a317b053b8b81d9" title="Mutates the given vertex according to the given mutation type, if possible." alt="" coords="1290,71,1530,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a6dbd168077a4fb24f16e1e9ac14d0c4c" title=" " alt="" coords="1313,136,1507,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#af86b79061d15a4d2e3d7ccdf0d758f44" title=" " alt="" coords="1313,5,1507,47"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_a_p_map_finder.html#ada1b2c2155faeefced1d9a64f82a6668" title="Constructor that launches the search for a mapping between the AttachmentPoints on the first vertex t..." alt="" coords="1319,201,1501,243"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="1293,328,1527,369"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="753,839,923,880"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a17505cbf52d9203a1af793f07bcf27f9" title="Selects a number of members from the given population." alt="" coords="1321,445,1499,487"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="1027,416,1197,457"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0c2e353b243250b4959a3f86608f1020" title="Generates one offspring according to the method where crossover and mutation are decoupled,..." alt="" coords="751,384,925,425"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ae7a90a911b109ed47b3acf54193acc35" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="751,449,925,491"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="489,417,667,459"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,417,424,459"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,384,211,425"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,449,198,491"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4df69c91a742d22f8d14d44489aeac15" title="Edit this graph according to a given list of edit tasks." alt="" coords="1319,799,1501,840"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_d_graph.html#a86e888ef245d2bd40b49d145c7ef3af0" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="1309,1060,1511,1101"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_d_graph.html#adc362402e41af41656e820def73de5ad" title="Replaced a given vertex belonging to this graph with a new vertex generated specifically for this pur..." alt="" coords="1309,864,1511,905"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aea227d615f6c2f3bac5839a8099a900d" title=" " alt="" coords="1306,929,1514,971"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a75784f0e5c219c9bae7d4c84054de8fd" title=" " alt="" coords="1306,995,1514,1036"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a75fad604a87ef9485e9180f7360ddc69" title=" " alt="" coords="1293,511,1527,552"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a887c0d2f99c17c0c4659e84e4c52c61d" title=" " alt="" coords="1280,575,1540,631"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ac8c1cd307797507a5de5a37becb167d5" title=" " alt="" coords="1285,655,1535,696"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#af7f0715cf5fdabf96fa54678e6c18d74" title=" " alt="" coords="1291,719,1529,775"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="1011,799,1213,840"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="1013,995,1211,1036"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1ga_1_1_graph_operations.html#affb1be89a32e4a429bd7dbdfe0708419" title="Performs the crossover that swaps the two subgraphs defining the given XoverSite." alt="" coords="992,1060,1232,1101"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#a3c2407eb1204a7b25600d3d347d98447" title=" " alt="" coords="472,1253,684,1295"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a60b1ca7ac8b9d3775e72bd7cea418f1a" title=" " alt="" coords="1303,1177,1517,1219"/>
+</map>

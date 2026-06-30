@@ -1,0 +1,12 @@
+<map id="denoptim.combinatorial.CEBLUtils.getBaseNameOfStorageFile" name="denoptim.combinatorial.CEBLUtils.getBaseNameOfStorageFile">
+<area shape="rect" id="node1" title=" " alt="" coords="1765,97,2005,139"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1combinatorial_1_1_c_e_b_l_utils.html#a619a913713d68c4cd0c8ab77e5c7dcfc" title=" " alt="" coords="1477,67,1717,108"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1combinatorial_1_1_check_point.html#a4c2f8a0f643060ecff83ca32c296d0f2" title=" " alt="" coords="1207,129,1401,171"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1combinatorial_1_1_c_e_b_l_utils.html#ad12e9fc00e6e4286f4b3320591053f30" title="Serialize a DENOPTIMGraph to a file." alt="" coords="1179,64,1429,105"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1combinatorial_1_1_graph_building_task.html#a3eaee724fc921194fa158714aafe182d" title="Calls the task." alt="" coords="909,5,1102,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1combinatorial_1_1_c_e_b_l_utils.html#a78098828adbf6277a04188e6f82f39cf" title="Serialize all DENOPTIMGraphs to file." alt="" coords="880,71,1131,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#adcd462866e3f9d6a2a6ef0385807807e" title="Generate graphs by exploring all combination of fragments at a given level of a growing graph." alt="" coords="581,93,832,149"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#af9327fa81f9e2a617cdff353848ad6e1" title="Run the combinatorial exploration." alt="" coords="296,100,533,141"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a8f359a45038dc604a5e437d63a35e1a2" title="Constructor." alt="" coords="5,57,248,113"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1combinatorial_1_1_frag_space_explorer.html#a1c6a2aae9ab686d5c7c0fc6246f7aa61" title=" " alt="" coords="19,136,234,177"/>
+</map>

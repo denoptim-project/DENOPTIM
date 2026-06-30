@@ -1,0 +1,5 @@
+<map id="denoptim.gui.CompatibilityMatrixForm.importAllAPClassesFromFragmentLibs" name="denoptim.gui.CompatibilityMatrixForm.importAllAPClassesFromFragmentLibs">
+<area shape="rect" id="node1" title="Reads all the APClasses found in a list of files." alt="" coords="535,5,771,61"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#a4bc183818810a26037080b47f082b9af" title="Initialize the panel and add buttons." alt="" coords="291,13,487,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#ab550b03594a5843183d6f925e66d444b" title="Constructor." alt="" coords="5,13,243,54"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.utils.AtomOrganizer.branchOrienterReordering" name="denoptim.utils.AtomOrganizer.branchOrienterReordering">
+<area shape="rect" id="node1" title="Reorders atoms according to the branch&#45;oriented scheme." alt="" coords="1171,13,1404,54"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#ac679b2a45c111736e81e8dd2604b5a77" title="Reorder the atoms in mol starting with atom seed" alt="" coords="888,13,1123,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a1cd879265bf12e9c2980efae1e8e74aa" title="Generate 3D structure by assembling 3D fragments according to attachment point vector and following t..." alt="" coords="587,13,840,54"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,5,539,61"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,13,280,54"/>
+</map>

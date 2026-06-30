@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GUIInspectFSERun.renderViewWithSelectedItem" name="denoptim.gui.GUIInspectFSERun.renderViewWithSelectedItem">
+<area shape="rect" id="node1" title=" " alt="" coords="5,104,257,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a95069843e337d5e85a5434aceb8e9c42" title=" " alt="" coords="340,5,511,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a32bfab2ec1e037a1a28e9d0c9bb2075d" title="Returns the level that generated this graph in a fragment space exploration experiment." alt="" coords="340,71,511,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a73f9188a92ff8dde58db2d344accde90" title=" " alt="" coords="340,136,511,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#aa64c40b887997341511f076c73f51480" title="Loads a structure in the Jmol viewer." alt="" coords="305,225,545,267"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="denoptim.gui.GUI" name="denoptim.gui.GUI">
+<area shape="rect" id="node1" title="Graphical User Interface of the DENOPTIM package." alt="" coords="1413,348,1536,375"/>
+<area shape="rect" id="node2" title=" " alt="" coords="243,9,319,36"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i.html" title="Graphical User Interface of the DENOPTIM package." alt="" coords="514,188,637,215"/>
+<area shape="rect" id="node3" title=" " alt="" coords="248,96,315,123"/>
+<area shape="rect" id="node4" title=" " alt="" coords="250,200,313,227"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_main_panel.html" title="The main panel is a deck of cards that occupies all the GUI frame." alt="" coords="1117,255,1300,281"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html" title="Main tool bar of the DENOPTIM graphical user interface." alt="" coords="833,300,1004,327"/>
+<area shape="rect" id="node7" title=" " alt="" coords="535,412,616,439"/>
+<area shape="rect" id="node8" title=" " alt="" coords="545,244,606,271"/>
+<area shape="rect" id="node9" title=" " alt="" coords="525,295,626,321"/>
+<area shape="rect" id="node10" title=" " alt="" coords="483,346,668,387"/>
+<area shape="rect" id="node12" title=" " alt="" coords="228,461,335,488"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="195,563,368,589"/>
+<area shape="rect" id="node14" title=" " alt="" coords="5,563,128,589"/>
+</map>

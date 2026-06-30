@@ -1,0 +1,7 @@
+<map id="denoptim.graph.rings.PathSubGraph.makeMolecularRepresentation" name="denoptim.graph.rings.PathSubGraph.makeMolecularRepresentation">
+<area shape="rect" id="node1" title="Creates the molecular representation, list of atoms and bonds involved in the path between the head a..." alt="" coords="5,142,264,183"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#aa1352172290adaaf3a478ed7a90cf3fc" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="312,29,537,85"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a9fb520cb11466c3613745b31df09ee0c" title="Finds the shortest path of atoms between the first and last atom in the given atom container." alt="" coords="339,109,510,150"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#aef11c232cbc65e343d11fcce3a6a1ebd" title=" " alt="" coords="331,174,518,215"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="329,263,520,305"/>
+</map>

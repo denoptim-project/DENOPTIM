@@ -1,0 +1,8 @@
+<map id="denoptim.graph.Template.updateInnerToOuter" name="denoptim.graph.Template.updateInnerToOuter">
+<area shape="rect" id="node1" title=" " alt="" coords="5,100,215,141"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_template.html#a82c53a76c42c31848f394c3f7aab21b9" title="Removes the molecular representation." alt="" coords="265,5,463,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3fc88e09bf84838d98d7583b457f637f" title="Returns the attachment point with the given identifier, or null if no AP is found with the given iden..." alt="" coords="275,71,453,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#a9e1e1c1dd87ebfb469b6c705c00038b6" title=" " alt="" coords="263,137,465,163"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a76bfbe6cc3918c114c73974b2fe4e59d" title="Sets the reference to the vertex that owns this attachment point." alt="" coords="274,188,454,229"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a27e25f8f8e1516d81cc281e2795a9428" title="Returns the list of all attachment points contained in this graph." alt="" coords="513,71,692,112"/>
+</map>

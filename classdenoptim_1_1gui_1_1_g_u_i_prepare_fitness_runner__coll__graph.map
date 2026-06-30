@@ -1,0 +1,21 @@
+<map id="denoptim.gui.GUIPrepareFitnessRunner" name="denoptim.gui.GUIPrepareFitnessRunner">
+<area shape="rect" id="node1" title="Form that allows to test the configuration of a fitness provider." alt="" coords="1173,82,1384,123"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare.html" title="Class representing the general structure of a form including a specific set of parameter collections." alt="" coords="843,56,1010,83"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel.html" title="Class of GUI panels meant to occupy one card in the deck&#45;of&#45;cards layout of the main panel." alt="" coords="492,5,675,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="35,207,98,233"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_main_panel.html" title="The main panel is a deck of cards that occupies all the GUI frame." alt="" coords="195,207,377,233"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i.html" title="Graphical User Interface of the DENOPTIM package." alt="" coords="522,517,645,544"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html" title="Main tool bar of the DENOPTIM graphical user interface." alt="" coords="841,355,1012,381"/>
+<area shape="rect" id="node7" title=" " alt="" coords="543,299,624,325"/>
+<area shape="rect" id="node8" title=" " alt="" coords="553,349,614,376"/>
+<area shape="rect" id="node9" title=" " alt="" coords="533,400,634,427"/>
+<area shape="rect" id="node10" title=" " alt="" coords="491,451,676,493"/>
+<area shape="rect" id="node12" title=" " alt="" coords="248,441,324,468"/>
+<area shape="rect" id="node13" title=" " alt="" coords="253,492,319,519"/>
+<area shape="rect" id="node14" title=" " alt="" coords="233,543,339,569"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="199,593,373,620"/>
+<area shape="rect" id="node16" title=" " alt="" coords="5,593,128,620"/>
+<area shape="rect" id="node17" title=" " alt="" coords="532,56,635,83"/>
+<area shape="rect" id="node18" title=" " alt="" coords="503,107,664,149"/>
+<area shape="rect" id="node19" title=" " alt="" coords="875,107,978,133"/>
+</map>

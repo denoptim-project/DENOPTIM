@@ -1,0 +1,5 @@
+<map id="denoptim.programs.fragmenter.FragmenterParameters.setScaffoldingPolicy" name="denoptim.programs.fragmenter.FragmenterParameters.setScaffoldingPolicy">
+<area shape="rect" id="node1" title=" " alt="" coords="289,31,529,87"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a5e9b439608a02da3f5074f24a17d4b0a" title="Converts a molecule into a DGraph by fragmentation and re&#45;assembling of the fragments." alt="" coords="21,5,226,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_mol_to_graph_parameters_dialog.html#aa306786eb0e954e1607b7c3d8ff77f7a" title=" " alt="" coords="5,71,241,112"/>
+</map>

@@ -1,0 +1,46 @@
+<map id="denoptim.graph.Fragment.addAPOnAtom" name="denoptim.graph.Fragment.addAPOnAtom">
+<area shape="rect" id="node1" title="Add an attachment point to the specifies atom." alt="" coords="912,1383,1104,1424"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#ad4e8fdd45d167a3802ea50582b478960" title="Add an attachment point to the specifies atom." alt="" coords="627,467,838,494"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ae401cb5105c9afd41d058685eb051869" title=" " alt="" coords="629,519,836,560"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ac8fad7d4a576d2af0fe5c2fbd4164e99" title=" " alt="" coords="269,808,553,849"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a692723b803a64dd25e775b2f8726fe27" title="Works with this graph:" alt="" coords="288,873,535,929"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6b60be1b437b1d21334d39d003c14249" title="Removes an atom and replaces it with an attachment point." alt="" coords="603,960,862,1001"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ae0fc307ce14bc73de8cb51459e122392" title="Selects only the atoms that originate from a subgraph of a whole graph that originated the whole mole..." alt="" coords="619,1055,846,1096"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a37c0e44680ec1c54fcff98dae0832a50" title="Chops one chemical structure by applying the given cutting rules." alt="" coords="628,1135,837,1176"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a198cffde4134eecf80f3eba650efc5ba" title=" " alt="" coords="618,1200,847,1241"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a8bff8b7d1c409ddc9a55707f4e67f427" title=" " alt="" coords="618,1324,847,1365"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_symmetric_a_ps_test.html#a9425bd6d6e87f4d8ff966498564a3633" title=" " alt="" coords="314,1265,509,1307"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_symmetric_a_ps_test.html#a90b0920db91160f9d8f797d5167e39de" title=" " alt="" coords="324,1527,499,1568"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_fragment_test.html#ae2ae980f38f76b7681a4e967d4cbdb4f" title="Differs from the fragment produced by makeFragmentA() only by the identity of one atom." alt="" coords="618,1507,847,1548"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a63f6f06d84a8b731e131034a8e24c238" title="Differs from the fragment produced by makeFragmentA() only by the one APCLass." alt="" coords="618,1441,847,1483"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector_test.html#acb9a03612c6166cb98bb92587213b4a4" title=" " alt="" coords="601,1572,864,1613"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a7710e822a7212af405b83c4693ace410" title=" " alt="" coords="627,1637,838,1679"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_vertex_test.html#ab36c441c57e9852e2be6d810d80fbc87" title=" " alt="" coords="632,1703,833,1744"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a12552fabbb6c8af399da78f10279fce2" title=" " alt="" coords="623,1768,842,1809"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a6494b234f01c4cf298d123dc59e047d6" title=" " alt="" coords="623,1833,842,1875"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#af88d30ce68477984fe6179325d1540b2" title=" " alt="" coords="613,1899,853,1940"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a4889032266eb87d0f91af8b4e9869360" title=" " alt="" coords="627,1964,839,2005"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a92ea09ddfe9f40627e43ce087f160e12" title=" " alt="" coords="627,2029,838,2071"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a6f2ce8f6a8319b39440b0dc43ede061f" title="Check that the following graph&#39;s fused ring gets added to the fragment library." alt="" coords="272,649,551,705"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a56ef448997df677c5ce4a73737f127e2" title="Checks that a graph with a fused ring containing a scaffold vertex is added to the scaffold library." alt="" coords="276,729,547,785"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a7555fcdf60b6fabae0c95844f351fc6f" title=" " alt="" coords="278,5,545,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ae884d9d970bc9d561dad00bf0c20b4b5" title=" " alt="" coords="288,70,535,126"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a2ba7718688486212e987638aef444bad" title=" " alt="" coords="288,150,535,206"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab95d03f36f68718eb1cc11fac188401f" title=" " alt="" coords="282,230,541,286"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a7179e27179c0bbe5a8ae101a9aa8e3d8" title=" " alt="" coords="291,309,532,351"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab9575d2419ec5b1e4ec532a1214ed718" title=" " alt="" coords="291,374,532,430"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a2bc47267db60222f3843961ce8c54933" title=" " alt="" coords="283,453,539,495"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a0a8e70b34898de659ead818d0202f242" title=" " alt="" coords="276,519,547,560"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab364422886eee4ba289a703f83b0ef1b" title=" " alt="" coords="315,584,508,625"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="280,953,543,979"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,945,221,987"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a32b0be109306e9c81fc830867296bc66" title="Extracts a system of one or more fused rings and adds them to the fragment space if not already prese..." alt="" coords="281,1004,542,1045"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a0a98792d99861bb6673e66a76ff49d31" title=" " alt="" coords="302,1069,521,1111"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#afa1376c9ab452a7e75cdf00489be1e07" title=" " alt="" coords="306,1135,517,1176"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson_test.html#ac2186d67581bef7c19379247af6672d6" title=" " alt="" coords="284,1200,539,1241"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_symmetric_set_with_mode_test.html#ad5f88e052ee33d3d501eb3bf7bdfc2b5" title=" " alt="" coords="316,1331,507,1372"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_symmetric_set_with_mode_test.html#a93fbe30c458212dbc8f0006c4ddda437" title=" " alt="" coords="305,1396,517,1437"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_fragment_test.html#aa17f42b21847b022c3d7a87876e17717" title=" " alt="" coords="302,1461,521,1503"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_fragment_test.html#af49cc0e35c38f683bfc3d332210d1124" title=" " alt="" coords="302,1592,521,1633"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector_test.html#a06e7f03c86471b6a5b06ffcb5358d0cf" title=" " alt="" coords="290,1657,533,1699"/>
+</map>

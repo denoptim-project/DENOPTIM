@@ -1,0 +1,13 @@
+<map id="denoptim.graph.RelatedAPPairTest.testEquals" name="denoptim.graph.RelatedAPPairTest.testEquals">
+<area shape="rect" id="node1" title=" " alt="" coords="5,105,204,147"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="257,13,485,39"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_related_a_p_pair.html#a009f0b59f5f5025070773cadd9393adb" title=" " alt="" coords="252,87,491,114"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="277,138,466,165"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="272,213,471,239"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="539,5,745,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_related_a_p_pair.html#afdc310bf8ff79a4c68b90a5d6fa1d8e2" title="Construct a new relation between two APs." alt="" coords="541,72,743,113"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="557,137,727,179"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="553,205,731,247"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="793,172,971,213"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="793,237,971,279"/>
+</map>

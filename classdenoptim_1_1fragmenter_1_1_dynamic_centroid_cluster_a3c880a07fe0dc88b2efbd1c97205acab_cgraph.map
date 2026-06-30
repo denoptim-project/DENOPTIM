@@ -1,0 +1,8 @@
+<map id="denoptim.fragmenter.DynamicCentroidCluster.getNearestToCentroid" name="denoptim.fragmenter.DynamicCentroidCluster.getNearestToCentroid">
+<area shape="rect" id="node1" title="Gets the original data that upon clustering is closest to the cluster centroid according to the given..." alt="" coords="5,35,247,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_dynamic_centroid_cluster.html#a02ff66aa7ed756b8272fd82694e01293" title="Get the point chosen to be the centroid of this cluster." alt="" coords="295,64,488,105"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#ae140104922da4f6176ba174119e1dade" title=" " alt="" coords="544,5,752,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_math_utils.html#ade2c9d5d24cad1bf24d74e9a9b65c47b" title=" " alt="" coords="536,71,760,98"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragmenter_1_1_dynamic_centroid_cluster.html#a7a61f312d508a801f8513a746a0ef8c3" title="Get the points contained in the cluster." alt="" coords="551,123,745,164"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#a7e46cc1d031044dd987d4cf114f85185" title="Sets the coordinates of each atom and attachment point in this object." alt="" coords="544,188,752,229"/>
+</map>

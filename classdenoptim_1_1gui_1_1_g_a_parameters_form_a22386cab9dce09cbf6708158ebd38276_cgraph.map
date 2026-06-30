@@ -1,0 +1,6 @@
+<map id="denoptim.gui.GAParametersForm.createLvlProbDataset" name="denoptim.gui.GAParametersForm.createLvlProbDataset">
+<area shape="rect" id="node1" title=" " alt="" coords="5,49,189,90"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a4488a01992b7a7f2cda6f3aa7baa25ab" title=" " alt="" coords="237,5,452,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a3dc8bf41035f263b397e14655edc1db3" title="Calculates the probability of adding a fragment to the given level." alt="" coords="243,85,446,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a41e3b62363bfa04f372d094483eee83f" title="Calculated a probability given parameters defining the shape of the probability function and a single..." alt="" coords="500,92,720,119"/>
+</map>

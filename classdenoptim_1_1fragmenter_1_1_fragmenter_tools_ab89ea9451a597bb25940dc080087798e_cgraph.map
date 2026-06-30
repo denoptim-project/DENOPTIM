@@ -1,0 +1,8 @@
+<map id="denoptim.fragmenter.FragmenterTools.filterStrucutresBySMARTS" name="denoptim.fragmenter.FragmenterTools.filterStrucutresBySMARTS">
+<area shape="rect" id="node1" title="Removes from the structures anyone that matches any of the given SMARTS queries." alt="" coords="5,136,216,177"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a07031c5387efae1aa8c10465067293b7" title=" " alt="" coords="265,5,512,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a3506079a3de962c32b2c715f8cea96e6" title=" " alt="" coords="265,71,512,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#a9c0bc47eeaca313657de40ca4b1fb24b" title=" " alt="" coords="265,136,512,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_many_s_m_a_r_t_s_query.html#aaffb007354a24c9fb679742e431c9980" title=" " alt="" coords="264,201,513,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="293,291,484,332"/>
+</map>

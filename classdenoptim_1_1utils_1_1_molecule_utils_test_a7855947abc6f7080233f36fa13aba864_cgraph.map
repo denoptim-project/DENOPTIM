@@ -1,0 +1,17 @@
+<map id="denoptim.utils.MoleculeUtilsTest.testFindAtomMappingWithMultipleMatches" name="denoptim.utils.MoleculeUtilsTest.testFindAtomMappingWithMultipleMatches">
+<area shape="rect" id="node1" title=" " alt="" coords="5,219,255,275"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a696950b738bc2c4d0374ffb7323f8263" title="Finds the maximum common substructure (MCS) between two molecules." alt="" coords="303,226,509,267"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a02e67057e68e9dbbbbf568808544f005" title="Calculates bond angle agreement and returns raw data." alt="" coords="814,113,1053,154"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8f4bc0f5aed8b6b13d69bd58b6a2c441" title="Finds the maximum common substructure (MCS) between two molecules." alt="" coords="557,226,764,267"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a328ac35ce6ed2f5d61be7142fb8cf12c" title="Normalizes the raw bond angle agreement data to a single score." alt="" coords="812,309,1055,350"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_math_utils.html#af2e2b857db3b0a9c8d0ada2901eafca1" title="Compute the cross product of two vectors." alt="" coords="1109,15,1323,57"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_math_utils.html#aab91f5150ef82c7e3c04c350fa2bfe0f" title="Calculates angle (in degrees) between vectors BA and BC." alt="" coords="1125,81,1307,122"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="1113,146,1319,187"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_math_utils.html#ac697c4b44f2cc17f369c23672ed6f68e" title="compute the angle between two vectors a &amp; b of same length" alt="" coords="1377,81,1593,122"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="1651,29,1846,56"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_math_utils.html#a2d786a84f8631fb1080ee7bfbc15d697" title="Compute the dot product (a scalar) between two vectors." alt="" coords="1641,81,1856,122"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_math_utils.html#a56ec1293dcc43a7c5cf5f41a551ecd72" title="Return the norm of a vector." alt="" coords="1649,147,1848,173"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8cc5143fa76686dda4a0e1e348fef03c" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="820,178,1047,219"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a364533d507e42ebb43dc537c0e3ad3a4" title="Sets zero implicit hydrogen count to all atoms." alt="" coords="823,243,1043,285"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ab217b40e0b54cad6f9857b2103d4fd69" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="1103,211,1329,253"/>
+</map>

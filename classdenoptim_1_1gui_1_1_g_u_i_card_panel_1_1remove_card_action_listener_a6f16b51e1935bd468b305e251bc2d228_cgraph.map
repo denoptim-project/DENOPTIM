@@ -1,0 +1,6 @@
+<map id="denoptim.gui.GUICardPanel.removeCardActionListener.actionPerformed" name="denoptim.gui.GUICardPanel.removeCardActionListener.actionPerformed">
+<area shape="rect" id="node1" title=" " alt="" coords="5,35,236,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel.html#a4ff5d1c8275df4651642beefd69b6ff2" title="Check for unsaved changes in the components included in this card." alt="" coords="309,5,515,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_main_panel.html#afb6a13b8208b40874590cad8f4ea77d8" title="Remove a panel (i.e., a card) from the pile of cards (i.e., card deck)" alt="" coords="284,71,540,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a919ef551482113b114895b79c0209ce8" title="Remove the reference to an panel/tab in the menu listing active tabs." alt="" coords="588,64,805,105"/>
+</map>

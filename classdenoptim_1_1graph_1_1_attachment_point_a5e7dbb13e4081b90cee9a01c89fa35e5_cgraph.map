@@ -1,0 +1,8 @@
+<map id="denoptim.graph.AttachmentPoint.AttachmentPoint" name="denoptim.graph.AttachmentPoint.AttachmentPoint">
+<area shape="rect" id="node1" title="Construct an attachment point based on the formatted string representation." alt="" coords="5,39,185,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a81cb014d96c9ab75aa640639724d261f" title="Parses the string format used to record one attachment point in SDF files." alt="" coords="233,39,413,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="461,46,660,73"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="708,39,885,80"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="933,5,1111,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="933,71,1111,112"/>
+</map>

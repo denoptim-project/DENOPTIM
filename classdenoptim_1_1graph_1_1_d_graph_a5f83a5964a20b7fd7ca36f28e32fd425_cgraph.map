@@ -1,0 +1,9 @@
+<map id="denoptim.graph.DGraph.setScaffold" name="denoptim.graph.DGraph.setScaffold">
+<area shape="rect" id="node1" title="Update the graph so that the vertex argument is at the scaffold level i.e." alt="" coords="5,169,184,211"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="237,5,407,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af8040db3f56d75da29132079df2b25cb" title="Gets the edge that is using this AP, or null if no edge is using this AP." alt="" coords="232,71,412,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="237,136,407,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="232,201,412,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="237,267,407,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a0567839609e4cc14173ee2e882eccf56" title=" " alt="" coords="233,332,411,373"/>
+</map>

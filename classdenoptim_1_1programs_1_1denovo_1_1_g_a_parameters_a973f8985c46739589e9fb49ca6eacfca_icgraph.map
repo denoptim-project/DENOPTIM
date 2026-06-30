@@ -1,0 +1,5 @@
+<map id="denoptim.programs.denovo.GAParameters.getMolGrowthMultiplier" name="denoptim.programs.denovo.GAParameters.getMolGrowthMultiplier">
+<area shape="rect" id="node1" title=" " alt="" coords="517,29,761,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aec4528b790625410efcb268566c03897" title="Calculated the probability of extending a graph based on the current size of the molecular representa..." alt="" coords="288,29,469,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="5,29,240,71"/>
+</map>

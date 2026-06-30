@@ -1,0 +1,11 @@
+<map id="denoptim.ga.EAUtils.getCrowdedness" name="denoptim.ga.EAUtils.getCrowdedness">
+<area shape="rect" id="node1" title="Calculate the current crowdedness of the given attachment point." alt="" coords="5,143,244,170"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="292,5,489,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="305,71,476,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="305,136,476,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="301,201,481,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#add148f4aeadcca422218448c4868e7ab" title="Search for used ring closing vertices: vertices that contain only a RingClosingAttractor and are part..." alt="" coords="301,267,480,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a49ca4849cb306cbbd45e579bb8139cf6" title="Search for unused ring closing vertices: vertices that contain only a RingClosingAttractor and are no..." alt="" coords="537,296,716,337"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a46e5563a41c18adbcee9aa60b39094fa" title="Search for ring closing vertices: vertices that contain only a RingClosingAttractor" alt="" coords="764,237,943,279"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#aca10b3acbf66e3652cb9664179ed368f" title=" " alt="" coords="768,303,939,344"/>
+</map>

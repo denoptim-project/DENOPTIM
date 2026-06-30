@@ -1,0 +1,39 @@
+<map id="denoptim.gui.VertexAsGraphViewPanel" name="denoptim.gui.VertexAsGraphViewPanel">
+<area shape="rect" id="node1" title="A panel to visualize a vertex as a graph component with attachment point table." alt="" coords="850,356,1037,397"/>
+<area shape="rect" id="node2" title=" " alt="" coords="523,225,608,251"/>
+<area shape="rect" id="node3" href="$interfacedenoptim_1_1gui_1_1_i_vertex_a_p_selection.html" title="Interface for all vertex viewers that intend to allow selection of attachment points." alt="" coords="460,275,671,302"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html" title="A vertex is a data structure that has an identity and holds a list of AttachmentPoints." alt="" coords="490,737,641,763"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_template.html" title=" " alt="" coords="860,1094,1027,1121"/>
+<area shape="rect" id="node5" title=" " alt="" coords="96,623,175,650"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html" title="Container for the list of vertices and the edges that connect them." alt="" coords="1211,986,1368,1013"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_candidate.html" title="A candidate is the combination of a denoptim graph with molecular representation and may include also..." alt="" coords="1483,747,1653,774"/>
+<area shape="rect" id="node7" title=" " alt="" coords="846,1145,1041,1171"/>
+<area shape="rect" id="node8" title=" " alt="" coords="850,1195,1037,1222"/>
+<area shape="rect" id="node9" title=" " alt="" coords="852,1246,1035,1273"/>
+<area shape="rect" id="node10" title=" " alt="" coords="855,1297,1032,1339"/>
+<area shape="rect" id="node11" title=" " alt="" coords="839,788,1047,829"/>
+<area shape="rect" id="node13" title=" " alt="" coords="1204,747,1375,774"/>
+<area shape="rect" id="node14" title=" " alt="" coords="509,886,621,913"/>
+<area shape="rect" id="node16" href="$enumdenoptim_1_1graph_1_1_template_1_1_contract_level.html" title="Enum specifying to what extent the template&#39;s inner graph can be changed." alt="" coords="480,1087,651,1128"/>
+<area shape="rect" id="node17" title=" " alt="" coords="459,1152,672,1193"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html" title="Attachment point mapping where keys are sorted by natural ordering, i.e., by AttachmentPoint#compareT..." alt="" coords="474,1035,657,1062"/>
+<area shape="rect" id="node19" title=" " alt="" coords="38,1028,233,1069"/>
+<area shape="rect" id="node20" title=" " alt="" coords="825,853,1061,924"/>
+<area shape="rect" id="node21" title=" " alt="" coords="824,948,1063,1019"/>
+<area shape="rect" id="node22" title=" " alt="" coords="892,1043,995,1070"/>
+<area shape="rect" id="node23" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_b_b_type.html" title="The type of building block." alt="" coords="36,686,235,713"/>
+<area shape="rect" id="node24" title=" " alt="" coords="59,737,211,763"/>
+<area shape="rect" id="node25" title=" " alt="" coords="86,787,185,814"/>
+<area shape="rect" id="node26" title=" " alt="" coords="41,839,229,880"/>
+<area shape="rect" id="node27" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_vertex_type.html" title="Flag declaring the type of Vertex implementation." alt="" coords="26,905,245,931"/>
+<area shape="rect" id="node28" title=" " alt="" coords="467,327,663,368"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html" title="A Panel that holds the JUNG representation of a graph." alt="" coords="479,159,652,200"/>
+<area shape="rect" id="node30" title=" " alt="" coords="104,101,167,127"/>
+<area shape="rect" id="node31" title=" " alt="" coords="23,151,248,207"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1gui_1_1_d_n_p_spring_layout.html" title=" " alt="" coords="5,232,265,303"/>
+<area shape="rect" id="node33" title=" " alt="" coords="25,327,245,397"/>
+<area shape="rect" id="node34" title=" " alt="" coords="5,5,265,76"/>
+<area shape="rect" id="node35" title=" " alt="" coords="519,393,611,419"/>
+<area shape="rect" id="node36" title=" " alt="" coords="500,443,631,470"/>
+<area shape="rect" id="node37" title=" " alt="" coords="535,494,596,521"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="denoptim.gui.ParametersForm.importParametersFromDenoptimParamsFile" name="denoptim.gui.ParametersForm.importParametersFromDenoptimParamsFile">
+<area shape="rect" id="node1" title="Reads in the parameters from a text file collecting &#160;&#160;DENOPTIM parameters in the form of KEY=VALUE li..." alt="" coords="5,104,245,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a43eb49e0af9eed95fb1c908ed9ecbdae" title="Overwritten by subclasses." alt="" coords="308,5,539,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_file_utils.html#a16bc762b79f5033f2323fb8728593334" title=" " alt="" coords="328,71,519,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a1ea0ff6e93b001958e5f8a54b6705584" title=" " alt="" coords="306,136,541,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_parameters_form.html#ae379d9cf9d1386a8330ca439664faab0" title="Overwritten by subclasses." alt="" coords="293,201,553,243"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_parameters_form.html#ac668592976b35990b79bb8844f2d396a" title=" " alt="" coords="601,136,836,177"/>
+</map>

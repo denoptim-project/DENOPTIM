@@ -1,0 +1,9 @@
+<map id="denoptim.programs.grapheditor.GraphEdParameters.processParameters" name="denoptim.programs.grapheditor.GraphEdParameters.processParameters">
+<area shape="rect" id="node1" title="Processes all parameters and initialize related objects." alt="" coords="5,71,260,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#a16bc762b79f5033f2323fb8728593334" title=" " alt="" coords="331,5,522,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#abcdf563c6c95b9a293cb0e71738355ff" title="Processes any of the parameter collections contained in this instance." alt="" coords="308,71,545,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#af483b79b1aed95e3e72074ddb02be508" title="Reads a list of graph editing tasks from a JSON file." alt="" coords="327,136,526,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a3e85cb26bb2f36407e309e41880ef191" title=" " alt="" coords="593,136,816,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="864,136,1087,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a4aafec42bd09225870fdf330db93b84c" title=" " alt="" coords="1135,136,1340,177"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="denoptim.ga.EAUtils.getCrowdingProbabilityForCrowdedness" name="denoptim.ga.EAUtils.getCrowdingProbabilityForCrowdedness">
+<area shape="rect" id="node1" title="Calculated the crowding probability for a given level of crowdedness." alt="" coords="1047,68,1261,109"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#a44e653526253cfea892611376a7fa3bb" title=" " alt="" coords="791,35,991,76"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a11c2af48ff1901e53677b8e6b914b1db" title="Calculated the probability of using and attachment point rooted on an atom that is holding other atta..." alt="" coords="784,100,999,141"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#a567ed81852332217cc344d9a5ecd8eb0" title=" " alt="" coords="269,5,459,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#a2e63957f5d08fb45f9a5fb3fbf5882a0" title=" " alt="" coords="533,64,736,105"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#a1da1237b4f0c1d5c5335abc8c2bb2602" title=" " alt="" coords="8,64,192,105"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#aee2a063d83a006a2cddb4b4af1af2673" title="Imports parameters from a properly formatted parameters file." alt="" coords="243,146,485,202"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#aa88930fb4bdf44a723bfe96599a7275f" title=" " alt="" coords="5,153,195,195"/>
+</map>

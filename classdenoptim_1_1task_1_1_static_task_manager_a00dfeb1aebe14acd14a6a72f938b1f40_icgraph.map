@@ -1,0 +1,6 @@
+<map id="denoptim.task.StaticTaskManager.subtractDoneTask" name="denoptim.task.StaticTaskManager.subtractDoneTask">
+<area shape="rect" id="node1" title=" " alt="" coords="477,23,659,65"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_program_task.html#a2745e7f75fcf2ef6d128bd826156e2ce" title="This method redirects the callable functionality to an abstract method (namely ProgramTask#runProgram..." alt="" coords="223,5,429,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_task.html#abe8e96c65d147220af01e7cec04d3670" title="Stop the task if not already completed." alt="" coords="230,56,422,83"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1task_1_1_static_task_manager.html#ae63bb7f573cf95c77d7441ae648ee7f3" title=" " alt="" coords="5,49,175,90"/>
+</map>

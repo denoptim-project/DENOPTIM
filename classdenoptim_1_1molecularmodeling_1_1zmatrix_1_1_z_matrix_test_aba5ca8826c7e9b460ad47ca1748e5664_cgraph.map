@@ -1,0 +1,10 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testGetAngleRefAtomIndex" name="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testGetAngleRefAtomIndex">
+<area shape="rect" id="node1" title=" " alt="" coords="5,71,257,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#afdcc04b2f8a9fe8f0eeabe867b6ff9e2" title="Get the index of the angle reference atom for the atom at the given index." alt="" coords="305,37,539,79"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#af057822127c5cdb8dd95809365f69f32" title=" " alt="" coords="305,103,539,144"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a4ac6b31dc0dbed6e2b53bb659f7d60d5" title="Get the angle reference atom for the atom at the given index." alt="" coords="587,37,820,79"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#af58205f6fbb21f9df38755ee8cd17e89" title="Get the angle reference atom." alt="" coords="868,5,1101,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="868,71,1101,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ae9486d28880e0c8225c0092acab98165" title="Add an atom to the ZMatrix." alt="" coords="587,103,820,144"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="587,192,820,233"/>
+</map>

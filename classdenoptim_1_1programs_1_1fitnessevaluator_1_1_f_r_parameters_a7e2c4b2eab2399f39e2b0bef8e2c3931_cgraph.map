@@ -1,0 +1,5 @@
+<map id="denoptim.programs.fitnessevaluator.FRParameters.processParameters" name="denoptim.programs.fitnessevaluator.FRParameters.processParameters">
+<area shape="rect" id="node1" title="Processes all parameters and initialize related objects." alt="" coords="5,63,235,104"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#af572123d13600224e1de3cb7b79cb028" title="Appends an entry to the list of recent files." alt="" coords="313,29,489,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#abcdf563c6c95b9a293cb0e71738355ff" title="Processes any of the parameter collections contained in this instance." alt="" coords="283,95,520,136"/>
+</map>

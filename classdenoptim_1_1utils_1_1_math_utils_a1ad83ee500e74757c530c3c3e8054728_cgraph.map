@@ -1,0 +1,6 @@
+<map id="denoptim.utils.MathUtils.computeDihedralAngle" name="denoptim.utils.MathUtils.computeDihedralAngle">
+<area shape="rect" id="node1" title="Compute the dihedral angle." alt="" coords="5,71,220,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_math_utils.html#af2e2b857db3b0a9c8d0ada2901eafca1" title="Compute the cross product of two vectors." alt="" coords="268,5,483,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_math_utils.html#a2d786a84f8631fb1080ee7bfbc15d697" title="Compute the dot product (a scalar) between two vectors." alt="" coords="268,71,483,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_math_utils.html#abd305c2110e62105a52004b18053d3ec" title="Perform vector subtraction." alt="" coords="270,137,481,163"/>
+</map>

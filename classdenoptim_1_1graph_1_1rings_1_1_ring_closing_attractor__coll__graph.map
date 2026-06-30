@@ -1,0 +1,16 @@
+<map id="denoptim.graph.rings.RingClosingAttractor" name="denoptim.graph.rings.RingClosingAttractor">
+<area shape="rect" id="node1" title="The RingClosingAttractor represent the available valence/connection that allows to close a ring." alt="" coords="923,391,1093,433"/>
+<area shape="rect" id="node2" title=" " alt="" coords="536,51,687,77"/>
+<area shape="rect" id="node3" title=" " alt="" coords="583,105,640,132"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html" title=" " alt="" coords="529,268,693,295"/>
+<area shape="rect" id="node5" title=" " alt="" coords="191,175,269,201"/>
+<area shape="rect" id="node6" title=" " alt="" coords="148,225,312,252"/>
+<area shape="rect" id="node7" title=" " alt="" coords="127,297,333,324"/>
+<area shape="rect" id="node8" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html" title="Possible chemical bond types an edge can represent." alt="" coords="129,412,331,439"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_ring.html" title="This class represents the closure of a ring in a spanning tree." alt="" coords="542,460,681,487"/>
+<area shape="rect" id="node9" title=" " alt="" coords="5,412,61,439"/>
+<area shape="rect" id="node11" title=" " alt="" coords="133,492,327,519"/>
+<area shape="rect" id="node12" title=" " alt="" coords="521,511,701,553"/>
+<area shape="rect" id="node13" title=" " alt="" coords="509,577,713,618"/>
+<area shape="rect" id="node14" title=" " alt="" coords="539,643,683,669"/>
+</map>

@@ -1,0 +1,27 @@
+<map id="denoptim.graph.AttachmentPointTest.testSameAs" name="denoptim.graph.AttachmentPointTest.testSameAs">
+<area shape="rect" id="node1" title=" " alt="" coords="5,515,185,556"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="233,117,461,143"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#a537720023ac6debd9f4663d61026a423" title="Returns a deep&#45;copy of this vertex." alt="" coords="237,522,457,549"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="518,71,707,98"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aef9389b9ff4cd684c741b7b7a428074d" title="Compares this and another attachment points based on their unique identifier." alt="" coords="257,573,437,615"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ab1226264e663d411606bc5af27dd921e" title="Compares the features of this and another attachment point and decides if the two are same." alt="" coords="257,663,437,704"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="509,5,716,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="525,253,700,295"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a6e237f0bbd68ebc3c6cd4278713ea7b2" title="Copies all the string&#45;based properties and properties defined in the Vertex#uniquefyingPropertyKeys s..." alt="" coords="523,319,703,360"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#a808137ce0933f43bce1d605b1cba0a3d" title="Constructor for an empty vertex." alt="" coords="518,384,707,425"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="527,515,698,556"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="527,580,698,621"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex.html#a5671e1d926fba782f48c494d61980d29" title="Returns the mutation types that are constitutionally configures for this vertex irrespectively on the..." alt="" coords="527,645,698,687"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="527,711,698,752"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_vertex.html#a5dbac662f4102558f3cf874c55174c5e" title=" " alt="" coords="527,776,698,817"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="527,841,698,883"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="527,907,698,948"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aef38e3d525bb269bd6e77a25ebfbd144" title=" " alt="" coords="523,972,703,1013"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a929c8f781b4c999a5228f322a3bd901e" title="Sets the unique integer that is used to sort list of attachment points." alt="" coords="523,1037,703,1079"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_vertex.html#a0e1114b16856fd16a2de9cface2ea806" title=" " alt="" coords="527,123,698,164"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_vertex.html#a1b3682ddb7fc71fdd981526b43d773dc" title=" " alt="" coords="527,188,698,229"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#aae72acf124dacf9e900c754417f08a36" title=" " alt="" coords="509,449,716,491"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="764,384,952,425"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="773,64,943,105"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a72dd6bd75a701cabb65832778da6e574" title="Returns a unique integer that is used to sort list of attachment points." alt="" coords="523,1103,703,1144"/>
+</map>

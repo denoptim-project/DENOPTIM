@@ -1,0 +1,5 @@
+<map id="denoptim.graph.Fragment.projectPropertyToAP" name="denoptim.graph.Fragment.projectPropertyToAP">
+<area shape="rect" id="node1" title="Uses the molecular property defining attachment points to create the DENOPTIMAttachmentPoint objects ..." alt="" coords="272,39,483,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#aa1cdff6a2da8a5c234a58317c8ac33e6" title="Constructor from an atom container, which has APs only as molecular properties." alt="" coords="29,5,200,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment_test.html#a6494b234f01c4cf298d123dc59e047d6" title=" " alt="" coords="5,71,224,112"/>
+</map>

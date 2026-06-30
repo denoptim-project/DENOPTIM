@@ -1,0 +1,19 @@
+<map id="denoptim.fragspace.FragmentSpace" name="denoptim.fragspace.FragmentSpace">
+<area shape="rect" id="node1" title="Class defining a space of building blocks." alt="" coords="1363,407,1556,449"/>
+<area shape="rect" id="node2" title=" " alt="" coords="241,110,417,151"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html" title="Class defining a space of building blocks." alt="" coords="671,373,864,414"/>
+<area shape="rect" id="node3" title=" " alt="" coords="211,260,446,316"/>
+<area shape="rect" id="node4" title=" " alt="" coords="212,39,445,81"/>
+<area shape="rect" id="node5" title=" " alt="" coords="225,187,432,213"/>
+<area shape="rect" id="node6" title=" " alt="" coords="235,421,423,462"/>
+<area shape="rect" id="node7" title=" " alt="" coords="230,610,427,651"/>
+<area shape="rect" id="node8" title=" " alt="" coords="231,675,426,731"/>
+<area shape="rect" id="node9" title=" " alt="" coords="239,545,419,586"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html" title="Parameters defining the fragment space." alt="" coords="1072,407,1265,449"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html" title="Collection of parameters controlling the behavior of the software." alt="" coords="674,814,861,855"/>
+<area shape="rect" id="node12" title=" " alt="" coords="297,952,360,979"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="242,821,415,848"/>
+<area shape="rect" id="node14" title=" " alt="" coords="5,821,128,848"/>
+<area shape="rect" id="node15" title=" " alt="" coords="195,872,463,928"/>
+<area shape="rect" id="node16" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html" title="Identifier of the type of parameters." alt="" coords="235,755,422,797"/>
+</map>

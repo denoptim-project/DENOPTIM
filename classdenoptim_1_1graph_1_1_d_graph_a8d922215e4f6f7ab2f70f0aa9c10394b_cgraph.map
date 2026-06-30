@@ -1,0 +1,4 @@
+<map id="denoptim.graph.DGraph.reassignSymmetricLabels" name="denoptim.graph.DGraph.reassignSymmetricLabels">
+<area shape="rect" id="node1" title="Marks the vertices of this graph with a string that is consistent for all vertices that belong to sym..." alt="" coords="5,5,215,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a419f97ea0a361b122274c4eda97e3be6" title="Get an iterator for the sets of symmetrically related vertices." alt="" coords="263,5,441,47"/>
+</map>

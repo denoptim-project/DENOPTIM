@@ -1,0 +1,12 @@
+<map id="denoptim.programs.fragmenter.MatchedBond" name="denoptim.programs.fragmenter.MatchedBond">
+<area shape="rect" id="node1" title=" " alt="" coords="1035,109,1235,150"/>
+<area shape="rect" id="node2" title=" " alt="" coords="825,87,882,113"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_cutting_rule.html" title="A cutting rule with three SMARTS queries (atom 1, bond, atom2) and options." alt="" coords="753,138,953,179"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html" title=" " alt="" coords="509,117,673,144"/>
+<area shape="rect" id="node5" title=" " alt="" coords="191,41,269,68"/>
+<area shape="rect" id="node6" title=" " alt="" coords="148,92,312,119"/>
+<area shape="rect" id="node7" title=" " alt="" coords="127,143,333,169"/>
+<area shape="rect" id="node8" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html" title="Possible chemical bond types an edge can represent." alt="" coords="129,201,331,228"/>
+<area shape="rect" id="node9" title=" " alt="" coords="5,201,61,228"/>
+<area shape="rect" id="node10" title=" " alt="" coords="541,168,641,195"/>
+</map>

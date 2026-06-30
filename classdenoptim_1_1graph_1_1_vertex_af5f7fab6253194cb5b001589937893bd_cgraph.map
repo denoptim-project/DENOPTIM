@@ -1,0 +1,9 @@
+<map id="denoptim.graph.Vertex.getEdgeWith" name="denoptim.graph.Vertex.getEdgeWith">
+<area shape="rect" id="node1" title="Finds the edge between this and the other vertex, if it exists." alt="" coords="5,104,176,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="229,5,399,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af8040db3f56d75da29132079df2b25cb" title="Gets the edge that is using this AP, or null if no edge is using this AP." alt="" coords="224,71,404,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a05ecc9dd632f58f95e7613f8aa4ece97" title="Gets the attachment point (AP) that is connected to this AP via the edge user." alt="" coords="224,136,404,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="224,201,404,243"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="452,118,653,145"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="453,169,653,195"/>
+</map>

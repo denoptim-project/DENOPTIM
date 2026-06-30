@@ -1,0 +1,7 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.getNewRingClosures" name="denoptim.molecularmodeling.ChemicalObjectModel.getNewRingClosures">
+<area shape="rect" id="node1" title="Return the list of RingClosures that have been identified as closable head/tail of atom chains during..." alt="" coords="961,46,1236,87"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool.html#a26896649739e0a5e63dd88079c6efe7a" title="Performs one or more attempts to close rings by conformational adaptation." alt="" coords="622,13,878,54"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1_ring_closure_tool_1_1_ring_closed_mol_comparator.html#afc89dcbc18dbc234c8c2325850ed913a" title=" " alt="" coords="587,78,913,119"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,5,539,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,13,280,54"/>
+</map>

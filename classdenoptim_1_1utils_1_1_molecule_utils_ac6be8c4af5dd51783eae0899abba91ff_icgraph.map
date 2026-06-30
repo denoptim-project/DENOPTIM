@@ -1,0 +1,6 @@
+<map id="denoptim.utils.MoleculeUtils.findShortestPath" name="denoptim.utils.MoleculeUtils.findShortestPath">
+<area shape="rect" id="node1" title="Finds the shortest path between two atoms in a molecule using BFS." alt="" coords="500,46,707,87"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_topo_template_producer.html#a6f3c923d504d0e15ae6a607fa49ce995" title=" " alt="" coords="271,13,449,54"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils_test.html#a1ef1cc1fa9064fc5b7168e782ebe6f76" title=" " alt="" coords="268,78,452,119"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_topo_template_producer.html#ab1c7da10be82774bc3f207ff5dfed635" title="Constructor." alt="" coords="5,5,220,61"/>
+</map>

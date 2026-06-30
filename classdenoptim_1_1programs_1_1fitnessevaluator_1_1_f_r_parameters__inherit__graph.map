@@ -1,0 +1,4 @@
+<map id="denoptim.programs.fitnessevaluator.FRParameters" name="denoptim.programs.fitnessevaluator.FRParameters">
+<area shape="rect" id="node1" title="Parameters controlling execution of FitnessRunner." alt="" coords="5,95,235,136"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html" title="Collection of parameters controlling the behavior of the software." alt="" coords="27,5,213,47"/>
+</map>

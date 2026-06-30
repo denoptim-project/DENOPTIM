@@ -1,0 +1,6 @@
+<map id="denoptim.graph.rings.RingClosingAttractor.RingClosingAttractor" name="denoptim.graph.rings.RingClosingAttractor.RingClosingAttractor">
+<area shape="rect" id="node1" title="Constructor for a RingClosingAttractor corresponding to an atom in an IAtomContainer." alt="" coords="5,63,243,104"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="291,29,496,71"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#a1181ea61bfd92dd5bfc3068772cce586" title="Checks whether the constructed RingClosingAttractor does corresponds to a RingClosingAttractor in the..." alt="" coords="304,95,483,136"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="544,29,741,71"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixAtom.setType" name="denoptim.molecularmodeling.zmatrix.ZMatrixAtom.setType">
+<area shape="rect" id="node1" title="Set the type of the atom." alt="" coords="648,46,881,87"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_conformational_search_p_s_s_r_o_t.html#a4e23cd79b91caeac12ba1e801e919b5c" title="Used elemental symbols (ot pseudo&#45;element symbols) to assign atom types." alt="" coords="304,13,600,54"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom_test.html#ad4d7db05267c3fae2e322ca48ef357f1" title=" " alt="" coords="335,78,569,119"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1tinker_1_1_conformational_search_p_s_s_r_o_t.html#a40d8eeb17fa0eb16f0a92d3a35408c26" title="Performs PSSROT conformational search on the given chemical object." alt="" coords="5,5,256,61"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.graph.DGraph.removeEdge" name="denoptim.graph.DGraph.removeEdge">
+<area shape="rect" id="node1" title="Removes an edge and update the free valences of the attachment points that were originally involved i..." alt="" coords="5,56,237,83"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="285,5,487,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="286,56,486,83"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a266aa67ce6e0afd82fa723a12f46235a" title="Sets the reference to the edge that is using this attachment point." alt="" coords="296,107,476,149"/>
+</map>

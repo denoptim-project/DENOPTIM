@@ -1,0 +1,9 @@
+<map id="denoptim.programs.RunTimeParameters.startConsoleLogger" name="denoptim.programs.RunTimeParameters.startConsoleLogger">
+<area shape="rect" id="node1" title="Starts a program&#45;specific logger that prints to System.err stream." alt="" coords="879,69,1084,111"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#ae6eecb27bf631e3cf159af0834ff6ee2" title="Starts a dialog to define the on&#45;the&#45;fly fragmentation settings." alt="" coords="580,36,831,77"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#aa17925160f3f03080e8680c7016fc1c4" title=" " alt="" coords="606,101,805,143"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="275,17,526,43"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,71,532,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="11,5,216,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,71,221,112"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.fragmenter.FragmenterTask" name="denoptim.fragmenter.FragmenterTask">
+<area shape="rect" id="node1" title="Task that performs the various steps in the process that prepares chemical structured to be chopped,..." alt="" coords="5,155,244,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="57,80,192,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="61,5,189,32"/>
+</map>

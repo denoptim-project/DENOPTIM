@@ -1,0 +1,5 @@
+<map id="denoptim.utils.SizeControlledSet.addNewUniqueEntry" name="denoptim.utils.SizeControlledSet.addNewUniqueEntry">
+<area shape="rect" id="node1" title="Checks if the given entry is already container in the set of known entries and, if not,..." alt="" coords="5,35,193,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#a67d99e2b559128d91c93886ba80fa392" title="Search in a file for a line matching the given string query." alt="" coords="268,5,433,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="241,71,460,98"/>
+</map>

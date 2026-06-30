@@ -1,0 +1,52 @@
+<map id="denoptim.graph.AttachmentPoint.getLinkedAP" name="denoptim.graph.AttachmentPoint.getLinkedAP">
+<area shape="rect" id="node1" title="Gets the attachment point (AP) that is connected to this AP via the edge user." alt="" coords="1219,559,1399,600"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#add74b865c897144437bf30e3734edf01" title="Tries to use any free AP of the given vertex to close ring in the graph by adding a chord." alt="" coords="928,97,1171,123"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a98af55c12fde55e3f3f5ebe24389194b" title="Depth&#45;first exploration of graphs." alt="" coords="949,716,1150,757"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5eada465c0a497b7c7b057ab28e518c1" title="Replaced the subgraph defined by a set of Attachment Points that belong to a graph (ie...." alt="" coords="639,391,842,432"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a887c0d2f99c17c0c4659e84e4c52c61d" title=" " alt="" coords="293,557,553,613"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#af7f0715cf5fdabf96fa54678e6c18d74" title=" " alt="" coords="304,637,543,693"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_vertex.html#a1f5734168f6b63ba510689efa217e54f" title="Gets attachment points that are used by capping groups." alt="" coords="964,857,1135,899"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_vertex.html#af5f7fab6253194cb5b001589937893bd" title="Finds the edge between this and the other vertex, if it exists." alt="" coords="964,243,1135,284"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_attachment_point_query.html#ae479b571d3b26271e8caa535fb26fd97" title="Tests whether the given attachment point satisfies all non&#45;null criteria in this query." alt="" coords="959,1227,1139,1268"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a53d8b566aaa0a77eeaa840021d48ace4" title=" " alt="" coords="627,1693,855,1735"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_template.html#a049d3fd512e29df9e0dd7b94f484ce97" title="Removes the mapping of the given inner AP from this template&#39;s surface, if such mapping exists." alt="" coords="943,332,1156,373"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_d_graph.html#a357b4099599e47ae47102123550771f8" title="Remove a given vertex belonging to this graph and re&#45;connects the resulting graph branches as much as..." alt="" coords="639,555,842,596"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad67d64b6e09e10ab65001d5cc4a3f9d0" title="We assume that the two vertexes belong to the same graph." alt="" coords="948,449,1151,491"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a0b0bdaef47bda93b08dbb3dc0e7b23e5" title=" " alt="" coords="959,1344,1140,1385"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a0c851972015fbb4b2a317b053b8b81d9" title="Mutates the given vertex according to the given mutation type, if possible." alt="" coords="5,5,245,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#af86b79061d15a4d2e3d7ccdf0d758f44" title=" " alt="" coords="644,89,837,131"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#accc98472143d32cd2b16308948e1602d" title="Check if this graph is connected, i.e., there is at least one path between any two vertices." alt="" coords="655,868,826,909"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a46ad0dd6a74f71292fffec8631295f34" title=" " alt="" coords="601,672,880,713"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a7927c89dd820a91154a86c5073bf791e" title=" " alt="" coords="637,737,845,779"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a1096d97bec742c5855b75231ea7a9e7c" title=" " alt="" coords="637,803,845,844"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#ac1e5c9703afc6f29fe11cca08ddb1a1c" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="326,839,521,880"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a2a0dc529e97e433ef5df472916def13e" title=" " alt="" coords="319,904,527,945"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4df69c91a742d22f8d14d44489aeac15" title="Edit this graph according to a given list of edit tasks." alt="" coords="333,100,514,141"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_d_graph.html#a86e888ef245d2bd40b49d145c7ef3af0" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="322,165,525,207"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_d_graph.html#adc362402e41af41656e820def73de5ad" title="Replaced a given vertex belonging to this graph with a new vertex generated specifically for this pur..." alt="" coords="322,231,525,272"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#aea227d615f6c2f3bac5839a8099a900d" title=" " alt="" coords="319,296,527,337"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a75784f0e5c219c9bae7d4c84054de8fd" title=" " alt="" coords="319,361,527,403"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a75fad604a87ef9485e9180f7360ddc69" title=" " alt="" coords="306,427,541,468"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#ac8c1cd307797507a5de5a37becb167d5" title=" " alt="" coords="299,492,548,533"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_vertex.html#a5c6af6108f5caedf3641ef2ed383f954" title="Returns the list of mutation types." alt="" coords="655,933,826,975"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1rings_1_1_path_sub_graph.html#a05724ec8582ec35d7bc9b059b68408bf" title="Constructs a new path sub graph specifying the first and last vertex of the path." alt="" coords="655,211,826,252"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_d_graph.html#af404e25092eabcdfbe69b5d7204e9483" title="Mutates the graph by removing the chain where a given vertex is located up to the first branching (i...." alt="" coords="639,276,842,317"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1ga_1_1_graph_operations.html#afd659e74a056d1a6ae6f52513fee0be3" title="Deletes the given vertex and all other vertexes that are not connected to more than 2 non&#45;capping gro..." alt="" coords="308,35,539,76"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_d_graph.html#abd78d550ed20f6423ad5b02d4b64e88e" title="Search the graph for AttachmentPoints that match the criteria defined in a query." alt="" coords="638,1158,843,1185"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_edge_query.html#a348b003646180ab98f25eb1d2dcd1a01" title="Tests whether the given edge satisfies this query." alt="" coords="626,1209,855,1235"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ac1f03b3b5f2827eddb99ff3dcffee46f" title=" " alt="" coords="309,1361,538,1417"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ab87c87b4f3d9d00c9e636c09a64b10c0" title=" " alt="" coords="623,1310,859,1366"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a4155118d5840043feffc693e1e4201d7" title=" " alt="" coords="631,1390,850,1446"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ac51fc0114c7ab50fe54f761193d05652" title=" " alt="" coords="628,1470,853,1526"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a3c62de3555953fdec032b260711206f5" title=" " alt="" coords="621,1549,860,1591"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a30e0dc0ce67cebcd9a938e368cb0f087" title=" " alt="" coords="613,1614,868,1670"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ad10db1021c53834285d1f2a42a3bf028" title=" " alt="" coords="613,998,868,1054"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a8307c3a13a2700eba3fceb2b986dfb19" title=" " alt="" coords="626,1078,855,1134"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8e50ddb746bca4b0d9c341327482f88b" title="Search this graph for edges that match the criteria defined in a query." alt="" coords="333,1113,513,1155"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a7e95907b905875bb7bcc9521a3b90a94" title=" " alt="" coords="18,1143,233,1184"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_vertex_query.html#af23dd64a35938660e9be863c60b5b47d" title=" " alt="" coords="305,1231,542,1272"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#af64066b322b2594efbea933ced2bc2b5" title=" " alt="" coords="322,1296,525,1337"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a74cb8674a8fd016993c045b0a9041dda" title=" " alt="" coords="329,969,517,1011"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a95f6b08356683724ca6005311d56a9c5" title=" " alt="" coords="313,1034,533,1090"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_d_graph.html#a00209ca8b4a9623b41e7d9e1e62f69ec" title="Remove a given vertex belonging to this graph and re&#45;connects the resulting graph branches as much as..." alt="" coords="322,716,525,757"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="denoptim.io.DenoptimIO.readGraphFromSDFileIAC" name="denoptim.io.DenoptimIO.readGraphFromSDFileIAC">
+<area shape="rect" id="node1" title="Converts an atom container read in from an SDF file into a graph, if possible." alt="" coords="5,29,193,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a3d1393195144f47b8071517c24336a66" title="Converts an atom container read in from an SDF file into a graph, if possible." alt="" coords="241,29,429,71"/>
+</map>

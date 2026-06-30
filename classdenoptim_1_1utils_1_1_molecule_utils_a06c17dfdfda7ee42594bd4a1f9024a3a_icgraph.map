@@ -1,0 +1,4 @@
+<map id="denoptim.utils.MoleculeUtils.numOfBondsWithBO" name="denoptim.utils.MoleculeUtils.numOfBondsWithBO">
+<area shape="rect" id="node1" title="Returns the number of bonds, with a certain bond order, surrounding the given atom." alt="" coords="321,5,533,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a64dcaabacba2ea9c1cd1586cf81b74e9" title="Looks for carbon atoms that are flagged as aromatic, but do not have any double bond and are,..." alt="" coords="5,5,273,47"/>
+</map>

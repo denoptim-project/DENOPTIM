@@ -1,0 +1,9 @@
+<map id="denoptim.fragspace.FragmentSpace.addFusedRingsToFragmentLibrary" name="denoptim.fragspace.FragmentSpace.addFusedRingsToFragmentLibrary">
+<area shape="rect" id="node1" title="Extracts a system of one or more fused rings and adds them to the fragment space if not already prese..." alt="" coords="332,183,593,224"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_offspring_evaluation_task.html#aab5b9c0b8a88922460f5c28ae161d1fa" title=" " alt="" coords="41,5,248,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1fitnessevaluator_1_1_fitness_evaluation_task.html#a498b4214d06fc161d92cf1a38635ece3" title=" " alt="" coords="30,71,259,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a6f2ce8f6a8319b39440b0dc43ede061f" title="Check that the following graph&#39;s fused ring gets added to the fragment library." alt="" coords="5,135,284,191"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a56ef448997df677c5ce4a73737f127e2" title="Checks that a graph with a fused ring containing a scaffold vertex is added to the scaffold library." alt="" coords="9,215,280,271"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a7555fcdf60b6fabae0c95844f351fc6f" title=" " alt="" coords="11,295,278,336"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a692723b803a64dd25e775b2f8726fe27" title="Works with this graph:" alt="" coords="21,359,268,415"/>
+</map>

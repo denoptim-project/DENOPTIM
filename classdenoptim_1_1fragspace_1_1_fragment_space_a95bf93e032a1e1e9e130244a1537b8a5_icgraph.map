@@ -1,0 +1,7 @@
+<map id="denoptim.fragspace.FragmentSpace.getRCVs" name="denoptim.fragspace.FragmentSpace.getRCVs">
+<area shape="rect" id="node1" title="Returns the list of registered ring&#45;closing vertexes (RCVs)." alt="" coords="537,39,731,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#af15a7e1bfc7235e3242e3d99f4277397" title="Searches for all building blocks that are ring&#45;closing vertexes and are compatible with the given AP." alt="" coords="296,5,489,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a96de4850b97ff260187dc7450c883167" title="Searches for all building blocks that are ring&#45;closing vertexes and hold an AP with the given class." alt="" coords="296,71,489,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a342092d5d542a9e50e81c73aa931b223" title=" " alt="" coords="9,5,244,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ac722cc2d3eff673746ba6c3eba3cace3" title=" " alt="" coords="5,71,248,112"/>
+</map>

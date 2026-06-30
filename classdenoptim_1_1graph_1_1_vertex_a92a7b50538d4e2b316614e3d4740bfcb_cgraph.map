@@ -1,0 +1,7 @@
+<map id="denoptim.graph.Vertex.getAPsFromChildren" name="denoptim.graph.Vertex.getAPsFromChildren">
+<area shape="rect" id="node1" title="Looks into the edges that use any of the APs that belong to this vertex and returns the list of attac..." alt="" coords="5,71,176,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="230,5,401,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_edge.html#a20a0c78541321532267b2fda0a6b634b" title=" " alt="" coords="224,71,407,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_edge.html#ae5c20718860e84083e008b5bef44e1ae" title=" " alt="" coords="224,136,407,177"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a0e96f6c954de060a628eb3de1b2f4554" title="For vertices that are templates this method returns the attachment point that is embedded in the temp..." alt="" coords="455,104,635,145"/>
+</map>

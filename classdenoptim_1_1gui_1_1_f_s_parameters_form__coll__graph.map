@@ -1,0 +1,26 @@
+<map id="denoptim.gui.FSParametersForm" name="denoptim.gui.FSParametersForm">
+<area shape="rect" id="node1" title="Form collecting input parameters for defining the fragment space." alt="" coords="1092,804,1304,831"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html" title="General structure of a form for collecting input parameters of various nature." alt="" coords="695,365,889,392"/>
+<area shape="rect" id="node3" title=" " alt="" coords="259,132,321,159"/>
+<area shape="rect" id="node4" href="$interfacedenoptim_1_1gui_1_1_i_parameters_form.html" title="Interface for parameter forms." alt="" coords="191,191,389,217"/>
+<area shape="rect" id="node5" title=" " alt="" coords="249,241,331,268"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_parameters_form_1_1_field_listener.html" title=" " alt="" coords="191,293,389,334"/>
+<area shape="rect" id="node7" title=" " alt="" coords="9,300,137,327"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_parameters_form_1_1_rdb_field_change.html" title=" " alt="" coords="191,358,389,399"/>
+<area shape="rect" id="node9" title=" " alt="" coords="17,365,130,392"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_parameters_form_1_1_tab_field_change.html" title=" " alt="" coords="191,423,389,465"/>
+<area shape="rect" id="node11" title=" " alt="" coords="5,431,141,457"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_parameters_form_1_1_cmb_field_change.html" title=" " alt="" coords="191,489,389,530"/>
+<area shape="rect" id="node13" title=" " alt="" coords="20,496,127,523"/>
+<area shape="rect" id="node14" title=" " alt="" coords="211,555,369,581"/>
+<area shape="rect" id="node15" title=" " alt="" coords="249,605,331,632"/>
+<area shape="rect" id="node16" title=" " alt="" coords="264,663,316,689"/>
+<area shape="rect" id="node17" title=" " alt="" coords="718,416,866,443"/>
+<area shape="rect" id="node18" title=" " alt="" coords="742,516,842,543"/>
+<area shape="rect" id="node19" title=" " alt="" coords="761,708,823,735"/>
+<area shape="rect" id="node20" title=" " alt="" coords="751,900,833,927"/>
+<area shape="rect" id="node21" title=" " alt="" coords="759,1092,825,1119"/>
+<area shape="rect" id="node22" title=" " alt="" coords="761,1167,823,1193"/>
+<area shape="rect" id="node23" title=" " alt="" coords="727,1241,857,1268"/>
+<area shape="rect" id="node24" title=" " alt="" coords="718,1292,866,1319"/>
+</map>

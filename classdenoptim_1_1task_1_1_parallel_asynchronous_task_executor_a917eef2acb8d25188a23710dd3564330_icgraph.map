@@ -1,0 +1,6 @@
+<map id="denoptim.task.ParallelAsynchronousTaskExecutor.cleanup" name="denoptim.task.ParallelAsynchronousTaskExecutor.cleanup">
+<area shape="rect" id="node1" title="clean all reference to submitted tasks" alt="" coords="560,49,791,90"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#ad30f9246af171eb84949ce699229e383" title="Constructor." alt="" coords="253,5,512,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_parallel_asynchronous_task_executor.html#a662a7724fc1c6fd4c7a44cb437918f78" title="Stops all subtasks and shutdown executor." alt="" coords="267,85,498,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter.html#a0b06ef73b5f59f3816f5b322775600b3" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="5,85,205,126"/>
+</map>

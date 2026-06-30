@@ -1,0 +1,7 @@
+<map id="denoptim.utils.StatUtils.skewness" name="denoptim.utils.StatUtils.skewness">
+<area shape="rect" id="node1" title="Computes the skewness of the available values." alt="" coords="5,31,224,57"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a12ae258bebe1f3568dabdd606edd3d56" title="Returns the mean number in the numbers list." alt="" coords="744,5,935,32"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a31cf5dc53af191a60dbcdba3b1f9da6b" title="Returns the standard deviation of the numbers." alt="" coords="272,68,471,95"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a181673167433cb8ad256d0295d76c29f" title="Returns the sum number in the numbers list." alt="" coords="983,31,1167,57"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_stat_utils.html#aac6cf70b1516266ef3e845d5ad4633f5" title="Computes the variance of the available values." alt="" coords="519,56,696,83"/>
+</map>

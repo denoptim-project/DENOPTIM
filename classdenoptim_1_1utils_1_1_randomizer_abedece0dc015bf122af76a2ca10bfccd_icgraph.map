@@ -1,0 +1,27 @@
+<map id="denoptim.utils.Randomizer.nextDouble" name="denoptim.utils.Randomizer.nextDouble">
+<area shape="rect" id="node1" title="Returns the next pseudo&#45;random, uniformly distributed double value between 0.0 and 1...." alt="" coords="1801,219,2001,260"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_randomizer.html#ac846a1f050f9ee65022492c84e4793fa" title="Returns a point in three&#45;dimensional space with a random set of coordinates, the absolute value of wh..." alt="" coords="1524,69,1719,111"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_randomizer.html#a092f91406a0f1261369c2105d35d5f87" title="Returns whether the next pseudo&#45;random, uniformly distributed double is lower than the specified valu..." alt="" coords="1521,135,1721,176"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_selection_helper.html#a97c9e13b0a571dcc17a223d01a47cee4" title="Roulette wheel selection is implemented as follows:" alt="" coords="1489,201,1753,227"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1ga_1_1_selection_helper.html#abd757f95a4bff442ce65e51e87e0baca" title="Stochastic Uniform Sampling Note: this implementation is based on the WATCHMAKER framework http://wat..." alt="" coords="1490,251,1753,278"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0eaa0754c76b7a20702ae6de34424d13" title="Takes a decision on which CandidateSource method to use for generating a new Candidate." alt="" coords="1239,364,1441,405"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1utils_1_1_randomizer_test.html#ad5d0acfecbfa655aad229d72b3c139e7" title=" " alt="" coords="1509,353,1734,395"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#a6c81ab7e238aeed0006bc08ca584db62" title="The noise magnitude is to be interpreted as half of the overall magnitude." alt="" coords="1241,71,1439,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_randomizer_test.html#a668de9e8b868a6b84e8a781b1a1d317f" title=" " alt="" coords="1253,5,1427,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#aa17925160f3f03080e8680c7016fc1c4" title=" " alt="" coords="956,72,1155,113"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#acb2fe702b9d02d39a38ca1cc732c9ee4" title=" " alt="" coords="956,7,1155,48"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a17505cbf52d9203a1af793f07bcf27f9" title="Selects a number of members from the given population." alt="" coords="1251,192,1429,233"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="971,247,1140,288"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="701,163,870,204"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a45d4e9ec6a308aa73891efa1d501dd5e" title="Perform fitness&#45;based, class&#45;compatible selection of parents that can do crossover operations." alt="" coords="945,145,1166,171"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0c2e353b243250b4959a3f86608f1020" title="Generates one offspring according to the method where crossover and mutation are decoupled,..." alt="" coords="699,345,872,387"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ae7a90a911b109ed47b3acf54193acc35" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="699,280,872,321"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="472,313,651,355"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,313,424,355"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,280,211,321"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,345,198,387"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1ga_1_1_seelction_helper_test.html#aafd5d3124aa2d4a523894cd96bdd9240" title=" " alt="" coords="1247,257,1433,299"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a56acf2ee9e798fee88334db3cdaedb6b" title="Choose one of the methods to make new Candidates." alt="" coords="963,429,1147,471"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a6adbad6b23ce0047c31b621b395b18e8" title=" " alt="" coords="960,495,1151,536"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a2ad2d5c42c363f37e49557ffdb45e33c" title=" " alt="" coords="920,364,1191,405"/>
+</map>

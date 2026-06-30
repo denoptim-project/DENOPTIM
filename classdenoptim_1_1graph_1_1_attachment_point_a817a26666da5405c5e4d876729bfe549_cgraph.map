@@ -1,0 +1,10 @@
+<map id="denoptim.graph.AttachmentPoint.isSrcInUserThroughout" name="denoptim.graph.AttachmentPoint.isSrcInUserThroughout">
+<area shape="rect" id="node1" title="Checks the role of this AP in the user or in any user that might be external to the template embeddin..." alt="" coords="5,115,195,156"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aa1ae3c328e8ea24ead206b822daca7f7" title="Gets the edge that is using this AP, or null if no edge is using this AP." alt="" coords="246,56,441,97"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="243,122,444,149"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_edge.html#a20a0c78541321532267b2fda0a6b634b" title=" " alt="" coords="252,173,435,215"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="501,5,671,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_template.html#aca9a03a1d6e2fd5de8f859f18996ec62" title=" " alt="" coords="492,71,680,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#abb77efcfaa507592758e7fd4845bdd80" title=" " alt="" coords="728,78,931,105"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a0e96f6c954de060a628eb3de1b2f4554" title="For vertices that are templates this method returns the attachment point that is embedded in the temp..." alt="" coords="496,173,676,215"/>
+</map>

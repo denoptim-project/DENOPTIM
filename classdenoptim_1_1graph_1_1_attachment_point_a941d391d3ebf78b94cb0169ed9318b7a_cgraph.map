@@ -1,0 +1,6 @@
+<map id="denoptim.graph.AttachmentPoint.isAvailableThroughout" name="denoptim.graph.AttachmentPoint.isAvailableThroughout">
+<area shape="rect" id="node1" title="Check availability of this attachment point throughout the graph level, i.e., check also across the i..." alt="" coords="5,39,188,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="245,5,415,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_template.html#aca9a03a1d6e2fd5de8f859f18996ec62" title=" " alt="" coords="236,71,424,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#abb77efcfaa507592758e7fd4845bdd80" title=" " alt="" coords="472,78,675,105"/>
+</map>

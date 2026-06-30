@@ -1,0 +1,4 @@
+<map id="denoptim.graph.AttachmentPoint.compareTo" name="denoptim.graph.AttachmentPoint.compareTo">
+<area shape="rect" id="node1" title="Compares this and another attachment points based on their unique identifier." alt="" coords="5,5,185,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a72dd6bd75a701cabb65832778da6e574" title="Returns a unique integer that is used to sort list of attachment points." alt="" coords="233,5,413,47"/>
+</map>

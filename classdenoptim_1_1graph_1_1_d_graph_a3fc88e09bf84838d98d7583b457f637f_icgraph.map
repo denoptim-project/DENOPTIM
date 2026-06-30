@@ -1,0 +1,10 @@
+<map id="denoptim.graph.DGraph.getAPWithId" name="denoptim.graph.DGraph.getAPWithId">
+<area shape="rect" id="node1" title="Returns the attachment point with the given identifier, or null if no AP is found with the given iden..." alt="" coords="896,104,1075,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph_1_1_d_e_n_o_p_t_i_m_graph_deserializer.html#ac7e1fd6d8a34f40e43c818404546d404" title=" " alt="" coords="584,5,848,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4df69c91a742d22f8d14d44489aeac15" title="Edit this graph according to a given list of edit tasks." alt="" coords="625,71,807,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="617,136,815,177"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_template.html#a8ec4d171f4457634263a61211fb3508b" title=" " alt="" coords="611,201,821,243"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1grapheditor_1_1_graph_editor.html#a649a62e3d4635ef4c19424fa49e6dcd4" title=" " alt="" coords="323,71,525,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_template.html#a1918656a5c1deed84daddfcf84757a3b" title="Reads a JSON string and returns an instance of this class." alt="" coords="312,209,536,235"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex_1_1_d_e_n_o_p_t_i_m_vertex_deserializer.html#a281fc89776bbb6dbb93813fbb6eb2f70" title=" " alt="" coords="5,201,264,243"/>
+</map>

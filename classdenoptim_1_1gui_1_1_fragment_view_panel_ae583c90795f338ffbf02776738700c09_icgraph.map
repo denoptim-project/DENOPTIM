@@ -1,0 +1,9 @@
+<map id="denoptim.gui.FragmentViewPanel.getLoadedStructure" name="denoptim.gui.FragmentViewPanel.getLoadedStructure">
+<area shape="rect" id="node1" title="Returns the chemical representation of the currently loaded chemical object." alt="" coords="1147,93,1329,135"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a756c2375d70d66c5bbba03e8772bb24a" title="Returns the currently loaded vertex." alt="" coords="880,93,1099,135"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a7e833ba52549966556cc1bd1852dcfa4" title=" " alt="" coords="580,5,832,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,101,532,127"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a530b2f509d3e15fd285526a34461cc9e" title="Imports the given SMILES into the viewer." alt="" coords="580,123,832,164"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a09363e21a5254efe8f128a99e82acbf0" title=" " alt="" coords="584,188,828,229"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,93,221,135"/>
+</map>

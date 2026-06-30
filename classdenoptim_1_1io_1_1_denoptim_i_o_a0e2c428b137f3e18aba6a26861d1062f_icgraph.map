@@ -1,0 +1,6 @@
+<map id="denoptim.io.DenoptimIO.readGenerationFromSummary" name="denoptim.io.DenoptimIO.readGenerationFromSummary">
+<area shape="rect" id="node1" title="Reads a FileFormat#GENSUMMARY file and searches all the files defining each member of the population." alt="" coords="507,39,695,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a746a93c4742c53dfb3cc767eae8aac92" title="Reads any content of a given pathname and tries to read DENOPTIM data from it." alt="" coords="259,5,447,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#af5c2f9114881ebde82a83f922c0c23fe" title=" " alt="" coords="248,71,459,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1integration_1_1python_1_1_py4_j_getaway_server.html#a15873756d67e5fcc5b3219c5d26db990" title="Reads any DENOPTIM&#45;kind of data from the given pathname." alt="" coords="5,5,200,47"/>
+</map>

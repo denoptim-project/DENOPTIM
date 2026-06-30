@@ -1,0 +1,7 @@
+<map id="denoptim.gui.CuttingRulesSelectionDialog.SMARTSVisualizationButton.SMARTSVisualizationButton" name="denoptim.gui.CuttingRulesSelectionDialog.SMARTSVisualizationButton.SMARTSVisualizationButton">
+<area shape="rect" id="node1" title=" " alt="" coords="5,106,248,162"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#a2a2fc5b1a50e2ff8b54728dcf44f42f6" title="Adds a component to the central part of this dialog frame." alt="" coords="301,5,518,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog.html#abb25d53e82ce90eca70b378dff75ebb0" title="Escaping some characters as explained in https://smarts.plus/rest." alt="" coords="299,70,519,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#aaf274203565174a2ca3ac3d95b95797f" title="Constructor." alt="" coords="311,149,507,191"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#aaa04536e178fdfa5bad92cdc1fcc4583" title="Shows the dialog and restrains the modality to it, until the dialog gets closed." alt="" coords="296,215,523,256"/>
+</map>

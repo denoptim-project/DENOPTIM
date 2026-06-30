@@ -1,0 +1,12 @@
+<map id="denoptim.gui.GraphViewerPanel.GraphOptsPopup.GraphOptsPopup" name="denoptim.gui.GraphViewerPanel.GraphOptsPopup.GraphOptsPopup">
+<area shape="rect" id="node1" title=" " alt="" coords="5,169,267,211"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#ac1986beea060f3468430c9eb81969660" title="Adds or removes labels from the elements selected in the graph view." alt="" coords="347,5,521,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a5d141993a4e2544320e3905fd2ef5df9" title=" " alt="" coords="347,71,521,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a581e856de9d7b202a219773b3d9bef2a" title="Removes the currently loaded graph viewer." alt="" coords="347,136,521,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#ace9b1e7d329348ddfcb8c3e5fcee46ba" title="Files a property change relative to the mode of mouse transformation." alt="" coords="315,201,553,243"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a1afa86408d591d029c89f11852b899bd" title="Returns a copy of the graph loaded into the viewer." alt="" coords="332,267,536,308"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a0311f258391ff189afefcc333ade4cee" title="Load the given DGraph to this graph viewer." alt="" coords="347,356,521,397"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a63652cbc8cbef5690625202ab7f6ac3e" title="Finds selected nodes from the viewer." alt="" coords="625,5,799,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#ad5c23dcbf1dcf069a53ab6da2e1d1049" title=" " alt="" coords="625,71,799,112"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#abed87e5b88f44a20955b9e1bb2491156" title="Created a JUNG graph object that represents a DGraph, and allows to load a graphical representation i..." alt="" coords="601,356,823,397"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="denoptim.fragmenter.ConformerExtractorTask.ConformerExtractorTask" name="denoptim.fragmenter.ConformerExtractorTask.ConformerExtractorTask">
+<area shape="rect" id="node1" title="Constructs a task that will analyze the isomorphic family of the given fragment." alt="" coords="5,172,251,213"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="329,5,515,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a79a12ef5b801f610a2ceda909092ac05" title="Builds the pathname of the file meant to hold all isomorphic fragments from a given MW slot." alt="" coords="301,70,543,126"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a37f87b26bd9a229cfd84e9c487f6495a" title="Gets the pathname to the working directory." alt="" coords="593,140,784,181"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#ac485c253cfb295e84e2d77b2c253b5b8" title="Determines the name of the MW slot to use when comparing the given fragment with previously stored fr..." alt="" coords="317,201,527,243"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a3ba66fc2a4b53ee369878bf95ebb381f" title=" " alt="" coords="299,267,545,308"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_task_utils.html#a04b7f04efd81199814b4e81de32df86f" title="Unique counter for tasks." alt="" coords="331,332,513,373"/>
+<area shape="rect" id="node4" href="$enumdenoptim_1_1files_1_1_file_format.html#a3add0e6a04faada7ca012a68d9658bf2" title=" " alt="" coords="595,75,782,116"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#acc83e15edc2c04f8b3ae66a8628a6134" title=" " alt="" coords="603,205,774,247"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.gui.MoleculeViewPanel.loadChemicalStructure" name="denoptim.gui.MoleculeViewPanel.loadChemicalStructure">
+<area shape="rect" id="node1" title="Loads a structure in the Jmol viewer." alt="" coords="5,75,195,116"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#aa64c40b887997341511f076c73f51480" title="Loads a structure in the Jmol viewer." alt="" coords="243,29,483,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="267,119,458,160"/>
+</map>

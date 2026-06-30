@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.loadDnGraphToViewer" name="denoptim.gui.GraphVertexMolViewerPanel.loadDnGraphToViewer">
+<area shape="rect" id="node1" title="Loads the given graph into the graph viewer." alt="" coords="5,41,215,97"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a71ebb2645638b3512d2f4bb137c7d77d" title="Allows to show the given card in the molecular structure viewer." alt="" coords="263,5,473,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a77e7e3eacddd0198571354f931c2c470" title="Loads a structure in the Jmol viewer." alt="" coords="273,85,463,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#aa64c40b887997341511f076c73f51480" title="Loads a structure in the Jmol viewer." alt="" coords="521,39,761,81"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="546,129,737,170"/>
+</map>

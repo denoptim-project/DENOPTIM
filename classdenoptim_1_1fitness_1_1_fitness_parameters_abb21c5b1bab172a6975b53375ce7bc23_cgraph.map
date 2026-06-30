@@ -1,0 +1,5 @@
+<map id="denoptim.fitness.FitnessParameters.checkParameters" name="denoptim.fitness.FitnessParameters.checkParameters">
+<area shape="rect" id="node1" title="Evaluate consistency of input parameters." alt="" coords="5,39,200,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#a16bc762b79f5033f2323fb8728593334" title=" " alt="" coords="266,5,457,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#aaeaf94275f1b63439850a68a244a74c2" title="Checks any of the parameter collections contained in this instance." alt="" coords="248,71,475,112"/>
+</map>

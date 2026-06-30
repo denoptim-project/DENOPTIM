@@ -1,0 +1,4 @@
+<map id="denoptim.gui.FragmentViewPanel.waitForJmolViewer" name="denoptim.gui.FragmentViewPanel.waitForJmolViewer">
+<area shape="rect" id="node1" title="Waits until Jmol is finished." alt="" coords="5,5,188,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad2fc717c7c33817e4178031130d46f6d" title="Clears the molecular viewer." alt="" coords="236,5,419,47"/>
+</map>

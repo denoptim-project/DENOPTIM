@@ -1,0 +1,11 @@
+<map id="denoptim.ga.GraphOperations.locateCompatibleXOverPoints" name="denoptim.ga.GraphOperations.locateCompatibleXOverPoints">
+<area shape="rect" id="node1" title="Identify crossover sites, i.e., subgraphs that can be swapped between two graphs (i...." alt="" coords="792,163,1023,204"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_population.html#a31b74cc5407c42fa3a4214029fb08190" title="Returns a list of population members that can do crossover with the specified member." alt="" coords="529,97,707,139"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#ab0f92a94c4fb2334e7d3813e73fc4247" title=" " alt="" coords="512,163,724,204"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a9fcf8fffef10a59df722c92e94da2815" title=" " alt="" coords="492,228,744,269"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a45d4e9ec6a308aa73891efa1d501dd5e" title="Perform fitness&#45;based, class&#45;compatible selection of parents that can do crossover operations." alt="" coords="223,13,444,39"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_population_test.html#a5db0672054a9fc1dbc923310732fdb3a" title=" " alt="" coords="230,64,437,105"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_population_test.html#a278212ebff2501b7071d342f9a027599" title=" " alt="" coords="230,129,437,171"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="5,5,175,47"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#a3c2407eb1204a7b25600d3d347d98447" title=" " alt="" coords="227,195,439,236"/>
+</map>

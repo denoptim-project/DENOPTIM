@@ -1,0 +1,5 @@
+<map id="denoptim.integration.python.Py4JGetawayServer.setServer" name="denoptim.integration.python.Py4JGetawayServer.setServer">
+<area shape="rect" id="node1" title="Sets the reference to the launched server." alt="" coords="452,5,651,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1python_1_1_py4_j_getaway_server.html#ab7976e49bcc94dfa9122667beedcf209" title="Starts a gateway server using this class as entry point, which then becomes the interpreter of any da..." alt="" coords="221,5,404,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1main_1_1_main.html#a5d0a8599c5e2e81cffd07e35353bfc84" title="Launches the appropriate program according to the arguments given." alt="" coords="5,13,173,39"/>
+</map>

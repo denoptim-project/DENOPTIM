@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GUIEmptyVertexMaker.updateBBTypeBasedOnAPCount" name="denoptim.gui.GUIEmptyVertexMaker.updateBBTypeBasedOnAPCount">
+<area shape="rect" id="node1" title=" " alt="" coords="248,5,500,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_empty_vertex_maker.html#a5b98876b4b05ee77516d9889ec438acc" title="Constructs a maker that can make empty vertexes, but controls whether the generated vertexes are allo..." alt="" coords="5,5,200,47"/>
+</map>

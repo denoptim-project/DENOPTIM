@@ -1,0 +1,5 @@
+<map id="denoptim.graph.rings.ClosableChain.getTurningPointIdx" name="denoptim.graph.rings.ClosableChain.getTurningPointIdx">
+<area shape="rect" id="node1" title="Get the vertex ID of the turning point.Note that since the chain is a path in a graph the relative di..." alt="" coords="5,39,200,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1rings_1_1_chain_link.html#a22ada7777c4665cbe71df26caa560d54" title=" " alt="" coords="257,5,434,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#a2c40d6aa717937f6f478f413cbcc1eb5" title="Get a specific ChainLink" alt="" coords="248,71,443,112"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GUICardPanel.removeCardActionListener" name="denoptim.gui.GUICardPanel.removeCardActionListener">
+<area shape="rect" id="node1" title="Remove the card from the deck of cards and takes care of removing also the entry in the list of activ..." alt="" coords="5,80,233,121"/>
+<area shape="rect" id="node2" title=" " alt="" coords="66,5,173,32"/>
+</map>

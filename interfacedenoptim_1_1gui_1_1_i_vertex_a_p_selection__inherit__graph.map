@@ -1,0 +1,6 @@
+<map id="denoptim.gui.IVertexAPSelection" name="denoptim.gui.IVertexAPSelection">
+<area shape="rect" id="node1" title="Interface for all vertex viewers that intend to allow selection of attachment points." alt="" coords="5,78,216,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html" title="A panel with a molecular viewer and attachment point table." alt="" coords="266,5,449,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html" title="A panel to visualize a vertex as a graph component with attachment point table." alt="" coords="264,71,451,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html" title="A panel to visualize a vertex as two&#45;dimensional chemical structure with attachment point table." alt="" coords="269,136,445,177"/>
+</map>

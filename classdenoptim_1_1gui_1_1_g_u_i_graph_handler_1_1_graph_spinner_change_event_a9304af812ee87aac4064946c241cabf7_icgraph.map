@@ -1,0 +1,11 @@
+<map id="denoptim.gui.GUIGraphHandler.GraphSpinnerChangeEvent.setEnabled" name="denoptim.gui.GUIGraphHandler.GraphSpinnerChangeEvent.setEnabled">
+<area shape="rect" id="node1" title="Enables/disable the listener." alt="" coords="1504,168,1749,209"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#aecf8050385cc9b905141c7404021ac64" title=" " alt="" coords="904,77,1163,118"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a0bfee228212165cd5bc2f5cee7b131d8" title=" " alt="" coords="1211,197,1456,238"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,146,509,172"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a11c5c55e0930e8eb7304416707016522" title=" " alt="" coords="583,44,831,85"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ad54901fb2a09953591c971ffc48f3de1" title=" " alt="" coords="590,109,823,150"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,138,211,180"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af7024886a4203aa93d8cf7975f7c2e72" title=" " alt="" coords="913,226,1154,268"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a857bfe6291322daccf2af3fd9a28a356" title="Start the construction of a new graph from scratch." alt="" coords="557,277,856,318"/>
+</map>
