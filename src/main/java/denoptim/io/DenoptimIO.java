@@ -28,7 +28,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,30 +52,23 @@ import org.jmol.adapter.smarter.SmarterJmolAdapter;
 import org.jmol.viewer.Viewer;
 import org.openscience.cdk.AtomContainerSet;
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.ChemObject;
+import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomContainerSet;
-import org.openscience.cdk.interfaces.IChemFile;
-import org.openscience.cdk.interfaces.IChemObject;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
 import org.openscience.cdk.io.DefaultChemObjectReader;
 import org.openscience.cdk.io.FormatFactory;
 import org.openscience.cdk.io.IChemObjectReaderErrorHandler;
-import org.openscience.cdk.io.ISimpleChemObjectReader;
-import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.io.Mol2Writer;
-import org.openscience.cdk.io.ReaderFactory;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.io.XYZWriter;
 import org.openscience.cdk.io.formats.CIFFormat;
 import org.openscience.cdk.io.formats.IChemFormat;
+import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.ILoggingTool;
 import org.openscience.cdk.tools.LoggingToolFactory;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -285,7 +277,7 @@ public class DenoptimIO
      * @throws CDKException if the reading of the file goes wrong.
      */
     public static List<IAtomContainer> readAllAtomContainers(File file) 
-            throws IOException, CDKException
+            throws IOException, CDKException, DENOPTIMException
     {
         List<IAtomContainer> results = null;
      
@@ -328,15 +320,7 @@ public class DenoptimIO
             
             results = readAllAtomContainers(new File(tmp));
         } else {
-            FileReader fileReader = new FileReader(file);
-            ReaderFactory readerFact = new ReaderFactory();
-            ISimpleChemObjectReader reader = readerFact.createReader(fileReader);
-            reader.setErrorHandler(new PartlySilencedChemObjReaderErrorHandler(
-                    DefaultChemObjectReader.class));
-            IChemFile chemFile = (IChemFile) reader.read(
-                    (IChemObject) new ChemFile());
-            results = ChemFileManipulator.getAllAtomContainers(chemFile);
-            fileReader.close();
+            results = readSDFFile(file.getAbsolutePath());
         }
         
         return results;
@@ -345,30 +329,35 @@ public class DenoptimIO
 //------------------------------------------------------------------------------
 
     /**
-     * Reads a file containing multiple molecules (multiple SD format))
+     * Reads a file containing multiple molecules. Suitable for both MDLV3000 
+     * and MDLV2000 formats, and can read very large files.
      *
      * @param fileName the file containing the molecules
      * @return IAtomContainer[] an array of molecules
      * @throws DENOPTIMException
      */
     public static ArrayList<IAtomContainer> readSDFFile(String fileName)
-            throws DENOPTIMException {
-        MDLV2000Reader mdlreader = null;
+            throws DENOPTIMException 
+    {
         ArrayList<IAtomContainer> lstContainers = new ArrayList<>();
 
+        File file = new File(fileName);
+        IteratingSDFReader reader = null;
         try {
-            mdlreader = new MDLV2000Reader(new FileReader(new File(fileName)));
-            mdlreader.setErrorHandler(new PartlySilencedChemObjReaderErrorHandler(
-                    DefaultChemObjectReader.class));
-            ChemFile chemFile = (ChemFile) mdlreader.read((ChemObject) new ChemFile());
-            lstContainers.addAll(
-                    ChemFileManipulator.getAllAtomContainers(chemFile));
-        } catch (CDKException | IOException cdke) {
+            reader = new IteratingSDFReader(
+                new BufferedReader(new FileReader(file)), 
+                DefaultChemObjectBuilder.getInstance());
+            reader.setErrorHandler(new PartlySilencedChemObjReaderErrorHandler(
+                DefaultChemObjectReader.class));
+            while (reader.hasNext()) {
+                lstContainers.add((IAtomContainer)reader.next());
+            }
+        } catch (IOException cdke) {
             throw new DENOPTIMException(cdke);
         } finally {
             try {
-                if (mdlreader != null) {
-                    mdlreader.close();
+                if (reader != null) {
+                    reader.close();
                 }
             } catch (IOException ioe) {
                 throw new DENOPTIMException(ioe);
@@ -1149,50 +1138,6 @@ public class DenoptimIO
             results.add(properties);
         }
         return results;
-    }
-
-//------------------------------------------------------------------------------
-
-    /**
-     * Generate the ChemDoodle representation of the molecule
-     *
-     * @param mol
-     * @return molecule as a formatted string
-     * @throws DENOPTIMException
-     */
-    public static String getChemDoodleString(IAtomContainer mol)
-            throws DENOPTIMException {
-        StringWriter stringWriter = new StringWriter();
-        MDLV2000Writer mw = null;
-        try {
-            mw = new MDLV2000Writer(stringWriter);
-            mw.write(mol);
-        } catch (CDKException cdke) {
-            throw new DENOPTIMException(cdke);
-        } finally {
-            try {
-                if (mw != null) {
-                    mw.close();
-                }
-            } catch (IOException ioe) {
-                throw new DENOPTIMException(ioe);
-            }
-        }
-
-        String MoleculeString = stringWriter.toString();
-
-        //System.out.print(stringWriter.toString());
-        //now split MoleculeString into multiple lines to enable explicit printout of \n
-        String Moleculelines[] = MoleculeString.split("\\r?\\n");
-
-        StringBuilder sb = new StringBuilder(1024);
-        sb.append("var molFile = '");
-        for (int i = 0; i < Moleculelines.length; i++) {
-            sb.append(Moleculelines[i]);
-            sb.append("\\n");
-        }
-        sb.append("';");
-        return sb.toString();
     }
 
 //------------------------------------------------------------------------------

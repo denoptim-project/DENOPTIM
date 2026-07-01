@@ -86,7 +86,7 @@ public class ParallelFragmentationAlgorithm extends ParallelAsynchronousTaskExec
             reader =  new IteratingAtomContainerReader
                     (new File(settings.getStructuresFile()));
 
-        } catch (IOException | CDKException e1)
+        } catch (IOException | CDKException | DENOPTIMException e1)
         {
             throw new Error("Error reading file '" + settings.getStructuresFile()
             + "'. " + e1.getMessage());

@@ -20,6 +20,8 @@ import org.openscience.cdk.io.iterator.DefaultIteratingChemObjectReader;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.io.iterator.IteratingSMILESReader;
 
+import denoptim.exception.DENOPTIMException;
+
 /**
  * An iterator that take {@link IAtomContainer}s from a file, possibly using
  * an available iterating reader, or, if such reader does not exist, reads
@@ -68,7 +70,8 @@ public class IteratingAtomContainerReader implements Iterator<IAtomContainer>
      * @throws CDKException
      */
     public IteratingAtomContainerReader(File input) 
-            throws FileNotFoundException, IOException, CDKException
+            throws FileNotFoundException, IOException, CDKException,
+            DENOPTIMException
     {
         FormatFactory factory = new FormatFactory();
         factory.registerFormat(new SMILESListFormat());
@@ -93,7 +96,7 @@ public class IteratingAtomContainerReader implements Iterator<IAtomContainer>
         } else { 
             results = DenoptimIO.readAllAtomContainers(input);
             listIterator = results.iterator();
-        } 
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -143,4 +146,6 @@ public class IteratingAtomContainerReader implements Iterator<IAtomContainer>
         else
             return listIterator.getClass();
     }
+
+//------------------------------------------------------------------------------
 }
