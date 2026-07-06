@@ -1195,10 +1195,9 @@ public class DenoptimIO
                 sb.append(trgAPC);
                 if (i != (cpMap.get(srcAPC).size() - 1)) {
                     sb.append(",");
-                } else {
-                    sb.append(NL);
                 }
             }
+            sb.append(NL);
         }
 
         sb.append(DENOPTIMConstants.APCMAPIGNORE);
