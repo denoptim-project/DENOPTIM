@@ -188,6 +188,8 @@ public class MultiMolecularModelBuilder
             } else {
                 RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance(
                     settings.getRCOServerHostname(), settings.getRCOServerPort());
+                rcoServer.setRecordRequestsFileName(
+                    settings.getPathnameForRecordingRCOServerRequests());
                 for (ChemicalObjectModel com : structures)
                 {
                     try

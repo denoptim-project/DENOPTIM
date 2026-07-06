@@ -153,6 +153,12 @@ public class MMBuilderParameters extends RunTimeParameters
      */
     protected Integer rcoServerPort = 5972;
 
+    /**
+     * Pathname to file where to record requests sent to the RCOServer.
+     * If <code>null</code>, no file is written.
+     */
+    protected String rcoServerRequestsFileName = null;
+
 //------------------------------------------------------------------------------
     
     /**
@@ -301,6 +307,12 @@ public class MMBuilderParameters extends RunTimeParameters
         return rcoServerPort;
     }
 
+//------------------------------------------------------------------------------
+
+    public String getPathnameForRecordingRCOServerRequests() {
+        return rcoServerRequestsFileName;
+    }
+
 //-----------------------------------------------------------------------------
 
     /**
@@ -382,6 +394,9 @@ public class MMBuilderParameters extends RunTimeParameters
             break;
         case "RCOSERVERPORT=":
             rcoServerPort = Integer.parseInt(value);
+            break;
+        case "RECORDRCOSERVERREQUESTSTOFILE=":
+            rcoServerRequestsFileName = value;
             break;
 
 /*

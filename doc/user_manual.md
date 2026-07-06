@@ -613,6 +613,7 @@ The following tables list all the keywords grouped according to the main functio
 |__RCO Service__||
 |`3DB-RCOServerHostName`| Specifies a custom hostname for the ring-closing molecular modeling service (see [RingClosingMM](https://github.com/denoptim-project/RingClosingMM)). By default we use `localhost`.|
 |`3DB-RCOServerPort`| Specifies a custom port for the ring-closing molecular modeling service  (see [RingClosingMM](https://github.com/denoptim-project/RingClosingMM)). By default we use port 5972.|
+|`3DB-RecordRCOServerRequestsToFile`| Specifies the pathname of a file where to write the requests sent to the RCO server. By default no request is recorded alsewhere than in the log, if logging level is sufficiently high.|
 |__Tinker Interface__||
 |`3DB-ToolPSSROT`| Specifies the pathname of Tinker’s `pssrot` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)).|
 |`3DB-ToolXYZINT`| Specifies the pathname of Tinker’s `xyzint` executable (see [https://dasher.wustl.edu/tinker/](https://dasher.wustl.edu/tinker/)).|

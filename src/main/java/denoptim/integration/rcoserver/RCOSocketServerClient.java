@@ -42,6 +42,7 @@ import com.google.gson.JsonSyntaxException;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.graph.rings.RingClosingAttractor;
+import denoptim.io.DenoptimIO;
 import denoptim.molecularmodeling.ChemicalObjectModel;
 import denoptim.molecularmodeling.zmatrix.ZMatrix;
 import denoptim.molecularmodeling.zmatrix.ZMatrixAtom;
@@ -84,6 +85,12 @@ public class RCOSocketServerClient
      */
     private Gson jsonConverter = new GsonBuilder().create();
 
+    /**
+     * Pathname to file where to record requests sent to the server.
+     * If <code>null</code>, no file is written.
+     */
+    private String requestFileName = null;
+
 //------------------------------------------------------------------------------
     
     /**
@@ -92,6 +99,16 @@ public class RCOSocketServerClient
     private RCOSocketServerClient(String hostname, Integer port) {
         this.hostname = hostname;
         this.port = port;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Sets the pathname to file where to record requests sent to the server.
+     * @param requestFileName The pathname to file
+     */
+    public void setRecordRequestsFileName(String requestFileName) {
+        this.requestFileName = requestFileName;
     }
 
 //------------------------------------------------------------------------------
@@ -253,7 +270,10 @@ public class RCOSocketServerClient
         
         //This might be useful for debugging to get the actual request placed to the server
         logger.log(Level.FINE, "Request to the socket server: " + requestAsJSONString);
-        //TinkerUtils.writeTinkerINT("/tmp/zmat.int", chemObj.getZMatrix());
+        if (requestFileName != null) {
+            DenoptimIO.writeData(requestFileName, 
+                requestAsJSONString+System.lineSeparator(), true);
+        }
         
         JsonObject answer = sendRequest(requestAsJSONString);
         for (String requiredMember : new String[] {"Cartesian_coordinates", "zmatrix"})

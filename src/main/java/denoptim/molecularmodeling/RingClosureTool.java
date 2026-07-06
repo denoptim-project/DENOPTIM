@@ -263,8 +263,10 @@ public class RingClosureTool
                                 + " adaptation for " + molName
                                 + " (Iteration: " + itn + ")");
 
-        RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance(settings.getRCOServerHostname(), settings.getRCOServerPort());
-        
+        RCOSocketServerClient rcoServer = RCOSocketServerClient.getInstance(
+            settings.getRCOServerHostname(), settings.getRCOServerPort());
+        rcoServer.setRecordRequestsFileName(settings.getPathnameForRecordingRCOServerRequests());
+
         long startTime = System.nanoTime();
         try {
             rcoServer.runConformationalOptimization(chemObj, rcaCombination, logger);

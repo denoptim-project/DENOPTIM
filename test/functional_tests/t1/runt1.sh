@@ -101,6 +101,9 @@ do
     echo "3DB-RCOServerPort=$PORT" >> "$dnpParams"
     echo "3DB-workDir=$wrkDir" >> "$dnpParams"
 
+    # May be used to generate requests to be used for standalone testing of the RCO server
+    #echo "3DB-RecordRCOServerRequestsToFile=/tmp/requests" >> "$dnpParams"
+
     if [ "$fname" = "Mol9" ]; then
        # Ring closing settings
         echo "RC-CloseRings"  >> "$dnpParams"
