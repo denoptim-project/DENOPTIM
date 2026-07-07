@@ -32,8 +32,10 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BoxLayout;
@@ -458,12 +460,7 @@ public class GUIVertexInspector extends GUICardPanel
 					return;
 				}
 				else
-				{
-					//TODO: ask about hapticity:
-					// if multihapto, then use all the selected atoms for 1 AP
-					// and ask to select another set for other end of bond to 
-					// break.
-				    
+				{   
 	                List<APClass> selectedAPCs = choseOrCreateNewAPClass(
 	                        btnAtmToAP, true);
 					
@@ -505,56 +502,196 @@ public class GUIVertexInspector extends GUICardPanel
 		ctrlPane.add(pnlAtmToAP);
 
 		pnlBondToAPPair = new JPanel();
-		btnBondToAPPair = new JButton("Bond to AP Pair");
+        String bndToApLabel = "Bond to AP Pair";
+		btnBondToAPPair = new JButton(bndToApLabel);
 		btnBondToAPPair.setToolTipText("<html>Replaces bonds with "
-				+ "pairs of attachment points.<br>Click on the two atoms of "
-				+ "each bond to select them. The order of selection of each " 
-                + "atom pair determines the APClass assignment.<br>"
-                + "Multiple pairs can be selected, but keep in mind that the "
-                + "order of selection of each atom pair determines the APClass "
-                + "assignment.<br>"
+				+ "pairs of attachment points. "
+                + "</br>Click on this button to start the selection of atoms that define the bonds to break."
 				+ "<br><b>WARNING:</b> this action cannot be undone!<html>");
 		btnBondToAPPair.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				vertex = vertexViewer.getLoadedStructure();
 
-				List<IAtom> selectedAtms =
-				        vertexViewer.getAtomsSelectedFromJMol();
-
-				if (selectedAtms.size()% 2 != 0)
-				{
-					JOptionPane.showMessageDialog(btnBondToAPPair,
-			                "<html>Select an even number of atoms that form the bonds "
-			                + "to replace.<br>Click on atoms to select them."
-			                + "<br>Click again to unselect.</html>",
-			                "Error",
-			                JOptionPane.ERROR_MESSAGE,
-			                UIManager.getIcon("OptionPane.errorIcon"));
-					return;
-				}
-
-                List<List<IAtom>> atomPairs = new ArrayList<>();
-                for (int i = 0; i < selectedAtms.size(); i += 2)
+                GUIAtomSelectionDialog firstAtomSelectionDialog = new GUIAtomSelectionDialog(
+                    btnAtmToAP, vertex, null, 2, 1);
+                Object firstSelected = firstAtomSelectionDialog.showDialog();
+                if (firstSelected == null)
                 {
-                    IAtom atmA = selectedAtms.get(i);
-                    IAtom atmB = selectedAtms.get(i + 1);
-                    IBond bond = atmA.getBond(atmB);
-                    if (bond == null)
+                    return;
+                }
+                List<IAtom> firstSelAtoms = (List<IAtom>) firstSelected;
+
+                GUIAtomSelectionDialog secondAtomSelectionDialog = new GUIAtomSelectionDialog(
+                    btnAtmToAP, vertex, firstSelAtoms, 2, 2);
+                Object secondSelected = secondAtomSelectionDialog.showDialog();
+                if (secondSelected == null)
+                {
+                    return;
+                }
+                List<IAtom> secondSelAtoms = (List<IAtom>) secondSelected;
+
+                List<List<List<IAtom>>> atomPairs = new ArrayList<>();
+                if (firstSelAtoms.size() == secondSelAtoms.size())
+                {
+                    // Assume 2-center bonds
+                    for (int i = 0; i < firstSelAtoms.size(); i++)
                     {
-                        JOptionPane.showMessageDialog(btnBondToAPPair,
-                            "<html>The selected atoms are not bonded to each "
-                            + "other.</html>",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE,
-                            UIManager.getIcon("OptionPane.errorIcon"));
+                        if (firstSelAtoms.get(i).getBond(secondSelAtoms.get(i)) == null)
+                        {
+                            String[] options = new String[]{"Ignore bonds", "Cancel"};
+                            String txt =  "<html>Atom " 
+                                + MoleculeUtils.getAtomRef(firstSelAtoms.get(i), vertex.getIAtomContainer()) 
+                                + " is not bound to "
+                                + MoleculeUtils.getAtomRef(secondSelAtoms.get(i), vertex.getIAtomContainer()) 
+                                + ". Proceed the creation of AP pairs irrespective of the bonds?</html>";
+                            int answer = JOptionPane.showOptionDialog(btnBondToAPPair,
+                                    String.format(txt,200),
+                                    "Ignore bonds?",
+                                    JOptionPane.DEFAULT_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE,
+                                    UIManager.getIcon("OptionPane.warningIcon"),
+                                    options,
+                                    options[1]);
+                            if (answer == 1) 
+                            {
+                                return;
+                            }
+                        }
+                        atomPairs.add(Arrays.asList(Arrays.asList(firstSelAtoms.get(i)), 
+                        Arrays.asList(secondSelAtoms.get(i))));
+                    }
+                } else {
+                    String[] options = new String[]{"Multihaptic bond", 
+                        "Multidentate bonds",
+                        "Cancel"};
+                    String txt = "<html>Unequal number of atoms in the two sets. Bonds may "
+                        + "be treated as:<ul>"
+                        + "<li> multihapto bond (create a single AP pair)</li>"
+                        + "<li> multiple multidentate bonds (create multiple AP pairs)</li>"
+                        + "</ul>"
+                        + "<br>How to threat the selected atoms?</html>";
+                    int answer = JOptionPane.showOptionDialog(btnBondToAPPair,
+                            String.format(txt,200),
+                            "Multihaptic or Multidentate?",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            UIManager.getIcon("OptionPane.warningIcon"),
+                            options,
+                            options[2]);
+                    
+                    if (answer == 0) 
+                    {
+                        // Assume multihapto bonds
+                        if (firstSelAtoms.size() < secondSelAtoms.size())
+                        {
+                            Set<IAtom> assignedSecondAtoms = new HashSet<>();
+                            for (int i = 0; i < firstSelAtoms.size(); i++)
+                            {
+                                IAtom firstAtom = firstSelAtoms.get(i);
+                                List<IAtom> secondAtomsConnectedToFirstAtom = new ArrayList<>();
+                                for (int j = 0; j < secondSelAtoms.size(); j++)
+                                {
+                                    IAtom secondAtom = secondSelAtoms.get(j);
+                                    if (firstAtom.getBond(secondAtom) != null)
+                                    {
+                                        if (i>0 && assignedSecondAtoms.contains(secondSelAtoms.get(j)))
+                                        {
+                                            JOptionPane.showMessageDialog(btnBondToAPPair,
+                                                "<html>Atom " 
+                                                + MoleculeUtils.getAtomRef(secondAtom, vertex.getIAtomContainer()) 
+                                                + " is bound to "
+                                                + MoleculeUtils.getAtomRef(firstAtom, vertex.getIAtomContainer()) 
+                                                + " but is already assigned to another atom. "
+                                                + "<br>Aborting: you'll have to break bonds involving "
+                                                + MoleculeUtils.getAtomRef(secondAtom, vertex.getIAtomContainer()) 
+                                                + " one at the time.</html>",
+                                                "Error",
+                                                JOptionPane.ERROR_MESSAGE,
+                                                UIManager.getIcon("OptionPane.errorIcon"));
+                                            return;
+                                        }
+                                        assignedSecondAtoms.add(secondAtom);
+                                        secondAtomsConnectedToFirstAtom.add(secondAtom);
+                                    }
+                                }
+                                if (secondAtomsConnectedToFirstAtom.size() == 0)
+                                {
+                                    JOptionPane.showMessageDialog(btnBondToAPPair,
+                                        "<html>No atoms in the second set is connected to atom " 
+                                        + MoleculeUtils.getAtomRef(firstAtom, vertex.getIAtomContainer()) 
+                                        + ". Aborting.</html>",
+                                        "Error",
+                                        JOptionPane.ERROR_MESSAGE,
+                                        UIManager.getIcon("OptionPane.errorIcon"));
+                                    return;
+                                }
+                                atomPairs.add(Arrays.asList(Arrays.asList(firstAtom), secondAtomsConnectedToFirstAtom));
+                            }
+                        } else {
+                        Set<IAtom> assignedFirstAtoms = new HashSet<>();
+                        for (int i = 0; i < secondSelAtoms.size(); i++)
+                        {
+                            IAtom secondAtom = secondSelAtoms.get(i);
+                            List<IAtom> firstAtomsConnectedToSecondAtom = new ArrayList<>();
+                            for (int j = 0; j < firstSelAtoms.size(); j++)
+                            {
+                                IAtom firstAtom = firstSelAtoms.get(j);
+                                if (firstAtom.getBond(secondAtom) != null)
+                                {
+                                    if (i>0 && assignedFirstAtoms.contains(firstSelAtoms.get(j)))
+                                    {
+                                        JOptionPane.showMessageDialog(btnBondToAPPair,
+                                            "<html>Atom " 
+                                            + MoleculeUtils.getAtomRef(firstAtom, vertex.getIAtomContainer()) 
+                                            + " is bound to "
+                                            + MoleculeUtils.getAtomRef(secondAtom, vertex.getIAtomContainer()) 
+                                            + " but is already assigned to another atom. "
+                                            + "<br>Aborting: you'll have to break bonds involving "
+                                            + MoleculeUtils.getAtomRef(firstAtom, vertex.getIAtomContainer()) 
+                                            + " one at the time.</html>",
+                                            "Error",
+                                            JOptionPane.ERROR_MESSAGE,
+                                            UIManager.getIcon("OptionPane.errorIcon"));
+                                        return;
+                                    }
+                                    assignedFirstAtoms.add(firstAtom);
+                                    firstAtomsConnectedToSecondAtom.add(firstAtom);
+                                }
+                            }
+                            if (firstAtomsConnectedToSecondAtom.size() == 0)
+                            {
+                                JOptionPane.showMessageDialog(btnBondToAPPair,
+                                    "<html>No atoms in the second set is connected to atom " 
+                                    + MoleculeUtils.getAtomRef(secondAtom, vertex.getIAtomContainer()) 
+                                    + ". Aborting.</html>",
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE,
+                                    UIManager.getIcon("OptionPane.errorIcon"));
+                                return;
+                            }
+                            atomPairs.add(Arrays.asList(firstAtomsConnectedToSecondAtom, Arrays.asList(secondAtom)));
+                        }
+                    }
+                    } else if (answer == 1) {
+                        // Assume multiple multidentate bonds
+                        for (IAtom firstAtom : firstSelAtoms)
+                        {
+                            for (IAtom secondAtom : secondSelAtoms)
+                            {
+                                if (firstAtom.getBond(secondAtom) != null)
+                                {
+                                    atomPairs.add(Arrays.asList(Arrays.asList(firstAtom), Arrays.asList(secondAtom)));
+                                }
+                            }
+                        }
+                    } else {
                         return;
                     }
-                    atomPairs.add(Arrays.asList(atmA, atmB));
                 }
 
                 List<List<APClass>> apClasses = new ArrayList<>();
                 List<APClass> selectedAPCs = choseOrCreateNewAPClass(
-                    btnBondToAPPair, false);
+                    btnBondToAPPair, true, "APClass on 1st set of atoms");
                 if (selectedAPCs.size() == 0)
                 {
                     return;
@@ -562,7 +699,7 @@ public class GUIVertexInspector extends GUICardPanel
                 APClass apc0 = selectedAPCs.get(0);
 
                 selectedAPCs = choseOrCreateNewAPClass(
-                    btnBondToAPPair, false);
+                    btnBondToAPPair, true, "APClass on 2nd set of atoms");
                 if (selectedAPCs.size() == 0)
                 {
                     return;
@@ -575,7 +712,7 @@ public class GUIVertexInspector extends GUICardPanel
 
                 // Get default parameters
                 FragmenterParameters settings = new FragmenterParameters();
-                
+
                 // Now chop the structure to produce fragments
                 List<Vertex> fragments;
                 try
@@ -1165,19 +1302,9 @@ public class GUIVertexInspector extends GUICardPanel
         settings.startConsoleLogger("GUI-controlledFragmenterLogger");
         
         List<CuttingRule> defaultCuttingRules = new ArrayList<CuttingRule>();
-        BufferedReader reader = null;
         try
         {
-            try {
-                reader = new BufferedReader(
-                        new InputStreamReader(classLoader.getResourceAsStream(
-                                        "data/cutting_rules")));
-                DenoptimIO.readCuttingRules(reader, defaultCuttingRules, 
-                        "bundled jar");
-            } finally {
-                if (reader!=null)
-                    reader.close();
-            }
+            defaultCuttingRules = settings.getDefaultCuttingRules(classLoader);
         } catch (Exception e )
         {
             e.printStackTrace();
@@ -1853,16 +1980,33 @@ public class GUIVertexInspector extends GUICardPanel
   	
 //----------------------------------------------------------------------------
 
+    /**
+     * Runs a dialog aimed at selecting an existing APClass or defining a new
+     * one.
+     * @param parent the component the dialog window will the bound to.
+     * @param singleSelection use <code>true</code> to restrict the choice to
+     * a single APClass.
+     * @return
+     */
+    public static List<APClass> choseOrCreateNewAPClass(JComponent parent,
+            boolean singleSelection)
+    {
+        return choseOrCreateNewAPClass(parent, singleSelection, "Choose APClasses to Add");
+    }
+  	
+//----------------------------------------------------------------------------
+
   	/**
   	 * Runs a dialog aimed at selecting an existing APClass or defining a new
   	 * one.
   	 * @param parent the component the dialog window will the bound to.
   	 * @param singleSelection use <code>true</code> to restrict the choice to
   	 * a single APClass.
+     * @param title the title of the dialog.
   	 * @return
   	 */
   	public static List<APClass> choseOrCreateNewAPClass(JComponent parent,
-  	        boolean singleSelection)
+  	        boolean singleSelection, String title)
   	{
         // To facilitate selection of existing APCs we offer a list...
         DefaultListModel<String> apClassLstModel =
@@ -1899,7 +2043,7 @@ public class GUIVertexInspector extends GUICardPanel
       
         int res = JOptionPane.showConfirmDialog(parent,
               chooseApPanel, 
-              "Choose APClasses to Add", 
+              title, 
               JOptionPane.OK_CANCEL_OPTION,
               JOptionPane.PLAIN_MESSAGE, 
               null);

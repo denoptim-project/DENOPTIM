@@ -1006,6 +1006,44 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		
 		return selectedAtms;
     }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Highlights the given atoms in the Jmol viewer using colored halos
+     * (the same ring style as selection halos).
+     * @param atoms the atoms to highlight
+     * @param color the Jmol color name or RGB value for the halo
+     */
+    public void setColorOfAtoms(List<IAtom> atoms, String color)
+    {
+        if (atoms == null || atoms.isEmpty())
+        {
+            return;
+        }
+
+        StringBuilder selectExpr = new StringBuilder();
+        for (IAtom atom : atoms)
+        {
+            int atomIndex = fragment.indexOf(atom);
+            if (atomIndex != -1)
+            {
+                if (selectExpr.length() > 0)
+                {
+                    selectExpr.append(" or ");
+                }
+                selectExpr.append("@").append(atomIndex + 1);
+            }
+        }
+
+        if (selectExpr.length() == 0)
+        {
+            return;
+        }
+
+        jmolPanel.viewer.evalString(
+                "select " + selectExpr + "; halos on; color halos " + color + "; select none");
+    }
  	
 //-----------------------------------------------------------------------------
 	

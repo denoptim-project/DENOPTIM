@@ -54,6 +54,9 @@ public class JmolPanel extends JPanel
 
 	@Override
     public void paint(Graphics g) {
+        if (viewer == null) {
+            return;
+        }
         getSize(hostPanelSize);
         viewer.renderScreenImage(g, hostPanelSize.width, hostPanelSize.height);
     }
@@ -61,7 +64,10 @@ public class JmolPanel extends JPanel
 //------------------------------------------------------------------------------
 
 	public void dispose() {
-		viewer.dispose();
+		if (viewer != null) {
+			viewer.dispose();
+			viewer = null;
+		}
 	}
 
 //------------------------------------------------------------------------------

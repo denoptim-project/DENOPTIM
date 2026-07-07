@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -459,6 +460,17 @@ public class VertexViewPanel extends JPanel
         graphNodeViewer.loadVertexToViewer(tmpl);
         switchToGraphNodeViewer();
         graphNodeViewer.setVertexSpecificEditableAPTable(false);
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Highlights the given atoms in the Jmol viewer.
+     * @param atoms the atoms to highlight
+     */
+    public void highlightAtoms(List<IAtom> atoms)
+    {
+        fragViewer.setColorOfAtoms(atoms, "purple");
     }
     
 //-----------------------------------------------------------------------------
