@@ -1,0 +1,5 @@
+#
+# Fragmentation of multihapto
+#
+FRG-VERBOSITY=4
+FRG-STRUCTURESFILE=mols-26.sdf

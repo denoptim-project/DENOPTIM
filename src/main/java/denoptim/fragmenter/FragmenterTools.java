@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -986,6 +987,11 @@ public class FragmenterTools
                     continue;
                 }
 
+                // Initialize the source atoms for the attachment points
+                // but may be changed to handle hapticity
+                IAtom srcAPA = atmA;
+                IAtom srcAPB = atmB;
+
                 //treatment of n-hapto ligands
                 if (rule.isHAPTO())
                 {
@@ -1036,97 +1042,71 @@ public class FragmenterTools
                     if (!isSystemIntact)
                         continue;
 
-                    // A dummy atom will be used to define attachment point of
-                    // ligand with high hapticity
-                    Point3d dummyP3d = new Point3d(); //Used also for 2D
-                    for (IAtom ligAtm : atmsInHapto)
-                    {
-                        Point3d ligP3d = MoleculeUtils.getPoint3d(ligAtm);
-                        dummyP3d.x = dummyP3d.x + ligP3d.x;
-                        dummyP3d.y = dummyP3d.y + ligP3d.y;
-                        dummyP3d.z = dummyP3d.z + ligP3d.z;
-                    }
+                    srcAPA = centralAtm;
+                    srcAPB = getAPSourceAtom(masterFrag, new ArrayList<>(atmsInHapto), Arrays.asList(centralAtm));
+                }
 
-                    dummyP3d.x = dummyP3d.x / (double) atmsInHapto.size();
-                    dummyP3d.y = dummyP3d.y / (double) atmsInHapto.size();
-                    dummyP3d.z = dummyP3d.z / (double) atmsInHapto.size();
-
-                    //Add Dummy atom to molecular object
-                    //if no other Du is already in the same position
-                    IAtom dummyAtm = null;
-                    for (IAtom oldDu : fragsMol.atoms())
-                    {
-                        if (MoleculeUtils.getSymbolOrLabel(oldDu) 
-                                == DENOPTIMConstants.DUMMYATMSYMBOL)
-                        {
-                            Point3d oldDuP3d = oldDu.getPoint3d();
-                            if (oldDuP3d.distance(dummyP3d) < 0.002)
-                            {
-                                dummyAtm = oldDu;
-                                break;
-                            }
-                        } 
-                    }
-                
-                    if (dummyAtm==null)
-                    {
-                        dummyAtm = new PseudoAtom(DENOPTIMConstants.DUMMYATMSYMBOL);
-                        dummyAtm.setPoint3d(dummyP3d);
-                        fragsMol.addAtom(dummyAtm);
-                    }
-
-                    // Modify connectivity of atoms involved in high-hapticity 
-                    // coordination creation of Du-to-ATM bonds 
-                    // By internal convention the bond order is "SINGLE".
-                    IBond.Order border = IBond.Order.valueOf("SINGLE");
-                    
-                    for (IAtom ligAtm : atmsInHapto)
-                    {
-                        List<IAtom> nbrsOfDu = fragsMol.getConnectedAtomsList(
-                                dummyAtm);
-                        if (!nbrsOfDu.contains(ligAtm))
-                        {
-                            // Add bond with dummy
-                            Bond bnd = new Bond(dummyAtm,ligAtm,border);
-                            fragsMol.addBond(bnd);
-                        }
-                        // Remove bonds between central and coordinating atoms
-                        IBond oldBnd = fragsMol.getBond(centralAtm,ligAtm);
-                        fragsMol.removeBond(oldBnd);
-                    }
-                    
-                    // NB: by convention the "first" class (i.e., the ???:0 class)
-                    // is always  on the central atom.
-                    AttachmentPoint apA = masterFrag.addAPOnAtom(centralAtm, 
-                            rule.getAPClass0(), 
-                            MoleculeUtils.getPoint3d(dummyAtm));
-                    AttachmentPoint apB = masterFrag.addAPOnAtom(dummyAtm, 
-                            rule.getAPClass1(), 
-                            MoleculeUtils.getPoint3d(centralAtm));
-
-                    cutId++;
-                    apA.setCutId(cutId);
-                    apB.setCutId(cutId);
-                } else {
-                    //treatment of mono-hapto ligands
-                    IBond bnd = fragsMol.getBond(atmA,atmB);
-                    fragsMol.removeBond(bnd);
-
-                    AttachmentPoint apA = masterFrag.addAPOnAtom(atmA, 
-                            rule.getAPClass0(), 
-                            MoleculeUtils.getPoint3d(atmB));
-                    AttachmentPoint apB = masterFrag.addAPOnAtom(atmB, 
-                            rule.getAPClass1(), 
-                            MoleculeUtils.getPoint3d(atmA));
-
-                    cutId++;
-                    apA.setCutId(cutId);
-                    apB.setCutId(cutId);
-                } //end of if (hapticity>1)
+                // Storage of info for AP creation
+                List<List<List<IAtom>>> listOfAtomPairs = new ArrayList<>();
+                List<List<APClass>> listOfAPClasses = new ArrayList<>();
+                listOfAtomPairs.add(Arrays.asList(Arrays.asList(srcAPA), Arrays.asList(srcAPB)));
+                listOfAPClasses.add(Arrays.asList(rule.getAPClass0(), rule.getAPClass1()));
+                cutId++;
+                makeAPPairs(masterFrag, listOfAtomPairs, listOfAPClasses, cutId);
             } //end of loop over matching bonds
         } //end of loop over rules
         
-        // Extract isolated fragments
+        return isolateFragments(masterFrag);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Chops one chemical structure by converting the given structure of atoms
+     * into attachment points anre removing the corresponding bonds.
+     * @param mol the chemical structure to be chopped.
+     * @param atomPairs the list of atom "pairs" to be converted into attachment 
+     * points. 
+     * Each pair is a list that must have only two members, corresponding
+     * to the two sides of the (possibly multihapto) bond to break. 
+     * Each member of the "pair" may actually be a list of atoms in case
+     * of hapticity>1.
+     * @param apClasses the list of AP classes to be used for the attachment points.
+     * @return the list of fragments
+     * @throws DENOPTIMException if the fragmentation fails.
+     */
+    public static List<Vertex> fragmentation(IAtomContainer mol, 
+        List<List<List<IAtom>>> atomPairs, List<List<APClass>> apClasses) 
+        throws DENOPTIMException
+    {   
+        Fragment masterFrag = new Fragment(mol,BBType.UNDEFINED);
+        IAtomContainer fragsMol = masterFrag.getIAtomContainer();
+
+        // Project the list of atoms to the new atom container
+        List<List<List<IAtom>>> projectedAtomPairs = new ArrayList<>();
+        for (List<List<IAtom>> atomPair : atomPairs)
+        {
+            List<List<IAtom>> projectedAtomPair = new ArrayList<>();
+            for (List<IAtom> leftOrRightMembers : atomPair)
+            {
+                List<IAtom> projectedLeftOrRightMembers = new ArrayList<>();
+                for (IAtom atm : leftOrRightMembers)
+                {
+                    projectedLeftOrRightMembers.add(fragsMol.getAtom(mol.indexOf(atm)));
+                }
+                projectedAtomPair.add(projectedLeftOrRightMembers);
+            }
+            projectedAtomPairs.add(projectedAtomPair);
+        }
+        makeAPPairs(masterFrag, projectedAtomPairs, apClasses, 1);
+        return isolateFragments(masterFrag);
+    }
+
+//------------------------------------------------------------------------------
+
+    private static List<Vertex> isolateFragments(Fragment masterFrag) 
+    throws DENOPTIMException
+    {
         List<Vertex>  fragments = new ArrayList<Vertex>();
         Set<Integer> doneAlready = new HashSet<Integer>();
         for (int idx=0 ; idx<masterFrag.getAtomCount(); idx++)
@@ -1151,8 +1131,143 @@ public class FragmenterTools
             if (cloneOfMaster.getAttachmentPoints().size()>0)
                 fragments.add(cloneOfMaster);
         }
-        
         return fragments;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Makes attachment points for the given atom pairs and AP classes.
+     * @param masterFrag the fragment to work on.
+     * @param atomPairs the list of atom "pairs" to be converted into attachment 
+     * points. 
+     * Each pair is a list that must have only two members, corresponding
+     * to the two sides of the (possibly multihapto) bond to break. 
+     * Each member of the "pair" may actually be a list of atoms in case
+     * of hapticity>1.
+     * @param apClasses the list of AP classes to be used for the attachment points.
+     * @param cutId the ID of the cut to be used for the attachment points.
+     * @throws DENOPTIMException if the attachment points cannot be created.
+     */
+    private static void  makeAPPairs(Fragment masterFrag, 
+        List<List<List<IAtom>>> atomPairs, List<List<APClass>> apClasses, Integer cutId) 
+        throws DENOPTIMException
+    {
+        for (int i = 0; i < atomPairs.size(); i++)
+        {
+            // "pair" in the sense that the list must have two items, but each 
+            // item may actually be a list of atoms in case of hapticity>1.
+            List<List<IAtom>> atomPair = atomPairs.get(i);
+            APClass apClassA = apClasses.get(i).get(0);
+            APClass apClassB = apClasses.get(i).get(1);
+
+            IAtom srcAPA = getAPSourceAtom(masterFrag, atomPair.get(0), atomPair.get(1));
+            IAtom srcAPB =  getAPSourceAtom(masterFrag, atomPair.get(1), atomPair.get(0));
+            
+            //treatment of mono-hapto ligands
+            IBond bnd = masterFrag.getIAtomContainer().getBond(srcAPA,srcAPB);
+            if (bnd != null)
+            {
+                masterFrag.removeBond(bnd);
+            }
+
+            AttachmentPoint apA = masterFrag.addAPOnAtom(srcAPA, apClassA, 
+                MoleculeUtils.getPoint3d(srcAPB));
+            AttachmentPoint apB = masterFrag.addAPOnAtom(srcAPB, apClassB, 
+                MoleculeUtils.getPoint3d(srcAPA));
+
+            cutId++;
+            apA.setCutId(cutId);
+            apB.setCutId(cutId);
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Returns the atom that will be used as the source of the attachment point
+     * possibly handling a multy-hapto system.
+     * @param masterFrag the fragment to work on.
+     * @param atmsInHapto the atoms to be threatedas a hapto system.
+     * @param atmsOutsideHapto the atoms outside the hapto system, typically
+     * the central atom, but could theoretically be more than one atom.
+     * @return the atom that will be used as the source of the attachment point
+     * for the hapto system.
+     * @throws DENOPTIMException
+     */
+    private static IAtom getAPSourceAtom(Fragment masterFrag, List<IAtom> atmsInHapto, 
+        List<IAtom> atmsOutsideHapto) throws DENOPTIMException
+    {
+        // Not really a multihapto system: return the single atoms
+        if (atmsInHapto.size() == 1)
+        {
+            return atmsInHapto.get(0);
+        }
+
+        IAtomContainer fragsMol = masterFrag.getIAtomContainer();
+        // A dummy atom will be used to define attachment point of
+        // ligand with high hapticity
+        Point3d dummyP3d = new Point3d(); //Used also for 2D
+        for (IAtom ligAtm : atmsInHapto)
+        {
+            Point3d ligP3d = MoleculeUtils.getPoint3d(ligAtm);
+            dummyP3d.x = dummyP3d.x + ligP3d.x;
+            dummyP3d.y = dummyP3d.y + ligP3d.y;
+            dummyP3d.z = dummyP3d.z + ligP3d.z;
+        }
+
+        dummyP3d.x = dummyP3d.x / (double) atmsInHapto.size();
+        dummyP3d.y = dummyP3d.y / (double) atmsInHapto.size();
+        dummyP3d.z = dummyP3d.z / (double) atmsInHapto.size();
+
+        //Add Dummy atom to molecular object
+        //if no other Du is already in the same position
+        IAtom dummyAtm = null;
+        for (IAtom oldDu : fragsMol.atoms())
+        {
+            if (MoleculeUtils.getSymbolOrLabel(oldDu) 
+                    == DENOPTIMConstants.DUMMYATMSYMBOL)
+            {
+                Point3d oldDuP3d = oldDu.getPoint3d();
+                if (oldDuP3d.distance(dummyP3d) < 0.002)
+                {
+                    dummyAtm = oldDu;
+                    break;
+                }
+            } 
+        }
+    
+        // Make the dummy, since it is not there already
+        if (dummyAtm==null)
+        {
+            dummyAtm = new PseudoAtom(DENOPTIMConstants.DUMMYATMSYMBOL);
+            dummyAtm.setPoint3d(dummyP3d);
+            fragsMol.addAtom(dummyAtm);
+        }
+
+        // Modify connectivity of atoms involved in high-hapticity 
+        // coordination creation of Du-to-ATM bonds 
+        // By internal convention the bond order is "SINGLE".
+        IBond.Order border = IBond.Order.valueOf("SINGLE");
+        
+        for (IAtom ligAtm : atmsInHapto)
+        {
+            List<IAtom> nbrsOfDu = fragsMol.getConnectedAtomsList(
+                    dummyAtm);
+            if (!nbrsOfDu.contains(ligAtm))
+            {
+                // Add bond with dummy
+                Bond bnd = new Bond(dummyAtm,ligAtm,border);
+                fragsMol.addBond(bnd);
+            }
+            // Remove bonds between central and coordinating atoms
+            for (IAtom atmOutsideHapto : atmsOutsideHapto)
+            {
+                IBond oldBnd = fragsMol.getBond(atmOutsideHapto,ligAtm);
+                fragsMol.removeBond(oldBnd);
+            }
+        }
+        return dummyAtm;
     }
     
 //------------------------------------------------------------------------------

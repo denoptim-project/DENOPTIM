@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -146,6 +147,9 @@ public class GUIVertexInspector extends GUICardPanel
     
 	private JPanel pnlAtmToAP;
 	private JButton btnAtmToAP;
+
+	private JPanel pnlBondToAPPair;
+	private JButton btnBondToAPPair;
 
 	private JPanel pnlTmplBasedChop;
 	private JButton btnTmplBldChop;
@@ -499,6 +503,177 @@ public class GUIVertexInspector extends GUICardPanel
 		});
 		pnlAtmToAP.add(btnAtmToAP);
 		ctrlPane.add(pnlAtmToAP);
+
+		pnlBondToAPPair = new JPanel();
+		btnBondToAPPair = new JButton("Bond to AP Pair");
+		btnBondToAPPair.setToolTipText("<html>Replaces bonds with "
+				+ "pairs of attachment points.<br>Click on the two atoms of "
+				+ "each bond to select them. The order of selection of each " 
+                + "atom pair determines the APClass assignment.<br>"
+                + "Multiple pairs can be selected, but keep in mind that the "
+                + "order of selection of each atom pair determines the APClass "
+                + "assignment.<br>"
+				+ "<br><b>WARNING:</b> this action cannot be undone!<html>");
+		btnBondToAPPair.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				vertex = vertexViewer.getLoadedStructure();
+
+				List<IAtom> selectedAtms =
+				        vertexViewer.getAtomsSelectedFromJMol();
+
+				if (selectedAtms.size()% 2 != 0)
+				{
+					JOptionPane.showMessageDialog(btnBondToAPPair,
+			                "<html>Select an even number of atoms that form the bonds "
+			                + "to replace.<br>Click on atoms to select them."
+			                + "<br>Click again to unselect.</html>",
+			                "Error",
+			                JOptionPane.ERROR_MESSAGE,
+			                UIManager.getIcon("OptionPane.errorIcon"));
+					return;
+				}
+
+                List<List<IAtom>> atomPairs = new ArrayList<>();
+                for (int i = 0; i < selectedAtms.size(); i += 2)
+                {
+                    IAtom atmA = selectedAtms.get(i);
+                    IAtom atmB = selectedAtms.get(i + 1);
+                    IBond bond = atmA.getBond(atmB);
+                    if (bond == null)
+                    {
+                        JOptionPane.showMessageDialog(btnBondToAPPair,
+                            "<html>The selected atoms are not bonded to each "
+                            + "other.</html>",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                        return;
+                    }
+                    atomPairs.add(Arrays.asList(atmA, atmB));
+                }
+
+                List<List<APClass>> apClasses = new ArrayList<>();
+                List<APClass> selectedAPCs = choseOrCreateNewAPClass(
+                    btnBondToAPPair, false);
+                if (selectedAPCs.size() == 0)
+                {
+                    return;
+                }
+                APClass apc0 = selectedAPCs.get(0);
+
+                selectedAPCs = choseOrCreateNewAPClass(
+                    btnBondToAPPair, false);
+                if (selectedAPCs.size() == 0)
+                {
+                    return;
+                }
+                APClass apc1 = selectedAPCs.get(0);
+                for (int i = 0; i < atomPairs.size(); i++)
+                {
+                    apClasses.add(Arrays.asList(apc0, apc1));
+                }
+
+                // Get default parameters
+                FragmenterParameters settings = new FragmenterParameters();
+                
+                // Now chop the structure to produce fragments
+                List<Vertex> fragments;
+                try
+                {
+                    fragments = FragmenterTools.fragmentation(
+                            vertex.getIAtomContainer(), 
+                            atomPairs, 
+                            apClasses);
+                } catch (Throwable t)
+                {
+                    JOptionPane.showMessageDialog(btnChop,String.format(
+                            "<html><body width='%1s'"
+                            + "Could not complete fragmentation. Hint: "
+                            + t.getMessage() + "</html>", 400),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                    return;
+                }
+                
+                // Add linearity-breaking dummy atoms
+                for (Vertex frag : fragments)
+                {
+                    DummyAtomHandler.addDummiesOnLinearities((Fragment) frag,
+                            settings.getLinearAngleLimit());
+                }
+                
+                // Signal no result obtained
+                if (fragments.size() < 1 || (fragments.size() == 1 &&
+                        ((Fragment)fragments.get(0)).isIsomorphicTo(vertex)))
+                {
+                    JOptionPane.showMessageDialog(btnAddVrtx,
+                            "<html>Fragmentation produced no fragments!</html>",
+                            "Error",
+                            JOptionPane.WARNING_MESSAGE,
+                            UIManager.getIcon("OptionPane.warningIcon"));
+                    return;
+                }
+                
+                // The resulting fragments are loaded into the viewer, without
+                // removing the original structure.
+                
+                String[] options = new String[]{"All", 
+                        "Select",
+                        "Cancel"};
+                String txt = "<html><body width='%1s'>Fragmentation produced "
+                        + fragments.size() + " fragments. Do you want to "
+                        + "append all or select some?"
+                        + "</html>";
+                int answer = JOptionPane.showOptionDialog(btnAddVrtx,
+                        String.format(txt,200),
+                        "Append Building Blocks",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        UIManager.getIcon("OptionPane.warningIcon"),
+                        options,
+                        options[0]);
+                
+                if (answer == 2)
+                {
+                    return;
+                }
+                
+                switch (answer)
+                {
+                    case 0:
+                        importVertices(fragments);
+                        break;
+                        
+                    case 1:
+                        List<Vertex> selectedVrtxs = 
+                                new ArrayList<Vertex>();
+                        GUIVertexSelector vrtxSelector = new GUIVertexSelector(
+                                btnAddVrtx,true);
+                        vrtxSelector.setRequireApSelection(false);
+                        vrtxSelector.load(fragments, 0);
+                        Object selected = vrtxSelector.showDialog();
+
+                        if (selected != null)
+                        {
+                            @SuppressWarnings("unchecked")
+                            List<ArrayList<Integer>> selList = 
+                                    (ArrayList<ArrayList<Integer>>) selected;
+                            for (ArrayList<Integer> pair : selList)
+                            {
+                                selectedVrtxs.add(fragments.get(pair.get(0)));
+                            }
+                        }
+                        importVertices(selectedVrtxs);
+                        break;
+                    
+                    default:
+                        return;
+                }
+			}
+		});
+		pnlBondToAPPair.add(btnBondToAPPair);
+		ctrlPane.add(pnlBondToAPPair);
 		
 	    pnlChop = new JPanel();
 	    btnChop = new JButton("Chop Structure");
@@ -1105,6 +1280,7 @@ public class GUIVertexInspector extends GUICardPanel
 			unsavedChanges = true;
 	        btnDelSel.setEnabled(true);
 	        btnAtmToAP.setEnabled(true);
+	        btnBondToAPPair.setEnabled(true);
 		} catch (Exception e) {
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			e.printStackTrace();
@@ -1155,6 +1331,7 @@ public class GUIVertexInspector extends GUICardPanel
 		unsavedChanges = true;
 		btnDelSel.setEnabled(true);
         btnAtmToAP.setEnabled(true);
+        btnBondToAPPair.setEnabled(true);
         btnSaveEdits.setEnabled(true);
 		
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -1282,9 +1459,11 @@ public class GUIVertexInspector extends GUICardPanel
 		{
 	        btnDelSel.setEnabled(false);
 	        btnAtmToAP.setEnabled(false);
+	        btnBondToAPPair.setEnabled(false);
 		} else {
 	        btnDelSel.setEnabled(true);
 	        btnAtmToAP.setEnabled(true);
+	        btnBondToAPPair.setEnabled(true);
 		}
 	}
 	
@@ -1466,9 +1645,11 @@ public class GUIVertexInspector extends GUICardPanel
         {
             btnDelSel.setEnabled(false);
             btnAtmToAP.setEnabled(false);
+            btnBondToAPPair.setEnabled(false);
         } else {
             btnDelSel.setEnabled(true);
             btnAtmToAP.setEnabled(true);
+            btnBondToAPPair.setEnabled(true);
         }
 		
 		((DefaultEditor) navigSpinner.getEditor())

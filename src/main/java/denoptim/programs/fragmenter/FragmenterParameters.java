@@ -18,7 +18,10 @@
 
 package denoptim.programs.fragmenter;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -94,7 +97,7 @@ public class FragmenterParameters extends RunTimeParameters
      * of the content of the structure file against a given molecular formula.
      * This task is meant to identify structures with missing atoms.
      */
-    private boolean checkFormula = false;
+    private boolean doCheckFormula = false;
     
     /**
      * Flag requesting to force-accepting the approximation that converts all
@@ -110,9 +113,9 @@ public class FragmenterParameters extends RunTimeParameters
     private boolean addExplicitH = false;
     
     /**
-     * Fag requesting the pre-fragmentation filtering of the structures.
+     * Flag requesting the pre-fragmentation filtering of the structures.
      */
-    private boolean preFilter = false;
+    private boolean doPreFilter = false;
     
     /**
      * SMARTS identifying substructures that lead to rejection of a structure
@@ -122,7 +125,7 @@ public class FragmenterParameters extends RunTimeParameters
     private Set<String> preFilterSMARTS = new HashSet<String>();
     
     /**
-     * Fag requesting the fragmentation of the structures.
+     * Flag requesting the fragmentation of the structures.
      */
     private boolean doFragmentation = false;
     
@@ -539,7 +542,7 @@ public class FragmenterParameters extends RunTimeParameters
      */
     public boolean doCheckFormula()
     {
-        return checkFormula;
+        return doCheckFormula;
     }
 
 //------------------------------------------------------------------------------
@@ -551,7 +554,7 @@ public class FragmenterParameters extends RunTimeParameters
      */
     public void setCheckFormula(boolean checkFormula)
     {
-        this.checkFormula = checkFormula;
+        this.doCheckFormula = checkFormula;
     }
     
     
@@ -562,7 +565,7 @@ public class FragmenterParameters extends RunTimeParameters
      */
     public boolean doPreFilter()
     {
-        return preFilter;
+        return doPreFilter;
     }
     
 //------------------------------------------------------------------------------
@@ -1101,12 +1104,12 @@ public class FragmenterParameters extends RunTimeParameters
                 break;
 
             case "FORMULATXTFILE=":
-                checkFormula = true;
+                doCheckFormula = true;
                 formulaeFile = value;
                 break;
                 
             case "PREFILTERSMARTS=":
-                preFilter = true;
+                doPreFilter = true;
                 preFilterSMARTS.add(value);
                 break;
 
@@ -1377,6 +1380,38 @@ public class FragmenterParameters extends RunTimeParameters
 //------------------------------------------------------------------------------
 
     /**
+     * Get default cutting rules from the class loader of the current class
+     */
+    public List<CuttingRule> getDefaultCuttingRules() throws IOException, DENOPTIMException
+    {
+        return getDefaultCuttingRules(this.getClass().getClassLoader());
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Get default cutting rules from a given class loader
+     */
+    public List<CuttingRule> getDefaultCuttingRules(ClassLoader classLoader) throws IOException, DENOPTIMException
+    {
+        List<CuttingRule> defaultCuttingRules = new ArrayList<CuttingRule>();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(classLoader.getResourceAsStream(
+                                    "data/cutting_rules")));
+            DenoptimIO.readCuttingRules(reader, defaultCuttingRules, 
+                    "bundled jar");
+        } finally {
+            if (reader!=null)
+                reader.close();
+        }
+        return defaultCuttingRules;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Evaluate consistency of input parameters.
      * @throws DENOPTIMException
      */
@@ -1466,6 +1501,16 @@ public class FragmenterParameters extends RunTimeParameters
         if (!doFragmentation && !doFragExtractionFromGraphs && doExtactRepresentativeConformer)
         {
             isStandaloneFragmentClustering = true;
+        }
+
+        if (!doCheckFormula && !doPreFilter && !doFragmentation && !doFragExtractionFromGraphs && !doFiltering && !doManageIsomorphicFamilies && !doExtactRepresentativeConformer)
+        {
+            doFragmentation = true;
+            try {
+                cuttingRules = getDefaultCuttingRules();
+            } catch (IOException | DENOPTIMException e) {
+                throw new DENOPTIMException("Problems reading default cutting rules", e);
+            }
         }
        
 		if (isMaster)

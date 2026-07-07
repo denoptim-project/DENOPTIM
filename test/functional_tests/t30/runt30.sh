@@ -8,12 +8,12 @@ mv data/* "$wrkDir"
 rm -rf data
 
 # Here we define the expected results
-#           sub test ID: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
-expctdNoMissingAtomMols=(9  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)
-    expectedPreFiltered=(0  0  2  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0) 
-      expectedFragments=(0  0  0 20 12  8  6 11 70  0  0  0  0  0  9  0  4  2  7  3  3  3  3  0  0)
-expectedIsomorphicFrags=(0  0  0  0  0  0 30 11  0  0  0  0  0  0 96  0  0  0  0  0  0  0  0  0  0)
-        expectedResults=(9  1  2  0  0  0  0  0  0  4  2  2  2  3  0  2  0  0  0  0  0  0  0  0  6)
+#           sub test ID: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+expctdNoMissingAtomMols=(9  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0)
+    expectedPreFiltered=(0  0  2  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0) 
+      expectedFragments=(0  0  0 20 12  8  6 11 70  0  0  0  0  0  9  0  4  2  7  3  3  3  3  0  0  7)
+expectedIsomorphicFrags=(0  0  0  0  0  0 30 11  0  0  0  0  0  0 96  0  0  0  0  0  0  0  0  0  0  0)
+        expectedResults=(9  1  2  0  0  0  0  0  0  4  2  2  2  3  0  2  0  0  0  0  0  0  0  0  6  0)
 
 nSubTests=${#expctdNoMissingAtomMols[@]}
 
@@ -70,7 +70,7 @@ do
         n=$(grep "\$\$\$\$" "$output"/MW*All* | wc -l)
         if [ "$n" -ne ${expectedIsomorphicFrags[$i-1]} ]
         then
-            echo "Test 't30' NOT PASSED (symptom: wrong number of fragments produced: $n vs. ${expectedIsomorphicFrags[$i-1]}. Step $i"
+            echo "Test 't30' NOT PASSED (symptom: wrong number of isomorphic fragments produced: $n vs. ${expectedIsomorphicFrags[$i-1]}. Step $i"
             exit -1
         fi
     fi
@@ -93,6 +93,21 @@ do
         if [ "$nH" -ne 8 ]
         then
             echo "Test 't30' NOT PASSED (symptom: wrong number of hydrogen atoms in results: $nH vs. 8. Strp $i (see $output)"
+            exit -1
+        fi
+    fi
+
+    if [ 26 -eq "$i" ] ; then
+        nDu=$(grep " Du "  "$output"/Fragments.sdf | wc -l)
+        if [ "$nDu" -ne 11 ]
+        then
+            echo "Test 't30' NOT PASSED (symptom: wrong number of Du atoms in fragment: $nDu vs. 11. Strp $i (see $output)"
+            exit -1
+        fi
+        nAPC=$(grep "MCp"  "$output"/Fragments.sdf | wc -l)
+        if [ "$nAPC" -ne 6 ]
+        then
+            echo "Test 't30' NOT PASSED (symptom: wrong number of Du atoms in fragment: $nAPC vs. 6. Strp $i (see $output)"
             exit -1
         fi
     fi
