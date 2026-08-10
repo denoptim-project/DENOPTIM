@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.6.7, July 2026_
+_Version 4.6.8, August 2026_
 
 
 [TOC]
@@ -1095,17 +1095,16 @@ In the example above, all possible fields are shown, but a valid query can inclu
 The currently available graph editing tasks are:
 
 *   "CHANGESUBGRAPH": replaces a subgraph (i.e., a set of vertexes that can be isolated from the rest of the graph) from within a graph (the target graph) with a new subgraph that may be extracted from another graph (the incoming graph). Both subgraphs are defioned by specifying a list of attachment points. The order of the attachment points in two lists also define the mapping between the attachment points replaced in the target graph and the replacing ones from the incoming graph. Each list must define a 'confined subgraph' of the corresponding graph, that is, the attachment points must allow to identify each vertex as either belonging to the subbgraph or not. For example, consider graph *vertec_A*-*AP_A1*--*AP_B1*-*vertex_B*-*AP_B2*--*AP_C1*-*vertex_C*. Forst, note that since this is a linear connected graph, any list containing only one attachment point defines a confined subgraph and its complement. Then, note that a list containing the pair {*AP_B1*, *AP_B2*} defined the confined subgraph containing only *vertex_B*. Instead, the pair {*AP_A1*, *AP_B2*} does not define a confined subgraph because the presence of *AP_A1* in the list bakes *vertex_B* be part outsite of the vertexes selected as members of the subgraph, but the presence of *AP_B2* requires *vertex_B* to be part of the subgraph. This inconsistency makes it impossible to select a subgraph from the pair {*AP_A1*, *AP_B2*}. Attachment point lists are checked for consistency with the requested graph editing task. To this end these are the fields associated with this type of graph edit:
-    * "apQueriesOnTargetGraph": defined a list of attachment point queries needed to identify the attachment points in the target graph.
-    * "apQueriesOnIncomingGraph": defined a list of attachment point queries needed to identify the attachment points in the incoming graph.
-    * "incomingGraph": provides the incoming graph in JSON format.
-    * "incomingGraphPathname": allows to read the incoming graph from the given pathname.
+    * `apQueriesOnTargetGraph`: defines a list of attachment point queries needed to identify the attachment points in the target graph.
+    * `apQueriesOnIncomingGraph`: defines a list of attachment point queries needed to identify the attachment points in the incoming graph.
+    * `incomingGraph`/`incomingGraphPathname`: defines the incoming graph either directly in JSON format or by reading the given pathname.
 *   "CHANGEVERTEX": Changes any vertex matching the vertex query with the vertex given as input and using the given AP mapping mask. Requires the definition of these alternative set of additional fields:
     *   `incomingBBId`, `incomingBBTyp`, and `incomingAPMap`, which are respectively the index (0-based) of the building block to use to replace any matched vertex, its type, and the mapping of attachment points (by 0-based index) to use when connecting the incoming vertex to the existing graph. Use of this functionality requires the definition of a space of building blocks. The space needed to perform the graph editing tasks may be different from that used to create the graph to edit, but is defined using the usual keywords defining the [Space of Graphs Building Blocks](#BBSpace) in the primary input file (NB: not in the graph editing task file).
-    *   `incomingGraph` and `incomingAPMap`, which are respectively the JSON formatted definition of a subgraph (NB: it may contain a single vertex) and the mapping of attachment points (by 0-based index) to use when connecting the incoming subgraph to the existing graph.
+    *   `incomingGraph`/`incomingGraphPathname` and `incomingAPMap`, which define respectively the incoming subgraph (NB: it may contain a single vertex) either in JSON format or from reading a file, and the mapping of attachment points (by 0-based index) to use when connecting the incoming subgraph to the existing graph.
 *   "DELETEBRANCH": remove any branch starting from any vertex matching the vertex query.
 *   "DELETEVERTEX": remove any vertex matching the vertex query, without removing branches starting from that vertex.
 *   "REPLACECHILD": Replaces any child (or tree of children) of any vertex matching the vertex query with a given incoming graph that may contain one or more vertices. Requires the definition of these additional fields:
-    *   `incomingGraph` to provide a JSON format of the graph to be inserted as a replacement to the child/children tree of any matched vertex.
+    *   `incomingGraph`/`incomingGraphPathname` to define, either as JSON format or by reading the given pathname, the graph to be inserted as a replacement to the child/children tree of any matched vertex.
     *   `idAPOnIncomingGraph` to provide the AP identifier (not the index!) of the AP on the incoming graph to use for connecting the edited graph with the incoming graph.
 
 The graph edit tasks can be more than one. A sequence of graph editing tasks is defining using JSON syntax as following:

@@ -7005,6 +7005,24 @@ public class DGraph implements Cloneable
                 case REPLACECHILD:
                 {
                     DGraph inGraph = edit.getIncomingGraph();
+                    if (inGraph == null)
+                    {
+                        String pathName = edit.getIncomingGraphPathname();
+                        if (pathName == null)
+                        {
+                            throw new IllegalStateException(
+                                "The incoming graph pathname is null. "
+                                + "Cannot perform " + edit.getType() + ".");
+                        }
+                        try {
+                            inGraph = DenoptimIO.readDENOPTIMGraphsFromFile(
+                                new File(pathName)).get(0);
+                        } catch (Exception e) {
+                            throw new IllegalStateException(
+                                "Error reading the incoming graph from file " + pathName + ". "
+                                + "Cannot perform " + edit.getType() + ".", e);
+                        }
+                    }
                     VertexQuery query = edit.getVertexQuery();
                     int idAPOnInGraph = -1; // Initialization to invalid value
                     Vertex rootOfInGraph = null;
@@ -7101,11 +7119,27 @@ public class DGraph implements Cloneable
                                         fragSpace);
                             }
                         }
-                    }
-                    // Another of the ways to provide the incoming vertex/subgraph
-                    if (edit.getIncomingGraph() != null
-                            && edit.getIncomingBBType() == null)
-                    {
+                    } else {
+                        DGraph inGraph = edit.getIncomingGraph();
+                        if (inGraph == null)
+                        {
+                            String pathName = edit.getIncomingGraphPathname();
+                            if (pathName == null)
+                            {
+                                throw new IllegalStateException(
+                                    "The incoming graph pathname is null. "
+                                    + "Cannot perform " + edit.getType() + ".");
+                            }
+                            try {
+                                inGraph = DenoptimIO.readDENOPTIMGraphsFromFile(
+                                    new File(pathName)).get(0);
+                            } catch (Exception e) {
+                                throw new IllegalStateException(
+                                    "Error reading the incoming graph from file " + pathName + ". "
+                                    + "Cannot perform " + edit.getType() + ".", e);
+                            }
+                        }
+
                         // Since the replaceSingleSubGraph method below does not
                         // deal with symmetry, we keep symmetrically-redundant
                         // matches
@@ -7114,7 +7148,7 @@ public class DGraph implements Cloneable
                         
                         for (Vertex vertexToChange : matches)
                         {
-                            DGraph newSubG = edit.getIncomingGraph().clone();
+                            DGraph newSubG = inGraph.clone();
                             newSubG.renumberGraphVertices();
                             
                             APMapping apMap = new APMapping();
