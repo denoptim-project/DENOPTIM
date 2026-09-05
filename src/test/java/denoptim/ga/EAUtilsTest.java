@@ -348,6 +348,10 @@ public class EAUtilsTest
     public void testBuildByXOver_Embedded_Free() throws Exception
     {
         GAParameters gaparams = PopulationTest.prepare();
+        gaparams.maxXoverEndPointsCombinations = 100;
+        gaparams.maxXoverEndPointsPermutations = 100;
+        gaparams.maxAPMappingCombinations = 100;
+        gaparams.maxCompatibleVrtxPairs = 100; 
         Population population = new Population(gaparams);
 
         DGraph[] pair = PopulationTest.getPairOfTestGraphsB();

@@ -395,7 +395,11 @@ public class Population extends ArrayList<Candidate> implements Cloneable
             {
                 List<XoverSite> xoverSites = GraphOperations
                         .locateCompatibleXOverPoints(gA, gB, fragSpace, 
-                                settings.maxXOverableSubGraphSize);
+                                settings.maxXOverableSubGraphSize,
+                                settings.maxCompatibleVrtxPairs,
+                                settings.maxXoverEndPointsCombinations,
+                                settings.maxXoverEndPointsPermutations,
+                                settings.maxAPMappingCombinations);
                 xoverCompatibilities.put(memberA, memberB, xoverSites);
             } catch (DENOPTIMException e)
             {
