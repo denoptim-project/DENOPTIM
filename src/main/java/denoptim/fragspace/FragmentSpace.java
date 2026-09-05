@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.vecmath.Point3d;
 
@@ -462,6 +463,17 @@ public class FragmentSpace
     public Randomizer getRandomizer()
     {
         return settings.getRandomizer();
+    }
+
+//------------------------------------------------------------------------------
+    
+    /**
+     * Returns the logger associated with this fragment space's parameters.
+     * @return the logger.
+     */
+    public Logger getLogger()
+    {
+        return settings.getLogger();
     }
 
 //------------------------------------------------------------------------------

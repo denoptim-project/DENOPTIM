@@ -55,13 +55,18 @@ public class APMapFinder
     private List<APMapping> allAPMappings = new ArrayList<APMapping>();
     
     /**
+     * Default maximum number of combinations when none is specified.
+     */
+    public static final int DEFAULT_MAX_COMBS = 250;
+
+    /**
      * Maximum number of combinations. This prevents combinatorial explosion, 
      * but it is ignored if the constructor is required to screen all.
      * Remember that the combinations are anyway randomized, so even with the 
      * maximum limit on the number of combination to consider, there is no
      * systematic exclusion of specific combinations.
      */
-    private static int maxCombs = 250;
+    private int maxCombs = DEFAULT_MAX_COMBS;
     
     /**
      * Program-specific fragment space
@@ -126,7 +131,28 @@ public class APMapFinder
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
+        this(fragSpace, vA, vB, fixedRootAPs, screenAll, onlyCompleteMappings,
+                compatibleIfFree, DEFAULT_MAX_COMBS);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor that launches the search for a mapping between the
+     * {@link AttachmentPoint}s on the first vertex to those of the
+     * second. See
+     * {@link #APMapFinder(FragmentSpace, Vertex, Vertex, APMapping, boolean, boolean, boolean)}
+     * for details.
+     * @param maxCombs maximum number of AP mapping combinations to consider.
+     */
+    public APMapFinder(FragmentSpace fragSpace, 
+            Vertex vA, Vertex vB, 
+            APMapping fixedRootAPs, boolean screenAll,
+            boolean onlyCompleteMappings, boolean compatibleIfFree,
+            int maxCombs) 
+    {
         this.fragSpace = fragSpace;
+        this.maxCombs = maxCombs;
         List<AttachmentPoint> needyAPsA = new ArrayList<AttachmentPoint>();
         if (vA.getGraphOwner()!=null)
         {
@@ -178,7 +204,31 @@ public class APMapFinder
             APMapping fixedRootAPs, boolean screenAll,
             boolean onlyCompleteMappings, boolean compatibleIfFree) 
     {
+        this(fragSpace, lstA, needyAPsA, lstB, needyAPsB, fixedRootAPs,
+                screenAll, onlyCompleteMappings, compatibleIfFree,
+                DEFAULT_MAX_COMBS);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Constructor that launches the search for a mapping between the
+     * {@link AttachmentPoint}s on two lists. See
+     * {@link #APMapFinder(FragmentSpace, List, List, List, List, APMapping, boolean, boolean, boolean)}
+     * for details.
+     * @param maxCombs maximum number of AP mapping combinations to consider.
+     */
+    public APMapFinder(FragmentSpace fragSpace,
+            List<AttachmentPoint> lstA, 
+            List<AttachmentPoint> needyAPsA,
+            List<AttachmentPoint> lstB, 
+            List<AttachmentPoint> needyAPsB,
+            APMapping fixedRootAPs, boolean screenAll,
+            boolean onlyCompleteMappings, boolean compatibleIfFree,
+            int maxCombs) 
+    {
         this.fragSpace = fragSpace;
+        this.maxCombs = maxCombs;
         findAllMappings(lstA, needyAPsA, lstB, needyAPsB,
                 fixedRootAPs, screenAll, onlyCompleteMappings, compatibleIfFree);
     }

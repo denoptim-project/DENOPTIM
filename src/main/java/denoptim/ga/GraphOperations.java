@@ -89,12 +89,22 @@ public class GraphOperations
      * graphs.
      * @param maxSizeXoverSubGraph the limit to the size of subgraphs that can
      * can be exchanged by crossover.
+     * @param maxCompatibleVrtxPairs the limit to the number of compatible vertex
+     * pairs to consider. When exceeded, a random subset of this size is kept.
+     * @param maxEndPointsCombinations the limit to the number of combinations of
+     * subgraph end points considered for each compatible vertex pair.
+     * @param maxEndPointsPermutations the limit to the number of permutations of
+     * subgraph end points considered for each combination.
+     * @param maxAPMappingCombinations the limit to the number of AP-AP mapping
+     * combinations considered when validating crossover sites.
      * @return the list of pairs of crossover sites.
      * @throws DENOPTIMException 
      */
     public static List<XoverSite> locateCompatibleXOverPoints(
             DGraph graphA, DGraph graphB, FragmentSpace fragSpace, 
-            int maxSizeXoverSubGraph) 
+            int maxSizeXoverSubGraph, int maxCompatibleVrtxPairs,
+            int maxEndPointsCombinations, int maxEndPointsPermutations,
+            int maxAPMappingCombinations) 
                     throws DENOPTIMException
     {
         // First, we identify all the edges that allow crossover, and collect
@@ -122,6 +132,26 @@ public class GraphOperations
                     compatibleVrtxPairs.add(pair);
                 }
             }
+        }
+
+        // Limit the number of compatible vertex pairs to avoid 
+        // combinatorial explosion (random subset for unbiased coverage)
+        if (compatibleVrtxPairs.size() > maxCompatibleVrtxPairs)
+        {
+            fragSpace.getLogger().log(Level.WARNING, 
+                "Capped list of compatible xover vertex pairs from "
+                    + compatibleVrtxPairs.size() + " to " + maxCompatibleVrtxPairs);
+
+            Randomizer rng = fragSpace.getRandomizer();
+            for (int i = 0; i < maxCompatibleVrtxPairs; i++)
+            {
+                int j = i + rng.nextInt(compatibleVrtxPairs.size() - i);
+                Vertex[] tmp = compatibleVrtxPairs.get(i);
+                compatibleVrtxPairs.set(i, compatibleVrtxPairs.get(j));
+                compatibleVrtxPairs.set(j, tmp);
+            }
+            compatibleVrtxPairs = new ArrayList<Vertex[]>(
+                    compatibleVrtxPairs.subList(0, maxCompatibleVrtxPairs));
         }
         
         // The crossover sites are the combination of the above compatible
@@ -161,7 +191,8 @@ public class GraphOperations
                         branchOnVB.addAll(descendantsB);
                         
                         checkAndAddXoverSites(fragSpace, branchOnVA, branchOnVB, 
-                                CrossoverType.BRANCH, sites);
+                                CrossoverType.BRANCH, sites,
+                                maxAPMappingCombinations);
                     }
                 }
             } catch (DENOPTIMException e)
@@ -270,7 +301,7 @@ public class GraphOperations
             List<List<Vertex[]>> preCombsOfEnds = Generator.cartesianProduct(
                     fewestBranchesSide.values())
                     .stream()
-                    .limit(100000) //Prevent explosion!!!
+                    .limit(maxEndPointsCombinations) //Prevent explosion!!!
                     .collect(Collectors.<List<Vertex[]>>toList());
             
             // Remove the 'null,null' place holders that indicate the use of no
@@ -298,15 +329,17 @@ public class GraphOperations
             /*
             combsOfEnds
                 .parallelStream()
-                .limit(50) // Prevent explosion!
+                .limit(maxEndPointsCombinations) // Prevent explosion!
                 .forEach(c -> processCombinationOfEndPoints(pair, c, sites,
-                    fragSpace));
+                    fragSpace, maxEndPointsPermutations,
+                    maxAPMappingCombinations));
             */
             
             combsOfEnds.stream()
-                .limit(50) // Prevent explosion!
+                .limit(maxEndPointsCombinations) // Prevent explosion!
                 .forEach(c -> processCombinationOfEndPoints(pair, c, sites,
-                    fragSpace));
+                    fragSpace, maxEndPointsPermutations,
+                    maxAPMappingCombinations));
         }
         
         // NB: we consider only templates that are at the same level of embedding
@@ -330,7 +363,9 @@ public class GraphOperations
                 
                 for (XoverSite xos : locateCompatibleXOverPoints(
                         tA.getInnerGraph(), tB.getInnerGraph(), fragSpace,
-                        maxSizeXoverSubGraph))
+                        maxSizeXoverSubGraph, maxCompatibleVrtxPairs,
+                        maxEndPointsCombinations, maxEndPointsPermutations,
+                        maxAPMappingCombinations))
                 {
                     if (!sites.contains(xos))
                         sites.add(xos);
@@ -353,10 +388,13 @@ public class GraphOperations
      * evaluated. The order of the entries does not matter as we will consider
      * the permutations of this list.
      * @param collector this is where the crossover sites are stored.
+     * @param maxEndPointsPermutations limit on permutations of end points.
+     * @param maxAPMappingCombinations limit on AP mapping combinations.
      */
     private static void processCombinationOfEndPoints(Vertex[] pair,
             List<Vertex[]> cominationOfEnds,
-            List<XoverSite> collector, FragmentSpace fragSpace)
+            List<XoverSite> collector, FragmentSpace fragSpace,
+            int maxEndPointsPermutations, int maxAPMappingCombinations)
     {
         // Empty set corresponds to using the entire branch and subgraph and
         // has been already dealt with at this point
@@ -378,15 +416,15 @@ public class GraphOperations
         permutsOfEnds
             .parallelStream()
             .forEach(c -> processPermutationOfEndPoints(pair, c, collector,
-                    fragSpace));
+                    fragSpace, maxAPMappingCombinations));
         */
         
         Generator.permutation(cominationOfEnds)
             .simple()
             .stream()
-            .limit(100) // Prevent explosion!
+            .limit(maxEndPointsPermutations) // Prevent explosion!
             .forEach(c -> processPermutationOfEndPoints(pair, c, collector,
-                    fragSpace));
+                    fragSpace, maxAPMappingCombinations));
     }
     
 //------------------------------------------------------------------------------
@@ -402,10 +440,12 @@ public class GraphOperations
      * @param chosenSequenceOfEndpoints the specific permutation of subgraph end
      * points to be evaluated.
      * @param collector this is where the crossover sites are stored.
+     * @param maxAPMappingCombinations limit on AP mapping combinations.
      */
     private static void processPermutationOfEndPoints(Vertex[] pair,
             List<Vertex[]> chosenSequenceOfEndpoints,
-            List<XoverSite> collector, FragmentSpace fragSpace)
+            List<XoverSite> collector, FragmentSpace fragSpace,
+            int maxAPMappingCombinations)
     {
         Vertex vA = pair[0];
         Vertex vB = pair[1];
@@ -487,7 +527,7 @@ public class GraphOperations
         }
         
         checkAndAddXoverSites(fragSpace, subGraphA, subGraphB, 
-                CrossoverType.SUBGRAPH, collector);
+                CrossoverType.SUBGRAPH, collector, maxAPMappingCombinations);
     }
     
 //------------------------------------------------------------------------------
@@ -504,7 +544,7 @@ public class GraphOperations
     private static void checkAndAddXoverSites(FragmentSpace fragSpace,
             List<Vertex> subGraphA, 
             List<Vertex> subGraphB, CrossoverType xoverType,
-            List<XoverSite> collector)
+            List<XoverSite> collector, int maxAPMappingCombinations)
     {
         DGraph gOwnerA = subGraphA.get(0).getGraphOwner();
         DGraph gOwnerB = subGraphB.get(0).getGraphOwner();
@@ -580,7 +620,8 @@ public class GraphOperations
                 fixedRootAPs, 
                 false,  // false: we stop at the first good mapping
                 true,   // true: only complete mapping
-                false); // false: free APs are not compatible by default
+                false,  // false: free APs are not compatible by default
+                maxAPMappingCombinations);
         if (apmf.foundMapping())
         {
             XoverSite xos = new XoverSite(subGraphA, needyAPsA, 
@@ -2261,6 +2302,27 @@ public class GraphOperations
      */
     public static boolean performCrossover(XoverSite site, 
             FragmentSpace fragSpace) throws DENOPTIMException
+    {
+        return performCrossover(site, fragSpace,
+                APMapFinder.DEFAULT_MAX_COMBS);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Performs crossover as defined by the given
+     * {@link XoverSite}. 
+     * The operation is performed on the graphs that own the vertexes referred
+     * in the {@link XoverSite}, so the original version of the graphs is lost.
+     * We expect the graphs to have an healthy set of vertex IDs. This can 
+     * be ensured by running {@link DGraph#renumberGraphVertices()}.
+     * @param site the definition of the crossover site.
+     * @param maxAPMappingCombinations limit on AP mapping combinations.
+     * @throws DENOPTIMException
+     */
+    public static boolean performCrossover(XoverSite site, 
+            FragmentSpace fragSpace, int maxAPMappingCombinations)
+                    throws DENOPTIMException
     {          
         DGraph gA = site.getA().get(0).getGraphOwner();
         DGraph gB = site.getB().get(0).getGraphOwner();
@@ -2323,7 +2385,8 @@ public class GraphOperations
                 allAPsOnB, needyAPsOnB, fixedRootAPs, 
                 false,  // false means stop at the first compatible mapping.
                 false,  // false means we do not require complete mapping.
-                false); // false means free AP are not considered compatible.
+                false,  // false means free AP are not considered compatible.
+                maxAPMappingCombinations);
         if (!apmf.foundMapping())
         {
             // Since the xover site has been detected by searching for compatible

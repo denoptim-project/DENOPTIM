@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.6.8, August 2026_
+_Version 4.6.9, September 2026_
 
 
 [TOC]
@@ -586,6 +586,10 @@ The following tables list all the keywords grouped according to the main functio
 |`GA-KeepNewRingSystemScaffolds`| Makes DENOPTIM save newly encountered ring systems (i.e., cyclic subgraphs) that contain any scaffold vertex as template scaffolds.|
 |`GA-KeepNewRingSystemFitnessTrsh`| Specified a percentage of the current population fitness range in the form of %/100 double (i.e., a value between 0 and 1). This value represents a threshold limiting the possibility to store a newly encountered ring system only to those candidate items having a fitness that in in the best fraction of the instantaneous population range. For example, giving a value of 0.10 will make denoptim store new ring systems only from newly encountered candidates that are among the best 10% of the population in the moment each of these candidates is considered as a potential population member.|
 |`GA-MaxXoverSubGraphSize`| Specifies the maximum number of vertices that can be exchanged by a single crossover event.|
+|`GA-MaxXoverCompatVrtxPairs`| Specifies the maximum number of compatible vertex pairs to consider when locating crossover sites between two graphs. When more pairs are found, a random subset of this size is retained (using the GA random seed). Use this to limit the cost of crossover-site mapping on large or highly compatible graphs. Default is 20.|
+|`GA-MaxXoverEndPointsCombinations`| Specifies the maximum number of combinations of subgraph end points considered for each compatible vertex pair when locating crossover sites. Limits the combinatorial expansion used to define partial-branch (subgraph) crossovers. Default is 50.|
+|`GA-MaxXoverEndPointsPermutations`| Specifies the maximum number of permutations of subgraph end points considered for each combination when locating crossover sites. Default is 10.|
+|`GA-MaxAPMappingCombinations`| Specifies the maximum number of attachment-point mapping combinations considered when searching for a valid AP-AP mapping (e.g., during crossover involving templates). Default is 250.|
 |__Interface__||
 |`GA-InitMolsToFragmentFile`| Specifies the pathname of a file containing molecules to be considered individuals for the initial population. Each molecule is converted to a candidate by fragmentation and assembling of a DENOPTIM's graph representation. The candidate is then sent to the fitness provider. Note that the graph's first vertex, i.e., the scaffold is assigned on-the-fly according to the `FRG-ScaffoldingPolicy`. See also `FRG-EmbedRingsInTemplates` and `FRG-RingEmbeddingContract`. If the number of molecules is lower than the size of the populationDENOPTIM will create additional individuals.|
 |`GA-InitPoplnFile`| Specifies the pathname of a file (can be an SDF file or a text file where each line containing the pathname to a single-molecule SDF file) containing previously evaluated individuals to be added to the initial population. If the number of individuals is lower than the specified population side, DENOPTIM will create additional individuals.|

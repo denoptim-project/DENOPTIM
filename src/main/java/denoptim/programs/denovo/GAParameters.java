@@ -422,6 +422,30 @@ public class GAParameters extends RunTimeParameters
      * Limit to the size of subgraphs that are exchanged during crossover.
      */
     public int maxXOverableSubGraphSize = 20;
+
+    /**
+     * Limit to the number of compatible vertex pairs to consider for crossover.
+     * When more pairs are found, a random subset of this size is retained.
+     */
+    public int maxCompatibleVrtxPairs = 20;
+
+    /**
+     * Limit to the number of combinations of subgraph end points considered
+     * when locating crossover sites.
+     */
+    public int maxXoverEndPointsCombinations = 50;
+
+    /**
+     * Limit to the number of permutations of subgraph end points considered
+     * for each combination when locating crossover sites.
+     */
+    public int maxXoverEndPointsPermutations = 10;
+
+    /**
+     * Limit to the number of AP-AP mapping combinations considered by
+     * {@link denoptim.fragspace.APMapFinder} (e.g., during crossover).
+     */
+    public int maxAPMappingCombinations = 250;
     
     /**
      * Flag requesting to write a SDF file that collects all the population 
@@ -1383,6 +1407,42 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     maxXOverableSubGraphSize = Integer.parseInt(value);
+                }
+                break;
+            }
+
+            case "MAXXOVERCOMPATVRTXPAIRS=":
+            {
+                if (value.length() > 0)
+                {
+                    maxCompatibleVrtxPairs = Integer.parseInt(value);
+                }
+                break;
+            }
+
+            case "MAXXOVERENDPOINTSCOMBINATIONS=":
+            {
+                if (value.length() > 0)
+                {
+                    maxXoverEndPointsCombinations = Integer.parseInt(value);
+                }
+                break;
+            }
+
+            case "MAXXOVERENDPOINTSPERMUTATIONS=":
+            {
+                if (value.length() > 0)
+                {
+                    maxXoverEndPointsPermutations = Integer.parseInt(value);
+                }
+                break;
+            }
+
+            case "MAXAPMAPPINGCOMBINATIONS=":
+            {
+                if (value.length() > 0)
+                {
+                    maxAPMappingCombinations = Integer.parseInt(value);
                 }
                 break;
             }

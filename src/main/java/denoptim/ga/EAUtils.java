@@ -472,7 +472,8 @@ public class EAUtils
         
         try
         {
-            if (!GraphOperations.performCrossover(xosOnClones,fragSpace))
+            if (!GraphOperations.performCrossover(xosOnClones, fragSpace,
+                    settings.maxAPMappingCombinations))
             {
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS_PERFORM);
                 mnt.increase(CounterID.FAILEDXOVERATTEMPTS);

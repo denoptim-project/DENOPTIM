@@ -278,7 +278,11 @@ public class GeneOpsRunner extends ProgramTask
             logger.log(Level.INFO, "Attempting crossover on a site detected "
                     + "on-the-fly");
             List<XoverSite> sites = GraphOperations.locateCompatibleXOverPoints(
-                    male, female, fragSpace, gaParams.maxXOverableSubGraphSize);
+                    male, female, fragSpace, gaParams.maxXOverableSubGraphSize,
+                    gaParams.maxCompatibleVrtxPairs,
+                    gaParams.maxXoverEndPointsCombinations,
+                    gaParams.maxXoverEndPointsPermutations,
+                    gaParams.maxAPMappingCombinations);
             if (sites.isEmpty())
             {
                 logger.log(Level.WARNING, "No crossover site detected.");
@@ -290,7 +294,8 @@ public class GeneOpsRunner extends ProgramTask
             xos = settings.getRandomizer().randomlyChooseOne(sites);
         }
         
-        GraphOperations.performCrossover(xos, fragSpace);
+        GraphOperations.performCrossover(xos, fragSpace,
+                gaParams.maxAPMappingCombinations);
     
         logger.log(Level.INFO, NL + "Result of crossover:"
                 + NL + "MALE: " + male
