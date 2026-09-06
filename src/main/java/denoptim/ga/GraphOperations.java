@@ -1461,13 +1461,13 @@ public class GraphOperations
         }
         
         boolean done = false;
-        Set<AttachmentPoint> usedAPs = new HashSet<AttachmentPoint>();
         for (RelatedAPPair pairOfAPs : chosenPairsSet)
         {
             AttachmentPoint apHead = pairOfAPs.apA;
             AttachmentPoint apTail = pairOfAPs.apB;
             if (apHead == apTail
-                    || usedAPs.contains(apHead) || usedAPs.contains(apTail))
+                    || !apHead.isAvailableThroughout()
+                    || !apTail.isAvailableThroughout())
             {
                 continue;
             }
@@ -1484,8 +1484,6 @@ public class GraphOperations
             Vertex rcvTail = fragSpace.getPolarizedRCV(false);
             graph.appendVertexOnAP(apTail, rcvTail.getAP(0));
             graph.addRing(rcvBridge, rcvTail);
-            usedAPs.add(apHead);
-            usedAPs.add(apTail);
             done = true;
         }
         
