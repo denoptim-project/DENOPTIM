@@ -2685,7 +2685,9 @@ public class EAUtils
         ManySMARTSQuery msq = new ManySMARTSQuery(mol, smarts);
         if (msq.hasProblems())
         {
-            throw new DENOPTIMException(msq.getMessage());
+            logger.warning("Could not apply bridgehead finding rules: " 
+                + msq.getMessage() + ". Returning no match.");
+            return result;
         }
         Map<SymmetricSetWithMode,List<RelatedAPPair>> symmRelatedBridgeHeadAPs = 
                 new HashMap<SymmetricSetWithMode,List<RelatedAPPair>>();
