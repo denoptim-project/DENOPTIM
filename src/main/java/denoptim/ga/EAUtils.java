@@ -2924,6 +2924,17 @@ public class EAUtils
                 {
                     continue;
                 }
+            {
+                // if head and tail are symmetric to each other, we now
+                // get the sem set of vertexec to loop over and, thus, an
+                // attempt to use the same APs both as head and tail.
+                // Therefore, we skip the pair
+                if (tmpGraph.getSymSetForVertex(
+                    pairOnTmpGraph.apA.getOwner()).contains(
+                        pairOnTmpGraph.apB.getOwner()))
+                {
+                    continue;
+                }
                 Vertex headVertexOnGraph = graph.getVertexAtPosition(
                         tmpGraph.indexOf(pairOnTmpGraph.apA.getOwner()));
                 int apHeadID = pairOnTmpGraph.apA.getIndexInOwner();
@@ -2950,7 +2961,15 @@ public class EAUtils
                         // This should never happen, but we keep it as safeguard
                         continue;
                     }
+                    AttachmentPoint apH = symHeadVrts.get(iPair).getAP(apHeadID);
+                    AttachmentPoint apT = symTailVrts.get(iPair).getAP(apTailID);
+                    if (apH == apT)
+                    {
+                        // This should never happen, but we keep it as safeguard
+                        continue;
+                    }
                     RelatedAPPair pairOnOriginalGraph = new RelatedAPPair(
+                            apH, apT,
                             apH, apT,
                             pairOnTmpGraph.property, 
                             pairOnTmpGraph.propID);
