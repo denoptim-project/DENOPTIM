@@ -21,10 +21,12 @@ package denoptim.ga;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -1452,11 +1454,23 @@ public class GraphOperations
                     DENOPTIMConstants.VRTPROPBRIDGEEND_B).toString());
         }
         
+        if (idApOnBridge[0] == idApOnBridge[1])
+        {
+            mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE);
+            return false;
+        }
+        
         boolean done = false;
+        Set<AttachmentPoint> usedAPs = new HashSet<AttachmentPoint>();
         for (RelatedAPPair pairOfAPs : chosenPairsSet)
         {
             AttachmentPoint apHead = pairOfAPs.apA;
             AttachmentPoint apTail = pairOfAPs.apB;
+            if (apHead == apTail
+                    || usedAPs.contains(apHead) || usedAPs.contains(apTail))
+            {
+                continue;
+            }
             
             Vertex bridgeClone = incomingVertex.clone();
             bridgeClone.setVertexId(graph.getMaxVertexId()+1);
@@ -1470,6 +1484,8 @@ public class GraphOperations
             Vertex rcvTail = fragSpace.getPolarizedRCV(false);
             graph.appendVertexOnAP(apTail, rcvTail.getAP(0));
             graph.addRing(rcvBridge, rcvTail);
+            usedAPs.add(apHead);
+            usedAPs.add(apTail);
             done = true;
         }
         
