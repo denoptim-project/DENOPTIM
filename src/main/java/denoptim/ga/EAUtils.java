@@ -2909,7 +2909,17 @@ public class EAUtils
             List<RelatedAPPair> combOnOriginalGraph = 
                     new ArrayList<RelatedAPPair>();
             for (RelatedAPPair pairOnTmpGraph : combOnTmpGraph)
-            {   
+            {
+                // if head and tail are symmetric to each other, we now
+                // get the sem set of vertexec to loop over and, thus, an
+                // attempt to use the same APs both as head and tail.
+                // Therefore, we skip the pair
+                if (tmpGraph.getSymSetForVertex(
+                    pairOnTmpGraph.apA.getOwner()).contains(
+                        pairOnTmpGraph.apB.getOwner()))
+                {
+                    continue;
+                }
                 Vertex headVertexOnGraph = graph.getVertexAtPosition(
                         tmpGraph.indexOf(pairOnTmpGraph.apA.getOwner()));
                 int apHeadID = pairOnTmpGraph.apA.getIndexInOwner();
@@ -2929,15 +2939,24 @@ public class EAUtils
                 int numPairs = Math.min(symHeadVrts.size(), symTailVrts.size());
                 for (int iPair=0; iPair<numPairs; iPair++)
                 {
+                    AttachmentPoint apH = symHeadVrts.get(iPair).getAP(apHeadID);
+                    AttachmentPoint apT = symTailVrts.get(iPair).getAP(apTailID);
+                    if (apH == apT)
+                    {
+                        // This should never happen, but we keep it as safeguard
+                        continue;
+                    }
                     RelatedAPPair pairOnOriginalGraph = new RelatedAPPair(
-                            symHeadVrts.get(iPair).getAP(apHeadID), 
-                            symTailVrts.get(iPair).getAP(apTailID),
+                            apH, apT,
                             pairOnTmpGraph.property, 
                             pairOnTmpGraph.propID);
                     combOnOriginalGraph.add(pairOnOriginalGraph);
                 }
             }
-            result.add(combOnOriginalGraph);
+            if (combOnOriginalGraph.size() != 0)
+            {
+                result.add(combOnOriginalGraph);
+            }
         }
         return result;
     } 
