@@ -370,7 +370,10 @@ public class EmptyVertex extends Vertex
     {
         IAtomContainer iac = new AtomContainer();
         iac.setProperty(DENOPTIMConstants.APSTAG, "");
-        iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+        if (embedJsonInIAtomContainer())
+        {
+            iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+        }
         
         return iac;
     }

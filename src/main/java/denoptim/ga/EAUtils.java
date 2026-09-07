@@ -2033,11 +2033,20 @@ public class EAUtils
         if (!rcParams.allowRingClosures())
             return true;
 
-        // get a atoms/bonds molecular representation (no 3D needed)
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
-                settings.getRandomizer());
-        t3d.setAlignBBsIn3D(false);
-        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
+        // Molecular model for ring search: no JSON embedding (deferred to
+        // fitness/SDF writing). Topology only; BB alignment already off.
+        boolean prevEmbedJson = Vertex.embedJsonInIAtomContainer();
+        IAtomContainer mol;
+        try
+        {
+            Vertex.setEmbedJsonInIAtomContainer(false);
+            ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
+                    settings.getRandomizer());
+            t3d.setAlignBBsIn3D(false);
+            mol = t3d.convertGraphTo3DAtomContainer(molGraph,true);
+        } finally {
+            Vertex.setEmbedJsonInIAtomContainer(prevEmbedJson);
+        }
         
         // Set rotatability property as property of IBond
         String rotoSpaceFile = "";

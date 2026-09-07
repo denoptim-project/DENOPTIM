@@ -6126,8 +6126,107 @@ public class DGraph implements Cloneable
             fsSettings = (FragmentSpaceParameters)settings.getParameters(
                     ParametersType.FS_PARAMS);
         }
+
+        // Graph-only filters first, then a molecular model without JSON.
+        // Graph/vertex JSON is deferred to fitness/SDF writing of survivors.
+        boolean prevEmbedJson = Vertex.embedJsonInIAtomContainer();
+        try
+        {
+            Vertex.setEmbedJsonInIAtomContainer(false);
+            return checkConsistencyNoJsonEmbed(settings, permissive, rcSettings,
+                    fsSettings);
+        } finally {
+            Vertex.setEmbedJsonInIAtomContainer(prevEmbedJson);
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Body of {@link #checkConsistency(RunTimeParameters, boolean)} assuming
+     * {@link Vertex#embedJsonInIAtomContainer()} is already {@code false}.
+     */
+    private Object[] checkConsistencyNoJsonEmbed(RunTimeParameters settings,
+            boolean permissive, RingClosureParameters rcSettings,
+            FragmentSpaceParameters fsSettings) throws DENOPTIMException
+    {
+        if (fsSettings.getFragmentSpace().useAPclassBasedApproach())
+        {
+            if (hasForbiddenEnd(fsSettings))
+            {
+                String msg = "Evaluation of graph: forbidden end in graph!";
+                settings.getLogger().log(Level.FINE, msg);
+                return null;
+            }
+        }
+
+        if (rcSettings.allowRingClosures() && !permissive)
+        {
+            // Count rings and RCAs
+            int nPossRings = 0;
+            Set<String> doneType = new HashSet<>();
+            Map<String,String> rcaTypes = RingClosingAttractor.RCATYPEMAP;
+            for (String rcaTyp : rcaTypes.keySet())
+            {
+                if (doneType.contains(rcaTyp))
+                {
+                    continue;
+                }
+
+                int nThisType = 0;
+                int nCompType = 0;
+                for (Vertex v : getRCVertices())
+                {
+                    if (v.containsAtoms())
+                    {
+                        IAtom atm = v.getIAtomContainer().getAtom(0);
+                        if (MoleculeUtils.getSymbolOrLabel(atm).equals(rcaTyp))
+                        {
+                            nThisType++;
+                        } else if (MoleculeUtils.getSymbolOrLabel(atm).equals(
+                                rcaTypes.get(rcaTyp)))
+                        {
+                            nCompType++;
+                        } 
+                        if (rcaTyp.equals(rcaTypes.get(rcaTyp)))
+                        {
+                            nCompType++;
+                        }
+                    }
+                }
+
+                // check number of rca per type
+                if (nThisType > rcSettings.getMaxRcaPerType(rcaTyp) ||
+                        nCompType > rcSettings.getMaxRcaPerType(rcaTyp))
+                {
+                    String msg = "Evaluation of graph: too many RCAs! "
+                            + rcaTyp + ":" + nThisType + " "
+                            + rcaTypes.get(rcaTyp) + ":" + nCompType;
+                    settings.getLogger().log(Level.FINE, msg);
+                    return null;
+                }
+                if (nThisType < rcSettings.getMinRcaPerType(rcaTyp) ||
+                        nCompType < rcSettings.getMinRcaPerType(rcaTyp))
+                {
+                    String msg = "Evaluation of graph: too few RCAs! "
+                            + rcaTyp + ":" + nThisType + " "
+                            + rcaTypes.get(rcaTyp) + ":" + nCompType;
+                    settings.getLogger().log(Level.FINE, msg);
+                    return null;
+                }
+
+                nPossRings = nPossRings + Math.min(nThisType, nCompType);
+                doneType.add(rcaTyp);
+                doneType.add(rcaTypes.get(rcaTyp));
+            }
+            if (nPossRings < rcSettings.getMinRingClosures())
+            {
+                String msg = "Evaluation of graph: too few ring candidates";
+                settings.getLogger().log(Level.FINE, msg);
+                return null;
+            }
+        }
         
-        // calculate the molecule representation
         ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
                 settings.getRandomizer());
         t3d.setAlignBBsIn3D(false);
@@ -6210,85 +6309,6 @@ public class DGraph implements Cloneable
         }
         mol.setProperty("ROT_BND", nrot);
 
-        // 1D) unacceptable free APs
-        if (fsSettings.getFragmentSpace().useAPclassBasedApproach())
-        {
-            if (hasForbiddenEnd(fsSettings))
-            {
-                String msg = "Evaluation of graph: forbidden end in graph!";
-                settings.getLogger().log(Level.FINE, msg);
-                return null;
-            }
-        }
-
-        // criteria from settings of ring closures
-        if (rcSettings.allowRingClosures() && !permissive)
-        {
-            // Count rings and RCAs
-            int nPossRings = 0;
-            Set<String> doneType = new HashSet<>();
-            Map<String,String> rcaTypes = RingClosingAttractor.RCATYPEMAP;
-            for (String rcaTyp : rcaTypes.keySet())
-            {
-                if (doneType.contains(rcaTyp))
-                {
-                    continue;
-                }
-
-                int nThisType = 0;
-                int nCompType = 0;
-                for (Vertex v : getRCVertices())
-                {
-                    if (v.containsAtoms())
-                    {
-                        IAtom atm = v.getIAtomContainer().getAtom(0);
-                        if (MoleculeUtils.getSymbolOrLabel(atm).equals(rcaTyp))
-                        {
-                            nThisType++;
-                        } else if (MoleculeUtils.getSymbolOrLabel(atm).equals(
-                                rcaTypes.get(rcaTyp)))
-                        {
-                            nCompType++;
-                        } 
-                        if (rcaTyp.equals(rcaTypes.get(rcaTyp)))
-                        {
-                            nCompType++;
-                        }
-                    }
-                }
-
-                // check number of rca per type
-                if (nThisType > rcSettings.getMaxRcaPerType(rcaTyp) ||
-                        nCompType > rcSettings.getMaxRcaPerType(rcaTyp))
-                {
-                    String msg = "Evaluation of graph: too many RCAs! "
-                            + rcaTyp + ":" + nThisType + " "
-                            + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    settings.getLogger().log(Level.FINE, msg);
-                    return null;
-                }
-                if (nThisType < rcSettings.getMinRcaPerType(rcaTyp) ||
-                        nCompType < rcSettings.getMinRcaPerType(rcaTyp))
-                {
-                    String msg = "Evaluation of graph: too few RCAs! "
-                            + rcaTyp + ":" + nThisType + " "
-                            + rcaTypes.get(rcaTyp) + ":" + nCompType;
-                    settings.getLogger().log(Level.FINE, msg);
-                    return null;
-                }
-
-                nPossRings = nPossRings + Math.min(nThisType, nCompType);
-                doneType.add(rcaTyp);
-                doneType.add(rcaTypes.get(rcaTyp));
-            }
-            if (nPossRings < rcSettings.getMinRingClosures())
-            {
-                String msg = "Evaluation of graph: too few ring candidates";
-                settings.getLogger().log(Level.FINE, msg);
-                return null;
-            }
-        }
-
         // get the smiles/Inchi representation
         String inchiKey = MoleculeUtils.getInChIKeyForMolecule(mol, 
                 settings.getLogger());
@@ -6343,11 +6363,19 @@ public class DGraph implements Cloneable
         if (!evaluateRings)
             return lstGraphs;
 
-        // get a atoms/bonds molecular representation (no 3D needed)
-        ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
-                settings.getRandomizer());
-        t3d.setAlignBBsIn3D(false);
-        IAtomContainer mol = t3d.convertGraphTo3DAtomContainer(this,false);
+        // get a atoms/bonds molecular representation (no 3D needed; no JSON)
+        boolean prevEmbedJson = Vertex.embedJsonInIAtomContainer();
+        IAtomContainer mol;
+        try
+        {
+            Vertex.setEmbedJsonInIAtomContainer(false);
+            ThreeDimTreeBuilder t3d = new ThreeDimTreeBuilder(settings.getLogger(),
+                    settings.getRandomizer());
+            t3d.setAlignBBsIn3D(false);
+            mol = t3d.convertGraphTo3DAtomContainer(this,false);
+        } finally {
+            Vertex.setEmbedJsonInIAtomContainer(prevEmbedJson);
+        }
 
         // Set rotatable property as property of IBond
         RotationalSpaceUtils.defineRotatableBonds(mol,

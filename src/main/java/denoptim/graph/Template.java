@@ -781,7 +781,12 @@ public class Template extends Vertex
         mol.setProperty(DENOPTIMConstants.APSTAG, 
                 AttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
         
-        mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+        if (embedJsonInIAtomContainer())
+        {
+            mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+        } else {
+            mol.removeProperty(DENOPTIMConstants.VERTEXJSONTAG);
+        }
         
         mol.removeProperty(DENOPTIMConstants.GRAPHJSONTAG);
         mol.removeProperty(DENOPTIMConstants.GRAPHTAG);
@@ -833,6 +838,15 @@ public class Template extends Vertex
     {
         if (mol!=null && !rebuild)
         {
+            if (embedJsonInIAtomContainer())
+            {
+                if (mol.getProperty(DENOPTIMConstants.VERTEXJSONTAG) == null)
+                {
+                    mol.setProperty(DENOPTIMConstants.VERTEXJSONTAG, this.toJson());
+                }
+            } else {
+                mol.removeProperty(DENOPTIMConstants.VERTEXJSONTAG);
+            }
             return mol;
         }
         try
@@ -888,7 +902,12 @@ public class Template extends Vertex
             iac.setProperty(DENOPTIMConstants.APSTAG, 
                     AttachmentPoint.getAPDefinitionsForSDF(apsPerAtom));
             
-            iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+            if (embedJsonInIAtomContainer())
+            {
+                iac.setProperty(DENOPTIMConstants.VERTEXJSONTAG,this.toJson());
+            } else {
+                iac.removeProperty(DENOPTIMConstants.VERTEXJSONTAG);
+            }
             
             iac.removeProperty(DENOPTIMConstants.GRAPHJSONTAG);
             iac.removeProperty(DENOPTIMConstants.GRAPHTAG);

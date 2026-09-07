@@ -60,6 +60,15 @@ import denoptim.utils.Randomizer;
 public abstract class Vertex implements Cloneable
 {
     /**
+     * When <code>false</code>, {@link #getIAtomContainer()} implementations skip
+     * embedding JSON string properties on the molecular representation. Used to
+     * avoid expensive Gson serialization on hot GA paths (consistency checks,
+     * ring setup); JSON is added later when writing fitness/SDF output.
+     */
+    private static final ThreadLocal<Boolean> EMBED_JSON_IN_IAC =
+            ThreadLocal.withInitial(() -> Boolean.TRUE);
+
+    /**
      * Graph that includes this vertex
      */
     private DGraph owner;
@@ -751,6 +760,29 @@ public abstract class Vertex implements Cloneable
         }
     	
     	return true;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Controls whether chemical representations returned by
+     * {@link #getIAtomContainer()} embed JSON properties. Thread-local so nested
+     * template builds inherit the caller's choice.
+     * @param embed use <code>false</code> to skip JSON embedding (hot path).
+     */
+    public static void setEmbedJsonInIAtomContainer(boolean embed)
+    {
+        EMBED_JSON_IN_IAC.set(embed);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return whether {@link #getIAtomContainer()} should embed JSON properties.
+     */
+    public static boolean embedJsonInIAtomContainer()
+    {
+        return EMBED_JSON_IN_IAC.get();
     }
 
 //------------------------------------------------------------------------------

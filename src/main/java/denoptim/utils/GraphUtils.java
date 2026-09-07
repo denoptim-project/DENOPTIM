@@ -195,9 +195,30 @@ public class GraphUtils
     public static void writeSDFFields(IAtomContainer iac, DGraph g)
             throws DENOPTIMException
     {
+        writeSDFFields(iac, g, Vertex.embedJsonInIAtomContainer());
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Writes standard graph-related SDF properties onto a molecular
+     * representation.
+     * @param iac the molecule to annotate.
+     * @param g the graph to serialize (when embedding is requested).
+     * @param embedGraphText when <code>true</code>, embeds both the legacy
+     * graph string and the JSON representation. When <code>false</code>, only
+     * lightweight tags (graph id, provenance) are set — intended for hot-path
+     * consistency checks where JSON is added later (e.g. fitness evaluation).
+     */
+    public static void writeSDFFields(IAtomContainer iac, DGraph g,
+            boolean embedGraphText) throws DENOPTIMException
+    {
         iac.setProperty(DENOPTIMConstants.GCODETAG, g.getGraphId());
-        iac.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
-        iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG, g.toJson());
+        if (embedGraphText)
+        {
+            iac.setProperty(DENOPTIMConstants.GRAPHTAG, g.toString());
+            iac.setProperty(DENOPTIMConstants.GRAPHJSONTAG, g.toJson());
+        }
         if (g.getLocalMsg() != null
                 && !g.getLocalMsg().toString().equals(""))
         {
