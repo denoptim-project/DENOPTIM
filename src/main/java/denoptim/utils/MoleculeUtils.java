@@ -1077,7 +1077,7 @@ public class MoleculeUtils
                 throw new DENOPTIMException("Property '" 
                         + DENOPTIMConstants.STOREDVID + "' not defined in "
                         + "vertex " + v + ", but is needed to extract "
-                                + "substructure.");
+                        + "substructure.");
             }
             wantedVIDs.add(((Long) o).longValue());
             wantedVertexesMap.put(((Long) o).longValue(), v);
@@ -1171,8 +1171,8 @@ public class MoleculeUtils
             Point3d srcP3d = MoleculeUtils.getPoint3d(srcAtm);
             Point3d trgP3d = MoleculeUtils.getPoint3d(trgAtm);
             double currentLength = srcP3d.distance(trgP3d);
-            //TODO-V3+? change hard-coded value with property of AP, when such
-            // property will be available, i. e., one refactoring of AP and 
+            //TODO-V4+? change hard-coded value with property of AP, when such
+            // property might be available, i. e., once refactoring of AP and 
             // atom coordinates is done.
             double idealLength = 1.53;
             /*
@@ -1180,9 +1180,23 @@ public class MoleculeUtils
                     DENOPTIMConstants.APORIGINALLENGTH);
                     */
             Point3d vector = new Point3d();
-            vector.x = srcP3d.x + (trgP3d.x - srcP3d.x)*(idealLength/currentLength);
-            vector.y = srcP3d.y + (trgP3d.y - srcP3d.y)*(idealLength/currentLength);
-            vector.z = srcP3d.z + (trgP3d.z - srcP3d.z)*(idealLength/currentLength);
+            if (currentLength > 1.0E-8)
+            {
+                // Place AP tip along the existing src->trg direction, scaled
+                // to the ideal attachment-point length.
+                vector.x = srcP3d.x + (trgP3d.x - srcP3d.x)
+                        * (idealLength / currentLength);
+                vector.y = srcP3d.y + (trgP3d.y - srcP3d.y)
+                        * (idealLength / currentLength);
+                vector.z = srcP3d.z + (trgP3d.z - srcP3d.z)
+                        * (idealLength / currentLength);
+            } else {
+                // No usable direction (e.g., coincident atoms in a 2D/flat
+                // model). Fall back to a default axis of length idealLength.
+                vector.x = srcP3d.x + idealLength;
+                vector.y = srcP3d.y;
+                vector.z = srcP3d.z;
+            }
             
             AttachmentPoint createdAP = frag.addAPOnAtom(srcAtm, 
                     apcMap.get(trgAtmInIAC), vector);
