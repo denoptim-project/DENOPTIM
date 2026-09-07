@@ -5333,6 +5333,103 @@ public class DGraph implements Cloneable
     }
 
 //------------------------------------------------------------------------------
+
+    /**
+     * Recursively expands every {@link Template} vertex in this graph into its
+     * inner-graph content until no template vertices remain (a single flat
+     * graph level of non-template vertices).
+     * <p>
+     * The returned contract is the most restrictive among all expanded
+     * templates ({@link ContractLevel#FREE} &lt;
+     * {@link ContractLevel#FIXED_STRUCT} &lt; {@link ContractLevel#FIXED}).
+     * If this graph contained no templates, returns <code>null</code>.
+     *
+     * @param fragSpace fragment space used by subgraph replacement (AP
+     * reconnection / capping).
+     * @return most restrictive embedded contract, or <code>null</code> if none.
+     * @throws DENOPTIMException if a template cannot be expanded in place.
+     */
+    public ContractLevel flattenEmbeddedTemplates(FragmentSpace fragSpace)
+            throws DENOPTIMException
+    {
+        ContractLevel mostRestrictive = null;
+        boolean expanded = true;
+        while (expanded)
+        {
+            expanded = false;
+            for (Vertex v : new ArrayList<>(gVertices))
+            {
+                if (!(v instanceof Template))
+                    continue;
+                Template tmpl = (Template) v;
+                mostRestrictive = tmpl.getContractLevel()
+                        .mostRestrictive(mostRestrictive);
+                if (!expandEmbeddedTemplate(tmpl, fragSpace))
+                {
+                    throw new DENOPTIMException("Failed to expand embedded "
+                            + "template (vertexId=" + tmpl.getVertexId()
+                            + ") while flattening the graph.");
+                }
+                expanded = true;
+                break; // restart: vertex list changed
+            }
+        }
+        return mostRestrictive;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Replaces one {@link Template} vertex in this graph with a clone of its
+     * inner graph, reconnecting edges and free APs via the inner↔outer AP map.
+     *
+     * @param template the template vertex belonging to this graph.
+     * @param fragSpace fragment space for subgraph replacement.
+     * @return <code>true</code> if replacement succeeded.
+     * @throws DENOPTIMException on inconsistent AP mapping or replacement error.
+     */
+    private boolean expandEmbeddedTemplate(Template template,
+            FragmentSpace fragSpace) throws DENOPTIMException
+    {
+        if (!gVertices.contains(template))
+            return false;
+
+        DGraph innerOrig = template.getInnerGraph();
+        if (innerOrig == null)
+            return false;
+
+        // Incoming graph must not be jacketed (replaceSingleSubGraph contract).
+        DGraph incoming = innerOrig.clone();
+        incoming.setTemplateJacket(null);
+
+        LinkedHashMap<AttachmentPoint, AttachmentPoint> apMap =
+                new LinkedHashMap<>();
+        for (AttachmentPoint outerAP : template.getAttachmentPoints())
+        {
+            AttachmentPoint innerAP = template.getInnerAPFromOuterAP(outerAP);
+            if (innerAP == null)
+            {
+                throw new DENOPTIMException("Template outer AP has no inner "
+                        + "counterpart while flattening: " + outerAP);
+            }
+            int vPos = innerOrig.indexOf(innerAP.getOwner());
+            int apIdx = innerAP.getIndexInOwner();
+            if (vPos < 0 || apIdx < 0)
+            {
+                throw new DENOPTIMException("Cannot map inner AP onto cloned "
+                        + "inner graph while flattening template.");
+            }
+            AttachmentPoint apOnIncoming = incoming.getVertexAtPosition(vPos)
+                    .getAP(apIdx);
+            apMap.put(outerAP, apOnIncoming);
+        }
+
+        List<Vertex> toReplace = new ArrayList<>();
+        toReplace.add(template);
+        return replaceSubGraph(toReplace, incoming, apMap, fragSpace);
+    }
+
+//------------------------------------------------------------------------------
     
     /**
      * Searches for the given pattern type and generated a new graph where each 

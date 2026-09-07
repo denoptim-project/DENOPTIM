@@ -4027,6 +4027,79 @@ public class DGraphTest
                 .filter(t -> t.getBuildingBlockType() == BBType.FRAGMENT)
                 .count());
     }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFlattenEmbeddedTemplates_mostRestrictiveContract()
+            throws Exception
+    {
+        FragmentSpace fs = prepare();
+
+        EmptyVertex a = new EmptyVertex(10);
+        a.addAP();
+        a.addAP();
+        EmptyVertex b = new EmptyVertex(11);
+        b.addAP();
+        b.addAP();
+        DGraph innerFree = new DGraph();
+        innerFree.addVertex(a);
+        innerFree.addVertex(b);
+        innerFree.addEdge(new Edge(a.getAP(0), b.getAP(0)));
+        Template tFree = new Template(BBType.FRAGMENT);
+        tFree.setInnerGraph(innerFree);
+        tFree.setContractLevel(ContractLevel.FREE);
+
+        EmptyVertex c = new EmptyVertex(20);
+        c.addAP();
+        c.addAP();
+        EmptyVertex d = new EmptyVertex(21);
+        d.addAP();
+        d.addAP();
+        DGraph innerFixedStruct = new DGraph();
+        innerFixedStruct.addVertex(c);
+        innerFixedStruct.addVertex(d);
+        innerFixedStruct.addEdge(new Edge(c.getAP(0), d.getAP(0)));
+        Template tFixedStruct = new Template(BBType.FRAGMENT);
+        tFixedStruct.setInnerGraph(innerFixedStruct);
+        tFixedStruct.setContractLevel(ContractLevel.FIXED_STRUCT);
+
+        // Nest FIXED template inside another FREE jacket, then place both
+        // templates in an outer graph so flattening must expand two levels
+        // and take FIXED as the most restrictive contract.
+        EmptyVertex e = new EmptyVertex(30);
+        e.addAP();
+        e.addAP();
+        DGraph innerFixed = new DGraph();
+        innerFixed.addVertex(e);
+        Template tFixed = new Template(BBType.FRAGMENT);
+        tFixed.setInnerGraph(innerFixed);
+        tFixed.setContractLevel(ContractLevel.FIXED);
+
+        DGraph nestInner = new DGraph();
+        nestInner.addVertex(tFixed);
+        Template tNestFree = new Template(BBType.FRAGMENT);
+        tNestFree.setInnerGraph(nestInner);
+        tNestFree.setContractLevel(ContractLevel.FREE);
+
+        DGraph outer = new DGraph();
+        outer.addVertex(tFree);
+        outer.appendVertexOnAP(tFree.getAP(0), tFixedStruct.getAP(0));
+        outer.appendVertexOnAP(tFixedStruct.getAP(1), tNestFree.getAP(0));
+
+        assertEquals(3, outer.getVertexCount());
+        assertEquals(3, outer.getVertexList().stream()
+                .filter(v -> v instanceof Template).count());
+
+        ContractLevel most = outer.flattenEmbeddedTemplates(fs);
+
+        assertEquals(ContractLevel.FIXED, most);
+        assertEquals(0, outer.getVertexList().stream()
+                .filter(v -> v instanceof Template).count());
+        // a,b + c,d + e
+        assertEquals(5, outer.getVertexCount());
+        assertNull(new DGraph().flattenEmbeddedTemplates(fs));
+    }
     
 //------------------------------------------------------------------------------
 

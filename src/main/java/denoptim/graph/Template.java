@@ -122,7 +122,39 @@ public class Template extends Vertex
          * Effectively this contract allows only 
          * {@value MutationType#CHANGELINK} mutation.
          */
-        FIXED_STRUCT
+        FIXED_STRUCT;
+
+        /**
+         * Restrictiveness rank: {@link #FREE} &lt; {@link #FIXED_STRUCT} &lt;
+         * {@link #FIXED}.
+         */
+        private int restrictiveness()
+        {
+            switch (this)
+            {
+                case FREE:
+                    return 0;
+                case FIXED_STRUCT:
+                    return 1;
+                case FIXED:
+                    return 2;
+                default:
+                    return 0;
+            }
+        }
+
+        /**
+         * @param other another contract, or <code>null</code>.
+         * @return the more restrictive of this and {@code other}; this if
+         * {@code other} is <code>null</code>.
+         */
+        public ContractLevel mostRestrictive(ContractLevel other)
+        {
+            if (other == null)
+                return this;
+            return this.restrictiveness() >= other.restrictiveness() ? this
+                    : other;
+        }
     }
 
     private List<AttachmentPoint> requiredAPs = new ArrayList<>();
