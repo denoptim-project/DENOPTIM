@@ -170,6 +170,14 @@ public class DENOPTIMgson
                     && field.getName().equals("mol")) {
                 return true;
             }
+            if (field.getDeclaringClass() == Template.class
+                    && field.getName().equals("cachedOuterAPs")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == Template.class
+                    && field.getName().equals("cachedOuterAPIndexes")) {
+                return true;
+            }
 
             return false;
         }
@@ -236,6 +244,14 @@ public class DENOPTIMgson
             }
             if (field.getDeclaringClass() == Template.class
                     && field.getName().equals("mol")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == Template.class
+                    && field.getName().equals("cachedOuterAPs")) {
+                return true;
+            }
+            if (field.getDeclaringClass() == Template.class
+                    && field.getName().equals("cachedOuterAPIndexes")) {
                 return true;
             }
             if (field.getDeclaringClass() == DGraph.class

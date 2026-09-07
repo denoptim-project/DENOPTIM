@@ -1404,7 +1404,7 @@ public class GraphOperations
         BridgeHeadFindingRule bhfr = (BridgeHeadFindingRule) 
                 chosenPairsSet.get(0).property;
 
-        List<Vertex> usableBridges = null;
+        List<EAUtils.BridgeOption> usableBridges = null;
         if (newRingIsAromatic)
         {
             usableBridges = EAUtils.getUsableAromaticBridges(
@@ -1413,7 +1413,8 @@ public class GraphOperations
                 fragSpace);
         } else {
             // NB: we keep track of which APs are supposed to be used to form
-            // the bridge by recording their index in a property of the vertex
+            // the bridge by recording their index in BridgeOption (cloned only
+            // when a bridge is actually inserted into the graph).
             usableBridges = EAUtils.getUsableAliphaticBridges(
                     chosenPairsSet.get(0).apA.getAPClass(),
                     chosenPairsSet.get(0).apB.getAPClass(),
@@ -1430,11 +1431,11 @@ public class GraphOperations
         // Select size of the incoming bridge based on ring-size biases
         // NB: we have to do this twice because some sites may be used to 
         // form rings with different sizes. So, see above for the first time...
-        List<Vertex> szBiasedUsableBridges = new ArrayList<Vertex>();
-        for (Vertex candidateBridge : usableBridges)
+        List<EAUtils.BridgeOption> szBiasedUsableBridges =
+                new ArrayList<EAUtils.BridgeOption>();
+        for (EAUtils.BridgeOption candidateBridge : usableBridges)
         {
-            int thisBridgeLength = (int) candidateBridge.getProperty(
-                    DENOPTIMConstants.VRTPROPBRIDGELENGTH);
+            int thisBridgeLength = candidateBridge.getBridgeLength();
             int existingBridgeLength = bhfr.getExistingBridgeLength();
             int resultingRingSize = existingBridgeLength + thisBridgeLength;
             int weigth = 1; // weight of a ring size
@@ -1443,8 +1444,8 @@ public class GraphOperations
                 weigth = rcParams.getRingSizeBias().get(resultingRingSize);
             }
             
-            // We add copies of the same vertex to the list of candidate 
-            // vertexes, so when we randomly choose we are more likely to 
+            // We add copies of the same option to the list of candidates,
+            // so when we randomly choose we are more likely to 
             // choose those leading to preferred ring sizes.
             for (int z=0; z<weigth; z++)
             {
@@ -1458,14 +1459,17 @@ public class GraphOperations
             return false;
         }
         
-        Vertex incomingVertex = rng.randomlyChooseOne(szBiasedUsableBridges);
+        EAUtils.BridgeOption chosenBridge =
+                rng.randomlyChooseOne(szBiasedUsableBridges);
         
         // Decide which aps on the bridge are used as head/tail
-        List<AttachmentPoint> apsInFusion = new ArrayList<AttachmentPoint>();
         int[] idApOnBridge = new int[2];
         if (newRingIsAromatic)
         {
-            apsInFusion.addAll(incomingVertex.getAPsWithAPClassStartingWith(
+            // Need a temporary view of APs on the library vertex (no clone yet)
+            Vertex libBridge = chosenBridge.getLibraryVertex();
+            List<AttachmentPoint> apsInFusion = new ArrayList<AttachmentPoint>();
+            apsInFusion.addAll(libBridge.getAPsWithAPClassStartingWith(
                     elInIncomingFrag));
             if (rng.nextBoolean())
             {
@@ -1476,10 +1480,8 @@ public class GraphOperations
                 idApOnBridge[1] = apsInFusion.get(0).getIndexInOwner();
             }
         } else {
-            idApOnBridge[0] = Integer.parseInt(incomingVertex.getProperty(
-                            DENOPTIMConstants.VRTPROPBRIDGEEND_A).toString());
-            idApOnBridge[1] = Integer.parseInt(incomingVertex.getProperty(
-                    DENOPTIMConstants.VRTPROPBRIDGEEND_B).toString());
+            idApOnBridge[0] = chosenBridge.getEndA();
+            idApOnBridge[1] = chosenBridge.getEndB();
         }
         
         if (idApOnBridge[0] == idApOnBridge[1])
@@ -1500,7 +1502,7 @@ public class GraphOperations
                 continue;
             }
             
-            Vertex bridgeClone = incomingVertex.clone();
+            Vertex bridgeClone = chosenBridge.makeConfiguredClone();
             bridgeClone.setVertexId(graph.getMaxVertexId()+1);
             
             graph.appendVertexOnAP(apHead, bridgeClone.getAP(idApOnBridge[0]));

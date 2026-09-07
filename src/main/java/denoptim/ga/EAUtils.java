@@ -3127,6 +3127,79 @@ public class EAUtils
 //------------------------------------------------------------------------------
 
     /**
+     * A usable ring-fusion bridge candidate that references a library vertex
+     * without cloning it until a clone is actually needed for insertion.
+     */
+    public static final class BridgeOption
+    {
+        private final Vertex libraryVertex;
+        private final int bridgeLength;
+        private final Integer endA;
+        private final Integer endB;
+
+        /**
+         * @param libraryVertex fragment/template from the fragment space
+         * (not a clone).
+         * @param bridgeLength number of atoms on the shortest path between the
+         * chosen ends.
+         * @param endA index of the AP used as bridge end A, or <code>null</code>
+         * if ends are chosen later (aromatic case).
+         * @param endB index of the AP used as bridge end B, or <code>null</code>
+         * if ends are chosen later (aromatic case).
+         */
+        public BridgeOption(Vertex libraryVertex, int bridgeLength,
+                Integer endA, Integer endB)
+        {
+            this.libraryVertex = libraryVertex;
+            this.bridgeLength = bridgeLength;
+            this.endA = endA;
+            this.endB = endB;
+        }
+
+        public Vertex getLibraryVertex()
+        {
+            return libraryVertex;
+        }
+
+        public int getBridgeLength()
+        {
+            return bridgeLength;
+        }
+
+        public Integer getEndA()
+        {
+            return endA;
+        }
+
+        public Integer getEndB()
+        {
+            return endB;
+        }
+
+        /**
+         * Creates a clone of the library vertex with bridge metadata properties
+         * set, ready to be inserted into a graph.
+         */
+        public Vertex makeConfiguredClone()
+        {
+            Vertex clone = libraryVertex.clone();
+            clone.setProperty(DENOPTIMConstants.VRTPROPBRIDGELENGTH,
+                    bridgeLength);
+            if (endA != null)
+            {
+                clone.setProperty(DENOPTIMConstants.VRTPROPBRIDGEEND_A, endA);
+            }
+            if (endB != null)
+            {
+                clone.setProperty(DENOPTIMConstants.VRTPROPBRIDGEEND_B, endB);
+            }
+            return clone;
+        }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
      * Finds all vertexes that can be used as aromatic bridge, i.e., can be used 
      * to create an aromatic ring by fusion with another aromatic ring.
      * @param elInIncomingFrag beginning of the {@link APClass} required on the
@@ -3134,17 +3207,16 @@ public class EAUtils
      * number of electrons available to the aromatic system.
      * @param allowedBridgeLength number of atoms.
      * @param fragSpace the fragment space where to look for fragments.
-     * @return the list of clones of usable fragments from the fragment space. 
-     * The length the bridge is recorded in {@link Vertex} property 
-     * {@link DENOPTIMConstants#VRTPROPBRIDGELENGH}.
+     * @return options referencing library fragments (not clones). Bridge length
+     * is recorded in each {@link BridgeOption}.
      */
-    public static List<Vertex> getUsableAromaticBridges(
+    public static List<BridgeOption> getUsableAromaticBridges(
             String elInIncomingFrag, int[] allowedLengths,
             FragmentSpace fragSpace)
     {
         List<Vertex> usableBridgesOriginals =
                 fragSpace.getVerticesWithAPClassStartingWith(elInIncomingFrag);
-        List<Vertex> usableBridges = new ArrayList<Vertex>();
+        List<BridgeOption> usableBridges = new ArrayList<BridgeOption>();
         final String rootAPC = elInIncomingFrag;
         for (Vertex bridge : usableBridgesOriginals)
         {
@@ -3161,10 +3233,8 @@ public class EAUtils
                     sp.atomsTo(atomIDs.get(1))));
             if (IntStream.of(allowedLengths).anyMatch(x -> x == path.size()))
             {
-                Vertex clone = bridge.clone();
-                clone.setProperty(DENOPTIMConstants.VRTPROPBRIDGELENGTH, 
-                        path.size());
-                usableBridges.add(clone);
+                usableBridges.add(new BridgeOption(bridge, path.size(),
+                        null, null));
             }
         }
         return usableBridges;
@@ -3178,14 +3248,13 @@ public class EAUtils
      * @param apcB class of the other AP to be used to attach the bridge.
      * @param allowedLengths list of allowed lengths in number of atoms.
      * @param fragSpace the fragment space where to look for fragments.
-     * @return the list of clones of usable fragments from the fragment space. 
-     * The length the bridge is recorded in {@link Vertex} property 
-     * {@link DENOPTIMConstants#VRTPROPBRIDGELENGH}.
+     * @return options referencing library fragments (not clones). Bridge length
+     * and end AP indexes are recorded in each {@link BridgeOption}.
      */
-    public static List<Vertex> getUsableAliphaticBridges(APClass apcA, 
+    public static List<BridgeOption> getUsableAliphaticBridges(APClass apcA, 
             APClass apcB, int[] allowedLengths, FragmentSpace fragSpace)
     {
-        List<Vertex> usableBridges = new ArrayList<Vertex>();
+        List<BridgeOption> usableBridges = new ArrayList<BridgeOption>();
         
         List<APClass> compatApClassesA = fragSpace.getCompatibleAPClasses(apcA);
         List<APClass> compatApClassesB = fragSpace.getCompatibleAPClasses(apcB);
@@ -3235,17 +3304,10 @@ public class EAUtils
                             if (IntStream.of(allowedLengths).anyMatch(
                                     x -> x == path.size()))
                             {
-                                Vertex clone = bridge.clone();
-                                clone.setProperty(
-                                        DENOPTIMConstants.VRTPROPBRIDGELENGTH, 
-                                        path.size());
-                                clone.setProperty(
-                                        DENOPTIMConstants.VRTPROPBRIDGEEND_A, 
-                                        apForA.getIndexInOwner());
-                                clone.setProperty(
-                                        DENOPTIMConstants.VRTPROPBRIDGEEND_B, 
-                                        apForB.getIndexInOwner());
-                                usableBridges.add(clone);
+                                usableBridges.add(new BridgeOption(bridge,
+                                        path.size(),
+                                        apForA.getIndexInOwner(),
+                                        apForB.getIndexInOwner()));
                             }
                         }
                     }

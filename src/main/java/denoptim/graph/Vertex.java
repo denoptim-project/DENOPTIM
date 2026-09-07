@@ -1035,10 +1035,10 @@ public abstract class Vertex implements Cloneable
      */
     public int getIndexOfAP(AttachmentPoint ap)
     {
-        for (int i=0; i<getAttachmentPoints().size(); i++)
+        List<AttachmentPoint> aps = getAttachmentPoints();
+        for (int i = 0; i < aps.size(); i++)
         {
-            AttachmentPoint candAp = getAttachmentPoints().get(i);
-            if (candAp == ap)
+            if (aps.get(i) == ap)
             {
                 return i;
             }

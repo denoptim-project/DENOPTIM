@@ -2478,8 +2478,8 @@ public class EAUtilsTest
                 new HashMap<APClass,ArrayList<APClass>>()); 
         
         // Wrong size is enough to find no match
-        List<Vertex> lst = EAUtils.getUsableAromaticBridges("4el", new int[]{5},
-                fs);
+        List<EAUtils.BridgeOption> lst = EAUtils.getUsableAromaticBridges("4el",
+                new int[]{5}, fs);
         assertEquals(0, lst.size());
         
         // Wrong number of electrons is enough to find no match
@@ -2568,8 +2568,8 @@ public class EAUtilsTest
                 new HashMap<APClass,ArrayList<APClass>>()); 
         
         // Same class on both ends
-        List<Vertex> lst = EAUtils.getUsableAliphaticBridges(apcB, apcB, 
-                new int[]{2}, fs);
+        List<EAUtils.BridgeOption> lst = EAUtils.getUsableAliphaticBridges(apcB,
+                apcB, new int[]{2}, fs);
         assertEquals(4, lst.size());
         
         // Multiple lengths

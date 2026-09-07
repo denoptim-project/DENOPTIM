@@ -367,6 +367,37 @@ public class TemplateTest
 //------------------------------------------------------------------------------
 
     @Test
+    public void testGetAttachmentPoints_reusesCachedListAndIndexes()
+            throws DENOPTIMException
+    {
+        Template template = new Template(BBType.NONE);
+        EmptyVertex v = new EmptyVertex();
+        v.addAP();
+        v.addAP();
+        DGraph innerGraph = new DGraph();
+        innerGraph.addVertex(v);
+        template.setInnerGraph(innerGraph);
+
+        List<AttachmentPoint> first = template.getAttachmentPoints();
+        List<AttachmentPoint> second = template.getAttachmentPoints();
+        assertSame(first, second);
+        assertEquals(2, first.size());
+        for (int i = 0; i < first.size(); i++)
+        {
+            assertEquals(i, first.get(i).getIndexInOwner());
+            assertEquals(i, template.getIndexOfAP(first.get(i)));
+        }
+
+        AttachmentPoint innerToRemove = v.getAP(0);
+        template.removeProjectionOfInnerAP(innerToRemove);
+        List<AttachmentPoint> afterRemove = template.getAttachmentPoints();
+        assertEquals(1, afterRemove.size());
+        assertEquals(0, afterRemove.get(0).getIndexInOwner());
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
     public void testSetInnerGraph_throws_on_graph_incompatible_w_requiredAPs()
             throws DENOPTIMException {
         int numberOfAPs = 2;

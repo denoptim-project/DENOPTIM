@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,6 +128,20 @@ public class Template extends Vertex
     private List<AttachmentPoint> requiredAPs = new ArrayList<>();
 
     private APTreeMap innerToOuterAPs;
+
+    /**
+     * Cached list of outer APs (values of {@link #innerToOuterAPs}). Rebuilt
+     * lazily and invalidated when the inner-to-outer mapping changes, so
+     * {@link #getAttachmentPoints()} does not allocate a new list on every
+     * call.
+     */
+    private ArrayList<AttachmentPoint> cachedOuterAPs;
+
+    /**
+     * Identity map from outer AP to its index in {@link #cachedOuterAPs}.
+     * Kept in sync with that cache.
+     */
+    private IdentityHashMap<AttachmentPoint, Integer> cachedOuterAPIndexes;
 
     
 //------------------------------------------------------------------------------
@@ -311,6 +326,7 @@ public class Template extends Vertex
         this.innerGraph = innerGraph;
         innerGraph.setTemplateJacket(this);
         this.innerToOuterAPs = new APTreeMap();
+        invalidateOuterAPCache();
 
         //TODO: we might need to remove unused RCVs from inner graph.
         // Such RCVs cannot be used outside the template.
@@ -333,6 +349,43 @@ public class Template extends Vertex
             outerAP.setOwner(this);
             this.innerToOuterAPs.put(innerAP, outerAP);
         }
+        invalidateOuterAPCache();
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Drops cached outer-AP list and AP-index map so they are rebuilt on next
+     * access after the inner-to-outer mapping has changed.
+     */
+    private void invalidateOuterAPCache()
+    {
+        cachedOuterAPs = null;
+        cachedOuterAPIndexes = null;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Ensures {@link #cachedOuterAPs} and {@link #cachedOuterAPIndexes} match
+     * the current {@link #innerToOuterAPs} mapping.
+     */
+    private void ensureOuterAPCache()
+    {
+        if (cachedOuterAPs != null)
+            return;
+        if (innerToOuterAPs == null)
+        {
+            cachedOuterAPs = new ArrayList<>();
+            cachedOuterAPIndexes = new IdentityHashMap<>();
+            return;
+        }
+        cachedOuterAPs = new ArrayList<>(innerToOuterAPs.values());
+        cachedOuterAPIndexes = new IdentityHashMap<>(cachedOuterAPs.size());
+        for (int i = 0; i < cachedOuterAPs.size(); i++)
+        {
+            cachedOuterAPIndexes.put(cachedOuterAPs.get(i), i);
+        }
     }
 
 //-----------------------------------------------------------------------------
@@ -354,6 +407,7 @@ public class Template extends Vertex
         AttachmentPoint outerAP = newInnerAP.clone();
         outerAP.setOwner(this);
         innerToOuterAPs.put(newInnerAP, outerAP);
+        invalidateOuterAPCache();
         // Recursion on nesting templates to add projections of the AP
         if (getGraphOwner() != null && getGraphOwner().templateJacket != null)
         {
@@ -386,6 +440,8 @@ public class Template extends Vertex
         
         innerToOuterAPs.remove(oldInnerAP);
         innerToOuterAPs.put(newInnerAP, outerAP);
+        // LinkedHashMap reinsertion moves the entry; list order may change.
+        invalidateOuterAPCache();
     }
     
 //-----------------------------------------------------------------------------
@@ -415,6 +471,7 @@ public class Template extends Vertex
             getGraphOwner().templateJacket.removeProjectionOfInnerAP(outer); 
         }
         innerToOuterAPs.remove(oldInnerAP);
+        invalidateOuterAPCache();
     }
     
 //-----------------------------------------------------------------------------
@@ -452,15 +509,48 @@ public class Template extends Vertex
      * Return the list of attachment points visible from outside the template, 
      * i.e., the so-called outer APs. Each outer AP is a projection of an AP
      * present in the embedded graph, i.e., inner AP.
+     * <p>
+     * The returned list is cached and reused until the inner-to-outer AP
+     * mapping changes. Callers must not add/remove elements; use the template
+     * mapping methods instead.
      * @return the list of outer AP
      */
     @Override
     public ArrayList<AttachmentPoint> getAttachmentPoints()
     {
-        if (innerToOuterAPs == null)
-            return new ArrayList<>();
-        else
-            return new ArrayList<>(innerToOuterAPs.values());
+        ensureOuterAPCache();
+        return cachedOuterAPs;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     * Uses a cached identity map so repeated index lookups do not walk the
+     * outer-AP list.
+     */
+    @Override
+    public int getIndexOfAP(AttachmentPoint ap)
+    {
+        ensureOuterAPCache();
+        Integer idx = cachedOuterAPIndexes.get(ap);
+        return idx == null ? -1 : idx;
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Clears the outer-AP mapping and its caches. Prefer this over mutating
+     * the list returned by {@link #getAttachmentPoints()}.
+     */
+    @Override
+    public void cleanup()
+    {
+        if (innerToOuterAPs != null)
+        {
+            innerToOuterAPs.clear();
+        }
+        invalidateOuterAPCache();
     }
 
 //-----------------------------------------------------------------------------
