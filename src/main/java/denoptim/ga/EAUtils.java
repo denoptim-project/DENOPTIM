@@ -2605,7 +2605,8 @@ public class EAUtils
         // method searchRingFusionSites
         Logger logger = gaParams.getLogger();
         return searchRingFusionSites(graph, fragSpace, rcParams, 
-                projectOnSymmetricAPs, logger,  rng);
+                projectOnSymmetricAPs, logger, rng,
+                gaParams.maxAddFusedRingSites);
     }
 
 //------------------------------------------------------------------------------
@@ -2642,6 +2643,26 @@ public class EAUtils
             DGraph graph, FragmentSpace fragSpace, 
             RingClosureParameters rcParams, boolean projectOnSymmetricAPs, 
             Logger logger, Randomizer rng) throws DENOPTIMException
+    {
+        return searchRingFusionSites(graph, fragSpace, rcParams,
+                projectOnSymmetricAPs, logger, rng, Integer.MAX_VALUE);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Same as {@link #searchRingFusionSites(DGraph, FragmentSpace,
+     * RingClosureParameters, boolean, Logger, Randomizer)} but caps the number
+     * of returned fusion-site combinations.
+     *
+     * @param maxFusionSites maximum number of site combinations to return.
+     * When more are found, a random subset of this size is retained.
+     */
+    public static List<List<RelatedAPPair>> searchRingFusionSites(
+            DGraph graph, FragmentSpace fragSpace, 
+            RingClosureParameters rcParams, boolean projectOnSymmetricAPs, 
+            Logger logger, Randomizer rng, int maxFusionSites)
+                    throws DENOPTIMException
     {   
         // Prepare the empty collector of combinations
         List<List<RelatedAPPair>> result = new ArrayList<List<RelatedAPPair>>();
@@ -2970,6 +2991,13 @@ public class EAUtils
             {
                 result.add(combOnOriginalGraph);
             }
+        }
+        if (result.size() > maxFusionSites)
+        {
+            logger.log(Level.WARNING,
+                    "Capped list of ring fusion sites at " + maxFusionSites);
+            rng.shuffle(result);
+            return new ArrayList<>(result.subList(0, maxFusionSites));
         }
         return result;
     } 

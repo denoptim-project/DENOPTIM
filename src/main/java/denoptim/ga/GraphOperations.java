@@ -1305,7 +1305,8 @@ public class GraphOperations
                     fragSpace,
                     rcParams,
                     rng.nextBoolean(settings.getSymmetryProbability()),
-                    settings.getLogger(), rng);
+                    settings.getLogger(), rng,
+                    settings.maxAddFusedRingSites);
         if (candidatePairsSets.size()==0)
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOSITE);
@@ -1426,6 +1427,16 @@ public class GraphOperations
         {
             mnt.increase(CounterID.FAILEDMUTATTEMTS_PERFORM_NOADDFUSEDRING_NOBRIDGE);
             return false;
+        }
+
+        if (usableBridges.size() > settings.maxAddFusedRingBridges)
+        {
+            settings.getLogger().log(Level.WARNING,
+                    "Capped list of ADDFUSEDRING bridges at "
+                    + settings.maxAddFusedRingBridges);
+            rng.shuffle(usableBridges);
+            usableBridges = new ArrayList<>(usableBridges.subList(0,
+                    settings.maxAddFusedRingBridges));
         }
         
         // Select size of the incoming bridge based on ring-size biases

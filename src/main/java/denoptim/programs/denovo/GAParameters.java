@@ -446,6 +446,25 @@ public class GAParameters extends RunTimeParameters
      * {@link denoptim.fragspace.APMapFinder} (e.g., during crossover).
      */
     public int maxAPMappingCombinations = 250;
+
+    /**
+     * Limit to the number of distinct bridge candidates considered in a single
+     * {@link denoptim.utils.MutationType#ADDFUSEDRING} mutation. When more
+     * bridges are found, a random subset of this size is retained before
+     * ring-size biasing. Default is no practical limit
+     * ({@link Integer#MAX_VALUE}).
+     */
+    public int maxAddFusedRingBridges = Integer.MAX_VALUE;
+
+    /**
+     * Limit to the number of ring-fusion site combinations considered in a
+     * single {@link denoptim.utils.MutationType#ADDFUSEDRING} mutation (and
+     * when scanning mutable sites that may host that mutation). When more
+     * sites are found, a random subset of this size is retained before
+     * ring-size biasing. Default is no practical limit
+     * ({@link Integer#MAX_VALUE}).
+     */
+    public int maxAddFusedRingSites = Integer.MAX_VALUE;
     
     /**
      * Flag requesting to write a SDF file that collects all the population 
@@ -1443,6 +1462,24 @@ public class GAParameters extends RunTimeParameters
                 if (value.length() > 0)
                 {
                     maxAPMappingCombinations = Integer.parseInt(value);
+                }
+                break;
+            }
+
+            case "MAXADDFUSEDRINGBRIDGES=":
+            {
+                if (value.length() > 0)
+                {
+                    maxAddFusedRingBridges = Integer.parseInt(value);
+                }
+                break;
+            }
+
+            case "MAXADDFUSEDRINGSITES=":
+            {
+                if (value.length() > 0)
+                {
+                    maxAddFusedRingSites = Integer.parseInt(value);
                 }
                 break;
             }
