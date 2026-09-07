@@ -19,6 +19,7 @@
 package denoptim.utils;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.vecmath.Point3d;
 
@@ -313,6 +314,25 @@ public class Randomizer
             i++;
         }
         return chosenObj;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Fisher-Yates shuffle of the given list. The outcome is reproducible for a
+     * given random seed of this {@link Randomizer}.
+     * @param <T> the type of the list elements.
+     * @param list the list to shuffle in place.
+     */
+    public <T> void shuffle(List<T> list)
+    {
+        for (int i = list.size() - 1; i > 0; i--)
+        {
+            int j = nextInt(i + 1);
+            T tmp = list.get(i);
+            list.set(i, list.get(j));
+            list.set(j, tmp);
+        }
     }
 
 //------------------------------------------------------------------------------

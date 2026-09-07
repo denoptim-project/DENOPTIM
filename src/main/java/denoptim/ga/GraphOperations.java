@@ -92,7 +92,9 @@ public class GraphOperations
      * @param maxSizeXoverSubGraph the limit to the size of subgraphs that can
      * can be exchanged by crossover.
      * @param maxCompatibleVrtxPairs the limit to the number of compatible vertex
-     * pairs to consider. When exceeded, a random subset of this size is kept.
+     * pairs to consider. If more compatible pairs exist, collection stops and
+     * a random sample of this size is taken by scanning shuffled edge lists
+     * (via {@link Randomizer}), so the sample is randomized yet reproducible.
      * @param maxEndPointsCombinations the limit to the number of combinations of
      * subgraph end points considered for each compatible vertex pair.
      * @param maxEndPointsPermutations the limit to the number of permutations of
@@ -109,10 +111,15 @@ public class GraphOperations
             int maxAPMappingCombinations) 
                     throws DENOPTIMException
     {
-        // First, we identify all the edges that allow crossover, and collect
-        // their target vertexes (i.e., all the potential seed vertexes of 
-        // subgraphs that crossover could swap.
+        // First, we identify edges that allow crossover, and collect
+        // their target vertexes (i.e., potential seed vertexes of 
+        // subgraphs that crossover could swap). If more than
+        // maxCompatibleVrtxPairs compatible pairs exist, we stop and
+        // re-collect from edge lists shuffled via Randomizer so the
+        // capped sample is randomized yet reproducible.
         List<Vertex[]> compatibleVrtxPairs = new ArrayList<Vertex[]>();
+        boolean needsRandomCap = false;
+        scanCompatiblePairs:
         for (Edge eA : graphA.getEdgeList())
         {
             Vertex vA = eA.getTrgAP().getOwner();
@@ -130,30 +137,53 @@ public class GraphOperations
                 //Check condition for considering this combination
                 if (isCrossoverPossible(eA, eB, fragSpace))
                 {
+                    if (compatibleVrtxPairs.size() >= maxCompatibleVrtxPairs)
+                    {
+                        needsRandomCap = true;
+                        break scanCompatiblePairs;
+                    }
                     Vertex[] pair = new Vertex[]{vA,vB};
                     compatibleVrtxPairs.add(pair);
                 }
             }
         }
-
-        // Limit the number of compatible vertex pairs to avoid 
-        // combinatorial explosion (random subset for unbiased coverage)
-        if (compatibleVrtxPairs.size() > maxCompatibleVrtxPairs)
+        if (needsRandomCap)
         {
             fragSpace.getLogger().log(Level.WARNING, 
-                "Capped list of compatible xover vertex pairs from "
-                    + compatibleVrtxPairs.size() + " to " + maxCompatibleVrtxPairs);
+                "Capped list of compatible xover vertex pairs at "
+                    + maxCompatibleVrtxPairs);
 
             Randomizer rng = fragSpace.getRandomizer();
-            for (int i = 0; i < maxCompatibleVrtxPairs; i++)
+            List<Edge> edgesA = new ArrayList<Edge>(graphA.getEdgeList());
+            List<Edge> edgesB = new ArrayList<Edge>(graphB.getEdgeList());
+            rng.shuffle(edgesA);
+            rng.shuffle(edgesB);
+
+            compatibleVrtxPairs = new ArrayList<Vertex[]>();
+            collectRandomCompatiblePairs:
+            for (Edge eA : edgesA)
             {
-                int j = i + rng.nextInt(compatibleVrtxPairs.size() - i);
-                Vertex[] tmp = compatibleVrtxPairs.get(i);
-                compatibleVrtxPairs.set(i, compatibleVrtxPairs.get(j));
-                compatibleVrtxPairs.set(j, tmp);
+                Vertex vA = eA.getTrgAP().getOwner();
+                if (vA.getBuildingBlockType() == BBType.CAP)
+                    continue;
+                
+                for (Edge eB : edgesB)
+                {
+                    Vertex vB = eB.getTrgAP().getOwner();
+                    if (vB.getBuildingBlockType() == BBType.CAP)
+                        continue;
+                    
+                    if (isCrossoverPossible(eA, eB, fragSpace))
+                    {
+                        Vertex[] pair = new Vertex[]{vA,vB};
+                        compatibleVrtxPairs.add(pair);
+                        if (compatibleVrtxPairs.size() >= maxCompatibleVrtxPairs)
+                        {
+                            break collectRandomCompatiblePairs;
+                        }
+                    }
+                }
             }
-            compatibleVrtxPairs = new ArrayList<Vertex[]>(
-                    compatibleVrtxPairs.subList(0, maxCompatibleVrtxPairs));
         }
         
         // The crossover sites are the combination of the above compatible
