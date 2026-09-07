@@ -1,0 +1,8 @@
+<map id="denoptim.graph.Edge.getTrgAPID" name="denoptim.graph.Edge.getTrgAPID">
+<area shape="rect" id="node1" title=" " alt="" coords="831,78,1044,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5bac29c23eccedca8d2371ad372d87b6" title=" " alt="" coords="586,5,765,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a7a13e1b1304c0857ae6fa97b744e7289" title="Method to select fragments that increase the likeliness of generating closable chains." alt="" coords="568,71,783,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_edge.html#a9a7430e5a0df146b404ca4d30e0beee4" title=" " alt="" coords="580,137,771,163"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a649892c4a2b1d4ccd2f97cae6dd7ed98" title=" " alt="" coords="288,71,520,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="5,71,240,112"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.io.DenoptimIO.readGraphFromSDFileIAC" name="denoptim.io.DenoptimIO.readGraphFromSDFileIAC">
+<area shape="rect" id="node1" title="Converts an atom container read in from an SDF file into a graph, if possible." alt="" coords="5,22,193,63"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aa5f803143b57df02989af878b098798f" title="Reads a JSON string and returns an instance of this class." alt="" coords="241,29,456,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a3e85cb26bb2f36407e309e41880ef191" title=" " alt="" coords="504,22,727,63"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="775,22,997,63"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a4aafec42bd09225870fdf330db93b84c" title=" " alt="" coords="1045,22,1251,63"/>
+</map>

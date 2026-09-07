@@ -1,0 +1,4 @@
+<map id="denoptim.programs.RunTimeParameters.ensureFileExists" name="denoptim.programs.RunTimeParameters.ensureFileExists">
+<area shape="rect" id="node1" title="Ensures a pathname does lead to an existing file or triggers an error." alt="" coords="5,5,192,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#a16bc762b79f5033f2323fb8728593334" title=" " alt="" coords="240,5,431,47"/>
+</map>

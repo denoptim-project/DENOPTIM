@@ -1,0 +1,4 @@
+<map id="denoptim.graph.Ring.insertVertex" name="denoptim.graph.Ring.insertVertex">
+<area shape="rect" id="node1" title="Adds a vertex to the ring, and in between two defined vertices." alt="" coords="5,5,180,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_ring.html#a52d320207aa3fc73898eb662e8f208cb" title="Checks whether a given vertex is part of this ring." alt="" coords="228,13,419,39"/>
+</map>

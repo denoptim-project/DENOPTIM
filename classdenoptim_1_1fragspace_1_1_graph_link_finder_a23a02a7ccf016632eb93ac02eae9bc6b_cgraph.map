@@ -1,0 +1,12 @@
+<map id="denoptim.fragspace.GraphLinkFinder.getCandidateBBs" name="denoptim.fragspace.GraphLinkFinder.getCandidateBBs">
+<area shape="rect" id="node1" title=" " alt="" coords="5,90,192,131"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#aed02226a5695be948ae2c33e787e22c3" title=" " alt="" coords="240,25,433,66"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ae30c8a77be3202d7072d5b0b66a6ae59" title=" " alt="" coords="240,90,433,131"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a492683049dc687fcdc41b43051d30554" title="Returns a clone of the requested building block." alt="" coords="240,155,433,197"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="483,5,667,32"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="490,57,661,98"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="482,122,669,163"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="481,187,669,229"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="490,253,661,294"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a29e20c43a6110fbaac6cc86c216fe143" title=" " alt="" coords="490,318,661,359"/>
+</map>

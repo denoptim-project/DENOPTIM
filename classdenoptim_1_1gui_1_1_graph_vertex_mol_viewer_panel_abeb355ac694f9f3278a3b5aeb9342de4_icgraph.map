@@ -1,0 +1,8 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.resetFragViewerCardDeck" name="denoptim.gui.GraphVertexMolViewerPanel.resetFragViewerCardDeck">
+<area shape="rect" id="node1" title="Changes the appearance of the vertex visualisation panel to an empty card that is consistent with the..." alt="" coords="895,77,1109,133"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#abab3007ca39f050b3b9916c4bcc994ca" title="Loads the given graph into the graph viewer." alt="" coords="597,5,807,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a67ce3e03e9d13d3f312652296d25c0a5" title=" " alt="" coords="587,85,817,126"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel_1_1_node_clicked_listener.html#a4c7c2b6e03029c1850296cda96c5d6bc" title=" " alt="" coords="557,149,847,205"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,92,509,119"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,85,211,126"/>
+</map>

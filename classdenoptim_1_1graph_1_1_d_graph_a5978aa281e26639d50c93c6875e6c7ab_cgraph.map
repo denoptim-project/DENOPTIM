@@ -1,0 +1,6 @@
+<map id="denoptim.graph.DGraph.getEmbeddedGraphInClone" name="denoptim.graph.DGraph.getEmbeddedGraphInClone">
+<area shape="rect" id="node1" title="Searches for a graphs (X) embedded at any level in a graph (Y) by knowing." alt="" coords="5,71,184,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_template.html#a7869ba705f5898855fe68dd443721f8e" title=" " alt="" coords="240,5,428,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a58811a9ea75a26abffc1a9c7c2b22741" title="Returns the vertex that is in the given position of the list of vertices belonging to this graph." alt="" coords="245,71,423,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4ce08e69a1405ecd454bafbe2e86e363" title="Returns the index of a vertex in the list of vertices of this graph." alt="" coords="232,137,436,163"/>
+</map>

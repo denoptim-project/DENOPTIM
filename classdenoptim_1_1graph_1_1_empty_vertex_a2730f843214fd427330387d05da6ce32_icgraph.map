@@ -1,0 +1,4 @@
+<map id="denoptim.graph.EmptyVertex.getIAtomContainer" name="denoptim.graph.EmptyVertex.getIAtomContainer">
+<area shape="rect" id="node1" title="Although empty vertex do not contain atoms, by definitions, we allow the generation of an SDF represe..." alt="" coords="260,5,467,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#a34cb7de329118a02e4c9c6a8217826c1" title="Although empty vertex do not contain atoms, by definitions, we allow the generation of an SDF represe..." alt="" coords="5,5,212,47"/>
+</map>

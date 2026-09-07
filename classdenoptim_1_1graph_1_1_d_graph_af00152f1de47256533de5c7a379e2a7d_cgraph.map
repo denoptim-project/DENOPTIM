@@ -1,0 +1,4 @@
+<map id="denoptim.graph.DGraph.getEmbeddingPath" name="denoptim.graph.DGraph.getEmbeddingPath">
+<area shape="rect" id="node1" title="Find the path that one has to traverse to reach this graph from any template&#45;embedding structure." alt="" coords="5,29,184,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="232,29,403,71"/>
+</map>

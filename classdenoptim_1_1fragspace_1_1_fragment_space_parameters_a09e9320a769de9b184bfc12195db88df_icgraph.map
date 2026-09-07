@@ -1,0 +1,8 @@
+<map id="denoptim.fragspace.FragmentSpaceParameters.processParameters" name="denoptim.fragspace.FragmentSpaceParameters.processParameters">
+<area shape="rect" id="node1" title="Read the information collected in the parameters stored in this class and create the fragment space a..." alt="" coords="1113,39,1356,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_f_s_params_dialog.html#ae39602275c1287e6916f7693a0824b08" title="Reads all the parameters, calls the interpreters, and eventually creates the static FragmentSpace obj..." alt="" coords="835,39,1065,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_f_s_params_dialog.html#a5a9b51978e6cfce0b434a8d72c7c6107" title="Constructor." alt="" coords="573,5,771,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a67ce3e03e9d13d3f312652296d25c0a5" title=" " alt="" coords="557,71,787,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,78,509,105"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,71,211,112"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="denoptim.graph.DGraph.convertSymmetricLabelsToSymmetricSets" name="denoptim.graph.DGraph.convertSymmetricLabelsToSymmetricSets">
+<area shape="rect" id="node1" title="Looks for any symmetric labels, creates symmetric sets that collect the same information,..." alt="" coords="613,201,840,243"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a86e888ef245d2bd40b49d145c7ef3af0" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="328,37,531,79"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#adc362402e41af41656e820def73de5ad" title="Replaced a given vertex belonging to this graph with a new vertex generated specifically for this pur..." alt="" coords="328,103,531,144"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a88c2fd8a1b401d9aa25bf85869bc28c7" title=" " alt="" coords="293,168,565,209"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a75784f0e5c219c9bae7d4c84054de8fd" title=" " alt="" coords="325,233,533,275"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a887c0d2f99c17c0c4659e84e4c52c61d" title=" " alt="" coords="299,298,559,354"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#af7f0715cf5fdabf96fa54678e6c18d74" title=" " alt="" coords="310,378,549,434"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="26,5,225,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations.html#aa669d9f9dff0f3dd32a7a786bcb839bd" title="Performs crossover as defined by the given XoverSite." alt="" coords="5,71,245,112"/>
+</map>

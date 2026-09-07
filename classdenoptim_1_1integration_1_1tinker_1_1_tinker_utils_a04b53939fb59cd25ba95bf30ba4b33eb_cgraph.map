@@ -1,0 +1,8 @@
+<map id="denoptim.integration.tinker.TinkerUtils.readTinkerINT" name="denoptim.integration.tinker.TinkerUtils.readTinkerINT">
+<area shape="rect" id="node1" title="Reads a Tinker INT file." alt="" coords="5,184,181,225"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ae9486d28880e0c8225c0092acab98165" title="Add an atom to the ZMatrix." alt="" coords="229,5,463,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="229,95,463,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a1db113a8dbb6ff33d597115771893fed" title="Delete the bond between the two atoms at the given indices." alt="" coords="229,184,463,225"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="229,249,463,291"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a6a5dddb77381cffcd8f187d3cf009c48" title="Set the id of the ZMatrix." alt="" coords="229,315,463,356"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GUITextReader" name="denoptim.gui.GUITextReader">
+<area shape="rect" id="node1" title="A panel that allows to print the content of a text file into a GUI tab." alt="" coords="5,155,193,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel.html" title="Class of GUI panels meant to occupy one card in the deck&#45;of&#45;cards layout of the main panel." alt="" coords="8,80,191,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="68,5,131,32"/>
+</map>

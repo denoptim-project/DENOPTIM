@@ -1,0 +1,12 @@
+<map id="denoptim.utils.MoleculeUtilsTest.testCalculateBondAngleAgreement" name="denoptim.utils.MoleculeUtilsTest.testCalculateBondAngleAgreement">
+<area shape="rect" id="node1" title=" " alt="" coords="5,114,259,155"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a02e67057e68e9dbbbbf568808544f005" title="Calculates bond angle agreement and returns raw data." alt="" coords="309,81,547,122"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a328ac35ce6ed2f5d61be7142fb8cf12c" title="Normalizes the raw bond angle agreement data to a single score." alt="" coords="307,146,549,187"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_math_utils.html#af2e2b857db3b0a9c8d0ada2901eafca1" title="Compute the cross product of two vectors." alt="" coords="597,15,812,57"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_math_utils.html#aab91f5150ef82c7e3c04c350fa2bfe0f" title="Calculates angle (in degrees) between vectors BA and BC." alt="" coords="613,81,796,122"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="602,146,807,187"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_math_utils.html#ac697c4b44f2cc17f369c23672ed6f68e" title="compute the angle between two vectors a &amp; b of same length" alt="" coords="860,81,1076,122"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="1134,29,1329,56"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_math_utils.html#a2d786a84f8631fb1080ee7bfbc15d697" title="Compute the dot product (a scalar) between two vectors." alt="" coords="1124,81,1339,122"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_math_utils.html#a56ec1293dcc43a7c5cf5f41a551ecd72" title="Return the norm of a vector." alt="" coords="1132,147,1331,173"/>
+</map>

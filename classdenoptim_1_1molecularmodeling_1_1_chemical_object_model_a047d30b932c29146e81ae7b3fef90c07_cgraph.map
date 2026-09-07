@@ -1,0 +1,4 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.convertRingsToRCACombinations" name="denoptim.molecularmodeling.ChemicalObjectModel.convertRingsToRCACombinations">
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,233,61"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#a082a9cf3e1a0b4d17f08080d00b0d6df" title="Get the reference to the graph representation of the ring this attractor is meant to close." alt="" coords="281,13,472,54"/>
+</map>

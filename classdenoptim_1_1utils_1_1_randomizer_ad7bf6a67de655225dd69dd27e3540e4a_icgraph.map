@@ -1,0 +1,4 @@
+<map id="denoptim.utils.Randomizer.setSeed" name="denoptim.utils.Randomizer.setSeed">
+<area shape="rect" id="node1" title="Sets the random seed." alt="" coords="305,5,529,32"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_randomizer.html#afb91c2c6e78b76fcaab660267adddc14" title="Initialized this random number generator using the given seed." alt="" coords="5,5,257,32"/>
+</map>

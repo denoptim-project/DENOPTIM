@@ -1,0 +1,7 @@
+<map id="denoptim.molecularmodeling.ChemicalObjectModel.ChemicalObjectModel" name="denoptim.molecularmodeling.ChemicalObjectModel.ChemicalObjectModel">
+<area shape="rect" id="node1" title="Constructs an item specifying all its features." alt="" coords="5,62,284,103"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_chemical_object_model.html#a047d30b932c29146e81ae7b3fef90c07" title=" " alt="" coords="332,5,560,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#afcb7e84c46c1a2eeb445a90cb282dc83" title="Check for rings in this graph and in any graph that is embedded at any level in any vertex of this gr..." alt="" coords="355,110,537,151"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closing_attractor.html#a082a9cf3e1a0b4d17f08080d00b0d6df" title="Get the reference to the graph representation of the ring this attractor is meant to close." alt="" coords="608,13,799,54"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template.html#a7869ba705f5898855fe68dd443721f8e" title=" " alt="" coords="609,110,797,151"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.ga.Population.getMinFitness" name="denoptim.ga.Population.getMinFitness">
+<area shape="rect" id="node1" title="Gets the minimum value of the fitness in this population." alt="" coords="5,5,183,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_candidate.html#a0738609a1a3bec92633440d449a62c67" title=" " alt="" coords="456,5,648,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_population.html#a914f7bdf119e8a7b749d6e37eed3f0e4" title="Gets the Candidate with minimum value of the fitness in this population." alt="" coords="231,35,408,76"/>
+</map>

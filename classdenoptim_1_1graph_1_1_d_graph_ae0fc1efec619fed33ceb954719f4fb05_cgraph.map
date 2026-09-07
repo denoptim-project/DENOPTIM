@@ -1,0 +1,10 @@
+<map id="denoptim.graph.DGraph.getChildrenTree" name="denoptim.graph.DGraph.getChildrenTree">
+<area shape="rect" id="node1" title="Gets all the children of the current vertex recursively." alt="" coords="5,100,184,141"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3a184063c09f54ff6798aea4dd504302" title="Gets all the children of the current vertex recursively." alt="" coords="232,71,411,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a70aeea1a1fe35ea9fe5a49a147e76f1a" title=" " alt="" coords="459,100,637,141"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a846e0f49dfefd933c429450545338d25" title="Looks into the edges that use any of the APs that belong to this vertex and returns the list of verti..." alt="" coords="685,100,856,141"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="919,5,1090,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="915,71,1095,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="904,137,1105,163"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="905,187,1105,214"/>
+</map>

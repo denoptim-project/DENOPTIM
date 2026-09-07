@@ -1,0 +1,5 @@
+<map id="denoptim.programs.fragmenter.FragmenterParameters.interpretKeyword" name="denoptim.programs.fragmenter.FragmenterParameters.interpretKeyword">
+<area shape="rect" id="node1" title="Processes a keyword/value pair and assign the related parameters." alt="" coords="5,39,260,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_formula_utils.html#a361fd821e0c6a83709faada69b192c8d" title="Reads a molecular formula written as &quot;H2 O&quot; or &quot;C6 H12 O6&quot;." alt="" coords="308,5,523,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a3cc82da1fcb9f1e354522b55eda3ff27" title="Reads a string searching for any common way to say either yes/true (including shorthand t/y) or no/fa..." alt="" coords="308,71,523,112"/>
+</map>

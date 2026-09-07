@@ -1,0 +1,4 @@
+<map id="denoptim.integration.tinker.TinkerException.TinkerException" name="denoptim.integration.tinker.TinkerException.TinkerException">
+<area shape="rect" id="node1" title="Constructor for an exception resulting from a failure of Tinker." alt="" coords="5,5,215,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_exception.html#a57bf684b8948776403fa2b4916caa9b8" title="Reads the message and trying to find a match in the map of solutions to known problems." alt="" coords="263,5,459,47"/>
+</map>

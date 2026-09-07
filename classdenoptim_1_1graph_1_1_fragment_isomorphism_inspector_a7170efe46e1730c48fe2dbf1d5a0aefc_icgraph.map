@@ -1,0 +1,7 @@
+<map id="denoptim.graph.FragmentIsomorphismInspector.isomorphismExists" name="denoptim.graph.FragmentIsomorphismInspector.isomorphismExists">
+<area shape="rect" id="node1" title="Checks if an isomorphism exists between the two fragments." alt="" coords="296,104,539,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragment_alignement.html#a544426b853510be7f33a7b794b225b04" title="Constructor for an alignment of two fragments." alt="" coords="21,5,232,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a58818a8ad99db167934420283484a5f7" title="Checks for isomorphism of the graph representation of this and another fragment." alt="" coords="36,71,217,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector_test.html#ac33b26784f254c873593368ccd717125" title=" " alt="" coords="5,136,248,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_fragment_isomorphism_inspector_test.html#a06e7f03c86471b6a5b06ffcb5358d0cf" title=" " alt="" coords="5,201,248,243"/>
+</map>

@@ -1,0 +1,25 @@
+<map id="denoptim.programs.denovo.GAParametersTest.testLogging" name="denoptim.programs.denovo.GAParametersTest.testLogging">
+<area shape="rect" id="node1" title=" " alt="" coords="5,300,211,341"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#a16bc762b79f5033f2323fb8728593334" title=" " alt="" coords="275,5,466,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_file_utils.html#a5c4375aa4522cc7f8229c131fbc2e0af" title="Creates a directory." alt="" coords="275,71,466,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a2cbfb524deabf9890bd1bd12b87c6bac" title=" " alt="" coords="267,136,474,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a6c52e0993a067619c2d812dfd493c168" title="Gets the pathname to the log file." alt="" coords="265,201,477,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="277,267,464,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#ad8adff3858c7dea67631d2c0de1b0a8c" title="Processes currently loaded fields." alt="" coords="259,332,483,373"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#af044aeccd6e679f1835024718507855e" title=" " alt="" coords="859,391,1086,432"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="265,519,476,546"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a890aaf1919e171a9c3f9206c9a93aa3b" title=" " alt="" coords="269,571,472,612"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a068e87ad643ab93690714153354f9944" title="Starts a logger with the given name." alt="" coords="264,661,477,717"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closure_parameters.html#ac31060459a0e96c5382f0e609422f178" title=" " alt="" coords="532,201,775,243"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a132443dda8e8278736100a7ff759f666" title=" " alt="" coords="549,267,757,308"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#acbac6ae9bd163f332713e3a6c8cb62a1" title="Create the directory that will store the output of the GA run." alt="" coords="531,332,776,373"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4da800dd8e739b91dbf8b4b960ee2e51" title=" " alt="" coords="560,397,747,439"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a0bfbd80ca3352b87f938e7e4c0c438ce" title="Returns the seed." alt="" coords="559,5,747,47"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#abcdf563c6c95b9a293cb0e71738355ff" title="Processes any of the parameter collections contained in this instance." alt="" coords="535,71,772,112"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#ab90df597a50f7903c802309cb87c5aca" title="Starts a program specific randomizer, i.e., a tool for generating random numbers and taking random de..." alt="" coords="560,136,747,177"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1utils_1_1_randomizer.html#a2d03be3ca70f76f94f4a178f2b12eb37" title=" " alt="" coords="861,13,1085,39"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a38d652dfc85081f78687a61b32f9a283" title="Builds the implementation of this class suitable to allocate parameters of the given type." alt="" coords="560,552,747,593"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a4cf7f93ac962a8979be6426b5b576384" title="Processes a string looking for keyword and a possibly associated value." alt="" coords="559,641,748,683"/>
+<area shape="rect" id="node20" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html#af225a4d21c1a04771222f81fe5622b2d" title=" " alt="" coords="824,520,1121,561"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a0ff947a81c127a3460907c7cffb9843b" title="Constructor." alt="" coords="867,585,1078,627"/>
+</map>

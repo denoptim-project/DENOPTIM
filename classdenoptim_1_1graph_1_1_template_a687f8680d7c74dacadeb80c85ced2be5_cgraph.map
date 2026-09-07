@@ -1,0 +1,11 @@
+<map id="denoptim.graph.Template.addInnerToOuterAPMapping" name="denoptim.graph.Template.addInnerToOuterAPMapping">
+<area shape="rect" id="node1" title="Adds the projection of an AP in the template&#39;s inner graph (i.e., innerAP) to the list of APs visible..." alt="" coords="5,188,196,229"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a8dc9e31a8d2fb5ef6a9705cbf2ec22c9" title="Returns a deep clone of this attachment point." alt="" coords="255,93,435,135"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="260,159,431,200"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#a9e1e1c1dd87ebfb469b6c705c00038b6" title=" " alt="" coords="244,225,447,251"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a76bfbe6cc3918c114c73974b2fe4e59d" title="Sets the reference to the vertex that owns this attachment point." alt="" coords="255,276,435,317"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a087f6102f1c542587ec2ec3c2240041f" title="Constructor for undefined DENOPTIMAttachmentPoint." alt="" coords="504,5,684,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a1781af804ce3ff7b7ed2d681fd1eeae3" title="WARNING: this method does NOT clone! It just returns the reference to this." alt="" coords="495,71,693,98"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="504,123,684,164"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af58c1eca18c36403992fc01d2e08fc03" title=" " alt="" coords="504,188,684,229"/>
+</map>

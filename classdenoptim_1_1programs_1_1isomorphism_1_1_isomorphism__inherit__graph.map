@@ -1,0 +1,6 @@
+<map id="denoptim.programs.isomorphism.Isomorphism" name="denoptim.programs.isomorphism.Isomorphism">
+<area shape="rect" id="node1" title="Tool to perform isomorphism analysis on DGraphs." alt="" coords="5,229,217,271"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_program_task.html" title="Task structure for any of the main programs in the denoptim project, such as genetic algorithm and co..." alt="" coords="19,155,203,181"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="44,80,179,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="47,5,175,32"/>
+</map>

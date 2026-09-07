@@ -1,0 +1,6 @@
+<map id="denoptim.gui.GUIPrepareFitnessRunner" name="denoptim.gui.GUIPrepareFitnessRunner">
+<area shape="rect" id="node1" title="Form that allows to test the configuration of a fitness provider." alt="" coords="5,229,216,271"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare.html" title="Class representing the general structure of a form including a specific set of parameter collections." alt="" coords="27,155,194,181"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel.html" title="Class of GUI panels meant to occupy one card in the deck&#45;of&#45;cards layout of the main panel." alt="" coords="19,80,202,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="79,5,142,32"/>
+</map>

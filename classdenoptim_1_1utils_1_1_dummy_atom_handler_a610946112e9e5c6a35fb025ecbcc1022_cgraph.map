@@ -1,0 +1,10 @@
+<map id="denoptim.utils.DummyAtomHandler.getDummyInSafeDirection" name="denoptim.utils.DummyAtomHandler.getDummyInSafeDirection">
+<area shape="rect" id="node1" title="Generates a dummy atom 0.1 nm from atom A in a place that is safe for a dummy atom." alt="" coords="5,201,227,243"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a5f3fe22980b12cc11374bcb4290873d3" title="Calculates the vector difference of vectors A and B." alt="" coords="304,5,483,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a8756db32338fda8d7c6f891138835bba" title="Generate a vector that is perpendicular to the given one." alt="" coords="293,71,493,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="291,136,496,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a501cff6c2e4d899cddd70cefcea9a601" title="Get sum of vector A and B." alt="" coords="300,201,487,243"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a9191811a0f9bb6ba79616e9d1922130d" title="Creates an object Vector3d that originates from point a and goes to point b." alt="" coords="298,267,489,308"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#aacb4c43ba442f22726372bf4d479a988" title="Rotate a vector according to a given rotation axis and angle." alt="" coords="275,332,512,373"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a76f2584042f3115738f800d8f97de777" title="Changes the origin of a vector." alt="" coords="307,397,480,439"/>
+</map>

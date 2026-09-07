@@ -1,0 +1,5 @@
+<map id="denoptim.programs.combinatorial.FragSpaceExplorer.handleThrowable" name="denoptim.programs.combinatorial.FragSpaceExplorer.handleThrowable">
+<area shape="rect" id="node1" title="Method to handle any Throwable originated from the runProgram() method." alt="" coords="5,5,237,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#ace61a6c1b9d4fc0c4120c1bd3507efed" title="Stops all subtasks and shutdown executor." alt="" coords="285,5,523,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1combinatorial_1_1_combinatorial_explorer_by_layer.html#a471ee8aed24d5e6499dd4d747d6fea5b" title="clean all reference to submitted tasks" alt="" coords="571,5,808,47"/>
+</map>

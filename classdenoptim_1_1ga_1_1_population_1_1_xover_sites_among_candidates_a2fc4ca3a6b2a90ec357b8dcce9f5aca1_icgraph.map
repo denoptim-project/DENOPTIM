@@ -1,0 +1,6 @@
+<map id="denoptim.ga.Population.XoverSitesAmongCandidates.XoverSitesAmongCandidates" name="denoptim.ga.Population.XoverSitesAmongCandidates.XoverSitesAmongCandidates">
+<area shape="rect" id="node1" title="Initializes an empty data structure." alt="" coords="740,15,965,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_population_1_1_xover_sites_among_candidates.html#ac06d99289f7db3b1153427446c9a9054" title="Return a somewhat&#45;shallow clone of this object: the map and list are new objects, but the references ..." alt="" coords="499,22,692,63"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_population.html#a6ee19df57078d4a4e9831cf97dcf7cc4" title="Does not clone the cross&#45;over compatibility relations between each pairs of population members." alt="" coords="260,29,451,56"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_population_test.html#a5db0672054a9fc1dbc923310732fdb3a" title=" " alt="" coords="5,22,212,63"/>
+</map>

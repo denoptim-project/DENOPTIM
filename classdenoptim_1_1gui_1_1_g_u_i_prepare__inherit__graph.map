@@ -1,0 +1,8 @@
+<map id="denoptim.gui.GUIPrepare" name="denoptim.gui.GUIPrepare">
+<area shape="rect" id="node1" title="Class representing the general structure of a form including a specific set of parameter collections." alt="" coords="347,64,513,91"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare_f_s_e_run.html" title="Master form containing all sub&#45;forms that need to be filled to define the input parameters for FragSp..." alt="" coords="561,5,776,32"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare_fitness_runner.html" title="Form that allows to test the configuration of a fitness provider." alt="" coords="563,57,774,98"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare_g_a_run.html" title="Master form containing all sub&#45;forms that need to be filled to define the input parameters for Denopt..." alt="" coords="564,123,773,149"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel.html" title="Class of GUI panels meant to occupy one card in the deck&#45;of&#45;cards layout of the main panel." alt="" coords="116,64,299,91"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,64,68,91"/>
+</map>

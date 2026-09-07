@@ -1,0 +1,12 @@
+<map id="denoptim.utils.StatUtils.stddev" name="denoptim.utils.StatUtils.stddev">
+<area shape="rect" id="node1" title="Returns the standard deviation of the numbers." alt="" coords="1511,60,1709,87"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad34f42098ef4a513cd3f551024e8498e" title="Check if fitness values have significant standard deviation." alt="" coords="957,5,1196,32"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aa9dec22b5b0a35d6b333f8ce3bf83643" title=" " alt="" coords="969,103,1184,145"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a42a83457989ab54a4cbb808fbca8ee1f" title="Computes the skewness of the available values." alt="" coords="1244,111,1463,137"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,47,424,89"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,14,211,55"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,79,198,121"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ac03e7d805c9afda30244e831da74ae81" title="Write out summary for the current GA population." alt="" coords="731,105,909,146"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a01ee989f992e0cff04e3498b63d6c0b0" title="Saves the final results to disk." alt="" coords="488,106,667,147"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#af5c2f9114881ebde82a83f922c0c23fe" title=" " alt="" coords="472,171,683,213"/>
+</map>

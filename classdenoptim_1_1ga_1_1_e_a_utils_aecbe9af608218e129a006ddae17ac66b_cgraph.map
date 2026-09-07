@@ -1,0 +1,20 @@
+<map id="denoptim.ga.EAUtils.importInitialPopulation" name="denoptim.ga.EAUtils.importInitialPopulation">
+<area shape="rect" id="node1" title="Reads unique identifiers and initial population file according to the GAParameters." alt="" coords="5,312,184,353"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad094b30fa7e429418af3f5ba26addfa4" title=" " alt="" coords="249,104,436,145"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a2f160fc3fb0488bb995d1e008a706ed4" title="Reconstruct the molecular population from the file." alt="" coords="232,312,453,353"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ae7b99bd4963c623f12a867bf2624c3fb" title=" " alt="" coords="247,455,438,482"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a2cbfb524deabf9890bd1bd12b87c6bac" title=" " alt="" coords="527,5,734,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a71a6c20ceaf9395ab2a5eee83dbd5eb3" title=" " alt="" coords="501,71,760,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_general_utils.html#ab0c97460520e98fa670681d851754703" title="returns the padded string with zeroes placed to the left of &#39;number&#39; up to reach the desired number o..." alt="" coords="531,136,730,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aec200d5d7fdb3bdd7139736499a679ae" title="Unique counter for the number of graphs generated." alt="" coords="537,201,725,243"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_graph_utils.html#ad951e78a24210e710cba8296b67bf732" title="Unique counter for the number of molecules generated." alt="" coords="537,267,725,308"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a042c8c616521cdd15aee8b7a0cf02fdf" title="Reads SDF files that represent one or more tested candidates." alt="" coords="537,356,725,397"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a6b9258348dd659b17113f8e67f203504" title="Set the Vertex counter value according to the largest value found in the given population." alt="" coords="532,421,729,463"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a63e36e73d8b6574afd0ee55e4206100a" title="Writes one candidate item to file." alt="" coords="535,487,726,528"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_graph_utils.html#a642eb920915ad715efab1cdda1afa891" title="Method used to ensure consistency between internal atomic integer and vertex id from imported graphs." alt="" coords="808,356,1017,397"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_d_graph.html#a372132d7440bb35316e635944b9ac18b" title=" " alt="" coords="823,421,1002,463"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="1071,324,1259,365"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1utils_1_1_graph_utils.html#adceb5d2a62ee7cb0c67e8ccd1c13e0f0" title="Reset the unique vertex counter to the given value." alt="" coords="1065,389,1264,431"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="817,511,1008,552"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="525,577,736,603"/>
+</map>

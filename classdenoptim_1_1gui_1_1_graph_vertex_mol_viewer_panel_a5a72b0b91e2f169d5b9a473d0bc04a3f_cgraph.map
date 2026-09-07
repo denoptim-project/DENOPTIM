@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.clearMolecularViewer" name="denoptim.gui.GraphVertexMolViewerPanel.clearMolecularViewer">
+<area shape="rect" id="node1" title="Clears the molecular viewer and hides it behind the empty card." alt="" coords="5,41,208,97"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a71ebb2645638b3512d2f4bb137c7d77d" title="Allows to show the given card in the molecular structure viewer." alt="" coords="256,5,467,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a700b2ae92d1de1c0be3e1bbde5cae71d" title="Removes the currently visualized molecule and AP table." alt="" coords="272,85,451,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a0917c33381934f156d4196b46819276b" title="Clears the table of attachment points." alt="" coords="517,51,695,93"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a20eef80a872503d11d3253d5557e0876" title="Clears the molecular viewer." alt="" coords="515,117,697,158"/>
+</map>

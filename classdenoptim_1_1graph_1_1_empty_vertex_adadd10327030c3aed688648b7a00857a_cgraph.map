@@ -1,0 +1,5 @@
+<map id="denoptim.graph.EmptyVertex.getMutationSites" name="denoptim.graph.EmptyVertex.getMutationSites">
+<area shape="rect" id="node1" title="A list of mutation sites from within this vertex." alt="" coords="5,51,212,92"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="260,5,431,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a0ff4d9561ea341eb2d968d37a1db8818" title="Returns the list of mutation types." alt="" coords="260,95,431,136"/>
+</map>

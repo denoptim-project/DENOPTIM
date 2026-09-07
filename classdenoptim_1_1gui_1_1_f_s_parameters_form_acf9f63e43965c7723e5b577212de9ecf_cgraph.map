@@ -1,0 +1,6 @@
+<map id="denoptim.gui.FSParametersForm.possiblyReadParamsFromFSParFile" name="denoptim.gui.FSParametersForm.possiblyReadParamsFromFSParFile">
+<area shape="rect" id="node1" title=" " alt="" coords="5,39,271,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_f_s_parameters_form.html#a3efd797a6bfa6106f3134ead85fcab5e" title="Imports parameters from a properly formatted parameters file." alt="" coords="319,31,561,87"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a32d73057266a7b76fdf463cbf4400547" title=" " alt="" coords="611,5,837,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_parameters_form.html#aa73e9df9398e76e8f146f8b70e4a468c" title="Shown a warning dialog that informs the user about having found text that is not present in the Param..." alt="" coords="609,71,839,112"/>
+</map>

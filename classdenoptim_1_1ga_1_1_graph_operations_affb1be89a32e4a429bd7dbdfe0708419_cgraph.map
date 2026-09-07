@@ -1,0 +1,3 @@
+<map id="denoptim.ga.GraphOperations.performCrossover" name="denoptim.ga.GraphOperations.performCrossover">
+<area shape="rect" id="node1" title="Performs the crossover that swaps the two subgraphs defining the given XoverSite." alt="" coords="5,29,245,71"/>
+</map>

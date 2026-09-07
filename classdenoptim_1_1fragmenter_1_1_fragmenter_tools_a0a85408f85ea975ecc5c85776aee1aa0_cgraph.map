@@ -1,0 +1,12 @@
+<map id="denoptim.fragmenter.FragmenterTools.exploreDGraphForMappings" name="denoptim.fragmenter.FragmenterTools.exploreDGraphForMappings">
+<area shape="rect" id="node1" title="Recursive function to process edges at any level of embedding to remove the corresponding bonds and c..." alt="" coords="5,147,223,188"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#accc9b7b7e9f17375c19cb849ea01b46b" title="Finds the point on the master fragment that is aligned with the template geometry." alt="" coords="271,147,480,188"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="544,5,749,47"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aef38e3d525bb269bd6e77a25ebfbd144" title=" " alt="" coords="285,212,465,253"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="549,95,744,122"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a8756db32338fda8d7c6f891138835bba" title="Generate a vector that is perpendicular to the given one." alt="" coords="547,147,747,188"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a9191811a0f9bb6ba79616e9d1922130d" title="Creates an object Vector3d that originates from point a and goes to point b." alt="" coords="551,212,742,253"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="537,277,756,319"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#aacb4c43ba442f22726372bf4d479a988" title="Rotate a vector according to a given rotation axis and angle." alt="" coords="528,343,765,384"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="813,277,1032,319"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="denoptim.fragspace.FragmentSpace.appendVerticesToLibrary" name="denoptim.fragspace.FragmentSpace.appendVerticesToLibrary">
+<area shape="rect" id="node1" title="Takes a list of vertices and add them to a given library." alt="" coords="729,71,936,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#abbd24a68393f1849c2d742f944c1c348" title=" " alt="" coords="488,5,681,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a5f1ddd58bd4295a9d9d0cf867f3f6914" title=" " alt="" coords="488,71,681,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a26482f3889e4ad9b334784687df2fa18" title=" " alt="" coords="488,136,681,177"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a4792b534137a7989aab4ab2237d12438" title="Define all components of this fragment space." alt="" coords="247,71,440,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#ad10ece408a10dbb06fa5d75747ae1fbb" title="Define all components of a fragment space that implements the attachment point class&#45;approach." alt="" coords="5,71,199,112"/>
+</map>

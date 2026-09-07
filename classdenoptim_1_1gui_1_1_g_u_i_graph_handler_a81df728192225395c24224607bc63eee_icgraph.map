@@ -1,0 +1,14 @@
+<map id="denoptim.gui.GUIGraphHandler.importGraphsFromFile" name="denoptim.gui.GUIGraphHandler.importGraphsFromFile">
+<area shape="rect" id="node1" title="Imports graphs from file." alt="" coords="1071,107,1312,148"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="766,21,1017,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#aa30815ac9aa8f815fd24c115afaabd62" title="Initialize the panel and add buttons." alt="" coords="760,82,1023,109"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#ad63012fa4fa9bec2e54ce86425039186" title="Initialize the panel and add buttons." alt="" coords="763,139,1019,166"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a1a2e06a2647032587d42155302b8c0a6" title="Process a file that has a recognized file format and loads a suitable GUI card to visualize the file ..." alt="" coords="780,227,1003,254"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="501,5,707,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#aa4cc9386cd3e91865c486ba914af789d" title="Constructor." alt="" coords="496,71,712,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#aefffdc97385f7a524badf71808a3053b" title="Constructor." alt="" coords="499,136,709,177"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a0df9ca063352fbc50f9476f3b2820926" title="Initialize the contents of the tool bar." alt="" coords="228,257,448,283"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i.html#a460fa99497f04de06d2adf8671a92441" title="Launch the application." alt="" coords="533,253,675,279"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a94df24e485081c9b9d7441387f409e26" title="Updated the the list of recent files in the &quot;open Recent&quot; menu." alt="" coords="497,304,711,345"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a36f4409849998e032342f49b19e6c5b5" title="Constructor that build the tool bar." alt="" coords="5,249,180,291"/>
+</map>

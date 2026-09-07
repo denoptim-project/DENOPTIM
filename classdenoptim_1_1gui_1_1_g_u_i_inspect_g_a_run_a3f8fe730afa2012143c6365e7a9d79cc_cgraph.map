@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GUIInspectGARun.buildAndFillMonitorPlot" name="denoptim.gui.GUIInspectGARun.buildAndFillMonitorPlot">
+<area shape="rect" id="node1" title="Modal dialog to display visual examples of line colors and strokes." alt="" coords="5,104,243,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_scrollable_j_pupup_menu.html#abed0c4ce1f87a5be689f05d377ff9848" title="Add a check box to the list of check boxes to display in the menu." alt="" coords="297,5,495,47"/>
+<area shape="rect" id="node3" href="$enumdenoptim_1_1logging_1_1_counter_i_d.html#a9e7a6825141da490fbb146db05242ca4" title=" " alt="" coords="313,71,479,112"/>
+<area shape="rect" id="node4" href="$enumdenoptim_1_1logging_1_1_counter_i_d.html#a63a44b7afb772b979182aa0eb83ea1ac" title="Returns a string representing the mane of this counter in a way that is pretty enough to be shown in ..." alt="" coords="313,136,479,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="291,226,501,253"/>
+</map>

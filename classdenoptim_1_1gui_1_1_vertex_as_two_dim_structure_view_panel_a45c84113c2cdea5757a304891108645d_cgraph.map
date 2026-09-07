@@ -1,0 +1,6 @@
+<map id="denoptim.gui.VertexAsTwoDimStructureViewPanel.clearAll" name="denoptim.gui.VertexAsTwoDimStructureViewPanel.clearAll">
+<area shape="rect" id="node1" title="Removes the currently visualized molecule and AP table." alt="" coords="5,13,212,54"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a96588a21ab72f01a72c846d3d1dc08c6" title="Clears the table of attachment points." alt="" coords="260,13,501,54"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a69ceb353f2391f1e5b25dc6e6bc88492" title="Allows to activate and deactivate the listener." alt="" coords="549,5,759,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_pausable_table_model_listener.html#a326ffbf277447d4c06bcb4fbf85f20cb" title=" " alt="" coords="807,5,1024,61"/>
+</map>

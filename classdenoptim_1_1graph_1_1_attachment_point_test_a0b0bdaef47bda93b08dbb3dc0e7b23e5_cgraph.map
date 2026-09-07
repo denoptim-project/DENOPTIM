@@ -1,0 +1,19 @@
+<map id="denoptim.graph.AttachmentPointTest.testGetLinkedAP" name="denoptim.graph.AttachmentPointTest.testGetLinkedAP">
+<area shape="rect" id="node1" title=" " alt="" coords="5,159,187,200"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="235,21,463,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="525,71,707,112"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#a641d9078c27d992053500e12cec0049d" title="Append a vertex to this graph: adds the new vertex to the list of vertices belonging to the graph,..." alt="" coords="247,129,450,171"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="254,195,443,222"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a05ecc9dd632f58f95e7613f8aa4ece97" title="Gets the attachment point (AP) that is connected to this AP via the edge user." alt="" coords="259,247,439,288"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac957566ebf8db3b83713ed0c12a56a3f" title="Creates an APClass if it does not exist already, or returns the reference to the existing instance." alt="" coords="249,350,448,377"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="513,5,719,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="769,39,979,80"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="785,104,963,145"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="511,137,721,163"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="531,188,701,229"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="515,254,717,281"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="516,305,716,331"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6981e4878a844276c416f5cd31a80b66" title="Evaluate is a candidate string can be used as APClass." alt="" coords="527,356,705,397"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a6ce0fb88cd79a6e154d889496c88455b" title="Evaluates the given string as a candidate attachment point rule, i.e., as name of a fragmentation rul..." alt="" coords="785,323,963,364"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac13faa6d99c5b9c3f89a42f00f4744ea" title="Evaluate the given string as a candidate for attachment point subclass, i.e., the attachment point cl..." alt="" coords="785,388,963,429"/>
+</map>

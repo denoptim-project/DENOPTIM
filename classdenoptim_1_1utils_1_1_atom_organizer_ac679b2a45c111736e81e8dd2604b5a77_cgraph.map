@@ -1,0 +1,13 @@
+<map id="denoptim.utils.AtomOrganizer.reorderStartingFrom" name="denoptim.utils.AtomOrganizer.reorderStartingFrom">
+<area shape="rect" id="node1" title="Reorder the atoms in mol starting with atom seed" alt="" coords="5,237,240,279"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a2970c029fa822f5597969bda9adabdaf" title="Reorders atoms according to the branch&#45;oriented scheme." alt="" coords="288,55,521,96"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a057aaf4bd577d0566b6fc73c1f792e10" title="Destroy a vector of flags." alt="" coords="572,120,801,161"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#aa08a493e0e4325f3f76262dc9cb40de0" title="Generates a vector of boolean flags." alt="" coords="581,355,793,396"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#ac9be639b72c847d5875a12250a94bebe" title="Reorders atoms according to the layer&#45;oriented scheme." alt="" coords="294,237,515,279"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#aaa2b8f9bfaed825389a6453e88403108" title="Produces a new container that looks very similar to the original one, but has a different atom order." alt="" coords="291,421,518,463"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#af107340bb330f98b9b7f899ff08c80ad" title="Method meant for recursion on all atoms connected to a starting point." alt="" coords="569,55,804,96"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a291686eac0b022879608b2dd85ffab6e" title="Perform all the operation to report an atom in the new order." alt="" coords="852,62,1123,89"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a32438216f863d45940768576a05178f5" title="Change the order of atoms in a list according to the priority rules defined in the comparator Connect..." alt="" coords="866,204,1109,245"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_atom_organizer.html#a71803b33cd2507b3053503bbc10a3d7c" title="Set the layer membership of an antom." alt="" coords="579,237,794,279"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="577,444,796,485"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.graph.Template.setContractLevel" name="denoptim.graph.Template.setContractLevel">
+<area shape="rect" id="node1" title="Imposes the given contract to this template." alt="" coords="5,39,193,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_template.html#a1c1bd08e467f7738d2868996e9f22c3a" title=" " alt="" coords="241,39,451,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#aac7848d9fe16b008e5b2989ac294fbf2" title="Removes the specified mutation type." alt="" coords="499,5,695,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_template.html#aad385a42d6afcdac25d87f9519644a00" title=" " alt="" coords="511,71,682,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="743,71,913,112"/>
+</map>

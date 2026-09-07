@@ -1,0 +1,6 @@
+<map id="denoptim.gui.FragmentViewPanel.putAPsFromTableIntoIAtomContainer" name="denoptim.gui.FragmentViewPanel.putAPsFromTableIntoIAtomContainer">
+<area shape="rect" id="node1" title=" " alt="" coords="5,63,225,119"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="282,5,462,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="273,71,471,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a9c1db3123b7f73aa20c0d1895f31f8d7" title="Returns the end of the direction vector." alt="" coords="282,136,462,177"/>
+</map>

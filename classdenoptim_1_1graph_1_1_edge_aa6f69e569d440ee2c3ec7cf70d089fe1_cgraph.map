@@ -1,0 +1,4 @@
+<map id="denoptim.graph.Edge.Edge" name="denoptim.graph.Edge.Edge">
+<area shape="rect" id="node1" title="Constructor for an edge that connects two APs." alt="" coords="5,13,180,39"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a266aa67ce6e0afd82fa723a12f46235a" title="Sets the reference to the edge that is using this attachment point." alt="" coords="228,5,408,47"/>
+</map>

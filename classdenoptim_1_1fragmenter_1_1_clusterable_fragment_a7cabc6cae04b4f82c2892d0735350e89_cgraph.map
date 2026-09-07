@@ -1,0 +1,5 @@
+<map id="denoptim.fragmenter.ClusterableFragment.clone" name="denoptim.fragmenter.ClusterableFragment.clone">
+<area shape="rect" id="node1" title="Returns a shallow copy where the vector of coordinates has a new reference." alt="" coords="5,39,213,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#ac860d026acae0a9381c5ddf3e5d5bba3" title="Constructor." alt="" coords="261,5,469,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_clusterable_fragment.html#ac969b7cb43cdd23507e67c5141766997" title="Sets the order of nodes (i.e., atoms/APs) to use for geometric comparison with other fragments,..." alt="" coords="261,71,469,112"/>
+</map>

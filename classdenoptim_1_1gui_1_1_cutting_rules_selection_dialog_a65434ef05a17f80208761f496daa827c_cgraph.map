@@ -1,0 +1,5 @@
+<map id="denoptim.gui.CuttingRulesSelectionDialog.getTmpFileForCuttingRules" name="denoptim.gui.CuttingRulesSelectionDialog.getTmpFileForCuttingRules">
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,279,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#a17d841e4bb8eab3b9abc5405a4ec6d11" title="Define a filename that can be used, i.e., is still available, because no other file with the same pat..." alt="" coords="327,5,500,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_file_utils.html#a5c4375aa4522cc7f8229c131fbc2e0af" title="Creates a directory." alt="" coords="548,5,739,47"/>
+</map>

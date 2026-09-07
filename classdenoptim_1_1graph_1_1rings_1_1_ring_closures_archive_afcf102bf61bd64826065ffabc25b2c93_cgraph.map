@@ -1,0 +1,7 @@
+<map id="denoptim.graph.rings.RingClosuresArchive.readLibraryOfRCCs" name="denoptim.graph.rings.RingClosuresArchive.readLibraryOfRCCs">
+<area shape="rect" id="node1" title=" " alt="" coords="5,39,237,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1rings_1_1_ring_closures_archive.html#a16ab04b77232f70ee5fec35b80caa36f" title=" " alt="" coords="285,39,468,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#ab17dd74bc55e826f3aa69ac69a674639" title="Get the vertex ID of the turning point.Note that since the chain is a path in a graph the relative di..." alt="" coords="516,39,711,80"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1rings_1_1_chain_link.html#a22ada7777c4665cbe71df26caa560d54" title=" " alt="" coords="767,5,945,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1rings_1_1_closable_chain.html#a2c40d6aa717937f6f478f413cbcc1eb5" title="Get a specific ChainLink" alt="" coords="759,71,953,112"/>
+</map>

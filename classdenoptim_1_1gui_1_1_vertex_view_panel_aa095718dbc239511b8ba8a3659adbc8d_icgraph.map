@@ -1,0 +1,4 @@
+<map id="denoptim.gui.VertexViewPanel.highlightAtoms" name="denoptim.gui.VertexViewPanel.highlightAtoms">
+<area shape="rect" id="node1" title="Highlights the given atoms in the Jmol viewer." alt="" coords="260,5,508,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_atom_selection_dialog.html#ad220a9d7bc37b0b7e13df05cd0b6de19" title="Constructs a dialog for setting the preferences of the GUI." alt="" coords="5,5,212,47"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.utils.DummyAtomHandler.removeDummy" name="denoptim.utils.DummyAtomHandler.removeDummy">
+<area shape="rect" id="node1" title="Removes all dummy atoms and the bonds connecting them to other atoms." alt="" coords="5,39,185,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_dummy_atom_handler.html#a4cd147e9f65c7826d4bf8bc295f9d5b3" title=" " alt="" coords="241,5,431,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="233,71,439,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="487,71,684,112"/>
+</map>

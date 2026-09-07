@@ -1,0 +1,5 @@
+<map id="denoptim.fragspace.FragmentSpace.imposeSymmetryOnAPsOfClass" name="denoptim.fragspace.FragmentSpace.imposeSymmetryOnAPsOfClass">
+<area shape="rect" id="node1" title="Checks if the symmetry settings impose use of symmetry on attachment points of the given AP class." alt="" coords="5,39,256,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a1e550048eaf844b84ca694d149458a01" title="Return the constitutional symmetry constrain for the given APclass, or null." alt="" coords="305,5,499,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a0f617041b436cd3c990f946511026cd7" title="Checks if there is a constraint on the constitutional symmetry probability for the given AP class." alt="" coords="304,71,500,112"/>
+</map>

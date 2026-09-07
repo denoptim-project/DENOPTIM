@@ -1,0 +1,6 @@
+<map id="denoptim.gui.VertexViewPanel.getAtomsSelectedFromJMol" name="denoptim.gui.VertexViewPanel.getAtomsSelectedFromJMol">
+<area shape="rect" id="node1" title="Identifies the atoms that are selected in the Jmol viewer." alt="" coords="580,35,799,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_atom_selection_dialog.html#ad220a9d7bc37b0b7e13df05cd0b6de19" title="Constructs a dialog for setting the preferences of the GUI." alt="" coords="297,5,504,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,71,532,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,64,221,105"/>
+</map>

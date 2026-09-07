@@ -1,0 +1,6 @@
+<map id="denoptim.io.DenoptimIO.writeVertexesToFile" name="denoptim.io.DenoptimIO.writeVertexesToFile">
+<area shape="rect" id="node1" title="Writes vertexes to file." alt="" coords="5,63,196,104"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#acacadea29e15654169ef48304b492da8" title="Writes vertexes to JSON file." alt="" coords="244,29,435,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#afa901a9ac5603e9063cdc4d2737199b8" title="Write a list of vertexes to file." alt="" coords="244,95,435,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a33af2ecd8e9f62a54855b2a7866262b3" title="Writes IAtomContainer to SDF file." alt="" coords="483,95,673,136"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.ConformerExtractorTask.getChosenFragPathname" name="denoptim.fragmenter.ConformerExtractorTask.getChosenFragPathname">
+<area shape="rect" id="node1" title="Builds the pathname for the file where we save all the fragments that we found to be closest to each ..." alt="" coords="5,5,257,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a37f87b26bd9a229cfd84e9c487f6495a" title="Gets the pathname to the working directory." alt="" coords="305,5,496,47"/>
+</map>

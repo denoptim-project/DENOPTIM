@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GUIVertexInspector" name="denoptim.gui.GUIVertexInspector">
+<area shape="rect" id="node1" title="A panel with a viewer capable of visualising DENOPTIM fragments and allows to create and edit fragmen..." alt="" coords="5,155,219,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_card_panel.html" title="Class of GUI panels meant to occupy one card in the deck&#45;of&#45;cards layout of the main panel." alt="" coords="21,80,203,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="81,5,143,32"/>
+</map>

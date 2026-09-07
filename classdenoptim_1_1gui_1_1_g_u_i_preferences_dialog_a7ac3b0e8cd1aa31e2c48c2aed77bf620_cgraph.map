@@ -1,0 +1,7 @@
+<map id="denoptim.gui.GUIPreferencesDialog.pathMustBeReadableWritable" name="denoptim.gui.GUIPreferencesDialog.pathMustBeReadableWritable">
+<area shape="rect" id="node1" title=" " alt="" coords="5,77,237,118"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#abb578573334c0bc633d537d987223e63" title="Check whether we can write and read to a given pathname." alt="" coords="303,47,479,89"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1files_1_1_file_utils.html#ae1f2f7638bfd256f21d5fab326776509" title="Delete the file." alt="" coords="285,113,496,140"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="548,29,759,56"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="544,80,763,107"/>
+</map>

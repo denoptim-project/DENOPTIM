@@ -1,0 +1,5 @@
+<map id="denoptim.graph.DGraph.getHeavyAtomsCount" name="denoptim.graph.DGraph.getHeavyAtomsCount">
+<area shape="rect" id="node1" title="Calculate the number of atoms from the graph representation." alt="" coords="241,39,420,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_template.html#ae1c82608e1520d297d3eec18ccabe5b3" title=" " alt="" coords="5,5,193,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aab1ec7dee8e54e2f0b0a5b4f8409f36b" title="Calculated the probability of extending a graph based on the current size of the molecular representa..." alt="" coords="9,71,190,112"/>
+</map>

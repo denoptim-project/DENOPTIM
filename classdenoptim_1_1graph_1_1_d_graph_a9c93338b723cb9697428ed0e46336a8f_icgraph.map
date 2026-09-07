@@ -1,0 +1,7 @@
+<map id="denoptim.graph.DGraph.ensureUniqueApIDs" name="denoptim.graph.DGraph.ensureUniqueApIDs">
+<area shape="rect" id="node1" title=" " alt="" coords="567,71,765,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="287,5,486,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph_1_1_d_e_n_o_p_t_i_m_graph_serializer.html#a642832757b905c952fc7c194dcb7e0dd" title=" " alt="" coords="255,71,519,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_template.html#affbc6ea7a008d8e615f3e3c99641ad30" title="Produces a string that represents this vertex and that adheres to the JSON format." alt="" coords="282,137,491,163"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex_test.html#a903343147e9c65e098a01e6210426817" title=" " alt="" coords="5,129,207,171"/>
+</map>

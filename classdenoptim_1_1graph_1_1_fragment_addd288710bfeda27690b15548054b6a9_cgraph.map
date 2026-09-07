@@ -1,0 +1,5 @@
+<map id="denoptim.graph.Fragment.getAtomHoldingAP" name="denoptim.graph.Fragment.getAtomHoldingAP">
+<area shape="rect" id="node1" title="Returns the atom where the given attachment point is rooted, i.e., the atom that is involved in the b..." alt="" coords="5,39,195,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="243,5,440,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="251,71,431,112"/>
+</map>

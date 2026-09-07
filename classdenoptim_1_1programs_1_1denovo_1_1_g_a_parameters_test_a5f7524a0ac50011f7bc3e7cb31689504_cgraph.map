@@ -1,0 +1,6 @@
+<map id="denoptim.programs.denovo.GAParametersTest.testYesNoTrueFalseKeyword" name="denoptim.programs.denovo.GAParametersTest.testYesNoTrueFalseKeyword">
+<area shape="rect" id="node1" title=" " alt="" coords="5,41,231,97"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a151bc101f1480bfd9f0df329e31e3990" title="Processes a keyword/value pair and assign the related parameters." alt="" coords="279,49,487,90"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a4488a01992b7a7f2cda6f3aa7baa25ab" title=" " alt="" coords="535,5,749,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a3cc82da1fcb9f1e354522b55eda3ff27" title="Reads a string searching for any common way to say either yes/true (including shorthand t/y) or no/fa..." alt="" coords="535,85,749,126"/>
+</map>

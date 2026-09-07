@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GUIAtomSelectionDialog" name="denoptim.gui.GUIAtomSelectionDialog">
+<area shape="rect" id="node1" title="A dialog window meant only to select atoms one or multiple times." alt="" coords="5,155,212,196"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html" title=" " alt="" coords="12,80,205,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="76,5,141,32"/>
+</map>

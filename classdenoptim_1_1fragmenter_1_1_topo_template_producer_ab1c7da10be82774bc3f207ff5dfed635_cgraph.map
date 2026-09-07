@@ -1,0 +1,7 @@
+<map id="denoptim.fragmenter.TopoTemplateProducer.TopoTemplateProducer" name="denoptim.fragmenter.TopoTemplateProducer.TopoTemplateProducer">
+<area shape="rect" id="node1" title="Constructor." alt="" coords="5,31,220,87"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_topo_template_producer.html#a6f3c923d504d0e15ae6a607fa49ce995" title=" " alt="" coords="268,39,445,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac6be8c4af5dd51783eae0899abba91ff" title="Finds the shortest path between two atoms in a molecule using BFS." alt="" coords="493,5,700,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="494,71,699,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="748,71,945,112"/>
+</map>

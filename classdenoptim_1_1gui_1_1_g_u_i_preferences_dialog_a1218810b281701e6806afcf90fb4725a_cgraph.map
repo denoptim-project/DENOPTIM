@@ -1,0 +1,12 @@
+<map id="denoptim.gui.GUIPreferencesDialog.GUIPreferencesDialog" name="denoptim.gui.GUIPreferencesDialog.GUIPreferencesDialog">
+<area shape="rect" id="node1" title="Constructs a dialog for setting the preferences of the GUI." alt="" coords="5,103,197,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_preferences_dialog.html#ab9703d44532c40f4f03c47fcc5e07c23" title=" " alt="" coords="263,45,455,86"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_modal_dialog.html#aef5c48b1c797dddd898f2564c330318c" title="Closes the dialog window." alt="" coords="245,111,472,137"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_preferences_dialog.html#a581d54679fd92205ca56d7684bd877b2" title=" " alt="" coords="263,162,455,203"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_preferences_dialog.html#a71c2f89ac257a211751e7b9f41c69026" title=" " alt="" coords="540,11,732,53"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_preferences_dialog.html#a7ac3b0e8cd1aa31e2c48c2aed77bf620" title=" " alt="" coords="520,77,752,118"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1files_1_1_file_utils.html#abb578573334c0bc633d537d987223e63" title="Check whether we can write and read to a given pathname." alt="" coords="817,47,993,89"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1files_1_1_file_utils.html#ae1f2f7638bfd256f21d5fab326776509" title="Delete the file." alt="" coords="800,113,1011,140"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="1063,29,1273,56"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="1059,80,1277,107"/>
+</map>

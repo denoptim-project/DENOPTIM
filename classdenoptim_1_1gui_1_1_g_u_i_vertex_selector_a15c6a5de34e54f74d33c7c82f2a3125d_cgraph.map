@@ -1,0 +1,52 @@
+<map id="denoptim.gui.GUIVertexSelector.load" name="denoptim.gui.GUIVertexSelector.load">
+<area shape="rect" id="node1" title="Load the list of vertexes to choose from." alt="" coords="5,267,240,294"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a9a6057c6f67098a32bd84f4f7bffe4a8" title="Loads the vertices corresponding to the field index." alt="" coords="295,227,530,268"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#aa4b78edfd7715bb5620e94f27aaa8acd" title=" " alt="" coords="288,292,537,333"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_selector.html#a663bee223ce1f6a7f3c91f511abbdca5" title=" " alt="" coords="585,181,824,223"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a697ecc5ef3352a5860a6a6a355d87d1b" title="Loads the given vertex to this viewer." alt="" coords="593,272,817,313"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a04374b744146d399fb0403bf9d95b132" title="Removes the currently visualized molecule and AP table." alt="" coords="872,155,1100,196"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a65e5473c03b2075c97fbfa9b587b8949" title="Clears the table of attachment points." alt="" coords="2041,1096,2224,1137"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#af9187da422f4f24b56b63c8e225b9c13" title="Clears the table of attachment points." alt="" coords="2039,5,2226,47"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a9bcc749971b5bff83b5c94c419509567" title=" " alt="" coords="1148,155,1387,196"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad1564e5c67234495668c68f02ab04ed4" title="Allows to activate and deactivate the listener." alt="" coords="2315,1037,2518,1079"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_fragment_view_panel_1_1_pausable_table_model_listener.html#ab8f315a71d317424e2647c160fc3fdfb" title=" " alt="" coords="2595,1030,2841,1086"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#a87f08fd10d2e9ce079c42619f52317e3" title="Allows to activate and deactivate the listener." alt="" coords="2301,64,2532,105"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel_1_1_pausable_table_model_listener.html#a37b99134be224897be59444fca4734bf" title=" " alt="" coords="2580,57,2856,113"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#af961ff72b42d1852cd21fc95a238a294" title="Loads the given empty vertex to this viewer." alt="" coords="874,272,1098,313"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a5de255e134fc5c4eea74c6b653ddb913" title="Loads the given fragments to this viewer." alt="" coords="1155,501,1379,543"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a23695fc49f5ff660a828bddbf74a5006" title="Loads the given template to this viewer." alt="" coords="874,584,1098,625"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#a47990a9c843a7177b65f7076fb0bb817" title=" " alt="" coords="1453,197,1655,239"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#acef361888bea673ec1fab6e1155cfdab" title=" " alt="" coords="1148,272,1387,313"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#aaef6ddb420cb2656d21e25cb61e2a713" title=" " alt="" coords="1742,188,1943,229"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#afa74b4f4fea57fb3a15847d6a01b977f" title=" " alt="" coords="2039,123,2226,164"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#a39b3b57d45d29b99494a09e06fd67a69" title=" " alt="" coords="1725,253,1960,309"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1gui_1_1_vertex_as_graph_view_panel.html#ae4788febb341d24665ac291b0ad04d7d" title="Uses the AP of the Fragment to create a new map and table of APs." alt="" coords="1727,71,1958,112"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="2042,395,2223,436"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a581e856de9d7b202a219773b3d9bef2a" title="Removes the currently loaded graph viewer." alt="" coords="2046,188,2219,229"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="2041,254,2225,281"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a0311f258391ff189afefcc333ade4cee" title="Load the given DGraph to this graph viewer." alt="" coords="2046,329,2219,371"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_fragment.html#aad537b06e3c2091bd768b10358a72bb4" title="Checks if atoms and APs contained in this fragment have non&#45;zero 3D coordinates." alt="" coords="1455,506,1653,533"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ace0d1e97a4f3899a40c6bc9430be7aef" title="Loads the given fragments to this viewer." alt="" coords="1458,869,1650,911"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#ab86329c1976609bf004a1b4345213bf5" title=" " alt="" coords="1442,557,1666,613"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#ae055bc653d4fe7edc6f08156db24279c" title=" " alt="" coords="1435,636,1673,677"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#a8b9a434e470a5fab4d54100e931657bd" title=" " alt="" coords="1435,440,1673,481"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_fragment.html#a4babe43e60f32e990179be8dfe96e38e" title=" " alt="" coords="1739,450,1946,477"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1utils_1_1_math_utils.html#ad3885756312f8e602cc604f1b0ce62d9" title="Calculates distance between point a and point b." alt="" coords="1736,333,1949,359"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_fragment.html#a366dfaf65191c724b8e393b9d9dc899f" title=" " alt="" coords="1748,384,1937,425"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#aa904048d57867cca4527be0531c79dc5" title="Loads the structure of the currently loaded &#39;fragment&#39; (i.e., our member) into the Jmol viewer." alt="" coords="1751,907,1934,948"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ab6094e7c8cb846552c93a55915bd4d88" title=" " alt="" coords="2041,913,2224,955"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a039c1f297f20187d7a3db26cc9823501" title=" " alt="" coords="1742,972,1943,1013"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a31fd7e726b0845744515b63174e6d546" title="Uses the AP of the Fragment to create a new map and table of APs." alt="" coords="1741,1037,1944,1079"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a96588a21ab72f01a72c846d3d1dc08c6" title="Clears the table of attachment points." alt="" coords="2012,527,2253,568"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#aea1a1a4a407b6886148f398f09fe78b3" title=" " alt="" coords="1731,631,1955,687"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a0ce8a719faec963fb57855c12a8ddb4d" title=" " alt="" coords="1721,711,1964,752"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a27bd1b9426bdc53468cbfd8afea54f7d" title=" " alt="" coords="1733,775,1952,831"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#af05043aa9732bea8f31603a41e3c1dea" title="Uses the AP of the Fragment to create a new map and table of APs." alt="" coords="1741,551,1944,607"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a5b02a7e511de2c6dd4aa18420d5f76f8" title="Removes the currently visualized molecule and AP table." alt="" coords="1176,1064,1359,1105"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_template.html#a3ce90b32843fd429b54ef474154fe4da" title=" " alt="" coords="1158,983,1377,1024"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="1182,732,1353,773"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_template.html#abfadff8365e8de0abdf0d9cc513e0e5b" title="The molecular representation, if any, is generated by this method and stored until further changes in..." alt="" coords="1173,821,1361,863"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="1182,667,1353,708"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#ad2fc717c7c33817e4178031130d46f6d" title="Clears the molecular viewer." alt="" coords="1463,1064,1645,1105"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5908e0c308bffc1429344250b0438e19" title="Returns true if this graph has any vertex that contains atoms." alt="" coords="1449,987,1659,1028"/>
+</map>

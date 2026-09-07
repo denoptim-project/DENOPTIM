@@ -1,0 +1,4 @@
+<map id="denoptim.integration.python.Py4JGetawayServer" name="denoptim.integration.python.Py4JGetawayServer">
+<area shape="rect" id="node1" title="A tool that start a Py4J gateway server that can listens to calls from Python and translate JAVA obje..." alt="" coords="5,95,188,136"/>
+<area shape="rect" id="node2" title=" " alt="" coords="41,5,152,32"/>
+</map>

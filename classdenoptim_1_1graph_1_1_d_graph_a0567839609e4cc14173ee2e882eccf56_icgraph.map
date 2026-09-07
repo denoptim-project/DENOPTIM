@@ -1,0 +1,8 @@
+<map id="denoptim.graph.DGraph.setVertexList" name="denoptim.graph.DGraph.setVertexList">
+<area shape="rect" id="node1" title=" " alt="" coords="727,50,905,91"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5f83a5964a20b7fd7ca36f28e32fd425" title="Update the graph so that the vertex argument is at the scaffold level i.e." alt="" coords="500,50,679,91"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#af7dad44701e1c81c71d47052733822fd" title="Returns a molecule consisting of two pairs of fused rings connected by an oxygen atom." alt="" coords="255,15,449,57"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a45b3ec4b3b4d6384e49093e9b9449537" title="Sets the vertex at the lowest level as the scaffold, changes the &#160;&#160;directions of edges so that the sc..." alt="" coords="252,82,452,123"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a81e15cea05ce67c5b0c2af89d301d072" title=" " alt="" coords="8,5,201,61"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5f9a8cd2ab45c226c2e1ec714c19724b" title="Extracts subgraphs that match the provided pattern." alt="" coords="5,85,204,126"/>
+</map>

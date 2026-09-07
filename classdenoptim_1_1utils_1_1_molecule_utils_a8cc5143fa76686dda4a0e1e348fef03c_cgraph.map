@@ -1,0 +1,4 @@
+<map id="denoptim.utils.MoleculeUtils.ensureNoUnsetBondOrdersSilent" name="denoptim.utils.MoleculeUtils.ensureNoUnsetBondOrdersSilent">
+<area shape="rect" id="node1" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="5,5,232,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ab217b40e0b54cad6f9857b2103d4fd69" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="280,5,507,47"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrix.getThirdRefAtomId" name="denoptim.molecularmodeling.zmatrix.ZMatrix.getThirdRefAtomId">
+<area shape="rect" id="node1" title=" " alt="" coords="5,81,239,122"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="306,29,501,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a38c46abe7069329356bbf3a48fb58849" title=" " alt="" coords="287,81,520,122"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="301,146,506,187"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="568,146,765,187"/>
+</map>

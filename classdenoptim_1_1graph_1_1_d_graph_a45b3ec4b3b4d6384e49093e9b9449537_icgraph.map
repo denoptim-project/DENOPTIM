@@ -1,0 +1,4 @@
+<map id="denoptim.graph.DGraph.reorderVertexList" name="denoptim.graph.DGraph.reorderVertexList">
+<area shape="rect" id="node1" title="Sets the vertex at the lowest level as the scaffold, changes the &#160;&#160;directions of edges so that the sc..." alt="" coords="252,5,452,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5f9a8cd2ab45c226c2e1ec714c19724b" title="Extracts subgraphs that match the provided pattern." alt="" coords="5,5,204,47"/>
+</map>

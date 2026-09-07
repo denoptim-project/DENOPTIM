@@ -1,0 +1,8 @@
+<map id="denoptim.graph.DGraph.extractPattern" name="denoptim.graph.DGraph.extractPattern">
+<area shape="rect" id="node1" title="Extracts subgraphs that match the provided pattern." alt="" coords="315,143,513,184"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a32b0be109306e9c81fc830867296bc66" title="Extracts a system of one or more fused rings and adds them to the fragment space if not already prese..." alt="" coords="5,5,267,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="37,71,235,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a81e15cea05ce67c5b0c2af89d301d072" title=" " alt="" coords="39,135,233,191"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a51afdfc40faf5bcc51609ddef161f078" title=" " alt="" coords="39,215,233,271"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a161540d22b2ad17c44fc3e1a911a1367" title=" " alt="" coords="39,295,233,351"/>
+</map>

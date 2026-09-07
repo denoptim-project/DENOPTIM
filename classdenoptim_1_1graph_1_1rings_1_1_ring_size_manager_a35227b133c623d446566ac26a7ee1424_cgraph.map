@@ -1,0 +1,15 @@
+<map id="denoptim.graph.rings.RingSizeManager.evaluateRCVPair" name="denoptim.graph.rings.RingSizeManager.evaluateRCVPair">
+<area shape="rect" id="node1" title="Method to analyze a pair of vertices and evaluate whether they respect the criteria for being the two..." alt="" coords="5,216,204,257"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="261,5,458,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="764,165,935,207"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a2937a75fd3652481c84235742b94736b" title="Looks into the edges that use any of the APs that belong to this vertex and returns the edge that has..." alt="" coords="274,151,445,192"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a44e705b8949b0fd73763e2e92a118b78" title="Looks into the edges that use any of the APs that belong to this vertex and returns the vertex which ..." alt="" coords="274,216,445,257"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a76a6438c28d260a0f676e22e08cf0dbe" title="Returns the compatibility matrix for ring closing fragment&#45;fragment connections or null if not provid..." alt="" coords="256,281,463,323"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_edge.html#a79f950d1cffe6e323eadc8cd36079841" title=" " alt="" coords="268,427,451,468"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_edge.html#a9696d3ee0d321b73b06d33bcb8fa86fd" title=" " alt="" coords="252,347,467,374"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="515,173,715,199"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="525,325,705,367"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="515,274,716,301"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="525,456,705,497"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="530,391,701,432"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.integration.tinker.ConformationalSearchPSSROT.setTinkerTypes" name="denoptim.integration.tinker.ConformationalSearchPSSROT.setTinkerTypes">
+<area shape="rect" id="node1" title="Used elemental symbols (ot pseudo&#45;element symbols) to assign atom types." alt="" coords="5,71,301,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="349,5,583,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a0c1d972b730eec8ccd5de41cd80e8812" title="Get the symbol of the atom." alt="" coords="349,71,583,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a8b43b83af1c6917f9ac9f81222978a35" title="Set the type of the atom." alt="" coords="349,136,583,177"/>
+</map>

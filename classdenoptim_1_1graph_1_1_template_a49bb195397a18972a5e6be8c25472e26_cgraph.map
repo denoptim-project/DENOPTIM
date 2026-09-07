@@ -1,0 +1,7 @@
+<map id="denoptim.graph.Template.getPathIDs" name="denoptim.graph.Template.getPathIDs">
+<area shape="rect" id="node1" title="Produces a pair of strings that identify the &quot;path&quot; between two given attachment points." alt="" coords="5,71,193,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="241,5,412,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="241,71,412,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="241,136,412,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="460,136,631,177"/>
+</map>

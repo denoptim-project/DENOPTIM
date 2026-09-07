@@ -1,0 +1,16 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testUsesProperDihedral" name="denoptim.molecularmodeling.zmatrix.ZMatrixTest.testUsesProperDihedral">
+<area shape="rect" id="node1" title=" " alt="" coords="5,160,239,201"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_test.html#af057822127c5cdb8dd95809365f69f32" title=" " alt="" coords="287,95,520,136"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a666cb8dd3165b5b3eb7e29323107b781" title="Check if the dihedral between the two atoms at the given indices uses proper torsion." alt="" coords="287,192,520,233"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ae9486d28880e0c8225c0092acab98165" title="Add an atom to the ZMatrix." alt="" coords="568,95,801,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="568,29,801,71"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#afdcc04b2f8a9fe8f0eeabe867b6ff9e2" title="Get the index of the angle reference atom for the atom at the given index." alt="" coords="568,291,801,332"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a4c06388161962480e83acac036d6aa68" title="Get the index of the bond reference atom for the atom at the given index." alt="" coords="568,160,801,201"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a2b48b01815de175fe998f9f28ff22ea7" title="Get the chiral flag for the atom at the given index." alt="" coords="568,225,801,267"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a4ac6b31dc0dbed6e2b53bb659f7d60d5" title="Get the angle reference atom for the atom at the given index." alt="" coords="849,316,1083,357"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#af58205f6fbb21f9df38755ee8cd17e89" title="Get the angle reference atom." alt="" coords="1131,316,1364,357"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="1131,196,1364,237"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a97816fa27c0cc136b67f1dd92f8e3c31" title="Get the bond reference atom for the atom at the given index." alt="" coords="849,133,1083,175"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a70fef3e9cafe930bc1fa43a5e8729fcd" title="Get the bond reference atom." alt="" coords="1131,131,1364,172"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a348f17c35781a2d5a15bd53022b5af24" title="Get the chiral flag." alt="" coords="849,251,1083,292"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.graph.AttachmentPoint.clone" name="denoptim.graph.AttachmentPoint.clone">
+<area shape="rect" id="node1" title="Returns a deep clone of this attachment point." alt="" coords="5,93,185,135"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a087f6102f1c542587ec2ec3c2240041f" title="Constructor for undefined DENOPTIMAttachmentPoint." alt="" coords="243,5,423,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a1781af804ce3ff7b7ed2d681fd1eeae3" title="WARNING: this method does NOT clone! It just returns the reference to this." alt="" coords="233,71,432,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="243,123,423,164"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_attachment_point.html#af58c1eca18c36403992fc01d2e08fc03" title=" " alt="" coords="243,188,423,229"/>
+</map>

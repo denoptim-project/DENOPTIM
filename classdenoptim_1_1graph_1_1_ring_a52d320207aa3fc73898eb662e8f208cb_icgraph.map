@@ -1,0 +1,12 @@
+<map id="denoptim.graph.Ring.contains" name="denoptim.graph.Ring.contains">
+<area shape="rect" id="node1" title="Checks whether a given vertex is part of this ring." alt="" coords="1031,130,1221,157"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_ring.html#ae8d15b94c699e5555c032e268807df0a" title="Chooses among the two given vertices the one that is closer to the target vertex." alt="" coords="501,71,713,98"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_ring.html#a5f09bd9ccfc437f70de652e0746d2fe1" title="Measures how many edges there are between two edges along the sequence of vertices that defined this ..." alt="" coords="772,130,983,157"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_ring.html#aca08b208ca54c53ff946f94acbc263fb" title="Adds a vertex to the ring, in the given position." alt="" coords="790,217,965,259"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_ring.html#a2662f3078f277d97eebf88adc2d53742" title="Chooses among the two given vertices the one that is closer to the head vertex." alt="" coords="244,5,441,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_ring_test.html#a239900f3f4e759fb8178a3a6de3d1a6e" title=" " alt="" coords="5,64,196,105"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_ring.html#af177de24d64e641f9895af5dcfe647d4" title="Chooses among the two given vertices the one that is closer to the tail vertex." alt="" coords="244,123,441,164"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_ring_test.html#a59ec40d4e947b186afccd3be69f81f20" title=" " alt="" coords="511,123,702,164"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph_test.html#a75fad604a87ef9485e9180f7360ddc69" title=" " alt="" coords="489,188,724,229"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_ring_test.html#a52d497a8a99f6d9252cb2295755dfb1e" title=" " alt="" coords="511,253,702,295"/>
+</map>

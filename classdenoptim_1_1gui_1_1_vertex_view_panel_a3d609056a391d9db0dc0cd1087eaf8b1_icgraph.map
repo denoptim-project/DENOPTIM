@@ -1,0 +1,6 @@
+<map id="denoptim.gui.VertexViewPanel.getActiveMapAPs" name="denoptim.gui.VertexViewPanel.getActiveMapAPs">
+<area shape="rect" id="node1" title="Returns the map of attachment points in the currently active viewer." alt="" coords="872,5,1091,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a09363e21a5254efe8f128a99e82acbf0" title=" " alt="" coords="580,5,824,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,13,532,39"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,5,221,47"/>
+</map>

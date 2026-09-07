@@ -1,0 +1,52 @@
+<map id="denoptim.fragmenter.FragmenterTools.fragmentation" name="denoptim.fragmenter.FragmenterTools.fragmentation">
+<area shape="rect" id="node1" title="Chops one chemical structure by applying the given fragmentation templates." alt="" coords="5,1685,215,1727"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a4babe43e60f32e990179be8dfe96e38e" title=" " alt="" coords="554,202,761,229"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a3b476687a392e637d2bf2f3b6ccb09a4" title="Returns a deep copy of this fragments." alt="" coords="274,1017,477,1043"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#aa1352172290adaaf3a478ed7a90cf3fc" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="263,1849,488,1905"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a56e8a422b78c3242bf0090e4c61b15fc" title="Explores the connectivity annotating which atoms have been visited." alt="" coords="271,1928,480,1969"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a0a85408f85ea975ecc5c85776aee1aa0" title="Recursive function to process edges at any level of embedding to remove the corresponding bonds and c..." alt="" coords="267,1685,484,1727"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8f4bc0f5aed8b6b13d69bd58b6a2c441" title="Finds the maximum common substructure (MCS) between two molecules." alt="" coords="272,1759,479,1800"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1graph_1_1_fragment.html#abc17b26de8be2c51acd434f914c76b83" title=" " alt="" coords="281,1993,470,2035"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1graph_1_1_fragment.html#a366dfaf65191c724b8e393b9d9dc899f" title=" " alt="" coords="841,1496,1031,1537"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1graph_1_1_fragment.html#a7e8b973a33c7ec906e65d1512d9faecb" title=" " alt="" coords="281,124,470,165"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1fragmenter_1_1_topo_template_producer.html#af662073b8d7b1ea59f306cfaedd58662" title="Produced a new IAtomContainer containing all the atoms needed to define the topology of the original ..." alt="" coords="274,2073,477,2129"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1graph_1_1_fragment.html#afe608a1ee2180aa73c91b8cc0a5bb744" title="Removes a list of atoms and updates the list of attachment points." alt="" coords="268,304,483,345"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="570,1205,745,1247"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a6e237f0bbd68ebc3c6cd4278713ea7b2" title="Copies all the string&#45;based properties and properties defined in the Vertex#uniquefyingPropertyKeys s..." alt="" coords="567,1271,747,1312"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_fragment.html#ad9843701125210a688964d85a77bfac4" title="Constructor of an empty fragment." alt="" coords="572,1336,743,1377"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="563,1467,752,1494"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex.html#a200f775296c4c9804e3a2b59e065be8a" title="Returns the index of the building block that should correspond to the position of the building block ..." alt="" coords="572,1401,743,1443"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#a46dadb5fd30f1877db91e97ae55c2dd8" title=" " alt="" coords="572,552,743,593"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_fragment.html#ab6e4a71b8f20faab8bec095322604f73" title=" " alt="" coords="563,617,752,659"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex.html#a5671e1d926fba782f48c494d61980d29" title="Returns the mutation types that are constitutionally configures for this vertex irrespectively on the..." alt="" coords="572,683,743,724"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="572,136,743,177"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="827,1561,1045,1603"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_fragment.html#a8d33526e74e10db5d8db591544d6836a" title="Takes the list of APs from the field of this class and projects the APs into properties of the IAtoms..." alt="" coords="552,369,763,411"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_vertex.html#a5dbac662f4102558f3cf874c55174c5e" title=" " alt="" coords="572,748,743,789"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="572,813,743,855"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_vertex.html#ab8088bc1c894c7c916ca8d8a151fa905" title=" " alt="" coords="572,879,743,920"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aef38e3d525bb269bd6e77a25ebfbd144" title=" " alt="" coords="567,1620,747,1661"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a929c8f781b4c999a5228f322a3bd901e" title="Sets the unique integer that is used to sort list of attachment points." alt="" coords="567,944,747,985"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_vertex.html#a0e1114b16856fd16a2de9cface2ea806" title=" " alt="" coords="572,1009,743,1051"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_vertex.html#a1b3682ddb7fc71fdd981526b43d773dc" title=" " alt="" coords="572,1075,743,1116"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_fragment.html#a13fe376fd06c5aca7e4dfeba36e37b0e" title=" " alt="" coords="841,464,1031,505"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_vertex.html#a29e20c43a6110fbaac6cc86c216fe143" title=" " alt="" coords="572,1140,743,1181"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="851,1431,1021,1472"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="1093,1561,1312,1603"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_fragment.html#a551361a1155600e6e2fe4e37590c924f" title=" " alt="" coords="841,245,1031,287"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="837,369,1035,411"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#accc9b7b7e9f17375c19cb849ea01b46b" title="Finds the point on the master fragment that is aligned with the template geometry." alt="" coords="553,1685,762,1727"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="833,1833,1039,1875"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="839,1782,1033,1809"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a8756db32338fda8d7c6f891138835bba" title="Generate a vector that is perpendicular to the given one." alt="" coords="836,1627,1036,1668"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a9191811a0f9bb6ba79616e9d1922130d" title="Creates an object Vector3d that originates from point a and goes to point b." alt="" coords="841,1692,1031,1733"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a02e67057e68e9dbbbbf568808544f005" title="Calculates bond angle agreement and returns raw data." alt="" coords="538,1868,777,1909"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8cc5143fa76686dda4a0e1e348fef03c" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="544,1803,771,1844"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a328ac35ce6ed2f5d61be7142fb8cf12c" title="Normalizes the raw bond angle agreement data to a single score." alt="" coords="536,1933,779,1975"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a364533d507e42ebb43dc537c0e3ad3a4" title="Sets zero implicit hydrogen count to all atoms." alt="" coords="547,1999,767,2040"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="572,5,743,47"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1graph_1_1_fragment.html#a9e7e05e43d235a3b0bfc01e3ac43c26d" title="Finds the DENOPTIMAttachmentPoint objects defined as properties of the atoms in this container,..." alt="" coords="552,71,763,112"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="559,2088,756,2129"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a54d64a8abc57153a64783ddb262f518c" title="Set the index of the source atom in the list of atoms of the fragment." alt="" coords="559,304,756,345"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1graph_1_1_fragment.html#ab272daa0515a1ee2fb99a2eb6a81a4a0" title="Depends on an healthy list of attachment points with properly set pointers to the source atoms." alt="" coords="552,435,763,476"/>
+</map>

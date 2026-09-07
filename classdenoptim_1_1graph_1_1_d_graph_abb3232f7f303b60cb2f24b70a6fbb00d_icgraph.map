@@ -1,0 +1,7 @@
+<map id="denoptim.graph.DGraph.removeCappingGroups" name="denoptim.graph.DGraph.removeCappingGroups">
+<area shape="rect" id="node1" title="Remove all capping groups on this graph." alt="" coords="795,39,997,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#ac06dd330dc8decdf385cdad0658e137a" title=" " alt="" coords="544,39,747,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a86e888ef245d2bd40b49d145c7ef3af0" title="Replaced the subgraph represented by a given collection of vertices that belong to this graph." alt="" coords="293,39,496,80"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1cb3c55237933f7a4d32e002175b84bc" title="Searches for the given pattern type and generated a new graph where each set of (clones of) vertexes ..." alt="" coords="26,5,225,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_graph_operations.html#aa669d9f9dff0f3dd32a7a786bcb839bd" title="Performs crossover as defined by the given XoverSite." alt="" coords="5,71,245,112"/>
+</map>

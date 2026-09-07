@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GUIMainPanel.add" name="denoptim.gui.GUIMainPanel.add">
+<area shape="rect" id="node1" title="Add a component and a reference to such component in the main tool bar." alt="" coords="5,13,212,39"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#acdff6d9c1e266c2d5f13e7e9dba0af87" title="Add the reference to an active panel/tab in the menu listing active panel/tabs." alt="" coords="260,5,455,47"/>
+</map>

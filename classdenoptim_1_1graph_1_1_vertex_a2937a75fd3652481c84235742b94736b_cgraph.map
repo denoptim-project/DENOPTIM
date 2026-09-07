@@ -1,0 +1,5 @@
+<map id="denoptim.graph.Vertex.getEdgeToParent" name="denoptim.graph.Vertex.getEdgeToParent">
+<area shape="rect" id="node1" title="Looks into the edges that use any of the APs that belong to this vertex and returns the edge that has..." alt="" coords="5,35,176,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="239,5,409,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="224,71,424,98"/>
+</map>

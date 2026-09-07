@@ -1,0 +1,5 @@
+<map id="denoptim.gui.FitnessParametersForm.importSingleParameter" name="denoptim.gui.FitnessParametersForm.importSingleParameter">
+<area shape="rect" id="node1" title=" " alt="" coords="5,39,213,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a9f6973c336f5d9835061a59130cc43a6" title=" " alt="" coords="261,5,480,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a3cc82da1fcb9f1e354522b55eda3ff27" title="Reads a string searching for any common way to say either yes/true (including shorthand t/y) or no/fa..." alt="" coords="263,71,478,112"/>
+</map>

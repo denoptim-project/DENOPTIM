@@ -1,0 +1,5 @@
+<map id="denoptim.fragmenter.FragmenterTools.getAPSourceAtom" name="denoptim.fragmenter.FragmenterTools.getAPSourceAtom">
+<area shape="rect" id="node1" title="Returns the atom that will be used as the source of the attachment point possibly handling a multy&#45;ha..." alt="" coords="520,5,729,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a37c0e44680ec1c54fcff98dae0832a50" title="Chops one chemical structure by applying the given cutting rules." alt="" coords="5,5,215,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a4a4917d71823b9e893ee6e0f0ae13434" title="Makes attachment points for the given atom pairs and AP classes." alt="" coords="263,35,472,76"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="denoptim.graph.Template.toJson" name="denoptim.graph.Template.toJson">
+<area shape="rect" id="node1" title="Produces a string that represents this vertex and that adheres to the JSON format." alt="" coords="5,46,215,73"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a9c93338b723cb9697428ed0e46336a8f" title=" " alt="" coords="275,5,473,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa8cbbc7dcd366e9f1053c4b2b676e0d7" title=" " alt="" coords="263,71,485,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a27e25f8f8e1516d81cc281e2795a9428" title="Returns the list of all attachment points contained in this graph." alt="" coords="555,5,734,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#aa14de224ae5d1ae5156f11d5715d360c" title=" " alt="" coords="533,71,756,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a4aafec42bd09225870fdf330db93b84c" title=" " alt="" coords="804,71,1009,112"/>
+</map>

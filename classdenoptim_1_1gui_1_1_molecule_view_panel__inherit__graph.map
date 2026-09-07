@@ -1,0 +1,4 @@
+<map id="denoptim.gui.MoleculeViewPanel" name="denoptim.gui.MoleculeViewPanel">
+<area shape="rect" id="node1" title="A panel with a molecular viewer and data table." alt="" coords="5,80,184,121"/>
+<area shape="rect" id="node2" title=" " alt="" coords="52,5,137,32"/>
+</map>

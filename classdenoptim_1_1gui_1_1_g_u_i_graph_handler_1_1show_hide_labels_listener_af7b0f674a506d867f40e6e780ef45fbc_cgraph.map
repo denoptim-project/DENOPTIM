@@ -1,0 +1,8 @@
+<map id="denoptim.gui.GUIGraphHandler.showHideLabelsListener.actionPerformed" name="denoptim.gui.GUIGraphHandler.showHideLabelsListener.actionPerformed">
+<area shape="rect" id="node1" title=" " alt="" coords="5,39,241,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#ad5d14054ef438012b2c2224917f61688" title="Adds/Removes labels to the graph components that are presently selected." alt="" coords="313,5,495,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#abbd53528136668a8694438df86731fb5" title=" " alt="" coords="289,71,519,112"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#ac1986beea060f3468430c9eb81969660" title="Adds or removes labels from the elements selected in the graph view." alt="" coords="567,5,740,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a63652cbc8cbef5690625202ab7f6ac3e" title="Finds selected nodes from the viewer." alt="" coords="788,5,961,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#adde1000b066dec6d496a801794a463e6" title="Check is there is any node selected in the viewer." alt="" coords="567,71,740,112"/>
+</map>

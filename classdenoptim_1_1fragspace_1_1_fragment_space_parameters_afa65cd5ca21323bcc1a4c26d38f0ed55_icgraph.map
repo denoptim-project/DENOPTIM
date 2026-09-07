@@ -1,0 +1,5 @@
+<map id="denoptim.fragspace.FragmentSpaceParameters.getMaxHeavyAtom" name="denoptim.fragspace.FragmentSpaceParameters.getMaxHeavyAtom">
+<area shape="rect" id="node1" title=" " alt="" coords="288,39,527,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#ac1e5c9703afc6f29fe11cca08ddb1a1c" title="Peeks into this graph to derive a preliminary chemical representation with SMILES and InChIKey." alt="" coords="25,5,220,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="5,71,240,112"/>
+</map>

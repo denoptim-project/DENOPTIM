@@ -1,0 +1,4 @@
+<map id="denoptim.gui.GUI.weRunOnMacDarkMode" name="denoptim.gui.GUI.weRunOnMacDarkMode">
+<area shape="rect" id="node1" title="Checks if we are in dark mode." alt="" coords="196,5,379,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i.html#a460fa99497f04de06d2adf8671a92441" title="Launch the application." alt="" coords="5,13,148,39"/>
+</map>

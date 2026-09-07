@@ -1,0 +1,8 @@
+<map id="denoptim.gui.MoleculeViewPanel.enablePartialData" name="denoptim.gui.MoleculeViewPanel.enablePartialData">
+<area shape="rect" id="node1" title="Sets the behavior in case of request to visualize partial data." alt="" coords="1076,53,1255,94"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a75353b8746f24c9932f0d8383384901d" title="Initialize the panel and add buttons." alt="" coords="857,53,1028,94"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#ac484312f6e8dc288700127243028a44a" title="Constructor." alt="" coords="597,45,809,101"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a5edf6f6270bf3d180455295bffb57df0" title="Makes a clone of the given vertex and loads that clone into the nested visualization frame." alt="" coords="343,45,549,101"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#abab3007ca39f050b3b9916c4bcc994ca" title="Loads the given graph into the graph viewer." alt="" coords="45,5,255,61"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel_1_1_node_clicked_listener.html#a4c7c2b6e03029c1850296cda96c5d6bc" title=" " alt="" coords="5,85,295,141"/>
+</map>

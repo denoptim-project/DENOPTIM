@@ -1,0 +1,13 @@
+<map id="denoptim.ga.EAUtils.getSummaryStatistics" name="denoptim.ga.EAUtils.getSummaryStatistics">
+<area shape="rect" id="node1" title=" " alt="" coords="5,215,220,257"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#aa9960d143f0848577aec0e8ee65deb12" title="Get the fitness values for the list of molecules." alt="" coords="269,5,486,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_parameters.html#a2e544172988f30a190ef37cceb09fbfc" title=" " alt="" coords="270,57,485,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_stat_utils.html#abd3508ae7b87a92f819db91a0dd70dcb" title="Returns the maximum value among the numbers ." alt="" coords="286,147,469,173"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a12ae258bebe1f3568dabdd606edd3d56" title="Returns the mean number in the numbers list." alt="" coords="1007,324,1197,351"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a68460a326762f6b16aca2c3380525c35" title="Calculates median value of a sorted list." alt="" coords="277,248,478,275"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_stat_utils.html#aad3c103a99a3c3110108f6dd7d1922ff" title="Returns the minimum value among the numbers ." alt="" coords="287,323,467,349"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a42a83457989ab54a4cbb808fbca8ee1f" title="Computes the skewness of the available values." alt="" coords="268,373,487,400"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a31cf5dc53af191a60dbcdba3b1f9da6b" title="Returns the standard deviation of the numbers." alt="" coords="535,399,733,425"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_stat_utils.html#a181673167433cb8ad256d0295d76c29f" title="Returns the sum number in the numbers list." alt="" coords="1245,349,1429,376"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1utils_1_1_stat_utils.html#aac6cf70b1516266ef3e845d5ad4633f5" title="Computes the variance of the available values." alt="" coords="781,375,959,401"/>
+</map>

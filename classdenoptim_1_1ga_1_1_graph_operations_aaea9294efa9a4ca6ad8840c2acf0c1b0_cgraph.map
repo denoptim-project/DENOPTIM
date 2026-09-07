@@ -1,0 +1,10 @@
+<map id="denoptim.ga.GraphOperations.deleteFragment" name="denoptim.ga.GraphOperations.deleteFragment">
+<area shape="rect" id="node1" title="Deletion mutation removes the vertex and also the symmetric partners on its parent." alt="" coords="5,129,236,171"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#aadd56400d6e58931401e88dd814de705" title="Returns the set of vertexes symmetric to the given one." alt="" coords="541,152,719,193"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3b7c2feb2da30079318f06819e0e6761" title=" " alt="" coords="296,71,475,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a16e970d1e94704f9e720ff16f58f5796" title="Searches for a vertex with the given identifier." alt="" coords="296,5,475,47"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad6c07d79d0bf95370569f11ad4d4cadf" title=" " alt="" coords="539,241,721,283"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#ae46f896d67929c516cc66031b8777f0b" title="Deletes the branch, i.e., the specified vertex and its children." alt="" coords="284,212,487,253"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a3560b051e55499bf45522a55f6219d29" title="Returns the position of the first vertex that has the given ID." alt="" coords="535,5,725,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="773,5,944,47"/>
+</map>

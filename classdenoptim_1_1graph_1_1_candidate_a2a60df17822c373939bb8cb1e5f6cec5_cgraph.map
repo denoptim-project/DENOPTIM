@@ -1,0 +1,4 @@
+<map id="denoptim.graph.Candidate.cleanup" name="denoptim.graph.Candidate.cleanup">
+<area shape="rect" id="node1" title="Clear the graph describing this candidate." alt="" coords="5,5,224,32"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#abcfe2ce7f7bb4d5bea2dbbd816d12d2b" title="Wipes the data in this graph." alt="" coords="272,5,477,32"/>
+</map>

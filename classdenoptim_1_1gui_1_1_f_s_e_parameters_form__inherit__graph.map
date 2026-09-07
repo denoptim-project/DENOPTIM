@@ -1,0 +1,6 @@
+<map id="denoptim.gui.FSEParametersForm" name="denoptim.gui.FSEParametersForm">
+<area shape="rect" id="node1" title="Form collecting input parameters for a combinatorial/virtual screening experiment performed by FragSp..." alt="" coords="5,155,225,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html" title="General structure of a form for collecting input parameters of various nature." alt="" coords="18,80,213,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="7,5,69,32"/>
+<area shape="rect" id="node4" href="$interfacedenoptim_1_1gui_1_1_i_parameters_form.html" title="Interface for parameter forms." alt="" coords="93,5,292,32"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="denoptim.gui.VertexAsGraphViewPanel.loadVertexStructure" name="denoptim.gui.VertexAsGraphViewPanel.loadVertexStructure">
+<area shape="rect" id="node1" title=" " alt="" coords="5,132,207,173"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="256,37,437,79"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a581e856de9d7b202a219773b3d9bef2a" title="Removes the currently loaded graph viewer." alt="" coords="260,103,433,144"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex.html#a05e1f8f3d4595534fb18c8d6b7e4a82d" title="Returns a deep&#45;copy of this vertex." alt="" coords="255,169,439,195"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#a0311f258391ff189afefcc333ade4cee" title="Load the given DGraph to this graph viewer." alt="" coords="260,244,433,285"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="493,5,702,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="508,71,687,112"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_graph_viewer_panel.html#abed87e5b88f44a20955b9e1bb2491156" title="Created a JUNG graph object that represents a DGraph, and allows to load a graphical representation i..." alt="" coords="487,244,708,285"/>
+</map>

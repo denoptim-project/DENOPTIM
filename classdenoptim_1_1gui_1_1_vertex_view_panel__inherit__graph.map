@@ -1,0 +1,4 @@
+<map id="denoptim.gui.VertexViewPanel" name="denoptim.gui.VertexViewPanel">
+<area shape="rect" id="node1" title="A panel for visualizing vertices." alt="" coords="5,80,203,107"/>
+<area shape="rect" id="node2" title=" " alt="" coords="73,5,135,32"/>
+</map>

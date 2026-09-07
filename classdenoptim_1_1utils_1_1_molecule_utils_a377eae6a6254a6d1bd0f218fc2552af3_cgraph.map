@@ -1,0 +1,4 @@
+<map id="denoptim.utils.MoleculeUtils.makeSameAs" name="denoptim.utils.MoleculeUtils.makeSameAs">
+<area shape="rect" id="node1" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="5,29,224,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="272,29,491,71"/>
+</map>

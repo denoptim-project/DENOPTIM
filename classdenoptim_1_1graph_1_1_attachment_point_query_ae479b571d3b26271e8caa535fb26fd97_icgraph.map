@@ -1,0 +1,38 @@
+<map id="denoptim.graph.AttachmentPointQuery.matches" name="denoptim.graph.AttachmentPointQuery.matches">
+<area shape="rect" id="node1" title="Tests whether the given attachment point satisfies all non&#45;null criteria in this query." alt="" coords="1191,665,1371,707"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#abd78d550ed20f6423ad5b02d4b64e88e" title="Search the graph for AttachmentPoints that match the criteria defined in a query." alt="" coords="913,354,1118,381"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_edge_query.html#a348b003646180ab98f25eb1d2dcd1a01" title="Tests whether the given edge satisfies this query." alt="" coords="901,405,1130,431"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ac1f03b3b5f2827eddb99ff3dcffee46f" title=" " alt="" coords="607,789,836,845"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ab87c87b4f3d9d00c9e636c09a64b10c0" title=" " alt="" coords="897,506,1133,562"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a4155118d5840043feffc693e1e4201d7" title=" " alt="" coords="906,586,1125,642"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a53d8b566aaa0a77eeaa840021d48ace4" title=" " alt="" coords="901,665,1129,707"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ac51fc0114c7ab50fe54f761193d05652" title=" " alt="" coords="903,730,1128,786"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a3c62de3555953fdec032b260711206f5" title=" " alt="" coords="896,809,1135,851"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a30e0dc0ce67cebcd9a938e368cb0f087" title=" " alt="" coords="888,874,1143,930"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#ad10db1021c53834285d1f2a42a3bf028" title=" " alt="" coords="888,954,1143,1010"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1graph_1_1_attachment_point_query_test.html#a8307c3a13a2700eba3fceb2b986dfb19" title=" " alt="" coords="901,1034,1130,1090"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a8e50ddb746bca4b0d9c341327482f88b" title="Search this graph for edges that match the criteria defined in a query." alt="" coords="631,5,811,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a7e95907b905875bb7bcc9521a3b90a94" title=" " alt="" coords="329,35,543,76"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex_query.html#af23dd64a35938660e9be863c60b5b47d" title=" " alt="" coords="603,123,840,164"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#af64066b322b2594efbea933ced2bc2b5" title=" " alt="" coords="620,188,823,229"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a74cb8674a8fd016993c045b0a9041dda" title=" " alt="" coords="627,253,815,295"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a95f6b08356683724ca6005311d56a9c5" title=" " alt="" coords="611,318,831,374"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a565f15c53df8b3dc07e595dc2f0d09b2" title=" " alt="" coords="631,397,812,439"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#ae6ddfb3fbb3165eb20c1737fb796f58e" title=" " alt="" coords="610,463,833,504"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a61f96d90c4a7569b2321f6052afd27f8" title=" " alt="" coords="616,528,827,569"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a2c86b6c1aa442f890a295c21b97fcc15" title=" " alt="" coords="633,593,809,635"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_edge_query_test.html#a89a074a7cc202c4147d01581772cca15" title=" " alt="" coords="609,658,833,714"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex_query.html#aebc8904e5daf03d098e9d4ae06d1de3f" title="Tests whether the given vertex satisfies all non&#45;null criteria in this query." alt="" coords="317,738,555,765"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#aacbd38c639a6a0140b8ae2749d65ac3b" title="Filters a list of vertices according to a query." alt="" coords="47,341,227,383"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#a5d80cf09a8149d9eb3cee3946fbffbbf" title=" " alt="" coords="33,406,241,462"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#af40e72e82602eaa42c3ff165d3f7ebd3" title=" " alt="" coords="24,485,251,527"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#a0d8ea8401e48c7a729d9aec86d5730e4" title=" " alt="" coords="36,551,239,592"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#a9f53ceeacbadd968ba88b3a54269926a" title=" " alt="" coords="27,615,247,671"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#a806eb7a269bf85b4743b28543898830c" title=" " alt="" coords="5,695,269,736"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#a79d72b64cd57ba7ee854c909ba70c10a" title=" " alt="" coords="12,759,263,815"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#ae448c8439f8d390b4b037ce938d1587b" title=" " alt="" coords="18,839,257,880"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#acdcd8b3952e812531c002dc607e414ed" title=" " alt="" coords="45,904,229,945"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#ac0b5661a3ed93b78fc568fee3faf7e51" title=" " alt="" coords="18,969,257,1011"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#aefbd0f508525488888d9fe04a0a13db0" title=" " alt="" coords="45,1035,229,1076"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1graph_1_1_vertex_query_test.html#a6394041fda59925358cd8c6c1ebace16" title=" " alt="" coords="43,1100,231,1141"/>
+</map>

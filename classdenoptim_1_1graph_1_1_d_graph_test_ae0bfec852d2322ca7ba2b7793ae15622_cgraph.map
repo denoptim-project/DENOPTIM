@@ -1,0 +1,16 @@
+<map id="denoptim.graph.DGraphTest.makeIsostructuralGraphs" name="denoptim.graph.DGraphTest.makeIsostructuralGraphs">
+<area shape="rect" id="node1" title=" " alt="" coords="5,195,224,236"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#af9d9965c880b45d82e9b4cc10e60efa7" title="Adds an attachment point with no APClass or other attribute." alt="" coords="272,13,500,39"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#ad16255987a45bace2ef62f2b49e0d873" title=" " alt="" coords="283,63,489,90"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a33a3299b77560786461345412d2fe193" title="Appends a vertex to this graph without creating any edge." alt="" coords="563,107,744,148"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_d_graph.html#a641d9078c27d992053500e12cec0049d" title="Append a vertex to this graph: adds the new vertex to the list of vertices belonging to the graph,..." alt="" coords="285,165,487,207"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_vertex.html#aee39019987712f9784138e97917ac97f" title="Get attachment point i on this vertex." alt="" coords="291,231,481,258"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_vertex.html#a5dbac662f4102558f3cf874c55174c5e" title=" " alt="" coords="301,283,471,324"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1graph_1_1_vertex.html#ad26ecf426a5e415605df94be904e58d3" title=" " alt="" coords="301,348,471,389"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1graph_1_1_vertex.html#aab761467eeeb2cc6c316b97da3af7927" title="Add the given key among the properties that are checked for equality when comparing vertices with the..." alt="" coords="301,413,471,455"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_empty_vertex.html#ade206f06a9a16581bbc22b654d4a2446" title=" " alt="" coords="550,5,757,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_d_graph.html#a28d94625c4fae66625b3061f0361e959" title="Checks if a number is already used as VertexIDs within the graph." alt="" coords="807,73,1016,115"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="822,139,1001,180"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_d_graph.html#aedfe0dc03ea1250a9944fcd30a888fa1" title="Adds the edge to the list of edges belonging to this graph." alt="" coords="548,173,759,199"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="568,224,739,265"/>
+</map>

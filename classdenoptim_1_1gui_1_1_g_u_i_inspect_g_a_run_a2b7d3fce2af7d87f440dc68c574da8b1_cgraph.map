@@ -1,0 +1,6 @@
+<map id="denoptim.gui.GUIInspectGARun.renderViewWithoutSelectedItems" name="denoptim.gui.GUIInspectGARun.renderViewWithoutSelectedItems">
+<area shape="rect" id="node1" title=" " alt="" coords="5,39,252,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a700b2ae92d1de1c0be3e1bbde5cae71d" title="Removes the currently visualized molecule and AP table." alt="" coords="300,39,479,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a0917c33381934f156d4196b46819276b" title="Clears the table of attachment points." alt="" coords="529,5,707,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a20eef80a872503d11d3253d5557e0876" title="Clears the molecular viewer." alt="" coords="527,71,709,112"/>
+</map>

@@ -1,0 +1,7 @@
+var _vertex_as_two_dim_structure_view_panel_8java =
+[
+    [ "denoptim.gui.VertexAsTwoDimStructureViewPanel", "classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html", "classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel" ],
+    [ "denoptim.gui.VertexAsTwoDimStructureViewPanel.TwoDimStructurePanel", "classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_two_dim_structure_panel.html", "classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_two_dim_structure_panel" ],
+    [ "denoptim.gui.VertexAsTwoDimStructureViewPanel.AtomOrAPGenerator", "classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_atom_or_a_p_generator.html", "classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_atom_or_a_p_generator" ],
+    [ "denoptim.gui.VertexAsTwoDimStructureViewPanel.PausableTableModelListener", "classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_pausable_table_model_listener.html", "classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_pausable_table_model_listener" ]
+];

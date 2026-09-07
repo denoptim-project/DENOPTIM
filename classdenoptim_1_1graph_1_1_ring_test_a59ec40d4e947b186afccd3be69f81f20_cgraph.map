@@ -1,0 +1,6 @@
+<map id="denoptim.graph.RingTest.testGetDistance" name="denoptim.graph.RingTest.testGetDistance">
+<area shape="rect" id="node1" title=" " alt="" coords="5,27,196,69"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_ring.html#a5f09bd9ccfc437f70de652e0746d2fe1" title="Measures how many edges there are between two edges along the sequence of vertices that defined this ..." alt="" coords="244,5,455,32"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a867032399d8aad0a894cbf5b51406ac4" title=" " alt="" coords="264,57,435,98"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_ring.html#a52d320207aa3fc73898eb662e8f208cb" title="Checks whether a given vertex is part of this ring." alt="" coords="503,5,693,32"/>
+</map>

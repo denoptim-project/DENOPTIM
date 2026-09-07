@@ -1,0 +1,8 @@
+<map id="denoptim.ga.Population.XoverSitesAmongCandidates.put" name="denoptim.ga.Population.XoverSitesAmongCandidates.put">
+<area shape="rect" id="node1" title="Creates the entry corresponding to the pair of given candidates." alt="" coords="717,64,911,105"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_population.html#a31b74cc5407c42fa3a4214029fb08190" title="Returns a list of population members that can do crossover with the specified member." alt="" coords="492,64,669,105"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a45d4e9ec6a308aa73891efa1d501dd5e" title="Perform fitness&#45;based, class&#45;compatible selection of parents that can do crossover operations." alt="" coords="223,13,444,39"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_population_test.html#a5db0672054a9fc1dbc923310732fdb3a" title=" " alt="" coords="230,64,437,105"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_population_test.html#a278212ebff2501b7071d342f9a027599" title=" " alt="" coords="230,129,437,171"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a0b958439d79fae30f14530213ad22e3a" title="Generates up to a pair of new offspring by performing a crossover operation." alt="" coords="5,5,175,47"/>
+</map>

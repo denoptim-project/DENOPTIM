@@ -1,0 +1,5 @@
+<map id="denoptim.fragmenter.FragmenterTools.findPointAlignedWithTmpl" name="denoptim.fragmenter.FragmenterTools.findPointAlignedWithTmpl">
+<area shape="rect" id="node1" title="Finds the point on the master fragment that is aligned with the template geometry." alt="" coords="528,29,737,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a0a85408f85ea975ecc5c85776aee1aa0" title="Recursive function to process edges at any level of embedding to remove the corresponding bonds and c..." alt="" coords="263,29,480,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#a38e4793ebca03b3cbda4f035580620b7" title="Chops one chemical structure by applying the given fragmentation templates." alt="" coords="5,29,215,71"/>
+</map>

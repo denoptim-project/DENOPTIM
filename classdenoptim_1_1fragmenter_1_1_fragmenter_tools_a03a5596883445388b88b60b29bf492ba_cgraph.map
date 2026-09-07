@@ -1,0 +1,6 @@
+<map id="denoptim.fragmenter.FragmenterTools.getAPSourceAtom" name="denoptim.fragmenter.FragmenterTools.getAPSourceAtom">
+<area shape="rect" id="node1" title="Returns the atom that will be used as the source of the attachment point possibly handling a multy&#45;ha..." alt="" coords="5,39,215,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="263,5,468,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a8bca186632882f9399b9511020a43211" title="Gets either the elemental symbol (for standard atoms) of the label (for pseudo&#45;atoms)." alt="" coords="263,71,468,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#af975649c8225c4653efb1135d8360c2d" title="Check element symbol corresponds to real element of Periodic Table." alt="" coords="516,71,713,112"/>
+</map>

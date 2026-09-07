@@ -1,0 +1,8 @@
+<map id="denoptim.utils.MoleculeUtils.calculateCentroid" name="denoptim.utils.MoleculeUtils.calculateCentroid">
+<area shape="rect" id="node1" title="Calculated the centroid of the given molecule." alt="" coords="1199,45,1437,86"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a6ef3c605f4c86de64db48e322f338119" title=" " alt="" coords="908,11,1151,53"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_molecule_utils_test.html#ad3ae67a1a381e0bec24f26fda7aad4cf" title=" " alt="" coords="937,77,1121,118"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a38d5f86f923595401e3315e0460c46d7" title="A a veretex 3D structure (if any) that is not connected to anything previously added." alt="" coords="279,5,545,61"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#a91fba166ba9fe73858ed16209d575cc5" title="Recursive method that appends branches of building blocks following the edges of the graph." alt="" coords="593,49,860,105"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1_three_dim_tree_builder.html#acbaf5061621ed283eecc80a51b523422" title="Created a three&#45;dimensional molecular representation from a given DGraph." alt="" coords="5,5,231,61"/>
+</map>

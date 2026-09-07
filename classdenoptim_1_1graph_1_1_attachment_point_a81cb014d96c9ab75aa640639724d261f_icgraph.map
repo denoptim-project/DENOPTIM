@@ -1,0 +1,5 @@
+<map id="denoptim.graph.AttachmentPoint.processSdfString" name="denoptim.graph.AttachmentPoint.processSdfString">
+<area shape="rect" id="node1" title="Parses the string format used to record one attachment point in SDF files." alt="" coords="284,39,464,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a5e7dbb13e4081b90cee9a01c89fa35e5" title="Construct an attachment point based on the formatted string representation." alt="" coords="31,5,211,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point_test.html#a4cef28018e749a37b9484318b64bc694" title=" " alt="" coords="5,71,236,112"/>
+</map>

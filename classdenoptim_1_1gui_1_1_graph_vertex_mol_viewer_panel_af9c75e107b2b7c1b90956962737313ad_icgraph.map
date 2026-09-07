@@ -1,0 +1,12 @@
+<map id="denoptim.gui.GraphVertexMolViewerPanel.dispose" name="denoptim.gui.GraphVertexMolViewerPanel.dispose">
+<area shape="rect" id="node1" title=" " alt="" coords="1456,31,1627,73"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a46c924d960aab4ad6da4880961eca4af" title=" " alt="" coords="1157,5,1408,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a3cf222c297371678ddd971e9857188b0" title=" " alt="" coords="1163,56,1402,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#abeb355ac694f9f3278a3b5aeb9342de4" title="Changes the appearance of the vertex visualisation panel to an empty card that is consistent with the..." alt="" coords="895,96,1109,152"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#a5edf6f6270bf3d180455295bffb57df0" title="Makes a clone of the given vertex and loads that clone into the nested visualization frame." alt="" coords="899,16,1105,72"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel.html#abab3007ca39f050b3b9916c4bcc994ca" title="Loads the given graph into the graph viewer." alt="" coords="597,96,807,152"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a67ce3e03e9d13d3f312652296d25c0a5" title=" " alt="" coords="587,175,817,217"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_graph_vertex_mol_viewer_panel_1_1_node_clicked_listener.html#a4c7c2b6e03029c1850296cda96c5d6bc" title=" " alt="" coords="557,16,847,72"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="259,183,509,209"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="5,175,211,217"/>
+</map>

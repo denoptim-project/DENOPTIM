@@ -1,0 +1,7 @@
+<map id="denoptim.gui.CompatibilityMatrixForm.CompatibilityRuleLine.renderIfMatches" name="denoptim.gui.CompatibilityMatrixForm.CompatibilityRuleLine.renderIfMatches">
+<area shape="rect" id="node1" title="Checks if there is any component matching the regex query and returns the number of matches." alt="" coords="5,104,260,160"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_target_a_p_class_token.html#abefc7dbd695b17f6952e14edff49b358" title=" " alt="" coords="308,5,575,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_a_p_class.html#ac33a29894453a78896488fa441fcbd85" title="Do not use this to make SDF representations." alt="" coords="623,46,801,87"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_target_a_p_class_token.html#a9828a0edadb7eca402276acf445bc2c9" title=" " alt="" coords="315,136,568,192"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form_1_1_compatibility_rule_line.html#a362c0a6c7b89d2375c41f4e6248e2fb7" title=" " alt="" coords="311,216,572,272"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="denoptim.gui.MoleculeViewPanel.initialize" name="denoptim.gui.MoleculeViewPanel.initialize">
+<area shape="rect" id="node1" title=" " alt="" coords="5,99,184,141"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_utils.html#a392b3f9d6c47ab4ee7dc8e9f2a09f0c5" title="Returns the pathname to a tmp file." alt="" coords="699,36,899,63"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#af99749d5f2b6b6d83ce1b0f9b5c94095" title=" " alt="" coords="232,141,411,182"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_file_utils.html#abb578573334c0bc633d537d987223e63" title="Check whether we can write and read to a given pathname." alt="" coords="1183,47,1359,89"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1files_1_1_file_utils.html#ae2209fbdfdcf1fdf0499e32989b057b5" title="Looks for a writable location where to put temporary files and returns an absolute pathname to the fo..." alt="" coords="954,77,1127,118"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="1411,29,1621,56"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="1407,80,1625,107"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_molecule_view_panel.html#a7823d9f27dc96ba2c777339e181dcfdc" title=" " alt="" coords="465,111,644,153"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#aded8f83abc7d4310a5d95312a29363af" title="Returns a single collection with all atom containers found in a file of any format." alt="" coords="705,122,893,163"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_candidate.html#a65cfcaa4ce7b537005082fd90e90d8b6" title=" " alt="" coords="459,229,651,270"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a48102bb79e9cc581e8c6ef527e003b08" title="Reads a file containing multiple molecules." alt="" coords="947,142,1135,183"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.graph.Candidate.Candidate" name="denoptim.graph.Candidate.Candidate">
+<area shape="rect" id="node1" title="Builds a candidate from the SDF representation of an atom container." alt="" coords="5,119,180,160"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="228,29,447,71"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a3d1393195144f47b8071517c24336a66" title="Converts an atom container read in from an SDF file into a graph, if possible." alt="" coords="243,119,431,160"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a4aa6e335f7b9d467cd7f978b7589a293" title="Sets the reference to the candidate item that is defined by this graph." alt="" coords="248,184,427,225"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="495,29,713,71"/>
+</map>

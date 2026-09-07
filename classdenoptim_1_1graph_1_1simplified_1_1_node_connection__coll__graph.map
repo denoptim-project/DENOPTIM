@@ -1,0 +1,5 @@
+<map id="denoptim.graph.simplified.NodeConnection" name="denoptim.graph.simplified.NodeConnection">
+<area shape="rect" id="node1" title="This class represents an edge that is undirected and ignores attachment points." alt="" coords="21,184,192,225"/>
+<area shape="rect" id="node2" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html" title="Possible chemical bond types an edge can represent." alt="" coords="5,95,208,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="79,5,135,32"/>
+</map>

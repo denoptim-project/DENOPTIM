@@ -1,0 +1,5 @@
+<map id="denoptim.gui.ParametersForm.importSingleParameter" name="denoptim.gui.ParametersForm.importSingleParameter">
+<area shape="rect" id="node1" title=" " alt="" coords="576,5,811,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_parameters_form.html#a1ea0ff6e93b001958e5f8a54b6705584" title=" " alt="" coords="293,5,528,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_parameters_form.html#acc519aa0a8708f022a7d0dff46f64050" title="Reads in the parameters from a text file collecting &#160;&#160;DENOPTIM parameters in the form of KEY=VALUE li..." alt="" coords="5,5,245,47"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.fragspace.FragmentSpace.getPolarizedRCV" name="denoptim.fragspace.FragmentSpace.getPolarizedRCV">
+<area shape="rect" id="node1" title="Returns a newly&#45;built vertex that can play the role of a ring&#45;closing vertex even when working with 3..." alt="" coords="5,73,199,114"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_fragment.html#a1f1eee26acede7b656a922201399f2b4" title="Adds an attachment point with a dummy APClass." alt="" coords="253,29,463,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a65c4f181651f2cd9606b581988af9247" title=" " alt="" coords="247,80,469,107"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a5dbac662f4102558f3cf874c55174c5e" title=" " alt="" coords="273,131,443,173"/>
+</map>

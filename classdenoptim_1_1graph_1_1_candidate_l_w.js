@@ -1,0 +1,27 @@
+var classdenoptim_1_1graph_1_1_candidate_l_w =
+[
+    [ "CandidateLW", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a336b2e8011861c1447be491703d68553", null ],
+    [ "equals", "classdenoptim_1_1graph_1_1_candidate_l_w.html#af67e5ac07977dd43168bf0d3fb8b826f", null ],
+    [ "getError", "classdenoptim_1_1graph_1_1_candidate_l_w.html#aa77171547e60b1872ccdbb7db60d4b77", null ],
+    [ "getFitness", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a95069843e337d5e85a5434aceb8e9c42", null ],
+    [ "getGeneratingSource", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a3af9ebb9222d8454625d6a5d8548be70", null ],
+    [ "getGeneration", "classdenoptim_1_1graph_1_1_candidate_l_w.html#ae0d754f27cb1396b28fadfa6e1cfcd92", null ],
+    [ "getLevel", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a32bfab2ec1e037a1a28e9d0c9bb2075d", null ],
+    [ "getName", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a2d2a01085357ec8852d7cdd563a9f811", null ],
+    [ "getPathToFile", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a73f9188a92ff8dde58db2d344accde90", null ],
+    [ "getUid", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a566cdc7feeb2bb9a8503831cbcc8e0fe", null ],
+    [ "hasFitness", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a015435de7c18b38757709c97bd46f10d", null ],
+    [ "setError", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a5b0854960a04b31ce12b5d0bdbcfbad6", null ],
+    [ "setFitness", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a382d6d04e131453c7c4736de583ea996", null ],
+    [ "setGeneratingSource", "classdenoptim_1_1graph_1_1_candidate_l_w.html#aa375e204e094848126768561901a32e4", null ],
+    [ "setGeneration", "classdenoptim_1_1graph_1_1_candidate_l_w.html#abeb30140b862fc08d90bdd6d2290b9b6", null ],
+    [ "setLevel", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a7458628d4e902ca60749a5986a14ecc0", null ],
+    [ "error", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a742bba518fa824d0f5fe24a4cb45077f", null ],
+    [ "fitness", "classdenoptim_1_1graph_1_1_candidate_l_w.html#aa2a2028d54bd26f732bb8887ee55eaf6", null ],
+    [ "generatingSource", "classdenoptim_1_1graph_1_1_candidate_l_w.html#af79d9d2969c6ddef2539640f4587ba8b", null ],
+    [ "generationId", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a77ab6cc6eae808b695e998a24ebbfbb7", null ],
+    [ "level", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a8c87cbd16ea6567332c68f970c004a46", null ],
+    [ "name", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a5fc401bce44e2c2261d8481a25bbf0a4", null ],
+    [ "pathNameToFile", "classdenoptim_1_1graph_1_1_candidate_l_w.html#a13686cb5e05826cb1c0a5591b80fcc31", null ],
+    [ "uid", "classdenoptim_1_1graph_1_1_candidate_l_w.html#aee6d7bdea09ddfa898ce475df2143adf", null ]
+];

@@ -1,0 +1,7 @@
+<map id="denoptim.ga.EAUtils.setVertexCounterValue" name="denoptim.ga.EAUtils.setVertexCounterValue">
+<area shape="rect" id="node1" title="Set the Vertex counter value according to the largest value found in the given population." alt="" coords="5,71,203,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_graph_utils.html#a642eb920915ad715efab1cdda1afa891" title="Method used to ensure consistency between internal atomic integer and vertex id from imported graphs." alt="" coords="251,37,460,79"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_d_graph.html#a372132d7440bb35316e635944b9ac18b" title=" " alt="" coords="266,103,445,144"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_graph_utils.html#aad6245f297edf8a9f100b3949092f3c1" title="Unique counter for the number of graph vertices generated." alt="" coords="513,5,701,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_graph_utils.html#adceb5d2a62ee7cb0c67e8ccd1c13e0f0" title="Reset the unique vertex counter to the given value." alt="" coords="508,71,707,112"/>
+</map>

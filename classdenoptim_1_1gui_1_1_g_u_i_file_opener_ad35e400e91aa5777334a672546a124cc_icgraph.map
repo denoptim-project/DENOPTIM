@@ -1,0 +1,18 @@
+<map id="denoptim.gui.GUIFileOpener.pickFile" name="denoptim.gui.GUIFileOpener.pickFile">
+<area shape="rect" id="node1" title=" " alt="" coords="601,176,835,203"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_cutting_rules_selection_dialog.html#a64ab4ac8312bff57a077266658555757" title="Constructor." alt="" coords="301,5,543,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#a4bc183818810a26037080b47f082b9af" title="Initialize the panel and add buttons." alt="" coords="324,85,520,126"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#af5b000c105018cbd7c262b34f9750044" title="Initialize the panel and add buttons." alt="" coords="297,151,547,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare.html#a8a63383bbabdfbda99d36e6dbd9c390e" title="Initialize the panel with tabbedPane and buttons." alt="" coords="314,201,530,228"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="291,260,553,287"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1gui_1_1_g_u_i_file_opener.html#aff1eb57da9cbb113e119fbc24c96c3da" title=" " alt="" coords="316,422,528,463"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#ab550b03594a5843183d6f925e66d444b" title="Constructor." alt="" coords="5,63,243,105"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#ab7d010d9a384f6b85edce47c95d6723b" title="Constructor." alt="" coords="21,129,227,170"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare.html#a429aa206246e784daacd7308e908f6af" title="Constructor." alt="" coords="39,194,209,235"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="16,259,232,301"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1gui_1_1_fitness_parameters_form.html#a989880b9075bcb6124c36a444731b6a9" title=" " alt="" coords="20,325,228,366"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1gui_1_1_f_s_e_parameters_form.html#a70d0bd7abbb56dab83315be97afa8b4e" title=" " alt="" coords="29,390,219,431"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1gui_1_1_f_s_parameters_form.html#a5e0ab7ceb7ad81ee8e14b5e217ab97ba" title=" " alt="" coords="33,455,215,497"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1gui_1_1_g_a_parameters_form.html#a1da1237b4f0c1d5c5335abc8c2bb2602" title=" " alt="" coords="32,521,216,562"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare_fitness_runner_1_1_input_form.html#ad4c925fb08ff03706326cd87d1fcac18" title=" " alt="" coords="19,586,229,627"/>
+</map>

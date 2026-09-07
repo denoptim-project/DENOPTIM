@@ -1,0 +1,9 @@
+<map id="denoptim.gui.GraphViewerPanel.JVertex.JVertex" name="denoptim.gui.GraphViewerPanel.JVertex.JVertex">
+<area shape="rect" id="node1" title="Constructor for vertex that represents a given AttachmentPoint." alt="" coords="5,104,179,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a72dd6bd75a701cabb65832778da6e574" title="Returns a unique integer that is used to sort list of attachment points." alt="" coords="227,5,407,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#acd666767475f39f0d7f17550d2b47651" title=" " alt="" coords="227,71,407,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="227,136,407,177"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_vertex.html#a9493346ca1480edfcfa00cb78a52adf5" title=" " alt="" coords="231,201,402,243"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_vertex.html#a367c9d31e4bb13c16e865389c154a767" title="Returns the position of the given AP in the list of APs of this vertex." alt="" coords="455,71,625,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="673,71,844,112"/>
+</map>

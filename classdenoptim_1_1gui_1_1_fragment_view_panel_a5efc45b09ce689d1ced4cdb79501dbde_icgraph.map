@@ -1,0 +1,5 @@
+<map id="denoptim.gui.FragmentViewPanel.setColorOfAtoms" name="denoptim.gui.FragmentViewPanel.setColorOfAtoms">
+<area shape="rect" id="node1" title="Highlights the given atoms in the Jmol viewer using colored halos (the same ring style as selection h..." alt="" coords="556,5,739,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#aa095718dbc239511b8ba8a3659adbc8d" title="Highlights the given atoms in the Jmol viewer." alt="" coords="260,5,508,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_atom_selection_dialog.html#ad220a9d7bc37b0b7e13df05cd0b6de19" title="Constructs a dialog for setting the preferences of the GUI." alt="" coords="5,5,212,47"/>
+</map>

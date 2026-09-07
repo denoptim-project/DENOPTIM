@@ -1,0 +1,15 @@
+<map id="denoptim.graph.VertexQuery" name="denoptim.graph.VertexQuery">
+<area shape="rect" id="node1" title="Query for searching vertices." alt="" coords="1107,77,1291,104"/>
+<area shape="rect" id="node2" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_b_b_type.html" title="The type of building block." alt="" coords="15,5,214,32"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_vertex_query.html" title="Query for searching vertices." alt="" coords="393,187,577,213"/>
+<area shape="rect" id="node3" href="$enumdenoptim_1_1graph_1_1_vertex_1_1_vertex_type.html" title="Flag declaring the type of Vertex implementation." alt="" coords="5,96,224,123"/>
+<area shape="rect" id="node4" title=" " alt="" coords="8,157,221,198"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_edge_query.html" title="A query for edges: a list of properties that target edges should possess in order to match this query..." alt="" coords="764,247,940,273"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_attachment_point_query.html" title="Query for searching AttachmentPoints." alt="" coords="1109,306,1289,347"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_a_p_class.html" title=" " alt="" coords="770,509,934,536"/>
+<area shape="rect" id="node9" title=" " alt="" coords="445,459,524,485"/>
+<area shape="rect" id="node10" title=" " alt="" coords="403,509,567,536"/>
+<area shape="rect" id="node11" title=" " alt="" coords="381,560,588,587"/>
+<area shape="rect" id="node12" href="$enumdenoptim_1_1graph_1_1_edge_1_1_bond_type.html" title="Possible chemical bond types an edge can represent." alt="" coords="383,345,586,372"/>
+<area shape="rect" id="node13" title=" " alt="" coords="87,345,143,372"/>
+</map>

@@ -1,0 +1,52 @@
+<map id="denoptim.gui.MainToolBar.MainToolBar" name="denoptim.gui.MainToolBar.MainToolBar">
+<area shape="rect" id="node1" title="Constructor that build the tool bar." alt="" coords="5,1057,180,1099"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a0df9ca063352fbc50f9476f3b2820926" title="Initialize the contents of the tool bar." alt="" coords="228,1065,448,1091"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_main_panel.html#a358fd697624ec6b8b23849c1956cc975" title="Add a component and a reference to such component in the main tool bar." alt="" coords="1051,207,1257,234"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1gui_1_1_g_u_i.html#a44f2d6b2d6fbb59f5836760c92c75292" title="Close GUI is there are no unsaved changes to the open components." alt="" coords="521,1116,685,1157"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1files_1_1_file_utils.html#adf038babeb9f64d8c853a0290efe04fb" title="Inspects a file/folder and tries to detect if there is one of the data sources that is recognized by ..." alt="" coords="1359,1332,1549,1373"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a1a2e06a2647032587d42155302b8c0a6" title="Process a file that has a recognized file format and loads a suitable GUI card to visualize the file ..." alt="" coords="757,494,980,521"/>
+<area shape="rect" id="node47" href="$classdenoptim_1_1gui_1_1_g_u_i_file_opener.html#ad7b920446bd429869671293d264adac2" title=" " alt="" coords="497,1181,709,1223"/>
+<area shape="rect" id="node48" href="$classdenoptim_1_1task_1_1_static_task_manager.html#a40a4557dcc3645729033969c5cf7ca22" title="Adds a reference to the given progress bar." alt="" coords="500,1247,705,1288"/>
+<area shape="rect" id="node49" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#a94df24e485081c9b9d7441387f409e26" title="Updated the the list of recent files in the &quot;open Recent&quot; menu." alt="" coords="496,861,709,903"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_main_tool_bar.html#acdff6d9c1e266c2d5f13e7e9dba0af87" title="Add the reference to an active panel/tab in the menu listing active panel/tabs." alt="" coords="1357,5,1551,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1task_1_1_static_task_manager.html#aa082037a2747bc07e6a496157b1d9652" title=" " alt="" coords="784,1181,953,1223"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1gui_1_1_g_u_i_main_panel.html#a175562c560d3a40dd88b9abefc18fcaa" title="Checks is any card has unsaved changes." alt="" coords="765,1271,972,1312"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1task_1_1_static_task_manager.html#a8482fea755a3ebfb8284d64e82b9ae3a" title=" " alt="" coords="784,1116,953,1157"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1files_1_1_file_utils.html#a81ee3939d31a3703a85b19b02b7c2906" title="Detect the content of a json file." alt="" coords="1628,1201,1819,1243"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1files_1_1_file_utils.html#af0429c88ee95afd0cc9d3da72fe5b60b" title="Looks into a text file and tries to understand if the file is a collection of parameters for any spec..." alt="" coords="1628,1332,1819,1373"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1files_1_1_file_utils.html#aa44c824a41849bcaaae541151db21cd6" title="Looks into a text file and tries to understand if the file is a collection of parameters for any spec..." alt="" coords="1628,1267,1819,1308"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1files_1_1_file_utils.html#a33e38e26f52c870617eec9e1c4810f7a" title="Looks into a text file and tries to understand if the file is a known text file." alt="" coords="1628,1397,1819,1439"/>
+<area shape="rect" id="node19" href="$enumdenoptim_1_1files_1_1_file_format.html#a3add0e6a04faada7ca012a68d9658bf2" title=" " alt="" coords="1630,1463,1817,1504"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1json_1_1_d_e_n_o_p_t_i_mgson.html#a3e85cb26bb2f36407e309e41880ef191" title=" " alt="" coords="1867,1201,2089,1243"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1files_1_1_file_utils.html#ac4f9dab79d47fe1f2c398fa7ab99da83" title="Looks into a text file and tries to understand what format it is among the given formats." alt="" coords="1883,1332,2073,1373"/>
+<area shape="rect" id="node14" href="$enumdenoptim_1_1files_1_1_file_format.html#a1195c718a5815ad69711686b478e5ec6" title="Returns the collection of file formats with input parameters." alt="" coords="1885,1397,2071,1439"/>
+<area shape="rect" id="node16" href="$enumdenoptim_1_1files_1_1_file_format.html#a45ce558c824bcceb76dcb1cd0ccc6013" title="Returns the collection of file formats using SDF syntax." alt="" coords="1885,1267,2071,1308"/>
+<area shape="rect" id="node18" href="$enumdenoptim_1_1files_1_1_file_format.html#aacb6d37afa380f4f44c3f6699882a432" title="Returns the collection of file formats restricted to TXT files (excluded parameter files)" alt="" coords="1885,1463,2071,1504"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1gui_1_1_g_u_i_text_reader.html#af93992c7d6f33c7cf9832462c3059120" title="Print the content of the given file in this tab&#39;s pane." alt="" coords="1039,389,1269,431"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1gui_1_1_g_u_i_compatibility_matrix_tab.html#a12aed375c445d523520977cead0632b5" title=" " alt="" coords="1048,455,1260,496"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#ad4dab9aade0d84507879d53780a88199" title=" " alt="" coords="1028,520,1280,561"/>
+<area shape="rect" id="node36" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a9be67aaf7774f89c1fdafd56472360fd" title=" " alt="" coords="1031,933,1277,975"/>
+<area shape="rect" id="node44" href="$classdenoptim_1_1gui_1_1_g_u_i_graph_handler.html#a81df728192225395c24224607bc63eee" title="Imports graphs from file." alt="" coords="1033,999,1275,1040"/>
+<area shape="rect" id="node45" href="$classdenoptim_1_1gui_1_1_g_u_i_prepare.html#a39e236ecfd9276f889f123a70cd9ee42" title=" " alt="" coords="1034,259,1274,300"/>
+<area shape="rect" id="node46" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#a6698fa37bf04503e58c61f0543946834" title="Imports fragments from a file." alt="" coords="1028,324,1280,365"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#abb6475cf2be569dd6c87969f80b27d59" title="Read text from file." alt="" coords="1347,137,1561,163"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1gui_1_1_g_u_i_text_reader.html#a630acef76d0ef789df6536d4a4853c9c" title=" " alt="" coords="1349,71,1559,112"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1gui_1_1_compatibility_matrix_form.html#a1094ffe0650c36b088356f51d1020d6f" title=" " alt="" coords="1344,188,1564,229"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#adc9aaa1dcca5325d211a6a197a72af53" title=" " alt="" coords="1329,552,1579,593"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a95069843e337d5e85a5434aceb8e9c42" title=" " alt="" coords="1638,727,1809,768"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a32bfab2ec1e037a1a28e9d0c9bb2075d" title="Returns the level that generated this graph in a fragment space exploration experiment." alt="" coords="1638,432,1809,473"/>
+<area shape="rect" id="node30" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#a015435de7c18b38757709c97bd46f10d" title=" " alt="" coords="1638,992,1809,1033"/>
+<area shape="rect" id="node31" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#aab1bd788e028b3a5b77dca355e8d557b" title="Read only selected data from a GA produced items." alt="" coords="1629,512,1817,553"/>
+<area shape="rect" id="node32" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#a93064e3487745a0588ef1eb77d3d5e15" title=" " alt="" coords="1328,356,1580,397"/>
+<area shape="rect" id="node33" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#a3eaeb4ba499d9f3c9a8a905127bf8ce7" title=" " alt="" coords="1328,617,1580,659"/>
+<area shape="rect" id="node34" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#ae64c850463d7d16d61d9612ea1613eb3" title=" " alt="" coords="1331,421,1577,463"/>
+<area shape="rect" id="node35" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_f_s_e_run.html#afaf02b7c3af6f525e2536b23bd0bbdd1" title=" " alt="" coords="1331,487,1577,528"/>
+<area shape="rect" id="node37" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a3f8fe730afa2012143c6365e7a9d79cc" title="Modal dialog to display visual examples of line colors and strokes." alt="" coords="1335,1149,1573,1191"/>
+<area shape="rect" id="node38" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#afe7e7a12c08dba4f2ecb97274064d35b" title=" " alt="" coords="1331,1215,1577,1256"/>
+<area shape="rect" id="node39" href="$classdenoptim_1_1graph_1_1_candidate_l_w.html#ae0d754f27cb1396b28fadfa6e1cfcd92" title=" " alt="" coords="1638,1084,1809,1125"/>
+<area shape="rect" id="node40" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a9a5cf8d6ae31378ae37fcfb3031c567e" title=" " alt="" coords="1340,1084,1568,1125"/>
+<area shape="rect" id="node41" href="$classdenoptim_1_1utils_1_1_general_utils.html#ab0c97460520e98fa670681d851754703" title="returns the padded string with zeroes placed to the left of &#39;number&#39; up to reach the desired number o..." alt="" coords="1355,836,1553,877"/>
+<area shape="rect" id="node42" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a32e8ea84a91515a20ffaf45350972dda" title=" " alt="" coords="1337,967,1571,1008"/>
+<area shape="rect" id="node43" href="$classdenoptim_1_1gui_1_1_g_u_i_inspect_g_a_run.html#a2b7d3fce2af7d87f440dc68c574da8b1" title=" " alt="" coords="1331,901,1577,943"/>
+<area shape="rect" id="node50" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#a468b91723acb5df58e0efdb1ae9e41a6" title="Reads the file defined in DENOPTIMConstants#RECENTFILESLIST and makes a map that contains the pathnam..." alt="" coords="775,861,963,903"/>
+</map>

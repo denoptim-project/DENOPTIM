@@ -1,0 +1,6 @@
+<map id="denoptim.gui.GUIVertexInspector.choseOrCreateNewAPClass" name="denoptim.gui.GUIVertexInspector.choseOrCreateNewAPClass">
+<area shape="rect" id="node1" title="Runs a dialog aimed at selecting an existing APClass or defining a new one." alt="" coords="580,35,831,76"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_empty_vertex_maker.html#a5b98876b4b05ee77516d9889ec438acc" title="Constructs a maker that can make empty vertexes, but controls whether the generated vertexes are allo..." alt="" coords="303,5,498,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="269,71,532,98"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="5,64,221,105"/>
+</map>

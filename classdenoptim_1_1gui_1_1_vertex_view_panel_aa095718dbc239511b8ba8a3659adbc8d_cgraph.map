@@ -1,0 +1,5 @@
+<map id="denoptim.gui.VertexViewPanel.highlightAtoms" name="denoptim.gui.VertexViewPanel.highlightAtoms">
+<area shape="rect" id="node1" title="Highlights the given atoms in the Jmol viewer." alt="" coords="5,5,253,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_fragment_view_panel.html#a5efc45b09ce689d1ced4cdb79501dbde" title="Highlights the given atoms in the Jmol viewer using colored halos (the same ring style as selection h..." alt="" coords="301,5,484,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#af7331efe9eccdc6ef2df711fbeec1068" title=" " alt="" coords="532,13,747,39"/>
+</map>

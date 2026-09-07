@@ -1,0 +1,8 @@
+<map id="denoptim.programs.RunTimeParameters.ensureFileExists" name="denoptim.programs.RunTimeParameters.ensureFileExists">
+<area shape="rect" id="node1" title="Ensures a pathname does lead to an existing file or triggers an error." alt="" coords="651,113,837,155"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a3824a3165946e8f32e4490a2a9be0c00" title="Evaluate consistency of input parameters." alt="" coords="335,77,595,119"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_m_m_builder_parameters.html#a9728bc4268329cb39bbea267ad9760c2" title="Check all parameters." alt="" coords="328,145,603,187"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter.html#aa27df9705e3aed34cc8cb8bc05e6ce85" title=" " alt="" coords="43,5,243,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm_test.html#a11b2178cd3d55ba7f1fe1e0e047dd684" title=" " alt="" coords="37,70,248,126"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,149,280,191"/>
+</map>

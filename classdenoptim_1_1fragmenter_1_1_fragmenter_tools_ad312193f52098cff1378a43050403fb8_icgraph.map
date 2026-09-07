@@ -1,0 +1,6 @@
+<map id="denoptim.fragmenter.FragmenterTools.manageFragmentCollection" name="denoptim.fragmenter.FragmenterTools.manageFragmentCollection">
+<area shape="rect" id="node1" title="Management of fragments: includes application of fragment filters, rejection rules,..." alt="" coords="520,29,735,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_task.html#ad73de82da7bcd76c0159c2d5080682c4" title="Performs the whatever work has to be done by this task." alt="" coords="5,33,215,75"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#afe25e249e1296a0a0d911a41e18bb2c2" title="Performs fragmentation according to the given cutting rules." alt="" coords="263,29,472,71"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_fragmenter_tools.html#adf20ca7e1ee86d06eef9d07501b47a4f" title="Performs fragmentation from graphs, i.e., extracts existing fragments from graphs (stored in a file)." alt="" coords="263,95,472,136"/>
+</map>

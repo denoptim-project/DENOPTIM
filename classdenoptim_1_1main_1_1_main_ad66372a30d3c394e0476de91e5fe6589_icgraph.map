@@ -1,0 +1,5 @@
+<map id="denoptim.main.Main.defineProgramBehavior" name="denoptim.main.Main.defineProgramBehavior">
+<area shape="rect" id="node1" title="Does the processing of the application arguments and decides what the program should do." alt="" coords="241,27,416,69"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1main_1_1_main.html#a5d0a8599c5e2e81cffd07e35353bfc84" title="Launches the appropriate program according to the arguments given." alt="" coords="15,5,183,32"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1main_1_1_main_test.html#a94c1db07c57d2ec754035270fc1a435c" title=" " alt="" coords="5,57,193,98"/>
+</map>

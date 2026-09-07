@@ -1,0 +1,23 @@
+<map id="denoptim.fragspace.APMapFinder" name="denoptim.fragspace.APMapFinder">
+<area shape="rect" id="node1" title="An utility class to encapsulate the search for an AttachmentPoint&#45;AttachmentPoint mapping." alt="" coords="1074,163,1255,205"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_a_p_mapping.html" title="Class representing a mapping between attachment points (APs)." alt="" coords="693,64,873,91"/>
+<area shape="rect" id="node3" title=" " alt="" coords="231,57,426,98"/>
+<area shape="rect" id="node4" title=" " alt="" coords="289,5,368,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="671,171,895,197"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html" title="Class defining a space of building blocks." alt="" coords="686,390,879,431"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1fragspace_1_1_fragment_space_parameters.html" title="Parameters defining the fragment space." alt="" coords="1068,578,1261,619"/>
+<area shape="rect" id="node7" title=" " alt="" coords="241,129,417,170"/>
+<area shape="rect" id="node8" title=" " alt="" coords="211,193,446,249"/>
+<area shape="rect" id="node9" title=" " alt="" coords="212,273,445,314"/>
+<area shape="rect" id="node10" title=" " alt="" coords="225,339,432,365"/>
+<area shape="rect" id="node11" title=" " alt="" coords="235,390,423,431"/>
+<area shape="rect" id="node12" title=" " alt="" coords="230,455,427,497"/>
+<area shape="rect" id="node13" title=" " alt="" coords="231,520,426,576"/>
+<area shape="rect" id="node14" title=" " alt="" coords="239,599,419,641"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html" title="Collection of parameters controlling the behavior of the software." alt="" coords="689,709,876,750"/>
+<area shape="rect" id="node17" title=" " alt="" coords="297,665,360,692"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1utils_1_1_randomizer.html" title="Tool to generate random numbers and random decisions." alt="" coords="242,716,415,743"/>
+<area shape="rect" id="node19" title=" " alt="" coords="5,716,128,743"/>
+<area shape="rect" id="node20" title=" " alt="" coords="195,767,463,823"/>
+<area shape="rect" id="node21" href="$enumdenoptim_1_1programs_1_1_run_time_parameters_1_1_parameters_type.html" title="Identifier of the type of parameters." alt="" coords="235,846,422,887"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="denoptim.graph.Fragment" name="denoptim.graph.Fragment">
+<area shape="rect" id="node1" title="Class representing a continuously connected portion of chemical object holding attachment points." alt="" coords="5,155,173,181"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_vertex.html" title="A vertex is a data structure that has an identity and holds a list of AttachmentPoints." alt="" coords="14,80,165,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="50,5,129,32"/>
+</map>

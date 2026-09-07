@@ -1,0 +1,4 @@
+<map id="denoptim.fragmenter.ClusterableFragment" name="denoptim.fragmenter.ClusterableFragment">
+<area shape="rect" id="node1" title="Represents a fragment that can be clustered based on the 3*N coordinate of atoms and attachment point..." alt="" coords="5,80,213,121"/>
+<area shape="rect" id="node2" title=" " alt="" coords="66,5,153,32"/>
+</map>

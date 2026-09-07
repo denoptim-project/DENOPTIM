@@ -1,0 +1,14 @@
+<map id="denoptim.graph.Fragment.projectPropertyToAP" name="denoptim.graph.Fragment.projectPropertyToAP">
+<area shape="rect" id="node1" title="Uses a string formatted like the molecular property used for defining attachment points to create the..." alt="" coords="5,48,216,89"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a7e45846280a63bd2bf36b85e502ffa49" title="The index of the source atom in the atom list of the fragment." alt="" coords="800,5,997,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_fragment.html#a8d33526e74e10db5d8db591544d6836a" title="Takes the list of APs from the field of this class and projects the APs into properties of the IAtoms..." alt="" coords="264,48,475,89"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_fragment.html#ab272daa0515a1ee2fb99a2eb6a81a4a0" title="Depends on an healthy list of attachment points with properly set pointers to the source atoms." alt="" coords="264,145,475,187"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_fragment.html#a551361a1155600e6e2fe4e37590c924f" title=" " alt="" coords="534,64,723,105"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_fragment.html#a366dfaf65191c724b8e393b9d9dc899f" title=" " alt="" coords="534,129,723,171"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_fragment.html#ad87484692035efb425e352a5135aa3d9" title=" " alt="" coords="523,195,735,236"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_fragment.html#a13fe376fd06c5aca7e4dfeba36e37b0e" title=" " alt="" coords="534,260,723,301"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_symmetric_set.html#aa3db3c29bdb4ed481b63257a2ffa1b14" title="Adds an item to this list, if not already present." alt="" coords="811,100,986,141"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_fragment.html#a90fc66d07e071376ee45a32ab8a76020" title="Checks if the atoms at the given positions have similar environments i.e." alt="" coords="795,165,1002,207"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_a_p_class.html#a5cac5d20b70a0eace014ce062a271fbf" title=" " alt="" coords="783,231,1015,258"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a31bed4cb29f6437bf8a888a1dda3fd95" title="Returns the Attachment Point class." alt="" coords="809,283,989,324"/>
+</map>

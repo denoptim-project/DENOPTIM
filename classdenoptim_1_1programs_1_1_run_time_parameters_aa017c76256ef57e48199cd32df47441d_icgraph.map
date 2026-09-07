@@ -1,0 +1,6 @@
+<map id="denoptim.programs.RunTimeParameters.ensureIsPositive" name="denoptim.programs.RunTimeParameters.ensureIsPositive">
+<area shape="rect" id="node1" title="Ensures that a parameter is a positive number (x&gt;=0) or triggers an error." alt="" coords="572,41,761,83"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#a3824a3165946e8f32e4490a2a9be0c00" title="Evaluate consistency of input parameters." alt="" coords="264,41,524,83"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter.html#aa27df9705e3aed34cc8cb8bc05e6ce85" title=" " alt="" coords="11,5,211,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragmenter_1_1_parallel_fragmentation_algorithm_test.html#a11b2178cd3d55ba7f1fe1e0e047dd684" title=" " alt="" coords="5,70,216,126"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="denoptim.gui.VertexAsTwoDimStructureViewPanel.updateAPsMapAndTable" name="denoptim.gui.VertexAsTwoDimStructureViewPanel.updateAPsMapAndTable">
+<area shape="rect" id="node1" title="Uses the AP of the Fragment to create a new map and table of APs." alt="" coords="5,35,208,91"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a69ceb353f2391f1e5b25dc6e6bc88492" title="Allows to activate and deactivate the listener." alt="" coords="545,5,755,61"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel.html#a96588a21ab72f01a72c846d3d1dc08c6" title="Clears the table of attachment points." alt="" coords="256,42,497,83"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a85aa901ec3fff8e566c0cc32d9c9f84e" title=" " alt="" coords="291,107,462,149"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_as_two_dim_structure_view_panel_1_1_pausable_table_model_listener.html#a326ffbf277447d4c06bcb4fbf85f20cb" title=" " alt="" coords="803,5,1020,61"/>
+</map>

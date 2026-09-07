@@ -1,0 +1,6 @@
+<map id="denoptim.molecularmodeling.zmatrix.ZMatrix.getBondRefAtomIndex" name="denoptim.molecularmodeling.zmatrix.ZMatrix.getBondRefAtomIndex">
+<area shape="rect" id="node1" title="Get the index of the bond reference atom for the atom at the given index." alt="" coords="5,39,239,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a97816fa27c0cc136b67f1dd92f8e3c31" title="Get the bond reference atom for the atom at the given index." alt="" coords="287,39,520,80"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="568,5,801,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a70fef3e9cafe930bc1fa43a5e8729fcd" title="Get the bond reference atom." alt="" coords="568,71,801,112"/>
+</map>

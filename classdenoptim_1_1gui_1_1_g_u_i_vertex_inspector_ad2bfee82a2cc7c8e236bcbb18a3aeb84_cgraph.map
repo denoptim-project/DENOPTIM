@@ -1,0 +1,5 @@
+<map id="denoptim.gui.GUIVertexInspector.protectEditedSystem" name="denoptim.gui.GUIVertexInspector.protectEditedSystem">
+<area shape="rect" id="node1" title=" " alt="" coords="5,39,261,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector_1_1_vrtx_spinner_change_event.html#aadd9bd7cbca65495eb27e4f9e4a3411f" title="Enables/disable the listener." alt="" coords="309,5,543,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_vertex_view_panel.html#ab5a415c6dbe55114c957b6241eab83eb" title="Enable/disable switch&#45;able view." alt="" coords="317,71,535,112"/>
+</map>

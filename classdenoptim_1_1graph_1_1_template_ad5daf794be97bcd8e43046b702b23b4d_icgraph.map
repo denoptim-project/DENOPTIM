@@ -1,0 +1,4 @@
+<map id="denoptim.graph.Template.setIAtomContainer" name="denoptim.graph.Template.setIAtomContainer">
+<area shape="rect" id="node1" title="Attaches a molecular representation to this template." alt="" coords="315,5,503,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a32b0be109306e9c81fc830867296bc66" title="Extracts a system of one or more fused rings and adds them to the fragment space if not already prese..." alt="" coords="5,5,267,47"/>
+</map>

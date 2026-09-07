@@ -1,0 +1,10 @@
+<map id="denoptim.fragmenter.FragmenterTools.findPointAlignedWithTmpl" name="denoptim.fragmenter.FragmenterTools.findPointAlignedWithTmpl">
+<area shape="rect" id="node1" title="Finds the point on the master fragment that is aligned with the template geometry." alt="" coords="5,179,215,221"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_math_utils.html#a334843fcf3bc5056d3262754feac30cf" title="Calculate the angle between the 3 points." alt="" coords="284,29,479,56"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a8756db32338fda8d7c6f891138835bba" title="Generate a vector that is perpendicular to the given one." alt="" coords="281,81,481,122"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac74037442de1ef05310f5e6fa79f7fb0" title="Return the 3D coordinates, if present." alt="" coords="279,146,484,187"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#a9191811a0f9bb6ba79616e9d1922130d" title="Creates an object Vector3d that originates from point a and goes to point b." alt="" coords="286,211,477,253"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a377eae6a6254a6d1bd0f218fc2552af3" title="Constructs a copy of an atom container, i.e., a molecule that reflects the one given in the input arg..." alt="" coords="272,277,491,318"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_cartesian_space_utils.html#aacb4c43ba442f22726372bf4d479a988" title="Rotate a vector according to a given rotation axis and angle." alt="" coords="263,342,500,383"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a68a0db70d2e6d3252269574918177014" title="Method that constructs an atom that reflect the same atom given as parameter in terms of element symb..." alt="" coords="548,277,767,318"/>
+</map>

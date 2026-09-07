@@ -1,0 +1,7 @@
+<map id="denoptim.utils.GraphUtils.getLabel" name="denoptim.utils.GraphUtils.getLabel">
+<area shape="rect" id="node1" title=" " alt="" coords="5,104,193,145"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#abc9d9eae901e1e868183f8bdaca13aea" title=" " alt="" coords="241,5,420,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_vertex.html#a9ad275adf822019ad803cb3c95e9a6d2" title=" " alt="" coords="245,71,416,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_d_graph.html#a58811a9ea75a26abffc1a9c7c2b22741" title="Returns the vertex that is in the given position of the list of vertices belonging to this graph." alt="" coords="241,136,420,177"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#aa49c772ed95da9bebd45729a54d154d9" title=" " alt="" coords="243,201,418,243"/>
+</map>

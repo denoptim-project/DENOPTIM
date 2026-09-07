@@ -1,0 +1,17 @@
+<map id="denoptim.integration.tinker.TinkerUtilsTest.testINTRoundTrip" name="denoptim.integration.tinker.TinkerUtilsTest.testINTRoundTrip">
+<area shape="rect" id="node1" title=" " alt="" coords="5,269,223,311"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ae9486d28880e0c8225c0092acab98165" title="Add an atom to the ZMatrix." alt="" coords="552,5,785,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a74973227abbe71ddf68a01051675a16c" title="Add a bond between the two atoms at the given indices." alt="" coords="552,95,785,136"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a1c679f69d769635317582c7ad463e537" title=" " alt="" coords="271,445,504,487"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a04b53939fb59cd25ba95bf30ba4b33eb" title="Reads a Tinker INT file." alt="" coords="299,228,475,269"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a6a5dddb77381cffcd8f187d3cf009c48" title="Set the id of the ZMatrix." alt="" coords="552,315,785,356"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1integration_1_1tinker_1_1_tinker_utils.html#a7ce8ad5c951a5f0c57655ad4b34f4cf2" title="Write Tinker INT file." alt="" coords="299,608,475,649"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_bond.html#a6c29c716ac7741ba240fc227a8d9a79b" title="Get the first atom in the bond." alt="" coords="552,380,785,421"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_bond.html#a2d7764f322e7dba876116bc432c38d84" title="Get the second atom in the bond." alt="" coords="552,445,785,487"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a501ef1f2a8fddf72585f7776f0b90f73" title="Get the id of the atom." alt="" coords="552,576,785,617"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ab3814ca6929883135e97eca28175407e" title="Constructor for ZMatrix." alt="" coords="552,511,785,552"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#a1db113a8dbb6ff33d597115771893fed" title="Delete the bond between the two atoms at the given indices." alt="" coords="552,249,785,291"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix.html#ad0f695527ee91cd88d95d381e55f73cc" title="Get the atom at the given index." alt="" coords="552,160,785,201"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#a0c1d972b730eec8ccd5de41cd80e8812" title="Get the symbol of the atom." alt="" coords="552,707,785,748"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1molecularmodeling_1_1zmatrix_1_1_z_matrix_atom.html#aa9020e51df783289cbbb17ba7fc4e920" title="Get the type of the atom." alt="" coords="552,641,785,683"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="denoptim.ga.ExternalCmdsListener.run" name="denoptim.ga.ExternalCmdsListener.run">
+<area shape="rect" id="node1" title="Starts listening for events and keeps listening in its own thread." alt="" coords="5,85,180,127"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1exception_1_1_exception_utils.html#ad9c36f7546914017a9ce5d6e22508fa2" title="Prints the stack trace of an exception into a string." alt="" coords="238,52,430,93"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_external_cmds_listener.html#a252e1a6342524c0dc6fc467c43966655" title=" " alt="" coords="228,117,440,159"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a64d75b20ef9ab8af80544e9981881631" title="Adds candidate IDs to the list of &quot;to&#45;be&#45;included&quot; candidates." alt="" coords="510,5,677,47"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="488,95,699,122"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad3c60eba8bde5a804c840482acc829a6" title="Adds candidate IDs to the list of &quot;to&#45;be&#45;removed&quot; candidates." alt="" coords="499,147,687,188"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a5d4c7ed4e7b8d2219c845f906e539408" title=" " alt="" coords="511,212,676,253"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a2367e2b5713154c6d49905975fb852b0" title="Removes all tasks whether they are completed or not." alt="" coords="747,212,912,253"/>
+</map>

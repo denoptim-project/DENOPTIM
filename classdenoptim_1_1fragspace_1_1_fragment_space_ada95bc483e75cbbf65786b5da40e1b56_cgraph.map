@@ -1,0 +1,4 @@
+<map id="denoptim.fragspace.FragmentSpace.getLogger" name="denoptim.fragspace.FragmentSpace.getLogger">
+<area shape="rect" id="node1" title="Returns the logger associated with this fragment space&#39;s parameters." alt="" coords="5,5,199,47"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="247,5,433,47"/>
+</map>

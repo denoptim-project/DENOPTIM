@@ -1,0 +1,6 @@
+<map id="denoptim.fragspace.FragmentSpaceParameters.checkParameters" name="denoptim.fragspace.FragmentSpaceParameters.checkParameters">
+<area shape="rect" id="node1" title="Evaluate consistency of input parameters." alt="" coords="5,71,236,112"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1files_1_1_file_utils.html#a16bc762b79f5033f2323fb8728593334" title=" " alt="" coords="302,5,493,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#aaeaf94275f1b63439850a68a244a74c2" title="Checks any of the parameter collections contained in this instance." alt="" coords="284,71,511,112"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="304,136,491,177"/>
+</map>

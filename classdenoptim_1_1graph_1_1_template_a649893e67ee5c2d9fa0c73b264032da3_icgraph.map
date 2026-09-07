@@ -1,0 +1,7 @@
+<map id="denoptim.graph.Template.sameAs" name="denoptim.graph.Template.sameAs">
+<area shape="rect" id="node1" title="Compares this and another template ignoring vertex IDs." alt="" coords="332,136,551,163"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a6f2ce8f6a8319b39440b0dc43ede061f" title="Check that the following graph&#39;s fused ring gets added to the fragment library." alt="" coords="5,5,284,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a56ef448997df677c5ce4a73737f127e2" title="Checks that a graph with a fused ring containing a scaffold vertex is added to the scaffold library." alt="" coords="9,85,280,141"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o_test.html#a9ad0d01f5abd9f5c57e64dc7dd92484f" title=" " alt="" coords="39,165,250,206"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_template_test.html#a50688358b5a557ee51683082427bdc14" title=" " alt="" coords="35,230,254,271"/>
+</map>

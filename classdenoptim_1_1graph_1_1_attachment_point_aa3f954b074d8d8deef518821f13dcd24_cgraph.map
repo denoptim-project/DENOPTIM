@@ -1,0 +1,14 @@
+<map id="denoptim.graph.AttachmentPoint.hasConnectedSrcAtom" name="denoptim.graph.AttachmentPoint.hasConnectedSrcAtom">
+<area shape="rect" id="node1" title="Checks if this and another APs are rooted on atoms that are bonded in any way other than a possible c..." alt="" coords="5,124,195,165"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_attachment_point.html#a0e96f6c954de060a628eb3de1b2f4554" title="For vertices that are templates this method returns the attachment point that is embedded in the temp..." alt="" coords="739,29,919,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_attachment_point.html#adfc2840f3e5126d847c8d800082f8958" title="Gets the attachment point (AP) that is connected to this AP via the edge user or in any edge user tha..." alt="" coords="243,124,437,165"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1graph_1_1_attachment_point.html#ac8551521d38644f5109800b665957ee9" title=" " alt="" coords="250,189,430,231"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1graph_1_1_attachment_point.html#aa1ae3c328e8ea24ead206b822daca7f7" title="Gets the edge that is using this AP, or null if no edge is using this AP." alt="" coords="489,213,683,255"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1graph_1_1_edge.html#a658e275a18a50f12474777f5f28c35e9" title=" " alt="" coords="485,279,687,306"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1graph_1_1_edge.html#a20a0c78541321532267b2fda0a6b634b" title=" " alt="" coords="495,59,677,100"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1graph_1_1_edge.html#a44521a3ad1a83e5d0a6be227e35ceffa" title=" " alt="" coords="486,330,686,357"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1graph_1_1_edge.html#ae5c20718860e84083e008b5bef44e1ae" title=" " alt="" coords="495,124,677,165"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1graph_1_1_vertex.html#a6615f1c869173b8bd6d730c6683b9de4" title="Returns the graph this vertex belongs to or null." alt="" coords="743,181,914,223"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1graph_1_1_template.html#aca9a03a1d6e2fd5de8f859f18996ec62" title=" " alt="" coords="735,247,923,288"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1graph_1_1_a_p_tree_map.html#abb77efcfaa507592758e7fd4845bdd80" title=" " alt="" coords="971,254,1173,281"/>
+</map>

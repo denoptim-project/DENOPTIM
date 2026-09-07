@@ -1,0 +1,5 @@
+<map id="denoptim.graph.DGraph.fixEdgeDirections" name="denoptim.graph.DGraph.fixEdgeDirections">
+<area shape="rect" id="node1" title="Flips edges in the graph so that the scaffold is the only source vertex." alt="" coords="500,29,672,71"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a45b3ec4b3b4d6384e49093e9b9449537" title="Sets the vertex at the lowest level as the scaffold, changes the &#160;&#160;directions of edges so that the sc..." alt="" coords="252,29,452,71"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a5f9a8cd2ab45c226c2e1ec714c19724b" title="Extracts subgraphs that match the provided pattern." alt="" coords="5,29,204,71"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="denoptim.programs.graphlisthandler.GraphListsHandler" name="denoptim.programs.graphlisthandler.GraphListsHandler">
+<area shape="rect" id="node1" title="Tool for handling lists of graphs." alt="" coords="5,229,235,271"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1task_1_1_program_task.html" title="Task structure for any of the main programs in the denoptim project, such as genetic algorithm and co..." alt="" coords="28,155,212,181"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1task_1_1_task.html" title="A task that can throw exceptions." alt="" coords="53,80,187,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="56,5,184,32"/>
+</map>

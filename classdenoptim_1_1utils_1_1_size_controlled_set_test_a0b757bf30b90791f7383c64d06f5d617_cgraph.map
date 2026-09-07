@@ -1,0 +1,9 @@
+<map id="denoptim.utils.SizeControlledSetTest.test" name="denoptim.utils.SizeControlledSetTest.test">
+<area shape="rect" id="node1" title=" " alt="" coords="5,112,193,153"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1utils_1_1_size_controlled_set.html#aa6aeb248f6884d9a6f331b35058b5e18" title="Checks if the given entry is already container in the set of known entries and, if not,..." alt="" coords="253,71,441,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_size_controlled_set.html#a60fb92a2b0764c43f2d55baed07666fa" title="Checks if an entry is contained in this collection." alt="" coords="253,5,441,47"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#ad5bee53baea572e1d76f8dd0bf3ddd76" title="Read list of data as text." alt="" coords="241,161,452,187"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1utils_1_1_size_controlled_set.html#a0cdd516dbd00652fe06f2d7639801141" title="Returns the number of unique entries." alt="" coords="253,212,441,253"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1files_1_1_file_utils.html#a67d99e2b559128d91c93886ba80fa392" title="Search in a file for a line matching the given string query." alt="" coords="527,9,692,51"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1io_1_1_denoptim_i_o.html#adc7de175de66792f4f37f1661c10e7f8" title="Write text&#45;like data file." alt="" coords="500,78,719,105"/>
+</map>

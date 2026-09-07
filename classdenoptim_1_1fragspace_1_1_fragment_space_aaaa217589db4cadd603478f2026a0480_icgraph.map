@@ -1,0 +1,9 @@
+<map id="denoptim.fragspace.FragmentSpace.getFragAPsCompatibleWithClass" name="denoptim.fragspace.FragmentSpace.getFragAPsCompatibleWithClass">
+<area shape="rect" id="node1" title="Returns the list of attachment points found in the fragment space and that are compatible with a give..." alt="" coords="937,85,1192,126"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1fragspace_1_1_frags_combination_iterator.html#afa4835767d37078abce9e3fbe5fa16e1" title="Constructs a new factory for generating all the combination of fragments that can be attached on a gi..." alt="" coords="627,5,869,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a2dca1b8ac952e62a5b5aa1f961334a01" title="Searches for all APs that are compatible with the given list of APs." alt="" coords="607,85,889,126"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ae884d9d970bc9d561dad00bf0c20b4b5" title=" " alt="" coords="625,149,871,205"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1fragspace_1_1_fragment_space.html#a0311d9fe4a945fc7e06ba466bb8ca121" title="Searches for all building blocks that are compatible with the given list of APs." alt="" coords="319,37,552,93"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#a2ba7718688486212e987638aef444bad" title=" " alt="" coords="312,117,559,173"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1fragspace_1_1_fragment_space_test.html#ab95d03f36f68718eb1cc11fac188401f" title=" " alt="" coords="5,37,264,93"/>
+</map>

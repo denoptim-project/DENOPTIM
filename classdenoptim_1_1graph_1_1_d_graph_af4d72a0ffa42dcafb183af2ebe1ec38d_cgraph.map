@@ -1,0 +1,5 @@
+<map id="denoptim.graph.DGraph.getBranchIdOfVertexAtPosition" name="denoptim.graph.DGraph.getBranchIdOfVertexAtPosition">
+<area shape="rect" id="node1" title="Returns the branch identifier." alt="" coords="5,39,191,80"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1graph_1_1_d_graph.html#a1b6ffe09345affdaf53651dfbdbb691b" title="Returns the branch identifier." alt="" coords="239,5,417,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1graph_1_1_d_graph.html#a58811a9ea75a26abffc1a9c7c2b22741" title="Returns the vertex that is in the given position of the list of vertices belonging to this graph." alt="" coords="239,71,417,112"/>
+</map>

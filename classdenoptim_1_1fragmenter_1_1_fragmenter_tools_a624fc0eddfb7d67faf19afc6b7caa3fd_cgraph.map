@@ -1,0 +1,8 @@
+<map id="denoptim.fragmenter.FragmenterTools.prepareMolToFragmentation" name="denoptim.fragmenter.FragmenterTools.prepareMolToFragmentation">
+<area shape="rect" id="node1" title="Do any pre&#45;processing on a IAtomContainer meant to be fragmented." alt="" coords="5,150,224,191"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1programs_1_1fragmenter_1_1_fragmenter_parameters.html#ac75656ab1a925a9af3d894403c1833be" title=" " alt="" coords="272,5,504,61"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ab217b40e0b54cad6f9857b2103d4fd69" title="Sets bond order = single to all otherwise unset bonds." alt="" coords="275,85,501,126"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#ac014c01d8b787219c07e30d982d10cbf" title="Converts all the implicit hydrogens to explicit." alt="" coords="275,150,501,191"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1programs_1_1_run_time_parameters.html#a5d529ee791990d15bde012d8dcd6b5c1" title="Get the name of the program specific logger." alt="" coords="295,215,481,257"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a364533d507e42ebb43dc537c0e3ad3a4" title="Sets zero implicit hydrogen count to all atoms." alt="" coords="278,281,498,322"/>
+</map>

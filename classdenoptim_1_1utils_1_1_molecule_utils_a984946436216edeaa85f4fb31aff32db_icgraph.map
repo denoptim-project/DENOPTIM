@@ -1,0 +1,11 @@
+<map id="denoptim.utils.MoleculeUtils.getAtomRef" name="denoptim.utils.MoleculeUtils.getAtomRef">
+<area shape="rect" id="node1" title=" " alt="" coords="1232,93,1437,135"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1gui_1_1_g_u_i_atom_selection_dialog.html#ad220a9d7bc37b0b7e13df05cd0b6de19" title="Constructs a dialog for setting the preferences of the GUI." alt="" coords="933,5,1139,47"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#acadecc92299a7ea46113c06382a1f333" title="Initialize the panel and add buttons." alt="" coords="905,71,1167,98"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1utils_1_1_molecule_utils.html#a64dcaabacba2ea9c1cd1586cf81b74e9" title="Looks for carbon atoms that are flagged as aromatic, but do not have any double bond and are,..." alt="" coords="902,123,1170,164"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1utils_1_1_rotational_space_utils.html#a95673bf4bcfa24f53e7d077eb7979942" title="Process the constrained rotatable bonds." alt="" coords="888,188,1184,229"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1gui_1_1_g_u_i_vertex_inspector.html#abc5d3c33ad9b2b114ce43e9b2cd577bb" title="Constructor." alt="" coords="605,64,821,105"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a1cd879265bf12e9c2980efae1e8e74aa" title="Generate 3D structure by assembling 3D fragments according to attachment point vector and following t..." alt="" coords="587,188,840,229"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1molecularmodeling_1_1_multi_molecular_model_builder.html#a6a8e314f3fb37f66c32c8c4d5695b8a4" title="Given the graph representation of the molecular constitution, along with the 3D coordinates of the fr..." alt="" coords="328,181,539,237"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1programs_1_1moldecularmodelbuilder_1_1_molecular_model_builder.html#ad2e44290de6a861274def677044e9754" title=" " alt="" coords="5,188,280,229"/>
+</map>

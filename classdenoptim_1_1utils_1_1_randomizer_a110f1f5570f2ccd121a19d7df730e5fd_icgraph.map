@@ -1,0 +1,31 @@
+<map id="denoptim.utils.Randomizer.nextBoolean" name="denoptim.utils.Randomizer.nextBoolean">
+<area shape="rect" id="node1" title="Returns the next pseudo&#45;random, uniformly distributed boolean value from this random number generator..." alt="" coords="2059,288,2259,329"/>
+<area shape="rect" id="node2" href="$classdenoptim_1_1ga_1_1_graph_operations.html#ab157137220b19383b24af17f77cf8948" title="Tries to add a fused ring using a pair of free APs, one of which on the given vertex." alt="" coords="1500,71,1717,112"/>
+<area shape="rect" id="node5" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a253bf47206c313b9f62623677eb589ef" title="Decides whether to apply constitutional symmetry or not." alt="" coords="1784,349,2011,391"/>
+<area shape="rect" id="node8" href="$classdenoptim_1_1utils_1_1_randomizer.html#ac846a1f050f9ee65022492c84e4793fa" title="Returns a point in three&#45;dimensional space with a random set of coordinates, the absolute value of wh..." alt="" coords="1800,473,1995,515"/>
+<area shape="rect" id="node13" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a6931f6dd235b0cf3c2fe974797e24857" title=" " alt="" coords="1807,225,1988,267"/>
+<area shape="rect" id="node3" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a0c851972015fbb4b2a317b053b8b81d9" title="Mutates the given vertex according to the given mutation type, if possible." alt="" coords="1193,5,1433,47"/>
+<area shape="rect" id="node4" href="$classdenoptim_1_1ga_1_1_graph_operations_test.html#a6dbd168077a4fb24f16e1e9ac14d0c4c" title=" " alt="" coords="1217,71,1410,112"/>
+<area shape="rect" id="node6" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a649892c4a2b1d4ccd2f97cae6dd7ed98" title=" " alt="" coords="1493,408,1725,449"/>
+<area shape="rect" id="node7" href="$classdenoptim_1_1ga_1_1_graph_operations.html#a104e82aba7242a457da09540ff0400da" title="function that will keep extending the graph." alt="" coords="1196,364,1431,405"/>
+<area shape="rect" id="node9" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#a6c81ab7e238aeed0006bc08ca584db62" title="The noise magnitude is to be interpreted as half of the overall magnitude." alt="" coords="1509,473,1708,515"/>
+<area shape="rect" id="node12" href="$classdenoptim_1_1utils_1_1_randomizer_test.html#a668de9e8b868a6b84e8a781b1a1d317f" title=" " alt="" coords="1522,539,1695,580"/>
+<area shape="rect" id="node10" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#aa17925160f3f03080e8680c7016fc1c4" title=" " alt="" coords="1214,459,1413,500"/>
+<area shape="rect" id="node11" href="$classdenoptim_1_1fragmenter_1_1_fragment_clusterer_test.html#acb2fe702b9d02d39a38ca1cc732c9ee4" title=" " alt="" coords="1214,524,1413,565"/>
+<area shape="rect" id="node14" href="$classdenoptim_1_1ga_1_1_graph_operations.html#ad6ad588ae59fe0454cae046259b3f49d" title="Tries to do mutate the given graph." alt="" coords="1489,160,1729,201"/>
+<area shape="rect" id="node28" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a59d7af49096313a9707af30d78d7a7e1" title=" " alt="" coords="1485,225,1732,267"/>
+<area shape="rect" id="node29" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#a3f7e3dd977875217a40f51b5d3bffff5" title=" " alt="" coords="1481,291,1736,332"/>
+<area shape="rect" id="node15" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a8122818f58919fce84dce75e7506025a" title=" " alt="" coords="952,97,1121,139"/>
+<area shape="rect" id="node22" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#a87ea0ad600ad26e1a89a4947abcfef86" title="Graph construction starts with selecting a random core/scaffold." alt="" coords="1229,188,1398,229"/>
+<area shape="rect" id="node26" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#adb60b4cb2cda6a912a831974c5303df4" title=" " alt="" coords="1207,268,1419,309"/>
+<area shape="rect" id="node16" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0c2e353b243250b4959a3f86608f1020" title="Generates one offspring according to the method where crossover and mutation are decoupled,..." alt="" coords="707,163,880,204"/>
+<area shape="rect" id="node21" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ae7a90a911b109ed47b3acf54193acc35" title="Generates one offspring according to the method where crossover and mutation are coupled,..." alt="" coords="707,97,880,139"/>
+<area shape="rect" id="node17" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a596b2f5f0b097c5b67a6e5163bd6fe66" title="Generates a given number of new candidate items and adds them to the current population." alt="" coords="476,156,655,197"/>
+<area shape="rect" id="node18" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a6bfc2fa59b199da6259b5b6bad3d6de7" title=" " alt="" coords="259,189,424,231"/>
+<area shape="rect" id="node19" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#a0f2063b722b7291daf83d62acaa683d3" title=" " alt="" coords="5,156,211,197"/>
+<area shape="rect" id="node20" href="$classdenoptim_1_1programs_1_1denovo_1_1_g_a_runner.html#a7cafd6d78727b89dce3e2c8d06f0dd7c" title=" " alt="" coords="18,221,198,263"/>
+<area shape="rect" id="node23" href="$classdenoptim_1_1ga_1_1_e_a_utils.html#ad3d2daeb11e68a356e971ca1846596b5" title=" " alt="" coords="952,163,1121,204"/>
+<area shape="rect" id="node25" href="$classdenoptim_1_1ga_1_1_e_a_utils_test.html#ab7a37d3340d35ab586332ce2122e7bb0" title=" " alt="" coords="928,228,1145,269"/>
+<area shape="rect" id="node24" href="$classdenoptim_1_1ga_1_1_evolutionary_algorithm.html#ad43588620dab3340e0d8b0042ec73618" title="Fills up the population with candidates build from scratch." alt="" coords="472,221,659,263"/>
+<area shape="rect" id="node27" href="$classdenoptim_1_1programs_1_1genetweeker_1_1_gene_ops_runner.html#a3c2407eb1204a7b25600d3d347d98447" title=" " alt="" coords="931,293,1143,335"/>
+</map>
