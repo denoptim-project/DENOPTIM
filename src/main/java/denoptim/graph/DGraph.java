@@ -4958,28 +4958,10 @@ public class DGraph implements Cloneable
             throw new DENOPTIMException("Attempt to extract a subgraph giving "
                     + "a seed vertex that is not contained in this graph.");
         }
-        DGraph subGraph = this.clone();
-        Vertex seedClone = subGraph.getVertexAtPosition(
-                this.indexOf(seed));
-        
-        ArrayList<Vertex> subGrpVrtxs = new ArrayList<Vertex>();
-        subGrpVrtxs.add(seedClone);
-        subGraph.getChildrenTree(seedClone, subGrpVrtxs, numLayers, stopBeforeRCVs);
-        ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
-        for (Vertex v : subGraph.gVertices)
-        {
-            if (!subGrpVrtxs.contains(v))
-            {
-                toRemove.add(v);
-            }
-        }
-        
-        for (Vertex v : toRemove)
-        {
-            subGraph.removeVertex(v);
-        }
-        
-        return subGraph;
+        ArrayList<Vertex> members = new ArrayList<Vertex>();
+        members.add(seed);
+        getChildrenTree(seed, members, numLayers, stopBeforeRCVs);
+        return buildSubgraphFromMembers(members);
     }
     
 //------------------------------------------------------------------------------
@@ -5016,33 +4998,10 @@ public class DGraph implements Cloneable
             return extractSubgraph(seed, stopBeforeRCVs);
         }
         
-        DGraph subGraph = this.clone();
-        Vertex seedClone = subGraph.getVertexAtPosition(
-                this.indexOf(seed));
-        
-        List<Vertex> limitsInClone =  new ArrayList<Vertex>();
-        for (Vertex v : limits)
-            limitsInClone.add(subGraph.getVertexAtPosition(this.indexOf(v)));
-        
-        ArrayList<Vertex> subGrpVrtxs = new ArrayList<Vertex>();
-        subGrpVrtxs.add(seedClone);
-        subGraph.getChildTreeLimited(seedClone, subGrpVrtxs, limitsInClone, 
-                stopBeforeRCVs);
-        
-        ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
-        for (Vertex v : subGraph.gVertices)
-        {
-            if (!subGrpVrtxs.contains(v))
-            {
-                toRemove.add(v);
-            }
-        }
-        for (Vertex v : toRemove)
-        {
-            subGraph.removeVertex(v);
-        }
-        
-        return subGraph;
+        ArrayList<Vertex> members = new ArrayList<Vertex>();
+        members.add(seed);
+        getChildTreeLimited(seed, members, limits, stopBeforeRCVs);
+        return buildSubgraphFromMembers(members);
     }
 
 //------------------------------------------------------------------------------
@@ -5120,28 +5079,10 @@ public class DGraph implements Cloneable
                     + "a seed vertex that is not contained in this graph.");
         }
         
-        DGraph subGraph = this.clone();
-        Vertex seedClone = subGraph.getVertexAtPosition(
-                this.indexOf(seed));
-        
-        ArrayList<Vertex> subGrpVrtxs = new ArrayList<Vertex>();
-        subGrpVrtxs.add(seedClone);
-        subGraph.getChildTreeLimited(seedClone, subGrpVrtxs, stopBeforeRCVs);
-        
-        ArrayList<Vertex> toRemove = new ArrayList<Vertex>();
-        for (Vertex v : subGraph.gVertices)
-        {
-            if (!subGrpVrtxs.contains(v))
-            {
-                toRemove.add(v);
-            }
-        }
-        for (Vertex v : toRemove)
-        {
-            subGraph.removeVertex(v);
-        }
-        
-        return subGraph;
+        ArrayList<Vertex> members = new ArrayList<Vertex>();
+        members.add(seed);
+        getChildTreeLimited(seed, members, stopBeforeRCVs);
+        return buildSubgraphFromMembers(members);
     }
   
 //------------------------------------------------------------------------------
@@ -5259,19 +5200,8 @@ public class DGraph implements Cloneable
             Set<Edge> connectionToSubgraph, 
             Set<Edge> connectionFromSubgraph) 
     {
-        
-        DGraph subgraph = this.clone();
-
-        Set<Vertex> complement = subgraph
-                .getVertexList()
-                .stream()
-                .filter(u -> definedOn
-                        .stream()
-                        .allMatch(v -> v.getVertexId() != u.getVertexId())
-                ).collect(Collectors.toSet());
-        
-        Set<Long> vrtxIDsInComplement = complement.stream()
-                .map(v -> v.getVertexId())
+        Set<Long> idsInSub = definedOn.stream()
+                .map(Vertex::getVertexId)
                 .collect(Collectors.toSet());
         
         if (connectionToSubgraph!=null && connectionFromSubgraph!=null)
@@ -5281,13 +5211,13 @@ public class DGraph implements Cloneable
                 for (Edge e : this.getEdgeList())
                 {
                     if (e.getSrcAP().getOwner() == v && 
-                            vrtxIDsInComplement.contains(e.getTrgVertex()))
+                            !idsInSub.contains(e.getTrgVertex()))
                     {
                         connectionFromSubgraph.add(e);
                     }
                     
                     if (e.getTrgAP().getOwner() == v && 
-                            vrtxIDsInComplement.contains(e.getSrcVertex()))
+                            !idsInSub.contains(e.getSrcVertex()))
                     {
                         connectionToSubgraph.add(e);
                     }
@@ -5295,11 +5225,111 @@ public class DGraph implements Cloneable
             }
         }
         
-        for (Vertex v : complement) {
-            subgraph.removeVertex(v);
+        return buildSubgraphFromMembers(definedOn);
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Builds a new graph that contains clones of only the given members of this
+     * graph, plus the edges and rings that are fully defined on those members.
+     * Symmetric sets are retained when at least two members remain. This avoids
+     * cloning the full graph and then deleting vertices.
+     * @param members vertices of this graph that should appear in the result.
+     * @return a new graph defined on clones of the given members.
+     */
+    private DGraph buildSubgraphFromMembers(Collection<Vertex> members)
+    {
+        Set<Vertex> memberSet = (members instanceof Set)
+                ? (Set<Vertex>) members
+                : new HashSet<Vertex>(members);
+        
+        // Keep the relative order of vertices as in this graph
+        List<Vertex> orderedMembers = new ArrayList<Vertex>();
+        for (Vertex v : gVertices)
+        {
+            if (memberSet.contains(v))
+                orderedMembers.add(v);
         }
         
-        return subgraph;
+        ArrayList<Vertex> cListVrtx = new ArrayList<Vertex>();
+        Map<Long, Vertex> vidsInSub = new HashMap<Long, Vertex>();
+        for (Vertex vOrig : orderedMembers)
+        {
+            Vertex vClone = vOrig.clone();
+            cListVrtx.add(vClone);
+            vidsInSub.put(vClone.getVertexId(), vClone);
+        }
+        
+        ArrayList<Edge> cListEdges = new ArrayList<Edge>();
+        for (Edge e : gEdges)
+        {
+            if (!vidsInSub.containsKey(e.getSrcVertex())
+                    || !vidsInSub.containsKey(e.getTrgVertex()))
+            {
+                continue;
+            }
+            
+            Vertex srcOrig = e.getSrcAP().getOwner();
+            Vertex trgOrig = e.getTrgAP().getOwner();
+            int srcApId = srcOrig.getIndexOfAP(e.getSrcAP());
+            int trgApId = trgOrig.getIndexOfAP(e.getTrgAP());
+            
+            AttachmentPoint srcAPClone = vidsInSub.get(e.getSrcVertex())
+                    .getAP(srcApId);
+            AttachmentPoint trgAPClone = vidsInSub.get(e.getTrgVertex())
+                    .getAP(trgApId);
+            cListEdges.add(new Edge(srcAPClone, trgAPClone, e.getBondType()));
+        }
+        
+        DGraph subGraph = new DGraph(cListVrtx, cListEdges);
+        
+        ArrayList<Ring> cListRings = new ArrayList<Ring>();
+        for (Ring ring : gRings)
+        {
+            boolean allIn = true;
+            for (int iv = 0; iv < ring.getSize(); iv++)
+            {
+                if (!vidsInSub.containsKey(
+                        ring.getVertexAtPosition(iv).getVertexId()))
+                {
+                    allIn = false;
+                    break;
+                }
+            }
+            if (!allIn)
+                continue;
+            
+            Ring cRing = new Ring();
+            for (int iv = 0; iv < ring.getSize(); iv++)
+            {
+                cRing.addVertex(vidsInSub.get(
+                        ring.getVertexAtPosition(iv).getVertexId()));
+            }
+            cRing.setBondType(ring.getBondType());
+            cListRings.add(cRing);
+        }
+        subGraph.setRings(cListRings);
+        
+        List<SymmetricVertexes> cSymVertices = new ArrayList<SymmetricVertexes>();
+        for (SymmetricVertexes ss : symVertices)
+        {
+            SymmetricVertexes clonedSS = new SymmetricVertexes();
+            for (Vertex origVrt : ss)
+            {
+                Vertex mapped = vidsInSub.get(origVrt.getVertexId());
+                if (mapped != null)
+                    clonedSS.add(mapped);
+            }
+            // Match removeVertex semantics: a set needs at least two members
+            if (clonedSS.size() >= 2)
+                cSymVertices.add(clonedSS);
+        }
+        subGraph.setSymmetricVertexSets(cSymVertices);
+        
+        subGraph.setGraphId(graphId);
+        subGraph.setLocalMsg(localMsg);
+        return subGraph;
     }
 
 //------------------------------------------------------------------------------

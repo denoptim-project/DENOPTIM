@@ -204,12 +204,10 @@ public class GraphOperations
             gB.getChildrenTree(vB, descendantsB, true);
             
             // Branches that are isomorphic are not considered for crossover
-            DGraph test1 = gA.clone();
-            DGraph test2 = gB.clone();
             try
             {
-                DGraph subGraph1 = test1.extractSubgraph(gA.indexOf(vA));
-                DGraph subGraph2 = test2.extractSubgraph(gB.indexOf(vB));
+                DGraph subGraph1 = gA.extractSubgraph(vA);
+                DGraph subGraph2 = gB.extractSubgraph(vB);
                 if (maxSizeXoverSubGraph >= Math.max(subGraph1.getVertexCount(), 
                         subGraph2.getVertexCount()))
                 {
