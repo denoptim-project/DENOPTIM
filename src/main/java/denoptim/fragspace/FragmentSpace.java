@@ -47,7 +47,6 @@ import denoptim.graph.DGraph;
 import denoptim.graph.Fragment;
 import denoptim.graph.GraphPattern;
 import denoptim.graph.Template;
-import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.RingClosingAttractor;
@@ -1725,50 +1724,15 @@ public class FragmentSpace
             
             synchronized (LOCK)
             {
-                // Flatten nested templates so the library stores a single
-                // jacket level. Keep the most restrictive embedded contract.
-                DGraph flatInner = g.clone();
-                // clone() does not copy STOREDVID (non-String property values),
-                // but extractIACForSubgraph needs those labels to pull geometry
-                // from wholeMol.
-                for (int i = 0; i < g.getVertexCount(); i++)
-                {
-                    Object storedVid = g.getVertexAtPosition(i)
-                            .getProperty(DENOPTIMConstants.STOREDVID);
-                    if (storedVid != null)
-                    {
-                        flatInner.getVertexAtPosition(i).setProperty(
-                                DENOPTIMConstants.STOREDVID, storedVid);
-                    }
-                }
-                ContractLevel embeddedContract = null;
-                try
-                {
-                    embeddedContract = flatInner.flattenEmbeddedTemplates(this);
-                } catch (DENOPTIMException e)
-                {
-                    settings.getLogger().log(Level.WARNING,
-                            "Failed to flatten nested templates when "
-                            + "adding a ring-system to the " + type
-                            + " library; keeping nested form. Cause: "
-                            + e.getMessage());
-                    flatInner = g;
-                    embeddedContract = null;
-                }
-
-                if (!hasIsomorph(flatInner, type)) 
-                {
+                if (!hasIsomorph(g, type)) 
+                {   
                     //TODO: try to transform the template into its isomorphic
                     // with highest symmetry, and define the symmetric sets. 
                     // Such enhancement would facilitate the creation of 
                     // symmetric graphs from templates generated on the fly.
                     
                     Template t = new Template(type);
-                    t.setInnerGraph(flatInner);
-                    if (embeddedContract != null)
-                    {
-                        t.setContractLevel(embeddedContract);
-                    }
+                    t.setInnerGraph(g);
                     
                     boolean has3Dgeometry = false;
                     IAtomContainer subIAC = null;
@@ -1777,8 +1741,7 @@ public class FragmentSpace
                         try
                         {
                             subIAC = MoleculeUtils.extractIACForSubgraph(
-                                    wholeMol, flatInner, graph,
-                                    settings.getLogger(),
+                                    wholeMol, g, graph, settings.getLogger(),
                                     settings.getRandomizer());
                             t.setIAtomContainer(subIAC,true);
                             has3Dgeometry = true;
@@ -1787,7 +1750,7 @@ public class FragmentSpace
                             e1.printStackTrace();
                             ArrayList<DGraph> lst = new ArrayList<>();
                             lst.add(graph);
-                            lst.add(flatInner);
+                            lst.add(g);
                             String forDebugFile = "failedExtractIAC_" 
                             + graph.getGraphId() + ".json";
                             try
@@ -1817,11 +1780,6 @@ public class FragmentSpace
                         msg = msg + " candidate " + source.getName();
                     else
                         msg = msg + ".";
-                    if (embeddedContract != null)
-                    {
-                        msg = msg + " Flattened nested templates; contract="
-                                + embeddedContract + ".";
-                    }
                     settings.getLogger().log(Level.INFO, msg);
                     
                     appendVertexToLibrary(t, type, library);
@@ -1840,7 +1798,7 @@ public class FragmentSpace
                             DenoptimIO.writeSDFFile(destFileName,subIAC,true);
                         } else {
                             DenoptimIO.writeGraphToSDF(new File(destFileName), 
-                                    flatInner, true, false, settings.getLogger(),
+                                    g, true, false, settings.getLogger(),
                                     settings.getRandomizer());
                         }
                     } catch (DENOPTIMException e)
