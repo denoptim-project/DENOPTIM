@@ -21,6 +21,8 @@ package denoptim.gui;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
@@ -113,16 +115,38 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	{
 		setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		setOneTouchExpandable(true);
-		// WARNING: setting the divider location has to be node after the 
-		// split pane is visible
-		//setDividerLocation(defDivLoc);
 		setResizeWeight(0.5);
+		// Divider location needs a real size; set proportionally once laid out.
+		addComponentListener(new ComponentAdapter() {
+		    private boolean dividerInitialized = false;
+            @Override
+            public void componentResized(ComponentEvent e)
+            {
+                if (!dividerInitialized && getWidth() > 0)
+                {
+                    setDividerLocation(defDivLoc);
+                    dividerInitialized = true;
+                }
+            }
+        });
 		
 		// In the left part we have the mol and frag viewers
 		leftPane = new JSplitPane();
 		leftPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		leftPane.setOneTouchExpandable(true);
 		leftPane.setResizeWeight(0.5);
+		leftPane.addComponentListener(new ComponentAdapter() {
+		    private boolean dividerInitialized = false;
+            @Override
+            public void componentResized(ComponentEvent e)
+            {
+                if (!dividerInitialized && leftPane.getHeight() > 0)
+                {
+                    leftPane.setDividerLocation(0.5);
+                    dividerInitialized = true;
+                }
+            }
+        });
 		setLeftComponent(leftPane);
 		
 		graphViewer = new GraphViewerPanel();

@@ -29,6 +29,8 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -332,6 +334,15 @@ public class GraphViewerPanel extends JPanel
 		this.setLayout(new BorderLayout());
 		this.setBackground(Color.decode("#D9D9D9"));
 		this.setToolTipText("No graph to visualize");
+		// The graph is often loaded before this panel has its final size (e.g.
+		// inside a CardLayout / JSplitPane). Sync layout+viewer when we grow.
+		this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e)
+            {
+                syncPlotSizeToPanel();
+            }
+        });
 	}
 	
 //-----------------------------------------------------------------------------
@@ -349,6 +360,10 @@ public class GraphViewerPanel extends JPanel
 		{
 			this.remove(c);
 		}
+		viewer = null;
+		layout = null;
+		// Keep loadedGraph: menu actions (refine/shrink/enlarge) call cleanup()
+		// then reload from loadedGraph.
 		this.repaint();
 		this.revalidate();
 	}
@@ -556,25 +571,12 @@ public class GraphViewerPanel extends JPanel
 	    scaling = scaling * reScaling;
 	    layout = new DNPSpringLayout<>(g);
 	    
-	    //NB: the size depends on where this panel is used. In GUIVertexSelector
-        // the size vanishes, so we need to set a decent value or the graph will
-        // be displayed with 0:0 dimensions, i.e., all nodes on top of each other
-	    Dimension dimLayout = null;
-	    Dimension dimViewer = null;
-        if (this.getSize().height<150)
-        {
-            dimLayout = new Dimension(150, 150);
-            layout.setSize(dimLayout);
-            dimViewer = new Dimension(150, 150);
-        } else {
-            double w = this.getSize().width * scaling
-                    - GUIPreferences.graphNodeSize * 1.5;
-            double h = this.getSize().height * scaling
-                    - GUIPreferences.graphNodeSize * 1.5;
-            dimLayout = new Dimension((int) w, (int) h);
-            layout.setSize(dimLayout);
-            dimViewer = this.getSize();
-        }
+	    // NB: this panel may not have its final size yet (e.g. CardLayout /
+        // JSplitPane). Use a fallback for the first layout; syncPlotSizeToPanel
+        // will expand to the real available size once we are painted.
+	    Dimension panelSize = resolvePanelSize();
+	    Dimension dimLayout = computeLayoutSize(panelSize);
+	    layout.setSize(dimLayout);
 	    
 	    // Unless we have a snapshot from previous visualization, generate the
         // initial layout of nodes with ISOM layout
@@ -584,7 +586,7 @@ public class GraphViewerPanel extends JPanel
 	        inheritFeatures(prevStatus, lock);
 	    }
 	    
-        viewer = new VisualizationViewer<>(layout,dimViewer);
+        viewer = new VisualizationViewer<>(layout, panelSize);
 		
 	    // Listener for clicks on the graph nodes
         viewer.addGraphMouseListener(new GraphMouseListener<JVertex>() {
@@ -652,9 +654,105 @@ public class GraphViewerPanel extends JPanel
         gm.add(new PopupGraphMousePlugin());
         viewer.setGraphMouse(gm);
         viewer.addKeyListener(gm.getModeKeyListener());
-		this.add(viewer);
+		this.add(viewer, BorderLayout.CENTER);
         
+        syncPlotSizeToPanel();
         centerGraphLayout();
+	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Best-effort size of this panel for plotting. Falls back to a non-zero
+	 * size when the panel has not been laid out yet.
+	 */
+	private Dimension resolvePanelSize()
+	{
+	    Dimension s = getSize();
+	    if (s.width >= 150 && s.height >= 150)
+	    {
+	        return new Dimension(s);
+	    }
+	    if (getParent() != null)
+	    {
+	        Dimension p = getParent().getSize();
+	        if (p.width >= 150 && p.height >= 150)
+	        {
+	            return new Dimension(p);
+	        }
+	    }
+	    return new Dimension(150, 150);
+	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Layout coordinate space derived from the panel size and current scaling.
+	 */
+	private Dimension computeLayoutSize(Dimension panelSize)
+	{
+	    double w = panelSize.width * scaling
+	            - GUIPreferences.graphNodeSize * 1.5;
+	    double h = panelSize.height * scaling
+	            - GUIPreferences.graphNodeSize * 1.5;
+	    return new Dimension(Math.max(150, (int) w), Math.max(150, (int) h));
+	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Updates the JUNG layout and viewer to match the current panel size.
+	 * Scales existing node positions so the graph fills the available space
+	 * instead of remaining in a smaller initial layout box.
+	 */
+	private void syncPlotSizeToPanel()
+	{
+	    if (layout == null || viewer == null || loadedGraph == null)
+	    {
+	        return;
+	    }
+	    Dimension panelSize = getSize();
+	    if (panelSize.width < 150 || panelSize.height < 150)
+	    {
+	        return;
+	    }
+
+	    Dimension oldLayoutSize = layout.getSize();
+	    Dimension newLayoutSize = computeLayoutSize(panelSize);
+	    if (oldLayoutSize != null
+	            && Math.abs(oldLayoutSize.width - newLayoutSize.width) < 2
+	            && Math.abs(oldLayoutSize.height - newLayoutSize.height) < 2)
+	    {
+	        return;
+	    }
+
+	    if (oldLayoutSize != null && oldLayoutSize.width > 0
+	            && oldLayoutSize.height > 0)
+	    {
+	        double sx = (double) newLayoutSize.width / oldLayoutSize.width;
+	        double sy = (double) newLayoutSize.height / oldLayoutSize.height;
+	        for (JVertex v : loadedGraph.getVertices())
+	        {
+	            try
+	            {
+	                Point2D p = layout.getVertexPosition(v);
+	                if (p != null)
+	                {
+	                    layout.setLocation(v, new Point2D.Double(
+	                            p.getX() * sx, p.getY() * sy));
+	                }
+	            } catch (ExecutionException ex)
+	            {
+	                // ignore missing position
+	            }
+	        }
+	    }
+	    layout.setSize(newLayoutSize);
+	    viewer.setPreferredSize(panelSize);
+	    viewer.setSize(panelSize);
+	    centerGraphLayout();
+	    viewer.revalidate();
+	    viewer.repaint();
 	}
 	
 //-----------------------------------------------------------------------------
