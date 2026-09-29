@@ -99,6 +99,10 @@ public class GUIPreferencesDialog extends GUIModalDialog
     private String namMntChartLegend = "Display legend in monitor chart";
     private JPanel pnlMntChartLegend;
     private JRadioButton rcbMntChartLegend;
+
+    private String namShow2DHydrogens = "Show H atoms in 2D structures";
+    private JPanel pnlShow2DHydrogens;
+    private JRadioButton rcbShow2DHydrogens;
     
     private JPanel linePropTags;
     private JLabel lblPropTags;
@@ -210,6 +214,11 @@ public class GUIPreferencesDialog extends GUIModalDialog
         pnlMolDimDisplay.add(lblMolDimDisplay);
         pnlMolDimDisplay.add(cmbMolDimDisplay);
         centralPanel.add(pnlMolDimDisplay);
+
+        pnlShow2DHydrogens = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rcbShow2DHydrogens = new JRadioButton(namShow2DHydrogens);
+        pnlShow2DHydrogens.add(rcbShow2DHydrogens);
+        centralPanel.add(pnlShow2DHydrogens);
         
         String toolTipPropTags = "</html>Customizes the list of properties displayed together with the chemical representation of an item.</html>";
         linePropTags = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -361,6 +370,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	    txtGraphTxtSize.setText(GUIPreferences.graphLabelFontSize + "");
 	    txtGraphNodeSize.setText(GUIPreferences.graphNodeSize + "");
 	    cmbMolDimDisplay.setSelectedItem(GUIPreferences.molDimDisplay);
+        rcbShow2DHydrogens.setSelected(GUIPreferences.show2DHydrogens);
 	    while (tabModPropTags.getRowCount() > 0)
 	    {
 	        tabModPropTags.removeRow(0);
@@ -439,6 +449,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         GUIPreferences.tmpSpace = txtTmpSpace.getText();
         GUIPreferences.showLegenInEvolutionPlot = rcbEvoChartLegend.isSelected();
         GUIPreferences.showLegenInMonitorPlot = rcbMntChartLegend.isSelected();
+        GUIPreferences.show2DHydrogens = rcbShow2DHydrogens.isSelected();
         // NB: other values are stored by the action listeners of the combo boxes
 
 	}

@@ -63,6 +63,7 @@ public class GUIPreferences
                 SMITo3DEngine.CACTVS;
         public static final MolDimDisplay MOL_DIM_DISPLAY =
                 MolDimDisplay.THREE_DIMENSIONAL;
+        public static final boolean SHOW_2D_HYDROGENS = false;
         public static final boolean SHOW_LEGEND_IN_EVOLUTION_PLOT = false;
         public static final boolean SHOW_LEGEND_IN_MONITOR_PLOT = false;
         public static final TreeSet<String> CHOSEN_SDF_TAGS;
@@ -127,6 +128,11 @@ public class GUIPreferences
 	 * Selects the representation for molecular structures
 	 */
 	protected static MolDimDisplay molDimDisplay = Defaults.MOL_DIM_DISPLAY;
+
+    /**
+     * Choice of displaying H atoms in 2D structures
+     */
+    protected static boolean show2DHydrogens = Defaults.SHOW_2D_HYDROGENS;
 	
 	/**
 	 * Choice of displaying legend in evolution plot
@@ -164,6 +170,7 @@ public class GUIPreferences
                 Defaults.SHOW_LEGEND_IN_EVOLUTION_PLOT;
         boolean showLegenInMonitorPlot = Defaults.SHOW_LEGEND_IN_MONITOR_PLOT;
         String lastCutRulesFile = null;
+        boolean show2DHydrogens = false;
     }
     
 //-----------------------------------------------------------------------------
@@ -188,6 +195,7 @@ public class GUIPreferences
         data.tmpSpace = tmpSpace;
         data.smiTo3dResolver = smiTo3dResolver;
         data.molDimDisplay = molDimDisplay;
+        data.show2DHydrogens = show2DHydrogens;
         data.showLegenInEvolutionPlot = showLegenInEvolutionPlot;
         data.showLegenInMonitorPlot = showLegenInMonitorPlot;
         data.lastCutRulesFile = lastCutRulesFile == null ? null
@@ -226,6 +234,7 @@ public class GUIPreferences
         {
             molDimDisplay = data.molDimDisplay;
         }
+        show2DHydrogens = data.show2DHydrogens;
         showLegenInEvolutionPlot = data.showLegenInEvolutionPlot;
         showLegenInMonitorPlot = data.showLegenInMonitorPlot;
         if (data.lastCutRulesFile != null && !data.lastCutRulesFile.isEmpty())

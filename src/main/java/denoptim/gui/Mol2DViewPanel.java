@@ -62,7 +62,8 @@ public class Mol2DViewPanel extends MolAndPropTableViewPanel
     @Override
     protected void displayLoadedStructure(IAtomContainer mol)
 	{
-        this.setTopComponent(new TwoDimStructurePanel(mol));
+        this.setTopComponent(new TwoDimStructurePanel(mol, 
+            GUIPreferences.show2DHydrogens));
         fillDataTable(mol);
 	}
 

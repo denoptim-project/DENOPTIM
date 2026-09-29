@@ -52,6 +52,7 @@ import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 
+import denoptim.exception.DENOPTIMException;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Vertex;
 import denoptim.utils.MoleculeUtils;
@@ -90,26 +91,62 @@ MouseListener, MouseMotionListener
 //-----------------------------------------------------------------------------
 
     /**
-     * Constructor
+     * Constructor for a viewer that ignores H atoms.
      * @param extendenMol the atom container, possibly extended to include 
      * {@link AttachmentPoint}s as pseudoatoms.
      */
 
     public TwoDimStructurePanel(IAtomContainer extendedMol) 
     {
+        this(extendedMol, false);
+    }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Constructor for a viewer that may ignore H atoms is requested.
+     * @param extendenMol the atom container, possibly extended to include 
+     * {@link AttachmentPoint}s as pseudoatoms.
+     */
+
+    public TwoDimStructurePanel(IAtomContainer extendedMol, boolean showHydrogens) 
+    {
+        IAtomContainer inputMol;
+        try {
+            inputMol = MoleculeUtils.makeSameAs(extendedMol);
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+            renderer = null;
+            return;
+        }
+        if (!showHydrogens)
+        {
+            List<IAtom> atomsToRemove = new ArrayList<IAtom>();
+            for (IAtom atom : inputMol.atoms())
+            {
+                if (MoleculeUtils.getSymbolOrLabel(atom).equals("H"))
+                {
+                    atomsToRemove.add(atom);
+                }
+            }
+            for (IAtom atom : atomsToRemove)
+            {
+                inputMol.removeAtom(atom);
+            }
+        }
         Logger logger = Logger.getLogger(GUI.GUILOGGER);
         StructureDiagramGenerator sdg = new StructureDiagramGenerator();
         try
         {
-            sdg.setMolecule(extendedMol);
+            sdg.setMolecule(inputMol);
             sdg.generateCoordinates();
         } catch (Exception e)
         {
             logger.warning("Inconsistent stereochemistry in the molecule. " 
                 + "Ignoring stereochemistry.");
-            extendedMol.setStereoElements(new ArrayList<IStereoElement>());
+                mol.setStereoElements(new ArrayList<IStereoElement>());
             try {
-                sdg.setMolecule(extendedMol);
+                sdg.setMolecule(mol);
                 sdg.generateCoordinates();
             } catch (Exception e2) {
                 e2.printStackTrace();
