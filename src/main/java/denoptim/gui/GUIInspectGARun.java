@@ -81,6 +81,8 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -119,7 +121,7 @@ public class GUIInspectGARun extends GUICardPanel
 	private JSplitPane rightPanel;
     private JPanel rightUpPanel;
     private JPanel rightDownPanel;
-	private MoleculeViewPanel molViewer;
+	private MoleculeViewerPanel molViewer;
 	
 	private File srcFolder;
 	
@@ -572,7 +574,7 @@ public class GUIInspectGARun extends GUICardPanel
         rightPanel.setBottomComponent(rightDownPanel);
         
 		centralPanel.setRightComponent(rightPanel);
-		molViewer = new MoleculeViewPanel();
+		molViewer = new MoleculeViewerPanel();
 		centralPanel.setLeftComponent(molViewer);
 		centralPanel.setDividerLocation(300);
 		this.add(centralPanel,BorderLayout.CENTER);
@@ -1547,9 +1549,21 @@ public class GUIInspectGARun extends GUICardPanel
         datasetSelected.addSeries("Selected_candidates", selectedCandsData);
         // NB the '0' is determined by initialization at HERE@HERE
 		evoPlot.setDataset(0, datasetSelected);
-		
+        
 		// Update the molecular viewer
-		molViewer.loadChemicalStructureFromFile(item.getPathToFile());
+        IAtomContainer mol;
+        try {
+            mol = DenoptimIO.readAllAtomContainers(new File(
+                item.getPathToFile())).get(0);
+        } catch (Exception e) {
+            System.out.println("Could not read molecular structure from " 
+                + item.getPathToFile() + ": " + e.getLocalizedMessage());
+            e.printStackTrace();
+            mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            return;
+        }
+
+		molViewer.loadContent(mol);
 		pathToSelectedItem = item.getPathToFile();
         openSingleGraph.setEnabled(true);
 
@@ -1561,8 +1575,7 @@ public class GUIInspectGARun extends GUICardPanel
 	private void renderViewWithoutSelectedItems()
 	{
 		datasetSelected.removeSeries("Selected_candidates");
-        //TODO: we could avoid 'zap-ping' jmol by covering it with an opaque card
-        molViewer.clearAll(false);
+        molViewer.clear();
 		openSingleGraph.setEnabled(false);
 	}
 	

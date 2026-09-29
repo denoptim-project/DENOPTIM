@@ -74,6 +74,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYDataset;
+import org.openscience.cdk.interfaces.IAtomContainer;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
@@ -105,7 +106,7 @@ public class GUIInspectFSERun extends GUICardPanel
 	private JPanel ctrlPanelRight;
 	private JSplitPane centralPanel;
 	private JPanel rightPanel;
-	private MoleculeViewPanel molViewer;
+	private MoleculeViewerPanel molViewer;
 	private JPanel chartHolderPanel;
 	
 	private JComboBox<String> cmbPlotType;
@@ -248,7 +249,7 @@ public class GUIInspectFSERun extends GUICardPanel
 		rightPanel = new JPanel(); 
 		rightPanel.setLayout(new BorderLayout());
 		centralPanel.setRightComponent(rightPanel);
-		molViewer = new MoleculeViewPanel();
+		molViewer = new MoleculeViewerPanel();
 		centralPanel.setLeftComponent(molViewer);
 		centralPanel.setDividerLocation(300);
 		this.add(centralPanel,BorderLayout.CENTER);
@@ -813,9 +814,23 @@ public class GUIInspectFSERun extends GUICardPanel
 		
 		pathToSelectedItem = item.getPathToFile();
         openGraph.setEnabled(true);
+
+        mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		// Update the molecular viewer
-		molViewer.loadChemicalStructureFromFile(item.getPathToFile());
+        IAtomContainer mol;
+        try {
+            mol = DenoptimIO.readAllAtomContainers(new File(
+                item.getPathToFile())).get(0);
+        } catch (Exception e) {
+            System.out.println("Could not read molecular structure from " 
+                + item.getPathToFile() + ": " + e.getLocalizedMessage());
+            e.printStackTrace();
+            mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            return;
+        }
+        
+        molViewer.loadContent(mol);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -824,8 +839,7 @@ public class GUIInspectFSERun extends GUICardPanel
 	{
 		datasetSelectedLev.removeSeries("Selected_candidates");
 		datasetSelectedOrd.removeSeries("Selected_candidates");
-		//TODO: we could avoid 'zap-ping' jmol by covering it with an opaque card
-		molViewer.clearAll(false);
+		molViewer.clear();
         openGraph.setEnabled(false);
 	}
 

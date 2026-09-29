@@ -94,7 +94,21 @@ public final class DENOPTIMConstants
      */
     public static final File RECENTFILESLIST = new File(
             GLOBALCONFIG.getAbsoluteFile() + FSEP + "recent_files_list");
+
+    /**
+     * JSON file holding the current GUI preferences
+     */
+    public static final File GUIPREFERENCESFILE = new File(
+            GLOBALCONFIG.getAbsoluteFile() + FSEP + "gui_preferences.json");
+
+    /**
+     * JSON file holding the factory-default GUI preferences (written once)
+     */
+    public static final File GUIPREFERENCESDEFAULTSFILE = new File(
+            GLOBALCONFIG.getAbsoluteFile() + FSEP
+            + "gui_preferences_defaults.json");
  
+
     public static final Map<String, Integer> VALENCE_MAP = createMap();
     private static Map<String, Integer> createMap()
     {

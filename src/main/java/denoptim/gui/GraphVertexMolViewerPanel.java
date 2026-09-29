@@ -25,15 +25,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IChemObjectBuilder;
-import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
@@ -44,8 +41,6 @@ import denoptim.graph.Vertex;
 import denoptim.gui.GraphViewerPanel.JVertex;
 import denoptim.gui.GraphViewerPanel.JVertexType;
 import denoptim.gui.GraphViewerPanel.LabelType;
-import denoptim.molecularmodeling.ThreeDimTreeBuilder;
-import denoptim.utils.MoleculeUtils;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 
 
@@ -68,11 +63,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * The unsaved version of the currently loaded graph
-	 */
-	private DGraph dnGraph;
-	
-	/**
 	 * The snapshot of the old (removed) visualized GraphStrem system. 
 	 * Used only to remember stuff like sprites and node positions.
 	 */
@@ -87,12 +77,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	private JPanel fragViewerNotDuableCard;
 	private JPanel fragViewerNoFSCard;
     private GraphVertexMolViewerPanel fragViewerTmplViewerCard;
-	protected MoleculeViewPanel molViewer;
-	private JPanel molViewerPanel;
-	private JPanel molViewerHeader;
-	private JPanel molViewerCardHolder;
-	private JPanel molViewerEmptyCard;
-	private JPanel molViewerNeedUpdateCard;
+	protected MoleculeViewerPanel molViewerPanel;
 	protected final String NOFSCARDNAME = "noFSCard";
 	protected final String EMPTYCARDNAME = "emptyCard";
 	protected final String NOTDUABLECARDNAME = "notDoableCard";
@@ -100,14 +85,14 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	protected final String MOLVIEWERCARDNAME = "molViewerCard";
 	protected final String FRAGVIEWERCARDNAME = "fragViewerCard";
 	protected final String TMPLVIEWERCARDNAME = "tmplViewwerCard";
+    protected final String TWODVIEWERCARDNAME = "twoDimViewerCard";
+    protected final String THREEDVIEWERCARDNAME = "threeDimViewerCard";
 	protected GraphViewerPanel graphViewer;
 	
 	//Default divider location
 	private final double DEFDIVLOC = 0.5;
 	private double defDivLoc = DEFDIVLOC;
-	
-	private static final IChemObjectBuilder builder = 
-	            SilentChemObjectBuilder.getInstance();
+    
 	
 //-----------------------------------------------------------------------------
 	
@@ -194,41 +179,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 		
 		leftPane.setTopComponent(fragViewerPanel);
 		
-		// The molecular viewer is embedded in a container structure that 
-		// is meant to show/hide the molViewer according to specific needs.
-		molViewerPanel = new JPanel(new BorderLayout());
-		molViewerHeader = new JPanel();
-		molViewerHeader.add(new JLabel("Associated Structure:"));
-		String molViewerToolTip = "<html>This viewer shows the chemical "
-				+ "structure associated with the current graph.</html>";
-		molViewerHeader.setToolTipText(molViewerToolTip);
-		molViewerPanel.add(molViewerHeader, BorderLayout.NORTH);
-		molViewerCardHolder = new JPanel(new CardLayout());
-		
-		molViewerPanel.add(molViewerCardHolder, BorderLayout.CENTER);
-		
-		molViewerEmptyCard = new JPanel();
-		String txt2 = "<html><body width='%1s'><center>No chemical "
-				+ "structure.</center>"
-				+ "</html>";
-		molViewerEmptyCard.add(new JLabel(String.format(txt2, 120)));
-		molViewerEmptyCard.setToolTipText(molViewerToolTip);
-		molViewerCardHolder.add(molViewerEmptyCard, EMPTYCARDNAME);
-		
-		molViewerNeedUpdateCard = new JPanel();
-		String txt2b = "<html><body width='%1s'><center>Save changes to "
-				+ "update the molecular representation.</center>"
-				+ "</html>";
-		molViewerNeedUpdateCard.add(new JLabel(String.format(txt2b, 120)));
-		molViewerNeedUpdateCard.setToolTipText(molViewerToolTip);
-		molViewerCardHolder.add(molViewerNeedUpdateCard, UPDATETOVIEW);
-		
-		molViewer = new MoleculeViewPanel();
-		molViewer.enablePartialData(true);
-		molViewerCardHolder.add(molViewer, MOLVIEWERCARDNAME);
-		((CardLayout) molViewerCardHolder.getLayout()).show(
-				molViewerCardHolder, EMPTYCARDNAME);
-		
+        molViewerPanel = new MoleculeViewerPanel();
 		leftPane.setBottomComponent(molViewerPanel);
 	}
 	
@@ -246,14 +197,13 @@ public class GraphVertexMolViewerPanel extends JSplitPane
             boolean keepSprites)
     {
         try {
-            loadDnGraphToViewer(dnGraph,keepSprites); 
-            molViewer.loadChemicalStructure(mol);
-            bringCardToTopOfMolViewer(MOLVIEWERCARDNAME);
+            loadDnGraphToViewer(dnGraph, keepSprites); 
+            molViewerPanel.loadContent(mol);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Could not read molecular data: "+
                     e.getCause() + " " + e.getMessage());
-            bringCardToTopOfMolViewer(EMPTYCARDNAME);
+            molViewerPanel.switchToEmptyCard();
         }
     }
 	
@@ -267,7 +217,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	 */
 	public void loadDnGraphToViewer(DGraph dnGraph, boolean keepLabels)
 	{
-	    this.dnGraph = dnGraph;
 	    resetFragViewerCardDeck();
 		
 		// Keep a snapshot of the old data visualized
@@ -291,68 +240,17 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 
 //-----------------------------------------------------------------------------
     
-    /**
-     * Triggers the generation of the molecular representation of the loaded
-     * graph.
-     */
-	
-    public void renderMolVieverToNeedUpdate()
+    public void renderMolViewerToNeedUpdate()
     {
-        // We lease data in the viewer to increase speed of execution, but the
-        // leftover is outdated! This is the meaning of 'true'
-        molViewer.clearAll(true); 
-        bringCardToTopOfMolViewer(UPDATETOVIEW);
+        molViewerPanel.renderToNeedUpdate();
     }
-	
+
 //-----------------------------------------------------------------------------
-	
-	/**
-	 * Updates the molecular representation of the loaded graph. We rebuild 
-	 * the molecular representation.
-	 * This method is needed in case of changes to the loaded
-	 * graph, to project those changes in the graph into the molecular
-	 * representation.
-	 */
-	public IAtomContainer updateMolevularViewer()
-	{
-	    // We lease data in the viewer to increase speed of execution, but the
-        // leftover is outdated! This is the meaning of 'true'
-	    molViewer.clearAll(true);
-
-        IAtomContainer mol = builder.newAtomContainer();
-	    if (!dnGraph.containsAtoms())
-	    {
-            bringCardToTopOfMolViewer(EMPTYCARDNAME);
-	        return mol;
-	    }
-	    
-        Logger logger = Logger.getLogger(GUI.GUILOGGER);
-        ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, GUI.PRNG);
-        try {
-            mol = tb.convertGraphTo3DAtomContainer(dnGraph);
-            MoleculeUtils.removeUsedRCA(mol,dnGraph, logger);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            System.out.println("Couldn't make 3D-tree representation: "
-                    + t.getMessage());
-        }
-
-        if (mol.getAtomCount() > 0)
-        {
-            try {
-                molViewer.loadChemicalStructure(mol);
-                bringCardToTopOfMolViewer(MOLVIEWERCARDNAME);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Could not read molecular data: "+
-                        e.getCause() + " " + e.getMessage());
-                bringCardToTopOfMolViewer(EMPTYCARDNAME);
-            }
-        } else {
-            bringCardToTopOfMolViewer(EMPTYCARDNAME);
-        }
-        return mol;
-	}
+    
+    public IAtomContainer updateMolViewer(DGraph dnGraph)
+    {
+        return molViewerPanel.update(dnGraph);
+    }
 
 //-----------------------------------------------------------------------------
 	
@@ -394,10 +292,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	 */
 	public void clearCurrentSystem()
 	{
-		dnGraph = null;
         graphViewer.cleanup();
         clearVertexViewer();
-        clearMolecularViewer();
+        molViewerPanel.clear();
 	}
 	
 //-----------------------------------------------------------------------------
@@ -412,18 +309,15 @@ public class GraphVertexMolViewerPanel extends JSplitPane
         fragViewer.clearAll(true);
         bringCardToTopOfVertexViewer(EMPTYCARDNAME);
     }
-	
+
 //-----------------------------------------------------------------------------
-    
+
     /**
      * Clears the molecular viewer and hides it behind the empty card.
      */
-    public void clearMolecularViewer()
+    public void clearMolViewer()
     {
-        // We lease data in the viewer to increase speed of execution, but the
-        // leftover is outdated! This is the meaning of 'true'
-        molViewer.clearAll(true);
-        bringCardToTopOfMolViewer(EMPTYCARDNAME);
+        molViewerPanel.clear();
     }
     
 //-----------------------------------------------------------------------------
@@ -510,7 +404,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      */
     private class MouseModeChoiceListener implements PropertyChangeListener
     {
-        
         @Override
         public void propertyChange(PropertyChangeEvent evt) 
         { 
@@ -624,22 +517,6 @@ public class GraphVertexMolViewerPanel extends JSplitPane
     
 //-----------------------------------------------------------------------------
 
-    /**
-     * Allows to show the given card in the molecular structure viewer.
-     * @param cardName the name of the card to display. The possible values
-     * are defined as static, final fields: 
-     * {@link GraphVertexMolViewerPanel.UPDATETOVIEW}, 
-     * {@link GraphVertexMolViewerPanel.MOLVIEWERCARDNAME}, 
-     * {@link GraphVertexMolViewerPanel.TMPLVIEWERCARDNAME}
-     */
-    public void bringCardToTopOfMolViewer(String cardName)
-    {
-        ((CardLayout) molViewerCardHolder.getLayout()).show(
-                molViewerCardHolder, cardName);
-    }
-    
-//-----------------------------------------------------------------------------
-
 	/*
 	 * This is needed to stop GraphStream and Jmol threads upon closure of this
 	 * gui card.
@@ -648,7 +525,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	{
 		graphViewer.dispose();
 		fragViewer.dispose();
-		molViewer.dispose();
+		molViewerPanel.dispose();
 		if (fragViewerTmplViewerCard != null)
 		{
 		    fragViewerTmplViewerCard.dispose();

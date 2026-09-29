@@ -43,6 +43,7 @@ import javax.swing.table.DefaultTableModel;
 
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileUtils;
+import denoptim.gui.GUIPreferences.MolDimDisplay;
 import denoptim.gui.GUIPreferences.SMITo3DEngine;
 
 public class GUIPreferencesDialog extends GUIModalDialog
@@ -70,6 +71,11 @@ public class GUIPreferencesDialog extends GUIModalDialog
     final Dimension strFieldSize = new Dimension(75,preferredHeight);
     
 	private JPanel centralPanel;
+	
+	private String namMolDimDisplay = "Display mode for chemical structures";
+	private JPanel pnlMolDimDisplay;
+	private JLabel lblMolDimDisplay;
+	private JComboBox<MolDimDisplay> cmbMolDimDisplay;
 	
 	private String namGraphTxtSize = "Font size for graph labels";
 	private JPanel pnlGraphTxtSize;
@@ -123,7 +129,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
 	@SuppressWarnings("serial")
     public GUIPreferencesDialog(Component refForPlacement)
 	{
-	    super(refForPlacement);
+	    super(refForPlacement, true);
 	    setTitle("Preferences");
 		centralPanel = new JPanel();
         JScrollPane scrollablePane = new JScrollPane(centralPanel);
@@ -138,7 +144,6 @@ public class GUIPreferencesDialog extends GUIModalDialog
         lblTmpSpace = new JLabel(namTmpSpace + ":");
         txtTmpSpace = new JTextField();
         txtTmpSpace.setPreferredSize(fileLabelSize);
-        txtTmpSpace.setText(GUIPreferences.tmpSpace+"");
         pnlTmpSpace.add(lblTmpSpace);
         pnlTmpSpace.add(txtTmpSpace);
         centralPanel.add(pnlTmpSpace);
@@ -150,16 +155,14 @@ public class GUIPreferencesDialog extends GUIModalDialog
         centralPanel.add(titleFragments);
         
         pnlSMILESTo3D = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        lblSMILESTo3D = new JLabel(namSMILESTo3D + ": " 
-        		+ GUIPreferences.smiTo3dResolver + " - Change to ");
+        lblSMILESTo3D = new JLabel(namSMILESTo3D + ":");
         cmbSMILESTo3D = new JComboBox<SMITo3DEngine>(SMITo3DEngine.values());
+        cmbSMILESTo3D.setSelectedItem(GUIPreferences.smiTo3dResolver);
         cmbSMILESTo3D.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				GUIPreferences.smiTo3dResolver = (SMITo3DEngine) 
 						cmbSMILESTo3D.getSelectedItem();
-				lblSMILESTo3D.setText(namSMILESTo3D + ": " 
-        		+ GUIPreferences.smiTo3dResolver + " - Change to ");
 			}
 		});
         pnlSMILESTo3D.add(lblSMILESTo3D);
@@ -176,7 +179,6 @@ public class GUIPreferencesDialog extends GUIModalDialog
         lblGraphTxtSize = new JLabel(namGraphTxtSize + ":");
         txtGraphTxtSize = new JTextField();
         txtGraphTxtSize.setPreferredSize(strFieldSize);
-        txtGraphTxtSize.setText(GUIPreferences.graphLabelFontSize+"");
         pnlGraphTxtSize.add(lblGraphTxtSize);
         pnlGraphTxtSize.add(txtGraphTxtSize);
         centralPanel.add(pnlGraphTxtSize);
@@ -185,7 +187,6 @@ public class GUIPreferencesDialog extends GUIModalDialog
         lblGraphNodeSize = new JLabel(namGraphNodeSize + ":");
         txtGraphNodeSize = new JTextField();
         txtGraphNodeSize.setPreferredSize(strFieldSize);
-        txtGraphNodeSize.setText(GUIPreferences.graphNodeSize+"");
         pnlGraphNodeSize.add(lblGraphNodeSize);
         pnlGraphNodeSize.add(txtGraphNodeSize);
         centralPanel.add(pnlGraphNodeSize);
@@ -193,10 +194,24 @@ public class GUIPreferencesDialog extends GUIModalDialog
         centralPanel.add(new JSeparator());
         
         JPanel titleMolViewer = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        titleMolViewer.add(new JLabel("<html><b>Candidate item visualization</b></html>"));
+        titleMolViewer.add(new JLabel("<html><b>Chemical structure visualization</b></html>"));
         centralPanel.add(titleMolViewer);
+
+        pnlMolDimDisplay = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lblMolDimDisplay = new JLabel(namMolDimDisplay + ":");
+        cmbMolDimDisplay = new JComboBox<MolDimDisplay>(MolDimDisplay.values());
+        cmbMolDimDisplay.setSelectedItem(GUIPreferences.molDimDisplay);
+        cmbMolDimDisplay.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GUIPreferences.molDimDisplay = (MolDimDisplay) cmbMolDimDisplay.getSelectedItem();
+            }
+        });
+        pnlMolDimDisplay.add(lblMolDimDisplay);
+        pnlMolDimDisplay.add(cmbMolDimDisplay);
+        centralPanel.add(pnlMolDimDisplay);
         
-        String toolTipPropTags = "</html>Customizes the list of properties displayed togetther with the chemical representation of an item.</html>";
+        String toolTipPropTags = "</html>Customizes the list of properties displayed together with the chemical representation of an item.</html>";
         linePropTags = new JPanel(new FlowLayout(FlowLayout.LEFT));
         lblPropTags = new JLabel("Additional properties to display:", SwingConstants.LEFT);
         lblPropTags.setPreferredSize(fileLabelSize);
@@ -208,10 +223,6 @@ public class GUIPreferencesDialog extends GUIModalDialog
             }
         };
         tabModPropTags.setColumnCount(1);
-        for (String propName : GUIPreferences.chosenSDFTags)
-        {
-        	tabModPropTags.addRow(new Object[]{propName});
-        }
         tabPropTags = new JTable(tabModPropTags);
         tabPropTags.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         btnPropTagsInsert = new JButton("Add Property Name");
@@ -287,26 +298,26 @@ public class GUIPreferencesDialog extends GUIModalDialog
         lblChartPointSize = new JLabel(namChartPointSize + ":");
         txtChartPointSize = new JTextField();
         txtChartPointSize.setPreferredSize(strFieldSize);
-        txtChartPointSize.setText(GUIPreferences.chartPointSize+"");
         pnlChartPointSize.add(lblChartPointSize);
         pnlChartPointSize.add(txtChartPointSize);
         centralPanel.add(pnlChartPointSize);
         
         pnlEvoChartLegend = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rcbEvoChartLegend = new JRadioButton(namEvoChartLegend);
-        rcbEvoChartLegend.setSelected(GUIPreferences.showLegenInEvolutionPlot);
         pnlEvoChartLegend.add(rcbEvoChartLegend);
         centralPanel.add(pnlEvoChartLegend);
         
         pnlMntChartLegend = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rcbMntChartLegend = new JRadioButton(namMntChartLegend);
-        rcbMntChartLegend.setSelected(GUIPreferences.showLegenInMonitorPlot);
         pnlMntChartLegend.add(rcbMntChartLegend);
         centralPanel.add(pnlMntChartLegend);
         
+        refreshUIFromPreferences();
+        
 		// Customize the buttons of the modal dialog
 		this.btnDone.setText("Save");
-		this.btnDone.setToolTipText("Save the values and close dialog");
+		this.btnDone.setToolTipText("Save the values to the preferences file "
+		        + "and close dialog");
 		this.btnDone.addActionListener(new ActionListener() {
 
 			@Override
@@ -315,15 +326,52 @@ public class GUIPreferencesDialog extends GUIModalDialog
 				if (inputIsOK)
 				{
 					storeValues();
+					GUIPreferences.save();
 					close();
 				}
 			}
 		});
 		
+		this.btnExtra.setText("Restore defaults");
+		this.btnExtra.setToolTipText("Restore factory-default preferences "
+		        + "from the defaults file");
+		this.btnExtra.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GUIPreferences.restoreDefaults();
+                refreshUIFromPreferences();
+            }
+        });
+		
 		this.btnCanc.setEnabled(false);
 		this.btnCanc.setVisible(false);
 		
 		super.addToCentralPane(scrollablePane);
+	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Updates all dialog widgets from the current in-memory preferences.
+	 */
+	private void refreshUIFromPreferences()
+	{
+	    txtTmpSpace.setText(GUIPreferences.tmpSpace);
+	    cmbSMILESTo3D.setSelectedItem(GUIPreferences.smiTo3dResolver);
+	    txtGraphTxtSize.setText(GUIPreferences.graphLabelFontSize + "");
+	    txtGraphNodeSize.setText(GUIPreferences.graphNodeSize + "");
+	    cmbMolDimDisplay.setSelectedItem(GUIPreferences.molDimDisplay);
+	    while (tabModPropTags.getRowCount() > 0)
+	    {
+	        tabModPropTags.removeRow(0);
+	    }
+	    for (String propName : GUIPreferences.chosenSDFTags)
+	    {
+	        tabModPropTags.addRow(new Object[]{propName});
+	    }
+	    txtChartPointSize.setText(GUIPreferences.chartPointSize + "");
+	    rcbEvoChartLegend.setSelected(GUIPreferences.showLegenInEvolutionPlot);
+	    rcbMntChartLegend.setSelected(GUIPreferences.showLegenInMonitorPlot);
 	}
 	
 //-----------------------------------------------------------------------------
@@ -391,5 +439,7 @@ public class GUIPreferencesDialog extends GUIModalDialog
         GUIPreferences.tmpSpace = txtTmpSpace.getText();
         GUIPreferences.showLegenInEvolutionPlot = rcbEvoChartLegend.isSelected();
         GUIPreferences.showLegenInMonitorPlot = rcbMntChartLegend.isSelected();
+        // NB: other values are stored by the action listeners of the combo boxes
+
 	}
 }

@@ -103,6 +103,7 @@ public class GUI implements Runnable
 	public GUI(CommandLine cmd) 
 	{
 	    this.cmd = cmd;
+	    GUIPreferences.loadAtStartup();
 		ToolTipManager.sharedInstance().setDismissDelay(6000);
 		ToolTipManager.sharedInstance().setInitialDelay(1000);
 		ToolTipManager.sharedInstance().setReshowDelay(100);

@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -688,6 +689,37 @@ public class DenoptimIO
                 throw new DENOPTIMException(ioe);
             }
         }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Serializes an {@link IAtomContainer} to an SDF string (no disk I/O).
+     *
+     * @param mol the molecule to serialize
+     * @return the SDF content as a string
+     * @throws DENOPTIMException if serialization fails
+     */
+    public static String getSDFString(IAtomContainer mol)
+            throws DENOPTIMException
+    {
+        StringWriter stringWriter = new StringWriter();
+        SDFWriter sdfWriter = null;
+        try {
+            sdfWriter = new SDFWriter(stringWriter);
+            sdfWriter.write(mol);
+        } catch (CDKException cdke) {
+            throw new DENOPTIMException(cdke);
+        } finally {
+            try {
+                if (sdfWriter != null) {
+                    sdfWriter.close();
+                }
+            } catch (IOException ioe) {
+                throw new DENOPTIMException(ioe);
+            }
+        }
+        return stringWriter.toString();
     }
 
 //------------------------------------------------------------------------------

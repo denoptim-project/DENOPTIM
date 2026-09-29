@@ -542,7 +542,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        protectEditedSystem();
 
 				// The molecular representation is updated when we save changes
-		        visualPanel.renderMolVieverToNeedUpdate();
+		        visualPanel.renderMolViewerToNeedUpdate();
 		        updateMolViewer = true;
 			}
 		});
@@ -634,7 +634,7 @@ public class GUIGraphHandler extends GUICardPanel
 		        protectEditedSystem();
 			
 		        // The molecular representation is updated when we save changes
-                visualPanel.renderMolVieverToNeedUpdate();
+                visualPanel.renderMolViewerToNeedUpdate();
                 updateMolViewer = true;
 			}
 		});
@@ -671,7 +671,7 @@ public class GUIGraphHandler extends GUICardPanel
                 protectEditedSystem();
 
                 // The molecular representation is updated when we save changes
-                visualPanel.renderMolVieverToNeedUpdate();
+                visualPanel.renderMolViewerToNeedUpdate();
                 updateMolViewer = true;
             }
         });
@@ -722,7 +722,7 @@ public class GUIGraphHandler extends GUICardPanel
                 protectEditedSystem();
     
                 // The molecular representation is updated when we save changes
-                visualPanel.renderMolVieverToNeedUpdate();
+                visualPanel.renderMolViewerToNeedUpdate();
                 updateMolViewer = true;
             }
         });
@@ -1155,7 +1155,7 @@ public class GUIGraphHandler extends GUICardPanel
         protectEditedSystem();
 
         // The molecular representation is updated when we save changes
-        visualPanel.renderMolVieverToNeedUpdate();
+        visualPanel.renderMolViewerToNeedUpdate();
         updateMolViewer = true;
 	}
 
@@ -1297,7 +1297,7 @@ public class GUIGraphHandler extends GUICardPanel
         //NB: we add an empty molecular representation to keep the list
         // of graphs and that of mol.rep. in sync
         molLibrary.add(builder.newAtomContainer());
-        visualPanel.clearMolecularViewer();
+        visualPanel.clearMolViewer();
         updateGraphListSpinner();
 	}
 	
@@ -1990,8 +1990,7 @@ public class GUIGraphHandler extends GUICardPanel
     			//Spinner will be fixed by the deprotection routine
     			totalGraphsLabel.setText(Integer.toString(
     					dnGraphLibrary.size()));
-				visualPanel.bringCardToTopOfMolViewer(
-				        visualPanel.EMPTYCARDNAME);
+				visualPanel.clearMolViewer();
     			enableGraphDependentButtons(false);
     		}
     		deprotectEditedSystem();
@@ -2015,7 +2014,7 @@ public class GUIGraphHandler extends GUICardPanel
   		
   		if (updateMolViewer)
   		{
-		    IAtomContainer mol = visualPanel.updateMolevularViewer();
+		    IAtomContainer mol = visualPanel.updateMolViewer(dnGraph);
 		    if (mol != null)
 		    {
                 molLibrary.set(currGrphIdx, mol);
