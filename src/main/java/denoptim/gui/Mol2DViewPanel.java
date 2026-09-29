@@ -45,19 +45,7 @@ public class Mol2DViewPanel extends MolAndPropTableViewPanel
 	 */
 	public Mol2DViewPanel()
 	{
-		initialize(340);
-	}
-	
-//-----------------------------------------------------------------------------
-
-	/**
-	 * Constructor that allows to specify whether the data table is editable or 
-	 * not.
-	 * @param dividerPosition allows to set the initial position of the divide
-	 */
-	public Mol2DViewPanel(int dividerPosition)
-	{
-		initialize(dividerPosition);
+		initialize();
 	}
 
 //-----------------------------------------------------------------------------

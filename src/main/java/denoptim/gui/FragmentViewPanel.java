@@ -22,6 +22,8 @@ package denoptim.gui;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -133,35 +135,33 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	 */
 	public FragmentViewPanel(JComponent parent, boolean editableTable)
 	{
-		this(parent,editableTable,340);
-	}
-	
-//-----------------------------------------------------------------------------
-
-	/**
-	 * Constructor that allows to specify whether the AP table is editable or 
-	 * not.
-	 * @param parent the parent component
-	 * @param editableTable use <code>true</code> to make the AP table editable
-	 * @param dividerPosition allows to set the initial position of the divide
-	 */
-	public FragmentViewPanel(JComponent parent, boolean editableTable, 
-	        int dividerPosition)
-	{
 		this.parent = parent;
 		editableAPTable = editableTable;
-		initialize(dividerPosition);
+		initialize();
 	}
 	
 //-----------------------------------------------------------------------------
 
 	@SuppressWarnings("serial")
-	private void initialize(int dividerPosition)
+	private void initialize()
 	{	
 		this.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		this.setOneTouchExpandable(true);
-		this.setDividerLocation(dividerPosition);
-		this.setResizeWeight(0.5);
+		this.setResizeWeight(0.75);
+		// Proportional divider location only works once the split pane has a
+		// real size (e.g. after a CardLayout shows this panel).
+		this.addComponentListener(new ComponentAdapter() {
+		    private boolean dividerInitialized = false;
+            @Override
+            public void componentResized(ComponentEvent e)
+            {
+                if (!dividerInitialized && getHeight() > 0)
+                {
+                    setDividerLocation(0.75);
+                    dividerInitialized = true;
+                }
+            }
+        });
         
         // Jmol viewer panel
         jmolPanel = new JmolPanel();

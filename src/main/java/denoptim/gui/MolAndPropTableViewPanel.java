@@ -24,14 +24,13 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
@@ -41,10 +40,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
-import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.interfaces.IAtomContainer;
-
-import denoptim.constants.DENOPTIMConstants;
 
 
 /**
@@ -83,14 +79,29 @@ public abstract class MolAndPropTableViewPanel extends JSplitPane
 	 * Initializes the split pane layout and the shared property data table.
 	 * Subclasses may set up their molecular viewer via 
 	 * {@link #initializeViewer()}.
-	 * @param dividerPosition initial position of the divider
+	 * The divider is placed at 50% of the available height and keeps that
+	 * proportion when this panel is resized.
 	 */
 	@SuppressWarnings("serial")
-	protected void initialize(int dividerPosition)
+	protected void initialize()
 	{	
 		this.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		this.setOneTouchExpandable(true);
-		//this.setDividerLocation(dividerPosition);
+		this.setResizeWeight(0.75);
+		// Proportional divider location only works once the split pane has a
+		// real size (e.g. after a CardLayout shows this panel).
+		this.addComponentListener(new ComponentAdapter() {
+		    private boolean dividerInitialized = false;
+            @Override
+            public void componentResized(ComponentEvent e)
+            {
+                if (!dividerInitialized && getHeight() > 0)
+                {
+                    setDividerLocation(0.75);
+                    dividerInitialized = true;
+                }
+            }
+        });
         
 		initializeViewer();
         
@@ -154,7 +165,7 @@ public abstract class MolAndPropTableViewPanel extends JSplitPane
 
 	/**
 	 * Hook for subclasses to initialize their molecular viewer component.
-	 * Called from {@link #initialize(int)} before the data table is created.
+	 * Called from {@link #initialize()} before the data table is created.
 	 */
 	protected void initializeViewer()
 	{
