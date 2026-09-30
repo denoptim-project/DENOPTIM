@@ -31,6 +31,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -602,10 +604,29 @@ public class GraphViewerPanel extends JPanel
             @Override
             public void graphClicked(JVertex v, MouseEvent me)
             {
+                // Clicking a selected node in picking mode deselects it; do not
+                // re-open the nested vertex viewer in that case.
+                if (!viewer.getPickedVertexState().isPicked(v))
+                {
+                    firePropertyChange(PROPERTYNODECLICKED, null, null);
+                    return;
+                }
                 if (v.expandable)
                 {
                     firePropertyChange(PROPERTYNODECLICKED, null, v);
                 } else {
+                    firePropertyChange(PROPERTYNODECLICKED, null, null);
+                }
+            }
+        });
+        // Background click (or otherwise clearing the pick set) should also
+        // notify listeners so the nested vertex viewer can show its empty card.
+        viewer.getPickedVertexState().addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                if (viewer.getPickedVertexState().getPicked().isEmpty())
+                {
                     firePropertyChange(PROPERTYNODECLICKED, null, null);
                 }
             }
