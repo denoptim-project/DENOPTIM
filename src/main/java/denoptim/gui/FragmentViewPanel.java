@@ -24,8 +24,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,6 +53,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IChemObjectBuilder;
+import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.modeling.builder3d.ModelBuilder3D;
 import org.openscience.cdk.modeling.builder3d.TemplateHandler3D;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
@@ -72,7 +73,7 @@ import denoptim.utils.MoleculeUtils;
 
 
 /**
- * A panel with a molecular viewer and attachment point table.
+ * A panel with a 3D molecular viewer and attachment point table.
  * 
  * @author Marco Foscato
  */
@@ -107,8 +108,6 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	private boolean editableAPTable = false;
 	
 	private final String NL = System.getProperty("line.separator");
-	
-	private String tmpSDFFile;
 	
 	private JComponent parent;
 	
@@ -194,9 +193,6 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 		tabPanel = new JScrollPane(apTable);
 		tabPanel.setMinimumSize(new Dimension(100,30));
 		this.setBottomComponent(tabPanel);
-		
-		//Find a proper tmp disk space
-		tmpSDFFile = Utils.getTempFile("Denoptim_FragViewer_loadedMol.sdf");
 	}
 	
 //-----------------------------------------------------------------------------
@@ -538,7 +534,6 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 			throws DENOPTIMException
 	{
 	    IChemObjectBuilder builder = SilentChemObjectBuilder.getInstance();
-		IAtomContainer mol = builder.newAtomContainer();
 		
 		String strData = getDataFromJmol();
 		if (strData.trim().equals(""))
@@ -580,17 +575,26 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 			sb.append(lines[3+nAtms+i+1]).append("  0").append(NL);
 		}
 		sb.append("M  END").append(NL).append("$$$$");
-		
-		DenoptimIO.writeData(tmpSDFFile, sb.toString(), false);
-		try
-        {
-            mol = DenoptimIO.readAllAtomContainers(new File(tmpSDFFile)).get(0);
-        } catch (Exception e)
-        {
-            throw new DENOPTIMException("Unable to fetch molecule from tmp SDF",
-                    e);
-        }
-		return mol;
+
+		MDLV2000Reader reader = null;
+		try {
+			reader = new MDLV2000Reader(new StringReader(sb.toString()));
+			return reader.read(builder.newAtomContainer());
+		} catch (CDKException e) {
+			clearMolecularViewer(false);
+			clearAPTable();
+			throw new DENOPTIMException("Could not parse molecular data from "
+					+ "Jmol viewer: " + e.getMessage(), e);
+		} finally {
+			if (reader != null)
+			{
+				try {
+					reader.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
 	}
 	
 //-----------------------------------------------------------------------------
@@ -726,7 +730,6 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
      */
     private void loadStructure()
     {		
-		
 		if (fragment == null)
 		{
 			JOptionPane.showMessageDialog(this,
@@ -738,24 +741,40 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
 	                UIManager.getIcon("OptionPane.errorIcon"));
 			return;			
 		}
-		
-		// NB: we use the nasty trick of a tmp file to by-pass the 
-		// fragile/discontinued CDK-to-Jmol support.
-		
+
+        IAtomContainer mol = fragment.getIAtomContainer();
+        waitForJmolIdle();
 		try {
-			DenoptimIO.writeSDFFile(tmpSDFFile, fragment.getIAtomContainer(), 
-			        false);
+			String sdf = DenoptimIO.getSDFString(mol);
+			jmolPanel.viewer.openStringInline(sdf);
 		} catch (DENOPTIMException e) {
+			System.out.println("Could not serialize molecular representation "
+					+ "to SDF string. Thus, could not load it into Jmol viewer.");
 			e.printStackTrace();
-			System.out.println("Error writing TMP file '" + tmpSDFFile + "'");
-			System.out.println("Please, report this to the DENOPTIM team.");
+			return;
 		}
-		
-		jmolPanel.viewer.openFile(tmpSDFFile);
 
 		setJmolViewer();
 
         jmolPanel.viewer.evalString("zoom OUT");
+	}
+
+//-----------------------------------------------------------------------------
+
+	private void waitForJmolIdle()
+	{
+		// This is often needed to wait for the 'zap' script to finish.
+        while (jmolPanel.viewer.isScriptExecuting())
+        {
+            try
+            {
+                Thread.sleep(100);
+            } catch (InterruptedException e)
+            {
+                // should never happen
+                e.printStackTrace();
+            }
+        }
 	}
 
 //-----------------------------------------------------------------------------
@@ -996,7 +1015,7 @@ public class FragmentViewPanel extends JSplitPane implements IVertexAPSelection
     		return selectedAtms;
     	}
     	
-		for (int i =0; i< fragment.getAtomCount(); i++)
+		for (int i=0; i< fragment.getAtomCount(); i++)
 		{
 			if (((Viewer) jmolPanel.viewer).slm.isSelected(i))
 			{
