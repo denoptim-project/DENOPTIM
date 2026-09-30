@@ -737,9 +737,13 @@ public class MoleculeUtils
         }
         for (IBond bnd : iac.bonds())
         {
-            if (bnd.getOrder().equals(IBond.Order.UNSET)) 
-            {
+            if (bnd.getOrder() == null) {
                 bnd.setOrder(IBond.Order.SINGLE);
+            } else {
+                if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+                {
+                    bnd.setOrder(IBond.Order.SINGLE);
+                }
             }
         }
     }
@@ -760,7 +764,7 @@ public class MoleculeUtils
         
         for (IBond bnd : iac.bonds())
         {
-            if (bnd.getOrder().equals(IBond.Order.UNSET)) 
+            if (bnd.getOrder() != null && bnd.getOrder().equals(IBond.Order.UNSET)) 
             {
                 bnd.setOrder(IBond.Order.SINGLE);
             }

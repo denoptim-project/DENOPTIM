@@ -1445,8 +1445,13 @@ public class GUIVertexInspector extends GUICardPanel
 			return;
 		}
 		
-		vertex = vertexViewer.getLoadedStructure();
-		
+        try {
+		    vertex = vertexViewer.getLoadedStructure();
+        } catch (Exception e) {
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            return;
+        }
+
 		// The system is not a fragment but, this is done for consistency:
 		// when we have a molecule loaded the list is not empty:
 		// The currently viewed fragment (if any) is always part of the library
@@ -1654,8 +1659,11 @@ public class GUIVertexInspector extends GUICardPanel
     	}
     	
     	IAtom srcAtm = frag.getConnectedAtomsList(trgAtm).get(0);
-    	BondType bt = BondType.valueOf(
-    	        srcAtm.getBond(trgAtm).getOrder().toString());
+
+        BondType bt = BondType.UNDEFINED;
+        if (srcAtm.getBond(trgAtm).getOrder() != null) {
+            bt = BondType.valueOf(srcAtm.getBond(trgAtm).getOrder().toString());
+        }
     	
     	Point3d srcP3d = MoleculeUtils.getPoint3d(srcAtm);
     	Point3d trgP3d = MoleculeUtils.getPoint3d(trgAtm);
