@@ -54,6 +54,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
@@ -66,6 +67,7 @@ import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileAndFormat;
 import denoptim.files.FileFormat;
 import denoptim.files.FileUtils;
+import denoptim.graph.DGraph;
 import denoptim.io.DenoptimIO;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
@@ -95,8 +97,13 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
      */
     protected JPanel centralPanel = new JPanel(new BorderLayout()); 
     
-    private JRadioButton rdbUseDefault;
-    private JRadioButton rdbUseCustom;
+    protected JRadioButton tmplGrphUse;
+    protected JRadioButton rdbUseDefault;
+    protected JRadioButton rdbUseCustom;
+
+    private JLabel lblTmplGrphSource;
+    private JTextField txtTmplGrphSource;
+    private JButton btnTmplGrphSource;
     
     private DefaultTableModel defaultRulesTabModel;
     private DefaultTableModel customRulesTabModel;
@@ -151,11 +158,22 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         super(refForPlacement);
         this.frgParams = settings;
         setTitle("Choose Cutting Rules");
-        
+
+        tmplGrphUse = new JRadioButton("Use template graph.");
+        tmplGrphUse.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tmplGrphUse.isSelected()) {
+                    txtTmplGrphSource.setEnabled(true);
+                    btnTmplGrphSource.setEnabled(true);
+                }
+            }
+        });
         rdbUseDefault = new JRadioButton("Use default cutting rules.");
         rdbUseCustom = new JRadioButton(
                 "Use the following curtomized cutting rules.");
 
+        tmplGrphUse.setSelected(false);
         if (preselectDefault)
         {
             rdbUseDefault.setSelected(true);
@@ -164,9 +182,28 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
             rdbUseDefault.setSelected(false);
             rdbUseCustom.setSelected(true);
         }
+
         ButtonGroup rdbGroup = new ButtonGroup();
+        rdbGroup.add(tmplGrphUse);
         rdbGroup.add(rdbUseDefault);
         rdbGroup.add(rdbUseCustom);
+
+        lblTmplGrphSource = new JLabel("Graph to be used as fragmentation template:", 
+            SwingConstants.LEFT);
+        String toolTipTmplGrphSource = "<html>Pathname of a graph file to be used as template.</html>";
+        lblTmplGrphSource.setToolTipText(toolTipTmplGrphSource);
+        txtTmplGrphSource = new JTextField();
+        txtTmplGrphSource.setToolTipText(toolTipTmplGrphSource);
+        txtTmplGrphSource.setPreferredSize(strFieldSize);
+        txtTmplGrphSource.setEnabled(false);
+        btnTmplGrphSource = new JButton("Browse");
+        btnTmplGrphSource.setEnabled(false);
+        btnTmplGrphSource.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+                GUIFileOpener.pickFileForTxtField(txtTmplGrphSource,
+                        btnTmplGrphSource);
+            }
+        });
         
         defaultRulesTabModel = new DefaultTableModel();
         defaultRulesTabModel.setColumnCount(7);
@@ -328,6 +365,9 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
             {
                 customCuttingRules.clear();
                 File cutRulFile = GUIFileOpener.pickFile(btnImportRules);
+                if (cutRulFile == null) {
+                    return;
+                }
                 try
                 {
                     DenoptimIO.readCuttingRules(cutRulFile, customCuttingRules);
@@ -430,6 +470,14 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
         customRulesTable.getTableHeader().setPreferredSize(
                 new Dimension(customRulesScrollPane.getWidth(), 40));
         
+        JPanel lineTmplGrphSource = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        lineTmplGrphSource.setToolTipText(toolTipTmplGrphSource);
+        lineTmplGrphSource.add(tmplGrphUse);
+        lineTmplGrphSource.add(lblTmplGrphSource);
+        lineTmplGrphSource.add(txtTmplGrphSource);
+        lineTmplGrphSource.add(btnTmplGrphSource);
+        appendToCentralPanel(lineTmplGrphSource);
+        
 
         JPanel pnlButtonsDefaultRules = new JPanel(new FlowLayout(FlowLayout.LEFT));
         pnlButtonsDefaultRules.add(btnAddDefaultRule);
@@ -508,94 +556,130 @@ class CuttingRulesSelectionDialog extends GUIModalDialog
             @Override
             public void actionPerformed(ActionEvent e) 
             {   
-                DefaultTableModel chosenTab = defaultRulesTabModel;
-                if (rdbUseCustom.isSelected())
-                    chosenTab = customRulesTabModel;
-                
-                boolean setOfCuttingRulesHasBeenModified = false;
-                    
-                chosenOnes = new ArrayList<CuttingRule>();
-                for (int iRow=0; iRow<chosenTab.getRowCount(); iRow++)
+                if (tmplGrphUse.isSelected()) 
                 {
-                    String[] values = new String[5];
-                    for (int iCol=0; iCol<5; iCol++)
-                    {
-                        values[iCol] = chosenTab.getValueAt(iRow,iCol)
-                                .toString().trim();
+                    String tmplGrphSource = txtTmplGrphSource.getText();
+                    if (tmplGrphSource.isBlank()) {
+                        JOptionPane.showMessageDialog(btnDone, 
+                            "Please specify a file with graphs to be used as fragmentation templates.", 
+                            "Error", 
+                            JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
-                    ArrayList<String> opts = new ArrayList<String>();
-                    if (!chosenTab.getValueAt(iRow,5).toString().trim().isBlank())
-                        opts.addAll(Arrays.asList(chosenTab.getValueAt(iRow,5)
-                                    .toString().trim().split("\\s+")));
-                    
-                    int prioIdx = 0;
+                    List<DGraph> tmplGraphs = new ArrayList<DGraph>();
                     try {
-                        prioIdx = Integer.parseInt(values[1]);
-                    } catch (Throwable t)
-                    {
-                        JOptionPane.showMessageDialog(btnDone,String.format(
-                                "<html><body width='%1s'>"
-                                + "Could not convert string '" + values[1]
-                                + "' into an integer. Ignoring row " + iRow 
-                                + " in table of custom cutting rules.</html>",
-                                    400),
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE,
-                                UIManager.getIcon("OptionPane.errorIcon"));
-                        continue;
-                    }
-                    
-                    CuttingRule newCuttingRule = new CuttingRule(values[0], 
-                            values[2], values[4], values[3], prioIdx, opts);
-                    chosenOnes.add(newCuttingRule);
-                    
-                    // Verify introduction of differences
-                    if (!setOfCuttingRulesHasBeenModified)
-                    {
-                        boolean fromDefault = false;
-                        if (defaultCuttingRules.size() > iRow)
-                        {
-                            fromDefault = defaultCuttingRules.get(iRow).equals(
-                                    newCuttingRule);
-                        }
-                        boolean fromCustom = false;
-                        if (customCuttingRules.size() > iRow)
-                        {
-                            fromCustom = customCuttingRules.get(iRow).equals(
-                                    newCuttingRule);
-                        }
-                        if (!fromDefault && !fromCustom)
-                        {
-                            setOfCuttingRulesHasBeenModified = true;
-                        }
-                    }
-                }
-                
-                // Verify shortening of the list of rules (case not covered above)
-                if (chosenOnes.size() != defaultCuttingRules.size()
-                        && chosenOnes.size() != customCuttingRules.size())
-                {
-                    setOfCuttingRulesHasBeenModified = true;
-                }
-                
-                //Store a copy of the modified/customized rules
-                if (setOfCuttingRulesHasBeenModified)
-                {
-                    try
-                    {
-                        lastUsedCutRulFile = nextWrittenCutRulFile;
-                        DenoptimIO.writeCuttingRules(lastUsedCutRulFile, 
-                                chosenOnes);
-                        FileUtils.addToRecentFiles(lastUsedCutRulFile, 
-                                FileFormat.CUTRULE);
-                    } catch (DENOPTIMException e1)
-                    {
+                        tmplGraphs = DenoptimIO.readDENOPTIMGraphsFromFile(new File(tmplGrphSource));
+                    } catch (Exception e1) {
                         e1.printStackTrace();
+                        JOptionPane.showMessageDialog(btnDone, 
+                            "Could not read graphs from file '" + tmplGrphSource + "'.", 
+                            "Error", 
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                        return;
                     }
+                    if (tmplGraphs.isEmpty()) {
+                        JOptionPane.showMessageDialog(btnDone, 
+                            "No graphs found in file '" + tmplGrphSource + "'.", 
+                            "Error", 
+                            JOptionPane.ERROR_MESSAGE,
+                            UIManager.getIcon("OptionPane.errorIcon"));
+                        return;
+                    }
+                    result = new ArrayList<CuttingRule>();
+                    frgParams.setFragmentationTmpls(tmplGraphs);
+                    frgParams.setLinearAngleLimit(
+                        Double.parseDouble(txtLinearity.getText()));
+                } else { 
+                    DefaultTableModel chosenTab = defaultRulesTabModel;
+                    if (rdbUseCustom.isSelected())
+                        chosenTab = customRulesTabModel;
+                    
+                    boolean setOfCuttingRulesHasBeenModified = false;
+                        
+                    chosenOnes = new ArrayList<CuttingRule>();
+                    for (int iRow=0; iRow<chosenTab.getRowCount(); iRow++)
+                    {
+                        String[] values = new String[5];
+                        for (int iCol=0; iCol<5; iCol++)
+                        {
+                            values[iCol] = chosenTab.getValueAt(iRow,iCol)
+                                    .toString().trim();
+                        }
+                        ArrayList<String> opts = new ArrayList<String>();
+                        if (!chosenTab.getValueAt(iRow,5).toString().trim().isBlank())
+                            opts.addAll(Arrays.asList(chosenTab.getValueAt(iRow,5)
+                                        .toString().trim().split("\\s+")));
+                        
+                        int prioIdx = 0;
+                        try {
+                            prioIdx = Integer.parseInt(values[1]);
+                        } catch (Throwable t)
+                        {
+                            JOptionPane.showMessageDialog(btnDone,String.format(
+                                    "<html><body width='%1s'>"
+                                    + "Could not convert string '" + values[1]
+                                    + "' into an integer. Ignoring row " + iRow 
+                                    + " in table of custom cutting rules.</html>",
+                                        400),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE,
+                                    UIManager.getIcon("OptionPane.errorIcon"));
+                            continue;
+                        }
+                        
+                        CuttingRule newCuttingRule = new CuttingRule(values[0], 
+                                values[2], values[4], values[3], prioIdx, opts);
+                        chosenOnes.add(newCuttingRule);
+                        
+                        // Verify introduction of differences
+                        if (!setOfCuttingRulesHasBeenModified)
+                        {
+                            boolean fromDefault = false;
+                            if (defaultCuttingRules.size() > iRow)
+                            {
+                                fromDefault = defaultCuttingRules.get(iRow).equals(
+                                        newCuttingRule);
+                            }
+                            boolean fromCustom = false;
+                            if (customCuttingRules.size() > iRow)
+                            {
+                                fromCustom = customCuttingRules.get(iRow).equals(
+                                        newCuttingRule);
+                            }
+                            if (!fromDefault && !fromCustom)
+                            {
+                                setOfCuttingRulesHasBeenModified = true;
+                            }
+                        }
+                    }
+                    
+                    // Verify shortening of the list of rules (case not covered above)
+                    if (chosenOnes.size() != defaultCuttingRules.size()
+                            && chosenOnes.size() != customCuttingRules.size())
+                    {
+                        setOfCuttingRulesHasBeenModified = true;
+                    }
+                    
+                    //Store a copy of the modified/customized rules
+                    if (setOfCuttingRulesHasBeenModified)
+                    {
+                        try
+                        {
+                            lastUsedCutRulFile = nextWrittenCutRulFile;
+                            DenoptimIO.writeCuttingRules(lastUsedCutRulFile, 
+                                    chosenOnes);
+                            FileUtils.addToRecentFiles(lastUsedCutRulFile, 
+                                    FileFormat.CUTRULE);
+                        } catch (DENOPTIMException e1)
+                        {
+                            e1.printStackTrace();
+                        }
+                    }
+                    
+                    saveResults();
                 }
-                
-                saveResults();
-                
+
                 close();
             }
         });

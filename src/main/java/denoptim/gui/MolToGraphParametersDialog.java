@@ -138,6 +138,43 @@ public class MolToGraphParametersDialog extends CuttingRulesSelectionDialog
         lineTemplateContract.add(lblTemplateContract);
         lineTemplateContract.add(cmbTemplateContract);
         appendToCentralPanel(lineTemplateContract);
+
+
+        tmplGrphUse.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tmplGrphUse.isSelected()) {
+                    cmbScaffoldingPolicy.setEnabled(false);
+                    txtScaffoldingPolicy.setEnabled(false);
+                    cmbTemplateContract.setEnabled(false);
+                    rdbEmbTmpl.setEnabled(false);
+                }
+            }
+        });
+
+        rdbUseDefault.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (rdbUseDefault.isSelected()) {
+                    cmbScaffoldingPolicy.setEnabled(true);
+                    txtScaffoldingPolicy.setEnabled(true);
+                    cmbTemplateContract.setEnabled(true);
+                    rdbEmbTmpl.setEnabled(true);
+                }
+            }
+        });
+
+        rdbUseCustom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (rdbUseCustom.isSelected()) {
+                    cmbScaffoldingPolicy.setEnabled(true);
+                    txtScaffoldingPolicy.setEnabled(true);
+                    cmbTemplateContract.setEnabled(true);
+                    rdbEmbTmpl.setEnabled(true);
+                }
+            }
+        });
     }
     
 //-----------------------------------------------------------------------------

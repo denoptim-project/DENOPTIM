@@ -1585,12 +1585,6 @@ public class GUIGraphHandler extends GUICardPanel
             return;
         }
         
-        // Make empty fragment space or use the loaded one to identify capping
-        if (fragSpace == null)
-        {
-            fragSpace = new FragmentSpace();
-        }
-        
         // Read and convert molecules one by one
         List<DGraph> graphs = new ArrayList<DGraph>();
         int i=0;
@@ -1612,11 +1606,7 @@ public class GUIGraphHandler extends GUICardPanel
             }
             DGraph graph = null;
             try {
-                graph = EAUtils.makeGraphFromFragmentationOfMol(mol, 
-                        frgParams.getCuttingRules(), frgParams.getLogger(),
-                        frgParams.getScaffoldingPolicy(),
-                        frgParams.getLinearAngleLimit(),
-                        fragSpace);
+                graph = EAUtils.makeGraphFromFragmentationOfMol(mol, frgParams);
             } catch (DENOPTIMException de)
             {
                 String msg = "<html><body width='%1s'>Unable to convert "
@@ -1633,6 +1623,10 @@ public class GUIGraphHandler extends GUICardPanel
             if (frgParams.embedRingsInTemplate())
             {
                 try {
+                    if (fragSpace == null)
+                    {
+                        fragSpace = new FragmentSpace();
+                    }
                     DGraph modGraph = graph.embedPatternsInTemplates(
                             GraphPattern.RING, 
                             fragSpace, frgParams.getEmbeddedRingsContract());

@@ -73,7 +73,7 @@ public class VertexViewPanel extends JPanel
 	
     private JLabel labTitle;
     private JButton btnSwitchToNodeViewer;
-    private JButton btnSwitchToMolViewer;
+    private JButton btnSwitchTo3DViewer;
     private JButton btnSwitchTo2DViewer;
     
     private JPanel centralPanel;
@@ -158,18 +158,18 @@ public class VertexViewPanel extends JPanel
         }
         
         if (nodeFreeMode) {
-            btnSwitchToMolViewer = new JButton("3D");
+            btnSwitchTo3DViewer = new JButton("3D");
         } else {
-            btnSwitchToMolViewer = new JButton("3D Molecule View");
+            btnSwitchTo3DViewer = new JButton("3D Molecule View");
         }
-        btnSwitchToMolViewer.setToolTipText("Switch to 3D molecular depiction "
+        btnSwitchTo3DViewer.setToolTipText("Switch to 3D molecular depiction "
                 + "of this vertex.");
-        btnSwitchToMolViewer.addActionListener(new ActionListener() {
+        btnSwitchTo3DViewer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 switchTo3DViewer();
             }
         });
-        btnSwitchToMolViewer.setEnabled(false);
+        btnSwitchTo3DViewer.setEnabled(false);
         
         if (nodeFreeMode) {    
             btnSwitchTo2DViewer = new JButton("2D");
@@ -187,9 +187,9 @@ public class VertexViewPanel extends JPanel
 
         if (nodeFreeMode) {
             titlePanel.add(btnSwitchTo2DViewer);
-            titlePanel.add(btnSwitchToMolViewer);
+            titlePanel.add(btnSwitchTo3DViewer);
         } else {
-            titlePanel.add(btnSwitchToMolViewer);
+            titlePanel.add(btnSwitchTo3DViewer);
             titlePanel.add(btnSwitchTo2DViewer);
         }
         
@@ -278,11 +278,11 @@ public class VertexViewPanel extends JPanel
 	    {
     	    if (switchable)
     	    {
-    	        btnSwitchToMolViewer.setEnabled(true);
+    	        btnSwitchTo3DViewer.setEnabled(true);
     	        btnSwitchToNodeViewer.setEnabled(true);
                 btnSwitchTo2DViewer.setEnabled(true);
     	    } else {
-    	        btnSwitchToMolViewer.setEnabled(false);
+    	        btnSwitchTo3DViewer.setEnabled(false);
     	        btnSwitchToNodeViewer.setEnabled(false);
                 btnSwitchTo2DViewer.setEnabled(false);
     	    }
@@ -293,7 +293,7 @@ public class VertexViewPanel extends JPanel
 	
 	private void switchToEmptyCard()
 	{
-        btnSwitchToMolViewer.setEnabled(false);
+        btnSwitchTo3DViewer.setEnabled(false);
         btnSwitchToNodeViewer.setEnabled(false);
         btnSwitchTo2DViewer.setEnabled(false);
 	    ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
@@ -305,6 +305,9 @@ public class VertexViewPanel extends JPanel
 	
 	private void switchToGraphNodeViewer()
 	{
+        btnSwitchTo3DViewer.setEnabled(true);
+        btnSwitchToNodeViewer.setEnabled(false);
+        btnSwitchTo2DViewer.setEnabled(true);
 	    ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
 	            GRAPHVIEWERCARDNAME);
 	    activeViewer = graphNodeViewer;
@@ -314,6 +317,9 @@ public class VertexViewPanel extends JPanel
     
     private void switchTo3DViewer()
     {
+        btnSwitchTo3DViewer.setEnabled(false);
+        btnSwitchToNodeViewer.setEnabled(true);
+        btnSwitchTo2DViewer.setEnabled(true);
         ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
                 MOLVIEWERCARDNAME);
         activeViewer = fragViewer;
@@ -323,6 +329,9 @@ public class VertexViewPanel extends JPanel
     
     private void switchTo2DViewer()
     {
+        btnSwitchTo3DViewer.setEnabled(true);
+        btnSwitchToNodeViewer.setEnabled(true);
+        btnSwitchTo2DViewer.setEnabled(false);
         ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
                 TWODVIEWERCARDNAME);
         activeViewer = twoDimViewer;
@@ -447,7 +456,7 @@ public class VertexViewPanel extends JPanel
      */
     private void loadEmptyVertexToViewer(EmptyVertex ev)
     {
-        btnSwitchToMolViewer.setEnabled(false);
+        btnSwitchTo3DViewer.setEnabled(false);
         btnSwitchToNodeViewer.setEnabled(false);
         btnSwitchTo2DViewer.setEnabled(false);
         graphNodeViewer.loadVertexToViewer(ev);
@@ -467,7 +476,7 @@ public class VertexViewPanel extends JPanel
 	 */
 	private void loadFragmentToViewer(Fragment frag)
 	{
-        btnSwitchToMolViewer.setEnabled(true);
+        btnSwitchTo3DViewer.setEnabled(true);
         btnSwitchToNodeViewer.setEnabled(true);
         btnSwitchTo2DViewer.setEnabled(true);
 		fragViewer.loadFragmentToViewer(frag);
@@ -494,7 +503,7 @@ public class VertexViewPanel extends JPanel
                         tmpl.getIAtomContainer(), tmpl.getBuildingBlockType());
 
                 loadFragmentToViewer(frag);
-                btnSwitchToMolViewer.setEnabled(true);
+                btnSwitchTo3DViewer.setEnabled(true);
                 btnSwitchToNodeViewer.setEnabled(true);
                 btnSwitchTo2DViewer.setEnabled(true);
                 switchbleByVertexType = true;
