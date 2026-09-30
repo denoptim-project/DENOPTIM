@@ -71,21 +71,20 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	private JUNGGraphSnapshot oldGSStatus;
 	
 	private JSplitPane leftPane;
-	protected FragmentViewPanel fragViewer;
-	private JPanel fragViewerPanel;
-	private JPanel fragViewerHeader;
-	private JPanel fragViewerCardHolder;
-	private JPanel fragViewerEmptyCard;
-	private JPanel fragViewerNotDuableCard;
-	private JPanel fragViewerNoFSCard;
-    private GraphVertexMolViewerPanel fragViewerTmplViewerCard;
+	protected VertexViewPanel vrtxViewer;
+	private JPanel vrtxViewerPanel;
+	private JPanel vrtxViewerCardHolder;
+	private JPanel vrtxViewerEmptyCard;
+	private JPanel vrtxViewerNotDuableCard;
+	private JPanel vrtxViewerNoFSCard;
+    private GraphVertexMolViewerPanel vrtxViewerTmplViewerCard;
 	protected MoleculeViewerPanel molViewerPanel;
 	protected final String NOFSCARDNAME = "noFSCard";
 	protected final String EMPTYCARDNAME = "emptyCard";
 	protected final String NOTDUABLECARDNAME = "notDoableCard";
 	protected final String UPDATETOVIEW = "updateCard";
 	protected final String MOLVIEWERCARDNAME = "molViewerCard";
-	protected final String FRAGVIEWERCARDNAME = "fragViewerCard";
+	protected final String VRTXEVIEWERCARDNAME = "vrtxViewerCard";
 	protected final String TMPLVIEWERCARDNAME = "tmplViewwerCard";
     protected final String TWODVIEWERCARDNAME = "twoDimViewerCard";
     protected final String THREEDVIEWERCARDNAME = "threeDimViewerCard";
@@ -160,48 +159,45 @@ public class GraphVertexMolViewerPanel extends JSplitPane
                         GraphViewerPanel.PROPERTYMOUSEMODE, 
                         new MouseModeChoiceListener()));
 		
-		fragViewerPanel = new JPanel(new BorderLayout());
-		fragViewerHeader = new JPanel();
-		fragViewerHeader.add(new JLabel("Node content:"));
-		String fragViewerToolTip = "<html>This viewer shows the "
+		vrtxViewerPanel = new JPanel(new BorderLayout());
+		String vrtxViewerToolTip = "<html>This viewer shows the "
 				+ "content of the selected vertex.<br>"
 				+ "Click on a node to select it and display its "
 				+ "content here.</html>";
-		fragViewerHeader.setToolTipText(fragViewerToolTip);
-		fragViewerPanel.add(fragViewerHeader, BorderLayout.NORTH);
-		fragViewerCardHolder = new JPanel(new CardLayout());
+		vrtxViewerCardHolder = new JPanel(new CardLayout());
+        vrtxViewerCardHolder.setToolTipText(vrtxViewerToolTip);
 		
-		fragViewerPanel.add(fragViewerCardHolder, BorderLayout.CENTER);
+		vrtxViewerPanel.add(vrtxViewerCardHolder, BorderLayout.CENTER);
 		
-		fragViewerEmptyCard = new JPanel();
+		vrtxViewerEmptyCard = new JPanel();
 		String txt = "<html><body width='%1s'><center>No chosen node.</center>"
 		        + "</html>";
-		fragViewerEmptyCard.add(new JLabel(String.format(txt, 120)));
-		fragViewerEmptyCard.setToolTipText(fragViewerToolTip);
-		fragViewerCardHolder.add(fragViewerEmptyCard, EMPTYCARDNAME);
+		vrtxViewerEmptyCard.add(new JLabel(String.format(txt, 120)));
+		vrtxViewerEmptyCard.setToolTipText(vrtxViewerToolTip);
+		vrtxViewerCardHolder.add(vrtxViewerEmptyCard, EMPTYCARDNAME);
 		
-		fragViewerNotDuableCard = new JPanel();
+		vrtxViewerNotDuableCard = new JPanel();
         String txtn = "<html><body width='%1s'><center>Content not visualizable"
                 + "</center></html>";
-        fragViewerNotDuableCard.add(new JLabel(String.format(txtn, 120)));
-        fragViewerNotDuableCard.setToolTipText(fragViewerToolTip);
-        fragViewerCardHolder.add(fragViewerNotDuableCard, NOTDUABLECARDNAME);
+        vrtxViewerNotDuableCard.add(new JLabel(String.format(txtn, 120)));
+        vrtxViewerNotDuableCard.setToolTipText(vrtxViewerToolTip);
+        vrtxViewerCardHolder.add(vrtxViewerNotDuableCard, NOTDUABLECARDNAME);
 		
-		fragViewerNoFSCard = new JPanel();
+		vrtxViewerNoFSCard = new JPanel();
 		String txtb = "<html><body width='%1s'><center>To inspect the content "
 				+ "of nodes, please load a space of building blocks, "
 				+ "and re-open this tab.</center></html>";
-		fragViewerNoFSCard.add(new JLabel(String.format(txtb, 120)));
-		fragViewerNoFSCard.setToolTipText(fragViewerToolTip);
-		fragViewerCardHolder.add(fragViewerNoFSCard, NOFSCARDNAME);
+		vrtxViewerNoFSCard.add(new JLabel(String.format(txtb, 120)));
+		vrtxViewerNoFSCard.setToolTipText(vrtxViewerToolTip);
+		vrtxViewerCardHolder.add(vrtxViewerNoFSCard, NOFSCARDNAME);
 				
-		fragViewer = new FragmentViewPanel(false);
-		fragViewerCardHolder.add(fragViewer, FRAGVIEWERCARDNAME);
+		vrtxViewer = new VertexViewPanel(false, true);
+		vrtxViewerCardHolder.add(vrtxViewer, VRTXEVIEWERCARDNAME);
 		
-		((CardLayout) fragViewerCardHolder.getLayout()).show(
-				fragViewerCardHolder, EMPTYCARDNAME);
+		((CardLayout) vrtxViewerCardHolder.getLayout()).show(
+				vrtxViewerCardHolder, EMPTYCARDNAME);
 		
-		leftPane.setTopComponent(fragViewerPanel);
+		leftPane.setTopComponent(vrtxViewerPanel);
 		
         molViewerPanel = new MoleculeViewerPanel();
 		leftPane.setBottomComponent(molViewerPanel);
@@ -285,11 +281,9 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	 */
 	public void resetFragViewerCardDeck()
 	{
-	    if (fragViewer != null)
+	    if (vrtxViewer != null)
         {
-	        // We lease data in the viewer to increase speed of execution, but the
-	        // leftover is outdated! This is the meaning of 'true'
-            fragViewer.clearAll(true);
+            vrtxViewer.clearCurrentSystem();
             bringCardToTopOfVertexViewer(EMPTYCARDNAME);
             removeNestedGraphViewer();
         }
@@ -299,12 +293,12 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	
 	private void removeNestedGraphViewer()
 	{
-	    if (fragViewerTmplViewerCard != null)
+	    if (vrtxViewerTmplViewerCard != null)
         {
-            ((CardLayout) fragViewerCardHolder.getLayout()).
-            removeLayoutComponent(fragViewerTmplViewerCard);
-            fragViewerTmplViewerCard.dispose();
-            fragViewerTmplViewerCard = null;
+            ((CardLayout) vrtxViewerCardHolder.getLayout()).
+            removeLayoutComponent(vrtxViewerTmplViewerCard);
+            vrtxViewerTmplViewerCard.dispose();
+            vrtxViewerTmplViewerCard = null;
         }
 	}
 	
@@ -328,9 +322,7 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      */
     public void clearVertexViewer()
     {
-        // We lease data in the viewer to increase speed of execution, but the
-        // leftover is outdated! This is the meaning of 'true'
-        fragViewer.clearAll(true);
+        vrtxViewer.clearCurrentSystem();
         bringCardToTopOfVertexViewer(EMPTYCARDNAME);
     }
 
@@ -376,47 +368,34 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	private void visualizeVertexInNestedViewer(Vertex v)
 	{
 	    Vertex bb = v.clone();
-        if (bb instanceof Fragment) {
-            removeNestedGraphViewer(); //Just is case we still have it
-            Fragment frag = (Fragment) bb;
-            fragViewer.loadFragmentToViewer(frag);
-            bringCardToTopOfVertexViewer(FRAGVIEWERCARDNAME);
-        } else if (bb instanceof Template) {
+        if (bb instanceof Template) 
+        {
             Template t = (Template) bb;
 
-            // We lease data in the viewer to increase speed of execution, but the
-            // leftover is outdated! This is the meaning of 'true'
-            fragViewer.clearAll(true);
-            fragViewerTmplViewerCard = new GraphVertexMolViewerPanel();
+            vrtxViewer.clearCurrentSystem();
+            vrtxViewerTmplViewerCard = new GraphVertexMolViewerPanel();
             
             //NB: this setting of the size is needed to allow generation
             // of the graph layout.
             Dimension d = new Dimension();
-            d.height = (int) fragViewerCardHolder.getSize().height;
-            d.width = (int) (fragViewerCardHolder.getSize().width*0.5);
-            fragViewerTmplViewerCard.graphViewer.setSize(d);
+            d.height = (int) vrtxViewerCardHolder.getSize().height;
+            d.width = (int) (vrtxViewerCardHolder.getSize().width*0.5);
+            vrtxViewerTmplViewerCard.graphViewer.setSize(d);
             
-            fragViewerCardHolder.add(fragViewerTmplViewerCard, 
+            vrtxViewerCardHolder.add(vrtxViewerTmplViewerCard, 
                     TMPLVIEWERCARDNAME);
-            fragViewerTmplViewerCard.setSize(
-                    fragViewerCardHolder.getSize());
+            vrtxViewerTmplViewerCard.setSize(
+                    vrtxViewerCardHolder.getSize());
 
-            fragViewerTmplViewerCard.loadDnGraphToViewer(t.getInnerGraph(), 
+            vrtxViewerTmplViewerCard.loadDnGraphToViewer(t.getInnerGraph(), 
                     t.getIAtomContainer(), false);
             
             bringCardToTopOfVertexViewer(TMPLVIEWERCARDNAME);
-            fragViewerTmplViewerCard.setDividerLocation(DEFDIVLOC);
-        } else if (bb instanceof EmptyVertex) {
-            removeNestedGraphViewer(); //Just is case we still have it
-            
-            //TODO
-            System.out.println("WARNING: Visualization of "
-                    + "EmptyVertex is not implemented yet");
-            
-            // We lease data in the viewer to increase speed of execution, but the
-            // leftover is outdated! This is the meaning of 'true'
-            fragViewer.clearAll(true);
-            bringCardToTopOfVertexViewer(NOTDUABLECARDNAME);
+            vrtxViewerTmplViewerCard.setDividerLocation(DEFDIVLOC);
+        } else {
+            removeNestedGraphViewer(); 
+            vrtxViewer.loadVertexToViewer(bb);
+            bringCardToTopOfVertexViewer(VRTXEVIEWERCARDNAME);
         }
 	}
 	
@@ -531,12 +510,12 @@ public class GraphVertexMolViewerPanel extends JSplitPane
      * {@link GraphVertexMolViewerPanel.NOFSCARDNAME}, 
      * {@link GraphVertexMolViewerPanel.EMPTYCARDNAME}, 
      * {@link GraphVertexMolViewerPanel.NOTDUABLECARDNAME},
-     * {@link GraphVertexMolViewerPanel.FRAGVIEWERCARDNAME}
+     * {@link GraphVertexMolViewerPanel.VRTXEVIEWERCARDNAME}
      */
     public void bringCardToTopOfVertexViewer(String cardName)
     {
-        ((CardLayout) fragViewerCardHolder.getLayout()).show(
-                fragViewerCardHolder, cardName);
+        ((CardLayout) vrtxViewerCardHolder.getLayout()).show(
+                vrtxViewerCardHolder, cardName);
     }
     
 //-----------------------------------------------------------------------------
@@ -548,11 +527,11 @@ public class GraphVertexMolViewerPanel extends JSplitPane
 	public void dispose() 
 	{
 		graphViewer.dispose();
-		fragViewer.dispose();
+		vrtxViewer.dispose();
 		molViewerPanel.dispose();
-		if (fragViewerTmplViewerCard != null)
+		if (vrtxViewerTmplViewerCard != null)
 		{
-		    fragViewerTmplViewerCard.dispose();
+		    vrtxViewerTmplViewerCard.dispose();
 		}
 	}
 

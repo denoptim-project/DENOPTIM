@@ -90,11 +90,17 @@ public class VertexViewPanel extends JPanel
 	    
 	private boolean editableAPTable = false;
 	
+    /**
+     * Flag enabling/disabling the node free mode
+     */
+    private boolean nodeFreeMode = false;
+
 	/**
 	 * Flag enabling/disabling the capability to switch between mol- and 
 	 * graph-based viewer
 	 */
 	private boolean switchbleByVertexType = true;
+	
 	
 //-----------------------------------------------------------------------------
 
@@ -105,8 +111,23 @@ public class VertexViewPanel extends JPanel
 	 */
 	public VertexViewPanel(boolean editableTable)
 	{
+        this(editableTable, false);
+	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Constructor that allows to specify whether the AP table is editable or 
+	 * not.
+	 * @param editableTable use <code>true</code> to make the AP table editable.
+     * @param nodeFreeMode use <code>true</code> to enable the node free mode,
+     * i.e., the mode excluding node-like depiction.
+	 */
+	public VertexViewPanel(boolean editableTable, boolean nodeFreeMode)
+	{
 	    super(new BorderLayout());
 		this.editableAPTable = editableTable;
+        this.nodeFreeMode = nodeFreeMode;
 		initialize();
 	}
 	
@@ -122,6 +143,7 @@ public class VertexViewPanel extends JPanel
         labTitle = new JLabel("");
         titlePanel.add(labTitle);
         
+        // We create it even it we might not visualize it. See nodeFreeMode
         btnSwitchToNodeViewer = new JButton("Node View");
         btnSwitchToNodeViewer.setToolTipText("Switch to graph node depiction "
                 + "of this vertex.");
@@ -131,20 +153,29 @@ public class VertexViewPanel extends JPanel
             }
         });
         btnSwitchToNodeViewer.setEnabled(false);
-        titlePanel.add(btnSwitchToNodeViewer);
+        if (!nodeFreeMode) {
+            titlePanel.add(btnSwitchToNodeViewer);
+        }
         
-        btnSwitchToMolViewer = new JButton("3D Molecule View");
+        if (nodeFreeMode) {
+            btnSwitchToMolViewer = new JButton("3D");
+        } else {
+            btnSwitchToMolViewer = new JButton("3D Molecule View");
+        }
         btnSwitchToMolViewer.setToolTipText("Switch to 3D molecular depiction "
                 + "of this vertex.");
         btnSwitchToMolViewer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                switchToMolecularViewer();
+                switchTo3DViewer();
             }
         });
         btnSwitchToMolViewer.setEnabled(false);
-        titlePanel.add(btnSwitchToMolViewer);
         
-        btnSwitchTo2DViewer = new JButton("2D Molecular Structure");
+        if (nodeFreeMode) {    
+            btnSwitchTo2DViewer = new JButton("2D");
+        } else {
+            btnSwitchTo2DViewer = new JButton("2D Molecular Structure");
+        }
         btnSwitchTo2DViewer.setToolTipText("Switch to 2D molecular depiction "
                 + "of this vertex.");
         btnSwitchTo2DViewer.addActionListener(new ActionListener() {
@@ -153,7 +184,14 @@ public class VertexViewPanel extends JPanel
             }
         });
         btnSwitchTo2DViewer.setEnabled(false);
-        titlePanel.add(btnSwitchTo2DViewer);
+
+        if (nodeFreeMode) {
+            titlePanel.add(btnSwitchTo2DViewer);
+            titlePanel.add(btnSwitchToMolViewer);
+        } else {
+            titlePanel.add(btnSwitchToMolViewer);
+            titlePanel.add(btnSwitchTo2DViewer);
+        }
         
         this.add(titlePanel, BorderLayout.NORTH);
         
@@ -274,7 +312,7 @@ public class VertexViewPanel extends JPanel
 	
 //-----------------------------------------------------------------------------
     
-    private void switchToMolecularViewer()
+    private void switchTo3DViewer()
     {
         ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
                 MOLVIEWERCARDNAME);
@@ -288,6 +326,24 @@ public class VertexViewPanel extends JPanel
         ((CardLayout) centralPanel.getLayout()).show(centralPanel, 
                 TWODVIEWERCARDNAME);
         activeViewer = twoDimViewer;
+    }
+
+//-----------------------------------------------------------------------------
+    
+    /**
+     * Switches to the viewer based on the current preference for molecular 
+     * dimension display.
+     */
+    private void switchToMolViewer()
+    {
+        switch(GUIPreferences.molDimDisplay) {
+            case THREE_DIMENSIONAL:
+                switchTo3DViewer();
+                break;
+            case TWO_DIMENSIONAL:
+                switchTo2DViewer();
+                break;
+        }
     }
     
 //-----------------------------------------------------------------------------
@@ -304,8 +360,8 @@ public class VertexViewPanel extends JPanel
 	 * @throws DENOPTIMException 
 	 */
 	public boolean loadSMILES(String smiles)
-	{	
-	    switchToMolecularViewer();
+	{
+        switchToMolViewer();
 	    return fragViewer.loadSMILES(smiles);
 	}
 
@@ -326,7 +382,7 @@ public class VertexViewPanel extends JPanel
 	    if (vertex == null || vertex instanceof Fragment)
 	    {
 	        v = fragViewer.getLoadedStructure();
-	        switchToMolecularViewer();
+	        switchToMolViewer();
 	    } else {
 	        v = vertex;
 	    }
@@ -342,7 +398,7 @@ public class VertexViewPanel extends JPanel
 	public void loadPlainStructure(IAtomContainer mol)
 	{
 	    fragViewer.loadPlainStructure(mol);
-	    switchToMolecularViewer();
+	    switchToMolViewer();
 	}
 
 //-----------------------------------------------------------------------------
@@ -359,7 +415,11 @@ public class VertexViewPanel extends JPanel
     {
         vertex = v;
         if (v instanceof Fragment) {
-            labTitle.setText("Fragment");
+            if (nodeFreeMode) {
+                labTitle.setText("Fragment:");
+            } else {
+                labTitle.setText("Fragment");
+            }
             Fragment frag = (Fragment) v;
             loadFragmentToViewer(frag);
         } else if (v instanceof EmptyVertex) {
@@ -414,12 +474,7 @@ public class VertexViewPanel extends JPanel
         graphNodeViewer.loadVertexToViewer(frag);
         twoDimViewer.loadVertexToViewer(frag);
         switchbleByVertexType = true;
-        if (frag.is3D())
-		{
-            switchToMolecularViewer();
-		} else {
-		    switchTo2DViewer();
-		}
+        switchToMolViewer();
 	}
 
 //-----------------------------------------------------------------------------
@@ -441,8 +496,7 @@ public class VertexViewPanel extends JPanel
                 loadFragmentToViewer(frag);
                 btnSwitchToMolViewer.setEnabled(true);
                 btnSwitchToNodeViewer.setEnabled(true);
-                //TODO: maybe one day we'll enable looking at the 2D of the whole template
-                btnSwitchTo2DViewer.setEnabled(false);
+                btnSwitchTo2DViewer.setEnabled(true);
                 switchbleByVertexType = true;
             } catch (DENOPTIMException e)
             {
