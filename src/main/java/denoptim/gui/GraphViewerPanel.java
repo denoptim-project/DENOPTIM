@@ -65,7 +65,6 @@ import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.AbstractPopupGraphMousePlugin;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-import edu.uci.ics.jung.visualization.control.GraphMouseListener;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
@@ -590,45 +589,17 @@ public class GraphViewerPanel extends JPanel
 	    
         viewer = new VisualizationViewer<>(layout, panelSize);
 		
-	    // Listener for clicks on the graph nodes
-        viewer.addGraphMouseListener(new GraphMouseListener<JVertex>() {
-            
-            @Override
-            public void graphReleased(JVertex v, MouseEvent me)
-            {}
-            
-            @Override
-            public void graphPressed(JVertex v, MouseEvent me)
-            {}
-            
-            @Override
-            public void graphClicked(JVertex v, MouseEvent me)
-            {
-                // Clicking a selected node in picking mode deselects it; do not
-                // re-open the nested vertex viewer in that case.
-                if (!viewer.getPickedVertexState().isPicked(v))
-                {
-                    firePropertyChange(PROPERTYNODECLICKED, null, null);
-                    return;
-                }
-                if (v.expandable)
-                {
-                    firePropertyChange(PROPERTYNODECLICKED, null, v);
-                } else {
-                    firePropertyChange(PROPERTYNODECLICKED, null, null);
-                }
-            }
-        });
-        // Background click (or otherwise clearing the pick set) should also
-        // notify listeners so the nested vertex viewer can show its empty card.
+	    // Selection is applied by JUNG on mousePressed. GraphMouseListener
+        // graphClicked is driven by AWT mouseClicked, which is suppressed if the
+        // pointer moves even slightly between press and release. So the nested
+        // vertex viewer must react to pick-state changes, not to graphClicked.
         viewer.getPickedVertexState().addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e)
             {
-                if (viewer.getPickedVertexState().getPicked().isEmpty())
-                {
-                    firePropertyChange(PROPERTYNODECLICKED, null, null);
-                }
+                // Coalesce multi-step clear+pick updates from one press.
+                javax.swing.SwingUtilities.invokeLater(
+                        () -> notifyPickedVerticesChanged());
             }
         });
         viewer.getRenderer().getVertexLabelRenderer().setPosition(
@@ -703,6 +674,37 @@ public class GraphViewerPanel extends JPanel
 	        }
 	    }
 	    return new Dimension(150, 150);
+	}
+
+//-----------------------------------------------------------------------------
+
+	/**
+	 * Notifies listeners about the current vertex pick set. Expandable
+	 * {@link JVertex}es (DENOPTIM vertices) open the nested viewer; an empty
+	 * pick set (or only APs) clears it.
+	 */
+	private void notifyPickedVerticesChanged()
+	{
+	    if (viewer == null)
+	    {
+	        return;
+	    }
+	    Set<JVertex> picked = viewer.getPickedVertexState().getPicked();
+	    if (picked == null || picked.isEmpty())
+	    {
+	        firePropertyChange(PROPERTYNODECLICKED, null, null);
+	        return;
+	    }
+	    JVertex chosen = null;
+	    for (JVertex v : picked)
+	    {
+	        if (v.expandable)
+	        {
+	            chosen = v;
+	            break;
+	        }
+	    }
+	    firePropertyChange(PROPERTYNODECLICKED, null, chosen);
 	}
 
 //-----------------------------------------------------------------------------
