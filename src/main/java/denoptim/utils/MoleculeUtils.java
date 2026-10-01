@@ -20,11 +20,13 @@
 package denoptim.utils;
 
 import java.io.File;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1518,7 +1520,7 @@ public class MoleculeUtils
     public static Map<IAtom,IAtom> findBestAtomMapping(
             IAtomContainer substructure, IAtomContainer mol, Logger logger)
     {
-        List<Map<IAtom,IAtom>> uniqueAtomMappings = findUniqueAtomMappings(substructure, mol, logger);
+        List<Map<IAtom,IAtom>> uniqueAtomMappings = collectUniqueAtomMappings(substructure, mol, logger);
         double bestScore = Double.MAX_VALUE;
         Map<IAtom,IAtom> bestTemplateToMolMap = new HashMap<>();
         for (Map<IAtom,IAtom> templateToMolMap : uniqueAtomMappings)
@@ -1537,14 +1539,33 @@ public class MoleculeUtils
 //------------------------------------------------------------------------------
 
     /**
-     * Finds the maximum common substructure (MCS) between two molecules.
-     * @param substructure the substructure to search for in the target molecule
-     * @param mol the target molecule to search in
+     * Finds overall mappings of {@code substructure} onto {@code mol}.
+     * Each overall mapping is a largest set of placements with pairwise
+     * disjoint target atoms. Placements that cover the same target atoms
+     * are reduced to the best bond-angle assignment. Overlapping placements
+     * are split across separate overall mappings, and disjoint placements
+     * are combined. A chain of partial overlaps contributes only the
+     * combinations that contain the most placements.
+     * @param substructure the substructure to search for
+     * @param mol the target molecule
      * @param logger logger for reporting
-     * @return the atom mapping as a Map<IAtom,IAtom> (key: substructure atom, 
-     * value: mol atom), or an empty map if none found
+     * @return one inner list per overall mapping, from query atom to target
+     * atom. Empty when {@code substructure} does not occur in {@code mol}.
      */
-    public static List<Map<IAtom,IAtom>> findUniqueAtomMappings(
+    public static List<List<Map<IAtom,IAtom>>> findUniqueAtomMappings(
+            IAtomContainer substructure, IAtomContainer mol, Logger logger)
+    {
+        return buildOverallAtomMappings(
+                collectUniqueAtomMappings(substructure, mol, logger));
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Substructure placements reduced to one assignment per target-atom set.
+     * The assignment kept for each set is the one with the best bond-angle score.
+     */
+    private static List<Map<IAtom,IAtom>> collectUniqueAtomMappings(
             IAtomContainer substructure, IAtomContainer mol, Logger logger)
     {
         try
@@ -1671,6 +1692,236 @@ public class MoleculeUtils
             logger.log(Level.WARNING, "Error finding MCS: " + e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Groups placements into overall mappings. Two placements conflict when
+     * their target atoms intersect. Each connected component of that conflict
+     * graph is solved on its own, and the overall mappings are the Cartesian
+     * product of the maximum independent sets of the components.
+     * @param uniqueMappings one placement per distinct target-atom set
+     * @return one inner list per overall mapping, reusing the input maps
+     */
+    static List<List<Map<IAtom,IAtom>>> buildOverallAtomMappings(
+            List<Map<IAtom,IAtom>> uniqueMappings)
+    {
+        if (uniqueMappings.isEmpty())
+        {
+            return new ArrayList<>();
+        }
+
+        List<Map<IAtom,IAtom>> ordered = new ArrayList<>(uniqueMappings);
+        Collections.sort(ordered, (left, right) ->
+                targetAtomKey(left).compareTo(targetAtomKey(right)));
+
+        int n = ordered.size();
+        List<Set<Integer>> neighbors = new ArrayList<>();
+        for (int i = 0; i < n; i++)
+        {
+            neighbors.add(new HashSet<>());
+        }
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = i + 1; j < n; j++)
+            {
+                if (shareTargetAtom(ordered.get(i), ordered.get(j)))
+                {
+                    neighbors.get(i).add(j);
+                    neighbors.get(j).add(i);
+                }
+            }
+        }
+
+        List<List<Integer>> components = new ArrayList<>();
+        boolean[] seen = new boolean[n];
+        for (int i = 0; i < n; i++)
+        {
+            if (seen[i])
+            {
+                continue;
+            }
+            List<Integer> component = new ArrayList<>();
+            ArrayDeque<Integer> queue = new ArrayDeque<>();
+            queue.add(i);
+            seen[i] = true;
+            while (!queue.isEmpty())
+            {
+                int vertex = queue.remove();
+                component.add(vertex);
+                for (int neighbor : neighbors.get(vertex))
+                {
+                    if (!seen[neighbor])
+                    {
+                        seen[neighbor] = true;
+                        queue.add(neighbor);
+                    }
+                }
+            }
+            Collections.sort(component);
+            components.add(component);
+        }
+        Collections.sort(components, (left, right) ->
+                Integer.compare(left.get(0), right.get(0)));
+
+        List<List<List<Integer>>> choicesPerComponent = new ArrayList<>();
+        for (List<Integer> component : components)
+        {
+            choicesPerComponent.add(maximumIndependentSets(component, neighbors));
+        }
+
+        List<List<Integer>> indexPacks = new ArrayList<>();
+        indexPacks.add(new ArrayList<>());
+        for (List<List<Integer>> choices : choicesPerComponent)
+        {
+            List<List<Integer>> expanded = new ArrayList<>();
+            for (List<Integer> pack : indexPacks)
+            {
+                for (List<Integer> choice : choices)
+                {
+                    List<Integer> combined = new ArrayList<>(pack);
+                    combined.addAll(choice);
+                    Collections.sort(combined);
+                    expanded.add(combined);
+                }
+            }
+            indexPacks = expanded;
+        }
+
+        List<List<Map<IAtom,IAtom>>> result = new ArrayList<>();
+        for (List<Integer> indexPack : indexPacks)
+        {
+            List<Map<IAtom,IAtom>> pack = new ArrayList<>();
+            for (int index : indexPack)
+            {
+                pack.add(ordered.get(index));
+            }
+            result.add(pack);
+        }
+        Collections.sort(result, (left, right) -> {
+            int length = Math.min(left.size(), right.size());
+            for (int i = 0; i < length; i++)
+            {
+                int comparison = targetAtomKey(left.get(i)).compareTo(
+                        targetAtomKey(right.get(i)));
+                if (comparison != 0)
+                {
+                    return comparison;
+                }
+            }
+            return Integer.compare(left.size(), right.size());
+        });
+        return result;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Maximum independent sets of one conflict-graph component.
+     * {@code vertices} are indices into {@code neighbors}.
+     */
+    private static List<List<Integer>> maximumIndependentSets(
+            List<Integer> vertices, List<Set<Integer>> neighbors)
+    {
+        int[] bestSize = new int[] {0};
+        searchIndependentSets(vertices, neighbors, 0, new ArrayList<>(),
+                new HashSet<>(), bestSize, null);
+        if (bestSize[0] == 0)
+        {
+            return new ArrayList<>();
+        }
+        List<List<Integer>> found = new ArrayList<>();
+        searchIndependentSets(vertices, neighbors, 0, new ArrayList<>(),
+                new HashSet<>(), new int[] {bestSize[0]}, found);
+        return found;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @param sink when {@code null}, only {@code bestSize} is updated;
+     * otherwise sets of that size are recorded and the search stops at that size
+     */
+    private static void searchIndependentSets(
+            List<Integer> vertices,
+            List<Set<Integer>> neighbors,
+            int index,
+            List<Integer> chosen,
+            Set<Integer> blocked,
+            int[] bestSize,
+            List<List<Integer>> sink)
+    {
+        if (sink != null && chosen.size() == bestSize[0])
+        {
+            sink.add(new ArrayList<>(chosen));
+            return;
+        }
+        if (index == vertices.size())
+        {
+            if (sink == null && chosen.size() > bestSize[0])
+            {
+                bestSize[0] = chosen.size();
+            }
+            return;
+        }
+
+        int eligible = 0;
+        for (int k = index; k < vertices.size(); k++)
+        {
+            if (!blocked.contains(vertices.get(k)))
+            {
+                eligible++;
+            }
+        }
+        if (chosen.size() + eligible < bestSize[0])
+        {
+            return;
+        }
+
+        int vertex = vertices.get(index);
+        if (!blocked.contains(vertex))
+        {
+            chosen.add(vertex);
+            Set<Integer> blockedWithVertex = new HashSet<>(blocked);
+            blockedWithVertex.add(vertex);
+            blockedWithVertex.addAll(neighbors.get(vertex));
+            searchIndependentSets(vertices, neighbors, index + 1, chosen,
+                    blockedWithVertex, bestSize, sink);
+            chosen.remove(chosen.size() - 1);
+        }
+        searchIndependentSets(vertices, neighbors, index + 1, chosen, blocked,
+                bestSize, sink);
+    }
+
+//------------------------------------------------------------------------------
+
+    private static boolean shareTargetAtom(Map<IAtom,IAtom> left,
+            Map<IAtom,IAtom> right)
+    {
+        Set<IAtom> leftAtoms = Collections.newSetFromMap(new IdentityHashMap<>());
+        leftAtoms.addAll(left.values());
+        for (IAtom atom : right.values())
+        {
+            if (leftAtoms.contains(atom))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+//------------------------------------------------------------------------------
+
+    private static String targetAtomKey(Map<IAtom,IAtom> mapping)
+    {
+        List<Integer> indices = new ArrayList<>();
+        for (IAtom atom : mapping.values())
+        {
+            indices.add(atom.getIndex());
+        }
+        Collections.sort(indices);
+        return indices.toString();
     }
 
 //------------------------------------------------------------------------------

@@ -5,8 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -575,107 +577,116 @@ public class FragmenterTools
             {
                 // Use a reduced templateMol for isomorphism search (faster)
                 IAtomContainer reducedTemplateMol = ttp.getTemplateWithBufferShell(bufferShellSize);
-                List<Map<IAtom,IAtom>> reducedAtomMappings = MoleculeUtils.findUniqueAtomMappings(
+                List<List<Map<IAtom,IAtom>>> redTmpltoMolMappings = MoleculeUtils.findUniqueAtomMappings(
                         reducedTemplateMol, mol, logger);
                 
                 // Convert mappings from reducedTemplateMol:mol to templateMol:mol using stored indices
-                List<Map<IAtom,IAtom>> atomMappings = new ArrayList<>();
-                for (Map<IAtom,IAtom> reducedMapping : reducedAtomMappings)
+                List<List<Map<IAtom,IAtom>>> tmplToMolMappings = new ArrayList<>();
+                for (List<Map<IAtom,IAtom>> redMapping : redTmpltoMolMappings)
                 {
-                    Map<IAtom,IAtom> fullMapping = new HashMap<>();
-                    for (Map.Entry<IAtom,IAtom> entry : reducedMapping.entrySet())
+                    List<Map<IAtom,IAtom>> tmplMapping = new ArrayList<>();
+                    for (Map<IAtom,IAtom> redSingleMatch : redMapping)
                     {
-                        IAtom reducedAtom = entry.getKey();
-                        IAtom molAtom = entry.getValue();
-                        
-                        // Get original atom index from reduced atom property
-                        Object indexObj = reducedAtom.getProperty("DENOPTIM_ORIGINAL_ATOM_INDEX");
-                        if (indexObj != null)
+                        Map<IAtom,IAtom> singleMatch = new HashMap<>();
+                        for (Map.Entry<IAtom,IAtom> redEntry : redSingleMatch.entrySet())
                         {
-                            int originalIndex = ((Number) indexObj).intValue();
-                            IAtom originalAtom = templateMol.getAtom(originalIndex);
-                            if (originalAtom != null)
+                            IAtom reducedAtom = redEntry.getKey();
+                            IAtom molAtom = redEntry.getValue();
+                            
+                            // Get original atom index from reduced atom property
+                            Object indexObj = reducedAtom.getProperty("DENOPTIM_ORIGINAL_ATOM_INDEX");
+                            if (indexObj != null)
                             {
-                                fullMapping.put(originalAtom, molAtom);
+                                int originalIndex = ((Number) indexObj).intValue();
+                                IAtom tmplAtom = templateMol.getAtom(originalIndex);
+                                if (tmplAtom != null)
+                                {
+                                    singleMatch.put(tmplAtom, molAtom);
+                                }
                             }
                         }
+                        if (!singleMatch.isEmpty())
+                        {
+                            tmplMapping.add(singleMatch);
+                        }
                     }
-                    if (!fullMapping.isEmpty())
+                    if (!tmplMapping.isEmpty())
                     {
-                        atomMappings.add(fullMapping);
+                        tmplToMolMappings.add(tmplMapping);
                     }
                 }
                 
-                Fragment masterFrag = new Fragment(mol, BBType.UNDEFINED);
-                IAtomContainer masterFragIAC = masterFrag.getIAtomContainer();
-
-                // For each atom mapping, replace bonds corresponding to edges 
-                // (at any embedding level) with attachment points and annotate embedding level.
-                // In case of symmetry, multiple mappings will effectivly cut the same bonds,
-                // and produce the same fragments of the template graph only for
-                // symmetry-redundant mappings.
-                for (Map<IAtom,IAtom> atomMapping : atomMappings)
+                // Try to apply each mapping independently
+                for (List<Map<IAtom,IAtom>> atomMappings : tmplToMolMappings)
                 {
-                    try {
-                        exploreDGraphForMappings(templateGraph, templateMol,
-                            masterFrag, masterFragIAC, mol, atomMapping);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                        logger.log(Level.WARNING, "Error while exploring the template graph: " + e.getMessage());
-                        continue;
-                    }
-                }
+                    Fragment masterFrag = new Fragment(mol, BBType.UNDEFINED);
+                    IAtomContainer masterFragIAC = masterFrag.getIAtomContainer();
 
-                // Extract isolated fragments
-                List<Vertex> locfragments = new ArrayList<Vertex>();
-                Set<Integer> doneAlready = new HashSet<Integer>();
-                for (int idx=0 ; idx<masterFrag.getAtomCount(); idx++)
-                {
-                    if (doneAlready.contains(idx))
-                        continue;
-                    
-                    Fragment cloneOfMaster = masterFrag.clone();
-                    IAtomContainer iac = cloneOfMaster.getIAtomContainer();
-                    Set<IAtom> atmsToKeep = exploreConnectivity(iac.getAtom(idx), iac);
-                    atmsToKeep.stream().forEach(atm -> doneAlready.add(iac.indexOf(atm)));
-                    
-                    Set<IAtom> atmsToRemove = new HashSet<IAtom>();
-                    for (IAtom atm : cloneOfMaster.atoms())
+                    // For each atom mapping, replace bonds corresponding to edges 
+                    // (at any embedding level) with attachment points and annotate embedding level.
+                    for (Map<IAtom,IAtom> atomMapping : atomMappings)
                     {
-                        if (!atmsToKeep.contains(atm))
-                        {
-                            atmsToRemove.add(atm);
+                        try {
+                            exploreDGraphForMappings(templateGraph, templateMol,
+                                masterFrag, masterFragIAC, mol, atomMapping);
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                            logger.log(Level.WARNING, "Error while exploring the template graph: " + e.getMessage());
+                            continue;
                         }
                     }
-                    cloneOfMaster.removeAtoms(atmsToRemove);
-                    if (cloneOfMaster.getAttachmentPoints().size()>0)
-                        locfragments.add(cloneOfMaster);
-                }
-            
-                int localScore = 0;
-                for (Vertex frag : locfragments)
-                {
-                    if (!(frag instanceof Fragment))
+
+                    // Extract isolated fragments
+                    List<Vertex> locfragments = new ArrayList<Vertex>();
+                    Set<Integer> doneAlready = new HashSet<Integer>();
+                    for (int idx=0 ; idx<masterFrag.getAtomCount(); idx++)
                     {
-                        continue;
-                    }
-                    for (Vertex templateVertex : templateGraph.getVertexList())
-                    {
-                        if (((Fragment) frag).isIsomorphicTo(templateVertex))
+                        if (doneAlready.contains(idx))
+                            continue;
+                        
+                        Fragment cloneOfMaster = masterFrag.clone();
+                        IAtomContainer iac = cloneOfMaster.getIAtomContainer();
+                        Set<IAtom> atmsToKeep = exploreConnectivity(iac.getAtom(idx), iac);
+                        atmsToKeep.stream().forEach(atm -> doneAlready.add(iac.indexOf(atm)));
+                        
+                        Set<IAtom> atmsToRemove = new HashSet<IAtom>();
+                        for (IAtom atm : cloneOfMaster.atoms())
                         {
-                            localScore++;
+                            if (!atmsToKeep.contains(atm))
+                            {
+                                atmsToRemove.add(atm);
+                            }
+                        }
+                        cloneOfMaster.removeAtoms(atmsToRemove);
+                        if (cloneOfMaster.getAttachmentPoints().size()>0)
+                            locfragments.add(cloneOfMaster);
+                    }
+                
+                    int localScore = 0;
+                    for (Vertex frag : locfragments)
+                    {
+                        if (!(frag instanceof Fragment))
+                        {
+                            continue;
+                        }
+                        for (Vertex templateVertex : templateGraph.getVertexList())
+                        {
+                            if (((Fragment) frag).isIsomorphicTo(templateVertex))
+                            {
+                                localScore++;
+                            }
                         }
                     }
-                }
 
-                if (localScore > maxNumIsomorfFrgsFromThisTmpl)
-                {
-                    maxNumIsomorfFrgsFromThisTmpl = localScore;
-                    fragsFromThisTemplate = locfragments;
-                    if (maxNumIsomorfFrgsFromThisTmpl == 
-                        maxTheoreticalScorePerMapping*atomMappings.size())
+                    if (localScore > maxNumIsomorfFrgsFromThisTmpl)
                     {
-                        break;
+                        maxNumIsomorfFrgsFromThisTmpl = localScore;
+                        fragsFromThisTemplate = locfragments;
+                        if (maxNumIsomorfFrgsFromThisTmpl == 
+                            maxTheoreticalScorePerMapping*atomMappings.size())
+                        {
+                            break;
+                        }
                     }
                 }
             }

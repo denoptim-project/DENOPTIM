@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -469,9 +470,12 @@ public class MoleculeUtilsTest
         IAtomContainer substructure = builder.newAtomContainer();
         IAtom c1 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
         IAtom c2 = new Atom("C", new Point3d(1.5, 0.0, 0.0));
+        IAtom ct = new Atom("C", new Point3d(3.0, 1.0, 0.0));
         substructure.addAtom(c1);
         substructure.addAtom(c2);
+        substructure.addAtom(ct); ;
         substructure.addBond(new Bond(c1, c2));
+        substructure.addBond(new Bond(c2, ct));
         
         // Create a molecule with multiple C-C bonds: C-C-C-C
         // Arrange atoms to have different angles so we can test angle-based selection
@@ -479,7 +483,7 @@ public class MoleculeUtilsTest
         IAtom c3 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
         IAtom c4 = new Atom("C", new Point3d(1.5, 0.0, 0.0));
         IAtom c5 = new Atom("C", new Point3d(3.0, 0.0, 0.0));
-        IAtom c6 = new Atom("C", new Point3d(4.5, 0.0, 0.0));
+        IAtom c6 = new Atom("C", new Point3d(4.5, 1.0, 0.0));
         mol.addAtom(c3);
         mol.addAtom(c4);
         mol.addAtom(c5);
@@ -492,15 +496,25 @@ public class MoleculeUtilsTest
         Map<IAtom, IAtom> mapping = MoleculeUtils.findBestAtomMapping(substructure, mol, logger);
         
         assertNotNull(mapping, "Mapping should not be null");
-        assertEquals(2, mapping.size(), "Mapping should contain 2 atoms");
+        assertEquals(3, mapping.size(), "Mapping should contain 2 atoms");
         assertTrue(mapping.containsKey(c1), "Mapping should contain first carbon");
         assertTrue(mapping.containsKey(c2), "Mapping should contain second carbon");
         
         // Verify the mapped atoms are bonded
         IAtom mappedC1 = mapping.get(c1);
         IAtom mappedC2 = mapping.get(c2);
-        IBond bond = mol.getBond(mappedC1, mappedC2);
-        assertNotNull(bond, "Mapped atoms should be bonded");
+        IAtom mappedCt = mapping.get(ct);
+        IBond bond1 = mol.getBond(mappedC1, mappedC2);
+        IBond bond2 = mol.getBond(mappedC2, mappedCt);
+        assertNotNull(bond1, "Mapped atoms should be bonded");
+        assertNotNull(bond2, "Mapped atoms should be bonded");
+
+        // Verify the angled triplet was selected
+        double[] mappedA = {mappedC1.getPoint3d().x, mappedC1.getPoint3d().y, mappedC1.getPoint3d().z};
+        double[] mappedB = {mappedC2.getPoint3d().x, mappedC2.getPoint3d().y, mappedC2.getPoint3d().z};
+        double[] mappedC = {mappedCt.getPoint3d().x, mappedCt.getPoint3d().y, mappedCt.getPoint3d().z};
+        double angle = MathUtils.getAngle(mappedA, mappedB, mappedC);
+        assertTrue(angle < 170.0, "Angle should not be planar");
     }
     
 //------------------------------------------------------------------------------
@@ -536,14 +550,26 @@ public class MoleculeUtilsTest
         mol.addBond(new Bond(c4, c5));
         mol.addBond(new Bond(c5, c6));
         
-        // Find all unique atom mappings
-        List<Map<IAtom, IAtom>> mappings = MoleculeUtils.findUniqueAtomMappings(
+        // Find all unique atom mappings. Overall mappings nest the individual
+        // placements; flatten them so the checks below still see each placement.
+        List<List<Map<IAtom, IAtom>>> overallMappings = MoleculeUtils.findUniqueAtomMappings(
                 substructure, mol, logger);
+        List<Map<IAtom, IAtom>> mappings = new ArrayList<>();
+        for (List<Map<IAtom, IAtom>> overallMapping : overallMappings)
+        {
+            for (Map<IAtom, IAtom> mapping : overallMapping)
+            {
+                if (!mappings.contains(mapping))
+                {
+                    mappings.add(mapping);
+                }
+            }
+        }
         
-        // Should find multiple mappings (at least 3, one for each C-C bond)
+        // Should find 2 mappings 
         assertNotNull(mappings, "Mappings list should not be null");
-        assertTrue(mappings.size() > 1, 
-                "Should find more than one mapping when substructure appears multiple times. " +
+        assertTrue(mappings.size() == 2, 
+                "Should find exactly 2 non-overlappingmappings. " +
                 "Found: " + mappings.size());
         
         // Verify each mapping contains 2 atoms (the C-C pair)
@@ -654,6 +680,372 @@ public class MoleculeUtilsTest
         List<IAtom> path4 = MoleculeUtils.findShortestPath(mol, c1, c5, atomToVertexId2);
         assertNotNull(path4, "Path should not be null");
         assertEquals(5, path4.size(), "Path should contain 5 atoms even with different vertex IDs");
+    }
+    
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testOverallMappingCombinesDisjointMatchesAndSplitsOverlaps()
+    {
+        // ABC, ADE and ADG all share atoms. MNO and XYZ do not overlap anything.
+        IAtom[] t = targetAtoms(12);
+        IAtom a = t[0];
+        IAtom b = t[1];
+        IAtom c = t[2];
+        IAtom d = t[3];
+        IAtom e = t[4];
+        IAtom g = t[5];
+        IAtom m = t[6];
+        IAtom n = t[7];
+        IAtom o = t[8];
+        IAtom x = t[9];
+        IAtom y = t[10];
+        IAtom z = t[11];
+
+        List<Map<IAtom,IAtom>> placements = new ArrayList<>();
+        placements.add(placement(a, b, c));
+        placements.add(placement(a, d, e));
+        placements.add(placement(a, d, g));
+        placements.add(placement(m, n, o));
+        placements.add(placement(x, y, z));
+
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.buildOverallAtomMappings(placements);
+
+        Set<Set<Set<Integer>>> expected = new HashSet<>();
+        expected.add(packOf(new int[] {0, 1, 2}, new int[] {6, 7, 8}, new int[] {9, 10, 11}));
+        expected.add(packOf(new int[] {0, 3, 4}, new int[] {6, 7, 8}, new int[] {9, 10, 11}));
+        expected.add(packOf(new int[] {0, 3, 5}, new int[] {6, 7, 8}, new int[] {9, 10, 11}));
+        assertEquals(expected, imagesOfPacks(overall));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testOverallMappingKeepsBothEndsOfAnOverlapChain()
+    {
+        // AB overlaps BC and BC overlaps CD. AB and CD are disjoint, so the
+        // only maximum overall mapping is AB with CD.
+        IAtom[] t = targetAtoms(4);
+        IAtom a = t[0];
+        IAtom b = t[1];
+        IAtom c = t[2];
+        IAtom d = t[3];
+
+        List<Map<IAtom,IAtom>> placements = new ArrayList<>();
+        placements.add(placement(a, b));
+        placements.add(placement(b, c));
+        placements.add(placement(c, d));
+
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.buildOverallAtomMappings(placements);
+
+        Set<Set<Set<Integer>>> expected = new HashSet<>();
+        expected.add(packOf(new int[] {0, 1}, new int[] {2, 3}));
+        assertEquals(expected, imagesOfPacks(overall));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testOverallMappingOfAnOverlapCycle()
+    {
+        // Four pairwise overlaps around a cycle. The two maximum overall
+        // mappings are the pairs of opposite placements.
+        IAtom[] t = targetAtoms(4);
+        IAtom a = t[0];
+        IAtom b = t[1];
+        IAtom c = t[2];
+        IAtom d = t[3];
+
+        List<Map<IAtom,IAtom>> placements = new ArrayList<>();
+        placements.add(placement(a, b));
+        placements.add(placement(b, c));
+        placements.add(placement(c, d));
+        placements.add(placement(d, a));
+
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.buildOverallAtomMappings(placements);
+
+        Set<Set<Set<Integer>>> expected = new HashSet<>();
+        expected.add(packOf(new int[] {0, 1}, new int[] {2, 3}));
+        expected.add(packOf(new int[] {1, 2}, new int[] {0, 3}));
+        assertEquals(expected, imagesOfPacks(overall));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testOverallMappingIsProductOfIndependentOverlaps()
+    {
+        // {AB, AC} overlap each other, and {XY, XZ} overlap each other.
+        // Nothing overlaps across the two groups.
+        IAtom[] t = targetAtoms(6);
+        IAtom a = t[0];
+        IAtom b = t[1];
+        IAtom c = t[2];
+        IAtom x = t[3];
+        IAtom y = t[4];
+        IAtom z = t[5];
+
+        List<Map<IAtom,IAtom>> placements = new ArrayList<>();
+        placements.add(placement(a, b));
+        placements.add(placement(a, c));
+        placements.add(placement(x, y));
+        placements.add(placement(x, z));
+
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.buildOverallAtomMappings(placements);
+
+        Set<Set<Set<Integer>>> expected = new HashSet<>();
+        expected.add(packOf(new int[] {0, 1}, new int[] {3, 4}));
+        expected.add(packOf(new int[] {0, 1}, new int[] {3, 5}));
+        expected.add(packOf(new int[] {0, 2}, new int[] {3, 4}));
+        expected.add(packOf(new int[] {0, 2}, new int[] {3, 5}));
+        assertEquals(expected, imagesOfPacks(overall));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testOverallMappingOfDisjointPlacementsIsASinglePack()
+    {
+        IAtom[] t = targetAtoms(6);
+        List<Map<IAtom,IAtom>> placements = new ArrayList<>();
+        placements.add(placement(t[0], t[1]));
+        placements.add(placement(t[2], t[3]));
+        placements.add(placement(t[4], t[5]));
+
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.buildOverallAtomMappings(placements);
+
+        assertEquals(1, overall.size());
+        assertEquals(3, overall.get(0).size());
+        Set<Set<Set<Integer>>> expected = new HashSet<>();
+        expected.add(packOf(new int[] {0, 1}, new int[] {2, 3}, new int[] {4, 5}));
+        assertEquals(expected, imagesOfPacks(overall));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testOverallMappingOfNoPlacementsIsEmpty()
+    {
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.buildOverallAtomMappings(
+                new ArrayList<>());
+        assertTrue(overall.isEmpty());
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFindUniqueAtomMappingsPacksChainMatches() throws Exception
+    {
+        Logger logger = Logger.getLogger("TestLogger");
+        IAtomContainer substructure = bondedPair("C", "C");
+
+        // C-C-C-C has three C-C placements. The two terminal bonds do not
+        // share an atom; the middle bond overlaps both and is left out.
+        IAtomContainer mol = builder.newAtomContainer();
+        IAtom c0 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
+        IAtom c1 = new Atom("C", new Point3d(1.5, 0.0, 0.0));
+        IAtom c2 = new Atom("C", new Point3d(3.0, 0.0, 0.0));
+        IAtom c3 = new Atom("C", new Point3d(4.5, 0.0, 0.0));
+        mol.addAtom(c0);
+        mol.addAtom(c1);
+        mol.addAtom(c2);
+        mol.addAtom(c3);
+        mol.addBond(new Bond(c0, c1));
+        mol.addBond(new Bond(c1, c2));
+        mol.addBond(new Bond(c2, c3));
+
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.findUniqueAtomMappings(
+                substructure, mol, logger);
+
+        Set<Set<Set<Integer>>> expected = new HashSet<>();
+        expected.add(packOf(new int[] {0, 1}, new int[] {2, 3}));
+        assertEquals(expected, imagesOfPacks(overall));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFindUniqueAtomMappingsPacksSeparateCopiesAndLocalAlternatives()
+            throws Exception
+    {
+        Logger logger = Logger.getLogger("TestLogger");
+        IAtomContainer substructure = bondedPair("C", "O");
+
+        // One carbon bonded to three oxygens gives three overlapping C-O
+        // placements. Two further C-O pairs share no atom with those or
+        // with each other, so each overall mapping keeps both of them.
+        IAtomContainer mol = builder.newAtomContainer();
+        IAtom c0 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
+        IAtom o1 = new Atom("O", new Point3d(1.5, 0.0, 0.0));
+        IAtom o2 = new Atom("O", new Point3d(-0.75, 1.3, 0.0));
+        IAtom o3 = new Atom("O", new Point3d(-0.75, -1.3, 0.0));
+        IAtom c4 = new Atom("C", new Point3d(10.0, 0.0, 0.0));
+        IAtom o5 = new Atom("O", new Point3d(11.5, 0.0, 0.0));
+        IAtom c6 = new Atom("C", new Point3d(20.0, 0.0, 0.0));
+        IAtom o7 = new Atom("O", new Point3d(21.5, 0.0, 0.0));
+        mol.addAtom(c0);
+        mol.addAtom(o1);
+        mol.addAtom(o2);
+        mol.addAtom(o3);
+        mol.addAtom(c4);
+        mol.addAtom(o5);
+        mol.addAtom(c6);
+        mol.addAtom(o7);
+        mol.addBond(new Bond(c0, o1));
+        mol.addBond(new Bond(c0, o2));
+        mol.addBond(new Bond(c0, o3));
+        mol.addBond(new Bond(c4, o5));
+        mol.addBond(new Bond(c6, o7));
+
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.findUniqueAtomMappings(
+                substructure, mol, logger);
+
+        Set<Set<Set<Integer>>> expected = new HashSet<>();
+        expected.add(packOf(new int[] {0, 1}, new int[] {4, 5}, new int[] {6, 7}));
+        expected.add(packOf(new int[] {0, 2}, new int[] {4, 5}, new int[] {6, 7}));
+        expected.add(packOf(new int[] {0, 3}, new int[] {4, 5}, new int[] {6, 7}));
+        assertEquals(expected, imagesOfPacks(overall));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFindUniqueAtomMappingsPacksRingBonds() throws Exception
+    {
+        Logger logger = Logger.getLogger("TestLogger");
+        IAtomContainer substructure = bondedPair("C", "C");
+
+        IAtomContainer mol = builder.newAtomContainer();
+        IAtom c0 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
+        IAtom c1 = new Atom("C", new Point3d(1.5, 0.0, 0.0));
+        IAtom c2 = new Atom("C", new Point3d(1.5, 1.5, 0.0));
+        IAtom c3 = new Atom("C", new Point3d(0.0, 1.5, 0.0));
+        mol.addAtom(c0);
+        mol.addAtom(c1);
+        mol.addAtom(c2);
+        mol.addAtom(c3);
+        mol.addBond(new Bond(c0, c1));
+        mol.addBond(new Bond(c1, c2));
+        mol.addBond(new Bond(c2, c3));
+        mol.addBond(new Bond(c3, c0));
+
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.findUniqueAtomMappings(
+                substructure, mol, logger);
+
+        Set<Set<Set<Integer>>> expected = new HashSet<>();
+        expected.add(packOf(new int[] {0, 1}, new int[] {2, 3}));
+        expected.add(packOf(new int[] {1, 2}, new int[] {0, 3}));
+        assertEquals(expected, imagesOfPacks(overall));
+    }
+
+//------------------------------------------------------------------------------
+
+    @Test
+    public void testFindUniqueAtomMappingsReturnsEmptyWhenSubstructureIsAbsent()
+            throws Exception
+    {
+        Logger logger = Logger.getLogger("TestLogger");
+        IAtomContainer substructure = bondedPair("N", "N");
+        IAtomContainer mol = builder.newAtomContainer();
+        IAtom c0 = new Atom("C", new Point3d(0.0, 0.0, 0.0));
+        IAtom c1 = new Atom("C", new Point3d(1.5, 0.0, 0.0));
+        mol.addAtom(c0);
+        mol.addAtom(c1);
+        mol.addBond(new Bond(c0, c1));
+
+        List<List<Map<IAtom,IAtom>>> overall = MoleculeUtils.findUniqueAtomMappings(
+                substructure, mol, logger);
+        assertTrue(overall.isEmpty());
+    }
+
+//------------------------------------------------------------------------------
+
+    private IAtom[] targetAtoms(int count)
+    {
+        IAtomContainer mol = builder.newAtomContainer();
+        for (int i = 0; i < count; i++)
+        {
+            mol.addAtom(new Atom("C", new Point3d(i, 0.0, 0.0)));
+        }
+        IAtom[] atoms = new IAtom[count];
+        for (int i = 0; i < count; i++)
+        {
+            atoms[i] = mol.getAtom(i);
+        }
+        return atoms;
+    }
+
+//------------------------------------------------------------------------------
+
+    private Map<IAtom,IAtom> placement(IAtom... targets)
+    {
+        Map<IAtom,IAtom> mapping = new HashMap<>();
+        for (IAtom target : targets)
+        {
+            mapping.put(new Atom("C"), target);
+        }
+        return mapping;
+    }
+
+//------------------------------------------------------------------------------
+
+    private IAtomContainer bondedPair(String symbolA, String symbolB)
+    {
+        IAtomContainer pair = builder.newAtomContainer();
+        IAtom a = new Atom(symbolA, new Point3d(0.0, 0.0, 0.0));
+        IAtom b = new Atom(symbolB, new Point3d(1.5, 0.0, 0.0));
+        pair.addAtom(a);
+        pair.addAtom(b);
+        pair.addBond(new Bond(a, b));
+        return pair;
+    }
+
+//------------------------------------------------------------------------------
+
+    private Set<Set<Set<Integer>>> imagesOfPacks(List<List<Map<IAtom,IAtom>>> packs)
+    {
+        Set<Set<Set<Integer>>> result = new HashSet<>();
+        for (List<Map<IAtom,IAtom>> pack : packs)
+        {
+            Set<Set<Integer>> images = new HashSet<>();
+            Set<Integer> covered = new HashSet<>();
+            int atomCount = 0;
+            for (Map<IAtom,IAtom> mapping : pack)
+            {
+                Set<Integer> image = new HashSet<>();
+                for (IAtom atom : mapping.values())
+                {
+                    image.add(atom.getIndex());
+                }
+                images.add(image);
+                atomCount += image.size();
+                covered.addAll(image);
+            }
+            assertEquals(pack.size(), images.size(),
+                    "An overall mapping must not repeat a placement");
+            assertEquals(atomCount, covered.size(),
+                    "Placements in one overall mapping must not share a target atom");
+            result.add(images);
+        }
+        assertEquals(packs.size(), result.size(), "Overall mappings must be unique");
+        return result;
+    }
+
+//------------------------------------------------------------------------------
+
+    private Set<Set<Integer>> packOf(int[]... groups)
+    {
+        Set<Set<Integer>> pack = new HashSet<>();
+        for (int[] group : groups)
+        {
+            Set<Integer> image = new HashSet<>();
+            for (int index : group)
+            {
+                image.add(index);
+            }
+            pack.add(image);
+        }
+        return pack;
     }
     
 //------------------------------------------------------------------------------
