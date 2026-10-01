@@ -105,6 +105,11 @@ public class MoleculeUtils
     private static final  IChemObjectBuilder builder = 
             SilentChemObjectBuilder.getInstance();
 
+    /**
+     * Property used to record {@link BBType} during fragmentation by template graphs.
+     */
+    public static final String ATMPROPBBTYPE = "DENOPTIM_BBT";
+
 //------------------------------------------------------------------------------
 
     public static double getMolecularWeight(IAtomContainer mol) 
@@ -971,6 +976,8 @@ public class MoleculeUtils
             nAtm.setMaxBondOrder(oAtm.getMaxBondOrder());
         if (oAtm.getNaturalAbundance() != null)
             nAtm.setNaturalAbundance(oAtm.getNaturalAbundance());
+        if (oAtm.getProperty(ATMPROPBBTYPE) != null)
+            nAtm.setProperty(ATMPROPBBTYPE, oAtm.getProperty(ATMPROPBBTYPE));
         
         return nAtm;
     }

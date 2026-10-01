@@ -14,7 +14,6 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 
 import denoptim.constants.DENOPTIMConstants;
-import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.MoleculeUtils;
 
 public class TopoTemplateProducer 

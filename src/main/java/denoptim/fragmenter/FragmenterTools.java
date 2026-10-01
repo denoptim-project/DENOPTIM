@@ -44,6 +44,7 @@ import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
 import denoptim.graph.Fragment;
+import denoptim.graph.Ring;
 import denoptim.graph.Template;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
@@ -65,7 +66,7 @@ import denoptim.utils.Randomizer;
 
 public class FragmenterTools
 {
-    
+
 //------------------------------------------------------------------------------
     
     /**
@@ -373,10 +374,12 @@ public class FragmenterTools
         List<Vertex> fragments = new ArrayList<Vertex>();
         if (settings.getFragmentationTmpls().size()>0)
         {
+            // Fragmentation by template graphs
             fragments = fragmentation(mol, settings.getFragmentationTmpls(), 
                 settings.getMaxBufferShellSize(),
                 settings.getRandomizer(), settings.getLogger());
         } else {
+            // Fragmentation by cutting rules
             fragments = fragmentation(mol, settings.getCuttingRules(), 
                 settings.getLogger());
         }
@@ -658,6 +661,19 @@ public class FragmenterTools
                             }
                         }
                         cloneOfMaster.removeAtoms(atmsToRemove);
+
+                        // Inherit buildong block type from info stored in atoms, if any
+                        cloneOfMaster.setBuildingBlockType(BBType.UNDEFINED);
+                        for (IAtom atm : cloneOfMaster.atoms())
+                        {
+                            Object bbt = atm.getProperty(MoleculeUtils.ATMPROPBBTYPE);
+                            if (bbt != null && bbt instanceof BBType)
+                            {
+                                cloneOfMaster.setBuildingBlockType((BBType) bbt);
+                                break;
+                            }
+                        }
+
                         if (cloneOfMaster.getAttachmentPoints().size()>0)
                             locfragments.add(cloneOfMaster);
                     }
@@ -703,29 +719,43 @@ public class FragmenterTools
 //------------------------------------------------------------------------------
 
     /**
-     * Recursive function to process edges at any level of embedding to 
+     * Recursive function to process edges to 
      * remove the corresponding bonds and create the corresponding attachment points.
      * 
      * TODO: 
      * 1) deal with RCVs in the graph.
      * 2) deal with multihapticity.
+     * 3) Template embedding
      */
     private static void exploreDGraphForMappings(DGraph graph, IAtomContainer graphIAC, 
         Fragment masterFrag, IAtomContainer masterFragIAC, IAtomContainer mol,
         Map<IAtom,IAtom> graphToMolMapping) 
         throws DENOPTIMException
     {
+        // ID used to rebuild the edges following the graph used to identify bonds to cut.
         int cutId = -1;
+        List<Vertex> usedRCVs = graph.getUsedRCVertices();
         for (Edge edge : graph.getEdgeList())
         {
             cutId++;
-            int srcAPIdx = edge.getSrcAP().getAtomPositionNumberInMol();
-            int trgAPIdx = edge.getTrgAP().getAtomPositionNumberInMol();
-            IAtom graphAtmSrc = graphIAC.getAtom(srcAPIdx);
-            IAtom graphAtmTrg = graphIAC.getAtom(trgAPIdx);
+            int srcAtmIdx = getAtomIdxforAP(edge.getSrcAP(), graph, usedRCVs);
+            int trgAtmIdx = getAtomIdxforAP(edge.getTrgAP(), graph, usedRCVs);
+            IAtom graphAtmSrc = graphIAC.getAtom(srcAtmIdx);
+            IAtom graphAtmTrg = graphIAC.getAtom(trgAtmIdx);
+
+            if (!graphToMolMapping.containsKey(graphAtmSrc) || !graphToMolMapping.containsKey(graphAtmTrg))
+            {
+                break;
+            }
 
             IAtom masterFragAtmSrc = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
             IAtom masterFragAtmTrg = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmTrg)));
+
+            // Flag the atoms to trace building block type
+            masterFragAtmSrc.setProperty(MoleculeUtils.ATMPROPBBTYPE,
+                edge.getSrcAP().getOwner().getBuildingBlockType());
+            masterFragAtmTrg.setProperty(MoleculeUtils.ATMPROPBBTYPE,
+                edge.getTrgAP().getOwner().getBuildingBlockType());
             
             IBond bnd = masterFragIAC.getBond(masterFragAtmSrc, masterFragAtmTrg);
             if (bnd != null)
@@ -747,9 +777,12 @@ public class FragmenterTools
         {
             if (v instanceof Template)
             {
+                //TODO: only when identification of topo-determining atoms will consider graph nesting too
+                /* 
                 DGraph innerGraph = ((Template) v).getInnerGraph();
                 exploreDGraphForMappings(innerGraph, graphIAC, masterFrag, masterFragIAC, mol, graphToMolMapping);
                 continue;
+                */
             }
 
             // Deal with vertexes without edges, i.e., free APs
@@ -770,6 +803,31 @@ public class FragmenterTools
                 masterFrag.addAPOnAtom(masterFragAtmSrc, ap.getAPClass(), apHead);
             }
         }
+    }
+
+//------------------------------------------------------------------------------
+
+    private static int getAtomIdxforAP(AttachmentPoint ap, DGraph templateGraph, List<Vertex> usedRCVs)
+    {
+        int apIdx = ap.getAtomPositionNumberInMol();
+        Vertex apOwnerVrt = ap.getOwner();
+        if (apOwnerVrt.isRCV() && usedRCVs.contains(apOwnerVrt))
+        {
+            List<Ring> rings = templateGraph.getRingsInvolvingVertex(apOwnerVrt);
+            if (rings.size() > 1)
+            {
+                throw new IllegalStateException("The RCV " + apOwnerVrt.getVertexId()
+                    + " is used in multiple rings.");
+            }
+            Ring ring = rings.get(0);
+            if (apOwnerVrt == ring.getHeadVertex())
+            {
+                apIdx = ring.getTailVertex().getAttachmentPoints().get(0).getLinkedAP().getAtomPositionNumberInMol();
+            } else {
+                apIdx =ring.getHeadVertex().getAttachmentPoints().get(0).getLinkedAP().getAtomPositionNumberInMol();
+            }
+        }
+        return apIdx;
     }
 
 //------------------------------------------------------------------------------

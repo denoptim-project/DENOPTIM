@@ -1209,8 +1209,14 @@ public class EAUtils
         ContractLevel ringTmplContract = frgParams.getEmbeddedRingsContract();
         ScaffoldingPolicy scaffoldingPolicy = frgParams.getScaffoldingPolicy();
         
-        // We expect only Fragments here.
+        boolean fragmentationByTemplateGraph = frgParams.getFragmentationTmpls().size()>0;
+
+        // Fragmentation also records properties in the APs and Atoms as to
+        // allow reconstruction of the appropriate edges and assignation of
+        // building block types.
         List<Vertex> fragments = FragmenterTools.fragmentation(mol, frgParams);
+
+        // TODO-gg: drop assumption that only Fragments can be received from fragmentation
 
         for (Vertex v : fragments)
         {
@@ -1233,72 +1239,86 @@ public class EAUtils
         }
         
         // Define which fragment is the scaffold
-        Vertex scaffold = null;
-        switch (scaffoldingPolicy)
+        Vertex firstVertex = null;
+        if (fragmentationByTemplateGraph)
         {
-            case ELEMENT:
+            for (Vertex v : fragments)
             {
-                for (Vertex v : fragments)
+                if (v.getBuildingBlockType() == BBType.SCAFFOLD)
                 {
-                    if (v instanceof Fragment)
+                    firstVertex = v;
+                    break;
+                }
+            }
+        } else {
+            switch (scaffoldingPolicy)
+            {
+                case ELEMENT:
+                {
+                    for (Vertex v : fragments)
                     {
-                        boolean setAsScaffold = false;
-                        IAtomContainer iac = v.getIAtomContainer();
-                        for (IAtom atm : iac.atoms())
+                        if (v instanceof Fragment)
                         {
-                            if (scaffoldingPolicy.label.equals(
-                                    MoleculeUtils.getSymbolOrLabel(atm)))
+                            boolean setAsScaffold = false;
+                            IAtomContainer iac = v.getIAtomContainer();
+                            for (IAtom atm : iac.atoms())
                             {
-                                setAsScaffold = true;
+                                if (scaffoldingPolicy.label.equals(
+                                        MoleculeUtils.getSymbolOrLabel(atm)))
+                                {
+                                    setAsScaffold = true;
+                                    break;
+                                }
+                            }
+                            if (setAsScaffold)
+                            {
+                                firstVertex = v;
                                 break;
                             }
                         }
-                        if (setAsScaffold)
-                        {
-                            scaffold = v;
-                            break;
-                        }
                     }
+                    break;
                 }
-                break;
-            }
 
-            default:
-            case LARGEST_FRAGMENT:
-            {
-                try {
-                    scaffold = fragments.stream()
-                            .max(Comparator.comparing(
-                                    Vertex::getHeavyAtomsCount))
-                            .get();
-                } catch (Exception e)
+                default:
+                case LARGEST_FRAGMENT:
                 {
-                    if (monitor!=null)
+                    try {
+                        firstVertex = fragments.stream()
+                                .max(Comparator.comparing(
+                                        Vertex::getHeavyAtomsCount))
+                                .get();
+                    } catch (Exception e)
                     {
-                        monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
+                        if (monitor!=null)
+                        {
+                            monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
+                        }
+                        throw new DENOPTIMException("Cannot get largest fragment "
+                                + "among " + fragments.size() + " fragments.", e);
                     }
-                    throw new DENOPTIMException("Cannot get largest fragment "
-                            + "among " + fragments.size() + " fragments.", e);
+                    break;
                 }
-                break;
             }
         }
-        if (scaffold==null)
+        if (firstVertex==null)
         {
             if (monitor!=null)
             {
                 monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
             }
+            //TODO-gg: make optional! In worst case use first vertes in list
             throw new DENOPTIMException("No fragment matches criteria to be "
                     + "identified as the " 
                     + BBType.SCAFFOLD.toString().toLowerCase() + ".");
+        } else {
+            firstVertex.setVertexId(0);
+            firstVertex.setBuildingBlockType(BBType.SCAFFOLD);
         }
-        scaffold.setVertexId(0);
-        scaffold.setBuildingBlockType(BBType.SCAFFOLD);
-        
+
         // Build the graph
         DGraph graph = new DGraph();
-        graph.addVertex(scaffold);
+        graph.addVertex(firstVertex);
         AtomicInteger vId = new AtomicInteger(1);
         for (int i=1; i<fragments.size(); i++)
         {
@@ -1336,7 +1356,7 @@ public class EAUtils
             }
         }
 
-        if (embedRingsInTemplates)
+        if (embedRingsInTemplates && !fragmentationByTemplateGraph)
         {
             try {
                 graph = graph.embedPatternsInTemplates(GraphPattern.RING, 
