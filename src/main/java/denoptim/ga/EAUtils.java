@@ -48,6 +48,7 @@ import java.util.stream.IntStream;
 
 import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
+import denoptim.files.FileFormat;
 import denoptim.fitness.FitnessParameters;
 import denoptim.fragmenter.BridgeHeadFindingRule;
 import denoptim.fragmenter.FragmenterTools;
@@ -87,6 +88,7 @@ import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MoleculeUtils;
+import denoptim.utils.ObjectPair;
 import denoptim.utils.Randomizer;
 import denoptim.utils.RotationalSpaceUtils;
 import denoptim.utils.SizeControlledSet;
@@ -1214,9 +1216,9 @@ public class EAUtils
         // Fragmentation also records properties in the APs and Atoms as to
         // allow reconstruction of the appropriate edges and assignation of
         // building block types.
+        // NB: only Fragments are produced by this fragmentation. Any
+        // ambedding into Templates must be done later.
         List<Vertex> fragments = FragmenterTools.fragmentation(mol, frgParams);
-
-        // TODO-gg: drop assumption that only Fragments can be received from fragmentation
 
         for (Vertex v : fragments)
         {
@@ -1237,6 +1239,27 @@ public class EAUtils
             throw new DENOPTIMException("Fragmentation of molecule with "
                     + mol.getAtomCount() + " atoms produced 0 fragments.");
         }
+
+        //TODO-gg a possibility is to do the embedding of the vertexes here, 
+        // but we have to project cutId outside the templates
+        if (fragmentationByTemplateGraph) 
+        {
+            //TODO-gg
+            for (Vertex v : fragments)
+            {
+                System.out.println("v: "+v.getVertexId());
+                for (IAtom atm : v.getIAtomContainer().atoms())
+                {
+                    if (atm.getProperty(MoleculeUtils.ATMPROPBBTYPE) != null)
+                    {
+                        List<ObjectPair> bbInfo = (List<ObjectPair>) atm.getProperty(MoleculeUtils.ATMPROPBBTYPE);
+                        System.out.println(MoleculeUtils.getAtomRef(atm, v.getIAtomContainer())+" bbInfo: " + bbInfo);
+                    }
+                }
+            }
+
+        }
+
         
         // Define which fragment is the scaffold
         Vertex firstVertex = null;
@@ -1301,6 +1324,14 @@ public class EAUtils
                 }
             }
         }
+        
+        //TODO-gg
+        try {
+            DenoptimIO.writeVertexesToFile(new File("/tmp/tmp_v.sdf"), FileFormat.VRTXSDF, fragments);
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+        }
+        
         if (firstVertex==null)
         {
             if (monitor!=null)
@@ -1322,9 +1353,17 @@ public class EAUtils
         AtomicInteger vId = new AtomicInteger(1);
         for (int i=1; i<fragments.size(); i++)
         {
+            //TODO-gg
+            try {
+                DenoptimIO.writeGraphToFile(new File("/tmp/tmp_g.sdf"), FileFormat.GRAPHSDF, graph);
+                DenoptimIO.writeVertexesToFile(new File("/tmp/tmp_v.sdf"), FileFormat.VRTXSDF, fragments);
+            } catch (DENOPTIMException e) {
+                e.printStackTrace();
+            }
+
             appendVertexesToGraphFollowingEdges(graph, vId, fragments);
         }
-        
+
         // Set symmetry relations: these depend on which scaffold we have chosen
         graph.detectSymVertexSets();
         

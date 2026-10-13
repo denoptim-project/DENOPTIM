@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.openscience.cdk.interfaces.IAtom;
@@ -34,6 +35,22 @@ public class TopoTemplateProducer
      */
     boolean produceHDepleted = false;
 
+    /**
+     * Logger.
+     */
+    private final Logger logger = Logger.getLogger(TopoTemplateProducer.class.getName());
+
+    /**
+     * Property used to trace vertex membership for atoms. Comes from the
+     * action of {@link ThreeDimTreeBuilder}.
+     */
+    private final static String ATMPROPERTYUSEDASID = DENOPTIMConstants.ATMPROPVERTEXPATH;
+
+    /**
+     * Property used to store the original index of an atom in the original {@link IAtomContainer}.
+     */
+    public final static String ATMPROPORIGINALINDEX = "DENOPTIM_ORIGINAL_ATOM_INDEX";
+
 //-----------------------------------------------------------------------------
 
     /**
@@ -51,26 +68,30 @@ public class TopoTemplateProducer
 
     private void initialize() 
     {
-        // Find all boundary atoms: atoms connected to atoms with different vertex IDs
+        // Find all boundary atoms: atoms connected to atoms with different 
+        // different vertex "paths" (IDs separated by commas, thus representing 
+        // path from outernmost vertes to innermost vertes , across template 
+        // barriers).
         Set<IAtom> boundaryAtoms = new HashSet<>();
-        Map<IAtom, Long> atomToVertexId = new HashMap<>();
-        Set<Long> visitedVertexIds = new HashSet<>();
-        Set<Long> visitedVertexIdsBoundaries = new HashSet<>();
+        Map<IAtom, String> atomToVertexId = new HashMap<>();
+        Set<String> visitedVertexIds = new HashSet<>();
+        Set<String> visitedVertexIdsBoundaries = new HashSet<>();
         Set<IAtom> atomsWithAPs = new HashSet<>();
 
         // collect vertex IDs and identify boundary atoms
         for (IAtom atom : originalIAC.atoms())
         {
-            Object vidProp = atom.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
-            if (vidProp == null)
+            Object pathProp = atom.getProperty(ATMPROPERTYUSEDASID);
+            if (pathProp == null)
             {
-                // If no vertex ID, keep all atoms (can't optimize)
+                // If no vertex ID or path, keep all atoms (can't optimize)
                 produceHDepleted = true;
-                vidProp = -1L;
+                pathProp = -1L;
             }
-            Long vid = Long.parseLong(vidProp.toString());
+            String vid = pathProp.toString();
             visitedVertexIds.add(vid);
             atomToVertexId.put(atom, vid);
+
 
             Object apsProp = atom.getProperty(DENOPTIMConstants.ATMPROPAPS);
             if (apsProp != null)
@@ -82,10 +103,10 @@ public class TopoTemplateProducer
             List<IAtom> neighbors = originalIAC.getConnectedAtomsList(atom);
             for (IAtom neighbor : neighbors)
             {
-                Object nbrVidProp = neighbor.getProperty(DENOPTIMConstants.ATMPROPVERTEXID);
-                if (nbrVidProp != null)
+                Object nbrPathProp = neighbor.getProperty(ATMPROPERTYUSEDASID);
+                if (nbrPathProp != null)
                 {
-                    Long nbrVid = Long.parseLong(nbrVidProp.toString());
+                    String nbrVid = nbrPathProp.toString();
                     if (!vid.equals(nbrVid))
                     {
                         boundaryAtoms.add(atom);
@@ -167,6 +188,18 @@ public class TopoTemplateProducer
                 }
             }
         }
+
+        // Log
+        if (logger.isLoggable(Level.FINE))
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Topologically critical atoms: " + topoCriticalAtoms.size() + "\n");
+            for (IAtom atm : topoCriticalAtoms)
+            {
+                sb.append(MoleculeUtils.getAtomRef(atm, originalIAC) + "\n");
+            }
+            logger.fine(sb.toString());
+        }
     }
 
 //-----------------------------------------------------------------------------
@@ -227,12 +260,12 @@ public class TopoTemplateProducer
             
             // Store the original atom index as a property
             int originalIndex = originalIAC.indexOf(originalAtom);
-            reducedAtom.setProperty("DENOPTIM_ORIGINAL_ATOM_INDEX", originalIndex);
+            reducedAtom.setProperty(ATMPROPORIGINALINDEX, originalIndex);
             
             // Copy all other properties
             for (Object key : originalAtom.getProperties().keySet())
             {
-                if (!key.equals("DENOPTIM_ORIGINAL_ATOM_INDEX"))
+                if (!key.equals(ATMPROPORIGINALINDEX))
                 {
                     reducedAtom.setProperty(key, originalAtom.getProperty(key));
                 }

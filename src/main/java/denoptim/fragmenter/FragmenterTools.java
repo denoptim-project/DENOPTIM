@@ -62,6 +62,7 @@ import denoptim.utils.FormulaUtils;
 import denoptim.utils.ManySMARTSQuery;
 import denoptim.utils.MathUtils;
 import denoptim.utils.MoleculeUtils;
+import denoptim.utils.ObjectPair;
 import denoptim.utils.Randomizer;
 
 public class FragmenterTools
@@ -531,9 +532,6 @@ public class FragmenterTools
             ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
             IAtomContainer templateMol = tb.convertGraphTo3DAtomContainer(templateGraph, 
                 true, true, true);
-
-            //TODO: consider splitting the template into connected components and
-            // reduce each component independently.
             
             // Optimized creation of a reduced templateMol for faster isomorphism search
             // Keep full templateMol for exploreDGraphForMappings
@@ -622,6 +620,9 @@ public class FragmenterTools
                 // Try to apply each mapping independently
                 for (List<Map<IAtom,IAtom>> atomMappings : tmplToMolMappings)
                 {
+                    //TODO-gg
+                    System.out.println("atomMappings: " + atomMappings.size());
+
                     Fragment masterFrag = new Fragment(mol, BBType.UNDEFINED);
                     IAtomContainer masterFragIAC = masterFrag.getIAtomContainer();
 
@@ -630,8 +631,9 @@ public class FragmenterTools
                     for (Map<IAtom,IAtom> atomMapping : atomMappings)
                     {
                         try {
+                            Integer nextCutId = Integer.valueOf(-1);
                             exploreDGraphForMappings(templateGraph, templateMol,
-                                masterFrag, masterFragIAC, mol, atomMapping);
+                                masterFrag, masterFragIAC, mol, atomMapping, nextCutId);
                         } catch (Throwable e) {
                             e.printStackTrace();
                             logger.log(Level.WARNING, "Error while exploring the template graph: " + e.getMessage());
@@ -723,23 +725,49 @@ public class FragmenterTools
      * remove the corresponding bonds and create the corresponding attachment points.
      * 
      * TODO: 
-     * 1) deal with RCVs in the graph.
      * 2) deal with multihapticity.
      * 3) Template embedding
      */
-    private static void exploreDGraphForMappings(DGraph graph, IAtomContainer graphIAC, 
+    private static int exploreDGraphForMappings(DGraph graph, IAtomContainer graphIAC, 
         Fragment masterFrag, IAtomContainer masterFragIAC, IAtomContainer mol,
-        Map<IAtom,IAtom> graphToMolMapping) 
+        Map<IAtom,IAtom> graphToMolMapping, int cutId) 
         throws DENOPTIMException
     {
+
+        //TODO-gg del
+        try {
+            DenoptimIO.writeMol2File("/tmp/mol.sdf", mol, false);
+            DenoptimIO.writeMol2File("/tmp/graphIAC.sdf", graphIAC, false);
+            DenoptimIO.writeMol2File("/tmp/masterFragIAC.sdf", masterFragIAC, false);
+            DenoptimIO.writeGraphToFile(new File("/tmp/g.sdf"), FileFormat.GRAPHSDF, graph);
+        } catch (DENOPTIMException e) {
+            e.printStackTrace();
+        }
+
         // ID used to rebuild the edges following the graph used to identify bonds to cut.
-        int cutId = -1;
         List<Vertex> usedRCVs = graph.getUsedRCVertices();
+        Set<Vertex> visitedRCVs = new HashSet<>();
         for (Edge edge : graph.getEdgeList())
         {
             cutId++;
-            int srcAtmIdx = getAtomIdxforAP(edge.getSrcAP(), graph, usedRCVs);
-            int trgAtmIdx = getAtomIdxforAP(edge.getTrgAP(), graph, usedRCVs);
+
+            // Since we do not add RCVs we must consider edges to used RCVs only once, or
+            // we'll be adding APs twice: once per each RCV. So, to do it only once we
+            // have to keep track of the RCVs that were already visited.
+            if (allowOnlyOneRCVPErRing(edge.getSrcAP().getOwner(), graph, usedRCVs, visitedRCVs)
+                || allowOnlyOneRCVPErRing(edge.getTrgAP().getOwner(), graph, usedRCVs, visitedRCVs))
+            {
+                continue;
+            }
+
+            ObjectPair srcPair = getAtomIdxforAP(edge.getSrcAP(), graph, usedRCVs);
+            int srcAtmIdx = (Integer) srcPair.getFirst();
+            APClass srcAPClass = (APClass) srcPair.getSecond();
+
+            ObjectPair trgPair = getAtomIdxforAP(edge.getTrgAP(), graph, usedRCVs);
+            int trgAtmIdx = (Integer) trgPair.getFirst();
+            APClass trgAPClass = (APClass) trgPair.getSecond();
+
             IAtom graphAtmSrc = graphIAC.getAtom(srcAtmIdx);
             IAtom graphAtmTrg = graphIAC.getAtom(trgAtmIdx);
 
@@ -752,10 +780,13 @@ public class FragmenterTools
             IAtom masterFragAtmTrg = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmTrg)));
 
             // Flag the atoms to trace building block type
-            masterFragAtmSrc.setProperty(MoleculeUtils.ATMPROPBBTYPE,
-                edge.getSrcAP().getOwner().getBuildingBlockType());
-            masterFragAtmTrg.setProperty(MoleculeUtils.ATMPROPBBTYPE,
-                edge.getTrgAP().getOwner().getBuildingBlockType());
+            recordBBIdAndType(masterFragAtmSrc, edge.getSrcAP());
+            recordBBIdAndType(masterFragAtmTrg, edge.getTrgAP());
+
+            //TODO-gg del
+            System.out.println("cutId: " + cutId + " " 
+                + MoleculeUtils.getAtomRef(masterFragAtmSrc, masterFragIAC) + "(" + srcAPClass + ") "
+                + MoleculeUtils.getAtomRef(masterFragAtmTrg, masterFragIAC) + "(" + trgAPClass + ") ");
             
             IBond bnd = masterFragIAC.getBond(masterFragAtmSrc, masterFragAtmTrg);
             if (bnd != null)
@@ -764,11 +795,11 @@ public class FragmenterTools
             }
 
             AttachmentPoint srcAP = masterFrag.addAPOnAtom(masterFragAtmSrc, 
-                edge.getSrcAP().getAPClass(), 
+                srcAPClass, 
                 MoleculeUtils.getPoint3d(masterFragAtmTrg));
             srcAP.setCutId(cutId);
             AttachmentPoint trgAP = masterFrag.addAPOnAtom(masterFragAtmTrg, 
-                edge.getTrgAP().getAPClass(), 
+                trgAPClass, 
                 MoleculeUtils.getPoint3d(masterFragAtmSrc));
             trgAP.setCutId(cutId);
         }
@@ -777,39 +808,95 @@ public class FragmenterTools
         {
             if (v instanceof Template)
             {
-                //TODO: only when identification of topo-determining atoms will consider graph nesting too
-                /* 
                 DGraph innerGraph = ((Template) v).getInnerGraph();
-                exploreDGraphForMappings(innerGraph, graphIAC, masterFrag, masterFragIAC, mol, graphToMolMapping);
+                cutId = exploreDGraphForMappings(innerGraph, graphIAC, masterFrag, masterFragIAC, mol,
+                     graphToMolMapping, cutId);
                 continue;
-                */
             }
 
             // Deal with vertexes without edges, i.e., free APs
             for (AttachmentPoint ap : v.getAttachmentPoints())
             {
-                if (!ap.isAvailable())
+                if (!ap.isAvailableThroughout())
                 {
                     continue;
                 }
                 IAtom graphAtmSrc = graphIAC.getAtom(ap.getAtomPositionNumberInMol());
                 IAtom masterFragAtmSrc = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
 
-                // find the position of the AP head in 3D space by aligning geoetry to template geometry
+                // find the position of the AP head in 3D space by aligning geometry to template geometry
                 Point3d apHead = findPointAlignedWithTmpl(ap, graphAtmSrc, 
                     graphIAC, masterFragIAC, mol, graphToMolMapping);
 
                 // Make the free AP on the master
                 masterFrag.addAPOnAtom(masterFragAtmSrc, ap.getAPClass(), apHead);
+
+                //TODO-gg del
+                System.out.println("freeAP: " 
+                    + MoleculeUtils.getAtomRef(masterFragAtmSrc, masterFragIAC) + "(" + ap.getAPClass().toString() + ") ");
+        
             }
+        }
+        return cutId;
+    }
+
+//------------------------------------------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    private static void recordBBIdAndType(IAtom atm, AttachmentPoint ap)
+    {
+        ObjectPair info = new ObjectPair(ap.getOwner().hashCode(), ap.getOwner().getBuildingBlockType());
+        if (atm.getProperty(MoleculeUtils.ATMPROPBBTYPE) != null)
+        {
+            List<ObjectPair> existing = (List<ObjectPair>) atm.getProperty(MoleculeUtils.ATMPROPBBTYPE);
+            if (!existing.contains(info))
+            {
+                existing.add(info);
+            }
+        } else {
+            atm.setProperty(MoleculeUtils.ATMPROPBBTYPE,
+                new ArrayList<ObjectPair>(Arrays.asList(info)));
         }
     }
 
 //------------------------------------------------------------------------------
 
-    private static int getAtomIdxforAP(AttachmentPoint ap, DGraph templateGraph, List<Vertex> usedRCVs)
+    /**
+     * @return true if the vertex is a RCV and was already used, false otherwise
+     */
+    private static boolean allowOnlyOneRCVPErRing(Vertex vrtx, DGraph graph, 
+        List<Vertex> usedRCVs, Set<Vertex> visitedRCVs)
     {
-        int apIdx = ap.getAtomPositionNumberInMol();
+        if (usedRCVs.contains(vrtx))
+        {
+            if (visitedRCVs.contains(vrtx))
+            {
+                // Skip this edge as corresponding APs were already generated
+                // by a previous Edge using the other RCV in the ring
+                return true;
+            }
+            visitedRCVs.add(vrtx);
+            Ring ring = graph.getRingsInvolvingVertex(vrtx).get(0);
+            if (ring != null)
+            {
+                if (ring.getHeadVertex() == vrtx)
+                {
+                    visitedRCVs.add(ring.getTailVertex());
+                } else {
+                    visitedRCVs.add(ring.getHeadVertex());
+                }
+            }
+        }
+        return false;
+    }
+
+//------------------------------------------------------------------------------
+
+    private static ObjectPair getAtomIdxforAP(
+        AttachmentPoint ap, DGraph templateGraph, List<Vertex> usedRCVs)
+    {
+        int atmIdx = ap.getAtomPositionNumberInMol();
+        APClass apClass = ap.getAPClass();
         Vertex apOwnerVrt = ap.getOwner();
         if (apOwnerVrt.isRCV() && usedRCVs.contains(apOwnerVrt))
         {
@@ -822,12 +909,18 @@ public class FragmenterTools
             Ring ring = rings.get(0);
             if (apOwnerVrt == ring.getHeadVertex())
             {
-                apIdx = ring.getTailVertex().getAttachmentPoints().get(0).getLinkedAP().getAtomPositionNumberInMol();
+                AttachmentPoint linkedAP = ring.getTailVertex().getAttachmentPoints().get(
+                    0).getLinkedAP();
+                atmIdx = linkedAP.getAtomPositionNumberInMol();
+                apClass = linkedAP.getAPClass();
             } else {
-                apIdx =ring.getHeadVertex().getAttachmentPoints().get(0).getLinkedAP().getAtomPositionNumberInMol();
+                AttachmentPoint linkedAP = ring.getHeadVertex().getAttachmentPoints().get(
+                    0).getLinkedAP();
+                atmIdx = linkedAP.getAtomPositionNumberInMol();
+                apClass = linkedAP.getAPClass();
             }
         }
-        return apIdx;
+        return new ObjectPair(atmIdx, apClass);
     }
 
 //------------------------------------------------------------------------------

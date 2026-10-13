@@ -1943,7 +1943,7 @@ public class MoleculeUtils
      * @return the shortest path as a list of atoms, or null if no path exists
      */
     public static List<IAtom> findShortestPath(IAtomContainer mol, IAtom start, 
-            IAtom end, Map<IAtom, Long> atomToVertexId)
+            IAtom end, Map<IAtom, ?> atomToVertexId)
     {
         if (start.equals(end))
         {
@@ -1982,13 +1982,13 @@ public class MoleculeUtils
                 if (!visited.contains(neighbor))
                 {
                     // Only traverse if same vertex ID or if we're at a boundary
-                    Long currentVid = atomToVertexId.get(current);
-                    Long neighborVid = atomToVertexId.get(neighbor);
+                    Object currentVid = atomToVertexId.get(current);
+                    Object neighborVid = atomToVertexId.get(neighbor);
                     
                     if (currentVid != null && neighborVid != null)
                     {
                         // Allow traversal if same vertex ID, or if moving to/from boundary
-                        boolean canTraverse = currentVid.equals(neighborVid);
+                        boolean canTraverse = currentVid.toString().equals(neighborVid.toString());
                         if (!canTraverse)
                         {
                             // Check if this is a boundary transition (both are boundary atoms)

@@ -5378,7 +5378,26 @@ public class DGraph implements Cloneable
         Map<DGraph,ObjectPair> subGraphsAndLinks = graph.extractPattern(
                 pattern, true);
         
-        // Replace the subgraphs with the templates
+        embedSubgraphInTemplate(subGraphsAndLinks, graph, fragSpace, contract);
+
+        return graph;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Replaces a subgraph with a {@inl Template} that embeds that subgraph.
+     * @param subGraphsAndLinks map of subgraphs to be replaced by templates, 
+     * and the edges that cross the subgraph borders.
+     * @param graph graph to replace subgraphs in.
+     * @param fragSpace fragment space to use for the replacement.
+     * @param contract contract level to use for the {@link Template}.
+     */
+    public static void embedSubgraphInTemplate(
+        Map<DGraph,ObjectPair> subGraphsAndLinks, DGraph graph, 
+        FragmentSpace fragSpace, ContractLevel contract) 
+        throws DENOPTIMException
+    {
         for (Map.Entry<DGraph,ObjectPair> entry : subGraphsAndLinks.entrySet())
         {
             // WARNING: while the subgraph is a clone of 'graph', the sets
@@ -5431,8 +5450,6 @@ public class DGraph implements Cloneable
             graph.replaceSubGraph(toReplaceByTemplate, singleVertedGraph, 
                     apMapOrigToTmpl, fragSpace);
         }
-        
-        return graph;
     }
     
 //------------------------------------------------------------------------------
