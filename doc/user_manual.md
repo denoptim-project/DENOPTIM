@@ -1,7 +1,7 @@
 
 # DENOPTIM
 _De novo_ Optimization of In/organic Molecules  
-_Version 4.6.9, September 2026_
+_Version 4.7.0, October 2026_
 
 
 [TOC]
@@ -346,7 +346,9 @@ FragSpaceExplorer can be very long, so a checkpoint file is dumped at regular ti
 
 ## Fragmenter {#Fragmenter}
 
-Fragmenter is a program that performs fragmentation of molecules and management of fragments. Fragmentation is based on the application of bond-cutting rules that identify which bonds should be broken (see [_J. Chem. Inf. Model._ **2014**, 54, 3, 767–780](https://doi.org/10.1021/ci4007497)). Each broken bond is replaced by a pair of attachment points: one attachment point on each of the atoms (or pseudoatoms) that were originally bonded. The attachment point class (APClass) on each such attachment points is defined by the string identifying the cutting rule (i.e., the rule name) and an integer that distinguish the two ends of the broken bond. For example, if the cutting rule is named `myCuttingRule`, the two APs will have APClass `myCuttingRule:0` and `myCuttingRule:1`.
+Fragmenter is a program that performs fragmentation of molecules and management of fragments. Fragmentation may be based on
+* bond-cutting rules that identify which bonds should be broken (see [_J. Chem. Inf. Model._ **2014**, 54, 3, 767–780](https://doi.org/10.1021/ci4007497)). Each broken bond is replaced by a pair of attachment points: one attachment point on each of the atoms (or pseudoatoms) that were originally bonded. The attachment point class (APClass) on each such attachment points is defined by the string identifying the cutting rule (i.e., the rule name) and an integer that distinguish the two ends of the broken bond. For example, if the cutting rule is named `myCuttingRule`, the two APs will have APClass `myCuttingRule:0` and `myCuttingRule:1`.
+* template graphs that contain a molecular (sub)structure that matches parts of the molecule to be fragmented. APs are generated for bonds that can be matched by bonds broken in the template. APClass, vertex types, and graph embedding ate inherited from the template graph.
 
 Fragmenter can also filter fragments according to criteria based on fragment's molecular formula, number of non-Hydrogen atoms, substructures (by SMARTS), and pool of attachment points. Moreover, graph-isomorphic fragments (i.e., fragments that have the same topological structure of atoms, bonds, and attachment points, but possibly different geometry) can be collected and analyzed by Fragmenter to identify clusters of geometries and extract the most representative geometry for each cluster. Both filtration and clustering are tasks that can be performed during the fragmentation of molecules or in a standalone fashion.
 
@@ -734,7 +736,7 @@ The following tables list all the keywords grouped according to the main functio
 |`M2G-InputFile`| Pathname of a SDF file containing the molecules to convert into graphs. __[REQUIRED]__|
 |`M2G-OutputGraphs`| Pathname of a file where to put the edited graphs. __[REQUIRED]__|
 |`M2G-OutpotGraphsFormat`| Format of the output. Can be SDF (default) or JSON.|
-Default settings apply to the fragmentation process and the management of fragments unless the corresponding `FRG-` and `FS-` keywords are found to specify custom settings (e.g., FRG-ScaffoldingPolicy, FRG-CuttingRulesFile).
+Default settings apply to the fragmentation process and the management of fragments unless the corresponding `FRG-` and `FS-` keywords are found to specify custom settings (e.g., FRG-ScaffoldingPolicy, FRG-CuttingRulesFile, FRG-FragmentationTemplate).
 
 
 
@@ -1022,7 +1024,7 @@ $$$$
 
 ## Graph Editing Task Files {#GraphEditingTaskFiles}
 
-Graph editing tasks are defined in JSON format. Multiple tasks can be defined using the JSON array syntax (e.g., "[{task},{another task}]"), and they will be executed sequentially according to the given order. Each task must define a `task` field that defined the type of task among the known tasks defined in the list below (e.g., `DELETEVERTEX`, `CHANGESUBGRAPH`, etc.). Additional fields are required only by some tasks (see list below) but usually involve ways to identify vertexes, edges, or attachment points involved in the graph operation. 
+Graph editing tasks are defined in JSON format. Multiple tasks can be defined using the JSON array syntax (e.g., "[{task},{another task}]"), and they will be executed sequentially according to the given order. Each task must define a `task` field that defined the type of task among the known tasks defined in the list below (e.g., `DELETEVERTEX`, `CHANGESUBGRAPH`, etc.). Additional fields are required only by some tasks (see list below) but usually involve ways to identify vertexes, edges, or attachment points involved in the graph operation.
 
 ### Graph Element Queries
 To following JSON syntax allows to define queries that identify graph elements that may be involved in various graph editing tasks. Any field in any query can be omitted to make the query less restrictive, and some fields are intentionally redundant to provide extreme versatility.
@@ -1054,7 +1056,7 @@ To following JSON syntax allows to define queries that identify graph elements t
     {
         "apID": 123,
         "apIndex": 0,
-        "apClass": 
+        "apClass":
         {
             "rule": "RuL",
             "subClass": 0
