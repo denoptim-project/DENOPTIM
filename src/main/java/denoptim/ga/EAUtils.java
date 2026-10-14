@@ -25,7 +25,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,10 +57,8 @@ import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.Candidate;
 import denoptim.graph.DGraph;
-import denoptim.graph.Edge.BondType;
 import denoptim.graph.EmptyVertex;
 import denoptim.graph.Fragment;
-import denoptim.graph.GraphPattern;
 import denoptim.graph.RelatedAPPair;
 import denoptim.graph.Ring;
 import denoptim.graph.SymmetricAPs;
@@ -83,7 +79,6 @@ import denoptim.programs.RunTimeParameters.ParametersType;
 import denoptim.programs.denovo.GAParameters;
 import denoptim.programs.fragmenter.CuttingRule;
 import denoptim.programs.fragmenter.FragmenterParameters;
-import denoptim.utils.DummyAtomHandler;
 import denoptim.utils.GeneralUtils;
 import denoptim.utils.GraphUtils;
 import denoptim.utils.ManySMARTSQuery;
@@ -967,6 +962,10 @@ public class EAUtils
         mnt.increase(CounterID.CONVERTBYFRAGATTEMPTS);
         mnt.increase(CounterID.NEWCANDIDATEATTEMPTS);
 
+        // Hand-built or late-attached fragmenter settings keep DummyLogger
+        // unless they are pointed at the GA logger here.
+        frgParams.adoptLogger(settings.getLogger());
+
         // Adjust molecular representation to our settings
         if (!FragmenterTools.prepareMolToFragmentation(mol, frgParams, index))
             return null;
@@ -974,18 +973,28 @@ public class EAUtils
         // Do actual fragmentation
         DGraph graph = null;
         try {
-            graph = makeGraphFromFragmentationOfMol(mol, 
-                    frgParams.getCuttingRules(), settings.getLogger(),
-                    frgParams.getScaffoldingPolicy(),
-                    frgParams.getLinearAngleLimit(),
-                    frgParams.embedRingsInTemplate(),
-                    frgParams.getEmbeddedRingsContract(),
-                    fragSpace, mnt);
+            graph = FragmenterTools.makeGraphFromFragmentationOfMol(mol, frgParams, fragSpace, true);
         } catch (DENOPTIMException de)
         {
+            if (de.getCause() instanceof DENOPTIMException)
+            {
+                DENOPTIMException de2 = (DENOPTIMException) de.getCause();
+                if (de2.getMessage().contains("Unable to embed patterns in templates."))
+                {
+                    mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING);
+                } else if (de2.getMessage().contains("Fragmentation of molecule with "
+                        + mol.getAtomCount() + " atoms produced 0 fragments.")) {
+                    mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
+                } else {
+                    mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
+                }
+            } else {
+                mnt.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS);
+            }
             String msg = "Unable to convert molecule (" + mol.getAtomCount() 
                 + " atoms) to DENOPTIM graph. " + de.getMessage();
             settings.getLogger().log(Level.WARNING, msg);
+            return null;
         }
         if (graph == null)
         {
@@ -1014,147 +1023,6 @@ public class EAUtils
         
         return candidate;
     }
-    
-//------------------------------------------------------------------------------  
-    
-    /**
-     * Converts a molecule into a {@link DGraph} by fragmentation and 
-     * re-assembling of the fragments.
-     * @param mol the molecule to convert
-     * @param cuttingRules the cutting rules defining how to do fragmentation.
-     * @param logger tool managing log.
-     * @param scaffoldingPolicy the policy for deciding which vertex should be 
-     * given the role of scaffold.
-     * @return the graph.
-     * @throws DENOPTIMException 
-     */
-    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
-            List<CuttingRule> cuttingRules, Logger logger, 
-            ScaffoldingPolicy scaffoldingPolicy) 
-                    throws DENOPTIMException
-    {
-        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
-                scaffoldingPolicy, 190, new FragmentSpace()); 
-        // NB: and angle of 190 means we are not adding Du on linearities
-        // because the max possible bond angle is 180.
-    }
-
-//------------------------------------------------------------------------------  
-      
-    /**
-     * Converts a molecule into a {@link DGraph} by fragmentation and 
-     * re-assembling of the fragments.
-     * @param mol the molecule to convert
-     * @param cuttingRules the cutting rules defining how to do fragmentation.
-     * @param logger tool managing log.
-     * @param scaffoldingPolicy the policy for deciding which vertex should be 
-     * given the role of scaffold.
-     * @param linearAngleLimit the max bond angle before we start considering 
-     * the angle linear and add a linearity-breaking dummy atom.
-     * @return the graph.
-     * @throws DENOPTIMException 
-     */
-    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
-            List<CuttingRule> cuttingRules, Logger logger, 
-            ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit) 
-                    throws DENOPTIMException
-    {
-        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
-                scaffoldingPolicy, linearAngleLimit, new FragmentSpace()); 
-    }
-      
-//------------------------------------------------------------------------------  
-    
-    /**
-     * Converts a molecule into a {@link DGraph} by fragmentation and 
-     * re-assembling of the fragments.
-     * @param mol the molecule to convert
-     * @param cuttingRules the cutting rules defining how to do fragmentation.
-     * @param logger tool managing log.
-     * @param scaffoldingPolicy the policy for deciding which vertex should be 
-     * given the role of scaffold.
-     * @param fragSpace the fragment space for defining things like, what
-     * capping groups we have.
-     * @return the graph.
-     * @throws DENOPTIMException 
-     */
-    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
-            List<CuttingRule> cuttingRules, Logger logger, 
-            ScaffoldingPolicy scaffoldingPolicy, FragmentSpace fragSpace) 
-                    throws DENOPTIMException
-    {
-        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
-                scaffoldingPolicy, 190, fragSpace); 
-        // NB: and angle of 190 means we are not adding Du on linearities
-        // because the max possible bond angle is 180.
-    }
-    
-//------------------------------------------------------------------------------  
-    
-    /**
-     * Converts a molecule into a {@link DGraph} by fragmentation and 
-     * re-assembling of the fragments.
-     * @param mol the molecule to convert
-     * @param cuttingRules the cutting rules defining how to do fragmentation.
-     * @param logger tool managing log.
-     * @param scaffoldingPolicy the policy for deciding which vertex should be 
-     * given the role of scaffold.
-     * @param linearAngleLimit the max bond angle before we start considering 
-     * the angle linear and add a linearity-breaking dummy atom.
-     * @param fragSpace the definition of the fragment space to consider when
-     * generating fragments.
-     * @return the graph.
-     * @throws DENOPTIMException 
-     */
-    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
-            List<CuttingRule> cuttingRules, Logger logger, 
-            ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit,
-            FragmentSpace fragSpace) 
-                    throws DENOPTIMException
-    {
-        return makeGraphFromFragmentationOfMol(mol, cuttingRules, logger, 
-                scaffoldingPolicy, linearAngleLimit, false, null, 
-                fragSpace, null); 
-    }
-    
-//------------------------------------------------------------------------------  
-    
-    /**
-     * Converts a molecule into a {@link DGraph} by fragmentation and 
-     * re-assembling of the fragments.
-     * @param mol the molecule to convert
-     * @param cuttingRules the cutting rules defining how to do fragmentation.
-     * @param logger tool managing log.
-     * @param scaffoldingPolicy the policy for deciding which vertex should be 
-     * given the role of scaffold.
-     * @param linearAngleLimit the max bond angle before we start considering 
-     * the angle linear and add a linearity-breaking dummy atom.
-     * @param embedRingsInTemplates use <code>true</code> to require embedding
-     * of rings in {@link Template}s.
-     * @param ringTmplContract specifies the type of contract to give to 
-     * templates embedding rings. Can be <code>null</code>.
-     * @param fragSpace the definition of the fragment space to consider when
-     * generating fragments.
-     * @param monitor tool to keep track of events and count failures. Can be 
-     * <code>null</code>, in which case it is ignored.
-     * @return the graph.
-     * @throws DENOPTIMException 
-     */
-    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
-            List<CuttingRule> cuttingRules, Logger logger, 
-            ScaffoldingPolicy scaffoldingPolicy, double linearAngleLimit,
-            boolean embedRingsInTemplates, ContractLevel ringTmplContract,
-            FragmentSpace fragSpace, Monitor monitor) 
-                    throws DENOPTIMException
-    {
-        FragmenterParameters frgParams = new FragmenterParameters();
-        frgParams.setCuttingRules(cuttingRules);
-        frgParams.setScaffoldingPolicy(scaffoldingPolicy);
-        frgParams.setLinearAngleLimit(linearAngleLimit);
-        frgParams.setEmbedRingsInTemplate(embedRingsInTemplates);
-        frgParams.setEmbeddedRingsContract(ringTmplContract);
-        return makeGraphFromFragmentationOfMol(mol, frgParams, fragSpace, monitor);
-    }
 
 //------------------------------------------------------------------------------  
     
@@ -1168,15 +1036,7 @@ public class EAUtils
     public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
         FragmenterParameters frgParams) throws DENOPTIMException
     {
-        FragmentSpace fragSpace = null;
-        if (frgParams.containsParameters(ParametersType.FS_PARAMS))
-        {
-            fragSpace = ((FragmentSpaceParameters) frgParams.getParameters(
-                    ParametersType.FS_PARAMS)).getFragmentSpace();
-        } else {
-            fragSpace = new FragmentSpace();
-        }
-        return makeGraphFromFragmentationOfMol(mol, frgParams, fragSpace, null);
+        return FragmenterTools.makeGraphFromFragmentationOfMol(mol, frgParams, new FragmentSpace(), true);
     }
 
 //------------------------------------------------------------------------------  
@@ -1185,301 +1045,23 @@ public class EAUtils
      * Converts a molecule into a {@link DGraph} by fragmentation and 
      * re-assembling of the fragments.
      * @param mol the molecule to convert
-     * @param cuttingRules the cutting rules defining how to do fragmentation.
-     * @param logger tool managing log.
-     * @param scaffoldingPolicy the policy for deciding which vertex should be 
-     * given the role of scaffold.
-     * @param linearAngleLimit the max bond angle before we start considering 
-     * the angle linear and add a linearity-breaking dummy atom.
-     * @param embedRingsInTemplates use <code>true</code> to require embedding
-     * of rings in {@link Template}s.
-     * @param ringTmplContract specifies the type of contract to give to 
-     * templates embedding rings. Can be <code>null</code>.
-     * @param fragSpace the definition of the fragment space to consider when
-     * generating fragments.
-     * @param monitor tool to keep track of events and count failures. Can be 
-     * <code>null</code>, in which case it is ignored.
+     * @param cleanupAPProperties if <code>true</code>, the AP properties are
+     * cleaned up after the fragmentation.
      * @return the graph.
      * @throws DENOPTIMException 
      */
     public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
-        FragmenterParameters frgParams, FragmentSpace fragSpace, Monitor monitor) 
-                throws DENOPTIMException
+        FragmenterParameters frgParams, boolean cleanupAPProperties) throws DENOPTIMException
     {
-        double linearAngleLimit = frgParams.getLinearAngleLimit();
-        boolean embedRingsInTemplates = frgParams.embedRingsInTemplate();
-        ContractLevel ringTmplContract = frgParams.getEmbeddedRingsContract();
-        ScaffoldingPolicy scaffoldingPolicy = frgParams.getScaffoldingPolicy();
-        
-        boolean fragmentationByTemplateGraph = frgParams.getFragmentationTmpls().size()>0;
-
-        // Fragmentation also records properties in the APs and Atoms as to
-        // allow reconstruction of the appropriate edges and assignation of
-        // building block types.
-        // NB: only Fragments are produced by this fragmentation. Any
-        // ambedding into Templates must be done later.
-        List<Vertex> fragments = FragmenterTools.fragmentation(mol, frgParams);
-
-        for (Vertex v : fragments)
+        FragmentSpace fragSpace = null;
+        if (frgParams.containsParameters(ParametersType.FS_PARAMS))
         {
-            Fragment frag = (Fragment) v;
-            
-            // This is done to set the symmetry relations in each vertex
-            frag.updateAPs();
-            
-            // Add linearity-breaking dummy atoms
-            DummyAtomHandler.addDummiesOnLinearities(frag, linearAngleLimit);
-        }
-        if (fragments.size()==0)
-        {
-            if (monitor!=null)
-            {
-                monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
-            }
-            throw new DENOPTIMException("Fragmentation of molecule with "
-                    + mol.getAtomCount() + " atoms produced 0 fragments.");
-        }
-
-        //TODO-gg a possibility is to do the embedding of the vertexes here, 
-        // but we have to project cutId outside the templates
-        if (fragmentationByTemplateGraph) 
-        {
-            //TODO-gg
-            for (Vertex v : fragments)
-            {
-                System.out.println("v: "+v.getVertexId());
-                for (IAtom atm : v.getIAtomContainer().atoms())
-                {
-                    if (atm.getProperty(MoleculeUtils.ATMPROPBBTYPE) != null)
-                    {
-                        List<ObjectPair> bbInfo = (List<ObjectPair>) atm.getProperty(MoleculeUtils.ATMPROPBBTYPE);
-                        System.out.println(MoleculeUtils.getAtomRef(atm, v.getIAtomContainer())+" bbInfo: " + bbInfo);
-                    }
-                }
-            }
-
-        }
-
-        
-        // Define which fragment is the scaffold
-        Vertex firstVertex = null;
-        if (fragmentationByTemplateGraph)
-        {
-            for (Vertex v : fragments)
-            {
-                if (v.getBuildingBlockType() == BBType.SCAFFOLD)
-                {
-                    firstVertex = v;
-                    break;
-                }
-            }
+            fragSpace = ((FragmentSpaceParameters) frgParams.getParameters(
+                    ParametersType.FS_PARAMS)).getFragmentSpace();
         } else {
-            switch (scaffoldingPolicy)
-            {
-                case ELEMENT:
-                {
-                    for (Vertex v : fragments)
-                    {
-                        if (v instanceof Fragment)
-                        {
-                            boolean setAsScaffold = false;
-                            IAtomContainer iac = v.getIAtomContainer();
-                            for (IAtom atm : iac.atoms())
-                            {
-                                if (scaffoldingPolicy.label.equals(
-                                        MoleculeUtils.getSymbolOrLabel(atm)))
-                                {
-                                    setAsScaffold = true;
-                                    break;
-                                }
-                            }
-                            if (setAsScaffold)
-                            {
-                                firstVertex = v;
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                }
-
-                default:
-                case LARGEST_FRAGMENT:
-                {
-                    try {
-                        firstVertex = fragments.stream()
-                                .max(Comparator.comparing(
-                                        Vertex::getHeavyAtomsCount))
-                                .get();
-                    } catch (Exception e)
-                    {
-                        if (monitor!=null)
-                        {
-                            monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
-                        }
-                        throw new DENOPTIMException("Cannot get largest fragment "
-                                + "among " + fragments.size() + " fragments.", e);
-                    }
-                    break;
-                }
-            }
+            fragSpace = new FragmentSpace();
         }
-        
-        //TODO-gg
-        try {
-            DenoptimIO.writeVertexesToFile(new File("/tmp/tmp_v.sdf"), FileFormat.VRTXSDF, fragments);
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
-        }
-        
-        if (firstVertex==null)
-        {
-            if (monitor!=null)
-            {
-                monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_FRAGMENTATION);
-            }
-            //TODO-gg: make optional! In worst case use first vertes in list
-            throw new DENOPTIMException("No fragment matches criteria to be "
-                    + "identified as the " 
-                    + BBType.SCAFFOLD.toString().toLowerCase() + ".");
-        } else {
-            firstVertex.setVertexId(0);
-            firstVertex.setBuildingBlockType(BBType.SCAFFOLD);
-        }
-
-        // Build the graph
-        DGraph graph = new DGraph();
-        graph.addVertex(firstVertex);
-        AtomicInteger vId = new AtomicInteger(1);
-        for (int i=1; i<fragments.size(); i++)
-        {
-            //TODO-gg
-            try {
-                DenoptimIO.writeGraphToFile(new File("/tmp/tmp_g.sdf"), FileFormat.GRAPHSDF, graph);
-                DenoptimIO.writeVertexesToFile(new File("/tmp/tmp_v.sdf"), FileFormat.VRTXSDF, fragments);
-            } catch (DENOPTIMException e) {
-                e.printStackTrace();
-            }
-
-            appendVertexesToGraphFollowingEdges(graph, vId, fragments);
-        }
-
-        // Set symmetry relations: these depend on which scaffold we have chosen
-        graph.detectSymVertexSets();
-        
-        // Identify capping groups, i.e., fragments that reflect the capping 
-        // groups found in the fragment space, if any.
-        if (fragSpace!=null && fragSpace.getCappingMap()!=null)
-        {
-            for (Vertex v : graph.getVertexList())
-            {
-                if (v.getAttachmentPoints().size()!=1 || v.isRCV())
-                    continue;
-                
-                APClass srcAPC = v.getAP(0).getLinkedAPThroughout().getAPClass();
-                APClass capAPC = fragSpace.getAPClassOfCappingVertex(srcAPC);
-                Vertex cap = fragSpace.getCappingVertexWithAPClass(capAPC);
-                if (cap==null)
-                    continue;
-                
-                if (!(v instanceof Fragment && cap instanceof Fragment))
-                    continue;
-                    
-                Fragment f = (Fragment) v;
-                // NB: here we ignore APClasses and Du atoms
-                if (f.isIsomorphicTo(cap, true))
-                {
-                    v.setBuildingBlockType(BBType.CAP);
-                    v.getAP(0).setAPClass(capAPC);
-                }
-            }
-        }
-
-        if (embedRingsInTemplates && !fragmentationByTemplateGraph)
-        {
-            try {
-                graph = graph.embedPatternsInTemplates(GraphPattern.RING, 
-                        fragSpace, ringTmplContract);
-            } catch (DENOPTIMException e) {
-                graph.cleanup();
-                if (monitor!=null)
-                {
-                    monitor.increase(CounterID.FAILEDCONVERTBYFRAGATTEMPTS_TMPLEMBEDDING);
-                }
-                return null;
-            }
-        }
-        
-        return graph;
-    }
-    
-//------------------------------------------------------------------------------
-    
-    private static void appendVertexesToGraphFollowingEdges(DGraph graph,
-            AtomicInteger vId, List<Vertex> vertexes) throws DENOPTIMException
-    {
-        // We seek for the last and non-RCV vertex added to the graph
-        Vertex lastlyAdded = null;
-        for (int i=-1; i>-4; i--)
-        {
-            lastlyAdded = graph.getVertexList().get(
-                    graph.getVertexList().size()+i);
-            if (!lastlyAdded.isRCV())
-                break;
-        }
-        for (AttachmentPoint apI : lastlyAdded.getAttachmentPoints())
-        {
-            if (!apI.isAvailable())
-                continue;
-            
-            for (int j=0; j<vertexes.size(); j++)
-            {
-                Vertex fragJ = vertexes.get(j);
-                
-                boolean ringClosure = false;
-                if (graph.containsVertex(fragJ))
-                {   
-                    ringClosure = true;
-                }
-                for (AttachmentPoint apJ : fragJ.getAttachmentPoints())
-                {
-                    if (apI==apJ)
-                        continue;
-
-                    if (!apI.isAvailable() || !apJ.isAvailable())
-                        continue;
-                    
-                    if (apI.getCutId()==apJ.getCutId())
-                    {
-                        if (ringClosure)
-                        {
-                            Vertex rcvI = FragmenterTools.getRCVForAP(apI,
-                                    APClass.make(APClass.ATPLUS, 0, 
-                                            BondType.ANY));
-                            rcvI.setBuildingBlockType(BBType.FRAGMENT);
-                            rcvI.setVertexId(vId.getAndIncrement());
-                            graph.appendVertexOnAP(apI, rcvI.getAP(0));
-                            
-                            Vertex rcvJ = FragmenterTools.getRCVForAP(apJ,
-                                    APClass.RCACLASSMINUS);
-                            rcvJ.setBuildingBlockType(BBType.FRAGMENT);
-                            rcvJ.setVertexId(vId.getAndIncrement());
-                            graph.appendVertexOnAP(apJ, rcvJ.getAP(0));
-                            graph.addRing(rcvI, rcvJ);
-                        } else {
-                            fragJ.setBuildingBlockType(BBType.FRAGMENT);
-                            fragJ.setVertexId(vId.getAndIncrement());
-                            graph.appendVertexOnAP(apI, apJ);
-                            
-                            // Recursion into the branch of the graph that is
-                            // rooted onto the lastly added vertex
-                            appendVertexesToGraphFollowingEdges(graph, vId, 
-                                    vertexes);
-                        }
-                    }
-                }
-            }
-        }
+        return FragmenterTools.makeGraphFromFragmentationOfMol(mol, frgParams, fragSpace, cleanupAPProperties);
     }
 
 //------------------------------------------------------------------------------  

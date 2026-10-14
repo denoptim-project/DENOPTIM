@@ -159,5 +159,19 @@ if ! checkMatchCount '^ 38 40  0  0  0  0  0  0  0' graphs-9.sdf 1 ; then exit -
 if ! checkMatchCount '"vertexType": "MolecularFragment"' graphs-9.sdf 5 ; then exit -1 ; fi
 if ! checkMatchCount 'apClass' graphs-9.sdf 8 ; then exit -1 ; fi
 
+# 10th: templae graphs contains Templates (graph nesting) and nested SCAFFOLD 
+"$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-10.params" > "t32-10.log" 2>&1
+if ! checkLog t32-10.log ; then exit -1 ; fi
+#if ! checkMatchCount '^ 38 40  0  0  0  0  0  0  0' graphs-10.sdf 1 ; then exit -1 ; fi
+#if ! checkMatchCount '"vertexType": "MolecularFragment"' graphs-10.sdf 5 ; then exit -1 ; fi
+#if ! checkMatchCount 'apClass' graphs-10.sdf 8 ; then exit -1 ; fi
+
+# 11th: templae graphs contains Templates and does nto define SCAFFOLD
+"$javaDENOPTIM" -jar "$denoptimJar" -r M2G "t32-11.params" > "t32-11.log" 2>&1
+if ! checkLog t32-11.log ; then exit -1 ; fi
+#if ! checkMatchCount '^ 38 40  0  0  0  0  0  0  0' graphs-11.sdf 1 ; then exit -1 ; fi
+#if ! checkMatchCount '"vertexType": "MolecularFragment"' graphs-11.sdf 5 ; then exit -1 ; fi
+#if ! checkMatchCount 'apClass' graphs-11.sdf 8 ; then exit -1 ; fi
+
 echo "Test 't32' PASSED"
 exit 0

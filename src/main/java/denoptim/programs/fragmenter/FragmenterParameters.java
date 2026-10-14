@@ -86,7 +86,12 @@ public class FragmenterParameters extends RunTimeParameters
      * List of cutting rules sorted by priority.
      */
     List<CuttingRule> cuttingRules;
-    
+
+    /**
+     * Unique identifier of cut operation.
+     */
+    private AtomicInteger nextCutId = null;
+
     /**
      * Number of parallel tasks to run.
      */
@@ -1079,6 +1084,49 @@ public class FragmenterParameters extends RunTimeParameters
     public int getMaxBufferShellSize()
     {
         return maxBufferShellSize;
+    }
+
+//------------------------------------------------------------------------------
+
+    public void setMaxBufferShellSize(int maxBufferShellSize)
+    {
+        this.maxBufferShellSize = maxBufferShellSize;
+    }
+
+//------------------------------------------------------------------------------
+
+    public AtomicInteger getNextCutIdGenerator()
+    {
+        return nextCutId;
+    }
+
+//------------------------------------------------------------------------------
+
+    public void setNextCutIdGenerator(AtomicInteger nextCutIdGenerator)
+    {
+        this.nextCutId = nextCutIdGenerator;
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * @return the next unique identifier of a cut operation.
+     */
+    public Integer getNextCutId()
+    {
+        return nextCutId.getAndIncrement();
+    }
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Restart the counter of the next unique identifier of a cut operation. 
+     * This may breake uniqueness of the cut id, and it is meant to be used
+     * when we are sure the id does not conflict with previous ones.
+     */
+    public void restartNextCutId()
+    {
+        this.nextCutId = new AtomicInteger(0);
     }
 
 //------------------------------------------------------------------------------

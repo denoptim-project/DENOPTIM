@@ -88,14 +88,20 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
     private Edge user;
    
     /**
-     * Identifier of the cut operation that generated this AP
+     * Identifier of the cut operation that generated this AP. -1 if not set.
      */
-    private int cutId;
+    private int cutId = -1;
     
     /**
      * Map of customisable properties
      */
     private Map<Object, Object> properties;
+
+    /**
+     * Property used to record the mapping of {@link AttachmentPoint} upon 
+     * fragmentation based on a template graph.
+     */
+    public static final String APPROPMATCHEDAP = "DENOPTIM_ORIGINAL_AP";
     
     
 //------------------------------------------------------------------------------
@@ -748,23 +754,17 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
                     dirVec,
                     apClass.clone());
         }
+
+        if (cutId != -1)
+        {
+            ap.setCutId(cutId);
+        }
         
         if (properties != null)
         {
             for (Object key : properties.keySet())
             {
-                Object value = properties.get(key);
-                if (!(key instanceof String) || !(value instanceof String))
-                {
-                    throw new IllegalArgumentException("Unable to clone "
-                            + "non-string "
-                            + "property of attachment point (key: '" + key 
-                            + "'). Implement deep cloning of property " 
-                            + properties.get(key).getClass().getName());
-                }
-                String keyStr = ((String) key) + "";
-                String valueStr = ((String) value) + "";
-                ap.setProperty(keyStr, valueStr);
+                ap.setProperty(key, properties.get(key));
             }
         }
         return ap;
@@ -1184,6 +1184,13 @@ public class AttachmentPoint implements Cloneable,Comparable<AttachmentPoint>
     public Map<Object,Object> getProperties()
     {
         return properties;
+    }
+
+//------------------------------------------------------------------------------
+    
+    public void setProperties(Map<Object,Object> properties)
+    {
+        this.properties = properties;
     }
     
 //------------------------------------------------------------------------------

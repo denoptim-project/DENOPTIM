@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,13 +41,17 @@ import denoptim.constants.DENOPTIMConstants;
 import denoptim.exception.DENOPTIMException;
 import denoptim.files.FileFormat;
 import denoptim.files.UndetectedFileFormatException;
+import denoptim.fragspace.FragmentSpace;
 import denoptim.graph.APClass;
 import denoptim.graph.AttachmentPoint;
 import denoptim.graph.DGraph;
 import denoptim.graph.Edge;
+import denoptim.graph.Edge.BondType;
 import denoptim.graph.Fragment;
+import denoptim.graph.GraphPattern;
 import denoptim.graph.Ring;
 import denoptim.graph.Template;
+import denoptim.graph.Template.ContractLevel;
 import denoptim.graph.Vertex;
 import denoptim.graph.Vertex.BBType;
 import denoptim.graph.rings.RingClosingAttractor;
@@ -377,8 +383,7 @@ public class FragmenterTools
         {
             // Fragmentation by template graphs
             fragments = fragmentation(mol, settings.getFragmentationTmpls(), 
-                settings.getMaxBufferShellSize(),
-                settings.getRandomizer(), settings.getLogger());
+                settings);
         } else {
             // Fragmentation by cutting rules
             fragments = fragmentation(mol, settings.getCuttingRules(), 
@@ -390,10 +395,10 @@ public class FragmenterTools
 //-----------------------------------------------------------------------------
     
     /**
-     * Performs fragmentation according to the given cutting rules.
+     * Performs fragmentation according to the given settings.
      * @param input the source of chemical structures.
-     * @param settings configurations including cutting rules and filtration 
-     * criteria.
+     * @param settings configurations including cutting rules, template graphs,
+     * and filtration criteria.
      * @param output the file where to write extracted structures. 
      * @param logger where to direct log messages. This is typically different 
      * from the logger registered in the {@link FragmenterParameters}, which is
@@ -437,6 +442,16 @@ public class FragmenterTools
                 {
                     logger.log(Level.FINE,"Fragmentation produced " 
                             + fragments.size() + " fragments.");
+                }
+                if (settings.getFragmentationTmpls().size()>0)
+                {
+                    // Fragmentation by template records the template AP in
+                    // the properties of the produced APs. Here, we remove 
+                    // that information.
+                    for (Vertex v : fragments)
+                    {
+                        v.clearAttachmentPoints();
+                    }
                 }
                 totalProd += fragments.size();
                 
@@ -506,14 +521,14 @@ public class FragmenterTools
      * @throws DENOPTIMException 
      */
     public static List<Vertex> fragmentation(IAtomContainer mol, 
-            List<DGraph> templates, int maxBufferShellSize, 
-            Randomizer randomizer, Logger logger) 
+            List<DGraph> templates, FragmenterParameters frgParams) 
             throws DENOPTIMException
     { 
         // The best set of fragments is the one with as many fragments that are isomorfic 
-        // // with the template
+        // with the template
         List<Vertex> fragments = new ArrayList<Vertex>();
         int maxNumIsomorfFrgs = -1;
+        DGraph usedTemplate = null;
         for (DGraph templateGraph : templates)
         {
             // Check if the template is connected
@@ -529,7 +544,8 @@ public class FragmenterTools
                         + "template graph and make sure it is connected.");
             }
 
-            ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(logger, randomizer);
+            ThreeDimTreeBuilder tb = new ThreeDimTreeBuilder(frgParams.getLogger(), 
+                frgParams.getRandomizer());
             IAtomContainer templateMol = tb.convertGraphTo3DAtomContainer(templateGraph, 
                 true, true, true);
             
@@ -574,12 +590,16 @@ public class FragmenterTools
 
             // Use the smallest possible template needed to identify the graph topology
             // in the molecular structure.
-            for (int bufferShellSize = 0; bufferShellSize < maxBufferShellSize; bufferShellSize++)
+            if (frgParams.getNextCutIdGenerator() == null)
+            {
+                frgParams.restartNextCutId();
+            }
+            for (int bufferShellSize = 0; bufferShellSize < frgParams.getMaxBufferShellSize(); bufferShellSize++)
             {
                 // Use a reduced templateMol for isomorphism search (faster)
                 IAtomContainer reducedTemplateMol = ttp.getTemplateWithBufferShell(bufferShellSize);
                 List<List<Map<IAtom,IAtom>>> redTmpltoMolMappings = MoleculeUtils.findUniqueAtomMappings(
-                        reducedTemplateMol, mol, logger);
+                        reducedTemplateMol, mol, frgParams.getLogger());
                 
                 // Convert mappings from reducedTemplateMol:mol to templateMol:mol using stored indices
                 List<List<Map<IAtom,IAtom>>> tmplToMolMappings = new ArrayList<>();
@@ -620,23 +640,20 @@ public class FragmenterTools
                 // Try to apply each mapping independently
                 for (List<Map<IAtom,IAtom>> atomMappings : tmplToMolMappings)
                 {
-                    //TODO-gg
-                    System.out.println("atomMappings: " + atomMappings.size());
-
                     Fragment masterFrag = new Fragment(mol, BBType.UNDEFINED);
                     IAtomContainer masterFragIAC = masterFrag.getIAtomContainer();
 
                     // For each atom mapping, replace bonds corresponding to edges 
-                    // (at any embedding level) with attachment points and annotate embedding level.
+                    // with attachment points. Do not enter graph embeddings!
                     for (Map<IAtom,IAtom> atomMapping : atomMappings)
                     {
                         try {
-                            Integer nextCutId = Integer.valueOf(-1);
                             exploreDGraphForMappings(templateGraph, templateMol,
-                                masterFrag, masterFragIAC, mol, atomMapping, nextCutId);
+                                masterFrag, masterFragIAC, mol, atomMapping, frgParams.getNextCutIdGenerator());
                         } catch (Throwable e) {
                             e.printStackTrace();
-                            logger.log(Level.WARNING, "Error while exploring the template graph: " + e.getMessage());
+                            frgParams.getLogger().log(Level.WARNING, 
+                                "Error while exploring the template graph: " + e.getMessage());
                             continue;
                         }
                     }
@@ -666,12 +683,13 @@ public class FragmenterTools
 
                         // Inherit buildong block type from info stored in atoms, if any
                         cloneOfMaster.setBuildingBlockType(BBType.UNDEFINED);
-                        for (IAtom atm : cloneOfMaster.atoms())
+                        for (AttachmentPoint ap : cloneOfMaster.getAttachmentPoints())
                         {
-                            Object bbt = atm.getProperty(MoleculeUtils.ATMPROPBBTYPE);
-                            if (bbt != null && bbt instanceof BBType)
+                            Object objProp = ap.getProperty("DENOPTIM_ORIGINAL_AP");
+                            if (objProp != null)
                             {
-                                cloneOfMaster.setBuildingBlockType((BBType) bbt);
+                                cloneOfMaster.setBuildingBlockType(
+                                    ((AttachmentPoint) objProp).getOwner().getBuildingBlockType());
                                 break;
                             }
                         }
@@ -713,8 +731,108 @@ public class FragmenterTools
             {
                 maxNumIsomorfFrgs = maxNumIsomorfFrgsFromThisTmpl;
                 fragments = fragsFromThisTemplate;
+                usedTemplate = templateGraph;
             }
         }
+
+        if (usedTemplate != null)
+        {
+            // Consider subgraphs embedding
+            Map<Vertex, Vertex> fragsAndReplacingTemplates = new HashMap<>();
+            for (Vertex fragToReplace : fragments)
+            {
+                // Identify the template graph's vertex matched by this new fragment
+                Vertex matchedVrtx = null;
+                for (AttachmentPoint ap : fragToReplace.getAttachmentPoints())
+                {
+                    Object originalAPObj = ap.getProperty("DENOPTIM_ORIGINAL_AP");
+                    if (originalAPObj != null)
+                    {
+                        AttachmentPoint originalAP = (AttachmentPoint) originalAPObj;
+                        if (matchedVrtx!=null)
+                        {
+                            if (matchedVrtx != originalAP.getOwner())
+                            {
+                                throw new IllegalStateException("Multiple matched vertices found for the same fragment. "
+                                    + "This is not possible.");
+                            }
+                        } else {
+                            matchedVrtx = (Vertex) originalAP.getOwner();
+                        }
+                    }
+                }
+
+                if (matchedVrtx !=null && matchedVrtx instanceof Template)
+                {
+                    Template matchedVrtxTmpl = (Template) matchedVrtx;
+                    DGraph innerGraphTmpl = matchedVrtxTmpl.getInnerGraph();
+                    // NB: APs of fragToReplace are projected onto mol property DENOPTIMConstants.APSTAG
+                    // and re-created from scratch on the fragments generated from innerMol.
+                    // To be able to trace them across the transformation that may
+                    // change their order, we temporarily change their APClass to
+                    // make them unique. 
+                    int idx = -1;
+                    final String UNIQUIFIER_SEPARATOR = "_UNIQUIFIER_";
+                    Map<String,AttachmentPoint> unqApToApOnTmplGraph = new HashMap<>();
+                    Map<String,Integer> unqApToCutId = new HashMap<>();
+                    for (AttachmentPoint ap : fragToReplace.getAttachmentPoints())
+                    {
+                        idx++;
+                        String unqApClass = idx + UNIQUIFIER_SEPARATOR + ap.getAPClass().toString();
+                        ap.setAPClass(unqApClass);
+                        unqApToApOnTmplGraph.put(unqApClass, (AttachmentPoint) ap.getProperty(
+                            AttachmentPoint.APPROPMATCHEDAP));
+                        unqApToCutId.put(unqApClass, ap.getCutId());
+                    }
+                    IAtomContainer innerMol = fragToReplace.getIAtomContainer();
+
+                    FragmenterParameters innerFrgParams = new FragmenterParameters();
+                    innerFrgParams.setFragmentationTmpls(Arrays.asList(innerGraphTmpl));
+                    innerFrgParams.setMaxBufferShellSize(frgParams.getMaxBufferShellSize());
+                    innerFrgParams.setRandomizer(frgParams.getRandomizer());
+                    innerFrgParams.setNextCutIdGenerator(frgParams.getNextCutIdGenerator());
+
+                    DGraph innerGraph = makeGraphFromFragmentationOfMol(innerMol, innerFrgParams, new FragmentSpace(), false);
+
+                    Template replacingTemplate = new Template(matchedVrtx.getBuildingBlockType());
+                    replacingTemplate.setInnerGraph(innerGraph);
+                    replacingTemplate.setContractLevel(matchedVrtxTmpl.getContractLevel());
+
+                    // Project ref AP info onto surface APs, which are those that were previously 
+                    // uniquified, so their APClass needs to be restored.
+                    for (AttachmentPoint surfaceAP : replacingTemplate.getAttachmentPoints())
+                    {
+                        AttachmentPoint innerAP = replacingTemplate.getInnerAPFromOuterAP(surfaceAP);
+
+                        // Restore the APClass from the uniquified one
+                        String uniquifiedAPClass = surfaceAP.getAPClass().toString();
+                        String restoredApClass = uniquifiedAPClass.split(UNIQUIFIER_SEPARATOR)[1];
+                        surfaceAP.setAPClass(restoredApClass);
+                        innerAP.setAPClass(restoredApClass);
+
+                        // Map template AP onto the surface AP for edge creation
+                        surfaceAP.setProperty("DENOPTIM_ORIGINAL_AP", 
+                            unqApToApOnTmplGraph.get(uniquifiedAPClass));
+                        surfaceAP.setCutId(unqApToCutId.get(uniquifiedAPClass));
+                    }
+
+                    // Store the pair of vertices to be swapped
+                    fragsAndReplacingTemplates.put(fragToReplace, replacingTemplate);
+                }
+            }
+
+            // Replace fragments with templates
+            for (Map.Entry<Vertex, Vertex> entry : fragsAndReplacingTemplates.entrySet())
+            {
+                Vertex fragToBeReplaced = entry.getKey();
+                Vertex replacingTemplate = entry.getValue();
+
+                int idx = fragments.indexOf(fragToBeReplaced);
+                fragments.remove(idx);
+                fragments.add(idx, replacingTemplate);
+            }
+        }
+
         return fragments;
     }
 
@@ -726,30 +844,19 @@ public class FragmenterTools
      * 
      * TODO: 
      * 2) deal with multihapticity.
-     * 3) Template embedding
      */
-    private static int exploreDGraphForMappings(DGraph graph, IAtomContainer graphIAC, 
+    private static void exploreDGraphForMappings(DGraph graph, IAtomContainer graphIAC, 
         Fragment masterFrag, IAtomContainer masterFragIAC, IAtomContainer mol,
-        Map<IAtom,IAtom> graphToMolMapping, int cutId) 
+        Map<IAtom,IAtom> graphToMolMapping, AtomicInteger cutIdGenerator) 
         throws DENOPTIMException
     {
-
-        //TODO-gg del
-        try {
-            DenoptimIO.writeMol2File("/tmp/mol.sdf", mol, false);
-            DenoptimIO.writeMol2File("/tmp/graphIAC.sdf", graphIAC, false);
-            DenoptimIO.writeMol2File("/tmp/masterFragIAC.sdf", masterFragIAC, false);
-            DenoptimIO.writeGraphToFile(new File("/tmp/g.sdf"), FileFormat.GRAPHSDF, graph);
-        } catch (DENOPTIMException e) {
-            e.printStackTrace();
-        }
-
         // ID used to rebuild the edges following the graph used to identify bonds to cut.
         List<Vertex> usedRCVs = graph.getUsedRCVertices();
         Set<Vertex> visitedRCVs = new HashSet<>();
+        int cutId = cutIdGenerator.getAndIncrement();
         for (Edge edge : graph.getEdgeList())
         {
-            cutId++;
+            cutId = cutIdGenerator.getAndIncrement();
 
             // Since we do not add RCVs we must consider edges to used RCVs only once, or
             // we'll be adding APs twice: once per each RCV. So, to do it only once we
@@ -762,11 +869,15 @@ public class FragmenterTools
 
             ObjectPair srcPair = getAtomIdxforAP(edge.getSrcAP(), graph, usedRCVs);
             int srcAtmIdx = (Integer) srcPair.getFirst();
-            APClass srcAPClass = (APClass) srcPair.getSecond();
+            AttachmentPoint srcAPPossiblyThroughRing = (AttachmentPoint) srcPair.getSecond();
+            APClass srcAPClass = srcAPPossiblyThroughRing.getAPClass();
+            BBType srcBBType = srcAPPossiblyThroughRing.getOwner().getBuildingBlockType();
 
             ObjectPair trgPair = getAtomIdxforAP(edge.getTrgAP(), graph, usedRCVs);
             int trgAtmIdx = (Integer) trgPair.getFirst();
-            APClass trgAPClass = (APClass) trgPair.getSecond();
+            AttachmentPoint trgAPPossiblyThroughRing = (AttachmentPoint) trgPair.getSecond();
+            APClass trgAPClass = trgAPPossiblyThroughRing.getAPClass();
+            BBType trgBBType = trgAPPossiblyThroughRing.getOwner().getBuildingBlockType();
 
             IAtom graphAtmSrc = graphIAC.getAtom(srcAtmIdx);
             IAtom graphAtmTrg = graphIAC.getAtom(trgAtmIdx);
@@ -779,15 +890,6 @@ public class FragmenterTools
             IAtom masterFragAtmSrc = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmSrc)));
             IAtom masterFragAtmTrg = masterFragIAC.getAtom(mol.indexOf(graphToMolMapping.get(graphAtmTrg)));
 
-            // Flag the atoms to trace building block type
-            recordBBIdAndType(masterFragAtmSrc, edge.getSrcAP());
-            recordBBIdAndType(masterFragAtmTrg, edge.getTrgAP());
-
-            //TODO-gg del
-            System.out.println("cutId: " + cutId + " " 
-                + MoleculeUtils.getAtomRef(masterFragAtmSrc, masterFragIAC) + "(" + srcAPClass + ") "
-                + MoleculeUtils.getAtomRef(masterFragAtmTrg, masterFragIAC) + "(" + trgAPClass + ") ");
-            
             IBond bnd = masterFragIAC.getBond(masterFragAtmSrc, masterFragAtmTrg);
             if (bnd != null)
             {
@@ -798,22 +900,16 @@ public class FragmenterTools
                 srcAPClass, 
                 MoleculeUtils.getPoint3d(masterFragAtmTrg));
             srcAP.setCutId(cutId);
+            srcAP.setProperty(AttachmentPoint.APPROPMATCHEDAP, srcAPPossiblyThroughRing);
             AttachmentPoint trgAP = masterFrag.addAPOnAtom(masterFragAtmTrg, 
                 trgAPClass, 
                 MoleculeUtils.getPoint3d(masterFragAtmSrc));
             trgAP.setCutId(cutId);
+            trgAP.setProperty(AttachmentPoint.APPROPMATCHEDAP, trgAPPossiblyThroughRing);
         }
 
         for (Vertex v : graph.getVertexList())
         {
-            if (v instanceof Template)
-            {
-                DGraph innerGraph = ((Template) v).getInnerGraph();
-                cutId = exploreDGraphForMappings(innerGraph, graphIAC, masterFrag, masterFragIAC, mol,
-                     graphToMolMapping, cutId);
-                continue;
-            }
-
             // Deal with vertexes without edges, i.e., free APs
             for (AttachmentPoint ap : v.getAttachmentPoints())
             {
@@ -829,33 +925,9 @@ public class FragmenterTools
                     graphIAC, masterFragIAC, mol, graphToMolMapping);
 
                 // Make the free AP on the master
-                masterFrag.addAPOnAtom(masterFragAtmSrc, ap.getAPClass(), apHead);
-
-                //TODO-gg del
-                System.out.println("freeAP: " 
-                    + MoleculeUtils.getAtomRef(masterFragAtmSrc, masterFragIAC) + "(" + ap.getAPClass().toString() + ") ");
-        
+                AttachmentPoint apOnMasterFrag = masterFrag.addAPOnAtom(masterFragAtmSrc, ap.getAPClass(), apHead);
+                apOnMasterFrag.setProperty(AttachmentPoint.APPROPMATCHEDAP, ap);
             }
-        }
-        return cutId;
-    }
-
-//------------------------------------------------------------------------------
-
-    @SuppressWarnings("unchecked")
-    private static void recordBBIdAndType(IAtom atm, AttachmentPoint ap)
-    {
-        ObjectPair info = new ObjectPair(ap.getOwner().hashCode(), ap.getOwner().getBuildingBlockType());
-        if (atm.getProperty(MoleculeUtils.ATMPROPBBTYPE) != null)
-        {
-            List<ObjectPair> existing = (List<ObjectPair>) atm.getProperty(MoleculeUtils.ATMPROPBBTYPE);
-            if (!existing.contains(info))
-            {
-                existing.add(info);
-            }
-        } else {
-            atm.setProperty(MoleculeUtils.ATMPROPBBTYPE,
-                new ArrayList<ObjectPair>(Arrays.asList(info)));
         }
     }
 
@@ -896,7 +968,7 @@ public class FragmenterTools
         AttachmentPoint ap, DGraph templateGraph, List<Vertex> usedRCVs)
     {
         int atmIdx = ap.getAtomPositionNumberInMol();
-        APClass apClass = ap.getAPClass();
+        AttachmentPoint apPossiblyThroughRing = ap;
         Vertex apOwnerVrt = ap.getOwner();
         if (apOwnerVrt.isRCV() && usedRCVs.contains(apOwnerVrt))
         {
@@ -912,15 +984,15 @@ public class FragmenterTools
                 AttachmentPoint linkedAP = ring.getTailVertex().getAttachmentPoints().get(
                     0).getLinkedAP();
                 atmIdx = linkedAP.getAtomPositionNumberInMol();
-                apClass = linkedAP.getAPClass();
+                apPossiblyThroughRing = linkedAP;
             } else {
                 AttachmentPoint linkedAP = ring.getHeadVertex().getAttachmentPoints().get(
                     0).getLinkedAP();
                 atmIdx = linkedAP.getAtomPositionNumberInMol();
-                apClass = linkedAP.getAPClass();
+                apPossiblyThroughRing = linkedAP;
             }
         }
-        return new ObjectPair(atmIdx, apClass);
+        return new ObjectPair(atmIdx, apPossiblyThroughRing);
     }
 
 //------------------------------------------------------------------------------
@@ -2151,4 +2223,256 @@ public class FragmenterTools
     
 //------------------------------------------------------------------------------
  
+    /**
+     * Converts a molecule into a {@link DGraph} by fragmentation and 
+     * re-assembling of the fragments.
+     * @param mol the molecule to convert
+     * @param frgParams the parameters for the fragmentation.
+     * @param fragSpace the definition of the fragment space to consider when
+     * generating fragments.
+     * @param cleanupAPProperties if <code>true</code>, the AP properties are
+     * cleaned up after the fragmentation.
+     * @return the graph.
+     * @throws DENOPTIMException 
+     */
+    public static DGraph makeGraphFromFragmentationOfMol(IAtomContainer mol,
+        FragmenterParameters frgParams, FragmentSpace fragSpace,
+        boolean cleanupAPProperties) throws DENOPTIMException
+    {
+        double linearAngleLimit = frgParams.getLinearAngleLimit();
+        boolean embedRingsInTemplates = frgParams.embedRingsInTemplate();
+        ContractLevel ringTmplContract = frgParams.getEmbeddedRingsContract();
+        ScaffoldingPolicy scaffoldingPolicy = frgParams.getScaffoldingPolicy();
+        
+        boolean fragmentationByTemplateGraph = frgParams.getFragmentationTmpls().size()>0;
+
+        // Fragmentation also records properties in the APs and Atoms as to
+        // allow reconstruction of the appropriate edges and assignation of
+        // building block types.
+        List<Vertex> fragments = fragmentation(mol, frgParams);
+
+        for (Vertex v : fragments)
+        {
+            // For Templates this has been done in deeper recursions
+            if (v instanceof Fragment)
+            {
+                Fragment frag = (Fragment) v;
+                
+                // This is done to set the symmetry relations in each vertex
+                frag.updateAPs();
+                
+                // Add linearity-breaking dummy atoms
+                DummyAtomHandler.addDummiesOnLinearities(frag, linearAngleLimit);
+            }
+        }
+        if (fragments.size()==0)
+        {
+            throw new DENOPTIMException("Fragmentation of molecule with "
+                    + mol.getAtomCount() + " atoms produced 0 fragments.");
+        }
+        
+        // Define which fragment is the scaffold
+        Vertex firstVertex = null;
+        if (fragmentationByTemplateGraph)
+        {
+            for (Vertex v : fragments)
+            {
+                if (v.getBuildingBlockType() == BBType.SCAFFOLD)
+                {
+                    firstVertex = v;
+                    break;
+                }
+            }
+            if (firstVertex==null)
+            {
+                firstVertex = fragments.get(0);
+            }
+        } else {
+            switch (scaffoldingPolicy)
+            {
+                case ELEMENT:
+                {
+                    for (Vertex v : fragments)
+                    {
+                        if (v instanceof Fragment)
+                        {
+                            boolean setAsScaffold = false;
+                            IAtomContainer iac = v.getIAtomContainer();
+                            for (IAtom atm : iac.atoms())
+                            {
+                                if (scaffoldingPolicy.label.equals(
+                                        MoleculeUtils.getSymbolOrLabel(atm)))
+                                {
+                                    setAsScaffold = true;
+                                    break;
+                                }
+                            }
+                            if (setAsScaffold)
+                            {
+                                firstVertex = v;
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+
+                default:
+                case LARGEST_FRAGMENT:
+                {
+                    try {
+                        firstVertex = fragments.stream()
+                                .max(Comparator.comparing(
+                                        Vertex::getHeavyAtomsCount))
+                                .get();
+                    } catch (Exception e)
+                    {
+                        throw new DENOPTIMException("Cannot get largest fragment "
+                                + "among " + fragments.size() + " fragments.", e);
+                    }
+                    break;
+                }
+            }
+            if (firstVertex==null)
+            {
+                throw new DENOPTIMException("No fragment matches criteria to be "
+                        + "identified as the " 
+                        + BBType.SCAFFOLD.toString().toLowerCase() + ".");
+            } else {
+                firstVertex.setBuildingBlockType(BBType.SCAFFOLD);
+            }
+        }
+        
+        // Build the graph
+        DGraph graph = new DGraph();
+        graph.addVertex(firstVertex);
+        AtomicInteger vId = new AtomicInteger(1);
+        for (int i=1; i<fragments.size(); i++)
+        {
+            appendVertexesToGraphFollowingCutIds(graph, vId, fragments);
+        }
+
+        // Set symmetry relations: these depend on which scaffold we have chosen
+        graph.detectSymVertexSets();
+        
+        // Identify capping groups, i.e., fragments that reflect the capping 
+        // groups found in the fragment space, if any.
+        if (fragSpace!=null && fragSpace.getCappingMap()!=null)
+        {
+            for (Vertex v : graph.getVertexList())
+            {
+                if (v.getAttachmentPoints().size()!=1 || v.isRCV())
+                    continue;
+                
+                APClass srcAPC = v.getAP(0).getLinkedAPThroughout().getAPClass();
+                APClass capAPC = fragSpace.getAPClassOfCappingVertex(srcAPC);
+                Vertex cap = fragSpace.getCappingVertexWithAPClass(capAPC);
+                if (cap==null)
+                    continue;
+                
+                if (!(v instanceof Fragment && cap instanceof Fragment))
+                    continue;
+                    
+                Fragment f = (Fragment) v;
+                // NB: here we ignore APClasses and Du atoms
+                if (f.isIsomorphicTo(cap, true))
+                {
+                    v.setBuildingBlockType(BBType.CAP);
+                    v.getAP(0).setAPClass(capAPC);
+                }
+            }
+        }
+
+        if (embedRingsInTemplates && !fragmentationByTemplateGraph)
+        {
+            try {
+                graph = graph.embedPatternsInTemplates(GraphPattern.RING, 
+                        fragSpace, ringTmplContract);
+            } catch (DENOPTIMException e) {
+                graph.cleanup();
+                throw new DENOPTIMException("Unable to embed patterns in templates.", e);
+            }
+        }
+
+        if (cleanupAPProperties)
+        {
+            graph.clearAttachmentPoints();
+        }
+        
+        return graph;
+    }
+    
+//------------------------------------------------------------------------------
+    
+    private static void appendVertexesToGraphFollowingCutIds(DGraph graph,
+            AtomicInteger vId, List<Vertex> vertexes) throws DENOPTIMException
+    {
+        // We seek for the last and non-RCV vertex added to the graph
+        Vertex lastlyAdded = null;
+        for (int i=-1; i>-4; i--)
+        {
+            lastlyAdded = graph.getVertexList().get(
+                    graph.getVertexList().size()+i);
+            if (!lastlyAdded.isRCV())
+                break;
+        }
+        for (AttachmentPoint apI : lastlyAdded.getAttachmentPoints())
+        {
+            if (!apI.isAvailable() || apI.getCutId()==-1)
+                continue;
+
+            for (int j=0; j<vertexes.size(); j++)
+            {
+                Vertex fragJ = vertexes.get(j);
+                
+                boolean ringClosure = false;
+                if (graph.containsVertex(fragJ))
+                {   
+                    ringClosure = true;
+                }
+                for (AttachmentPoint apJ : fragJ.getAttachmentPoints())
+                {
+                    if (apI==apJ)
+                        continue;
+
+                    if (!apI.isAvailable() || !apJ.isAvailable())
+                        continue;
+
+                    if (apJ.getCutId()==-1)
+                        continue;
+
+                    if (apI.getCutId()==apJ.getCutId())
+                    {
+                        if (ringClosure)
+                        {
+                            Vertex rcvI = getRCVForAP(apI,
+                                    APClass.make(APClass.ATPLUS, 0, 
+                                            BondType.ANY));
+                            rcvI.setBuildingBlockType(BBType.FRAGMENT);
+                            rcvI.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apI, rcvI.getAP(0));
+                            
+                            Vertex rcvJ = getRCVForAP(apJ,
+                                    APClass.RCACLASSMINUS);
+                            rcvJ.setBuildingBlockType(BBType.FRAGMENT);
+                            rcvJ.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apJ, rcvJ.getAP(0));
+                            graph.addRing(rcvI, rcvJ);
+                        } else {
+                            fragJ.setBuildingBlockType(BBType.FRAGMENT);
+                            fragJ.setVertexId(vId.getAndIncrement());
+                            graph.appendVertexOnAP(apI, apJ);
+                            
+                            // Recursion into the branch of the graph that is
+                            // rooted onto the lastly added vertex
+                            appendVertexesToGraphFollowingCutIds(graph, vId, 
+                                    vertexes);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 }

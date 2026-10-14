@@ -553,6 +553,20 @@ public class Template extends Vertex
         invalidateOuterAPCache();
     }
 
+
+
+//------------------------------------------------------------------------------
+
+    /**
+     * Clears the attachment points of the vertex.
+     */
+    @Override
+    public void clearAttachmentPoints()
+    {
+        super.clearAttachmentPoints();
+        innerGraph.clearAttachmentPoints();
+    }
+
 //-----------------------------------------------------------------------------
     
     /**

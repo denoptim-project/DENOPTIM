@@ -368,6 +368,24 @@ public abstract class RunTimeParameters
             innerParams.setLogger(logger);
         }
     }
+
+//-----------------------------------------------------------------------------
+
+    /**
+     * Points this parameter collection, and any nested collections, at the
+     * given logger. Meant for a collector built by hand, rather than one that
+     * already inherited the logger from {@link #startProgramSpecificLogger}.
+     * A {@code null} logger is ignored, so the current logger is kept.
+     * @param logger the logger to use.
+     */
+    public void adoptLogger(Logger logger)
+    {
+        if (logger == null)
+        {
+            return;
+        }
+        setLogger(logger);
+    }
     
 //-----------------------------------------------------------------------------
     

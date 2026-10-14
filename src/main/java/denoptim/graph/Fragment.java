@@ -617,8 +617,7 @@ public class Fragment extends Vertex
 			    String[] moreAPonThisAtm = onThisAtm.split(
 			    		DENOPTIMConstants.SEPARATORAPPROPAPS);
 			    
-			    AttachmentPoint ap = 
-			    		new AttachmentPoint(this, moreAPonThisAtm[0]);
+			    AttachmentPoint ap = new AttachmentPoint(this, moreAPonThisAtm[0]);
 			    
 			    int atmID = ap.getAtomPositionNumber();
 			    //WARNING the atmID is already 0-based
@@ -636,8 +635,7 @@ public class Fragment extends Vertex
 			} 
 			else 
 			{
-			    AttachmentPoint ap = 
-			    		new AttachmentPoint(this, onThisAtm);
+			    AttachmentPoint ap = new AttachmentPoint(this, onThisAtm);
 			    lstAPs.add(ap);
 			}
 	    }
@@ -674,8 +672,7 @@ public class Fragment extends Vertex
             } 
             else
             {
-                ArrayList<AttachmentPoint> aps = 
-                        new ArrayList<AttachmentPoint>();
+                ArrayList<AttachmentPoint> aps = new ArrayList<AttachmentPoint>();
                 aps.add(ap);
                 
                 atm.setProperty(DENOPTIMConstants.ATMPROPAPS,aps);
@@ -692,7 +689,6 @@ public class Fragment extends Vertex
      */
     public void projectAPsToProperties()
     {
-        
         // Prepare the string-representation of unused APs on this graph
         LinkedHashMap<Integer,List<AttachmentPoint>> apsPerAtom =
                 new LinkedHashMap<>();
@@ -743,8 +739,8 @@ public class Fragment extends Vertex
             e1.printStackTrace();
         }
     	
-    	// WARNING: here we are not recovering all info from APs: we take only
-    	// some info. This can be improved...
+    	// WARNING: here we do not clone the ap because the cloning 
+        // would greate an AP owned by the original vertex, which is not what we want.
         for (AttachmentPoint ap : lstAPs)
         {
             AttachmentPoint cAp = new AttachmentPoint(clone,
@@ -753,6 +749,15 @@ public class Fragment extends Vertex
                     ap.getAPClass());
             cAp.setCutId(ap.getCutId());
             cAp.setID(ap.getID());
+            cAp.setProperties(ap.getProperties());
+            Map<Object, Object> properties = ap.getProperties();
+            if (properties != null)
+            {
+                for (Object key : properties.keySet())
+                {
+                    cAp.setProperty(key, properties.get(key));
+                }
+            }   
             clone.lstAPs.add(cAp);
         }
         
