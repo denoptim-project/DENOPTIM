@@ -35,14 +35,48 @@
         },
         {
             "type": "java",
-            "name": "Run test M2G 32-4",
+            "name": "GUI display graph",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "test/functional_tests/t1/input/Mol9.sdf"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "GUI display vertexes",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "/tmp/frags.sdf"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test t25",
+            "projectName": "denoptim",
+            "request": "launch",
+            "mainClass": "denoptim.main.Main",
+            "args": [
+                "-r", "fit", "t25.params"
+            ],
+            "cwd": "/tmp/denoptim_test/t25",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "Run test M2G t32-4",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
                 "-r", "M2G", "t32-4.params"
             ],
-            "cwd": "/tmp/t32",
+            "cwd": "/tmp/denoptim_test/t32",
             "console": "integratedTerminal"
         },
         {
@@ -61,15 +95,15 @@
         },
         {
             "type": "java",
-            "name": "Run test M2G_L",
+            "name": "POLYCYCLE test",
             "projectName": "denoptim",
             "request": "launch",
             "mainClass": "denoptim.main.Main",
             "args": [
-                "-r", "M2G", "Mol1_L_1_1_1_m2g.par"
+                "-r", "GA", "GA.params"
             ],
-            "cwd": "/tmp/m2g_L",
+            "cwd": "/tmp/polycycle/run_1",
             "console": "integratedTerminal"
-        },
+        }
     ]
 }
